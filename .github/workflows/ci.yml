@@ -1,0 +1,81 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Python
+        run: uv python install 3.14.5
+
+      - name: Sync dependencies
+        run: uv sync --all-groups
+
+      - name: Ruff check
+        run: uv run ruff check .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Mypy
+        run: uv run mypy src tests
+
+      - name: Pyright
+        run: uv run pyright
+
+      - name: Import boundary contracts
+        run: uv run lint-imports
+
+  unit-tests:
+    name: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Python
+        run: uv python install 3.14.5
+
+      - name: Sync dependencies
+        run: uv sync --all-groups
+
+      - name: Run fast tests
+        run: uv run pytest tests/ -m "not slow and not integration"
+
+  integration-smoke:
+    name: integration-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Python
+        run: uv python install 3.14.5
+
+      - name: Sync dependencies
+        run: uv sync --all-groups
+
+      - name: Run code-quality and integration tests
+        run: uv run pytest tests/code_quality tests/integration -q
