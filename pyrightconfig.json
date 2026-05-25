@@ -1,0 +1,12 @@
+{
+  "include": ["src", "tests"],
+  "pythonVersion": "3.14",
+  "typeCheckingMode": "strict",
+  "reportMissingTypeStubs": "warning",
+  "reportUnknownMemberType": "error",
+  "reportUnknownArgumentType": "error",
+  "reportUnknownVariableType": "error",
+  "reportUnusedImport": "error",
+  "reportUnusedVariable": "error",
+  "reportUnnecessaryTypeIgnoreComment": "error"
+}

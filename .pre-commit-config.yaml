@@ -1,0 +1,37 @@
+minimum_pre_commit_version: "4.2.0"
+fail_fast: false
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: mypy
+        name: mypy strict
+        entry: uv run mypy src tests
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: pyright
+        name: pyright strict
+        entry: uv run pyright
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: pytest-code-quality
+        name: code quality tests
+        entry: uv run pytest tests/code_quality -q
+        language: system
+        pass_filenames: false
+      - id: import-linter
+        name: import boundary contracts
+        entry: uv run lint-imports
+        language: system
+        pass_filenames: false
