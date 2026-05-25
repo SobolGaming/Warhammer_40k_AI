@@ -1,6 +1,3 @@
-mkdir -p .github
-
-cat > .github/pull_request_template.md <<'EOF'
 ## Purpose
 
 What invariant, module, or behavior does this PR introduce/change?
