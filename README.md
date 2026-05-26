@@ -58,10 +58,19 @@ warhammer40k_core/
     attributes.py
     modifiers.py
     wargear.py
+    weapon_profiles.py
     model.py
     unit.py
     attached_unit.py
+    unit_group.py
     battlefield.py
+    objectives.py
+    deployment_zones.py
+    datasheet.py
+    army_catalog.py
+    faction.py
+    detachment.py
+    ruleset_descriptor.py
   geometry/
     pose.py
     base.py
@@ -71,18 +80,33 @@ warhammer40k_core/
     pathing.py
   rules/
     text_normalization.py
+    parsed_tokens.py
+    source_data.py
+    source_catalog.py
+    data_package.py
     descriptors.py
     timing.py
     effects.py
     registry.py
   engine/
-    decision.py
+    decision_request.py
+    decision_result.py
     decision_queue.py
+    decision_controller.py
     decision_record.py
     event_log.py
     replay.py
     validation.py
+    lifecycle.py
+    game_state.py
+    setup_flow.py
+    battle_round_flow.py
+    phase.py
+    army_mustering.py
+    unit_factory.py
+    list_validation.py
     phases/
+      command.py
       movement.py
       shooting.py
       charge.py
@@ -507,7 +531,179 @@ Invariants:
 - engine validates every result;
 - engine alone mutates authoritative state.
 
-### Phase 10: movement vertical slice
+### Phase 9A: catalog, content provenance, and sequence descriptors
+
+This phase exists after the completed Phase 1-9 foundation. It adds the source
+catalog, datasheet/faction catalog definitions, canonical content fixtures, and
+setup/battle sequence descriptors needed before lifecycle and mustering are
+implemented.
+
+Modules:
+
+- `rules/source_catalog.py`
+- `rules/data_package.py`
+- `rules/source_data.py`
+- `core/datasheet.py`
+- `core/army_catalog.py`
+- `core/faction.py`
+- `core/detachment.py`
+- `core/ruleset_descriptor.py`
+
+Objects:
+
+- `DataPackageId`
+- `SourceDocumentId`
+- `RuleSourceText`
+- `RulesetBundle`
+- `CatalogVersion`
+- `DatasheetDefinition`
+- `ModelProfileDefinition`
+- `UnitCompositionDefinition`
+- `DatasheetKeywordSet`
+- `DatasheetWargearOption`
+- `DatasheetAbilityDescriptor`
+- `FactionDefinition`
+- `DetachmentDefinition`
+- `ArmyRuleDefinition`
+- `EnhancementDefinition`
+- `StratagemDefinition`
+- `SetupSequenceDescriptor`
+- `BattlePhaseSequenceDescriptor`
+
+Catalog definitions may include real source facts as soon as the schema exists:
+
+- movement, toughness, save, wounds, leadership, objective control;
+- weapon skill and ballistic skill;
+- base size and model profile composition;
+- keywords and faction keywords;
+- default wargear and legal wargear options;
+- source-linked ability text and inert ability descriptors.
+
+Invariants:
+
+- all source data has deterministic source IDs;
+- source package identity is explicit;
+- raw rule text is normalized once at the data boundary;
+- no runtime rule handler consumes unnormalized text;
+- unsupported source shapes fail during ingest;
+- datasheet facts are immutable catalog definitions;
+- catalog definitions do not mutate battlefield state;
+- runtime unit instances are not source data;
+- ability descriptors are not executable handlers;
+- unsupported abilities remain explicit unsupported descriptors;
+- faction and detachment selection is data, not behavior;
+- setup and battle phase order are explicit policy data, not driver-local enum arithmetic.
+
+Add a tiny canonical content pack before broad content import. It should include
+infantry, a character leader, a transport, a vehicle or monster, and a deep-strike
+unit so engine contract tests use real fixtures instead of ad hoc objects.
+
+### Phase 9B: authoritative game lifecycle
+
+Modules:
+
+- `engine/lifecycle.py`
+- `engine/game_state.py`
+- `engine/setup_flow.py`
+- `engine/battle_round_flow.py`
+- `engine/phase.py`
+- `engine/phases/command.py`
+
+Objects:
+
+- `GameLifecycle`
+- `GameState`
+- `GameLifecycleStage`
+- `SetupStep`
+- `BattlePhase`
+- `LifecycleStatus`
+- `PhaseHandler`
+
+Top-level setup order is explicit:
+
+```text
+MUSTER_ARMIES
+SELECT_MISSION
+CREATE_BATTLEFIELD
+DETERMINE_ATTACKER_DEFENDER
+DECLARE_BATTLE_FORMATIONS
+DEPLOY_ARMIES
+REDEPLOY_UNITS
+RESOLVE_PREBATTLE_ACTIONS
+DETERMINE_FIRST_TURN
+```
+
+Battle round order is explicit:
+
+```text
+COMMAND
+MOVEMENT
+SHOOTING
+CHARGE
+FIGHT
+```
+
+`GameLifecycle` owns the single authoritative clock:
+
+```text
+start(config)
+advance_until_decision_or_terminal()
+submit_decision(result)
+```
+
+Invariants:
+
+- one engine-owned setup-to-battle state machine;
+- setup sequence is explicit policy data, not duplicated driver code;
+- battle phase order is command, movement, shooting, charge, fight;
+- phase wrap switches the active player;
+- battle round increments only after every player has completed the fight phase;
+- lifecycle advances only through engine commands and decision results;
+- UI, headless, replay, and network do not own phase progression;
+- unsupported phase bodies fail explicitly or return typed unsupported results;
+- all lifecycle state is deterministic and serializable.
+
+Required tests:
+
+- new game starts at `MUSTER_ARMIES`;
+- setup steps advance in order;
+- setup completion enters battle round 1 command phase;
+- battle phases advance command, movement, shooting, charge, fight;
+- phase wrap switches the active player;
+- battle round increments after all players complete fight phase;
+- lifecycle stops at a `DecisionRequest`;
+- no UI or headless-specific phase path exists.
+
+### Phase 9C: army mustering and runtime instantiation
+
+Modules:
+
+- `engine/army_mustering.py`
+- `engine/unit_factory.py`
+- `engine/list_validation.py`
+
+Objects:
+
+- `ArmyMusterRequest`
+- `ArmyDefinition`
+- `UnitInstance`
+- `ModelInstance`
+- `WargearSelection`
+- `DetachmentSelection`
+
+Invariants:
+
+- mustering consumes catalog definitions and produces runtime instances;
+- runtime units keep stable links back to datasheet and source IDs;
+- all selected wargear is legal for the datasheet;
+- all model profiles and base sizes are resolved before battlefield placement;
+- faction, detachment, enhancement, and stratagem selections are validated as data;
+- invalid or unsupported list content fails explicitly.
+
+### Phase 10: movement phase body vertical slice
+
+This phase fills the movement phase body behind the Phase 9B lifecycle. It does
+not own turn or phase progression.
 
 Implement:
 
@@ -517,6 +713,8 @@ Implement:
 - reroll decision;
 - move models;
 - path witness;
+- datasheet Movement and keyword consumption;
+- movement ability descriptors for supported timing windows;
 - unit status update;
 - objective update;
 - event log;
@@ -535,7 +733,11 @@ MOVE_UNIT
 
 No next `SELECT_UNIT` may be queued before the movement activation terminal event.
 
-### Phase 11: shooting vertical slice
+### Phase 11: shooting phase body vertical slice
+
+This phase fills the shooting phase body behind the Phase 9B lifecycle. It
+consumes datasheet ballistic skill, weapon profiles, ranged keywords, and
+shooting ability descriptors only through structured catalog data.
 
 Implement:
 
@@ -550,7 +752,11 @@ Implement:
 - event log;
 - replay.
 
-### Phase 12: charge and fight vertical slice
+### Phase 12: charge and fight phase body vertical slice
+
+This phase fills the charge and fight phase bodies behind the Phase 9B lifecycle.
+It consumes melee profiles, weapon skill, charge policy descriptors, and
+charge/fight ability descriptors only through structured catalog data.
 
 Implement:
 
@@ -573,9 +779,11 @@ blocking_parent = true
 resume_parent_after_resolution = true
 ```
 
-### Phase 13: deployment, reserves, transports
+### Phase 13: richer deployment, reserves, transports, and pre-battle abilities
 
-Implement after movement/pathing exists:
+The lifecycle slots for deployment, redeploy, pre-battle actions, and battle
+round entry exist in Phase 9B. This phase fills the advanced behavior in those
+slots after movement/pathing and unit instantiation exist.
 
 - deployment;
 - Scout;
@@ -584,7 +792,34 @@ Implement after movement/pathing exists:
 - deep strike;
 - embark;
 - disembark;
-- destroyed transport disembark.
+- destroyed transport disembark;
+- transport capacity restrictions;
+- leader attachment constraints;
+- reserve restriction validation.
+
+### Phase 14: broad content import and ability handler expansion
+
+Bring in wider faction, detachment, codex, and core-rules content only after the
+owning schema, lifecycle slot, and phase pipeline exist.
+
+Invariants:
+
+- load real facts as soon as the schema exists;
+- instantiate real units only through mustering;
+- execute rules only in the owning phase or timing-window handler;
+- source text remains linked to structured descriptors;
+- unsupported ability shapes remain explicit unsupported descriptors;
+- no raw codex text is parsed by runtime engine code.
+
+Handler examples:
+
+- movement handlers for Advance, Fall Back, FLY, and movement modifiers;
+- shooting handlers for Sustained Hits, Melta, Rapid Fire, Heavy, Blast, Torrent,
+  Lethal Hits, Devastating Wounds, and Pistol;
+- charge and fight handlers for charge bonuses, Fight First, fight-on-death,
+  pile-in, consolidate, and melee weapon abilities;
+- deployment and pre-battle handlers for Deep Strike, Infiltrators, Scouts,
+  reserves, transports, and redeploy effects.
 
 ## 5. Test policy
 

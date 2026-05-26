@@ -1,0 +1,304 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Self, TypedDict
+
+
+class DetachmentCatalogError(ValueError):
+    """Raised when detachment catalog data violates CORE V2 invariants."""
+
+
+class EnhancementDefinitionPayload(TypedDict):
+    enhancement_id: str
+    name: str
+    source_id: str
+    points: int | None
+    ability_descriptor_ids: list[str]
+
+
+class StratagemDefinitionPayload(TypedDict):
+    stratagem_id: str
+    name: str
+    source_id: str
+    command_point_cost: int
+    timing_tags: list[str]
+    ability_descriptor_ids: list[str]
+
+
+class DetachmentDefinitionPayload(TypedDict):
+    detachment_id: str
+    name: str
+    faction_id: str
+    rule_source_ids: list[str]
+    enhancement_ids: list[str]
+    stratagem_ids: list[str]
+    source_ids: list[str]
+
+
+@dataclass(frozen=True, slots=True)
+class EnhancementDefinition:
+    enhancement_id: str
+    name: str
+    source_id: str
+    points: int | None = None
+    ability_descriptor_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_unprefixed_identifier(
+                "EnhancementDefinition enhancement_id",
+                self.enhancement_id,
+                "enhancement:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("EnhancementDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("EnhancementDefinition source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "points",
+            _validate_optional_non_negative_int("EnhancementDefinition points", self.points),
+        )
+        object.__setattr__(
+            self,
+            "ability_descriptor_ids",
+            _validate_identifier_tuple(
+                "EnhancementDefinition ability_descriptor_ids",
+                self.ability_descriptor_ids,
+            ),
+        )
+
+    def stable_identity(self) -> str:
+        return f"enhancement:{self.enhancement_id}"
+
+    def to_payload(self) -> EnhancementDefinitionPayload:
+        return {
+            "enhancement_id": self.enhancement_id,
+            "name": self.name,
+            "source_id": self.source_id,
+            "points": self.points,
+            "ability_descriptor_ids": list(self.ability_descriptor_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: EnhancementDefinitionPayload) -> Self:
+        return cls(
+            enhancement_id=payload["enhancement_id"],
+            name=payload["name"],
+            source_id=payload["source_id"],
+            points=payload["points"],
+            ability_descriptor_ids=tuple(payload["ability_descriptor_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class StratagemDefinition:
+    stratagem_id: str
+    name: str
+    source_id: str
+    command_point_cost: int
+    timing_tags: tuple[str, ...] = ()
+    ability_descriptor_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "stratagem_id",
+            _validate_unprefixed_identifier(
+                "StratagemDefinition stratagem_id",
+                self.stratagem_id,
+                "stratagem:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("StratagemDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("StratagemDefinition source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "command_point_cost",
+            _validate_non_negative_int(
+                "StratagemDefinition command_point_cost",
+                self.command_point_cost,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "timing_tags",
+            _validate_identifier_tuple("StratagemDefinition timing_tags", self.timing_tags),
+        )
+        object.__setattr__(
+            self,
+            "ability_descriptor_ids",
+            _validate_identifier_tuple(
+                "StratagemDefinition ability_descriptor_ids",
+                self.ability_descriptor_ids,
+            ),
+        )
+
+    def stable_identity(self) -> str:
+        return f"stratagem:{self.stratagem_id}"
+
+    def to_payload(self) -> StratagemDefinitionPayload:
+        return {
+            "stratagem_id": self.stratagem_id,
+            "name": self.name,
+            "source_id": self.source_id,
+            "command_point_cost": self.command_point_cost,
+            "timing_tags": list(self.timing_tags),
+            "ability_descriptor_ids": list(self.ability_descriptor_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: StratagemDefinitionPayload) -> Self:
+        return cls(
+            stratagem_id=payload["stratagem_id"],
+            name=payload["name"],
+            source_id=payload["source_id"],
+            command_point_cost=payload["command_point_cost"],
+            timing_tags=tuple(payload["timing_tags"]),
+            ability_descriptor_ids=tuple(payload["ability_descriptor_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DetachmentDefinition:
+    detachment_id: str
+    name: str
+    faction_id: str
+    rule_source_ids: tuple[str, ...] = ()
+    enhancement_ids: tuple[str, ...] = ()
+    stratagem_ids: tuple[str, ...] = ()
+    source_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "detachment_id",
+            _validate_unprefixed_identifier(
+                "DetachmentDefinition detachment_id",
+                self.detachment_id,
+                "detachment:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("DetachmentDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "faction_id",
+            _validate_identifier("DetachmentDefinition faction_id", self.faction_id),
+        )
+        object.__setattr__(
+            self,
+            "rule_source_ids",
+            _validate_identifier_tuple(
+                "DetachmentDefinition rule_source_ids",
+                self.rule_source_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "enhancement_ids",
+            _validate_identifier_tuple(
+                "DetachmentDefinition enhancement_ids",
+                self.enhancement_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_ids",
+            _validate_identifier_tuple("DetachmentDefinition stratagem_ids", self.stratagem_ids),
+        )
+        object.__setattr__(
+            self,
+            "source_ids",
+            _validate_identifier_tuple("DetachmentDefinition source_ids", self.source_ids),
+        )
+
+    def stable_identity(self) -> str:
+        return f"detachment:{self.detachment_id}"
+
+    def to_payload(self) -> DetachmentDefinitionPayload:
+        return {
+            "detachment_id": self.detachment_id,
+            "name": self.name,
+            "faction_id": self.faction_id,
+            "rule_source_ids": list(self.rule_source_ids),
+            "enhancement_ids": list(self.enhancement_ids),
+            "stratagem_ids": list(self.stratagem_ids),
+            "source_ids": list(self.source_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DetachmentDefinitionPayload) -> Self:
+        return cls(
+            detachment_id=payload["detachment_id"],
+            name=payload["name"],
+            faction_id=payload["faction_id"],
+            rule_source_ids=tuple(payload["rule_source_ids"]),
+            enhancement_ids=tuple(payload["enhancement_ids"]),
+            stratagem_ids=tuple(payload["stratagem_ids"]),
+            source_ids=tuple(payload["source_ids"]),
+        )
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise DetachmentCatalogError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise DetachmentCatalogError(f"{field_name} must not be empty.")
+    return stripped
+
+
+def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:
+    identifier = _validate_identifier(field_name, value)
+    if identifier.startswith(prefix):
+        raise DetachmentCatalogError(f"{field_name} must not include the stable identity prefix.")
+    return identifier
+
+
+def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise DetachmentCatalogError(f"{field_name} must be a tuple.")
+    seen: set[str] = set()
+    validated: list[str] = []
+    for value in values:
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise DetachmentCatalogError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        validated.append(identifier)
+    return tuple(sorted(validated))
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise DetachmentCatalogError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise DetachmentCatalogError(f"{field_name} must not be negative.")
+    return value
+
+
+def _validate_optional_non_negative_int(field_name: str, value: object | None) -> int | None:
+    if value is None:
+        return None
+    return _validate_non_negative_int(field_name, value)
