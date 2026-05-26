@@ -7,9 +7,12 @@ import pytest
 
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.rules.parsed_tokens import (
+    DiceExpressionToken,
     ParsedRuleText,
     ParsedRuleTextPayload,
+    RangeExpressionToken,
     RuleTokenError,
+    TextSpan,
     parse_normalized_tokens,
 )
 from warhammer40k_core.rules.source_data import (
@@ -80,6 +83,52 @@ def test_parsed_rule_text_serialization_round_trips_exactly() -> None:
     )
 
     assert ParsedRuleText.from_payload(payload).to_payload() == parsed.to_payload()
+
+
+def test_parsed_rule_text_rejects_tokens_not_matching_normalized_text() -> None:
+    with pytest.raises(RuleTokenError):
+        ParsedRuleText(
+            normalized_text="No dice here.",
+            dice_expressions=(
+                DiceExpressionToken(
+                    span=TextSpan(text="D6", start=0, end=2),
+                    expression=DiceExpression(quantity=1, sides=6),
+                ),
+            ),
+        )
+
+
+def test_parsed_rule_text_rejects_corrupted_payload_text_mismatch() -> None:
+    payload = parse_normalized_tokens("Roll D6.").to_payload()
+    payload["normalized_text"] = "No dice."
+
+    with pytest.raises(RuleTokenError):
+        ParsedRuleText.from_payload(payload)
+
+
+def test_parsed_rule_text_rejects_out_of_order_tokens() -> None:
+    with pytest.raises(RuleTokenError):
+        ParsedRuleText(
+            normalized_text='Targets within 12" and 18".',
+            range_expressions=(
+                RangeExpressionToken(
+                    span=TextSpan(text='18"', start=23, end=26),
+                    distance_inches=18,
+                ),
+                RangeExpressionToken(
+                    span=TextSpan(text='12"', start=15, end=18),
+                    distance_inches=12,
+                ),
+            ),
+        )
+
+
+def test_hyphenated_range_is_not_silently_parsed_as_single_distance() -> None:
+    normalized = normalize_rule_text('Range 12\u201324"')
+    assert normalized == 'Range 12-24"'
+
+    parsed = parse_normalized_tokens(normalized)
+    assert parsed.range_expressions == ()
 
 
 def test_parsed_tokens_fail_explicitly_for_invalid_inputs() -> None:

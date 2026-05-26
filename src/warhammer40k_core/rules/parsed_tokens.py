@@ -47,7 +47,7 @@ _DICE_TOKEN_RE = re.compile(
     r"(?P<modifier>[+-]\d+)?"
     r"(?![A-Za-z0-9_])"
 )
-_RANGE_TOKEN_RE = re.compile(r'(?<![A-Za-z0-9_])(?P<distance>\d+)"')
+_RANGE_TOKEN_RE = re.compile(r'(?<![A-Za-z0-9_-])(?P<distance>\d+)"')
 _KEYWORD_TOKEN_PATTERNS = tuple(
     (
         re.compile(
@@ -181,6 +181,17 @@ class ParsedRuleText:
         _validate_token_tuple(self.dice_expressions, DiceExpressionToken, "dice_expressions")
         _validate_token_tuple(self.range_expressions, RangeExpressionToken, "range_expressions")
         _validate_token_tuple(self.keywords, KeywordToken, "keywords")
+        _validate_tokens_belong_to_text(
+            self.normalized_text,
+            self.dice_expressions,
+            "dice_expressions",
+        )
+        _validate_tokens_belong_to_text(
+            self.normalized_text,
+            self.range_expressions,
+            "range_expressions",
+        )
+        _validate_tokens_belong_to_text(self.normalized_text, self.keywords, "keywords")
 
     def to_payload(self) -> ParsedRuleTextPayload:
         return {
@@ -306,3 +317,39 @@ def _validate_token_tuple(
     for token in tokens:
         if type(token) is not expected_type:
             raise RuleTokenError(f"ParsedRuleText {field_name} contains an invalid token.")
+
+
+def _validate_tokens_belong_to_text(
+    normalized_text: str,
+    tokens: tuple[object, ...],
+    field_name: str,
+) -> None:
+    previous_key: tuple[int, int, str] | None = None
+
+    for token in tokens:
+        span = _token_span(token)
+        if span.end > len(normalized_text):
+            raise RuleTokenError(
+                f"ParsedRuleText {field_name} token span is outside normalized_text."
+            )
+        if normalized_text[span.start : span.end] != span.text:
+            raise RuleTokenError(
+                f"ParsedRuleText {field_name} token span text does not match normalized_text."
+            )
+
+        key = (span.start, span.end, span.text)
+        if previous_key is not None and key < previous_key:
+            raise RuleTokenError(
+                f"ParsedRuleText {field_name} tokens must be deterministically ordered."
+            )
+        previous_key = key
+
+
+def _token_span(token: object) -> TextSpan:
+    if type(token) is DiceExpressionToken:
+        return token.span
+    if type(token) is RangeExpressionToken:
+        return token.span
+    if type(token) is KeywordToken:
+        return token.span
+    raise RuleTokenError("ParsedRuleText token type is invalid.")
