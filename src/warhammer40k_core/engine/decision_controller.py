@@ -38,9 +38,11 @@ class DecisionController:
     def submit_result(self, result: DecisionResult) -> DecisionRecord:
         if type(result) is not DecisionResult:
             raise DecisionError("DecisionController result must be a DecisionResult.")
-        request = self.queue.request_by_id(result.request_id)
+        request = self.queue.peek_next()
+        if result.request_id != request.request_id:
+            raise DecisionError("DecisionController must resolve the next queued request.")
         result.validate_for_request(request)
-        self.queue.remove_by_id(request.request_id)
+        self.queue.pop_next()
         record = DecisionRecord(
             record_id=f"decision-record-{len(self._records) + 1:06d}",
             request=request,

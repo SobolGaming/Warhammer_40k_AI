@@ -26,6 +26,27 @@ from warhammer40k_core.engine.decision import (
 from warhammer40k_core.engine.event_log import EventLog, EventLogError, EventRecord, JsonValue
 
 
+def _select_unit_request(request_id: str = "decision-request-branch") -> DecisionRequest:
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type="select_unit",
+        actor_id=None,
+        payload={"phase": "movement"},
+        options=(
+            DecisionOption(
+                option_id="unit-a",
+                label="Unit A",
+                payload={"selected_unit_id": "unit-a"},
+            ),
+            DecisionOption(
+                option_id="unit-b",
+                label="Unit B",
+                payload={"selected_unit_id": "unit-b"},
+            ),
+        ),
+    )
+
+
 def test_same_seed_determinism_for_dice_rolls_and_events() -> None:
     spec = DiceRollSpec(
         expression=DiceExpression(quantity=2, sides=6),
@@ -51,24 +72,7 @@ def test_branch_decision_history_affects_dice_deterministically() -> None:
     )
     left = DiceRollManager("seed")
     right = DiceRollManager("seed")
-    request = DecisionRequest(
-        request_id="decision-request-branch",
-        decision_type="select_unit",
-        actor_id=None,
-        payload={"phase": "movement"},
-        options=(
-            DecisionOption(
-                option_id="unit-a",
-                label="Unit A",
-                payload={"selected_unit_id": "unit-a"},
-            ),
-            DecisionOption(
-                option_id="unit-b",
-                label="Unit B",
-                payload={"selected_unit_id": "unit-b"},
-            ),
-        ),
-    )
+    request = _select_unit_request()
 
     left.record_decision(
         request=request,
@@ -89,6 +93,83 @@ def test_branch_decision_history_affects_dice_deterministically() -> None:
 
     assert left.roll(spec).current_values == (84072,)
     assert right.roll(spec).current_values == (31999,)
+
+
+def test_reconstructed_decision_record_history_affects_next_dice_roll() -> None:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=100_000),
+        reason="Roll after decision reconstruction",
+        roll_type="advance_roll",
+    )
+    request = _select_unit_request("decision-request-1")
+    original = DiceRollManager("seed")
+    original.record_decision(
+        request=request,
+        result=DecisionResult.for_request(
+            result_id="decision-result-1",
+            request=request,
+            selected_option_id="unit-a",
+        ),
+    )
+    saved_history = original.event_log.to_payload()
+    original_next = original.roll(spec)
+
+    reconstructed = DiceRollManager("seed", event_log=EventLog.from_payload(saved_history))
+    reconstructed_next = reconstructed.roll(spec)
+
+    assert reconstructed.decision_records == original.decision_records
+    assert reconstructed_next.to_payload() == original_next.to_payload()
+
+
+def test_reconstructed_decision_records_advance_record_id_counter() -> None:
+    first_request = _select_unit_request("decision-request-1")
+    original = DiceRollManager("seed")
+    original.record_decision(
+        request=first_request,
+        result=DecisionResult.for_request(
+            result_id="decision-result-1",
+            request=first_request,
+            selected_option_id="unit-a",
+        ),
+    )
+    reconstructed = DiceRollManager(
+        "seed",
+        event_log=EventLog.from_payload(original.event_log.to_payload()),
+    )
+    second_request = _select_unit_request("decision-request-2")
+    reconstructed.record_decision(
+        request=second_request,
+        result=DecisionResult.for_request(
+            result_id="decision-result-2",
+            request=second_request,
+            selected_option_id="unit-b",
+        ),
+    )
+
+    assert reconstructed.decision_records[-1].record_id == "decision-record-000002"
+
+
+def test_reconstructed_pending_decision_request_history_affects_next_dice_roll() -> None:
+    fixed_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Fixed roll before pending reroll request",
+        roll_type="advance_roll",
+    )
+    next_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=100_000),
+        reason="Roll after pending decision request reconstruction",
+        roll_type="battle_shock_roll",
+    )
+    original = DiceRollManager("seed")
+    state = original.roll_fixed(fixed_spec, [2])
+    original.request_reroll(state, allowed_selections=((0,),))
+    saved_history = original.event_log.to_payload()
+    original_next = original.roll(next_spec)
+
+    reconstructed = DiceRollManager("seed", event_log=EventLog.from_payload(saved_history))
+    reconstructed_next = reconstructed.roll(next_spec)
+
+    assert reconstructed_next.to_payload() == original_next.to_payload()
 
 
 def test_reconstructed_event_history_affects_next_dice_roll() -> None:
@@ -235,7 +316,7 @@ def test_reroll_selection_is_an_explicit_decision() -> None:
         actor_id="unit-assault-intercessors",
     )
     state = manager.roll_fixed(spec, [1, 4])
-    request = manager.request_reroll(state, allowed_indices=[0, 1])
+    request = manager.request_reroll(state, allowed_selections=((0,),))
 
     rejected = DecisionResult(
         result_id="decision-result-bad",
@@ -259,6 +340,39 @@ def test_reroll_selection_is_an_explicit_decision() -> None:
     assert updated.rerolls[0].decision_id == accepted.result_id
     assert updated.rerolls[0].selected_indices == (0,)
     assert updated.current_values[1] == 4
+
+
+def test_reroll_request_uses_explicit_allowed_selections_not_power_set() -> None:
+    manager = DiceRollManager("seed")
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=2, sides=6),
+        reason="Charge distance whole-test reroll fixture",
+        roll_type="charge_roll",
+    )
+    state = manager.roll_fixed(spec, [1, 4])
+
+    request = manager.request_reroll(state, allowed_selections=((0, 1),))
+    payload = cast(dict[str, JsonValue], request.payload)
+
+    assert tuple(option.option_id for option in request.options) == ("decline", "reroll:0,1")
+    assert payload["allowed_selections"] == [[0, 1]]
+
+
+def test_reroll_request_rejects_duplicate_or_out_of_range_selection() -> None:
+    manager = DiceRollManager("seed")
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=2, sides=6),
+        reason="Reroll selection validation fixture",
+        roll_type="charge_roll",
+    )
+    state = manager.roll_fixed(spec, [1, 4])
+
+    with pytest.raises(DecisionError):
+        manager.request_reroll(state, allowed_selections=((0,), (0,)))
+    with pytest.raises(DecisionError):
+        manager.request_reroll(state, allowed_selections=((0, 0),))
+    with pytest.raises(DecisionError):
+        manager.request_reroll(state, allowed_selections=((2,),))
 
 
 def test_replay_injected_dice_reproduce_original_result() -> None:
@@ -487,7 +601,7 @@ def test_decision_records_serialize_and_validate() -> None:
         request_id="decision-request-1",
         decision_type="select_dice_reroll",
         actor_id="unit-a",
-        payload={"allowed_indices": [0]},
+        payload={"allowed_selections": [[0]]},
         options=(
             DecisionOption(
                 option_id="reroll:0",
@@ -542,7 +656,7 @@ def test_reroll_decline_records_explicit_decision_without_new_roll() -> None:
         roll_type="advance_roll",
     )
     state = manager.roll_fixed(spec, [2])
-    request = manager.request_reroll(state, allowed_indices=[0])
+    request = manager.request_reroll(state, allowed_selections=((0,),))
     result = DecisionResult.for_request(
         result_id="decision-result-decline",
         request=request,
@@ -563,10 +677,10 @@ def test_reroll_rejects_disallowed_or_malformed_decisions() -> None:
         roll_type="advance_roll",
     )
     state = manager.roll_fixed(spec, [2])
-    request = manager.request_reroll(state, allowed_indices=[0])
+    request = manager.request_reroll(state, allowed_selections=((0,),))
 
     with pytest.raises(DecisionError):
-        manager.request_reroll(state, allowed_indices=[1])
+        manager.request_reroll(state, allowed_selections=((1,),))
     with pytest.raises(DecisionError):
         manager.resolve_reroll(
             state,

@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import deque
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from itertools import combinations
+from typing import cast
 
 from warhammer40k_core.core.dice import (
     DiceExpression,
@@ -17,8 +17,13 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
 )
 from warhammer40k_core.core.rng import RandomSource
-from warhammer40k_core.engine.decision_record import DecisionRecord
-from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
+from warhammer40k_core.engine.decision_request import (
+    DecisionError,
+    DecisionOption,
+    DecisionRequest,
+    DecisionRequestPayload,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 
@@ -106,12 +111,9 @@ class DiceRollManager:
         self,
         state: DiceRollState,
         *,
-        allowed_indices: Iterable[int],
+        allowed_selections: Iterable[Iterable[int]],
     ) -> DecisionRequest:
-        indices = _validate_index_list(tuple(allowed_indices), field_name="allowed_indices")
-        for index in indices:
-            if index >= len(state.current_values):
-                raise DecisionError("Reroll allowed index is outside the current dice.")
+        selections = _validate_index_selections(allowed_selections, state=state)
 
         self._decision_request_counter += 1
         request = DecisionRequest(
@@ -121,10 +123,10 @@ class DiceRollManager:
             payload={
                 "roll_id": state.original_result.roll_id,
                 "roll_type": state.original_result.spec.roll_type,
-                "allowed_indices": list(indices),
+                "allowed_selections": [list(selection) for selection in selections],
                 "current_values": list(state.current_values),
             },
-            options=_reroll_options(indices),
+            options=_reroll_options(selections),
         )
         event = self.event_log.append("decision_requested", request.to_payload())
         self.rng.append_history(request.history_token())
@@ -208,13 +210,28 @@ class DiceRollManager:
         return f"roll-{self._roll_counter:06d}"
 
     def _seed_existing_event_history(self) -> None:
-        for record in self.event_log.records:
-            self.rng.append_history(record.history_token())
-            if record.event_type == "dice_rolled":
-                self._roll_counter += 1
-                self.rng.draw_count += _restored_rng_draw_count(record.payload)
-            elif record.event_type == "decision_requested":
+        for event in self.event_log.records:
+            if event.event_type == "decision_requested":
+                request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
                 self._decision_request_counter += 1
+                self.rng.append_history(request.history_token())
+                self.rng.append_history(event.history_token())
+                continue
+
+            if event.event_type == "decision_recorded":
+                record = DecisionRecord.from_payload(cast(DecisionRecordPayload, event.payload))
+                expected_record_id = f"decision-record-{len(self._decision_records) + 1:06d}"
+                if record.record_id != expected_record_id:
+                    raise DecisionError("Decision records must be sequential.")
+                self._decision_records.append(record)
+                self.rng.append_history(record.history_token())
+                self.rng.append_history(event.history_token())
+                continue
+
+            self.rng.append_history(event.history_token())
+            if event.event_type == "dice_rolled":
+                self._roll_counter += 1
+                self.rng.draw_count += _restored_rng_draw_count(event.payload)
 
     def _validate_reroll_decision(
         self,
@@ -228,10 +245,12 @@ class DiceRollManager:
         request_roll_id = _extract_string(request.payload, key="roll_id")
         if request_roll_id != state.original_result.roll_id:
             raise DecisionError("Reroll request does not target this dice roll.")
-        allowed_indices = set(_extract_index_list(request.payload, key="allowed_indices"))
+        allowed_selections = set(
+            _extract_index_selections(request.payload, key="allowed_selections")
+        )
         selected_indices = _extract_index_list(result.payload, key="selected_indices")
-        if not set(selected_indices).issubset(allowed_indices):
-            raise DecisionError("Reroll selected_indices must be allowed by the request.")
+        if selected_indices and selected_indices not in allowed_selections:
+            raise DecisionError("Reroll selected_indices must match an allowed selection.")
 
 
 def _coerce_result(result: DiceRollResult | DiceRollResultPayload) -> DiceRollResult:
@@ -240,7 +259,7 @@ def _coerce_result(result: DiceRollResult | DiceRollResultPayload) -> DiceRollRe
     return DiceRollResult.from_payload(result)
 
 
-def _reroll_options(indices: tuple[int, ...]) -> tuple[DecisionOption, ...]:
+def _reroll_options(selections: tuple[tuple[int, ...], ...]) -> tuple[DecisionOption, ...]:
     options: list[DecisionOption] = [
         DecisionOption(
             option_id="decline",
@@ -248,16 +267,15 @@ def _reroll_options(indices: tuple[int, ...]) -> tuple[DecisionOption, ...]:
             payload={"selected_indices": []},
         )
     ]
-    for size in range(1, len(indices) + 1):
-        for selected in combinations(indices, size):
-            selected_label = ",".join(str(index) for index in selected)
-            options.append(
-                DecisionOption(
-                    option_id=f"reroll:{selected_label}",
-                    label=f"Reroll dice {selected_label}",
-                    payload={"selected_indices": list(selected)},
-                )
+    for selection in selections:
+        selected_label = ",".join(str(index) for index in selection)
+        options.append(
+            DecisionOption(
+                option_id=f"reroll:{selected_label}",
+                label=f"Reroll dice {selected_label}",
+                payload={"selected_indices": list(selection)},
             )
+        )
     return tuple(options)
 
 
@@ -281,6 +299,23 @@ def _extract_index_list(payload: JsonValue, *, key: str) -> tuple[int, ...]:
     if not isinstance(value, list):
         raise DecisionError(f"Decision payload key must be an index list: {key}.")
     return _validate_index_list(tuple(value), field_name=key)
+
+
+def _extract_index_selections(payload: JsonValue, *, key: str) -> tuple[tuple[int, ...], ...]:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        raise DecisionError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, list):
+        raise DecisionError(f"Decision payload key must be an index selection list: {key}.")
+
+    selections: list[tuple[int, ...]] = []
+    for selection in value:
+        if not isinstance(selection, list):
+            raise DecisionError(f"Decision payload key must contain index lists: {key}.")
+        selections.append(_validate_index_list(tuple(selection), field_name=key))
+    return _validate_unique_index_selections(tuple(selections), field_name=key)
 
 
 def _extract_object(payload: JsonValue, *, key: str) -> dict[str, JsonValue]:
@@ -378,6 +413,48 @@ def _extract_optional_string(payload: JsonValue, *, key: str) -> str | None:
 def _restored_rng_draw_count(payload: JsonValue) -> int:
     result = _dice_roll_result_from_payload(payload)
     return len(result.values) if result.source == "rng" else 0
+
+
+def _validate_index_selections(
+    selections: Iterable[Iterable[int]],
+    *,
+    state: DiceRollState,
+) -> tuple[tuple[int, ...], ...]:
+    selection_values = cast(object, selections)
+    if not isinstance(selection_values, Iterable):
+        raise DecisionError("Reroll allowed_selections must be iterable.")
+
+    validated: list[tuple[int, ...]] = []
+    for selection in cast(Iterable[object], selection_values):
+        if not isinstance(selection, Iterable):
+            raise DecisionError("Reroll allowed_selections must contain iterable selections.")
+        index_selection = _validate_index_list(
+            tuple(cast(Iterable[object], selection)),
+            field_name="allowed_selections",
+        )
+        for index in index_selection:
+            if index >= len(state.current_values):
+                raise DecisionError("Reroll allowed selection index is outside the current dice.")
+        validated.append(index_selection)
+    return _validate_unique_index_selections(tuple(validated), field_name="allowed_selections")
+
+
+def _validate_unique_index_selections(
+    selections: tuple[tuple[int, ...], ...],
+    *,
+    field_name: str,
+) -> tuple[tuple[int, ...], ...]:
+    if not selections:
+        raise DecisionError(f"Decision {field_name} must not be empty.")
+
+    seen: set[tuple[int, ...]] = set()
+    for selection in selections:
+        if not selection:
+            raise DecisionError(f"Decision {field_name} must not contain empty selections.")
+        if selection in seen:
+            raise DecisionError(f"Decision {field_name} must not contain duplicate selections.")
+        seen.add(selection)
+    return tuple(sorted(selections))
 
 
 def _validate_index_list(indices: tuple[object, ...], *, field_name: str) -> tuple[int, ...]:

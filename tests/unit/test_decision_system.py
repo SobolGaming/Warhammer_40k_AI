@@ -202,6 +202,24 @@ def test_decision_controller_validates_records_and_uses_one_engine_path() -> Non
         controller.submit_result(result)
 
 
+def test_decision_controller_rejects_out_of_order_result_submission() -> None:
+    first = _select_unit_request("decision-request-1")
+    second = _select_unit_request("decision-request-2")
+    controller = DecisionController()
+    controller.request_decision(first)
+    controller.request_decision(second)
+    second_result = DecisionResult.for_request(
+        result_id="decision-result-2",
+        request=second,
+        selected_option_id="unit-a",
+    )
+
+    with pytest.raises(DecisionError):
+        controller.submit_result(second_result)
+
+    assert controller.queue.peek_next() == first
+
+
 def test_decision_controller_rejects_non_sequential_record_payloads() -> None:
     request = _select_unit_request()
     result = DecisionResult.for_request(
