@@ -5,7 +5,14 @@ from dataclasses import dataclass, field
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZonePayload
-from warhammer40k_core.core.objectives import Objective, ObjectivePayload
+from warhammer40k_core.core.objectives import (
+    Objective,
+    ObjectiveAnchorKind,
+    ObjectivePayload,
+    PointObjectiveAnchor,
+    TerrainObjectiveAnchor,
+)
+from warhammer40k_core.core.ruleset import RulesetId, RulesetIdPayload
 
 
 class BattlefieldError(ValueError):
@@ -45,6 +52,7 @@ class ObjectiveControlScorePayload(TypedDict):
 
 class BattlefieldPayload(TypedDict):
     battlefield_id: str
+    ruleset_id: RulesetIdPayload
     width: float
     depth: float
     terrain_layout: TerrainLayoutPayload
@@ -279,6 +287,7 @@ class Battlefield:
     battlefield_id: str
     width: float
     depth: float
+    ruleset_id: RulesetId = field(default_factory=RulesetId.warhammer_40000_tenth)
     terrain_layout: TerrainLayout = field(default_factory=TerrainLayout)
     objectives: tuple[Objective, ...] = ()
     deployment_zones: tuple[DeploymentZone, ...] = ()
@@ -296,6 +305,8 @@ class Battlefield:
             "depth",
             _validate_positive_number("Battlefield depth", self.depth),
         )
+        if type(self.ruleset_id) is not RulesetId:
+            raise BattlefieldError("Battlefield ruleset_id must be a RulesetId.")
         if type(self.terrain_layout) is not TerrainLayout:
             raise BattlefieldError("Battlefield terrain_layout must be a TerrainLayout.")
         if type(self.objectives) is not tuple:
@@ -308,6 +319,8 @@ class Battlefield:
         )
         _validate_unique_objective_ids(objectives)
         _validate_unique_deployment_zone_ids(deployment_zones)
+        _validate_objectives_are_on_battlefield(self, objectives)
+        _validate_deployment_zones_are_on_battlefield(self, deployment_zones)
         if type(self.spatial_state) is not SpatialState:
             raise BattlefieldError("Battlefield spatial_state must be a SpatialState.")
         _validate_points_are_on_battlefield(self, self.spatial_state.model_states)
@@ -346,6 +359,10 @@ class Battlefield:
 
     def objective_control_scores(self, objective_id: str) -> tuple[tuple[str, int], ...]:
         objective = self.objective(objective_id)
+        if objective.anchor.kind is ObjectiveAnchorKind.TERRAIN:
+            raise BattlefieldError(
+                "Terrain-anchored objective control requires a ruleset/geometry control policy."
+            )
         scores: dict[str, int] = {}
         for model_state in self.spatial_state.model_states:
             if not model_state.is_alive:
@@ -396,6 +413,7 @@ class Battlefield:
             battlefield_id=self.battlefield_id,
             width=self.width,
             depth=self.depth,
+            ruleset_id=self.ruleset_id,
             terrain_layout=self.terrain_layout,
             objectives=self.objectives,
             deployment_zones=self.deployment_zones,
@@ -417,6 +435,7 @@ class Battlefield:
     def to_payload(self) -> BattlefieldPayload:
         return {
             "battlefield_id": self.battlefield_id,
+            "ruleset_id": self.ruleset_id.to_payload(),
             "width": self.width,
             "depth": self.depth,
             "terrain_layout": self.terrain_layout.to_payload(),
@@ -431,6 +450,7 @@ class Battlefield:
     def from_payload(cls, payload: BattlefieldPayload) -> Self:
         return cls(
             battlefield_id=payload["battlefield_id"],
+            ruleset_id=RulesetId.from_payload(payload["ruleset_id"]),
             width=payload["width"],
             depth=payload["depth"],
             terrain_layout=TerrainLayout.from_payload(payload["terrain_layout"]),
@@ -544,6 +564,38 @@ def _validate_deployment_zone(value: object) -> DeploymentZone:
     if type(value) is not DeploymentZone:
         raise BattlefieldError("Battlefield deployment_zones must contain DeploymentZone values.")
     return value
+
+
+def _validate_objectives_are_on_battlefield(
+    battlefield: Battlefield,
+    objectives: tuple[Objective, ...],
+) -> None:
+    terrain_ids = set(battlefield.terrain_layout.terrain_ids)
+    for objective in objectives:
+        if type(objective.anchor) is PointObjectiveAnchor:
+            if objective.anchor.x < 0.0 or objective.anchor.x > battlefield.width:
+                raise BattlefieldError("Objective x must be within the battlefield.")
+            if objective.anchor.y < 0.0 or objective.anchor.y > battlefield.depth:
+                raise BattlefieldError("Objective y must be within the battlefield.")
+            continue
+        if type(objective.anchor) is TerrainObjectiveAnchor:
+            if objective.anchor.terrain_id not in terrain_ids:
+                raise BattlefieldError(
+                    "Terrain-anchored objective must reference TerrainLayout terrain_ids."
+                )
+            continue
+        raise BattlefieldError("Objective anchor must be supported by Battlefield.")
+
+
+def _validate_deployment_zones_are_on_battlefield(
+    battlefield: Battlefield,
+    deployment_zones: tuple[DeploymentZone, ...],
+) -> None:
+    for deployment_zone in deployment_zones:
+        if deployment_zone.min_x < 0.0 or deployment_zone.max_x > battlefield.width:
+            raise BattlefieldError("DeploymentZone x bounds must be within the battlefield.")
+        if deployment_zone.min_y < 0.0 or deployment_zone.max_y > battlefield.depth:
+            raise BattlefieldError("DeploymentZone y bounds must be within the battlefield.")
 
 
 def _validate_unique_model_state_ids(model_states: tuple[SpatialModelState, ...]) -> None:
