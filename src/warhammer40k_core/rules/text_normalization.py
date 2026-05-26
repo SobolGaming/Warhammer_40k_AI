@@ -5,6 +5,8 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
+
 
 class TextNormalizationError(ValueError):
     """Raised when raw rule text cannot be normalized at the data boundary."""
@@ -70,26 +72,7 @@ _RANGE_WORD_RE = re.compile(
 _RANGE_QUOTE_RE = re.compile(r'(?<![A-Za-z0-9_])(?P<distance>\d+)\s*"')
 _WHITESPACE_RE = re.compile(r"\s+")
 
-_CANONICAL_KEYWORDS = (
-    "Devastating Wounds",
-    "Feel No Pain",
-    "Sustained Hits",
-    "Lethal Hits",
-    "Twin-linked",
-    "Ignores Cover",
-    "Indirect Fire",
-    "Extra Attacks",
-    "Rapid Fire",
-    "Precision",
-    "Hazardous",
-    "Assault",
-    "Torrent",
-    "Psychic",
-    "Pistol",
-    "Heavy",
-    "Blast",
-    "Melta",
-)
+_CANONICAL_KEYWORDS = canonical_weapon_keyword_tokens()
 _KEYWORD_PATTERNS = tuple(
     (
         re.compile(
