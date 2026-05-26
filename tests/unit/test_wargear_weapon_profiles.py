@@ -21,6 +21,7 @@ from warhammer40k_core.core.weapon_profiles import (
     range_profile_kind_from_token,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.rules.keywords import canonical_rule_keyword_tokens
 from warhammer40k_core.rules.text_normalization import canonical_keyword_forms
 
 
@@ -39,11 +40,21 @@ def _bolt_rifle_profile() -> WeaponProfile:
 
 
 def test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization() -> None:
-    assert canonical_weapon_keyword_tokens() == canonical_keyword_forms()
+    assert canonical_keyword_forms() == (
+        *canonical_weapon_keyword_tokens(),
+        *canonical_rule_keyword_tokens(),
+    )
+    assert "Feel No Pain" in canonical_rule_keyword_tokens()
+    assert "Feel No Pain" not in canonical_weapon_keyword_tokens()
     assert weapon_keyword_from_token("Rapid Fire") is WeaponKeyword.RAPID_FIRE
 
     with pytest.raises(WeaponProfileError):
         weapon_keyword_from_token("rapid fire")
+    with pytest.raises(WeaponProfileError):
+        weapon_keyword_from_token("Feel No Pain")
+
+
+def test_weapon_profile_rejects_non_weapon_rule_keywords() -> None:
     with pytest.raises(WeaponProfileError):
         WeaponProfile(
             profile_id="bad-keyword",
@@ -54,7 +65,7 @@ def test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization() -
             strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
             armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
             damage_profile=DamageProfile.fixed(1),
-            keywords=(cast(WeaponKeyword, "Rapid Fire"),),
+            keywords=(cast(WeaponKeyword, "Feel No Pain"),),
         )
 
 
@@ -92,10 +103,22 @@ def test_weapon_profile_identity_and_serialization_are_stable() -> None:
     assert "<" not in json.dumps(profile.to_payload())
     assert "object at 0x" not in json.dumps(profile.to_payload())
 
+    with pytest.raises(WeaponProfileError):
+        WeaponProfile(
+            profile_id="weapon-profile:bolt-rifle",
+            name="Bolt rifle",
+            range_profile=RangeProfile.distance(24),
+            attack_profile=AttackProfile.fixed(2),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -1),
+            damage_profile=DamageProfile.fixed(1),
+        )
+
 
 def test_weapon_profile_keywords_are_deduplicated_and_sorted_deterministically() -> None:
     profile = WeaponProfile(
-        profile_id="weapon-profile:deterministic-keywords",
+        profile_id="deterministic-keywords",
         name="Deterministic keywords",
         range_profile=RangeProfile.distance(12),
         attack_profile=AttackProfile.fixed(1),
@@ -110,7 +133,7 @@ def test_weapon_profile_keywords_are_deduplicated_and_sorted_deterministically()
 
     with pytest.raises(WeaponProfileError):
         WeaponProfile(
-            profile_id="weapon-profile:duplicate-keywords",
+            profile_id="duplicate-keywords",
             name="Duplicate keywords",
             range_profile=RangeProfile.distance(12),
             attack_profile=AttackProfile.fixed(1),
@@ -132,12 +155,14 @@ def test_weapon_profile_rejects_unparsed_or_mismatched_profile_data() -> None:
     with pytest.raises(WeaponProfileError):
         DamageProfile.fixed(0)
     with pytest.raises(WeaponProfileError):
+        RangeProfile.distance(0)
+    with pytest.raises(WeaponProfileError):
         RangeProfile(kind=RangeProfileKind.MELEE, distance_inches=1)
     with pytest.raises(WeaponProfileError):
         range_profile_kind_from_token("unsupported")
     with pytest.raises(WeaponProfileError):
         WeaponProfile(
-            profile_id="weapon-profile:bad-skill",
+            profile_id="bad-skill",
             name="Bad skill",
             range_profile=RangeProfile.distance(12),
             attack_profile=AttackProfile.fixed(1),
@@ -189,14 +214,16 @@ def test_wargear_rejects_invalid_or_ambiguous_profiles() -> None:
     with pytest.raises(WargearError):
         Wargear(wargear_id=" ", name="Bad")
     with pytest.raises(WargearError):
+        Wargear(wargear_id="wargear:bolt-rifle", name="Bolt rifle")
+    with pytest.raises(WargearError):
         Wargear(
-            wargear_id="wargear:duplicate-profile",
+            wargear_id="duplicate-profile",
             name="Duplicate profile",
             weapon_profiles=(profile, profile),
         )
     with pytest.raises(WargearError):
         Wargear(
-            wargear_id="wargear:bad-profile",
+            wargear_id="bad-profile",
             name="Bad profile",
             weapon_profiles=(cast(WeaponProfile, "profile-id"),),
         )

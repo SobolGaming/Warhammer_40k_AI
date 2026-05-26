@@ -30,7 +30,7 @@ class Wargear:
         object.__setattr__(
             self,
             "wargear_id",
-            _validate_identifier("Wargear wargear_id", self.wargear_id),
+            _validate_wargear_id(self.wargear_id),
         )
         object.__setattr__(self, "name", _validate_identifier("Wargear name", self.name))
         profiles = tuple(_validate_weapon_profile(profile) for profile in self.weapon_profiles)
@@ -73,6 +73,13 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise WargearError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_wargear_id(value: object) -> str:
+    identifier = _validate_identifier("Wargear wargear_id", value)
+    if identifier.startswith("wargear:"):
+        raise WargearError("Wargear wargear_id must not include the stable identity prefix.")
+    return identifier
 
 
 def _validate_weapon_profile(profile: object) -> WeaponProfile:

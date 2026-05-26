@@ -19,7 +19,6 @@ class WeaponProfileError(ValueError):
 
 class WeaponKeyword(StrEnum):
     DEVASTATING_WOUNDS = "Devastating Wounds"
-    FEEL_NO_PAIN = "Feel No Pain"
     SUSTAINED_HITS = "Sustained Hits"
     LETHAL_HITS = "Lethal Hits"
     TWIN_LINKED = "Twin-linked"
@@ -83,8 +82,8 @@ class RangeProfile:
         if kind is RangeProfileKind.DISTANCE:
             if type(self.distance_inches) is not int:
                 raise WeaponProfileError("RangeProfile distance_inches must be an integer.")
-            if self.distance_inches < 0:
-                raise WeaponProfileError("RangeProfile distance_inches must not be negative.")
+            if self.distance_inches < 1:
+                raise WeaponProfileError("RangeProfile distance_inches must be at least 1.")
             return
 
         if self.distance_inches is not None:
@@ -222,7 +221,7 @@ class WeaponProfile:
         object.__setattr__(
             self,
             "profile_id",
-            _validate_identifier("WeaponProfile profile_id", self.profile_id),
+            _validate_profile_id(self.profile_id),
         )
         object.__setattr__(self, "name", _validate_identifier("WeaponProfile name", self.name))
         _validate_range_profile(self.range_profile)
@@ -313,6 +312,15 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise WeaponProfileError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_profile_id(value: object) -> str:
+    identifier = _validate_identifier("WeaponProfile profile_id", value)
+    if identifier.startswith("weapon-profile:"):
+        raise WeaponProfileError(
+            "WeaponProfile profile_id must not include the stable identity prefix."
+        )
+    return identifier
 
 
 def _validate_range_kind(kind: object) -> RangeProfileKind:

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
+from warhammer40k_core.rules.keywords import canonical_rule_keyword_tokens
 
 
 class TextNormalizationError(ValueError):
@@ -72,7 +73,7 @@ _RANGE_WORD_RE = re.compile(
 _RANGE_QUOTE_RE = re.compile(r'(?<![A-Za-z0-9_])(?P<distance>\d+)\s*"')
 _WHITESPACE_RE = re.compile(r"\s+")
 
-_CANONICAL_KEYWORDS = canonical_weapon_keyword_tokens()
+_CANONICAL_KEYWORDS = (*canonical_weapon_keyword_tokens(), *canonical_rule_keyword_tokens())
 _KEYWORD_PATTERNS = tuple(
     (
         re.compile(
