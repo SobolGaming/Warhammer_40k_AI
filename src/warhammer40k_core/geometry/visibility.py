@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.geometry import shapely_backend
@@ -39,6 +39,14 @@ class VisibilityResultPayload(TypedDict):
     blocking_model_ids: list[str]
     checked_terrain_ids: list[str]
     checked_model_ids: list[str]
+    metrics: VisibilityMetricsPayload
+
+
+class VisibilityMetricsPayload(TypedDict):
+    terrain_candidate_count: int
+    model_candidate_count: int
+    exact_terrain_check_count: int
+    exact_model_check_count: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,6 +107,10 @@ class VisibilityQuery:
         checked_model_ids: set[str] = set()
         blocking_terrain_ids: set[str] = set()
         blocking_model_ids: set[str] = set()
+        terrain_candidate_count = 0
+        model_candidate_count = 0
+        exact_terrain_check_count = 0
+        exact_model_check_count = 0
 
         for ray_index, ray in enumerate(self.rays):
             start, end = ray
@@ -112,15 +124,19 @@ class VisibilityQuery:
                 for model in self.dynamic_model_blockers
                 if _model_broad_phase_intersects(ray, model)
             )
+            terrain_candidate_count += len(terrain_candidates)
+            model_candidate_count += len(model_candidates)
 
             checked_terrain_ids.update(terrain.terrain_id for terrain in terrain_candidates)
             checked_model_ids.update(model.model_id for model in model_candidates)
 
+            exact_terrain_check_count += len(terrain_candidates)
             terrain_blockers = tuple(
                 terrain.terrain_id
                 for terrain in terrain_candidates
                 if terrain.blocks_line_segment(start, end)
             )
+            exact_model_check_count += len(model_candidates)
             model_blockers = tuple(
                 model.model_id
                 for model in model_candidates
@@ -133,6 +149,12 @@ class VisibilityQuery:
                     clear_ray_index=ray_index,
                     checked_terrain_ids=tuple(sorted(checked_terrain_ids)),
                     checked_model_ids=tuple(sorted(checked_model_ids)),
+                    metrics=VisibilityMetrics(
+                        terrain_candidate_count=terrain_candidate_count,
+                        model_candidate_count=model_candidate_count,
+                        exact_terrain_check_count=exact_terrain_check_count,
+                        exact_model_check_count=exact_model_check_count,
+                    ),
                 )
 
             blocking_terrain_ids.update(terrain_blockers)
@@ -146,6 +168,12 @@ class VisibilityQuery:
             blocking_model_ids=tuple(sorted(blocking_model_ids)),
             checked_terrain_ids=tuple(sorted(checked_terrain_ids)),
             checked_model_ids=tuple(sorted(checked_model_ids)),
+            metrics=VisibilityMetrics(
+                terrain_candidate_count=terrain_candidate_count,
+                model_candidate_count=model_candidate_count,
+                exact_terrain_check_count=exact_terrain_check_count,
+                exact_model_check_count=exact_model_check_count,
+            ),
         )
 
     def to_payload(self) -> VisibilityQueryPayload:
@@ -177,6 +205,65 @@ class VisibilityQuery:
 
 
 @dataclass(frozen=True, slots=True)
+class VisibilityMetrics:
+    terrain_candidate_count: int = 0
+    model_candidate_count: int = 0
+    exact_terrain_check_count: int = 0
+    exact_model_check_count: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "terrain_candidate_count",
+            _validate_non_negative_int(
+                "VisibilityMetrics terrain_candidate_count",
+                self.terrain_candidate_count,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_candidate_count",
+            _validate_non_negative_int(
+                "VisibilityMetrics model_candidate_count",
+                self.model_candidate_count,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "exact_terrain_check_count",
+            _validate_non_negative_int(
+                "VisibilityMetrics exact_terrain_check_count",
+                self.exact_terrain_check_count,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "exact_model_check_count",
+            _validate_non_negative_int(
+                "VisibilityMetrics exact_model_check_count",
+                self.exact_model_check_count,
+            ),
+        )
+
+    def to_payload(self) -> VisibilityMetricsPayload:
+        return {
+            "terrain_candidate_count": self.terrain_candidate_count,
+            "model_candidate_count": self.model_candidate_count,
+            "exact_terrain_check_count": self.exact_terrain_check_count,
+            "exact_model_check_count": self.exact_model_check_count,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: VisibilityMetricsPayload) -> Self:
+        return cls(
+            terrain_candidate_count=payload["terrain_candidate_count"],
+            model_candidate_count=payload["model_candidate_count"],
+            exact_terrain_check_count=payload["exact_terrain_check_count"],
+            exact_model_check_count=payload["exact_model_check_count"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class VisibilityResult:
     has_line_of_sight: bool
     checked_ray_count: int
@@ -185,6 +272,7 @@ class VisibilityResult:
     blocking_model_ids: tuple[str, ...] = ()
     checked_terrain_ids: tuple[str, ...] = ()
     checked_model_ids: tuple[str, ...] = ()
+    metrics: VisibilityMetrics = field(default_factory=VisibilityMetrics)
 
     def __post_init__(self) -> None:
         if type(self.has_line_of_sight) is not bool:
@@ -229,6 +317,8 @@ class VisibilityResult:
                 "VisibilityResult checked_model_ids", self.checked_model_ids
             ),
         )
+        if type(self.metrics) is not VisibilityMetrics:
+            raise GeometryError("VisibilityResult metrics must be VisibilityMetrics.")
 
     def to_payload(self) -> VisibilityResultPayload:
         return {
@@ -239,6 +329,7 @@ class VisibilityResult:
             "blocking_model_ids": list(self.blocking_model_ids),
             "checked_terrain_ids": list(self.checked_terrain_ids),
             "checked_model_ids": list(self.checked_model_ids),
+            "metrics": self.metrics.to_payload(),
         }
 
     @classmethod
@@ -251,6 +342,7 @@ class VisibilityResult:
             blocking_model_ids=tuple(payload["blocking_model_ids"]),
             checked_terrain_ids=tuple(payload["checked_terrain_ids"]),
             checked_model_ids=tuple(payload["checked_model_ids"]),
+            metrics=VisibilityMetrics.from_payload(payload["metrics"]),
         )
 
 
@@ -313,6 +405,14 @@ def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tupl
         seen.add(stripped)
         validated.append(stripped)
     return tuple(sorted(validated))
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GeometryError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise GeometryError(f"{field_name} must not be negative.")
+    return value
 
 
 def _terrain_broad_phase_intersects(ray: VisibilityRay, terrain: TerrainVolume) -> bool:

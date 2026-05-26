@@ -87,6 +87,8 @@ def test_visibility_uses_staged_rays_and_early_exits_on_clear_ray() -> None:
     assert result.clear_ray_index == 1
     assert result.blocking_terrain_ids == ()
     assert result.checked_terrain_ids == ("wall",)
+    assert result.metrics.terrain_candidate_count == 1
+    assert result.metrics.exact_terrain_check_count == 1
 
 
 def test_visibility_reports_deterministic_blockers_when_all_rays_are_blocked() -> None:
@@ -152,6 +154,8 @@ def test_visibility_dynamic_model_blocker_uses_2_5d_volume() -> None:
 
     assert not blocked.has_line_of_sight
     assert blocked.blocking_model_ids == ("blocker",)
+    assert blocked.metrics.model_candidate_count == 1
+    assert blocked.metrics.exact_model_check_count == 1
     assert clear_above.has_line_of_sight
 
 
@@ -213,6 +217,7 @@ def test_path_query_checks_model_collision_along_witness_path() -> None:
     assert result.failure is not None
     assert result.failure.reason is PathFailureReason.MODEL_COLLISION
     assert result.failure.blocker_id == "blocker"
+    assert result.metrics.model_collision_check_count > 0
 
 
 def test_path_query_checks_terrain_collision_along_witness_path() -> None:
@@ -329,6 +334,7 @@ def test_path_query_validates_attached_unit_group_together() -> None:
     assert incomplete_result.failure is not None
     assert incomplete_result.failure.reason is PathFailureReason.GROUP_MISMATCH
     assert complete_result.is_valid
+    assert complete_result.metrics.sampled_pose_count == 6
 
 
 def test_path_query_accepts_attached_group_when_witness_order_differs_from_unit_order() -> None:

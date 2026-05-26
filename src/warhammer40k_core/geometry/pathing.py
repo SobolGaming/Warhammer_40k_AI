@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
@@ -50,6 +50,14 @@ class PathResultPayload(TypedDict):
     is_valid: bool
     witness: PathWitnessPayload | None
     failure: PathFailurePayload | None
+    metrics: PathMetricsPayload
+
+
+class PathMetricsPayload(TypedDict):
+    sampled_pose_count: int
+    model_collision_check_count: int
+    terrain_collision_check_count: int
+    engagement_check_count: int
 
 
 class PathQueryPayload(TypedDict):
@@ -160,9 +168,66 @@ class PathFailure:
 
 
 @dataclass(frozen=True, slots=True)
+class PathMetrics:
+    sampled_pose_count: int = 0
+    model_collision_check_count: int = 0
+    terrain_collision_check_count: int = 0
+    engagement_check_count: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "sampled_pose_count",
+            _validate_non_negative_int("PathMetrics sampled_pose_count", self.sampled_pose_count),
+        )
+        object.__setattr__(
+            self,
+            "model_collision_check_count",
+            _validate_non_negative_int(
+                "PathMetrics model_collision_check_count",
+                self.model_collision_check_count,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "terrain_collision_check_count",
+            _validate_non_negative_int(
+                "PathMetrics terrain_collision_check_count",
+                self.terrain_collision_check_count,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "engagement_check_count",
+            _validate_non_negative_int(
+                "PathMetrics engagement_check_count",
+                self.engagement_check_count,
+            ),
+        )
+
+    def to_payload(self) -> PathMetricsPayload:
+        return {
+            "sampled_pose_count": self.sampled_pose_count,
+            "model_collision_check_count": self.model_collision_check_count,
+            "terrain_collision_check_count": self.terrain_collision_check_count,
+            "engagement_check_count": self.engagement_check_count,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PathMetricsPayload) -> Self:
+        return cls(
+            sampled_pose_count=payload["sampled_pose_count"],
+            model_collision_check_count=payload["model_collision_check_count"],
+            terrain_collision_check_count=payload["terrain_collision_check_count"],
+            engagement_check_count=payload["engagement_check_count"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class PathResult:
     witness: PathWitness | None = None
     failure: PathFailure | None = None
+    metrics: PathMetrics = field(default_factory=PathMetrics)
 
     def __post_init__(self) -> None:
         if (self.witness is None) == (self.failure is None):
@@ -171,14 +236,16 @@ class PathResult:
             raise GeometryError("PathResult witness must be a PathWitness.")
         if self.failure is not None and type(self.failure) is not PathFailure:
             raise GeometryError("PathResult failure must be a PathFailure.")
+        if type(self.metrics) is not PathMetrics:
+            raise GeometryError("PathResult metrics must be PathMetrics.")
 
     @classmethod
-    def valid(cls, witness: PathWitness) -> Self:
-        return cls(witness=witness)
+    def valid(cls, witness: PathWitness, metrics: PathMetrics | None = None) -> Self:
+        return cls(witness=witness, metrics=PathMetrics() if metrics is None else metrics)
 
     @classmethod
-    def invalid(cls, failure: PathFailure) -> Self:
-        return cls(failure=failure)
+    def invalid(cls, failure: PathFailure, metrics: PathMetrics | None = None) -> Self:
+        return cls(failure=failure, metrics=PathMetrics() if metrics is None else metrics)
 
     @property
     def is_valid(self) -> bool:
@@ -189,6 +256,7 @@ class PathResult:
             "is_valid": self.is_valid,
             "witness": None if self.witness is None else self.witness.to_payload(),
             "failure": None if self.failure is None else self.failure.to_payload(),
+            "metrics": self.metrics.to_payload(),
         }
 
     @classmethod
@@ -198,10 +266,16 @@ class PathResult:
         if payload["is_valid"]:
             if witness_payload is None or failure_payload is not None:
                 raise GeometryError("Valid PathResult payload must include only witness.")
-            return cls.valid(PathWitness.from_payload(witness_payload))
+            return cls.valid(
+                PathWitness.from_payload(witness_payload),
+                metrics=PathMetrics.from_payload(payload["metrics"]),
+            )
         if failure_payload is None or witness_payload is not None:
             raise GeometryError("Invalid PathResult payload must include only failure.")
-        return cls.invalid(PathFailure.from_payload(failure_payload))
+        return cls.invalid(
+            PathFailure.from_payload(failure_payload),
+            metrics=PathMetrics.from_payload(payload["metrics"]),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -234,6 +308,7 @@ class PathQuery:
 
         indexed_models = {model.model_id: model for model in self.spatial_index.models}
         final_models: list[Model] = []
+        metrics = _PathMetricCounts()
 
         for model_id in expected_model_ids:
             current_model = indexed_models.get(model_id)
@@ -242,6 +317,7 @@ class PathQuery:
                     PathFailureReason.MISSING_MODEL,
                     "PathWitness references a model missing from the spatial index.",
                     model_id=model_id,
+                    metrics=metrics.to_metrics(),
                 )
 
             path = self.witness.poses_for_model(model_id)
@@ -250,12 +326,14 @@ class PathQuery:
                     PathFailureReason.STARTING_POSE_MISMATCH,
                     "PathWitness must start at the current model pose.",
                     model_id=model_id,
+                    metrics=metrics.to_metrics(),
                 )
             if len(path) < 3 or not _has_non_endpoint_interior_pose(path):
                 return _invalid(
                     PathFailureReason.ENDPOINT_ONLY_PATH,
                     "PathWitness must include path evidence beyond start and end poses.",
                     model_id=model_id,
+                    metrics=metrics.to_metrics(),
                 )
             if (
                 self.movement_envelope.path_distance(path)
@@ -265,10 +343,14 @@ class PathQuery:
                     PathFailureReason.MOVEMENT_DISTANCE_EXCEEDED,
                     "PathWitness exceeds the movement envelope distance.",
                     model_id=model_id,
+                    metrics=metrics.to_metrics(),
                 )
 
-            for sampled_pose in self.movement_envelope.sampled_path(path):
+            sampled_path = self.movement_envelope.sampled_path(path)
+            metrics.sampled_pose_count += len(sampled_path)
+            for sampled_pose in sampled_path:
                 sampled_model = _model_at_pose(current_model, sampled_pose)
+                metrics.model_collision_check_count += len(self.collision_set.model_blockers)
                 model_collisions = self.collision_set.colliding_model_ids(sampled_model)
                 if model_collisions:
                     return _invalid(
@@ -276,7 +358,9 @@ class PathQuery:
                         "PathWitness collides with a model blocker.",
                         model_id=model_id,
                         blocker_id=model_collisions[0],
+                        metrics=metrics.to_metrics(),
                     )
+                metrics.terrain_collision_check_count += len(self.collision_set.terrain_blockers)
                 terrain_collisions = self.collision_set.colliding_terrain_ids(sampled_model)
                 if terrain_collisions:
                     return _invalid(
@@ -284,7 +368,9 @@ class PathQuery:
                         "PathWitness collides with terrain.",
                         model_id=model_id,
                         blocker_id=terrain_collisions[0],
+                        metrics=metrics.to_metrics(),
                     )
+                metrics.engagement_check_count += len(self.collision_set.engagement_blockers)
                 engagement_blockers = self.collision_set.engagement_model_ids(
                     sampled_model,
                     horizontal_inches=self.movement_envelope.engagement_horizontal_inches,
@@ -296,6 +382,7 @@ class PathQuery:
                         "PathWitness enters engagement range.",
                         model_id=model_id,
                         blocker_id=engagement_blockers[0],
+                        metrics=metrics.to_metrics(),
                     )
 
             final_models.append(_model_at_pose(current_model, path[-1]))
@@ -308,15 +395,17 @@ class PathQuery:
                 "PathWitness final poses overlap moving models.",
                 model_id=first_model_id,
                 blocker_id=second_model_id,
+                metrics=metrics.to_metrics(),
             )
 
         if not self.movement_envelope.models_are_coherent(tuple(final_models)):
             return _invalid(
                 PathFailureReason.COHERENCY,
                 "PathWitness final poses fail model coherency.",
+                metrics=metrics.to_metrics(),
             )
 
-        return PathResult.valid(self.witness)
+        return PathResult.valid(self.witness, metrics=metrics.to_metrics())
 
     def to_payload(self) -> PathQueryPayload:
         return {
@@ -392,6 +481,30 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     return _validate_identifier(field_name, value)
 
 
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GeometryError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise GeometryError(f"{field_name} must not be negative.")
+    return value
+
+
+@dataclass(slots=True)
+class _PathMetricCounts:
+    sampled_pose_count: int = 0
+    model_collision_check_count: int = 0
+    terrain_collision_check_count: int = 0
+    engagement_check_count: int = 0
+
+    def to_metrics(self) -> PathMetrics:
+        return PathMetrics(
+            sampled_pose_count=self.sampled_pose_count,
+            model_collision_check_count=self.model_collision_check_count,
+            terrain_collision_check_count=self.terrain_collision_check_count,
+            engagement_check_count=self.engagement_check_count,
+        )
+
+
 def _model_at_pose(model: Model, pose: Pose) -> Model:
     return Model(
         model_id=model.model_id,
@@ -423,6 +536,7 @@ def _invalid(
     message: str,
     model_id: str | None = None,
     blocker_id: str | None = None,
+    metrics: PathMetrics | None = None,
 ) -> PathResult:
     return PathResult.invalid(
         PathFailure(
@@ -430,5 +544,6 @@ def _invalid(
             message=message,
             model_id=model_id,
             blocker_id=blocker_id,
-        )
+        ),
+        metrics=metrics,
     )
