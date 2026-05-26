@@ -4,14 +4,14 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-GEOMETRY = ROOT / "src" / "warhammer40k_core" / "geometry"
-SHAPELY_BACKEND = GEOMETRY / "shapely_backend.py"
+PACKAGE = ROOT / "src" / "warhammer40k_core"
+SHAPELY_BACKEND = PACKAGE / "geometry" / "shapely_backend.py"
 
 
 def test_shapely_imports_stay_inside_private_backend() -> None:
     violations: list[str] = []
 
-    for path in sorted(GEOMETRY.rglob("*.py")):
+    for path in sorted(PACKAGE.rglob("*.py")):
         if path == SHAPELY_BACKEND:
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))

@@ -201,6 +201,36 @@ def test_line_of_sight_segment_blocking_uses_obstacle_volume() -> None:
     assert index.has_clear_line_of_sight(Point3(-3.0, 3.0, 1.0), Point3(3.0, 3.0, 1.0))
 
 
+def test_los_segment_crossing_footprint_above_obstacle_does_not_block() -> None:
+    wall = ObstacleVolume(
+        terrain_id="wall",
+        bottom_center=Point3(-8.0, 0.0, 0.0),
+        width=1.0,
+        depth=4.0,
+        height=3.0,
+    )
+
+    assert not wall.blocks_line_segment(
+        Point3(-10.0, 0.0, 10.0),
+        Point3(10.0, 0.0, 0.0),
+    )
+
+
+def test_los_segment_crossing_footprint_at_obstacle_height_blocks() -> None:
+    wall = ObstacleVolume(
+        terrain_id="wall",
+        bottom_center=Point3(-8.0, 0.0, 0.0),
+        width=1.0,
+        depth=4.0,
+        height=3.0,
+    )
+
+    assert wall.blocks_line_segment(
+        Point3(-10.0, 0.0, 2.0),
+        Point3(10.0, 0.0, 2.0),
+    )
+
+
 def test_spatial_index_orders_entries_and_rejects_duplicates() -> None:
     second = _model("second", 3.0, 0.0)
     first = _model("first", 0.0, 0.0)
