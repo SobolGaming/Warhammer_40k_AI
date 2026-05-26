@@ -123,12 +123,23 @@ def test_parsed_rule_text_rejects_out_of_order_tokens() -> None:
         )
 
 
-def test_hyphenated_range_is_not_silently_parsed_as_single_distance() -> None:
-    normalized = normalize_rule_text('Range 12\u201324"')
-    assert normalized == 'Range 12-24"'
+@pytest.mark.parametrize(
+    ("raw_text", "expected_normalized"),
+    [
+        ('Range 12-24"', 'Range 12-24"'),
+        ('Range 12 - 24"', 'Range 12 - 24"'),
+        ("Range 12 \u2013 24 inches", 'Range 12 - 24"'),
+    ],
+)
+def test_hyphenated_range_intervals_fail_explicitly(
+    raw_text: str,
+    expected_normalized: str,
+) -> None:
+    normalized = normalize_rule_text(raw_text)
+    assert normalized == expected_normalized
 
-    parsed = parse_normalized_tokens(normalized)
-    assert parsed.range_expressions == ()
+    with pytest.raises(RuleTokenError):
+        parse_normalized_tokens(normalized)
 
 
 def test_parsed_tokens_fail_explicitly_for_invalid_inputs() -> None:

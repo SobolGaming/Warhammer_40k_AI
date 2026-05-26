@@ -47,6 +47,7 @@ _DICE_TOKEN_RE = re.compile(
     r"(?P<modifier>[+-]\d+)?"
     r"(?![A-Za-z0-9_])"
 )
+_RANGE_INTERVAL_RE = re.compile(r'(?<![A-Za-z0-9_])\d+\s*-\s*\d+\s*"')
 _RANGE_TOKEN_RE = re.compile(r'(?<![A-Za-z0-9_-])(?P<distance>\d+)"')
 _KEYWORD_TOKEN_PATTERNS = tuple(
     (
@@ -252,6 +253,9 @@ def _dice_expression_from_match(match: re.Match[str]) -> DiceExpression:
 
 
 def _parse_range_tokens(text: str) -> tuple[RangeExpressionToken, ...]:
+    if _RANGE_INTERVAL_RE.search(text):
+        raise RuleTokenError("Range intervals are not supported yet.")
+
     return tuple(
         RangeExpressionToken(
             span=TextSpan(text=match.group(0), start=match.start(), end=match.end()),
