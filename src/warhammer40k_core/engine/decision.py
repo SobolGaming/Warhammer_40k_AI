@@ -289,6 +289,7 @@ class DiceRollManager:
             self.rng.append_history(record.history_token())
             if record.event_type == "dice_rolled":
                 self._roll_counter += 1
+                self.rng.draw_count += _restored_rng_draw_count(record.payload)
             elif record.event_type == "decision_requested":
                 self._decision_request_counter += 1
 
@@ -341,6 +342,32 @@ def _extract_index_list(payload: JsonValue, *, key: str) -> tuple[int, ...]:
     if not isinstance(value, list):
         raise DecisionError(f"Decision payload key must be an index list: {key}.")
     return _validate_index_list(tuple(value), field_name=key)
+
+
+def _extract_int_list(payload: JsonValue, *, key: str) -> tuple[int, ...]:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        raise DecisionError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, list):
+        raise DecisionError(f"Decision payload key must be an integer list: {key}.")
+
+    validated: list[int] = []
+    for item in value:
+        if type(item) is not int:
+            raise DecisionError(f"Decision payload key must contain integers: {key}.")
+        validated.append(item)
+    return tuple(validated)
+
+
+def _restored_rng_draw_count(payload: JsonValue) -> int:
+    source = _extract_string(payload, key="source")
+    if source == "rng":
+        return len(_extract_int_list(payload, key="values"))
+    if source == "fixed" or source == "injected":
+        return 0
+    raise DecisionError("dice_rolled event source must be rng, fixed, or injected.")
 
 
 def _validate_index_list(indices: tuple[object, ...], *, field_name: str) -> tuple[int, ...]:

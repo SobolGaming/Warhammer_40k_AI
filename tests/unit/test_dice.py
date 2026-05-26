@@ -99,6 +99,89 @@ def test_reconstructed_event_history_affects_next_dice_roll() -> None:
     assert reconstructed_next.to_payload() == original_next.to_payload()
 
 
+def test_reconstructed_rng_event_history_restores_next_random_roll_after_rng_roll() -> None:
+    first_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=2, sides=6),
+        reason="Initial random charge roll",
+        roll_type="charge_roll",
+    )
+    next_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Next random advance roll",
+        roll_type="advance_roll",
+    )
+
+    original = DiceRollManager("seed")
+    original.roll(first_spec)
+    saved_history = original.event_log.to_payload()
+    original_next = original.roll(next_spec)
+
+    reconstructed = DiceRollManager(
+        "seed",
+        event_log=EventLog.from_payload(saved_history),
+    )
+    reconstructed_next = reconstructed.roll(next_spec)
+
+    assert reconstructed.rng.draw_count == 3
+    assert reconstructed_next.to_payload() == original_next.to_payload()
+
+
+def test_reconstructed_rng_dice_event_advances_draw_count() -> None:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=3, sides=6),
+        reason="Initial random battle-shock roll",
+        roll_type="battle_shock_roll",
+    )
+    original = DiceRollManager("seed")
+    original.roll(spec)
+
+    reconstructed = DiceRollManager(
+        "seed",
+        event_log=EventLog.from_payload(original.event_log.to_payload()),
+    )
+
+    assert reconstructed.rng.draw_count == 3
+
+
+def test_reconstructed_fixed_dice_event_does_not_advance_draw_count() -> None:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=3, sides=6),
+        reason="Fixed reconstruction fixture",
+        roll_type="advance_roll",
+    )
+    original = DiceRollManager("seed")
+    original.roll_fixed(spec, [1, 2, 3])
+
+    reconstructed = DiceRollManager(
+        "seed",
+        event_log=EventLog.from_payload(original.event_log.to_payload()),
+    )
+
+    assert reconstructed.rng.draw_count == 0
+
+
+def test_reconstructed_injected_dice_event_does_not_advance_draw_count() -> None:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=2, sides=6),
+        reason="Injected reconstruction fixture",
+        roll_type="advance_roll",
+    )
+    event_log = EventLog()
+    event_log.append(
+        "dice_rolled",
+        DiceRollResult.from_values(
+            roll_id="roll-000001",
+            spec=spec,
+            values=[4, 5],
+            source="injected",
+        ).to_payload(),
+    )
+
+    reconstructed = DiceRollManager("seed", event_log=event_log)
+
+    assert reconstructed.rng.draw_count == 0
+
+
 def test_reroll_selection_is_an_explicit_decision() -> None:
     manager = DiceRollManager("seed")
     spec = DiceRollSpec(
