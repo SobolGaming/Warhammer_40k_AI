@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from enum import StrEnum
+from math import isfinite
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.dice import (
@@ -30,6 +32,12 @@ class RangeExpressionTokenPayload(TextSpanPayload):
     distance_inches: int
 
 
+class DistancePredicateTokenPayload(TextSpanPayload):
+    kind: str
+    distance_inches: float | None
+    qualifier: str | None
+
+
 class KeywordTokenPayload(TextSpanPayload):
     keyword: str
 
@@ -38,7 +46,19 @@ class ParsedRuleTextPayload(TypedDict):
     normalized_text: str
     dice_expressions: list[DiceExpressionTokenPayload]
     range_expressions: list[RangeExpressionTokenPayload]
+    distance_predicates: list[DistancePredicateTokenPayload]
     keywords: list[KeywordTokenPayload]
+
+
+class DistancePredicateKind(StrEnum):
+    WITHIN = "within"
+    MORE_THAN = "more_than"
+    AT_LEAST = "at_least"
+    AT_MOST = "at_most"
+    EXACTLY = "exactly"
+    WITHIN_ENGAGEMENT_RANGE = "within_engagement_range"
+    OUTSIDE_DETECTION_RANGE = "outside_detection_range"
+    HALF_RANGE = "half_range"
 
 
 _DICE_TOKEN_RE = re.compile(
@@ -49,6 +69,63 @@ _DICE_TOKEN_RE = re.compile(
 )
 _RANGE_INTERVAL_RE = re.compile(r'(?<![A-Za-z0-9_])\d+\s*-\s*\d+\s*"')
 _RANGE_TOKEN_RE = re.compile(r'(?<![A-Za-z0-9_-])(?P<distance>\d+)"')
+_DISTANCE_VALUE_RE = r'(?P<distance>\d+(?:\.\d+)?)"'
+_DISTANCE_PREDICATE_PATTERNS = (
+    (
+        re.compile(
+            rf"(?<![A-Za-z0-9_-])within\s+{_DISTANCE_VALUE_RE}"
+            r"(?P<qualifier>\s+if\s+possible)?(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.WITHIN,
+    ),
+    (
+        re.compile(
+            rf"(?<![A-Za-z0-9_-])more\s+than\s+{_DISTANCE_VALUE_RE}(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.MORE_THAN,
+    ),
+    (
+        re.compile(
+            rf"(?<![A-Za-z0-9_-])at\s+least\s+{_DISTANCE_VALUE_RE}(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.AT_LEAST,
+    ),
+    (
+        re.compile(
+            rf"(?<![A-Za-z0-9_-])at\s+most\s+{_DISTANCE_VALUE_RE}(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.AT_MOST,
+    ),
+    (
+        re.compile(
+            rf"(?<![A-Za-z0-9_-])exactly\s+{_DISTANCE_VALUE_RE}(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.EXACTLY,
+    ),
+    (
+        re.compile(
+            r"(?<![A-Za-z0-9_-])within\s+Engagement\s+Range(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.WITHIN_ENGAGEMENT_RANGE,
+    ),
+    (
+        re.compile(
+            r"(?<![A-Za-z0-9_-])outside\s+Detection\s+Range(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.OUTSIDE_DETECTION_RANGE,
+    ),
+    (
+        re.compile(r"(?<![A-Za-z0-9_-])Half\s+Range(?![A-Za-z0-9_-])", re.IGNORECASE),
+        DistancePredicateKind.HALF_RANGE,
+    ),
+)
 _KEYWORD_TOKEN_PATTERNS = tuple(
     (
         re.compile(
@@ -139,6 +216,51 @@ class RangeExpressionToken:
 
 
 @dataclass(frozen=True, slots=True)
+class DistancePredicateToken:
+    span: TextSpan
+    kind: DistancePredicateKind
+    distance_inches: float | None = None
+    qualifier: str | None = None
+
+    def __post_init__(self) -> None:
+        _validate_span_object(self.span)
+        kind = _validate_distance_predicate_kind(self.kind)
+        if kind != self.kind:
+            object.__setattr__(self, "kind", kind)
+
+        distance = _validate_distance_predicate_distance(kind, self.distance_inches)
+        if distance != self.distance_inches:
+            object.__setattr__(self, "distance_inches", distance)
+
+        qualifier = _validate_optional_qualifier(kind, self.qualifier)
+        if qualifier != self.qualifier:
+            object.__setattr__(self, "qualifier", qualifier)
+
+    def to_payload(self) -> DistancePredicateTokenPayload:
+        return {
+            "text": self.span.text,
+            "start": self.span.start,
+            "end": self.span.end,
+            "kind": self.kind.value,
+            "distance_inches": self.distance_inches,
+            "qualifier": self.qualifier,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DistancePredicateTokenPayload) -> Self:
+        return cls(
+            span=TextSpan(
+                text=payload["text"],
+                start=payload["start"],
+                end=payload["end"],
+            ),
+            kind=distance_predicate_kind_from_token(payload["kind"]),
+            distance_inches=payload["distance_inches"],
+            qualifier=payload["qualifier"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class KeywordToken:
     span: TextSpan
     keyword: str
@@ -175,12 +297,18 @@ class ParsedRuleText:
     normalized_text: str
     dice_expressions: tuple[DiceExpressionToken, ...] = ()
     range_expressions: tuple[RangeExpressionToken, ...] = ()
+    distance_predicates: tuple[DistancePredicateToken, ...] = ()
     keywords: tuple[KeywordToken, ...] = ()
 
     def __post_init__(self) -> None:
         _validate_normalized_text(self.normalized_text)
         _validate_token_tuple(self.dice_expressions, DiceExpressionToken, "dice_expressions")
         _validate_token_tuple(self.range_expressions, RangeExpressionToken, "range_expressions")
+        _validate_token_tuple(
+            self.distance_predicates,
+            DistancePredicateToken,
+            "distance_predicates",
+        )
         _validate_token_tuple(self.keywords, KeywordToken, "keywords")
         _validate_tokens_belong_to_text(
             self.normalized_text,
@@ -192,6 +320,11 @@ class ParsedRuleText:
             self.range_expressions,
             "range_expressions",
         )
+        _validate_tokens_belong_to_text(
+            self.normalized_text,
+            self.distance_predicates,
+            "distance_predicates",
+        )
         _validate_tokens_belong_to_text(self.normalized_text, self.keywords, "keywords")
 
     def to_payload(self) -> ParsedRuleTextPayload:
@@ -199,6 +332,7 @@ class ParsedRuleText:
             "normalized_text": self.normalized_text,
             "dice_expressions": [token.to_payload() for token in self.dice_expressions],
             "range_expressions": [token.to_payload() for token in self.range_expressions],
+            "distance_predicates": [token.to_payload() for token in self.distance_predicates],
             "keywords": [token.to_payload() for token in self.keywords],
         }
 
@@ -212,18 +346,38 @@ class ParsedRuleText:
             range_expressions=tuple(
                 RangeExpressionToken.from_payload(token) for token in payload["range_expressions"]
             ),
+            distance_predicates=tuple(
+                DistancePredicateToken.from_payload(token)
+                for token in payload["distance_predicates"]
+            ),
             keywords=tuple(KeywordToken.from_payload(token) for token in payload["keywords"]),
         )
 
 
 def parse_normalized_tokens(normalized_text: object) -> ParsedRuleText:
     text = _validate_normalized_text(normalized_text)
+    distance_predicates = _parse_distance_predicate_tokens(text)
     return ParsedRuleText(
         normalized_text=text,
         dice_expressions=_parse_dice_tokens(text),
-        range_expressions=_parse_range_tokens(text),
+        range_expressions=_parse_range_tokens(
+            text,
+            tuple((token.span.start, token.span.end) for token in distance_predicates),
+        ),
+        distance_predicates=distance_predicates,
         keywords=_parse_keyword_tokens(text),
     )
+
+
+def distance_predicate_kind_from_token(token: object) -> DistancePredicateKind:
+    if type(token) is DistancePredicateKind:
+        return token
+    if type(token) is not str:
+        raise RuleTokenError("DistancePredicateKind token must be a string.")
+    try:
+        return DistancePredicateKind(token)
+    except ValueError as exc:
+        raise RuleTokenError(f"Unsupported DistancePredicateKind token: {token}.") from exc
 
 
 def _parse_dice_tokens(text: str) -> tuple[DiceExpressionToken, ...]:
@@ -252,16 +406,60 @@ def _dice_expression_from_match(match: re.Match[str]) -> DiceExpression:
         raise RuleTokenError("Dice expression token is invalid.") from exc
 
 
-def _parse_range_tokens(text: str) -> tuple[RangeExpressionToken, ...]:
+def _parse_range_tokens(
+    text: str,
+    excluded_spans: tuple[tuple[int, int], ...] = (),
+) -> tuple[RangeExpressionToken, ...]:
     if _RANGE_INTERVAL_RE.search(text):
         raise RuleTokenError("Range intervals are not supported yet.")
 
-    return tuple(
-        RangeExpressionToken(
-            span=TextSpan(text=match.group(0), start=match.start(), end=match.end()),
-            distance_inches=int(match.group("distance")),
+    tokens: list[RangeExpressionToken] = []
+    for match in _RANGE_TOKEN_RE.finditer(text):
+        if _span_is_inside(match.start(), match.end(), excluded_spans):
+            continue
+        tokens.append(
+            RangeExpressionToken(
+                span=TextSpan(text=match.group(0), start=match.start(), end=match.end()),
+                distance_inches=int(match.group("distance")),
+            )
         )
-        for match in _RANGE_TOKEN_RE.finditer(text)
+    return tuple(tokens)
+
+
+def _parse_distance_predicate_tokens(text: str) -> tuple[DistancePredicateToken, ...]:
+    tokens: list[DistancePredicateToken] = []
+    for pattern, kind in _DISTANCE_PREDICATE_PATTERNS:
+        tokens.extend(
+            _distance_predicate_token_from_match(match, kind) for match in pattern.finditer(text)
+        )
+
+    return tuple(
+        sorted(tokens, key=lambda token: (token.span.start, token.span.end, token.kind.value))
+    )
+
+
+def _distance_predicate_token_from_match(
+    match: re.Match[str],
+    kind: DistancePredicateKind,
+) -> DistancePredicateToken:
+    distance_text = match.groupdict().get("distance")
+    qualifier_text = match.groupdict().get("qualifier")
+    return DistancePredicateToken(
+        span=TextSpan(text=match.group(0), start=match.start(), end=match.end()),
+        kind=kind,
+        distance_inches=None if distance_text is None else float(distance_text),
+        qualifier=None if qualifier_text is None else qualifier_text.strip(),
+    )
+
+
+def _span_is_inside(
+    start: int,
+    end: int,
+    excluded_spans: tuple[tuple[int, int], ...],
+) -> bool:
+    return any(
+        excluded_start <= start and end <= excluded_end
+        for excluded_start, excluded_end in excluded_spans
     )
 
 
@@ -313,6 +511,56 @@ def _validate_dice_expression(expression: object) -> DiceExpression:
     return expression
 
 
+def _validate_distance_predicate_kind(kind: object) -> DistancePredicateKind:
+    if type(kind) is not DistancePredicateKind:
+        raise RuleTokenError("DistancePredicateToken kind must be a DistancePredicateKind.")
+    return kind
+
+
+def _validate_distance_predicate_distance(
+    kind: DistancePredicateKind,
+    distance_inches: object | None,
+) -> float | None:
+    if kind in {
+        DistancePredicateKind.WITHIN,
+        DistancePredicateKind.MORE_THAN,
+        DistancePredicateKind.AT_LEAST,
+        DistancePredicateKind.AT_MOST,
+        DistancePredicateKind.EXACTLY,
+    }:
+        if type(distance_inches) is int:
+            distance = float(distance_inches)
+        elif type(distance_inches) is float:
+            distance = distance_inches
+        else:
+            raise RuleTokenError("DistancePredicateToken distance_inches must be a number.")
+        if not isfinite(distance) or distance <= 0.0:
+            raise RuleTokenError("DistancePredicateToken distance_inches must be positive.")
+        return distance
+
+    if distance_inches is not None:
+        raise RuleTokenError(
+            "DistancePredicateToken distance_inches must be empty for non-numeric predicates."
+        )
+    return None
+
+
+def _validate_optional_qualifier(
+    kind: DistancePredicateKind,
+    qualifier: object | None,
+) -> str | None:
+    if qualifier is None:
+        return None
+    if kind is not DistancePredicateKind.WITHIN:
+        raise RuleTokenError("DistancePredicateToken qualifier is only supported for within.")
+    if type(qualifier) is not str:
+        raise RuleTokenError("DistancePredicateToken qualifier must be a string.")
+    stripped = qualifier.strip()
+    if not stripped:
+        raise RuleTokenError("DistancePredicateToken qualifier must not be empty.")
+    return stripped
+
+
 def _validate_token_tuple(
     tokens: tuple[object, ...],
     expected_type: type[object],
@@ -353,6 +601,8 @@ def _token_span(token: object) -> TextSpan:
     if type(token) is DiceExpressionToken:
         return token.span
     if type(token) is RangeExpressionToken:
+        return token.span
+    if type(token) is DistancePredicateToken:
         return token.span
     if type(token) is KeywordToken:
         return token.span
