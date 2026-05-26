@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import deque
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from typing import Self, TypedDict
+from itertools import combinations
 
 from warhammer40k_core.core.dice import (
     DiceExpression,
@@ -17,118 +17,26 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
 )
 from warhammer40k_core.core.rng import RandomSource
-from warhammer40k_core.engine.event_log import (
-    EventLog,
-    JsonValue,
-    canonical_json,
-    validate_json_value,
-)
+from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import EventLog, JsonValue
 
-
-class DecisionError(ValueError):
-    """Raised when a decision request/result is invalid."""
-
-
-class DecisionRequestPayload(TypedDict):
-    request_id: str
-    decision_type: str
-    actor_id: str | None
-    payload: JsonValue
-
-
-class DecisionResultPayload(TypedDict):
-    result_id: str
-    request_id: str
-    decision_type: str
-    actor_id: str | None
-    payload: JsonValue
+__all__ = [
+    "DecisionError",
+    "DecisionOption",
+    "DecisionRequest",
+    "DecisionResult",
+    "DiceRollManager",
+]
 
 
 def _new_injected_results() -> deque[DiceRollResult]:
     return deque()
 
 
-def _new_decision_records() -> list[DecisionResult]:
+def _new_decision_records() -> list[DecisionRecord]:
     return []
-
-
-@dataclass(frozen=True, slots=True)
-class DecisionRequest:
-    request_id: str
-    decision_type: str
-    actor_id: str | None
-    payload: JsonValue
-
-    def __post_init__(self) -> None:
-        if not self.request_id.strip():
-            raise DecisionError("DecisionRequest request_id must not be empty.")
-        if not self.decision_type.strip():
-            raise DecisionError("DecisionRequest decision_type must not be empty.")
-        if self.actor_id is not None and not self.actor_id.strip():
-            raise DecisionError("DecisionRequest actor_id must not be empty when supplied.")
-        object.__setattr__(self, "payload", validate_json_value(self.payload))
-
-    def history_token(self) -> str:
-        return canonical_json(self.to_payload())
-
-    def to_payload(self) -> DecisionRequestPayload:
-        return {
-            "request_id": self.request_id,
-            "decision_type": self.decision_type,
-            "actor_id": self.actor_id,
-            "payload": self.payload,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: DecisionRequestPayload) -> Self:
-        return cls(
-            request_id=payload["request_id"],
-            decision_type=payload["decision_type"],
-            actor_id=payload["actor_id"],
-            payload=payload["payload"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class DecisionResult:
-    result_id: str
-    request_id: str
-    decision_type: str
-    actor_id: str | None
-    payload: JsonValue
-
-    def __post_init__(self) -> None:
-        if not self.result_id.strip():
-            raise DecisionError("DecisionResult result_id must not be empty.")
-        if not self.request_id.strip():
-            raise DecisionError("DecisionResult request_id must not be empty.")
-        if not self.decision_type.strip():
-            raise DecisionError("DecisionResult decision_type must not be empty.")
-        if self.actor_id is not None and not self.actor_id.strip():
-            raise DecisionError("DecisionResult actor_id must not be empty when supplied.")
-        object.__setattr__(self, "payload", validate_json_value(self.payload))
-
-    def history_token(self) -> str:
-        return canonical_json(self.to_payload())
-
-    def to_payload(self) -> DecisionResultPayload:
-        return {
-            "result_id": self.result_id,
-            "request_id": self.request_id,
-            "decision_type": self.decision_type,
-            "actor_id": self.actor_id,
-            "payload": self.payload,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: DecisionResultPayload) -> Self:
-        return cls(
-            result_id=payload["result_id"],
-            request_id=payload["request_id"],
-            decision_type=payload["decision_type"],
-            actor_id=payload["actor_id"],
-            payload=payload["payload"],
-        )
 
 
 @dataclass(slots=True)
@@ -136,7 +44,7 @@ class DiceRollManager:
     rng: RandomSource
     event_log: EventLog
     _injected_results: deque[DiceRollResult] = field(default_factory=_new_injected_results)
-    _decision_records: list[DecisionResult] = field(default_factory=_new_decision_records)
+    _decision_records: list[DecisionRecord] = field(default_factory=_new_decision_records)
     _roll_counter: int = 0
     _decision_request_counter: int = 0
 
@@ -159,7 +67,7 @@ class DiceRollManager:
         self._seed_existing_event_history()
 
     @property
-    def decision_records(self) -> tuple[DecisionResult, ...]:
+    def decision_records(self) -> tuple[DecisionRecord, ...]:
         return tuple(self._decision_records)
 
     def roll(self, spec: DiceRollSpec) -> DiceRollState:
@@ -177,11 +85,22 @@ class DiceRollManager:
         self._record_roll(result)
         return DiceRollState.from_result(result)
 
-    def record_decision(self, result: DecisionResult) -> None:
-        self._decision_records.append(result)
-        self.rng.append_history(result.history_token())
-        event = self.event_log.append("decision_recorded", result.to_payload())
+    def record_decision(
+        self,
+        *,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> DecisionRecord:
+        record = DecisionRecord(
+            record_id=f"decision-record-{len(self._decision_records) + 1:06d}",
+            request=request,
+            result=result,
+        )
+        self._decision_records.append(record)
+        self.rng.append_history(record.history_token())
+        event = self.event_log.append("decision_recorded", record.to_payload())
         self.rng.append_history(event.history_token())
+        return record
 
     def request_reroll(
         self,
@@ -205,6 +124,7 @@ class DiceRollManager:
                 "allowed_indices": list(indices),
                 "current_values": list(state.current_values),
             },
+            options=_reroll_options(indices),
         )
         event = self.event_log.append("decision_requested", request.to_payload())
         self.rng.append_history(request.history_token())
@@ -219,7 +139,7 @@ class DiceRollManager:
         result: DecisionResult,
     ) -> DiceRollState:
         self._validate_reroll_decision(state, request, result)
-        self.record_decision(result)
+        self.record_decision(request=request, result=result)
         selected_indices = _extract_index_list(result.payload, key="selected_indices")
         if not selected_indices:
             event = self.event_log.append(
@@ -304,12 +224,7 @@ class DiceRollManager:
     ) -> None:
         if request.decision_type != "select_dice_reroll":
             raise DecisionError("Reroll request has the wrong decision_type.")
-        if result.decision_type != request.decision_type:
-            raise DecisionError("Reroll result decision_type does not match request.")
-        if result.request_id != request.request_id:
-            raise DecisionError("Reroll result request_id does not match request.")
-        if result.actor_id != request.actor_id:
-            raise DecisionError("Reroll result actor_id does not match request.")
+        result.validate_for_request(request)
         request_roll_id = _extract_string(request.payload, key="roll_id")
         if request_roll_id != state.original_result.roll_id:
             raise DecisionError("Reroll request does not target this dice roll.")
@@ -323,6 +238,27 @@ def _coerce_result(result: DiceRollResult | DiceRollResultPayload) -> DiceRollRe
     if isinstance(result, DiceRollResult):
         return result
     return DiceRollResult.from_payload(result)
+
+
+def _reroll_options(indices: tuple[int, ...]) -> tuple[DecisionOption, ...]:
+    options: list[DecisionOption] = [
+        DecisionOption(
+            option_id="decline",
+            label="Decline reroll",
+            payload={"selected_indices": []},
+        )
+    ]
+    for size in range(1, len(indices) + 1):
+        for selected in combinations(indices, size):
+            selected_label = ",".join(str(index) for index in selected)
+            options.append(
+                DecisionOption(
+                    option_id=f"reroll:{selected_label}",
+                    label=f"Reroll dice {selected_label}",
+                    payload={"selected_indices": list(selected)},
+                )
+            )
+    return tuple(options)
 
 
 def _extract_string(payload: JsonValue, *, key: str) -> str:

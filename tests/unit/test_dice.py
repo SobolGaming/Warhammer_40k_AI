@@ -18,6 +18,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.engine.decision import (
     DecisionError,
+    DecisionOption,
     DecisionRequest,
     DecisionResult,
     DiceRollManager,
@@ -50,28 +51,44 @@ def test_branch_decision_history_affects_dice_deterministically() -> None:
     )
     left = DiceRollManager("seed")
     right = DiceRollManager("seed")
+    request = DecisionRequest(
+        request_id="decision-request-branch",
+        decision_type="select_unit",
+        actor_id=None,
+        payload={"phase": "movement"},
+        options=(
+            DecisionOption(
+                option_id="unit-a",
+                label="Unit A",
+                payload={"selected_unit_id": "unit-a"},
+            ),
+            DecisionOption(
+                option_id="unit-b",
+                label="Unit B",
+                payload={"selected_unit_id": "unit-b"},
+            ),
+        ),
+    )
 
     left.record_decision(
-        DecisionResult(
+        request=request,
+        result=DecisionResult.for_request(
             result_id="decision-result-branch-a",
-            request_id="decision-request-branch",
-            decision_type="select_unit",
-            actor_id=None,
-            payload={"selected_unit_id": "unit-a"},
-        )
+            request=request,
+            selected_option_id="unit-a",
+        ),
     )
     right.record_decision(
-        DecisionResult(
+        request=request,
+        result=DecisionResult.for_request(
             result_id="decision-result-branch-b",
-            request_id="decision-request-branch",
-            decision_type="select_unit",
-            actor_id=None,
-            payload={"selected_unit_id": "unit-b"},
-        )
+            request=request,
+            selected_option_id="unit-b",
+        ),
     )
 
-    assert left.roll(spec).current_values == (80498,)
-    assert right.roll(spec).current_values == (25395,)
+    assert left.roll(spec).current_values == (84072,)
+    assert right.roll(spec).current_values == (31999,)
 
 
 def test_reconstructed_event_history_affects_next_dice_roll() -> None:
@@ -225,21 +242,20 @@ def test_reroll_selection_is_an_explicit_decision() -> None:
         request_id="wrong-request",
         decision_type="select_dice_reroll",
         actor_id="unit-assault-intercessors",
+        selected_option_id="reroll:0",
         payload={"selected_indices": [0]},
     )
     with pytest.raises(DecisionError):
         manager.resolve_reroll(state, request=request, result=rejected)
 
-    accepted = DecisionResult(
+    accepted = DecisionResult.for_request(
         result_id="decision-result-reroll-low-die",
-        request_id=request.request_id,
-        decision_type="select_dice_reroll",
-        actor_id="unit-assault-intercessors",
-        payload={"selected_indices": [0]},
+        request=request,
+        selected_option_id="reroll:0",
     )
     updated = manager.resolve_reroll(state, request=request, result=accepted)
 
-    assert manager.decision_records == (accepted,)
+    assert manager.decision_records[0].result == accepted
     assert updated.rerolls[0].decision_id == accepted.result_id
     assert updated.rerolls[0].selected_indices == (0,)
     assert updated.current_values[1] == 4
@@ -331,6 +347,7 @@ def test_event_payload_rejects_object_reprs() -> None:
             request_id="decision-request-1",
             decision_type="select_unit",
             actor_id=None,
+            selected_option_id="unit-a",
             payload={"bad": "<object object at 0x1234abcd>"},
         )
 
@@ -471,13 +488,18 @@ def test_decision_records_serialize_and_validate() -> None:
         decision_type="select_dice_reroll",
         actor_id="unit-a",
         payload={"allowed_indices": [0]},
+        options=(
+            DecisionOption(
+                option_id="reroll:0",
+                label="Reroll die 0",
+                payload={"selected_indices": [0]},
+            ),
+        ),
     )
-    result = DecisionResult(
+    result = DecisionResult.for_request(
         result_id="decision-result-1",
-        request_id=request.request_id,
-        decision_type=request.decision_type,
-        actor_id=request.actor_id,
-        payload={"selected_indices": [0]},
+        request=request,
+        selected_option_id="reroll:0",
     )
 
     assert DecisionRequest.from_payload(request.to_payload()).to_payload() == request.to_payload()
@@ -491,6 +513,7 @@ def test_decision_records_serialize_and_validate() -> None:
             decision_type="select_dice_reroll",
             actor_id=None,
             payload={},
+            options=(DecisionOption(option_id="decline", label="Decline", payload={}),),
         )
     with pytest.raises(DecisionError):
         DecisionRequest(
@@ -498,6 +521,7 @@ def test_decision_records_serialize_and_validate() -> None:
             decision_type=" ",
             actor_id=None,
             payload={},
+            options=(DecisionOption(option_id="decline", label="Decline", payload={}),),
         )
     with pytest.raises(DecisionError):
         DecisionResult(
@@ -505,6 +529,7 @@ def test_decision_records_serialize_and_validate() -> None:
             request_id="decision-request-1",
             decision_type="select_dice_reroll",
             actor_id=" ",
+            selected_option_id="decline",
             payload={},
         )
 
@@ -518,12 +543,10 @@ def test_reroll_decline_records_explicit_decision_without_new_roll() -> None:
     )
     state = manager.roll_fixed(spec, [2])
     request = manager.request_reroll(state, allowed_indices=[0])
-    result = DecisionResult(
+    result = DecisionResult.for_request(
         result_id="decision-result-decline",
-        request_id=request.request_id,
-        decision_type=request.decision_type,
-        actor_id=None,
-        payload={"selected_indices": []},
+        request=request,
+        selected_option_id="decline",
     )
 
     updated = manager.resolve_reroll(state, request=request, result=result)
@@ -553,6 +576,7 @@ def test_reroll_rejects_disallowed_or_malformed_decisions() -> None:
                 request_id=request.request_id,
                 decision_type="select_unit",
                 actor_id=None,
+                selected_option_id="reroll:0",
                 payload={"selected_indices": [0]},
             ),
         )
@@ -565,6 +589,7 @@ def test_reroll_rejects_disallowed_or_malformed_decisions() -> None:
                 request_id=request.request_id,
                 decision_type=request.decision_type,
                 actor_id=None,
+                selected_option_id="reroll:1",
                 payload={"selected_indices": [1]},
             ),
         )
@@ -577,6 +602,7 @@ def test_reroll_rejects_disallowed_or_malformed_decisions() -> None:
                 request_id=request.request_id,
                 decision_type=request.decision_type,
                 actor_id=None,
+                selected_option_id="reroll:0",
                 payload={"selected_indices": ["0"]},
             ),
         )
