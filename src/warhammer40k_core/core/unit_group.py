@@ -106,7 +106,7 @@ class UnitGroup:
         return tuple(member.model_id for member in self.alive_models())
 
     def model_ids_for_movement(self) -> tuple[str, ...]:
-        return self.all_model_ids()
+        return self.alive_model_ids()
 
     def model_ids_for_damage_allocation(self) -> tuple[str, ...]:
         return self.alive_model_ids()

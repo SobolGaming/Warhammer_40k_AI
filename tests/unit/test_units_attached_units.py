@@ -68,6 +68,24 @@ def test_attached_unit_moves_as_one_rules_unit() -> None:
     assert group.model_ids_for_movement() == ("bodyguard-1", "bodyguard-2", "leader-1")
 
 
+def test_movement_model_ids_exclude_destroyed_models_across_attached_group() -> None:
+    bodyguard = Unit(
+        unit_id="bodyguard",
+        name="Bodyguard",
+        own_models=(
+            UnitMember("bodyguard-1", "Bodyguard 1", starting_wounds=1, wounds_remaining=1),
+            UnitMember("bodyguard-2", "Bodyguard 2", starting_wounds=1, wounds_remaining=0),
+        ),
+    )
+    leader = _unit("leader", "leader-1")
+    group = UnitGroup.attached(
+        AttachedUnit(attached_unit_id="move-group", bodyguard=bodyguard, leaders=(leader,))
+    )
+
+    assert group.all_model_ids() == ("bodyguard-1", "bodyguard-2", "leader-1")
+    assert group.model_ids_for_movement() == ("bodyguard-1", "leader-1")
+
+
 def test_damage_allocation_sees_alive_models_across_attached_group() -> None:
     bodyguard = Unit(
         unit_id="bodyguard",
