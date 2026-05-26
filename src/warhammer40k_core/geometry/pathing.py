@@ -24,6 +24,7 @@ class PathFailureReason(StrEnum):
     ENDPOINT_ONLY_PATH = "endpoint_only_path"
     MOVEMENT_DISTANCE_EXCEEDED = "movement_distance_exceeded"
     MODEL_COLLISION = "model_collision"
+    SELF_COLLISION = "self_collision"
     TERRAIN_COLLISION = "terrain_collision"
     ENGAGEMENT_RANGE = "engagement_range"
     COHERENCY = "coherency"
@@ -225,7 +226,7 @@ class PathQuery:
 
     def evaluate(self) -> PathResult:
         expected_model_ids = self.unit_group.model_ids_for_movement()
-        if self.witness.model_ids() != expected_model_ids:
+        if tuple(sorted(self.witness.model_ids())) != tuple(sorted(expected_model_ids)):
             return _invalid(
                 PathFailureReason.GROUP_MISMATCH,
                 "PathWitness model IDs must match the moving UnitGroup alive model IDs.",
@@ -250,7 +251,7 @@ class PathQuery:
                     "PathWitness must start at the current model pose.",
                     model_id=model_id,
                 )
-            if len(path) < 3:
+            if len(path) < 3 or not _has_non_endpoint_interior_pose(path):
                 return _invalid(
                     PathFailureReason.ENDPOINT_ONLY_PATH,
                     "PathWitness must include path evidence beyond start and end poses.",
@@ -298,6 +299,16 @@ class PathQuery:
                     )
 
             final_models.append(_model_at_pose(current_model, path[-1]))
+
+        moving_overlap = _moving_models_overlap(tuple(final_models))
+        if moving_overlap is not None:
+            first_model_id, second_model_id = moving_overlap
+            return _invalid(
+                PathFailureReason.SELF_COLLISION,
+                "PathWitness final poses overlap moving models.",
+                model_id=first_model_id,
+                blocker_id=second_model_id,
+            )
 
         if not self.movement_envelope.models_are_coherent(tuple(final_models)):
             return _invalid(
@@ -388,6 +399,23 @@ def _model_at_pose(model: Model, pose: Pose) -> Model:
         base=model.base,
         volume=model.volume,
     )
+
+
+def _has_non_endpoint_interior_pose(path: tuple[Pose, ...]) -> bool:
+    start = path[0]
+    end = path[-1]
+    return any(pose != start and pose != end for pose in path[1:-1])
+
+
+def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
+    for index, first in enumerate(models):
+        for second in models[index + 1 :]:
+            if (
+                first.base_overlaps(second)
+                and first.volume.vertical_gap_to(first.pose, second.volume, second.pose) == 0.0
+            ):
+                return (first.model_id, second.model_id)
+    return None
 
 
 def _invalid(

@@ -20,6 +20,7 @@ class MovementEnvelopePayload(TypedDict):
     sample_interval_inches: float
     coherency_horizontal_inches: float
     coherency_vertical_inches: float
+    required_coherency_neighbors: int
     engagement_horizontal_inches: float
     engagement_vertical_inches: float
 
@@ -30,6 +31,7 @@ class MovementEnvelope:
     sample_interval_inches: float = 1.0
     coherency_horizontal_inches: float = 2.0
     coherency_vertical_inches: float = 5.0
+    required_coherency_neighbors: int = 1
     engagement_horizontal_inches: float = 1.0
     engagement_vertical_inches: float = 5.0
 
@@ -82,6 +84,14 @@ class MovementEnvelope:
                 self.engagement_vertical_inches,
             ),
         )
+        object.__setattr__(
+            self,
+            "required_coherency_neighbors",
+            _validate_positive_int(
+                "MovementEnvelope required_coherency_neighbors",
+                self.required_coherency_neighbors,
+            ),
+        )
 
     def path_distance(self, poses: tuple[Pose, ...]) -> float:
         path = _validate_pose_path("poses", poses)
@@ -112,10 +122,11 @@ class MovementEnvelope:
             return True
 
         for model in valid_models:
-            if not any(
+            coherent_neighbors = sum(
                 model.model_id != other.model_id and self._models_are_coherent_pair(model, other)
                 for other in valid_models
-            ):
+            )
+            if coherent_neighbors < self.required_coherency_neighbors:
                 return False
         return True
 
@@ -125,6 +136,7 @@ class MovementEnvelope:
             "sample_interval_inches": self.sample_interval_inches,
             "coherency_horizontal_inches": self.coherency_horizontal_inches,
             "coherency_vertical_inches": self.coherency_vertical_inches,
+            "required_coherency_neighbors": self.required_coherency_neighbors,
             "engagement_horizontal_inches": self.engagement_horizontal_inches,
             "engagement_vertical_inches": self.engagement_vertical_inches,
         }
@@ -136,6 +148,7 @@ class MovementEnvelope:
             sample_interval_inches=payload["sample_interval_inches"],
             coherency_horizontal_inches=payload["coherency_horizontal_inches"],
             coherency_vertical_inches=payload["coherency_vertical_inches"],
+            required_coherency_neighbors=payload["required_coherency_neighbors"],
             engagement_horizontal_inches=payload["engagement_horizontal_inches"],
             engagement_vertical_inches=payload["engagement_vertical_inches"],
         )
@@ -176,6 +189,14 @@ def _validate_non_negative_number(field_name: str, value: object) -> float:
     if number < 0.0:
         raise GeometryError(f"{field_name} must not be negative.")
     return number
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GeometryError(f"{field_name} must be an integer.")
+    if value < 1:
+        raise GeometryError(f"{field_name} must be at least 1.")
+    return value
 
 
 def _interpolate_pose(start: Pose, end: Pose, t: float) -> Pose:

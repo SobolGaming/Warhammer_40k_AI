@@ -183,6 +183,23 @@ def test_path_query_rejects_endpoint_only_movement_witness() -> None:
     assert result.failure.reason is PathFailureReason.ENDPOINT_ONLY_PATH
 
 
+@pytest.mark.parametrize(
+    "poses",
+    [
+        (Pose.at(0.0, 0.0), Pose.at(4.0, 0.0), Pose.at(4.0, 0.0)),
+        (Pose.at(0.0, 0.0), Pose.at(0.0, 0.0), Pose.at(4.0, 0.0)),
+    ],
+)
+def test_path_query_rejects_degenerate_endpoint_only_witnesses(
+    poses: tuple[Pose, ...],
+) -> None:
+    result = _query_for_single_model(_single_model_witness(*poses)).evaluate()
+
+    assert not result.is_valid
+    assert result.failure is not None
+    assert result.failure.reason is PathFailureReason.ENDPOINT_ONLY_PATH
+
+
 def test_path_query_checks_model_collision_along_witness_path() -> None:
     blocker = _model("blocker", 2.0, 0.0)
     query = _query_for_single_model(
@@ -259,6 +276,19 @@ def test_path_query_checks_coherency_after_group_movement() -> None:
     assert result.failure.reason is PathFailureReason.COHERENCY
 
 
+def test_movement_envelope_can_require_two_coherency_neighbors() -> None:
+    envelope = MovementEnvelope(max_distance_inches=10.0, required_coherency_neighbors=2)
+    coherent = (_model("first", 0.0, 0.0), _model("second", 1.5, 0.0), _model("third", 0.0, 1.5))
+    incoherent = (
+        _model("first", 0.0, 0.0),
+        _model("second", 1.5, 0.0),
+        _model("third", 4.0, 0.0),
+    )
+
+    assert envelope.models_are_coherent(coherent)
+    assert not envelope.models_are_coherent(incoherent)
+
+
 def test_path_query_validates_attached_unit_group_together() -> None:
     bodyguard_model = _model("bodyguard-1", 0.0, 0.0)
     leader_model = _model("leader-1", 1.0, 0.0)
@@ -271,11 +301,11 @@ def test_path_query_validates_attached_unit_group_together() -> None:
     )
     index = SpatialIndex.empty().with_model(bodyguard_model).with_model(leader_model)
     incomplete = PathWitness.for_paths(
-        (("bodyguard-1", (Pose.at(0.0, 0.0), Pose.at(0.5, 0.0), Pose.at(1.0, 0.0))),)
+        (("bodyguard-1", (Pose.at(0.0, 0.0), Pose.at(0.25, 0.0), Pose.at(0.5, 0.0))),)
     )
     complete = PathWitness.for_paths(
         (
-            ("bodyguard-1", (Pose.at(0.0, 0.0), Pose.at(0.5, 0.0), Pose.at(1.0, 0.0))),
+            ("bodyguard-1", (Pose.at(0.0, 0.0), Pose.at(0.25, 0.0), Pose.at(0.5, 0.0))),
             ("leader-1", (Pose.at(1.0, 0.0), Pose.at(1.5, 0.0), Pose.at(2.0, 0.0))),
         )
     )
@@ -301,9 +331,67 @@ def test_path_query_validates_attached_unit_group_together() -> None:
     assert complete_result.is_valid
 
 
+def test_path_query_accepts_attached_group_when_witness_order_differs_from_unit_order() -> None:
+    bodyguard_model = _model("z-bodyguard-1", 0.0, 0.0)
+    leader_model = _model("a-leader-1", 1.0, 0.0)
+    group = UnitGroup.attached(
+        AttachedUnit(
+            attached_unit_id="joined",
+            bodyguard=_unit("bodyguard", "z-bodyguard-1"),
+            leaders=(_unit("leader", "a-leader-1"),),
+        )
+    )
+    witness = PathWitness.for_paths(
+        (
+            ("z-bodyguard-1", (Pose.at(0.0, 0.0), Pose.at(0.25, 0.0), Pose.at(0.5, 0.0))),
+            ("a-leader-1", (Pose.at(1.0, 0.0), Pose.at(1.5, 0.0), Pose.at(2.0, 0.0))),
+        )
+    )
+
+    result = PathQuery(
+        unit_group=group,
+        spatial_index=SpatialIndex.empty().with_model(bodyguard_model).with_model(leader_model),
+        witness=witness,
+        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        collision_set=CollisionSet.empty(),
+    ).evaluate()
+
+    assert result.is_valid
+
+
+def test_path_query_rejects_final_overlap_between_moving_models() -> None:
+    first = _model("mover-1", 0.0, 0.0)
+    second = _model("mover-2", 2.0, 0.0)
+    unit_group = UnitGroup.single(_unit("movers", "mover-1", "mover-2"))
+    witness = PathWitness.for_paths(
+        (
+            ("mover-1", (Pose.at(0.0, 0.0), Pose.at(0.5, 0.0), Pose.at(1.0, 0.0))),
+            ("mover-2", (Pose.at(2.0, 0.0), Pose.at(1.5, 0.0), Pose.at(1.0, 0.0))),
+        )
+    )
+
+    result = PathQuery(
+        unit_group=unit_group,
+        spatial_index=SpatialIndex.empty().with_model(first).with_model(second),
+        witness=witness,
+        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        collision_set=CollisionSet.empty(),
+    ).evaluate()
+
+    assert not result.is_valid
+    assert result.failure is not None
+    assert result.failure.reason is PathFailureReason.SELF_COLLISION
+    assert result.failure.model_id == "mover-1"
+    assert result.failure.blocker_id == "mover-2"
+
+
 def test_pathing_payloads_round_trip_without_object_reprs() -> None:
     witness = _single_model_witness(Pose.at(0.0, 0.0), Pose.at(1.0, 0.0), Pose.at(2.0, 0.0))
-    envelope = MovementEnvelope(max_distance_inches=10.0, sample_interval_inches=0.5)
+    envelope = MovementEnvelope(
+        max_distance_inches=10.0,
+        sample_interval_inches=0.5,
+        required_coherency_neighbors=1,
+    )
     collision_set = CollisionSet(model_blockers=(_model("blocker", 10.0, 0.0),))
     query = _query_for_single_model(witness, collision_set=collision_set, envelope=envelope)
     result = query.evaluate()
