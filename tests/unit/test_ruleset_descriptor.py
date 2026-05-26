@@ -7,6 +7,7 @@ import pytest
 
 from warhammer40k_core.core.objectives import ObjectiveAnchorKind
 from warhammer40k_core.core.ruleset_descriptor import (
+    ChargeEndpointRequirement,
     ChargeTargetSelectionTiming,
     CoverEffect,
     MovementMode,
@@ -54,10 +55,18 @@ def test_ruleset_descriptors_capture_engagement_and_movement_mode_differences() 
 
     assert tenth.engagement_policy.horizontal_inches == 1.0
     assert tenth.engagement_policy.vertical_inches == 5.0
+    assert preview.engagement_policy.horizontal_inches == 2.0
+    assert preview.engagement_policy.vertical_inches == 5.0
     assert not tenth_normal.may_transit_enemy_engagement
     assert not tenth_normal.may_end_in_enemy_engagement
     assert preview_normal.may_transit_enemy_engagement
     assert not preview_normal.may_end_in_enemy_engagement
+
+    preview_fly = preview.movement_policy.policy_for_mode(MovementMode.FLY_TAKE_TO_SKIES)
+    assert preview_fly.movement_distance_modifier == -2.0
+    assert preview_fly.ignores_vertical_distance
+    assert preview_fly.ignores_models
+    assert preview_fly.ignores_terrain
 
 
 def test_ruleset_descriptors_capture_charge_timing_without_execution() -> None:
@@ -65,11 +74,15 @@ def test_ruleset_descriptors_capture_charge_timing_without_execution() -> None:
     preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
 
     assert tenth.charge_policy.target_selection_timing is ChargeTargetSelectionTiming.BEFORE_ROLL
-    assert tenth.charge_policy.endpoint_requires_declared_target_engagement
-    assert not tenth.charge_policy.endpoint_allows_any_enemy_engagement
+    assert (
+        tenth.charge_policy.endpoint_requirement
+        is ChargeEndpointRequirement.DECLARED_TARGET_ENGAGEMENT
+    )
     assert preview.charge_policy.target_selection_timing is ChargeTargetSelectionTiming.AFTER_ROLL
-    assert not preview.charge_policy.endpoint_requires_declared_target_engagement
-    assert preview.charge_policy.endpoint_allows_any_enemy_engagement
+    assert (
+        preview.charge_policy.endpoint_requirement
+        is ChargeEndpointRequirement.SELECTED_TARGET_BASE_CONTACT
+    )
 
 
 def test_ruleset_descriptors_capture_objective_anchor_policy() -> None:
@@ -98,10 +111,11 @@ def test_ruleset_descriptors_capture_coherency_hidden_and_fly_policy() -> None:
     assert not tenth.terrain_visibility_policy.hidden_supported
     assert tenth.terrain_visibility_policy.cover_effect is CoverEffect.SAVE_BONUS
     assert preview.terrain_visibility_policy.hidden_supported
-    assert preview.terrain_visibility_policy.hidden_detection_range_inches is None
+    assert preview.terrain_visibility_policy.hidden_detection_range_inches == 15.0
     assert preview.terrain_visibility_policy.hidden_requires_keywords == ("Hidden",)
     assert preview.terrain_visibility_policy.hidden_requires_terrain_area_occupancy
     assert preview.fly_policy.take_to_the_skies_supported
+    assert preview.fly_policy.movement_penalty_inches == 2.0
     assert preview.fly_policy.ignores_vertical_distance
 
 

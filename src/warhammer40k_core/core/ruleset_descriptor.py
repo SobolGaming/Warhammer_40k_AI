@@ -29,6 +29,14 @@ class ChargeTargetSelectionTiming(StrEnum):
     AFTER_ROLL = "after_roll"
 
 
+class ChargeEndpointRequirement(StrEnum):
+    DECLARED_TARGET_ENGAGEMENT = "declared_target_engagement"
+    SELECTED_TARGET_ENGAGEMENT = "selected_target_engagement"
+    SELECTED_TARGET_BASE_CONTACT = "selected_target_base_contact"
+    ANY_ENEMY_ENGAGEMENT = "any_enemy_engagement"
+    UNSUPPORTED = "unsupported"
+
+
 class TerrainObjectiveControlPolicy(StrEnum):
     UNSUPPORTED = "unsupported"
     TERRAIN_AREA_OCCUPANCY = "terrain_area_occupancy"
@@ -68,8 +76,7 @@ class MovementPolicyDescriptorPayload(TypedDict):
 
 class ChargePolicyDescriptorPayload(TypedDict):
     target_selection_timing: str
-    endpoint_requires_declared_target_engagement: bool
-    endpoint_allows_any_enemy_engagement: bool
+    endpoint_requirement: str
 
 
 class TerrainVisibilityPolicyDescriptorPayload(TypedDict):
@@ -274,8 +281,7 @@ class MovementPolicyDescriptor:
 @dataclass(frozen=True, slots=True)
 class ChargePolicyDescriptor:
     target_selection_timing: ChargeTargetSelectionTiming
-    endpoint_requires_declared_target_engagement: bool
-    endpoint_allows_any_enemy_engagement: bool
+    endpoint_requirement: ChargeEndpointRequirement
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -283,22 +289,16 @@ class ChargePolicyDescriptor:
             "target_selection_timing",
             charge_target_selection_timing_from_token(self.target_selection_timing),
         )
-        _validate_bool(
-            "ChargePolicyDescriptor endpoint_requires_declared_target_engagement",
-            self.endpoint_requires_declared_target_engagement,
-        )
-        _validate_bool(
-            "ChargePolicyDescriptor endpoint_allows_any_enemy_engagement",
-            self.endpoint_allows_any_enemy_engagement,
+        object.__setattr__(
+            self,
+            "endpoint_requirement",
+            charge_endpoint_requirement_from_token(self.endpoint_requirement),
         )
 
     def to_payload(self) -> ChargePolicyDescriptorPayload:
         return {
             "target_selection_timing": self.target_selection_timing.value,
-            "endpoint_requires_declared_target_engagement": (
-                self.endpoint_requires_declared_target_engagement
-            ),
-            "endpoint_allows_any_enemy_engagement": self.endpoint_allows_any_enemy_engagement,
+            "endpoint_requirement": self.endpoint_requirement.value,
         }
 
     @classmethod
@@ -307,10 +307,9 @@ class ChargePolicyDescriptor:
             target_selection_timing=charge_target_selection_timing_from_token(
                 payload["target_selection_timing"]
             ),
-            endpoint_requires_declared_target_engagement=payload[
-                "endpoint_requires_declared_target_engagement"
-            ],
-            endpoint_allows_any_enemy_engagement=payload["endpoint_allows_any_enemy_engagement"],
+            endpoint_requirement=charge_endpoint_requirement_from_token(
+                payload["endpoint_requirement"]
+            ),
         )
 
 
@@ -709,8 +708,7 @@ class RulesetDescriptor:
             movement_policy=_movement_policy_for_tenth(),
             charge_policy=ChargePolicyDescriptor(
                 target_selection_timing=ChargeTargetSelectionTiming.BEFORE_ROLL,
-                endpoint_requires_declared_target_engagement=True,
-                endpoint_allows_any_enemy_engagement=False,
+                endpoint_requirement=ChargeEndpointRequirement.DECLARED_TARGET_ENGAGEMENT,
             ),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=False,
@@ -758,18 +756,17 @@ class RulesetDescriptor:
             source_date=source_date,
             descriptor_version=descriptor_version,
             engagement_policy=EngagementPolicyDescriptor(
-                horizontal_inches=1.0,
+                horizontal_inches=2.0,
                 vertical_inches=5.0,
             ),
             movement_policy=_movement_policy_for_eleventh_preview(),
             charge_policy=ChargePolicyDescriptor(
                 target_selection_timing=ChargeTargetSelectionTiming.AFTER_ROLL,
-                endpoint_requires_declared_target_engagement=False,
-                endpoint_allows_any_enemy_engagement=True,
+                endpoint_requirement=ChargeEndpointRequirement.SELECTED_TARGET_BASE_CONTACT,
             ),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=True,
-                hidden_detection_range_inches=None,
+                hidden_detection_range_inches=15.0,
                 hidden_requires_keywords=("Hidden",),
                 hidden_requires_terrain_area_occupancy=True,
                 hidden_lost_after_shooting=True,
@@ -793,7 +790,7 @@ class RulesetDescriptor:
             ),
             fly_policy=FlyPolicyDescriptor(
                 take_to_the_skies_supported=True,
-                movement_penalty_inches=0.0,
+                movement_penalty_inches=2.0,
                 ignores_vertical_distance=True,
                 may_move_through_models=True,
                 may_move_through_terrain=True,
@@ -867,6 +864,19 @@ def charge_target_selection_timing_from_token(token: object) -> ChargeTargetSele
     except ValueError as exc:
         raise RulesetDescriptorError(
             f"Unsupported ChargeTargetSelectionTiming token: {token}."
+        ) from exc
+
+
+def charge_endpoint_requirement_from_token(token: object) -> ChargeEndpointRequirement:
+    if type(token) is ChargeEndpointRequirement:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("ChargeEndpointRequirement token must be a string.")
+    try:
+        return ChargeEndpointRequirement(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(
+            f"Unsupported ChargeEndpointRequirement token: {token}."
         ) from exc
 
 
@@ -1010,6 +1020,7 @@ def _movement_policy_for_eleventh_preview() -> MovementPolicyDescriptor:
                 ignores_vertical_distance=True,
                 ignores_models=True,
                 ignores_terrain=True,
+                movement_distance_modifier=-2.0,
             ),
         )
     )

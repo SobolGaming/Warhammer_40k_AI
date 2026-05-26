@@ -164,6 +164,7 @@ class AbilityDescriptor:
         _validate_supported_ability_shape(
             ability_kind=ability_kind,
             parameters=parameters,
+            timing=timing,
             condition=condition,
         )
 
@@ -723,6 +724,7 @@ def _validate_supported_ability_shape(
     *,
     ability_kind: AbilityKind,
     parameters: tuple[AbilityParameter, ...],
+    timing: AbilityTiming | None,
     condition: AbilityCondition | None,
 ) -> None:
     if ability_kind in {
@@ -731,6 +733,8 @@ def _validate_supported_ability_shape(
         AbilityKind.RAPID_FIRE,
     }:
         _validate_single_positive_int_parameter(ability_kind, parameters)
+        if timing is not AbilityTiming.ATTACK_SEQUENCE:
+            raise WeaponProfileError("Parameterized weapon abilities must use attack timing.")
         if condition is not None:
             raise WeaponProfileError("Parameterized weapon abilities must not include a condition.")
         return
@@ -738,6 +742,8 @@ def _validate_supported_ability_shape(
     if ability_kind is AbilityKind.HEAVY:
         if parameters:
             raise WeaponProfileError("Heavy ability must not include parameters.")
+        if timing is not AbilityTiming.MOVEMENT_CONDITIONED:
+            raise WeaponProfileError("Heavy ability must use movement-conditioned timing.")
         if condition is not AbilityCondition.STATIONARY_OR_POLICY_DEFINED:
             raise WeaponProfileError("Heavy ability must include the stationary policy condition.")
         return

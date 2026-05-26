@@ -144,6 +144,22 @@ def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
         )
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor(
+            ability_id="bad-sustained-timing",
+            name="Bad Sustained Hits",
+            ability_kind=AbilityKind.SUSTAINED_HITS,
+            parameters=(AbilityParameter.integer(1),),
+            timing=None,
+        )
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="bad-heavy-timing",
+            name="Bad Heavy",
+            ability_kind=AbilityKind.HEAVY,
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+            condition=AbilityCondition.STATIONARY_OR_POLICY_DEFINED,
+        )
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
             ability_id="ability:prefixed",
             name="Prefixed",
             ability_kind=AbilityKind.MELTA,

@@ -245,6 +245,13 @@ def test_distance_predicate_validation_failures_are_token_domain_errors() -> Non
             distance_inches=1.0,
             qualifier=" ",
         )
+    with pytest.raises(RuleTokenError):
+        DistancePredicateToken(
+            span=TextSpan(text='more than 1"', start=0, end=12),
+            kind=DistancePredicateKind.MORE_THAN,
+            distance_inches=1.0,
+            qualifier="if possible",
+        )
 
 
 @pytest.mark.parametrize(

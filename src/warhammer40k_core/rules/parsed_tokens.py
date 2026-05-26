@@ -232,7 +232,7 @@ class DistancePredicateToken:
         if distance != self.distance_inches:
             object.__setattr__(self, "distance_inches", distance)
 
-        qualifier = _validate_optional_qualifier(self.qualifier)
+        qualifier = _validate_optional_qualifier(kind, self.qualifier)
         if qualifier != self.qualifier:
             object.__setattr__(self, "qualifier", qualifier)
 
@@ -545,9 +545,14 @@ def _validate_distance_predicate_distance(
     return None
 
 
-def _validate_optional_qualifier(qualifier: object | None) -> str | None:
+def _validate_optional_qualifier(
+    kind: DistancePredicateKind,
+    qualifier: object | None,
+) -> str | None:
     if qualifier is None:
         return None
+    if kind is not DistancePredicateKind.WITHIN:
+        raise RuleTokenError("DistancePredicateToken qualifier is only supported for within.")
     if type(qualifier) is not str:
         raise RuleTokenError("DistancePredicateToken qualifier must be a string.")
     stripped = qualifier.strip()

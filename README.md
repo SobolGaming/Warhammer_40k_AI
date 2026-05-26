@@ -407,6 +407,7 @@ Objects:
 - `MovementPolicyDescriptor`
 - `MovementModePolicy`
 - `ChargePolicyDescriptor`
+- `ChargeEndpointRequirement`
 - `TerrainVisibilityPolicyDescriptor`
 - `ObjectivePolicyDescriptor`
 - `CoherencyPolicyDescriptor`
@@ -418,6 +419,7 @@ Invariants:
 - descriptor data does not execute rules;
 - descriptor payloads include deterministic `ruleset_id` and `descriptor_hash`;
 - movement, engagement, objective, coherency, terrain, FLY, charge, and mission assumptions are explicit data;
+- charge endpoint requirements are typed descriptors, not coarse boolean fallbacks;
 - unsupported preview rule paths remain explicit policy descriptors, not fallback behavior.
 
 ### Phase 8C: distance predicate tokens
