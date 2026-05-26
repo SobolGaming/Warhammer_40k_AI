@@ -22,7 +22,7 @@ from warhammer40k_core.engine.decision import (
     DecisionResult,
     DiceRollManager,
 )
-from warhammer40k_core.engine.event_log import EventLog, EventLogError, EventRecord
+from warhammer40k_core.engine.event_log import EventLog, EventLogError, EventRecord, JsonValue
 
 
 def test_same_seed_determinism_for_dice_rolls_and_events() -> None:
@@ -180,6 +180,33 @@ def test_reconstructed_injected_dice_event_does_not_advance_draw_count() -> None
     reconstructed = DiceRollManager("seed", event_log=event_log)
 
     assert reconstructed.rng.draw_count == 0
+
+
+def test_reconstructed_dice_history_validates_complete_dice_result_payload() -> None:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=2, sides=6),
+        reason="Corrupted reconstruction fixture",
+        roll_type="advance_roll",
+    )
+    corrupted = DiceRollResult.from_values(
+        roll_id="roll-000001",
+        spec=spec,
+        values=[4, 5],
+        source="rng",
+    ).to_payload()
+    corrupted["total"] = 99
+    event_log = EventLog.from_payload(
+        [
+            {
+                "event_id": "event-000001",
+                "event_type": "dice_rolled",
+                "payload": cast(JsonValue, corrupted),
+            }
+        ]
+    )
+
+    with pytest.raises(DiceRollSpecError):
+        DiceRollManager("seed", event_log=event_log)
 
 
 def test_reroll_selection_is_an_explicit_decision() -> None:

@@ -7,10 +7,13 @@ from typing import Self, TypedDict
 
 from warhammer40k_core.core.dice import (
     DiceExpression,
+    DiceExpressionPayload,
     DiceRollResult,
     DiceRollResultPayload,
+    DiceRollSource,
     DiceRollSpec,
     DiceRollSpecError,
+    DiceRollSpecPayload,
     DiceRollState,
 )
 from warhammer40k_core.core.rng import RandomSource
@@ -344,6 +347,28 @@ def _extract_index_list(payload: JsonValue, *, key: str) -> tuple[int, ...]:
     return _validate_index_list(tuple(value), field_name=key)
 
 
+def _extract_object(payload: JsonValue, *, key: str) -> dict[str, JsonValue]:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        raise DecisionError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, dict):
+        raise DecisionError(f"Decision payload key must be an object: {key}.")
+    return value
+
+
+def _extract_int(payload: JsonValue, *, key: str) -> int:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        raise DecisionError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if type(value) is not int:
+        raise DecisionError(f"Decision payload key must be an integer: {key}.")
+    return value
+
+
 def _extract_int_list(payload: JsonValue, *, key: str) -> tuple[int, ...]:
     if not isinstance(payload, dict):
         raise DecisionError("Decision payload must be an object.")
@@ -361,13 +386,62 @@ def _extract_int_list(payload: JsonValue, *, key: str) -> tuple[int, ...]:
     return tuple(validated)
 
 
-def _restored_rng_draw_count(payload: JsonValue) -> int:
+def _dice_expression_payload(payload: JsonValue) -> DiceExpressionPayload:
+    return {
+        "quantity": _extract_int(payload, key="quantity"),
+        "sides": _extract_int(payload, key="sides"),
+        "modifier": _extract_int(payload, key="modifier"),
+    }
+
+
+def _dice_roll_spec_payload(payload: JsonValue) -> DiceRollSpecPayload:
+    return {
+        "expression": _dice_expression_payload(_extract_object(payload, key="expression")),
+        "reason": _extract_string(payload, key="reason"),
+        "roll_type": _extract_string(payload, key="roll_type"),
+        "actor_id": _extract_optional_string(payload, key="actor_id"),
+    }
+
+
+def _dice_roll_result_from_payload(payload: JsonValue) -> DiceRollResult:
+    return DiceRollResult.from_payload(
+        {
+            "roll_id": _extract_string(payload, key="roll_id"),
+            "spec": _dice_roll_spec_payload(_extract_object(payload, key="spec")),
+            "values": list(_extract_int_list(payload, key="values")),
+            "total": _extract_int(payload, key="total"),
+            "source": _dice_roll_source(payload),
+        }
+    )
+
+
+def _dice_roll_source(payload: JsonValue) -> DiceRollSource:
     source = _extract_string(payload, key="source")
     if source == "rng":
-        return len(_extract_int_list(payload, key="values"))
-    if source == "fixed" or source == "injected":
-        return 0
+        return "rng"
+    if source == "fixed":
+        return "fixed"
+    if source == "injected":
+        return "injected"
     raise DecisionError("dice_rolled event source must be rng, fixed, or injected.")
+
+
+def _extract_optional_string(payload: JsonValue, *, key: str) -> str | None:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        raise DecisionError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise DecisionError(f"Decision payload key must be a string or null: {key}.")
+    return value
+
+
+def _restored_rng_draw_count(payload: JsonValue) -> int:
+    result = _dice_roll_result_from_payload(payload)
+    return len(result.values) if result.source == "rng" else 0
 
 
 def _validate_index_list(indices: tuple[object, ...], *, field_name: str) -> tuple[int, ...]:
