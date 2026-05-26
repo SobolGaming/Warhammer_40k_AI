@@ -27,7 +27,7 @@ repos:
         pass_filenames: false
       - id: pytest-code-quality
         name: code quality tests
-        entry: uv run pytest tests/code_quality -q
+        entry: uv run pytest tests/code_quality -q --no-cov
         language: system
         pass_filenames: false
       - id: import-linter
