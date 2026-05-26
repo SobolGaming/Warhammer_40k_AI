@@ -15,9 +15,17 @@ _EPSILON = 1e-9
 
 
 class _Geometry(Protocol):
+    @property
+    def bounds(self) -> tuple[float, float, float, float]: ...
+
+    @property
+    def is_empty(self) -> bool: ...
+
     def buffer(self, distance: float, quad_segs: int = _FOOTPRINT_QUAD_SEGS) -> _Geometry: ...
 
     def distance(self, other: _Geometry) -> float: ...
+
+    def intersection(self, other: _Geometry) -> _Geometry: ...
 
     def intersects(self, other: _Geometry) -> bool: ...
 
@@ -167,6 +175,22 @@ def segment_intersects_terrain_footprint(
     return crossing_top >= terrain_bottom and crossing_bottom <= terrain_top
 
 
+def segment_intersects_model_footprint(
+    start: Point3,
+    end: Point3,
+    model: Model,
+) -> bool:
+    valid_start = validate_point3("start", start)
+    valid_end = validate_point3("end", end)
+    valid_model = _validate_model("model", model)
+    return _segment_intersects_footprint_with_vertical_interval(
+        valid_start,
+        valid_end,
+        footprint_for_base(valid_model.base, valid_model.pose),
+        valid_model.volume.vertical_interval(valid_model.pose),
+    )
+
+
 def _geometry_module() -> _GeometryModule:
     return cast(_GeometryModule, importlib.import_module("shapely.geometry"))
 
@@ -233,6 +257,54 @@ def _segment_rectangle_intersection_interval(
             end_t = min(end_t, edge_t)
 
     return (start_t, end_t)
+
+
+def _segment_intersects_footprint_with_vertical_interval(
+    start: Point3,
+    end: Point3,
+    footprint: _Geometry,
+    vertical_interval: tuple[float, float],
+) -> bool:
+    segment_bottom = min(start.z, end.z)
+    segment_top = max(start.z, end.z)
+    interval_bottom, interval_top = vertical_interval
+    if segment_top < interval_bottom or segment_bottom > interval_top:
+        return False
+
+    geometry = _geometry_module()
+    if start.x == end.x and start.y == end.y:
+        if not geometry.Point(start.x, start.y).intersects(footprint):
+            return False
+        return segment_top >= interval_bottom and segment_bottom <= interval_top
+
+    line = geometry.LineString(((start.x, start.y), (end.x, end.y)))
+    intersection = line.intersection(footprint)
+    if intersection.is_empty:
+        return False
+
+    start_t, end_t = _intersection_bounds_to_segment_interval(start, end, intersection.bounds)
+    start_z = _interpolate(start.z, end.z, start_t)
+    end_z = _interpolate(start.z, end.z, end_t)
+    crossing_bottom = min(start_z, end_z)
+    crossing_top = max(start_z, end_z)
+    return crossing_top >= interval_bottom and crossing_bottom <= interval_top
+
+
+def _intersection_bounds_to_segment_interval(
+    start: Point3,
+    end: Point3,
+    bounds: tuple[float, float, float, float],
+) -> tuple[float, float]:
+    min_x, min_y, max_x, max_y = bounds
+    dx = end.x - start.x
+    dy = end.y - start.y
+    if abs(dx) > _EPSILON:
+        start_t = (min_x - start.x) / dx
+        end_t = (max_x - start.x) / dx
+    else:
+        start_t = (min_y - start.y) / dy
+        end_t = (max_y - start.y) / dy
+    return (max(0.0, min(start_t, end_t)), min(1.0, max(start_t, end_t)))
 
 
 def _interpolate(start: float, end: float, t: float) -> float:
