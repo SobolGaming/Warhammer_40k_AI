@@ -227,17 +227,17 @@ class WeaponProfile:
         _validate_range_profile(self.range_profile)
         _validate_attack_profile(self.attack_profile)
         _validate_damage_profile(self.damage_profile)
-        _validate_characteristic_profile(
+        _validate_unmodified_characteristic_profile(
             "WeaponProfile skill",
             self.skill,
             frozenset({Characteristic.WEAPON_SKILL, Characteristic.BALLISTIC_SKILL}),
         )
-        _validate_characteristic_profile(
+        _validate_unmodified_characteristic_profile(
             "WeaponProfile strength",
             self.strength,
             frozenset({Characteristic.STRENGTH}),
         )
-        _validate_characteristic_profile(
+        _validate_unmodified_characteristic_profile(
             "WeaponProfile armor_penetration",
             self.armor_penetration,
             frozenset({Characteristic.ARMOR_PENETRATION}),
@@ -382,6 +382,25 @@ def _validate_characteristic_profile(
     if value.characteristic not in allowed_characteristics:
         raise WeaponProfileError(f"{field_name} has the wrong characteristic.")
     return value
+
+
+def _validate_unmodified_characteristic_profile(
+    field_name: str,
+    value: object,
+    allowed_characteristics: frozenset[Characteristic],
+) -> CharacteristicValue:
+    characteristic_value = _validate_characteristic_profile(
+        field_name,
+        value,
+        allowed_characteristics,
+    )
+    if (
+        characteristic_value.raw != characteristic_value.base
+        or characteristic_value.base != characteristic_value.final
+        or characteristic_value.applied_modifier_ids
+    ):
+        raise WeaponProfileError(f"{field_name} must be an unmodified base profile value.")
+    return characteristic_value
 
 
 def _characteristic_value_from_payload(

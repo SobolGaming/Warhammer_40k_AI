@@ -173,6 +173,44 @@ def test_weapon_profile_rejects_unparsed_or_mismatched_profile_data() -> None:
         )
 
 
+def test_weapon_profile_rejects_modified_characteristic_values() -> None:
+    with pytest.raises(WeaponProfileError):
+        WeaponProfile(
+            profile_id="modified-ap",
+            name="Modified AP",
+            range_profile=RangeProfile.distance(24),
+            attack_profile=AttackProfile.fixed(2),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue(
+                characteristic=Characteristic.ARMOR_PENETRATION,
+                raw=-1,
+                base=-1,
+                final=-2,
+                applied_modifier_ids=("storm-doctrine",),
+            ),
+            damage_profile=DamageProfile.fixed(1),
+        )
+
+    with pytest.raises(WeaponProfileError):
+        WeaponProfile(
+            profile_id="modified-skill",
+            name="Modified skill",
+            range_profile=RangeProfile.distance(24),
+            attack_profile=AttackProfile.fixed(2),
+            skill=CharacteristicValue(
+                characteristic=Characteristic.BALLISTIC_SKILL,
+                raw=4,
+                base=4,
+                final=3,
+                applied_modifier_ids=(),
+            ),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -1),
+            damage_profile=DamageProfile.fixed(1),
+        )
+
+
 def test_weapon_profile_payload_errors_stay_in_weapon_profile_domain() -> None:
     profile_payload = _bolt_rifle_profile().to_payload()
     profile_payload["skill"]["raw"] = -1
