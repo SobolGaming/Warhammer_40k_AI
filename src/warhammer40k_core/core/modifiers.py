@@ -10,8 +10,6 @@ from warhammer40k_core.core.attributes import (
     CharacteristicValue,
     characteristic_from_token,
     validate_characteristic_value,
-    validate_identifier,
-    validate_optional_identifier,
 )
 
 
@@ -106,7 +104,7 @@ class ModifierScope:
             if not self.target_ids:
                 raise ModifierError("ModifierScope target_ids must not be empty when supplied.")
             target_ids = frozenset(
-                validate_identifier("ModifierScope target_ids", target_id)
+                _validate_identifier("ModifierScope target_ids", target_id)
                 for target_id in self.target_ids
             )
             if target_ids != self.target_ids:
@@ -132,7 +130,7 @@ class ModifierScope:
 
     def matches(self, characteristic: Characteristic, *, target_id: str | None = None) -> bool:
         _validate_characteristic(characteristic)
-        validated_target_id = validate_optional_identifier("target_id", target_id)
+        validated_target_id = _validate_optional_identifier("target_id", target_id)
 
         if self.characteristics is not None and characteristic not in self.characteristics:
             return False
@@ -169,7 +167,7 @@ class ModifierScope:
             None
             if target_id_tokens is None
             else frozenset(
-                validate_identifier("ModifierScope target_ids", target_id)
+                _validate_identifier("ModifierScope target_ids", target_id)
                 for target_id in target_id_tokens
             )
         )
@@ -191,17 +189,17 @@ class Modifier:
         object.__setattr__(
             self,
             "modifier_id",
-            validate_identifier("Modifier modifier_id", self.modifier_id),
+            _validate_identifier("Modifier modifier_id", self.modifier_id),
         )
         object.__setattr__(
             self,
             "source_id",
-            validate_optional_identifier("Modifier source_id", self.source_id),
+            _validate_optional_identifier("Modifier source_id", self.source_id),
         )
         object.__setattr__(
             self,
             "exclusive_group",
-            validate_optional_identifier("Modifier exclusive_group", self.exclusive_group),
+            _validate_optional_identifier("Modifier exclusive_group", self.exclusive_group),
         )
 
         scope = _validate_modifier_scope(self.scope)
@@ -266,7 +264,7 @@ class ModifierStack:
         object.__setattr__(
             self,
             "target_id",
-            validate_optional_identifier("ModifierStack target_id", self.target_id),
+            _validate_optional_identifier("ModifierStack target_id", self.target_id),
         )
 
         modifier_tuple = tuple(self.modifiers)
@@ -366,6 +364,21 @@ def _validate_characteristic(characteristic: object) -> Characteristic:
     if type(characteristic) is not Characteristic:
         raise ModifierError("Expected a Characteristic.")
     return characteristic
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise ModifierError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise ModifierError(f"{field_name} must not be empty.")
+    return stripped
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
 
 
 def _validate_modifier_scope(scope: object) -> ModifierScope:

@@ -114,8 +114,22 @@ def test_modifier_scope_rejects_empty_or_untyped_inputs() -> None:
         ModifierScope.for_targets(())
     with pytest.raises(ModifierError):
         ModifierScope.for_characteristics((cast(Characteristic, "movement"),))
-    with pytest.raises(CharacteristicError):
+    with pytest.raises(ModifierError):
         ModifierScope.for_targets((" ",))
+    with pytest.raises(ModifierError):
+        Modifier(
+            modifier_id=" ",
+            scope=ModifierScope.any(),
+            timing=ModifierTiming.ADDITIVE,
+            operation=ModifierOperation.ADD,
+            operand=1,
+        )
+    with pytest.raises(ModifierError):
+        ModifierStack(
+            characteristic=Characteristic.MOVEMENT,
+            raw_value=6,
+            target_id=" ",
+        )
 
 
 def test_modifier_order_is_deterministic_and_values_are_inspectable() -> None:
