@@ -489,6 +489,15 @@ Modules:
 - `engine/decision_controller.py`
 - `engine/decision_record.py`
 
+Objects:
+
+- `DecisionOption`
+- `DecisionRequest`
+- `DecisionResult`
+- `DecisionQueue`
+- `DecisionController`
+- `DecisionRecord`
+
 Invariants:
 
 - every player choice emits a `DecisionRequest`;
