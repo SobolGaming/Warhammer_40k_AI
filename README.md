@@ -394,6 +394,32 @@ Invariants:
 - objective control derives from current spatial state;
 - no hidden mutation bypasses generation counters.
 
+### Phase 8B: ruleset compatibility descriptors
+
+Module:
+
+- `core/ruleset_descriptor.py`
+
+Objects:
+
+- `RulesetDescriptor`
+- `EngagementPolicyDescriptor`
+- `MovementPolicyDescriptor`
+- `MovementModePolicy`
+- `ChargePolicyDescriptor`
+- `TerrainVisibilityPolicyDescriptor`
+- `ObjectivePolicyDescriptor`
+- `CoherencyPolicyDescriptor`
+- `FlyPolicyDescriptor`
+- `MissionPolicyDescriptor`
+
+Invariants:
+
+- descriptor data does not execute rules;
+- descriptor payloads include deterministic `ruleset_id` and `descriptor_hash`;
+- movement, engagement, objective, coherency, terrain, FLY, charge, and mission assumptions are explicit data;
+- unsupported preview rule paths remain explicit policy descriptors, not fallback behavior.
+
 ### Phase 9: decision system
 
 Modules:
