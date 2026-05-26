@@ -253,10 +253,11 @@ class DiceRollManager:
 
     def _produce_result(self, spec: DiceRollSpec) -> DiceRollResult:
         if self._injected_results:
-            result = self._injected_results.popleft()
-            self._roll_counter += 1
+            result = self._injected_results[0]
             if result.spec != spec:
                 raise DiceRollSpecError("Injected dice result does not match requested spec.")
+            self._injected_results.popleft()
+            self._roll_counter += 1
             return result
 
         roll_id = self._next_roll_id()

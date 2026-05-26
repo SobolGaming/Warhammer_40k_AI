@@ -78,4 +78,4 @@ jobs:
         run: uv sync --all-groups
 
       - name: Run code-quality and integration tests
-        run: uv run pytest tests/code_quality tests/integration -q
+        run: uv run pytest tests/code_quality tests/integration -q --no-cov

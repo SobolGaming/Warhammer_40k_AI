@@ -272,6 +272,8 @@ class DiceRollState:
             raise DiceRollSpecError("Reroll replacement count does not match selected dice.")
         if replacement_result.spec.expression.sides != expression.sides:
             raise DiceRollSpecError("Reroll replacement die size does not match original dice.")
+        if replacement_result.spec.expression.modifier != 0:
+            raise DiceRollSpecError("Reroll replacement expression must not include a modifier.")
 
         values = list(self.current_values)
         for replacement_index, selected_index in enumerate(indices):

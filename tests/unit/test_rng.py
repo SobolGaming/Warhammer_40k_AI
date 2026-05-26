@@ -25,7 +25,8 @@ def test_random_source_history_changes_draw_stream() -> None:
     right_value = right.randint_inclusive(1, 100_000, stream_label="branch-test")
 
     assert left.history_digest() != right.history_digest()
-    assert left_value != right_value
+    assert left_value == 33441
+    assert right_value == 33050
 
 
 def test_random_source_serialization_round_trips_exactly() -> None:

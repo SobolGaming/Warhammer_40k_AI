@@ -70,7 +70,8 @@ def test_branch_decision_history_affects_dice_deterministically() -> None:
         )
     )
 
-    assert left.roll(spec).current_values != right.roll(spec).current_values
+    assert left.roll(spec).current_values == (80498,)
+    assert right.roll(spec).current_values == (25395,)
 
 
 def test_reconstructed_event_history_affects_next_dice_roll() -> None:
@@ -324,6 +325,22 @@ def test_dice_reroll_state_validation_errors_are_fail_fast() -> None:
         state.with_reroll(
             decision_id="decision-result-1",
             request_id="decision-request-1",
+            selected_indices=(0,),
+            replacement_result=DiceRollResult.from_values(
+                roll_id="roll-000002",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6, modifier=1),
+                    reason="Replacement modifier validation roll",
+                    roll_type="charge_roll.reroll",
+                ),
+                values=[3],
+                source="rng",
+            ),
+        )
+    with pytest.raises(DiceRollSpecError):
+        state.with_reroll(
+            decision_id="decision-result-1",
+            request_id="decision-request-1",
             selected_indices=(2,),
             replacement_result=DiceRollResult.from_values(
                 roll_id="roll-000002",
@@ -478,6 +495,33 @@ def test_injected_dice_must_match_requested_spec() -> None:
         manager.roll(other_spec)
 
 
+def test_injected_dice_spec_mismatch_does_not_consume_replay_state() -> None:
+    original_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Original injected state fixture",
+        roll_type="advance_roll",
+    )
+    other_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Different injected state fixture",
+        roll_type="advance_roll",
+    )
+    injected = DiceRollResult.from_values(
+        roll_id="roll-000001",
+        spec=original_spec,
+        values=[4],
+        source="rng",
+    )
+    manager = DiceRollManager("seed", injected_results=[injected])
+
+    with pytest.raises(DiceRollSpecError):
+        manager.roll(other_spec)
+
+    assert manager.event_log.records == ()
+    replayed = manager.roll(original_spec).original_result
+    assert replayed.to_payload() == injected.to_payload()
+
+
 def test_event_log_validation_errors_are_fail_fast() -> None:
     with pytest.raises(EventLogError):
         EventRecord(event_id=" ", event_type="dice_rolled", payload={})
@@ -499,3 +543,10 @@ def test_event_log_validation_errors_are_fail_fast() -> None:
         EventLog().append("bad", {"float": float("nan")})
     with pytest.raises(EventLogError):
         EventLog().append("bad", {"<object object at 0x1234abcd>": "bad"})
+
+
+def test_event_log_tuple_payloads_normalize_to_lists() -> None:
+    event_log = EventLog()
+    record = event_log.append("tuple_payload", {"values": (1, 2, 3)})
+
+    assert record.payload == {"values": [1, 2, 3]}
