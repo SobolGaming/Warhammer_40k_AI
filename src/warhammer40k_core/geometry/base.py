@@ -3,7 +3,9 @@ from __future__ import annotations
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import TypedDict
 
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pose import (
     Facing,
     GeometryError,
@@ -13,7 +15,12 @@ from warhammer40k_core.geometry.pose import (
     validate_pose,
 )
 
-_EPSILON = 1e-9
+
+class BaseShapePayload(TypedDict):
+    kind: str
+    radius: float | None
+    length: float | None
+    width: float | None
 
 
 class BaseShape(ABC):
@@ -23,6 +30,10 @@ class BaseShape(ABC):
 
     @abstractmethod
     def max_radius(self) -> float:
+        raise NotImplementedError
+
+    @abstractmethod
+    def to_payload(self) -> BaseShapePayload:
         raise NotImplementedError
 
     def distance_to(self, own_pose: Pose, other: BaseShape, other_pose: Pose) -> float:
@@ -48,6 +59,14 @@ class CircularBase(BaseShape):
 
     def max_radius(self) -> float:
         return self.radius
+
+    def to_payload(self) -> BaseShapePayload:
+        return {
+            "kind": "circular",
+            "radius": self.radius,
+            "length": None,
+            "width": None,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,6 +99,57 @@ class OvalBase(BaseShape):
     def max_radius(self) -> float:
         return self.length / 2.0
 
+    def to_payload(self) -> BaseShapePayload:
+        return {
+            "kind": "oval",
+            "radius": None,
+            "length": self.length,
+            "width": self.width,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class RectangularBase(BaseShape):
+    length: float
+    width: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "length", _validate_positive_number("RectangularBase length", self.length)
+        )
+        object.__setattr__(
+            self, "width", _validate_positive_number("RectangularBase width", self.width)
+        )
+
+    def radius_at_angle(self, angle_degrees: float, facing: Facing) -> float:
+        angle = validate_finite_number("angle_degrees", angle_degrees)
+        validate_facing("facing", facing)
+        relative_radians = math.radians(angle - facing.degrees)
+        cos_angle = abs(math.cos(relative_radians))
+        sin_angle = abs(math.sin(relative_radians))
+        half_length = self.length / 2.0
+        half_width = self.width / 2.0
+
+        candidates: list[float] = []
+        if cos_angle > 0.0:
+            candidates.append(half_length / cos_angle)
+        if sin_angle > 0.0:
+            candidates.append(half_width / sin_angle)
+        if not candidates:
+            raise GeometryError("RectangularBase angle produced no finite ray intersection.")
+        return min(candidates)
+
+    def max_radius(self) -> float:
+        return math.hypot(self.length / 2.0, self.width / 2.0)
+
+    def to_payload(self) -> BaseShapePayload:
+        return {
+            "kind": "rectangular",
+            "radius": None,
+            "length": self.length,
+            "width": self.width,
+        }
+
 
 def base_distance(
     first: BaseShape,
@@ -91,17 +161,12 @@ def base_distance(
     first_valid_pose = validate_pose("first_pose", first_pose)
     second_base = validate_base_shape("second", second)
     second_valid_pose = validate_pose("second_pose", second_pose)
-
-    dx = second_valid_pose.position.x - first_valid_pose.position.x
-    dy = second_valid_pose.position.y - first_valid_pose.position.y
-    center_distance = math.hypot(dx, dy)
-    if center_distance <= _EPSILON:
-        return 0.0
-
-    angle = math.degrees(math.atan2(dy, dx))
-    first_radius = first_base.radius_at_angle(angle, first_valid_pose.facing)
-    second_radius = second_base.radius_at_angle(angle + 180.0, second_valid_pose.facing)
-    return max(0.0, center_distance - first_radius - second_radius)
+    return shapely_backend.base_footprint_distance(
+        first_base,
+        first_valid_pose,
+        second_base,
+        second_valid_pose,
+    )
 
 
 def bases_overlap(
@@ -110,7 +175,40 @@ def bases_overlap(
     second: BaseShape,
     second_pose: Pose,
 ) -> bool:
-    return base_distance(first, first_pose, second, second_pose) <= _EPSILON
+    first_base = validate_base_shape("first", first)
+    first_valid_pose = validate_pose("first_pose", first_pose)
+    second_base = validate_base_shape("second", second)
+    second_valid_pose = validate_pose("second_pose", second_pose)
+    return shapely_backend.base_footprints_intersect(
+        first_base,
+        first_valid_pose,
+        second_base,
+        second_valid_pose,
+    )
+
+
+def base_shape_from_payload(payload: BaseShapePayload) -> BaseShape:
+    kind = payload["kind"]
+    if type(kind) is not str:
+        raise GeometryError("BaseShape payload kind must be a string.")
+    if kind == "circular":
+        radius = payload["radius"]
+        if radius is None or payload["length"] is not None or payload["width"] is not None:
+            raise GeometryError("CircularBase payload must include only radius.")
+        return CircularBase(radius=radius)
+    if kind == "oval":
+        length = payload["length"]
+        width = payload["width"]
+        if length is None or width is None or payload["radius"] is not None:
+            raise GeometryError("OvalBase payload must include only length and width.")
+        return OvalBase(length=length, width=width)
+    if kind == "rectangular":
+        length = payload["length"]
+        width = payload["width"]
+        if length is None or width is None or payload["radius"] is not None:
+            raise GeometryError("RectangularBase payload must include only length and width.")
+        return RectangularBase(length=length, width=width)
+    raise GeometryError(f"Unsupported BaseShape payload kind: {kind}.")
 
 
 def validate_base_shape(field_name: str, value: object) -> BaseShape:

@@ -2,11 +2,26 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Self
+from typing import Self, TypedDict
 
 
 class GeometryError(ValueError):
     """Raised when geometry data violates CORE V2 invariants."""
+
+
+class Point3Payload(TypedDict):
+    x: float
+    y: float
+    z: float
+
+
+class FacingPayload(TypedDict):
+    degrees: float
+
+
+class PosePayload(TypedDict):
+    position: Point3Payload
+    facing: FacingPayload
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +47,17 @@ class Point3:
         other_point = validate_point3("other", other)
         return math.dist((self.x, self.y, self.z), (other_point.x, other_point.y, other_point.z))
 
+    def to_payload(self) -> Point3Payload:
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: Point3Payload) -> Self:
+        return cls(x=payload["x"], y=payload["y"], z=payload["z"])
+
 
 @dataclass(frozen=True, slots=True)
 class Facing:
@@ -47,6 +73,13 @@ class Facing:
 
     def radians(self) -> float:
         return math.radians(self.degrees)
+
+    def to_payload(self) -> FacingPayload:
+        return {"degrees": self.degrees}
+
+    @classmethod
+    def from_payload(cls, payload: FacingPayload) -> Self:
+        return cls(degrees=payload["degrees"])
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +105,19 @@ class Pose:
     def distance_3d_to(self, other: Pose) -> float:
         other_pose = validate_pose("other", other)
         return self.position.distance_3d_to(other_pose.position)
+
+    def to_payload(self) -> PosePayload:
+        return {
+            "position": self.position.to_payload(),
+            "facing": self.facing.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PosePayload) -> Self:
+        return cls(
+            position=Point3.from_payload(payload["position"]),
+            facing=Facing.from_payload(payload["facing"]),
+        )
 
 
 def validate_finite_number(field_name: str, value: object) -> float:

@@ -2,14 +2,32 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Self, TypedDict
 
-from warhammer40k_core.geometry.base import BaseShape, validate_base_shape
+from warhammer40k_core.geometry.base import (
+    BaseShape,
+    BaseShapePayload,
+    base_shape_from_payload,
+    validate_base_shape,
+)
 from warhammer40k_core.geometry.pose import (
     GeometryError,
     Pose,
+    PosePayload,
     validate_finite_number,
     validate_pose,
 )
+
+
+class ModelVolumePayload(TypedDict):
+    height: float
+
+
+class ModelPayload(TypedDict):
+    model_id: str
+    pose: PosePayload
+    base: BaseShapePayload
+    volume: ModelVolumePayload
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,6 +54,13 @@ class ModelVolume:
         own_interval = self.vertical_interval(own_pose)
         other_interval = _validate_model_volume("other", other).vertical_interval(other_pose)
         return _vertical_gap(own_interval, other_interval)
+
+    def to_payload(self) -> ModelVolumePayload:
+        return {"height": self.height}
+
+    @classmethod
+    def from_payload(cls, payload: ModelVolumePayload) -> Self:
+        return cls(height=payload["height"])
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +110,23 @@ class Model:
             self.base_distance_to(other_model) <= horizontal_limit
             and self.volume.vertical_gap_to(self.pose, other_model.volume, other_model.pose)
             <= vertical_limit
+        )
+
+    def to_payload(self) -> ModelPayload:
+        return {
+            "model_id": self.model_id,
+            "pose": self.pose.to_payload(),
+            "base": self.base.to_payload(),
+            "volume": self.volume.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ModelPayload) -> Self:
+        return cls(
+            model_id=payload["model_id"],
+            pose=Pose.from_payload(payload["pose"]),
+            base=base_shape_from_payload(payload["base"]),
+            volume=ModelVolume.from_payload(payload["volume"]),
         )
 
 

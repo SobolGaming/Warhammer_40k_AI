@@ -1,11 +1,21 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, TypedDict
 
 from warhammer40k_core.geometry.pose import GeometryError, Point3, validate_point3
-from warhammer40k_core.geometry.terrain import ObstacleVolume, TerrainVolume
-from warhammer40k_core.geometry.volume import Model
+from warhammer40k_core.geometry.terrain import (
+    TerrainVolume,
+    TerrainVolumePayload,
+    terrain_volume_from_payload,
+)
+from warhammer40k_core.geometry.volume import Model, ModelPayload
+
+
+class SpatialIndexPayload(TypedDict):
+    models: list[ModelPayload]
+    terrain: list[TerrainVolumePayload]
+    generation: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,12 +74,12 @@ class SpatialIndex:
         valid_terrain = _validate_terrain_volume("terrain", terrain)
         return tuple(model for model in self.models if valid_terrain.intersects_model(model))
 
-    def line_of_sight_blockers(self, start: Point3, end: Point3) -> tuple[ObstacleVolume, ...]:
+    def line_of_sight_blockers(self, start: Point3, end: Point3) -> tuple[TerrainVolume, ...]:
         valid_start = validate_point3("start", start)
         valid_end = validate_point3("end", end)
-        blockers: list[ObstacleVolume] = []
+        blockers: list[TerrainVolume] = []
         for volume in self.terrain:
-            if not isinstance(volume, ObstacleVolume):
+            if not volume.blocks_line_of_sight:
                 continue
             if volume.blocks_line_segment(valid_start, valid_end):
                 blockers.append(volume)
@@ -77,6 +87,21 @@ class SpatialIndex:
 
     def has_clear_line_of_sight(self, start: Point3, end: Point3) -> bool:
         return not self.line_of_sight_blockers(start, end)
+
+    def to_payload(self) -> SpatialIndexPayload:
+        return {
+            "models": [model.to_payload() for model in self.models],
+            "terrain": [volume.to_payload() for volume in self.terrain],
+            "generation": self.generation,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SpatialIndexPayload) -> Self:
+        return cls(
+            models=tuple(Model.from_payload(model) for model in payload["models"]),
+            terrain=tuple(terrain_volume_from_payload(volume) for volume in payload["terrain"]),
+            generation=payload["generation"],
+        )
 
 
 def _validate_model(field_name: str, value: object) -> Model:
