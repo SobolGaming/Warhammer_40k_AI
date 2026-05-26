@@ -5,7 +5,10 @@ from enum import StrEnum
 
 class RuleKeyword(StrEnum):
     BATTLE_SHOCK = "Battle-shock"
+    DETECTION_RANGE = "Detection Range"
+    ENGAGEMENT_RANGE = "Engagement Range"
     FEEL_NO_PAIN = "Feel No Pain"
+    HALF_RANGE = "Half Range"
 
 
 def canonical_rule_keyword_tokens() -> tuple[str, ...]:

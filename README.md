@@ -420,6 +420,63 @@ Invariants:
 - movement, engagement, objective, coherency, terrain, FLY, charge, and mission assumptions are explicit data;
 - unsupported preview rule paths remain explicit policy descriptors, not fallback behavior.
 
+### Phase 8C: distance predicate tokens
+
+Module:
+
+- `rules/parsed_tokens.py`
+
+Objects:
+
+- `DistancePredicateKind`
+- `DistancePredicateToken`
+
+Invariants:
+
+- rule text that states a distance predicate is parsed as a structured predicate, not a bare range;
+- bare `RangeExpressionToken` remains for profile-like distances such as weapon range text;
+- predicate spans are tied to `normalized_text` and payload round-trips;
+- unsupported distance interval semantics fail explicitly.
+
+Initial supported predicates:
+
+- within N inches;
+- more than N inches;
+- at least N inches;
+- at most N inches;
+- exactly N inches;
+- within Engagement Range;
+- outside Detection Range;
+- Half Range.
+
+### Phase 8D: weapon ability descriptors
+
+Module:
+
+- `core/weapon_profiles.py`
+
+Objects:
+
+- `AbilityDescriptor`
+- `AbilityKind`
+- `AbilityParameter`
+- `AbilityTiming`
+- `AbilityCondition`
+
+Invariants:
+
+- weapon abilities are typed ingest-time descriptors, not executable rule handlers;
+- ability payloads are JSON-safe and never use object reprs;
+- parameterized abilities validate their parameters before weapon profiles can use them;
+- unsupported ability shapes fail explicitly.
+
+Initial supported descriptors:
+
+- Sustained Hits X;
+- Melta X;
+- Rapid Fire X;
+- Heavy with stationary-or-policy-defined condition.
+
 ### Phase 9: decision system
 
 Modules:

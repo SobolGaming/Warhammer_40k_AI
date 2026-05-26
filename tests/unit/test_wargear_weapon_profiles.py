@@ -9,6 +9,11 @@ from warhammer40k_core.core.attributes import Characteristic, CharacteristicValu
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.wargear import Wargear, WargearError, WargearPayload
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityCondition,
+    AbilityDescriptor,
+    AbilityKind,
+    AbilityParameter,
+    AbilityTiming,
     AttackProfile,
     DamageProfile,
     RangeProfile,
@@ -17,6 +22,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
     WeaponProfileError,
     WeaponProfilePayload,
+    ability_condition_from_token,
+    ability_kind_from_token,
+    ability_timing_from_token,
     canonical_weapon_keyword_tokens,
     range_profile_kind_from_token,
     weapon_keyword_from_token,
@@ -89,6 +97,83 @@ def test_range_attack_and_damage_profiles_consume_parsed_values() -> None:
     }
 
 
+def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
+    abilities = (
+        AbilityDescriptor.sustained_hits(1),
+        AbilityDescriptor.melta(2),
+        AbilityDescriptor.rapid_fire(1),
+        AbilityDescriptor.heavy(),
+    )
+    payloads = [ability.to_payload() for ability in abilities]
+    blob = json.dumps(payloads, sort_keys=True)
+
+    assert payloads[0]["ability_kind"] == AbilityKind.SUSTAINED_HITS.value
+    assert payloads[0]["parameters"] == [{"name": "value", "value": 1}]
+    assert payloads[3]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
+    assert payloads[3]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
+    assert "<" not in blob
+    assert "object at 0x" not in blob
+    assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities
+
+
+def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
+    assert ability_kind_from_token(AbilityKind.MELTA) is AbilityKind.MELTA
+    assert ability_timing_from_token(AbilityTiming.ATTACK_SEQUENCE) is AbilityTiming.ATTACK_SEQUENCE
+    assert (
+        ability_condition_from_token(AbilityCondition.STATIONARY_OR_POLICY_DEFINED)
+        is AbilityCondition.STATIONARY_OR_POLICY_DEFINED
+    )
+    assert ability_timing_from_token(None) is None
+    assert ability_condition_from_token(None) is None
+
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor.sustained_hits(0)
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="bad-heavy",
+            name="Bad Heavy",
+            ability_kind=AbilityKind.HEAVY,
+        )
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="conditioned-rapid-fire",
+            name="Conditioned Rapid Fire",
+            ability_kind=AbilityKind.RAPID_FIRE,
+            parameters=(AbilityParameter.integer(1),),
+            condition=AbilityCondition.STATIONARY_OR_POLICY_DEFINED,
+        )
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="ability:prefixed",
+            name="Prefixed",
+            ability_kind=AbilityKind.MELTA,
+            parameters=(AbilityParameter.integer(2),),
+        )
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="duplicate-parameters",
+            name="Duplicate parameters",
+            ability_kind=AbilityKind.MELTA,
+            parameters=(AbilityParameter.integer(2), AbilityParameter.integer(3)),
+        )
+    with pytest.raises(WeaponProfileError):
+        AbilityParameter(name="value", value=float("inf"))
+    with pytest.raises(WeaponProfileError):
+        AbilityParameter(name="value", value="")
+    with pytest.raises(WeaponProfileError):
+        ability_kind_from_token(cast(str, 1))
+    with pytest.raises(WeaponProfileError):
+        ability_kind_from_token("unsupported")
+    with pytest.raises(WeaponProfileError):
+        ability_timing_from_token(cast(str, 1))
+    with pytest.raises(WeaponProfileError):
+        ability_timing_from_token("unsupported")
+    with pytest.raises(WeaponProfileError):
+        ability_condition_from_token(cast(str, 1))
+    with pytest.raises(WeaponProfileError):
+        ability_condition_from_token("unsupported")
+
+
 def test_weapon_profile_identity_and_serialization_are_stable() -> None:
     profile = _bolt_rifle_profile()
     same_profile = _bolt_rifle_profile()
@@ -142,6 +227,54 @@ def test_weapon_profile_keywords_are_deduplicated_and_sorted_deterministically()
             armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
             damage_profile=DamageProfile.fixed(1),
             keywords=(WeaponKeyword.ASSAULT, WeaponKeyword.ASSAULT),
+        )
+
+
+def test_weapon_profile_abilities_are_deduplicated_and_sorted_deterministically() -> None:
+    rapid_fire = AbilityDescriptor.rapid_fire(1)
+    sustained_hits = AbilityDescriptor.sustained_hits(1)
+    profile = WeaponProfile(
+        profile_id="deterministic-abilities",
+        name="Deterministic abilities",
+        range_profile=RangeProfile.distance(12),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+        abilities=(sustained_hits, rapid_fire),
+    )
+    payload = cast(
+        WeaponProfilePayload,
+        json.loads(json.dumps(profile.to_payload(), sort_keys=True)),
+    )
+
+    assert profile.abilities == (rapid_fire, sustained_hits)
+    assert WeaponProfile.from_payload(payload).to_payload() == profile.to_payload()
+
+    with pytest.raises(WeaponProfileError):
+        WeaponProfile(
+            profile_id="duplicate-abilities",
+            name="Duplicate abilities",
+            range_profile=RangeProfile.distance(12),
+            attack_profile=AttackProfile.fixed(1),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+            damage_profile=DamageProfile.fixed(1),
+            abilities=(rapid_fire, rapid_fire),
+        )
+    with pytest.raises(WeaponProfileError):
+        WeaponProfile(
+            profile_id="bad-ability",
+            name="Bad ability",
+            range_profile=RangeProfile.distance(12),
+            attack_profile=AttackProfile.fixed(1),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+            damage_profile=DamageProfile.fixed(1),
+            abilities=(cast(AbilityDescriptor, "rapid-fire"),),
         )
 
 
