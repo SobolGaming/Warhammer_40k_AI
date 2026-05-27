@@ -1188,7 +1188,13 @@ Objects:
 Invariants:
 
 - battlefield edge crossing can be rejected;
-- enemy model base crossing can be rejected;
+- non-FLY Normal/Advance movement cannot path through enemy model bases;
+- Fall Back movement can move over enemy models only through the Desperate
+  Escape flow;
+- FLY Normal/Advance/Fall Back movement can move over enemy models without
+  Desperate Escape;
+- Desperate Escape resolution is deferred to the Fall Back phase
+  implementation;
 - enemy Engagement Range transit can be rejected independently from ending in
   enemy Engagement Range;
 - friendly model pass-through can be allowed;
@@ -1206,9 +1212,12 @@ Required tests:
 
 - circular infantry base can move through friendly infantry but cannot end
   overlapping;
-- vehicle cannot pass through friendly vehicle/monster;
+- non-FLY vehicle cannot pass through friendly vehicle/monster;
 - model cannot cross battlefield edge;
-- model cannot path through enemy base;
+- non-FLY Normal/Advance movement cannot path through enemy model bases;
+- FLY Normal Move can transit enemy model bases and enemy Engagement Range;
+- FLY Normal Move cannot end within enemy Engagement Range or on another model;
+- FLY VEHICLE can transit friendly VEHICLE/MONSTER blockers;
 - model cannot move through enemy Engagement Range for 10e Normal Move;
 - model cannot move through enemy Engagement Range for 10e Advance;
 - model can move through enemy Engagement Range for 10e Fall Back when policy
@@ -1249,6 +1258,12 @@ Objects:
 Invariants:
 
 - `ADVANCE` is a Movement phase action;
+- movement action option generation must be enemy Engagement Range-aware before
+  Advance and Fall Back are fully implemented;
+- units outside enemy Engagement Range can be offered Remain Stationary, Normal
+  Move, and Advance;
+- units within enemy Engagement Range can be offered Remain Stationary and Fall
+  Back;
 - Advance distance is Movement characteristic plus Advance roll;
 - dice results and reroll decisions are replay-facing;
 - Advance emits displacement records when models move;

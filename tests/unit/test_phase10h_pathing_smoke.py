@@ -76,7 +76,65 @@ def test_vehicle_cannot_transit_friendly_vehicle_or_monster_blocker() -> None:
     assert result.violations[0].blocker_id == "friendly-vehicle"
 
 
-def test_fly_vehicle_still_treats_friendly_vehicle_monster_models_as_blockers() -> None:
+def test_fly_normal_move_can_transit_enemy_models_and_engagement_range() -> None:
+    mover = _model("fly-mover", 1.0, 1.0)
+    enemy_base_blocker = _model("enemy-base-blocker", 3.0, 1.0)
+    enemy_engagement_blocker = _model("enemy-engagement-blocker", 3.0, 2.5)
+    context = _normal_legality_context(keywords=("FLY", "INFANTRY"))
+
+    enemy_base_context = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(enemy_base_blocker,),
+        end_pose=Pose.at(6.0, 1.0),
+    )
+    enemy_engagement_context = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(enemy_engagement_blocker,),
+        end_pose=Pose.at(6.0, 1.0),
+    )
+    enemy_base_result = enemy_base_context.validate()
+    enemy_engagement_result = enemy_engagement_context.validate()
+
+    assert context.capabilities.can_move_through_models
+    assert enemy_base_context.may_transit_enemy_models
+    assert enemy_engagement_context.may_transit_enemy_engagement
+    assert enemy_base_result.is_valid
+    assert enemy_engagement_result.is_valid
+
+
+def test_fly_normal_move_still_cannot_end_in_enemy_engagement_range_or_on_model() -> None:
+    mover = _model("fly-mover", 1.0, 1.0)
+    engagement_blocker = _model("enemy-engagement-blocker", 3.0, 2.5)
+    model_blocker = _model("enemy-model-blocker", 3.0, 1.0)
+    context = _normal_legality_context(keywords=("FLY", "INFANTRY"))
+
+    engagement_result = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(engagement_blocker,),
+        middle_pose=Pose.at(1.5, 1.0),
+        end_pose=Pose.at(3.0, 1.0),
+        sample_interval_inches=10.0,
+    ).validate()
+    model_overlap_result = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(model_blocker,),
+        middle_pose=Pose.at(2.0, 1.0),
+        end_pose=model_blocker.pose,
+    ).validate()
+
+    assert not engagement_result.is_valid
+    assert engagement_result.violations[0].violation_code == "enemy_engagement_range_end_forbidden"
+    assert engagement_result.violations[0].blocker_id == "enemy-engagement-blocker"
+    assert not model_overlap_result.is_valid
+    assert model_overlap_result.violations[0].violation_code == "end_on_model_overlap"
+    assert model_overlap_result.violations[0].blocker_id == "enemy-model-blocker"
+
+
+def test_fly_vehicle_can_transit_friendly_vehicle_monster_blocker() -> None:
     mover = _model("fly-vehicle-mover", 1.0, 1.0, radius=0.7)
     friendly_vehicle = _model("friendly-vehicle", 3.0, 1.0, radius=0.9)
     context = _normal_legality_context(keywords=("FLY", "VEHICLE"))
@@ -91,9 +149,7 @@ def test_fly_vehicle_still_treats_friendly_vehicle_monster_models_as_blockers() 
 
     assert context.capabilities.can_move_through_models
     assert context.capabilities.blocks_friendly_vehicle_monster_pass_through
-    assert not result.is_valid
-    assert result.violations[0].violation_code == "friendly_vehicle_monster_transit_forbidden"
-    assert result.violations[0].blocker_id == "friendly-vehicle"
+    assert result.is_valid
 
 
 def test_model_cannot_cross_battlefield_edge() -> None:
@@ -110,20 +166,30 @@ def test_model_cannot_cross_battlefield_edge() -> None:
     assert result.violations[0].violation_code == "battlefield_edge_crossed"
 
 
-def test_model_cannot_path_through_enemy_base() -> None:
+def test_non_fly_normal_and_advance_cannot_transit_enemy_model_base() -> None:
     mover = _model("mover", 1.0, 1.0)
     enemy = _model("enemy", 3.0, 1.0)
 
-    result = _path_context(
+    for context in (
         _normal_legality_context(),
-        moving_model=mover,
-        enemy_models=(enemy,),
-        end_pose=Pose.at(5.0, 1.0),
-    ).validate()
+        _legality_context(
+            movement_mode=MovementMode.ADVANCE,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            displacement_kind=ModelDisplacementKind.ADVANCE,
+        ),
+    ):
+        path_context = _path_context(
+            context,
+            moving_model=mover,
+            enemy_models=(enemy,),
+            end_pose=Pose.at(5.0, 1.0),
+        )
+        result = path_context.validate()
 
-    assert not result.is_valid
-    assert result.violations[0].violation_code == "enemy_model_base_crossed"
-    assert result.violations[0].blocker_id == "enemy"
+        assert not path_context.may_transit_enemy_models
+        assert not result.is_valid
+        assert result.violations[0].violation_code == "enemy_model_base_crossed"
+        assert result.violations[0].blocker_id == "enemy"
 
 
 def test_model_cannot_path_through_terrain_smoke_blocker() -> None:

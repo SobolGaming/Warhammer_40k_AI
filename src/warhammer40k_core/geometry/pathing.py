@@ -111,6 +111,7 @@ class PathValidationContextPayload(TypedDict):
     enemy_models: list[ModelPayload]
     terrain: list[TerrainVolumePayload]
     friendly_vehicle_monster_model_ids: list[str]
+    may_transit_enemy_models: bool
     may_transit_enemy_engagement: bool
     may_end_in_enemy_engagement: bool
     enemy_engagement_horizontal_inches: float
@@ -310,6 +311,7 @@ class PathValidationContext:
     enemy_models: tuple[Model, ...] = ()
     terrain: tuple[TerrainVolume, ...] = ()
     friendly_vehicle_monster_model_ids: tuple[str, ...] = ()
+    may_transit_enemy_models: bool = False
     may_transit_enemy_engagement: bool = False
     may_end_in_enemy_engagement: bool = False
     enemy_engagement_horizontal_inches: float = 1.0
@@ -375,6 +377,10 @@ class PathValidationContext:
             self,
             "friendly_vehicle_monster_model_ids",
             friendly_vehicle_monster_model_ids,
+        )
+        _validate_bool(
+            "PathValidationContext may_transit_enemy_models",
+            self.may_transit_enemy_models,
         )
         _validate_bool(
             "PathValidationContext may_transit_enemy_engagement",
@@ -446,6 +452,8 @@ class PathValidationContext:
             for enemy_model in self.enemy_models:
                 metrics.model_collision_check_count += 1
                 if _models_overlap_with_volume(sampled_model, enemy_model):
+                    if self.may_transit_enemy_models:
+                        continue
                     return _invalid_path_validation(
                         "enemy_model_base_crossed",
                         "Path witness crosses an enemy model base.",
@@ -556,6 +564,7 @@ class PathValidationContext:
             "enemy_models": [model.to_payload() for model in self.enemy_models],
             "terrain": [terrain.to_payload() for terrain in self.terrain],
             "friendly_vehicle_monster_model_ids": list(self.friendly_vehicle_monster_model_ids),
+            "may_transit_enemy_models": self.may_transit_enemy_models,
             "may_transit_enemy_engagement": self.may_transit_enemy_engagement,
             "may_end_in_enemy_engagement": self.may_end_in_enemy_engagement,
             "enemy_engagement_horizontal_inches": self.enemy_engagement_horizontal_inches,
@@ -576,6 +585,7 @@ class PathValidationContext:
             enemy_models=tuple(Model.from_payload(model) for model in payload["enemy_models"]),
             terrain=tuple(terrain_volume_from_payload(terrain) for terrain in payload["terrain"]),
             friendly_vehicle_monster_model_ids=tuple(payload["friendly_vehicle_monster_model_ids"]),
+            may_transit_enemy_models=payload["may_transit_enemy_models"],
             may_transit_enemy_engagement=payload["may_transit_enemy_engagement"],
             may_end_in_enemy_engagement=payload["may_end_in_enemy_engagement"],
             enemy_engagement_horizontal_inches=payload["enemy_engagement_horizontal_inches"],
