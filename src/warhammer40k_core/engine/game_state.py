@@ -8,6 +8,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     RulesetDescriptor,
     RulesetDescriptorPayload,
+    SetupStepKind,
     battle_phase_kind_from_token,
     setup_step_kind_from_token,
 )
@@ -542,9 +543,18 @@ def secondary_mission_mode_from_token(token: object) -> SecondaryMissionMode:
 
 
 def _validate_lifecycle_sequences(ruleset_descriptor: RulesetDescriptor) -> None:
+    setup_steps = ruleset_descriptor.setup_sequence.steps
     phases = ruleset_descriptor.battle_phase_sequence.phases
-    if BattlePhaseKind.COMMAND not in phases:
-        raise GameLifecycleError("GameConfig battle_phase_sequence must include COMMAND.")
+    if SetupStepKind.MUSTER_ARMIES not in setup_steps:
+        raise GameLifecycleError("GameConfig setup_sequence must include MUSTER_ARMIES.")
+    if SetupStepKind.SELECT_SECONDARY_MISSIONS not in setup_steps:
+        raise GameLifecycleError(
+            "GameConfig setup_sequence must include SELECT_SECONDARY_MISSIONS."
+        )
+    if SetupStepKind.DETERMINE_FIRST_TURN not in setup_steps:
+        raise GameLifecycleError("GameConfig setup_sequence must include DETERMINE_FIRST_TURN.")
+    if phases[0] is not BattlePhaseKind.COMMAND:
+        raise GameLifecycleError("GameConfig battle_phase_sequence must start with COMMAND.")
     if BattlePhaseKind.FIGHT not in phases:
         raise GameLifecycleError("GameConfig battle_phase_sequence must include FIGHT.")
     if phases[-1] is not BattlePhaseKind.FIGHT:

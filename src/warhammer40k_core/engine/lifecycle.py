@@ -22,7 +22,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+    LifecycleStatusKind,
     PhaseHandler,
+    PlaceholderPhaseHandler,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -35,6 +37,9 @@ class GameLifecyclePayload(TypedDict):
     config: GameConfigPayload | None
     state: GameStatePayload
     decisions: DecisionControllerPayload
+
+
+MAX_LIFECYCLE_TRANSITIONS = 128
 
 
 def _new_decision_controller() -> DecisionController:
@@ -82,6 +87,17 @@ class GameLifecycle:
         )
 
     def advance_until_decision_or_terminal(self) -> LifecycleStatus:
+        for _transition_index in range(MAX_LIFECYCLE_TRANSITIONS):
+            status = self._advance_once()
+            if status.status_kind in (
+                LifecycleStatusKind.WAITING_FOR_DECISION,
+                LifecycleStatusKind.TERMINAL,
+                LifecycleStatusKind.UNSUPPORTED,
+            ):
+                return status
+        raise GameLifecycleError("GameLifecycle exceeded deterministic transition guard.")
+
+    def _advance_once(self) -> LifecycleStatus:
         state = self._require_state()
         pending_request = self._pending_decision_request()
         if pending_request is not None:
@@ -145,11 +161,18 @@ class GameLifecycle:
             state=GameState.from_payload(payload["state"]),
             _config=None if config_payload is None else GameConfig.from_payload(config_payload),
         )
+        _validate_payload_consistency(state=lifecycle._require_state(), config=lifecycle._config)
         lifecycle._battle_round_flow = BattleRoundFlow(phase_handlers=lifecycle._phase_handlers())
         return lifecycle
 
     def _phase_handlers(self) -> Mapping[BattlePhase, PhaseHandler]:
-        return {BattlePhase.COMMAND: self._command_phase_handler}
+        return {
+            BattlePhase.COMMAND: self._command_phase_handler,
+            BattlePhase.MOVEMENT: PlaceholderPhaseHandler(BattlePhase.MOVEMENT),
+            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
+            BattlePhase.CHARGE: PlaceholderPhaseHandler(BattlePhase.CHARGE),
+            BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
+        }
 
     def _pending_decision_request(self) -> DecisionRequest | None:
         pending_requests = self.decision_controller.queue.pending_requests
@@ -171,3 +194,17 @@ class GameLifecycle:
         if self._battle_round_flow is None:
             raise GameLifecycleError("GameLifecycle battle round flow is unavailable.")
         return self._battle_round_flow
+
+
+def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
+    if config is None:
+        return
+    expected_hash = config.ruleset_descriptor.descriptor_hash
+    if state.ruleset_descriptor_hash != expected_hash:
+        raise GameLifecycleError("Lifecycle state ruleset hash does not match config.")
+    expected_setup = tuple(config.ruleset_descriptor.setup_sequence.steps)
+    if state.setup_sequence != expected_setup:
+        raise GameLifecycleError("Lifecycle state setup sequence does not match config.")
+    expected_battle = tuple(config.ruleset_descriptor.battle_phase_sequence.phases)
+    if state.battle_phase_sequence != expected_battle:
+        raise GameLifecycleError("Lifecycle state battle phase sequence does not match config.")

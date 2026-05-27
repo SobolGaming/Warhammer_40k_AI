@@ -13,10 +13,17 @@ from warhammer40k_core.core.ruleset_descriptor import (
     SetupSequenceDescriptor,
     SetupStepKind,
 )
+from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.game_state import GameConfig, GameStatePayload
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    GameStatePayload,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -24,6 +31,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
+    PlaceholderPhaseHandler,
     SetupStep,
     game_lifecycle_stage_from_token,
     lifecycle_status_kind_from_token,
@@ -116,9 +124,8 @@ def _public_secondary_choices(payload: dict[str, JsonValue]) -> list[JsonValue]:
     return choices
 
 
-def _current_battle_phase(lifecycle: GameLifecycle) -> BattlePhaseKind | None:
-    assert lifecycle.state is not None
-    return lifecycle.state.current_battle_phase
+def _state_battle_phase(state: GameState) -> BattlePhaseKind | None:
+    return state.current_battle_phase
 
 
 def _submit_pending(lifecycle: GameLifecycle, *, option_id: str, result_number: int) -> None:
@@ -141,7 +148,7 @@ def _advance_to_secondary_mission_step(lifecycle: GameLifecycle) -> None:
 def _choose_secondaries(
     lifecycle: GameLifecycle,
     *,
-    player_a_option: str = "fixed:assassination:bring_it_down",
+    player_a_option: str = "tactical",
     player_b_option: str = "fixed:assassination:bring_it_down",
 ) -> None:
     _advance_to_secondary_mission_step(lifecycle)
@@ -166,6 +173,34 @@ def _advance_to_battle(lifecycle: GameLifecycle) -> None:
         lifecycle.advance_until_decision_or_terminal()
 
 
+def _battle_flow() -> BattleRoundFlow:
+    return BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.COMMAND: CommandPhaseHandler(),
+            BattlePhase.MOVEMENT: PlaceholderPhaseHandler(BattlePhase.MOVEMENT),
+            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
+            BattlePhase.CHARGE: PlaceholderPhaseHandler(BattlePhase.CHARGE),
+            BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
+        }
+    )
+
+
+def _battle_state(config: GameConfig | None = None) -> GameState:
+    resolved_config = _config() if config is None else config
+    state = GameState.from_config(resolved_config)
+    while state.stage is GameLifecycleStage.SETUP:
+        state.complete_current_setup_step()
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
+    return state
+
+
 def test_new_game_starts_at_muster_armies_and_records_descriptor_hash() -> None:
     config = _config()
     lifecycle = GameLifecycle()
@@ -182,25 +217,20 @@ def test_new_game_starts_at_muster_armies_and_records_descriptor_hash() -> None:
 def test_setup_steps_advance_in_ruleset_descriptor_order() -> None:
     lifecycle = _start_lifecycle()
     assert lifecycle.state is not None
-    observed_steps = [lifecycle.state.current_setup_step]
+    status = lifecycle.advance_until_decision_or_terminal()
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    _submit_pending(lifecycle, option_id="tactical", result_number=1)
+    _submit_pending(lifecycle, option_id="fixed:assassination:bring_it_down", result_number=2)
 
-    while lifecycle.state.stage is GameLifecycleStage.SETUP:
-        status = lifecycle.advance_until_decision_or_terminal()
-        if status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
-            selected_option = (
-                "tactical"
-                if status.decision_request is not None
-                and status.decision_request.actor_id == "player-a"
-                else "fixed:assassination:bring_it_down"
-            )
-            result_number = len(lifecycle.decision_controller.records) + 1
-            _submit_pending(lifecycle, option_id=selected_option, result_number=result_number)
-        if lifecycle.state.stage is GameLifecycleStage.SETUP:
-            current_step = lifecycle.state.current_setup_step
-            if observed_steps[-1] is not current_step:
-                observed_steps.append(current_step)
+    observed_steps = [
+        event.payload["step"]
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "setup_step_completed" and isinstance(event.payload, dict)
+    ]
 
-    assert observed_steps == list(RulesetDescriptor.warhammer_40000_tenth().setup_sequence.steps)
+    assert observed_steps == [
+        step.value for step in RulesetDescriptor.warhammer_40000_tenth().setup_sequence.steps
+    ]
 
 
 def test_lifecycle_reads_setup_order_from_ruleset_descriptor() -> None:
@@ -239,19 +269,18 @@ def test_setup_completion_enters_battle_round_one_command_phase() -> None:
 
 
 def test_battle_phases_advance_command_movement_shooting_charge_fight() -> None:
-    lifecycle = _start_lifecycle()
-    _advance_to_battle(lifecycle)
+    state = _battle_state()
+    flow = _battle_flow()
 
-    assert lifecycle.state is not None
-    assert _current_battle_phase(lifecycle) is BattlePhase.COMMAND
-    lifecycle.advance_until_decision_or_terminal()
-    assert _current_battle_phase(lifecycle) is BattlePhase.MOVEMENT
-    lifecycle.advance_until_decision_or_terminal()
-    assert _current_battle_phase(lifecycle) is BattlePhase.SHOOTING
-    lifecycle.advance_until_decision_or_terminal()
-    assert _current_battle_phase(lifecycle) is BattlePhase.CHARGE
-    lifecycle.advance_until_decision_or_terminal()
-    assert _current_battle_phase(lifecycle) is BattlePhase.FIGHT
+    assert _state_battle_phase(state) is BattlePhase.COMMAND
+    flow.advance(state=state, decisions=GameLifecycle().decision_controller)
+    assert _state_battle_phase(state) is BattlePhase.MOVEMENT
+    flow.advance(state=state, decisions=GameLifecycle().decision_controller)
+    assert _state_battle_phase(state) is BattlePhase.SHOOTING
+    flow.advance(state=state, decisions=GameLifecycle().decision_controller)
+    assert _state_battle_phase(state) is BattlePhase.CHARGE
+    flow.advance(state=state, decisions=GameLifecycle().decision_controller)
+    assert _state_battle_phase(state) is BattlePhase.FIGHT
 
 
 def test_lifecycle_reads_battle_phase_order_from_ruleset_descriptor() -> None:
@@ -264,44 +293,72 @@ def test_lifecycle_reads_battle_phase_order_from_ruleset_descriptor() -> None:
             BattlePhaseKind.FIGHT,
         )
     )
-    lifecycle = _start_lifecycle(_config(ruleset_descriptor=descriptor))
-    _advance_to_battle(lifecycle)
+    state = _battle_state(_config(ruleset_descriptor=descriptor))
+    _battle_flow().advance(state=state, decisions=GameLifecycle().decision_controller)
 
-    lifecycle.advance_until_decision_or_terminal()
+    assert state.current_battle_phase is BattlePhase.SHOOTING
 
-    assert lifecycle.state is not None
-    assert lifecycle.state.current_battle_phase is BattlePhase.SHOOTING
+
+def test_missing_battle_phase_handler_is_not_silently_skipped() -> None:
+    state = _battle_state()
+    decisions = GameLifecycle().decision_controller
+    flow = BattleRoundFlow(phase_handlers={})
+
+    with pytest.raises(GameLifecycleError, match="missing handler"):
+        flow.advance(state=state, decisions=decisions)
+
+    assert state.current_battle_phase is BattlePhase.COMMAND
+
+
+def test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary() -> None:
+    state = _battle_state()
+    flow = _battle_flow()
+    decisions = GameLifecycle().decision_controller
+    flow.advance(state=state, decisions=decisions)
+
+    status = flow.advance(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert status.payload == {
+        "completed_phase": BattlePhase.MOVEMENT.value,
+        "phase_body_status": "placeholder_noop",
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "current_phase": BattlePhase.SHOOTING.value,
+    }
+    assert tuple(event.event_type for event in decisions.event_log.records) == (
+        "battle_phase_completed",
+        "phase_body_placeholder_noop",
+        "battle_phase_completed",
+    )
 
 
 def test_phase_wrap_switches_active_player() -> None:
-    lifecycle = _start_lifecycle()
-    _advance_to_battle(lifecycle)
+    state = _battle_state()
+    flow = _battle_flow()
 
     for _ in range(5):
-        lifecycle.advance_until_decision_or_terminal()
+        flow.advance(state=state, decisions=GameLifecycle().decision_controller)
 
-    assert lifecycle.state is not None
-    assert lifecycle.state.battle_round == 1
-    assert lifecycle.state.active_player_id == "player-b"
-    assert lifecycle.state.current_battle_phase is BattlePhase.COMMAND
+    assert state.battle_round == 1
+    assert state.active_player_id == "player-b"
+    assert state.current_battle_phase is BattlePhase.COMMAND
 
 
 def test_battle_round_increments_after_all_players_complete_fight_phase() -> None:
-    lifecycle = _start_lifecycle()
-    _advance_to_battle(lifecycle)
+    state = _battle_state()
+    flow = _battle_flow()
 
     for _ in range(10):
-        lifecycle.advance_until_decision_or_terminal()
+        flow.advance(state=state, decisions=GameLifecycle().decision_controller)
 
-    assert lifecycle.state is not None
-    assert lifecycle.state.battle_round == 2
-    assert lifecycle.state.active_player_id == "player-a"
-    assert lifecycle.state.current_battle_phase is BattlePhase.COMMAND
+    assert state.battle_round == 2
+    assert state.active_player_id == "player-a"
+    assert state.current_battle_phase is BattlePhase.COMMAND
 
 
 def test_lifecycle_stops_at_decision_request() -> None:
     lifecycle = _start_lifecycle()
-    _advance_to_secondary_mission_step(lifecycle)
 
     status = lifecycle.advance_until_decision_or_terminal()
 
@@ -309,6 +366,19 @@ def test_lifecycle_stops_at_decision_request() -> None:
     assert status.decision_request is not None
     assert status.decision_request.actor_id == "player-a"
     assert status.decision_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
+    assert lifecycle.state is not None
+    assert lifecycle.state.current_setup_step is SetupStep.SELECT_SECONDARY_MISSIONS
+
+
+def test_advance_until_reaches_first_decision_from_initial_state_in_one_call() -> None:
+    lifecycle = _start_lifecycle()
+
+    status = lifecycle.advance_until_decision_or_terminal()
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
+    assert status.decision_request.actor_id == "player-a"
     assert lifecycle.state is not None
     assert lifecycle.state.current_setup_step is SetupStep.SELECT_SECONDARY_MISSIONS
 
@@ -402,10 +472,18 @@ def test_tactical_secondary_draw_decision_records_command_draw_and_advances() ->
         request=status.decision_request,
         selected_option_id="draw",
     )
-    lifecycle.submit_decision(draw_result)
+    follow_up_status = lifecycle.submit_decision(draw_result)
 
     assert lifecycle.state is not None
-    assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
+    assert follow_up_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert follow_up_status.payload == {
+        "completed_phase": BattlePhase.MOVEMENT.value,
+        "phase_body_status": "placeholder_noop",
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "current_phase": BattlePhase.SHOOTING.value,
+    }
+    assert lifecycle.state.current_battle_phase is BattlePhase.SHOOTING
     assert len(lifecycle.state.tactical_secondary_draws) == 1
     draw = lifecycle.state.tactical_secondary_draws[0]
     assert draw.player_id == "player-a"
@@ -433,6 +511,63 @@ def test_descriptor_hash_is_recorded_in_lifecycle_replay_payloads() -> None:
     )
     assert payload["state"]["ruleset_descriptor_hash"] == config.ruleset_descriptor.descriptor_hash
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+
+def test_game_config_rejects_lifecycle_sequence_prerequisite_gaps() -> None:
+    missing_secondary = _descriptor_with_sequences(
+        setup_steps=(
+            SetupStepKind.MUSTER_ARMIES,
+            SetupStepKind.SELECT_MISSION,
+            SetupStepKind.CREATE_BATTLEFIELD,
+            SetupStepKind.DETERMINE_ATTACKER_DEFENDER,
+            SetupStepKind.DECLARE_BATTLE_FORMATIONS,
+            SetupStepKind.DEPLOY_ARMIES,
+            SetupStepKind.REDEPLOY_UNITS,
+            SetupStepKind.DETERMINE_FIRST_TURN,
+            SetupStepKind.RESOLVE_PREBATTLE_ACTIONS,
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="SELECT_SECONDARY_MISSIONS"):
+        _config(ruleset_descriptor=missing_secondary)
+
+    not_command_first = _descriptor_with_sequences(
+        battle_phases=(
+            BattlePhaseKind.MOVEMENT,
+            BattlePhaseKind.COMMAND,
+            BattlePhaseKind.FIGHT,
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="start with COMMAND"):
+        _config(ruleset_descriptor=not_command_first)
+
+
+def test_lifecycle_from_payload_rejects_config_state_ruleset_drift() -> None:
+    lifecycle = _start_lifecycle()
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    hash_mismatch = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+    hash_mismatch["state"]["ruleset_descriptor_hash"] = "0" * 64
+    with pytest.raises(GameLifecycleError, match="ruleset hash"):
+        GameLifecycle.from_payload(hash_mismatch)
+
+    setup_mismatch = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+    setup_mismatch["state"]["setup_sequence"] = list(reversed(payload["state"]["setup_sequence"]))
+    with pytest.raises(GameLifecycleError, match="setup sequence"):
+        GameLifecycle.from_payload(setup_mismatch)
+
+    battle_mismatch = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+    battle_mismatch["state"]["battle_phase_sequence"] = [
+        BattlePhaseKind.COMMAND.value,
+        BattlePhaseKind.SHOOTING.value,
+        BattlePhaseKind.MOVEMENT.value,
+        BattlePhaseKind.CHARGE.value,
+        BattlePhaseKind.FIGHT.value,
+    ]
+    with pytest.raises(GameLifecycleError, match="battle phase sequence"):
+        GameLifecycle.from_payload(battle_mismatch)
 
 
 def test_no_ui_or_headless_specific_phase_path_exists() -> None:
@@ -463,9 +598,9 @@ def test_lifecycle_and_command_handler_fail_fast_on_invalid_entry_points() -> No
 
     _advance_to_battle(lifecycle)
     assert CommandPhaseHandler().phase is BattlePhase.COMMAND
-    lifecycle.advance_until_decision_or_terminal()
+    _submit_pending(lifecycle, option_id="draw", result_number=3)
     assert lifecycle.state is not None
-    assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
+    assert lifecycle.state.current_battle_phase is BattlePhase.SHOOTING
     with pytest.raises(GameLifecycleError, match="only in the COMMAND phase"):
         CommandPhaseHandler().begin_phase(
             state=lifecycle.state,

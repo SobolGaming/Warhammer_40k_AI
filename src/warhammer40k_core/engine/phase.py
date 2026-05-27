@@ -175,6 +175,44 @@ class PhaseHandler(Protocol):
         ...
 
 
+@dataclass(frozen=True, slots=True)
+class PlaceholderPhaseHandler:
+    phase: BattlePhase
+
+    def __post_init__(self) -> None:
+        if type(self.phase) is not BattlePhase:
+            raise GameLifecycleError("PlaceholderPhaseHandler phase must be a BattlePhase.")
+
+    def begin_phase(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+    ) -> LifecycleStatus:
+        if state.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("PlaceholderPhaseHandler can run only during battle.")
+        if state.current_battle_phase is not self.phase:
+            raise GameLifecycleError("PlaceholderPhaseHandler phase does not match state.")
+        decisions.event_log.append(
+            "phase_body_placeholder_noop",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": self.phase.value,
+                "phase_body_status": "placeholder_noop",
+            },
+        )
+        return LifecycleStatus.unsupported(
+            stage=GameLifecycleStage.BATTLE,
+            message="Phase body is a Phase 9B placeholder.",
+            payload={
+                "phase": self.phase.value,
+                "phase_body_status": "placeholder_noop",
+            },
+        )
+
+
 def game_lifecycle_stage_from_token(token: object) -> GameLifecycleStage:
     if type(token) is GameLifecycleStage:
         return token

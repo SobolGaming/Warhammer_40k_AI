@@ -31,14 +31,18 @@ class BattleRoundFlow:
             raise GameLifecycleError("BattleRoundFlow requires a current battle phase.")
 
         handler = self._phase_handlers.get(current_phase)
-        if handler is not None:
-            status = handler.begin_phase(state=state, decisions=decisions)
-            if status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
-                return status
-            if status.status_kind is LifecycleStatusKind.TERMINAL:
-                return status
-            if status.status_kind is LifecycleStatusKind.UNSUPPORTED:
-                return status
+        if handler is None:
+            raise GameLifecycleError("BattleRoundFlow missing handler for current battle phase.")
+        status = handler.begin_phase(state=state, decisions=decisions)
+        if status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
+            return status
+        if status.status_kind is LifecycleStatusKind.TERMINAL:
+            return status
+        if (
+            status.status_kind is LifecycleStatusKind.UNSUPPORTED
+            and not _is_placeholder_noop_status(status)
+        ):
+            return status
 
         completed_phase = state.advance_to_next_battle_phase()
         decisions.event_log.append(
@@ -49,12 +53,26 @@ class BattleRoundFlow:
                 "battle_round": state.battle_round,
                 "active_player_id": state.active_player_id,
                 "next_phase": _current_battle_phase_payload(state),
+                "phase_body_status": _phase_body_status(status),
             },
         )
+        if status.status_kind is LifecycleStatusKind.UNSUPPORTED:
+            return LifecycleStatus.unsupported(
+                stage=GameLifecycleStage.BATTLE,
+                message="Phase body is a Phase 9B placeholder.",
+                payload={
+                    "completed_phase": completed_phase.value,
+                    "phase_body_status": _phase_body_status(status),
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "current_phase": _current_battle_phase_payload(state),
+                },
+            )
         return LifecycleStatus.advanced(
             stage=GameLifecycleStage.BATTLE,
             payload={
                 "completed_phase": completed_phase.value,
+                "phase_body_status": _phase_body_status(status),
                 "battle_round": state.battle_round,
                 "active_player_id": state.active_player_id,
                 "current_phase": _current_battle_phase_payload(state),
@@ -67,3 +85,16 @@ def _current_battle_phase_payload(state: GameState) -> str | None:
     if current_phase is None:
         return None
     return current_phase.value
+
+
+def _is_placeholder_noop_status(status: LifecycleStatus) -> bool:
+    return _phase_body_status(status) == "placeholder_noop"
+
+
+def _phase_body_status(status: LifecycleStatus) -> str:
+    payload = status.payload
+    if isinstance(payload, dict):
+        value = payload.get("phase_body_status")
+        if type(value) is str:
+            return value
+    return "complete"
