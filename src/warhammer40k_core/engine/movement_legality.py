@@ -15,6 +15,9 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     model_displacement_kind_from_token,
 )
+from warhammer40k_core.geometry.pathing import PathValidationContext, PathWitness
+from warhammer40k_core.geometry.terrain import TerrainVolume
+from warhammer40k_core.geometry.volume import Model
 
 
 class MovementLegalityError(ValueError):
@@ -455,6 +458,39 @@ class MovementLegalityContext:
                 f"{self.movement_mode.value} cannot move through enemy Engagement Range "
                 f"under {self.engagement_policy.ruleset_edition.value} policy."
             ),
+        )
+
+    def to_path_validation_context(
+        self,
+        *,
+        moving_model: Model,
+        witness: PathWitness,
+        battlefield_width_inches: float,
+        battlefield_depth_inches: float,
+        friendly_models: tuple[Model, ...] = (),
+        enemy_models: tuple[Model, ...] = (),
+        terrain: tuple[TerrainVolume, ...] = (),
+        friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
+        sample_interval_inches: float = 0.5,
+    ) -> PathValidationContext:
+        return PathValidationContext(
+            moving_model=moving_model,
+            witness=witness,
+            battlefield_width_inches=battlefield_width_inches,
+            battlefield_depth_inches=battlefield_depth_inches,
+            friendly_models=friendly_models,
+            enemy_models=enemy_models,
+            terrain=terrain,
+            friendly_vehicle_monster_model_ids=(
+                ()
+                if self.capabilities.can_move_through_models
+                else friendly_vehicle_monster_model_ids
+            ),
+            may_transit_enemy_engagement=(self.engagement_policy.may_transit_enemy_engagement),
+            may_end_in_enemy_engagement=self.engagement_policy.may_end_in_enemy_engagement,
+            enemy_engagement_horizontal_inches=self.engagement_policy.horizontal_inches,
+            enemy_engagement_vertical_inches=self.engagement_policy.vertical_inches,
+            sample_interval_inches=sample_interval_inches,
         )
 
     def to_payload(self) -> MovementLegalityContextPayload:

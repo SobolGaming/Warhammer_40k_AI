@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import date
 
 import pytest
@@ -10,6 +11,8 @@ from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     ChargeEndpointRequirement,
     ChargeTargetSelectionTiming,
+    CoherencyPolicyDescriptor,
+    CoherencyPolicyKind,
     CoverEffect,
     MovementMode,
     MovementModePolicy,
@@ -142,10 +145,21 @@ def test_ruleset_descriptors_capture_coherency_hidden_and_fly_policy() -> None:
     tenth = RulesetDescriptor.warhammer_40000_tenth()
     preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
 
+    assert tenth.coherency_policy.policy_kind is CoherencyPolicyKind.NEIGHBOR_COUNT
     assert tenth.coherency_policy.required_neighbors_small_unit == 1
     assert tenth.coherency_policy.required_neighbors_large_unit == 2
-    assert tenth.coherency_policy.large_unit_model_count_threshold == 6
+    assert tenth.coherency_policy.large_unit_model_count_threshold == 7
+    assert tenth.coherency_policy.max_horizontal_inches == 2.0
+    assert tenth.coherency_policy.max_vertical_inches == 5.0
+    assert tenth.coherency_policy.max_all_models_distance_inches is None
     assert tenth.coherency_policy.max_unit_span_inches is None
+    assert preview.coherency_policy.policy_kind is CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE
+    assert preview.coherency_policy.required_neighbors_small_unit is None
+    assert preview.coherency_policy.required_neighbors_large_unit is None
+    assert preview.coherency_policy.large_unit_model_count_threshold is None
+    assert preview.coherency_policy.max_horizontal_inches is None
+    assert preview.coherency_policy.max_vertical_inches is None
+    assert preview.coherency_policy.max_all_models_distance_inches == 9.0
     assert not tenth.terrain_visibility_policy.hidden_supported
     assert tenth.terrain_visibility_policy.cover_effect is CoverEffect.SAVE_BONUS
     assert preview.terrain_visibility_policy.hidden_supported
@@ -179,3 +193,69 @@ def test_objective_policy_rejects_duplicate_anchor_kinds() -> None:
             default_point_control_radius_inches=3.0,
             terrain_objective_control_policy=TerrainObjectiveControlPolicy.UNSUPPORTED,
         )
+
+
+def test_tenth_coherency_descriptor_round_trips_with_threshold_seven() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    payload = descriptor.coherency_policy.to_payload()
+
+    assert payload["policy_kind"] == CoherencyPolicyKind.NEIGHBOR_COUNT.value
+    assert payload["large_unit_model_count_threshold"] == 7
+    assert CoherencyPolicyDescriptor.from_payload(payload).to_payload() == payload
+
+
+def test_preview_coherency_descriptor_uses_all_models_distance_policy() -> None:
+    policy = RulesetDescriptor.warhammer_40000_eleventh_preview().coherency_policy
+
+    assert policy.policy_kind is CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE
+    assert policy.max_all_models_distance_inches == 9.0
+    assert policy.required_neighbors_small_unit is None
+    assert policy.max_horizontal_inches is None
+
+
+def test_coherency_policy_rejects_invalid_mixed_policy_fields() -> None:
+    with pytest.raises(RulesetDescriptorError, match="requires small-unit"):
+        CoherencyPolicyDescriptor(
+            policy_kind=CoherencyPolicyKind.NEIGHBOR_COUNT,
+            required_neighbors_small_unit=None,
+            max_horizontal_inches=2.0,
+            max_vertical_inches=5.0,
+        )
+    with pytest.raises(RulesetDescriptorError, match="both be set or unset"):
+        CoherencyPolicyDescriptor(
+            policy_kind=CoherencyPolicyKind.NEIGHBOR_COUNT,
+            required_neighbors_small_unit=1,
+            required_neighbors_large_unit=2,
+            large_unit_model_count_threshold=None,
+            max_horizontal_inches=2.0,
+            max_vertical_inches=5.0,
+        )
+    with pytest.raises(RulesetDescriptorError, match="must not set neighbor-count"):
+        CoherencyPolicyDescriptor(
+            policy_kind=CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE,
+            required_neighbors_small_unit=1,
+            max_all_models_distance_inches=9.0,
+        )
+    with pytest.raises(RulesetDescriptorError, match="greater than 0"):
+        CoherencyPolicyDescriptor(
+            policy_kind=CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE,
+            max_all_models_distance_inches=0.0,
+        )
+
+
+def test_descriptor_hash_changes_if_coherency_policy_changes() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    changed = replace(
+        descriptor,
+        coherency_policy=CoherencyPolicyDescriptor(
+            policy_kind=CoherencyPolicyKind.NEIGHBOR_COUNT,
+            required_neighbors_small_unit=1,
+            required_neighbors_large_unit=2,
+            large_unit_model_count_threshold=8,
+            max_horizontal_inches=2.0,
+            max_vertical_inches=5.0,
+        ),
+        descriptor_hash="",
+    )
+
+    assert changed.descriptor_hash != descriptor.descriptor_hash

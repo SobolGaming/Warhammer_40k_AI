@@ -1,0 +1,279 @@
+from __future__ import annotations
+
+import json
+from typing import cast
+
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
+from warhammer40k_core.engine.movement_legality import MovementLegalityContext
+from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
+from warhammer40k_core.geometry.base import CircularBase, OvalBase
+from warhammer40k_core.geometry.pathing import (
+    PathValidationContext,
+    PathValidationContextPayload,
+    PathValidationResult,
+    PathValidationResultPayload,
+    PathWitness,
+)
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.volume import Model, ModelVolume
+
+
+def test_circular_infantry_can_transit_friendly_infantry_but_not_end_overlapping() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    friendly = _model("friendly-infantry", 3.0, 1.0)
+    transit_context = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        friendly_models=(friendly,),
+        end_pose=Pose.at(5.0, 1.0),
+    )
+    overlap_context = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        friendly_models=(friendly,),
+        end_pose=friendly.pose,
+    )
+
+    transit_result = transit_context.validate()
+    overlap_result = overlap_context.validate()
+
+    assert transit_result.is_valid
+    assert overlap_result.violations[0].violation_code == "end_on_model_overlap"
+    assert overlap_result.violations[0].blocker_id == "friendly-infantry"
+
+    context_payload = cast(
+        PathValidationContextPayload,
+        json.loads(json.dumps(transit_context.to_payload(), sort_keys=True)),
+    )
+    result_payload = cast(
+        PathValidationResultPayload,
+        json.loads(json.dumps(transit_result.to_payload(), sort_keys=True)),
+    )
+    for payload in (context_payload, result_payload):
+        blob = json.dumps(payload, sort_keys=True)
+        assert "<" not in blob
+        assert "object at 0x" not in blob
+    assert PathValidationContext.from_payload(context_payload).to_payload() == context_payload
+    assert PathValidationResult.from_payload(result_payload).to_payload() == result_payload
+
+
+def test_vehicle_cannot_transit_friendly_vehicle_or_monster_blocker() -> None:
+    mover = _model("mover", 1.0, 1.0, radius=0.7)
+    friendly_vehicle = _model("friendly-vehicle", 3.0, 1.0, radius=0.9)
+
+    result = _path_context(
+        _normal_legality_context(keywords=("VEHICLE",)),
+        moving_model=mover,
+        friendly_models=(friendly_vehicle,),
+        friendly_vehicle_monster_model_ids=("friendly-vehicle",),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "friendly_vehicle_monster_transit_forbidden"
+    assert result.violations[0].blocker_id == "friendly-vehicle"
+
+
+def test_model_cannot_cross_battlefield_edge() -> None:
+    mover = _model("mover", 1.0, 1.0)
+
+    result = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        middle_pose=Pose.at(0.6, 1.0),
+        end_pose=Pose.at(0.4, 1.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "battlefield_edge_crossed"
+
+
+def test_model_cannot_path_through_enemy_base() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    enemy = _model("enemy", 3.0, 1.0)
+
+    result = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        enemy_models=(enemy,),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "enemy_model_base_crossed"
+    assert result.violations[0].blocker_id == "enemy"
+
+
+def test_normal_move_and_advance_cannot_transit_enemy_engagement_range() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    enemy = _model("enemy", 3.0, 2.5)
+
+    for context in (
+        _normal_legality_context(),
+        _legality_context(
+            movement_mode=MovementMode.ADVANCE,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            displacement_kind=ModelDisplacementKind.ADVANCE,
+        ),
+    ):
+        result = _path_context(
+            context,
+            moving_model=mover,
+            enemy_models=(enemy,),
+            end_pose=Pose.at(5.0, 1.0),
+        ).validate()
+
+        assert not result.is_valid
+        assert result.violations[0].violation_code == ("enemy_engagement_range_transit_forbidden")
+        assert result.violations[0].blocker_id == "enemy"
+
+
+def test_fall_back_can_transit_enemy_engagement_range_but_cannot_end_there() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    enemy = _model("enemy", 5.0, 2.5)
+
+    result = _path_context(
+        _legality_context(
+            movement_mode=MovementMode.FALL_BACK,
+            movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+            displacement_kind=ModelDisplacementKind.FALL_BACK,
+        ),
+        moving_model=mover,
+        enemy_models=(enemy,),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "enemy_engagement_range_end_forbidden"
+    assert result.violations[0].blocker_id == "enemy"
+
+
+def test_normal_move_cannot_end_in_enemy_engagement_range() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    enemy = _model("enemy", 3.0, 2.5)
+
+    result = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        enemy_models=(enemy,),
+        middle_pose=Pose.at(1.5, 1.0),
+        end_pose=Pose.at(3.0, 1.0),
+        sample_interval_inches=10.0,
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "enemy_engagement_range_end_forbidden"
+
+
+def test_charge_policy_allows_transit_and_ending_in_enemy_engagement_range() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    enemy = _model("enemy", 3.0, 2.5)
+
+    result = _path_context(
+        _legality_context(
+            movement_mode=MovementMode.CHARGE,
+            movement_phase_action=None,
+            displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+        ),
+        moving_model=mover,
+        enemy_models=(enemy,),
+        middle_pose=Pose.at(2.0, 1.0),
+        end_pose=Pose.at(3.0, 1.0),
+    ).validate()
+
+    assert result.is_valid
+    assert result.engagement_check_count > 0
+
+
+def test_non_circular_base_movement_records_pivot_cost_placeholder() -> None:
+    mover = _model("oval-mover", 2.0, 2.0, base=OvalBase(length=2.0, width=1.0))
+    result = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        middle_pose=Pose.at(3.0, 2.0, facing_degrees=90.0),
+        end_pose=Pose.at(4.0, 2.0, facing_degrees=90.0),
+    ).validate()
+
+    assert result.is_valid
+    assert result.pivot_cost_pending
+    assert result.pivot_cost_inches == 0.0
+
+
+def _model(
+    model_id: str,
+    x: float,
+    y: float,
+    *,
+    radius: float = 0.5,
+    base: CircularBase | OvalBase | None = None,
+) -> Model:
+    return Model(
+        model_id=model_id,
+        pose=Pose.at(x, y),
+        base=CircularBase(radius=radius) if base is None else base,
+        volume=ModelVolume(height=2.0),
+    )
+
+
+def _normal_legality_context(
+    *,
+    keywords: tuple[str, ...] = ("INFANTRY",),
+) -> MovementLegalityContext:
+    return _legality_context(
+        keywords=keywords,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+    )
+
+
+def _legality_context(
+    *,
+    movement_mode: MovementMode,
+    movement_phase_action: MovementPhaseActionKind | None,
+    displacement_kind: ModelDisplacementKind,
+    keywords: tuple[str, ...] = ("INFANTRY",),
+) -> MovementLegalityContext:
+    return MovementLegalityContext.from_keywords(
+        keywords=keywords,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        movement_mode=movement_mode,
+        movement_phase_action=movement_phase_action,
+        displacement_kind=displacement_kind,
+    )
+
+
+def _path_context(
+    legality_context: MovementLegalityContext,
+    *,
+    moving_model: Model,
+    friendly_models: tuple[Model, ...] = (),
+    enemy_models: tuple[Model, ...] = (),
+    friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
+    middle_pose: Pose | None = None,
+    end_pose: Pose,
+    sample_interval_inches: float = 0.5,
+) -> PathValidationContext:
+    witness = PathWitness.for_paths(
+        (
+            (
+                moving_model.model_id,
+                (
+                    moving_model.pose,
+                    Pose.at(3.0, 1.0) if middle_pose is None else middle_pose,
+                    end_pose,
+                ),
+            ),
+        )
+    )
+    return legality_context.to_path_validation_context(
+        moving_model=moving_model,
+        witness=witness,
+        battlefield_width_inches=10.0,
+        battlefield_depth_inches=10.0,
+        friendly_models=friendly_models,
+        enemy_models=enemy_models,
+        friendly_vehicle_monster_model_ids=friendly_vehicle_monster_model_ids,
+        sample_interval_inches=sample_interval_inches,
+    )

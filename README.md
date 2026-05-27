@@ -1176,12 +1176,14 @@ Modules:
 - `geometry/pathing.py`
 - `engine/movement_legality.py`
 - `engine/phases/movement.py`
+- `core/ruleset_descriptor.py`
 
 Objects:
 
 - `PathValidationContext`
 - `PathValidationResult`
 - `PathConstraintViolation`
+- `CoherencyPolicyKind`
 
 Invariants:
 
@@ -1195,6 +1197,10 @@ Invariants:
 - base gap checks use base footprint geometry;
 - model-volume-at-end checks use resolved model geometry;
 - pivot-cost support is represented, even if not fully solved yet.
+- coherency policy is descriptor data only in this phase;
+- runtime coherency validation remains future work;
+- future coherency enforcement sites are setup/placement, end of any move, and
+  end of every turn cleanup.
 
 Required tests:
 
@@ -1211,6 +1217,8 @@ Required tests:
 - charge movement uses the charge policy and is the exception path for ending
   in Engagement Range;
 - non-circular base movement records pivot-cost placeholder.
+- 10e coherency descriptor uses a seven-model large-unit threshold;
+- 11e preview coherency descriptor uses all-models-within-distance policy.
 
 CORE V1 relevant areas:
 
