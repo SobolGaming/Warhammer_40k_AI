@@ -1437,11 +1437,13 @@ Handler examples:
 
 ## CORE V1 investigation and reuse policy by phase
 
-CORE V1 is a reference implementation, not a source to copy wholesale. For each
-phase below, inspect the listed CORE V1 areas before implementation, identify
-the invariants and algorithms worth preserving, and then implement them in CORE
-V2 using strict typed data, fail-fast validation, replay-safe payloads, and
-current import boundaries.
+CORE V1 is the previous implementation at
+[SobolGaming/Warhammer40k_AI](https://github.com/SobolGaming/Warhammer40k_AI).
+It is a reference implementation, not a source to copy wholesale. For each phase
+below, inspect the listed CORE V1 areas before implementation, identify the
+invariants and algorithms worth preserving, and then implement them in CORE V2
+using strict typed data, fail-fast validation, replay-safe payloads, and current
+import boundaries.
 
 General migration rule for every phase:
 
