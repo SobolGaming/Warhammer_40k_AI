@@ -42,6 +42,14 @@ class TerrainObjectiveControlPolicy(StrEnum):
     TERRAIN_AREA_OCCUPANCY = "terrain_area_occupancy"
 
 
+class TerrainTraversalMode(StrEnum):
+    BLOCKED = "blocked"
+    FREELY_TRAVERSABLE = "freely_traversable"
+    CLIMB = "climb"
+    THROUGH_FEATURE = "through_feature"
+    AIR_PATH = "air_path"
+
+
 class CoverEffect(StrEnum):
     SAVE_BONUS = "save_bonus"
     ATTACKER_BS_MODIFIER = "attacker_bs_modifier"
@@ -105,6 +113,16 @@ class ChargePolicyDescriptorPayload(TypedDict):
     endpoint_requirement: str
 
 
+class TerrainMovementPolicyPayload(TypedDict):
+    freely_traversable_height_threshold_inches: float
+    climb_vertical_distance_counts: bool
+    may_end_mid_climb: bool
+    requires_permission_to_move_through_features: bool
+    infantry_beast_ruins_wall_traversal_mode: str
+    fly_traversal_mode: str
+    fly_uses_air_path_measurement: bool
+
+
 class TerrainVisibilityPolicyDescriptorPayload(TypedDict):
     hidden_supported: bool
     hidden_detection_range_inches: float | None
@@ -161,6 +179,7 @@ class RulesetDescriptorPayload(TypedDict):
     engagement_policy: EngagementPolicyDescriptorPayload
     movement_policy: MovementPolicyDescriptorPayload
     charge_policy: ChargePolicyDescriptorPayload
+    terrain_movement_policy: TerrainMovementPolicyPayload
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptorPayload
     objective_policy: ObjectivePolicyDescriptorPayload
     coherency_policy: CoherencyPolicyDescriptorPayload
@@ -435,6 +454,104 @@ class ChargePolicyDescriptor:
             endpoint_requirement=charge_endpoint_requirement_from_token(
                 payload["endpoint_requirement"]
             ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainMovementPolicy:
+    freely_traversable_height_threshold_inches: float
+    climb_vertical_distance_counts: bool
+    may_end_mid_climb: bool
+    requires_permission_to_move_through_features: bool
+    infantry_beast_ruins_wall_traversal_mode: TerrainTraversalMode
+    fly_traversal_mode: TerrainTraversalMode
+    fly_uses_air_path_measurement: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "freely_traversable_height_threshold_inches",
+            _validate_positive_number(
+                "TerrainMovementPolicy freely_traversable_height_threshold_inches",
+                self.freely_traversable_height_threshold_inches,
+            ),
+        )
+        _validate_bool(
+            "TerrainMovementPolicy climb_vertical_distance_counts",
+            self.climb_vertical_distance_counts,
+        )
+        _validate_bool("TerrainMovementPolicy may_end_mid_climb", self.may_end_mid_climb)
+        _validate_bool(
+            "TerrainMovementPolicy requires_permission_to_move_through_features",
+            self.requires_permission_to_move_through_features,
+        )
+        object.__setattr__(
+            self,
+            "infantry_beast_ruins_wall_traversal_mode",
+            terrain_traversal_mode_from_token(self.infantry_beast_ruins_wall_traversal_mode),
+        )
+        object.__setattr__(
+            self,
+            "fly_traversal_mode",
+            terrain_traversal_mode_from_token(self.fly_traversal_mode),
+        )
+        _validate_bool(
+            "TerrainMovementPolicy fly_uses_air_path_measurement",
+            self.fly_uses_air_path_measurement,
+        )
+        if (
+            self.fly_uses_air_path_measurement
+            and self.fly_traversal_mode is not TerrainTraversalMode.AIR_PATH
+        ):
+            raise RulesetDescriptorError(
+                "TerrainMovementPolicy fly air-path measurement requires AIR_PATH mode."
+            )
+
+    @classmethod
+    def warhammer_40000_tenth_default(cls) -> Self:
+        return cls(
+            freely_traversable_height_threshold_inches=2.0,
+            climb_vertical_distance_counts=True,
+            may_end_mid_climb=False,
+            requires_permission_to_move_through_features=True,
+            infantry_beast_ruins_wall_traversal_mode=TerrainTraversalMode.THROUGH_FEATURE,
+            fly_traversal_mode=TerrainTraversalMode.AIR_PATH,
+            fly_uses_air_path_measurement=True,
+        )
+
+    def to_payload(self) -> TerrainMovementPolicyPayload:
+        return {
+            "freely_traversable_height_threshold_inches": (
+                self.freely_traversable_height_threshold_inches
+            ),
+            "climb_vertical_distance_counts": self.climb_vertical_distance_counts,
+            "may_end_mid_climb": self.may_end_mid_climb,
+            "requires_permission_to_move_through_features": (
+                self.requires_permission_to_move_through_features
+            ),
+            "infantry_beast_ruins_wall_traversal_mode": (
+                self.infantry_beast_ruins_wall_traversal_mode.value
+            ),
+            "fly_traversal_mode": self.fly_traversal_mode.value,
+            "fly_uses_air_path_measurement": self.fly_uses_air_path_measurement,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainMovementPolicyPayload) -> Self:
+        return cls(
+            freely_traversable_height_threshold_inches=payload[
+                "freely_traversable_height_threshold_inches"
+            ],
+            climb_vertical_distance_counts=payload["climb_vertical_distance_counts"],
+            may_end_mid_climb=payload["may_end_mid_climb"],
+            requires_permission_to_move_through_features=payload[
+                "requires_permission_to_move_through_features"
+            ],
+            infantry_beast_ruins_wall_traversal_mode=terrain_traversal_mode_from_token(
+                payload["infantry_beast_ruins_wall_traversal_mode"]
+            ),
+            fly_traversal_mode=terrain_traversal_mode_from_token(payload["fly_traversal_mode"]),
+            fly_uses_air_path_measurement=payload["fly_uses_air_path_measurement"],
         )
 
 
@@ -796,6 +913,7 @@ class RulesetDescriptor:
     engagement_policy: EngagementPolicyDescriptor
     movement_policy: MovementPolicyDescriptor
     charge_policy: ChargePolicyDescriptor
+    terrain_movement_policy: TerrainMovementPolicy
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptor
     objective_policy: ObjectivePolicyDescriptor
     coherency_policy: CoherencyPolicyDescriptor
@@ -828,6 +946,11 @@ class RulesetDescriptor:
             "RulesetDescriptor charge_policy",
             self.charge_policy,
             ChargePolicyDescriptor,
+        )
+        _validate_descriptor_part(
+            "RulesetDescriptor terrain_movement_policy",
+            self.terrain_movement_policy,
+            TerrainMovementPolicy,
         )
         _validate_descriptor_part(
             "RulesetDescriptor terrain_visibility_policy",
@@ -891,6 +1014,7 @@ class RulesetDescriptor:
                 target_selection_timing=ChargeTargetSelectionTiming.BEFORE_ROLL,
                 endpoint_requirement=ChargeEndpointRequirement.DECLARED_TARGET_ENGAGEMENT,
             ),
+            terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_tenth_default(),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=False,
                 hidden_detection_range_inches=None,
@@ -949,6 +1073,7 @@ class RulesetDescriptor:
                 target_selection_timing=ChargeTargetSelectionTiming.AFTER_ROLL,
                 endpoint_requirement=ChargeEndpointRequirement.SELECTED_TARGET_BASE_CONTACT,
             ),
+            terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_tenth_default(),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=True,
                 hidden_detection_range_inches=15.0,
@@ -1006,6 +1131,9 @@ class RulesetDescriptor:
             engagement_policy=EngagementPolicyDescriptor.from_payload(payload["engagement_policy"]),
             movement_policy=MovementPolicyDescriptor.from_payload(payload["movement_policy"]),
             charge_policy=ChargePolicyDescriptor.from_payload(payload["charge_policy"]),
+            terrain_movement_policy=TerrainMovementPolicy.from_payload(
+                payload["terrain_movement_policy"]
+            ),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor.from_payload(
                 payload["terrain_visibility_policy"]
             ),
@@ -1028,6 +1156,7 @@ class RulesetDescriptor:
             "engagement_policy": self.engagement_policy.to_payload(),
             "movement_policy": self.movement_policy.to_payload(),
             "charge_policy": self.charge_policy.to_payload(),
+            "terrain_movement_policy": self.terrain_movement_policy.to_payload(),
             "terrain_visibility_policy": self.terrain_visibility_policy.to_payload(),
             "objective_policy": self.objective_policy.to_payload(),
             "coherency_policy": self.coherency_policy.to_payload(),
@@ -1088,6 +1217,17 @@ def terrain_objective_control_policy_from_token(
         raise RulesetDescriptorError(
             f"Unsupported TerrainObjectiveControlPolicy token: {token}."
         ) from exc
+
+
+def terrain_traversal_mode_from_token(token: object) -> TerrainTraversalMode:
+    if type(token) is TerrainTraversalMode:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("TerrainTraversalMode token must be a string.")
+    try:
+        return TerrainTraversalMode(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported TerrainTraversalMode token: {token}.") from exc
 
 
 def cover_effect_from_token(token: object) -> CoverEffect:
@@ -1372,6 +1512,13 @@ def _validate_non_negative_number(field_name: str, value: object) -> float:
     number = _validate_finite_number(field_name, value)
     if number < 0.0:
         raise RulesetDescriptorError(f"{field_name} must not be negative.")
+    return number
+
+
+def _validate_positive_number(field_name: str, value: object) -> float:
+    number = _validate_finite_number(field_name, value)
+    if number <= 0.0:
+        raise RulesetDescriptorError(f"{field_name} must be greater than 0.")
     return number
 
 

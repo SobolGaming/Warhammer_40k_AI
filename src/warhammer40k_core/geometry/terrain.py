@@ -99,6 +99,9 @@ class TerrainVolume:
         bottom = self.bottom_center.z
         return (bottom, bottom + self.height)
 
+    def top_z_inches(self) -> float:
+        return self.bottom_center.z + self.height
+
     def horizontal_bounds(self) -> tuple[float, float, float, float]:
         half_width = self.width / 2.0
         half_depth = self.depth / 2.0

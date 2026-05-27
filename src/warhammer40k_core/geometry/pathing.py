@@ -3,8 +3,15 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import StrEnum
+from itertools import pairwise
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.ruleset_descriptor import (
+    TerrainMovementPolicy,
+    TerrainMovementPolicyPayload,
+    TerrainTraversalMode,
+    terrain_traversal_mode_from_token,
+)
 from warhammer40k_core.core.unit_group import UnitGroup, UnitGroupPayload
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase
@@ -23,6 +30,7 @@ from warhammer40k_core.geometry.pose import (
 )
 from warhammer40k_core.geometry.spatial_index import SpatialIndex, SpatialIndexPayload
 from warhammer40k_core.geometry.terrain import (
+    ObstacleVolume,
     TerrainVolume,
     TerrainVolumePayload,
     terrain_volume_from_payload,
@@ -116,6 +124,41 @@ class PathValidationContextPayload(TypedDict):
     may_end_in_enemy_engagement: bool
     enemy_engagement_horizontal_inches: float
     enemy_engagement_vertical_inches: float
+    sample_interval_inches: float
+
+
+class TerrainPathSegmentPayload(TypedDict):
+    terrain_id: str
+    traversal_mode: str
+    start_pose: PosePayload
+    end_pose: PosePayload
+    horizontal_distance_inches: float
+    vertical_distance_inches: float
+    counted_distance_inches: float
+    air_path_measurement_pending: bool
+
+
+class TerrainTraversalViolationPayload(TypedDict):
+    violation_code: str
+    message: str
+    terrain_id: str | None
+
+
+class TerrainPathLegalityResultPayload(TypedDict):
+    is_valid: bool
+    violations: list[TerrainTraversalViolationPayload]
+    segments: list[TerrainPathSegmentPayload]
+    sampled_pose_count: int
+
+
+class TerrainPathLegalityContextPayload(TypedDict):
+    moving_model: ModelPayload
+    witness: PathWitnessPayload
+    terrain: list[TerrainVolumePayload]
+    terrain_movement_policy: TerrainMovementPolicyPayload
+    can_traverse_ruins_walls: bool
+    can_move_through_terrain: bool
+    has_fly: bool
     sample_interval_inches: float
 
 
@@ -669,6 +712,385 @@ class PathWitness:
 
 
 @dataclass(frozen=True, slots=True)
+class TerrainPathSegment:
+    terrain_id: str
+    traversal_mode: TerrainTraversalMode
+    start_pose: Pose
+    end_pose: Pose
+    horizontal_distance_inches: float
+    vertical_distance_inches: float
+    counted_distance_inches: float
+    air_path_measurement_pending: bool = False
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "terrain_id",
+            _validate_identifier("TerrainPathSegment terrain_id", self.terrain_id),
+        )
+        object.__setattr__(
+            self,
+            "traversal_mode",
+            terrain_traversal_mode_from_token(self.traversal_mode),
+        )
+        validate_pose("TerrainPathSegment start_pose", self.start_pose)
+        validate_pose("TerrainPathSegment end_pose", self.end_pose)
+        object.__setattr__(
+            self,
+            "horizontal_distance_inches",
+            _validate_non_negative_number(
+                "TerrainPathSegment horizontal_distance_inches",
+                self.horizontal_distance_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "vertical_distance_inches",
+            _validate_non_negative_number(
+                "TerrainPathSegment vertical_distance_inches",
+                self.vertical_distance_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "counted_distance_inches",
+            _validate_non_negative_number(
+                "TerrainPathSegment counted_distance_inches",
+                self.counted_distance_inches,
+            ),
+        )
+        _validate_bool(
+            "TerrainPathSegment air_path_measurement_pending",
+            self.air_path_measurement_pending,
+        )
+        if (
+            self.air_path_measurement_pending
+            and self.traversal_mode is not TerrainTraversalMode.AIR_PATH
+        ):
+            raise GeometryError("TerrainPathSegment air-path hook requires AIR_PATH mode.")
+
+    def to_payload(self) -> TerrainPathSegmentPayload:
+        return {
+            "terrain_id": self.terrain_id,
+            "traversal_mode": self.traversal_mode.value,
+            "start_pose": self.start_pose.to_payload(),
+            "end_pose": self.end_pose.to_payload(),
+            "horizontal_distance_inches": self.horizontal_distance_inches,
+            "vertical_distance_inches": self.vertical_distance_inches,
+            "counted_distance_inches": self.counted_distance_inches,
+            "air_path_measurement_pending": self.air_path_measurement_pending,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainPathSegmentPayload) -> Self:
+        return cls(
+            terrain_id=payload["terrain_id"],
+            traversal_mode=terrain_traversal_mode_from_token(payload["traversal_mode"]),
+            start_pose=Pose.from_payload(payload["start_pose"]),
+            end_pose=Pose.from_payload(payload["end_pose"]),
+            horizontal_distance_inches=payload["horizontal_distance_inches"],
+            vertical_distance_inches=payload["vertical_distance_inches"],
+            counted_distance_inches=payload["counted_distance_inches"],
+            air_path_measurement_pending=payload["air_path_measurement_pending"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainTraversalViolation:
+    violation_code: str
+    message: str
+    terrain_id: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "violation_code",
+            _validate_identifier("TerrainTraversalViolation violation_code", self.violation_code),
+        )
+        object.__setattr__(
+            self,
+            "message",
+            _validate_identifier("TerrainTraversalViolation message", self.message),
+        )
+        object.__setattr__(
+            self,
+            "terrain_id",
+            _validate_optional_identifier("TerrainTraversalViolation terrain_id", self.terrain_id),
+        )
+
+    def to_payload(self) -> TerrainTraversalViolationPayload:
+        return {
+            "violation_code": self.violation_code,
+            "message": self.message,
+            "terrain_id": self.terrain_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainTraversalViolationPayload) -> Self:
+        return cls(
+            violation_code=payload["violation_code"],
+            message=payload["message"],
+            terrain_id=payload["terrain_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainPathLegalityResult:
+    violations: tuple[TerrainTraversalViolation, ...] = ()
+    segments: tuple[TerrainPathSegment, ...] = ()
+    sampled_pose_count: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "violations",
+            _validate_terrain_traversal_violation_tuple(self.violations),
+        )
+        object.__setattr__(
+            self,
+            "segments",
+            _validate_terrain_path_segment_tuple(self.segments),
+        )
+        object.__setattr__(
+            self,
+            "sampled_pose_count",
+            _validate_non_negative_int(
+                "TerrainPathLegalityResult sampled_pose_count",
+                self.sampled_pose_count,
+            ),
+        )
+
+    @classmethod
+    def valid(
+        cls,
+        *,
+        segments: tuple[TerrainPathSegment, ...],
+        sampled_pose_count: int,
+    ) -> Self:
+        return cls(segments=segments, sampled_pose_count=sampled_pose_count)
+
+    @classmethod
+    def invalid(
+        cls,
+        violation: TerrainTraversalViolation,
+        *,
+        segments: tuple[TerrainPathSegment, ...],
+        sampled_pose_count: int,
+    ) -> Self:
+        return cls(
+            violations=(violation,),
+            segments=segments,
+            sampled_pose_count=sampled_pose_count,
+        )
+
+    @property
+    def is_valid(self) -> bool:
+        return not self.violations
+
+    def to_payload(self) -> TerrainPathLegalityResultPayload:
+        return {
+            "is_valid": self.is_valid,
+            "violations": [violation.to_payload() for violation in self.violations],
+            "segments": [segment.to_payload() for segment in self.segments],
+            "sampled_pose_count": self.sampled_pose_count,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainPathLegalityResultPayload) -> Self:
+        result = cls(
+            violations=tuple(
+                TerrainTraversalViolation.from_payload(violation)
+                for violation in payload["violations"]
+            ),
+            segments=tuple(
+                TerrainPathSegment.from_payload(segment) for segment in payload["segments"]
+            ),
+            sampled_pose_count=payload["sampled_pose_count"],
+        )
+        if result.is_valid != payload["is_valid"]:
+            raise GeometryError(
+                "TerrainPathLegalityResult payload validity does not match violations."
+            )
+        return result
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainPathLegalityContext:
+    moving_model: Model
+    witness: PathWitness
+    terrain: tuple[TerrainVolume, ...]
+    terrain_movement_policy: TerrainMovementPolicy
+    can_traverse_ruins_walls: bool = False
+    can_move_through_terrain: bool = False
+    has_fly: bool = False
+    sample_interval_inches: float = 0.5
+
+    def __post_init__(self) -> None:
+        if type(self.moving_model) is not Model:
+            raise GeometryError("TerrainPathLegalityContext moving_model must be a Model.")
+        if type(self.witness) is not PathWitness:
+            raise GeometryError("TerrainPathLegalityContext witness must be a PathWitness.")
+        if self.witness.model_ids() != (self.moving_model.model_id,):
+            raise GeometryError(
+                "TerrainPathLegalityContext witness must contain only the moving model."
+            )
+        object.__setattr__(
+            self,
+            "terrain",
+            _validate_terrain_tuple("TerrainPathLegalityContext terrain", self.terrain),
+        )
+        if type(self.terrain_movement_policy) is not TerrainMovementPolicy:
+            raise GeometryError(
+                "TerrainPathLegalityContext terrain_movement_policy must be "
+                "a TerrainMovementPolicy."
+            )
+        _validate_bool(
+            "TerrainPathLegalityContext can_traverse_ruins_walls",
+            self.can_traverse_ruins_walls,
+        )
+        _validate_bool(
+            "TerrainPathLegalityContext can_move_through_terrain",
+            self.can_move_through_terrain,
+        )
+        _validate_bool("TerrainPathLegalityContext has_fly", self.has_fly)
+        object.__setattr__(
+            self,
+            "sample_interval_inches",
+            _validate_positive_number(
+                "TerrainPathLegalityContext sample_interval_inches",
+                self.sample_interval_inches,
+            ),
+        )
+
+    def validate(self) -> TerrainPathLegalityResult:
+        path = self.witness.poses_for_model(self.moving_model.model_id)
+        sampled_path = _sampled_pose_path(path, sample_interval_inches=self.sample_interval_inches)
+        if path[0] != self.moving_model.pose:
+            return TerrainPathLegalityResult.invalid(
+                TerrainTraversalViolation(
+                    violation_code="starting_pose_mismatch",
+                    message="Terrain path witness must start at the moving model pose.",
+                ),
+                segments=(),
+                sampled_pose_count=len(sampled_path),
+            )
+        if len(path) < 3 or not _has_non_endpoint_interior_pose(path):
+            return TerrainPathLegalityResult.invalid(
+                TerrainTraversalViolation(
+                    violation_code="endpoint_only_path",
+                    message="Terrain path witness must include non-endpoint path evidence.",
+                ),
+                segments=(),
+                sampled_pose_count=len(sampled_path),
+            )
+
+        segments: list[TerrainPathSegment] = []
+        for terrain in self.terrain:
+            touching_poses = tuple(
+                pose
+                for pose in sampled_path
+                if _model_horizontally_intersects_terrain(
+                    _model_at_pose(self.moving_model, pose),
+                    terrain,
+                )
+            )
+            if not touching_poses:
+                continue
+            if not self.terrain_movement_policy.may_end_mid_climb and _pose_is_mid_climb(
+                path[-1], terrain, self.moving_model
+            ):
+                return TerrainPathLegalityResult.invalid(
+                    TerrainTraversalViolation(
+                        violation_code="terrain_mid_climb_endpoint_forbidden",
+                        message="Terrain path cannot end mid-climb.",
+                        terrain_id=terrain.terrain_id,
+                    ),
+                    segments=tuple(segments),
+                    sampled_pose_count=len(sampled_path),
+                )
+
+            traversal_mode = self._traversal_mode_for_terrain(terrain, touching_poses)
+            if traversal_mode is TerrainTraversalMode.BLOCKED:
+                return TerrainPathLegalityResult.invalid(
+                    TerrainTraversalViolation(
+                        violation_code="terrain_feature_transit_forbidden",
+                        message="Terrain path crosses terrain without traversal permission.",
+                        terrain_id=terrain.terrain_id,
+                    ),
+                    segments=tuple(segments),
+                    sampled_pose_count=len(sampled_path),
+                )
+
+            segments.append(
+                _terrain_path_segment(
+                    terrain_id=terrain.terrain_id,
+                    traversal_mode=traversal_mode,
+                    path=path,
+                    touching_poses=touching_poses,
+                    policy=self.terrain_movement_policy,
+                )
+            )
+
+        return TerrainPathLegalityResult.valid(
+            segments=tuple(segments),
+            sampled_pose_count=len(sampled_path),
+        )
+
+    def _traversal_mode_for_terrain(
+        self,
+        terrain: TerrainVolume,
+        touching_poses: tuple[Pose, ...],
+    ) -> TerrainTraversalMode:
+        if (
+            self.has_fly
+            and self.terrain_movement_policy.fly_uses_air_path_measurement
+            and _path_reaches_or_clears_terrain_top(touching_poses, terrain)
+        ):
+            return self.terrain_movement_policy.fly_traversal_mode
+        if type(terrain) is ObstacleVolume:
+            if self.can_move_through_terrain or self.can_traverse_ruins_walls:
+                return self.terrain_movement_policy.infantry_beast_ruins_wall_traversal_mode
+            if _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+                return TerrainTraversalMode.CLIMB
+            return TerrainTraversalMode.BLOCKED
+        if (
+            terrain.height
+            <= self.terrain_movement_policy.freely_traversable_height_threshold_inches
+        ):
+            return TerrainTraversalMode.FREELY_TRAVERSABLE
+        if _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+            return TerrainTraversalMode.CLIMB
+        return TerrainTraversalMode.BLOCKED
+
+    def to_payload(self) -> TerrainPathLegalityContextPayload:
+        return {
+            "moving_model": self.moving_model.to_payload(),
+            "witness": self.witness.to_payload(),
+            "terrain": [terrain.to_payload() for terrain in self.terrain],
+            "terrain_movement_policy": self.terrain_movement_policy.to_payload(),
+            "can_traverse_ruins_walls": self.can_traverse_ruins_walls,
+            "can_move_through_terrain": self.can_move_through_terrain,
+            "has_fly": self.has_fly,
+            "sample_interval_inches": self.sample_interval_inches,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainPathLegalityContextPayload) -> Self:
+        return cls(
+            moving_model=Model.from_payload(payload["moving_model"]),
+            witness=PathWitness.from_payload(payload["witness"]),
+            terrain=tuple(terrain_volume_from_payload(terrain) for terrain in payload["terrain"]),
+            terrain_movement_policy=TerrainMovementPolicy.from_payload(
+                payload["terrain_movement_policy"]
+            ),
+            can_traverse_ruins_walls=payload["can_traverse_ruins_walls"],
+            can_move_through_terrain=payload["can_move_through_terrain"],
+            has_fly=payload["has_fly"],
+            sample_interval_inches=payload["sample_interval_inches"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class PathFailure:
     reason: PathFailureReason
     message: str
@@ -1156,6 +1578,47 @@ def _validate_path_constraint_violation(
     return value
 
 
+def _validate_terrain_traversal_violation_tuple(
+    values: object,
+) -> tuple[TerrainTraversalViolation, ...]:
+    if type(values) is not tuple:
+        raise GeometryError("TerrainPathLegalityResult violations must be a tuple.")
+    return tuple(
+        _validate_terrain_traversal_violation("TerrainPathLegalityResult violation", value)
+        for value in cast(tuple[object, ...], values)
+    )
+
+
+def _validate_terrain_traversal_violation(
+    field_name: str,
+    value: object,
+) -> TerrainTraversalViolation:
+    if type(value) is not TerrainTraversalViolation:
+        raise GeometryError(f"{field_name} must be a TerrainTraversalViolation.")
+    return value
+
+
+def _validate_terrain_path_segment_tuple(
+    values: object,
+) -> tuple[TerrainPathSegment, ...]:
+    if type(values) is not tuple:
+        raise GeometryError("TerrainPathLegalityResult segments must be a tuple.")
+    segments = tuple(
+        _validate_terrain_path_segment("TerrainPathLegalityResult segment", value)
+        for value in cast(tuple[object, ...], values)
+    )
+    return tuple(sorted(segments, key=lambda segment: segment.terrain_id))
+
+
+def _validate_terrain_path_segment(
+    field_name: str,
+    value: object,
+) -> TerrainPathSegment:
+    if type(value) is not TerrainPathSegment:
+        raise GeometryError(f"{field_name} must be a TerrainPathSegment.")
+    return value
+
+
 def _validate_model(field_name: str, value: object) -> Model:
     if type(value) is not Model:
         raise GeometryError(f"{field_name} must be a Model.")
@@ -1199,6 +1662,81 @@ def _model_at_pose(model: Model, pose: Pose) -> Model:
         base=model.base,
         volume=model.volume,
     )
+
+
+def _terrain_path_segment(
+    *,
+    terrain_id: str,
+    traversal_mode: TerrainTraversalMode,
+    path: tuple[Pose, ...],
+    touching_poses: tuple[Pose, ...],
+    policy: TerrainMovementPolicy,
+) -> TerrainPathSegment:
+    horizontal_distance = _path_horizontal_distance(path)
+    vertical_distance = _path_vertical_distance(path)
+    if traversal_mode is TerrainTraversalMode.AIR_PATH:
+        counted_distance = _path_3d_distance(path)
+        air_path_measurement_pending = policy.fly_uses_air_path_measurement
+    elif traversal_mode is TerrainTraversalMode.CLIMB and policy.climb_vertical_distance_counts:
+        counted_distance = horizontal_distance + vertical_distance
+        air_path_measurement_pending = False
+    else:
+        counted_distance = horizontal_distance
+        air_path_measurement_pending = False
+    return TerrainPathSegment(
+        terrain_id=terrain_id,
+        traversal_mode=traversal_mode,
+        start_pose=touching_poses[0],
+        end_pose=touching_poses[-1],
+        horizontal_distance_inches=horizontal_distance,
+        vertical_distance_inches=vertical_distance,
+        counted_distance_inches=counted_distance,
+        air_path_measurement_pending=air_path_measurement_pending,
+    )
+
+
+def _model_horizontally_intersects_terrain(model: Model, terrain: TerrainVolume) -> bool:
+    return shapely_backend.footprint_for_terrain(terrain).intersects(
+        shapely_backend.footprint_for_base(model.base, model.pose)
+    )
+
+
+def _pose_is_mid_climb(pose: Pose, terrain: TerrainVolume, model: Model) -> bool:
+    model_at_end = _model_at_pose(model, pose)
+    if not _model_horizontally_intersects_terrain(model_at_end, terrain):
+        return False
+    bottom_z = pose.position.z
+    terrain_bottom, terrain_top = terrain.vertical_interval()
+    return terrain_bottom < bottom_z < terrain_top and not math.isclose(bottom_z, terrain_top)
+
+
+def _path_reaches_or_clears_terrain_top(
+    touching_poses: tuple[Pose, ...],
+    terrain: TerrainVolume,
+) -> bool:
+    terrain_top = terrain.top_z_inches()
+    return any(
+        pose.position.z > terrain_top or math.isclose(pose.position.z, terrain_top)
+        for pose in touching_poses
+    )
+
+
+def _path_horizontal_distance(poses: tuple[Pose, ...]) -> float:
+    return sum(
+        math.hypot(
+            end.position.x - start.position.x,
+            end.position.y - start.position.y,
+        )
+        for start, end in pairwise(poses)
+    )
+
+
+def _path_vertical_distance(poses: tuple[Pose, ...]) -> float:
+    return sum(abs(end.position.z - start.position.z) for start, end in pairwise(poses))
+
+
+def _path_3d_distance(poses: tuple[Pose, ...]) -> float:
+    return sum(start.distance_3d_to(end) for start, end in pairwise(poses))
 
 
 def _sampled_pose_path(
