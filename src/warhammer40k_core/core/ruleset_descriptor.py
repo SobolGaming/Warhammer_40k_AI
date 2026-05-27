@@ -59,6 +59,7 @@ class SetupStepKind(StrEnum):
     SELECT_MISSION = "select_mission"
     CREATE_BATTLEFIELD = "create_battlefield"
     DETERMINE_ATTACKER_DEFENDER = "determine_attacker_defender"
+    SELECT_SECONDARY_MISSIONS = "select_secondary_missions"
     DECLARE_BATTLE_FORMATIONS = "declare_battle_formations"
     DEPLOY_ARMIES = "deploy_armies"
     REDEPLOY_UNITS = "redeploy_units"
@@ -183,6 +184,7 @@ class SetupSequenceDescriptor:
                 SetupStepKind.SELECT_MISSION,
                 SetupStepKind.CREATE_BATTLEFIELD,
                 SetupStepKind.DETERMINE_ATTACKER_DEFENDER,
+                SetupStepKind.SELECT_SECONDARY_MISSIONS,
                 SetupStepKind.DECLARE_BATTLE_FORMATIONS,
                 SetupStepKind.DEPLOY_ARMIES,
                 SetupStepKind.REDEPLOY_UNITS,

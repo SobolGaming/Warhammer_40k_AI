@@ -628,12 +628,17 @@ MUSTER_ARMIES
 SELECT_MISSION
 CREATE_BATTLEFIELD
 DETERMINE_ATTACKER_DEFENDER
+SELECT_SECONDARY_MISSIONS
 DECLARE_BATTLE_FORMATIONS
 DEPLOY_ARMIES
 REDEPLOY_UNITS
 DETERMINE_FIRST_TURN
 RESOLVE_PREBATTLE_ACTIONS
 ```
+
+`SELECT_SECONDARY_MISSIONS` covers each player's secret Fixed or Tactical
+Secondary Mission choice. Fixed choices also include selecting the two Fixed
+Missions; Tactical choices are deferred to Command phase draws.
 
 Battle round order is explicit:
 

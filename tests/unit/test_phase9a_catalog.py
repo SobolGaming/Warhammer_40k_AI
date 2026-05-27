@@ -364,6 +364,7 @@ def test_phase_sequence_descriptors_are_explicit_policy_data() -> None:
         SetupStepKind.SELECT_MISSION,
         SetupStepKind.CREATE_BATTLEFIELD,
         SetupStepKind.DETERMINE_ATTACKER_DEFENDER,
+        SetupStepKind.SELECT_SECONDARY_MISSIONS,
         SetupStepKind.DECLARE_BATTLE_FORMATIONS,
         SetupStepKind.DEPLOY_ARMIES,
         SetupStepKind.REDEPLOY_UNITS,

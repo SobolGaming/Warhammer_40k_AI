@@ -57,6 +57,7 @@ def test_descriptor_hash_includes_setup_and_battle_phase_sequences() -> None:
         SetupStepKind.SELECT_MISSION.value,
         SetupStepKind.CREATE_BATTLEFIELD.value,
         SetupStepKind.DETERMINE_ATTACKER_DEFENDER.value,
+        SetupStepKind.SELECT_SECONDARY_MISSIONS.value,
         SetupStepKind.DECLARE_BATTLE_FORMATIONS.value,
         SetupStepKind.DEPLOY_ARMIES.value,
         SetupStepKind.REDEPLOY_UNITS.value,
