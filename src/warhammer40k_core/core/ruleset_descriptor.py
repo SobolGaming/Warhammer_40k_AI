@@ -54,6 +54,27 @@ class MissionDeploymentZoneSource(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
+class SetupStepKind(StrEnum):
+    MUSTER_ARMIES = "muster_armies"
+    SELECT_MISSION = "select_mission"
+    CREATE_BATTLEFIELD = "create_battlefield"
+    DETERMINE_ATTACKER_DEFENDER = "determine_attacker_defender"
+    SELECT_SECONDARY_MISSIONS = "select_secondary_missions"
+    DECLARE_BATTLE_FORMATIONS = "declare_battle_formations"
+    DEPLOY_ARMIES = "deploy_armies"
+    REDEPLOY_UNITS = "redeploy_units"
+    RESOLVE_PREBATTLE_ACTIONS = "resolve_prebattle_actions"
+    DETERMINE_FIRST_TURN = "determine_first_turn"
+
+
+class BattlePhaseKind(StrEnum):
+    COMMAND = "command"
+    MOVEMENT = "movement"
+    SHOOTING = "shooting"
+    CHARGE = "charge"
+    FIGHT = "fight"
+
+
 class EngagementPolicyDescriptorPayload(TypedDict):
     horizontal_inches: float
     vertical_inches: float
@@ -117,6 +138,14 @@ class MissionPolicyDescriptorPayload(TypedDict):
     deployment_zone_source: str
 
 
+class SetupSequenceDescriptorPayload(TypedDict):
+    steps: list[str]
+
+
+class BattlePhaseSequenceDescriptorPayload(TypedDict):
+    phases: list[str]
+
+
 class RulesetDescriptorPayload(TypedDict):
     ruleset_id: RulesetIdPayload
     source_date: str
@@ -130,6 +159,79 @@ class RulesetDescriptorPayload(TypedDict):
     coherency_policy: CoherencyPolicyDescriptorPayload
     fly_policy: FlyPolicyDescriptorPayload
     mission_policy: MissionPolicyDescriptorPayload
+    setup_sequence: SetupSequenceDescriptorPayload
+    battle_phase_sequence: BattlePhaseSequenceDescriptorPayload
+
+
+@dataclass(frozen=True, slots=True)
+class SetupSequenceDescriptor:
+    steps: tuple[SetupStepKind, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.steps) is not tuple:
+            raise RulesetDescriptorError("SetupSequenceDescriptor steps must be a tuple.")
+        steps = tuple(setup_step_kind_from_token(step) for step in self.steps)
+        if not steps:
+            raise RulesetDescriptorError("SetupSequenceDescriptor steps must not be empty.")
+        _validate_unique_setup_steps(steps)
+        object.__setattr__(self, "steps", steps)
+
+    @classmethod
+    def warhammer_40000_tenth_default(cls) -> Self:
+        return cls(
+            steps=(
+                SetupStepKind.MUSTER_ARMIES,
+                SetupStepKind.SELECT_MISSION,
+                SetupStepKind.CREATE_BATTLEFIELD,
+                SetupStepKind.DETERMINE_ATTACKER_DEFENDER,
+                SetupStepKind.SELECT_SECONDARY_MISSIONS,
+                SetupStepKind.DECLARE_BATTLE_FORMATIONS,
+                SetupStepKind.DEPLOY_ARMIES,
+                SetupStepKind.REDEPLOY_UNITS,
+                SetupStepKind.DETERMINE_FIRST_TURN,
+                SetupStepKind.RESOLVE_PREBATTLE_ACTIONS,
+            )
+        )
+
+    def to_payload(self) -> SetupSequenceDescriptorPayload:
+        return {"steps": [step.value for step in self.steps]}
+
+    @classmethod
+    def from_payload(cls, payload: SetupSequenceDescriptorPayload) -> Self:
+        return cls(steps=tuple(setup_step_kind_from_token(step) for step in payload["steps"]))
+
+
+@dataclass(frozen=True, slots=True)
+class BattlePhaseSequenceDescriptor:
+    phases: tuple[BattlePhaseKind, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.phases) is not tuple:
+            raise RulesetDescriptorError("BattlePhaseSequenceDescriptor phases must be a tuple.")
+        phases = tuple(battle_phase_kind_from_token(phase) for phase in self.phases)
+        if not phases:
+            raise RulesetDescriptorError("BattlePhaseSequenceDescriptor phases must not be empty.")
+        _validate_unique_battle_phases(phases)
+        object.__setattr__(self, "phases", phases)
+
+    @classmethod
+    def warhammer_40000_tenth_default(cls) -> Self:
+        return cls(
+            phases=(
+                BattlePhaseKind.COMMAND,
+                BattlePhaseKind.MOVEMENT,
+                BattlePhaseKind.SHOOTING,
+                BattlePhaseKind.CHARGE,
+                BattlePhaseKind.FIGHT,
+            )
+        )
+
+    def to_payload(self) -> BattlePhaseSequenceDescriptorPayload:
+        return {"phases": [phase.value for phase in self.phases]}
+
+    @classmethod
+    def from_payload(cls, payload: BattlePhaseSequenceDescriptorPayload) -> Self:
+        return cls(phases=tuple(battle_phase_kind_from_token(phase) for phase in payload["phases"]))
 
 
 @dataclass(frozen=True, slots=True)
@@ -632,6 +734,8 @@ class RulesetDescriptor:
     coherency_policy: CoherencyPolicyDescriptor
     fly_policy: FlyPolicyDescriptor
     mission_policy: MissionPolicyDescriptor
+    setup_sequence: SetupSequenceDescriptor
+    battle_phase_sequence: BattlePhaseSequenceDescriptor
     descriptor_hash: str = ""
 
     def __post_init__(self) -> None:
@@ -683,6 +787,16 @@ class RulesetDescriptor:
             self.mission_policy,
             MissionPolicyDescriptor,
         )
+        _validate_descriptor_part(
+            "RulesetDescriptor setup_sequence",
+            self.setup_sequence,
+            SetupSequenceDescriptor,
+        )
+        _validate_descriptor_part(
+            "RulesetDescriptor battle_phase_sequence",
+            self.battle_phase_sequence,
+            BattlePhaseSequenceDescriptor,
+        )
 
         expected_hash = _descriptor_hash(self._payload_without_hash())
         if self.descriptor_hash:
@@ -695,7 +809,7 @@ class RulesetDescriptor:
     def warhammer_40000_tenth(
         cls,
         source_date: str | date = "2023-06-24",
-        descriptor_version: str = "core-v2-phase8b",
+        descriptor_version: str = "core-v2-phase9a",
     ) -> Self:
         return cls(
             ruleset_id=RulesetId.warhammer_40000_tenth(version=descriptor_version),
@@ -743,13 +857,15 @@ class RulesetDescriptor:
                 terrain_objective_missions_supported=False,
                 deployment_zone_source=MissionDeploymentZoneSource.MISSION,
             ),
+            setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
+            battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
         )
 
     @classmethod
     def warhammer_40000_eleventh_preview(
         cls,
         source_date: str | date = "2026-05-26",
-        descriptor_version: str = "core-v2-phase8b-preview",
+        descriptor_version: str = "core-v2-phase9a-preview",
     ) -> Self:
         return cls(
             ruleset_id=RulesetId.warhammer_40000_eleventh_preview(version=descriptor_version),
@@ -800,6 +916,8 @@ class RulesetDescriptor:
                 terrain_objective_missions_supported=True,
                 deployment_zone_source=MissionDeploymentZoneSource.MISSION,
             ),
+            setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
+            battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
         )
 
     def to_payload(self) -> RulesetDescriptorPayload:
@@ -824,6 +942,10 @@ class RulesetDescriptor:
             coherency_policy=CoherencyPolicyDescriptor.from_payload(payload["coherency_policy"]),
             fly_policy=FlyPolicyDescriptor.from_payload(payload["fly_policy"]),
             mission_policy=MissionPolicyDescriptor.from_payload(payload["mission_policy"]),
+            setup_sequence=SetupSequenceDescriptor.from_payload(payload["setup_sequence"]),
+            battle_phase_sequence=BattlePhaseSequenceDescriptor.from_payload(
+                payload["battle_phase_sequence"]
+            ),
         )
 
     def _payload_without_hash(self) -> RulesetDescriptorPayload:
@@ -840,6 +962,8 @@ class RulesetDescriptor:
             "coherency_policy": self.coherency_policy.to_payload(),
             "fly_policy": self.fly_policy.to_payload(),
             "mission_policy": self.mission_policy.to_payload(),
+            "setup_sequence": self.setup_sequence.to_payload(),
+            "battle_phase_sequence": self.battle_phase_sequence.to_payload(),
         }
 
 
@@ -928,6 +1052,28 @@ def objective_anchor_kind_from_token(token: object) -> ObjectiveAnchorKind:
         return ObjectiveAnchorKind(token)
     except ValueError as exc:
         raise RulesetDescriptorError(f"Unsupported ObjectiveAnchorKind token: {token}.") from exc
+
+
+def setup_step_kind_from_token(token: object) -> SetupStepKind:
+    if type(token) is SetupStepKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("SetupStepKind token must be a string.")
+    try:
+        return SetupStepKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported SetupStepKind token: {token}.") from exc
+
+
+def battle_phase_kind_from_token(token: object) -> BattlePhaseKind:
+    if type(token) is BattlePhaseKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("BattlePhaseKind token must be a string.")
+    try:
+        return BattlePhaseKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported BattlePhaseKind token: {token}.") from exc
 
 
 def _movement_policy_for_tenth() -> MovementPolicyDescriptor:
@@ -1079,6 +1225,22 @@ def _validate_unique_anchor_kinds(anchor_kinds: tuple[ObjectiveAnchorKind, ...])
                 "ObjectivePolicyDescriptor supported_anchor_kinds must be unique."
             )
         seen.add(anchor_kind)
+
+
+def _validate_unique_setup_steps(steps: tuple[SetupStepKind, ...]) -> None:
+    seen: set[SetupStepKind] = set()
+    for step in steps:
+        if step in seen:
+            raise RulesetDescriptorError("SetupSequenceDescriptor steps must be unique.")
+        seen.add(step)
+
+
+def _validate_unique_battle_phases(phases: tuple[BattlePhaseKind, ...]) -> None:
+    seen: set[BattlePhaseKind] = set()
+    for phase in phases:
+        if phase in seen:
+            raise RulesetDescriptorError("BattlePhaseSequenceDescriptor phases must be unique.")
+        seen.add(phase)
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

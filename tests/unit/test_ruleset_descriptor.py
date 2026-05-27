@@ -7,6 +7,7 @@ import pytest
 
 from warhammer40k_core.core.objectives import ObjectiveAnchorKind
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     ChargeEndpointRequirement,
     ChargeTargetSelectionTiming,
     CoverEffect,
@@ -16,6 +17,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     ObjectivePolicyDescriptor,
     RulesetDescriptor,
     RulesetDescriptorError,
+    SetupStepKind,
     TerrainObjectiveControlPolicy,
 )
 
@@ -41,6 +43,42 @@ def test_descriptor_hash_rejects_policy_payload_drift() -> None:
     for movement_mode in payload["movement_policy"]["movement_modes"]:
         if movement_mode["movement_mode"] == MovementMode.NORMAL.value:
             movement_mode["may_transit_enemy_engagement"] = True
+
+    with pytest.raises(RulesetDescriptorError, match="descriptor_hash"):
+        RulesetDescriptor.from_payload(payload)
+
+
+def test_descriptor_hash_includes_setup_and_battle_phase_sequences() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    payload = descriptor.to_payload()
+
+    assert payload["setup_sequence"]["steps"] == [
+        SetupStepKind.MUSTER_ARMIES.value,
+        SetupStepKind.SELECT_MISSION.value,
+        SetupStepKind.CREATE_BATTLEFIELD.value,
+        SetupStepKind.DETERMINE_ATTACKER_DEFENDER.value,
+        SetupStepKind.SELECT_SECONDARY_MISSIONS.value,
+        SetupStepKind.DECLARE_BATTLE_FORMATIONS.value,
+        SetupStepKind.DEPLOY_ARMIES.value,
+        SetupStepKind.REDEPLOY_UNITS.value,
+        SetupStepKind.DETERMINE_FIRST_TURN.value,
+        SetupStepKind.RESOLVE_PREBATTLE_ACTIONS.value,
+    ]
+    assert payload["battle_phase_sequence"]["phases"] == [
+        BattlePhaseKind.COMMAND.value,
+        BattlePhaseKind.MOVEMENT.value,
+        BattlePhaseKind.SHOOTING.value,
+        BattlePhaseKind.CHARGE.value,
+        BattlePhaseKind.FIGHT.value,
+    ]
+
+    payload["battle_phase_sequence"]["phases"] = [
+        BattlePhaseKind.COMMAND.value,
+        BattlePhaseKind.SHOOTING.value,
+        BattlePhaseKind.MOVEMENT.value,
+        BattlePhaseKind.CHARGE.value,
+        BattlePhaseKind.FIGHT.value,
+    ]
 
     with pytest.raises(RulesetDescriptorError, match="descriptor_hash"):
         RulesetDescriptor.from_payload(payload)
