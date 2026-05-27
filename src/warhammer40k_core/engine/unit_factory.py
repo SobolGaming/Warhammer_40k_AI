@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
@@ -23,6 +24,11 @@ from warhammer40k_core.engine.list_validation import (
     resolve_model_profile_selections,
     resolve_wargear_selections,
 )
+from warhammer40k_core.geometry.model_geometry import (
+    GeometrySourceKind,
+    ModelGeometry,
+    ModelGeometryPayload,
+)
 
 
 class UnitFactoryError(ValueError):
@@ -36,6 +42,7 @@ class ModelInstancePayload(TypedDict):
     name: str
     characteristics: list[CharacteristicValuePayload]
     base_size: BaseSizeDefinitionPayload
+    geometry: ModelGeometryPayload
     starting_wounds: int
     wounds_remaining: int
     source_ids: list[str]
@@ -60,6 +67,7 @@ class ModelInstance:
     name: str
     characteristics: tuple[CharacteristicValue, ...]
     base_size: BaseSizeDefinition
+    geometry: ModelGeometry
     starting_wounds: int
     wounds_remaining: int
     source_ids: tuple[str, ...]
@@ -97,6 +105,9 @@ class ModelInstance:
         object.__setattr__(self, "characteristics", characteristics)
         if type(self.base_size) is not BaseSizeDefinition:
             raise UnitFactoryError("ModelInstance base_size must be a BaseSizeDefinition.")
+        if type(self.geometry) is not ModelGeometry:
+            raise UnitFactoryError("ModelInstance geometry must be a ModelGeometry.")
+        _validate_geometry_matches_base_size(base_size=self.base_size, geometry=self.geometry)
         starting_wounds = _validate_positive_int(
             "ModelInstance starting_wounds",
             self.starting_wounds,
@@ -136,6 +147,7 @@ class ModelInstance:
             "name": self.name,
             "characteristics": [value.to_payload() for value in self.characteristics],
             "base_size": self.base_size.to_payload(),
+            "geometry": self.geometry.to_payload(),
             "starting_wounds": self.starting_wounds,
             "wounds_remaining": self.wounds_remaining,
             "source_ids": list(self.source_ids),
@@ -152,6 +164,7 @@ class ModelInstance:
                 CharacteristicValue.from_payload(value) for value in payload["characteristics"]
             ),
             base_size=BaseSizeDefinition.from_payload(payload["base_size"]),
+            geometry=ModelGeometry.from_payload(payload["geometry"]),
             starting_wounds=payload["starting_wounds"],
             wounds_remaining=payload["wounds_remaining"],
             source_ids=tuple(payload["source_ids"]),
@@ -338,6 +351,11 @@ def _instantiate_models_for_profile(
 ) -> tuple[ModelInstance, ...]:
     starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
     source_ids = _merge_source_ids(datasheet.source_ids, profile.source_ids)
+    geometry = ModelGeometry.from_base_size(
+        profile.base_size,
+        keywords=datasheet.keywords.keywords,
+        geometry_source_id=profile.model_profile_id,
+    )
     return tuple(
         ModelInstance(
             model_instance_id=(
@@ -348,6 +366,7 @@ def _instantiate_models_for_profile(
             name=profile.name,
             characteristics=profile.characteristics,
             base_size=profile.base_size,
+            geometry=geometry,
             starting_wounds=starting_wounds,
             wounds_remaining=starting_wounds,
             source_ids=source_ids,
@@ -361,6 +380,33 @@ def _merge_source_ids(
     model_profile_source_ids: tuple[str, ...],
 ) -> tuple[str, ...]:
     return tuple(sorted({*datasheet_source_ids, *model_profile_source_ids}))
+
+
+def _validate_geometry_matches_base_size(
+    *,
+    base_size: BaseSizeDefinition,
+    geometry: ModelGeometry,
+) -> None:
+    if geometry.geometry_source_kind is not GeometrySourceKind.CATALOG_BASE_SIZE:
+        return
+    geometry_source_id = geometry.geometry_source_id
+    if geometry_source_id is None:
+        raise UnitFactoryError("ModelInstance catalog-derived geometry requires source ID.")
+    expected = ModelGeometry.from_base_size(
+        base_size,
+        geometry_source_id=geometry_source_id,
+        keywords=(),
+    )
+    if len(geometry.parts) != 1:
+        raise UnitFactoryError("ModelInstance geometry footprint does not match base_size.")
+    expected_part = expected.primary_part()
+    actual_part = geometry.primary_part()
+    if actual_part.footprint_kind is not expected_part.footprint_kind:
+        raise UnitFactoryError("ModelInstance geometry footprint does not match base_size.")
+    if not math.isclose(actual_part.radius_x_inches, expected_part.radius_x_inches):
+        raise UnitFactoryError("ModelInstance geometry radius_x_inches does not match base_size.")
+    if not math.isclose(actual_part.radius_y_inches, expected_part.radius_y_inches):
+        raise UnitFactoryError("ModelInstance geometry radius_y_inches does not match base_size.")
 
 
 def _validate_characteristics(values: object) -> tuple[CharacteristicValue, ...]:
