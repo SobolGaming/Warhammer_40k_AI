@@ -9,7 +9,12 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    BattlefieldRemovalKind,
+    BattlefieldScenario,
+    ModelDisplacementKind,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -35,9 +40,10 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-    MovementActionKind,
+    MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
+    MovementPhaseStepKind,
     MovementUnitSelection,
     MovementUnitSelectionPayload,
 )
@@ -143,6 +149,47 @@ def test_movement_unit_selection_records_activation_state_and_replay_payloads() 
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+
+def test_select_movement_action_options_are_standard_phase_actions_only() -> None:
+    _lifecycle, action_request = _advance_to_movement_action_request()
+
+    expected_option_ids = (
+        MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        MovementPhaseActionKind.NORMAL_MOVE.value,
+        MovementPhaseActionKind.ADVANCE.value,
+        MovementPhaseActionKind.FALL_BACK.value,
+    )
+    assert {option.option_id for option in action_request.options} == set(expected_option_ids)
+    assert tuple(option.option_id for option in action_request.options) == tuple(
+        sorted(expected_option_ids)
+    )
+    assert "fly" not in {option.option_id for option in action_request.options}
+    assert "embark" not in {option.option_id for option in action_request.options}
+    assert "disembark" not in {option.option_id for option in action_request.options}
+    assert "embark_disembark" not in {option.option_id for option in action_request.options}
+    assert "terrain_traversal" not in {option.option_id for option in action_request.options}
+    assert "engagement_constrained_move" not in {
+        option.option_id for option in action_request.options
+    }
+    for option in action_request.options:
+        assert isinstance(option.payload, dict)
+        assert "action" not in option.payload
+        assert option.payload["movement_phase_action"] == option.option_id
+
+
+def test_movement_taxonomy_keeps_steps_placements_and_displacements_separate() -> None:
+    placement_values = {kind.value for kind in BattlefieldPlacementKind}
+    displacement_values = {kind.value for kind in ModelDisplacementKind}
+    removal_values = {kind.value for kind in BattlefieldRemovalKind}
+
+    assert MovementPhaseStepKind.REINFORCEMENTS.value not in placement_values
+    assert BattlefieldPlacementKind.REDEPLOY.value == "redeploy"
+    assert BattlefieldPlacementKind.REDEPLOY.value not in displacement_values
+    assert BattlefieldRemovalKind.EMBARK.value == "embark"
+    assert BattlefieldPlacementKind.DISEMBARK.value == "disembark"
+    assert BattlefieldRemovalKind.EMBARK.value not in placement_values
+    assert BattlefieldPlacementKind.DISEMBARK.value not in removal_values
 
 
 def test_selected_units_are_excluded_from_legal_movement_unit_set() -> None:
@@ -366,7 +413,7 @@ def test_remain_stationary_marks_unit_complete_without_changing_poses() -> None:
     follow_up = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementActionKind.REMAIN_STATIONARY.value,
+        option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
         result_id="phase10c-result-000004",
     )
 
@@ -384,7 +431,11 @@ def test_remain_stationary_marks_unit_complete_without_changing_poses() -> None:
     assert movement_state.moved_unit_ids == ("army-alpha:intercessor-unit-1",)
     assert movement_state.active_selection is None
     terminal_event = _last_event_payload(lifecycle, "movement_activation_completed")
-    assert terminal_event["action"] == MovementActionKind.REMAIN_STATIONARY.value
+    assert "action" not in terminal_event
+    assert "displacement_kind" not in terminal_event
+    assert terminal_event["movement_phase_action"] == (
+        MovementPhaseActionKind.REMAIN_STATIONARY.value
+    )
     assert terminal_event["witness"] is None
     assert terminal_event["model_movements"] == []
     assert _event_index(lifecycle, "movement_activation_completed") < _event_index(
@@ -406,9 +457,12 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
         placement.model_instance_id: placement.pose
         for placement in before_placement.model_placements
     }
-    normal_option = action_request.option_by_id(MovementActionKind.NORMAL_MOVE.value)
+    normal_option = action_request.option_by_id(MovementPhaseActionKind.NORMAL_MOVE.value)
     assert isinstance(normal_option.payload, dict)
     normal_payload = cast(dict[str, object], normal_option.payload)
+    assert "action" not in normal_payload
+    assert normal_payload["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
+    assert normal_payload["displacement_kind"] == ModelDisplacementKind.NORMAL_MOVE.value
     assert normal_payload["movement_inches"] == 6
     assert normal_payload["witness"] is not None
     model_movements_raw = normal_payload["model_movements"]
@@ -424,7 +478,7 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
     follow_up = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementActionKind.NORMAL_MOVE.value,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         result_id="phase10c-result-000004",
     )
 
@@ -442,7 +496,9 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
         assert placement.pose.facing == start.facing
 
     terminal_event = _last_event_payload(lifecycle, "movement_activation_completed")
-    assert terminal_event["action"] == MovementActionKind.NORMAL_MOVE.value
+    assert "action" not in terminal_event
+    assert terminal_event["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
+    assert terminal_event["displacement_kind"] == ModelDisplacementKind.NORMAL_MOVE.value
     assert terminal_event["movement_inches"] == 6
     witness = terminal_event["witness"]
     assert isinstance(witness, dict)
@@ -476,7 +532,7 @@ def test_next_movement_unit_is_queued_only_after_activation_terminal_event() -> 
     _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementActionKind.NORMAL_MOVE.value,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         result_id="phase10c-result-000004",
     )
 
@@ -493,16 +549,12 @@ def test_next_movement_unit_is_queued_only_after_activation_terminal_event() -> 
 @pytest.mark.parametrize(
     "action",
     [
-        MovementActionKind.ADVANCE,
-        MovementActionKind.FALL_BACK,
-        MovementActionKind.FLY,
-        MovementActionKind.EMBARK_DISEMBARK,
-        MovementActionKind.TERRAIN_TRAVERSAL,
-        MovementActionKind.ENGAGEMENT_CONSTRAINED_MOVE,
+        MovementPhaseActionKind.ADVANCE,
+        MovementPhaseActionKind.FALL_BACK,
     ],
 )
 def test_unsupported_movement_modes_return_typed_unsupported_status(
-    action: MovementActionKind,
+    action: MovementPhaseActionKind,
 ) -> None:
     lifecycle, action_request = _advance_to_movement_action_request()
     assert lifecycle.state is not None
@@ -524,7 +576,7 @@ def test_unsupported_movement_modes_return_typed_unsupported_status(
         "battle_round": 1,
         "active_player_id": "player-a",
         "unit_instance_id": "army-alpha:intercessor-unit-1",
-        "action": action.value,
+        "movement_phase_action": action.value,
     }
     assert lifecycle.state.battlefield_state is not None
     assert lifecycle.state.battlefield_state.to_payload() == before_payload
@@ -532,7 +584,9 @@ def test_unsupported_movement_modes_return_typed_unsupported_status(
     assert movement_state is not None
     assert movement_state.moved_unit_ids == ()
     assert movement_state.active_selection is not None
-    assert _last_event_payload(lifecycle, "movement_action_unsupported")["action"] == action.value
+    unsupported_payload = _last_event_payload(lifecycle, "movement_action_unsupported")
+    assert "action" not in unsupported_payload
+    assert unsupported_payload["movement_phase_action"] == action.value
 
 
 def _advance_to_movement_unit_selection(

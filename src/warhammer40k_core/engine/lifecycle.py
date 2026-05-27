@@ -48,7 +48,7 @@ class GameLifecyclePayload(TypedDict):
 
 
 MAX_LIFECYCLE_TRANSITIONS = 128
-MOVEMENT_DECISION_TYPES = frozenset(
+_MOVEMENT_DECISION_TYPES = frozenset(
     (
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -158,7 +158,7 @@ class GameLifecycle:
                 decisions=self.decision_controller,
             )
             return self.advance_until_decision_or_terminal()
-        if record.request.decision_type in MOVEMENT_DECISION_TYPES:
+        if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
             movement_status = self._movement_phase_handler.apply_decision(
                 state=state,
                 result=result,

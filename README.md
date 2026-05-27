@@ -837,6 +837,40 @@ Required tests:
 - wrong-player placement drift fails explicitly;
 - placement and scenario payloads round-trip without Python object reprs.
 
+### Movement taxonomy boundary
+
+Movement work must keep these domains separate:
+
+Movement phase action:
+  A player choice made in the Move Units step: Remain Stationary, Normal Move,
+  Advance, or Fall Back.
+
+Model displacement:
+  A model pose change on the battlefield. Displacement can happen during the
+  Movement phase, Charge phase, Fight phase, or as a triggered rule effect.
+
+Battlefield placement:
+  A model or unit appearing on the battlefield from deployment, redeploy,
+  strategic reserves, deep strike, disembark, split-unit, or
+  return-to-battlefield effects.
+
+Battlefield removal:
+  A model or unit leaving the battlefield because it was destroyed, embarked,
+  placed into reserves, or temporarily removed.
+
+Movement capability / legality input:
+  Structured rule data used to evaluate a displacement. Keywords such as `FLY`,
+  `INFANTRY`, `BEAST`, `VEHICLE`, and `MONSTER` modify capabilities and
+  constraints; they are not Movement phase action options.
+
+`REINFORCEMENTS` is a Movement phase step, not a placement kind. During that
+step, specific placement mechanisms such as strategic reserves and deep strike
+place models onto the battlefield.
+
+`REDEPLOY` is a battlefield placement kind, not a model displacement kind. A
+redeploy transition may remove a model temporarily and then place it again, but
+it is not represented as a path-witnessed pose change.
+
 ### Phase 10B: movement phase entry and unit selection
 
 This phase replaces the Phase 9B Movement placeholder with a real
@@ -891,11 +925,11 @@ Required tests:
 - incomplete placement fails explicitly before unit selection;
 - no next movement action is resolved before unit selection is recorded.
 
-### Phase 10C: movement action and normal move
+### Phase 10C: movement phase action and normal move
 
-This phase adds the first actual movement action after unit selection. It should
-support `REMAIN_STATIONARY` and `NORMAL_MOVE`; other movement modes remain
-explicitly unsupported.
+This phase adds the first actual Movement phase action after unit selection.
+`SELECT_MOVEMENT_ACTION` exposes only the standard Move Units actions:
+`REMAIN_STATIONARY`, `NORMAL_MOVE`, `ADVANCE`, and `FALL_BACK`.
 
 Modules:
 
@@ -908,6 +942,7 @@ Implement:
 - emit `SELECT_MOVEMENT_ACTION`;
 - support `REMAIN_STATIONARY`;
 - support `NORMAL_MOVE`;
+- return typed unsupported results for `ADVANCE` and `FALL_BACK`;
 - consume the selected unit's datasheet Movement characteristic;
 - consume base size and current pose from placed `ModelInstance` data;
 - produce a `PathWitness` or typed movement witness for each moved model;
@@ -916,24 +951,33 @@ Implement:
 - emit a movement activation terminal event;
 - queue/select the next unit only after the current activation terminal event.
 
-Unsupported movement modes:
+Not Movement phase action options:
 
-- `ADVANCE`;
-- `FALL_BACK`;
 - `FLY`;
 - embark/disembark;
 - terrain traversal beyond existing explicit descriptors;
 - enemy engagement constraints beyond existing explicit descriptors.
 
+Serialized payloads use `movement_phase_action`, not generic `action`. Payloads
+that actually change poses also include `displacement_kind`, such as
+`normal_move`.
+
 Required tests:
 
+- `SELECT_MOVEMENT_ACTION` exposes exactly `remain_stationary`, `normal_move`,
+  `advance`, and `fall_back`;
+- `FLY`, embark, disembark, terrain traversal, and engagement-constrained moves
+  are absent from Movement phase action options;
+- `REINFORCEMENTS` is modeled as a Movement phase step, not a placement kind;
+- `REDEPLOY` is modeled as a battlefield placement kind, not a model
+  displacement kind;
 - `REMAIN_STATIONARY` marks the unit complete without changing poses;
 - `NORMAL_MOVE` consumes Movement, base size, and current pose;
 - movement updates placement payloads deterministically;
 - normal movement emits a witness and movement activation terminal event;
 - the selected unit cannot be selected again that phase;
 - the next `SELECT_MOVEMENT_UNIT` is not emitted before the terminal event;
-- unsupported movement modes return typed unsupported/invalid results.
+- `ADVANCE` and `FALL_BACK` return typed unsupported results.
 
 ### Phase 10D: advance roll and reroll decision
 

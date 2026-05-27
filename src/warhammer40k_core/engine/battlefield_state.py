@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.engine.army_mustering import (
@@ -14,6 +15,35 @@ from warhammer40k_core.geometry.pose import Pose, PosePayload
 
 class PlacementError(ValueError):
     """Raised when battlefield placement violates CORE V2 invariants."""
+
+
+class ModelDisplacementKind(StrEnum):
+    NORMAL_MOVE = "normal_move"
+    ADVANCE = "advance"
+    FALL_BACK = "fall_back"
+    CHARGE_MOVE = "charge_move"
+    PILE_IN = "pile_in"
+    CONSOLIDATE = "consolidate"
+    SURGE_MOVE = "surge_move"
+    TRIGGERED_MOVE = "triggered_move"
+    SCOUT_MOVE = "scout_move"
+
+
+class BattlefieldPlacementKind(StrEnum):
+    DEPLOYMENT = "deployment"
+    REDEPLOY = "redeploy"
+    STRATEGIC_RESERVES = "strategic_reserves"
+    DEEP_STRIKE = "deep_strike"
+    DISEMBARK = "disembark"
+    RETURN_TO_BATTLEFIELD = "return_to_battlefield"
+    SPLIT_UNIT = "split_unit"
+
+
+class BattlefieldRemovalKind(StrEnum):
+    DESTROYED = "destroyed"
+    EMBARK = "embark"
+    INTO_RESERVES = "into_reserves"
+    TEMPORARILY_REMOVED = "temporarily_removed"
 
 
 class ModelPlacementPayload(TypedDict):

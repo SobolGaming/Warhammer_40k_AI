@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
+    ModelDisplacementKind,
     ModelPlacement,
     PlacementError,
     UnitPlacement,
@@ -33,24 +34,25 @@ SELECT_MOVEMENT_UNIT_DECISION_TYPE = "select_movement_unit"
 SELECT_MOVEMENT_ACTION_DECISION_TYPE = "select_movement_action"
 
 
-class MovementActionKind(StrEnum):
+class MovementPhaseStepKind(StrEnum):
+    MOVE_UNITS = "move_units"
+    REINFORCEMENTS = "reinforcements"
+
+
+class MovementPhaseActionKind(StrEnum):
     REMAIN_STATIONARY = "remain_stationary"
     NORMAL_MOVE = "normal_move"
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
-    FLY = "fly"
-    EMBARK_DISEMBARK = "embark_disembark"
-    TERRAIN_TRAVERSAL = "terrain_traversal"
-    ENGAGEMENT_CONSTRAINED_MOVE = "engagement_constrained_move"
 
 
-_UNSUPPORTED_MOVEMENT_ACTIONS = (
-    MovementActionKind.ADVANCE,
-    MovementActionKind.FALL_BACK,
-    MovementActionKind.FLY,
-    MovementActionKind.EMBARK_DISEMBARK,
-    MovementActionKind.TERRAIN_TRAVERSAL,
-    MovementActionKind.ENGAGEMENT_CONSTRAINED_MOVE,
+_SUPPORTED_MOVEMENT_PHASE_ACTIONS = (
+    MovementPhaseActionKind.REMAIN_STATIONARY,
+    MovementPhaseActionKind.NORMAL_MOVE,
+)
+_UNSUPPORTED_MOVEMENT_PHASE_ACTIONS = (
+    MovementPhaseActionKind.ADVANCE,
+    MovementPhaseActionKind.FALL_BACK,
 )
 
 
@@ -444,11 +446,13 @@ def _apply_movement_action_decision(
 
     active_selection = movement_state.active_selection
     payload = _decision_payload_object(result.payload)
-    action = movement_action_kind_from_token(_payload_string(payload, key="action"))
+    action = movement_phase_action_kind_from_token(
+        _payload_string(payload, key="movement_phase_action")
+    )
     if _payload_string(payload, key="unit_instance_id") != active_selection.unit_instance_id:
         raise GameLifecycleError("Movement action unit_instance_id must match active_selection.")
 
-    if action is MovementActionKind.REMAIN_STATIONARY:
+    if action is MovementPhaseActionKind.REMAIN_STATIONARY:
         _complete_movement_activation(
             state=state,
             decisions=decisions,
@@ -461,7 +465,7 @@ def _apply_movement_action_decision(
             },
         )
         return None
-    if action is MovementActionKind.NORMAL_MOVE:
+    if action is MovementPhaseActionKind.NORMAL_MOVE:
         scenario = _battlefield_scenario(state)
         unit_placement = scenario.battlefield_state.unit_placement_by_id(
             active_selection.unit_instance_id
@@ -481,6 +485,7 @@ def _apply_movement_action_decision(
             action=action,
             witness=witness,
             movement_payload=movement_payload,
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
         )
         return None
 
@@ -492,7 +497,7 @@ def _apply_movement_action_decision(
             "active_player_id": active_player_id,
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": active_selection.unit_instance_id,
-            "action": action.value,
+            "movement_phase_action": action.value,
             "request_id": result.request_id,
             "result_id": result.result_id,
             "phase_body_status": "movement_action_unsupported",
@@ -507,7 +512,7 @@ def _apply_movement_action_decision(
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
             "unit_instance_id": active_selection.unit_instance_id,
-            "action": action.value,
+            "movement_phase_action": action.value,
         },
     )
 
@@ -517,9 +522,10 @@ def _complete_movement_activation(
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
-    action: MovementActionKind,
+    action: MovementPhaseActionKind,
     witness: PathWitness | None,
     movement_payload: dict[str, JsonValue],
+    displacement_kind: ModelDisplacementKind | None = None,
 ) -> None:
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.active_selection is None:
@@ -534,12 +540,14 @@ def _complete_movement_activation(
         "active_player_id": active_selection.player_id,
         "phase": BattlePhase.MOVEMENT.value,
         "unit_instance_id": active_selection.unit_instance_id,
-        "action": action.value,
+        "movement_phase_action": action.value,
         "request_id": result.request_id,
         "result_id": result.result_id,
         "phase_body_status": "activation_complete",
         "witness": None if witness is None else validate_json_value(witness.to_payload()),
     }
+    if displacement_kind is not None:
+        event_payload["displacement_kind"] = displacement_kind.value
     event_payload.update(movement_payload)
     decisions.event_log.append("movement_activation_completed", event_payload)
 
@@ -555,10 +563,10 @@ def _movement_action_options(
     )
     return (
         DecisionOption(
-            option_id=MovementActionKind.REMAIN_STATIONARY.value,
+            option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
             label="Remain Stationary",
             payload={
-                "action": MovementActionKind.REMAIN_STATIONARY.value,
+                "movement_phase_action": MovementPhaseActionKind.REMAIN_STATIONARY.value,
                 "unit_instance_id": unit_placement.unit_instance_id,
                 "movement_inches": 0,
                 "model_movements": [],
@@ -566,11 +574,12 @@ def _movement_action_options(
             },
         ),
         DecisionOption(
-            option_id=MovementActionKind.NORMAL_MOVE.value,
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             label="Normal Move",
             payload=validate_json_value(
                 {
-                    "action": MovementActionKind.NORMAL_MOVE.value,
+                    "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                    "displacement_kind": ModelDisplacementKind.NORMAL_MOVE.value,
                     "unit_instance_id": unit_placement.unit_instance_id,
                     "witness": witness.to_payload(),
                     **movement_payload,
@@ -582,11 +591,11 @@ def _movement_action_options(
                 option_id=action.value,
                 label=action.value.replace("_", " ").title(),
                 payload={
-                    "action": action.value,
+                    "movement_phase_action": action.value,
                     "unit_instance_id": unit_placement.unit_instance_id,
                 },
             )
-            for action in _UNSUPPORTED_MOVEMENT_ACTIONS
+            for action in _UNSUPPORTED_MOVEMENT_PHASE_ACTIONS
         ),
     )
 
@@ -706,15 +715,15 @@ def _active_player_id(state: GameState) -> str:
     return state.active_player_id
 
 
-def movement_action_kind_from_token(token: object) -> MovementActionKind:
-    if type(token) is MovementActionKind:
+def movement_phase_action_kind_from_token(token: object) -> MovementPhaseActionKind:
+    if type(token) is MovementPhaseActionKind:
         return token
     if type(token) is not str:
-        raise GameLifecycleError("MovementActionKind token must be a string.")
+        raise GameLifecycleError("MovementPhaseActionKind token must be a string.")
     try:
-        return MovementActionKind(token)
+        return MovementPhaseActionKind(token)
     except ValueError as exc:
-        raise GameLifecycleError(f"Unsupported MovementActionKind token: {token}.") from exc
+        raise GameLifecycleError(f"Unsupported MovementPhaseActionKind token: {token}.") from exc
 
 
 def _model_movement_inches(model: ModelInstance) -> int:
