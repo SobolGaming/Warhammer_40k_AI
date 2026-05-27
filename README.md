@@ -740,6 +740,56 @@ Required tests:
 - request/catalog identity drift fails during mustering;
 - mustering payloads round-trip without Python object reprs.
 
+### Phase 9D: pre-Phase-10 smoke gate
+
+This is a hardening gate, not a broad content phase. It proves that the
+catalog, mustering, authoritative lifecycle, decision path, and replay payloads
+work together end-to-end before the movement phase body starts consuming
+runtime units.
+
+Use the existing canonical content pack or a tiny Phase 10 smoke pack. Do not
+import broad official datasheets, detachments, stratagems, enhancements, or
+codex abilities in this phase.
+
+Required smoke path:
+
+```text
+GameLifecycle.start(config)
+advance_until_decision_or_terminal()
+  -> MUSTER_ARMIES runs
+  -> ArmyDefinition exists for every player
+  -> SELECT_SECONDARY_MISSIONS decision appears
+submit secondary mission choices
+advance through setup
+enter Battle Round 1 COMMAND phase
+draw Tactical secondary missions when required
+stop at explicit Phase 9B placeholder or unsupported phase body
+replay payload round-trips
+```
+
+Invariants:
+
+- lifecycle smoke tests use real catalog definitions and real mustering, not stubs;
+- mustered armies exist before secondary mission decisions are requested;
+- runtime units preserve datasheet IDs, source IDs, own models, base sizes, wounds,
+  characteristics, and resolved wargear selections;
+- Tactical secondary draws occur in Command phase, not setup;
+- public payloads do not leak hidden opponent secondary choices;
+- replay-facing payloads contain no Python object reprs;
+- placeholder movement, shooting, charge, and fight bodies remain explicit boundaries
+  until their vertical slices are implemented.
+
+Required tests:
+
+- minimal two-player catalog-backed lifecycle reaches `SELECT_SECONDARY_MISSIONS`
+  with both armies mustered;
+- the same lifecycle reaches Battle Round 1 `COMMAND`;
+- Tactical secondary selection emits a Command-phase draw decision;
+- after the draw, lifecycle stops at an explicit Phase 9B placeholder or unsupported
+  phase body;
+- replay payload round-trips after the smoke path;
+- public state hides opponent Fixed secondary choices.
+
 ### Phase 10: movement phase body vertical slice
 
 This phase fills the movement phase body behind the Phase 9B lifecycle. It does
