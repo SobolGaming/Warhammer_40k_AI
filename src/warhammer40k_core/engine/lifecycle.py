@@ -32,6 +32,10 @@ from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
     CommandPhaseHandler,
 )
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseHandler,
+)
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
 
 
@@ -55,6 +59,7 @@ class GameLifecycle:
     _config: GameConfig | None = None
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
+    _movement_phase_handler: MovementPhaseHandler = field(default_factory=MovementPhaseHandler)
     _battle_round_flow: BattleRoundFlow | None = None
 
     def start(self, config: GameConfig) -> LifecycleStatus:
@@ -145,6 +150,13 @@ class GameLifecycle:
                 decisions=self.decision_controller,
             )
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE:
+            self._movement_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            return self.advance_until_decision_or_terminal()
         raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
 
     def to_payload(self) -> GameLifecyclePayload:
@@ -170,7 +182,7 @@ class GameLifecycle:
     def _phase_handlers(self) -> Mapping[BattlePhase, PhaseHandler]:
         return {
             BattlePhase.COMMAND: self._command_phase_handler,
-            BattlePhase.MOVEMENT: PlaceholderPhaseHandler(BattlePhase.MOVEMENT),
+            BattlePhase.MOVEMENT: self._movement_phase_handler,
             BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
             BattlePhase.CHARGE: PlaceholderPhaseHandler(BattlePhase.CHARGE),
             BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),

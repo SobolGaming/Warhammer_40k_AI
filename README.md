@@ -765,7 +765,7 @@ submit secondary mission choices
 advance through setup
 enter Battle Round 1 COMMAND phase
 draw Tactical secondary missions when required
-stop at explicit Phase 9B placeholder or unsupported phase body
+stop at the next explicit phase boundary
 replay payload round-trips
 ```
 
@@ -778,8 +778,9 @@ Invariants:
 - Tactical secondary draws occur in Command phase, not setup;
 - public payloads do not leak hidden opponent secondary choices;
 - replay-facing payloads contain no Python object reprs;
-- placeholder movement, shooting, charge, and fight bodies remain explicit boundaries
-  until their vertical slices are implemented.
+- movement, shooting, charge, and fight bodies remain explicit boundaries until
+  their vertical slices are implemented; once a vertical slice lands, the smoke
+  path stops at that slice's first decision or unsupported boundary.
 
 Required tests:
 
@@ -787,8 +788,8 @@ Required tests:
   with both armies mustered;
 - the same lifecycle reaches Battle Round 1 `COMMAND`;
 - Tactical secondary selection emits a Command-phase draw decision;
-- after the draw, lifecycle stops at an explicit Phase 9B placeholder or unsupported
-  phase body;
+- after the draw, lifecycle stops at either an explicit Phase 9B placeholder, a
+  vertical-slice decision, or a typed unsupported boundary;
 - replay payload round-trips after the smoke path;
 - public state hides opponent Fixed secondary choices.
 
@@ -847,6 +848,8 @@ Modules:
 - `engine/phases/movement.py`
 - `engine/lifecycle.py`
 - `engine/battle_round_flow.py`
+- `engine/game_state.py`
+- `engine/setup_flow.py`
 
 Objects:
 
@@ -857,6 +860,9 @@ Objects:
 Implement:
 
 - register `MovementPhaseHandler` in `GameLifecycle`;
+- persist Phase 10A battlefield placement state in lifecycle `GameState`;
+- create the deterministic Phase 10A placement bridge at `DEPLOY_ARMIES`
+  until full deployment rules exist;
 - emit `SELECT_MOVEMENT_UNIT`;
 - derive the legal unit set from the active player's mustered and placed units;
 - allow each unit to be selected once per Movement phase;
@@ -869,6 +875,7 @@ Invariants:
 - Movement phase progression remains owned by the engine lifecycle;
 - player choice uses `DecisionRequest` / `DecisionResult`;
 - legal movement units come from placed runtime units, not ad hoc fixtures;
+- movement requires complete placement for mustered models before unit selection;
 - selected units are scoped to the active player;
 - a unit cannot be selected twice in the same Movement phase;
 - no displacement, movement action, path witness, or objective update is implemented yet.
@@ -880,6 +887,7 @@ Required tests:
 - decision options contain only the active player's placed units;
 - selecting a unit records deterministic activation state and event/replay payloads;
 - already-selected units are excluded from the legal unit set;
+- incomplete placement fails explicitly before unit selection;
 - no next movement action is resolved before unit selection is recorded.
 
 ### Phase 10C: movement action and normal move
