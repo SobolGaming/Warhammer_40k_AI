@@ -60,8 +60,8 @@ def test_descriptor_hash_includes_setup_and_battle_phase_sequences() -> None:
         SetupStepKind.DECLARE_BATTLE_FORMATIONS.value,
         SetupStepKind.DEPLOY_ARMIES.value,
         SetupStepKind.REDEPLOY_UNITS.value,
-        SetupStepKind.RESOLVE_PREBATTLE_ACTIONS.value,
         SetupStepKind.DETERMINE_FIRST_TURN.value,
+        SetupStepKind.RESOLVE_PREBATTLE_ACTIONS.value,
     ]
     assert payload["battle_phase_sequence"]["phases"] == [
         BattlePhaseKind.COMMAND.value,

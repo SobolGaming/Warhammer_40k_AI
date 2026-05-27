@@ -186,8 +186,8 @@ class SetupSequenceDescriptor:
                 SetupStepKind.DECLARE_BATTLE_FORMATIONS,
                 SetupStepKind.DEPLOY_ARMIES,
                 SetupStepKind.REDEPLOY_UNITS,
-                SetupStepKind.RESOLVE_PREBATTLE_ACTIONS,
                 SetupStepKind.DETERMINE_FIRST_TURN,
+                SetupStepKind.RESOLVE_PREBATTLE_ACTIONS,
             )
         )
 

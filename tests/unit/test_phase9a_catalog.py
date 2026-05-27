@@ -367,8 +367,8 @@ def test_phase_sequence_descriptors_are_explicit_policy_data() -> None:
         SetupStepKind.DECLARE_BATTLE_FORMATIONS,
         SetupStepKind.DEPLOY_ARMIES,
         SetupStepKind.REDEPLOY_UNITS,
-        SetupStepKind.RESOLVE_PREBATTLE_ACTIONS,
         SetupStepKind.DETERMINE_FIRST_TURN,
+        SetupStepKind.RESOLVE_PREBATTLE_ACTIONS,
     )
     assert battle_sequence.phases == (
         BattlePhaseKind.COMMAND,
