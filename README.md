@@ -1291,10 +1291,12 @@ Required tests:
 - model can end on hill/structure top when base is fully contained;
 - model cannot end on hill/structure top when base overhangs;
 - `INFANTRY` can move through Ruins walls/floors by policy;
+- `INFANTRY` can move through Ruins walls/floors but cannot end inside them;
 - non-eligible `VEHICLE` cannot move through Ruins walls/floors;
 - `INFANTRY`/`BEAST`/`FLY` can end on upper Ruins floor if no overhang;
 - non-eligible model cannot end on upper Ruins floor;
 - upper Ruins floor endpoint fails if base overhangs;
+- elevated terrain endpoint fails if there is no valid support surface;
 - baseless/hull no-overhang check returns typed unsupported/manual-geometry-required
   when contact geometry is missing;
 - terrain traversal result serializes without Python object reprs.

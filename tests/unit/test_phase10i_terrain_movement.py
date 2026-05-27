@@ -157,6 +157,46 @@ def test_infantry_and_beast_can_traverse_ruins_wall() -> None:
         assert result.segments[0].traversal_mode.value == "through_feature"
 
 
+def test_infantry_can_move_through_ruins_wall_but_cannot_end_inside_wall() -> None:
+    mover = _model("infantry-mover", 1.0, 1.0)
+    ruins = _ruins_blocking_wall_feature()
+
+    result = _terrain_context(
+        _normal_legality_context(keywords=("INFANTRY",)),
+        moving_model=mover,
+        terrain_features=(ruins,),
+        middle_pose=Pose.at(2.0, 1.0),
+        end_pose=Pose.at(3.0, 1.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert (
+        result.violations[0].violation_code
+        == TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value
+    )
+    assert result.violations[0].terrain_id == "ruin-wall-test:center-wall"
+
+
+def test_model_cannot_end_embedded_in_ruins_floor_volume() -> None:
+    mover = _model("infantry-floor-embedded", 1.0, 1.0)
+    ruins = _ruins_feature(upper_width_inches=4.0, upper_depth_inches=4.0)
+
+    result = _terrain_context(
+        _normal_legality_context(keywords=("INFANTRY",)),
+        moving_model=mover,
+        terrain_features=(ruins,),
+        middle_pose=Pose.at(2.0, 1.0, 0.06),
+        end_pose=Pose.at(3.0, 1.0, 0.06),
+    ).validate()
+
+    assert not result.is_valid
+    assert (
+        result.violations[0].violation_code
+        == TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value
+    )
+    assert result.violations[0].terrain_id == "ruin-alpha:ground"
+
+
 def test_model_cannot_end_on_barricade_or_debris_top() -> None:
     for feature_kind in (
         TerrainFeatureKind.BARRICADE_AND_FUEL_PIPES,
@@ -310,6 +350,33 @@ def test_missing_contact_footprint_returns_manual_geometry_required_for_no_overh
         result.violations[0].violation_code
         == TerrainEndpointViolationCode.MANUAL_GEOMETRY_REQUIRED.value
     )
+
+
+def test_model_cannot_end_on_elevated_feature_without_support_surface() -> None:
+    mover = _model("unsupported-hill-mover", 1.0, 1.0)
+    hill = TerrainFeatureDefinition(
+        feature_id="hill-no-floor",
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=3.0,
+        footprint_center_y_inches=1.0,
+        footprint_width_inches=4.0,
+        footprint_depth_inches=4.0,
+    )
+
+    result = _terrain_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        terrain_features=(hill,),
+        middle_pose=Pose.at(2.0, 1.0, 3.0),
+        end_pose=Pose.at(3.0, 1.0, 3.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert (
+        result.violations[0].violation_code
+        == TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value
+    )
+    assert result.violations[0].terrain_id == "hill-no-floor"
 
 
 def test_fly_terrain_movement_records_air_path_measurement_hook() -> None:

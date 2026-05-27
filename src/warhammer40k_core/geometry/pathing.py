@@ -1037,6 +1037,7 @@ class TerrainPathLegalityContext:
         for terrain in self.terrain:
             violation = self._append_terrain_volume_segment(
                 terrain=terrain,
+                feature=None,
                 feature_policy=None,
                 path=path,
                 sampled_path=sampled_path,
@@ -1056,6 +1057,7 @@ class TerrainPathLegalityContext:
             for terrain in feature.terrain_volumes():
                 violation = self._append_terrain_volume_segment(
                     terrain=terrain,
+                    feature=feature,
                     feature_policy=feature_policy,
                     path=path,
                     sampled_path=sampled_path,
@@ -1088,6 +1090,7 @@ class TerrainPathLegalityContext:
         self,
         *,
         terrain: TerrainVolume,
+        feature: TerrainFeatureDefinition | None,
         feature_policy: TerrainFeatureMovementPolicy | None,
         path: tuple[Pose, ...],
         sampled_path: tuple[Pose, ...],
@@ -1103,6 +1106,19 @@ class TerrainPathLegalityContext:
         )
         if not touching_poses:
             return None
+        traversal_mode = self._traversal_mode_for_terrain(
+            terrain,
+            touching_poses,
+            feature_policy=feature_policy,
+        )
+        if traversal_mode is not TerrainTraversalMode.BLOCKED:
+            endpoint_intersection_violation = self._endpoint_intersection_violation_for_terrain(
+                terrain=terrain,
+                feature=feature,
+                end_pose=path[-1],
+            )
+            if endpoint_intersection_violation is not None:
+                return endpoint_intersection_violation
         if not self.terrain_movement_policy.may_end_mid_climb and _pose_is_mid_climb(
             path[-1], terrain, self.moving_model
         ):
@@ -1111,12 +1127,6 @@ class TerrainPathLegalityContext:
                 message="Terrain path cannot end mid-climb.",
                 terrain_id=terrain.terrain_id,
             )
-
-        traversal_mode = self._traversal_mode_for_terrain(
-            terrain,
-            touching_poses,
-            feature_policy=feature_policy,
-        )
         if traversal_mode is TerrainTraversalMode.BLOCKED:
             return TerrainTraversalViolation(
                 violation_code="terrain_feature_transit_forbidden",
@@ -1134,6 +1144,30 @@ class TerrainPathLegalityContext:
             )
         )
         return None
+
+    def _endpoint_intersection_violation_for_terrain(
+        self,
+        *,
+        terrain: TerrainVolume,
+        feature: TerrainFeatureDefinition | None,
+        end_pose: Pose,
+    ) -> TerrainTraversalViolation | None:
+        if feature is None:
+            return None
+        end_model = _model_at_pose(self.moving_model, end_pose)
+        if not terrain.intersects_model(end_model):
+            return None
+        if _endpoint_is_supported_by_feature_surface(
+            feature=feature,
+            terrain=terrain,
+            end_model=end_model,
+        ):
+            return None
+        return TerrainTraversalViolation(
+            violation_code=TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value,
+            message="Model cannot end within a terrain wall, floor, or other terrain volume.",
+            terrain_id=terrain.terrain_id,
+        )
 
     def _traversal_mode_for_terrain(
         self,
@@ -1201,6 +1235,18 @@ class TerrainPathLegalityContext:
             if _model_endpoint_is_on_support_surface(end_model, surface)
         )
         if not touched_surfaces:
+            if (
+                end_pose.position.z > 0.0
+                and feature_policy.no_overhang_required
+                and _model_endpoint_intersects_feature_footprint(end_model, feature)
+            ):
+                return TerrainTraversalViolation(
+                    violation_code=(
+                        TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value
+                    ),
+                    message="Model endpoint has no valid support surface.",
+                    terrain_id=feature.feature_id,
+                )
             return None
 
         for surface in touched_surfaces:
@@ -1971,6 +2017,31 @@ def _model_endpoint_is_on_support_surface(
         model.base,
         model.pose,
         surface.bounds(),
+    )
+
+
+def _endpoint_is_supported_by_feature_surface(
+    *,
+    feature: TerrainFeatureDefinition,
+    terrain: TerrainVolume,
+    end_model: Model,
+) -> bool:
+    for surface in feature.support_surfaces(no_overhang_required=False):
+        if terrain.terrain_id != f"{feature.feature_id}:{surface.surface_id}":
+            continue
+        if _model_endpoint_is_on_support_surface(end_model, surface):
+            return True
+    return False
+
+
+def _model_endpoint_intersects_feature_footprint(
+    model: Model,
+    feature: TerrainFeatureDefinition,
+) -> bool:
+    return shapely_backend.base_footprint_intersects_bounds(
+        model.base,
+        model.pose,
+        feature.bounds(),
     )
 
 
