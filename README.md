@@ -694,7 +694,8 @@ Required tests:
 - Fixed and Tactical secondary choices serialize without leaking hidden opponent choices;
 - Tactical secondary draws occur in Command phase, not setup;
 - descriptor hash is recorded in lifecycle state and replay-facing payloads;
-- lifecycle payload hash and sequence mismatches fail during `from_payload()`;
+- lifecycle payload hash, sequence, and config-derived state mismatches fail during
+  `from_payload()`;
 - no UI or headless-specific phase path exists.
 
 ### Phase 9C: army mustering and runtime instantiation

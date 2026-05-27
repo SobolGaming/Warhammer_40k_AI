@@ -570,6 +570,40 @@ def test_lifecycle_from_payload_rejects_config_state_ruleset_drift() -> None:
         GameLifecycle.from_payload(battle_mismatch)
 
 
+def test_lifecycle_from_payload_rejects_config_state_identity_drift() -> None:
+    lifecycle = _start_lifecycle()
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    game_id_mismatch = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+    game_id_mismatch["state"]["game_id"] = "other-game"
+    with pytest.raises(GameLifecycleError, match="game_id"):
+        GameLifecycle.from_payload(game_id_mismatch)
+
+    player_mismatch = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+    player_mismatch["state"]["player_ids"] = ["player-a", "player-c"]
+    with pytest.raises(GameLifecycleError, match="player_ids"):
+        GameLifecycle.from_payload(player_mismatch)
+
+    turn_order_mismatch = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    turn_order_mismatch["state"]["turn_order"] = ["player-b", "player-a"]
+    with pytest.raises(GameLifecycleError, match="turn_order"):
+        GameLifecycle.from_payload(turn_order_mismatch)
+
+    tactical_count_mismatch = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    tactical_count_mismatch["state"]["tactical_secondary_draw_count"] = 3
+    with pytest.raises(GameLifecycleError, match="tactical secondary draw count"):
+        GameLifecycle.from_payload(tactical_count_mismatch)
+
+
 def test_no_ui_or_headless_specific_phase_path_exists() -> None:
     public_methods = {
         name

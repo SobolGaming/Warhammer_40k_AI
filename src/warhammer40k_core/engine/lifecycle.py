@@ -199,6 +199,16 @@ class GameLifecycle:
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
     if config is None:
         return
+    if state.game_id != config.game_id:
+        raise GameLifecycleError("Lifecycle state game_id does not match config.")
+    if state.player_ids != config.player_ids:
+        raise GameLifecycleError("Lifecycle state player_ids do not match config.")
+    if state.turn_order != config.turn_order:
+        raise GameLifecycleError("Lifecycle state turn_order does not match config.")
+    if state.tactical_secondary_draw_count != config.tactical_secondary_draw_count:
+        raise GameLifecycleError(
+            "Lifecycle state tactical secondary draw count does not match config."
+        )
     expected_hash = config.ruleset_descriptor.descriptor_hash
     if state.ruleset_descriptor_hash != expected_hash:
         raise GameLifecycleError("Lifecycle state ruleset hash does not match config.")
