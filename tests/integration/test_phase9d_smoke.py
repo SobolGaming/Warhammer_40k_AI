@@ -91,6 +91,7 @@ def test_minimal_catalog_game_reaches_battle_round_one_with_mustered_armies() ->
     assert state.tactical_secondary_draws[0].player_id == "player-a"
     assert state.tactical_secondary_draws[0].battle_round == 1
     assert state.tactical_secondary_draws[0].draw_count == 2
+    _assert_smoke_event_log(lifecycle)
 
     payload = cast(
         GameLifecyclePayload,
@@ -247,3 +248,28 @@ def _assert_hidden_secondaries_do_not_leak(state: GameState) -> None:
         }
         for choice in secondary_choices
     )
+
+
+def _assert_smoke_event_log(lifecycle: GameLifecycle) -> None:
+    event_types = tuple(
+        record.event_type for record in lifecycle.decision_controller.event_log.records
+    )
+
+    assert event_types.count("army_mustered") == 2
+    assert event_types.count("secondary_mission_choice_recorded") == 2
+    assert event_types.count("tactical_secondary_missions_drawn") == 1
+    assert event_types.count("phase_body_placeholder_noop") == 1
+    assert _first_event_index(event_types, "army_mustered") < _first_event_index(
+        event_types,
+        "secondary_mission_choice_recorded",
+    )
+    assert _first_event_index(event_types, "secondary_mission_choice_recorded") < (
+        _first_event_index(event_types, "tactical_secondary_missions_drawn")
+    )
+    assert _first_event_index(event_types, "tactical_secondary_missions_drawn") < (
+        _first_event_index(event_types, "phase_body_placeholder_noop")
+    )
+
+
+def _first_event_index(event_types: tuple[str, ...], event_type: str) -> int:
+    return event_types.index(event_type)
