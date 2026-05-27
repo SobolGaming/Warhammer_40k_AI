@@ -350,6 +350,23 @@ class BattlefieldScenario:
                 return model
         raise PlacementError("BattlefieldScenario model_instance_id was not found.")
 
+    def unplaced_model_ids(self) -> tuple[str, ...]:
+        placed_model_ids = set(self.battlefield_state.placed_model_ids())
+        return tuple(
+            model.model_instance_id
+            for army in self.armies
+            for unit in army.units
+            for model in unit.own_models
+            if model.model_instance_id not in placed_model_ids
+        )
+
+    def assert_all_mustered_models_placed(self) -> None:
+        unplaced_model_ids = self.unplaced_model_ids()
+        if unplaced_model_ids:
+            raise PlacementError(
+                f"BattlefieldScenario has unplaced model IDs: {', '.join(unplaced_model_ids)}"
+            )
+
     def to_payload(self) -> BattlefieldScenarioPayload:
         return {
             "armies": [army.to_payload() for army in self.armies],

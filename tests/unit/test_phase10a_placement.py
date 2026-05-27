@@ -103,6 +103,34 @@ def test_placement_payloads_round_trip_without_object_reprs() -> None:
     )
 
 
+def test_battlefield_scenario_reports_unplaced_mustered_models() -> None:
+    scenario = _scenario()
+    placed_army = scenario.battlefield_state.placed_armies[0]
+    other_army = scenario.battlefield_state.placed_armies[1]
+    unit_placement = placed_army.unit_placements[0]
+    removed_model_id = unit_placement.model_placements[-1].model_instance_id
+    partial_unit_placement = replace(
+        unit_placement,
+        model_placements=unit_placement.model_placements[:-1],
+    )
+    partial_scenario = BattlefieldScenario(
+        armies=scenario.armies,
+        battlefield_state=replace(
+            scenario.battlefield_state,
+            placed_armies=(
+                replace(placed_army, unit_placements=(partial_unit_placement,)),
+                other_army,
+            ),
+        ),
+    )
+
+    assert scenario.unplaced_model_ids() == ()
+    scenario.assert_all_mustered_models_placed()
+    assert partial_scenario.unplaced_model_ids() == (removed_model_id,)
+    with pytest.raises(PlacementError, match="unplaced model IDs"):
+        partial_scenario.assert_all_mustered_models_placed()
+
+
 def test_placement_rejects_duplicate_and_unknown_runtime_references() -> None:
     scenario = _scenario()
 
