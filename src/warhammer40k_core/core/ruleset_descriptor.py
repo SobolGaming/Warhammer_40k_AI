@@ -54,6 +54,11 @@ class MissionDeploymentZoneSource(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
+class CoherencyPolicyKind(StrEnum):
+    NEIGHBOR_COUNT = "neighbor_count"
+    ALL_MODELS_WITHIN_DISTANCE = "all_models_within_distance"
+
+
 class SetupStepKind(StrEnum):
     MUSTER_ARMIES = "muster_armies"
     SELECT_MISSION = "select_mission"
@@ -116,11 +121,13 @@ class ObjectivePolicyDescriptorPayload(TypedDict):
 
 
 class CoherencyPolicyDescriptorPayload(TypedDict):
-    required_neighbors_small_unit: int
+    policy_kind: str
+    required_neighbors_small_unit: int | None
     required_neighbors_large_unit: int | None
     large_unit_model_count_threshold: int | None
-    max_horizontal_inches: float
-    max_vertical_inches: float
+    max_horizontal_inches: float | None
+    max_vertical_inches: float | None
+    max_all_models_distance_inches: float | None
     max_unit_span_inches: float | None
 
 
@@ -559,18 +566,22 @@ class ObjectivePolicyDescriptor:
 
 @dataclass(frozen=True, slots=True)
 class CoherencyPolicyDescriptor:
-    required_neighbors_small_unit: int
-    required_neighbors_large_unit: int | None
-    large_unit_model_count_threshold: int | None
-    max_horizontal_inches: float
-    max_vertical_inches: float
+    policy_kind: CoherencyPolicyKind
+    required_neighbors_small_unit: int | None = None
+    required_neighbors_large_unit: int | None = None
+    large_unit_model_count_threshold: int | None = None
+    max_horizontal_inches: float | None = None
+    max_vertical_inches: float | None = None
+    max_all_models_distance_inches: float | None = None
     max_unit_span_inches: float | None = None
 
     def __post_init__(self) -> None:
+        policy_kind = coherency_policy_kind_from_token(self.policy_kind)
+        object.__setattr__(self, "policy_kind", policy_kind)
         object.__setattr__(
             self,
             "required_neighbors_small_unit",
-            _validate_positive_int(
+            _validate_optional_positive_int(
                 "CoherencyPolicyDescriptor required_neighbors_small_unit",
                 self.required_neighbors_small_unit,
             ),
@@ -600,7 +611,7 @@ class CoherencyPolicyDescriptor:
         object.__setattr__(
             self,
             "max_horizontal_inches",
-            _validate_non_negative_number(
+            _validate_optional_positive_number(
                 "CoherencyPolicyDescriptor max_horizontal_inches",
                 self.max_horizontal_inches,
             ),
@@ -608,9 +619,17 @@ class CoherencyPolicyDescriptor:
         object.__setattr__(
             self,
             "max_vertical_inches",
-            _validate_non_negative_number(
+            _validate_optional_positive_number(
                 "CoherencyPolicyDescriptor max_vertical_inches",
                 self.max_vertical_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "max_all_models_distance_inches",
+            _validate_optional_positive_number(
+                "CoherencyPolicyDescriptor max_all_models_distance_inches",
+                self.max_all_models_distance_inches,
             ),
         )
         object.__setattr__(
@@ -621,25 +640,57 @@ class CoherencyPolicyDescriptor:
                 self.max_unit_span_inches,
             ),
         )
+        if policy_kind is CoherencyPolicyKind.NEIGHBOR_COUNT:
+            if (
+                self.required_neighbors_small_unit is None
+                or self.max_horizontal_inches is None
+                or self.max_vertical_inches is None
+            ):
+                raise RulesetDescriptorError(
+                    "NEIGHBOR_COUNT coherency requires small-unit neighbors and distances."
+                )
+            if self.max_all_models_distance_inches is not None:
+                raise RulesetDescriptorError(
+                    "NEIGHBOR_COUNT coherency must not set all-model distance fields."
+                )
+        if policy_kind is CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE:
+            if self.max_all_models_distance_inches is None:
+                raise RulesetDescriptorError(
+                    "ALL_MODELS_WITHIN_DISTANCE coherency requires max_all_models_distance_inches."
+                )
+            if (
+                self.required_neighbors_small_unit is not None
+                or self.required_neighbors_large_unit is not None
+                or self.large_unit_model_count_threshold is not None
+                or self.max_horizontal_inches is not None
+                or self.max_vertical_inches is not None
+            ):
+                raise RulesetDescriptorError(
+                    "ALL_MODELS_WITHIN_DISTANCE coherency must not set neighbor-count fields."
+                )
 
     def to_payload(self) -> CoherencyPolicyDescriptorPayload:
         return {
+            "policy_kind": self.policy_kind.value,
             "required_neighbors_small_unit": self.required_neighbors_small_unit,
             "required_neighbors_large_unit": self.required_neighbors_large_unit,
             "large_unit_model_count_threshold": self.large_unit_model_count_threshold,
             "max_horizontal_inches": self.max_horizontal_inches,
             "max_vertical_inches": self.max_vertical_inches,
+            "max_all_models_distance_inches": self.max_all_models_distance_inches,
             "max_unit_span_inches": self.max_unit_span_inches,
         }
 
     @classmethod
     def from_payload(cls, payload: CoherencyPolicyDescriptorPayload) -> Self:
         return cls(
+            policy_kind=coherency_policy_kind_from_token(payload["policy_kind"]),
             required_neighbors_small_unit=payload["required_neighbors_small_unit"],
             required_neighbors_large_unit=payload["required_neighbors_large_unit"],
             large_unit_model_count_threshold=payload["large_unit_model_count_threshold"],
             max_horizontal_inches=payload["max_horizontal_inches"],
             max_vertical_inches=payload["max_vertical_inches"],
+            max_all_models_distance_inches=payload["max_all_models_distance_inches"],
             max_unit_span_inches=payload["max_unit_span_inches"],
         )
 
@@ -854,11 +905,13 @@ class RulesetDescriptor:
                 terrain_objective_control_policy=TerrainObjectiveControlPolicy.UNSUPPORTED,
             ),
             coherency_policy=CoherencyPolicyDescriptor(
+                policy_kind=CoherencyPolicyKind.NEIGHBOR_COUNT,
                 required_neighbors_small_unit=1,
                 required_neighbors_large_unit=2,
-                large_unit_model_count_threshold=6,
+                large_unit_model_count_threshold=7,
                 max_horizontal_inches=2.0,
                 max_vertical_inches=5.0,
+                max_all_models_distance_inches=None,
                 max_unit_span_inches=None,
             ),
             fly_policy=FlyPolicyDescriptor(
@@ -913,11 +966,13 @@ class RulesetDescriptor:
                 terrain_objective_control_policy=TerrainObjectiveControlPolicy.UNSUPPORTED,
             ),
             coherency_policy=CoherencyPolicyDescriptor(
-                required_neighbors_small_unit=1,
-                required_neighbors_large_unit=2,
-                large_unit_model_count_threshold=6,
-                max_horizontal_inches=2.0,
-                max_vertical_inches=5.0,
+                policy_kind=CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE,
+                required_neighbors_small_unit=None,
+                required_neighbors_large_unit=None,
+                large_unit_model_count_threshold=None,
+                max_horizontal_inches=None,
+                max_vertical_inches=None,
+                max_all_models_distance_inches=9.0,
                 max_unit_span_inches=None,
             ),
             fly_policy=FlyPolicyDescriptor(
@@ -1057,6 +1112,17 @@ def mission_deployment_zone_source_from_token(token: object) -> MissionDeploymen
         raise RulesetDescriptorError(
             f"Unsupported MissionDeploymentZoneSource token: {token}."
         ) from exc
+
+
+def coherency_policy_kind_from_token(token: object) -> CoherencyPolicyKind:
+    if type(token) is CoherencyPolicyKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("CoherencyPolicyKind token must be a string.")
+    try:
+        return CoherencyPolicyKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported CoherencyPolicyKind token: {token}.") from exc
 
 
 def objective_anchor_kind_from_token(token: object) -> ObjectiveAnchorKind:

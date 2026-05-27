@@ -1176,17 +1176,25 @@ Modules:
 - `geometry/pathing.py`
 - `engine/movement_legality.py`
 - `engine/phases/movement.py`
+- `core/ruleset_descriptor.py`
 
 Objects:
 
 - `PathValidationContext`
 - `PathValidationResult`
 - `PathConstraintViolation`
+- `CoherencyPolicyKind`
 
 Invariants:
 
 - battlefield edge crossing can be rejected;
-- enemy model base crossing can be rejected;
+- non-FLY Normal/Advance movement cannot path through enemy model bases;
+- Fall Back movement can move over enemy models only through the Desperate
+  Escape flow;
+- FLY Normal/Advance/Fall Back movement can move over enemy models without
+  Desperate Escape;
+- Desperate Escape resolution is deferred to the Fall Back phase
+  implementation;
 - enemy Engagement Range transit can be rejected independently from ending in
   enemy Engagement Range;
 - friendly model pass-through can be allowed;
@@ -1194,15 +1202,22 @@ Invariants:
 - end-on-model overlap can be rejected;
 - base gap checks use base footprint geometry;
 - model-volume-at-end checks use resolved model geometry;
-- pivot-cost support is represented, even if not fully solved yet.
+- pivot-cost support is represented, even if not fully solved yet;
+- coherency policy is descriptor data only in this phase;
+- runtime coherency validation remains future work;
+- future coherency enforcement sites are setup/placement, end of any move, and
+  end of every turn cleanup.
 
 Required tests:
 
 - circular infantry base can move through friendly infantry but cannot end
   overlapping;
-- vehicle cannot pass through friendly vehicle/monster;
+- non-FLY vehicle cannot pass through friendly vehicle/monster;
 - model cannot cross battlefield edge;
-- model cannot path through enemy base;
+- non-FLY Normal/Advance movement cannot path through enemy model bases;
+- FLY Normal Move can transit enemy model bases and enemy Engagement Range;
+- FLY Normal Move cannot end within enemy Engagement Range or on another model;
+- FLY VEHICLE can transit friendly VEHICLE/MONSTER blockers;
 - model cannot move through enemy Engagement Range for 10e Normal Move;
 - model cannot move through enemy Engagement Range for 10e Advance;
 - model can move through enemy Engagement Range for 10e Fall Back when policy
@@ -1210,7 +1225,9 @@ Required tests:
 - model cannot end in enemy Engagement Range for 10e Normal Move;
 - charge movement uses the charge policy and is the exception path for ending
   in Engagement Range;
-- non-circular base movement records pivot-cost placeholder.
+- non-circular base movement records pivot-cost placeholder;
+- 10e coherency descriptor uses a seven-model large-unit threshold;
+- 11e preview coherency descriptor uses all-models-within-distance policy.
 
 CORE V1 relevant areas:
 
@@ -1241,6 +1258,12 @@ Objects:
 Invariants:
 
 - `ADVANCE` is a Movement phase action;
+- movement action option generation must be enemy Engagement Range-aware before
+  Advance and Fall Back are fully implemented;
+- units outside enemy Engagement Range can be offered Remain Stationary, Normal
+  Move, and Advance;
+- units within enemy Engagement Range can be offered Remain Stationary and Fall
+  Back;
 - Advance distance is Movement characteristic plus Advance roll;
 - dice results and reroll decisions are replay-facing;
 - Advance emits displacement records when models move;
