@@ -1153,6 +1153,9 @@ Required tests:
 - `INFANTRY`/`BEAST` can receive terrain traversal permissions;
 - `VEHICLE`/`MONSTER` restrictions are capability constraints;
 - 10e Normal Move cannot end in enemy Engagement Range;
+- 10e Normal Move cannot transit enemy Engagement Range;
+- 10e Fall Back can transit but cannot end in enemy Engagement Range;
+- preview Normal Move can transit but cannot end in enemy Engagement Range;
 - unsupported/preview policy fails explicitly unless descriptor exists.
 
 CORE V1 relevant areas:
@@ -1184,6 +1187,8 @@ Invariants:
 
 - battlefield edge crossing can be rejected;
 - enemy model base crossing can be rejected;
+- enemy Engagement Range transit can be rejected independently from ending in
+  enemy Engagement Range;
 - friendly model pass-through can be allowed;
 - friendly `VEHICLE`/`MONSTER` pass-through can be blocked for relevant movers;
 - end-on-model overlap can be rejected;
@@ -1198,7 +1203,13 @@ Required tests:
 - vehicle cannot pass through friendly vehicle/monster;
 - model cannot cross battlefield edge;
 - model cannot path through enemy base;
+- model cannot move through enemy Engagement Range for 10e Normal Move;
+- model cannot move through enemy Engagement Range for 10e Advance;
+- model can move through enemy Engagement Range for 10e Fall Back when policy
+  allows, but cannot end there;
 - model cannot end in enemy Engagement Range for 10e Normal Move;
+- charge movement uses the charge policy and is the exception path for ending
+  in Engagement Range;
 - non-circular base movement records pivot-cost placeholder.
 
 CORE V1 relevant areas:

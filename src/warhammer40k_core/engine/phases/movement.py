@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -765,6 +766,19 @@ def movement_phase_action_kind_from_token(token: object) -> MovementPhaseActionK
         return MovementPhaseActionKind(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported MovementPhaseActionKind token: {token}.") from exc
+
+
+def movement_mode_for_phase_action(action: object) -> MovementMode | None:
+    action_kind = movement_phase_action_kind_from_token(action)
+    if action_kind is MovementPhaseActionKind.REMAIN_STATIONARY:
+        return None
+    if action_kind is MovementPhaseActionKind.NORMAL_MOVE:
+        return MovementMode.NORMAL
+    if action_kind is MovementPhaseActionKind.ADVANCE:
+        return MovementMode.ADVANCE
+    if action_kind is MovementPhaseActionKind.FALL_BACK:
+        return MovementMode.FALL_BACK
+    raise GameLifecycleError(f"Unsupported MovementPhaseActionKind token: {action_kind.value}.")
 
 
 def _model_movement_inches(model: ModelInstance) -> int:
