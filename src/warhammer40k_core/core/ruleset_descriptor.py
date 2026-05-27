@@ -158,6 +158,8 @@ class RulesetDescriptorPayload(TypedDict):
     coherency_policy: CoherencyPolicyDescriptorPayload
     fly_policy: FlyPolicyDescriptorPayload
     mission_policy: MissionPolicyDescriptorPayload
+    setup_sequence: SetupSequenceDescriptorPayload
+    battle_phase_sequence: BattlePhaseSequenceDescriptorPayload
 
 
 @dataclass(frozen=True, slots=True)
@@ -730,6 +732,8 @@ class RulesetDescriptor:
     coherency_policy: CoherencyPolicyDescriptor
     fly_policy: FlyPolicyDescriptor
     mission_policy: MissionPolicyDescriptor
+    setup_sequence: SetupSequenceDescriptor
+    battle_phase_sequence: BattlePhaseSequenceDescriptor
     descriptor_hash: str = ""
 
     def __post_init__(self) -> None:
@@ -781,6 +785,16 @@ class RulesetDescriptor:
             self.mission_policy,
             MissionPolicyDescriptor,
         )
+        _validate_descriptor_part(
+            "RulesetDescriptor setup_sequence",
+            self.setup_sequence,
+            SetupSequenceDescriptor,
+        )
+        _validate_descriptor_part(
+            "RulesetDescriptor battle_phase_sequence",
+            self.battle_phase_sequence,
+            BattlePhaseSequenceDescriptor,
+        )
 
         expected_hash = _descriptor_hash(self._payload_without_hash())
         if self.descriptor_hash:
@@ -793,7 +807,7 @@ class RulesetDescriptor:
     def warhammer_40000_tenth(
         cls,
         source_date: str | date = "2023-06-24",
-        descriptor_version: str = "core-v2-phase8b",
+        descriptor_version: str = "core-v2-phase9a",
     ) -> Self:
         return cls(
             ruleset_id=RulesetId.warhammer_40000_tenth(version=descriptor_version),
@@ -841,13 +855,15 @@ class RulesetDescriptor:
                 terrain_objective_missions_supported=False,
                 deployment_zone_source=MissionDeploymentZoneSource.MISSION,
             ),
+            setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
+            battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
         )
 
     @classmethod
     def warhammer_40000_eleventh_preview(
         cls,
         source_date: str | date = "2026-05-26",
-        descriptor_version: str = "core-v2-phase8b-preview",
+        descriptor_version: str = "core-v2-phase9a-preview",
     ) -> Self:
         return cls(
             ruleset_id=RulesetId.warhammer_40000_eleventh_preview(version=descriptor_version),
@@ -898,6 +914,8 @@ class RulesetDescriptor:
                 terrain_objective_missions_supported=True,
                 deployment_zone_source=MissionDeploymentZoneSource.MISSION,
             ),
+            setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
+            battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
         )
 
     def to_payload(self) -> RulesetDescriptorPayload:
@@ -922,6 +940,10 @@ class RulesetDescriptor:
             coherency_policy=CoherencyPolicyDescriptor.from_payload(payload["coherency_policy"]),
             fly_policy=FlyPolicyDescriptor.from_payload(payload["fly_policy"]),
             mission_policy=MissionPolicyDescriptor.from_payload(payload["mission_policy"]),
+            setup_sequence=SetupSequenceDescriptor.from_payload(payload["setup_sequence"]),
+            battle_phase_sequence=BattlePhaseSequenceDescriptor.from_payload(
+                payload["battle_phase_sequence"]
+            ),
         )
 
     def _payload_without_hash(self) -> RulesetDescriptorPayload:
@@ -938,6 +960,8 @@ class RulesetDescriptor:
             "coherency_policy": self.coherency_policy.to_payload(),
             "fly_policy": self.fly_policy.to_payload(),
             "mission_policy": self.mission_policy.to_payload(),
+            "setup_sequence": self.setup_sequence.to_payload(),
+            "battle_phase_sequence": self.battle_phase_sequence.to_payload(),
         }
 
 

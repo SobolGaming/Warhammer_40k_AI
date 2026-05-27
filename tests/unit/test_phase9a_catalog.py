@@ -190,6 +190,27 @@ def test_datasheet_catalog_keeps_base_facts_as_core_catalog_data() -> None:
         BaseSizeDefinition(kind=cast(BaseSizeKind, "unsupported"), diameter_mm=32.0)
 
 
+def test_model_profiles_fail_fast_when_required_characteristics_are_missing() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    profile = catalog.datasheet_by_id("core-intercessor-like-infantry").model_profile_by_id(
+        "core-intercessor-like"
+    )
+
+    for missing_characteristic in (
+        Characteristic.BALLISTIC_SKILL,
+        Characteristic.OBJECTIVE_CONTROL,
+    ):
+        with pytest.raises(DatasheetCatalogError, match="missing required characteristics"):
+            replace(
+                profile,
+                characteristics=tuple(
+                    value
+                    for value in profile.characteristics
+                    if value.characteristic is not missing_characteristic
+                ),
+            )
+
+
 def test_detachment_catalog_objects_are_data_not_behavior() -> None:
     enhancement = EnhancementDefinition(
         enhancement_id="core-enhancement",
@@ -272,6 +293,18 @@ def test_army_catalog_rejects_ambiguous_or_missing_catalog_links() -> None:
             datasheets=(datasheet, datasheet),
             wargear=catalog.wargear,
             factions=catalog.factions,
+        )
+
+
+def test_datasheet_wargear_options_reject_defaults_that_exceed_max_selections() -> None:
+    with pytest.raises(DatasheetCatalogError, match="default_wargear_ids"):
+        DatasheetWargearOption(
+            option_id="bad-default-cardinality",
+            model_profile_id="core-intercessor-like",
+            default_wargear_ids=("a", "b", "c"),
+            allowed_wargear_ids=("a", "b", "c"),
+            min_selections=0,
+            max_selections=1,
         )
 
 

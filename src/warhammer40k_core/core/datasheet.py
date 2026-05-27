@@ -31,6 +31,19 @@ class CatalogAbilitySupport(StrEnum):
 
 CatalogParameterValue = int | float | str | bool
 
+REQUIRED_MODEL_CHARACTERISTICS = frozenset(
+    {
+        Characteristic.MOVEMENT,
+        Characteristic.TOUGHNESS,
+        Characteristic.SAVE,
+        Characteristic.WOUNDS,
+        Characteristic.LEADERSHIP,
+        Characteristic.OBJECTIVE_CONTROL,
+        Characteristic.WEAPON_SKILL,
+        Characteristic.BALLISTIC_SKILL,
+    }
+)
+
 
 class BaseSizeDefinitionPayload(TypedDict):
     kind: str
@@ -177,6 +190,7 @@ class ModelProfileDefinition:
         characteristics = _canonical_characteristic_values(self.characteristics)
         if not characteristics:
             raise DatasheetCatalogError("ModelProfileDefinition characteristics must not be empty.")
+        _validate_required_model_characteristics(characteristics)
         object.__setattr__(self, "characteristics", characteristics)
         if type(self.base_size) is not BaseSizeDefinition:
             raise DatasheetCatalogError(
@@ -343,6 +357,10 @@ class DatasheetWargearOption:
         if max_selections < min_selections:
             raise DatasheetCatalogError(
                 "DatasheetWargearOption max_selections must be at least min_selections."
+            )
+        if len(default_wargear_ids) > max_selections:
+            raise DatasheetCatalogError(
+                "DatasheetWargearOption default_wargear_ids must not exceed max_selections."
             )
         object.__setattr__(self, "default_wargear_ids", default_wargear_ids)
         object.__setattr__(self, "allowed_wargear_ids", allowed_wargear_ids)
@@ -680,6 +698,23 @@ def _canonical_characteristic_values(
         seen.add(value.characteristic)
         validated.append(value)
     return tuple(sorted(validated, key=lambda value: value.characteristic.value))
+
+
+def _validate_required_model_characteristics(
+    values: tuple[CharacteristicValue, ...],
+) -> None:
+    present = {value.characteristic for value in values}
+    missing = tuple(
+        sorted(
+            REQUIRED_MODEL_CHARACTERISTICS.difference(present),
+            key=lambda characteristic: characteristic.value,
+        )
+    )
+    if missing:
+        missing_tokens = ", ".join(characteristic.value for characteristic in missing)
+        raise DatasheetCatalogError(
+            f"ModelProfileDefinition missing required characteristics: {missing_tokens}."
+        )
 
 
 def _validate_model_profile_tuple(

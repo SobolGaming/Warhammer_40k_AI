@@ -592,7 +592,9 @@ Invariants:
 - ability descriptors are not executable handlers;
 - unsupported abilities remain explicit unsupported descriptors;
 - faction and detachment selection is data, not behavior;
-- setup and battle phase order are explicit policy data, not driver-local enum arithmetic.
+- setup and battle phase order are explicit policy data, not driver-local enum arithmetic;
+- setup and battle phase sequence descriptors are carried by `RulesetDescriptor` and included in
+  descriptor hashing.
 
 Add a tiny canonical content pack before broad content import. It should include
 infantry, a character leader, a transport, a vehicle or monster, and a deep-strike
@@ -654,8 +656,8 @@ submit_decision(result)
 Invariants:
 
 - one engine-owned setup-to-battle state machine;
-- setup sequence is explicit policy data, not duplicated driver code;
-- battle phase order is command, movement, shooting, charge, fight;
+- setup sequence comes from `RulesetDescriptor.setup_sequence`, not duplicated driver code;
+- battle phase order comes from `RulesetDescriptor.battle_phase_sequence`;
 - phase wrap switches the active player;
 - battle round increments only after every player has completed the fight phase;
 - lifecycle advances only through engine commands and decision results;
