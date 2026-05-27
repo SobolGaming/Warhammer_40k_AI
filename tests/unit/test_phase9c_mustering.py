@@ -145,6 +145,51 @@ def test_runtime_units_use_explicit_own_model_semantics() -> None:
     assert not hasattr(unit, "models")
 
 
+def test_runtime_payloads_reject_hierarchy_and_source_drift() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    army = muster_army(catalog=catalog, request=_muster_request(catalog))
+    army_payload = cast(
+        ArmyDefinitionPayload,
+        json.loads(json.dumps(army.to_payload(), sort_keys=True)),
+    )
+    unit_payload = army_payload["units"][0]
+
+    foreign_army_payload = cast(
+        ArmyDefinitionPayload,
+        json.loads(json.dumps(army_payload, sort_keys=True)),
+    )
+    old_unit_id = foreign_army_payload["units"][0]["unit_instance_id"]
+    new_unit_id = "other-army:intercessor-unit-1"
+    foreign_army_payload["units"][0]["unit_instance_id"] = new_unit_id
+    for model_payload in foreign_army_payload["units"][0]["own_models"]:
+        model_payload["model_instance_id"] = model_payload["model_instance_id"].replace(
+            old_unit_id,
+            new_unit_id,
+        )
+    with pytest.raises(ArmyMusteringError, match="scoped to army_id"):
+        ArmyDefinition.from_payload(foreign_army_payload)
+
+    datasheet_mismatch = json.loads(json.dumps(unit_payload, sort_keys=True))
+    datasheet_mismatch["own_models"][0]["datasheet_id"] = "other-datasheet"
+    with pytest.raises(UnitFactoryError, match="datasheet_id"):
+        UnitInstance.from_payload(datasheet_mismatch)
+
+    model_scope_mismatch = json.loads(json.dumps(unit_payload, sort_keys=True))
+    model_scope_mismatch["own_models"][0]["model_instance_id"] = "other-unit:model-001"
+    with pytest.raises(UnitFactoryError, match="scoped to unit_instance_id"):
+        UnitInstance.from_payload(model_scope_mismatch)
+
+    empty_unit_sources = json.loads(json.dumps(unit_payload, sort_keys=True))
+    empty_unit_sources["datasheet_source_ids"] = []
+    with pytest.raises(UnitFactoryError, match="datasheet_source_ids"):
+        UnitInstance.from_payload(empty_unit_sources)
+
+    empty_model_sources = json.loads(json.dumps(unit_payload, sort_keys=True))
+    empty_model_sources["own_models"][0]["source_ids"] = []
+    with pytest.raises(UnitFactoryError, match="source_ids"):
+        UnitInstance.from_payload(empty_model_sources)
+
+
 def test_selected_wargear_must_be_legal_for_datasheet_option() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     illegal_wargear = WargearSelection(
@@ -432,6 +477,12 @@ def test_unit_factory_instances_and_validators_fail_fast() -> None:
             army_id="army-alpha",
             selection=replace(_unit_selection(), datasheet_id="core-transport"),
             datasheet=datasheet,
+        )
+    with pytest.raises(UnitFactoryError, match="factory catalog definition"):
+        factory.instantiate_unit(
+            army_id="army-alpha",
+            selection=_unit_selection(),
+            datasheet=replace(datasheet, source_ids=("datasheet:altered",)),
         )
     with pytest.raises(UnitFactoryError, match="base_size"):
         replace(model, base_size=cast(BaseSizeDefinition, "bad-base"))

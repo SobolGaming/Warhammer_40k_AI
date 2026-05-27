@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from itertools import combinations
 
+from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError, muster_army
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -54,6 +55,8 @@ class SetupFlow:
                         "player_id": next_player_id,
                     },
                 )
+        elif current_step is SetupStep.MUSTER_ARMIES:
+            self._muster_armies(state=state, decisions=decisions, config=config)
 
         completed_step = state.complete_current_setup_step()
         decisions.event_log.append(
@@ -127,6 +130,39 @@ class SetupFlow:
         if not missing_players:
             return None
         return missing_players[0]
+
+    def _muster_armies(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> None:
+        missing_player_ids = set(state.missing_army_player_ids())
+        if not missing_player_ids:
+            return
+        army_definitions: list[ArmyDefinition] = []
+        for request in config.army_muster_requests:
+            if request.player_id not in missing_player_ids:
+                continue
+            try:
+                army_definitions.append(muster_army(catalog=config.army_catalog, request=request))
+            except ArmyMusteringError as exc:
+                raise GameLifecycleError("MUSTER_ARMIES failed during army mustering.") from exc
+        for army_definition in army_definitions:
+            state.record_army_definition(army_definition)
+            decisions.event_log.append(
+                "army_mustered",
+                {
+                    "game_id": state.game_id,
+                    "setup_step": SetupStep.MUSTER_ARMIES.value,
+                    "player_id": army_definition.player_id,
+                    "army_id": army_definition.army_id,
+                    "unit_count": len(army_definition.units),
+                },
+            )
+        if state.missing_army_player_ids():
+            raise GameLifecycleError("MUSTER_ARMIES requires an army for every player.")
 
     def _secondary_mission_request(
         self,

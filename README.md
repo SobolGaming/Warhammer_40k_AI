@@ -718,6 +718,7 @@ Objects:
 Invariants:
 
 - mustering consumes catalog definitions and produces runtime instances;
+- lifecycle `MUSTER_ARMIES` consumes per-player `ArmyMusterRequest` data;
 - runtime units keep stable links back to datasheet and source IDs;
 - all selected wargear is legal for the datasheet;
 - all model profiles and base sizes are resolved before battlefield placement;
@@ -727,7 +728,11 @@ Invariants:
 Required tests:
 
 - canonical army mustering produces deterministic `ArmyDefinition` payloads;
+- lifecycle `MUSTER_ARMIES` consumes requests for every player and stores runtime armies;
+- invalid mustering prevents setup advancement past `MUSTER_ARMIES`;
+- lifecycle replay payloads preserve mustered army definitions;
 - runtime `UnitInstance` and `ModelInstance` objects preserve datasheet/source links;
+- runtime payloads reject army/unit/model hierarchy drift;
 - runtime units use explicit `own_models`, not ambiguous `models`;
 - selected wargear outside a datasheet option fails during mustering;
 - model counts outside datasheet composition bounds fail during mustering;

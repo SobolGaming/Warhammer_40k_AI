@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     BattlePhaseSequenceDescriptor,
@@ -13,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     SetupSequenceDescriptor,
     SetupStepKind,
 )
+from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -25,6 +27,12 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.list_validation import (
+    DetachmentSelection,
+    ModelProfileSelection,
+    UnitMusterSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -46,21 +54,79 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 def _config(
     *,
     ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
+    army_muster_requests: tuple[ArmyMusterRequest, ...] | None = None,
 ) -> GameConfig:
     descriptor = ruleset_descriptor
     if descriptor is None:
         descriptor = RulesetDescriptor.warhammer_40000_tenth(
             descriptor_version="core-v2-phase9b-test"
         )
+    catalog = ArmyCatalog.phase9a_canonical_content_pack() if army_catalog is None else army_catalog
     return GameConfig(
         game_id="phase9b-game",
         ruleset_descriptor=descriptor,
+        army_catalog=catalog,
+        army_muster_requests=(
+            _army_muster_requests(catalog) if army_muster_requests is None else army_muster_requests
+        ),
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=(
             "assassination",
             "bring_it_down",
             "cleanse",
+        ),
+    )
+
+
+def _army_muster_requests(catalog: ArmyCatalog) -> tuple[ArmyMusterRequest, ...]:
+    return (
+        _army_muster_request(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-alpha",
+            unit_selection_id="intercessor-unit-1",
+        ),
+        _army_muster_request(
+            catalog=catalog,
+            player_id="player-b",
+            army_id="army-beta",
+            unit_selection_id="intercessor-unit-2",
+        ),
+    )
+
+
+def _army_muster_request(
+    *,
+    catalog: ArmyCatalog,
+    player_id: str,
+    army_id: str,
+    unit_selection_id: str,
+    wargear_selections: tuple[WargearSelection, ...] = (),
+) -> ArmyMusterRequest:
+    return ArmyMusterRequest(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_id="core-combined-arms",
+        ),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id=unit_selection_id,
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+                wargear_selections=wargear_selections,
+            ),
         ),
     )
 
@@ -188,6 +254,10 @@ def _battle_flow() -> BattleRoundFlow:
 def _battle_state(config: GameConfig | None = None) -> GameState:
     resolved_config = _config() if config is None else config
     state = GameState.from_config(resolved_config)
+    for request in resolved_config.army_muster_requests:
+        state.record_army_definition(
+            muster_army(catalog=resolved_config.army_catalog, request=request)
+        )
     while state.stage is GameLifecycleStage.SETUP:
         state.complete_current_setup_step()
     for player_id in state.player_ids:
@@ -231,6 +301,98 @@ def test_setup_steps_advance_in_ruleset_descriptor_order() -> None:
     assert observed_steps == [
         step.value for step in RulesetDescriptor.warhammer_40000_tenth().setup_sequence.steps
     ]
+
+
+def test_lifecycle_muster_armies_consumes_requests_and_records_runtime_armies() -> None:
+    lifecycle = _start_lifecycle()
+
+    status = lifecycle.advance_until_decision_or_terminal()
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.state is not None
+    assert lifecycle.state.current_setup_step is SetupStep.SELECT_SECONDARY_MISSIONS
+    assert lifecycle.state.missing_army_player_ids() == ()
+    assert tuple(army.player_id for army in lifecycle.state.army_definitions) == (
+        "player-a",
+        "player-b",
+    )
+    assert tuple(army.army_id for army in lifecycle.state.army_definitions) == (
+        "army-alpha",
+        "army-beta",
+    )
+    assert [
+        event.payload["player_id"]
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "army_mustered" and isinstance(event.payload, dict)
+    ] == ["player-a", "player-b"]
+
+
+def test_lifecycle_replay_payload_preserves_mustered_army_definitions() -> None:
+    lifecycle = _start_lifecycle()
+    lifecycle.advance_until_decision_or_terminal()
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    blob = json.dumps(payload, sort_keys=True)
+
+    assert len(payload["state"]["army_definitions"]) == 2
+    assert "army-alpha:intercessor-unit-1" in blob
+    assert "<" not in blob
+    assert "object at 0x" not in blob
+    assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+
+def test_lifecycle_muster_armies_fails_before_setup_advancement_on_invalid_request() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bad_wargear = WargearSelection(
+        option_id="core-intercessor-like-infantry:default-wargear",
+        model_profile_id="core-intercessor-like",
+        wargear_ids=("core-heavy-cannon",),
+    )
+    config = _config(
+        army_catalog=catalog,
+        army_muster_requests=(
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_id="intercessor-unit-1",
+                wargear_selections=(bad_wargear,),
+            ),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+            ),
+        ),
+    )
+    lifecycle = _start_lifecycle(config)
+
+    with pytest.raises(GameLifecycleError, match="MUSTER_ARMIES"):
+        lifecycle.advance_until_decision_or_terminal()
+
+    assert lifecycle.state is not None
+    assert lifecycle.state.current_setup_step is SetupStep.MUSTER_ARMIES
+    assert lifecycle.state.army_definitions == []
+
+
+def test_game_config_requires_muster_requests_for_every_player() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+
+    with pytest.raises(GameLifecycleError, match="every player"):
+        _config(
+            army_catalog=catalog,
+            army_muster_requests=(
+                _army_muster_request(
+                    catalog=catalog,
+                    player_id="player-a",
+                    army_id="army-alpha",
+                    unit_selection_id="intercessor-unit-1",
+                ),
+            ),
+        )
 
 
 def test_lifecycle_reads_setup_order_from_ruleset_descriptor() -> None:
@@ -602,6 +764,25 @@ def test_lifecycle_from_payload_rejects_config_state_identity_drift() -> None:
     tactical_count_mismatch["state"]["tactical_secondary_draw_count"] = 3
     with pytest.raises(GameLifecycleError, match="tactical secondary draw count"):
         GameLifecycle.from_payload(tactical_count_mismatch)
+
+
+def test_lifecycle_from_payload_rejects_mustered_army_state_drift() -> None:
+    lifecycle = _start_lifecycle()
+    lifecycle.advance_until_decision_or_terminal()
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    missing_armies = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+    missing_armies["state"]["army_definitions"] = []
+    with pytest.raises(GameLifecycleError, match="mustered army definitions"):
+        GameLifecycle.from_payload(missing_armies)
+
+    army_mismatch = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
+    army_mismatch["state"]["army_definitions"][0]["units"][0]["name"] = "Different Name"
+    with pytest.raises(GameLifecycleError, match="army definitions"):
+        GameLifecycle.from_payload(army_mismatch)
 
 
 def test_no_ui_or_headless_specific_phase_path_exists() -> None:

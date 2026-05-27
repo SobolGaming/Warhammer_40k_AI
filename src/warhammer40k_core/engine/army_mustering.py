@@ -167,6 +167,7 @@ class ArmyDefinition:
             )
         units = _validate_unit_instance_tuple("ArmyDefinition units", self.units)
         _validate_unique_unit_instance_ids(units)
+        _validate_unit_ids_scoped_to_army(army_id=self.army_id, units=units)
         object.__setattr__(self, "units", units)
 
     def stable_identity(self) -> str:
@@ -203,7 +204,7 @@ class ArmyDefinition:
             source_package_id=payload["source_package_id"],
             ruleset_id=_ruleset_id_from_payload(payload["ruleset_id"]),
             detachment_selection=DetachmentSelection.from_payload(payload["detachment_selection"]),
-            units=tuple(UnitInstance.from_payload(unit) for unit in payload["units"]),
+            units=tuple(_unit_instance_from_payload(unit) for unit in payload["units"]),
         )
 
 
@@ -270,6 +271,13 @@ def _ruleset_id_from_payload(payload: RulesetIdPayload) -> RulesetId:
         raise ArmyMusteringError("ruleset_id payload is invalid.") from exc
 
 
+def _unit_instance_from_payload(payload: UnitInstancePayload) -> UnitInstance:
+    try:
+        return UnitInstance.from_payload(payload)
+    except UnitFactoryError as exc:
+        raise ArmyMusteringError("ArmyDefinition unit payload is invalid.") from exc
+
+
 def _validate_unit_muster_selection_tuple(
     field_name: str,
     values: object,
@@ -318,6 +326,16 @@ def _validate_unique_unit_instance_ids(units: tuple[UnitInstance, ...]) -> None:
         if unit.unit_instance_id in seen:
             raise ArmyMusteringError("ArmyDefinition units must have unique IDs.")
         seen.add(unit.unit_instance_id)
+
+
+def _validate_unit_ids_scoped_to_army(
+    *,
+    army_id: str,
+    units: tuple[UnitInstance, ...],
+) -> None:
+    for unit in units:
+        if not unit.unit_instance_id.startswith(f"{army_id}:"):
+            raise ArmyMusteringError("ArmyDefinition unit IDs must be scoped to army_id.")
 
 
 def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:

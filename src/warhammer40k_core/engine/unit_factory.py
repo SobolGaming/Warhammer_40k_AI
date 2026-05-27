@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.attributes import (
     Characteristic,
     CharacteristicValue,
@@ -114,7 +114,11 @@ class ModelInstance:
         object.__setattr__(
             self,
             "source_ids",
-            _validate_identifier_tuple("ModelInstance source_ids", self.source_ids),
+            _validate_identifier_tuple(
+                "ModelInstance source_ids",
+                self.source_ids,
+                min_length=1,
+            ),
         )
 
     def stable_identity(self) -> str:
@@ -188,12 +192,16 @@ class UnitInstance:
         object.__setattr__(
             self,
             "keywords",
-            _validate_identifier_tuple("UnitInstance keywords", self.keywords),
+            _validate_identifier_tuple("UnitInstance keywords", self.keywords, min_length=0),
         )
         object.__setattr__(
             self,
             "faction_keywords",
-            _validate_identifier_tuple("UnitInstance faction_keywords", self.faction_keywords),
+            _validate_identifier_tuple(
+                "UnitInstance faction_keywords",
+                self.faction_keywords,
+                min_length=0,
+            ),
         )
         object.__setattr__(
             self,
@@ -201,10 +209,12 @@ class UnitInstance:
             _validate_identifier_tuple(
                 "UnitInstance datasheet_source_ids",
                 self.datasheet_source_ids,
+                min_length=1,
             ),
         )
         own_models = _validate_model_instance_tuple("UnitInstance own_models", self.own_models)
         _validate_unique_model_instance_ids(own_models)
+        _validate_model_instance_links(unit_instance=self, own_models=own_models)
         object.__setattr__(self, "own_models", own_models)
         wargear_selections = _validate_wargear_selection_tuple(
             "UnitInstance wargear_selections",
@@ -272,6 +282,7 @@ class UnitFactory:
             raise UnitFactoryError("datasheet must be a DatasheetDefinition.")
         if datasheet.datasheet_id != selection.datasheet_id:
             raise UnitFactoryError("UnitMusterSelection datasheet_id does not match datasheet.")
+        datasheet = self._catalog_datasheet(datasheet)
         try:
             model_profile_selections = resolve_model_profile_selections(
                 datasheet=datasheet,
@@ -306,6 +317,15 @@ class UnitFactory:
             own_models=tuple(own_models),
             wargear_selections=wargear_selections,
         )
+
+    def _catalog_datasheet(self, datasheet: DatasheetDefinition) -> DatasheetDefinition:
+        try:
+            catalog_datasheet = self.catalog.datasheet_by_id(datasheet.datasheet_id)
+        except ArmyCatalogError as exc:
+            raise UnitFactoryError("datasheet must exist in the factory catalog.") from exc
+        if catalog_datasheet.to_payload() != datasheet.to_payload():
+            raise UnitFactoryError("datasheet must match the factory catalog definition.")
+        return catalog_datasheet
 
 
 def _instantiate_models_for_profile(
@@ -388,6 +408,18 @@ def _validate_unique_model_instance_ids(models: tuple[ModelInstance, ...]) -> No
         seen.add(model.model_instance_id)
 
 
+def _validate_model_instance_links(
+    *,
+    unit_instance: UnitInstance,
+    own_models: tuple[ModelInstance, ...],
+) -> None:
+    for model in own_models:
+        if model.datasheet_id != unit_instance.datasheet_id:
+            raise UnitFactoryError("UnitInstance own_models must match unit datasheet_id.")
+        if not model.model_instance_id.startswith(f"{unit_instance.unit_instance_id}:"):
+            raise UnitFactoryError("UnitInstance own_model IDs must be scoped to unit_instance_id.")
+
+
 def _validate_wargear_selection_tuple(
     field_name: str,
     values: object,
@@ -407,7 +439,12 @@ def _validate_wargear_selection_tuple(
     return tuple(sorted(validated, key=lambda selection: selection.option_id))
 
 
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+def _validate_identifier_tuple(
+    field_name: str,
+    values: object,
+    *,
+    min_length: int,
+) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise UnitFactoryError(f"{field_name} must be a tuple.")
     validated: list[str] = []
@@ -419,6 +456,8 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
             raise UnitFactoryError(f"{field_name} must not contain duplicates.")
         seen.add(identifier)
         validated.append(identifier)
+    if len(validated) < min_length:
+        raise UnitFactoryError(f"{field_name} must contain at least {min_length} values.")
     return tuple(sorted(validated))
 
 
