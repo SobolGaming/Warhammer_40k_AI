@@ -143,37 +143,50 @@ class ModelGeometry:
             "height_inches",
             _validate_positive_inches("ModelGeometry height_inches", self.height_inches),
         )
+        geometry_source_kind = geometry_source_kind_from_token(self.geometry_source_kind)
+        geometry_source_id = _validate_optional_source_id(
+            "ModelGeometry geometry_source_id",
+            self.geometry_source_id,
+        )
+        if (
+            geometry_source_kind is GeometrySourceKind.CATALOG_BASE_SIZE
+            and geometry_source_id is None
+        ):
+            raise GeometryError("Catalog-derived geometry requires geometry_source_id.")
         object.__setattr__(
             self,
             "geometry_source_kind",
-            geometry_source_kind_from_token(self.geometry_source_kind),
+            geometry_source_kind,
         )
-        object.__setattr__(
-            self,
-            "geometry_source_id",
-            _validate_optional_source_id(
-                "ModelGeometry geometry_source_id",
-                self.geometry_source_id,
-            ),
+        object.__setattr__(self, "geometry_source_id", geometry_source_id)
+        height_source_kind = height_source_kind_from_token(self.height_source_kind)
+        height_source_id = _validate_optional_source_id(
+            "ModelGeometry height_source_id",
+            self.height_source_id,
         )
+        if (
+            height_source_kind
+            in {
+                HeightSourceKind.KEYWORD_HEURISTIC,
+                HeightSourceKind.FALLBACK_BASE_MINOR_DIAMETER,
+            }
+            and height_source_id is None
+        ):
+            raise GeometryError("Resolved model height requires height_source_id.")
         object.__setattr__(
             self,
             "height_source_kind",
-            height_source_kind_from_token(self.height_source_kind),
+            height_source_kind,
         )
-        object.__setattr__(
-            self,
-            "height_source_id",
-            _validate_optional_source_id("ModelGeometry height_source_id", self.height_source_id),
-        )
+        object.__setattr__(self, "height_source_id", height_source_id)
 
     @classmethod
     def from_base_size(
         cls,
         base_size: BaseSizeDefinition,
         *,
+        geometry_source_id: str,
         keywords: tuple[str, ...] = (),
-        geometry_source_id: str | None = None,
     ) -> Self:
         if type(base_size) is not BaseSizeDefinition:
             raise GeometryError("base_size must be a BaseSizeDefinition.")

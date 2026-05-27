@@ -10,7 +10,12 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.engine.list_validation import ModelProfileSelection, UnitMusterSelection
-from warhammer40k_core.engine.unit_factory import UnitFactory, UnitFactoryError
+from warhammer40k_core.engine.unit_factory import (
+    ModelInstance,
+    ModelInstancePayload,
+    UnitFactory,
+    UnitFactoryError,
+)
 from warhammer40k_core.geometry.measurement import millimeters_to_inches
 from warhammer40k_core.geometry.model_geometry import (
     BaseFootprintKind,
@@ -108,7 +113,10 @@ def test_invalid_source_dimensions_and_shapes_fail_fast() -> None:
     with pytest.raises(GeometryError, match="greater than 0"):
         millimeters_to_inches(0.0)
     with pytest.raises(GeometryError, match="BaseSizeDefinition"):
-        ModelGeometry.from_base_size(cast(BaseSizeDefinition, "bad-base-size"))
+        ModelGeometry.from_base_size(
+            cast(BaseSizeDefinition, "bad-base-size"),
+            geometry_source_id="profile",
+        )
     with pytest.raises(GeometryError, match="greater than 0"):
         FootprintPart(
             part_id="base",
@@ -122,7 +130,42 @@ def test_invalid_source_dimensions_and_shapes_fail_fast() -> None:
         ModelGeometry.from_base_size(
             BaseSizeDefinition.circular(32.0),
             keywords=cast(tuple[str, ...], ("",)),
+            geometry_source_id="profile",
         )
+
+
+def test_model_geometry_requires_explicit_provenance_for_resolved_sources() -> None:
+    part = FootprintPart(
+        part_id="base",
+        footprint_kind=BaseFootprintKind.CIRCULAR,
+        radius_x_inches=1.0,
+        radius_y_inches=1.0,
+    )
+
+    with pytest.raises(GeometryError, match="Catalog-derived geometry requires"):
+        ModelGeometry(
+            footprint_kind=BaseFootprintKind.CIRCULAR,
+            parts=(part,),
+            height_inches=1.0,
+            geometry_source_kind=GeometrySourceKind.CATALOG_BASE_SIZE,
+            geometry_source_id=None,
+            height_source_kind=HeightSourceKind.MANUAL_OVERRIDE,
+            height_source_id=None,
+        )
+    for height_source_kind in (
+        HeightSourceKind.KEYWORD_HEURISTIC,
+        HeightSourceKind.FALLBACK_BASE_MINOR_DIAMETER,
+    ):
+        with pytest.raises(GeometryError, match="Resolved model height requires"):
+            ModelGeometry(
+                footprint_kind=BaseFootprintKind.CIRCULAR,
+                parts=(part,),
+                height_inches=1.0,
+                geometry_source_kind=GeometrySourceKind.MANUAL_OVERRIDE,
+                geometry_source_id=None,
+                height_source_kind=height_source_kind,
+                height_source_id=None,
+            )
 
 
 def test_model_geometry_payloads_round_trip_without_object_reprs() -> None:
@@ -156,6 +199,58 @@ def test_unit_factory_requires_resolved_model_geometry() -> None:
     assert isinstance(model.geometry, ModelGeometry)
     with pytest.raises(UnitFactoryError, match="geometry"):
         replace(model, geometry=cast(ModelGeometry, "bad-geometry"))
+
+
+def test_model_instance_from_payload_rejects_geometry_footprint_kind_drift() -> None:
+    payload = _runtime_model_payload()
+    payload["geometry"] = ModelGeometry.from_base_size(
+        BaseSizeDefinition.oval(length_mm=75.0, width_mm=42.0),
+        keywords=("Infantry",),
+        geometry_source_id=payload["model_profile_id"],
+    ).to_payload()
+
+    with pytest.raises(UnitFactoryError, match="footprint"):
+        ModelInstance.from_payload(payload)
+
+
+def test_model_instance_from_payload_rejects_geometry_radius_drift() -> None:
+    payload = _runtime_model_payload()
+    part = payload["geometry"]["parts"][0]
+    part["radius_x_inches"] = part["radius_x_inches"] * 1.25
+    part["radius_y_inches"] = part["radius_y_inches"] * 1.25
+
+    with pytest.raises(UnitFactoryError, match="radius_x_inches"):
+        ModelInstance.from_payload(payload)
+
+
+def test_model_instance_rejects_wrong_catalog_base_geometry_on_replace() -> None:
+    model = _runtime_model()
+    wrong_catalog_base_geometry = ModelGeometry.from_base_size(
+        BaseSizeDefinition.oval(length_mm=75.0, width_mm=42.0),
+        keywords=("Infantry",),
+        geometry_source_id=model.model_profile_id,
+    )
+
+    with pytest.raises(UnitFactoryError, match="footprint"):
+        replace(model, geometry=wrong_catalog_base_geometry)
+
+
+def _runtime_model() -> ModelInstance:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    unit = UnitFactory(catalog).instantiate_unit(
+        army_id="army-alpha",
+        selection=_unit_selection(),
+        datasheet=datasheet,
+    )
+    return unit.own_models[0]
+
+
+def _runtime_model_payload() -> ModelInstancePayload:
+    return cast(
+        ModelInstancePayload,
+        json.loads(json.dumps(_runtime_model().to_payload(), sort_keys=True)),
+    )
 
 
 def _unit_selection() -> UnitMusterSelection:
