@@ -436,6 +436,27 @@ class MovementLegalityContext:
             ),
         )
 
+    def validate_path_transits_enemy_engagement(
+        self,
+        *,
+        enemy_horizontal_distance_inches: object,
+        enemy_vertical_distance_inches: object,
+    ) -> MovementLegalityResult:
+        if not self.engagement_policy.enemy_engagement_at(
+            horizontal_inches=enemy_horizontal_distance_inches,
+            vertical_inches=enemy_vertical_distance_inches,
+        ):
+            return MovementLegalityResult.legal()
+        if self.engagement_policy.may_transit_enemy_engagement:
+            return MovementLegalityResult.legal()
+        return MovementLegalityResult.invalid(
+            violation_code="enemy_engagement_range_transit_forbidden",
+            message=(
+                f"{self.movement_mode.value} cannot move through enemy Engagement Range "
+                f"under {self.engagement_policy.ruleset_edition.value} policy."
+            ),
+        )
+
     def to_payload(self) -> MovementLegalityContextPayload:
         return {
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,

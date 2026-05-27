@@ -99,9 +99,8 @@ def test_vehicle_monster_restrictions_are_capability_constraints() -> None:
 
 def test_tenth_normal_move_cannot_end_in_enemy_engagement_range() -> None:
     descriptor = RulesetDescriptor.warhammer_40000_tenth()
-    context = MovementLegalityContext.from_keywords(
-        keywords=("INFANTRY",),
-        ruleset_descriptor=descriptor,
+    context = _legality_context(
+        descriptor=descriptor,
         movement_mode=MovementMode.NORMAL,
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
@@ -146,6 +145,102 @@ def test_tenth_normal_move_cannot_end_in_enemy_engagement_range() -> None:
     )
 
 
+def test_tenth_normal_and_advance_cannot_transit_enemy_engagement_range() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    normal = _legality_context(
+        descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+    )
+    advance = _legality_context(
+        descriptor=descriptor,
+        movement_mode=MovementMode.ADVANCE,
+        movement_phase_action=MovementPhaseActionKind.ADVANCE,
+        displacement_kind=ModelDisplacementKind.ADVANCE,
+    )
+
+    for context in (normal, advance):
+        result = context.validate_path_transits_enemy_engagement(
+            enemy_horizontal_distance_inches=1.0,
+            enemy_vertical_distance_inches=0.0,
+        )
+        outside_result = context.validate_path_transits_enemy_engagement(
+            enemy_horizontal_distance_inches=1.01,
+            enemy_vertical_distance_inches=0.0,
+        )
+
+        assert result.status is MovementLegalityStatus.INVALID
+        assert not result.is_legal
+        assert result.violation_code == "enemy_engagement_range_transit_forbidden"
+        assert outside_result.is_legal
+
+
+def test_tenth_fall_back_transit_allowed_but_endpoint_forbidden() -> None:
+    context = _legality_context(
+        descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        movement_mode=MovementMode.FALL_BACK,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        displacement_kind=ModelDisplacementKind.FALL_BACK,
+    )
+
+    transit = context.validate_path_transits_enemy_engagement(
+        enemy_horizontal_distance_inches=1.0,
+        enemy_vertical_distance_inches=0.0,
+    )
+    endpoint = context.validate_end_position_enemy_engagement(
+        enemy_horizontal_distance_inches=1.0,
+        enemy_vertical_distance_inches=0.0,
+    )
+
+    assert transit.is_legal
+    assert endpoint.status is MovementLegalityStatus.INVALID
+    assert endpoint.violation_code == "enemy_engagement_range_end_forbidden"
+
+
+def test_tenth_charge_transit_and_endpoint_are_allowed_by_charge_policy() -> None:
+    context = _legality_context(
+        descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        movement_mode=MovementMode.CHARGE,
+        movement_phase_action=None,
+        displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+    )
+
+    transit = context.validate_path_transits_enemy_engagement(
+        enemy_horizontal_distance_inches=1.0,
+        enemy_vertical_distance_inches=0.0,
+    )
+    endpoint = context.validate_end_position_enemy_engagement(
+        enemy_horizontal_distance_inches=1.0,
+        enemy_vertical_distance_inches=0.0,
+    )
+
+    assert transit.is_legal
+    assert endpoint.is_legal
+
+
+def test_preview_normal_move_transit_allowed_but_endpoint_forbidden() -> None:
+    context = _legality_context(
+        descriptor=RulesetDescriptor.warhammer_40000_eleventh_preview(),
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+    )
+
+    transit = context.validate_path_transits_enemy_engagement(
+        enemy_horizontal_distance_inches=2.0,
+        enemy_vertical_distance_inches=0.0,
+    )
+    endpoint = context.validate_end_position_enemy_engagement(
+        enemy_horizontal_distance_inches=2.0,
+        enemy_vertical_distance_inches=0.0,
+    )
+
+    assert transit.is_legal
+    assert endpoint.status is MovementLegalityStatus.INVALID
+    assert endpoint.violation_code == "enemy_engagement_range_end_forbidden"
+
+
 def test_preview_and_unsupported_policy_require_explicit_descriptor() -> None:
     tenth = RulesetDescriptor.warhammer_40000_tenth()
     preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
@@ -180,4 +275,20 @@ def test_preview_and_unsupported_policy_require_explicit_descriptor() -> None:
             cast(EngagementMovementPolicyPayload, json.loads(encoded))
         )
         == policy
+    )
+
+
+def _legality_context(
+    *,
+    descriptor: RulesetDescriptor,
+    movement_mode: MovementMode,
+    movement_phase_action: MovementPhaseActionKind | None,
+    displacement_kind: ModelDisplacementKind,
+) -> MovementLegalityContext:
+    return MovementLegalityContext.from_keywords(
+        keywords=("INFANTRY",),
+        ruleset_descriptor=descriptor,
+        movement_mode=movement_mode,
+        movement_phase_action=movement_phase_action,
+        displacement_kind=displacement_kind,
     )
