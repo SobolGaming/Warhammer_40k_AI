@@ -1435,6 +1435,140 @@ Handler examples:
 - deployment and pre-battle handlers for Deep Strike, Infiltrators, Scouts,
   reserves, transports, and redeploy effects.
 
+## Future phase CORE V1 relevant areas index
+
+CORE V1 is the previous implementation at
+[SobolGaming/Warhammer40k_AI](https://github.com/SobolGaming/Warhammer40k_AI).
+Before implementing each remaining phase, inspect only the narrow areas listed
+for that phase. Use them as reference material for invariants, algorithms, edge
+cases, and test ideas. Do not copy CORE V1 files wholesale.
+
+### Phase 10E: model geometry foundation
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/utility/model_geometry.py`
+- `src/warhammer40k_ai/utility/model_base.py`
+- `src/warhammer40k_ai/utility/calcs.py`
+- `src/warhammer40k_ai/utility/constants.py`
+- `tests/units/test_model_geometry_resolver.py`
+
+### Phase 10F: terrain factory foundation
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/battlefield/map.py`
+- `src/warhammer40k_ai/battlefield/terrain_runtime.py`
+- `src/warhammer40k_ai/battlefield/terrain_presets.py`
+- `src/warhammer40k_ai/battlefield/terrain_elevation.py`
+- `src/warhammer40k_ai/battlefield/terrain_visibility.py`
+- `src/warhammer40k_ai/battlefield/terrain_cover.py`
+- `tests/rules/test_line_of_sight.py`
+- terrain-related battlefield tests
+
+### Phase 10G: movement legality context and capability resolver
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/pathing/rules_profile.py`
+- `src/warhammer40k_ai/pathing/types.py`
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/utility/calcs.py`
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+
+### Phase 10H: pathing smoke constraints
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/pathing/sweep.py`
+- `src/warhammer40k_ai/pathing/types.py`
+- `src/warhammer40k_ai/path_witness.py`
+- `src/warhammer40k_ai/utility/calcs.py`
+- `src/warhammer40k_ai/battlefield/map.py`
+
+### Phase 10I: advance roll and reroll decision
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/movement_distance.py`
+- `src/warhammer40k_ai/utility/dice.py`
+- movement action/reroll tests
+
+### Phase 10J: fall back action and basic Fall Back constraints
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/pathing/rules_profile.py`
+- `src/warhammer40k_ai/pathing/validation.py`
+- Fall Back / Desperate Escape tests if present
+
+### Phase 10K: Movement phase Reinforcements step shell
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/reserve_entry_rules.py`
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/engine/game_setup_flow.py`
+- reserve/deep-strike tests
+
+### Phase 10L: transport embark/disembark shell
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `tests/rules/test_core_transport_movement_phase.py`
+- transport/deployment tests
+- any transport assignment helpers used during setup
+
+### Phase 10M: triggered movement foundation
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- surge/reactive movement tests
+- faction/rule handlers that queue reactive movement decisions
+
+### Phase 11: shooting phase body vertical slice
+
+Relevant CORE V1 areas:
+
+- shooting decision handlers
+- shooting commander/ranker tests
+- `battlefield/terrain_visibility.py`
+- `tests/rules/test_line_of_sight.py`
+- damage allocation tests
+
+### Phase 12: charge and fight phase body vertical slice
+
+Relevant CORE V1 areas:
+
+- charge/fight decision handlers
+- `src/warhammer40k_ai/fight_move.py`
+- charge diagnostics
+- melee tests
+- charge movement tests
+
+### Phase 13: richer deployment, reserves, transports, and pre-battle abilities
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/game_setup_flow.py`
+- `src/warhammer40k_ai/engine/game_phase_flow.py`
+- `src/warhammer40k_ai/engine/reserve_entry_rules.py`
+- deployment/prebattle/transport tests
+
+### Phase 14: broad content import and ability handler expansion
+
+Relevant CORE V1 areas:
+
+- faction/rule modules
+- datasheet/wargear mixins
+- faction-specific tests
+- ability-specific movement/shooting/fight tests
+
 ## CORE V1 investigation and reuse policy by phase
 
 CORE V1 is the previous implementation at
