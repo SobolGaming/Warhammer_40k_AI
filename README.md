@@ -1238,10 +1238,68 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/utility/calcs.py`
 - `src/warhammer40k_ai/battlefield/map.py`
 
-### Phase 10I: advance roll and reroll decision
+### Phase 10I: terrain movement semantics foundation
+
+This phase turns terrain fixtures and pathing smoke checks into movement-facing
+terrain traversal policy. It does not implement cover, line of sight, or
+shooting terrain behavior.
+
+Modules:
+
+- `geometry/pathing.py`
+- `geometry/terrain.py`
+- `engine/movement_legality.py`
+- `core/ruleset_descriptor.py`
+
+Objects:
+
+- `TerrainMovementPolicy`
+- `TerrainTraversalMode`
+- `TerrainPathLegalityContext`
+- `TerrainPathSegment`
+- `TerrainTraversalViolation`
+
+Invariants:
+
+- terrain movement policy is descriptor data, not hard-coded pathing behavior;
+- freely traversable terrain height threshold is explicit, including 2" for
+  10e;
+- climb up/down vertical distance is accounted for separately from horizontal
+  movement;
+- a model cannot end mid-climb;
+- models cannot move through terrain features unless a movement capability or
+  terrain traversal mode permits it;
+- `INFANTRY`/`BEAST` ruins-wall traversal is represented as capability input;
+- FLY terrain movement records an air-path measurement hook;
+- this phase does not implement cover, LoS, or shooting terrain rules.
+
+Required tests:
+
+- model can move freely over terrain up to the descriptor threshold;
+- model cannot pass through a wall without traversal permission;
+- model can climb terrain above the threshold by paying vertical distance;
+- model cannot end mid-climb;
+- `INFANTRY`/`BEAST` capability can permit ruins-wall traversal;
+- non-permitted `VEHICLE` cannot pass through ruins wall;
+- FLY terrain movement records air-path measurement hook;
+- terrain traversal result serializes without Python object reprs.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/pathing/rules_profile.py`
+- `src/warhammer40k_ai/pathing/types.py`
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/pathing/sweep.py`
+- `src/warhammer40k_ai/battlefield/terrain_runtime.py`
+- `src/warhammer40k_ai/battlefield/terrain_elevation.py`
+- `src/warhammer40k_ai/battlefield/terrain_presets.py`
+- `src/warhammer40k_ai/utility/calcs.py`
+
+### Phase 10J: advance roll and reroll decision
 
 This phase implements Advance as a Movement phase action after geometry,
-transition records, and basic legality foundations exist.
+transition records, terrain movement semantics, and basic legality foundations
+exist.
 
 Modules:
 
@@ -1266,6 +1324,8 @@ Invariants:
   Back;
 - Advance distance is Movement characteristic plus Advance roll;
 - dice results and reroll decisions are replay-facing;
+- Advance consumes `PathValidationContext` and terrain movement policy instead
+  of duplicating pathing assumptions;
 - Advance emits displacement records when models move;
 - Advance marks the unit as having advanced;
 - no next unit selection occurs before activation terminal event.
@@ -1286,7 +1346,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/utility/dice.py`
 - movement action/reroll tests
 
-### Phase 10J: fall back action and basic Fall Back constraints
+### Phase 10K: fall back action and Desperate Escape shell
 
 This phase implements Fall Back as a Movement phase action with explicit basic
 constraints. Desperate Escape can remain typed unsupported until implemented.
@@ -1326,7 +1386,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/pathing/validation.py`
 - Fall Back / Desperate Escape tests if present
 
-### Phase 10K: Movement phase Reinforcements step shell
+### Phase 10L: Movement phase Reinforcements step shell
 
 This phase adds the second Movement phase step. It does not implement full
 Strategic Reserves or Deep Strike rules.
@@ -1368,7 +1428,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/engine/game_setup_flow.py`
 - reserve/deep-strike tests
 
-### Phase 10L: transport embark/disembark shell
+### Phase 10M: transport embark/disembark shell
 
 This phase models transport state transitions without full transport rules.
 
@@ -1409,7 +1469,7 @@ CORE V1 relevant areas:
 - transport/deployment tests
 - any transport assignment helpers used during setup
 
-### Phase 10M: triggered movement foundation
+### Phase 10N: triggered movement foundation
 
 This phase models movement-like displacements caused by timing-window rule
 effects outside the standard Move Units action selector.
@@ -1451,7 +1511,53 @@ CORE V1 relevant areas:
 - surge/reactive movement tests
 - faction/rule handlers that queue reactive movement decisions
 
-### Phase 11: shooting phase body vertical slice
+### Phase 11A: line-of-sight terrain visibility foundation
+
+This phase adds terrain visibility and LoS foundations after movement terrain
+semantics are stable. It does not implement the full shooting attack sequence.
+
+Modules:
+
+- `geometry/visibility.py`
+- `geometry/terrain.py`
+- `engine/battlefield_state.py`
+- `core/ruleset_descriptor.py`
+
+Objects:
+
+- `LineOfSightPolicy`
+- `TerrainVisibilityContext`
+- `VisibilityBlockerRecord`
+- `LineOfSightWitness`
+- `CoverPolicyDescriptor`
+
+Invariants:
+
+- ruins visibility is explicit terrain policy, not ad hoc shooting logic;
+- visibility blockers use model volume and terrain wall/floor interactions;
+- cover policy descriptors are data and do not execute shooting behavior;
+- LoS and cover checks use spatial index/cache revision data;
+- LoS witness/debug payloads are replay-safe;
+- this phase does not implement hit/wound/save/damage or damage allocation.
+
+Required tests:
+
+- terrain visibility fixture can block LoS deterministically;
+- ruins wall/floor interactions are represented in LoS context;
+- model volume participates in visibility checks;
+- terrain visibility cache key changes when terrain revision changes;
+- cover policy descriptor round-trips without object reprs;
+- LoS witness/debug payload round-trips without object reprs.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/battlefield/terrain_visibility.py`
+- `src/warhammer40k_ai/battlefield/terrain_cover.py`
+- `src/warhammer40k_ai/battlefield/map.py`
+- `tests/rules/test_line_of_sight.py`
+- LoS and cover-related terrain tests
+
+### Phase 11B: shooting phase body vertical slice
 
 This phase fills the shooting phase body behind the authoritative lifecycle. It
 consumes placed units, weapon profiles, ballistic skill, range, line of sight,
