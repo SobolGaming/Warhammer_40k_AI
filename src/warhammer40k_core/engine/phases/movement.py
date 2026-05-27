@@ -7,7 +7,9 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
+    BattlefieldTransitionBatch,
     ModelDisplacementKind,
+    ModelDisplacementRecord,
     ModelPlacement,
     PlacementError,
     UnitPlacement,
@@ -474,6 +476,11 @@ def _apply_movement_action_decision(
             scenario=scenario,
             unit_placement=unit_placement,
         )
+        transition_batch = _normal_move_transition_batch(
+            before=unit_placement,
+            after=updated_placement,
+            witness=witness,
+        )
         battlefield_state = state.battlefield_state
         if battlefield_state is None:
             raise GameLifecycleError("Normal Move requires battlefield_state.")
@@ -486,6 +493,7 @@ def _apply_movement_action_decision(
             witness=witness,
             movement_payload=movement_payload,
             displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            transition_batch=transition_batch,
         )
         return None
 
@@ -526,6 +534,7 @@ def _complete_movement_activation(
     witness: PathWitness | None,
     movement_payload: dict[str, JsonValue],
     displacement_kind: ModelDisplacementKind | None = None,
+    transition_batch: BattlefieldTransitionBatch | None = None,
 ) -> None:
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.active_selection is None:
@@ -548,6 +557,8 @@ def _complete_movement_activation(
     }
     if displacement_kind is not None:
         event_payload["displacement_kind"] = displacement_kind.value
+    if transition_batch is not None:
+        event_payload["transition_batch"] = validate_json_value(transition_batch.to_payload())
     event_payload.update(movement_payload)
     decisions.event_log.append("movement_activation_completed", event_payload)
 
@@ -636,6 +647,36 @@ def _normal_move_plan(
             "model_movements": model_movements,
         },
     )
+
+
+def _normal_move_transition_batch(
+    *,
+    before: UnitPlacement,
+    after: UnitPlacement,
+    witness: PathWitness,
+) -> BattlefieldTransitionBatch:
+    before_poses = {
+        placement.model_instance_id: placement.pose for placement in before.model_placements
+    }
+    displacement_records: list[ModelDisplacementRecord] = []
+    for placement in after.model_placements:
+        if placement.model_instance_id not in before_poses:
+            raise GameLifecycleError("Normal Move transition references an unknown model.")
+        model_path = witness.poses_for_model(placement.model_instance_id)
+        displacement_records.append(
+            ModelDisplacementRecord(
+                model_instance_id=placement.model_instance_id,
+                displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+                start_pose=before_poses[placement.model_instance_id],
+                end_pose=placement.pose,
+                path_witness=PathWitness.for_paths(((placement.model_instance_id, model_path),)),
+                source_phase=BattlePhase.MOVEMENT.value,
+                source_step=MovementPhaseStepKind.MOVE_UNITS.value,
+                source_rule_id=None,
+                source_event_id=None,
+            )
+        )
+    return BattlefieldTransitionBatch(displacements=tuple(displacement_records))
 
 
 def _ensure_movement_phase_state(

@@ -979,49 +979,379 @@ Required tests:
 - the next `SELECT_MOVEMENT_UNIT` is not emitted before the terminal event;
 - `ADVANCE` and `FALL_BACK` return typed unsupported results.
 
-### Phase 10D: advance roll and reroll decision
+### Phase 10D: battlefield transition records
 
-This phase adds the dice-driven Advance path after deterministic normal movement
-is trustworthy.
+This phase makes model placement, removal, and displacement replay-facing
+records. It does not implement new rules behavior.
+
+Modules:
+
+- `engine/battlefield_state.py`
+- `engine/setup_flow.py`
+- `engine/phases/movement.py`
+
+Objects:
+
+- `ModelPlacementRecord`
+- `ModelRemovalRecord`
+- `ModelDisplacementRecord`
+- `BattlefieldTransitionBatch`
+
+Invariants:
+
+- placement records describe models appearing on the battlefield without a
+  path-witnessed move;
+- removal records describe models leaving the battlefield;
+- displacement records describe models changing pose while already on the
+  battlefield;
+- `REINFORCEMENTS` remains a Movement phase step, not a placement kind;
+- `REDEPLOY` remains a placement kind, not a displacement kind;
+- `EMBARK` is removal;
+- `DISEMBARK` is placement;
+- `NORMAL_MOVE` emits displacement records;
+- `REMAIN_STATIONARY` emits no placement/removal/displacement records;
+- transition records serialize without Python object reprs.
+
+Required tests:
+
+- placement/removal/displacement records round-trip;
+- invalid kind tokens fail;
+- displacement rejects identical start/end pose;
+- transition batch rejects duplicate and overlapping model IDs;
+- deployment bridge emits deployment placement records;
+- normal move emits `normal_move` displacement records;
+- remain stationary emits no transition records;
+- unsupported advance/fall back emit no transition records.
+
+### Phase 10E: model geometry foundation
+
+This phase resolves catalog/base-size data into runtime geometry used by
+movement, pathing, collision, and line-of-sight systems.
+
+Modules:
+
+- `geometry/model_geometry.py`
+- `geometry/measurement.py`
+- `core/datasheet.py`
+- `engine/unit_factory.py`
+
+Objects:
+
+- `BaseFootprintKind`
+- `GeometrySourceKind`
+- `HeightSourceKind`
+- `FootprintPart`
+- `ModelGeometry`
+
+Invariants:
+
+- catalog/source base sizes may remain in millimeters;
+- resolved runtime geometry uses inches only;
+- millimeter-to-inch conversion is centralized;
+- no runtime pathing code performs ad hoc unit conversion;
+- every resolved geometry has typed geometry and height provenance;
+- fallback height is allowed only with explicit `HeightSourceKind`;
+- hull/unique/large vehicle geometry can require manual overrides later.
+
+Required tests:
+
+- 32mm circular base resolves to inch radius;
+- oval base resolves major/minor inch radii;
+- resolved geometry stores inches only;
+- missing height uses explicit keyword/fallback provenance;
+- invalid source dimensions fail;
+- geometry payloads round-trip without Python object reprs.
+
+### Phase 10F: terrain factory foundation
+
+This phase creates deterministic terrain fixtures for future movement, pathing,
+and line-of-sight tests. It does not implement full terrain rules.
+
+Modules:
+
+- `geometry/terrain.py`
+- `geometry/terrain_factory.py`
+- `engine/battlefield_state.py`
+
+Objects:
+
+- `TerrainFeatureDefinition`
+- `TerrainWallDefinition`
+- `TerrainFloorDefinition`
+- `TerrainFactory`
+- `SpatialIndexState`
+
+Invariants:
+
+- terrain fixtures are deterministic and serializable;
+- terrain coordinates and dimensions use inches;
+- ruins walls/floors can be represented explicitly;
+- terrain state has revision/cache keys suitable for pathing and LoS;
+- pathing and LoS foundations are designed for spatial-index use;
+- this phase does not implement full LoS, cover, or terrain traversal rules.
+
+Required tests:
+
+- empty battlefield terrain fixture round-trips;
+- ruins fixture round-trips;
+- terrain wall/floor dimensions are deterministic;
+- invalid terrain geometry fails;
+- terrain revision changes when terrain changes;
+- spatial index state can be rebuilt deterministically.
+
+### Phase 10G: movement legality context and capability resolver
+
+This phase introduces structured movement legality inputs. It does not implement
+a full path solver.
+
+Modules:
+
+- `engine/movement_legality.py`
+- `engine/phases/movement.py`
+- `core/ruleset_descriptor.py`
+
+Objects:
+
+- `MovementLegalityContext`
+- `MovementCapabilitySet`
+- `EngagementMovementPolicy`
+- `MovementLegalityResult`
+
+Invariants:
+
+- `FLY`, `INFANTRY`, `BEAST`, `VEHICLE`, `MONSTER`, `WALKER`, `AIRCRAFT`, and
+  similar keywords are legality/capability inputs, not Movement phase actions;
+- 10e engagement policy is descriptor-driven;
+- preview/alternate-edition engagement behavior requires an explicit ruleset
+  descriptor;
+- Movement phase action and model displacement kind are both available to
+  legality checks;
+- capability resolution is deterministic and serializable.
+
+Required tests:
+
+- `FLY` is resolved as a capability, not an action;
+- `INFANTRY`/`BEAST` can receive terrain traversal permissions;
+- `VEHICLE`/`MONSTER` restrictions are capability constraints;
+- 10e Normal Move cannot end in enemy Engagement Range;
+- unsupported/preview policy fails explicitly unless descriptor exists.
+
+### Phase 10H: pathing smoke constraints
+
+This phase adds first pathing-legality smoke checks using model geometry,
+terrain fixtures, and movement capability data.
+
+Modules:
+
+- `geometry/pathing.py`
+- `engine/movement_legality.py`
+- `engine/phases/movement.py`
+
+Objects:
+
+- `PathValidationContext`
+- `PathValidationResult`
+- `PathConstraintViolation`
+
+Invariants:
+
+- battlefield edge crossing can be rejected;
+- enemy model base crossing can be rejected;
+- friendly model pass-through can be allowed;
+- friendly `VEHICLE`/`MONSTER` pass-through can be blocked for relevant movers;
+- end-on-model overlap can be rejected;
+- base gap checks use base footprint geometry;
+- model-volume-at-end checks use resolved model geometry;
+- pivot-cost support is represented, even if not fully solved yet.
+
+Required tests:
+
+- circular infantry base can move through friendly infantry but cannot end
+  overlapping;
+- vehicle cannot pass through friendly vehicle/monster;
+- model cannot cross battlefield edge;
+- model cannot path through enemy base;
+- model cannot end in enemy Engagement Range for 10e Normal Move;
+- non-circular base movement records pivot-cost placeholder.
+
+### Phase 10I: advance roll and reroll decision
+
+This phase implements Advance as a Movement phase action after geometry,
+transition records, and basic legality foundations exist.
 
 Modules:
 
 - `engine/phases/movement.py`
-- `core/dice.py`
-- `engine/decision_request.py`
-- `engine/decision_result.py`
+- `engine/dice.py`
+- `engine/decision_controller.py`
 
-Acceptance sequence:
+Objects:
 
-```text
-SELECT_MOVEMENT_ACTION = ADVANCE
-REQUEST_DICE_ROLL
-SELECT_DICE_REROLL if applicable
-MOVE_UNIT
-```
-
-Implement:
-
-- support `SELECT_MOVEMENT_ACTION = ADVANCE`;
-- request and record the Advance dice roll;
-- emit reroll decisions when a supported reroll source applies;
-- apply Movement plus Advance distance;
-- update model placements through the same witness path as normal movement;
-- record dice, reroll, movement, event, and replay payloads.
+- `AdvanceRollRequest`
+- `AdvanceRollResult`
+- `MovementDiceRecord`
 
 Invariants:
 
-- dice use Phase 1 deterministic roll/replay machinery;
-- rerolls are explicit decisions;
-- Advance movement still requires a path witness or typed invalid result;
-- unsupported reroll sources fail explicitly;
-- no shooting, charge, fight, deployment, reserves, transports, or broad content import is added.
+- `ADVANCE` is a Movement phase action;
+- Advance distance is Movement characteristic plus Advance roll;
+- dice results and reroll decisions are replay-facing;
+- Advance emits displacement records when models move;
+- Advance marks the unit as having advanced;
+- no next unit selection occurs before activation terminal event.
+
+Required tests:
+
+- selecting Advance emits a dice roll request;
+- Advance roll is recorded in replay payloads;
+- reroll decision is offered only when applicable;
+- Advance movement consumes Movement + roll distance;
+- Advance emits displacement records and PathWitness;
+- advanced unit cannot be selected again that Movement phase.
+
+### Phase 10J: fall back action and basic Fall Back constraints
+
+This phase implements Fall Back as a Movement phase action with explicit basic
+constraints. Desperate Escape can remain typed unsupported until implemented.
+
+Modules:
+
+- `engine/phases/movement.py`
+- `engine/movement_legality.py`
+
+Objects:
+
+- `FallBackActionResult`
+- `DesperateEscapeRequirement`
+
+Invariants:
+
+- `FALL_BACK` is a Movement phase action;
+- Fall Back is available only when the unit is eligible;
+- Fall Back movement is recorded as model displacement;
+- Desperate Escape requirements are detected and either resolved or explicitly
+  unsupported;
+- Fall Back marks the unit as having fallen back;
+- no next unit selection occurs before activation terminal event.
+
+Required tests:
+
+- eligible unit can select Fall Back;
+- ineligible unit cannot select Fall Back;
+- Fall Back emits displacement records;
+- Fall Back marks moved/fell-back state;
+- Desperate Escape path returns typed unsupported until implemented.
+
+### Phase 10K: Movement phase Reinforcements step shell
+
+This phase adds the second Movement phase step. It does not implement full
+Strategic Reserves or Deep Strike rules.
+
+Modules:
+
+- `engine/phases/movement.py`
+- `engine/battle_round_flow.py`
+- `engine/battlefield_state.py`
+
+Objects:
+
+- `MovementPhaseStepState`
+- `ReinforcementSelection`
+- `ReserveArrivalCandidate`
+
+Invariants:
+
+- Movement phase has `MOVE_UNITS` then `REINFORCEMENTS`;
+- `REINFORCEMENTS` is a phase step, not a placement kind;
+- Strategic Reserves and Deep Strike are placement kinds that may occur during
+  this step;
+- reserve arrival placements require placement records, not displacement records;
+- no PathWitness is required for reserve placement.
+
+Required tests:
+
+- Movement phase enters Move Units step first;
+- after all movement activations complete, phase enters Reinforcements step;
+- Reinforcements step can emit a reserve-arrival decision;
+- Deep Strike placement uses `BattlefieldPlacementKind.DEEP_STRIKE`;
+- Strategic Reserves placement uses `BattlefieldPlacementKind.STRATEGIC_RESERVES`;
+- Reinforcements itself never appears as a placement kind.
+
+### Phase 10L: transport embark/disembark shell
+
+This phase models transport state transitions without full transport rules.
+
+Modules:
+
+- `engine/transports.py`
+- `engine/phases/movement.py`
+- `engine/battlefield_state.py`
+
+Objects:
+
+- `TransportCargoState`
+- `EmbarkSelection`
+- `DisembarkSelection`
+
+Invariants:
+
+- `EMBARK` is battlefield removal;
+- `DISEMBARK` is battlefield placement;
+- neither Embark nor Disembark is a Movement phase action;
+- embarked units are not placed units;
+- embarked units cannot be selected for Normal Move as placed units;
+- disembarked units are placed on the battlefield with placement records.
+
+Required tests:
+
+- Embark removes placed models from battlefield state;
+- Embark emits removal records with `BattlefieldRemovalKind.EMBARK`;
+- embarked unit is unavailable for Movement unit selection;
+- Disembark places models on battlefield;
+- Disembark emits placement records with `BattlefieldPlacementKind.DISEMBARK`;
+- transport capacity validation is data-driven.
+
+### Phase 10M: triggered movement foundation
+
+This phase models movement-like displacements caused by timing-window rule
+effects outside the standard Move Units action selector.
+
+Modules:
+
+- `engine/triggered_movement.py`
+- `engine/battlefield_state.py`
+- `engine/decision_controller.py`
+
+Objects:
+
+- `TriggeredMovementDescriptor`
+- `TriggeredMovementKind`
+- `TriggeredMovementRequest`
+
+Invariants:
+
+- triggered movement is not a Movement phase action;
+- surge-like movement is a triggered model displacement;
+- triggered movement can occur outside the Movement phase;
+- triggered movement records source timing and source rule;
+- surge movement has its own displacement kind;
+- reactive movement is an umbrella/timing concept, not necessarily identical to
+  every surge rule.
+
+Required tests:
+
+- Blood-Surge-like movement is represented as triggered movement, not Movement
+  phase action;
+- triggered movement can occur during opponent Shooting phase;
+- triggered movement emits displacement records;
+- triggered movement records source rule and trigger timing;
+- triggered movement does not appear in `SELECT_MOVEMENT_ACTION`.
 
 ### Phase 11: shooting phase body vertical slice
 
-This phase fills the shooting phase body behind the Phase 9B lifecycle. It
-consumes datasheet ballistic skill, weapon profiles, ranged keywords, and
-shooting ability descriptors only through structured catalog data.
+This phase fills the shooting phase body behind the authoritative lifecycle. It
+consumes placed units, weapon profiles, ballistic skill, range, line of sight,
+visibility/terrain foundations, and damage allocation state.
 
 Implement:
 

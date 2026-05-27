@@ -10,6 +10,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusteringError,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
 
@@ -46,6 +47,44 @@ class BattlefieldRemovalKind(StrEnum):
     TEMPORARILY_REMOVED = "temporarily_removed"
 
 
+class ModelPlacementRecordPayload(TypedDict):
+    model_instance_id: str
+    placement_kind: str
+    pose: PosePayload
+    source_phase: str | None
+    source_step: str | None
+    source_rule_id: str | None
+    source_event_id: str | None
+
+
+class ModelRemovalRecordPayload(TypedDict):
+    model_instance_id: str
+    removal_kind: str
+    source_phase: str | None
+    source_step: str | None
+    source_rule_id: str | None
+    source_event_id: str | None
+    destination_id: str | None
+
+
+class ModelDisplacementRecordPayload(TypedDict):
+    model_instance_id: str
+    displacement_kind: str
+    start_pose: PosePayload
+    end_pose: PosePayload
+    path_witness: PathWitnessPayload | None
+    source_phase: str | None
+    source_step: str | None
+    source_rule_id: str | None
+    source_event_id: str | None
+
+
+class BattlefieldTransitionBatchPayload(TypedDict):
+    placements: list[ModelPlacementRecordPayload]
+    removals: list[ModelRemovalRecordPayload]
+    displacements: list[ModelDisplacementRecordPayload]
+
+
 class ModelPlacementPayload(TypedDict):
     army_id: str
     player_id: str
@@ -75,6 +114,321 @@ class BattlefieldRuntimeStatePayload(TypedDict):
 class BattlefieldScenarioPayload(TypedDict):
     armies: list[ArmyDefinitionPayload]
     battlefield_state: BattlefieldRuntimeStatePayload
+
+
+@dataclass(frozen=True, slots=True)
+class ModelPlacementRecord:
+    model_instance_id: str
+    placement_kind: BattlefieldPlacementKind
+    pose: Pose
+    source_phase: str | None = None
+    source_step: str | None = None
+    source_rule_id: str | None = None
+    source_event_id: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_unprefixed_identifier(
+                "ModelPlacementRecord model_instance_id",
+                self.model_instance_id,
+                "model:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "placement_kind",
+            battlefield_placement_kind_from_token(self.placement_kind),
+        )
+        if type(self.pose) is not Pose:
+            raise PlacementError("ModelPlacementRecord pose must be a Pose.")
+        object.__setattr__(
+            self,
+            "source_phase",
+            _validate_optional_identifier("ModelPlacementRecord source_phase", self.source_phase),
+        )
+        object.__setattr__(
+            self,
+            "source_step",
+            _validate_optional_identifier("ModelPlacementRecord source_step", self.source_step),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_optional_identifier(
+                "ModelPlacementRecord source_rule_id",
+                self.source_rule_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_event_id",
+            _validate_optional_identifier(
+                "ModelPlacementRecord source_event_id",
+                self.source_event_id,
+            ),
+        )
+
+    def to_payload(self) -> ModelPlacementRecordPayload:
+        return {
+            "model_instance_id": self.model_instance_id,
+            "placement_kind": self.placement_kind.value,
+            "pose": self.pose.to_payload(),
+            "source_phase": self.source_phase,
+            "source_step": self.source_step,
+            "source_rule_id": self.source_rule_id,
+            "source_event_id": self.source_event_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ModelPlacementRecordPayload) -> Self:
+        return cls(
+            model_instance_id=payload["model_instance_id"],
+            placement_kind=battlefield_placement_kind_from_token(payload["placement_kind"]),
+            pose=Pose.from_payload(payload["pose"]),
+            source_phase=payload["source_phase"],
+            source_step=payload["source_step"],
+            source_rule_id=payload["source_rule_id"],
+            source_event_id=payload["source_event_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class ModelRemovalRecord:
+    model_instance_id: str
+    removal_kind: BattlefieldRemovalKind
+    source_phase: str | None = None
+    source_step: str | None = None
+    source_rule_id: str | None = None
+    source_event_id: str | None = None
+    destination_id: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_unprefixed_identifier(
+                "ModelRemovalRecord model_instance_id",
+                self.model_instance_id,
+                "model:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "removal_kind",
+            battlefield_removal_kind_from_token(self.removal_kind),
+        )
+        object.__setattr__(
+            self,
+            "source_phase",
+            _validate_optional_identifier("ModelRemovalRecord source_phase", self.source_phase),
+        )
+        object.__setattr__(
+            self,
+            "source_step",
+            _validate_optional_identifier("ModelRemovalRecord source_step", self.source_step),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_optional_identifier(
+                "ModelRemovalRecord source_rule_id",
+                self.source_rule_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_event_id",
+            _validate_optional_identifier(
+                "ModelRemovalRecord source_event_id",
+                self.source_event_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "destination_id",
+            _validate_optional_identifier("ModelRemovalRecord destination_id", self.destination_id),
+        )
+
+    def to_payload(self) -> ModelRemovalRecordPayload:
+        return {
+            "model_instance_id": self.model_instance_id,
+            "removal_kind": self.removal_kind.value,
+            "source_phase": self.source_phase,
+            "source_step": self.source_step,
+            "source_rule_id": self.source_rule_id,
+            "source_event_id": self.source_event_id,
+            "destination_id": self.destination_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ModelRemovalRecordPayload) -> Self:
+        return cls(
+            model_instance_id=payload["model_instance_id"],
+            removal_kind=battlefield_removal_kind_from_token(payload["removal_kind"]),
+            source_phase=payload["source_phase"],
+            source_step=payload["source_step"],
+            source_rule_id=payload["source_rule_id"],
+            source_event_id=payload["source_event_id"],
+            destination_id=payload["destination_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class ModelDisplacementRecord:
+    model_instance_id: str
+    displacement_kind: ModelDisplacementKind
+    start_pose: Pose
+    end_pose: Pose
+    path_witness: PathWitness | None = None
+    source_phase: str | None = None
+    source_step: str | None = None
+    source_rule_id: str | None = None
+    source_event_id: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_unprefixed_identifier(
+                "ModelDisplacementRecord model_instance_id",
+                self.model_instance_id,
+                "model:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "displacement_kind",
+            model_displacement_kind_from_token(self.displacement_kind),
+        )
+        if type(self.start_pose) is not Pose:
+            raise PlacementError("ModelDisplacementRecord start_pose must be a Pose.")
+        if type(self.end_pose) is not Pose:
+            raise PlacementError("ModelDisplacementRecord end_pose must be a Pose.")
+        if self.start_pose == self.end_pose:
+            raise PlacementError("ModelDisplacementRecord start_pose and end_pose must differ.")
+        if self.path_witness is not None and type(self.path_witness) is not PathWitness:
+            raise PlacementError("ModelDisplacementRecord path_witness must be a PathWitness.")
+        object.__setattr__(
+            self,
+            "source_phase",
+            _validate_optional_identifier(
+                "ModelDisplacementRecord source_phase",
+                self.source_phase,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_step",
+            _validate_optional_identifier("ModelDisplacementRecord source_step", self.source_step),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_optional_identifier(
+                "ModelDisplacementRecord source_rule_id",
+                self.source_rule_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_event_id",
+            _validate_optional_identifier(
+                "ModelDisplacementRecord source_event_id",
+                self.source_event_id,
+            ),
+        )
+
+    def to_payload(self) -> ModelDisplacementRecordPayload:
+        return {
+            "model_instance_id": self.model_instance_id,
+            "displacement_kind": self.displacement_kind.value,
+            "start_pose": self.start_pose.to_payload(),
+            "end_pose": self.end_pose.to_payload(),
+            "path_witness": None if self.path_witness is None else self.path_witness.to_payload(),
+            "source_phase": self.source_phase,
+            "source_step": self.source_step,
+            "source_rule_id": self.source_rule_id,
+            "source_event_id": self.source_event_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ModelDisplacementRecordPayload) -> Self:
+        witness_payload = payload["path_witness"]
+        return cls(
+            model_instance_id=payload["model_instance_id"],
+            displacement_kind=model_displacement_kind_from_token(payload["displacement_kind"]),
+            start_pose=Pose.from_payload(payload["start_pose"]),
+            end_pose=Pose.from_payload(payload["end_pose"]),
+            path_witness=(
+                None if witness_payload is None else PathWitness.from_payload(witness_payload)
+            ),
+            source_phase=payload["source_phase"],
+            source_step=payload["source_step"],
+            source_rule_id=payload["source_rule_id"],
+            source_event_id=payload["source_event_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class BattlefieldTransitionBatch:
+    placements: tuple[ModelPlacementRecord, ...] = ()
+    removals: tuple[ModelRemovalRecord, ...] = ()
+    displacements: tuple[ModelDisplacementRecord, ...] = ()
+
+    def __post_init__(self) -> None:
+        placements = _validate_placement_records(
+            "BattlefieldTransitionBatch placements",
+            self.placements,
+        )
+        removals = _validate_removal_records(
+            "BattlefieldTransitionBatch removals",
+            self.removals,
+        )
+        displacements = _validate_displacement_records(
+            "BattlefieldTransitionBatch displacements",
+            self.displacements,
+        )
+        placement_ids = {record.model_instance_id for record in placements}
+        removal_ids = {record.model_instance_id for record in removals}
+        displacement_ids = {record.model_instance_id for record in displacements}
+        if placement_ids & removal_ids:
+            raise PlacementError(
+                "BattlefieldTransitionBatch models must not be both placed and removed."
+            )
+        if placement_ids & displacement_ids:
+            raise PlacementError(
+                "BattlefieldTransitionBatch models must not be both placed and displaced."
+            )
+        if removal_ids & displacement_ids:
+            raise PlacementError(
+                "BattlefieldTransitionBatch models must not be both removed and displaced."
+            )
+        object.__setattr__(self, "placements", placements)
+        object.__setattr__(self, "removals", removals)
+        object.__setattr__(self, "displacements", displacements)
+
+    def to_payload(self) -> BattlefieldTransitionBatchPayload:
+        return {
+            "placements": [record.to_payload() for record in self.placements],
+            "removals": [record.to_payload() for record in self.removals],
+            "displacements": [record.to_payload() for record in self.displacements],
+        }
+
+    @classmethod
+    def from_payload(cls, payload: BattlefieldTransitionBatchPayload) -> Self:
+        return cls(
+            placements=tuple(
+                ModelPlacementRecord.from_payload(record) for record in payload["placements"]
+            ),
+            removals=tuple(
+                ModelRemovalRecord.from_payload(record) for record in payload["removals"]
+            ),
+            displacements=tuple(
+                ModelDisplacementRecord.from_payload(record) for record in payload["displacements"]
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -458,6 +812,39 @@ class BattlefieldScenario:
         )
 
 
+def battlefield_placement_kind_from_token(token: object) -> BattlefieldPlacementKind:
+    if type(token) is BattlefieldPlacementKind:
+        return token
+    if type(token) is not str:
+        raise PlacementError("BattlefieldPlacementKind token must be a string.")
+    try:
+        return BattlefieldPlacementKind(token)
+    except ValueError as exc:
+        raise PlacementError(f"Unsupported BattlefieldPlacementKind token: {token}.") from exc
+
+
+def battlefield_removal_kind_from_token(token: object) -> BattlefieldRemovalKind:
+    if type(token) is BattlefieldRemovalKind:
+        return token
+    if type(token) is not str:
+        raise PlacementError("BattlefieldRemovalKind token must be a string.")
+    try:
+        return BattlefieldRemovalKind(token)
+    except ValueError as exc:
+        raise PlacementError(f"Unsupported BattlefieldRemovalKind token: {token}.") from exc
+
+
+def model_displacement_kind_from_token(token: object) -> ModelDisplacementKind:
+    if type(token) is ModelDisplacementKind:
+        return token
+    if type(token) is not str:
+        raise PlacementError("ModelDisplacementKind token must be a string.")
+    try:
+        return ModelDisplacementKind(token)
+    except ValueError as exc:
+        raise PlacementError(f"Unsupported ModelDisplacementKind token: {token}.") from exc
+
+
 def _validate_battlefield_state_references_armies(
     *,
     battlefield_state: BattlefieldRuntimeState,
@@ -495,6 +882,62 @@ def _army_definition_from_payload(payload: ArmyDefinitionPayload) -> ArmyDefinit
         return ArmyDefinition.from_payload(payload)
     except ArmyMusteringError as exc:
         raise PlacementError("BattlefieldScenario army payload is invalid.") from exc
+
+
+def _validate_placement_records(
+    field_name: str,
+    values: object,
+) -> tuple[ModelPlacementRecord, ...]:
+    if type(values) is not tuple:
+        raise PlacementError(f"{field_name} must be a tuple.")
+    records: list[ModelPlacementRecord] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ModelPlacementRecord:
+            raise PlacementError(f"{field_name} must contain ModelPlacementRecord values.")
+        if value.model_instance_id in seen:
+            raise PlacementError("ModelPlacementRecord model_instance_id must not be duplicated.")
+        seen.add(value.model_instance_id)
+        records.append(value)
+    return tuple(records)
+
+
+def _validate_removal_records(
+    field_name: str,
+    values: object,
+) -> tuple[ModelRemovalRecord, ...]:
+    if type(values) is not tuple:
+        raise PlacementError(f"{field_name} must be a tuple.")
+    records: list[ModelRemovalRecord] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ModelRemovalRecord:
+            raise PlacementError(f"{field_name} must contain ModelRemovalRecord values.")
+        if value.model_instance_id in seen:
+            raise PlacementError("ModelRemovalRecord model_instance_id must not be duplicated.")
+        seen.add(value.model_instance_id)
+        records.append(value)
+    return tuple(records)
+
+
+def _validate_displacement_records(
+    field_name: str,
+    values: object,
+) -> tuple[ModelDisplacementRecord, ...]:
+    if type(values) is not tuple:
+        raise PlacementError(f"{field_name} must be a tuple.")
+    records: list[ModelDisplacementRecord] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ModelDisplacementRecord:
+            raise PlacementError(f"{field_name} must contain ModelDisplacementRecord values.")
+        if value.model_instance_id in seen:
+            raise PlacementError(
+                "ModelDisplacementRecord model_instance_id must not be duplicated."
+            )
+        seen.add(value.model_instance_id)
+        records.append(value)
+    return tuple(records)
 
 
 def _validate_model_placements(
@@ -621,3 +1064,9 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise PlacementError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)

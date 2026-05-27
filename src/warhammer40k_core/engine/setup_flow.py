@@ -3,6 +3,11 @@ from __future__ import annotations
 from itertools import combinations
 
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError, muster_army
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    BattlefieldTransitionBatch,
+    ModelPlacementRecord,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -182,6 +187,22 @@ class SetupFlow:
             armies=tuple(state.army_definitions),
         )
         state.record_battlefield_state(scenario.battlefield_state)
+        transition_batch = BattlefieldTransitionBatch(
+            placements=tuple(
+                ModelPlacementRecord(
+                    model_instance_id=model_placement.model_instance_id,
+                    placement_kind=BattlefieldPlacementKind.DEPLOYMENT,
+                    pose=model_placement.pose,
+                    source_phase=None,
+                    source_step=SetupStep.DEPLOY_ARMIES.value,
+                    source_rule_id="phase10a_deterministic_bridge",
+                    source_event_id=None,
+                )
+                for placed_army in scenario.battlefield_state.placed_armies
+                for unit_placement in placed_army.unit_placements
+                for model_placement in unit_placement.model_placements
+            )
+        )
         decisions.event_log.append(
             "battlefield_placement_created",
             {
@@ -191,6 +212,17 @@ class SetupFlow:
                 "placed_army_count": len(scenario.battlefield_state.placed_armies),
                 "placed_model_count": len(scenario.battlefield_state.placed_model_ids()),
                 "placement_source": "phase10a_deterministic_bridge",
+            },
+        )
+        decisions.event_log.append(
+            "battlefield_models_placed",
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.DEPLOY_ARMIES.value,
+                "battlefield_id": scenario.battlefield_state.battlefield_id,
+                "placement_kind": BattlefieldPlacementKind.DEPLOYMENT.value,
+                "placed_model_count": len(scenario.battlefield_state.placed_model_ids()),
+                "transition_batch": transition_batch.to_payload(),
             },
         )
 
