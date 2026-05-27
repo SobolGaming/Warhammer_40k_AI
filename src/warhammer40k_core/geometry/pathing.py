@@ -15,6 +15,7 @@ from warhammer40k_core.geometry.spatial_index import SpatialIndex, SpatialIndexP
 from warhammer40k_core.geometry.volume import Model
 
 type ModelPath = tuple[str, tuple[Pose, ...]]
+type ModelPathEndpoint = tuple[str, Pose, Pose]
 
 
 class PathFailureReason(StrEnum):
@@ -88,6 +89,22 @@ class PathWitness:
     @classmethod
     def for_paths(cls, model_paths: tuple[ModelPath, ...]) -> Self:
         return cls(model_paths=model_paths)
+
+    @classmethod
+    def for_straight_line_endpoints(cls, endpoints: tuple[ModelPathEndpoint, ...]) -> Self:
+        if type(endpoints) is not tuple:
+            raise GeometryError("PathWitness straight-line endpoints must be a tuple.")
+        if not endpoints:
+            raise GeometryError("PathWitness straight-line endpoints must not be empty.")
+        return cls(
+            model_paths=tuple(
+                (
+                    _validate_identifier("PathWitness endpoint model_id", model_id),
+                    _straight_line_pose_path(start_pose=start_pose, end_pose=end_pose),
+                )
+                for model_id, start_pose, end_pose in endpoints
+            )
+        )
 
     def model_ids(self) -> tuple[str, ...]:
         return tuple(model_id for model_id, _poses in self.model_paths)
@@ -464,6 +481,20 @@ def _validate_unique_model_path_ids(paths: tuple[ModelPath, ...]) -> None:
         if model_id in seen:
             raise GeometryError("PathWitness model_paths must not contain duplicate model IDs.")
         seen.add(model_id)
+
+
+def _straight_line_pose_path(*, start_pose: Pose, end_pose: Pose) -> tuple[Pose, Pose, Pose]:
+    start = validate_pose("PathWitness start_pose", start_pose)
+    end = validate_pose("PathWitness end_pose", end_pose)
+    if start == end:
+        raise GeometryError("PathWitness straight-line endpoints must not match.")
+    midpoint = Pose.at(
+        x=(start.position.x + end.position.x) / 2.0,
+        y=(start.position.y + end.position.y) / 2.0,
+        z=(start.position.z + end.position.z) / 2.0,
+        facing_degrees=(start.facing.degrees + end.facing.degrees) / 2.0,
+    )
+    return (start, midpoint, end)
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

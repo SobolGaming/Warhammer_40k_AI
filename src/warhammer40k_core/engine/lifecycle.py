@@ -34,6 +34,7 @@ from warhammer40k_core.engine.phases.command import (
     CommandPhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseHandler,
 )
@@ -47,6 +48,12 @@ class GameLifecyclePayload(TypedDict):
 
 
 MAX_LIFECYCLE_TRANSITIONS = 128
+_MOVEMENT_DECISION_TYPES = frozenset(
+    (
+        SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    )
+)
 
 
 def _new_decision_controller() -> DecisionController:
@@ -151,12 +158,14 @@ class GameLifecycle:
                 decisions=self.decision_controller,
             )
             return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE:
-            self._movement_phase_handler.apply_decision(
+        if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
+            movement_status = self._movement_phase_handler.apply_decision(
                 state=state,
                 result=result,
                 decisions=self.decision_controller,
             )
+            if movement_status is not None:
+                return movement_status
             return self.advance_until_decision_or_terminal()
         raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
 
@@ -310,7 +319,7 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         placement.unit_instance_id for placement in placed_army.unit_placements
     }
-    for unit_id in movement_state.selected_unit_ids:
+    for unit_id in (*movement_state.selected_unit_ids, *movement_state.moved_unit_ids):
         if unit_id not in active_player_unit_ids:
             raise GameLifecycleError(
                 "movement_phase_state selected unit is not active player's unit."

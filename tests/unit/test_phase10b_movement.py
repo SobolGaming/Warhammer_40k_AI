@@ -9,7 +9,12 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    BattlefieldRemovalKind,
+    BattlefieldScenario,
+    ModelDisplacementKind,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -33,9 +38,12 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
+    MovementPhaseStepKind,
     MovementUnitSelection,
     MovementUnitSelectionPayload,
 )
@@ -87,20 +95,24 @@ def test_movement_unit_selection_records_activation_state_and_replay_payloads() 
         result_id="phase10b-result-000003",
     )
 
-    assert follow_up.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert follow_up.payload == {
-        "phase": BattlePhase.MOVEMENT.value,
-        "phase_body_status": "movement_action_not_implemented",
+    assert follow_up.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    action_request = _decision_request(follow_up)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert action_request.actor_id == "player-a"
+    assert action_request.payload == {
+        "game_id": "phase10b-game",
         "battle_round": 1,
+        "phase": BattlePhase.MOVEMENT.value,
         "active_player_id": "player-a",
         "unit_instance_id": "army-alpha:intercessor-unit-1",
     }
     assert lifecycle.state is not None
     assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
-    assert lifecycle.decision_controller.queue.pending_requests == ()
+    assert lifecycle.decision_controller.queue.pending_requests == (action_request,)
     movement_state = lifecycle.state.movement_phase_state
     assert movement_state is not None
     assert movement_state.selected_unit_ids == ("army-alpha:intercessor-unit-1",)
+    assert movement_state.moved_unit_ids == ()
     assert movement_state.active_selection == MovementUnitSelection(
         player_id="player-a",
         battle_round=1,
@@ -126,12 +138,58 @@ def test_movement_unit_selection_records_activation_state_and_replay_payloads() 
             "phase_body_status": "unit_selected",
         }
     ]
-    assert "select_movement_action" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+    assert _event_index(lifecycle, "movement_unit_selected") < _event_index(
+        lifecycle,
+        "decision_requested",
+        decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        start_after="movement_unit_selected",
+    )
     payload = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+
+def test_select_movement_action_options_are_standard_phase_actions_only() -> None:
+    _lifecycle, action_request = _advance_to_movement_action_request()
+
+    expected_option_ids = (
+        MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        MovementPhaseActionKind.NORMAL_MOVE.value,
+        MovementPhaseActionKind.ADVANCE.value,
+        MovementPhaseActionKind.FALL_BACK.value,
+    )
+    assert {option.option_id for option in action_request.options} == set(expected_option_ids)
+    assert tuple(option.option_id for option in action_request.options) == tuple(
+        sorted(expected_option_ids)
+    )
+    assert "fly" not in {option.option_id for option in action_request.options}
+    assert "embark" not in {option.option_id for option in action_request.options}
+    assert "disembark" not in {option.option_id for option in action_request.options}
+    assert "embark_disembark" not in {option.option_id for option in action_request.options}
+    assert "terrain_traversal" not in {option.option_id for option in action_request.options}
+    assert "engagement_constrained_move" not in {
+        option.option_id for option in action_request.options
+    }
+    for option in action_request.options:
+        assert isinstance(option.payload, dict)
+        assert "action" not in option.payload
+        assert option.payload["movement_phase_action"] == option.option_id
+
+
+def test_movement_taxonomy_keeps_steps_placements_and_displacements_separate() -> None:
+    placement_values = {kind.value for kind in BattlefieldPlacementKind}
+    displacement_values = {kind.value for kind in ModelDisplacementKind}
+    removal_values = {kind.value for kind in BattlefieldRemovalKind}
+
+    assert MovementPhaseStepKind.REINFORCEMENTS.value not in placement_values
+    assert BattlefieldPlacementKind.REDEPLOY.value == "redeploy"
+    assert BattlefieldPlacementKind.REDEPLOY.value not in displacement_values
+    assert BattlefieldRemovalKind.EMBARK.value == "embark"
+    assert BattlefieldPlacementKind.DISEMBARK.value == "disembark"
+    assert BattlefieldRemovalKind.EMBARK.value not in placement_values
+    assert BattlefieldPlacementKind.DISEMBARK.value not in removal_values
 
 
 def test_selected_units_are_excluded_from_legal_movement_unit_set() -> None:
@@ -201,6 +259,21 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
             battle_round=1,
             active_player_id="player-a",
             selected_unit_ids=("other-unit",),
+            active_selection=selection,
+        )
+    with pytest.raises(GameLifecycleError, match="moved_unit_ids must be in selected_unit_ids"):
+        MovementPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-unit-1",),
+            moved_unit_ids=("other-unit",),
+        )
+    with pytest.raises(GameLifecycleError, match="active_selection must not already be moved"):
+        MovementPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-unit-1",),
+            moved_unit_ids=("army-alpha:intercessor-unit-1",),
             active_selection=selection,
         )
 
@@ -330,6 +403,192 @@ def test_lifecycle_from_payload_rejects_active_selection_for_wrong_or_missing_un
         GameLifecycle.from_payload(payload)
 
 
+def test_remain_stationary_marks_unit_complete_without_changing_poses() -> None:
+    lifecycle, action_request = _advance_to_movement_action_request()
+    assert lifecycle.state is not None
+    battlefield_state = lifecycle.state.battlefield_state
+    assert battlefield_state is not None
+    before_payload = battlefield_state.to_payload()
+
+    follow_up = _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        result_id="phase10c-result-000004",
+    )
+
+    assert follow_up.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    next_request = _decision_request(follow_up)
+    assert next_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert tuple(option.option_id for option in next_request.options) == (
+        "army-alpha:intercessor-unit-2",
+    )
+    assert lifecycle.state.battlefield_state is not None
+    assert lifecycle.state.battlefield_state.to_payload() == before_payload
+    movement_state = lifecycle.state.movement_phase_state
+    assert movement_state is not None
+    assert movement_state.selected_unit_ids == ("army-alpha:intercessor-unit-1",)
+    assert movement_state.moved_unit_ids == ("army-alpha:intercessor-unit-1",)
+    assert movement_state.active_selection is None
+    terminal_event = _last_event_payload(lifecycle, "movement_activation_completed")
+    assert "action" not in terminal_event
+    assert "displacement_kind" not in terminal_event
+    assert terminal_event["movement_phase_action"] == (
+        MovementPhaseActionKind.REMAIN_STATIONARY.value
+    )
+    assert terminal_event["witness"] is None
+    assert terminal_event["model_movements"] == []
+    assert _event_index(lifecycle, "movement_activation_completed") < _event_index(
+        lifecycle,
+        "decision_requested",
+        decision_type=SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        start_after="movement_activation_completed",
+    )
+
+
+def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placement() -> None:
+    lifecycle, action_request = _advance_to_movement_action_request()
+    assert lifecycle.state is not None
+    scenario = _scenario_from_state(lifecycle.state)
+    before_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    before_poses = {
+        placement.model_instance_id: placement.pose
+        for placement in before_placement.model_placements
+    }
+    normal_option = action_request.option_by_id(MovementPhaseActionKind.NORMAL_MOVE.value)
+    assert isinstance(normal_option.payload, dict)
+    normal_payload = cast(dict[str, object], normal_option.payload)
+    assert "action" not in normal_payload
+    assert normal_payload["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
+    assert normal_payload["displacement_kind"] == ModelDisplacementKind.NORMAL_MOVE.value
+    assert normal_payload["movement_inches"] == 6
+    assert normal_payload["witness"] is not None
+    model_movements_raw = normal_payload["model_movements"]
+    assert isinstance(model_movements_raw, list)
+    model_movements = cast(list[object], model_movements_raw)
+    for model_movement_raw in model_movements:
+        assert isinstance(model_movement_raw, dict)
+        model_movement = cast(dict[str, object], model_movement_raw)
+        base_size = model_movement["base_size"]
+        assert isinstance(base_size, dict)
+        assert base_size["diameter_mm"] == 32.0
+
+    follow_up = _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        result_id="phase10c-result-000004",
+    )
+
+    assert follow_up.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.state.battlefield_state is not None
+    after_scenario = _scenario_from_state(lifecycle.state)
+    after_placement = after_scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    for placement in after_placement.model_placements:
+        start = before_poses[placement.model_instance_id]
+        assert placement.pose.position.x == start.position.x + 6
+        assert placement.pose.position.y == start.position.y
+        assert placement.pose.position.z == start.position.z
+        assert placement.pose.facing == start.facing
+
+    terminal_event = _last_event_payload(lifecycle, "movement_activation_completed")
+    assert "action" not in terminal_event
+    assert terminal_event["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
+    assert terminal_event["displacement_kind"] == ModelDisplacementKind.NORMAL_MOVE.value
+    assert terminal_event["movement_inches"] == 6
+    witness = terminal_event["witness"]
+    assert isinstance(witness, dict)
+    witness_payload = cast(dict[str, object], witness)
+    model_paths_raw = witness_payload["model_paths"]
+    assert isinstance(model_paths_raw, list)
+    model_paths = cast(list[object], model_paths_raw)
+    assert len(model_paths) == 5
+    for model_path_raw in model_paths:
+        assert isinstance(model_path_raw, dict)
+        model_path = cast(dict[str, object], model_path_raw)
+        poses_raw = model_path["poses"]
+        assert isinstance(poses_raw, list)
+        poses = cast(list[object], poses_raw)
+        assert len(poses) == 3
+        final_pose = poses[-1]
+        model_id = model_path["model_id"]
+        assert type(model_id) is str
+        assert (
+            final_pose
+            == after_scenario.battlefield_state.model_placement_by_id(model_id).pose.to_payload()
+        )
+    assert GameLifecycle.from_payload(_payload_copy(lifecycle)).to_payload() == (
+        lifecycle.to_payload()
+    )
+
+
+def test_next_movement_unit_is_queued_only_after_activation_terminal_event() -> None:
+    lifecycle, action_request = _advance_to_movement_action_request()
+
+    _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        result_id="phase10c-result-000004",
+    )
+
+    terminal_index = _event_index(lifecycle, "movement_activation_completed")
+    next_unit_request_index = _event_index(
+        lifecycle,
+        "decision_requested",
+        decision_type=SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        start_after="movement_activation_completed",
+    )
+    assert terminal_index < next_unit_request_index
+
+
+@pytest.mark.parametrize(
+    "action",
+    [
+        MovementPhaseActionKind.ADVANCE,
+        MovementPhaseActionKind.FALL_BACK,
+    ],
+)
+def test_unsupported_movement_modes_return_typed_unsupported_status(
+    action: MovementPhaseActionKind,
+) -> None:
+    lifecycle, action_request = _advance_to_movement_action_request()
+    assert lifecycle.state is not None
+    battlefield_state = lifecycle.state.battlefield_state
+    assert battlefield_state is not None
+    before_payload = battlefield_state.to_payload()
+
+    status = _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=action.value,
+        result_id="phase10c-result-000004",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert status.payload == {
+        "phase": BattlePhase.MOVEMENT.value,
+        "phase_body_status": "movement_action_unsupported",
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "unit_instance_id": "army-alpha:intercessor-unit-1",
+        "movement_phase_action": action.value,
+    }
+    assert lifecycle.state.battlefield_state is not None
+    assert lifecycle.state.battlefield_state.to_payload() == before_payload
+    movement_state = lifecycle.state.movement_phase_state
+    assert movement_state is not None
+    assert movement_state.moved_unit_ids == ()
+    assert movement_state.active_selection is not None
+    unsupported_payload = _last_event_payload(lifecycle, "movement_action_unsupported")
+    assert "action" not in unsupported_payload
+    assert unsupported_payload["movement_phase_action"] == action.value
+
+
 def _advance_to_movement_unit_selection(
     config: GameConfig,
 ) -> tuple[GameLifecycle, LifecycleStatus]:
@@ -365,6 +624,20 @@ def _lifecycle_after_movement_unit_selection() -> GameLifecycle:
     return lifecycle
 
 
+def _advance_to_movement_action_request() -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle, status = _advance_to_movement_unit_selection(_config())
+    request = _decision_request(status)
+    action_status = _submit_result(
+        lifecycle,
+        request=request,
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10b-result-000003",
+    )
+    action_request = _decision_request(action_status)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    return lifecycle, action_request
+
+
 def _payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
     return cast(
         GameLifecyclePayload,
@@ -392,6 +665,35 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, object]:
+    for event in reversed(lifecycle.decision_controller.event_log.records):
+        if event.event_type == event_type:
+            assert isinstance(event.payload, dict)
+            return cast(dict[str, object], event.payload)
+    raise AssertionError(f"Missing event type: {event_type}")
+
+
+def _event_index(
+    lifecycle: GameLifecycle,
+    event_type: str,
+    *,
+    decision_type: str | None = None,
+    start_after: str | None = None,
+) -> int:
+    records = lifecycle.decision_controller.event_log.records
+    start_index = 0
+    if start_after is not None:
+        start_index = _event_index(lifecycle, start_after) + 1
+    for index, event in enumerate(records[start_index:], start=start_index):
+        if event.event_type != event_type:
+            continue
+        if decision_type is None:
+            return index
+        if isinstance(event.payload, dict) and event.payload.get("decision_type") == decision_type:
+            return index
+    raise AssertionError(f"Missing event type: {event_type}")
 
 
 def _config() -> GameConfig:

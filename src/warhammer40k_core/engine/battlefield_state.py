@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.engine.army_mustering import (
@@ -14,6 +15,35 @@ from warhammer40k_core.geometry.pose import Pose, PosePayload
 
 class PlacementError(ValueError):
     """Raised when battlefield placement violates CORE V2 invariants."""
+
+
+class ModelDisplacementKind(StrEnum):
+    NORMAL_MOVE = "normal_move"
+    ADVANCE = "advance"
+    FALL_BACK = "fall_back"
+    CHARGE_MOVE = "charge_move"
+    PILE_IN = "pile_in"
+    CONSOLIDATE = "consolidate"
+    SURGE_MOVE = "surge_move"
+    TRIGGERED_MOVE = "triggered_move"
+    SCOUT_MOVE = "scout_move"
+
+
+class BattlefieldPlacementKind(StrEnum):
+    DEPLOYMENT = "deployment"
+    REDEPLOY = "redeploy"
+    STRATEGIC_RESERVES = "strategic_reserves"
+    DEEP_STRIKE = "deep_strike"
+    DISEMBARK = "disembark"
+    RETURN_TO_BATTLEFIELD = "return_to_battlefield"
+    SPLIT_UNIT = "split_unit"
+
+
+class BattlefieldRemovalKind(StrEnum):
+    DESTROYED = "destroyed"
+    EMBARK = "embark"
+    INTO_RESERVES = "into_reserves"
+    TEMPORARILY_REMOVED = "temporarily_removed"
 
 
 class ModelPlacementPayload(TypedDict):
@@ -102,6 +132,15 @@ class ModelPlacement:
             "pose": self.pose.to_payload(),
         }
 
+    def with_pose(self, pose: Pose) -> Self:
+        return type(self)(
+            army_id=self.army_id,
+            player_id=self.player_id,
+            unit_instance_id=self.unit_instance_id,
+            model_instance_id=self.model_instance_id,
+            pose=pose,
+        )
+
     @classmethod
     def from_payload(cls, payload: ModelPlacementPayload) -> Self:
         return cls(
@@ -162,6 +201,14 @@ class UnitPlacement:
             "unit_instance_id": self.unit_instance_id,
             "model_placements": [placement.to_payload() for placement in self.model_placements],
         }
+
+    def with_model_placements(self, model_placements: tuple[ModelPlacement, ...]) -> Self:
+        return type(self)(
+            army_id=self.army_id,
+            player_id=self.player_id,
+            unit_instance_id=self.unit_instance_id,
+            model_placements=model_placements,
+        )
 
     @classmethod
     def from_payload(cls, payload: UnitPlacementPayload) -> Self:
@@ -289,6 +336,36 @@ class BattlefieldRuntimeState:
                     if model_placement.model_instance_id == requested_model_id:
                         return model_placement
         raise PlacementError("BattlefieldRuntimeState model_instance_id is not placed.")
+
+    def with_unit_placement(self, updated_unit_placement: UnitPlacement) -> Self:
+        if type(updated_unit_placement) is not UnitPlacement:
+            raise PlacementError("updated_unit_placement must be a UnitPlacement.")
+        placed_armies: list[PlacedArmy] = []
+        did_update = False
+        for placed_army in self.placed_armies:
+            if placed_army.army_id != updated_unit_placement.army_id:
+                placed_armies.append(placed_army)
+                continue
+            unit_placements: list[UnitPlacement] = []
+            for unit_placement in placed_army.unit_placements:
+                if unit_placement.unit_instance_id == updated_unit_placement.unit_instance_id:
+                    unit_placements.append(updated_unit_placement)
+                    did_update = True
+                else:
+                    unit_placements.append(unit_placement)
+            placed_armies.append(
+                PlacedArmy(
+                    army_id=placed_army.army_id,
+                    player_id=placed_army.player_id,
+                    unit_placements=tuple(unit_placements),
+                )
+            )
+        if not did_update:
+            raise PlacementError("BattlefieldRuntimeState updated unit is not placed.")
+        return type(self)(
+            battlefield_id=self.battlefield_id,
+            placed_armies=tuple(placed_armies),
+        )
 
     def to_payload(self) -> BattlefieldRuntimeStatePayload:
         return {
