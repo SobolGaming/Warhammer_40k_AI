@@ -663,6 +663,7 @@ Invariants:
 - one engine-owned setup-to-battle state machine;
 - setup sequence comes from `RulesetDescriptor.setup_sequence`, not duplicated driver code;
 - battle phase order comes from `RulesetDescriptor.battle_phase_sequence`;
+- `RulesetDescriptor.descriptor_hash` is recorded in lifecycle state and replay-facing payloads;
 - phase wrap switches the active player;
 - battle round increments only after every player has completed the fight phase;
 - lifecycle advances only through engine commands and decision results;
@@ -674,11 +675,17 @@ Required tests:
 
 - new game starts at `MUSTER_ARMIES`;
 - setup steps advance in order;
+- lifecycle reads setup order from `RulesetDescriptor.setup_sequence`, not local constants;
+- lifecycle reads battle phase order from `RulesetDescriptor.battle_phase_sequence`, not local constants;
 - setup completion enters battle round 1 command phase;
 - battle phases advance command, movement, shooting, charge, fight;
 - phase wrap switches the active player;
 - battle round increments after all players complete fight phase;
 - lifecycle stops at a `DecisionRequest`;
+- `SELECT_SECONDARY_MISSIONS` emits secret decision requests for both players;
+- Fixed and Tactical secondary choices serialize without leaking hidden opponent choices;
+- Tactical secondary draws occur in Command phase, not setup;
+- descriptor hash is recorded in lifecycle state and replay-facing payloads;
 - no UI or headless-specific phase path exists.
 
 ### Phase 9C: army mustering and runtime instantiation
