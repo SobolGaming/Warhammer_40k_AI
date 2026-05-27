@@ -205,6 +205,113 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
         )
 
 
+def test_lifecycle_from_payload_rejects_battlefield_state_missing_unit_reference() -> None:
+    lifecycle, _status = _advance_to_movement_unit_selection(_config())
+    payload = _payload_copy(lifecycle)
+    battlefield_state = payload["state"]["battlefield_state"]
+    assert battlefield_state is not None
+    first_unit = battlefield_state["placed_armies"][0]["unit_placements"][0]
+    first_unit["unit_instance_id"] = "army-alpha:missing-unit"
+    for index, model_placement in enumerate(first_unit["model_placements"]):
+        model_placement["unit_instance_id"] = "army-alpha:missing-unit"
+        model_placement["model_instance_id"] = f"army-alpha:missing-unit:model-{index + 1}"
+
+    with pytest.raises(GameLifecycleError, match="battlefield_state"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_lifecycle_from_payload_rejects_battlefield_state_with_unplaced_model() -> None:
+    lifecycle, _status = _advance_to_movement_unit_selection(_config())
+    payload = _payload_copy(lifecycle)
+    battlefield_state = payload["state"]["battlefield_state"]
+    assert battlefield_state is not None
+    battlefield_state["placed_armies"][0]["unit_placements"][0]["model_placements"].pop()
+
+    with pytest.raises(GameLifecycleError, match="battlefield_state"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_lifecycle_from_payload_rejects_missing_battlefield_state_after_deploy() -> None:
+    lifecycle, _status = _advance_to_movement_unit_selection(_config())
+    payload = _payload_copy(lifecycle)
+    payload["state"]["battlefield_state"] = None
+
+    with pytest.raises(GameLifecycleError, match="missing battlefield_state"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_lifecycle_from_payload_rejects_movement_phase_state_outside_movement() -> None:
+    lifecycle = _lifecycle_after_movement_unit_selection()
+    payload = _payload_copy(lifecycle)
+    payload["state"]["battle_phase_index"] = 0
+
+    with pytest.raises(GameLifecycleError, match="MOVEMENT phase"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_lifecycle_from_payload_rejects_movement_phase_state_active_player_drift() -> None:
+    lifecycle = _lifecycle_after_movement_unit_selection()
+    payload = _payload_copy(lifecycle)
+    movement_state = payload["state"]["movement_phase_state"]
+    assert movement_state is not None
+    movement_state["active_player_id"] = "player-b"
+    active_selection = movement_state["active_selection"]
+    assert active_selection is not None
+    active_selection["player_id"] = "player-b"
+
+    with pytest.raises(GameLifecycleError, match="active player drift"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_lifecycle_from_payload_rejects_movement_phase_state_battle_round_drift() -> None:
+    lifecycle = _lifecycle_after_movement_unit_selection()
+    payload = _payload_copy(lifecycle)
+    movement_state = payload["state"]["movement_phase_state"]
+    assert movement_state is not None
+    movement_state["battle_round"] = 2
+    active_selection = movement_state["active_selection"]
+    assert active_selection is not None
+    active_selection["battle_round"] = 2
+
+    with pytest.raises(GameLifecycleError, match="battle round drift"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_lifecycle_from_payload_rejects_selected_unit_ids_for_opponent_unit() -> None:
+    lifecycle = _lifecycle_after_movement_unit_selection()
+    payload = _payload_copy(lifecycle)
+    movement_state = payload["state"]["movement_phase_state"]
+    assert movement_state is not None
+    movement_state["selected_unit_ids"] = ["army-beta:intercessor-unit-3"]
+    movement_state["active_selection"] = None
+
+    with pytest.raises(GameLifecycleError, match="selected unit"):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "unit_instance_id",
+    [
+        "army-beta:intercessor-unit-3",
+        "army-alpha:missing-unit",
+    ],
+)
+def test_lifecycle_from_payload_rejects_active_selection_for_wrong_or_missing_unit(
+    unit_instance_id: str,
+) -> None:
+    lifecycle = _lifecycle_after_movement_unit_selection()
+    payload = _payload_copy(lifecycle)
+    movement_state = payload["state"]["movement_phase_state"]
+    assert movement_state is not None
+    movement_state["selected_unit_ids"] = [unit_instance_id]
+    active_selection = movement_state["active_selection"]
+    assert active_selection is not None
+    active_selection["unit_instance_id"] = unit_instance_id
+
+    with pytest.raises(GameLifecycleError, match="active player's unit"):
+        GameLifecycle.from_payload(payload)
+
+
 def _advance_to_movement_unit_selection(
     config: GameConfig,
 ) -> tuple[GameLifecycle, LifecycleStatus]:
@@ -226,6 +333,25 @@ def _advance_to_movement_unit_selection(
         result_id="phase10b-result-000002",
     )
     return lifecycle, movement_status
+
+
+def _lifecycle_after_movement_unit_selection() -> GameLifecycle:
+    lifecycle, status = _advance_to_movement_unit_selection(_config())
+    request = _decision_request(status)
+    _submit_result(
+        lifecycle,
+        request=request,
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10b-result-000003",
+    )
+    return lifecycle
+
+
+def _payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
+    return cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
 
 
 def _submit_result(

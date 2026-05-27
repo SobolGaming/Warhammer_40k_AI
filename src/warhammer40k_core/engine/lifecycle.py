@@ -6,6 +6,7 @@ from typing import Self, TypedDict
 
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
     DecisionControllerPayload,
@@ -211,6 +212,8 @@ class GameLifecycle:
 
 
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
+    _validate_battlefield_state_consistency(state=state)
+    _validate_movement_phase_state_consistency(state=state)
     if config is None:
         return
     if state.game_id != config.game_id:
@@ -258,6 +261,67 @@ def _validate_mustered_army_consistency(*, state: GameState, config: GameConfig)
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")
 
 
+def _validate_battlefield_state_consistency(*, state: GameState) -> None:
+    if state.battlefield_state is None:
+        if _state_requires_battlefield_state(state):
+            raise GameLifecycleError("Lifecycle state is missing battlefield_state.")
+        return
+    try:
+        scenario = BattlefieldScenario(
+            armies=tuple(state.army_definitions),
+            battlefield_state=state.battlefield_state,
+        )
+        if _state_requires_battlefield_state(state):
+            scenario.assert_all_mustered_models_placed()
+    except PlacementError as exc:
+        raise GameLifecycleError("Lifecycle state battlefield_state is invalid.") from exc
+
+
+def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
+    movement_state = state.movement_phase_state
+    if movement_state is None:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("movement_phase_state requires battle stage.")
+    if state.current_battle_phase is not BattlePhase.MOVEMENT:
+        raise GameLifecycleError("movement_phase_state requires MOVEMENT phase.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("movement_phase_state requires active player.")
+    if movement_state.active_player_id != state.active_player_id:
+        raise GameLifecycleError("movement_phase_state active player drift.")
+    if movement_state.battle_round != state.battle_round:
+        raise GameLifecycleError("movement_phase_state battle round drift.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("movement_phase_state requires battlefield_state.")
+    try:
+        scenario = BattlefieldScenario(
+            armies=tuple(state.army_definitions),
+            battlefield_state=state.battlefield_state,
+        )
+        scenario.assert_all_mustered_models_placed()
+        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
+    except PlacementError as exc:
+        raise GameLifecycleError("Lifecycle state movement_phase_state is invalid.") from exc
+
+    active_player_unit_ids = {
+        placement.unit_instance_id for placement in placed_army.unit_placements
+    }
+    for unit_id in movement_state.selected_unit_ids:
+        if unit_id not in active_player_unit_ids:
+            raise GameLifecycleError(
+                "movement_phase_state selected unit is not active player's unit."
+            )
+    if movement_state.active_selection is None:
+        return
+    active_unit_id = movement_state.active_selection.unit_instance_id
+    if active_unit_id not in movement_state.selected_unit_ids:
+        raise GameLifecycleError("movement_phase_state active selection drift.")
+    if active_unit_id not in active_player_unit_ids:
+        raise GameLifecycleError(
+            "movement_phase_state active selection is not active player's unit."
+        )
+
+
 def _state_requires_mustered_armies(state: GameState) -> bool:
     if state.stage is not GameLifecycleStage.SETUP:
         return True
@@ -270,3 +334,15 @@ def _state_requires_mustered_armies(state: GameState) -> bool:
             "Lifecycle state setup sequence must include MUSTER_ARMIES."
         ) from exc
     return state.setup_step_index > muster_step_index
+
+
+def _state_requires_battlefield_state(state: GameState) -> bool:
+    if state.stage is not GameLifecycleStage.SETUP:
+        return True
+    if state.setup_step_index is None:
+        return True
+    try:
+        deploy_step_index = state.setup_sequence.index(SetupStep.DEPLOY_ARMIES)
+    except ValueError:
+        return False
+    return state.setup_step_index > deploy_step_index
