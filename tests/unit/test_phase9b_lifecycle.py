@@ -48,6 +48,7 @@ from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
     CommandPhaseHandler,
 )
+from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 
 
@@ -617,7 +618,7 @@ def test_tactical_secondary_draws_occur_in_command_phase_not_setup() -> None:
     assert _request_payload(status.decision_request)["phase"] == BattlePhase.COMMAND.value
 
 
-def test_tactical_secondary_draw_decision_records_command_draw_and_advances() -> None:
+def test_tactical_secondary_draw_decision_records_command_draw_and_enters_movement() -> None:
     lifecycle = _start_lifecycle()
     _choose_secondaries(
         lifecycle,
@@ -637,21 +638,18 @@ def test_tactical_secondary_draw_decision_records_command_draw_and_advances() ->
     follow_up_status = lifecycle.submit_decision(draw_result)
 
     assert lifecycle.state is not None
-    assert follow_up_status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert follow_up_status.payload == {
-        "completed_phase": BattlePhase.MOVEMENT.value,
-        "phase_body_status": "placeholder_noop",
-        "battle_round": 1,
-        "active_player_id": "player-a",
-        "current_phase": BattlePhase.SHOOTING.value,
-    }
-    assert lifecycle.state.current_battle_phase is BattlePhase.SHOOTING
+    assert follow_up_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert follow_up_status.decision_request is not None
+    assert follow_up_status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert follow_up_status.decision_request.actor_id == "player-a"
+    assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
+    assert lifecycle.state.battlefield_state is not None
     assert len(lifecycle.state.tactical_secondary_draws) == 1
     draw = lifecycle.state.tactical_secondary_draws[0]
     assert draw.player_id == "player-a"
     assert draw.battle_round == 1
     assert draw.draw_count == 2
-    assert lifecycle.decision_controller.queue.pending_requests == ()
+    assert len(lifecycle.decision_controller.queue.pending_requests) == 1
     payload = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
@@ -815,7 +813,7 @@ def test_lifecycle_and_command_handler_fail_fast_on_invalid_entry_points() -> No
     assert CommandPhaseHandler().phase is BattlePhase.COMMAND
     _submit_pending(lifecycle, option_id="draw", result_number=3)
     assert lifecycle.state is not None
-    assert lifecycle.state.current_battle_phase is BattlePhase.SHOOTING
+    assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
     with pytest.raises(GameLifecycleError, match="only in the COMMAND phase"):
         CommandPhaseHandler().begin_phase(
             state=lifecycle.state,

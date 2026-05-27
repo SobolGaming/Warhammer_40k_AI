@@ -25,6 +25,7 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
 )
 from warhammer40k_core.engine.phases.command import TACTICAL_SECONDARY_DRAW_DECISION_TYPE
+from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 
 
@@ -70,7 +71,7 @@ def test_minimal_catalog_game_reaches_battle_round_one_with_mustered_armies() ->
     assert command_status.decision_request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE
     assert command_status.decision_request.actor_id == "player-a"
 
-    placeholder_status = _submit_result(
+    movement_status = _submit_result(
         lifecycle,
         status=command_status,
         option_id="draw",
@@ -78,15 +79,12 @@ def test_minimal_catalog_game_reaches_battle_round_one_with_mustered_armies() ->
     )
 
     state = _require_state(lifecycle)
-    assert placeholder_status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert placeholder_status.payload == {
-        "completed_phase": BattlePhase.MOVEMENT.value,
-        "phase_body_status": "placeholder_noop",
-        "battle_round": 1,
-        "active_player_id": "player-a",
-        "current_phase": BattlePhase.SHOOTING.value,
-    }
-    assert state.current_battle_phase is BattlePhase.SHOOTING
+    assert movement_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert movement_status.decision_request is not None
+    assert movement_status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert movement_status.decision_request.actor_id == "player-a"
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.battlefield_state is not None
     assert len(state.tactical_secondary_draws) == 1
     assert state.tactical_secondary_draws[0].player_id == "player-a"
     assert state.tactical_secondary_draws[0].battle_round == 1
@@ -258,7 +256,9 @@ def _assert_smoke_event_log(lifecycle: GameLifecycle) -> None:
     assert event_types.count("army_mustered") == 2
     assert event_types.count("secondary_mission_choice_recorded") == 2
     assert event_types.count("tactical_secondary_missions_drawn") == 1
-    assert event_types.count("phase_body_placeholder_noop") == 1
+    assert event_types.count("battlefield_placement_created") == 1
+    assert event_types.count("movement_phase_entered") == 1
+    assert event_types.count("decision_requested") >= 4
     assert _first_event_index(event_types, "army_mustered") < _first_event_index(
         event_types,
         "secondary_mission_choice_recorded",
@@ -267,7 +267,7 @@ def _assert_smoke_event_log(lifecycle: GameLifecycle) -> None:
         _first_event_index(event_types, "tactical_secondary_missions_drawn")
     )
     assert _first_event_index(event_types, "tactical_secondary_missions_drawn") < (
-        _first_event_index(event_types, "phase_body_placeholder_noop")
+        _first_event_index(event_types, "movement_phase_entered")
     )
 
 

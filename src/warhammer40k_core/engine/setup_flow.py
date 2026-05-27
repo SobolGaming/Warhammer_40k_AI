@@ -20,6 +20,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     SetupStep,
 )
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
 
@@ -57,6 +58,8 @@ class SetupFlow:
                 )
         elif current_step is SetupStep.MUSTER_ARMIES:
             self._muster_armies(state=state, decisions=decisions, config=config)
+        elif current_step is SetupStep.DEPLOY_ARMIES:
+            self._place_mustered_armies(state=state, decisions=decisions)
 
         completed_step = state.complete_current_setup_step()
         decisions.event_log.append(
@@ -163,6 +166,33 @@ class SetupFlow:
             )
         if state.missing_army_player_ids():
             raise GameLifecycleError("MUSTER_ARMIES requires an army for every player.")
+
+    def _place_mustered_armies(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+    ) -> None:
+        if state.battlefield_state is not None:
+            return
+        if state.missing_army_player_ids():
+            raise GameLifecycleError("DEPLOY_ARMIES requires mustered armies for every player.")
+        scenario = create_deterministic_battlefield_scenario(
+            battlefield_id=f"{state.game_id}:phase10a-battlefield",
+            armies=tuple(state.army_definitions),
+        )
+        state.record_battlefield_state(scenario.battlefield_state)
+        decisions.event_log.append(
+            "battlefield_placement_created",
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.DEPLOY_ARMIES.value,
+                "battlefield_id": scenario.battlefield_state.battlefield_id,
+                "placed_army_count": len(scenario.battlefield_state.placed_armies),
+                "placed_model_count": len(scenario.battlefield_state.placed_model_ids()),
+                "placement_source": "phase10a_deterministic_bridge",
+            },
+        )
 
     def _secondary_mission_request(
         self,

@@ -20,6 +20,11 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     ArmyMusterRequestPayload,
 )
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRuntimeState,
+    BattlefieldRuntimeStatePayload,
+    PlacementError,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -27,6 +32,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     SetupStep,
     game_lifecycle_stage_from_token,
+)
+from warhammer40k_core.engine.phases.movement import (
+    MovementPhaseState,
+    MovementPhaseStatePayload,
 )
 
 
@@ -75,6 +84,8 @@ class GameStatePayload(TypedDict):
     decision_request_count: int
     tactical_secondary_draw_count: int
     army_definitions: list[ArmyDefinitionPayload]
+    battlefield_state: BattlefieldRuntimeStatePayload | None
+    movement_phase_state: MovementPhaseStatePayload | None
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
 
@@ -315,6 +326,8 @@ class GameState:
     active_player_id: str | None = None
     decision_request_count: int = 0
     army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
+    battlefield_state: BattlefieldRuntimeState | None = None
+    movement_phase_state: MovementPhaseState | None = None
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
@@ -368,6 +381,10 @@ class GameState:
         self.army_definitions = _validate_army_definitions(
             self.army_definitions,
             player_ids=self.player_ids,
+        )
+        self.battlefield_state = _validate_optional_battlefield_state(self.battlefield_state)
+        self.movement_phase_state = _validate_optional_movement_phase_state(
+            self.movement_phase_state
         )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
@@ -485,6 +502,15 @@ class GameState:
         mustered = {army_definition.player_id for army_definition in self.army_definitions}
         return tuple(player_id for player_id in self.player_ids if player_id not in mustered)
 
+    def record_battlefield_state(self, battlefield_state: BattlefieldRuntimeState) -> None:
+        if type(battlefield_state) is not BattlefieldRuntimeState:
+            raise GameLifecycleError(
+                "GameState battlefield_state must be a BattlefieldRuntimeState."
+            )
+        if self.battlefield_state is not None:
+            raise GameLifecycleError("GameState battlefield_state already exists.")
+        self.battlefield_state = battlefield_state
+
     def record_tactical_secondary_draw(self, draw: TacticalSecondaryDraw) -> None:
         if draw.player_id not in self.player_ids:
             raise GameLifecycleError("TacticalSecondaryDraw player_id is not in this game.")
@@ -522,6 +548,14 @@ class GameState:
             "decision_request_count": self.decision_request_count,
             "tactical_secondary_draw_count": self.tactical_secondary_draw_count,
             "army_definitions": [army.to_payload() for army in self.army_definitions],
+            "battlefield_state": (
+                None if self.battlefield_state is None else self.battlefield_state.to_payload()
+            ),
+            "movement_phase_state": (
+                None
+                if self.movement_phase_state is None
+                else self.movement_phase_state.to_payload()
+            ),
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
@@ -574,6 +608,16 @@ class GameState:
             army_definitions=[
                 _army_definition_from_payload(army) for army in payload["army_definitions"]
             ],
+            battlefield_state=(
+                None
+                if payload["battlefield_state"] is None
+                else _battlefield_state_from_payload(payload["battlefield_state"])
+            ),
+            movement_phase_state=(
+                None
+                if payload["movement_phase_state"] is None
+                else MovementPhaseState.from_payload(payload["movement_phase_state"])
+            ),
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -618,6 +662,15 @@ def _army_definition_from_payload(payload: ArmyDefinitionPayload) -> ArmyDefinit
         return ArmyDefinition.from_payload(payload)
     except ArmyMusteringError as exc:
         raise GameLifecycleError("GameState army_definition payload is invalid.") from exc
+
+
+def _battlefield_state_from_payload(
+    payload: BattlefieldRuntimeStatePayload,
+) -> BattlefieldRuntimeState:
+    try:
+        return BattlefieldRuntimeState.from_payload(payload)
+    except PlacementError as exc:
+        raise GameLifecycleError("GameState battlefield_state payload is invalid.") from exc
 
 
 def _validate_lifecycle_sequences(ruleset_descriptor: RulesetDescriptor) -> None:
@@ -692,6 +745,26 @@ def _validate_army_definitions(
         seen.add(value.player_id)
         validated.append(value)
     return sorted(validated, key=lambda stored: stored.player_id)
+
+
+def _validate_optional_battlefield_state(
+    value: object | None,
+) -> BattlefieldRuntimeState | None:
+    if value is None:
+        return None
+    if type(value) is not BattlefieldRuntimeState:
+        raise GameLifecycleError("GameState battlefield_state must be a BattlefieldRuntimeState.")
+    return value
+
+
+def _validate_optional_movement_phase_state(
+    value: object | None,
+) -> MovementPhaseState | None:
+    if value is None:
+        return None
+    if type(value) is not MovementPhaseState:
+        raise GameLifecycleError("GameState movement_phase_state must be a MovementPhaseState.")
+    return value
 
 
 def _validate_state_stage_indexes(state: GameState) -> None:
