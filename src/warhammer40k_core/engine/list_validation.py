@@ -1,0 +1,546 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Self, TypedDict, cast
+
+from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
+from warhammer40k_core.core.datasheet import (
+    DatasheetDefinition,
+    DatasheetWargearOption,
+    UnitCompositionDefinition,
+)
+from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.wargear import Wargear
+
+
+class ListValidationError(ValueError):
+    """Raised when army list data violates CORE V2 mustering invariants."""
+
+
+class ModelProfileSelectionPayload(TypedDict):
+    model_profile_id: str
+    model_count: int
+
+
+class WargearSelectionPayload(TypedDict):
+    option_id: str
+    model_profile_id: str
+    wargear_ids: list[str]
+
+
+class DetachmentSelectionPayload(TypedDict):
+    faction_id: str
+    detachment_id: str
+    enhancement_ids: list[str]
+    stratagem_ids: list[str]
+
+
+class UnitMusterSelectionPayload(TypedDict):
+    unit_selection_id: str
+    datasheet_id: str
+    model_profile_selections: list[ModelProfileSelectionPayload]
+    wargear_selections: list[WargearSelectionPayload]
+
+
+@dataclass(frozen=True, slots=True)
+class ModelProfileSelection:
+    model_profile_id: str
+    model_count: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_profile_id",
+            _validate_identifier("ModelProfileSelection model_profile_id", self.model_profile_id),
+        )
+        object.__setattr__(
+            self,
+            "model_count",
+            _validate_positive_int("ModelProfileSelection model_count", self.model_count),
+        )
+
+    def to_payload(self) -> ModelProfileSelectionPayload:
+        return {
+            "model_profile_id": self.model_profile_id,
+            "model_count": self.model_count,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ModelProfileSelectionPayload) -> Self:
+        return cls(
+            model_profile_id=payload["model_profile_id"],
+            model_count=payload["model_count"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class WargearSelection:
+    option_id: str
+    model_profile_id: str
+    wargear_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "option_id",
+            _validate_unprefixed_identifier(
+                "WargearSelection option_id",
+                self.option_id,
+                "wargear-option:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_profile_id",
+            _validate_identifier("WargearSelection model_profile_id", self.model_profile_id),
+        )
+        object.__setattr__(
+            self,
+            "wargear_ids",
+            _validate_identifier_tuple(
+                "WargearSelection wargear_ids",
+                self.wargear_ids,
+                min_length=0,
+            ),
+        )
+
+    def to_payload(self) -> WargearSelectionPayload:
+        return {
+            "option_id": self.option_id,
+            "model_profile_id": self.model_profile_id,
+            "wargear_ids": list(self.wargear_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: WargearSelectionPayload) -> Self:
+        return cls(
+            option_id=payload["option_id"],
+            model_profile_id=payload["model_profile_id"],
+            wargear_ids=tuple(payload["wargear_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DetachmentSelection:
+    faction_id: str
+    detachment_id: str
+    enhancement_ids: tuple[str, ...] = ()
+    stratagem_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "faction_id",
+            _validate_unprefixed_identifier(
+                "DetachmentSelection faction_id",
+                self.faction_id,
+                "faction:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "detachment_id",
+            _validate_unprefixed_identifier(
+                "DetachmentSelection detachment_id",
+                self.detachment_id,
+                "detachment:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "enhancement_ids",
+            _validate_identifier_tuple(
+                "DetachmentSelection enhancement_ids",
+                self.enhancement_ids,
+                min_length=0,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_ids",
+            _validate_identifier_tuple(
+                "DetachmentSelection stratagem_ids",
+                self.stratagem_ids,
+                min_length=0,
+            ),
+        )
+
+    def to_payload(self) -> DetachmentSelectionPayload:
+        return {
+            "faction_id": self.faction_id,
+            "detachment_id": self.detachment_id,
+            "enhancement_ids": list(self.enhancement_ids),
+            "stratagem_ids": list(self.stratagem_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DetachmentSelectionPayload) -> Self:
+        return cls(
+            faction_id=payload["faction_id"],
+            detachment_id=payload["detachment_id"],
+            enhancement_ids=tuple(payload["enhancement_ids"]),
+            stratagem_ids=tuple(payload["stratagem_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class UnitMusterSelection:
+    unit_selection_id: str
+    datasheet_id: str
+    model_profile_selections: tuple[ModelProfileSelection, ...]
+    wargear_selections: tuple[WargearSelection, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_selection_id",
+            _validate_unprefixed_identifier(
+                "UnitMusterSelection unit_selection_id",
+                self.unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "datasheet_id",
+            _validate_unprefixed_identifier(
+                "UnitMusterSelection datasheet_id",
+                self.datasheet_id,
+                "datasheet:",
+            ),
+        )
+        model_profile_selections = _validate_model_profile_selection_tuple(
+            "UnitMusterSelection model_profile_selections",
+            self.model_profile_selections,
+        )
+        _validate_unique_model_profile_selections(model_profile_selections)
+        wargear_selections = _validate_wargear_selection_tuple(
+            "UnitMusterSelection wargear_selections",
+            self.wargear_selections,
+        )
+        _validate_unique_wargear_selections(wargear_selections)
+        object.__setattr__(self, "model_profile_selections", model_profile_selections)
+        object.__setattr__(self, "wargear_selections", wargear_selections)
+
+    def to_payload(self) -> UnitMusterSelectionPayload:
+        return {
+            "unit_selection_id": self.unit_selection_id,
+            "datasheet_id": self.datasheet_id,
+            "model_profile_selections": [
+                selection.to_payload() for selection in self.model_profile_selections
+            ],
+            "wargear_selections": [selection.to_payload() for selection in self.wargear_selections],
+        }
+
+    @classmethod
+    def from_payload(cls, payload: UnitMusterSelectionPayload) -> Self:
+        return cls(
+            unit_selection_id=payload["unit_selection_id"],
+            datasheet_id=payload["datasheet_id"],
+            model_profile_selections=tuple(
+                ModelProfileSelection.from_payload(selection)
+                for selection in payload["model_profile_selections"]
+            ),
+            wargear_selections=tuple(
+                WargearSelection.from_payload(selection)
+                for selection in payload["wargear_selections"]
+            ),
+        )
+
+
+def validate_detachment_selection(
+    *,
+    catalog: ArmyCatalog,
+    selection: DetachmentSelection,
+) -> tuple[FactionDefinition, DetachmentDefinition]:
+    if type(catalog) is not ArmyCatalog:
+        raise ListValidationError("catalog must be an ArmyCatalog.")
+    if type(selection) is not DetachmentSelection:
+        raise ListValidationError("selection must be a DetachmentSelection.")
+    faction = _catalog_faction_by_id(catalog, selection.faction_id)
+    detachment = _catalog_detachment_by_id(catalog, selection.detachment_id)
+    if detachment.faction_id != faction.faction_id:
+        raise ListValidationError("DetachmentSelection detachment does not belong to faction.")
+    _validate_selected_ids_are_allowed(
+        field_name="DetachmentSelection enhancement_ids",
+        selected_ids=selection.enhancement_ids,
+        allowed_ids=detachment.enhancement_ids,
+    )
+    _validate_selected_ids_are_allowed(
+        field_name="DetachmentSelection stratagem_ids",
+        selected_ids=selection.stratagem_ids,
+        allowed_ids=detachment.stratagem_ids,
+    )
+    _validate_catalog_contains_enhancements(catalog, selection.enhancement_ids)
+    _validate_catalog_contains_stratagems(catalog, selection.stratagem_ids)
+    return faction, detachment
+
+
+def validate_unit_selection_for_faction(
+    *,
+    catalog: ArmyCatalog,
+    selection: UnitMusterSelection,
+    faction: FactionDefinition,
+) -> DatasheetDefinition:
+    if type(catalog) is not ArmyCatalog:
+        raise ListValidationError("catalog must be an ArmyCatalog.")
+    if type(selection) is not UnitMusterSelection:
+        raise ListValidationError("selection must be a UnitMusterSelection.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("faction must be a FactionDefinition.")
+    datasheet = _catalog_datasheet_by_id(catalog, selection.datasheet_id)
+    if not set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords):
+        raise ListValidationError("UnitMusterSelection datasheet is not legal for faction.")
+    return datasheet
+
+
+def resolve_model_profile_selections(
+    *,
+    datasheet: DatasheetDefinition,
+    selections: tuple[ModelProfileSelection, ...],
+) -> tuple[ModelProfileSelection, ...]:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("datasheet must be a DatasheetDefinition.")
+    selections = _validate_model_profile_selection_tuple("model_profile_selections", selections)
+    _validate_unique_model_profile_selections(selections)
+    composition_by_profile = {part.model_profile_id: part for part in datasheet.composition}
+    selection_by_profile = {selection.model_profile_id: selection for selection in selections}
+    if set(selection_by_profile) != set(composition_by_profile):
+        raise ListValidationError(
+            "UnitMusterSelection model_profile_selections must match datasheet composition."
+        )
+    for model_profile_id, selection in selection_by_profile.items():
+        composition = composition_by_profile[model_profile_id]
+        _validate_model_count_against_composition(selection, composition)
+        datasheet.model_profile_by_id(model_profile_id)
+    return tuple(sorted(selections, key=lambda selection: selection.model_profile_id))
+
+
+def resolve_wargear_selections(
+    *,
+    catalog: ArmyCatalog,
+    datasheet: DatasheetDefinition,
+    requested_selections: tuple[WargearSelection, ...],
+) -> tuple[WargearSelection, ...]:
+    if type(catalog) is not ArmyCatalog:
+        raise ListValidationError("catalog must be an ArmyCatalog.")
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("datasheet must be a DatasheetDefinition.")
+    requested_selections = _validate_wargear_selection_tuple(
+        "requested_selections",
+        requested_selections,
+    )
+    _validate_unique_wargear_selections(requested_selections)
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    requested_by_id = {selection.option_id: selection for selection in requested_selections}
+    unknown_requested = tuple(sorted(set(requested_by_id).difference(options_by_id)))
+    if unknown_requested:
+        raise ListValidationError("WargearSelection references an unknown datasheet option.")
+
+    resolved: list[WargearSelection] = []
+    for option in datasheet.wargear_options:
+        selection = requested_by_id.get(option.option_id)
+        if selection is None:
+            selection = WargearSelection(
+                option_id=option.option_id,
+                model_profile_id=option.model_profile_id,
+                wargear_ids=option.default_wargear_ids,
+            )
+        _validate_wargear_selection_against_option(selection, option)
+        for wargear_id in selection.wargear_ids:
+            _catalog_wargear_by_id(catalog, wargear_id)
+        resolved.append(selection)
+    return tuple(sorted(resolved, key=lambda selection: selection.option_id))
+
+
+def _catalog_datasheet_by_id(catalog: ArmyCatalog, datasheet_id: str) -> DatasheetDefinition:
+    try:
+        return catalog.datasheet_by_id(datasheet_id)
+    except ArmyCatalogError as exc:
+        raise ListValidationError("UnitMusterSelection datasheet_id was not found.") from exc
+
+
+def _catalog_faction_by_id(catalog: ArmyCatalog, faction_id: str) -> FactionDefinition:
+    try:
+        return catalog.faction_by_id(faction_id)
+    except ArmyCatalogError as exc:
+        raise ListValidationError("DetachmentSelection faction_id was not found.") from exc
+
+
+def _catalog_detachment_by_id(
+    catalog: ArmyCatalog,
+    detachment_id: str,
+) -> DetachmentDefinition:
+    requested_id = _validate_identifier("detachment_id", detachment_id)
+    for detachment in catalog.detachments:
+        if detachment.detachment_id == requested_id:
+            return detachment
+    raise ListValidationError("DetachmentSelection detachment_id was not found.")
+
+
+def _catalog_wargear_by_id(catalog: ArmyCatalog, wargear_id: str) -> Wargear:
+    requested_id = _validate_identifier("wargear_id", wargear_id)
+    for item in catalog.wargear:
+        if item.wargear_id == requested_id:
+            return item
+    raise ListValidationError("WargearSelection wargear_id was not found in catalog.")
+
+
+def _validate_catalog_contains_enhancements(
+    catalog: ArmyCatalog,
+    enhancement_ids: tuple[str, ...],
+) -> None:
+    catalog_ids = {enhancement.enhancement_id for enhancement in catalog.enhancements}
+    for enhancement_id in enhancement_ids:
+        if enhancement_id not in catalog_ids:
+            raise ListValidationError("DetachmentSelection enhancement_id was not found.")
+
+
+def _validate_catalog_contains_stratagems(
+    catalog: ArmyCatalog,
+    stratagem_ids: tuple[str, ...],
+) -> None:
+    catalog_ids = {stratagem.stratagem_id for stratagem in catalog.stratagems}
+    for stratagem_id in stratagem_ids:
+        if stratagem_id not in catalog_ids:
+            raise ListValidationError("DetachmentSelection stratagem_id was not found.")
+
+
+def _validate_selected_ids_are_allowed(
+    *,
+    field_name: str,
+    selected_ids: tuple[str, ...],
+    allowed_ids: tuple[str, ...],
+) -> None:
+    allowed = set(allowed_ids)
+    for selected_id in selected_ids:
+        if selected_id not in allowed:
+            raise ListValidationError(f"{field_name} includes an ID not allowed by detachment.")
+
+
+def _validate_model_count_against_composition(
+    selection: ModelProfileSelection,
+    composition: UnitCompositionDefinition,
+) -> None:
+    if selection.model_count < composition.min_models:
+        raise ListValidationError("ModelProfileSelection model_count is below datasheet minimum.")
+    if selection.model_count > composition.max_models:
+        raise ListValidationError("ModelProfileSelection model_count exceeds datasheet maximum.")
+
+
+def _validate_wargear_selection_against_option(
+    selection: WargearSelection,
+    option: DatasheetWargearOption,
+) -> None:
+    if selection.model_profile_id != option.model_profile_id:
+        raise ListValidationError("WargearSelection model_profile_id does not match option.")
+    selected_count = len(selection.wargear_ids)
+    if selected_count < option.min_selections:
+        raise ListValidationError("WargearSelection does not satisfy minimum selections.")
+    if selected_count > option.max_selections:
+        raise ListValidationError("WargearSelection exceeds maximum selections.")
+    allowed = set(option.allowed_wargear_ids)
+    for wargear_id in selection.wargear_ids:
+        if wargear_id not in allowed:
+            raise ListValidationError("WargearSelection includes wargear not allowed by option.")
+
+
+def _validate_model_profile_selection_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[ModelProfileSelection, ...]:
+    if type(values) is not tuple:
+        raise ListValidationError(f"{field_name} must be a tuple.")
+    if not values:
+        raise ListValidationError(f"{field_name} must not be empty.")
+    validated: list[ModelProfileSelection] = []
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        if type(value) is not ModelProfileSelection:
+            raise ListValidationError(f"{field_name} must contain ModelProfileSelection values.")
+        validated.append(value)
+    return tuple(validated)
+
+
+def _validate_unique_model_profile_selections(
+    selections: tuple[ModelProfileSelection, ...],
+) -> None:
+    seen: set[str] = set()
+    for selection in selections:
+        if selection.model_profile_id in seen:
+            raise ListValidationError(
+                "UnitMusterSelection model_profile_selections must not contain duplicates."
+            )
+        seen.add(selection.model_profile_id)
+
+
+def _validate_wargear_selection_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[WargearSelection, ...]:
+    if type(values) is not tuple:
+        raise ListValidationError(f"{field_name} must be a tuple.")
+    validated: list[WargearSelection] = []
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        if type(value) is not WargearSelection:
+            raise ListValidationError(f"{field_name} must contain WargearSelection values.")
+        validated.append(value)
+    return tuple(validated)
+
+
+def _validate_unique_wargear_selections(
+    selections: tuple[WargearSelection, ...],
+) -> None:
+    seen: set[str] = set()
+    for selection in selections:
+        if selection.option_id in seen:
+            raise ListValidationError("WargearSelection option_ids must be unique.")
+        seen.add(selection.option_id)
+
+
+def _validate_identifier_tuple(
+    field_name: str,
+    values: object,
+    *,
+    min_length: int,
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise ListValidationError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise ListValidationError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        validated.append(identifier)
+    if len(validated) < min_length:
+        raise ListValidationError(f"{field_name} must contain at least {min_length} values.")
+    return tuple(sorted(validated))
+
+
+def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:
+    identifier = _validate_identifier(field_name, value)
+    if identifier.startswith(prefix):
+        raise ListValidationError(f"{field_name} must not include the stable identity prefix.")
+    return identifier
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise ListValidationError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise ListValidationError(f"{field_name} must not be empty.")
+    return stripped
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise ListValidationError(f"{field_name} must be an integer.")
+    if value < 1:
+        raise ListValidationError(f"{field_name} must be at least 1.")
+    return value

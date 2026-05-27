@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogPayload
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     RulesetDescriptor,
@@ -11,6 +12,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
     SetupStepKind,
     battle_phase_kind_from_token,
     setup_step_kind_from_token,
+)
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyDefinitionPayload,
+    ArmyMusteringError,
+    ArmyMusterRequest,
+    ArmyMusterRequestPayload,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import (
@@ -30,6 +38,8 @@ class SecondaryMissionMode(StrEnum):
 class GameConfigPayload(TypedDict):
     game_id: str
     ruleset_descriptor: RulesetDescriptorPayload
+    army_catalog: ArmyCatalogPayload
+    army_muster_requests: list[ArmyMusterRequestPayload]
     player_ids: list[str]
     turn_order: list[str]
     fixed_secondary_mission_ids: list[str]
@@ -64,6 +74,7 @@ class GameStatePayload(TypedDict):
     turn_order: list[str]
     decision_request_count: int
     tactical_secondary_draw_count: int
+    army_definitions: list[ArmyDefinitionPayload]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
 
@@ -76,10 +87,16 @@ def _new_tactical_secondary_draws() -> list[TacticalSecondaryDraw]:
     return []
 
 
+def _new_army_definitions() -> list[ArmyDefinition]:
+    return []
+
+
 @dataclass(frozen=True, slots=True)
 class GameConfig:
     game_id: str
     ruleset_descriptor: RulesetDescriptor
+    army_catalog: ArmyCatalog
+    army_muster_requests: tuple[ArmyMusterRequest, ...]
     player_ids: tuple[str, ...]
     turn_order: tuple[str, ...]
     fixed_secondary_mission_ids: tuple[str, ...]
@@ -93,6 +110,8 @@ class GameConfig:
         )
         if type(self.ruleset_descriptor) is not RulesetDescriptor:
             raise GameLifecycleError("GameConfig ruleset_descriptor must be a RulesetDescriptor.")
+        if type(self.army_catalog) is not ArmyCatalog:
+            raise GameLifecycleError("GameConfig army_catalog must be an ArmyCatalog.")
         object.__setattr__(
             self,
             "player_ids",
@@ -101,6 +120,14 @@ class GameConfig:
                 self.player_ids,
                 min_length=2,
                 sort_values=False,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "army_muster_requests",
+            _validate_army_muster_requests(
+                self.army_muster_requests,
+                player_ids=self.player_ids,
             ),
         )
         object.__setattr__(
@@ -132,6 +159,8 @@ class GameConfig:
         return {
             "game_id": self.game_id,
             "ruleset_descriptor": self.ruleset_descriptor.to_payload(),
+            "army_catalog": self.army_catalog.to_payload(),
+            "army_muster_requests": [request.to_payload() for request in self.army_muster_requests],
             "player_ids": list(self.player_ids),
             "turn_order": list(self.turn_order),
             "fixed_secondary_mission_ids": list(self.fixed_secondary_mission_ids),
@@ -143,6 +172,11 @@ class GameConfig:
         return cls(
             game_id=payload["game_id"],
             ruleset_descriptor=RulesetDescriptor.from_payload(payload["ruleset_descriptor"]),
+            army_catalog=ArmyCatalog.from_payload(payload["army_catalog"]),
+            army_muster_requests=tuple(
+                _army_muster_request_from_payload(request)
+                for request in payload["army_muster_requests"]
+            ),
             player_ids=tuple(payload["player_ids"]),
             turn_order=tuple(payload["turn_order"]),
             fixed_secondary_mission_ids=tuple(payload["fixed_secondary_mission_ids"]),
@@ -280,6 +314,7 @@ class GameState:
     battle_round: int = 0
     active_player_id: str | None = None
     decision_request_count: int = 0
+    army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
@@ -329,6 +364,10 @@ class GameState:
         self.decision_request_count = _validate_non_negative_int(
             "GameState decision_request_count",
             self.decision_request_count,
+        )
+        self.army_definitions = _validate_army_definitions(
+            self.army_definitions,
+            player_ids=self.player_ids,
         )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
@@ -425,6 +464,27 @@ class GameState:
         selected = {choice.player_id for choice in self.secondary_mission_choices}
         return tuple(player_id for player_id in self.player_ids if player_id not in selected)
 
+    def record_army_definition(self, army_definition: ArmyDefinition) -> None:
+        if type(army_definition) is not ArmyDefinition:
+            raise GameLifecycleError("GameState army_definition must be an ArmyDefinition.")
+        if army_definition.player_id not in self.player_ids:
+            raise GameLifecycleError("ArmyDefinition player_id is not in this game.")
+        if self.army_definition_for_player(army_definition.player_id) is not None:
+            raise GameLifecycleError("ArmyDefinition already exists for player.")
+        self.army_definitions.append(army_definition)
+        self.army_definitions.sort(key=lambda stored: stored.player_id)
+
+    def army_definition_for_player(self, player_id: str) -> ArmyDefinition | None:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        for army_definition in self.army_definitions:
+            if army_definition.player_id == requested_player_id:
+                return army_definition
+        return None
+
+    def missing_army_player_ids(self) -> tuple[str, ...]:
+        mustered = {army_definition.player_id for army_definition in self.army_definitions}
+        return tuple(player_id for player_id in self.player_ids if player_id not in mustered)
+
     def record_tactical_secondary_draw(self, draw: TacticalSecondaryDraw) -> None:
         if draw.player_id not in self.player_ids:
             raise GameLifecycleError("TacticalSecondaryDraw player_id is not in this game.")
@@ -461,6 +521,7 @@ class GameState:
             "turn_order": list(self.turn_order),
             "decision_request_count": self.decision_request_count,
             "tactical_secondary_draw_count": self.tactical_secondary_draw_count,
+            "army_definitions": [army.to_payload() for army in self.army_definitions],
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
@@ -510,6 +571,9 @@ class GameState:
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
             decision_request_count=payload["decision_request_count"],
+            army_definitions=[
+                _army_definition_from_payload(army) for army in payload["army_definitions"]
+            ],
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -542,6 +606,20 @@ def secondary_mission_mode_from_token(token: object) -> SecondaryMissionMode:
         raise GameLifecycleError(f"Unsupported SecondaryMissionMode token: {token}.") from exc
 
 
+def _army_muster_request_from_payload(payload: ArmyMusterRequestPayload) -> ArmyMusterRequest:
+    try:
+        return ArmyMusterRequest.from_payload(payload)
+    except ArmyMusteringError as exc:
+        raise GameLifecycleError("GameConfig army_muster_request payload is invalid.") from exc
+
+
+def _army_definition_from_payload(payload: ArmyDefinitionPayload) -> ArmyDefinition:
+    try:
+        return ArmyDefinition.from_payload(payload)
+    except ArmyMusteringError as exc:
+        raise GameLifecycleError("GameState army_definition payload is invalid.") from exc
+
+
 def _validate_lifecycle_sequences(ruleset_descriptor: RulesetDescriptor) -> None:
     setup_steps = ruleset_descriptor.setup_sequence.steps
     phases = ruleset_descriptor.battle_phase_sequence.phases
@@ -559,6 +637,61 @@ def _validate_lifecycle_sequences(ruleset_descriptor: RulesetDescriptor) -> None
         raise GameLifecycleError("GameConfig battle_phase_sequence must include FIGHT.")
     if phases[-1] is not BattlePhaseKind.FIGHT:
         raise GameLifecycleError("GameConfig battle_phase_sequence must end with FIGHT.")
+
+
+def _validate_army_muster_requests(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> tuple[ArmyMusterRequest, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("GameConfig army_muster_requests must be a tuple.")
+    raw_values = cast(tuple[object, ...], values)
+    if len(raw_values) != len(player_ids):
+        raise GameLifecycleError(
+            "GameConfig army_muster_requests must include every player exactly once."
+        )
+    validated: list[ArmyMusterRequest] = []
+    seen: set[str] = set()
+    for value in raw_values:
+        if type(value) is not ArmyMusterRequest:
+            raise GameLifecycleError(
+                "GameConfig army_muster_requests must contain ArmyMusterRequest values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("ArmyMusterRequest player_id is not in this game.")
+        if value.player_id in seen:
+            raise GameLifecycleError("GameConfig army_muster_requests must be unique by player.")
+        seen.add(value.player_id)
+        validated.append(value)
+    if set(seen) != set(player_ids):
+        raise GameLifecycleError(
+            "GameConfig army_muster_requests must include every player exactly once."
+        )
+    return tuple(sorted(validated, key=lambda request: request.player_id))
+
+
+def _validate_army_definitions(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[ArmyDefinition]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState army_definitions must be a list.")
+    validated: list[ArmyDefinition] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not ArmyDefinition:
+            raise GameLifecycleError(
+                "GameState army_definitions must contain ArmyDefinition values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("ArmyDefinition player_id is not in this game.")
+        if value.player_id in seen:
+            raise GameLifecycleError("GameState army_definitions must be unique by player.")
+        seen.add(value.player_id)
+        validated.append(value)
+    return sorted(validated, key=lambda stored: stored.player_id)
 
 
 def _validate_state_stage_indexes(state: GameState) -> None:

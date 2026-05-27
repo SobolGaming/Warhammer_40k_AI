@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Self, TypedDict
 
+from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
@@ -25,6 +26,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     PhaseHandler,
     PlaceholderPhaseHandler,
+    SetupStep,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -218,3 +220,41 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     expected_battle = tuple(config.ruleset_descriptor.battle_phase_sequence.phases)
     if state.battle_phase_sequence != expected_battle:
         raise GameLifecycleError("Lifecycle state battle phase sequence does not match config.")
+    _validate_mustered_army_consistency(state=state, config=config)
+
+
+def _validate_mustered_army_consistency(*, state: GameState, config: GameConfig) -> None:
+    if not state.army_definitions and not _state_requires_mustered_armies(state):
+        return
+    try:
+        expected_armies = tuple(
+            sorted(
+                (
+                    muster_army(catalog=config.army_catalog, request=request)
+                    for request in config.army_muster_requests
+                ),
+                key=lambda army: army.player_id,
+            )
+        )
+    except ArmyMusteringError as exc:
+        raise GameLifecycleError("Lifecycle config army muster requests are invalid.") from exc
+    expected_payloads = [army.to_payload() for army in expected_armies]
+    state_payloads = [army.to_payload() for army in state.army_definitions]
+    if _state_requires_mustered_armies(state) and not state_payloads:
+        raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
+    if state_payloads and state_payloads != expected_payloads:
+        raise GameLifecycleError("Lifecycle state army definitions do not match config.")
+
+
+def _state_requires_mustered_armies(state: GameState) -> bool:
+    if state.stage is not GameLifecycleStage.SETUP:
+        return True
+    if state.setup_step_index is None:
+        return True
+    try:
+        muster_step_index = state.setup_sequence.index(SetupStep.MUSTER_ARMIES)
+    except ValueError as exc:
+        raise GameLifecycleError(
+            "Lifecycle state setup sequence must include MUSTER_ARMIES."
+        ) from exc
+    return state.setup_step_index > muster_step_index
