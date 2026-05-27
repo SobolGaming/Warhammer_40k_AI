@@ -105,6 +105,8 @@ warhammer40k_core/
     army_mustering.py
     unit_factory.py
     list_validation.py
+    battlefield_state.py
+    placement.py
     phases/
       command.py
       movement.py
@@ -789,6 +791,50 @@ Required tests:
   phase body;
 - replay payload round-trips after the smoke path;
 - public state hides opponent Fixed secondary choices.
+
+### Phase 10A: battlefield placement bridge
+
+This phase is a minimal runtime bridge for movement vertical-slice tests. Phase
+9C creates mustered runtime `UnitInstance` and `ModelInstance` objects, but
+movement needs placed models. Phase 10A records deterministic model poses for
+those runtime instances without implementing full deployment rules.
+
+Modules:
+
+- `engine/battlefield_state.py`
+- `engine/placement.py`
+
+Objects:
+
+- `ModelPlacement`
+- `UnitPlacement`
+- `BattlefieldRuntimeState`
+- `PlacedArmy`
+- `BattlefieldScenario`
+
+Invariants:
+
+- every placed model references an existing `ModelInstance`;
+- every placed unit references an existing `UnitInstance`;
+- no model is placed twice;
+- no placed model belongs to the wrong army or player;
+- base size remains available from the referenced `ModelInstance`;
+- pose payloads are deterministic and serializable;
+- placement state round-trips without Python object reprs;
+- placement fixtures use mustered armies from `GameState`, not ad hoc models;
+- this phase does not implement full `DEPLOY_ARMIES` rules.
+
+Required tests:
+
+- lifecycle smoke config reaches `SELECT_SECONDARY_MISSIONS` with both armies
+  mustered;
+- deterministic placement state is created from both `ArmyDefinition` objects;
+- every placed model maps back to a runtime `ModelInstance`;
+- referenced model base sizes and characteristics remain available;
+- duplicate model placements fail explicitly;
+- missing unit/model placement references fail explicitly;
+- wrong-player placement drift fails explicitly;
+- placement and scenario payloads round-trip without Python object reprs.
 
 ### Phase 10: movement phase body vertical slice
 
