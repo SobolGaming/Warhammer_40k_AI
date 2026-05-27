@@ -23,6 +23,7 @@ from warhammer40k_core.engine.list_validation import (
     resolve_model_profile_selections,
     resolve_wargear_selections,
 )
+from warhammer40k_core.geometry.model_geometry import ModelGeometry, ModelGeometryPayload
 
 
 class UnitFactoryError(ValueError):
@@ -36,6 +37,7 @@ class ModelInstancePayload(TypedDict):
     name: str
     characteristics: list[CharacteristicValuePayload]
     base_size: BaseSizeDefinitionPayload
+    geometry: ModelGeometryPayload
     starting_wounds: int
     wounds_remaining: int
     source_ids: list[str]
@@ -60,6 +62,7 @@ class ModelInstance:
     name: str
     characteristics: tuple[CharacteristicValue, ...]
     base_size: BaseSizeDefinition
+    geometry: ModelGeometry
     starting_wounds: int
     wounds_remaining: int
     source_ids: tuple[str, ...]
@@ -97,6 +100,8 @@ class ModelInstance:
         object.__setattr__(self, "characteristics", characteristics)
         if type(self.base_size) is not BaseSizeDefinition:
             raise UnitFactoryError("ModelInstance base_size must be a BaseSizeDefinition.")
+        if type(self.geometry) is not ModelGeometry:
+            raise UnitFactoryError("ModelInstance geometry must be a ModelGeometry.")
         starting_wounds = _validate_positive_int(
             "ModelInstance starting_wounds",
             self.starting_wounds,
@@ -136,6 +141,7 @@ class ModelInstance:
             "name": self.name,
             "characteristics": [value.to_payload() for value in self.characteristics],
             "base_size": self.base_size.to_payload(),
+            "geometry": self.geometry.to_payload(),
             "starting_wounds": self.starting_wounds,
             "wounds_remaining": self.wounds_remaining,
             "source_ids": list(self.source_ids),
@@ -152,6 +158,7 @@ class ModelInstance:
                 CharacteristicValue.from_payload(value) for value in payload["characteristics"]
             ),
             base_size=BaseSizeDefinition.from_payload(payload["base_size"]),
+            geometry=ModelGeometry.from_payload(payload["geometry"]),
             starting_wounds=payload["starting_wounds"],
             wounds_remaining=payload["wounds_remaining"],
             source_ids=tuple(payload["source_ids"]),
@@ -338,6 +345,11 @@ def _instantiate_models_for_profile(
 ) -> tuple[ModelInstance, ...]:
     starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
     source_ids = _merge_source_ids(datasheet.source_ids, profile.source_ids)
+    geometry = ModelGeometry.from_base_size(
+        profile.base_size,
+        keywords=datasheet.keywords.keywords,
+        geometry_source_id=profile.model_profile_id,
+    )
     return tuple(
         ModelInstance(
             model_instance_id=(
@@ -348,6 +360,7 @@ def _instantiate_models_for_profile(
             name=profile.name,
             characteristics=profile.characteristics,
             base_size=profile.base_size,
+            geometry=geometry,
             starting_wounds=starting_wounds,
             wounds_remaining=starting_wounds,
             source_ids=source_ids,
