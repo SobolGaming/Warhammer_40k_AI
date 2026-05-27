@@ -1435,6 +1435,518 @@ Handler examples:
 - deployment and pre-battle handlers for Deep Strike, Infiltrators, Scouts,
   reserves, transports, and redeploy effects.
 
+## CORE V1 investigation and reuse policy by phase
+
+CORE V1 is a reference implementation, not a source to copy wholesale. For each
+phase below, inspect the listed CORE V1 areas before implementation, identify
+the invariants and algorithms worth preserving, and then implement them in CORE
+V2 using strict typed data, fail-fast validation, replay-safe payloads, and
+current import boundaries.
+
+General migration rule for every phase:
+
+1. Inspect CORE V1 only for the narrow behavior needed by the phase.
+2. Name the invariant being preserved.
+3. Write CORE V2 tests before porting behavior.
+4. Port the smallest necessary algorithm, transform, or edge-case rule.
+5. Do not copy broad files or permissive fallback behavior.
+6. Replace raw object/string behavior with typed descriptors, payloads, and
+   records.
+7. Add replay/audit coverage for all state-changing behavior.
+
+### Phase 10D: battlefield transition records
+
+CORE V1 investigation:
+
+- Inspect movement/deployment-related event payloads and decision handlers only
+  to identify where models are placed, removed, or displaced.
+- Inspect CORE V1 movement handling to understand where `move`, `advance`,
+  `fall_back`, transport decisions, and reactive movement were historically
+  separated.
+- Do not port CORE V1 event shapes directly.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/engine/decision_kinds.py`
+- `src/warhammer40k_ai/engine/decision_requests.py`
+
+Reuse guidance:
+
+- Reuse the conceptual separation of movement action, model displacement,
+  embark/disembark, and triggered movement.
+- Do not reuse UI-specific or permissive event handling.
+- Transition records in CORE V2 must be new typed replay-facing records.
+
+Expected CORE V2 result:
+
+- `ModelPlacementRecord`
+- `ModelRemovalRecord`
+- `ModelDisplacementRecord`
+- `BattlefieldTransitionBatch`
+- Deployment emits placement records.
+- Normal Move emits displacement records.
+- Remain Stationary emits no transition records.
+- Unsupported Advance/Fall Back emit no transition records.
+
+### Phase 10E: model geometry foundation
+
+CORE V1 investigation:
+
+- Inspect how CORE V1 parses base dimensions, converts millimeters to inches,
+  resolves geometry overrides, handles compound/flying hull geometry, and
+  estimates model height.
+- Treat CORE V1 height heuristics as a starting point only; they are not assumed
+  correct.
+- Identify which geometry cases require explicit manual overrides.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/utility/model_geometry.py`
+- `src/warhammer40k_ai/utility/model_base.py`
+- `src/warhammer40k_ai/utility/calcs.py`
+- `src/warhammer40k_ai/utility/constants.py`
+- `tests/units/test_model_geometry_resolver.py`
+
+Reuse guidance:
+
+- Reuse the principle that source/base-size data may start in millimeters but
+  runtime geometry must be in inches.
+- Reuse the idea of geometry provenance: parsed base, override, heuristic,
+  fallback.
+- Reuse relevant conversion tests and edge cases.
+- Do not copy CORE V1's exact height heuristics without marking their source and
+  adding tests.
+- Do not store duplicate mm/inch fields in the resolved runtime geometry object.
+
+Expected CORE V2 result:
+
+- Catalog/base-size data may preserve official dimensions in millimeters.
+- Runtime `ModelGeometry` stores inches only.
+- Geometry source and height source are typed enums, not strings.
+- Every resolved model geometry has explicit provenance.
+- Large/unique/hull/flying models can require manual override later.
+
+### Phase 10F: terrain factory foundation
+
+CORE V1 investigation:
+
+- Inspect map/terrain representation, ruins presets, terrain walls/floors,
+  elevation helpers, visibility helpers, and cache invalidation strategy.
+- Focus on deterministic fixture generation and spatial-index friendliness.
+- Do not port the full CORE V1 `Map` object.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/battlefield/map.py`
+- `src/warhammer40k_ai/battlefield/terrain_runtime.py`
+- `src/warhammer40k_ai/battlefield/terrain_presets.py`
+- `src/warhammer40k_ai/battlefield/terrain_elevation.py`
+- `src/warhammer40k_ai/battlefield/terrain_visibility.py`
+- `src/warhammer40k_ai/battlefield/terrain_cover.py`
+- `tests/rules/test_line_of_sight.py`
+- terrain-related battlefield tests
+
+Reuse guidance:
+
+- Reuse deterministic terrain fixture ideas and common ruins dimensions where
+  appropriate.
+- Reuse cache/revision concepts, not mutable map internals.
+- Build CORE V2 terrain as serializable immutable definitions plus explicit
+  revision/index state.
+- Ensure the design is suitable for efficient pathing and LoS.
+
+Expected CORE V2 result:
+
+- Deterministic empty battlefield fixture.
+- Deterministic ruins fixture.
+- Explicit terrain walls/floors/footprints.
+- Revision/cache keys for terrain, model blockers, and LoS.
+- No full LoS, cover, or terrain traversal behavior yet.
+
+### Phase 10G: movement legality context and capability resolver
+
+CORE V1 investigation:
+
+- Inspect how CORE V1 resolves FLY, Infantry/Beast terrain traversal,
+  vehicle/monster/walker constraints, vertical distance, ruins traversal, and
+  engagement movement constraints.
+- Inspect movement profile and pathing rule helpers.
+- Do not import special-rule dictionaries directly into CORE V2 runtime logic.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/pathing/rules_profile.py`
+- `src/warhammer40k_ai/pathing/types.py`
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/utility/calcs.py`
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+
+Reuse guidance:
+
+- Reuse the capability categories, not CORE V1's dynamic attribute/string
+  probing.
+- Convert keyword/rule-driven behavior into typed capability resolution.
+- FLY, INFANTRY, BEAST, VEHICLE, MONSTER, WALKER, AIRCRAFT, and HOVER are
+  legality inputs, not actions.
+- Edition-specific engagement behavior must come from `RulesetDescriptor`, not
+  hard-coded checks.
+- Preview/alternate rules require explicit descriptor/source identity.
+
+Expected CORE V2 result:
+
+- `MovementLegalityContext`
+- `MovementCapabilitySet`
+- `EngagementMovementPolicy`
+- `MovementLegalityResult`
+- 10e policy tested.
+- Preview/alternate policy explicitly unavailable unless descriptor exists.
+
+### Phase 10H: pathing smoke constraints
+
+CORE V1 investigation:
+
+- Inspect CORE V1 path witness, sweep/collision validation, battlefield boundary
+  handling, model blocker handling, terrain sweep, tight clearance, and
+  friendly/enemy model path rules.
+- Focus on simple smoke constraints first, not full pathfinding.
+- Inspect performance-sensitive cache usage.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/pathing/sweep.py`
+- `src/warhammer40k_ai/pathing/types.py`
+- `src/warhammer40k_ai/path_witness.py`
+- `src/warhammer40k_ai/utility/calcs.py`
+- `src/warhammer40k_ai/battlefield/map.py`
+
+Reuse guidance:
+
+- Reuse concepts for swept footprint, blocker caches, and witness validation.
+- Do not port full shapely-heavy logic until CORE V2 geometry and terrain
+  contracts are stable.
+- Prefer small deterministic smoke checks with clear violation records.
+- Preserve performance direction: spatial index first, brute-force only in tiny
+  tests.
+
+Expected CORE V2 result:
+
+- battlefield edge crossing rejection;
+- enemy model base crossing rejection;
+- friendly model pass-through allowance;
+- friendly VEHICLE/MONSTER pass-through blocking where applicable;
+- end-on-model overlap rejection;
+- base gap checks;
+- model-volume-at-end checks;
+- pivot cost placeholder for non-circular bases.
+
+### Phase 10I: advance roll and reroll decision
+
+CORE V1 investigation:
+
+- Inspect how CORE V1 queues/selects movement action, rolls Advance, records
+  movement status, handles reroll decisions, and applies movement distance.
+- Inspect dice utilities and existing decision payload patterns.
+- Do not port broad movement-handler behavior.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/movement_distance.py`
+- `src/warhammer40k_ai/utility/dice.py`
+- movement action/reroll tests
+
+Reuse guidance:
+
+- Reuse the invariant that Advance is a Movement phase action and affects
+  movement status.
+- Reuse only the minimal dice/reroll flow ideas.
+- CORE V2 must route rolls and rerolls through deterministic dice/replay
+  machinery.
+- Advance emits displacement records only after actual model movement.
+
+Expected CORE V2 result:
+
+- selecting Advance emits dice roll request;
+- Advance roll is replayed deterministically;
+- reroll decision appears only when a supported reroll source exists;
+- movement distance = Movement characteristic + Advance roll;
+- Advance emits `ModelDisplacementRecord` values;
+- unit is marked moved/advanced and cannot be selected again that Movement
+  phase.
+
+### Phase 10J: fall back action and basic Fall Back constraints
+
+CORE V1 investigation:
+
+- Inspect CORE V1 Fall Back action handling, movement status flags, Desperate
+  Escape detection, and engagement/path constraints.
+- Do not implement all Desperate Escape behavior unless the phase explicitly
+  scopes it.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/pathing/rules_profile.py`
+- `src/warhammer40k_ai/pathing/validation.py`
+- Fall Back / Desperate Escape tests if present
+
+Reuse guidance:
+
+- Reuse the distinction between Fall Back action and general displacement.
+- Reuse detection ideas for Desperate Escape requirements, but return typed
+  unsupported if not fully implemented.
+- Fall Back legality must depend on movement legality/capability descriptors,
+  not ad hoc checks.
+
+Expected CORE V2 result:
+
+- eligible unit can select Fall Back;
+- ineligible unit cannot select Fall Back;
+- Fall Back emits displacement records;
+- Fall Back marks moved/fell-back state;
+- Desperate Escape is detected and either resolved or typed unsupported.
+
+### Phase 10K: Movement phase Reinforcements step shell
+
+CORE V1 investigation:
+
+- Inspect how CORE V1 handles reserves, Strategic Reserves, Deep Strike, reserve
+  arrival validation, and forced arrival failure.
+- Treat Reinforcements as a Movement phase step, not a placement kind.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/reserve_entry_rules.py`
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/engine/game_setup_flow.py`
+- reserve/deep-strike tests
+
+Reuse guidance:
+
+- Reuse arrival-position validation concepts.
+- Reuse edge cases around forced arrival, board edges, and deployment
+  restrictions only after strict tests exist.
+- Placement from reserves must emit placement records, not displacement records.
+- Do not require PathWitness for reserve placement.
+
+Expected CORE V2 result:
+
+- Movement phase has Move Units then Reinforcements.
+- Strategic Reserves placement uses `BattlefieldPlacementKind.STRATEGIC_RESERVES`.
+- Deep Strike placement uses `BattlefieldPlacementKind.DEEP_STRIKE`.
+- Reinforcements itself is never serialized as a placement kind.
+
+### Phase 10L: transport embark/disembark shell
+
+CORE V1 investigation:
+
+- Inspect transport assignment, embark, disembark, destroyed transport
+  disembark, capacity validation, and movement-phase transport decisions.
+- Keep transport state separate from placed battlefield state.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `tests/rules/test_core_transport_movement_phase.py`
+- transport/deployment tests
+- any transport assignment helpers used during setup
+
+Reuse guidance:
+
+- Reuse the invariant that Embark removes models from battlefield and places
+  them into transport cargo.
+- Reuse the invariant that Disembark places models onto battlefield from cargo.
+- Do not model Embark or Disembark as Movement phase actions.
+- Transport capacity and restrictions should be data-driven.
+
+Expected CORE V2 result:
+
+- Embark emits `BattlefieldRemovalKind.EMBARK`.
+- Disembark emits `BattlefieldPlacementKind.DISEMBARK`.
+- Embarked units are not placed units and cannot be selected for Normal Move.
+- Disembark places models with placement records.
+- Capacity validation fails explicitly.
+
+### Phase 10M: triggered movement foundation
+
+CORE V1 investigation:
+
+- Inspect Blood Surge, reactive move flags, Battle Focus-style movement,
+  reactive pursuit, and surge validation.
+- Do not collapse all reactive moves into one movement kind.
+- Treat "reactive" as a trigger/timing category; treat "surge" as a specific
+  displacement kind or rule family.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- surge/reactive movement tests
+- faction/rule handlers that queue reactive movement decisions
+
+Reuse guidance:
+
+- Reuse trigger timing ideas and validation edge cases.
+- Do not treat triggered moves as Movement phase actions.
+- Triggered movement can occur in opponent phases and must record source
+  timing/rule.
+- Use `ModelDisplacementKind.SURGE_MOVE` for surge-style displacement.
+- Use a descriptor for broader triggered movement categories.
+
+Expected CORE V2 result:
+
+- triggered movement descriptor exists;
+- Blood-Surge-like movement is not a Movement phase action;
+- triggered movement records source rule and trigger timing;
+- triggered movement emits displacement records;
+- triggered movement does not appear in `SELECT_MOVEMENT_ACTION`.
+
+### Phase 11: shooting phase body vertical slice
+
+CORE V1 investigation:
+
+- Inspect shooting decision flow, target selection, line of sight, weapon
+  declaration, attack sequence, damage allocation, and model destruction.
+- Inspect LoS and terrain visibility code only after Phase 10F terrain and Phase
+  10H path/geometry foundations exist.
+- Do not port shooting as one large handler.
+
+Relevant CORE V1 areas:
+
+- shooting decision handlers;
+- shooting commander/ranker tests;
+- `battlefield/terrain_visibility.py`;
+- `tests/rules/test_line_of_sight.py`;
+- damage allocation tests.
+
+Reuse guidance:
+
+- Reuse decision sequencing and attack pipeline invariants.
+- Reuse LoS edge cases once CORE V2 terrain/geometry are available.
+- Model destruction must emit battlefield removal records.
+- Weapon abilities must come from typed descriptors, not raw text.
+
+Expected CORE V2 result:
+
+- select shooting unit;
+- target selection;
+- LoS/range checks;
+- declare weapons;
+- hit/wound/save/damage;
+- damage allocation;
+- model destruction with removal records;
+- event log and replay.
+
+### Phase 12: charge and fight phase body vertical slice
+
+CORE V1 investigation:
+
+- Inspect charge declaration, charge roll, charge movement, pile-in, fight target
+  selection, melee declaration, attack resolution, consolidate, and interrupt
+  handling.
+- Inspect fight movement validation for pile-in/consolidate constraints.
+
+Relevant CORE V1 areas:
+
+- charge/fight decision handlers;
+- `src/warhammer40k_ai/fight_move.py`;
+- charge diagnostics;
+- melee tests;
+- charge movement tests.
+
+Reuse guidance:
+
+- Reuse timing and validation invariants.
+- Charge move, pile-in, and consolidate are model displacements, not Movement
+  phase actions.
+- Charge movement must emit displacement records.
+- Fight movement must use movement legality/pathing primitives rather than
+  duplicating geometry logic.
+- Interrupts must remain typed decision metadata.
+
+Expected CORE V2 result:
+
+- declare charge;
+- charge roll;
+- charge movement with `PathWitness`;
+- Heroic Intervention interrupt;
+- pile-in;
+- fight target selection;
+- melee declaration;
+- attack resolution;
+- consolidate;
+- displacement records for charge/pile-in/consolidate.
+
+### Phase 13: richer deployment, reserves, transports, and pre-battle abilities
+
+CORE V1 investigation:
+
+- Inspect setup flow, deployment, redeploy, Scout, Infiltrate, reserves, Deep
+  Strike, transports, leader attachment, and pre-battle rules.
+- Prioritize behavior that now has CORE V2 lifecycle slots and
+  placement/removal records.
+
+Relevant CORE V1 areas:
+
+- `src/warhammer40k_ai/engine/game_setup_flow.py`
+- `src/warhammer40k_ai/engine/game_phase_flow.py`
+- `src/warhammer40k_ai/engine/reserve_entry_rules.py`
+- deployment/prebattle/transport tests
+
+Reuse guidance:
+
+- Reuse setup sequence invariants and reserve validation ideas.
+- Deployment and redeploy must emit placement/removal records.
+- Scout moves are model displacements.
+- Infiltrate/Deep Strike are placement-rule mechanisms.
+- Transport assignment/capacity remains data-driven.
+
+Expected CORE V2 result:
+
+- richer deployment;
+- Scout;
+- Infiltrate;
+- reserves;
+- Deep Strike;
+- embark/disembark;
+- destroyed transport disembark;
+- transport capacity restrictions;
+- leader attachment constraints;
+- reserve restriction validation.
+
+### Phase 14: broad content import and ability handler expansion
+
+CORE V1 investigation:
+
+- Inspect existing faction/detachment/codex implementations only after the
+  owning CORE V2 schemas and timing windows exist.
+- Use CORE V1 tests to identify edge cases, not as runtime architecture.
+
+Relevant CORE V1 areas:
+
+- faction/rule modules;
+- datasheet/wargear mixins;
+- faction-specific tests;
+- ability-specific movement/shooting/fight tests.
+
+Reuse guidance:
+
+- Load real facts as soon as schema exists.
+- Instantiate real units only through mustering.
+- Execute rules only in owning phase/timing-window handler.
+- Source text must remain linked to structured descriptors.
+- Unsupported ability shapes remain explicit unsupported descriptors.
+- Runtime engine code must not parse raw codex text.
+
+Expected CORE V2 result:
+
+- movement handlers for supported movement modifiers/capabilities;
+- shooting handlers for supported weapon abilities;
+- charge/fight handlers for supported melee/timing abilities;
+- deployment/pre-battle handlers for supported setup abilities;
+- replay coverage for each imported behavior.
+
 ## 5. Test policy
 
 ### Pure tests
