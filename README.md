@@ -876,6 +876,7 @@ Invariants:
 - player choice uses `DecisionRequest` / `DecisionResult`;
 - legal movement units come from placed runtime units, not ad hoc fixtures;
 - movement requires complete placement for mustered models before unit selection;
+- replay payloads reject `battlefield_state` before `DEPLOY_ARMIES` completes;
 - selected units are scoped to the active player;
 - a unit cannot be selected twice in the same Movement phase;
 - no displacement, movement action, path witness, or objective update is implemented yet.

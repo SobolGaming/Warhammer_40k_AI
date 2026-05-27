@@ -266,6 +266,10 @@ def _validate_battlefield_state_consistency(*, state: GameState) -> None:
         if _state_requires_battlefield_state(state):
             raise GameLifecycleError("Lifecycle state is missing battlefield_state.")
         return
+    if not _state_allows_battlefield_state(state):
+        raise GameLifecycleError(
+            "Lifecycle state battlefield_state must be absent before DEPLOY_ARMIES."
+        )
     try:
         scenario = BattlefieldScenario(
             armies=tuple(state.army_definitions),
@@ -337,6 +341,18 @@ def _state_requires_mustered_armies(state: GameState) -> bool:
 
 
 def _state_requires_battlefield_state(state: GameState) -> bool:
+    if state.stage is not GameLifecycleStage.SETUP:
+        return True
+    if state.setup_step_index is None:
+        return True
+    try:
+        deploy_step_index = state.setup_sequence.index(SetupStep.DEPLOY_ARMIES)
+    except ValueError:
+        return False
+    return state.setup_step_index > deploy_step_index
+
+
+def _state_allows_battlefield_state(state: GameState) -> bool:
     if state.stage is not GameLifecycleStage.SETUP:
         return True
     if state.setup_step_index is None:

@@ -240,6 +240,24 @@ def test_lifecycle_from_payload_rejects_missing_battlefield_state_after_deploy()
         GameLifecycle.from_payload(payload)
 
 
+def test_lifecycle_from_payload_rejects_battlefield_state_before_deploy_armies() -> None:
+    lifecycle = GameLifecycle()
+    lifecycle.start(_config())
+    lifecycle.advance_until_decision_or_terminal()
+    assert lifecycle.state is not None
+    assert lifecycle.state.battlefield_state is None
+    assert tuple(lifecycle.state.army_definitions)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase10b-early-placement",
+        armies=tuple(lifecycle.state.army_definitions),
+    )
+    payload = _payload_copy(lifecycle)
+    payload["state"]["battlefield_state"] = scenario.battlefield_state.to_payload()
+
+    with pytest.raises(GameLifecycleError, match="absent before DEPLOY_ARMIES"):
+        GameLifecycle.from_payload(payload)
+
+
 def test_lifecycle_from_payload_rejects_movement_phase_state_outside_movement() -> None:
     lifecycle = _lifecycle_after_movement_unit_selection()
     payload = _payload_copy(lifecycle)
