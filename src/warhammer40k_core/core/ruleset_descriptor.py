@@ -263,6 +263,22 @@ class EngagementPolicyDescriptor:
             "vertical_inches": self.vertical_inches,
         }
 
+    def contains_distance(
+        self,
+        *,
+        horizontal_inches: object,
+        vertical_inches: object,
+    ) -> bool:
+        horizontal = _validate_non_negative_number(
+            "EngagementPolicyDescriptor horizontal distance",
+            horizontal_inches,
+        )
+        vertical = _validate_non_negative_number(
+            "EngagementPolicyDescriptor vertical distance",
+            vertical_inches,
+        )
+        return horizontal <= self.horizontal_inches and vertical <= self.vertical_inches
+
     @classmethod
     def from_payload(cls, payload: EngagementPolicyDescriptorPayload) -> Self:
         return cls(
