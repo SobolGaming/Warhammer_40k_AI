@@ -22,7 +22,7 @@ from warhammer40k_core.geometry.pathing import (
     PathWitness,
     TerrainPathLegalityContext,
 )
-from warhammer40k_core.geometry.terrain import TerrainVolume
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -160,7 +160,15 @@ class MovementCapabilitySet:
         is_beast = "BEAST" in keyword_set
         is_vehicle = "VEHICLE" in keyword_set
         is_monster = "MONSTER" in keyword_set
-        can_traverse_ruins_walls = is_infantry or is_beast
+        can_traverse_ruins_walls = bool(
+            keyword_set
+            & {
+                "BEAST",
+                "BELISARIUS_CAWL",
+                "IMPERIUM_PRIMARCH",
+                "INFANTRY",
+            }
+        )
         can_move_through_models = has_fly and descriptor.fly_policy.may_move_through_models
         can_move_through_terrain = can_traverse_ruins_walls or (
             has_fly and descriptor.fly_policy.may_move_through_terrain
@@ -528,6 +536,8 @@ class MovementLegalityContext:
         moving_model: Model,
         witness: PathWitness,
         terrain: tuple[TerrainVolume, ...] = (),
+        terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+        contact_footprint_available: bool = True,
         sample_interval_inches: float = 0.5,
     ) -> TerrainPathLegalityContext:
         return TerrainPathLegalityContext(
@@ -535,6 +545,9 @@ class MovementLegalityContext:
             witness=witness,
             terrain=terrain,
             terrain_movement_policy=self.terrain_movement_policy,
+            terrain_features=terrain_features,
+            movement_keywords=self.capabilities.keywords,
+            contact_footprint_available=contact_footprint_available,
             can_traverse_ruins_walls=self.capabilities.can_traverse_ruins_walls,
             can_move_through_terrain=self.capabilities.can_move_through_terrain,
             has_fly=self.capabilities.has_fly,

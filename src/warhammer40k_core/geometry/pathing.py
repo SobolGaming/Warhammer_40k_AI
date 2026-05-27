@@ -7,6 +7,8 @@ from itertools import pairwise
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
+    TerrainEndpointSupportPolicy,
+    TerrainFeatureMovementPolicy,
     TerrainMovementPolicy,
     TerrainMovementPolicyPayload,
     TerrainTraversalMode,
@@ -31,6 +33,9 @@ from warhammer40k_core.geometry.pose import (
 from warhammer40k_core.geometry.spatial_index import SpatialIndex, SpatialIndexPayload
 from warhammer40k_core.geometry.terrain import (
     ObstacleVolume,
+    TerrainFeatureDefinition,
+    TerrainFeatureDefinitionPayload,
+    TerrainSupportSurface,
     TerrainVolume,
     TerrainVolumePayload,
     terrain_volume_from_payload,
@@ -52,6 +57,15 @@ class PathFailureReason(StrEnum):
     TERRAIN_COLLISION = "terrain_collision"
     ENGAGEMENT_RANGE = "engagement_range"
     COHERENCY = "coherency"
+
+
+class TerrainEndpointViolationCode(StrEnum):
+    END_ON_FORBIDDEN_TERRAIN = "end_on_forbidden_terrain"
+    UPPER_FLOOR_KEYWORD_FORBIDDEN = "upper_floor_keyword_forbidden"
+    BASE_OVERHANGS_SUPPORT_SURFACE = "base_overhangs_support_surface"
+    MODEL_CANNOT_BE_PLACED_AT_ENDPOINT = "model_cannot_be_placed_at_endpoint"
+    ENDS_MID_CLIMB = "ends_mid_climb"
+    MANUAL_GEOMETRY_REQUIRED = "manual_geometry_required"
 
 
 class ModelPathPayload(TypedDict):
@@ -142,6 +156,7 @@ class TerrainTraversalViolationPayload(TypedDict):
     violation_code: str
     message: str
     terrain_id: str | None
+    surface_id: str | None
 
 
 class TerrainPathLegalityResultPayload(TypedDict):
@@ -155,7 +170,10 @@ class TerrainPathLegalityContextPayload(TypedDict):
     moving_model: ModelPayload
     witness: PathWitnessPayload
     terrain: list[TerrainVolumePayload]
+    terrain_features: list[TerrainFeatureDefinitionPayload]
     terrain_movement_policy: TerrainMovementPolicyPayload
+    movement_keywords: list[str]
+    contact_footprint_available: bool
     can_traverse_ruins_walls: bool
     can_move_through_terrain: bool
     has_fly: bool
@@ -800,6 +818,7 @@ class TerrainTraversalViolation:
     violation_code: str
     message: str
     terrain_id: str | None = None
+    surface_id: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -817,12 +836,18 @@ class TerrainTraversalViolation:
             "terrain_id",
             _validate_optional_identifier("TerrainTraversalViolation terrain_id", self.terrain_id),
         )
+        object.__setattr__(
+            self,
+            "surface_id",
+            _validate_optional_identifier("TerrainTraversalViolation surface_id", self.surface_id),
+        )
 
     def to_payload(self) -> TerrainTraversalViolationPayload:
         return {
             "violation_code": self.violation_code,
             "message": self.message,
             "terrain_id": self.terrain_id,
+            "surface_id": self.surface_id,
         }
 
     @classmethod
@@ -831,6 +856,7 @@ class TerrainTraversalViolation:
             violation_code=payload["violation_code"],
             message=payload["message"],
             terrain_id=payload["terrain_id"],
+            surface_id=payload["surface_id"],
         )
 
 
@@ -920,6 +946,9 @@ class TerrainPathLegalityContext:
     witness: PathWitness
     terrain: tuple[TerrainVolume, ...]
     terrain_movement_policy: TerrainMovementPolicy
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = ()
+    movement_keywords: tuple[str, ...] = ()
+    contact_footprint_available: bool = True
     can_traverse_ruins_walls: bool = False
     can_move_through_terrain: bool = False
     has_fly: bool = False
@@ -944,6 +973,26 @@ class TerrainPathLegalityContext:
                 "TerrainPathLegalityContext terrain_movement_policy must be "
                 "a TerrainMovementPolicy."
             )
+        object.__setattr__(
+            self,
+            "terrain_features",
+            _validate_terrain_feature_tuple(
+                "TerrainPathLegalityContext terrain_features",
+                self.terrain_features,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "movement_keywords",
+            _validate_keyword_tuple(
+                "TerrainPathLegalityContext movement_keywords",
+                self.movement_keywords,
+            ),
+        )
+        _validate_bool(
+            "TerrainPathLegalityContext contact_footprint_available",
+            self.contact_footprint_available,
+        )
         _validate_bool(
             "TerrainPathLegalityContext can_traverse_ruins_walls",
             self.can_traverse_ruins_walls,
@@ -986,60 +1035,112 @@ class TerrainPathLegalityContext:
 
         segments: list[TerrainPathSegment] = []
         for terrain in self.terrain:
-            touching_poses = tuple(
-                pose
-                for pose in sampled_path
-                if _model_horizontally_intersects_terrain(
-                    _model_at_pose(self.moving_model, pose),
-                    terrain,
-                )
+            violation = self._append_terrain_volume_segment(
+                terrain=terrain,
+                feature_policy=None,
+                path=path,
+                sampled_path=sampled_path,
+                segments=segments,
             )
-            if not touching_poses:
-                continue
-            if not self.terrain_movement_policy.may_end_mid_climb and _pose_is_mid_climb(
-                path[-1], terrain, self.moving_model
-            ):
+            if violation is not None:
                 return TerrainPathLegalityResult.invalid(
-                    TerrainTraversalViolation(
-                        violation_code="terrain_mid_climb_endpoint_forbidden",
-                        message="Terrain path cannot end mid-climb.",
-                        terrain_id=terrain.terrain_id,
-                    ),
+                    violation,
                     segments=tuple(segments),
                     sampled_pose_count=len(sampled_path),
                 )
 
-            traversal_mode = self._traversal_mode_for_terrain(terrain, touching_poses)
-            if traversal_mode is TerrainTraversalMode.BLOCKED:
-                return TerrainPathLegalityResult.invalid(
-                    TerrainTraversalViolation(
-                        violation_code="terrain_feature_transit_forbidden",
-                        message="Terrain path crosses terrain without traversal permission.",
-                        terrain_id=terrain.terrain_id,
-                    ),
-                    segments=tuple(segments),
-                    sampled_pose_count=len(sampled_path),
-                )
-
-            segments.append(
-                _terrain_path_segment(
-                    terrain_id=terrain.terrain_id,
-                    traversal_mode=traversal_mode,
+        for feature in self.terrain_features:
+            feature_policy = self.terrain_movement_policy.policy_for_feature_kind(
+                feature.feature_kind
+            )
+            for terrain in feature.terrain_volumes():
+                violation = self._append_terrain_volume_segment(
+                    terrain=terrain,
+                    feature_policy=feature_policy,
                     path=path,
-                    touching_poses=touching_poses,
-                    policy=self.terrain_movement_policy,
+                    sampled_path=sampled_path,
+                    segments=segments,
                 )
+                if violation is not None:
+                    return TerrainPathLegalityResult.invalid(
+                        violation,
+                        segments=tuple(segments),
+                        sampled_pose_count=len(sampled_path),
+                    )
+            endpoint_violation = self._endpoint_violation_for_feature(
+                feature=feature,
+                feature_policy=feature_policy,
+                end_pose=path[-1],
             )
+            if endpoint_violation is not None:
+                return TerrainPathLegalityResult.invalid(
+                    endpoint_violation,
+                    segments=tuple(segments),
+                    sampled_pose_count=len(sampled_path),
+                )
 
         return TerrainPathLegalityResult.valid(
             segments=tuple(segments),
             sampled_pose_count=len(sampled_path),
         )
 
+    def _append_terrain_volume_segment(
+        self,
+        *,
+        terrain: TerrainVolume,
+        feature_policy: TerrainFeatureMovementPolicy | None,
+        path: tuple[Pose, ...],
+        sampled_path: tuple[Pose, ...],
+        segments: list[TerrainPathSegment],
+    ) -> TerrainTraversalViolation | None:
+        touching_poses = tuple(
+            pose
+            for pose in sampled_path
+            if _model_horizontally_intersects_terrain(
+                _model_at_pose(self.moving_model, pose),
+                terrain,
+            )
+        )
+        if not touching_poses:
+            return None
+        if not self.terrain_movement_policy.may_end_mid_climb and _pose_is_mid_climb(
+            path[-1], terrain, self.moving_model
+        ):
+            return TerrainTraversalViolation(
+                violation_code=TerrainEndpointViolationCode.ENDS_MID_CLIMB.value,
+                message="Terrain path cannot end mid-climb.",
+                terrain_id=terrain.terrain_id,
+            )
+
+        traversal_mode = self._traversal_mode_for_terrain(
+            terrain,
+            touching_poses,
+            feature_policy=feature_policy,
+        )
+        if traversal_mode is TerrainTraversalMode.BLOCKED:
+            return TerrainTraversalViolation(
+                violation_code="terrain_feature_transit_forbidden",
+                message="Terrain path crosses terrain without traversal permission.",
+                terrain_id=terrain.terrain_id,
+            )
+
+        segments.append(
+            _terrain_path_segment(
+                terrain_id=terrain.terrain_id,
+                traversal_mode=traversal_mode,
+                path=path,
+                touching_poses=touching_poses,
+                policy=self.terrain_movement_policy,
+            )
+        )
+        return None
+
     def _traversal_mode_for_terrain(
         self,
         terrain: TerrainVolume,
         touching_poses: tuple[Pose, ...],
+        *,
+        feature_policy: TerrainFeatureMovementPolicy | None,
     ) -> TerrainTraversalMode:
         if (
             self.has_fly
@@ -1047,27 +1148,137 @@ class TerrainPathLegalityContext:
             and _path_reaches_or_clears_terrain_top(touching_poses, terrain)
         ):
             return self.terrain_movement_policy.fly_traversal_mode
+        free_height = self.terrain_movement_policy.freely_traversable_height_threshold_inches
+        if (
+            feature_policy is not None
+            and feature_policy.freely_moved_over_height_inches is not None
+        ):
+            free_height = feature_policy.freely_moved_over_height_inches
+        if terrain.height <= free_height:
+            return TerrainTraversalMode.FREELY_TRAVERSABLE
         if type(terrain) is ObstacleVolume:
-            if self.can_move_through_terrain or self.can_traverse_ruins_walls:
+            if self._can_move_through_feature(feature_policy):
                 return self.terrain_movement_policy.infantry_beast_ruins_wall_traversal_mode
-            if _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+            if (
+                feature_policy is None or feature_policy.can_move_over
+            ) and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
                 return TerrainTraversalMode.CLIMB
             return TerrainTraversalMode.BLOCKED
         if (
-            terrain.height
-            <= self.terrain_movement_policy.freely_traversable_height_threshold_inches
-        ):
-            return TerrainTraversalMode.FREELY_TRAVERSABLE
-        if _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+            feature_policy is None or feature_policy.can_move_over
+        ) and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
             return TerrainTraversalMode.CLIMB
         return TerrainTraversalMode.BLOCKED
+
+    def _can_move_through_feature(
+        self,
+        feature_policy: TerrainFeatureMovementPolicy | None,
+    ) -> bool:
+        if feature_policy is None:
+            return self.can_move_through_terrain or self.can_traverse_ruins_walls
+        if feature_policy.can_move_through:
+            return True
+        if not self.terrain_movement_policy.requires_permission_to_move_through_features:
+            return True
+        return bool(
+            set(self.movement_keywords) & set(feature_policy.through_terrain_allowed_keywords)
+        )
+
+    def _endpoint_violation_for_feature(
+        self,
+        *,
+        feature: TerrainFeatureDefinition,
+        feature_policy: TerrainFeatureMovementPolicy,
+        end_pose: Pose,
+    ) -> TerrainTraversalViolation | None:
+        end_model = _model_at_pose(self.moving_model, end_pose)
+        surfaces = feature.support_surfaces(
+            no_overhang_required=feature_policy.no_overhang_required
+        )
+        touched_surfaces = tuple(
+            surface
+            for surface in surfaces
+            if _model_endpoint_is_on_support_surface(end_model, surface)
+        )
+        if not touched_surfaces:
+            return None
+
+        for surface in touched_surfaces:
+            is_elevated_surface = surface.z_inches > 0.0
+            if (
+                feature_policy.endpoint_support_policy
+                is TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP
+            ):
+                return TerrainTraversalViolation(
+                    violation_code=TerrainEndpointViolationCode.END_ON_FORBIDDEN_TERRAIN.value,
+                    message="Model cannot end on top of this terrain feature.",
+                    terrain_id=feature.feature_id,
+                    surface_id=surface.surface_id,
+                )
+            if (
+                feature_policy.endpoint_support_policy
+                is TerrainEndpointSupportPolicy.ALLOWED_ON_GROUND_FLOOR_ONLY
+                and is_elevated_surface
+            ):
+                return TerrainTraversalViolation(
+                    violation_code=(
+                        TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value
+                    ),
+                    message="Model cannot end on an elevated surface for this terrain feature.",
+                    terrain_id=feature.feature_id,
+                    surface_id=surface.surface_id,
+                )
+            if (
+                is_elevated_surface
+                and feature_policy.ground_floor_only_unless_keyword
+                and not (
+                    set(self.movement_keywords) & set(feature_policy.upper_floor_allowed_keywords)
+                )
+            ):
+                return TerrainTraversalViolation(
+                    violation_code=TerrainEndpointViolationCode.UPPER_FLOOR_KEYWORD_FORBIDDEN.value,
+                    message="Model lacks a keyword required to end on this upper floor.",
+                    terrain_id=feature.feature_id,
+                    surface_id=surface.surface_id,
+                )
+            support_containment_required = surface.no_overhang_required and (
+                is_elevated_surface
+                or feature_policy.endpoint_support_policy
+                is TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG
+            )
+            if support_containment_required and not self.contact_footprint_available:
+                return TerrainTraversalViolation(
+                    violation_code=TerrainEndpointViolationCode.MANUAL_GEOMETRY_REQUIRED.value,
+                    message=(
+                        "No-overhang endpoint validation requires explicit contact-footprint "
+                        "geometry."
+                    ),
+                    terrain_id=feature.feature_id,
+                    surface_id=surface.surface_id,
+                )
+            if support_containment_required and not _model_base_is_fully_supported(
+                end_model,
+                surface,
+            ):
+                return TerrainTraversalViolation(
+                    violation_code=(
+                        TerrainEndpointViolationCode.BASE_OVERHANGS_SUPPORT_SURFACE.value
+                    ),
+                    message="Model base must not overhang the support surface.",
+                    terrain_id=feature.feature_id,
+                    surface_id=surface.surface_id,
+                )
+        return None
 
     def to_payload(self) -> TerrainPathLegalityContextPayload:
         return {
             "moving_model": self.moving_model.to_payload(),
             "witness": self.witness.to_payload(),
             "terrain": [terrain.to_payload() for terrain in self.terrain],
+            "terrain_features": [feature.to_payload() for feature in self.terrain_features],
             "terrain_movement_policy": self.terrain_movement_policy.to_payload(),
+            "movement_keywords": list(self.movement_keywords),
+            "contact_footprint_available": self.contact_footprint_available,
             "can_traverse_ruins_walls": self.can_traverse_ruins_walls,
             "can_move_through_terrain": self.can_move_through_terrain,
             "has_fly": self.has_fly,
@@ -1083,6 +1294,12 @@ class TerrainPathLegalityContext:
             terrain_movement_policy=TerrainMovementPolicy.from_payload(
                 payload["terrain_movement_policy"]
             ),
+            terrain_features=tuple(
+                TerrainFeatureDefinition.from_payload(feature)
+                for feature in payload["terrain_features"]
+            ),
+            movement_keywords=tuple(payload["movement_keywords"]),
+            contact_footprint_available=payload["contact_footprint_available"],
             can_traverse_ruins_walls=payload["can_traverse_ruins_walls"],
             can_move_through_terrain=payload["can_move_through_terrain"],
             has_fly=payload["has_fly"],
@@ -1520,6 +1737,45 @@ def _validate_terrain_tuple(field_name: str, values: object) -> tuple[TerrainVol
     return tuple(sorted(terrain_values, key=lambda terrain: terrain.terrain_id))
 
 
+def _validate_terrain_feature_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[TerrainFeatureDefinition, ...]:
+    if type(values) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    features = tuple(
+        _validate_terrain_feature(f"{field_name} feature", value)
+        for value in cast(tuple[object, ...], values)
+    )
+    seen: set[str] = set()
+    for feature in features:
+        if feature.feature_id in seen:
+            raise GeometryError(f"{field_name} must not contain duplicate feature IDs.")
+        seen.add(feature.feature_id)
+    return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _validate_terrain_feature(field_name: str, value: object) -> TerrainFeatureDefinition:
+    if type(value) is not TerrainFeatureDefinition:
+        raise GeometryError(f"{field_name} must be a TerrainFeatureDefinition.")
+    return value
+
+
+def _validate_keyword_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    keywords: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        keyword = _validate_identifier(f"{field_name} keyword", value)
+        keyword = keyword.upper().replace(" ", "_").replace("-", "_")
+        if keyword in seen:
+            raise GeometryError(f"{field_name} must not contain duplicate keywords.")
+        seen.add(keyword)
+        keywords.append(keyword)
+    return tuple(sorted(keywords))
+
+
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise GeometryError(f"{field_name} must be a tuple.")
@@ -1698,6 +1954,34 @@ def _terrain_path_segment(
 def _model_horizontally_intersects_terrain(model: Model, terrain: TerrainVolume) -> bool:
     return shapely_backend.footprint_for_terrain(terrain).intersects(
         shapely_backend.footprint_for_base(model.base, model.pose)
+    )
+
+
+def _model_endpoint_is_on_support_surface(
+    model: Model,
+    surface: TerrainSupportSurface,
+) -> bool:
+    if not math.isclose(model.pose.position.z, surface.z_inches):
+        return False
+    return shapely_backend.base_footprint_within_bounds(
+        model.base,
+        model.pose,
+        surface.bounds(),
+    ) or shapely_backend.base_footprint_intersects_bounds(
+        model.base,
+        model.pose,
+        surface.bounds(),
+    )
+
+
+def _model_base_is_fully_supported(
+    model: Model,
+    surface: TerrainSupportSurface,
+) -> bool:
+    return shapely_backend.base_footprint_within_bounds(
+        model.base,
+        model.pose,
+        surface.bounds(),
     )
 
 

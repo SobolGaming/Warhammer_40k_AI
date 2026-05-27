@@ -1238,11 +1238,10 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/utility/calcs.py`
 - `src/warhammer40k_ai/battlefield/map.py`
 
-### Phase 10I: terrain movement semantics foundation
+### Phase 10I: terrain movement semantics and endpoint support
 
-This phase turns terrain fixtures and pathing smoke checks into movement-facing
-terrain traversal policy. It does not implement cover, line of sight, or
-shooting terrain behavior.
+This phase implements movement-relevant terrain behavior. It does not implement
+visibility, Benefit of Cover, Plunging Fire, or shooting interactions.
 
 Modules:
 
@@ -1258,30 +1257,46 @@ Objects:
 - `TerrainPathLegalityContext`
 - `TerrainPathSegment`
 - `TerrainTraversalViolation`
+- `TerrainFeatureMovementPolicy`
+- `TerrainEndpointSupportPolicy`
+- `TerrainSupportSurface`
 
 Invariants:
 
-- terrain movement policy is descriptor data, not hard-coded pathing behavior;
-- freely traversable terrain height threshold is explicit, including 2" for
-  10e;
-- climb up/down vertical distance is accounted for separately from horizontal
-  movement;
-- a model cannot end mid-climb;
-- models cannot move through terrain features unless a movement capability or
-  terrain traversal mode permits it;
-- `INFANTRY`/`BEAST` ruins-wall traversal is represented as capability input;
-- FLY terrain movement records an air-path measurement hook;
-- this phase does not implement cover, LoS, or shooting terrain rules.
+- terrain movement behavior is descriptor-driven by terrain feature kind;
+- models may move up, over, and down terrain unless terrain-specific policy says
+  otherwise;
+- terrain features 2" or less in height can be moved over as if not there;
+- taller terrain requires vertical distance to climb up/down;
+- models cannot end a move mid-climb;
+- some terrain can be moved over but not ended on;
+- support surfaces can require the model base/contact footprint to be fully
+  contained;
+- no-overhang endpoint checks apply to elevated hills/structures and upper
+  ruin floors;
+- Ruins upper-floor endpoint eligibility is keyword-gated;
+- Ruins through-wall/floor traversal is keyword-gated;
+- baseless/hull models require explicit contact-footprint geometry before
+  no-overhang checks can be final;
+- visibility, cover, Plunging Fire, and shooting effects are deferred to
+  11A/11B.
 
 Required tests:
 
-- model can move freely over terrain up to the descriptor threshold;
-- model cannot pass through a wall without traversal permission;
-- model can climb terrain above the threshold by paying vertical distance;
+- model can move freely over terrain <= 2";
+- model pays vertical distance to climb terrain > 2";
 - model cannot end mid-climb;
-- `INFANTRY`/`BEAST` capability can permit ruins-wall traversal;
-- non-permitted `VEHICLE` cannot pass through ruins wall;
-- FLY terrain movement records air-path measurement hook;
+- model cannot end on barricade/fuel pipes;
+- model cannot end on battlefield debris/statuary;
+- model can end on hill/structure top when base is fully contained;
+- model cannot end on hill/structure top when base overhangs;
+- `INFANTRY` can move through Ruins walls/floors by policy;
+- non-eligible `VEHICLE` cannot move through Ruins walls/floors;
+- `INFANTRY`/`BEAST`/`FLY` can end on upper Ruins floor if no overhang;
+- non-eligible model cannot end on upper Ruins floor;
+- upper Ruins floor endpoint fails if base overhangs;
+- baseless/hull no-overhang check returns typed unsupported/manual-geometry-required
+  when contact geometry is missing;
 - terrain traversal result serializes without Python object reprs.
 
 CORE V1 relevant areas:
