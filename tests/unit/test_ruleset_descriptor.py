@@ -21,7 +21,12 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     RulesetDescriptorError,
     SetupStepKind,
+    TerrainEndpointSupportPolicy,
+    TerrainFeatureKind,
+    TerrainFeatureMovementPolicy,
+    TerrainMovementPolicy,
     TerrainObjectiveControlPolicy,
+    TerrainTraversalMode,
 )
 
 
@@ -171,6 +176,68 @@ def test_ruleset_descriptors_capture_coherency_hidden_and_fly_policy() -> None:
     assert preview.fly_policy.ignores_vertical_distance
 
 
+def test_tenth_terrain_movement_policy_uses_two_inch_free_traversal_threshold() -> None:
+    policy = RulesetDescriptor.warhammer_40000_tenth().terrain_movement_policy
+    payload = policy.to_payload()
+
+    assert policy.freely_traversable_height_threshold_inches == 2.0
+    assert policy.climb_vertical_distance_counts
+    assert not policy.may_end_mid_climb
+    assert policy.requires_permission_to_move_through_features
+    assert policy.infantry_beast_ruins_wall_traversal_mode is TerrainTraversalMode.THROUGH_FEATURE
+    assert policy.fly_traversal_mode is TerrainTraversalMode.AIR_PATH
+    assert policy.fly_uses_air_path_measurement
+    ruins_policy = policy.policy_for_feature_kind(TerrainFeatureKind.RUINS)
+    assert ruins_policy.endpoint_support_policy is (
+        TerrainEndpointSupportPolicy.ALLOWED_ON_ANY_FLOOR_WITH_NO_OVERHANG
+    )
+    assert ruins_policy.no_overhang_required
+    assert ruins_policy.ground_floor_only_unless_keyword
+    assert "INFANTRY" in ruins_policy.through_terrain_allowed_keywords
+    assert "FLY" in ruins_policy.upper_floor_allowed_keywords
+    barricade_policy = policy.policy_for_feature_kind(TerrainFeatureKind.BARRICADE_AND_FUEL_PIPES)
+    assert (
+        barricade_policy.endpoint_support_policy is TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP
+    )
+    assert TerrainMovementPolicy.from_payload(payload).to_payload() == payload
+
+
+def test_terrain_movement_policy_rejects_invalid_shapes() -> None:
+    with pytest.raises(RulesetDescriptorError, match="greater than 0"):
+        TerrainMovementPolicy(
+            freely_traversable_height_threshold_inches=0.0,
+            climb_vertical_distance_counts=True,
+            may_end_mid_climb=False,
+            requires_permission_to_move_through_features=True,
+            infantry_beast_ruins_wall_traversal_mode=TerrainTraversalMode.THROUGH_FEATURE,
+            fly_traversal_mode=TerrainTraversalMode.AIR_PATH,
+            fly_uses_air_path_measurement=True,
+            feature_policies=_terrain_feature_policies(),
+        )
+
+    with pytest.raises(RulesetDescriptorError, match="requires AIR_PATH"):
+        TerrainMovementPolicy(
+            freely_traversable_height_threshold_inches=2.0,
+            climb_vertical_distance_counts=True,
+            may_end_mid_climb=False,
+            requires_permission_to_move_through_features=True,
+            infantry_beast_ruins_wall_traversal_mode=TerrainTraversalMode.THROUGH_FEATURE,
+            fly_traversal_mode=TerrainTraversalMode.CLIMB,
+            fly_uses_air_path_measurement=True,
+            feature_policies=_terrain_feature_policies(),
+        )
+
+    with pytest.raises(RulesetDescriptorError, match="no-overhang endpoint policy"):
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.HILLS,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=2.0,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
+            no_overhang_required=False,
+        )
+
+
 def test_ruleset_descriptor_rejects_duplicate_movement_modes() -> None:
     policy = MovementModePolicy(
         movement_mode=MovementMode.NORMAL,
@@ -259,3 +326,27 @@ def test_descriptor_hash_changes_if_coherency_policy_changes() -> None:
     )
 
     assert changed.descriptor_hash != descriptor.descriptor_hash
+
+
+def test_descriptor_hash_changes_if_terrain_movement_policy_changes() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    changed = replace(
+        descriptor,
+        terrain_movement_policy=TerrainMovementPolicy(
+            freely_traversable_height_threshold_inches=1.0,
+            climb_vertical_distance_counts=True,
+            may_end_mid_climb=False,
+            requires_permission_to_move_through_features=True,
+            infantry_beast_ruins_wall_traversal_mode=TerrainTraversalMode.THROUGH_FEATURE,
+            fly_traversal_mode=TerrainTraversalMode.AIR_PATH,
+            fly_uses_air_path_measurement=True,
+            feature_policies=_terrain_feature_policies(),
+        ),
+        descriptor_hash="",
+    )
+
+    assert changed.descriptor_hash != descriptor.descriptor_hash
+
+
+def _terrain_feature_policies() -> tuple[TerrainFeatureMovementPolicy, ...]:
+    return RulesetDescriptor.warhammer_40000_tenth().terrain_movement_policy.feature_policies

@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.ruleset_descriptor import (
+    RulesetDescriptorError,
+)
+from warhammer40k_core.core.ruleset_descriptor import (
+    TerrainFeatureKind as TerrainFeatureKind,
+)
+from warhammer40k_core.core.ruleset_descriptor import (
+    terrain_feature_kind_from_token as core_terrain_feature_kind_from_token,
+)
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pose import (
     GeometryError,
@@ -45,6 +53,17 @@ class TerrainFloorDefinitionPayload(TypedDict):
     thickness_inches: float
 
 
+class TerrainSupportSurfacePayload(TypedDict):
+    surface_id: str
+    terrain_feature_id: str
+    z_inches: float
+    center_x_inches: float
+    center_y_inches: float
+    width_inches: float
+    depth_inches: float
+    no_overhang_required: bool
+
+
 class TerrainFeatureDefinitionPayload(TypedDict):
     feature_id: str
     feature_kind: str
@@ -55,15 +74,6 @@ class TerrainFeatureDefinitionPayload(TypedDict):
     walls: list[TerrainWallDefinitionPayload]
     floors: list[TerrainFloorDefinitionPayload]
     source_id: str | None
-
-
-class TerrainFeatureKind(StrEnum):
-    RUINS = "ruins"
-    WOODS = "woods"
-    CRATER_AND_RUBBLE = "crater_and_rubble"
-    BARRICADE_AND_FUEL_PIPES = "barricade_and_fuel_pipes"
-    DEBRIS_AND_STATUARY = "debris_and_statuary"
-    HILLS_AND_SEALED_BUILDINGS = "hills_and_sealed_buildings"
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,6 +108,9 @@ class TerrainVolume:
     def vertical_interval(self) -> tuple[float, float]:
         bottom = self.bottom_center.z
         return (bottom, bottom + self.height)
+
+    def top_z_inches(self) -> float:
+        return self.bottom_center.z + self.height
 
     def horizontal_bounds(self) -> tuple[float, float, float, float]:
         half_width = self.width / 2.0
@@ -411,6 +424,115 @@ class TerrainFloorDefinition:
 
 
 @dataclass(frozen=True, slots=True)
+class TerrainSupportSurface:
+    surface_id: str
+    terrain_feature_id: str
+    z_inches: float
+    center_x_inches: float
+    center_y_inches: float
+    width_inches: float
+    depth_inches: float
+    no_overhang_required: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "surface_id",
+            _validate_definition_id(
+                "TerrainSupportSurface surface_id",
+                self.surface_id,
+                reserved_prefix="surface:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "terrain_feature_id",
+            _validate_definition_id(
+                "TerrainSupportSurface terrain_feature_id",
+                self.terrain_feature_id,
+                reserved_prefix="terrain:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "z_inches",
+            _validate_non_negative_coordinate("TerrainSupportSurface z_inches", self.z_inches),
+        )
+        object.__setattr__(
+            self,
+            "center_x_inches",
+            _validate_finite_coordinate(
+                "TerrainSupportSurface center_x_inches",
+                self.center_x_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "center_y_inches",
+            _validate_finite_coordinate(
+                "TerrainSupportSurface center_y_inches",
+                self.center_y_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "width_inches",
+            _validate_positive_number(
+                "TerrainSupportSurface width_inches",
+                self.width_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "depth_inches",
+            _validate_positive_number(
+                "TerrainSupportSurface depth_inches",
+                self.depth_inches,
+            ),
+        )
+        if type(self.no_overhang_required) is not bool:
+            raise GeometryError("TerrainSupportSurface no_overhang_required must be a bool.")
+
+    def bounds(self) -> tuple[float, float, float, float]:
+        half_width = self.width_inches / 2.0
+        half_depth = self.depth_inches / 2.0
+        return (
+            self.center_x_inches - half_width,
+            self.center_y_inches - half_depth,
+            self.center_x_inches + half_width,
+            self.center_y_inches + half_depth,
+        )
+
+    def to_payload(self) -> TerrainSupportSurfacePayload:
+        return {
+            "surface_id": self.surface_id,
+            "terrain_feature_id": self.terrain_feature_id,
+            "z_inches": self.z_inches,
+            "center_x_inches": self.center_x_inches,
+            "center_y_inches": self.center_y_inches,
+            "width_inches": self.width_inches,
+            "depth_inches": self.depth_inches,
+            "no_overhang_required": self.no_overhang_required,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> Self:
+        if not isinstance(payload, dict):
+            raise GeometryError("Terrain support surface payload must be a mapping.")
+        raw_payload = cast(TerrainSupportSurfacePayload, payload)
+        return cls(
+            surface_id=raw_payload["surface_id"],
+            terrain_feature_id=raw_payload["terrain_feature_id"],
+            z_inches=raw_payload["z_inches"],
+            center_x_inches=raw_payload["center_x_inches"],
+            center_y_inches=raw_payload["center_y_inches"],
+            width_inches=raw_payload["width_inches"],
+            depth_inches=raw_payload["depth_inches"],
+            no_overhang_required=raw_payload["no_overhang_required"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class TerrainFeatureDefinition:
     feature_id: str
     feature_kind: TerrainFeatureKind
@@ -496,6 +618,22 @@ class TerrainFeatureDefinition:
         volumes = (*self.floor_volumes(), *self.wall_volumes())
         return tuple(sorted(volumes, key=lambda volume: volume.terrain_id))
 
+    def support_surfaces(self, *, no_overhang_required: bool) -> tuple[TerrainSupportSurface, ...]:
+        surfaces = tuple(
+            TerrainSupportSurface(
+                surface_id=floor.floor_id,
+                terrain_feature_id=self.feature_id,
+                z_inches=floor.bottom_z_inches,
+                center_x_inches=floor.center_x_inches,
+                center_y_inches=floor.center_y_inches,
+                width_inches=floor.width_inches,
+                depth_inches=floor.depth_inches,
+                no_overhang_required=no_overhang_required,
+            )
+            for floor in self.floors
+        )
+        return tuple(sorted(surfaces, key=lambda surface: surface.surface_id))
+
     def to_payload(self) -> TerrainFeatureDefinitionPayload:
         return {
             "feature_id": self.feature_id,
@@ -551,14 +689,10 @@ class TerrainFeatureDefinition:
 
 
 def terrain_feature_kind_from_token(token: object) -> TerrainFeatureKind:
-    if isinstance(token, TerrainFeatureKind):
-        return token
-    if type(token) is str:
-        try:
-            return TerrainFeatureKind(token)
-        except ValueError as exc:
-            raise GeometryError(f"Unsupported terrain feature kind: {token}.") from exc
-    raise GeometryError("Terrain feature kind token must be a string or TerrainFeatureKind.")
+    try:
+        return core_terrain_feature_kind_from_token(token)
+    except RulesetDescriptorError as exc:
+        raise GeometryError("Unsupported terrain feature kind token.") from exc
 
 
 def terrain_volume_from_payload(payload: TerrainVolumePayload) -> TerrainVolume:

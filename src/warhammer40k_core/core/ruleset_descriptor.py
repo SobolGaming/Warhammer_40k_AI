@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass
 from datetime import date
 from enum import StrEnum
-from typing import Self, TypedDict
+from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.objectives import ObjectiveAnchorKind
 from warhammer40k_core.core.ruleset import RulesetId, RulesetIdPayload
@@ -40,6 +40,35 @@ class ChargeEndpointRequirement(StrEnum):
 class TerrainObjectiveControlPolicy(StrEnum):
     UNSUPPORTED = "unsupported"
     TERRAIN_AREA_OCCUPANCY = "terrain_area_occupancy"
+
+
+class TerrainFeatureKind(StrEnum):
+    RUINS = "ruins"
+    WOODS = "woods"
+    CRATER_AND_RUBBLE = "crater_and_rubble"
+    BARRICADE_AND_FUEL_PIPES = "barricade_and_fuel_pipes"
+    DEBRIS_AND_STATUARY = "debris_and_statuary"
+    BATTLEFIELD_DEBRIS_AND_STATUARY = "battlefield_debris_and_statuary"
+    HILLS_AND_SEALED_BUILDINGS = "hills_and_sealed_buildings"
+    HILLS = "hills"
+    INDUSTRIAL_STRUCTURES = "industrial_structures"
+    SEALED_BUILDINGS = "sealed_buildings"
+    ARMOURED_CONTAINERS = "armoured_containers"
+
+
+class TerrainEndpointSupportPolicy(StrEnum):
+    NOT_ALLOWED_ON_TOP = "not_allowed_on_top"
+    ALLOWED_ON_TOP_WITH_NO_OVERHANG = "allowed_on_top_with_no_overhang"
+    ALLOWED_ON_GROUND_FLOOR_ONLY = "allowed_on_ground_floor_only"
+    ALLOWED_ON_ANY_FLOOR_WITH_NO_OVERHANG = "allowed_on_any_floor_with_no_overhang"
+
+
+class TerrainTraversalMode(StrEnum):
+    BLOCKED = "blocked"
+    FREELY_TRAVERSABLE = "freely_traversable"
+    CLIMB = "climb"
+    THROUGH_FEATURE = "through_feature"
+    AIR_PATH = "air_path"
 
 
 class CoverEffect(StrEnum):
@@ -105,6 +134,29 @@ class ChargePolicyDescriptorPayload(TypedDict):
     endpoint_requirement: str
 
 
+class TerrainFeatureMovementPolicyPayload(TypedDict):
+    terrain_feature_kind: str
+    can_move_over: bool
+    can_move_through: bool
+    freely_moved_over_height_inches: float | None
+    endpoint_support_policy: str
+    no_overhang_required: bool
+    upper_floor_allowed_keywords: list[str]
+    through_terrain_allowed_keywords: list[str]
+    ground_floor_only_unless_keyword: bool
+
+
+class TerrainMovementPolicyPayload(TypedDict):
+    freely_traversable_height_threshold_inches: float
+    climb_vertical_distance_counts: bool
+    may_end_mid_climb: bool
+    requires_permission_to_move_through_features: bool
+    infantry_beast_ruins_wall_traversal_mode: str
+    fly_traversal_mode: str
+    fly_uses_air_path_measurement: bool
+    feature_policies: list[TerrainFeatureMovementPolicyPayload]
+
+
 class TerrainVisibilityPolicyDescriptorPayload(TypedDict):
     hidden_supported: bool
     hidden_detection_range_inches: float | None
@@ -161,6 +213,7 @@ class RulesetDescriptorPayload(TypedDict):
     engagement_policy: EngagementPolicyDescriptorPayload
     movement_policy: MovementPolicyDescriptorPayload
     charge_policy: ChargePolicyDescriptorPayload
+    terrain_movement_policy: TerrainMovementPolicyPayload
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptorPayload
     objective_policy: ObjectivePolicyDescriptorPayload
     coherency_policy: CoherencyPolicyDescriptorPayload
@@ -434,6 +487,228 @@ class ChargePolicyDescriptor:
             ),
             endpoint_requirement=charge_endpoint_requirement_from_token(
                 payload["endpoint_requirement"]
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainFeatureMovementPolicy:
+    terrain_feature_kind: TerrainFeatureKind
+    can_move_over: bool
+    can_move_through: bool
+    freely_moved_over_height_inches: float | None
+    endpoint_support_policy: TerrainEndpointSupportPolicy
+    no_overhang_required: bool
+    upper_floor_allowed_keywords: tuple[str, ...] = ()
+    through_terrain_allowed_keywords: tuple[str, ...] = ()
+    ground_floor_only_unless_keyword: bool = False
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "terrain_feature_kind",
+            terrain_feature_kind_from_token(self.terrain_feature_kind),
+        )
+        _validate_bool("TerrainFeatureMovementPolicy can_move_over", self.can_move_over)
+        _validate_bool("TerrainFeatureMovementPolicy can_move_through", self.can_move_through)
+        object.__setattr__(
+            self,
+            "freely_moved_over_height_inches",
+            _validate_optional_positive_number(
+                "TerrainFeatureMovementPolicy freely_moved_over_height_inches",
+                self.freely_moved_over_height_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "endpoint_support_policy",
+            terrain_endpoint_support_policy_from_token(self.endpoint_support_policy),
+        )
+        _validate_bool(
+            "TerrainFeatureMovementPolicy no_overhang_required",
+            self.no_overhang_required,
+        )
+        object.__setattr__(
+            self,
+            "upper_floor_allowed_keywords",
+            _validate_keyword_tuple(
+                "TerrainFeatureMovementPolicy upper_floor_allowed_keywords",
+                self.upper_floor_allowed_keywords,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "through_terrain_allowed_keywords",
+            _validate_keyword_tuple(
+                "TerrainFeatureMovementPolicy through_terrain_allowed_keywords",
+                self.through_terrain_allowed_keywords,
+            ),
+        )
+        _validate_bool(
+            "TerrainFeatureMovementPolicy ground_floor_only_unless_keyword",
+            self.ground_floor_only_unless_keyword,
+        )
+        if (
+            self.endpoint_support_policy
+            in {
+                TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
+                TerrainEndpointSupportPolicy.ALLOWED_ON_ANY_FLOOR_WITH_NO_OVERHANG,
+            }
+            and not self.no_overhang_required
+        ):
+            raise RulesetDescriptorError(
+                "TerrainFeatureMovementPolicy no-overhang endpoint policy requires "
+                "no_overhang_required."
+            )
+
+    def to_payload(self) -> TerrainFeatureMovementPolicyPayload:
+        return {
+            "terrain_feature_kind": self.terrain_feature_kind.value,
+            "can_move_over": self.can_move_over,
+            "can_move_through": self.can_move_through,
+            "freely_moved_over_height_inches": self.freely_moved_over_height_inches,
+            "endpoint_support_policy": self.endpoint_support_policy.value,
+            "no_overhang_required": self.no_overhang_required,
+            "upper_floor_allowed_keywords": list(self.upper_floor_allowed_keywords),
+            "through_terrain_allowed_keywords": list(self.through_terrain_allowed_keywords),
+            "ground_floor_only_unless_keyword": self.ground_floor_only_unless_keyword,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainFeatureMovementPolicyPayload) -> Self:
+        return cls(
+            terrain_feature_kind=terrain_feature_kind_from_token(payload["terrain_feature_kind"]),
+            can_move_over=payload["can_move_over"],
+            can_move_through=payload["can_move_through"],
+            freely_moved_over_height_inches=payload["freely_moved_over_height_inches"],
+            endpoint_support_policy=terrain_endpoint_support_policy_from_token(
+                payload["endpoint_support_policy"]
+            ),
+            no_overhang_required=payload["no_overhang_required"],
+            upper_floor_allowed_keywords=tuple(payload["upper_floor_allowed_keywords"]),
+            through_terrain_allowed_keywords=tuple(payload["through_terrain_allowed_keywords"]),
+            ground_floor_only_unless_keyword=payload["ground_floor_only_unless_keyword"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainMovementPolicy:
+    freely_traversable_height_threshold_inches: float
+    climb_vertical_distance_counts: bool
+    may_end_mid_climb: bool
+    requires_permission_to_move_through_features: bool
+    infantry_beast_ruins_wall_traversal_mode: TerrainTraversalMode
+    fly_traversal_mode: TerrainTraversalMode
+    fly_uses_air_path_measurement: bool
+    feature_policies: tuple[TerrainFeatureMovementPolicy, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "freely_traversable_height_threshold_inches",
+            _validate_positive_number(
+                "TerrainMovementPolicy freely_traversable_height_threshold_inches",
+                self.freely_traversable_height_threshold_inches,
+            ),
+        )
+        _validate_bool(
+            "TerrainMovementPolicy climb_vertical_distance_counts",
+            self.climb_vertical_distance_counts,
+        )
+        _validate_bool("TerrainMovementPolicy may_end_mid_climb", self.may_end_mid_climb)
+        _validate_bool(
+            "TerrainMovementPolicy requires_permission_to_move_through_features",
+            self.requires_permission_to_move_through_features,
+        )
+        object.__setattr__(
+            self,
+            "infantry_beast_ruins_wall_traversal_mode",
+            terrain_traversal_mode_from_token(self.infantry_beast_ruins_wall_traversal_mode),
+        )
+        object.__setattr__(
+            self,
+            "fly_traversal_mode",
+            terrain_traversal_mode_from_token(self.fly_traversal_mode),
+        )
+        _validate_bool(
+            "TerrainMovementPolicy fly_uses_air_path_measurement",
+            self.fly_uses_air_path_measurement,
+        )
+        if (
+            self.fly_uses_air_path_measurement
+            and self.fly_traversal_mode is not TerrainTraversalMode.AIR_PATH
+        ):
+            raise RulesetDescriptorError(
+                "TerrainMovementPolicy fly air-path measurement requires AIR_PATH mode."
+            )
+        object.__setattr__(
+            self,
+            "feature_policies",
+            _validate_terrain_feature_movement_policy_tuple(self.feature_policies),
+        )
+
+    @classmethod
+    def warhammer_40000_tenth_default(cls) -> Self:
+        return cls(
+            freely_traversable_height_threshold_inches=2.0,
+            climb_vertical_distance_counts=True,
+            may_end_mid_climb=False,
+            requires_permission_to_move_through_features=True,
+            infantry_beast_ruins_wall_traversal_mode=TerrainTraversalMode.THROUGH_FEATURE,
+            fly_traversal_mode=TerrainTraversalMode.AIR_PATH,
+            fly_uses_air_path_measurement=True,
+            feature_policies=_terrain_feature_movement_policies_for_tenth(),
+        )
+
+    def policy_for_feature_kind(
+        self,
+        feature_kind: object,
+    ) -> TerrainFeatureMovementPolicy:
+        kind = terrain_feature_kind_from_token(feature_kind)
+        for policy in self.feature_policies:
+            if policy.terrain_feature_kind is kind:
+                return policy
+        raise RulesetDescriptorError(
+            f"TerrainMovementPolicy does not define {kind.value} terrain movement."
+        )
+
+    def to_payload(self) -> TerrainMovementPolicyPayload:
+        return {
+            "freely_traversable_height_threshold_inches": (
+                self.freely_traversable_height_threshold_inches
+            ),
+            "climb_vertical_distance_counts": self.climb_vertical_distance_counts,
+            "may_end_mid_climb": self.may_end_mid_climb,
+            "requires_permission_to_move_through_features": (
+                self.requires_permission_to_move_through_features
+            ),
+            "infantry_beast_ruins_wall_traversal_mode": (
+                self.infantry_beast_ruins_wall_traversal_mode.value
+            ),
+            "fly_traversal_mode": self.fly_traversal_mode.value,
+            "fly_uses_air_path_measurement": self.fly_uses_air_path_measurement,
+            "feature_policies": [policy.to_payload() for policy in self.feature_policies],
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainMovementPolicyPayload) -> Self:
+        return cls(
+            freely_traversable_height_threshold_inches=payload[
+                "freely_traversable_height_threshold_inches"
+            ],
+            climb_vertical_distance_counts=payload["climb_vertical_distance_counts"],
+            may_end_mid_climb=payload["may_end_mid_climb"],
+            requires_permission_to_move_through_features=payload[
+                "requires_permission_to_move_through_features"
+            ],
+            infantry_beast_ruins_wall_traversal_mode=terrain_traversal_mode_from_token(
+                payload["infantry_beast_ruins_wall_traversal_mode"]
+            ),
+            fly_traversal_mode=terrain_traversal_mode_from_token(payload["fly_traversal_mode"]),
+            fly_uses_air_path_measurement=payload["fly_uses_air_path_measurement"],
+            feature_policies=tuple(
+                TerrainFeatureMovementPolicy.from_payload(policy)
+                for policy in payload["feature_policies"]
             ),
         )
 
@@ -796,6 +1071,7 @@ class RulesetDescriptor:
     engagement_policy: EngagementPolicyDescriptor
     movement_policy: MovementPolicyDescriptor
     charge_policy: ChargePolicyDescriptor
+    terrain_movement_policy: TerrainMovementPolicy
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptor
     objective_policy: ObjectivePolicyDescriptor
     coherency_policy: CoherencyPolicyDescriptor
@@ -828,6 +1104,11 @@ class RulesetDescriptor:
             "RulesetDescriptor charge_policy",
             self.charge_policy,
             ChargePolicyDescriptor,
+        )
+        _validate_descriptor_part(
+            "RulesetDescriptor terrain_movement_policy",
+            self.terrain_movement_policy,
+            TerrainMovementPolicy,
         )
         _validate_descriptor_part(
             "RulesetDescriptor terrain_visibility_policy",
@@ -891,6 +1172,7 @@ class RulesetDescriptor:
                 target_selection_timing=ChargeTargetSelectionTiming.BEFORE_ROLL,
                 endpoint_requirement=ChargeEndpointRequirement.DECLARED_TARGET_ENGAGEMENT,
             ),
+            terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_tenth_default(),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=False,
                 hidden_detection_range_inches=None,
@@ -949,6 +1231,7 @@ class RulesetDescriptor:
                 target_selection_timing=ChargeTargetSelectionTiming.AFTER_ROLL,
                 endpoint_requirement=ChargeEndpointRequirement.SELECTED_TARGET_BASE_CONTACT,
             ),
+            terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_tenth_default(),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=True,
                 hidden_detection_range_inches=15.0,
@@ -1006,6 +1289,9 @@ class RulesetDescriptor:
             engagement_policy=EngagementPolicyDescriptor.from_payload(payload["engagement_policy"]),
             movement_policy=MovementPolicyDescriptor.from_payload(payload["movement_policy"]),
             charge_policy=ChargePolicyDescriptor.from_payload(payload["charge_policy"]),
+            terrain_movement_policy=TerrainMovementPolicy.from_payload(
+                payload["terrain_movement_policy"]
+            ),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor.from_payload(
                 payload["terrain_visibility_policy"]
             ),
@@ -1028,6 +1314,7 @@ class RulesetDescriptor:
             "engagement_policy": self.engagement_policy.to_payload(),
             "movement_policy": self.movement_policy.to_payload(),
             "charge_policy": self.charge_policy.to_payload(),
+            "terrain_movement_policy": self.terrain_movement_policy.to_payload(),
             "terrain_visibility_policy": self.terrain_visibility_policy.to_payload(),
             "objective_policy": self.objective_policy.to_payload(),
             "coherency_policy": self.coherency_policy.to_payload(),
@@ -1088,6 +1375,41 @@ def terrain_objective_control_policy_from_token(
         raise RulesetDescriptorError(
             f"Unsupported TerrainObjectiveControlPolicy token: {token}."
         ) from exc
+
+
+def terrain_feature_kind_from_token(token: object) -> TerrainFeatureKind:
+    if type(token) is TerrainFeatureKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("TerrainFeatureKind token must be a string.")
+    try:
+        return TerrainFeatureKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported TerrainFeatureKind token: {token}.") from exc
+
+
+def terrain_endpoint_support_policy_from_token(token: object) -> TerrainEndpointSupportPolicy:
+    if type(token) is TerrainEndpointSupportPolicy:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("TerrainEndpointSupportPolicy token must be a string.")
+    try:
+        return TerrainEndpointSupportPolicy(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(
+            f"Unsupported TerrainEndpointSupportPolicy token: {token}."
+        ) from exc
+
+
+def terrain_traversal_mode_from_token(token: object) -> TerrainTraversalMode:
+    if type(token) is TerrainTraversalMode:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("TerrainTraversalMode token must be a string.")
+    try:
+        return TerrainTraversalMode(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported TerrainTraversalMode token: {token}.") from exc
 
 
 def cover_effect_from_token(token: object) -> CoverEffect:
@@ -1254,6 +1576,149 @@ def _movement_policy_for_eleventh_preview() -> MovementPolicyDescriptor:
     )
 
 
+def _terrain_feature_movement_policies_for_tenth() -> tuple[TerrainFeatureMovementPolicy, ...]:
+    unrestricted_keywords: tuple[str, ...] = ()
+    ruins_through_keywords = (
+        "BEAST",
+        "BELISARIUS_CAWL",
+        "IMPERIUM_PRIMARCH",
+        "INFANTRY",
+    )
+    ruins_upper_floor_keywords = (
+        "BEAST",
+        "BELISARIUS_CAWL",
+        "FLY",
+        "IMPERIUM_PRIMARCH",
+        "INFANTRY",
+    )
+    freely_moved_over_height_inches = 2.0
+    return (
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.BARRICADE_AND_FUEL_PIPES,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP,
+            no_overhang_required=False,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP,
+            no_overhang_required=False,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.CRATER_AND_RUBBLE,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_GROUND_FLOOR_ONLY,
+            no_overhang_required=False,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.DEBRIS_AND_STATUARY,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP,
+            no_overhang_required=False,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.HILLS,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
+            no_overhang_required=True,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.HILLS_AND_SEALED_BUILDINGS,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
+            no_overhang_required=True,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.INDUSTRIAL_STRUCTURES,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
+            no_overhang_required=True,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.ARMOURED_CONTAINERS,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
+            no_overhang_required=True,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.SEALED_BUILDINGS,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG,
+            no_overhang_required=True,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.RUINS,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=(
+                TerrainEndpointSupportPolicy.ALLOWED_ON_ANY_FLOOR_WITH_NO_OVERHANG
+            ),
+            no_overhang_required=True,
+            upper_floor_allowed_keywords=ruins_upper_floor_keywords,
+            through_terrain_allowed_keywords=ruins_through_keywords,
+            ground_floor_only_unless_keyword=True,
+        ),
+        TerrainFeatureMovementPolicy(
+            terrain_feature_kind=TerrainFeatureKind.WOODS,
+            can_move_over=True,
+            can_move_through=False,
+            freely_moved_over_height_inches=freely_moved_over_height_inches,
+            endpoint_support_policy=TerrainEndpointSupportPolicy.ALLOWED_ON_GROUND_FLOOR_ONLY,
+            no_overhang_required=False,
+            upper_floor_allowed_keywords=unrestricted_keywords,
+            through_terrain_allowed_keywords=unrestricted_keywords,
+            ground_floor_only_unless_keyword=False,
+        ),
+    )
+
+
 def _descriptor_hash(payload: RulesetDescriptorPayload) -> str:
     clean_payload = dict(payload)
     clean_payload["descriptor_hash"] = ""
@@ -1339,6 +1804,49 @@ def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tupl
     return tuple(sorted(validated))
 
 
+def _validate_keyword_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        keyword = _validate_identifier(f"{field_name} value", value).upper()
+        keyword = keyword.replace(" ", "_").replace("-", "_")
+        if keyword in seen:
+            raise RulesetDescriptorError(f"{field_name} must not contain duplicates.")
+        seen.add(keyword)
+        validated.append(keyword)
+    return tuple(sorted(validated))
+
+
+def _validate_terrain_feature_movement_policy_tuple(
+    values: object,
+) -> tuple[TerrainFeatureMovementPolicy, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError("TerrainMovementPolicy feature_policies must be a tuple.")
+    policies = tuple(
+        _validate_terrain_feature_movement_policy("TerrainMovementPolicy feature_policy", value)
+        for value in cast(tuple[object, ...], values)
+    )
+    if not policies:
+        raise RulesetDescriptorError("TerrainMovementPolicy feature_policies must not be empty.")
+    seen: set[TerrainFeatureKind] = set()
+    for policy in policies:
+        if policy.terrain_feature_kind in seen:
+            raise RulesetDescriptorError("TerrainMovementPolicy feature_policies must be unique.")
+        seen.add(policy.terrain_feature_kind)
+    return tuple(sorted(policies, key=lambda policy: policy.terrain_feature_kind.value))
+
+
+def _validate_terrain_feature_movement_policy(
+    field_name: str,
+    value: object,
+) -> TerrainFeatureMovementPolicy:
+    if type(value) is not TerrainFeatureMovementPolicy:
+        raise RulesetDescriptorError(f"{field_name} must be a TerrainFeatureMovementPolicy.")
+    return value
+
+
 def _validate_source_date(value: object) -> str:
     if type(value) is date:
         return value.isoformat()
@@ -1372,6 +1880,13 @@ def _validate_non_negative_number(field_name: str, value: object) -> float:
     number = _validate_finite_number(field_name, value)
     if number < 0.0:
         raise RulesetDescriptorError(f"{field_name} must not be negative.")
+    return number
+
+
+def _validate_positive_number(field_name: str, value: object) -> float:
+    number = _validate_finite_number(field_name, value)
+    if number <= 0.0:
+        raise RulesetDescriptorError(f"{field_name} must be greater than 0.")
     return number
 
 

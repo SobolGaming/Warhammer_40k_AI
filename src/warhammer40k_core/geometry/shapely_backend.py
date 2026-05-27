@@ -29,6 +29,8 @@ class _Geometry(Protocol):
 
     def intersects(self, other: _Geometry) -> bool: ...
 
+    def covers(self, other: _Geometry) -> bool: ...
+
 
 class _GeometryModule(Protocol):
     def Point(self, x: float, y: float) -> _Geometry: ...
@@ -113,6 +115,26 @@ def footprint_for_terrain(terrain: TerrainVolume) -> _Geometry:
         valid_terrain.bottom_center.x + half_width,
         valid_terrain.bottom_center.y + half_depth,
     )
+
+
+def base_footprint_within_bounds(
+    base: BaseShape,
+    pose: Pose,
+    bounds: tuple[float, float, float, float],
+) -> bool:
+    min_x, min_y, max_x, max_y = bounds
+    surface = _geometry_module().box(min_x, min_y, max_x, max_y)
+    return surface.covers(footprint_for_base(base, pose))
+
+
+def base_footprint_intersects_bounds(
+    base: BaseShape,
+    pose: Pose,
+    bounds: tuple[float, float, float, float],
+) -> bool:
+    min_x, min_y, max_x, max_y = bounds
+    surface = _geometry_module().box(min_x, min_y, max_x, max_y)
+    return surface.intersects(footprint_for_base(base, pose))
 
 
 def base_footprint_distance(

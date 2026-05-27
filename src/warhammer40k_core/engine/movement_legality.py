@@ -10,13 +10,19 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
     RulesetDescriptorError,
+    TerrainMovementPolicy,
+    TerrainMovementPolicyPayload,
 )
 from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     model_displacement_kind_from_token,
 )
-from warhammer40k_core.geometry.pathing import PathValidationContext, PathWitness
-from warhammer40k_core.geometry.terrain import TerrainVolume
+from warhammer40k_core.geometry.pathing import (
+    PathValidationContext,
+    PathWitness,
+    TerrainPathLegalityContext,
+)
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -66,6 +72,7 @@ class MovementLegalityContextPayload(TypedDict):
     movement_mode: str
     capabilities: MovementCapabilitySetPayload
     engagement_policy: EngagementMovementPolicyPayload
+    terrain_movement_policy: TerrainMovementPolicyPayload
 
 
 class MovementLegalityResultPayload(TypedDict):
@@ -153,7 +160,15 @@ class MovementCapabilitySet:
         is_beast = "BEAST" in keyword_set
         is_vehicle = "VEHICLE" in keyword_set
         is_monster = "MONSTER" in keyword_set
-        can_traverse_ruins_walls = is_infantry or is_beast
+        can_traverse_ruins_walls = bool(
+            keyword_set
+            & {
+                "BEAST",
+                "BELISARIUS_CAWL",
+                "IMPERIUM_PRIMARCH",
+                "INFANTRY",
+            }
+        )
         can_move_through_models = has_fly and descriptor.fly_policy.may_move_through_models
         can_move_through_terrain = can_traverse_ruins_walls or (
             has_fly and descriptor.fly_policy.may_move_through_terrain
@@ -358,6 +373,7 @@ class MovementLegalityContext:
     movement_mode: MovementMode
     capabilities: MovementCapabilitySet
     engagement_policy: EngagementMovementPolicy
+    terrain_movement_policy: TerrainMovementPolicy
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -386,6 +402,10 @@ class MovementLegalityContext:
         if type(self.engagement_policy) is not EngagementMovementPolicy:
             raise MovementLegalityError(
                 "MovementLegalityContext engagement_policy must be an EngagementMovementPolicy."
+            )
+        if type(self.terrain_movement_policy) is not TerrainMovementPolicy:
+            raise MovementLegalityError(
+                "MovementLegalityContext terrain_movement_policy must be a TerrainMovementPolicy."
             )
         if self.capabilities.ruleset_descriptor_hash != self.ruleset_descriptor_hash:
             raise MovementLegalityError(
@@ -425,6 +445,7 @@ class MovementLegalityContext:
                 descriptor,
                 movement_mode=mode,
             ),
+            terrain_movement_policy=descriptor.terrain_movement_policy,
         )
 
     def validate_end_position_enemy_engagement(
@@ -509,6 +530,30 @@ class MovementLegalityContext:
             sample_interval_inches=sample_interval_inches,
         )
 
+    def to_terrain_path_legality_context(
+        self,
+        *,
+        moving_model: Model,
+        witness: PathWitness,
+        terrain: tuple[TerrainVolume, ...] = (),
+        terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+        contact_footprint_available: bool = True,
+        sample_interval_inches: float = 0.5,
+    ) -> TerrainPathLegalityContext:
+        return TerrainPathLegalityContext(
+            moving_model=moving_model,
+            witness=witness,
+            terrain=terrain,
+            terrain_movement_policy=self.terrain_movement_policy,
+            terrain_features=terrain_features,
+            movement_keywords=self.capabilities.keywords,
+            contact_footprint_available=contact_footprint_available,
+            can_traverse_ruins_walls=self.capabilities.can_traverse_ruins_walls,
+            can_move_through_terrain=self.capabilities.can_move_through_terrain,
+            has_fly=self.capabilities.has_fly,
+            sample_interval_inches=sample_interval_inches,
+        )
+
     def _fly_transit_applies(self) -> bool:
         return self.capabilities.has_fly and self.movement_mode in _FLY_TRANSIT_MOVEMENT_MODES
 
@@ -520,6 +565,7 @@ class MovementLegalityContext:
             "movement_mode": self.movement_mode.value,
             "capabilities": self.capabilities.to_payload(),
             "engagement_policy": self.engagement_policy.to_payload(),
+            "terrain_movement_policy": self.terrain_movement_policy.to_payload(),
         }
 
     @classmethod
@@ -535,6 +581,9 @@ class MovementLegalityContext:
             capabilities=MovementCapabilitySet.from_payload(raw_payload["capabilities"]),
             engagement_policy=EngagementMovementPolicy.from_payload(
                 raw_payload["engagement_policy"]
+            ),
+            terrain_movement_policy=TerrainMovementPolicy.from_payload(
+                raw_payload["terrain_movement_policy"]
             ),
         )
 
