@@ -663,22 +663,39 @@ Invariants:
 - one engine-owned setup-to-battle state machine;
 - setup sequence comes from `RulesetDescriptor.setup_sequence`, not duplicated driver code;
 - battle phase order comes from `RulesetDescriptor.battle_phase_sequence`;
+- `RulesetDescriptor.descriptor_hash` is recorded in lifecycle state and replay-facing payloads;
+- `advance_until_decision_or_terminal()` advances deterministic lifecycle transitions until a
+  decision, terminal status, unsupported status, or deterministic transition guard is reached;
 - phase wrap switches the active player;
 - battle round increments only after every player has completed the fight phase;
 - lifecycle advances only through engine commands and decision results;
 - UI, headless, replay, and network do not own phase progression;
-- unsupported phase bodies fail explicitly or return typed unsupported results;
+- phase handlers are explicit for every phase in the configured battle sequence;
+- Phase 9B placeholder phase bodies emit explicit no-op events and typed unsupported statuses;
 - all lifecycle state is deterministic and serializable.
 
 Required tests:
 
 - new game starts at `MUSTER_ARMIES`;
 - setup steps advance in order;
+- lifecycle reads setup order from `RulesetDescriptor.setup_sequence`, not local constants;
+- lifecycle reads battle phase order from `RulesetDescriptor.battle_phase_sequence`, not local constants;
+- one call to `advance_until_decision_or_terminal()` reaches the first setup decision from a new
+  game;
 - setup completion enters battle round 1 command phase;
 - battle phases advance command, movement, shooting, charge, fight;
 - phase wrap switches the active player;
 - battle round increments after all players complete fight phase;
 - lifecycle stops at a `DecisionRequest`;
+- missing battle phase handlers are not silently skipped;
+- malformed setup sequences missing `SELECT_SECONDARY_MISSIONS` fail at config construction;
+- battle phase sequences that do not start with `COMMAND` fail at config construction;
+- `SELECT_SECONDARY_MISSIONS` emits secret decision requests for both players;
+- Fixed and Tactical secondary choices serialize without leaking hidden opponent choices;
+- Tactical secondary draws occur in Command phase, not setup;
+- descriptor hash is recorded in lifecycle state and replay-facing payloads;
+- lifecycle payload hash, sequence, and config-derived state mismatches fail during
+  `from_payload()`;
 - no UI or headless-specific phase path exists.
 
 ### Phase 9C: army mustering and runtime instantiation
