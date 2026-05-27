@@ -15,7 +15,8 @@ from warhammer40k_core.geometry.pathing import (
     PathValidationResultPayload,
     PathWitness,
 )
-from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.pose import Point3, Pose
+from warhammer40k_core.geometry.terrain import TerrainVolume
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
@@ -75,6 +76,26 @@ def test_vehicle_cannot_transit_friendly_vehicle_or_monster_blocker() -> None:
     assert result.violations[0].blocker_id == "friendly-vehicle"
 
 
+def test_fly_vehicle_still_treats_friendly_vehicle_monster_models_as_blockers() -> None:
+    mover = _model("fly-vehicle-mover", 1.0, 1.0, radius=0.7)
+    friendly_vehicle = _model("friendly-vehicle", 3.0, 1.0, radius=0.9)
+    context = _normal_legality_context(keywords=("FLY", "VEHICLE"))
+
+    result = _path_context(
+        context,
+        moving_model=mover,
+        friendly_models=(friendly_vehicle,),
+        friendly_vehicle_monster_model_ids=("friendly-vehicle",),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert context.capabilities.can_move_through_models
+    assert context.capabilities.blocks_friendly_vehicle_monster_pass_through
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "friendly_vehicle_monster_transit_forbidden"
+    assert result.violations[0].blocker_id == "friendly-vehicle"
+
+
 def test_model_cannot_cross_battlefield_edge() -> None:
     mover = _model("mover", 1.0, 1.0)
 
@@ -103,6 +124,28 @@ def test_model_cannot_path_through_enemy_base() -> None:
     assert not result.is_valid
     assert result.violations[0].violation_code == "enemy_model_base_crossed"
     assert result.violations[0].blocker_id == "enemy"
+
+
+def test_model_cannot_path_through_terrain_smoke_blocker() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    terrain = TerrainVolume(
+        terrain_id="ruin-wall",
+        bottom_center=Point3(3.0, 1.0, 0.0),
+        width=1.0,
+        depth=1.0,
+        height=3.0,
+    )
+
+    result = _path_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        terrain=(terrain,),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "terrain_collision"
+    assert result.violations[0].blocker_id == "ruin-wall"
 
 
 def test_normal_move_and_advance_cannot_transit_enemy_engagement_range() -> None:
@@ -250,6 +293,7 @@ def _path_context(
     moving_model: Model,
     friendly_models: tuple[Model, ...] = (),
     enemy_models: tuple[Model, ...] = (),
+    terrain: tuple[TerrainVolume, ...] = (),
     friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
     middle_pose: Pose | None = None,
     end_pose: Pose,
@@ -274,6 +318,7 @@ def _path_context(
         battlefield_depth_inches=10.0,
         friendly_models=friendly_models,
         enemy_models=enemy_models,
+        terrain=terrain,
         friendly_vehicle_monster_model_ids=friendly_vehicle_monster_model_ids,
         sample_interval_inches=sample_interval_inches,
     )

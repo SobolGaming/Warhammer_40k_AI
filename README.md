@@ -1196,7 +1196,7 @@ Invariants:
 - end-on-model overlap can be rejected;
 - base gap checks use base footprint geometry;
 - model-volume-at-end checks use resolved model geometry;
-- pivot-cost support is represented, even if not fully solved yet.
+- pivot-cost support is represented, even if not fully solved yet;
 - coherency policy is descriptor data only in this phase;
 - runtime coherency validation remains future work;
 - future coherency enforcement sites are setup/placement, end of any move, and
@@ -1216,7 +1216,7 @@ Required tests:
 - model cannot end in enemy Engagement Range for 10e Normal Move;
 - charge movement uses the charge policy and is the exception path for ending
   in Engagement Range;
-- non-circular base movement records pivot-cost placeholder.
+- non-circular base movement records pivot-cost placeholder;
 - 10e coherency descriptor uses a seven-model large-unit threshold;
 - 11e preview coherency descriptor uses all-models-within-distance policy.
 

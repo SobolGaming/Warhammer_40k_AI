@@ -473,6 +473,12 @@ class MovementLegalityContext:
         friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
         sample_interval_inches: float = 0.5,
     ) -> PathValidationContext:
+        friendly_vehicle_monster_blockers = friendly_vehicle_monster_model_ids
+        if (
+            self.capabilities.can_move_through_models
+            and not self.capabilities.blocks_friendly_vehicle_monster_pass_through
+        ):
+            friendly_vehicle_monster_blockers = ()
         return PathValidationContext(
             moving_model=moving_model,
             witness=witness,
@@ -481,11 +487,7 @@ class MovementLegalityContext:
             friendly_models=friendly_models,
             enemy_models=enemy_models,
             terrain=terrain,
-            friendly_vehicle_monster_model_ids=(
-                ()
-                if self.capabilities.can_move_through_models
-                else friendly_vehicle_monster_model_ids
-            ),
+            friendly_vehicle_monster_model_ids=friendly_vehicle_monster_blockers,
             may_transit_enemy_engagement=(self.engagement_policy.may_transit_enemy_engagement),
             may_end_in_enemy_engagement=self.engagement_policy.may_end_in_enemy_engagement,
             enemy_engagement_horizontal_inches=self.engagement_policy.horizontal_inches,
