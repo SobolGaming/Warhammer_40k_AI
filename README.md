@@ -105,6 +105,8 @@ warhammer40k_core/
     army_mustering.py
     unit_factory.py
     list_validation.py
+    battlefield_state.py
+    placement.py
     phases/
       command.py
       movement.py
@@ -790,38 +792,177 @@ Required tests:
 - replay payload round-trips after the smoke path;
 - public state hides opponent Fixed secondary choices.
 
-### Phase 10: movement phase body vertical slice
+### Phase 10A: battlefield placement bridge
 
-This phase fills the movement phase body behind the Phase 9B lifecycle. It does
-not own turn or phase progression.
+This phase is a minimal runtime bridge for movement vertical-slice tests. Phase
+9C creates mustered runtime `UnitInstance` and `ModelInstance` objects, but
+movement needs placed models. Phase 10A records deterministic model poses for
+those runtime instances without implementing full deployment rules.
+
+Modules:
+
+- `engine/battlefield_state.py`
+- `engine/placement.py`
+
+Objects:
+
+- `ModelPlacement`
+- `UnitPlacement`
+- `BattlefieldRuntimeState`
+- `PlacedArmy`
+- `BattlefieldScenario`
+
+Invariants:
+
+- every placed model references an existing `ModelInstance`;
+- every placed unit references an existing `UnitInstance`;
+- no model is placed twice;
+- no placed model belongs to the wrong army or player;
+- base size remains available from the referenced `ModelInstance`;
+- pose payloads are deterministic and serializable;
+- placement state round-trips without Python object reprs;
+- placement fixtures use mustered armies from `GameState`, not ad hoc models;
+- this phase does not implement full `DEPLOY_ARMIES` rules.
+
+Required tests:
+
+- lifecycle smoke config reaches `SELECT_SECONDARY_MISSIONS` with both armies
+  mustered;
+- deterministic placement state is created from both `ArmyDefinition` objects;
+- every placed model maps back to a runtime `ModelInstance`;
+- referenced model base sizes and characteristics remain available;
+- duplicate model placements fail explicitly;
+- missing unit/model placement references fail explicitly;
+- wrong-player placement drift fails explicitly;
+- placement and scenario payloads round-trip without Python object reprs.
+
+### Phase 10B: movement phase entry and unit selection
+
+This phase replaces the Phase 9B Movement placeholder with a real
+`MovementPhaseHandler`, but keeps the first movement vertical slice narrow. It
+does not move models yet.
+
+Modules:
+
+- `engine/phases/movement.py`
+- `engine/lifecycle.py`
+- `engine/battle_round_flow.py`
+
+Objects:
+
+- `MovementPhaseHandler`
+- `MovementPhaseState`
+- `MovementUnitSelection`
 
 Implement:
 
-- select unit;
-- select movement action;
-- advance roll;
-- reroll decision;
-- move models;
-- path witness;
-- datasheet Movement and keyword consumption;
-- movement ability descriptors for supported timing windows;
-- unit status update;
-- objective update;
-- event log;
-- decision record;
-- replay.
+- register `MovementPhaseHandler` in `GameLifecycle`;
+- emit `SELECT_MOVEMENT_UNIT`;
+- derive the legal unit set from the active player's mustered and placed units;
+- allow each unit to be selected once per Movement phase;
+- put the selected unit into a movement activation state;
+- stop at the unit-selection `DecisionRequest`;
+- record movement phase entry and unit selection in event/replay payloads.
+
+Invariants:
+
+- Movement phase progression remains owned by the engine lifecycle;
+- player choice uses `DecisionRequest` / `DecisionResult`;
+- legal movement units come from placed runtime units, not ad hoc fixtures;
+- selected units are scoped to the active player;
+- a unit cannot be selected twice in the same Movement phase;
+- no displacement, movement action, path witness, or objective update is implemented yet.
+
+Required tests:
+
+- lifecycle enters Movement with a real `MovementPhaseHandler`;
+- Movement emits `SELECT_MOVEMENT_UNIT` for the active player;
+- decision options contain only the active player's placed units;
+- selecting a unit records deterministic activation state and event/replay payloads;
+- already-selected units are excluded from the legal unit set;
+- no next movement action is resolved before unit selection is recorded.
+
+### Phase 10C: movement action and normal move
+
+This phase adds the first actual movement action after unit selection. It should
+support `REMAIN_STATIONARY` and `NORMAL_MOVE`; other movement modes remain
+explicitly unsupported.
+
+Modules:
+
+- `engine/phases/movement.py`
+- `engine/battlefield_state.py`
+- `geometry/pathing.py`
+
+Implement:
+
+- emit `SELECT_MOVEMENT_ACTION`;
+- support `REMAIN_STATIONARY`;
+- support `NORMAL_MOVE`;
+- consume the selected unit's datasheet Movement characteristic;
+- consume base size and current pose from placed `ModelInstance` data;
+- produce a `PathWitness` or typed movement witness for each moved model;
+- update model placements;
+- mark the selected unit as moved;
+- emit a movement activation terminal event;
+- queue/select the next unit only after the current activation terminal event.
+
+Unsupported movement modes:
+
+- `ADVANCE`;
+- `FALL_BACK`;
+- `FLY`;
+- embark/disembark;
+- terrain traversal beyond existing explicit descriptors;
+- enemy engagement constraints beyond existing explicit descriptors.
+
+Required tests:
+
+- `REMAIN_STATIONARY` marks the unit complete without changing poses;
+- `NORMAL_MOVE` consumes Movement, base size, and current pose;
+- movement updates placement payloads deterministically;
+- normal movement emits a witness and movement activation terminal event;
+- the selected unit cannot be selected again that phase;
+- the next `SELECT_MOVEMENT_UNIT` is not emitted before the terminal event;
+- unsupported movement modes return typed unsupported/invalid results.
+
+### Phase 10D: advance roll and reroll decision
+
+This phase adds the dice-driven Advance path after deterministic normal movement
+is trustworthy.
+
+Modules:
+
+- `engine/phases/movement.py`
+- `core/dice.py`
+- `engine/decision_request.py`
+- `engine/decision_result.py`
 
 Acceptance sequence:
 
 ```text
-SELECT_UNIT
-SELECT_MOVEMENT_ACTION
-REQUEST_DICE_ROLL if Advance
+SELECT_MOVEMENT_ACTION = ADVANCE
+REQUEST_DICE_ROLL
 SELECT_DICE_REROLL if applicable
 MOVE_UNIT
 ```
 
-No next `SELECT_UNIT` may be queued before the movement activation terminal event.
+Implement:
+
+- support `SELECT_MOVEMENT_ACTION = ADVANCE`;
+- request and record the Advance dice roll;
+- emit reroll decisions when a supported reroll source applies;
+- apply Movement plus Advance distance;
+- update model placements through the same witness path as normal movement;
+- record dice, reroll, movement, event, and replay payloads.
+
+Invariants:
+
+- dice use Phase 1 deterministic roll/replay machinery;
+- rerolls are explicit decisions;
+- Advance movement still requires a path witness or typed invalid result;
+- unsupported reroll sources fail explicitly;
+- no shooting, charge, fight, deployment, reserves, transports, or broad content import is added.
 
 ### Phase 11: shooting phase body vertical slice
 
