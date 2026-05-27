@@ -724,6 +724,17 @@ Invariants:
 - faction, detachment, enhancement, and stratagem selections are validated as data;
 - invalid or unsupported list content fails explicitly.
 
+Required tests:
+
+- canonical army mustering produces deterministic `ArmyDefinition` payloads;
+- runtime `UnitInstance` and `ModelInstance` objects preserve datasheet/source links;
+- runtime units use explicit `own_models`, not ambiguous `models`;
+- selected wargear outside a datasheet option fails during mustering;
+- model counts outside datasheet composition bounds fail during mustering;
+- faction, detachment, enhancement, and stratagem selection drift fails during mustering;
+- request/catalog identity drift fails during mustering;
+- mustering payloads round-trip without Python object reprs.
+
 ### Phase 10: movement phase body vertical slice
 
 This phase fills the movement phase body behind the Phase 9B lifecycle. It does
