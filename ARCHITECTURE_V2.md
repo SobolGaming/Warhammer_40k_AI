@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10I work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10J work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10I** is treated as implemented or in final review at the time this file was generated. Do not insert new work before Phase 10J unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10J** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10J.1 unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -52,6 +52,7 @@ Completed / implemented foundation:
 | 10G | Complete | Movement legality context and capability resolver |
 | 10H | Complete | Pathing smoke constraints and coherency descriptor correction |
 | 10I | Complete | Terrain movement semantics and endpoint support |
+| 10J | Complete | Core dice, roll-off, reroll, random-characteristic, and modifier order semantics |
 
 ## Cross-cutting architectural rules
 
@@ -105,9 +106,11 @@ Rules audited against the 10e Core Rules page are assigned to explicit future ph
 | Muster army restrictions: battle size, faction, detachment restrictions, rule of three/six, Enhancements, Epic Heroes, Warlord, Dedicated Transport occupancy | Phase 15D |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 15A, 15C, 15E |
 
-# Remaining build order
+# Build order details
 
 ## Phase 10J: core dice, roll-off, reroll, random-characteristic, and modifier order semantics
+
+Status: Complete.
 
 This phase makes the Core Rules dice semantics explicit before Advance, Battle-shock, attacks, charges, Stratagems, faction abilities, or mission setup consume dice. Phase 1 established deterministic dice plumbing; this phase adds rules-compliant reroll, roll-off, D3, random-characteristic, and modifier-order state.
 

@@ -5,7 +5,9 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import cast
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
+    D3RollResult,
     DiceExpression,
     DiceExpressionPayload,
     DiceRollResult,
@@ -15,6 +17,16 @@ from warhammer40k_core.core.dice import (
     DiceRollSpecError,
     DiceRollSpecPayload,
     DiceRollState,
+    RandomCharacteristicRoll,
+    RandomCharacteristicTiming,
+    RerollDecisionRequest,
+    RerollPermission,
+    RerollPermissionPayload,
+    RerollSelection,
+    RollOffPlayerRoll,
+    RollOffRequest,
+    RollOffResult,
+    RollOffRound,
 )
 from warhammer40k_core.core.rng import RandomSource
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
@@ -25,7 +37,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequestPayload,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import EventLog, JsonValue
+from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 
 __all__ = [
     "DecisionError",
@@ -44,12 +56,23 @@ def _new_decision_records() -> list[DecisionRecord]:
     return []
 
 
+def _new_random_move_characteristic_rolls() -> dict[
+    tuple[str, Characteristic],
+    RandomCharacteristicRoll,
+]:
+    return {}
+
+
 @dataclass(slots=True)
 class DiceRollManager:
     rng: RandomSource
     event_log: EventLog
     _injected_results: deque[DiceRollResult] = field(default_factory=_new_injected_results)
     _decision_records: list[DecisionRecord] = field(default_factory=_new_decision_records)
+    _random_move_characteristic_rolls: dict[
+        tuple[str, Characteristic],
+        RandomCharacteristicRoll,
+    ] = field(default_factory=_new_random_move_characteristic_rolls)
     _roll_counter: int = 0
     _decision_request_counter: int = 0
 
@@ -67,6 +90,7 @@ class DiceRollManager:
         self.event_log = EventLog() if event_log is None else event_log
         self._injected_results = deque(_coerce_result(result) for result in injected_results)
         self._decision_records = []
+        self._random_move_characteristic_rolls = {}
         self._roll_counter = 0
         self._decision_request_counter = 0
         self._seed_existing_event_history()
@@ -90,6 +114,170 @@ class DiceRollManager:
         self._record_roll(result)
         return DiceRollState.from_result(result)
 
+    def roll_d3(self, *, reason: str, roll_type: str, actor_id: str | None = None) -> D3RollResult:
+        state = self.roll(
+            self.d3_source_spec(reason=reason, roll_type=roll_type, actor_id=actor_id)
+        )
+        result = D3RollResult.from_source_d6_result(state.original_result)
+        self._record_d3_result(result)
+        return result
+
+    def roll_d3_fixed(
+        self,
+        *,
+        reason: str,
+        roll_type: str,
+        source_d6_value: int,
+        actor_id: str | None = None,
+    ) -> D3RollResult:
+        state = self.roll_fixed(
+            self.d3_source_spec(reason=reason, roll_type=roll_type, actor_id=actor_id),
+            [source_d6_value],
+        )
+        result = D3RollResult.from_source_d6_result(state.original_result)
+        self._record_d3_result(result)
+        return result
+
+    @staticmethod
+    def d3_source_spec(
+        *,
+        reason: str,
+        roll_type: str,
+        actor_id: str | None = None,
+    ) -> DiceRollSpec:
+        return DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"D3 source D6 for {reason}",
+            roll_type=f"{roll_type}.d3_source",
+            actor_id=actor_id,
+        )
+
+    def roll_off(self, request: RollOffRequest) -> RollOffResult:
+        if type(request) is not RollOffRequest:
+            raise DiceRollSpecError("Roll-off requires a RollOffRequest.")
+        rounds: list[RollOffRound] = []
+        while True:
+            round_number = len(rounds) + 1
+            player_rolls: list[RollOffPlayerRoll] = []
+            for player_id in request.player_ids:
+                state = self.roll(
+                    self.roll_off_spec(
+                        request,
+                        round_number=round_number,
+                        player_id=player_id,
+                    )
+                )
+                player_rolls.append(
+                    RollOffPlayerRoll(
+                        player_id=player_id,
+                        roll_result=state.original_result,
+                        value=state.current_total,
+                    )
+                )
+            round_result = RollOffRound(
+                round_number=round_number,
+                player_rolls=tuple(player_rolls),
+            )
+            rounds.append(round_result)
+            if not round_result.is_tie:
+                winner = round_result.winner_player_id
+                if winner is None:
+                    raise DiceRollSpecError("Roll-off winner could not be resolved.")
+                result = RollOffResult(
+                    request=request,
+                    rounds=tuple(rounds),
+                    winner_player_id=winner,
+                )
+                event = self.event_log.append("roll_off_resolved", result.to_payload())
+                self.rng.append_history(event.history_token())
+                return result
+
+    @staticmethod
+    def roll_off_spec(
+        request: RollOffRequest,
+        *,
+        round_number: int,
+        player_id: str,
+    ) -> DiceRollSpec:
+        if type(request) is not RollOffRequest:
+            raise DiceRollSpecError("Roll-off spec requires a RollOffRequest.")
+        if player_id not in request.player_ids:
+            raise DiceRollSpecError("Roll-off spec player_id must be in the request.")
+        if type(round_number) is not int:
+            raise DiceRollSpecError("Roll-off round_number must be an integer.")
+        if round_number < 1:
+            raise DiceRollSpecError("Roll-off round_number must be at least 1.")
+        return DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Roll-off {request.purpose} round {round_number} for {player_id}",
+            roll_type="roll_off",
+            actor_id=player_id,
+        )
+
+    def roll_random_characteristic(
+        self,
+        *,
+        characteristic: Characteristic,
+        timing: RandomCharacteristicTiming,
+        scope_id: str,
+        expression: DiceExpression,
+        reason: str,
+        actor_id: str | None = None,
+    ) -> RandomCharacteristicRoll:
+        timing = _random_characteristic_timing(timing)
+        cached = self._random_move_characteristic_roll(characteristic, timing, scope_id)
+        if cached is not None:
+            return cached
+        state = self.roll(
+            _random_characteristic_spec(
+                characteristic=characteristic,
+                timing=timing,
+                scope_id=scope_id,
+                expression=expression,
+                reason=reason,
+                actor_id=actor_id,
+            )
+        )
+        return self._record_random_characteristic_roll(
+            characteristic=characteristic,
+            timing=timing,
+            scope_id=scope_id,
+            roll_state=state,
+        )
+
+    def roll_random_characteristic_fixed(
+        self,
+        *,
+        characteristic: Characteristic,
+        timing: RandomCharacteristicTiming,
+        scope_id: str,
+        expression: DiceExpression,
+        reason: str,
+        values: Iterable[int],
+        actor_id: str | None = None,
+    ) -> RandomCharacteristicRoll:
+        timing = _random_characteristic_timing(timing)
+        cached = self._random_move_characteristic_roll(characteristic, timing, scope_id)
+        if cached is not None:
+            return cached
+        state = self.roll_fixed(
+            _random_characteristic_spec(
+                characteristic=characteristic,
+                timing=timing,
+                scope_id=scope_id,
+                expression=expression,
+                reason=reason,
+                actor_id=actor_id,
+            ),
+            values,
+        )
+        return self._record_random_characteristic_roll(
+            characteristic=characteristic,
+            timing=timing,
+            scope_id=scope_id,
+            roll_state=state,
+        )
+
     def record_decision(
         self,
         *,
@@ -111,21 +299,37 @@ class DiceRollManager:
         self,
         state: DiceRollState,
         *,
-        allowed_selections: Iterable[Iterable[int]],
+        allowed_selections: Iterable[Iterable[int]] | None = None,
+        permission: RerollPermission | None = None,
     ) -> DecisionRequest:
-        selections = _validate_index_selections(allowed_selections, state=state)
+        if state.original_result.spec.roll_type == "roll_off":
+            raise DecisionError("Roll-off dice cannot be rerolled.")
+        if permission is not None:
+            if allowed_selections is not None:
+                raise DecisionError("Reroll request must use permission or selections, not both.")
+            reroll_request = RerollDecisionRequest.from_state(state, permission)
+            selections = reroll_request.allowed_selections
+            permission_payload: JsonValue = validate_json_value(permission.to_payload())
+        else:
+            if allowed_selections is None:
+                raise DecisionError("Reroll request requires allowed selections or permission.")
+            selections = _validate_raw_reroll_selections(allowed_selections, state=state)
+            permission_payload = None
 
         self._decision_request_counter += 1
+        payload: dict[str, JsonValue] = {
+            "roll_id": state.original_result.roll_id,
+            "roll_type": state.original_result.spec.roll_type,
+            "allowed_selections": [list(selection) for selection in selections],
+            "current_values": list(state.current_values),
+        }
+        if permission_payload is not None:
+            payload["permission"] = permission_payload
         request = DecisionRequest(
             request_id=f"decision-request-{self._decision_request_counter:06d}",
             decision_type="select_dice_reroll",
             actor_id=state.original_result.spec.actor_id,
-            payload={
-                "roll_id": state.original_result.roll_id,
-                "roll_type": state.original_result.spec.roll_type,
-                "allowed_selections": [list(selection) for selection in selections],
-                "current_values": list(state.current_values),
-            },
+            payload=payload,
             options=_reroll_options(selections),
         )
         event = self.event_log.append("decision_requested", request.to_payload())
@@ -205,6 +409,47 @@ class DiceRollManager:
         event = self.event_log.append("dice_rolled", result.to_payload())
         self.rng.append_history(event.history_token())
 
+    def _record_d3_result(self, result: D3RollResult) -> None:
+        event = self.event_log.append("d3_roll_resolved", result.to_payload())
+        self.rng.append_history(event.history_token())
+
+    def _random_move_characteristic_roll(
+        self,
+        characteristic: Characteristic,
+        timing: RandomCharacteristicTiming,
+        scope_id: str,
+    ) -> RandomCharacteristicRoll | None:
+        if (
+            characteristic is not Characteristic.MOVEMENT
+            or timing is not RandomCharacteristicTiming.UNIT_WHEN_SELECTED_TO_MOVE
+        ):
+            return None
+        return self._random_move_characteristic_rolls.get((scope_id, characteristic))
+
+    def _record_random_characteristic_roll(
+        self,
+        *,
+        characteristic: Characteristic,
+        timing: RandomCharacteristicTiming,
+        scope_id: str,
+        roll_state: DiceRollState,
+    ) -> RandomCharacteristicRoll:
+        result = RandomCharacteristicRoll(
+            characteristic=characteristic,
+            timing=timing,
+            scope_id=scope_id,
+            roll_state=roll_state,
+            value=roll_state.current_total,
+        )
+        if (
+            characteristic is Characteristic.MOVEMENT
+            and timing is RandomCharacteristicTiming.UNIT_WHEN_SELECTED_TO_MOVE
+        ):
+            self._random_move_characteristic_rolls[(scope_id, characteristic)] = result
+        event = self.event_log.append("random_characteristic_rolled", result.to_payload())
+        self.rng.append_history(event.history_token())
+        return result
+
     def _next_roll_id(self) -> str:
         self._roll_counter += 1
         return f"roll-{self._roll_counter:06d}"
@@ -245,18 +490,69 @@ class DiceRollManager:
         request_roll_id = _extract_string(request.payload, key="roll_id")
         if request_roll_id != state.original_result.roll_id:
             raise DecisionError("Reroll request does not target this dice roll.")
+        request_roll_type = _extract_string(request.payload, key="roll_type")
+        if request_roll_type != state.original_result.spec.roll_type:
+            raise DecisionError("Reroll request roll_type does not match this dice roll.")
+        request_current_values = _extract_int_list(request.payload, key="current_values")
+        if request_current_values != state.current_values:
+            raise DecisionError("Reroll request current_values do not match current dice state.")
         allowed_selections = set(
             _extract_index_selections(request.payload, key="allowed_selections")
         )
         selected_indices = _extract_index_list(result.payload, key="selected_indices")
         if selected_indices and selected_indices not in allowed_selections:
             raise DecisionError("Reroll selected_indices must match an allowed selection.")
+        permission_payload = _extract_optional_object(request.payload, key="permission")
+        if permission_payload is not None and selected_indices:
+            permission = RerollPermission.from_payload(
+                _reroll_permission_payload(permission_payload)
+            )
+            try:
+                permission.validate_selection(state, RerollSelection(indices=selected_indices))
+            except DiceRollSpecError as exc:
+                raise DecisionError("Reroll selected_indices violate permission.") from exc
 
 
 def _coerce_result(result: DiceRollResult | DiceRollResultPayload) -> DiceRollResult:
     if isinstance(result, DiceRollResult):
         return result
     return DiceRollResult.from_payload(result)
+
+
+def _random_characteristic_timing(timing: object) -> RandomCharacteristicTiming:
+    if type(timing) is RandomCharacteristicTiming:
+        return timing
+    if type(timing) is not str:
+        raise DiceRollSpecError("Random characteristic timing must be a token.")
+    try:
+        return RandomCharacteristicTiming(timing)
+    except ValueError as exc:
+        raise DiceRollSpecError(f"Unsupported random characteristic timing: {timing}.") from exc
+
+
+def _random_characteristic_spec(
+    *,
+    characteristic: Characteristic,
+    timing: RandomCharacteristicTiming,
+    scope_id: str,
+    expression: DiceExpression,
+    reason: str,
+    actor_id: str | None,
+) -> DiceRollSpec:
+    if type(characteristic) is not Characteristic:
+        raise DiceRollSpecError("Random characteristic requires a Characteristic.")
+    if type(timing) is not RandomCharacteristicTiming:
+        raise DiceRollSpecError("Random characteristic requires a RandomCharacteristicTiming.")
+    if type(expression) is not DiceExpression:
+        raise DiceRollSpecError("Random characteristic requires a DiceExpression.")
+    if type(scope_id) is not str or not scope_id.strip():
+        raise DiceRollSpecError("Random characteristic scope_id must not be empty.")
+    return DiceRollSpec(
+        expression=expression,
+        reason=reason,
+        roll_type=f"random_characteristic.{characteristic.value}.{timing.value}.{scope_id}",
+        actor_id=actor_id,
+    )
 
 
 def _reroll_options(selections: tuple[tuple[int, ...], ...]) -> tuple[DecisionOption, ...]:
@@ -318,6 +614,42 @@ def _extract_index_selections(payload: JsonValue, *, key: str) -> tuple[tuple[in
     return _validate_unique_index_selections(tuple(selections), field_name=key)
 
 
+def _reroll_permission_payload(payload: dict[str, JsonValue]) -> RerollPermissionPayload:
+    return {
+        "source_id": _extract_string(payload, key="source_id"),
+        "timing_window": _extract_string(payload, key="timing_window"),
+        "owning_player_id": _extract_string(payload, key="owning_player_id"),
+        "eligible_roll_type": _extract_string(payload, key="eligible_roll_type"),
+        "component_selection_policy": _extract_string(payload, key="component_selection_policy"),
+        "allowed_component_selections": _optional_index_selection_payload(
+            payload,
+            key="allowed_component_selections",
+        ),
+    }
+
+
+def _optional_index_selection_payload(
+    payload: JsonValue,
+    *,
+    key: str,
+) -> list[list[int]] | None:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        raise DecisionError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if value is None:
+        return None
+    if not isinstance(value, list):
+        raise DecisionError(f"Decision payload key must be an index selection list: {key}.")
+    selections: list[list[int]] = []
+    for selection in value:
+        if not isinstance(selection, list):
+            raise DecisionError(f"Decision payload key must contain index lists: {key}.")
+        selections.append(list(_validate_index_list(tuple(selection), field_name=key)))
+    return selections
+
+
 def _extract_object(payload: JsonValue, *, key: str) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise DecisionError("Decision payload must be an object.")
@@ -326,6 +658,19 @@ def _extract_object(payload: JsonValue, *, key: str) -> dict[str, JsonValue]:
     value = payload[key]
     if not isinstance(value, dict):
         raise DecisionError(f"Decision payload key must be an object: {key}.")
+    return value
+
+
+def _extract_optional_object(payload: JsonValue, *, key: str) -> dict[str, JsonValue] | None:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        return None
+    value = payload[key]
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise DecisionError(f"Decision payload key must be an object or null: {key}.")
     return value
 
 
@@ -437,6 +782,27 @@ def _validate_index_selections(
                 raise DecisionError("Reroll allowed selection index is outside the current dice.")
         validated.append(index_selection)
     return _validate_unique_index_selections(tuple(validated), field_name="allowed_selections")
+
+
+# TODO(Phase 10J): remove raw allowed_selections after callers provide RerollPermission metadata.
+def _validate_raw_reroll_selections(
+    selections: Iterable[Iterable[int]],
+    *,
+    state: DiceRollState,
+) -> tuple[tuple[int, ...], ...]:
+    validated = _validate_index_selections(selections, state=state)
+    already_rerolled = set(state.rerolled_indices())
+    for selection in validated:
+        if any(index in already_rerolled for index in selection):
+            raise DecisionError(
+                "Raw reroll allowed_selections cannot include an already-rerolled die."
+            )
+
+    full_selection = tuple(range(len(state.current_values)))
+    expected = ((0,),) if len(state.current_values) == 1 else (full_selection,)
+    if validated != expected:
+        raise DecisionError("Raw reroll allowed_selections must offer only the whole roll.")
+    return validated
 
 
 def _validate_unique_index_selections(
