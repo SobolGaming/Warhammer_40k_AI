@@ -555,46 +555,34 @@ def test_next_movement_unit_is_queued_only_after_activation_terminal_event() -> 
     assert terminal_index < next_unit_request_index
 
 
-@pytest.mark.parametrize(
-    "action",
-    [
-        MovementPhaseActionKind.ADVANCE,
-    ],
-)
-def test_unsupported_movement_modes_return_typed_unsupported_status(
-    action: MovementPhaseActionKind,
-) -> None:
+def test_advance_movement_mode_completes_activation_and_queues_next_unit() -> None:
     lifecycle, action_request = _advance_to_movement_action_request()
     assert lifecycle.state is not None
-    battlefield_state = lifecycle.state.battlefield_state
-    assert battlefield_state is not None
-    before_payload = battlefield_state.to_payload()
 
     status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=action.value,
+        option_id=MovementPhaseActionKind.ADVANCE.value,
         result_id="phase10c-result-000004",
     )
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert status.payload == {
-        "phase": BattlePhase.MOVEMENT.value,
-        "phase_body_status": "movement_action_unsupported",
-        "battle_round": 1,
-        "active_player_id": "player-a",
-        "unit_instance_id": "army-alpha:intercessor-unit-1",
-        "movement_phase_action": action.value,
-    }
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert _decision_request(status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert lifecycle.state.battlefield_state is not None
-    assert lifecycle.state.battlefield_state.to_payload() == before_payload
     movement_state = lifecycle.state.movement_phase_state
     assert movement_state is not None
-    assert movement_state.moved_unit_ids == ()
-    assert movement_state.active_selection is not None
-    unsupported_payload = _last_event_payload(lifecycle, "movement_action_unsupported")
-    assert "action" not in unsupported_payload
-    assert unsupported_payload["movement_phase_action"] == action.value
+    assert movement_state.moved_unit_ids == ("army-alpha:intercessor-unit-1",)
+    assert movement_state.active_selection is None
+    advanced_state = lifecycle.state.advanced_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+    assert advanced_state is not None
+    assert not advanced_state.can_shoot
+    assert not advanced_state.can_declare_charge
+    terminal_payload = _last_event_payload(lifecycle, "movement_activation_completed")
+    assert terminal_payload["movement_phase_action"] == MovementPhaseActionKind.ADVANCE.value
 
 
 def _advance_to_movement_unit_selection(

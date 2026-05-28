@@ -5,6 +5,16 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    DiceRollSpecPayload,
+    DiceRollState,
+    DiceRollStatePayload,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+    RerollPermissionPayload,
+)
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -19,6 +29,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import (
@@ -32,7 +43,7 @@ from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
     resolve_unit_movement_endpoint_coherency,
 )
-from warhammer40k_core.engine.unit_factory import ModelInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
     PathWitness,
@@ -82,6 +93,8 @@ _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT = (
 )
 _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
 _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
+_ADVANCE_REROLL_KEYWORD = "ADVANCE_REROLL"
+_ADVANCED_UNIT_CLEANUP_POINT = "end_of_turn"
 
 
 class MovementUnitSelectionPayload(TypedDict):
@@ -111,6 +124,40 @@ class MovementActionAvailabilityResultPayload(TypedDict):
     context: MovementActionAvailabilityContextPayload
     available_actions: list[str]
     unavailable_actions: list[str]
+
+
+class AdvanceRollRequestPayload(TypedDict):
+    request_id: str
+    game_id: str
+    battle_round: int
+    player_id: str
+    unit_instance_id: str
+    spec: DiceRollSpecPayload
+    reroll_permission: RerollPermissionPayload | None
+
+
+class AdvanceRollResultPayload(TypedDict):
+    request: AdvanceRollRequestPayload
+    roll_state: DiceRollStatePayload
+    value: int
+
+
+class MovementDiceRecordPayload(TypedDict):
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    movement_phase_action: str
+    advance_roll: AdvanceRollResultPayload
+
+
+class AdvancedUnitStatePayload(TypedDict):
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    movement_dice_record: MovementDiceRecordPayload
+    can_shoot: bool
+    can_declare_charge: bool
+    cleanup_point: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -247,6 +294,294 @@ class MovementActionAvailabilityResult:
                 movement_phase_action_kind_from_token(action)
                 for action in payload["unavailable_actions"]
             ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AdvanceRollRequest:
+    request_id: str
+    game_id: str
+    battle_round: int
+    player_id: str
+    unit_instance_id: str
+    spec: DiceRollSpec
+    reroll_permission: RerollPermission | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("AdvanceRollRequest request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "game_id",
+            _validate_identifier("AdvanceRollRequest game_id", self.game_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("AdvanceRollRequest battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("AdvanceRollRequest player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("AdvanceRollRequest unit_instance_id", self.unit_instance_id),
+        )
+        if type(self.spec) is not DiceRollSpec:
+            raise GameLifecycleError("AdvanceRollRequest spec must be a DiceRollSpec.")
+        _validate_advance_roll_spec(self.spec, unit_instance_id=self.unit_instance_id)
+        if self.reroll_permission is not None:
+            if type(self.reroll_permission) is not RerollPermission:
+                raise GameLifecycleError(
+                    "AdvanceRollRequest reroll_permission must be a RerollPermission."
+                )
+            if self.reroll_permission.owning_player_id != self.player_id:
+                raise GameLifecycleError(
+                    "AdvanceRollRequest reroll_permission owner must match player_id."
+                )
+            if self.reroll_permission.eligible_roll_type != self.spec.roll_type:
+                raise GameLifecycleError(
+                    "AdvanceRollRequest reroll_permission must target advance_roll."
+                )
+
+    @classmethod
+    def for_unit(
+        cls,
+        *,
+        request_id: str,
+        game_id: str,
+        battle_round: int,
+        player_id: str,
+        unit_instance_id: str,
+        reroll_permission: RerollPermission | None = None,
+    ) -> Self:
+        return cls(
+            request_id=request_id,
+            game_id=game_id,
+            battle_round=battle_round,
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+            spec=DiceRollSpec(
+                expression=DiceExpression(quantity=1, sides=6),
+                reason=f"Advance roll for {unit_instance_id}",
+                roll_type="advance_roll",
+                actor_id=unit_instance_id,
+            ),
+            reroll_permission=reroll_permission,
+        )
+
+    def to_payload(self) -> AdvanceRollRequestPayload:
+        return {
+            "request_id": self.request_id,
+            "game_id": self.game_id,
+            "battle_round": self.battle_round,
+            "player_id": self.player_id,
+            "unit_instance_id": self.unit_instance_id,
+            "spec": self.spec.to_payload(),
+            "reroll_permission": (
+                None if self.reroll_permission is None else self.reroll_permission.to_payload()
+            ),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AdvanceRollRequestPayload) -> Self:
+        reroll_permission_payload = payload["reroll_permission"]
+        return cls(
+            request_id=payload["request_id"],
+            game_id=payload["game_id"],
+            battle_round=payload["battle_round"],
+            player_id=payload["player_id"],
+            unit_instance_id=payload["unit_instance_id"],
+            spec=DiceRollSpec.from_payload(payload["spec"]),
+            reroll_permission=(
+                None
+                if reroll_permission_payload is None
+                else RerollPermission.from_payload(reroll_permission_payload)
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AdvanceRollResult:
+    request: AdvanceRollRequest
+    roll_state: DiceRollState
+    value: int
+
+    def __post_init__(self) -> None:
+        if type(self.request) is not AdvanceRollRequest:
+            raise GameLifecycleError("AdvanceRollResult request must be an AdvanceRollRequest.")
+        if type(self.roll_state) is not DiceRollState:
+            raise GameLifecycleError("AdvanceRollResult roll_state must be a DiceRollState.")
+        if self.roll_state.original_result.spec != self.request.spec:
+            raise GameLifecycleError("AdvanceRollResult roll_state spec must match request.")
+        if self.value != self.roll_state.current_total:
+            raise GameLifecycleError("AdvanceRollResult value must match roll_state total.")
+        if self.value < 1 or self.value > 6:
+            raise GameLifecycleError("AdvanceRollResult value must be between 1 and 6.")
+
+    @classmethod
+    def from_roll_state(cls, *, request: AdvanceRollRequest, roll_state: DiceRollState) -> Self:
+        return cls(request=request, roll_state=roll_state, value=roll_state.current_total)
+
+    def to_payload(self) -> AdvanceRollResultPayload:
+        return {
+            "request": self.request.to_payload(),
+            "roll_state": self.roll_state.to_payload(),
+            "value": self.value,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AdvanceRollResultPayload) -> Self:
+        return cls(
+            request=AdvanceRollRequest.from_payload(payload["request"]),
+            roll_state=DiceRollState.from_payload(payload["roll_state"]),
+            value=payload["value"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MovementDiceRecord:
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    movement_phase_action: MovementPhaseActionKind
+    advance_roll: AdvanceRollResult
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("MovementDiceRecord player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("MovementDiceRecord battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("MovementDiceRecord unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "movement_phase_action",
+            movement_phase_action_kind_from_token(self.movement_phase_action),
+        )
+        if self.movement_phase_action is not MovementPhaseActionKind.ADVANCE:
+            raise GameLifecycleError("MovementDiceRecord currently supports only Advance dice.")
+        if type(self.advance_roll) is not AdvanceRollResult:
+            raise GameLifecycleError("MovementDiceRecord advance_roll must be AdvanceRollResult.")
+        if self.advance_roll.request.player_id != self.player_id:
+            raise GameLifecycleError("MovementDiceRecord advance_roll player_id drift.")
+        if self.advance_roll.request.battle_round != self.battle_round:
+            raise GameLifecycleError("MovementDiceRecord advance_roll battle_round drift.")
+        if self.advance_roll.request.unit_instance_id != self.unit_instance_id:
+            raise GameLifecycleError("MovementDiceRecord advance_roll unit_instance_id drift.")
+
+    def to_payload(self) -> MovementDiceRecordPayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "unit_instance_id": self.unit_instance_id,
+            "movement_phase_action": self.movement_phase_action.value,
+            "advance_roll": self.advance_roll.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MovementDiceRecordPayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            unit_instance_id=payload["unit_instance_id"],
+            movement_phase_action=movement_phase_action_kind_from_token(
+                payload["movement_phase_action"]
+            ),
+            advance_roll=AdvanceRollResult.from_payload(payload["advance_roll"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AdvancedUnitState:
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    movement_dice_record: MovementDiceRecord
+    can_shoot: bool = False
+    can_declare_charge: bool = False
+    cleanup_point: str = _ADVANCED_UNIT_CLEANUP_POINT
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("AdvancedUnitState player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("AdvancedUnitState battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("AdvancedUnitState unit_instance_id", self.unit_instance_id),
+        )
+        if type(self.movement_dice_record) is not MovementDiceRecord:
+            raise GameLifecycleError(
+                "AdvancedUnitState movement_dice_record must be MovementDiceRecord."
+            )
+        if self.movement_dice_record.player_id != self.player_id:
+            raise GameLifecycleError("AdvancedUnitState movement_dice_record player_id drift.")
+        if self.movement_dice_record.battle_round != self.battle_round:
+            raise GameLifecycleError("AdvancedUnitState movement_dice_record battle_round drift.")
+        if self.movement_dice_record.unit_instance_id != self.unit_instance_id:
+            raise GameLifecycleError("AdvancedUnitState movement_dice_record unit drift.")
+        object.__setattr__(
+            self,
+            "can_shoot",
+            _validate_bool("AdvancedUnitState can_shoot", self.can_shoot),
+        )
+        object.__setattr__(
+            self,
+            "can_declare_charge",
+            _validate_bool("AdvancedUnitState can_declare_charge", self.can_declare_charge),
+        )
+        object.__setattr__(
+            self,
+            "cleanup_point",
+            _validate_identifier("AdvancedUnitState cleanup_point", self.cleanup_point),
+        )
+        if self.cleanup_point != _ADVANCED_UNIT_CLEANUP_POINT:
+            raise GameLifecycleError("AdvancedUnitState cleanup_point must be end_of_turn.")
+
+    def to_payload(self) -> AdvancedUnitStatePayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "unit_instance_id": self.unit_instance_id,
+            "movement_dice_record": self.movement_dice_record.to_payload(),
+            "can_shoot": self.can_shoot,
+            "can_declare_charge": self.can_declare_charge,
+            "cleanup_point": self.cleanup_point,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AdvancedUnitStatePayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            unit_instance_id=payload["unit_instance_id"],
+            movement_dice_record=MovementDiceRecord.from_payload(payload["movement_dice_record"]),
+            can_shoot=payload["can_shoot"],
+            can_declare_charge=payload["can_declare_charge"],
+            cleanup_point=payload["cleanup_point"],
         )
 
 
@@ -536,6 +871,105 @@ class NormalMoveResolution:
 
 
 @dataclass(frozen=True, slots=True)
+class AdvanceMoveResolution:
+    unit_instance_id: str
+    attempted_placement: UnitPlacement
+    witness: PathWitness
+    advance_roll: AdvanceRollResult
+    path_validation_results: tuple[PathValidationResult, ...]
+    terrain_path_legality_results: tuple[TerrainPathLegalityResult, ...]
+    coherency_result: UnitCoherencyResult
+    rollback_record: MovementRollbackRecord | None
+    movement_payload: dict[str, JsonValue]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("AdvanceMoveResolution unit_instance_id", self.unit_instance_id),
+        )
+        if type(self.attempted_placement) is not UnitPlacement:
+            raise GameLifecycleError(
+                "AdvanceMoveResolution attempted_placement must be a UnitPlacement."
+            )
+        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
+            raise GameLifecycleError(
+                "AdvanceMoveResolution attempted_placement must match unit_instance_id."
+            )
+        if type(self.witness) is not PathWitness:
+            raise GameLifecycleError("AdvanceMoveResolution witness must be a PathWitness.")
+        if type(self.advance_roll) is not AdvanceRollResult:
+            raise GameLifecycleError(
+                "AdvanceMoveResolution advance_roll must be an AdvanceRollResult."
+            )
+        if self.advance_roll.request.unit_instance_id != self.unit_instance_id:
+            raise GameLifecycleError("AdvanceMoveResolution advance_roll unit drift.")
+        object.__setattr__(
+            self,
+            "path_validation_results",
+            _validate_path_validation_result_tuple(
+                "AdvanceMoveResolution path_validation_results",
+                self.path_validation_results,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "terrain_path_legality_results",
+            _validate_terrain_path_legality_result_tuple(
+                "AdvanceMoveResolution terrain_path_legality_results",
+                self.terrain_path_legality_results,
+            ),
+        )
+        if type(self.coherency_result) is not UnitCoherencyResult:
+            raise GameLifecycleError(
+                "AdvanceMoveResolution coherency_result must be a UnitCoherencyResult."
+            )
+        if self.rollback_record is not None and type(self.rollback_record) is not (
+            MovementRollbackRecord
+        ):
+            raise GameLifecycleError(
+                "AdvanceMoveResolution rollback_record must be a MovementRollbackRecord."
+            )
+        object.__setattr__(
+            self,
+            "movement_payload",
+            _validate_json_object(
+                "AdvanceMoveResolution movement_payload",
+                self.movement_payload,
+            ),
+        )
+
+    @property
+    def is_valid(self) -> bool:
+        return (
+            all(result.is_valid for result in self.path_validation_results)
+            and all(result.is_valid for result in self.terrain_path_legality_results)
+            and self.rollback_record is None
+        )
+
+    def transition_batch(self, *, before: UnitPlacement) -> BattlefieldTransitionBatch:
+        if not self.is_valid:
+            raise GameLifecycleError("Invalid Advance cannot emit displacement records.")
+        return _movement_transition_batch(
+            before=before,
+            after=self.attempted_placement,
+            witness=self.witness,
+            displacement_kind=ModelDisplacementKind.ADVANCE,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class _ResolvedUnitMove:
+    attempted_placement: UnitPlacement
+    witness: PathWitness
+    path_validation_results: tuple[PathValidationResult, ...]
+    terrain_path_legality_results: tuple[TerrainPathLegalityResult, ...]
+    coherency_result: UnitCoherencyResult
+    rollback_record: MovementRollbackRecord | None
+    movement_payload: dict[str, JsonValue]
+
+
+@dataclass(frozen=True, slots=True)
 class MovementPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
 
@@ -623,6 +1057,13 @@ class MovementPhaseHandler:
         result: DecisionResult,
         decisions: DecisionController,
     ) -> LifecycleStatus | None:
+        if result.decision_type == DICE_REROLL_DECISION_TYPE:
+            return _apply_advance_roll_reroll_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
         if result.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return _apply_movement_action_decision(
                 state=state,
@@ -739,6 +1180,7 @@ def _apply_movement_action_decision(
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
         active_selection.unit_instance_id
     )
+    unit = scenario.unit_instance_for_placement(unit_placement)
     availability_result = _movement_action_availability_result(
         scenario=scenario,
         unit_placement=unit_placement,
@@ -851,6 +1293,51 @@ def _apply_movement_action_decision(
         )
         return None
 
+    if action is MovementPhaseActionKind.ADVANCE:
+        advance_roll_request = _advance_roll_request_for_action(
+            state=state,
+            unit=unit,
+            unit_placement=unit_placement,
+            action_result=result,
+        )
+        advance_roll_state = _roll_advance_dice(
+            state=state,
+            decisions=decisions,
+            request=advance_roll_request,
+        )
+        if advance_roll_request.reroll_permission is not None:
+            reroll_request = _advance_roll_reroll_request(
+                state=state,
+                decisions=decisions,
+                dice_roll_state=advance_roll_state,
+                advance_roll_request=advance_roll_request,
+                action_result=result,
+            )
+            decisions.request_decision(reroll_request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=reroll_request,
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "advance_roll_reroll_pending",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                },
+            )
+        advance_roll = AdvanceRollResult.from_roll_state(
+            request=advance_roll_request,
+            roll_state=advance_roll_state,
+        )
+        return _resolve_and_apply_advance_move(
+            state=state,
+            decisions=decisions,
+            result=result,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            advance_roll=advance_roll,
+        )
+
     decisions.event_log.append(
         "movement_action_unsupported",
         {
@@ -879,6 +1366,162 @@ def _apply_movement_action_decision(
             "movement_phase_action": action.value,
         },
     )
+
+
+def _apply_advance_roll_reroll_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Advance reroll actor must be the active player.")
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.active_selection is None:
+        raise GameLifecycleError("Advance reroll requires active movement selection.")
+
+    record = decisions.record_for_result(result)
+    request_payload = _decision_payload_object(record.request.payload)
+    context_payload = _payload_object(request_payload, key="movement_context")
+    if _payload_string(context_payload, key="movement_phase_action") != (
+        MovementPhaseActionKind.ADVANCE.value
+    ):
+        raise GameLifecycleError("Advance reroll request context must be for Advance.")
+    unit_instance_id = _payload_string(context_payload, key="unit_instance_id")
+    if unit_instance_id != movement_state.active_selection.unit_instance_id:
+        raise GameLifecycleError("Advance reroll unit must match active movement selection.")
+    action_request_id = _payload_string(context_payload, key="action_request_id")
+    action_result_id = _payload_string(context_payload, key="action_result_id")
+    initial_roll_payload = _payload_object(context_payload, key="advance_roll_state")
+    advance_request_payload = _payload_object(context_payload, key="advance_roll_request")
+    advance_request = AdvanceRollRequest.from_payload(
+        cast(AdvanceRollRequestPayload, advance_request_payload)
+    )
+    initial_roll_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, initial_roll_payload)
+    )
+    dice_manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
+    rerolled_state = dice_manager.resolve_reroll(
+        initial_roll_state,
+        request=record.request,
+        result=result,
+        record_decision=False,
+    )
+    advance_roll = AdvanceRollResult.from_roll_state(
+        request=advance_request,
+        roll_state=rerolled_state,
+    )
+    scenario = _battlefield_scenario(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    action_result = DecisionResult(
+        result_id=action_result_id,
+        request_id=action_request_id,
+        decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        actor_id=active_player_id,
+        selected_option_id=MovementPhaseActionKind.ADVANCE.value,
+        payload={
+            "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
+            "unit_instance_id": unit_instance_id,
+        },
+    )
+    return _resolve_and_apply_advance_move(
+        state=state,
+        decisions=decisions,
+        result=action_result,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        advance_roll=advance_roll,
+    )
+
+
+def _resolve_and_apply_advance_move(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    advance_roll: AdvanceRollResult,
+) -> LifecycleStatus | None:
+    active_player_id = _active_player_id(state)
+    _record_advance_roll_resolved_event(
+        state=state,
+        decisions=decisions,
+        advance_roll=advance_roll,
+    )
+    resolution = resolve_advance_move(
+        scenario=_battlefield_scenario(state),
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        advance_roll=advance_roll,
+    )
+    if not resolution.is_valid:
+        violation_code = _normal_move_violation_code(resolution)
+        invalid_payload: dict[str, JsonValue] = {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": unit_placement.unit_instance_id,
+            "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "movement_action_invalid",
+            "violation_code": violation_code,
+            **resolution.movement_payload,
+        }
+        if resolution.rollback_record is not None:
+            invalid_payload["rollback_record"] = validate_json_value(
+                resolution.rollback_record.to_payload()
+            )
+        decisions.event_log.append("movement_action_invalid", invalid_payload)
+        return LifecycleStatus.invalid(
+            stage=GameLifecycleStage.BATTLE,
+            message=_normal_move_invalid_message(violation_code).replace("Normal Move", "Advance"),
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "phase_body_status": "movement_action_invalid",
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "unit_instance_id": unit_placement.unit_instance_id,
+                "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
+                "violation_code": violation_code,
+            },
+        )
+    transition_batch = resolution.transition_batch(before=unit_placement)
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Advance requires battlefield_state.")
+    state.battlefield_state = battlefield_state.with_unit_placement(resolution.attempted_placement)
+    dice_record = MovementDiceRecord(
+        player_id=active_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.ADVANCE,
+        advance_roll=advance_roll,
+    )
+    state.record_advanced_unit_state(
+        AdvancedUnitState(
+            player_id=active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_placement.unit_instance_id,
+            movement_dice_record=dice_record,
+        )
+    )
+    _complete_movement_activation(
+        state=state,
+        decisions=decisions,
+        result=result,
+        action=MovementPhaseActionKind.ADVANCE,
+        witness=resolution.witness,
+        movement_payload=resolution.movement_payload,
+        displacement_kind=ModelDisplacementKind.ADVANCE,
+        transition_batch=transition_batch,
+    )
+    return None
 
 
 def _complete_movement_activation(
@@ -983,6 +1626,130 @@ def _movement_action_options(
     return tuple(options)
 
 
+def _advance_roll_request_for_action(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    unit_placement: UnitPlacement,
+    action_result: DecisionResult,
+) -> AdvanceRollRequest:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Advance roll requires a UnitInstance.")
+    if type(unit_placement) is not UnitPlacement:
+        raise GameLifecycleError("Advance roll requires a UnitPlacement.")
+    return AdvanceRollRequest.for_unit(
+        request_id=f"{action_result.result_id}:advance-roll",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=unit_placement.player_id,
+        unit_instance_id=unit_placement.unit_instance_id,
+        reroll_permission=_advance_reroll_permission_for_unit(
+            unit_instance_id=unit_placement.unit_instance_id,
+            player_id=unit_placement.player_id,
+            keywords=unit.keywords,
+        ),
+    )
+
+
+def _roll_advance_dice(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: AdvanceRollRequest,
+) -> DiceRollState:
+    decisions.event_log.append(
+        "advance_roll_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": request.unit_instance_id,
+            "advance_roll_request": validate_json_value(request.to_payload()),
+        },
+    )
+    manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
+    return manager.roll(request.spec)
+
+
+def _record_advance_roll_resolved_event(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    advance_roll: AdvanceRollResult,
+) -> None:
+    decisions.event_log.append(
+        "advance_roll_resolved",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": advance_roll.request.unit_instance_id,
+            "advance_roll": validate_json_value(advance_roll.to_payload()),
+        },
+    )
+
+
+def _advance_roll_reroll_request(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    dice_roll_state: DiceRollState,
+    advance_roll_request: AdvanceRollRequest,
+    action_result: DecisionResult,
+) -> DecisionRequest:
+    permission = advance_roll_request.reroll_permission
+    if permission is None:
+        raise GameLifecycleError("Advance reroll request requires a legal reroll permission.")
+    manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
+    return manager.build_reroll_request(
+        dice_roll_state,
+        request_id=state.next_decision_request_id(),
+        actor_id=advance_roll_request.player_id,
+        permission=permission,
+        extra_payload={
+            "movement_context": {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.MOVEMENT.value,
+                "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
+                "unit_instance_id": advance_roll_request.unit_instance_id,
+                "action_request_id": action_result.request_id,
+                "action_result_id": action_result.result_id,
+                "advance_roll_request": validate_json_value(advance_roll_request.to_payload()),
+                "advance_roll_state": validate_json_value(dice_roll_state.to_payload()),
+            }
+        },
+    )
+
+
+def _dice_roll_manager_for_state(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> DiceRollManager:
+    return DiceRollManager(state.game_id, event_log=decisions.event_log)
+
+
+def _advance_reroll_permission_for_unit(
+    *,
+    unit_instance_id: str,
+    player_id: str,
+    keywords: tuple[str, ...],
+) -> RerollPermission | None:
+    keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
+    if _ADVANCE_REROLL_KEYWORD not in keyword_set:
+        return None
+    return RerollPermission(
+        source_id=f"{unit_instance_id}:advance-reroll",
+        timing_window="after_roll_before_modifiers",
+        owning_player_id=player_id,
+        eligible_roll_type="advance_roll",
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+
+
 def resolve_normal_move(
     *,
     scenario: BattlefieldScenario,
@@ -994,7 +1761,7 @@ def resolve_normal_move(
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> NormalMoveResolution:
-    return _resolve_normal_move(
+    resolved = _resolve_unit_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
@@ -1003,10 +1770,71 @@ def resolve_normal_move(
         battlefield_depth_inches=battlefield_depth_inches,
         terrain=terrain,
         terrain_features=terrain_features,
+        movement_bonus_inches=0,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        action_label="Normal Move",
+    )
+    return NormalMoveResolution(
+        unit_instance_id=unit_placement.unit_instance_id,
+        attempted_placement=resolved.attempted_placement,
+        witness=resolved.witness,
+        path_validation_results=resolved.path_validation_results,
+        terrain_path_legality_results=resolved.terrain_path_legality_results,
+        coherency_result=resolved.coherency_result,
+        rollback_record=resolved.rollback_record,
+        movement_payload=resolved.movement_payload,
     )
 
 
-def _resolve_normal_move(
+def resolve_advance_move(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    advance_roll: AdvanceRollResult,
+    path_witness: PathWitness | None = None,
+    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    terrain: tuple[TerrainVolume, ...] = (),
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+) -> AdvanceMoveResolution:
+    if type(advance_roll) is not AdvanceRollResult:
+        raise GameLifecycleError("Advance requires an AdvanceRollResult.")
+    resolved = _resolve_unit_move(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        path_witness=path_witness,
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+        terrain=terrain,
+        terrain_features=terrain_features,
+        movement_bonus_inches=advance_roll.value,
+        movement_mode=MovementMode.ADVANCE,
+        movement_phase_action=MovementPhaseActionKind.ADVANCE,
+        displacement_kind=ModelDisplacementKind.ADVANCE,
+        action_label="Advance",
+    )
+    movement_payload = {
+        **resolved.movement_payload,
+        "advance_roll": validate_json_value(advance_roll.to_payload()),
+    }
+    return AdvanceMoveResolution(
+        unit_instance_id=unit_placement.unit_instance_id,
+        attempted_placement=resolved.attempted_placement,
+        witness=resolved.witness,
+        advance_roll=advance_roll,
+        path_validation_results=resolved.path_validation_results,
+        terrain_path_legality_results=resolved.terrain_path_legality_results,
+        coherency_result=resolved.coherency_result,
+        rollback_record=resolved.rollback_record,
+        movement_payload=movement_payload,
+    )
+
+
+def _resolve_unit_move(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -1016,21 +1844,35 @@ def _resolve_normal_move(
     battlefield_depth_inches: float,
     terrain: tuple[TerrainVolume, ...],
     terrain_features: tuple[TerrainFeatureDefinition, ...],
-) -> NormalMoveResolution:
+    movement_bonus_inches: int,
+    movement_mode: MovementMode,
+    movement_phase_action: MovementPhaseActionKind,
+    displacement_kind: ModelDisplacementKind,
+    action_label: str,
+) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
-        raise GameLifecycleError("Normal Move requires a BattlefieldScenario.")
+        raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
-        raise GameLifecycleError("Normal Move requires a RulesetDescriptor.")
+        raise GameLifecycleError(f"{action_label} requires a RulesetDescriptor.")
     if type(unit_placement) is not UnitPlacement:
-        raise GameLifecycleError("Normal Move unit_placement must be a UnitPlacement.")
+        raise GameLifecycleError(f"{action_label} unit_placement must be a UnitPlacement.")
+    if type(movement_bonus_inches) is not int:
+        raise GameLifecycleError(f"{action_label} movement_bonus_inches must be an integer.")
+    if movement_bonus_inches < 0:
+        raise GameLifecycleError(f"{action_label} movement_bonus_inches must not be negative.")
     witness = (
-        _default_normal_move_witness(scenario=scenario, unit_placement=unit_placement)
+        _default_move_witness(
+            scenario=scenario,
+            unit_placement=unit_placement,
+            movement_bonus_inches=movement_bonus_inches,
+        )
         if path_witness is None
         else path_witness
     )
-    _validate_normal_move_witness_matches_unit(
+    _validate_move_witness_matches_unit(
         witness=witness,
         unit_placement=unit_placement,
+        action_label=action_label,
     )
     unit = scenario.unit_instance_for_placement(unit_placement)
     moved_placements: list[ModelPlacement] = []
@@ -1045,7 +1887,8 @@ def _resolve_normal_move(
     max_movement_inches = 0.0
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
-        movement_inches = float(_model_movement_inches(model))
+        base_movement_inches = _model_movement_inches(model)
+        movement_inches = float(base_movement_inches + movement_bonus_inches)
         max_movement_inches = max(max_movement_inches, movement_inches)
         moving_model = geometry_model_for_placement(model=model, placement=placement)
         model_witness = PathWitness.for_paths(
@@ -1054,9 +1897,9 @@ def _resolve_normal_move(
         legality_context = MovementLegalityContext.from_keywords(
             keywords=unit.keywords,
             ruleset_descriptor=ruleset_descriptor,
-            movement_mode=MovementMode.NORMAL,
-            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
-            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            movement_mode=movement_mode,
+            movement_phase_action=movement_phase_action,
+            displacement_kind=displacement_kind,
         )
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,
@@ -1094,6 +1937,8 @@ def _resolve_normal_move(
                 {
                     "model_instance_id": placement.model_instance_id,
                     "movement_inches": movement_inches,
+                    "base_movement_inches": base_movement_inches,
+                    "movement_bonus_inches": movement_bonus_inches,
                     "base_size": model.base_size.to_payload(),
                     "start_pose": placement.pose.to_payload(),
                     "end_pose": witness.final_pose_for_model(
@@ -1115,7 +1960,7 @@ def _resolve_normal_move(
             ruleset_descriptor=ruleset_descriptor,
             before=unit_placement,
             attempted=attempted_placement,
-            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            displacement_kind=displacement_kind,
         )
     )
     movement_payload: dict[str, JsonValue] = {
@@ -1129,8 +1974,7 @@ def _resolve_normal_move(
         ),
         "coherency_result": validate_json_value(coherency_result.to_payload()),
     }
-    return NormalMoveResolution(
-        unit_instance_id=unit_placement.unit_instance_id,
+    return _ResolvedUnitMove(
         attempted_placement=attempted_placement,
         witness=witness,
         path_validation_results=tuple(path_validation_results),
@@ -1141,15 +1985,16 @@ def _resolve_normal_move(
     )
 
 
-def _default_normal_move_witness(
+def _default_move_witness(
     *,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
+    movement_bonus_inches: int,
 ) -> PathWitness:
     model_paths: list[tuple[str, Pose, Pose]] = []
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
-        movement_inches = _model_movement_inches(model)
+        movement_inches = _model_movement_inches(model) + movement_bonus_inches
         model_paths.append(
             (
                 placement.model_instance_id,
@@ -1160,11 +2005,12 @@ def _default_normal_move_witness(
     return PathWitness.for_straight_line_endpoints(tuple(model_paths))
 
 
-def _normal_move_transition_batch(
+def _movement_transition_batch(
     *,
     before: UnitPlacement,
     after: UnitPlacement,
     witness: PathWitness,
+    displacement_kind: ModelDisplacementKind,
 ) -> BattlefieldTransitionBatch:
     before_poses = {
         placement.model_instance_id: placement.pose for placement in before.model_placements
@@ -1172,12 +2018,12 @@ def _normal_move_transition_batch(
     displacement_records: list[ModelDisplacementRecord] = []
     for placement in after.model_placements:
         if placement.model_instance_id not in before_poses:
-            raise GameLifecycleError("Normal Move transition references an unknown model.")
+            raise GameLifecycleError("Movement transition references an unknown model.")
         model_path = witness.poses_for_model(placement.model_instance_id)
         displacement_records.append(
             ModelDisplacementRecord(
                 model_instance_id=placement.model_instance_id,
-                displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+                displacement_kind=displacement_kind,
                 start_pose=before_poses[placement.model_instance_id],
                 end_pose=placement.pose,
                 path_witness=PathWitness.for_paths(((placement.model_instance_id, model_path),)),
@@ -1188,6 +2034,20 @@ def _normal_move_transition_batch(
             )
         )
     return BattlefieldTransitionBatch(displacements=tuple(displacement_records))
+
+
+def _normal_move_transition_batch(
+    *,
+    before: UnitPlacement,
+    after: UnitPlacement,
+    witness: PathWitness,
+) -> BattlefieldTransitionBatch:
+    return _movement_transition_batch(
+        before=before,
+        after=after,
+        witness=witness,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+    )
 
 
 def _movement_action_availability_result(
@@ -1351,21 +2211,22 @@ def _canonical_keyword(value: str) -> str:
     return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")
 
 
-def _validate_normal_move_witness_matches_unit(
+def _validate_move_witness_matches_unit(
     *,
     witness: PathWitness,
     unit_placement: UnitPlacement,
+    action_label: str,
 ) -> None:
     if type(witness) is not PathWitness:
-        raise GameLifecycleError("Normal Move requires a PathWitness.")
+        raise GameLifecycleError(f"{action_label} requires a PathWitness.")
     expected_model_ids = tuple(
         sorted(placement.model_instance_id for placement in unit_placement.model_placements)
     )
     if tuple(sorted(witness.model_ids())) != expected_model_ids:
-        raise GameLifecycleError("Normal Move witness must match the selected unit models.")
+        raise GameLifecycleError(f"{action_label} witness must match the selected unit models.")
 
 
-def _normal_move_violation_code(resolution: NormalMoveResolution) -> str:
+def _normal_move_violation_code(resolution: NormalMoveResolution | AdvanceMoveResolution) -> str:
     for path_result in resolution.path_validation_results:
         if path_result.is_valid:
             continue
@@ -1541,6 +2402,15 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return value
 
 
+def _payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"Decision payload key must be an object: {key}.")
+    return value
+
+
 def _payload_path_witness(payload: dict[str, JsonValue], *, key: str) -> PathWitness:
     if key not in payload:
         raise GameLifecycleError(f"Decision payload missing required key: {key}.")
@@ -1620,6 +2490,17 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     return tuple(validated)
 
 
+def _validate_advance_roll_spec(spec: DiceRollSpec, *, unit_instance_id: str) -> None:
+    if type(spec) is not DiceRollSpec:
+        raise GameLifecycleError("Advance roll spec must be a DiceRollSpec.")
+    if spec.expression != DiceExpression(quantity=1, sides=6):
+        raise GameLifecycleError("Advance roll spec must be an unmodified D6.")
+    if spec.roll_type != "advance_roll":
+        raise GameLifecycleError("Advance roll spec roll_type must be advance_roll.")
+    if spec.actor_id != unit_instance_id:
+        raise GameLifecycleError("Advance roll spec actor_id must match unit_instance_id.")
+
+
 def _validate_identifier(field_name: str, value: object) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"{field_name} must be a string.")
@@ -1634,4 +2515,10 @@ def _validate_positive_int(field_name: str, value: object) -> int:
         raise GameLifecycleError(f"{field_name} must be an integer.")
     if value < 1:
         raise GameLifecycleError(f"{field_name} must be at least 1.")
+    return value
+
+
+def _validate_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
