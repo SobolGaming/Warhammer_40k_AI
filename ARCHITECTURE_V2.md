@@ -1,1320 +1,355 @@
 # CORE V2 Architecture Build Order
 
-This document contains the build order roadmap split out from README Section 4.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10I work.
 
-## 4. Build order
+The roadmap is intentionally rules-engine first:
 
-### Phase 0: governance and gates
+- engine lifecycle and state are authoritative;
+- every player, AI, UI, network, and replay interaction goes through `DecisionRequest`, `DecisionResult`, and `DecisionRecord`;
+- runtime code executes typed descriptors and handlers, not raw rule text;
+- replay payloads are deterministic, JSON-safe, and fail-fast on drift;
+- unsupported rule shapes are explicit, source-linked, and auditable.
 
-Before gameplay code, add:
+Primary references for roadmap coverage:
 
-- `ruff` linting;
-- strict type checking with `mypy` and/or `pyright`;
-- `pytest` test framework;
-- `coverage` reporting;
-- `pre-commit` hooks;
-- code-quality tests;
-- import-boundary checks;
-- broad-exception audit;
-- fallback-code audit;
-- raw-model-access audit for physical engine paths.
+- Warhammer 40,000 10th Edition Core Rules: <https://wahapedia.ru/wh40k10ed/the-rules/core-rules/>
+- Chapter Approved 2025-26: <https://wahapedia.ru/wh40k10ed/the-rules/chapter-approved-2025-26/>
+- CORE V1 reference implementation: <https://github.com/SobolGaming/Warhammer40k_AI>
+- CORE V1 generated Wahapedia data: <https://github.com/SobolGaming/Warhammer40k_AI/tree/dev/wahapedia_data>
+- CORE V2 repository: <https://github.com/SobolGaming/Warhammer_40k_AI>
 
-Exit criteria:
+## Roadmap status
 
-- `uv run ruff check .` passes;
-- `uv run mypy src tests` passes once typed modules exist;
-- `uv run pytest` passes;
-- code-quality tests fail on broad exception or forbidden fallback patterns.
+Everything through **Phase 10I** is treated as implemented or in final review at the time this file was generated. Do not insert new work before Phase 10J unless a merged implementation invalidates the phase boundary.
 
-### Phase 1: dice and deterministic randomness
+Completed / implemented foundation:
 
-Modules:
+| Phase | Status | Purpose |
+|---|---:|---|
+| 0 | Complete | Governance, linting, tests, import boundaries |
+| 1 | Complete | Dice and deterministic randomness |
+| 2 | Complete | Attributes and modifiers |
+| 3 | Complete | Rule-text normalization boundary |
+| 4 | Complete | Wargear and weapon profile foundations |
+| 5 | Complete | Model pose/base/volume geometry foundations |
+| 6 | Complete | Units and attached-unit terminology |
+| 7 | Complete | Initial 2.5D visibility/pathing core |
+| 8 | Complete | Battlefield/objective descriptors |
+| 8B | Complete | Ruleset compatibility descriptors |
+| 8C | Complete | Distance predicate tokens |
+| 8D | Complete | Weapon ability descriptors |
+| 9 | Complete | Decision system |
+| 9A | Complete | Catalog, provenance, sequence descriptors |
+| 9B | Complete | Authoritative lifecycle |
+| 9C | Complete | Army mustering and runtime instantiation |
+| 9D | Complete | Pre-Phase-10 smoke gate |
+| 10A | Complete | Battlefield placement bridge |
+| 10B | Complete | Movement phase entry and unit selection |
+| 10C | Complete | Movement phase action and Normal Move vertical slice |
+| 10D | Complete | Battlefield transition records |
+| 10E | Complete | Model geometry foundation |
+| 10F | Complete | Terrain factory foundation |
+| 10G | Complete | Movement legality context and capability resolver |
+| 10H | Complete | Pathing smoke constraints and coherency descriptor correction |
+| 10I | Complete | Terrain movement semantics and endpoint support |
 
-- `core/rng.py`
-- `core/dice.py`
-- `engine/decision.py`
-- `engine/event_log.py`
+## Cross-cutting architectural rules
 
-Objects:
+1. **No runtime raw text parsing.** Raw rule text is normalized, parsed, and compiled at ingest/authoring time into typed descriptors or explicit unsupported descriptors.
+2. **No silent fallbacks.** If a rule, terrain shape, ability, or decision cannot be represented safely, emit typed unsupported state.
+3. **No UI-owned state mutation.** CLI, local UI, network UI, and AI policies answer `DecisionRequest`s; the engine validates and mutates authoritative state.
+4. **No ad hoc content facts.** Datasheet stats, keywords, wargear, base sizes, factions, detachments, enhancements, Stratagems, missions, deployment maps, and terrain layouts come from catalog/source packages.
+5. **No broad imports from CORE V1.** CORE V1 is a reference for invariants, algorithms, edge cases, and tests. Port only the smallest needed behavior.
+6. **Every state change is replay-facing.** Dice, decisions, placement/removal/displacement, scoring, CP changes, Battle-shock, Stratagem use, attack resolution, model destruction, and mission actions must serialize deterministically.
+7. **Headless performance is a product requirement.** The engine must support fast large-corpus self-play for hierarchical AI orchestration.
 
-- `RandomSource`
-- `DiceExpression`
-- `DiceRollSpec`
-- `DiceRollResult`
-- `DiceRollState`
-- `DiceRollManager`
+## CORE V1 investigation and reuse policy
 
-Invariants:
+CORE V1 is the previous implementation at <https://github.com/SobolGaming/Warhammer40k_AI>. For every future phase:
 
-- same seed + same event/decision history produces same rolls;
-- every dice roll has `reason` and `roll_type`;
-- no generic `get_roll(D6)` replay-facing labels;
-- rerolls are explicit decisions;
-- fixed/replay-injected dice are supported;
-- serialization round-trips exactly.
+1. Inspect only the CORE V1 areas named in that phase.
+2. Name the invariant being preserved.
+3. Write CORE V2 tests before porting behavior.
+4. Port the smallest necessary algorithm, transform, or edge-case rule.
+5. Replace raw object/string behavior with typed descriptors, payloads, and records.
+6. Remove permissive fallbacks.
+7. Add replay/audit coverage for state-changing behavior.
 
-Required tests:
+---
 
-- same-seed determinism;
-- branch history affects dice deterministically;
-- reroll selection is explicit;
-- replay-injected dice reproduce original results;
-- unlabeled dice request is invalid.
+# Remaining build order
 
-### Phase 2: attributes and modifiers
+## Phase 10J: precise movement distance, straight-line segments, and pivot costs
 
-Modules:
-
-- `core/attributes.py`
-- `core/modifiers.py`
-- `rules/timing.py`
-
-Objects:
-
-- `Characteristic`
-- `CharacteristicValue`
-- `Modifier`
-- `ModifierScope`
-- `ModifierTiming`
-- `ModifierStack`
-
-Invariants:
-
-- modifiers are typed, not raw string-parsed at runtime;
-- modifier order is deterministic;
-- raw/base/final values are inspectable;
-- unsupported stacking interactions fail explicitly.
-
-Initial supported characteristics:
-
-- movement;
-- toughness;
-- save;
-- invulnerable save;
-- wounds;
-- leadership;
-- objective control;
-- weapon skill;
-- ballistic skill;
-- strength;
-- attacks;
-- armor penetration;
-- damage;
-- range.
-
-### Phase 3: rule text normalization boundary
+This phase replaces pivot-cost placeholders with real 10e movement-distance accounting. It must land before Advance, Fall Back, Charge movement, Pile-in, Consolidate, or triggered movement become authoritative.
 
 Modules:
 
-- `rules/text_normalization.py`
-- `rules/parsed_tokens.py`
-- `rules/source_data.py`
-
-Raw source text enters here and is normalized once. Engine runtime code must not scatter `.lower()`, `.replace()`, unicode punctuation cleanup, or dice-expression parsing across rule handlers.
-
-Normalize at least:
-
-- smart quotes and apostrophes;
-- en/em dashes;
-- unicode minus signs;
-- non-breaking spaces;
-- multiplication signs;
-- full-width punctuation where observed;
-- keyword casing;
-- dice expressions;
-- range expressions.
-
-### Phase 4: wargear and weapon profiles
-
-Modules:
-
-- `core/wargear.py`
-- `core/weapon_profiles.py`
-
-Objects:
-
-- `Wargear`
-- `WeaponProfile`
-- `WeaponKeyword`
-- `RangeProfile`
-- `AttackProfile`
-- `DamageProfile`
-
-Invariants:
-
-- weapon profile identity is stable;
-- serialization never uses object reprs;
-- profile expressions are parsed at ingest time;
-- keywords are canonical tokens.
-
-### Phase 5: model geometry
-
-As soon as `Model` exists, geometry begins.
-
-Modules:
-
-- `geometry/pose.py`
-- `geometry/base.py`
-- `geometry/volume.py`
-- `geometry/terrain.py`
-- `geometry/spatial_index.py`
-
-Objects:
-
-- `Point3`
-- `Pose`
-- `Facing`
-- `BaseShape`
-- `CircularBase`
-- `OvalBase`
-- `ModelVolume`
-- `TerrainVolume`
-- `ObstacleVolume`
-- `Model`
-
-Model invariants:
-
-- every battlefield model has a stable `model_id`;
-- every battlefield model has a pose;
-- every battlefield model has a base shape;
-- every battlefield model has a 2.5D volume;
-- no model without geometry can enter battlefield state.
-
-Required tests:
-
-- base overlap;
-- base distance;
-- 3D range;
-- engagement range;
-- terrain intersection;
-- simple line-of-sight segment blocking.
-
-### Phase 6: units and attached units
-
-Modules:
-
-- `core/unit.py`
-- `core/attached_unit.py`
-- `core/unit_group.py`
-
-Objects:
-
-- `Unit`
-- `UnitMember`
-- `AttachedUnit`
-- `UnitGroup`
-
-Terminology is explicit:
-
-```text
-unit.own_models            -> models physically owned by that unit object
-unit_group.all_models()    -> all models in the attached rules unit
-unit_group.alive_models()  -> alive models in the attached rules unit
-```
-
-Do not use ambiguous `unit.models` semantics.
-
-Required tests:
-
-- leader joins bodyguard;
-- joined support included;
-- attached unit moves as one rules unit;
-- damage allocation sees the attached group;
-- event logging includes attached group;
-- line-of-sight and targeting see attached group;
-- movement status applies to the whole attached group.
-
-### Phase 7: 2.5D visibility and pathing core
-
-Modules:
-
-- `geometry/visibility.py`
 - `geometry/pathing.py`
 - `geometry/movement_envelope.py`
-- `geometry/collision.py`
-
-Objects:
-
-- `VisibilityQuery`
-- `VisibilityResult`
-- `PathQuery`
-- `PathResult`
-- `PathWitness`
-- `PathFailure`
-- `CollisionSet`
-- `MovementEnvelope`
-
-Visibility design:
-
-- static terrain index;
-- dynamic model-blocker index;
-- segment bounding-box query;
-- deterministic candidate ordering;
-- exact geometry only after broad phase;
-- staged sampled rays;
-- early exit on first legal clear line.
-
-Pathing invariants:
-
-- no endpoint-only movement validation;
-- collision checked along path;
-- terrain checked along path;
-- engagement range checked along path;
-- coherency checked after movement;
-- attached-unit groups checked together;
-- impossible path returns typed failure, not fallback movement.
-
-### Phase 8: battlefield and objectives
-
-Modules:
-
-- `core/battlefield.py`
-- `core/objectives.py`
-- `core/deployment_zones.py`
-
-Objects:
-
-- `Battlefield`
-- `TerrainLayout`
-- `Objective`
-- `DeploymentZone`
-- `SpatialState`
-
-Invariants:
-
-- every battlefield model is indexed by stable ID;
-- spatial index uses generation counters;
-- objective control derives from current spatial state;
-- no hidden mutation bypasses generation counters.
-
-### Phase 8B: ruleset compatibility descriptors
-
-Module:
-
-- `core/ruleset_descriptor.py`
-
-Objects:
-
-- `RulesetDescriptor`
-- `EngagementPolicyDescriptor`
-- `MovementPolicyDescriptor`
-- `MovementModePolicy`
-- `ChargePolicyDescriptor`
-- `ChargeEndpointRequirement`
-- `TerrainVisibilityPolicyDescriptor`
-- `ObjectivePolicyDescriptor`
-- `CoherencyPolicyDescriptor`
-- `FlyPolicyDescriptor`
-- `MissionPolicyDescriptor`
-
-Invariants:
-
-- descriptor data does not execute rules;
-- descriptor payloads include deterministic `ruleset_id` and `descriptor_hash`;
-- movement, engagement, objective, coherency, terrain, FLY, charge, and mission assumptions are explicit data;
-- charge endpoint requirements are typed descriptors, not coarse boolean fallbacks;
-- unsupported preview rule paths remain explicit policy descriptors, not fallback behavior.
-
-### Phase 8C: distance predicate tokens
-
-Module:
-
-- `rules/parsed_tokens.py`
-
-Objects:
-
-- `DistancePredicateKind`
-- `DistancePredicateToken`
-
-Invariants:
-
-- rule text that states a distance predicate is parsed as a structured predicate, not a bare range;
-- bare `RangeExpressionToken` remains for profile-like distances such as weapon range text;
-- predicate spans are tied to `normalized_text` and payload round-trips;
-- unsupported distance interval semantics fail explicitly.
-
-Initial supported predicates:
-
-- within N inches;
-- more than N inches;
-- at least N inches;
-- at most N inches;
-- exactly N inches;
-- within Engagement Range;
-- outside Detection Range;
-- Half Range.
-
-### Phase 8D: weapon ability descriptors
-
-Module:
-
-- `core/weapon_profiles.py`
-
-Objects:
-
-- `AbilityDescriptor`
-- `AbilityKind`
-- `AbilityParameter`
-- `AbilityTiming`
-- `AbilityCondition`
-
-Invariants:
-
-- weapon abilities are typed ingest-time descriptors, not executable rule handlers;
-- ability payloads are JSON-safe and never use object reprs;
-- parameterized abilities validate their parameters before weapon profiles can use them;
-- unsupported ability shapes fail explicitly.
-
-Initial supported descriptors:
-
-- Sustained Hits X;
-- Melta X;
-- Rapid Fire X;
-- Heavy with stationary-or-policy-defined condition.
-
-### Phase 9: decision system
-
-Modules:
-
-- `engine/decision_request.py`
-- `engine/decision_result.py`
-- `engine/decision_queue.py`
-- `engine/decision_controller.py`
-- `engine/decision_record.py`
-
-Objects:
-
-- `DecisionOption`
-- `DecisionRequest`
-- `DecisionResult`
-- `DecisionQueue`
-- `DecisionController`
-- `DecisionRecord`
-
-Invariants:
-
-- every player choice emits a `DecisionRequest`;
-- every response is a `DecisionResult`;
-- action spaces are finite and serializable;
-- UI/headless/network choose decisions differently but use the same engine path;
-- engine validates every result;
-- engine alone mutates authoritative state.
-
-### Phase 9A: catalog, content provenance, and sequence descriptors
-
-This phase exists after the completed Phase 1-9 foundation. It adds the source
-catalog, datasheet/faction catalog definitions, canonical content fixtures, and
-setup/battle sequence descriptors needed before lifecycle and mustering are
-implemented.
-
-Modules:
-
-- `rules/source_catalog.py`
-- `rules/data_package.py`
-- `rules/source_data.py`
-- `core/datasheet.py`
-- `core/army_catalog.py`
-- `core/faction.py`
-- `core/detachment.py`
-- `core/ruleset_descriptor.py`
-
-Objects:
-
-- `DataPackageId`
-- `SourceDocumentId`
-- `RuleSourceText`
-- `RulesetBundle`
-- `CatalogVersion`
-- `DatasheetDefinition`
-- `ModelProfileDefinition`
-- `UnitCompositionDefinition`
-- `DatasheetKeywordSet`
-- `DatasheetWargearOption`
-- `DatasheetAbilityDescriptor`
-- `FactionDefinition`
-- `DetachmentDefinition`
-- `ArmyRuleDefinition`
-- `EnhancementDefinition`
-- `StratagemDefinition`
-- `SetupSequenceDescriptor`
-- `BattlePhaseSequenceDescriptor`
-
-Catalog definitions may include real source facts as soon as the schema exists:
-
-- movement, toughness, save, wounds, leadership, objective control;
-- weapon skill and ballistic skill;
-- base size and model profile composition;
-- keywords and faction keywords;
-- default wargear and legal wargear options;
-- source-linked ability text and inert ability descriptors.
-
-Invariants:
-
-- all source data has deterministic source IDs;
-- source package identity is explicit;
-- raw rule text is normalized once at the data boundary;
-- no runtime rule handler consumes unnormalized text;
-- unsupported source shapes fail during ingest;
-- datasheet facts are immutable catalog definitions;
-- catalog definitions do not mutate battlefield state;
-- runtime unit instances are not source data;
-- ability descriptors are not executable handlers;
-- unsupported abilities remain explicit unsupported descriptors;
-- faction and detachment selection is data, not behavior;
-- setup and battle phase order are explicit policy data, not driver-local enum arithmetic;
-- setup and battle phase sequence descriptors are carried by `RulesetDescriptor` and included in
-  descriptor hashing.
-
-Add a tiny canonical content pack before broad content import. It should include
-infantry, a character leader, a transport, a vehicle or monster, and a deep-strike
-unit so engine contract tests use real fixtures instead of ad hoc objects.
-
-### Phase 9B: authoritative game lifecycle
-
-Modules:
-
-- `engine/lifecycle.py`
-- `engine/game_state.py`
-- `engine/setup_flow.py`
-- `engine/battle_round_flow.py`
-- `engine/phase.py`
-- `engine/phases/command.py`
-
-Objects:
-
-- `GameLifecycle`
-- `GameState`
-- `GameLifecycleStage`
-- `SetupStep`
-- `BattlePhase`
-- `LifecycleStatus`
-- `PhaseHandler`
-
-Top-level setup order is explicit:
-
-```text
-MUSTER_ARMIES
-SELECT_MISSION
-CREATE_BATTLEFIELD
-DETERMINE_ATTACKER_DEFENDER
-SELECT_SECONDARY_MISSIONS
-DECLARE_BATTLE_FORMATIONS
-DEPLOY_ARMIES
-REDEPLOY_UNITS
-DETERMINE_FIRST_TURN
-RESOLVE_PREBATTLE_ACTIONS
-```
-
-`SELECT_SECONDARY_MISSIONS` covers each player's secret Fixed or Tactical
-Secondary Mission choice. Fixed choices also include selecting the two Fixed
-Missions; Tactical choices are deferred to Command phase draws.
-
-Battle round order is explicit:
-
-```text
-COMMAND
-MOVEMENT
-SHOOTING
-CHARGE
-FIGHT
-```
-
-`GameLifecycle` owns the single authoritative clock:
-
-```text
-start(config)
-advance_until_decision_or_terminal()
-submit_decision(result)
-```
-
-Invariants:
-
-- one engine-owned setup-to-battle state machine;
-- setup sequence comes from `RulesetDescriptor.setup_sequence`, not duplicated driver code;
-- battle phase order comes from `RulesetDescriptor.battle_phase_sequence`;
-- `RulesetDescriptor.descriptor_hash` is recorded in lifecycle state and replay-facing payloads;
-- `advance_until_decision_or_terminal()` advances deterministic lifecycle transitions until a
-  decision, terminal status, unsupported status, or deterministic transition guard is reached;
-- phase wrap switches the active player;
-- battle round increments only after every player has completed the fight phase;
-- lifecycle advances only through engine commands and decision results;
-- UI, headless, replay, and network do not own phase progression;
-- phase handlers are explicit for every phase in the configured battle sequence;
-- Phase 9B placeholder phase bodies emit explicit no-op events and typed unsupported statuses;
-- all lifecycle state is deterministic and serializable.
-
-Required tests:
-
-- new game starts at `MUSTER_ARMIES`;
-- setup steps advance in order;
-- lifecycle reads setup order from `RulesetDescriptor.setup_sequence`, not local constants;
-- lifecycle reads battle phase order from `RulesetDescriptor.battle_phase_sequence`, not local constants;
-- one call to `advance_until_decision_or_terminal()` reaches the first setup decision from a new
-  game;
-- setup completion enters battle round 1 command phase;
-- battle phases advance command, movement, shooting, charge, fight;
-- phase wrap switches the active player;
-- battle round increments after all players complete fight phase;
-- lifecycle stops at a `DecisionRequest`;
-- missing battle phase handlers are not silently skipped;
-- malformed setup sequences missing `SELECT_SECONDARY_MISSIONS` fail at config construction;
-- battle phase sequences that do not start with `COMMAND` fail at config construction;
-- `SELECT_SECONDARY_MISSIONS` emits secret decision requests for both players;
-- Fixed and Tactical secondary choices serialize without leaking hidden opponent choices;
-- Tactical secondary draws occur in Command phase, not setup;
-- descriptor hash is recorded in lifecycle state and replay-facing payloads;
-- lifecycle payload hash, sequence, and config-derived state mismatches fail during
-  `from_payload()`;
-- no UI or headless-specific phase path exists.
-
-### Phase 9C: army mustering and runtime instantiation
-
-Modules:
-
-- `engine/army_mustering.py`
-- `engine/unit_factory.py`
-- `engine/list_validation.py`
-
-Objects:
-
-- `ArmyMusterRequest`
-- `ArmyDefinition`
-- `UnitInstance`
-- `ModelInstance`
-- `WargearSelection`
-- `DetachmentSelection`
-
-Invariants:
-
-- mustering consumes catalog definitions and produces runtime instances;
-- lifecycle `MUSTER_ARMIES` consumes per-player `ArmyMusterRequest` data;
-- runtime units keep stable links back to datasheet and source IDs;
-- all selected wargear is legal for the datasheet;
-- all model profiles and base sizes are resolved before battlefield placement;
-- faction, detachment, enhancement, and stratagem selections are validated as data;
-- invalid or unsupported list content fails explicitly.
-
-Required tests:
-
-- canonical army mustering produces deterministic `ArmyDefinition` payloads;
-- lifecycle `MUSTER_ARMIES` consumes requests for every player and stores runtime armies;
-- invalid mustering prevents setup advancement past `MUSTER_ARMIES`;
-- lifecycle replay payloads preserve mustered army definitions;
-- runtime `UnitInstance` and `ModelInstance` objects preserve datasheet/source links;
-- runtime payloads reject army/unit/model hierarchy drift;
-- runtime units use explicit `own_models`, not ambiguous `models`;
-- selected wargear outside a datasheet option fails during mustering;
-- model counts outside datasheet composition bounds fail during mustering;
-- faction, detachment, enhancement, and stratagem selection drift fails during mustering;
-- request/catalog identity drift fails during mustering;
-- mustering payloads round-trip without Python object reprs.
-
-### Phase 9D: pre-Phase-10 smoke gate
-
-This is a hardening gate, not a broad content phase. It proves that the
-catalog, mustering, authoritative lifecycle, decision path, and replay payloads
-work together end-to-end before the movement phase body starts consuming
-runtime units.
-
-Use the existing canonical content pack or a tiny Phase 10 smoke pack. Do not
-import broad official datasheets, detachments, stratagems, enhancements, or
-codex abilities in this phase.
-
-Required smoke path:
-
-```text
-GameLifecycle.start(config)
-advance_until_decision_or_terminal()
-  -> MUSTER_ARMIES runs
-  -> ArmyDefinition exists for every player
-  -> SELECT_SECONDARY_MISSIONS decision appears
-submit secondary mission choices
-advance through setup
-enter Battle Round 1 COMMAND phase
-draw Tactical secondary missions when required
-stop at the next explicit phase boundary
-replay payload round-trips
-```
-
-Invariants:
-
-- lifecycle smoke tests use real catalog definitions and real mustering, not stubs;
-- mustered armies exist before secondary mission decisions are requested;
-- runtime units preserve datasheet IDs, source IDs, own models, base sizes, wounds,
-  characteristics, and resolved wargear selections;
-- Tactical secondary draws occur in Command phase, not setup;
-- public payloads do not leak hidden opponent secondary choices;
-- replay-facing payloads contain no Python object reprs;
-- movement, shooting, charge, and fight bodies remain explicit boundaries until
-  their vertical slices are implemented; once a vertical slice lands, the smoke
-  path stops at that slice's first decision or unsupported boundary.
-
-Required tests:
-
-- minimal two-player catalog-backed lifecycle reaches `SELECT_SECONDARY_MISSIONS`
-  with both armies mustered;
-- the same lifecycle reaches Battle Round 1 `COMMAND`;
-- Tactical secondary selection emits a Command-phase draw decision;
-- after the draw, lifecycle stops at either an explicit Phase 9B placeholder, a
-  vertical-slice decision, or a typed unsupported boundary;
-- replay payload round-trips after the smoke path;
-- public state hides opponent Fixed secondary choices.
-
-### Phase 10A: battlefield placement bridge
-
-This phase is a minimal runtime bridge for movement vertical-slice tests. Phase
-9C creates mustered runtime `UnitInstance` and `ModelInstance` objects, but
-movement needs placed models. Phase 10A records deterministic model poses for
-those runtime instances without implementing full deployment rules.
-
-Modules:
-
-- `engine/battlefield_state.py`
-- `engine/placement.py`
-
-Objects:
-
-- `ModelPlacement`
-- `UnitPlacement`
-- `BattlefieldRuntimeState`
-- `PlacedArmy`
-- `BattlefieldScenario`
-
-Invariants:
-
-- every placed model references an existing `ModelInstance`;
-- every placed unit references an existing `UnitInstance`;
-- no model is placed twice;
-- no placed model belongs to the wrong army or player;
-- base size remains available from the referenced `ModelInstance`;
-- pose payloads are deterministic and serializable;
-- placement state round-trips without Python object reprs;
-- placement fixtures use mustered armies from `GameState`, not ad hoc models;
-- this phase does not implement full `DEPLOY_ARMIES` rules.
-
-Required tests:
-
-- lifecycle smoke config reaches `SELECT_SECONDARY_MISSIONS` with both armies
-  mustered;
-- deterministic placement state is created from both `ArmyDefinition` objects;
-- every placed model maps back to a runtime `ModelInstance`;
-- referenced model base sizes and characteristics remain available;
-- duplicate model placements fail explicitly;
-- missing unit/model placement references fail explicitly;
-- wrong-player placement drift fails explicitly;
-- placement and scenario payloads round-trip without Python object reprs.
-
-### Movement taxonomy boundary
-
-Movement work must keep these domains separate:
-
-Movement phase action:
-  A player choice made in the Move Units step: Remain Stationary, Normal Move,
-  Advance, or Fall Back.
-
-Model displacement:
-  A model pose change on the battlefield. Displacement can happen during the
-  Movement phase, Charge phase, Fight phase, or as a triggered rule effect.
-
-Battlefield placement:
-  A model or unit appearing on the battlefield from deployment, redeploy,
-  strategic reserves, deep strike, disembark, split-unit, or
-  return-to-battlefield effects.
-
-Battlefield removal:
-  A model or unit leaving the battlefield because it was destroyed, embarked,
-  placed into reserves, or temporarily removed.
-
-Movement capability / legality input:
-  Structured rule data used to evaluate a displacement. Keywords such as `FLY`,
-  `INFANTRY`, `BEAST`, `VEHICLE`, and `MONSTER` modify capabilities and
-  constraints; they are not Movement phase action options.
-
-`REINFORCEMENTS` is a Movement phase step, not a placement kind. During that
-step, specific placement mechanisms such as strategic reserves and deep strike
-place models onto the battlefield.
-
-`REDEPLOY` is a battlefield placement kind, not a model displacement kind. A
-redeploy transition may remove a model temporarily and then place it again, but
-it is not represented as a path-witnessed pose change.
-
-### Phase 10B: movement phase entry and unit selection
-
-This phase replaces the Phase 9B Movement placeholder with a real
-`MovementPhaseHandler`, but keeps the first movement vertical slice narrow. It
-does not move models yet.
-
-Modules:
-
 - `engine/phases/movement.py`
-- `engine/lifecycle.py`
-- `engine/battle_round_flow.py`
-- `engine/game_state.py`
-- `engine/setup_flow.py`
+- `engine/movement_legality.py`
 
 Objects:
 
-- `MovementPhaseHandler`
-- `MovementPhaseState`
-- `MovementUnitSelection`
-
-Implement:
-
-- register `MovementPhaseHandler` in `GameLifecycle`;
-- persist Phase 10A battlefield placement state in lifecycle `GameState`;
-- create the deterministic Phase 10A placement bridge at `DEPLOY_ARMIES`
-  until full deployment rules exist;
-- emit `SELECT_MOVEMENT_UNIT`;
-- derive the legal unit set from the active player's mustered and placed units;
-- allow each unit to be selected once per Movement phase;
-- put the selected unit into a movement activation state;
-- stop at the unit-selection `DecisionRequest`;
-- record movement phase entry and unit selection in event/replay payloads.
+- `MovementDistanceBudget`
+- `MovementSegment`
+- `PivotCostPolicy`
+- `PivotEvent`
+- `MovementDistanceWitness`
 
 Invariants:
 
-- Movement phase progression remains owned by the engine lifecycle;
-- player choice uses `DecisionRequest` / `DecisionResult`;
-- legal movement units come from placed runtime units, not ad hoc fixtures;
-- movement requires complete placement for mustered models before unit selection;
-- replay payloads reject `battlefield_state` before `DEPLOY_ARMIES` completes;
-- selected units are scoped to the active player;
-- a unit cannot be selected twice in the same Movement phase;
-- no displacement, movement action, path witness, or objective update is implemented yet.
+- movement distance is measured across straight-line segments and pivots;
+- straight-line distance is measured from the same point on the base/model at the start and end of each line;
+- each model pays its pivot value only the first time it pivots during that move;
+- round-base models normally have pivot cost 0";
+- non-round-base non-`MONSTER`/non-`VEHICLE` models pay 1";
+- non-round-base `MONSTER`/`VEHICLE` models pay 2";
+- round-base `VEHICLE` models wider than 32mm with a flying stem or hover stand pay 2";
+- `AIRCRAFT` pivot cost is 0" in generic pivot accounting, with aircraft-specific movement deferred to Phase 10Q;
+- if insufficient movement remains to pay a required pivot cost, the move is invalid;
+- pivot-cost and movement-distance witnesses serialize without object reprs.
 
 Required tests:
 
-- lifecycle enters Movement with a real `MovementPhaseHandler`;
-- Movement emits `SELECT_MOVEMENT_UNIT` for the active player;
-- decision options contain only the active player's placed units;
-- selecting a unit records deterministic activation state and event/replay payloads;
-- already-selected units are excluded from the legal unit set;
-- incomplete placement fails explicitly before unit selection;
-- no next movement action is resolved before unit selection is recorded.
+- circular base with no facing change has 0" pivot cost;
+- non-round infantry base pays 1" once even if it pivots multiple times;
+- non-round `VEHICLE`/`MONSTER` pays 2";
+- round-base large flying-stem/hover-stand `VEHICLE` pays 2";
+- `AIRCRAFT` pays 0" in generic pivot policy;
+- insufficient remaining movement after pivot cost rejects the move;
+- straight-line distance uses same-point measurement semantics;
+- movement distance witness round-trips.
 
-### Phase 10C: movement phase action and normal move
+CORE V1 relevant areas:
 
-This phase adds the first actual Movement phase action after unit selection.
-`SELECT_MOVEMENT_ACTION` exposes only the standard Move Units actions:
-`REMAIN_STATIONARY`, `NORMAL_MOVE`, `ADVANCE`, and `FALL_BACK`.
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/pathing/sweep.py`
+- `src/warhammer40k_ai/pathing/types.py`
+- `src/warhammer40k_ai/movement_distance.py`
+- movement distance / pivot tests
+
+## Phase 10K: unit coherency runtime validation and movement rollback
+
+Descriptor data already represents 10e and preview coherency policies; this phase applies those policies to battlefield placements and move endpoints.
 
 Modules:
 
-- `engine/phases/movement.py`
+- `engine/unit_coherency.py`
 - `engine/battlefield_state.py`
+- `engine/phases/movement.py`
 - `geometry/pathing.py`
 
-Implement:
+Objects:
 
-- emit `SELECT_MOVEMENT_ACTION`;
-- support `REMAIN_STATIONARY`;
-- support `NORMAL_MOVE`;
-- return typed unsupported results for `ADVANCE` and `FALL_BACK`;
-- consume the selected unit's datasheet Movement characteristic;
-- consume base size and current pose from placed `ModelInstance` data;
-- produce a `PathWitness` or typed movement witness for each moved model;
-- update model placements;
-- mark the selected unit as moved;
-- emit a movement activation terminal event;
-- queue/select the next unit only after the current activation terminal event.
+- `UnitCoherencyContext`
+- `UnitCoherencyResult`
+- `UnitCoherencyViolation`
+- `MovementRollbackRecord`
 
-Not Movement phase action options:
+Invariants:
 
-- `FLY`;
-- embark/disembark;
-- terrain traversal beyond existing explicit descriptors;
-- enemy engagement constraints beyond existing explicit descriptors.
-
-Serialized payloads use `movement_phase_action`, not generic `action`. Payloads
-that actually change poses also include `displacement_kind`, such as
-`normal_move`.
+- single-model units are coherent;
+- 10e units of 2-6 models require each model to be within 2" horizontally and 5" vertically of at least one other model in that unit;
+- 10e units of 7+ models require each model to be within 2" horizontally and 5" vertically of at least two other models in that unit;
+- preview all-models-within-distance policy is supported by descriptor;
+- units must be set up in coherency;
+- units must end any kind of move in coherency;
+- if a unit cannot end a move in coherency, that move is invalid and model poses roll back;
+- end-of-turn coherency cleanup is detected here but model-removal resolution lands in Phase 11C;
+- coherency validation returns offending model IDs.
 
 Required tests:
 
-- `SELECT_MOVEMENT_ACTION` exposes exactly `remain_stationary`, `normal_move`,
-  `advance`, and `fall_back`;
-- `FLY`, embark, disembark, terrain traversal, and engagement-constrained moves
-  are absent from Movement phase action options;
-- `REINFORCEMENTS` is modeled as a Movement phase step, not a placement kind;
-- `REDEPLOY` is modeled as a battlefield placement kind, not a model
-  displacement kind;
-- `REMAIN_STATIONARY` marks the unit complete without changing poses;
-- `NORMAL_MOVE` consumes Movement, base size, and current pose;
-- movement updates placement payloads deterministically;
-- normal movement emits a witness and movement activation terminal event;
-- the selected unit cannot be selected again that phase;
-- the next `SELECT_MOVEMENT_UNIT` is not emitted before the terminal event;
-- `ADVANCE` and `FALL_BACK` return typed unsupported results.
+- 10e 5-model unit requires one neighbor per model;
+- 10e 7-model unit requires two neighbors per model;
+- 10e broken coherency identifies offending model IDs;
+- preview all-models-within-distance policy validates pairwise distance;
+- invalid Normal Move rolls back to previous placement;
+- deployment placement outside coherency is rejected;
+- coherency result payload round-trips.
 
-### Phase 10D: battlefield transition records
+CORE V1 relevant areas:
 
-This phase makes model placement, removal, and displacement replay-facing
-records. It does not implement new rules behavior.
+- movement validation/pathing tests;
+- setup/deployment placement validation tests;
+- coherency-related movement tests.
+
+## Phase 10L: engagement-aware Movement action options and Normal Move finalization
+
+This phase makes `SELECT_MOVEMENT_ACTION` legally conditional and upgrades Normal Move from a vertical slice into a rules-valid Move Units action.
 
 Modules:
 
-- `engine/battlefield_state.py`
-- `engine/setup_flow.py`
 - `engine/phases/movement.py`
-
-Objects:
-
-- `ModelPlacementRecord`
-- `ModelRemovalRecord`
-- `ModelDisplacementRecord`
-- `BattlefieldTransitionBatch`
-
-Invariants:
-
-- placement records describe models appearing on the battlefield without a
-  path-witnessed move;
-- removal records describe models leaving the battlefield;
-- displacement records describe models changing pose while already on the
-  battlefield;
-- `REINFORCEMENTS` remains a Movement phase step, not a placement kind;
-- `REDEPLOY` remains a placement kind, not a displacement kind;
-- `EMBARK` is removal;
-- `DISEMBARK` is placement;
-- `NORMAL_MOVE` emits displacement records;
-- `REMAIN_STATIONARY` emits no placement/removal/displacement records;
-- transition records serialize without Python object reprs.
-
-Required tests:
-
-- placement/removal/displacement records round-trip;
-- invalid kind tokens fail;
-- displacement rejects identical start/end pose;
-- transition batch rejects duplicate and overlapping model IDs;
-- deployment bridge emits deployment placement records;
-- normal move emits `normal_move` displacement records;
-- remain stationary emits no transition records;
-- unsupported advance/fall back emit no transition records.
-
-### Phase 10E: model geometry foundation
-
-This phase resolves catalog/base-size data into runtime geometry used by
-movement, pathing, collision, and line-of-sight systems.
-
-Modules:
-
-- `geometry/model_geometry.py`
-- `geometry/measurement.py`
-- `core/datasheet.py`
-- `engine/unit_factory.py`
-
-Objects:
-
-- `BaseFootprintKind`
-- `GeometrySourceKind`
-- `HeightSourceKind`
-- `FootprintPart`
-- `ModelGeometry`
-
-Invariants:
-
-- catalog/source base sizes may remain in millimeters;
-- resolved runtime geometry uses inches only;
-- millimeter-to-inch conversion is centralized;
-- no runtime pathing code performs ad hoc unit conversion;
-- every resolved geometry has typed geometry and height provenance;
-- fallback height is allowed only with explicit `HeightSourceKind`;
-- hull/unique/large vehicle geometry can require manual overrides later.
-
-Required tests:
-
-- 32mm circular base resolves to inch radius;
-- oval base resolves major/minor inch radii;
-- resolved geometry stores inches only;
-- missing height uses explicit keyword/fallback provenance;
-- invalid source dimensions fail;
-- geometry payloads round-trip without Python object reprs.
-
-CORE V1 relevant areas:
-
-- `src/warhammer40k_ai/utility/model_geometry.py`
-- `src/warhammer40k_ai/utility/model_base.py`
-- `src/warhammer40k_ai/utility/calcs.py`
-- `src/warhammer40k_ai/utility/constants.py`
-- `tests/units/test_model_geometry_resolver.py`
-
-### Phase 10F: terrain factory foundation
-
-This phase creates deterministic terrain fixtures for future movement, pathing,
-and line-of-sight tests. It does not implement full terrain rules.
-
-Modules:
-
-- `geometry/terrain.py`
-- `geometry/terrain_factory.py`
-- `engine/battlefield_state.py`
-
-Objects:
-
-- `TerrainFeatureDefinition`
-- `TerrainWallDefinition`
-- `TerrainFloorDefinition`
-- `TerrainFactory`
-- `SpatialIndexState`
-
-Invariants:
-
-- terrain fixtures are deterministic and serializable;
-- terrain coordinates and dimensions use inches;
-- ruins walls/floors can be represented explicitly;
-- terrain state has revision/cache keys suitable for pathing and LoS;
-- pathing and LoS foundations are designed for spatial-index use;
-- this phase does not implement full LoS, cover, or terrain traversal rules.
-
-Required tests:
-
-- empty battlefield terrain fixture round-trips;
-- ruins fixture round-trips;
-- terrain wall/floor dimensions are deterministic;
-- invalid terrain geometry fails;
-- terrain revision changes when terrain changes;
-- spatial index state can be rebuilt deterministically.
-
-CORE V1 relevant areas:
-
-- `src/warhammer40k_ai/battlefield/map.py`
-- `src/warhammer40k_ai/battlefield/terrain_runtime.py`
-- `src/warhammer40k_ai/battlefield/terrain_presets.py`
-- `src/warhammer40k_ai/battlefield/terrain_elevation.py`
-- `src/warhammer40k_ai/battlefield/terrain_visibility.py`
-- `src/warhammer40k_ai/battlefield/terrain_cover.py`
-- `tests/rules/test_line_of_sight.py`
-- terrain-related battlefield tests
-
-### Phase 10G: movement legality context and capability resolver
-
-This phase introduces structured movement legality inputs. It does not implement
-a full path solver.
-
-Modules:
-
 - `engine/movement_legality.py`
-- `engine/phases/movement.py`
-- `core/ruleset_descriptor.py`
+- `geometry/pathing.py`
+- `geometry/terrain.py`
 
 Objects:
 
-- `MovementLegalityContext`
-- `MovementCapabilitySet`
-- `EngagementMovementPolicy`
-- `MovementLegalityResult`
+- `MovementActionAvailabilityContext`
+- `MovementActionAvailabilityResult`
+- `NormalMoveResolution`
 
 Invariants:
 
-- `FLY`, `INFANTRY`, `BEAST`, `VEHICLE`, `MONSTER`, `WALKER`, `AIRCRAFT`, and
-  similar keywords are legality/capability inputs, not Movement phase actions;
-- 10e engagement policy is descriptor-driven;
-- preview/alternate-edition engagement behavior requires an explicit ruleset
-  descriptor;
-- Movement phase action and model displacement kind are both available to
-  legality checks;
-- capability resolution is deterministic and serializable.
+- units outside enemy Engagement Range can be offered Remain Stationary, Normal Move, and Advance;
+- units within enemy Engagement Range can be offered Remain Stationary and Fall Back;
+- Normal Move cannot be selected by a unit within enemy Engagement Range;
+- Normal Move cannot move within enemy Engagement Range unless an explicit rule permits it;
+- Normal Move cannot transit enemy model bases unless `FLY` or another explicit capability permits it;
+- Normal Move consumes precise distance, pivot, terrain, pathing, and coherency validators;
+- Normal Move cannot end on another model, inside terrain, outside the battlefield, or out of coherency;
+- Normal Move emits displacement records only after all validators pass.
 
 Required tests:
 
-- `FLY` is resolved as a capability, not an action;
-- `INFANTRY`/`BEAST` can receive terrain traversal permissions;
-- `VEHICLE`/`MONSTER` restrictions are capability constraints;
-- 10e Normal Move cannot end in enemy Engagement Range;
-- 10e Normal Move cannot transit enemy Engagement Range;
-- 10e Fall Back can transit but cannot end in enemy Engagement Range;
-- preview Normal Move can transit but cannot end in enemy Engagement Range;
-- unsupported/preview policy fails explicitly unless descriptor exists.
+- action options outside Engagement Range are Remain Stationary, Normal Move, Advance;
+- action options inside Engagement Range are Remain Stationary, Fall Back;
+- Normal Move validates pathing, terrain, pivot cost, and coherency;
+- failed Normal Move does not mutate battlefield state;
+- successful Normal Move emits displacement records and terminal activation event.
 
 CORE V1 relevant areas:
 
-- `src/warhammer40k_ai/pathing/rules_profile.py`
-- `src/warhammer40k_ai/pathing/types.py`
-- `src/warhammer40k_ai/pathing/validation.py`
-- `src/warhammer40k_ai/utility/calcs.py`
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
-
-### Phase 10H: pathing smoke constraints
-
-This phase adds first pathing-legality smoke checks using model geometry,
-terrain fixtures, and movement capability data.
-
-Modules:
-
-- `geometry/pathing.py`
-- `engine/movement_legality.py`
-- `engine/phases/movement.py`
-- `core/ruleset_descriptor.py`
-
-Objects:
-
-- `PathValidationContext`
-- `PathValidationResult`
-- `PathConstraintViolation`
-- `CoherencyPolicyKind`
-
-Invariants:
-
-- battlefield edge crossing can be rejected;
-- non-FLY Normal/Advance movement cannot path through enemy model bases;
-- Fall Back movement can move over enemy models only through the Desperate
-  Escape flow;
-- FLY Normal/Advance/Fall Back movement can move over enemy models without
-  Desperate Escape;
-- Desperate Escape resolution is deferred to the Fall Back phase
-  implementation;
-- enemy Engagement Range transit can be rejected independently from ending in
-  enemy Engagement Range;
-- friendly model pass-through can be allowed;
-- friendly `VEHICLE`/`MONSTER` pass-through can be blocked for relevant movers;
-- end-on-model overlap can be rejected;
-- base gap checks use base footprint geometry;
-- model-volume-at-end checks use resolved model geometry;
-- pivot-cost support is represented, even if not fully solved yet;
-- coherency policy is descriptor data only in this phase;
-- runtime coherency validation remains future work;
-- future coherency enforcement sites are setup/placement, end of any move, and
-  end of every turn cleanup.
-
-Required tests:
-
-- circular infantry base can move through friendly infantry but cannot end
-  overlapping;
-- non-FLY vehicle cannot pass through friendly vehicle/monster;
-- model cannot cross battlefield edge;
-- non-FLY Normal/Advance movement cannot path through enemy model bases;
-- FLY Normal Move can transit enemy model bases and enemy Engagement Range;
-- FLY Normal Move cannot end within enemy Engagement Range or on another model;
-- FLY VEHICLE can transit friendly VEHICLE/MONSTER blockers;
-- model cannot move through enemy Engagement Range for 10e Normal Move;
-- model cannot move through enemy Engagement Range for 10e Advance;
-- model can move through enemy Engagement Range for 10e Fall Back when policy
-  allows, but cannot end there;
-- model cannot end in enemy Engagement Range for 10e Normal Move;
-- charge movement uses the charge policy and is the exception path for ending
-  in Engagement Range;
-- non-circular base movement records pivot-cost placeholder;
-- 10e coherency descriptor uses a seven-model large-unit threshold;
-- 11e preview coherency descriptor uses all-models-within-distance policy.
-
-CORE V1 relevant areas:
-
 - `src/warhammer40k_ai/pathing/validation.py`
-- `src/warhammer40k_ai/pathing/sweep.py`
-- `src/warhammer40k_ai/pathing/types.py`
-- `src/warhammer40k_ai/path_witness.py`
-- `src/warhammer40k_ai/utility/calcs.py`
-- `src/warhammer40k_ai/battlefield/map.py`
-
-### Phase 10I: terrain movement semantics and endpoint support
-
-This phase implements movement-relevant terrain behavior. It does not implement
-visibility, Benefit of Cover, Plunging Fire, or shooting interactions.
-
-Modules:
-
-- `geometry/pathing.py`
-- `geometry/terrain.py`
-- `engine/movement_legality.py`
-- `core/ruleset_descriptor.py`
-
-Objects:
-
-- `TerrainMovementPolicy`
-- `TerrainTraversalMode`
-- `TerrainPathLegalityContext`
-- `TerrainPathSegment`
-- `TerrainTraversalViolation`
-- `TerrainFeatureMovementPolicy`
-- `TerrainEndpointSupportPolicy`
-- `TerrainSupportSurface`
-
-Invariants:
-
-- terrain movement behavior is descriptor-driven by terrain feature kind;
-- models may move up, over, and down terrain unless terrain-specific policy says
-  otherwise;
-- terrain features 2" or less in height can be moved over as if not there;
-- taller terrain requires vertical distance to climb up/down;
-- models cannot end a move mid-climb;
-- some terrain can be moved over but not ended on;
-- support surfaces can require the model base/contact footprint to be fully
-  contained;
-- no-overhang endpoint checks apply to elevated hills/structures and upper
-  ruin floors;
-- Ruins upper-floor endpoint eligibility is keyword-gated;
-- Ruins through-wall/floor traversal is keyword-gated;
-- baseless/hull models require explicit contact-footprint geometry before
-  no-overhang checks can be final;
-- visibility, cover, Plunging Fire, and shooting effects are deferred to
-  11A/11B.
-
-Required tests:
-
-- model can move freely over terrain <= 2";
-- model pays vertical distance to climb terrain > 2";
-- model cannot end mid-climb;
-- model cannot end on barricade/fuel pipes;
-- model cannot end on battlefield debris/statuary;
-- model can end on hill/structure top when base is fully contained;
-- model cannot end on hill/structure top when base overhangs;
-- `INFANTRY` can move through Ruins walls/floors by policy;
-- `INFANTRY` can move through Ruins walls/floors but cannot end inside them;
-- non-eligible `VEHICLE` cannot move through Ruins walls/floors;
-- `INFANTRY`/`BEAST`/`FLY` can end on upper Ruins floor if no overhang;
-- non-eligible model cannot end on upper Ruins floor;
-- upper Ruins floor endpoint fails if base overhangs;
-- elevated terrain endpoint fails if there is no valid support surface;
-- baseless/hull no-overhang check returns typed unsupported/manual-geometry-required
-  when contact geometry is missing;
-- terrain traversal result serializes without Python object reprs.
-
-CORE V1 relevant areas:
-
 - `src/warhammer40k_ai/pathing/rules_profile.py`
-- `src/warhammer40k_ai/pathing/types.py`
-- `src/warhammer40k_ai/pathing/validation.py`
-- `src/warhammer40k_ai/pathing/sweep.py`
-- `src/warhammer40k_ai/battlefield/terrain_runtime.py`
-- `src/warhammer40k_ai/battlefield/terrain_elevation.py`
-- `src/warhammer40k_ai/battlefield/terrain_presets.py`
-- `src/warhammer40k_ai/utility/calcs.py`
 
-### Phase 10J: advance roll and reroll decision
-
-This phase implements Advance as a Movement phase action after geometry,
-transition records, terrain movement semantics, and basic legality foundations
-exist.
+## Phase 10M: Advance action, dice, rerolls, and advanced-state restrictions
 
 Modules:
 
 - `engine/phases/movement.py`
 - `engine/dice.py`
 - `engine/decision_controller.py`
+- `engine/movement_legality.py`
 
 Objects:
 
 - `AdvanceRollRequest`
 - `AdvanceRollResult`
 - `MovementDiceRecord`
+- `AdvancedUnitState`
 
 Invariants:
 
-- `ADVANCE` is a Movement phase action;
-- movement action option generation must be enemy Engagement Range-aware before
-  Advance and Fall Back are fully implemented;
-- units outside enemy Engagement Range can be offered Remain Stationary, Normal
-  Move, and Advance;
-- units within enemy Engagement Range can be offered Remain Stationary and Fall
-  Back;
-- Advance distance is Movement characteristic plus Advance roll;
-- dice results and reroll decisions are replay-facing;
-- Advance consumes `PathValidationContext` and terrain movement policy instead
-  of duplicating pathing assumptions;
-- Advance emits displacement records when models move;
-- Advance marks the unit as having advanced;
-- no next unit selection occurs before activation terminal event.
+- Advance is available only to eligible units outside enemy Engagement Range;
+- selecting Advance emits a deterministic D6 roll request;
+- rerolls are explicit `DecisionRequest`s when a legal reroll source exists;
+- each model may move up to Movement + Advance roll;
+- no model can be moved within enemy Engagement Range unless an explicit rule permits it;
+- `FLY` rules apply to enemy model and Engagement Range transit;
+- Advance consumes terrain, pivot, pathing, and coherency validators;
+- a unit that Advanced cannot shoot or declare a charge that turn unless a rule permits it;
+- advanced state persists until the correct cleanup point.
 
 Required tests:
 
-- selecting Advance emits a dice roll request;
-- Advance roll is recorded in replay payloads;
-- reroll decision is offered only when applicable;
-- Advance movement consumes Movement + roll distance;
-- Advance emits displacement records and PathWitness;
-- advanced unit cannot be selected again that Movement phase.
+- Advance roll is deterministic and replay-facing;
+- Advance movement consumes Movement + D6;
+- reroll appears only with a legal reroll source;
+- Advance emits displacement records;
+- advanced unit cannot be selected again that Movement phase;
+- advanced unit is marked unable to shoot/charge by default.
 
 CORE V1 relevant areas:
 
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
 - `src/warhammer40k_ai/movement_distance.py`
 - `src/warhammer40k_ai/utility/dice.py`
-- movement action/reroll tests
 
-### Phase 10K: fall back action and Desperate Escape shell
-
-This phase implements Fall Back as a Movement phase action with explicit basic
-constraints. Desperate Escape can remain typed unsupported until implemented.
+## Phase 10N: Fall Back action and Desperate Escape resolution
 
 Modules:
 
 - `engine/phases/movement.py`
 - `engine/movement_legality.py`
+- `engine/dice.py`
+- `engine/battlefield_state.py`
 
 Objects:
 
 - `FallBackActionResult`
 - `DesperateEscapeRequirement`
+- `DesperateEscapeRoll`
+- `FellBackUnitState`
 
 Invariants:
 
-- `FALL_BACK` is a Movement phase action;
-- Fall Back is available only when the unit is eligible;
-- Fall Back movement is recorded as model displacement;
-- Desperate Escape requirements are detected and either resolved or explicitly
-  unsupported;
-- Fall Back marks the unit as having fallen back;
-- no next unit selection occurs before activation terminal event.
+- Fall Back is available only to eligible units within enemy Engagement Range;
+- Fall Back models move up to M";
+- Fall Back can move within enemy Engagement Range but cannot end there;
+- if no legal endpoint exists, the unit cannot Fall Back;
+- moving over enemy models during Fall Back requires Desperate Escape tests unless the model is `TITANIC` or can `FLY`;
+- Battle-shocked units selected to Fall Back require Desperate Escape tests for every model;
+- Desperate Escape rolls of 1-2 destroy one model from the falling-back unit, selected by the controlling player;
+- the same model can trigger only one Desperate Escape test per phase;
+- units that Fall Back cannot shoot or declare a charge that turn unless a rule permits it;
+- destroyed models emit removal records with correct destruction context.
 
 Required tests:
 
-- eligible unit can select Fall Back;
-- ineligible unit cannot select Fall Back;
-- Fall Back emits displacement records;
-- Fall Back marks moved/fell-back state;
-- Desperate Escape path returns typed unsupported until implemented.
+- eligible unit can Fall Back;
+- ineligible unit cannot Fall Back;
+- endpoint in Engagement Range is rejected;
+- enemy-model overflight creates Desperate Escape requirements;
+- `FLY`/`TITANIC` exceptions avoid Desperate Escape for crossing enemy models;
+- Battle-shocked Fall Back requires tests for every model;
+- failed Desperate Escape destroys a selected model;
+- Fall Back emits displacement and removal records where applicable.
 
 CORE V1 relevant areas:
 
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
 - `src/warhammer40k_ai/pathing/rules_profile.py`
 - `src/warhammer40k_ai/pathing/validation.py`
-- Fall Back / Desperate Escape tests if present
 
-### Phase 10L: Movement phase Reinforcements step shell
-
-This phase adds the second Movement phase step. It does not implement full
-Strategic Reserves or Deep Strike rules.
+## Phase 10O: Reinforcements, Strategic Reserves, Deep Strike, and reserve placement
 
 Modules:
 
 - `engine/phases/movement.py`
-- `engine/battle_round_flow.py`
+- `engine/reserves.py`
 - `engine/battlefield_state.py`
+- `engine/placement.py`
 
 Objects:
 
 - `MovementPhaseStepState`
-- `ReinforcementSelection`
+- `ReserveState`
 - `ReserveArrivalCandidate`
+- `ReinforcementPlacement`
+- `StrategicReserveRule`
 
 Invariants:
 
-- Movement phase has `MOVE_UNITS` then `REINFORCEMENTS`;
+- Movement phase has Move Units then Reinforcements;
 - `REINFORCEMENTS` is a phase step, not a placement kind;
-- Strategic Reserves and Deep Strike are placement kinds that may occur during
-  this step;
-- reserve arrival placements require placement records, not displacement records;
-- no PathWitness is required for reserve placement.
+- reserve placement uses placement records, not displacement records;
+- Strategic Reserves and Deep Strike are distinct placement mechanisms;
+- reserve placements validate battlefield edges, enemy distance restrictions, terrain endpoints, coherency, model overlap, and deployment restrictions;
+- mandatory arrivals are requeued or fail explicitly according to rules;
+- no `PathWitness` is required for placement.
 
 Required tests:
 
-- Movement phase enters Move Units step first;
-- after all movement activations complete, phase enters Reinforcements step;
-- Reinforcements step can emit a reserve-arrival decision;
+- Movement phase enters Reinforcements after Move Units;
 - Deep Strike placement uses `BattlefieldPlacementKind.DEEP_STRIKE`;
 - Strategic Reserves placement uses `BattlefieldPlacementKind.STRATEGIC_RESERVES`;
-- Reinforcements itself never appears as a placement kind.
+- illegal reserve placement fails without mutating state;
+- reserve placement validates coherency and Engagement Range setup restriction;
+- reserve placement validates terrain endpoint support.
 
 CORE V1 relevant areas:
 
 - `src/warhammer40k_ai/engine/reserve_entry_rules.py`
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
 - `src/warhammer40k_ai/engine/game_setup_flow.py`
-- reserve/deep-strike tests
 
-### Phase 10M: transport embark/disembark shell
-
-This phase models transport state transitions without full transport rules.
+## Phase 10P: transport embark/disembark and destroyed transport emergency disembark
 
 Modules:
 
@@ -1327,64 +362,99 @@ Objects:
 - `TransportCargoState`
 - `EmbarkSelection`
 - `DisembarkSelection`
+- `DestroyedTransportDisembark`
 
 Invariants:
 
-- `EMBARK` is battlefield removal;
-- `DISEMBARK` is battlefield placement;
+- Embark is battlefield removal into transport cargo;
+- Disembark is battlefield placement from transport cargo;
 - neither Embark nor Disembark is a Movement phase action;
-- embarked units are not placed units;
-- embarked units cannot be selected for Normal Move as placed units;
-- disembarked units are placed on the battlefield with placement records.
+- embarked units are not placed units and cannot be selected for Normal Move;
+- Disembark validates placement, terrain endpoint, Engagement Range setup restriction, and coherency;
+- transport capacity and model/unit restrictions are data-driven;
+- destroyed transports force emergency disembark or destruction according to rules.
 
 Required tests:
 
-- Embark removes placed models from battlefield state;
-- Embark emits removal records with `BattlefieldRemovalKind.EMBARK`;
+- Embark removes placed models and emits removal records;
 - embarked unit is unavailable for Movement unit selection;
-- Disembark places models on battlefield;
-- Disembark emits placement records with `BattlefieldPlacementKind.DISEMBARK`;
-- transport capacity validation is data-driven.
+- Disembark places models and emits placement records;
+- illegal Disembark fails without mutation;
+- destroyed transport disembark handles illegal placement consequences;
+- capacity validation fails explicitly.
 
 CORE V1 relevant areas:
 
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
 - `tests/rules/test_core_transport_movement_phase.py`
-- transport/deployment tests
-- any transport assignment helpers used during setup
 
-### Phase 10N: triggered movement foundation
+## Phase 10Q: Aircraft and Hover movement/reserve behavior
 
-This phase models movement-like displacements caused by timing-window rule
-effects outside the standard Move Units action selector.
+Modules:
+
+- `engine/aircraft.py`
+- `engine/phases/movement.py`
+- `engine/reserves.py`
+- `geometry/pathing.py`
+
+Objects:
+
+- `AircraftMovementPolicy`
+- `AircraftReserveTransition`
+- `HoverModeState`
+
+Invariants:
+
+- `AIRCRAFT` have special pivot and movement behavior;
+- `AIRCRAFT` that leave the battlefield transition into reserves where rules permit;
+- `HOVER` mode changes movement policy;
+- other models' movement around `AIRCRAFT` follows the aircraft movement policy;
+- aircraft restrictions in Charge/Fight are exposed for later phases.
+
+Required tests:
+
+- aircraft pivot policy uses 0" in generic pivot accounting;
+- aircraft reserve transition emits removal/placement records as appropriate;
+- hover state changes movement policy;
+- aircraft setup/arrival validates battlefield and terrain restrictions.
+
+CORE V1 relevant areas:
+
+- aircraft movement/reserve handling;
+- reserve-entry tests;
+- movement pathing tests.
+
+## Phase 10R: triggered and surge movement foundation
 
 Modules:
 
 - `engine/triggered_movement.py`
+- `engine/reaction_windows.py`
 - `engine/battlefield_state.py`
-- `engine/decision_controller.py`
 
 Objects:
 
 - `TriggeredMovementDescriptor`
 - `TriggeredMovementKind`
 - `TriggeredMovementRequest`
+- `SurgeMoveState`
 
 Invariants:
 
 - triggered movement is not a Movement phase action;
-- surge-like movement is a triggered model displacement;
-- triggered movement can occur outside the Movement phase;
-- triggered movement records source timing and source rule;
-- surge movement has its own displacement kind;
-- reactive movement is an umbrella/timing concept, not necessarily identical to
-  every surge rule.
+- surge-like movement is a triggered displacement;
+- each unit can only make one surge move per phase unless a rule says otherwise;
+- Battle-shocked units cannot make surge moves unless a rule says otherwise;
+- units within Engagement Range cannot make surge moves unless a rule says otherwise;
+- triggered movement records trigger timing and source rule;
+- triggered movement consumes pathing, terrain, pivot, and coherency validation.
 
 Required tests:
 
-- Blood-Surge-like movement is represented as triggered movement, not Movement
-  phase action;
-- triggered movement can occur during opponent Shooting phase;
+- Blood-Surge-like movement is represented as triggered movement;
+- surge movement cannot occur if Battle-shocked;
+- surge movement cannot occur while within Engagement Range;
+- one surge move per phase is enforced;
 - triggered movement emits displacement records;
 - triggered movement records source rule and trigger timing;
 - triggered movement does not appear in `SELECT_MOVEMENT_ACTION`.
@@ -1392,13 +462,414 @@ Required tests:
 CORE V1 relevant areas:
 
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
-- surge/reactive movement tests
-- faction/rule handlers that queue reactive movement decisions
+- surge/reactive movement tests.
 
-### Phase 11A: line-of-sight terrain visibility foundation
+## Phase 10S: Movement phase completion gate
 
-This phase adds terrain visibility and LoS foundations after movement terrain
-semantics are stable. It does not implement the full shooting attack sequence.
+This phase is a compliance gate for the full Movement phase.
+
+Invariants:
+
+- Move Units step completes with all eligible units either moved or remaining stationary;
+- action options are Engagement Range-aware;
+- failed movement rolls back state;
+- all successful movement emits transition records;
+- coherency is enforced at the end of every move;
+- Reinforcements step starts only after Move Units completion;
+- Movement phase advances only after Reinforcements and unresolved mandatory placements are complete;
+- movement phase events and replay payloads are deterministic.
+
+Required tests:
+
+- full Move Units step completes;
+- Advance/Fall Back/Normal/Remain Stationary interact correctly;
+- failed movement does not mutate state;
+- Reinforcements occurs after Move Units;
+- Movement phase exits to Shooting only when all movement-step work is complete.
+
+## Phase 10T: movement/pathing/terrain profiling and hotspot budget gate
+
+This phase introduces performance profiling before Shooting/Charge/Fight multiply pathing and LoS costs.
+
+Modules:
+
+- `profiling/`
+- `scripts/profile_movement_pathing.py`
+- `tests/performance/`
+
+Objects:
+
+- `PerformanceScenario`
+- `PerformanceBudget`
+- `HotspotReport`
+- `PathingBenchmarkResult`
+
+Invariants:
+
+- movement/pathing/terrain benchmark scenarios are deterministic;
+- pathing and terrain validation hotspots are profiled before AI self-play scaling;
+- benchmarks include crowded infantry, vehicle blockers, ruins, reserve-like placement, and FLY paths;
+- performance reports are machine-readable;
+- CI can run a small smoke benchmark;
+- larger profiling runs are manual or nightly;
+- no performance optimization may change deterministic replay payloads.
+
+Required tests / scripts:
+
+- smoke benchmark for pathing validation;
+- smoke benchmark for terrain legality;
+- hotspot report JSON round-trip;
+- same seed and same scenario produce same benchmark result;
+- profiling script exits non-zero if a configured budget is exceeded.
+
+CORE V1 relevant areas:
+
+- `docs/PROFILING.md`
+- `docs/HEADLESS_SELF_PLAY_RUNBOOK.md`
+- `scripts/run_headless_self_play.py`
+- `src/warhammer40k_ai/engine/time_manager.py`
+- `src/warhammer40k_ai/engine/tier2_orchestrator.py`
+- `src/warhammer40k_ai/engine/movement_solver.py`
+
+---
+
+# Mission pack, objectives, Command phase, and scoring
+
+## Phase 11A: Chapter Approved 2025-26 mission pack data
+
+This phase brings in Chapter Approved 2025-26 mission data: mission sequence, deployment maps, objective marker positions, mission pool, mission decks, secondary mission cards, Challenger cards, terrain layout templates, and tournament scoring caps.
+
+Modules:
+
+- `rules/mission_pack_import.py`
+- `core/missions.py`
+- `core/deployment_zones.py`
+- `core/terrain_layouts.py`
+- `engine/mission_setup.py`
+
+Objects:
+
+- `MissionPackDefinition`
+- `ChapterApprovedMissionSequence`
+- `DeploymentMapDefinition`
+- `ObjectiveMarkerDefinition`
+- `TerrainLayoutTemplate`
+- `MissionDeckDefinition`
+- `PrimaryMissionDefinition`
+- `SecondaryMissionDefinition`
+- `ChallengerCardDefinition`
+
+Invariants:
+
+- Chapter Approved 2025-26 is source-linked and versioned;
+- mission setup order is data, not driver-local enum arithmetic;
+- deployment zones are geometry objects tied to deployment maps;
+- objective marker positions are source-defined and use center-point measurement;
+- Chapter Approved objective markers are flat 40mm markers and do not impede movement/placement;
+- terrain layout templates are data and can instantiate pregenerated terrain pieces;
+- tournament mission pool is deterministic and replay-facing;
+- Fixed/Tactical/Challenger card behavior remains hidden/public-safe.
+
+Required tests:
+
+- Chapter Approved mission sequence round-trips;
+- deployment map geometry round-trips;
+- objective marker positions round-trip;
+- objective marker terrain/movement policy is flat/non-blocking for Chapter Approved;
+- terrain layout template instantiates deterministic terrain features;
+- mission pool selection is deterministic;
+- hidden Tactical/Fixed state does not leak to opponent public payload.
+
+CORE V1 relevant areas:
+
+- mission/deployment map data;
+- setup/deployment tests;
+- scoring tests;
+- terrain layout fixtures.
+
+## Phase 11B: objective control geometry and mission objective model
+
+Modules:
+
+- `core/objectives.py`
+- `engine/objective_control.py`
+- `engine/battlefield_state.py`
+- `geometry/spatial_index.py`
+
+Objects:
+
+- `ObjectiveMarker`
+- `ObjectiveControlContext`
+- `ObjectiveControlResult`
+- `ObjectiveControlRecord`
+
+Invariants:
+
+- objective control derives from current placed models and OC values;
+- Battle-shocked units have OC 0;
+- objective markers use mission-defined positions and control radius;
+- objective marker terrain interactions are descriptor-driven;
+- objective control results are replay-safe.
+
+Required tests:
+
+- objective control sums OC by player;
+- Battle-shocked unit contributes OC 0;
+- contested objective has deterministic result;
+- terrain objective policy is explicit unsupported until implemented;
+- objective control payloads round-trip.
+
+## Phase 11C: Command phase body: Command step, CP, Battle-shock, and OC updates
+
+Modules:
+
+- `engine/phases/command.py`
+- `engine/battle_shock.py`
+- `engine/command_points.py`
+- `engine/objective_control.py`
+
+Objects:
+
+- `CommandStepState`
+- `CommandPointLedger`
+- `BattleShockTestRequest`
+- `BattleShockResult`
+- `BelowHalfStrengthContext`
+
+Invariants:
+
+- Command phase has Command step then Battle-shock step;
+- active player gains CP according to rules/mission policy;
+- below-half-strength units create Battle-shock test requests;
+- Battle-shock tests are deterministic dice decisions;
+- failed Battle-shock marks unit Battle-shocked until the correct cleanup point;
+- Battle-shocked units have OC 0 and cannot be selected for Stratagems unless rules permit;
+- Command phase scoring hooks run at the correct timing.
+
+Required tests:
+
+- active player gains CP;
+- below-half-strength unit emits Battle-shock test request;
+- failed Battle-shock persists and changes OC to 0;
+- passed Battle-shock avoids Battle-shocked state;
+- Command phase stops at required dice/decision requests.
+
+## Phase 11D: mission actions, primary/secondary scoring, and end-of-turn cleanup
+
+Modules:
+
+- `engine/scoring.py`
+- `engine/missions.py`
+- `engine/actions.py`
+- `engine/turn_cleanup.py`
+- `engine/unit_coherency.py`
+
+Objects:
+
+- `MissionScoringPolicy`
+- `VictoryPointLedger`
+- `MissionActionState`
+- `EndTurnCleanupState`
+- `CoherencyCleanupRemoval`
+
+Invariants:
+
+- scoring is mission-pack data, not hard-coded phase logic;
+- mission Actions have start timing, eligible units, interruption conditions, completion timing, and scoring effects;
+- Fixed and Tactical secondary scoring use hidden/public payload boundaries;
+- objective control feeds scoring;
+- end-of-turn coherency cleanup removes models until each affected unit has one coherent group;
+- coherency-cleanup removals count as destroyed but do not trigger destroyed-model rules;
+- game end after configured battle rounds produces winner/draw result.
+
+Required tests:
+
+- primary scoring at correct timing;
+- Fixed secondary scoring preserves hidden/public boundaries;
+- Tactical secondary draw/score/discard flow works;
+- mission Action can start, complete, be interrupted, and score;
+- end-of-turn coherency cleanup removes models without destroyed triggers;
+- victory point ledger round-trips;
+- game ends after configured battle rounds.
+
+## Phase 11E: battle-round/game-end scoring and winner determination
+
+Invariants:
+
+- game length is mission/ruleset data;
+- end-of-round and end-of-game scoring windows are explicit;
+- final VP ledger determines winner/draw;
+- Chapter Approved 100VP cap and per-source caps are represented in scoring policy;
+- game-end payload includes public final score and replay-safe scoring audit.
+
+Required tests:
+
+- game ends after configured number of battle rounds;
+- winner/draw determination is deterministic;
+- end-of-game scoring windows fire once;
+- VP caps are enforced;
+- final scoring payload round-trips.
+
+---
+
+# Timing windows, Stratagems, and abilities
+
+## Phase 12A: timing windows, reaction queue, sequencing, and persisting effects
+
+Modules:
+
+- `engine/timing_windows.py`
+- `engine/reaction_queue.py`
+- `engine/effects.py`
+
+Objects:
+
+- `TimingWindow`
+- `ReactionWindow`
+- `PersistingEffect`
+- `EffectExpiration`
+- `TriggeredDecisionRequest`
+- `SequencingDecision`
+
+Invariants:
+
+- out-of-phase rules use typed timing windows;
+- reaction windows can block and resume parent phase execution;
+- persisting effects expire at deterministic lifecycle points;
+- sequencing conflicts are represented explicitly;
+- effect payloads are replay-safe;
+- no rule handler mutates state outside its owning timing window.
+
+Required tests:
+
+- reaction window emits interrupt-style decision request;
+- parent phase resumes after reaction resolution;
+- persisting effect expires at correct phase/turn/battle-round point;
+- unsupported timing windows fail explicitly;
+- sequencing conflict creates a deterministic resolver decision when needed.
+
+CORE V1 relevant areas:
+
+- `engine/combat_timing.py`
+- reactive decision handling;
+- phase/reaction tests.
+
+## Phase 12B: Command Point ledger and Stratagem framework
+
+Modules:
+
+- `engine/stratagems.py`
+- `engine/command_points.py`
+- `engine/timing_windows.py`
+
+Objects:
+
+- `CommandPointLedger`
+- `StratagemUseRequest`
+- `StratagemUseRecord`
+- `StratagemEligibilityContext`
+- `StratagemTargetBinding`
+
+Invariants:
+
+- Stratagems consume CP through a ledger;
+- once-per-phase/turn/battle restrictions are enforced;
+- Battle-shocked units cannot be selected for Stratagems unless rules permit;
+- target binding is typed and validated before a Stratagem option appears;
+- Stratagem timing is descriptor-driven;
+- Stratagem effects execute only through registered handlers;
+- invalid or missing target context suppresses the option rather than emitting illegal choices.
+
+Required tests:
+
+- insufficient CP hides/rejects Stratagem;
+- repeated-use restriction works;
+- Battle-shocked unit eligibility restriction works;
+- target-required Stratagem does not appear without legal target binding;
+- Stratagem use round-trips in replay.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/engine/stratagem_ledger.py`
+- stratagem tests;
+- headless tool-action context audits.
+
+## Phase 12C: Core Stratagems
+
+Initial supported Core Stratagem groups:
+
+- Command Re-roll;
+- Insane Bravery;
+- Fire Overwatch;
+- Go to Ground;
+- Smokescreen where applicable;
+- Heroic Intervention;
+- Counter-offensive;
+- Epic Challenge;
+- Grenade;
+- Tank Shock;
+- Rapid Ingress;
+- New Orders from Chapter Approved Tactical missions.
+
+Invariants:
+
+- each Core Stratagem has a timing descriptor;
+- each Core Stratagem has explicit target-binding rules;
+- each Core Stratagem consumes CP and records use;
+- damage/dice Stratagems use deterministic dice/replay plumbing;
+- unsupported Core Stratagems remain explicit unsupported descriptors.
+
+Required tests:
+
+- one legal use per supported timing window;
+- CP consumption and repeat-use restriction;
+- target-binding validation;
+- dice/damage records for relevant Stratagems;
+- unsupported Core Stratagems fail explicitly.
+
+## Phase 12D: ability handler registry and keyword-gated rule execution
+
+Modules:
+
+- `engine/abilities.py`
+- `rules/timing.py`
+- `core/datasheet.py`
+- `core/weapon_profiles.py`
+
+Objects:
+
+- `AbilityHandlerRegistry`
+- `AbilityExecutionContext`
+- `AbilityResolutionResult`
+- `KeywordGate`
+
+Invariants:
+
+- ability descriptors are inert until a registered handler executes them;
+- handlers declare timing windows and input requirements;
+- keyword-gated effects use canonical keywords;
+- unsupported ability descriptors remain unsupported rather than fallback-parsed;
+- ability execution records source IDs and replay payloads.
+
+Initial ability families:
+
+- Deep Strike;
+- Scouts;
+- Infiltrators;
+- Leader;
+- Stealth;
+- Lone Operative;
+- Feel No Pain;
+- Deadly Demise;
+- Firing Deck;
+- Hazardous;
+- weapon abilities wired through Phase 13D.
+
+---
+
+# Shooting phase
+
+## Phase 13A: terrain visibility, line of sight, and cover foundation
 
 Modules:
 
@@ -1414,24 +885,28 @@ Objects:
 - `VisibilityBlockerRecord`
 - `LineOfSightWitness`
 - `CoverPolicyDescriptor`
+- `BenefitOfCoverResult`
 
 Invariants:
 
-- ruins visibility is explicit terrain policy, not ad hoc shooting logic;
-- visibility blockers use model volume and terrain wall/floor interactions;
-- cover policy descriptors are data and do not execute shooting behavior;
+- true line of sight is modeled from model volume/pose;
+- model visible, unit visible, model fully visible, and unit fully visible are separate results;
+- terrain visibility rules are descriptor-driven;
+- Ruins and Woods visibility policies are explicit;
+- Benefit of Cover is a policy result, not a shooting side effect;
+- cover eligibility is visible in attack allocation context;
 - LoS and cover checks use spatial index/cache revision data;
-- LoS witness/debug payloads are replay-safe;
-- this phase does not implement hit/wound/save/damage or damage allocation.
+- LoS witness/debug payloads are replay-safe.
 
 Required tests:
 
 - terrain visibility fixture can block LoS deterministically;
-- ruins wall/floor interactions are represented in LoS context;
+- Ruins wall/floor interactions are represented in LoS context;
+- Woods visibility behavior is represented;
 - model volume participates in visibility checks;
 - terrain visibility cache key changes when terrain revision changes;
-- cover policy descriptor round-trips without object reprs;
-- LoS witness/debug payload round-trips without object reprs.
+- Benefit of Cover policy result round-trips;
+- LoS witness/debug payload round-trips.
 
 CORE V1 relevant areas:
 
@@ -1439,143 +914,810 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/battlefield/terrain_cover.py`
 - `src/warhammer40k_ai/battlefield/map.py`
 - `tests/rules/test_line_of_sight.py`
-- LoS and cover-related terrain tests
 
-### Phase 11B: shooting phase body vertical slice
+## Phase 13B: Shooting phase target selection and weapon declaration
 
-This phase fills the shooting phase body behind the authoritative lifecycle. It
-consumes placed units, weapon profiles, ballistic skill, range, line of sight,
-visibility/terrain foundations, and damage allocation state.
+Modules:
 
-Implement:
+- `engine/phases/shooting.py`
+- `engine/shooting_targets.py`
+- `engine/weapon_declaration.py`
 
-- select shooting unit;
-- target selection;
-- line of sight;
-- range;
-- declare weapons;
-- hit/wound/save/damage;
-- damage allocation;
-- model destruction;
-- event log;
-- replay.
+Objects:
 
-CORE V1 relevant areas:
-
-- shooting decision handlers
-- shooting commander/ranker tests
-- `battlefield/terrain_visibility.py`
-- `tests/rules/test_line_of_sight.py`
-- damage allocation tests
-
-### Phase 12: charge and fight phase body vertical slice
-
-This phase fills the charge and fight phase bodies behind the Phase 9B lifecycle.
-It consumes melee profiles, weapon skill, charge policy descriptors, and
-charge/fight ability descriptors only through structured catalog data.
-
-Implement:
-
-- declare charge;
-- charge roll;
-- charge movement with `PathWitness`;
-- Heroic Intervention interrupt;
-- pile-in;
-- fight target selection;
-- melee declaration;
-- attack resolution;
-- consolidate.
-
-Interrupts use typed decision metadata:
-
-```text
-dispatch_mode = "interrupt"
-interrupt_window = "after_enemy_charge_move"
-blocking_parent = true
-resume_parent_after_resolution = true
-```
-
-CORE V1 relevant areas:
-
-- charge/fight decision handlers
-- `src/warhammer40k_ai/fight_move.py`
-- charge diagnostics
-- melee tests
-- charge movement tests
-
-### Phase 13: richer deployment, reserves, transports, and pre-battle abilities
-
-The lifecycle slots for deployment, redeploy, pre-battle actions, and battle
-round entry exist in Phase 9B. This phase fills the advanced behavior in those
-slots after movement/pathing and unit instantiation exist.
-
-- deployment;
-- Scout;
-- Infiltrate;
-- reserves;
-- deep strike;
-- embark;
-- disembark;
-- destroyed transport disembark;
-- transport capacity restrictions;
-- leader attachment constraints;
-- reserve restriction validation.
-
-CORE V1 relevant areas:
-
-- `src/warhammer40k_ai/engine/game_setup_flow.py`
-- `src/warhammer40k_ai/engine/game_phase_flow.py`
-- `src/warhammer40k_ai/engine/reserve_entry_rules.py`
-- deployment/prebattle/transport tests
-
-### Phase 14: broad content import and ability handler expansion
-
-Bring in wider faction, detachment, codex, and core-rules content only after the
-owning schema, lifecycle slot, and phase pipeline exist.
+- `ShootingPhaseState`
+- `ShootingUnitSelection`
+- `ShootingTargetCandidate`
+- `WeaponDeclaration`
+- `RangedAttackPool`
 
 Invariants:
 
-- load real facts as soon as the schema exists;
-- instantiate real units only through mustering;
-- execute rules only in the owning phase or timing-window handler;
-- source text remains linked to structured descriptors;
-- unsupported ability shapes remain explicit unsupported descriptors;
-- no raw codex text is parsed by runtime engine code.
+- eligible shooting units are derived from current state;
+- units that Advanced/Fell Back cannot shoot unless a rule permits;
+- units locked in combat obey Locked in Combat / Big Guns Never Tire restrictions;
+- ranged weapons validate range and visibility;
+- attack declarations group by model, weapon, profile, and target;
+- Hazardous and one-shot-style requirements are explicit descriptors.
 
-Handler examples:
+Required tests:
 
-- movement handlers for Advance, Fall Back, FLY, and movement modifiers;
-- shooting handlers for Sustained Hits, Melta, Rapid Fire, Heavy, Blast, Torrent,
-  Lethal Hits, Devastating Wounds, and Pistol;
-- charge and fight handlers for charge bonuses, Fight First, fight-on-death,
-  pile-in, consolidate, and melee weapon abilities;
-- deployment and pre-battle handlers for Deep Strike, Infiltrators, Scouts,
-  reserves, transports, and redeploy effects.
+- eligible unit selection;
+- Advanced/Fell Back restriction;
+- target range/visibility validation;
+- weapon declaration payload round-trip;
+- invalid target declaration fails without mutation.
+
+## Phase 13C: attack sequence: hit, wound, allocate, save, damage
+
+Modules:
+
+- `engine/attack_sequence.py`
+- `engine/damage_allocation.py`
+- `engine/saves.py`
+
+Objects:
+
+- `AttackSequence`
+- `HitRoll`
+- `WoundRoll`
+- `AttackAllocation`
+- `SavingThrow`
+- `DamageApplication`
+
+Invariants:
+
+- attack sequence follows hit, wound, allocate, saving throw, inflict damage;
+- modifiers apply through typed modifier stacks;
+- invulnerable saves and mortal wounds are distinct;
+- damage spillover and excess damage rules are explicit;
+- model destruction emits removal records.
+
+Required tests:
+
+- hit/wound/save/damage deterministic dice flow;
+- invulnerable save path;
+- mortal wound path;
+- model destruction emits removal records;
+- damage allocation payload round-trips.
+
+## Phase 13D: weapon abilities and shooting modifiers
+
+Initial coverage:
+
+- Assault;
+- Heavy;
+- Rapid Fire X;
+- Sustained Hits X;
+- Lethal Hits;
+- Devastating Wounds;
+- Melta X;
+- Torrent;
+- Blast;
+- Pistol;
+- Hazardous;
+- Ignores Cover;
+- Precision.
+
+Invariants:
+
+- weapon abilities are structured descriptors;
+- ability handlers modify the attack sequence only in declared timing windows;
+- unsupported weapon ability shapes fail explicitly;
+- source IDs are preserved in emitted events.
+
+Required tests:
+
+- each supported weapon ability has at least one focused attack-sequence test;
+- unsupported weapon ability descriptor does not execute;
+- modifier interactions are deterministic.
+
+## Phase 13E: damage allocation, destroyed models, and destruction reactions
+
+Invariants:
+
+- defender allocates attacks according to rules;
+- wounded models must continue receiving damage where applicable;
+- destroyed models are removed with removal records;
+- destroyed-model reaction windows fire unless the removal cause suppresses them;
+- coherency-cleanup removals count as destroyed but do not trigger destroyed rules.
+
+Required tests:
+
+- wounded-model allocation priority;
+- destroyed-model removal event;
+- destroyed-model reaction timing;
+- non-triggering coherency cleanup removal.
+
+## Phase 13F: Shooting phase completion gate
+
+Required tests:
+
+- full Shooting phase can complete for both players;
+- shooting consumes visibility, cover, weapon declarations, attack sequence, damage allocation, and removal records;
+- invalid declarations do not mutate state;
+- shooting phase exits only after all selected/eligible units have resolved or skipped.
+
+---
+
+# Charge and Fight phases
+
+## Phase 14A: Charge phase declaration and charge roll
+
+Invariants:
+
+- eligible charging units are derived from state;
+- units that Advanced/Fell Back cannot charge unless a rule permits;
+- targets are selected according to ruleset descriptor;
+- charge roll is deterministic and replay-facing;
+- failed charges do not move models.
+
+## Phase 14B: charge movement, terrain, FLY, and endpoint rules
+
+Invariants:
+
+- charge movement consumes pathing, terrain, pivot, and coherency validation;
+- at least one charging model must satisfy the charge endpoint requirement;
+- charge may end in Engagement Range according to charge policy;
+- charging over terrain and charging with FLY are distinct policies;
+- charge movement emits displacement records.
+
+## Phase 14C: fight order, Fights First, and remaining combats
+
+Invariants:
+
+- Fight phase has Fights First then Remaining Combats;
+- eligible units are selected in correct order;
+- charging units and Fight First effects are represented in fight-order state;
+- fight interrupts use typed decision metadata.
+
+## Phase 14D: pile-in, melee attacks, and consolidate
+
+Invariants:
+
+- Pile-in and Consolidate are model displacements, not Movement phase actions;
+- Pile-in/Consolidate consume movement/pathing/terrain/coherency validators;
+- melee target selection follows engagement/eligibility rules;
+- melee attack sequence reuses attack-sequence infrastructure;
+- consolidation endpoint rules are explicit.
+
+## Phase 14E: fight-phase Stratagems and melee abilities
+
+Initial coverage:
+
+- Counter-offensive;
+- Epic Challenge;
+- Fight First;
+- fight-on-death;
+- melee weapon abilities;
+- pile-in/consolidate modifiers.
+
+## Phase 14F: Charge/Fight completion gate
+
+Required tests:
+
+- full Charge phase can complete;
+- full Fight phase can complete;
+- charge movement, pile-in, and consolidate emit displacement records;
+- melee attacks can destroy models;
+- fight order is deterministic and replay-safe.
+
+---
+
+# Setup, deployment, reserves, and army construction completion
+
+## Phase 15A: deployment rules and deployment-zone placement
+
+Invariants:
+
+- deployment zones come from mission map;
+- Attacker/Defender and deployment order are mission/ruleset policy;
+- deployed units validate terrain endpoint, coherency, Engagement Range setup restriction, and model overlap;
+- deployment emits placement records.
+
+## Phase 15B: redeployments, Scouts, Infiltrators, and pre-battle abilities
+
+Invariants:
+
+- redeployments occur after deployment and before first turn;
+- redeploy is removal + placement, not displacement;
+- Scout moves are pre-battle displacements;
+- Infiltrators modify setup legality;
+- all pre-battle abilities use timing windows and source IDs.
+
+## Phase 15C: reserves declarations, Strategic Reserves limits, and Deep Strike setup
+
+Invariants:
+
+- Strategic Reserves limits are validated during setup;
+- Deep Strike and similar abilities are setup/arrival mechanisms;
+- reserve declarations are replay-facing decisions;
+- illegal reserve declarations fail before battle starts.
+
+## Phase 15D: leader attachment, enhancements, and army construction completion
+
+Invariants:
+
+- Leader attachment restrictions are validated before battle;
+- enhancements are validated against character/faction/detachment restrictions;
+- faction/detachment army rules become active after mustering;
+- invalid list construction fails before lifecycle enters setup play.
+
+## Phase 15E: pre-battle/setup completion gate
+
+Required tests:
+
+- full setup sequence can complete without deterministic placement bridge;
+- deployment, redeploy, reserves, transports, leaders, and pre-battle abilities are resolved through DecisionRequests;
+- battle starts only after setup legality is complete.
+
+---
+
+# Wahapedia data ingestion, language parsing, and content coverage
+
+## Phase 16A: Wahapedia source mirror and CSV-to-JSON ETL
+
+CORE V1 already has generated `wahapedia_data` JSON such as `Abilities.json`, `Datasheets.json`, `Datasheets_models.json`, `Datasheets_wargear.json`, `Factions.json`, `Detachments.json`, `Enhancements.json`, and `Stratagems.json`. CORE V2 must rebuild this pipeline from the downloaded CSV/source exports, but with stricter normalization and provenance.
+
+Modules:
+
+- `tools/wahapedia_fetch.py`
+- `tools/wahapedia_csv_to_json.py`
+- `rules/source_catalog.py`
+- `rules/text_normalization.py`
+- `rules/html_sanitizer.py`
+- `rules/wahapedia_schema.py`
+
+Objects:
+
+- `WahapediaSourceSnapshot`
+- `WahapediaCsvTable`
+- `NormalizedSourceRow`
+- `SourceHtmlSanitizationReport`
+- `WahapediaJsonArtifact`
+- `SourcePackageManifest`
+
+Invariants:
+
+- downloaded CSV/source files are stored with checksum, source date, and upstream identity;
+- generated JSON is deterministic from source inputs;
+- HTML tags are stripped or converted to explicit structured markup before catalog ingestion;
+- normalized text preserves source spans, paragraph/list boundaries, dice expressions, keywords, and distance expressions;
+- smart quotes, dashes, non-breaking spaces, HTML entities, and embedded links are normalized once;
+- raw HTML is never consumed by runtime engine code;
+- generated JSON includes `raw_text`, `normalized_text`, and source-row provenance where needed;
+- invalid rows fail with actionable diagnostics rather than being silently skipped.
+
+Required tests:
+
+- CSV row normalization strips HTML tags and preserves meaningful text;
+- normalized output is stable across runs;
+- source checksum drift changes package manifest hash;
+- generated JSON contains no raw HTML tags in runtime fields;
+- every catalog-bound row has source table, source row ID, and source package ID;
+- failure report groups unsupported/malformed rows by reason.
 
 CORE V1 relevant areas:
 
-- faction/rule modules
-- datasheet/wargear mixins
-- faction-specific tests
-- ability-specific movement/shooting/fight tests
+- `wahapedia_data/`
+- `wahapedia_data/*.json`
+- content import scripts, if present;
+- datasheet/wargear/faction/stratagem tests.
 
-## CORE V1 investigation and reuse policy
+## Phase 16B: canonical catalog generation from Wahapedia data
 
-CORE V1 is the previous implementation at
-[SobolGaming/Warhammer40k_AI](https://github.com/SobolGaming/Warhammer40k_AI).
-It is a reference implementation, not a source to copy wholesale. For each
-future phase, inspect the listed CORE V1 areas embedded in that phase's roadmap
-entry before implementation, identify the invariants and algorithms worth
-preserving, and then implement them in CORE V2 using strict typed data, fail-fast
-validation, replay-safe payloads, and current import boundaries.
+Modules:
 
-General migration rule for every phase:
+- `tools/build_catalog.py`
+- `core/datasheet.py`
+- `core/army_catalog.py`
+- `core/faction.py`
+- `core/detachment.py`
+- `core/enhancement.py`
+- `core/stratagem.py`
 
-1. Inspect CORE V1 only for the narrow behavior needed by the phase.
-2. Name the invariant being preserved.
-3. Write CORE V2 tests before porting behavior.
-4. Port the smallest necessary algorithm, transform, or edge-case rule.
-5. Do not copy broad files or permissive fallback behavior.
-6. Replace raw object/string behavior with typed descriptors, payloads, and
-   records.
-7. Add replay/audit coverage for all state-changing behavior.
+Objects:
+
+- `CanonicalCatalogPackage`
+- `DatasheetCatalogRecord`
+- `WargearCatalogRecord`
+- `WeaponProfileCatalogRecord`
+- `FactionCatalogRecord`
+- `DetachmentCatalogRecord`
+- `EnhancementCatalogRecord`
+- `StratagemCatalogRecord`
+
+Invariants:
+
+- all datasheets, model profiles, unit composition, wargear options, base sizes, keywords, and faction keywords come from source-linked catalog records;
+- all factions and detachments are catalog records, not hand-authored fixture-only data;
+- all stratagems and enhancements are source-linked descriptors;
+- generated catalog package hash is deterministic;
+- catalog generation is idempotent and diffable;
+- missing geometry/height/base overrides are explicit import blockers or unsupported descriptors, not silent defaults.
+
+Required tests:
+
+- representative datasheets generate deterministic catalog records;
+- model profiles preserve base-size/source information;
+- wargear options and weapon profiles preserve stable IDs;
+- faction/detachment/enhancement/stratagem records round-trip;
+- package hash changes on source-data drift;
+- unsupported rows are reported and cannot be instantiated accidentally.
+
+## Phase 16C: rule language intermediate representation
+
+This is the foundation for handling army rules, detachment rules, stratagems, enhancements, datasheet abilities, and wargear abilities via language parsing rather than hard-coding named items.
+
+Modules:
+
+- `rules/rule_ir.py`
+- `rules/rule_parser.py`
+- `rules/rule_templates.py`
+- `rules/rule_compiler.py`
+
+Objects:
+
+- `RuleIR`
+- `RuleClause`
+- `RuleTrigger`
+- `RuleCondition`
+- `RuleTargetSpec`
+- `RuleEffectSpec`
+- `RuleDuration`
+- `RuleUnsupportedReason`
+- `RuleParseDiagnostic`
+
+Invariants:
+
+- rule text compiles to a typed intermediate representation before runtime;
+- IR is source-linked and keeps normalized-text spans;
+- common language patterns compile into reusable rule templates;
+- rules that cannot be represented produce explicit unsupported IR with diagnostics;
+- parser output is deterministic and versioned;
+- optional LLM-assisted parsing is offline/tooling-only and must emit reviewable deterministic IR; engine runtime never calls an LLM;
+- named handlers are a fallback only for rules too specific for generic templates.
+
+Initial supported language families:
+
+- keyword gates;
+- timing windows;
+- within/outside distance predicates;
+- selected unit/target constraints;
+- dice roll modification;
+- reroll permission;
+- characteristic modifier;
+- add/remove CP;
+- add VP;
+- grant ability until timing endpoint;
+- conditional weapon ability grant;
+- movement distance modification;
+- placement permission/restriction;
+- model/unit destruction trigger;
+- once per phase/turn/battle restriction.
+
+Required tests:
+
+- normalized source text compiles to stable IR;
+- unsupported clauses preserve source span and reason;
+- grammar/parser changes are snapshot tested;
+- multiple equivalent textual forms normalize to same IR where intended;
+- runtime cannot execute uncompiled raw text.
+
+## Phase 16D: generic rule execution handlers
+
+Modules:
+
+- `engine/rule_execution.py`
+- `engine/abilities.py`
+- `engine/stratagems.py`
+- `engine/effects.py`
+
+Objects:
+
+- `RuleExecutionHandler`
+- `RuleExecutionContext`
+- `RuleExecutionResult`
+- `RuleTemplateHandler`
+- `RuleRuntimeBinding`
+
+Invariants:
+
+- IR clauses execute through registered generic handlers;
+- handlers declare required timing, state inputs, and target bindings;
+- execution emits source-linked events;
+- unsupported IR cannot execute;
+- specific named handlers are allowed only when backed by source-linked tests and an unsupported generic shape is documented.
+
+Required tests:
+
+- generic modifier rule executes;
+- generic reroll permission executes;
+- generic VP scoring rule executes;
+- generic Stratagem target binding executes;
+- unsupported IR produces typed unsupported status.
+
+## Phase 16E: faction, detachment, enhancement, and army-rule coverage
+
+Invariants:
+
+- every faction has a source-linked army rule descriptor;
+- every detachment has source-linked detachment rule, enhancement, and Stratagem descriptors;
+- language parser produces generic IR where possible;
+- unique imperative rules are isolated behind source-linked named handlers;
+- coverage report groups implemented, generic-supported, named-handler-required, and unsupported rules.
+
+Required tests:
+
+- faction army rules load for every faction;
+- detachment rules load for every detachment;
+- enhancements validate eligibility and execute generic effects where supported;
+- detachment Stratagems validate timing and target bindings;
+- unsupported rule report is generated and non-empty only with approved reasons.
+
+## Phase 16F: broad weapon/wargear/datasheet ability coverage
+
+Invariants:
+
+- wargear abilities are linked only to selected wargear;
+- unselected wargear never grants rules;
+- selected wargear payload drift is rejected;
+- datasheet abilities and weapon abilities use source-linked descriptors and handlers;
+- all imported behavior has tests or explicit unsupported status.
+
+## Phase 16G: source-content coverage and unsupported-descriptor audit
+
+Required outputs:
+
+- coverage report for datasheets, abilities, wargear, detachments, enhancements, Stratagems, and army rules;
+- list of unsupported descriptors grouped by reason;
+- static audit that runtime code does not parse raw source text;
+- CI artifact with package hashes and coverage totals.
+
+---
+
+# Human UI, replay, and network
+
+## Phase 17A: local CLI/human DecisionRecord entry
+
+Modules:
+
+- `interfaces/cli.py`
+- `engine/decision_controller.py`
+- `engine/decision_record.py`
+
+Invariants:
+
+- every pending `DecisionRequest` can be displayed in a human-readable CLI form;
+- CLI responses become normal `DecisionResult`s;
+- CLI never mutates state directly;
+- CLI-entered decisions produce `DecisionRecord`s identical in shape to headless decisions;
+- hidden information display is scoped to the acting player.
+
+Required tests:
+
+- CLI adapter renders finite options;
+- invalid CLI choice is rejected;
+- valid CLI choice submits normal `DecisionResult`;
+- DecisionRecord round-trips.
+
+## Phase 17B: replay inspection and deterministic replay runner
+
+Invariants:
+
+- replay can load snapshot + event/decision tail;
+- replay can step forward deterministically;
+- replay drift is detected and reported;
+- replay can export human-readable decision/event traces;
+- replay can export training-friendly DecisionRecord corpora.
+
+## Phase 17C: local visual game UI
+
+Invariants:
+
+- UI displays battlefield, terrain, units, objectives, phase state, and pending decisions;
+- UI submits only `DecisionResult`s;
+- UI can visualize movement paths, LoS witnesses, attack allocation, scoring, and Stratagem windows;
+- UI never owns authoritative state progression.
+
+## Phase 17D: network/server-authoritative play
+
+Invariants:
+
+- server owns authoritative lifecycle and validation;
+- clients render public state and submit decisions;
+- hidden information remains hidden from opponent clients;
+- network resync preserves replay hash/state hash.
+
+---
+
+# Profiling, AI orchestration, and corpus generation
+
+## Phase 18A: full-game performance profiling, hotspot benchmarks, and throughput budgets
+
+Modules:
+
+- `profiling/`
+- `scripts/run_headless_self_play.py`
+- `scripts/profile_full_game.py`
+- `tests/performance/`
+
+Objects:
+
+- `FullGamePerformanceScenario`
+- `HeadlessThroughputReport`
+- `HotspotReport`
+- `PerformanceBudget`
+
+Invariants:
+
+- headless games are fast enough for large DecisionRecord corpora;
+- profiling reports identify pathing, LoS, candidate generation, scoring, serialization, attack resolution, and language-rule execution hotspots;
+- same seed and same scenario produce deterministic results modulo timing values;
+- CI runs small smoke benchmarks;
+- nightly/manual profiling runs larger battlefield and full-game workloads;
+- performance optimization cannot change authoritative replay output.
+
+Required tests / scripts:
+
+- full-game smoke benchmark;
+- movement/pathing benchmark;
+- LoS/shooting benchmark;
+- candidate-generation benchmark;
+- serialization/replay benchmark;
+- language-rule execution benchmark;
+- hotspot report JSON schema validation;
+- budget failure exits non-zero.
+
+CORE V1 relevant areas:
+
+- `docs/HEADLESS_SELF_PLAY_RUNBOOK.md`
+- `docs/PROFILING.md`
+- `scripts/run_headless_self_play.py`
+- `src/warhammer40k_ai/engine/time_manager.py`
+- `src/warhammer40k_ai/engine/tier2_orchestrator.py`
+- `src/warhammer40k_ai/engine/movement_solver.py`
+
+## Phase 18B: legal-candidate generation and action-space masking
+
+Invariants:
+
+- every AI candidate is generated from a `DecisionRequest`;
+- candidate generation never bypasses authoritative validation;
+- illegal candidates are masked before ranking;
+- candidate payloads include enough context for training and replay diagnostics;
+- bounded search budgets are deterministic and report timeout/skip reasons.
+
+## Phase 18C: hierarchical AI policy orchestration: General, Commanders, Rankers
+
+Modules:
+
+- `ai/orchestrator.py`
+- `ai/general.py`
+- `ai/commanders/`
+- `ai/rankers/`
+
+Objects:
+
+- `AIPolicyOrchestrator`
+- `GeneralPolicy`
+- `PhaseCommander`
+- `ActionRanker`
+- `PolicyBundle`
+- `CandidateScore`
+
+Invariants:
+
+- General chooses strategic posture/goals;
+- Commanders own phase/domain-specific candidate interpretation;
+- Rankers score already-legal candidates;
+- AI never mutates engine state directly;
+- AI decisions submit ordinary `DecisionResult`s;
+- AI-selected decisions produce normal `DecisionRecord`s;
+- policy latency, candidate counts, legal masks, and fallback modes are recorded for profiling and training.
+
+Required tests:
+
+- orchestrator routes movement/shooting/charge/fight/dice decisions to correct component;
+- ranker sees only legal candidates;
+- AI decision produces ordinary DecisionRecord;
+- same seed/policy produces deterministic choices.
+
+## Phase 18D: headless self-play and DecisionRecord corpus export
+
+Invariants:
+
+- AI-vs-AI self-play can run without UI;
+- games produce DecisionRecord corpora;
+- replay artifacts can be saved for each game;
+- failed games produce structured diagnostics;
+- parallel workers preserve deterministic per-game seeds;
+- hidden information is not leaked into public DecisionRecords.
+
+Required outputs:
+
+- JSONL/SQLite DecisionRecord export;
+- replay manifest;
+- self-play summary report;
+- failure triage report.
+
+## Phase 18E: training-data, reward annotation, and evaluation pipeline
+
+Invariants:
+
+- reward profiles are explicit and versioned;
+- generated corpora include game result, VP deltas, action context, legal mask, chosen action, and policy metadata;
+- evaluation can compare policies on fixed seed/matchup batches;
+- training data schema is stable and validated.
+
+---
+
+# Full-game gates
+
+## Phase 19A: full-game rules-compliance matrix
+
+Create a machine-readable coverage matrix mapping 10e Core Rules sections to implementation modules and tests.
+
+Required coverage areas:
+
+- core concepts;
+- datasheets and keywords;
+- dice and rerolls;
+- sequencing;
+- Command phase;
+- Battle-shock;
+- Movement phase;
+- terrain movement;
+- transports;
+- Strategic Reserves;
+- Aircraft;
+- Shooting phase;
+- attack sequence;
+- weapon abilities;
+- Charge phase;
+- Fight phase;
+- Stratagems;
+- missions;
+- objective control;
+- scoring;
+- terrain visibility and cover;
+- deployment and pre-battle abilities;
+- faction/detachment/enhancement rules;
+- Chapter Approved mission pack.
+
+## Phase 19B: end-to-end full-game regression suite
+
+Required tests:
+
+- full two-player game completes through final scoring;
+- replay round-trip at multiple battle rounds;
+- no hidden information leaks;
+- deterministic same-seed replay;
+- multiple terrain layouts;
+- multiple army archetypes;
+- multiple mission packs.
+
+## Phase 19C: balance/performance/stability soak
+
+Required runs:
+
+- local AI-vs-AI corpus generation;
+- long-running replay validation;
+- profiling hotspot report;
+- unsupported descriptor report;
+- crash/failure triage report.
+
+## Phase 19D: release gate for complete 10e-compatible CORE V2
+
+Exit criteria:
+
+- all Core Rules coverage rows are either implemented or explicitly unsupported with reason;
+- all Chapter Approved 2025-26 setup/scoring/terrain/deployment layout rows are implemented or explicitly unsupported with reason;
+- full-game regression suite passes;
+- headless throughput budget passes;
+- replay determinism passes;
+- source-content coverage report is generated;
+- human CLI can complete a game;
+- AI self-play can complete many games;
+- UI can inspect and play a local game;
+- network authoritative mode can synchronize state and decisions.
+
+---
+
+# 11th Edition preparation
+
+## Phase 20A: edition-diff descriptor registry
+
+Modules:
+
+- `core/ruleset_descriptor.py`
+- `rules/edition_diff.py`
+- `rules/source_catalog.py`
+
+Objects:
+
+- `EditionDiff`
+- `RulesetCompatibilityReport`
+- `RulesetDescriptorRegistry`
+
+Invariants:
+
+- 10e and 11e preview/official rulesets are separate descriptors;
+- preview rules are marked preview/unstable and source-linked;
+- no 11e behavior is hard-coded into 10e handlers;
+- edition differences live in descriptors, policy tables, and explicit handler switches.
+
+Required tests:
+
+- 10e and 11e descriptors hash differently;
+- edition-specific Engagement Range/coherency/movement policies do not drift into each other;
+- unsupported 11e preview behavior fails explicitly.
+
+## Phase 20B: 11e data import and migration harness
+
+Invariants:
+
+- 11e source data imports through the same ETL pipeline;
+- 11e catalog can coexist with 10e catalog;
+- migration reports changed datasheets, keywords, weapon profiles, Stratagems, missions, terrain, and core rules;
+- handlers declare which editions they support.
+
+## Phase 20C: 11e gameplay compatibility slices
+
+Implement 11e-specific behavior only after descriptors/source data are pinned.
+
+Candidate areas:
+
+- revised Engagement Range;
+- revised Unit Coherency;
+- revised movement/terrain/FLY behavior;
+- revised charge/fight flow;
+- revised mission pack;
+- revised datasheets and faction rules.
+
+## Phase 20D: dual-edition test matrix
+
+Required tests:
+
+- representative 10e game still passes after 11e support lands;
+- representative 11e preview/official game can run where implemented;
+- edition-incompatible rule paths fail explicitly;
+- content packages cannot be mixed across editions accidentally.
+
+---
+
+# Rules coverage map
+
+| Rules area | Planned phase(s) |
+|---|---|
+| Dice, rerolls, roll-offs | 1, 10M, 12C, 13C, 14A |
+| Datasheets and keywords | 9A, 9C, 16A-16G |
+| Army mustering | 9C, 15D, 16B |
+| Setup sequence | 9B, 11A, 15A-15E |
+| Deployment zones | 11A, 15A |
+| Redeployments | 10D, 15B |
+| Engagement Range | 10G, 10L, 10M, 10N, 14B |
+| Unit Coherency | 10G/10H descriptors, 10K runtime, 11D cleanup |
+| Terrain movement | 10F, 10H, 10I |
+| Terrain visibility/cover | 13A |
+| Movement phase Move Units | 10B-10S |
+| Movement phase Reinforcements | 10O |
+| Transports | 10P |
+| Aircraft | 10Q |
+| Command phase | 11C |
+| Battle-shock | 11C, 12B |
+| Mission scoring | 11A-11E |
+| Stratagems | 12B, 12C, 16E |
+| Shooting phase | 13A-13F |
+| Weapon abilities | 8D, 13D, 16F |
+| Charge phase | 14A, 14B |
+| Fight phase | 14C-14F |
+| Leader/attached units | 6, 15D, 16A |
+| Faction/detachment/enhancement rules | 16C-16F |
+| Chapter Approved 2025-26 | 11A, 11D, 11E, 15A, 19A |
+| Human CLI/UI | 17A, 17C |
+| Network play | 17D |
+| Replay | 17B, all state-changing phases |
+| AI/headless self-play | 18B-18E |
+| Performance budgets | 10T, 18A |
+| 11e preparation | 20A-20D |
