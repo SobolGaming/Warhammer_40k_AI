@@ -77,9 +77,163 @@ CORE V1 is the previous implementation at <https://github.com/SobolGaming/Warham
 
 ---
 
+# Core Rules audit coverage additions
+
+This section records the post-reroll Core Rules audit. It exists because missing a foundational rule, such as the reroll order and one-reroll-per-die restriction, can corrupt every later phase that consumes dice, attacks, movement, or scoring.
+
+Rules audited against the 10e Core Rules page are assigned to explicit future phases below. If a phase implements a mechanic that depends on one of these rules, it must either consume the owning phase's typed service or fail explicitly until that service exists.
+
+| Core Rules area | Required roadmap owner |
+|---|---|
+| D3 conversion, multi-dice expressions, roll-offs, reroll order, one-reroll-per-die, unmodified result semantics | Phase 10J |
+| Distance predicates including within, wholly within, more than, horizontal-only reserve distances, closest-points measurement, base-as-part-of-model visibility | Phase 10J.1, 13A, 15A |
+| Characteristic post-modifier caps/floors for Move, Toughness, Save, Leadership, Objective Control, Range, Attacks, WS, BS, Strength, AP, and Damage | Phase 10J.1, 13C, 16B |
+| Roll-offs for mission/setup/sequencing, including no rerolls or modifiers and repeat ties | Phase 10J, 12A, 15A |
+| Sequencing conflicts: active player chooses during battle, roll-off decides before/after battle or start/end battle round | Phase 12A |
+| Persisting effects through Embark/Disembark and Attached-unit splits | Phase 12A, 12D, 15D |
+| Out-of-phase actions: perform only the specified action and do not trigger other rules normally used in that phase | Phase 12A, 12C, 12D |
+| Starting Strength, Below Half-strength, Battle-shock, CP gain cap, and Battle-shocked restrictions | Phase 11C |
+| Attached-unit Toughness, allocation protection for Characters, split timing, destroyed-unit triggers and keywords | Phase 13E, 15D |
+| Objective marker placement, movement over objective markers, no endpoint on objective markers, 3"/5" range, control timing | Phase 11A, 11B, 11C |
+| Fast dice rolling constraints, including no fast dice for random damage where order matters | Phase 13C, 18A |
+| Full common weapon ability list from Core Rules | Phase 13D |
+| Transports: Firing Deck, Embark, Disembark, Destroyed Transport, Emergency Disembarkation | Phase 10Q, 13B, 13E |
+| Strategic Reserves limits, turn restrictions, horizontal setup distances, edge/deployment-zone restrictions, end-of-battle destroyed | Phase 10P, 11E, 15C |
+| Aircraft movement, minimum move, pivot, reserve transition, movement of other models, charge/fight restrictions | Phase 10R, 14B, 14D |
+| Terrain engagement exceptions for Barricades/Fuel Pipes in Charge and Fight phases | Phase 14B, 14D |
+| Terrain visibility/cover including Woods, Ruins, Plunging Fire, Benefit of Cover non-stacking and AP 0 / 3+ save exception | Phase 13A, 13C |
+| Muster army restrictions: battle size, faction, detachment restrictions, rule of three/six, Enhancements, Epic Heroes, Warlord, Dedicated Transport occupancy | Phase 15D |
+| Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 15A, 15C, 15E |
+
 # Remaining build order
 
-## Phase 10J: precise movement distance, straight-line segments, and pivot costs
+## Phase 10J: core dice, roll-off, reroll, random-characteristic, and modifier order semantics
+
+This phase makes the Core Rules dice semantics explicit before Advance, Battle-shock, attacks, charges, Stratagems, faction abilities, or mission setup consume dice. Phase 1 established deterministic dice plumbing; this phase adds rules-compliant reroll, roll-off, D3, random-characteristic, and modifier-order state.
+
+Modules:
+
+- `engine/dice.py`
+- `core/rng.py`
+- `core/modifiers.py`
+- `engine/decision_controller.py`
+- `engine/decision_record.py`
+
+Objects:
+
+- `DiceRollExpression`
+- `DiceRollInstance`
+- `DiceRollComponent`
+- `D3RollResult`
+- `RollOffRequest`
+- `RollOffResult`
+- `RerollPermission`
+- `RerollDecisionRequest`
+- `RerollSelection`
+- `RerollRecord`
+- `ModifiedRollResult`
+- `UnmodifiedRollResult`
+- `RandomCharacteristicRoll`
+
+Invariants:
+
+- D3 rolls are represented as D6 rolls halved and rounded up, with both source D6 and final D3 result recorded;
+- roll-offs roll one D6 per player, repeat on ties, and can never be rerolled or modified;
+- roll-off records are replay-facing and identify the decision they resolve, such as mission choice, attacker/defender, sequencing, or battlefield/objective setup;
+- a reroll is a replay-facing decision or deterministic auto-decision, never a hidden mutation of a prior roll;
+- each physical/logical die component can be rerolled at most once;
+- if a rule allows rerolling a dice roll made by adding several dice together, such as 2D6 or 3D6, all dice in that roll must be rerolled unless the rule explicitly permits partial rerolls;
+- rules that permit rerolling some dice must identify exactly which die components may be rerolled;
+- rerolls happen before modifiers are applied;
+- an unmodified roll value means the post-reroll result before modifiers;
+- modifier application consumes `UnmodifiedRollResult` and produces `ModifiedRollResult`;
+- random Move characteristics are rolled once for the whole unit when selected to move;
+- other random characteristics are rolled per model, per weapon, or per use when required by the rule/characteristic descriptor;
+- reroll permissions carry source IDs, timing window, owning player, eligible roll type, and legal component-selection policy;
+- replay payloads preserve original dice, selected reroll components, rerolled dice, final unmodified value, modifiers, and final modified value;
+- attempts to reroll a die twice fail explicitly;
+- attempts to partially reroll a multi-dice roll without explicit partial permission fail explicitly.
+
+Required tests:
+
+- D3 records source D6 and rounded-up result;
+- roll-off ties repeat until there is a winner;
+- roll-offs reject reroll and modifier attempts;
+- single D6 reroll records original die, rerolled die, and final unmodified value;
+- 2D6 charge-style reroll rerolls both dice by default;
+- partial reroll of a multi-dice roll fails unless the permission explicitly allows component selection;
+- no die can be rerolled twice;
+- modifiers apply after rerolls;
+- unmodified result equals post-reroll, pre-modifier value;
+- random Move characteristic is rolled once for the whole moving unit;
+- random Attacks/Damage characteristics can be rolled at the required per-weapon/per-attack timing;
+- reroll permission source IDs round-trip;
+- replay load rejects reroll record drift;
+- same seed and same reroll decisions reproduce identical final results.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/utility/dice.py`
+- `src/warhammer40k_ai/engine/dice_rolls.py`
+- `src/warhammer40k_ai/engine/roll_handlers.py`
+- reroll, command reroll, charge roll, Battle-shock, random characteristic, and attack-sequence tests
+
+## Phase 10J.1: measurement predicates and characteristic modifier bounds
+
+This phase completes the core numeric rules that many later phases rely on: distance predicate interpretation, closest-point measurement, horizontal-only reserve distances, wholly-within placement checks, and post-modifier characteristic caps/floors.
+
+Modules:
+
+- `rules/parsed_tokens.py`
+- `geometry/measurement.py`
+- `core/attributes.py`
+- `core/modifiers.py`
+
+Objects:
+
+- `DistanceMeasurementContext`
+- `DistancePredicateEvaluator`
+- `WithinPredicate`
+- `WhollyWithinPredicate`
+- `HorizontalDistancePredicate`
+- `CharacteristicBoundPolicy`
+- `BoundedCharacteristicValue`
+
+Invariants:
+
+- distance between models measures closest points of bases, or closest part of a baseless model where required;
+- bases are part of models for visibility and measurement unless a more specific rule says otherwise;
+- `within` means not more than the specified distance;
+- `wholly within` requires the entire base/contact footprint to satisfy the predicate;
+- reserve and set-up rules that specify distance from enemy models use horizontal distance where the Core Rules say so;
+- objective marker range is 3" horizontal and 5" vertical unless mission policy overrides it;
+- objective markers are 40mm markers by default, can be moved over as if not there, and cannot be ended on top of;
+- post-modifier Move and Toughness cannot be less than 1;
+- Save cannot become 1+ or better;
+- Leadership cannot become better than 4+ or worse than 9+;
+- Objective Control cannot be less than 0;
+- ranged weapon Range, Attacks, Strength, and Damage cannot be less than 1 unless a rule explicitly permits Damage 0;
+- WS and BS cannot become 1+ or better;
+- AP cannot become worse than 0;
+- all caps/floors are applied after modifier stacking and before result consumption.
+
+Required tests:
+
+- closest-base distance and baseless-model distance work;
+- within, wholly within, more-than, and horizontal-only predicates evaluate correctly;
+- objective marker range/control predicates use 3"/5";
+- objective marker endpoint overlap is rejected;
+- each characteristic cap/floor is enforced after modifiers;
+- Damage can become 0 only when an explicit rule permits it;
+- distance predicate payloads round-trip without object reprs.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/utility/calcs.py`
+- distance predicate tests
+- objective marker / deployment / reserve placement tests
+
+## Phase 10K: precise movement distance, straight-line segments, and pivot costs
 
 This phase replaces pivot-cost placeholders with real 10e movement-distance accounting. It must land before Advance, Fall Back, Charge movement, Pile-in, Consolidate, or triggered movement become authoritative.
 
@@ -130,7 +284,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/movement_distance.py`
 - movement distance / pivot tests
 
-## Phase 10K: unit coherency runtime validation and movement rollback
+## Phase 10L: unit coherency runtime validation and movement rollback
 
 Descriptor data already represents 10e and preview coherency policies; this phase applies those policies to battlefield placements and move endpoints.
 
@@ -176,7 +330,7 @@ CORE V1 relevant areas:
 - setup/deployment placement validation tests;
 - coherency-related movement tests.
 
-## Phase 10L: engagement-aware Movement action options and Normal Move finalization
+## Phase 10M: engagement-aware Movement action options and Normal Move finalization
 
 This phase makes `SELECT_MOVEMENT_ACTION` legally conditional and upgrades Normal Move from a vertical slice into a rules-valid Move Units action.
 
@@ -218,7 +372,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/pathing/validation.py`
 - `src/warhammer40k_ai/pathing/rules_profile.py`
 
-## Phase 10M: Advance action, dice, rerolls, and advanced-state restrictions
+## Phase 10N: Advance action, dice, rerolls, and advanced-state restrictions
 
 Modules:
 
@@ -261,7 +415,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/movement_distance.py`
 - `src/warhammer40k_ai/utility/dice.py`
 
-## Phase 10N: Fall Back action and Desperate Escape resolution
+## Phase 10O: Fall Back action and Desperate Escape resolution
 
 Modules:
 
@@ -307,7 +461,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/pathing/rules_profile.py`
 - `src/warhammer40k_ai/pathing/validation.py`
 
-## Phase 10O: Reinforcements, Strategic Reserves, Deep Strike, and reserve placement
+## Phase 10P: Reinforcements, Strategic Reserves, Deep Strike, and reserve placement
 
 Modules:
 
@@ -320,6 +474,7 @@ Objects:
 
 - `MovementPhaseStepState`
 - `ReserveState`
+- `StrategicReserveDeclaration`
 - `ReserveArrivalCandidate`
 - `ReinforcementPlacement`
 - `StrategicReserveRule`
@@ -329,7 +484,18 @@ Invariants:
 - Movement phase has Move Units then Reinforcements;
 - `REINFORCEMENTS` is a phase step, not a placement kind;
 - reserve placement uses placement records, not displacement records;
-- Strategic Reserves and Deep Strike are distinct placement mechanisms;
+- all Reserves units not set up on the battlefield when the battle ends count as destroyed;
+- Reserves units set up in the Reinforcements step count as having made a Normal move that turn and cannot move further in that phase;
+- any specified enemy-distance requirement for setting up Reserves applies to horizontal distance unless the source rule says otherwise;
+- Strategic Reserves are a subset of Reserves, while Deep Strike and other reserve-like abilities keep their own setup rules;
+- Strategic Reserves declarations exclude `FORTIFICATIONS` and enforce the battle-size points limit, including embarked units inside transports placed into Strategic Reserves;
+- Strategic Reserves cannot arrive in battle round 1;
+- Strategic Reserves arriving in battle round 2 must be wholly within 6" of a battlefield edge and not within the enemy deployment zone;
+- Strategic Reserves arriving from battle round 3 onward must be wholly within 6" of a battlefield edge;
+- Strategic Reserves cannot be set up within 9" horizontally of enemy models;
+- Deep Strike units may be placed in Reserves during Declare Battle Formations if every model has Deep Strike;
+- Deep Strike placement in the Reinforcements step is more than 9" horizontally from all enemy models;
+- a unit arriving from Strategic Reserves with Deep Strike may choose either Strategic Reserves setup rules or Deep Strike setup rules;
 - reserve placements validate battlefield edges, enemy distance restrictions, terrain endpoints, coherency, model overlap, and deployment restrictions;
 - mandatory arrivals are requeued or fail explicitly according to rules;
 - no `PathWitness` is required for placement.
@@ -341,38 +507,58 @@ Required tests:
 - Strategic Reserves placement uses `BattlefieldPlacementKind.STRATEGIC_RESERVES`;
 - illegal reserve placement fails without mutating state;
 - reserve placement validates coherency and Engagement Range setup restriction;
-- reserve placement validates terrain endpoint support.
+- reserve placement validates terrain endpoint support;
+- Strategic Reserves battle-round-2 edge/enemy-deployment-zone restrictions are enforced;
+- Strategic Reserves battle-round-3 edge restrictions are enforced;
+- Deep Strike and Strategic Reserves choose the correct placement policy;
+- unarrived Reserves count as destroyed at game end.
 
 CORE V1 relevant areas:
 
 - `src/warhammer40k_ai/engine/reserve_entry_rules.py`
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
 - `src/warhammer40k_ai/engine/game_setup_flow.py`
+- reserve, Deep Strike, Strategic Reserves, and battlefield-edge placement tests
 
-## Phase 10P: transport embark/disembark and destroyed transport emergency disembark
+## Phase 10Q: transport embark/disembark, Firing Deck, and destroyed transport emergency disembark
 
 Modules:
 
 - `engine/transports.py`
 - `engine/phases/movement.py`
 - `engine/battlefield_state.py`
+- `engine/phases/shooting.py`
 
 Objects:
 
 - `TransportCargoState`
 - `EmbarkSelection`
 - `DisembarkSelection`
+- `FiringDeckSelection`
 - `DestroyedTransportDisembark`
+- `EmergencyDisembarkationResolution`
 
 Invariants:
 
+- Transport capacity is data-driven by datasheet restrictions;
+- units can start the battle embarked within a Transport and must declare that before setup;
 - Embark is battlefield removal into transport cargo;
+- Embark requires every model in the unit to end a Normal, Advance, or Fall Back move within 3" of the friendly Transport;
+- a unit cannot Embark if it already Disembarked from a Transport in the same phase;
+- embarked units normally cannot do anything or be affected unless a rule says otherwise;
 - Disembark is battlefield placement from transport cargo;
-- neither Embark nor Disembark is a Movement phase action;
-- embarked units are not placed units and cannot be selected for Normal Move;
-- Disembark validates placement, terrain endpoint, Engagement Range setup restriction, and coherency;
-- transport capacity and model/unit restrictions are data-driven;
-- destroyed transports force emergency disembark or destruction according to rules.
+- Disembark is available only to units that started the Movement phase embarked;
+- Disembark placement must be wholly within 3" of the Transport and not within enemy Engagement Range;
+- units disembarking before a stationary/not-yet-moved Transport moves can act normally but cannot choose Remain Stationary;
+- units disembarking after a Transport made a Normal move count as having made a Normal move, cannot move further this phase, and cannot declare a charge that turn;
+- units cannot disembark from a Transport that Advanced or Fell Back this turn;
+- destroyed Transport disembark occurs before the Transport model is removed;
+- destroyed Transport disembark ignores that Transport's Deadly Demise effect for embarked units;
+- destroyed Transport disembark rolls one D6 per disembarking model, inflicting mortal wounds on 1s;
+- destroyed Transport disembarking units become Battle-shocked until the start of their controller's next Command phase and count as having made a Normal move/cannot charge that turn;
+- Emergency Disembarkation uses 6" instead of 3" and mortal wounds on 1-3 when normal destroyed-transport disembark is impossible;
+- any model that still cannot be set up during Emergency Disembarkation is destroyed;
+- Firing Deck selects up to X embarked models whose units have not shot, selects one non-One-Shot ranged weapon from each, temporarily equips the Transport with those weapons, and makes those embarked units ineligible to shoot until end of phase.
 
 Required tests:
 
@@ -380,15 +566,19 @@ Required tests:
 - embarked unit is unavailable for Movement unit selection;
 - Disembark places models and emits placement records;
 - illegal Disembark fails without mutation;
-- destroyed transport disembark handles illegal placement consequences;
+- disembark-before-move, disembark-after-Normal-move, Advanced/Fell-Back Transport restrictions are enforced;
+- destroyed Transport disembark occurs before Transport removal and applies Battle-shock/Normal-move/no-charge state;
+- Emergency Disembarkation uses 6" and 1-3 mortal-wound threshold;
+- Firing Deck grants temporary weapon profiles to the Transport and marks selected embarked units as having shot/ineligible;
 - capacity validation fails explicitly.
 
 CORE V1 relevant areas:
 
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
 - `tests/rules/test_core_transport_movement_phase.py`
+- transport, Firing Deck, destroyed Transport, and emergency disembark tests
 
-## Phase 10Q: Aircraft and Hover movement/reserve behavior
+## Phase 10R: Aircraft and Hover movement/reserve behavior
 
 Modules:
 
@@ -424,7 +614,7 @@ CORE V1 relevant areas:
 - reserve-entry tests;
 - movement pathing tests.
 
-## Phase 10R: triggered and surge movement foundation
+## Phase 10S: triggered and surge movement foundation
 
 Modules:
 
@@ -464,7 +654,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/engine/decision_handlers/movement.py`
 - surge/reactive movement tests.
 
-## Phase 10S: Movement phase completion gate
+## Phase 10T: Movement phase completion gate
 
 This phase is a compliance gate for the full Movement phase.
 
@@ -487,7 +677,7 @@ Required tests:
 - Reinforcements occurs after Move Units;
 - Movement phase exits to Shooting only when all movement-step work is complete.
 
-## Phase 10T: movement/pathing/terrain profiling and hotspot budget gate
+## Phase 10U: movement/pathing/terrain profiling and hotspot budget gate
 
 This phase introduces performance profiling before Shooting/Charge/Fight multiply pathing and LoS costs.
 
@@ -607,7 +797,10 @@ Invariants:
 
 - objective control derives from current placed models and OC values;
 - Battle-shocked units have OC 0;
-- objective markers use mission-defined positions and control radius;
+- objective markers use mission-defined center positions and default 40mm marker geometry unless a mission overrides it;
+- models can move over objective markers as if they were not there but cannot end a move on top of them;
+- objective marker range is 3" horizontally and 5" vertically unless a mission overrides it;
+- objective control updates at the end of every phase and turn;
 - objective marker terrain interactions are descriptor-driven;
 - objective control results are replay-safe.
 
@@ -617,6 +810,8 @@ Required tests:
 - Battle-shocked unit contributes OC 0;
 - contested objective has deterministic result;
 - terrain objective policy is explicit unsupported until implemented;
+- model cannot end on top of objective marker;
+- objective control updates at phase and turn end;
 - objective control payloads round-trip.
 
 ## Phase 11C: Command phase body: Command step, CP, Battle-shock, and OC updates
@@ -627,6 +822,7 @@ Modules:
 - `engine/battle_shock.py`
 - `engine/command_points.py`
 - `engine/objective_control.py`
+- `engine/unit_state.py`
 
 Objects:
 
@@ -635,23 +831,34 @@ Objects:
 - `BattleShockTestRequest`
 - `BattleShockResult`
 - `BelowHalfStrengthContext`
+- `StartingStrengthRecord`
 
 Invariants:
 
 - Command phase has Command step then Battle-shock step;
-- active player gains CP according to rules/mission policy;
-- below-half-strength units create Battle-shock test requests;
-- Battle-shock tests are deterministic dice decisions;
-- failed Battle-shock marks unit Battle-shocked until the correct cleanup point;
-- Battle-shocked units have OC 0 and cannot be selected for Stratagems unless rules permit;
+- at the start of each player's Command phase, before other Command rules, both players gain 1CP;
+- outside the normal Command-phase CP gain, each player can gain only 1CP per battle round, regardless of source, unless a rule explicitly overrides this;
+- below-half-strength units on the battlefield create Battle-shock test requests during the Battle-shock step;
+- a Battle-shock test rolls 2D6 and passes if the total is greater than or equal to the best Leadership in that unit;
+- if a unit is forced to test for being below Starting Strength, it does not also test for being Below Half-strength unless a rule says otherwise;
+- failed Battle-shock marks the unit and all its models Battle-shocked until the start of the controlling player's next Command phase;
+- Battle-shocked units have OC 0;
+- Battle-shocked units require Desperate Escape tests for every model if selected to Fall Back;
+- a player cannot use Stratagems to affect their Battle-shocked units unless a rule permits it;
+- Starting Strength is recorded at army creation and updated correctly when Attached units split;
+- Below Half-strength for single-model units uses remaining wounds less than half the Wounds characteristic; other units use current model count less than half Starting Strength;
 - Command phase scoring hooks run at the correct timing.
 
 Required tests:
 
-- active player gains CP;
+- both players gain 1CP at the start of each Command phase;
+- non-Command CP gain cap of 1CP per battle round is enforced;
 - below-half-strength unit emits Battle-shock test request;
+- below-Starting-Strength forced test suppresses duplicate Below Half-strength test unless overridden;
 - failed Battle-shock persists and changes OC to 0;
 - passed Battle-shock avoids Battle-shocked state;
+- Battle-shocked unit cannot be targeted by friendly Stratagems by default;
+- Starting Strength and Below Half-strength logic works for single-model and multi-model units;
 - Command phase stops at required dice/decision requests.
 
 ## Phase 11D: mission actions, primary/secondary scoring, and end-of-turn cleanup
@@ -721,6 +928,7 @@ Modules:
 - `engine/timing_windows.py`
 - `engine/reaction_queue.py`
 - `engine/effects.py`
+- `engine/sequencing.py`
 
 Objects:
 
@@ -730,13 +938,19 @@ Objects:
 - `EffectExpiration`
 - `TriggeredDecisionRequest`
 - `SequencingDecision`
+- `OutOfPhaseActionContext`
 
 Invariants:
 
 - out-of-phase rules use typed timing windows;
+- out-of-phase actions perform only the specified action and do not trigger other rules normally used in that phase unless the rule explicitly says so;
 - reaction windows can block and resume parent phase execution;
+- sequencing conflicts during battle are ordered by the player whose turn it is;
+- sequencing conflicts before or after the battle, or at the start or end of a battle round, are ordered by a roll-off winner;
+- roll-offs for sequencing use Phase 10J roll-off semantics and cannot be rerolled or modified;
 - persisting effects expire at deterministic lifecycle points;
-- sequencing conflicts are represented explicitly;
+- persisting effects continue to apply while a unit Embarks and still apply after it Disembarks for their remaining duration;
+- if a persisting effect applies to an Attached unit and the Attached unit splits because Bodyguard or Leader models are destroyed, the effect continues on the surviving unit(s) for its remaining duration;
 - effect payloads are replay-safe;
 - no rule handler mutates state outside its owning timing window.
 
@@ -744,7 +958,11 @@ Required tests:
 
 - reaction window emits interrupt-style decision request;
 - parent phase resumes after reaction resolution;
-- persisting effect expires at correct phase/turn/battle-round point;
+- out-of-phase shooting does not trigger unrelated Shooting-phase abilities;
+- active player chooses order for simultaneous during-battle rules;
+- roll-off decides simultaneous start/end battle round rules;
+- persisting effect survives Embark/Disembark;
+- persisting effect survives Attached-unit split;
 - unsupported timing windows fail explicitly;
 - sequencing conflict creates a deterministic resolver decision when needed.
 
@@ -752,7 +970,7 @@ CORE V1 relevant areas:
 
 - `engine/combat_timing.py`
 - reactive decision handling;
-- phase/reaction tests.
+- phase/reaction/persisting-effect tests.
 
 ## Phase 12B: Command Point ledger and Stratagem framework
 
@@ -935,8 +1153,11 @@ Invariants:
 
 - eligible shooting units are derived from current state;
 - units that Advanced/Fell Back cannot shoot unless a rule permits;
-- units locked in combat obey Locked in Combat / Big Guns Never Tire restrictions;
-- ranged weapons validate range and visibility;
+- units locked in combat obey Locked in Combat / Big Guns Never Tire / Pistol restrictions;
+- Big Guns Never Tire applies the correct Hit-roll penalty unless the attack is made with a Pistol;
+- Lone Operative prevents ranged targeting outside its distance gate when applicable;
+- ranged weapons validate range and visibility at target selection time;
+- a weapon remains resolved against a target selected as visible/in range even if later attacks remove visible/in-range models before resolution;
 - attack declarations group by model, weapon, profile, and target;
 - Hazardous and one-shot-style requirements are explicit descriptors.
 
@@ -945,6 +1166,9 @@ Required tests:
 - eligible unit selection;
 - Advanced/Fell Back restriction;
 - target range/visibility validation;
+- Lone Operative targeting gate;
+- Locked in Combat, Big Guns Never Tire, and Pistol interactions;
+- selected target remains valid for declared weapon resolution after casualties;
 - weapon declaration payload round-trip;
 - invalid target declaration fails without mutation.
 
@@ -955,6 +1179,7 @@ Modules:
 - `engine/attack_sequence.py`
 - `engine/damage_allocation.py`
 - `engine/saves.py`
+- `engine/dice.py`
 
 Objects:
 
@@ -963,46 +1188,85 @@ Objects:
 - `WoundRoll`
 - `AttackAllocation`
 - `SavingThrow`
+- `MortalWoundApplication`
 - `DamageApplication`
+- `FastDiceGroup`
 
 Invariants:
 
 - attack sequence follows hit, wound, allocate, saving throw, inflict damage;
-- modifiers apply through typed modifier stacks;
-- invulnerable saves and mortal wounds are distinct;
-- damage spillover and excess damage rules are explicit;
-- model destruction emits removal records.
+- Hit rolls use BS for ranged attacks and WS for melee attacks;
+- unmodified Hit roll of 6 is a Critical Hit and always succeeds;
+- unmodified Hit roll of 1 always fails;
+- Hit roll modifiers are capped at +1/-1;
+- Wound roll target number derives from Strength vs Toughness using the 2+/3+/4+/5+/6+ table;
+- Critical Wounds and wound-roll modification are explicit attack events;
+- the defender allocates attacks one at a time unless fast dice conditions are satisfied;
+- wounded models or models already allocated attacks this phase must continue receiving allocations until destroyed or all attacks are resolved/saved;
+- armour saves apply AP modifiers and Benefit of Cover where eligible;
+- invulnerable saves ignore AP but otherwise follow saving throw rules; the controlling player may choose armour or invulnerable save where both are available;
+- mortal wounds are allocated one at a time, do not allow saves, and spill over unless the source rule says remaining mortal wounds are lost;
+- mortal wounds from attacks are applied after normal damage from that attacking unit, even if the normal damage was saved;
+- Feel No Pain rolls are per lost wound, including mortal wounds, and only one Feel No Pain ability can be used per lost wound;
+- normal attack excess damage is lost when a model is destroyed;
+- Fast Dice Rolling is allowed only when BS/WS, Strength, AP, Damage, abilities, and target are the same and order cannot affect the result;
+- random Damage attacks cannot use fast dice in cases where allocation order can affect destroyed/damaged model outcomes;
+- model destruction emits removal records and destruction timing windows.
 
 Required tests:
 
 - hit/wound/save/damage deterministic dice flow;
-- invulnerable save path;
-- mortal wound path;
+- Hit roll 6 critical/auto-success and 1 auto-fail;
+- Hit modifier cap of +1/-1;
+- Wound roll table boundaries;
+- armour save, invulnerable save, and cover interaction;
+- mortal wound spillover and no-save path;
+- Devastating/Hazardous mortal-wound lost-remainder exceptions where applicable;
+- Feel No Pain per-wound roll path;
+- wounded-model allocation priority;
+- fast dice group allowed for identical attacks;
+- random damage fast dice is rejected where order matters;
 - model destruction emits removal records;
 - damage allocation payload round-trips.
 
-## Phase 13D: weapon abilities and shooting modifiers
+## Phase 13D: weapon abilities and shooting/fight modifiers
 
-Initial coverage:
+Initial Core Rules weapon ability coverage:
 
 - Assault;
-- Heavy;
 - Rapid Fire X;
-- Sustained Hits X;
-- Lethal Hits;
-- Devastating Wounds;
-- Melta X;
-- Torrent;
-- Blast;
-- Pistol;
-- Hazardous;
 - Ignores Cover;
-- Precision.
+- Twin-linked;
+- Pistol;
+- Torrent;
+- Lethal Hits;
+- Lance;
+- Indirect Fire;
+- Precision;
+- Blast;
+- Melta X;
+- Heavy;
+- Hazardous;
+- Devastating Wounds;
+- Sustained Hits X;
+- Extra Attacks;
+- Anti-KEYWORD X+.
 
 Invariants:
 
 - weapon abilities are structured descriptors;
 - ability handlers modify the attack sequence only in declared timing windows;
+- Assault changes shooting eligibility and restricts attacks to Assault weapons after Advance;
+- Rapid Fire, Blast, Melta, Heavy, Lance, and Indirect Fire modify characteristics/rolls through typed modifier stacks;
+- Twin-linked grants a Wound-roll reroll permission and consumes Phase 10J reroll semantics;
+- Pistol modifies Locked-in-Combat targeting and weapon selection restrictions;
+- Torrent bypasses Hit rolls and interacts correctly with Indirect Fire restrictions;
+- Lethal Hits and Sustained Hits consume Critical Hit events;
+- Anti modifies Critical Wound thresholds based on target keywords;
+- Precision modifies allocation to visible Character models in Attached units;
+- Hazardous tests occur after the unit has resolved all its attacks and allocate mortal wounds to eligible Hazardous-equipped models;
+- Devastating Wounds converts damage to mortal wounds and handles allocation timing;
+- Extra Attacks weapons are additional melee weapons and their Attacks cannot be modified unless the modifying rule names that weapon;
 - unsupported weapon ability shapes fail explicitly;
 - source IDs are preserved in emitted events.
 
@@ -1010,7 +1274,11 @@ Required tests:
 
 - each supported weapon ability has at least one focused attack-sequence test;
 - unsupported weapon ability descriptor does not execute;
-- modifier interactions are deterministic.
+- modifier interactions are deterministic;
+- Twin-linked cannot reroll a Wound roll twice;
+- Indirect Fire applies no-visibility hit penalty, unmodified 1-3 fail, and Benefit of Cover;
+- Pistol and Big Guns Never Tire restrictions interact correctly;
+- Hazardous and Devastating Wounds mortal-wound allocation ordering is correct.
 
 ## Phase 13E: damage allocation, destroyed models, and destruction reactions
 
@@ -1060,7 +1328,8 @@ Invariants:
 - at least one charging model must satisfy the charge endpoint requirement;
 - charge may end in Engagement Range according to charge policy;
 - charging over terrain and charging with FLY are distinct policies;
-- charge movement emits displacement records.
+- charge movement emits displacement records;
+- Barricades/Fuel Pipes opposite-side 2" charge exception is represented as a terrain engagement policy.
 
 ## Phase 14C: fight order, Fights First, and remaining combats
 
@@ -1079,7 +1348,8 @@ Invariants:
 - Pile-in/Consolidate consume movement/pathing/terrain/coherency validators;
 - melee target selection follows engagement/eligibility rules;
 - melee attack sequence reuses attack-sequence infrastructure;
-- consolidation endpoint rules are explicit.
+- consolidation endpoint rules are explicit;
+- Barricades/Fuel Pipes opposite-side 2" fight eligibility/attack exception is represented as a terrain engagement policy.
 
 ## Phase 14E: fight-phase Stratagems and melee abilities
 
@@ -1134,14 +1404,40 @@ Invariants:
 - reserve declarations are replay-facing decisions;
 - illegal reserve declarations fail before battle starts.
 
-## Phase 15D: leader attachment, enhancements, and army construction completion
+## Phase 15D: leader attachment, enhancements, army construction, and roster legality completion
 
 Invariants:
 
+- battle size defines points limit and mission-compatible battlefield expectations;
+- army faction is a selected Faction keyword and every included unit must be legal for that faction or an allowed exception;
+- detachment selection can impose required/prohibited units and grants detachment rules, Stratagems, and Enhancements;
+- the army must include at least one eligible `CHARACTER` model to be Warlord;
+- selected Warlord gains the `WARLORD` keyword;
+- Rule of Three is enforced for datasheets by name, except BATTLELINE and DEDICATED TRANSPORT allow up to six;
+- `EPIC HERO` units are unique and cannot receive Enhancements;
+- only `CHARACTER` models can receive Enhancements;
+- the army can include at most three Enhancements;
+- no unit can have more than one Enhancement;
+- each Enhancement must be unique;
+- every Dedicated Transport must start the battle with at least one unit embarked or it cannot be deployed and counts as destroyed during the first battle round;
 - Leader attachment restrictions are validated before battle;
-- enhancements are validated against character/faction/detachment restrictions;
-- faction/detachment army rules become active after mustering;
-- invalid list construction fails before lifecycle enters setup play.
+- each Bodyguard unit can have at most one Leader attached;
+- while attached, the Attached unit is treated as one unit for rules purposes except destroyed-unit triggers;
+- attacks against Attached units use Bodyguard Toughness until the attacking unit resolves all attacks;
+- attacks cannot be allocated to Character models in Attached units until the Bodyguard is destroyed unless a rule such as Precision permits it;
+- when Bodyguard or Leader components are destroyed, surviving units split at the correct timing and recover original Starting Strength;
+- destroyed-unit triggers for Attached-unit components use only the destroyed component's own keywords.
+
+Required tests:
+
+- Rule of Three and BATTLELINE/Dedicated Transport exceptions;
+- Epic Hero uniqueness and Enhancement denial;
+- Enhancement count, uniqueness, Character-only, and one-per-unit restrictions;
+- Dedicated Transport empty-at-start consequence;
+- Leader/Bodyguard legal attachment and one-Leader-per-Bodyguard enforcement;
+- Attached-unit Toughness and Character allocation protection;
+- Attached-unit split timing after attacks resolve;
+- destroyed-unit trigger identity for Leader vs Bodyguard components.
 
 ## Phase 15E: pre-battle/setup completion gate
 
@@ -1562,7 +1858,7 @@ Required coverage areas:
 
 - core concepts;
 - datasheets and keywords;
-- dice and rerolls;
+- dice, D3, roll-offs, random characteristics, rerolls, and modifiers;
 - sequencing;
 - Command phase;
 - Battle-shock;
@@ -1571,8 +1867,8 @@ Required coverage areas:
 - transports;
 - Strategic Reserves;
 - Aircraft;
-- Shooting phase;
-- attack sequence;
+- Shooting phase, target declaration, locked in combat, Big Guns Never Tire, Pistol, Lone Operative;
+- attack sequence, fast dice, mortal wounds, Feel No Pain, Deadly Demise, and damage allocation;
 - weapon abilities;
 - Charge phase;
 - Fight phase;
@@ -1690,20 +1986,20 @@ Required tests:
 
 | Rules area | Planned phase(s) |
 |---|---|
-| Dice, rerolls, roll-offs | 1, 10M, 12C, 13C, 14A |
+| Dice, rerolls, roll-offs | 1, 10J, 10N, 12C, 13C, 14A |
 | Datasheets and keywords | 9A, 9C, 16A-16G |
 | Army mustering | 9C, 15D, 16B |
 | Setup sequence | 9B, 11A, 15A-15E |
 | Deployment zones | 11A, 15A |
 | Redeployments | 10D, 15B |
-| Engagement Range | 10G, 10L, 10M, 10N, 14B |
-| Unit Coherency | 10G/10H descriptors, 10K runtime, 11D cleanup |
+| Engagement Range | 10G, 10M, 10N, 10O, 14B |
+| Unit Coherency | 10G/10H descriptors, 10L runtime, 11D cleanup |
 | Terrain movement | 10F, 10H, 10I |
 | Terrain visibility/cover | 13A |
-| Movement phase Move Units | 10B-10S |
-| Movement phase Reinforcements | 10O |
-| Transports | 10P |
-| Aircraft | 10Q |
+| Movement phase Move Units | 10B-10T |
+| Movement phase Reinforcements | 10P |
+| Transports | 10Q |
+| Aircraft | 10R |
 | Command phase | 11C |
 | Battle-shock | 11C, 12B |
 | Mission scoring | 11A-11E |
@@ -1719,5 +2015,5 @@ Required tests:
 | Network play | 17D |
 | Replay | 17B, all state-changing phases |
 | AI/headless self-play | 18B-18E |
-| Performance budgets | 10T, 18A |
+| Performance budgets | 10U, 18A |
 | 11e preparation | 20A-20D |
