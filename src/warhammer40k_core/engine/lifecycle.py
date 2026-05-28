@@ -13,6 +13,7 @@ from warhammer40k_core.engine.decision_controller import (
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameConfigPayload,
@@ -53,6 +54,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
     (
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        DICE_REROLL_DECISION_TYPE,
     )
 )
 
@@ -232,6 +234,7 @@ class GameLifecycle:
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
     _validate_battlefield_state_consistency(state=state, config=config)
     _validate_movement_phase_state_consistency(state=state)
+    _validate_advanced_unit_state_consistency(state=state)
     if config is None:
         return
     if state.game_id != config.game_id:
@@ -351,6 +354,36 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
         raise GameLifecycleError(
             "movement_phase_state active selection is not active player's unit."
         )
+
+
+def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:
+    if not state.advanced_unit_states:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("advanced_unit_states require battle stage.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("advanced_unit_states require active player.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("advanced_unit_states require battlefield_state.")
+    try:
+        scenario = BattlefieldScenario(
+            armies=tuple(state.army_definitions),
+            battlefield_state=state.battlefield_state,
+        )
+        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
+    except PlacementError as exc:
+        raise GameLifecycleError("Lifecycle state advanced_unit_states are invalid.") from exc
+
+    active_player_unit_ids = {
+        placement.unit_instance_id for placement in placed_army.unit_placements
+    }
+    for advanced_state in state.advanced_unit_states:
+        if advanced_state.player_id != state.active_player_id:
+            raise GameLifecycleError("advanced_unit_states player drift.")
+        if advanced_state.battle_round != state.battle_round:
+            raise GameLifecycleError("advanced_unit_states battle round drift.")
+        if advanced_state.unit_instance_id not in active_player_unit_ids:
+            raise GameLifecycleError("advanced_unit_states unit is not active player's unit.")
 
 
 def _state_requires_mustered_armies(state: GameState) -> bool:

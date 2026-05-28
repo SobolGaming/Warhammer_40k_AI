@@ -52,6 +52,14 @@ class DecisionController:
         self.event_log.append("decision_recorded", record.to_payload())
         return record
 
+    def record_for_result(self, result: DecisionResult) -> DecisionRecord:
+        if type(result) is not DecisionResult:
+            raise DecisionError("DecisionController result must be a DecisionResult.")
+        for record in reversed(self._records):
+            if record.result == result:
+                return record
+        raise DecisionError("DecisionController has no record for the supplied result.")
+
     def to_payload(self) -> DecisionControllerPayload:
         return {
             "queue": self.queue.to_payload(),

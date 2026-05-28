@@ -40,12 +40,16 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 
 __all__ = [
+    "DICE_REROLL_DECISION_TYPE",
     "DecisionError",
     "DecisionOption",
     "DecisionRequest",
     "DecisionResult",
     "DiceRollManager",
 ]
+
+
+DICE_REROLL_DECISION_TYPE = "select_dice_reroll"
 
 
 def _new_injected_results() -> deque[DiceRollResult]:
@@ -302,6 +306,28 @@ class DiceRollManager:
         allowed_selections: Iterable[Iterable[int]] | None = None,
         permission: RerollPermission | None = None,
     ) -> DecisionRequest:
+        self._decision_request_counter += 1
+        request = self.build_reroll_request(
+            state,
+            request_id=f"decision-request-{self._decision_request_counter:06d}",
+            allowed_selections=allowed_selections,
+            permission=permission,
+        )
+        event = self.event_log.append("decision_requested", request.to_payload())
+        self.rng.append_history(request.history_token())
+        self.rng.append_history(event.history_token())
+        return request
+
+    def build_reroll_request(
+        self,
+        state: DiceRollState,
+        *,
+        request_id: str,
+        actor_id: str | None = None,
+        allowed_selections: Iterable[Iterable[int]] | None = None,
+        permission: RerollPermission | None = None,
+        extra_payload: dict[str, JsonValue] | None = None,
+    ) -> DecisionRequest:
         if state.original_result.spec.roll_type == "roll_off":
             raise DecisionError("Roll-off dice cannot be rerolled.")
         if permission is not None:
@@ -316,7 +342,6 @@ class DiceRollManager:
             selections = _validate_raw_reroll_selections(allowed_selections, state=state)
             permission_payload = None
 
-        self._decision_request_counter += 1
         payload: dict[str, JsonValue] = {
             "roll_id": state.original_result.roll_id,
             "roll_type": state.original_result.spec.roll_type,
@@ -325,17 +350,18 @@ class DiceRollManager:
         }
         if permission_payload is not None:
             payload["permission"] = permission_payload
-        request = DecisionRequest(
-            request_id=f"decision-request-{self._decision_request_counter:06d}",
-            decision_type="select_dice_reroll",
-            actor_id=state.original_result.spec.actor_id,
+        if extra_payload is not None:
+            extra_json = validate_json_value(extra_payload)
+            if not isinstance(extra_json, dict):
+                raise DecisionError("Reroll request extra_payload must be an object.")
+            payload.update(extra_json)
+        return DecisionRequest(
+            request_id=request_id,
+            decision_type=DICE_REROLL_DECISION_TYPE,
+            actor_id=state.original_result.spec.actor_id if actor_id is None else actor_id,
             payload=payload,
             options=_reroll_options(selections),
         )
-        event = self.event_log.append("decision_requested", request.to_payload())
-        self.rng.append_history(request.history_token())
-        self.rng.append_history(event.history_token())
-        return request
 
     def resolve_reroll(
         self,
@@ -343,9 +369,11 @@ class DiceRollManager:
         *,
         request: DecisionRequest,
         result: DecisionResult,
+        record_decision: bool = True,
     ) -> DiceRollState:
         self._validate_reroll_decision(state, request, result)
-        self.record_decision(request=request, result=result)
+        if record_decision:
+            self.record_decision(request=request, result=result)
         selected_indices = _extract_index_list(result.payload, key="selected_indices")
         if not selected_indices:
             event = self.event_log.append(
@@ -484,7 +512,7 @@ class DiceRollManager:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> None:
-        if request.decision_type != "select_dice_reroll":
+        if request.decision_type != DICE_REROLL_DECISION_TYPE:
             raise DecisionError("Reroll request has the wrong decision_type.")
         result.validate_for_request(request)
         request_roll_id = _extract_string(request.payload, key="roll_id")

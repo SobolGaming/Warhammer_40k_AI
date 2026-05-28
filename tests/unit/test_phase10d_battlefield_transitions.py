@@ -282,33 +282,37 @@ def test_remain_stationary_emits_no_transition_records() -> None:
         }
 
 
-@pytest.mark.parametrize(
-    "action",
-    [
-        MovementPhaseActionKind.ADVANCE,
-    ],
-)
-def test_unsupported_movement_actions_emit_no_transition_records(
-    action: MovementPhaseActionKind,
-) -> None:
+def test_advance_emits_displacement_records() -> None:
     lifecycle, action_request = _advance_to_movement_action_request()
-    assert lifecycle.state is not None
-    battlefield_state = lifecycle.state.battlefield_state
-    assert battlefield_state is not None
-    before_payload = battlefield_state.to_payload()
 
-    status = _submit_result(
+    _submit_result(
         lifecycle,
         request=action_request,
-        option_id=action.value,
+        option_id=MovementPhaseActionKind.ADVANCE.value,
         result_id="phase10d-result-000004",
     )
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert lifecycle.state is not None
     assert lifecycle.state.battlefield_state is not None
-    assert lifecycle.state.battlefield_state.to_payload() == before_payload
-    unsupported_event = _last_event_payload(lifecycle, "movement_action_unsupported")
-    assert "transition_batch" not in unsupported_event
+    moved_unit = lifecycle.state.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    moved_model_ids = {placement.model_instance_id for placement in moved_unit.model_placements}
+    terminal_event = _last_event_payload(lifecycle, "movement_activation_completed")
+    batch = _transition_batch_from_event_payload(terminal_event)
+
+    assert batch.placements == ()
+    assert batch.removals == ()
+    assert len(batch.displacements) == len(moved_model_ids)
+    assert {record.model_instance_id for record in batch.displacements} == moved_model_ids
+    for record in batch.displacements:
+        assert record.displacement_kind is ModelDisplacementKind.ADVANCE
+        assert record.source_phase == BattlePhase.MOVEMENT.value
+        assert record.source_step == MovementPhaseStepKind.MOVE_UNITS.value
+        assert record.source_rule_id is None
+        assert record.source_event_id is None
+        assert record.start_pose != record.end_pose
+        assert record.path_witness is not None
 
 
 def _transition_records() -> tuple[
