@@ -556,8 +556,17 @@ def resolve_unit_movement_endpoint_coherency(
         raise UnitCoherencyError("Movement coherency before placement must be a UnitPlacement.")
     if type(attempted) is not UnitPlacement:
         raise UnitCoherencyError("Movement coherency attempted placement must be a UnitPlacement.")
-    if before.unit_instance_id != attempted.unit_instance_id:
+    if (
+        before.army_id != attempted.army_id
+        or before.player_id != attempted.player_id
+        or before.unit_instance_id != attempted.unit_instance_id
+    ):
         raise UnitCoherencyError("Movement coherency placements must reference the same unit.")
+    if _model_ids_for_unit_placement(before) != _model_ids_for_unit_placement(attempted):
+        raise UnitCoherencyError(
+            "Movement coherency before and attempted placements must contain the same "
+            "model_instance_ids."
+        )
     displacement = model_displacement_kind_from_token(displacement_kind)
     result = unit_placement_coherency_result(
         scenario=scenario,

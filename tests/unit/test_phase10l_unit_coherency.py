@@ -155,6 +155,82 @@ def test_invalid_normal_move_endpoint_rolls_back_to_previous_placement() -> None
     assert rollback.coherency_result == result
 
 
+def test_movement_endpoint_coherency_rejects_attempted_missing_model_even_if_coherent() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    scenario = _scenario()
+    before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    attempted = replace(before, model_placements=before.model_placements[:-1])
+
+    with pytest.raises(UnitCoherencyError, match="same model_instance_ids"):
+        resolve_unit_movement_endpoint_coherency(
+            scenario=scenario,
+            ruleset_descriptor=descriptor,
+            before=before,
+            attempted=attempted,
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        )
+
+
+def test_movement_endpoint_coherency_rejects_attempted_extra_or_swapped_model() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    scenario = _scenario()
+    before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    extra_placement = ModelPlacement(
+        army_id=before.army_id,
+        player_id=before.player_id,
+        unit_instance_id=before.unit_instance_id,
+        model_instance_id=f"{before.unit_instance_id}:extra-model:999",
+        pose=before.model_placements[-1].pose,
+    )
+
+    for attempted in (
+        replace(before, model_placements=(*before.model_placements, extra_placement)),
+        replace(before, model_placements=(*before.model_placements[:-1], extra_placement)),
+    ):
+        with pytest.raises(UnitCoherencyError, match="same model_instance_ids"):
+            resolve_unit_movement_endpoint_coherency(
+                scenario=scenario,
+                ruleset_descriptor=descriptor,
+                before=before,
+                attempted=attempted,
+                displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            )
+
+
+def test_movement_endpoint_coherency_rejects_army_or_player_drift() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    scenario = _scenario()
+    before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    player_drift_attempt = UnitPlacement(
+        army_id=before.army_id,
+        player_id="player-c",
+        unit_instance_id=before.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id=placement.army_id,
+                player_id="player-c",
+                unit_instance_id=placement.unit_instance_id,
+                model_instance_id=placement.model_instance_id,
+                pose=placement.pose,
+            )
+            for placement in before.model_placements
+        ),
+    )
+    army_drift_attempt = scenario.battlefield_state.unit_placement_by_id(
+        "army-beta:intercessor-unit-2"
+    )
+
+    for attempted in (player_drift_attempt, army_drift_attempt):
+        with pytest.raises(UnitCoherencyError, match="same unit"):
+            resolve_unit_movement_endpoint_coherency(
+                scenario=scenario,
+                ruleset_descriptor=descriptor,
+                before=before,
+                attempted=attempted,
+                displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            )
+
+
 def test_deployment_placement_outside_coherency_is_rejected() -> None:
     descriptor = RulesetDescriptor.warhammer_40000_tenth()
     scenario = _scenario()
