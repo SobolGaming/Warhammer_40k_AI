@@ -150,6 +150,20 @@ def test_distance_predicates_preserve_source_semantics_without_bare_ranges() -> 
     )
 
 
+def test_wholly_within_distance_predicate_does_not_emit_nested_within_token() -> None:
+    parsed = parse_normalized_tokens('Set up wholly within 6" and more than 9" away.')
+
+    assert parsed.range_expressions == ()
+    assert tuple(predicate.kind for predicate in parsed.distance_predicates) == (
+        DistancePredicateKind.WHOLLY_WITHIN,
+        DistancePredicateKind.MORE_THAN,
+    )
+    assert tuple(predicate.distance_inches for predicate in parsed.distance_predicates) == (
+        6.0,
+        9.0,
+    )
+
+
 def test_named_distance_predicates_parse_without_distances() -> None:
     normalized = normalize_rule_text(
         "while within engagement range, outside detection range, or at half range"

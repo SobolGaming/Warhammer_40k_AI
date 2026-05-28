@@ -52,6 +52,7 @@ class ParsedRuleTextPayload(TypedDict):
 
 class DistancePredicateKind(StrEnum):
     WITHIN = "within"
+    WHOLLY_WITHIN = "wholly_within"
     MORE_THAN = "more_than"
     AT_LEAST = "at_least"
     AT_MOST = "at_most"
@@ -71,6 +72,14 @@ _RANGE_INTERVAL_RE = re.compile(r'(?<![A-Za-z0-9_])\d+\s*-\s*\d+\s*"')
 _RANGE_TOKEN_RE = re.compile(r'(?<![A-Za-z0-9_-])(?P<distance>\d+)"')
 _DISTANCE_VALUE_RE = r'(?P<distance>\d+(?:\.\d+)?)"'
 _DISTANCE_PREDICATE_PATTERNS = (
+    (
+        re.compile(
+            rf"(?<![A-Za-z0-9_-])wholly\s+within\s+{_DISTANCE_VALUE_RE}"
+            r"(?P<qualifier>\s+if\s+possible)?(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ),
+        DistancePredicateKind.WHOLLY_WITHIN,
+    ),
     (
         re.compile(
             rf"(?<![A-Za-z0-9_-])within\s+{_DISTANCE_VALUE_RE}"
@@ -429,9 +438,10 @@ def _parse_range_tokens(
 def _parse_distance_predicate_tokens(text: str) -> tuple[DistancePredicateToken, ...]:
     tokens: list[DistancePredicateToken] = []
     for pattern, kind in _DISTANCE_PREDICATE_PATTERNS:
-        tokens.extend(
-            _distance_predicate_token_from_match(match, kind) for match in pattern.finditer(text)
-        )
+        for match in pattern.finditer(text):
+            if _span_overlaps(match.start(), match.end(), tokens):
+                continue
+            tokens.append(_distance_predicate_token_from_match(match, kind))
 
     return tuple(
         sorted(tokens, key=lambda token: (token.span.start, token.span.end, token.kind.value))
@@ -461,6 +471,14 @@ def _span_is_inside(
         excluded_start <= start and end <= excluded_end
         for excluded_start, excluded_end in excluded_spans
     )
+
+
+def _span_overlaps(
+    start: int,
+    end: int,
+    tokens: tuple[DistancePredicateToken, ...] | list[DistancePredicateToken],
+) -> bool:
+    return any(start < token.span.end and token.span.start < end for token in tokens)
 
 
 def _parse_keyword_tokens(text: str) -> tuple[KeywordToken, ...]:
@@ -523,6 +541,7 @@ def _validate_distance_predicate_distance(
 ) -> float | None:
     if kind in {
         DistancePredicateKind.WITHIN,
+        DistancePredicateKind.WHOLLY_WITHIN,
         DistancePredicateKind.MORE_THAN,
         DistancePredicateKind.AT_LEAST,
         DistancePredicateKind.AT_MOST,
@@ -551,8 +570,10 @@ def _validate_optional_qualifier(
 ) -> str | None:
     if qualifier is None:
         return None
-    if kind is not DistancePredicateKind.WITHIN:
-        raise RuleTokenError("DistancePredicateToken qualifier is only supported for within.")
+    if kind not in {DistancePredicateKind.WITHIN, DistancePredicateKind.WHOLLY_WITHIN}:
+        raise RuleTokenError(
+            "DistancePredicateToken qualifier is only supported for within predicates."
+        )
     if type(qualifier) is not str:
         raise RuleTokenError("DistancePredicateToken qualifier must be a string.")
     stripped = qualifier.strip()

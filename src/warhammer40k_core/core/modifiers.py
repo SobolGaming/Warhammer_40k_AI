@@ -6,7 +6,9 @@ from enum import StrEnum
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.attributes import (
+    BoundedCharacteristicValue,
     Characteristic,
+    CharacteristicBoundPolicy,
     CharacteristicValue,
     characteristic_from_token,
     validate_characteristic_value,
@@ -367,7 +369,18 @@ class ModifierStack:
         _validate_supported_stacking(applicable)
         return tuple(sorted(applicable, key=_modifier_order_key))
 
-    def resolve(self) -> CharacteristicValue:
+    def resolve(
+        self,
+        *,
+        bound_policy: CharacteristicBoundPolicy | None = None,
+    ) -> CharacteristicValue:
+        return self.resolve_bounded(bound_policy=bound_policy).to_characteristic_value()
+
+    def resolve_bounded(
+        self,
+        *,
+        bound_policy: CharacteristicBoundPolicy | None = None,
+    ) -> BoundedCharacteristicValue:
         base = self.raw_value
         final = self.raw_value
         applied_modifier_ids: list[str] = []
@@ -389,12 +402,18 @@ class ModifierStack:
 
             applied_modifier_ids.append(modifier.modifier_id)
 
-        return CharacteristicValue(
+        policy = (
+            CharacteristicBoundPolicy.for_characteristic(self.characteristic)
+            if bound_policy is None
+            else bound_policy
+        )
+        return BoundedCharacteristicValue.from_values(
             characteristic=self.characteristic,
             raw=self.raw_value,
             base=base,
-            final=final,
+            unbounded_final=final,
             applied_modifier_ids=tuple(applied_modifier_ids),
+            bound_policy=policy,
         )
 
     def to_payload(self) -> ModifierStackPayload:
