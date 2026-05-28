@@ -295,7 +295,7 @@ def test_charge_policy_allows_transit_and_ending_in_enemy_engagement_range() -> 
     assert result.engagement_check_count > 0
 
 
-def test_non_circular_base_movement_records_pivot_cost_placeholder() -> None:
+def test_non_circular_base_movement_records_real_pivot_cost() -> None:
     mover = _model("oval-mover", 2.0, 2.0, base=OvalBase(length=2.0, width=1.0))
     result = _path_context(
         _normal_legality_context(),
@@ -305,8 +305,10 @@ def test_non_circular_base_movement_records_pivot_cost_placeholder() -> None:
     ).validate()
 
     assert result.is_valid
-    assert result.pivot_cost_pending
-    assert result.pivot_cost_inches == 0.0
+    assert not result.pivot_cost_pending
+    assert result.pivot_cost_inches == 1.0
+    assert result.movement_distance_witness is not None
+    assert result.movement_distance_witness.pivot_events[0].applied_cost_inches == 1.0
 
 
 def _model(

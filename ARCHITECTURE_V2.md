@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10J.1 work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10K work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10J.1** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10K unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10K** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10L unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -54,6 +54,7 @@ Completed / implemented foundation:
 | 10I | Complete | Terrain movement semantics and endpoint support |
 | 10J | Complete | Core dice, roll-off, reroll, random-characteristic, and modifier order semantics |
 | 10J.1 | Complete | Measurement predicates and characteristic modifier bounds |
+| 10K | Complete | Precise movement distance, straight-line segments, and pivot costs |
 
 ## Cross-cutting architectural rules
 
@@ -240,6 +241,8 @@ CORE V1 relevant areas:
 - objective marker / deployment / reserve placement tests
 
 ## Phase 10K: precise movement distance, straight-line segments, and pivot costs
+
+Status: Complete.
 
 This phase replaces pivot-cost placeholders with real 10e movement-distance accounting. It must land before Advance, Fall Back, Charge movement, Pile-in, Consolidate, or triggered movement become authoritative.
 

@@ -17,6 +17,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     model_displacement_kind_from_token,
 )
+from warhammer40k_core.geometry.movement_envelope import PivotCostPolicy
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
@@ -502,6 +503,7 @@ class MovementLegalityContext:
         terrain: tuple[TerrainVolume, ...] = (),
         friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
         sample_interval_inches: float = 0.5,
+        movement_distance_budget_inches: float | None = None,
     ) -> PathValidationContext:
         fly_transit_applies = self._fly_transit_applies()
         may_transit_enemy_models = self.capabilities.can_move_through_models and fly_transit_applies
@@ -528,6 +530,8 @@ class MovementLegalityContext:
             enemy_engagement_horizontal_inches=self.engagement_policy.horizontal_inches,
             enemy_engagement_vertical_inches=self.engagement_policy.vertical_inches,
             sample_interval_inches=sample_interval_inches,
+            movement_distance_budget_inches=movement_distance_budget_inches,
+            pivot_cost_policy=self.to_pivot_cost_policy(moving_model.model_id),
         )
 
     def to_terrain_path_legality_context(
@@ -556,6 +560,28 @@ class MovementLegalityContext:
 
     def _fly_transit_applies(self) -> bool:
         return self.capabilities.has_fly and self.movement_mode in _FLY_TRANSIT_MOVEMENT_MODES
+
+    def to_pivot_cost_policy(self, model_id: str) -> PivotCostPolicy:
+        validated_model_id = _validate_identifier("model_id", model_id)
+        vehicle_or_monster_model_ids = (
+            (validated_model_id,)
+            if self.capabilities.is_vehicle or self.capabilities.is_monster
+            else ()
+        )
+        aircraft_model_ids = (validated_model_id,) if self.capabilities.is_aircraft else ()
+        round_base_stem_or_hover_model_ids = (
+            (validated_model_id,)
+            if self.capabilities.is_vehicle
+            and (self.capabilities.has_fly or self.capabilities.is_hover)
+            else ()
+        )
+        return PivotCostPolicy(
+            vehicle_or_monster_model_ids=vehicle_or_monster_model_ids,
+            aircraft_model_ids=aircraft_model_ids,
+            round_base_flying_stem_or_hover_stand_vehicle_model_ids=(
+                round_base_stem_or_hover_model_ids
+            ),
+        )
 
     def to_payload(self) -> MovementLegalityContextPayload:
         return {
