@@ -158,7 +158,6 @@ def test_select_movement_action_options_are_standard_phase_actions_only() -> Non
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
         MovementPhaseActionKind.NORMAL_MOVE.value,
         MovementPhaseActionKind.ADVANCE.value,
-        MovementPhaseActionKind.FALL_BACK.value,
     )
     assert {option.option_id for option in action_request.options} == set(expected_option_ids)
     assert tuple(option.option_id for option in action_request.options) == tuple(
@@ -560,7 +559,6 @@ def test_next_movement_unit_is_queued_only_after_activation_terminal_event() -> 
     "action",
     [
         MovementPhaseActionKind.ADVANCE,
-        MovementPhaseActionKind.FALL_BACK,
     ],
 )
 def test_unsupported_movement_modes_return_typed_unsupported_status(

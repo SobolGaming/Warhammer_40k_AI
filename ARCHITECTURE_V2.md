@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10L work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10M work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10L** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10M unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10M** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10N unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -56,6 +56,7 @@ Completed / implemented foundation:
 | 10J.1 | Complete | Measurement predicates and characteristic modifier bounds |
 | 10K | Complete | Precise movement distance, straight-line segments, and pivot costs |
 | 10L | Complete | Unit coherency runtime validation and movement rollback |
+| 10M | Complete | Engagement-aware Movement action options and Normal Move finalization |
 
 ## Cross-cutting architectural rules
 

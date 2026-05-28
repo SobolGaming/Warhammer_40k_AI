@@ -286,7 +286,6 @@ def test_remain_stationary_emits_no_transition_records() -> None:
     "action",
     [
         MovementPhaseActionKind.ADVANCE,
-        MovementPhaseActionKind.FALL_BACK,
     ],
 )
 def test_unsupported_movement_actions_emit_no_transition_records(

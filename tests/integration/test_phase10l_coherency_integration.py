@@ -31,10 +31,6 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
-from warhammer40k_core.engine.unit_coherency import (
-    MovementRollbackRecord,
-    MovementRollbackRecordPayload,
-)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 
@@ -90,16 +86,8 @@ def test_invalid_normal_move_does_not_mutate_state_and_keeps_selection_recoverab
 
     invalid_event = _last_event_payload(lifecycle, "movement_action_invalid")
     assert invalid_event["phase_body_status"] == "movement_action_invalid"
-    rollback_payload = invalid_event["rollback_record"]
-    assert isinstance(rollback_payload, dict)
-    rollback = MovementRollbackRecord.from_payload(
-        cast(MovementRollbackRecordPayload, rollback_payload)
-    )
-    assert (
-        rollback.before_placement.to_payload()
-        == (before_battlefield_payload["placed_armies"][0]["unit_placements"][0])
-    )
-    assert rollback.attempted_placement.to_payload() != rollback.before_placement.to_payload()
+    assert invalid_event["violation_code"] == "normal_move_model_movement_witness_drift"
+    assert "rollback_record" not in invalid_event
 
     retry_status = lifecycle.advance_until_decision_or_terminal()
     retry_request = _decision_request(retry_status)
