@@ -41,6 +41,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseState,
     MovementPhaseStatePayload,
 )
+from warhammer40k_core.engine.reserves import ReserveState, ReserveStatePayload, ReserveStatus
 
 
 class SecondaryMissionMode(StrEnum):
@@ -90,6 +91,7 @@ class GameStatePayload(TypedDict):
     army_definitions: list[ArmyDefinitionPayload]
     battlefield_state: BattlefieldRuntimeStatePayload | None
     movement_phase_state: MovementPhaseStatePayload | None
+    reserve_states: list[ReserveStatePayload]
     advanced_unit_states: list[AdvancedUnitStatePayload]
     fell_back_unit_states: list[FellBackUnitStatePayload]
     battle_shocked_unit_ids: list[str]
@@ -110,6 +112,10 @@ def _new_advanced_unit_states() -> list[AdvancedUnitState]:
 
 
 def _new_fell_back_unit_states() -> list[FellBackUnitState]:
+    return []
+
+
+def _new_reserve_states() -> list[ReserveState]:
     return []
 
 
@@ -347,6 +353,7 @@ class GameState:
     army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
     battlefield_state: BattlefieldRuntimeState | None = None
     movement_phase_state: MovementPhaseState | None = None
+    reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     advanced_unit_states: list[AdvancedUnitState] = field(default_factory=_new_advanced_unit_states)
     fell_back_unit_states: list[FellBackUnitState] = field(
         default_factory=_new_fell_back_unit_states
@@ -409,6 +416,10 @@ class GameState:
         self.battlefield_state = _validate_optional_battlefield_state(self.battlefield_state)
         self.movement_phase_state = _validate_optional_movement_phase_state(
             self.movement_phase_state
+        )
+        self.reserve_states = _validate_reserve_states(
+            self.reserve_states,
+            player_ids=self.player_ids,
         )
         self.advanced_unit_states = _validate_advanced_unit_states(
             self.advanced_unit_states,
@@ -583,6 +594,63 @@ class GameState:
             for draw in self.tactical_secondary_draws
         )
 
+    def record_reserve_state(self, reserve_state: ReserveState) -> None:
+        if type(reserve_state) is not ReserveState:
+            raise GameLifecycleError("reserve_state must be a ReserveState.")
+        if reserve_state.player_id not in self.player_ids:
+            raise GameLifecycleError("ReserveState player_id is not in this game.")
+        if self.reserve_state_for_unit(reserve_state.unit_instance_id) is not None:
+            raise GameLifecycleError("ReserveState already exists for unit.")
+        self.reserve_states.append(reserve_state)
+        self.reserve_states.sort(key=lambda state: state.unit_instance_id)
+
+    def reserve_state_for_unit(self, unit_instance_id: str) -> ReserveState | None:
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        for reserve_state in self.reserve_states:
+            if reserve_state.unit_instance_id == requested_unit_id:
+                return reserve_state
+        return None
+
+    def replace_reserve_state(self, reserve_state: ReserveState) -> None:
+        if type(reserve_state) is not ReserveState:
+            raise GameLifecycleError("reserve_state must be a ReserveState.")
+        for index, stored in enumerate(self.reserve_states):
+            if stored.unit_instance_id == reserve_state.unit_instance_id:
+                self.reserve_states[index] = reserve_state
+                self.reserve_states.sort(key=lambda state: state.unit_instance_id)
+                return
+        raise GameLifecycleError("ReserveState does not exist for unit.")
+
+    def unarrived_reserve_states_for_player(self, player_id: str) -> tuple[ReserveState, ...]:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        return tuple(
+            reserve_state
+            for reserve_state in self.reserve_states
+            if reserve_state.player_id == requested_player_id
+            and reserve_state.status is ReserveStatus.IN_RESERVES
+        )
+
+    def unarrived_reserve_model_ids(self) -> tuple[str, ...]:
+        if not self.reserve_states:
+            return ()
+        unit_by_id = {
+            unit.unit_instance_id: unit for army in self.army_definitions for unit in army.units
+        }
+        model_ids: list[str] = []
+        for reserve_state in self.reserve_states:
+            if reserve_state.status is not ReserveStatus.IN_RESERVES:
+                continue
+            impacted_unit_ids = (
+                reserve_state.unit_instance_id,
+                *reserve_state.embarked_unit_instance_ids,
+            )
+            for unit_id in impacted_unit_ids:
+                unit = unit_by_id.get(unit_id)
+                if unit is None:
+                    raise GameLifecycleError("ReserveState references an unknown unit.")
+                model_ids.extend(model.model_instance_id for model in unit.own_models)
+        return tuple(sorted(model_ids))
+
     def record_advanced_unit_state(self, state: AdvancedUnitState) -> None:
         if type(state) is not AdvancedUnitState:
             raise GameLifecycleError("Advanced unit state must be an AdvancedUnitState.")
@@ -691,6 +759,7 @@ class GameState:
                 if self.movement_phase_state is None
                 else self.movement_phase_state.to_payload()
             ),
+            "reserve_states": [state.to_payload() for state in self.reserve_states],
             "advanced_unit_states": [state.to_payload() for state in self.advanced_unit_states],
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
@@ -756,6 +825,9 @@ class GameState:
                 if payload["movement_phase_state"] is None
                 else MovementPhaseState.from_payload(payload["movement_phase_state"])
             ),
+            reserve_states=[
+                ReserveState.from_payload(state) for state in payload["reserve_states"]
+            ],
             advanced_unit_states=[
                 AdvancedUnitState.from_payload(state) for state in payload["advanced_unit_states"]
             ],
@@ -799,6 +871,13 @@ class GameState:
             if not (
                 state.player_id == requested_player_id and state.battle_round == requested_round
             )
+        ]
+        self.reserve_states = [
+            state.clear_expired_post_arrival_restrictions(
+                player_id=requested_player_id,
+                battle_round=requested_round,
+            )
+            for state in self.reserve_states
         ]
 
 
@@ -928,6 +1007,27 @@ def _validate_optional_movement_phase_state(
     if type(value) is not MovementPhaseState:
         raise GameLifecycleError("GameState movement_phase_state must be a MovementPhaseState.")
     return value
+
+
+def _validate_reserve_states(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[ReserveState]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState reserve_states must be a list.")
+    validated: list[ReserveState] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not ReserveState:
+            raise GameLifecycleError("GameState reserve_states must contain ReserveState values.")
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("ReserveState player_id is not in this game.")
+        if value.unit_instance_id in seen:
+            raise GameLifecycleError("GameState reserve_states must be unique by unit.")
+        seen.add(value.unit_instance_id)
+        validated.append(value)
+    return sorted(validated, key=lambda state: state.unit_instance_id)
 
 
 def _validate_advanced_unit_states(

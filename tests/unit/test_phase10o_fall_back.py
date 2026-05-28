@@ -624,7 +624,7 @@ def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-all-destroy-0121",
+        result_id="phase10o-all-destroy-candidate-00281",
     )
     removal_request = _decision_request(fall_back_status)
     unit_model_ids = tuple(

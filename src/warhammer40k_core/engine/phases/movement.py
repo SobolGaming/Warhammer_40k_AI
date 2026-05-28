@@ -126,6 +126,7 @@ class MovementUnitSelectionPayload(TypedDict):
 class MovementPhaseStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
+    step: str
     selected_unit_ids: list[str]
     moved_unit_ids: list[str]
     active_selection: MovementUnitSelectionPayload | None
@@ -948,6 +949,7 @@ class MovementUnitSelection:
 class MovementPhaseState:
     battle_round: int
     active_player_id: str
+    step: MovementPhaseStepKind = MovementPhaseStepKind.MOVE_UNITS
     selected_unit_ids: tuple[str, ...] = ()
     moved_unit_ids: tuple[str, ...] = ()
     active_selection: MovementUnitSelection | None = None
@@ -963,6 +965,7 @@ class MovementPhaseState:
             "active_player_id",
             _validate_identifier("MovementPhaseState active_player_id", self.active_player_id),
         )
+        object.__setattr__(self, "step", movement_phase_step_kind_from_token(self.step))
         object.__setattr__(
             self,
             "selected_unit_ids",
@@ -984,6 +987,8 @@ class MovementPhaseState:
                 raise GameLifecycleError(
                     "MovementPhaseState moved_unit_ids must be in selected_unit_ids."
                 )
+        if self.step is MovementPhaseStepKind.REINFORCEMENTS and self.active_selection is not None:
+            raise GameLifecycleError("Reinforcements step must not have active_selection.")
         if self.active_selection is not None:
             if type(self.active_selection) is not MovementUnitSelection:
                 raise GameLifecycleError(
@@ -1006,16 +1011,26 @@ class MovementPhaseState:
                     "MovementPhaseState active_selection must not already be moved."
                 )
 
-    def legal_unit_ids(self, scenario: BattlefieldScenario) -> tuple[str, ...]:
+    def legal_unit_ids(
+        self,
+        scenario: BattlefieldScenario,
+        *,
+        accounted_unplaced_model_ids: tuple[str, ...] = (),
+    ) -> tuple[str, ...]:
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            return ()
         if type(scenario) is not BattlefieldScenario:
             raise GameLifecycleError("MovementPhaseState scenario must be a BattlefieldScenario.")
         try:
-            scenario.assert_all_mustered_models_placed()
+            scenario.assert_all_mustered_models_placed_or_accounted(accounted_unplaced_model_ids)
+        except PlacementError as exc:
+            raise GameLifecycleError("Movement phase requires complete placed armies.") from exc
+        try:
             placed_army = scenario.battlefield_state.placed_army_for_player(
                 self.active_player_id,
             )
-        except PlacementError as exc:
-            raise GameLifecycleError("Movement phase requires complete placed armies.") from exc
+        except PlacementError:
+            return ()
         selected = set(self.selected_unit_ids)
         return tuple(
             placement.unit_instance_id
@@ -1026,6 +1041,8 @@ class MovementPhaseState:
     def with_unit_selection(self, selection: MovementUnitSelection) -> Self:
         if type(selection) is not MovementUnitSelection:
             raise GameLifecycleError("Movement selection must be a MovementUnitSelection.")
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("Movement selection requires Move Units step.")
         if self.active_selection is not None:
             raise GameLifecycleError("Movement selection requires no active movement selection.")
         if selection.player_id != self.active_player_id:
@@ -1037,6 +1054,7 @@ class MovementPhaseState:
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
+            step=self.step,
             selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
             moved_unit_ids=self.moved_unit_ids,
             active_selection=selection,
@@ -1044,6 +1062,8 @@ class MovementPhaseState:
 
     def with_activation_complete(self, unit_instance_id: str) -> Self:
         completed_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("Movement activation completion requires Move Units step.")
         if self.active_selection is None:
             raise GameLifecycleError("Movement activation completion requires active_selection.")
         if completed_unit_id != self.active_selection.unit_instance_id:
@@ -1053,8 +1073,26 @@ class MovementPhaseState:
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
+            step=self.step,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=(*self.moved_unit_ids, completed_unit_id),
+            active_selection=None,
+        )
+
+    def with_step(self, step: MovementPhaseStepKind) -> Self:
+        requested_step = movement_phase_step_kind_from_token(step)
+        if requested_step is self.step:
+            return self
+        if self.active_selection is not None:
+            raise GameLifecycleError("MovementPhaseState step change requires no active_selection.")
+        if requested_step is MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("MovementPhaseState cannot return to Move Units.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=requested_step,
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
             active_selection=None,
         )
 
@@ -1062,6 +1100,7 @@ class MovementPhaseState:
         return {
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
+            "step": self.step.value,
             "selected_unit_ids": list(self.selected_unit_ids),
             "moved_unit_ids": list(self.moved_unit_ids),
             "active_selection": (
@@ -1075,6 +1114,7 @@ class MovementPhaseState:
         return cls(
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
+            step=movement_phase_step_kind_from_token(payload["step"]),
             selected_unit_ids=tuple(payload["selected_unit_ids"]),
             moved_unit_ids=tuple(payload["moved_unit_ids"]),
             active_selection=(
@@ -1578,6 +1618,8 @@ class MovementPhaseHandler:
     ) -> LifecycleStatus:
         _validate_movement_phase_state(state)
         movement_state = _ensure_movement_phase_state(state=state, decisions=decisions)
+        if movement_state.step is MovementPhaseStepKind.REINFORCEMENTS:
+            return _begin_reinforcements_step(state=state, decisions=decisions)
         active_selection = movement_state.active_selection
         if active_selection is not None:
             return _request_movement_action(
@@ -1588,27 +1630,26 @@ class MovementPhaseHandler:
             )
 
         scenario = _battlefield_scenario(state)
-        legal_unit_ids = movement_state.legal_unit_ids(scenario)
+        legal_unit_ids = movement_state.legal_unit_ids(
+            scenario,
+            accounted_unplaced_model_ids=state.unarrived_reserve_model_ids(),
+        )
         if not legal_unit_ids:
+            state.movement_phase_state = movement_state.with_step(
+                MovementPhaseStepKind.REINFORCEMENTS
+            )
             decisions.event_log.append(
-                "movement_phase_unit_selection_completed",
+                "movement_phase_step_entered",
                 {
                     "game_id": state.game_id,
                     "battle_round": state.battle_round,
                     "active_player_id": _active_player_id(state),
                     "phase": BattlePhase.MOVEMENT.value,
-                    "phase_body_status": "unit_selection_complete",
+                    "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                    "phase_body_status": "reinforcements_step_entered",
                 },
             )
-            return LifecycleStatus.advanced(
-                stage=GameLifecycleStage.BATTLE,
-                payload={
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "phase_body_status": "unit_selection_complete",
-                    "battle_round": state.battle_round,
-                    "active_player_id": _active_player_id(state),
-                },
-            )
+            return _begin_reinforcements_step(state=state, decisions=decisions)
 
         request = DecisionRequest(
             request_id=state.next_decision_request_id(),
@@ -1675,7 +1716,10 @@ class MovementPhaseHandler:
         payload = _decision_payload_object(result.payload)
         unit_instance_id = _payload_string(payload, key="unit_instance_id")
         scenario = _battlefield_scenario(state)
-        if unit_instance_id not in movement_state.legal_unit_ids(scenario):
+        if unit_instance_id not in movement_state.legal_unit_ids(
+            scenario,
+            accounted_unplaced_model_ids=state.unarrived_reserve_model_ids(),
+        ):
             raise GameLifecycleError("Movement unit selection is not currently legal.")
 
         selection = MovementUnitSelection(
@@ -1700,6 +1744,38 @@ class MovementPhaseHandler:
             },
         )
         return None
+
+
+def _begin_reinforcements_step(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> LifecycleStatus:
+    active_player_id = _active_player_id(state)
+    unarrived_reserve_count = len(state.unarrived_reserve_states_for_player(active_player_id))
+    decisions.event_log.append(
+        "reinforcements_step_completed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "unarrived_reserve_count": unarrived_reserve_count,
+            "phase_body_status": "reinforcements_complete",
+        },
+    )
+    return LifecycleStatus.advanced(
+        stage=GameLifecycleStage.BATTLE,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "phase_body_status": "reinforcements_complete",
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "unarrived_reserve_count": unarrived_reserve_count,
+        },
+    )
 
 
 def _request_movement_action(
@@ -3600,6 +3676,17 @@ def movement_phase_action_kind_from_token(token: object) -> MovementPhaseActionK
         return MovementPhaseActionKind(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported MovementPhaseActionKind token: {token}.") from exc
+
+
+def movement_phase_step_kind_from_token(token: object) -> MovementPhaseStepKind:
+    if type(token) is MovementPhaseStepKind:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("MovementPhaseStepKind token must be a string.")
+    try:
+        return MovementPhaseStepKind(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported MovementPhaseStepKind token: {token}.") from exc
 
 
 def desperate_escape_requirement_reason_from_token(
