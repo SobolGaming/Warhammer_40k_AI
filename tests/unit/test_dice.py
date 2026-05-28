@@ -15,6 +15,8 @@ from warhammer40k_core.core.dice import (
     DiceRollSpecError,
     DiceRollState,
     DiceRollStatePayload,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
 )
 from warhammer40k_core.engine.decision import (
     DecisionError,
@@ -316,7 +318,15 @@ def test_reroll_selection_is_an_explicit_decision() -> None:
         actor_id="unit-assault-intercessors",
     )
     state = manager.roll_fixed(spec, [1, 4])
-    request = manager.request_reroll(state, allowed_selections=((0,),))
+    permission = RerollPermission(
+        source_id="test-partial-reroll",
+        timing_window="after_roll_before_modifiers",
+        owning_player_id="player-a",
+        eligible_roll_type="charge_roll",
+        component_selection_policy=RerollComponentSelectionPolicy.COMPONENT_SELECTION,
+        allowed_component_selections=((0,),),
+    )
+    request = manager.request_reroll(state, permission=permission)
 
     rejected = DecisionResult(
         result_id="decision-result-bad",

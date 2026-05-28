@@ -34,7 +34,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.engine.decision import DiceRollManager
-from warhammer40k_core.engine.decision_request import DecisionError
+from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager as ExportedDiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
@@ -251,6 +251,122 @@ def test_partial_multi_dice_reroll_requires_explicit_component_selection_permiss
 
     assert tuple(option.option_id for option in request.options) == ("decline", "reroll:0")
     assert RerollPermission.from_payload(permission.to_payload()) == permission
+
+
+def test_raw_allowed_selections_cannot_partially_reroll_multi_dice_roll() -> None:
+    manager = DiceRollManager("seed")
+    state = manager.roll_fixed(
+        _spec(
+            quantity=2,
+            reason="Charge distance raw reroll fixture",
+            roll_type="charge_roll",
+            actor_id="unit-assault",
+        ),
+        [1, 4],
+    )
+
+    with pytest.raises(DecisionError, match="whole roll"):
+        manager.request_reroll(state, allowed_selections=((0,),))
+
+
+def test_raw_allowed_selections_cannot_offer_already_rerolled_die() -> None:
+    manager = DiceRollManager("seed")
+    state = manager.roll_fixed(
+        _spec(
+            quantity=1,
+            reason="Advance roll raw reroll fixture",
+            roll_type="advance_roll",
+            actor_id="unit-tactical",
+        ),
+        [1],
+    ).with_reroll(
+        decision_id="decision-result-first-reroll",
+        request_id="decision-request-first-reroll",
+        selected_indices=(0,),
+        replacement_result=DiceRollResult.from_values(
+            roll_id="roll-raw-reroll-replacement",
+            spec=_spec(
+                quantity=1,
+                reason="Reroll selected dice for Advance roll raw reroll fixture",
+                roll_type="advance_roll.reroll",
+                actor_id="unit-tactical",
+            ),
+            values=[4],
+            source="fixed",
+        ),
+    )
+
+    with pytest.raises(DecisionError, match="already-rerolled"):
+        manager.request_reroll(state, allowed_selections=((0,),))
+
+
+def test_reroll_request_rejects_stale_current_values() -> None:
+    manager = DiceRollManager("seed")
+    state = manager.roll_fixed(
+        _spec(
+            quantity=1,
+            reason="Advance roll stale request fixture",
+            roll_type="advance_roll",
+            actor_id="unit-tactical",
+        ),
+        [1],
+    )
+    request = manager.request_reroll(state, allowed_selections=((0,),))
+    decision = DecisionResult.for_request(
+        result_id="decision-result-stale-reroll",
+        request=request,
+        selected_option_id="reroll:0",
+    )
+    changed_state = state.with_reroll(
+        decision_id="decision-result-prior-reroll",
+        request_id="decision-request-prior-reroll",
+        selected_indices=(0,),
+        replacement_result=DiceRollResult.from_values(
+            roll_id="roll-stale-request-replacement",
+            spec=_spec(
+                quantity=1,
+                reason="Reroll selected dice for Advance roll stale request fixture",
+                roll_type="advance_roll.reroll",
+                actor_id="unit-tactical",
+            ),
+            values=[5],
+            source="fixed",
+        ),
+    )
+
+    with pytest.raises(DecisionError, match="current_values"):
+        manager.resolve_reroll(changed_state, request=request, result=decision)
+
+
+def test_reroll_request_rejects_roll_type_drift() -> None:
+    manager = DiceRollManager("seed")
+    state = manager.roll_fixed(
+        _spec(
+            quantity=1,
+            reason="Advance roll roll type drift fixture",
+            roll_type="advance_roll",
+            actor_id="unit-tactical",
+        ),
+        [1],
+    )
+    request = manager.request_reroll(state, allowed_selections=((0,),))
+    payload = dict(cast(dict[str, JsonValue], request.payload))
+    payload["roll_type"] = "wound_roll"
+    drifted_request = DecisionRequest(
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        payload=payload,
+        options=request.options,
+    )
+    decision = DecisionResult.for_request(
+        result_id="decision-result-roll-type-drift",
+        request=drifted_request,
+        selected_option_id="reroll:0",
+    )
+
+    with pytest.raises(DecisionError, match="roll_type"):
+        manager.resolve_reroll(state, request=drifted_request, result=decision)
 
 
 def test_no_die_component_can_be_rerolled_twice() -> None:

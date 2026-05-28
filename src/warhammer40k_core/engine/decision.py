@@ -313,7 +313,7 @@ class DiceRollManager:
         else:
             if allowed_selections is None:
                 raise DecisionError("Reroll request requires allowed selections or permission.")
-            selections = _validate_index_selections(allowed_selections, state=state)
+            selections = _validate_raw_reroll_selections(allowed_selections, state=state)
             permission_payload = None
 
         self._decision_request_counter += 1
@@ -490,6 +490,12 @@ class DiceRollManager:
         request_roll_id = _extract_string(request.payload, key="roll_id")
         if request_roll_id != state.original_result.roll_id:
             raise DecisionError("Reroll request does not target this dice roll.")
+        request_roll_type = _extract_string(request.payload, key="roll_type")
+        if request_roll_type != state.original_result.spec.roll_type:
+            raise DecisionError("Reroll request roll_type does not match this dice roll.")
+        request_current_values = _extract_int_list(request.payload, key="current_values")
+        if request_current_values != state.current_values:
+            raise DecisionError("Reroll request current_values do not match current dice state.")
         allowed_selections = set(
             _extract_index_selections(request.payload, key="allowed_selections")
         )
@@ -776,6 +782,27 @@ def _validate_index_selections(
                 raise DecisionError("Reroll allowed selection index is outside the current dice.")
         validated.append(index_selection)
     return _validate_unique_index_selections(tuple(validated), field_name="allowed_selections")
+
+
+# TODO(Phase 10J): remove raw allowed_selections after callers provide RerollPermission metadata.
+def _validate_raw_reroll_selections(
+    selections: Iterable[Iterable[int]],
+    *,
+    state: DiceRollState,
+) -> tuple[tuple[int, ...], ...]:
+    validated = _validate_index_selections(selections, state=state)
+    already_rerolled = set(state.rerolled_indices())
+    for selection in validated:
+        if any(index in already_rerolled for index in selection):
+            raise DecisionError(
+                "Raw reroll allowed_selections cannot include an already-rerolled die."
+            )
+
+    full_selection = tuple(range(len(state.current_values)))
+    expected = ((0,),) if len(state.current_values) == 1 else (full_selection,)
+    if validated != expected:
+        raise DecisionError("Raw reroll allowed_selections must offer only the whole roll.")
+    return validated
 
 
 def _validate_unique_index_selections(
