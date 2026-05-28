@@ -66,6 +66,57 @@ def test_tenth_five_model_unit_requires_one_neighbor_per_model() -> None:
     assert result.offending_model_instance_ids == ()
 
 
+def test_tenth_two_disconnected_two_model_groups_are_not_coherent() -> None:
+    context = UnitCoherencyContext.from_ruleset_descriptor(
+        RulesetDescriptor.warhammer_40000_tenth(),
+        unit_instance_id="army-alpha:split-unit",
+    )
+
+    result = context.validate_models(
+        (
+            _model("model-1", x=0.0),
+            _model("model-2", x=3.0),
+            _model("model-3", x=50.0),
+            _model("model-4", x=53.0),
+        )
+    )
+
+    assert not result.is_coherent
+    assert {violation.violation_code for violation in result.violations} == {
+        "unit_coherency_not_single_group"
+    }
+    assert any(
+        violation.violation_code == "unit_coherency_not_single_group"
+        for violation in result.violations
+    )
+
+
+def test_tenth_large_unit_with_two_locally_coherent_clusters_is_not_coherent() -> None:
+    context = UnitCoherencyContext.from_ruleset_descriptor(
+        RulesetDescriptor.warhammer_40000_tenth(),
+        unit_instance_id="army-alpha:split-large-unit",
+    )
+
+    result = context.validate_models(
+        (
+            _model("model-1", x=0.0, y=0.0),
+            _model("model-2", x=0.0, y=3.0),
+            _model("model-3", x=3.0, y=0.0),
+            _model("model-4", x=3.0, y=3.0),
+            _model("model-5", x=50.0, y=0.0),
+            _model("model-6", x=50.0, y=3.0),
+            _model("model-7", x=53.0, y=0.0),
+            _model("model-8", x=53.0, y=3.0),
+        )
+    )
+
+    assert not result.is_coherent
+    assert {violation.violation_code for violation in result.violations} == {
+        "unit_coherency_not_single_group"
+    }
+    assert all(violation.neighbor_count is None for violation in result.violations)
+
+
 def test_tenth_seven_model_unit_requires_two_neighbors_per_model() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
         RulesetDescriptor.warhammer_40000_tenth(),

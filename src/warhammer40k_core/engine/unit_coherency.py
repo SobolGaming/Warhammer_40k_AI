@@ -326,18 +326,13 @@ class UnitCoherencyContext:
             "max_vertical_inches",
         )
         violations: list[UnitCoherencyViolation] = []
+        adjacency = _coherency_adjacency(
+            models,
+            max_horizontal_inches=max_horizontal,
+            max_vertical_inches=max_vertical,
+        )
         for model in models:
-            coherent_neighbors = tuple(
-                other.model_id
-                for other in models
-                if other.model_id != model.model_id
-                and _models_are_neighbor_coherent(
-                    first=model,
-                    second=other,
-                    max_horizontal_inches=max_horizontal,
-                    max_vertical_inches=max_vertical,
-                )
-            )
+            coherent_neighbors = tuple(sorted(adjacency[model.model_id]))
             if len(coherent_neighbors) >= required_neighbors:
                 continue
             violations.append(
@@ -351,6 +346,13 @@ class UnitCoherencyContext:
                     related_model_instance_ids=coherent_neighbors,
                 )
             )
+        violations.extend(
+            _single_group_violations(
+                adjacency,
+                max_horizontal_inches=max_horizontal,
+                max_vertical_inches=max_vertical,
+            )
+        )
         return self._result(models=models, violations=tuple(violations))
 
     def _validate_all_models_within_distance_policy(
@@ -610,6 +612,70 @@ def _models_are_neighbor_coherent(
     )
 
 
+def _coherency_adjacency(
+    models: tuple[Model, ...],
+    *,
+    max_horizontal_inches: float,
+    max_vertical_inches: float,
+) -> dict[str, set[str]]:
+    adjacency = {model.model_id: set[str]() for model in models}
+    for index, first in enumerate(models):
+        for second in models[index + 1 :]:
+            if _models_are_neighbor_coherent(
+                first=first,
+                second=second,
+                max_horizontal_inches=max_horizontal_inches,
+                max_vertical_inches=max_vertical_inches,
+            ):
+                adjacency[first.model_id].add(second.model_id)
+                adjacency[second.model_id].add(first.model_id)
+    return adjacency
+
+
+def _single_group_violations(
+    adjacency: dict[str, set[str]],
+    *,
+    max_horizontal_inches: float,
+    max_vertical_inches: float,
+) -> tuple[UnitCoherencyViolation, ...]:
+    components = _connected_components(adjacency)
+    if len(components) <= 1:
+        return ()
+    retained_component = components[0]
+    return tuple(
+        UnitCoherencyViolation(
+            model_instance_id=model_id,
+            violation_code="unit_coherency_not_single_group",
+            max_horizontal_inches=max_horizontal_inches,
+            max_vertical_inches=max_vertical_inches,
+            related_model_instance_ids=component,
+        )
+        for component in components
+        if component != retained_component
+        for model_id in component
+    )
+
+
+def _connected_components(adjacency: dict[str, set[str]]) -> tuple[tuple[str, ...], ...]:
+    unvisited = set(adjacency)
+    components: list[tuple[str, ...]] = []
+    while unvisited:
+        start = min(unvisited)
+        unvisited.remove(start)
+        stack = [start]
+        component: list[str] = []
+        while stack:
+            model_id = stack.pop()
+            component.append(model_id)
+            for neighbor_id in sorted(adjacency[model_id], reverse=True):
+                if neighbor_id not in unvisited:
+                    continue
+                unvisited.remove(neighbor_id)
+                stack.append(neighbor_id)
+        components.append(tuple(sorted(component)))
+    return tuple(sorted(components, key=lambda component: (-len(component), component)))
+
+
 def _required_neighbor_count(
     *,
     policy: CoherencyPolicyDescriptor,
@@ -660,15 +726,25 @@ def _validate_violation_tuple(
     if type(values) is not tuple:
         raise UnitCoherencyError(f"{field_name} must be a tuple.")
     violations: list[UnitCoherencyViolation] = []
-    seen: set[str] = set()
+    seen: set[tuple[str, str]] = set()
     for value in cast(tuple[object, ...], values):
         if type(value) is not UnitCoherencyViolation:
             raise UnitCoherencyError(f"{field_name} must contain UnitCoherencyViolation values.")
-        if value.model_instance_id in seen:
-            raise UnitCoherencyError(f"{field_name} must not contain duplicate model IDs.")
-        seen.add(value.model_instance_id)
+        violation_key = (value.model_instance_id, value.violation_code)
+        if violation_key in seen:
+            raise UnitCoherencyError(f"{field_name} must not contain duplicate violations.")
+        seen.add(violation_key)
         violations.append(value)
-    return tuple(sorted(violations, key=lambda violation: violation.model_instance_id))
+    return tuple(
+        sorted(
+            violations,
+            key=lambda violation: (
+                violation.model_instance_id,
+                violation.violation_code,
+                violation.related_model_instance_ids,
+            ),
+        )
+    )
 
 
 def _model_ids_for_unit_placement(unit_placement: UnitPlacement) -> tuple[str, ...]:
