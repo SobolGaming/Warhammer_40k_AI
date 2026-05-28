@@ -20,6 +20,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     muster_army,
 )
+from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRuntimeState,
@@ -29,14 +30,26 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.movement import (
+    COMPLETE_REINFORCEMENTS_OPTION_ID,
+    PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
+    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     MovementPhaseHandler,
     MovementPhaseState,
     MovementPhaseStepKind,
@@ -95,11 +108,167 @@ def test_movement_phase_enters_reinforcements_after_move_units() -> None:
         decisions=decisions,
     )
 
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     payload = cast(dict[str, object], status.payload)
-    assert payload["phase_body_status"] == "reinforcements_complete"
+    assert payload["phase_body_status"] == "reinforcements_waiting_for_arrival_choice"
     assert payload["unarrived_reserve_count"] == 1
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+    assert {option.option_id for option in status.decision_request.options} == {
+        COMPLETE_REINFORCEMENTS_OPTION_ID,
+        reserve_state.unit_instance_id,
+    }
     assert state.movement_phase_state is not None
     assert state.movement_phase_state.step is MovementPhaseStepKind.REINFORCEMENTS
+    assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
+
+
+def test_reinforcements_valid_strategic_reserves_arrival_mutates_state_atomically() -> None:
+    state, _scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
+    handler, decisions, selection_request = _enter_reinforcements_choice(
+        state=state,
+        battle_round=3,
+    )
+    placement_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=selection_request,
+        option_id=reserve_state.unit_instance_id,
+        result_id="phase10p-select-strategic",
+    )
+    placement_request = _decision_request(placement_status)
+    assert placement_request.decision_type == PLACE_REINFORCEMENT_UNIT_DECISION_TYPE
+
+    result_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        option_id=BattlefieldPlacementKind.STRATEGIC_RESERVES.value,
+        result_id="phase10p-place-strategic",
+    )
+    if result_status is None:
+        result_status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert result_status.status_kind is LifecycleStatusKind.ADVANCED
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.unit_placement_by_id(reserve_unit.unit_instance_id)
+    arrived_state = state.reserve_state_for_unit(reserve_state.unit_instance_id)
+    assert arrived_state is not None
+    assert arrived_state.status is ReserveStatus.ARRIVED
+    assert arrived_state.arrived_phase == BattlePhase.MOVEMENT.value
+    assert state.movement_phase_state is not None
+    assert reserve_state.unit_instance_id in state.movement_phase_state.moved_unit_ids
+    arrival_event = _last_event_payload(decisions, "reinforcement_unit_arrived")
+    assert arrival_event["placement_kind"] == BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+    transition_batch = arrival_event["transition_batch"]
+    assert isinstance(transition_batch, dict)
+    placements = cast(list[dict[str, object]], transition_batch["placements"])
+    assert placements[0]["placement_kind"] == BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+
+
+def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() -> None:
+    state, _scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
+    deep_strike_unit = replace(reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE"))
+    state.army_definitions = list(
+        _with_replaced_unit(tuple(state.army_definitions), deep_strike_unit)
+    )
+    deep_strike_state = replace(reserve_state, reserve_kind=ReserveKind.DEEP_STRIKE)
+    state.replace_reserve_state(deep_strike_state)
+    handler, decisions, selection_request = _enter_reinforcements_choice(
+        state=state,
+        battle_round=1,
+    )
+    placement_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=selection_request,
+        option_id=deep_strike_state.unit_instance_id,
+        result_id="phase10p-select-deep-strike",
+    )
+    placement_request = _decision_request(placement_status)
+
+    result_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        option_id=BattlefieldPlacementKind.DEEP_STRIKE.value,
+        result_id="phase10p-place-deep-strike",
+    )
+    if result_status is None:
+        result_status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert result_status.status_kind is LifecycleStatusKind.ADVANCED
+    arrival_event = _last_event_payload(decisions, "reinforcement_unit_arrived")
+    transition_batch = arrival_event["transition_batch"]
+    assert isinstance(transition_batch, dict)
+    placements = cast(list[dict[str, object]], transition_batch["placements"])
+    assert placements[0]["placement_kind"] == BattlefieldPlacementKind.DEEP_STRIKE.value
+    assert placements[0]["source_rule_id"] == "deep_strike"
+
+
+def test_reinforcements_invalid_arrival_does_not_mutate_state() -> None:
+    state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve(
+        ruleset_descriptor=_chapter_approved_ruleset(),
+    )
+    before_battlefield = state.battlefield_state.to_payload() if state.battlefield_state else None
+    before_reserve_state = reserve_state
+    handler, decisions, selection_request = _enter_reinforcements_choice(
+        state=state,
+        battle_round=1,
+        ruleset_descriptor=_chapter_approved_ruleset(),
+    )
+    placement_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=selection_request,
+        option_id=reserve_state.unit_instance_id,
+        result_id="phase10p-select-invalid",
+    )
+    placement_request = _decision_request(placement_status)
+
+    invalid_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        option_id=BattlefieldPlacementKind.STRATEGIC_RESERVES.value,
+        result_id="phase10p-place-invalid",
+    )
+
+    assert invalid_status is not None
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == before_battlefield
+    assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == before_reserve_state
+
+
+def test_reinforcements_completion_choice_leaves_reserve_unarrived_and_advances_phase() -> None:
+    state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve()
+    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    _set_movement_ready_for_reinforcements(state=state, battle_round=3)
+    flow = BattleRoundFlow(phase_handlers={BattlePhase.MOVEMENT: handler})
+    selection_status = flow.advance(state=state, decisions=decisions)
+    selection_request = _decision_request(selection_status)
+
+    decision_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=selection_request,
+        option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
+        result_id="phase10p-complete-reinforcements",
+    )
+    assert decision_status is None
+    advanced_status = flow.advance(state=state, decisions=decisions)
+
+    assert advanced_status.status_kind is LifecycleStatusKind.ADVANCED
+    assert state.current_battle_phase is BattlePhase.SHOOTING
     assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
 
 
@@ -820,6 +989,189 @@ def test_phase10p_deep_strike_requires_keyword_and_uses_same_arrival_path() -> N
     }
 
 
+def test_chapter_approved_declared_deep_strike_cannot_arrive_in_battle_round_1() -> None:
+    _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
+        ruleset_descriptor=_chapter_approved_ruleset(),
+    )
+    deep_strike_unit = replace(reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE"))
+    deep_strike_scenario = BattlefieldScenario(
+        armies=_with_replaced_unit(scenario.armies, deep_strike_unit),
+        battlefield_state=scenario.battlefield_state,
+    )
+    result = resolve_reserve_arrival(
+        scenario=deep_strike_scenario,
+        ruleset_descriptor=_chapter_approved_ruleset(),
+        reserve_state=replace(reserve_state, reserve_kind=ReserveKind.DEEP_STRIKE),
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=deep_strike_unit,
+            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+        ),
+        battle_round=1,
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+    )
+
+    assert ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN in set(
+        _violation_codes(result)
+    )
+
+
+def test_chapter_approved_declared_strategic_reserves_cannot_arrive_in_battle_round_1() -> None:
+    _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
+        ruleset_descriptor=_chapter_approved_ruleset(),
+    )
+    result = resolve_reserve_arrival(
+        scenario=scenario,
+        ruleset_descriptor=_chapter_approved_ruleset(),
+        reserve_state=reserve_state,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+        ),
+        battle_round=1,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        large_model_exceptions=(
+            LargeModelReservePlacementException(
+                model_instance_id=reserve_unit.own_models[0].model_instance_id,
+                battlefield_edge=BattlefieldEdge.SOUTH,
+            ),
+        ),
+    )
+
+    codes = set(_violation_codes(result))
+    assert ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN in codes
+    assert ReservePlacementViolationCode.STRATEGIC_RESERVES_BATTLE_ROUND_1 in codes
+
+
+def test_chapter_approved_during_battle_strategic_reserves_arrival_exemption_is_honored() -> None:
+    _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
+        ruleset_descriptor=_chapter_approved_ruleset(),
+    )
+    during_battle_state = replace(
+        reserve_state,
+        reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+        declared_during_step=None,
+        entered_reserves_battle_round=1,
+        entered_reserves_phase=BattlePhase.MOVEMENT.value,
+    )
+    result = resolve_reserve_arrival(
+        scenario=scenario,
+        ruleset_descriptor=_chapter_approved_ruleset(),
+        reserve_state=during_battle_state,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+        ),
+        battle_round=1,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        large_model_exceptions=(
+            LargeModelReservePlacementException(
+                model_instance_id=reserve_unit.own_models[0].model_instance_id,
+                battlefield_edge=BattlefieldEdge.SOUTH,
+            ),
+        ),
+    )
+
+    codes = set(_violation_codes(result))
+    assert ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN not in codes
+    assert ReservePlacementViolationCode.STRATEGIC_RESERVES_BATTLE_ROUND_1 in codes
+
+
+def test_core_rules_deep_strike_has_no_mission_pack_battle_round_1_block() -> None:
+    _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
+    deep_strike_unit = replace(reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE"))
+    deep_strike_scenario = BattlefieldScenario(
+        armies=_with_replaced_unit(scenario.armies, deep_strike_unit),
+        battlefield_state=scenario.battlefield_state,
+    )
+    result = resolve_reserve_arrival(
+        scenario=deep_strike_scenario,
+        ruleset_descriptor=_ruleset(),
+        reserve_state=replace(reserve_state, reserve_kind=ReserveKind.DEEP_STRIKE),
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=deep_strike_unit,
+            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+        ),
+        battle_round=1,
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+    )
+
+    assert ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN not in set(
+        _violation_codes(result)
+    )
+    assert result.is_valid
+
+
+def test_reserve_arrival_with_embarked_units_is_deferred_until_transport_cargo_state() -> None:
+    state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
+    cargo_reserve_state = replace(
+        reserve_state,
+        embarked_unit_instance_ids=("army-alpha:intercessor-unit-2",),
+    )
+    state.replace_reserve_state(cargo_reserve_state)
+    before_battlefield = state.battlefield_state.to_payload() if state.battlefield_state else None
+
+    result = resolve_reserve_arrival(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        reserve_state=cargo_reserve_state,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+        ),
+        battle_round=3,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        large_model_exceptions=(
+            LargeModelReservePlacementException(
+                model_instance_id=reserve_unit.own_models[0].model_instance_id,
+                battlefield_edge=BattlefieldEdge.SOUTH,
+            ),
+        ),
+    )
+
+    assert ReservePlacementViolationCode.RESERVE_EMBARKED_CARGO_UNSUPPORTED in set(
+        _violation_codes(result)
+    )
+    assert not result.is_valid
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == before_battlefield
+    assert state.reserve_state_for_unit(cargo_reserve_state.unit_instance_id) == cargo_reserve_state
+
+
+def test_replay_load_rejects_arrived_reserve_with_unaccounted_embarked_units() -> None:
+    state, _scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
+    embarked_unit_id = "army-alpha:intercessor-unit-2"
+    assert state.battlefield_state is not None
+    parent_placement = _single_model_reserve_placement(
+        reserve_unit=reserve_unit,
+        pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+    )
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        embarked_unit_id
+    ).with_added_unit_placement(parent_placement)
+    state.replace_reserve_state(
+        replace(
+            reserve_state,
+            embarked_unit_instance_ids=(embarked_unit_id,),
+        ).mark_arrived(
+            battle_round=3,
+            phase=BattlePhase.MOVEMENT,
+            large_model_exception_used=False,
+            post_arrival_restrictions=(),
+        )
+    )
+    payload = cast(
+        GameLifecyclePayload,
+        {
+            "config": None,
+            "state": state.to_payload(),
+            "decisions": DecisionController().to_payload(),
+        },
+    )
+
+    with pytest.raises(GameLifecycleError, match="arrived reserve with embarked cargo"):
+        GameLifecycle.from_payload(payload)
+
+
 def test_phase10p_reserve_destruction_application_marks_unplaced_models_removed() -> None:
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
     result = resolve_unarrived_reserve_destruction(
@@ -1357,6 +1709,71 @@ def _battle_state_with_reserve(
     )
     state.record_reserve_state(reserve_state)
     return state, scenario, reserve_state, reserve_unit
+
+
+def _set_movement_ready_for_reinforcements(
+    *,
+    state: GameState,
+    battle_round: int,
+) -> None:
+    placed_unit_id = "army-alpha:intercessor-unit-2"
+    state.battle_round = battle_round
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(placed_unit_id,),
+        moved_unit_ids=(placed_unit_id,),
+    )
+
+
+def _enter_reinforcements_choice(
+    *,
+    state: GameState,
+    battle_round: int,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+) -> tuple[MovementPhaseHandler, DecisionController, DecisionRequest]:
+    _set_movement_ready_for_reinforcements(state=state, battle_round=battle_round)
+    handler = MovementPhaseHandler(ruleset_descriptor=ruleset_descriptor or _ruleset())
+    decisions = DecisionController()
+    status = handler.begin_phase(state=state, decisions=decisions)
+    return handler, decisions, _decision_request(status)
+
+
+def _submit_handler_decision(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    option_id: str,
+    result_id: str,
+) -> LifecycleStatus | None:
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=request,
+        selected_option_id=option_id,
+    )
+    decisions.submit_result(result)
+    return handler.apply_decision(state=state, decisions=decisions, result=result)
+
+
+def _decision_request(status: LifecycleStatus | None) -> DecisionRequest:
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    return status.decision_request
+
+
+def _last_event_payload(
+    decisions: DecisionController,
+    event_type: str,
+) -> dict[str, object]:
+    for record in reversed(decisions.event_log.records):
+        if record.event_type == event_type:
+            payload = record.payload
+            assert isinstance(payload, dict)
+            return cast(dict[str, object], payload)
+    raise AssertionError(f"event {event_type} not found")
 
 
 def _with_reserve_unit_geometry(

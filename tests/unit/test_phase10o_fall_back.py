@@ -366,12 +366,15 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
         result_id="phase10o-result-000004",
     )
     removal_request = _decision_request(fall_back_status)
-    destroyed_model_id = "army-alpha:intercessor-unit-1:core-intercessor-like:002"
+    destroyed_model_ids = (
+        "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+    )
 
     status = _submit_result(
         lifecycle,
         request=removal_request,
-        option_id=f"destroy:{destroyed_model_id}",
+        option_id="destroy:" + ",".join(destroyed_model_ids),
         result_id="phase10o-result-000008",
     )
     state = _state(lifecycle)
@@ -624,7 +627,7 @@ def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-all-destroy-candidate-00281",
+        result_id="phase10o-all-destroy-candidate-00244",
     )
     removal_request = _decision_request(fall_back_status)
     unit_model_ids = tuple(

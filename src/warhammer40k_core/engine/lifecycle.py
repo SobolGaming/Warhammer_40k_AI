@@ -35,9 +35,11 @@ from warhammer40k_core.engine.phases.command import (
     CommandPhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
+    PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     MovementPhaseHandler,
 )
 from warhammer40k_core.engine.reserves import ReserveStatus
@@ -57,6 +59,8 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
         SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+        SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
+        PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
 )
@@ -235,8 +239,8 @@ class GameLifecycle:
 
 
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
-    _validate_battlefield_state_consistency(state=state, config=config)
     _validate_reserve_state_consistency(state=state)
+    _validate_battlefield_state_consistency(state=state, config=config)
     _validate_movement_phase_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
@@ -362,6 +366,10 @@ def _validate_reserve_state_consistency(*, state: GameState) -> None:
             if (reserve_model_ids | embarked_model_ids) & removed_model_ids:
                 raise GameLifecycleError("unarrived reserve models must not be removed.")
         if reserve_state.status is ReserveStatus.ARRIVED:
+            if reserve_state.embarked_unit_instance_ids:
+                raise GameLifecycleError(
+                    "arrived reserve with embarked cargo is unsupported before cargo state."
+                )
             if not reserve_model_ids <= placed_model_ids:
                 raise GameLifecycleError("arrived reserve unit models must be placed.")
             if reserve_model_ids & removed_model_ids:

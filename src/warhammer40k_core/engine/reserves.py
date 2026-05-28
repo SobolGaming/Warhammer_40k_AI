@@ -81,6 +81,8 @@ class ReservePlacementViolationCode(StrEnum):
     RESERVE_STATE_NOT_UNARRIVED = "reserve_state_not_unarrived"
     RESERVE_KIND_MISMATCH = "reserve_kind_mismatch"
     UNIT_PLACEMENT_DRIFT = "unit_placement_drift"
+    RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN = "reserve_arrival_battle_round_forbidden"
+    RESERVE_EMBARKED_CARGO_UNSUPPORTED = "reserve_embarked_cargo_unsupported"
     STRATEGIC_RESERVES_BATTLE_ROUND_1 = "strategic_reserves_battle_round_1"
     STRATEGIC_RESERVES_EDGE_DISTANCE = "strategic_reserves_edge_distance"
     STRATEGIC_RESERVES_ENEMY_DEPLOYMENT_ZONE = "strategic_reserves_enemy_deployment_zone"
@@ -108,6 +110,7 @@ LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS = (
 _DEFAULT_BATTLEFIELD_WIDTH_INCHES = 60.0
 _DEFAULT_BATTLEFIELD_DEPTH_INCHES = 44.0
 _EPSILON = 1e-9
+_RESERVES_RULE_ID = "reserves"
 _STRATEGIC_RESERVES_RULE_ID = "strategic_reserves"
 _DEEP_STRIKE_RULE_ID = "deep_strike"
 
@@ -1187,6 +1190,7 @@ def resolve_reserve_arrival(
         unit=unit,
         placement_kind=placement_kind,
         battle_round=requested_round,
+        mission_policy=ruleset_descriptor.mission_policy,
     )
     _append_unit_placement_drift_violations(
         violations=violations,
@@ -1252,11 +1256,7 @@ def resolve_reserve_arrival(
         transition_batch = _reserve_arrival_transition_batch(
             attempted_placement=attempted_placement,
             placement_kind=placement_kind,
-            source_rule_id=(
-                _STRATEGIC_RESERVES_RULE_ID
-                if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES
-                else _DEEP_STRIKE_RULE_ID
-            ),
+            source_rule_id=_source_rule_id_for_placement_kind(placement_kind),
         )
     return ReinforcementPlacement(
         candidate=candidate,
@@ -1465,7 +1465,30 @@ def _append_reserve_state_violations(
     unit: UnitInstance,
     placement_kind: BattlefieldPlacementKind,
     battle_round: int,
+    mission_policy: MissionPolicyDescriptor,
 ) -> None:
+    if type(mission_policy) is not MissionPolicyDescriptor:
+        raise GameLifecycleError("reserve arrival requires a MissionPolicyDescriptor.")
+    if (
+        battle_round in mission_policy.reserves_arrival_blocked_battle_rounds
+        and not _reserve_arrival_block_exemption_applies(
+            reserve_state=reserve_state,
+            mission_policy=mission_policy,
+        )
+    ):
+        violations.append(
+            ReservePlacementViolation(
+                violation_code=ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN,
+                message="Mission policy forbids this Reserve arrival battle round.",
+            )
+        )
+    if reserve_state.embarked_unit_instance_ids:
+        violations.append(
+            ReservePlacementViolation(
+                violation_code=ReservePlacementViolationCode.RESERVE_EMBARKED_CARGO_UNSUPPORTED,
+                message="Reserve arrival with embarked cargo is unsupported before transports.",
+            )
+        )
     if reserve_state.status is not ReserveStatus.IN_RESERVES:
         violations.append(
             ReservePlacementViolation(
@@ -1497,6 +1520,23 @@ def _append_reserve_state_violations(
                 message="Deep Strike placement requires every model to have Deep Strike.",
             )
         )
+
+
+def _reserve_arrival_block_exemption_applies(
+    *,
+    reserve_state: ReserveState,
+    mission_policy: MissionPolicyDescriptor,
+) -> bool:
+    return (
+        mission_policy.reserves_arrival_excludes_during_battle_strategic_reserves
+        and reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
+        and reserve_state.reserve_origin
+        in {
+            ReserveOrigin.DURING_BATTLE_ABILITY,
+            ReserveOrigin.DURING_BATTLE_STRATAGEM,
+            ReserveOrigin.DURING_BATTLE_OTHER,
+        }
+    )
 
 
 def _append_unit_placement_drift_violations(
@@ -1761,6 +1801,14 @@ def _reserve_arrival_transition_batch(
             for model_placement in attempted_placement.model_placements
         )
     )
+
+
+def _source_rule_id_for_placement_kind(placement_kind: BattlefieldPlacementKind) -> str:
+    if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES:
+        return _STRATEGIC_RESERVES_RULE_ID
+    if placement_kind is BattlefieldPlacementKind.DEEP_STRIKE:
+        return _DEEP_STRIKE_RULE_ID
+    return _RESERVES_RULE_ID
 
 
 def _terrain_endpoint_violation(
