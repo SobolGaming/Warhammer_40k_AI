@@ -15,6 +15,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
     ModelDisplacementKind,
+    PlacementError,
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
@@ -28,7 +29,12 @@ from warhammer40k_core.engine.list_validation import (
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -44,7 +50,11 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
-from warhammer40k_core.engine.unit_coherency import MovementRollbackRecord, UnitCoherencyResult
+from warhammer40k_core.engine.unit_coherency import (
+    MovementRollbackRecord,
+    UnitCoherencyResult,
+    unit_placement_coherency_result,
+)
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 
@@ -343,6 +353,104 @@ def test_fall_back_payload_round_trip_and_drift_codes() -> None:
     )
 
 
+def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_selection() -> None:
+    lifecycle, action_request = _advance_to_fall_back_action_request()
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    before_battlefield_payload = battlefield_state.to_payload()
+    fall_back_status = _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        result_id="phase10o-result-000004",
+    )
+    removal_request = _decision_request(fall_back_status)
+    destroyed_model_id = "army-alpha:intercessor-unit-1:core-intercessor-like:002"
+
+    status = _submit_result(
+        lifecycle,
+        request=removal_request,
+        option_id=f"destroy:{destroyed_model_id}",
+        result_id="phase10o-result-000008",
+    )
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.message == "Fall Back surviving endpoint violates unit coherency."
+    assert battlefield_state.to_payload() == before_battlefield_payload
+    assert (
+        state.fell_back_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+        is None
+    )
+    assert _event_payloads(lifecycle, "movement_activation_completed") == ()
+
+
+def test_fall_back_destruction_selection_can_make_otherwise_incoherent_endpoint_valid() -> None:
+    scenario = _engaged_scenario(enemy_pose=Pose.at(4.0, 6.0, facing_degrees=180.0))
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    destroyed_model_id = "army-alpha:intercessor-unit-1:core-intercessor-like:003"
+    attempted_end_poses = {
+        "army-alpha:intercessor-unit-1:core-intercessor-like:001": Pose.at(6.0, 12.0),
+        "army-alpha:intercessor-unit-1:core-intercessor-like:002": Pose.at(8.0, 12.0),
+        destroyed_model_id: Pose.at(10.0, 6.1),
+        "army-alpha:intercessor-unit-1:core-intercessor-like:004": Pose.at(10.3, 11.75),
+        "army-alpha:intercessor-unit-1:core-intercessor-like:005": Pose.at(12.3, 11.75),
+    }
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        unit_placement=unit_placement,
+        path_witness=_fall_back_witness_with_end_poses(unit_placement, attempted_end_poses),
+        battle_shocked_unit_ids=("army-alpha:intercessor-unit-1",),
+    )
+    rolls = tuple(
+        DesperateEscapeRoll.from_roll_state(
+            requirement=requirement,
+            roll_state=DiceRollManager("phase10o-rolls").roll_fixed(
+                requirement.roll_spec(),
+                [1 if requirement.model_instance_id == destroyed_model_id else 3],
+            ),
+        )
+        for requirement in resolution.desperate_escape_requirements
+    )
+    result = FallBackActionResult.with_desperate_escape_rolls(
+        resolution=resolution,
+        desperate_escape_rolls=rolls,
+    )
+    surviving_placement = result.surviving_attempted_placement(
+        destroyed_model_ids=(destroyed_model_id,),
+    )
+    assert surviving_placement is not None
+
+    survivor_coherency = unit_placement_coherency_result(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        unit_placement=surviving_placement,
+    )
+    batch = result.transition_batch(
+        before=unit_placement,
+        destroyed_model_ids=(destroyed_model_id,),
+    )
+
+    assert not resolution.coherency_result.is_coherent
+    assert resolution.rollback_record is None
+    assert resolution.is_valid
+    assert survivor_coherency.is_coherent
+    assert {removal.model_instance_id for removal in batch.removals} == {destroyed_model_id}
+    assert destroyed_model_id not in {
+        displacement.model_instance_id for displacement in batch.displacements
+    }
+
+
 def test_fall_back_result_rejects_destruction_selection_drift() -> None:
     scenario = _engaged_scenario(enemy_pose=Pose.at(6.0, 8.0, facing_degrees=180.0))
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
@@ -375,6 +483,22 @@ def test_fall_back_result_rejects_destruction_selection_drift() -> None:
             before=unit_placement,
             destroyed_model_ids=("army-beta:intercessor-unit-2:core-intercessor-like:001",),
         )
+
+
+def test_fall_back_transition_batch_rejects_unresolved_desperate_escape_requirements() -> None:
+    scenario = _engaged_scenario(enemy_pose=Pose.at(6.0, 8.0, facing_degrees=180.0))
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        unit_placement=unit_placement,
+        path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
+    )
+
+    with pytest.raises(GameLifecycleError, match="before Desperate Escape rolls are resolved"):
+        resolution.transition_batch(before=unit_placement, destroyed_model_ids=())
 
 
 def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
@@ -488,9 +612,56 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
     surviving = result.surviving_attempted_placement(
         destroyed_model_ids=(destroyed_model_id,),
     )
+    assert surviving is not None
     assert destroyed_model_id not in {
         placement.model_instance_id for placement in surviving.model_placements
     }
+
+
+def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift() -> None:
+    lifecycle, action_request = _advance_to_fall_back_action_request()
+    fall_back_status = _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        result_id="phase10o-all-destroy-0121",
+    )
+    removal_request = _decision_request(fall_back_status)
+    unit_model_ids = tuple(
+        f"army-alpha:intercessor-unit-1:core-intercessor-like:{index:03d}" for index in range(1, 6)
+    )
+    destroyed_option_id = "destroy:" + ",".join(unit_model_ids)
+
+    status = _submit_result(
+        lifecycle,
+        request=removal_request,
+        option_id=destroyed_option_id,
+        result_id="phase10o-result-000009",
+    )
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
+        battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    assert set(unit_model_ids) <= set(battlefield_state.removed_model_ids)
+    assert set(unit_model_ids).isdisjoint(battlefield_state.placed_model_ids())
+    assert (
+        state.fell_back_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+        is None
+    )
+
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
 
 
 def test_game_state_records_and_clears_fell_back_unit_state() -> None:
@@ -864,12 +1035,47 @@ def _fall_back_witness(
     return PathWitness.for_paths(tuple(model_paths))
 
 
+def _fall_back_witness_with_end_poses(
+    unit_placement: UnitPlacement,
+    end_poses_by_model_id: dict[str, Pose],
+) -> PathWitness:
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement in unit_placement.model_placements:
+        start = placement.pose
+        end = end_poses_by_model_id.get(
+            placement.model_instance_id,
+            Pose.at(
+                start.position.x,
+                start.position.y + 6.0,
+                start.position.z,
+                facing_degrees=start.facing.degrees,
+            ),
+        )
+        midpoint = Pose.at(
+            (start.position.x + end.position.x) / 2.0,
+            (start.position.y + end.position.y) / 2.0,
+            (start.position.z + end.position.z) / 2.0,
+            facing_degrees=(start.facing.degrees + end.facing.degrees) / 2.0,
+        )
+        model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
 def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, object]:
     for event in reversed(lifecycle.decision_controller.event_log.records):
         if event.event_type == event_type:
             assert isinstance(event.payload, dict)
             return cast(dict[str, object], event.payload)
     raise AssertionError(f"Missing event type: {event_type}")
+
+
+def _event_payloads(lifecycle: GameLifecycle, event_type: str) -> tuple[dict[str, object], ...]:
+    payloads: list[dict[str, object]] = []
+    for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type == event_type:
+            assert isinstance(event.payload, dict)
+            payloads.append(cast(dict[str, object], event.payload))
+    return tuple(payloads)
 
 
 def _transition_batch_from_event_payload(

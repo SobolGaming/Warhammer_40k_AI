@@ -49,6 +49,7 @@ from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
     resolve_unit_movement_endpoint_coherency,
+    unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pathing import (
@@ -1435,6 +1436,11 @@ class FallBackActionResult:
     ) -> BattlefieldTransitionBatch:
         if not self.is_valid:
             raise GameLifecycleError("Invalid Fall Back cannot emit transition records.")
+        if self.desperate_escape_requirements and not self.desperate_escape_rolls:
+            raise GameLifecycleError(
+                "Fall Back cannot emit transition records before Desperate Escape rolls are "
+                "resolved."
+            )
         destroyed_ids = _validate_identifier_tuple("destroyed_model_ids", destroyed_model_ids)
         failed_model_ids = tuple(
             roll.requirement.model_instance_id for roll in self.failed_desperate_escape_rolls
@@ -1462,15 +1468,16 @@ class FallBackActionResult:
         self,
         *,
         destroyed_model_ids: tuple[str, ...],
-    ) -> UnitPlacement:
+    ) -> UnitPlacement | None:
         destroyed_ids = set(_validate_identifier_tuple("destroyed_model_ids", destroyed_model_ids))
-        return self.attempted_placement.with_model_placements(
-            tuple(
-                placement
-                for placement in self.attempted_placement.model_placements
-                if placement.model_instance_id not in destroyed_ids
-            )
+        surviving_placements = tuple(
+            placement
+            for placement in self.attempted_placement.model_placements
+            if placement.model_instance_id not in destroyed_ids
         )
+        if not surviving_placements:
+            return None
+        return self.attempted_placement.with_model_placements(surviving_placements)
 
     def selected_payload_drift_code(self, payload: dict[str, JsonValue]) -> str | None:
         selected_payload = _validate_json_object("Fall Back selected payload", payload)
@@ -1646,6 +1653,7 @@ class MovementPhaseHandler:
                 state=state,
                 result=result,
                 decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
         if result.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return _apply_movement_action_decision(
@@ -2027,6 +2035,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             unit_placement=unit_placement,
             fall_back_result=fall_back_result,
             destroyed_model_ids=(),
+            ruleset_descriptor=ruleset_descriptor,
         )
 
 
@@ -2191,6 +2200,7 @@ def _apply_desperate_escape_model_selection_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -2242,6 +2252,7 @@ def _apply_desperate_escape_model_selection_decision(
         unit_placement=unit_placement,
         fall_back_result=fall_back_result,
         destroyed_model_ids=destroyed_model_ids,
+        ruleset_descriptor=ruleset_descriptor,
     )
 
 
@@ -2253,8 +2264,51 @@ def _apply_fall_back_result(
     unit_placement: UnitPlacement,
     fall_back_result: FallBackActionResult,
     destroyed_model_ids: tuple[str, ...],
+    ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
+    scenario = _battlefield_scenario(state)
+    surviving_placement = fall_back_result.surviving_attempted_placement(
+        destroyed_model_ids=destroyed_model_ids,
+    )
+    if surviving_placement is not None:
+        survivor_coherency_result = unit_placement_coherency_result(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=surviving_placement,
+        )
+        if not survivor_coherency_result.is_coherent:
+            violation_code = "unit_coherency_broken"
+            invalid_payload = _movement_action_invalid_payload(
+                state=state,
+                active_player_id=active_player_id,
+                unit_instance_id=unit_placement.unit_instance_id,
+                action=MovementPhaseActionKind.FALL_BACK,
+                result=result,
+                violation_code=violation_code,
+                movement_payload={
+                    **fall_back_result.movement_payload,
+                    "destroyed_model_ids": list(destroyed_model_ids),
+                    "surviving_coherency_result": validate_json_value(
+                        survivor_coherency_result.to_payload()
+                    ),
+                },
+                rollback_record=None,
+            )
+            decisions.event_log.append("movement_action_invalid", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Fall Back surviving endpoint violates unit coherency.",
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "movement_action_invalid",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                    "violation_code": violation_code,
+                },
+            )
     transition_batch = fall_back_result.transition_batch(
         before=unit_placement,
         destroyed_model_ids=destroyed_model_ids,
@@ -2265,14 +2319,15 @@ def _apply_fall_back_result(
     state.battlefield_state = battlefield_state.with_unit_placement(
         fall_back_result.attempted_placement
     ).with_removed_models(destroyed_model_ids)
-    state.record_fell_back_unit_state(
-        FellBackUnitState(
-            player_id=active_player_id,
-            battle_round=state.battle_round,
-            unit_instance_id=unit_placement.unit_instance_id,
-            desperate_escape_rolls=fall_back_result.desperate_escape_rolls,
+    if surviving_placement is not None:
+        state.record_fell_back_unit_state(
+            FellBackUnitState(
+                player_id=active_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_placement.unit_instance_id,
+                desperate_escape_rolls=fall_back_result.desperate_escape_rolls,
+            )
         )
-    )
     _complete_movement_activation(
         state=state,
         decisions=decisions,
@@ -2672,6 +2727,7 @@ def resolve_normal_move(
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
         action_label="Normal Move",
+        rollback_on_endpoint_coherency=True,
     )
     return NormalMoveResolution(
         unit_instance_id=unit_placement.unit_instance_id,
@@ -2713,6 +2769,7 @@ def resolve_advance_move(
         movement_phase_action=MovementPhaseActionKind.ADVANCE,
         displacement_kind=ModelDisplacementKind.ADVANCE,
         action_label="Advance",
+        rollback_on_endpoint_coherency=True,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -2763,6 +2820,7 @@ def resolve_fall_back_move(
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         action_label="Fall Back",
+        rollback_on_endpoint_coherency=False,
     )
     desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
@@ -2807,6 +2865,7 @@ def _resolve_unit_move(
     movement_phase_action: MovementPhaseActionKind,
     displacement_kind: ModelDisplacementKind,
     action_label: str,
+    rollback_on_endpoint_coherency: bool,
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -2912,15 +2971,21 @@ def _resolve_unit_move(
                 }
             )
         )
-    _resolved_placement, coherency_result, rollback_record = (
-        resolve_unit_movement_endpoint_coherency(
+    if rollback_on_endpoint_coherency:
+        _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             before=unit_placement,
             attempted=attempted_placement,
             displacement_kind=displacement_kind,
         )
-    )
+    else:
+        coherency_result = unit_placement_coherency_result(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=attempted_placement,
+        )
+        rollback_record = None
     movement_payload: dict[str, JsonValue] = {
         "movement_inches": max_movement_inches,
         "model_movements": model_movements,

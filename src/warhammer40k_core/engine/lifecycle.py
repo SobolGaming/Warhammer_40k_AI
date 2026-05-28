@@ -343,8 +343,20 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         placement.unit_instance_id for placement in placed_army.unit_placements
     }
+    removed_model_ids = set(state.battlefield_state.removed_model_ids)
+    fully_removed_active_player_unit_ids: set[str] = set()
+    for army_definition in state.army_definitions:
+        if army_definition.player_id != state.active_player_id:
+            continue
+        for unit in army_definition.units:
+            unit_model_ids = {model.model_instance_id for model in unit.own_models}
+            if unit_model_ids and unit_model_ids <= removed_model_ids:
+                fully_removed_active_player_unit_ids.add(unit.unit_instance_id)
     for unit_id in (*movement_state.selected_unit_ids, *movement_state.moved_unit_ids):
-        if unit_id not in active_player_unit_ids:
+        if (
+            unit_id not in active_player_unit_ids
+            and unit_id not in fully_removed_active_player_unit_ids
+        ):
             raise GameLifecycleError(
                 "movement_phase_state selected unit is not active player's unit."
             )
