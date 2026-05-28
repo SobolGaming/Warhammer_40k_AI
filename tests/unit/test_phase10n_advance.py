@@ -261,6 +261,106 @@ def test_advance_reroll_request_appears_only_with_legal_reroll_source() -> None:
     assert advanced.movement_dice_record.advance_roll.roll_state.rerolls
 
 
+def test_advance_roll_resolved_event_uses_final_rerolled_value() -> None:
+    lifecycle, movement_status = _advance_to_movement_unit_selection(_config())
+    _grant_first_unit_advance_reroll(lifecycle)
+    selected_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10n-result-000003",
+    )
+    pending_reroll = _submit_result(
+        lifecycle,
+        request=_decision_request(selected_status),
+        option_id=MovementPhaseActionKind.ADVANCE.value,
+        result_id="phase10n-result-000004",
+    )
+    reroll_request = _decision_request(pending_reroll)
+    reroll_payload = cast(dict[str, object], reroll_request.payload)
+    movement_context = cast(dict[str, object], reroll_payload["movement_context"])
+    initial_roll_state_payload = cast(dict[str, object], movement_context["advance_roll_state"])
+
+    assert _event_payloads(lifecycle, "advance_roll_resolved") == ()
+
+    _submit_result(
+        lifecycle,
+        request=reroll_request,
+        option_id="reroll:0",
+        result_id="phase10n-result-000005",
+    )
+    advanced = _state(lifecycle).advanced_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+    resolved_payloads = _event_payloads(lifecycle, "advance_roll_resolved")
+
+    assert advanced is not None
+    assert len(resolved_payloads) == 1
+    assert resolved_payloads[0]["advance_roll"] == (
+        advanced.movement_dice_record.advance_roll.to_payload()
+    )
+    assert advanced.movement_dice_record.advance_roll.roll_state.rerolls
+    final_advance_roll_payload = cast(dict[str, object], resolved_payloads[0]["advance_roll"])
+    assert final_advance_roll_payload["roll_state"] != initial_roll_state_payload
+    assert _first_event_index(lifecycle, "dice_reroll_resolved") < _first_event_index(
+        lifecycle,
+        "advance_roll_resolved",
+    )
+
+
+def test_advance_roll_resolved_event_after_reroll_decline_matches_original_value() -> None:
+    lifecycle, movement_status = _advance_to_movement_unit_selection(_config())
+    _grant_first_unit_advance_reroll(lifecycle)
+    selected_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10n-result-000003",
+    )
+    pending_reroll = _submit_result(
+        lifecycle,
+        request=_decision_request(selected_status),
+        option_id=MovementPhaseActionKind.ADVANCE.value,
+        result_id="phase10n-result-000004",
+    )
+    reroll_request = _decision_request(pending_reroll)
+    reroll_payload = cast(dict[str, object], reroll_request.payload)
+    movement_context = cast(dict[str, object], reroll_payload["movement_context"])
+    initial_roll_state_payload = cast(dict[str, object], movement_context["advance_roll_state"])
+    original_values = tuple(cast(list[int], reroll_payload["current_values"]))
+
+    assert _event_payloads(lifecycle, "advance_roll_resolved") == ()
+
+    _submit_result(
+        lifecycle,
+        request=reroll_request,
+        option_id="decline",
+        result_id="phase10n-result-000005",
+    )
+    advanced = _state(lifecycle).advanced_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+    resolved_payloads = _event_payloads(lifecycle, "advance_roll_resolved")
+
+    assert advanced is not None
+    assert len(resolved_payloads) == 1
+    assert resolved_payloads[0]["advance_roll"] == (
+        advanced.movement_dice_record.advance_roll.to_payload()
+    )
+    assert advanced.movement_dice_record.advance_roll.roll_state.current_values == original_values
+    assert advanced.movement_dice_record.advance_roll.roll_state.rerolls == ()
+    final_advance_roll_payload = cast(dict[str, object], resolved_payloads[0]["advance_roll"])
+    assert final_advance_roll_payload["roll_state"] == initial_roll_state_payload
+    assert _first_event_index(lifecycle, "dice_reroll_declined") < _first_event_index(
+        lifecycle,
+        "advance_roll_resolved",
+    )
+
+
 def test_advance_reroll_decline_keeps_original_roll() -> None:
     lifecycle, movement_status = _advance_to_movement_unit_selection(_config())
     _grant_first_unit_advance_reroll(lifecycle)
@@ -798,6 +898,22 @@ def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, 
         if event.event_type == event_type:
             assert isinstance(event.payload, dict)
             return cast(dict[str, object], event.payload)
+    raise AssertionError(f"Missing event type: {event_type}")
+
+
+def _event_payloads(lifecycle: GameLifecycle, event_type: str) -> tuple[dict[str, object], ...]:
+    payloads: list[dict[str, object]] = []
+    for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type == event_type:
+            assert isinstance(event.payload, dict)
+            payloads.append(cast(dict[str, object], event.payload))
+    return tuple(payloads)
+
+
+def _first_event_index(lifecycle: GameLifecycle, event_type: str) -> int:
+    for index, event in enumerate(lifecycle.decision_controller.event_log.records):
+        if event.event_type == event_type:
+            return index
     raise AssertionError(f"Missing event type: {event_type}")
 
 

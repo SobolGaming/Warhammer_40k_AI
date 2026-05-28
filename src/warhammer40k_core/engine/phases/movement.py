@@ -1447,6 +1447,11 @@ def _resolve_and_apply_advance_move(
     advance_roll: AdvanceRollResult,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
+    _record_advance_roll_resolved_event(
+        state=state,
+        decisions=decisions,
+        advance_roll=advance_roll,
+    )
     resolution = resolve_advance_move(
         scenario=_battlefield_scenario(state),
         ruleset_descriptor=ruleset_descriptor,
@@ -1664,7 +1669,15 @@ def _roll_advance_dice(
         },
     )
     manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
-    roll_state = manager.roll(request.spec)
+    return manager.roll(request.spec)
+
+
+def _record_advance_roll_resolved_event(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    advance_roll: AdvanceRollResult,
+) -> None:
     decisions.event_log.append(
         "advance_roll_resolved",
         {
@@ -1672,16 +1685,10 @@ def _roll_advance_dice(
             "battle_round": state.battle_round,
             "active_player_id": _active_player_id(state),
             "phase": BattlePhase.MOVEMENT.value,
-            "unit_instance_id": request.unit_instance_id,
-            "advance_roll": validate_json_value(
-                AdvanceRollResult.from_roll_state(
-                    request=request,
-                    roll_state=roll_state,
-                ).to_payload()
-            ),
+            "unit_instance_id": advance_roll.request.unit_instance_id,
+            "advance_roll": validate_json_value(advance_roll.to_payload()),
         },
     )
-    return roll_state
 
 
 def _advance_roll_reroll_request(
