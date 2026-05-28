@@ -19,6 +19,8 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
     TerrainFeatureDefinitionPayload,
 )
+from warhammer40k_core.geometry.volume import Model as GeometryModel
+from warhammer40k_core.geometry.volume import ModelVolume
 
 
 class PlacementError(ValueError):
@@ -960,6 +962,25 @@ class BattlefieldScenario:
             armies=tuple(_army_definition_from_payload(army) for army in payload["armies"]),
             battlefield_state=BattlefieldRuntimeState.from_payload(payload["battlefield_state"]),
         )
+
+
+def geometry_model_for_placement(
+    *,
+    model: ModelInstance,
+    placement: ModelPlacement,
+) -> GeometryModel:
+    if type(model) is not ModelInstance:
+        raise PlacementError("geometry model conversion requires a ModelInstance.")
+    if type(placement) is not ModelPlacement:
+        raise PlacementError("geometry model conversion requires a ModelPlacement.")
+    if model.model_instance_id != placement.model_instance_id:
+        raise PlacementError("geometry model conversion model_instance_id must match placement.")
+    return GeometryModel(
+        model_id=placement.model_instance_id,
+        pose=placement.pose,
+        base=model.geometry.base_shape(),
+        volume=ModelVolume(height=model.geometry.height_inches),
+    )
 
 
 def battlefield_placement_kind_from_token(token: object) -> BattlefieldPlacementKind:

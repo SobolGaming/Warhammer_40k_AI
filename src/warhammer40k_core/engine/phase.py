@@ -33,6 +33,7 @@ class LifecycleStatusKind(StrEnum):
     ADVANCED = "advanced"
     WAITING_FOR_DECISION = "waiting_for_decision"
     TERMINAL = "terminal"
+    INVALID = "invalid"
     UNSUPPORTED = "unsupported"
 
 
@@ -126,6 +127,21 @@ class LifecycleStatus:
         return cls(
             stage=stage,
             status_kind=LifecycleStatusKind.UNSUPPORTED,
+            message=message,
+            payload=payload,
+        )
+
+    @classmethod
+    def invalid(
+        cls,
+        *,
+        stage: GameLifecycleStage,
+        message: str,
+        payload: JsonValue = None,
+    ) -> Self:
+        return cls(
+            stage=stage,
+            status_kind=LifecycleStatusKind.INVALID,
             message=message,
             payload=payload,
         )

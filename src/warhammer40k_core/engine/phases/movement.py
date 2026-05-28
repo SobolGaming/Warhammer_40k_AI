@@ -5,7 +5,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.ruleset_descriptor import MovementMode
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -14,6 +14,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     PlacementError,
     UnitPlacement,
+    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -25,12 +26,11 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.unit_coherency import resolve_unit_movement_endpoint_coherency
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness, PivotCostPolicy
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.geometry.volume import Model as GeometryModel
-from warhammer40k_core.geometry.volume import ModelVolume
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -276,6 +276,17 @@ class MovementPhaseState:
 
 @dataclass(frozen=True, slots=True)
 class MovementPhaseHandler:
+    ruleset_descriptor: RulesetDescriptor | None = None
+
+    def __post_init__(self) -> None:
+        if (
+            self.ruleset_descriptor is not None
+            and type(self.ruleset_descriptor) is not RulesetDescriptor
+        ):
+            raise GameLifecycleError(
+                "MovementPhaseHandler ruleset_descriptor must be a RulesetDescriptor."
+            )
+
     @property
     def phase(self) -> BattlePhase:
         return BattlePhase.MOVEMENT
@@ -294,6 +305,7 @@ class MovementPhaseHandler:
                 state=state,
                 decisions=decisions,
                 active_selection=active_selection,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
 
         scenario = _battlefield_scenario(state)
@@ -355,6 +367,7 @@ class MovementPhaseHandler:
                 state=state,
                 result=result,
                 decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
         if result.decision_type != SELECT_MOVEMENT_UNIT_DECISION_TYPE:
             raise GameLifecycleError("MovementPhaseHandler received an unsupported decision_type.")
@@ -401,6 +414,7 @@ def _request_movement_action(
     state: GameState,
     decisions: DecisionController,
     active_selection: MovementUnitSelection,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
@@ -420,6 +434,7 @@ def _request_movement_action(
         options=_movement_action_options(
             scenario=scenario,
             unit_placement=unit_placement,
+            ruleset_descriptor=ruleset_descriptor,
         ),
     )
     decisions.request_decision(request)
@@ -441,6 +456,7 @@ def _apply_movement_action_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -480,15 +496,55 @@ def _apply_movement_action_decision(
             scenario=scenario,
             unit_placement=unit_placement,
         )
+        resolved_placement, coherency_result, rollback_record = (
+            resolve_unit_movement_endpoint_coherency(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                before=unit_placement,
+                attempted=updated_placement,
+                displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            )
+        )
+        movement_payload["coherency_result"] = validate_json_value(coherency_result.to_payload())
+        if rollback_record is not None:
+            decisions.event_log.append(
+                "movement_action_invalid",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                    "movement_phase_action": action.value,
+                    "request_id": result.request_id,
+                    "result_id": result.result_id,
+                    "phase_body_status": "movement_action_invalid",
+                    "rollback_record": validate_json_value(rollback_record.to_payload()),
+                    **movement_payload,
+                },
+            )
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Normal Move endpoint violates unit coherency.",
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "movement_action_invalid",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                    "movement_phase_action": action.value,
+                    "rollback_record": validate_json_value(rollback_record.to_payload()),
+                },
+            )
         transition_batch = _normal_move_transition_batch(
             before=unit_placement,
-            after=updated_placement,
+            after=resolved_placement,
             witness=witness,
         )
         battlefield_state = state.battlefield_state
         if battlefield_state is None:
             raise GameLifecycleError("Normal Move requires battlefield_state.")
-        state.battlefield_state = battlefield_state.with_unit_placement(updated_placement)
+        state.battlefield_state = battlefield_state.with_unit_placement(resolved_placement)
         _complete_movement_activation(
             state=state,
             decisions=decisions,
@@ -571,11 +627,39 @@ def _movement_action_options(
     *,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> tuple[DecisionOption, ...]:
-    _updated_placement, witness, movement_payload = _normal_move_plan(
+    updated_placement, witness, movement_payload = _normal_move_plan(
         scenario=scenario,
         unit_placement=unit_placement,
     )
+    _resolved_placement, coherency_result, rollback_record = (
+        resolve_unit_movement_endpoint_coherency(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            before=unit_placement,
+            attempted=updated_placement,
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        )
+    )
+    normal_move_options: tuple[DecisionOption, ...] = ()
+    if rollback_record is None:
+        normal_move_options = (
+            DecisionOption(
+                option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+                label="Normal Move",
+                payload=validate_json_value(
+                    {
+                        "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                        "displacement_kind": ModelDisplacementKind.NORMAL_MOVE.value,
+                        "unit_instance_id": unit_placement.unit_instance_id,
+                        "witness": witness.to_payload(),
+                        "coherency_result": coherency_result.to_payload(),
+                        **movement_payload,
+                    }
+                ),
+            ),
+        )
     return (
         DecisionOption(
             option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
@@ -588,19 +672,7 @@ def _movement_action_options(
                 "witness": None,
             },
         ),
-        DecisionOption(
-            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-            label="Normal Move",
-            payload=validate_json_value(
-                {
-                    "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
-                    "displacement_kind": ModelDisplacementKind.NORMAL_MOVE.value,
-                    "unit_instance_id": unit_placement.unit_instance_id,
-                    "witness": witness.to_payload(),
-                    **movement_payload,
-                }
-            ),
-        ),
+        *normal_move_options,
         *(
             DecisionOption(
                 option_id=action.value,
@@ -635,7 +707,7 @@ def _normal_move_plan(
             end_pose=end_pose,
         )
         movement_distance_witness = MovementDistanceWitness.for_model_path(
-            model=_geometry_model_for_placement(model=model, placement=placement),
+            model=geometry_model_for_placement(model=model, placement=placement),
             poses=path,
             pivot_cost_policy=PivotCostPolicy(),
             max_distance_inches=float(movement_inches),
@@ -829,21 +901,12 @@ def _straight_line_path(
     ).poses_for_model(model_instance_id)
 
 
-def _geometry_model_for_placement(
-    *,
-    model: ModelInstance,
-    placement: ModelPlacement,
-) -> GeometryModel:
-    if type(model) is not ModelInstance:
-        raise GameLifecycleError("movement distance witness model must be a ModelInstance.")
-    if type(placement) is not ModelPlacement:
-        raise GameLifecycleError("movement distance witness placement must be a ModelPlacement.")
-    return GeometryModel(
-        model_id=placement.model_instance_id,
-        pose=placement.pose,
-        base=model.geometry.base_shape(),
-        volume=ModelVolume(height=model.geometry.height_inches),
-    )
+def _ruleset_descriptor_for_handler(handler: MovementPhaseHandler) -> RulesetDescriptor:
+    if type(handler) is not MovementPhaseHandler:
+        raise GameLifecycleError("Movement ruleset descriptor requires a MovementPhaseHandler.")
+    if handler.ruleset_descriptor is None:
+        raise GameLifecycleError("Movement phase requires a RulesetDescriptor.")
+    return handler.ruleset_descriptor
 
 
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:

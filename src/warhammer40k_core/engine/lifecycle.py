@@ -39,6 +39,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseHandler,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
+from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 
 class GameLifecyclePayload(TypedDict):
@@ -76,6 +77,9 @@ class GameLifecycle:
         if self.state is not None:
             raise GameLifecycleError("GameLifecycle has already started.")
         self._config = config
+        self._movement_phase_handler = MovementPhaseHandler(
+            ruleset_descriptor=config.ruleset_descriptor
+        )
         self.state = GameState.from_config(config)
         self._battle_round_flow = BattleRoundFlow(phase_handlers=self._phase_handlers())
         current_setup_step = self.state.current_setup_step
@@ -107,6 +111,7 @@ class GameLifecycle:
             if status.status_kind in (
                 LifecycleStatusKind.WAITING_FOR_DECISION,
                 LifecycleStatusKind.TERMINAL,
+                LifecycleStatusKind.INVALID,
                 LifecycleStatusKind.UNSUPPORTED,
             ):
                 return status
@@ -180,10 +185,14 @@ class GameLifecycle:
     @classmethod
     def from_payload(cls, payload: GameLifecyclePayload) -> Self:
         config_payload = payload["config"]
+        config = None if config_payload is None else GameConfig.from_payload(config_payload)
         lifecycle = cls(
             decision_controller=DecisionController.from_payload(payload["decisions"]),
             state=GameState.from_payload(payload["state"]),
-            _config=None if config_payload is None else GameConfig.from_payload(config_payload),
+            _config=config,
+            _movement_phase_handler=MovementPhaseHandler(
+                ruleset_descriptor=None if config is None else config.ruleset_descriptor
+            ),
         )
         _validate_payload_consistency(state=lifecycle._require_state(), config=lifecycle._config)
         lifecycle._battle_round_flow = BattleRoundFlow(phase_handlers=lifecycle._phase_handlers())
@@ -221,7 +230,7 @@ class GameLifecycle:
 
 
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
-    _validate_battlefield_state_consistency(state=state)
+    _validate_battlefield_state_consistency(state=state, config=config)
     _validate_movement_phase_state_consistency(state=state)
     if config is None:
         return
@@ -270,7 +279,11 @@ def _validate_mustered_army_consistency(*, state: GameState, config: GameConfig)
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")
 
 
-def _validate_battlefield_state_consistency(*, state: GameState) -> None:
+def _validate_battlefield_state_consistency(
+    *,
+    state: GameState,
+    config: GameConfig | None,
+) -> None:
     if state.battlefield_state is None:
         if _state_requires_battlefield_state(state):
             raise GameLifecycleError("Lifecycle state is missing battlefield_state.")
@@ -286,6 +299,11 @@ def _validate_battlefield_state_consistency(*, state: GameState) -> None:
         )
         if _state_requires_battlefield_state(state):
             scenario.assert_all_mustered_models_placed()
+        if config is not None:
+            assert_battlefield_units_in_coherency(
+                scenario=scenario,
+                ruleset_descriptor=config.ruleset_descriptor,
+            )
     except PlacementError as exc:
         raise GameLifecycleError("Lifecycle state battlefield_state is invalid.") from exc
 

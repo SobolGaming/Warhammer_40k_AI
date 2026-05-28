@@ -26,6 +26,7 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
 
@@ -64,7 +65,7 @@ class SetupFlow:
         elif current_step is SetupStep.MUSTER_ARMIES:
             self._muster_armies(state=state, decisions=decisions, config=config)
         elif current_step is SetupStep.DEPLOY_ARMIES:
-            self._place_mustered_armies(state=state, decisions=decisions)
+            self._place_mustered_armies(state=state, decisions=decisions, config=config)
 
         completed_step = state.complete_current_setup_step()
         decisions.event_log.append(
@@ -177,6 +178,7 @@ class SetupFlow:
         *,
         state: GameState,
         decisions: DecisionController,
+        config: GameConfig,
     ) -> None:
         if state.battlefield_state is not None:
             return
@@ -185,6 +187,10 @@ class SetupFlow:
         scenario = create_deterministic_battlefield_scenario(
             battlefield_id=f"{state.game_id}:phase10a-battlefield",
             armies=tuple(state.army_definitions),
+        )
+        assert_battlefield_units_in_coherency(
+            scenario=scenario,
+            ruleset_descriptor=config.ruleset_descriptor,
         )
         state.record_battlefield_state(scenario.battlefield_state)
         transition_batch = BattlefieldTransitionBatch(

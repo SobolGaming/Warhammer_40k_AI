@@ -38,6 +38,8 @@ class BattleRoundFlow:
             return status
         if status.status_kind is LifecycleStatusKind.TERMINAL:
             return status
+        if status.status_kind is LifecycleStatusKind.INVALID:
+            return status
         if (
             status.status_kind is LifecycleStatusKind.UNSUPPORTED
             and not _is_placeholder_noop_status(status)
