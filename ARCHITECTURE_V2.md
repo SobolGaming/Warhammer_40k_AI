@@ -369,7 +369,7 @@ Invariants:
 - Normal Move cannot transit enemy model bases unless `FLY` or another explicit capability permits it;
 - Normal Move consumes precise distance, pivot, terrain, pathing, and coherency validators;
 - Normal Move movement-distance witnesses must use a model/rules-aware `PivotCostPolicy` derived from `MovementLegalityContext`, not a default policy;
-- Normal Move cannot end on another model, inside terrain, outside the battlefield, or out of coherency;
+- Normal Move cannot end on another model, embedded in a wall/floor/terrain volume without an explicit legal endpoint, outside the battlefield, or out of coherency;
 - Normal Move emits displacement records only after all validators pass;
 - Advance, Fall Back, Charge, Pile-in, Consolidate, Scout, and triggered movement must consume the same movement-distance and terrain-legality infrastructure instead of implementing independent distance accounting.
 

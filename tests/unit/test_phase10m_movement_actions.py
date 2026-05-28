@@ -37,9 +37,14 @@ from warhammer40k_core.engine.placement import create_deterministic_battlefield_
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
-from warhammer40k_core.geometry.pathing import PathWitness
-from warhammer40k_core.geometry.pose import Point3, Pose
-from warhammer40k_core.geometry.terrain import TerrainVolume
+from warhammer40k_core.geometry.pathing import PathWitness, TerrainEndpointViolationCode
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import (
+    TerrainFeatureDefinition,
+    TerrainFeatureKind,
+    TerrainFloorDefinition,
+    TerrainWallDefinition,
+)
 
 
 def test_action_options_outside_engagement_are_remain_normal_and_advance() -> None:
@@ -133,32 +138,91 @@ def test_normal_move_rejects_path_through_enemy_model_base() -> None:
     )
 
 
-def test_normal_move_rejects_terrain_collision() -> None:
+def test_normal_move_rejects_forbidden_terrain_transit_in_terrain_layer() -> None:
     scenario = _vehicle_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
     witness = _single_model_pivot_witness(unit_placement, movement_inches=8.0)
-    terrain = TerrainVolume(
-        terrain_id="phase10m-wall",
-        bottom_center=Point3(10.0, 6.0, 0.0),
-        width=1.0,
-        depth=1.0,
-        height=3.0,
-    )
+    ruins = _ruins_wall_feature(center_x_inches=10.0, center_y_inches=6.0)
 
     resolution = resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
         unit_placement=unit_placement,
         path_witness=witness,
-        terrain=(terrain,),
+        terrain_features=(ruins,),
     )
 
     assert not resolution.is_valid
-    assert resolution.path_validation_results[0].violations[0].violation_code == (
-        "terrain_collision"
+    assert resolution.path_validation_results[0].is_valid
+    assert not resolution.terrain_path_legality_results[0].is_valid
+    assert (
+        resolution.terrain_path_legality_results[0].violations[0].violation_code
+        == "terrain_feature_transit_forbidden"
     )
     with pytest.raises(GameLifecycleError, match="Invalid Normal Move"):
         resolution.transition_batch(before=unit_placement)
+
+
+def test_infantry_normal_move_can_traverse_ruins_wall() -> None:
+    scenario = _single_model_infantry_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
+    ruins = _ruins_wall_feature(center_x_inches=9.0, center_y_inches=6.0)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        unit_placement=unit_placement,
+        path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(12.0, 6.0)),
+        terrain_features=(ruins,),
+    )
+
+    assert resolution.path_validation_results[0].is_valid
+    assert resolution.terrain_path_legality_results[0].is_valid
+    assert resolution.is_valid
+
+
+def test_vehicle_normal_move_cannot_traverse_ruins_wall() -> None:
+    scenario = _vehicle_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
+    ruins = _ruins_wall_feature(center_x_inches=10.0, center_y_inches=6.0)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        unit_placement=unit_placement,
+        path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(14.0, 6.0)),
+        terrain_features=(ruins,),
+    )
+
+    assert resolution.path_validation_results[0].is_valid
+    assert not resolution.terrain_path_legality_results[0].is_valid
+    assert (
+        resolution.terrain_path_legality_results[0].violations[0].violation_code
+        == "terrain_feature_transit_forbidden"
+    )
+    assert not resolution.is_valid
+
+
+def test_infantry_normal_move_cannot_end_inside_ruins_wall() -> None:
+    scenario = _single_model_infantry_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
+    ruins = _ruins_wall_feature(center_x_inches=9.0, center_y_inches=6.0)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        unit_placement=unit_placement,
+        path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(9.0, 6.0)),
+        terrain_features=(ruins,),
+    )
+
+    assert resolution.path_validation_results[0].is_valid
+    assert not resolution.terrain_path_legality_results[0].is_valid
+    assert (
+        resolution.terrain_path_legality_results[0].violations[0].violation_code
+        == TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value
+    )
+    assert not resolution.is_valid
 
 
 def test_non_round_vehicle_or_monster_normal_move_pays_two_inch_pivot_cost() -> None:
@@ -411,6 +475,13 @@ def _infantry_scenario() -> BattlefieldScenario:
     )
 
 
+def _single_model_infantry_scenario() -> BattlefieldScenario:
+    return _vehicle_scenario_with_active_unit_keywords_and_base(
+        keywords=("INFANTRY",),
+        base_size=BaseSizeDefinition.circular(32.0),
+    )
+
+
 def _vehicle_scenario() -> BattlefieldScenario:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     armies = tuple(
@@ -556,6 +627,59 @@ def _single_model_pivot_witness(
         facing_degrees=start.facing.degrees + 45.0,
     )
     return PathWitness.for_paths(((placement.model_instance_id, (start, midpoint, end)),))
+
+
+def _single_model_witness_to_pose(
+    unit_placement: UnitPlacement,
+    *,
+    end_pose: Pose,
+) -> PathWitness:
+    placement = unit_placement.model_placements[0]
+    start = placement.pose
+    midpoint = Pose.at(
+        (start.position.x + end_pose.position.x) / 2.0,
+        (start.position.y + end_pose.position.y) / 2.0,
+        (start.position.z + end_pose.position.z) / 2.0,
+        facing_degrees=(start.facing.degrees + end_pose.facing.degrees) / 2.0,
+    )
+    return PathWitness.for_paths(((placement.model_instance_id, (start, midpoint, end_pose)),))
+
+
+def _ruins_wall_feature(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+) -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="phase10m-ruins-wall",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=center_x_inches,
+        footprint_center_y_inches=center_y_inches,
+        footprint_width_inches=8.0,
+        footprint_depth_inches=6.0,
+        walls=(
+            TerrainWallDefinition(
+                wall_id="center-wall",
+                center_x_inches=center_x_inches,
+                center_y_inches=center_y_inches,
+                bottom_z_inches=0.0,
+                width_inches=1.0,
+                depth_inches=1.0,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground",
+                center_x_inches=center_x_inches,
+                center_y_inches=center_y_inches,
+                bottom_z_inches=0.0,
+                width_inches=8.0,
+                depth_inches=6.0,
+                thickness_inches=0.12,
+            ),
+        ),
+    )
 
 
 def _vehicle_scenario_with_active_unit_keywords_and_base(

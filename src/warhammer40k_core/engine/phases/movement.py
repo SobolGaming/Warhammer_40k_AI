@@ -867,7 +867,9 @@ def _apply_movement_action_decision(
     )
     return LifecycleStatus.unsupported(
         stage=GameLifecycleStage.BATTLE,
-        message=f"Movement action is not supported in Phase 10C: {action.value}.",
+        message=(
+            f"Movement action is not supported by the current implementation slice: {action.value}."
+        ),
         payload={
             "phase": BattlePhase.MOVEMENT.value,
             "phase_body_status": "movement_action_unsupported",
@@ -1071,7 +1073,7 @@ def _resolve_normal_move(
                 scenario=scenario,
                 player_id=unit_placement.player_id,
             ),
-            terrain=terrain,
+            terrain=(),
             friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
                 scenario=scenario,
                 player_id=unit_placement.player_id,
