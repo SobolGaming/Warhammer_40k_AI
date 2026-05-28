@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import replace
 from typing import cast
 
@@ -223,6 +224,48 @@ def test_infantry_normal_move_cannot_end_inside_ruins_wall() -> None:
         == TerrainEndpointViolationCode.MODEL_CANNOT_BE_PLACED_AT_ENDPOINT.value
     )
     assert not resolution.is_valid
+
+
+def test_infantry_normal_move_can_end_on_upper_ruins_floor_with_vertical_movement() -> None:
+    scenario = _infantry_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    ruins = _multilevel_ruins_feature(
+        center_x_inches=10.0,
+        center_y_inches=6.0,
+        upper_floor_z_inches=3.0,
+    )
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        unit_placement=unit_placement,
+        path_witness=_unit_vertical_witness_to_z(unit_placement, z_inches=3.0),
+        terrain_features=(ruins,),
+    )
+
+    assert resolution.is_valid
+    assert all(result.is_valid for result in resolution.path_validation_results)
+    assert all(result.is_valid for result in resolution.terrain_path_legality_results)
+    for path_result in resolution.path_validation_results:
+        movement_distance_witness = path_result.movement_distance_witness
+        assert movement_distance_witness is not None
+        assert math.isclose(
+            movement_distance_witness.total_distance_inches,
+            3.0,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        assert movement_distance_witness.is_within_budget
+    for terrain_result in resolution.terrain_path_legality_results:
+        upper_floor_segments = tuple(
+            segment
+            for segment in terrain_result.segments
+            if segment.terrain_id == "phase10m-multilevel-ruins:upper"
+        )
+        assert len(upper_floor_segments) == 1
+        assert upper_floor_segments[0].traversal_mode.value == "freely_traversable"
 
 
 def test_non_round_vehicle_or_monster_normal_move_pays_two_inch_pivot_cost() -> None:
@@ -645,6 +688,30 @@ def _single_model_witness_to_pose(
     return PathWitness.for_paths(((placement.model_instance_id, (start, midpoint, end_pose)),))
 
 
+def _unit_vertical_witness_to_z(
+    unit_placement: UnitPlacement,
+    *,
+    z_inches: float,
+) -> PathWitness:
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement in unit_placement.model_placements:
+        start = placement.pose
+        midpoint = Pose.at(
+            start.position.x,
+            start.position.y,
+            z_inches / 2.0,
+            facing_degrees=start.facing.degrees,
+        )
+        end = Pose.at(
+            start.position.x,
+            start.position.y,
+            z_inches,
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
 def _ruins_wall_feature(
     *,
     center_x_inches: float,
@@ -675,6 +742,53 @@ def _ruins_wall_feature(
                 center_y_inches=center_y_inches,
                 bottom_z_inches=0.0,
                 width_inches=8.0,
+                depth_inches=6.0,
+                thickness_inches=0.12,
+            ),
+        ),
+    )
+
+
+def _multilevel_ruins_feature(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    upper_floor_z_inches: float,
+) -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="phase10m-multilevel-ruins",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=center_x_inches,
+        footprint_center_y_inches=center_y_inches,
+        footprint_width_inches=12.0,
+        footprint_depth_inches=6.0,
+        walls=(
+            TerrainWallDefinition(
+                wall_id="north-wall",
+                center_x_inches=center_x_inches,
+                center_y_inches=center_y_inches + 2.5,
+                bottom_z_inches=0.0,
+                width_inches=12.0,
+                depth_inches=0.12,
+                height_inches=upper_floor_z_inches,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground",
+                center_x_inches=center_x_inches,
+                center_y_inches=center_y_inches,
+                bottom_z_inches=0.0,
+                width_inches=12.0,
+                depth_inches=6.0,
+                thickness_inches=0.12,
+            ),
+            TerrainFloorDefinition(
+                floor_id="upper",
+                center_x_inches=center_x_inches,
+                center_y_inches=center_y_inches,
+                bottom_z_inches=upper_floor_z_inches,
+                width_inches=12.0,
                 depth_inches=6.0,
                 thickness_inches=0.12,
             ),
