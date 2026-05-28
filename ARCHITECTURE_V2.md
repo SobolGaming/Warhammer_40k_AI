@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10N** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10O unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10O** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10P unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -58,6 +58,7 @@ Completed / implemented foundation:
 | 10L | Complete | Unit coherency runtime validation and movement rollback |
 | 10M | Complete | Engagement-aware Movement action options and Normal Move finalization |
 | 10N | Complete | Advance action, dice, rerolls, and advanced-state restrictions |
+| 10O | Complete | Fall Back action and Desperate Escape resolution |
 
 ## Cross-cutting architectural rules
 
@@ -438,6 +439,8 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/utility/dice.py`
 
 ## Phase 10O: Fall Back action and Desperate Escape resolution
+
+Status: Complete.
 
 Modules:
 

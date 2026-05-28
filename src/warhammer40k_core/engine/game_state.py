@@ -36,6 +36,8 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
     AdvancedUnitStatePayload,
+    FellBackUnitState,
+    FellBackUnitStatePayload,
     MovementPhaseState,
     MovementPhaseStatePayload,
 )
@@ -89,6 +91,8 @@ class GameStatePayload(TypedDict):
     battlefield_state: BattlefieldRuntimeStatePayload | None
     movement_phase_state: MovementPhaseStatePayload | None
     advanced_unit_states: list[AdvancedUnitStatePayload]
+    fell_back_unit_states: list[FellBackUnitStatePayload]
+    battle_shocked_unit_ids: list[str]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
 
@@ -102,6 +106,14 @@ def _new_tactical_secondary_draws() -> list[TacticalSecondaryDraw]:
 
 
 def _new_advanced_unit_states() -> list[AdvancedUnitState]:
+    return []
+
+
+def _new_fell_back_unit_states() -> list[FellBackUnitState]:
+    return []
+
+
+def _new_battle_shocked_unit_ids() -> list[str]:
     return []
 
 
@@ -336,6 +348,10 @@ class GameState:
     battlefield_state: BattlefieldRuntimeState | None = None
     movement_phase_state: MovementPhaseState | None = None
     advanced_unit_states: list[AdvancedUnitState] = field(default_factory=_new_advanced_unit_states)
+    fell_back_unit_states: list[FellBackUnitState] = field(
+        default_factory=_new_fell_back_unit_states
+    )
+    battle_shocked_unit_ids: list[str] = field(default_factory=_new_battle_shocked_unit_ids)
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
@@ -397,6 +413,18 @@ class GameState:
         self.advanced_unit_states = _validate_advanced_unit_states(
             self.advanced_unit_states,
             player_ids=self.player_ids,
+        )
+        self.fell_back_unit_states = _validate_fell_back_unit_states(
+            self.fell_back_unit_states,
+            player_ids=self.player_ids,
+        )
+        self.battle_shocked_unit_ids = list(
+            _validate_identifier_tuple(
+                "GameState battle_shocked_unit_ids",
+                tuple(self.battle_shocked_unit_ids),
+                min_length=0,
+                sort_values=True,
+            )
         )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
@@ -597,6 +625,48 @@ class GameState:
                 return state
         return None
 
+    def record_fell_back_unit_state(self, state: FellBackUnitState) -> None:
+        if type(state) is not FellBackUnitState:
+            raise GameLifecycleError("Fell Back unit state must be a FellBackUnitState.")
+        if state.player_id not in self.player_ids:
+            raise GameLifecycleError("FellBackUnitState player_id is not in this game.")
+        if (
+            self.fell_back_unit_state_for_unit(
+                player_id=state.player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=state.unit_instance_id,
+            )
+            is not None
+        ):
+            raise GameLifecycleError("FellBackUnitState already exists for unit and turn.")
+        self.fell_back_unit_states.append(state)
+        self.fell_back_unit_states.sort(
+            key=lambda stored: (
+                stored.battle_round,
+                stored.player_id,
+                stored.unit_instance_id,
+            )
+        )
+
+    def fell_back_unit_state_for_unit(
+        self,
+        *,
+        player_id: str,
+        battle_round: int,
+        unit_instance_id: str,
+    ) -> FellBackUnitState | None:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        for state in self.fell_back_unit_states:
+            if (
+                state.player_id == requested_player_id
+                and state.battle_round == requested_round
+                and state.unit_instance_id == requested_unit_id
+            ):
+                return state
+        return None
+
     def to_payload(self) -> GameStatePayload:
         return {
             "game_id": self.game_id,
@@ -622,6 +692,8 @@ class GameState:
                 else self.movement_phase_state.to_payload()
             ),
             "advanced_unit_states": [state.to_payload() for state in self.advanced_unit_states],
+            "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
+            "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
@@ -687,6 +759,10 @@ class GameState:
             advanced_unit_states=[
                 AdvancedUnitState.from_payload(state) for state in payload["advanced_unit_states"]
             ],
+            fell_back_unit_states=[
+                FellBackUnitState.from_payload(state) for state in payload["fell_back_unit_states"]
+            ],
+            battle_shocked_unit_ids=list(payload["battle_shocked_unit_ids"]),
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -713,6 +789,13 @@ class GameState:
         self.advanced_unit_states = [
             state
             for state in self.advanced_unit_states
+            if not (
+                state.player_id == requested_player_id and state.battle_round == requested_round
+            )
+        ]
+        self.fell_back_unit_states = [
+            state
+            for state in self.fell_back_unit_states
             if not (
                 state.player_id == requested_player_id and state.battle_round == requested_round
             )
@@ -866,6 +949,33 @@ def _validate_advanced_unit_states(
         key = (value.battle_round, value.player_id, value.unit_instance_id)
         if key in seen:
             raise GameLifecycleError("GameState advanced_unit_states must be unique.")
+        seen.add(key)
+        validated.append(value)
+    return sorted(
+        validated,
+        key=lambda state: (state.battle_round, state.player_id, state.unit_instance_id),
+    )
+
+
+def _validate_fell_back_unit_states(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[FellBackUnitState]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState fell_back_unit_states must be a list.")
+    validated: list[FellBackUnitState] = []
+    seen: set[tuple[int, str, str]] = set()
+    for value in cast(list[object], values):
+        if type(value) is not FellBackUnitState:
+            raise GameLifecycleError(
+                "GameState fell_back_unit_states must contain FellBackUnitState values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("FellBackUnitState player_id is not in this game.")
+        key = (value.battle_round, value.player_id, value.unit_instance_id)
+        if key in seen:
+            raise GameLifecycleError("GameState fell_back_unit_states must be unique.")
         seen.add(key)
         validated.append(value)
     return sorted(
