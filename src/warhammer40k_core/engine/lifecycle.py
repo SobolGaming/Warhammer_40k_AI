@@ -35,11 +35,14 @@ from warhammer40k_core.engine.phases.command import (
     CommandPhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
+    PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     MovementPhaseHandler,
 )
+from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
@@ -56,6 +59,8 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
         SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+        SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
+        PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
 )
@@ -234,6 +239,7 @@ class GameLifecycle:
 
 
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
+    _validate_reserve_state_consistency(state=state)
     _validate_battlefield_state_consistency(state=state, config=config)
     _validate_movement_phase_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
@@ -304,7 +310,9 @@ def _validate_battlefield_state_consistency(
             battlefield_state=state.battlefield_state,
         )
         if _state_requires_battlefield_state(state):
-            scenario.assert_all_mustered_models_placed()
+            scenario.assert_all_mustered_models_placed_or_accounted(
+                state.unarrived_reserve_model_ids()
+            )
         if config is not None:
             assert_battlefield_units_in_coherency(
                 scenario=scenario,
@@ -312,6 +320,65 @@ def _validate_battlefield_state_consistency(
             )
     except PlacementError as exc:
         raise GameLifecycleError("Lifecycle state battlefield_state is invalid.") from exc
+
+
+def _validate_reserve_state_consistency(*, state: GameState) -> None:
+    if not state.reserve_states:
+        return
+    unit_owner_by_id = {
+        unit.unit_instance_id: army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    model_ids_by_unit_id = {
+        unit.unit_instance_id: tuple(model.model_instance_id for model in unit.own_models)
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    for reserve_state in state.reserve_states:
+        owner = unit_owner_by_id.get(reserve_state.unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("reserve_states unit is unknown.")
+        if owner != reserve_state.player_id:
+            raise GameLifecycleError("reserve_states player_id does not match unit owner.")
+        for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
+            embarked_owner = unit_owner_by_id.get(embarked_unit_id)
+            if embarked_owner is None:
+                raise GameLifecycleError("reserve_states embarked unit is unknown.")
+            if embarked_owner != reserve_state.player_id:
+                raise GameLifecycleError("reserve_states embarked unit owner drift.")
+
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        return
+    placed_model_ids = set(battlefield_state.placed_model_ids())
+    removed_model_ids = set(battlefield_state.removed_model_ids)
+    for reserve_state in state.reserve_states:
+        reserve_model_ids = set(model_ids_by_unit_id[reserve_state.unit_instance_id])
+        embarked_model_ids = {
+            model_id
+            for embarked_unit_id in reserve_state.embarked_unit_instance_ids
+            for model_id in model_ids_by_unit_id[embarked_unit_id]
+        }
+        if reserve_state.status is ReserveStatus.IN_RESERVES:
+            if (reserve_model_ids | embarked_model_ids) & placed_model_ids:
+                raise GameLifecycleError("unarrived reserve models must not be placed.")
+            if (reserve_model_ids | embarked_model_ids) & removed_model_ids:
+                raise GameLifecycleError("unarrived reserve models must not be removed.")
+        if reserve_state.status is ReserveStatus.ARRIVED:
+            if reserve_state.embarked_unit_instance_ids:
+                raise GameLifecycleError(
+                    "arrived reserve with embarked cargo is unsupported before cargo state."
+                )
+            if not reserve_model_ids <= placed_model_ids:
+                raise GameLifecycleError("arrived reserve unit models must be placed.")
+            if reserve_model_ids & removed_model_ids:
+                raise GameLifecycleError("arrived reserve unit models must not be removed.")
+        if (
+            reserve_state.status is ReserveStatus.DESTROYED
+            and not (reserve_model_ids | embarked_model_ids) <= removed_model_ids
+        ):
+            raise GameLifecycleError("destroyed reserve models must be removed.")
 
 
 def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
@@ -335,14 +402,17 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
             armies=tuple(state.army_definitions),
             battlefield_state=state.battlefield_state,
         )
-        scenario.assert_all_mustered_models_placed()
-        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
+        scenario.assert_all_mustered_models_placed_or_accounted(state.unarrived_reserve_model_ids())
     except PlacementError as exc:
         raise GameLifecycleError("Lifecycle state movement_phase_state is invalid.") from exc
 
-    active_player_unit_ids = {
-        placement.unit_instance_id for placement in placed_army.unit_placements
-    }
+    try:
+        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
+        active_player_unit_ids: set[str] = {
+            placement.unit_instance_id for placement in placed_army.unit_placements
+        }
+    except PlacementError:
+        active_player_unit_ids = set()
     removed_model_ids = set(state.battlefield_state.removed_model_ids)
     fully_removed_active_player_unit_ids: set[str] = set()
     for army_definition in state.army_definitions:

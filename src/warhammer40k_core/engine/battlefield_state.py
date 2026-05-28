@@ -888,6 +888,85 @@ class BattlefieldRuntimeState:
             removed_model_ids=self.removed_model_ids,
         )
 
+    def with_added_unit_placement(self, added_unit_placement: UnitPlacement) -> Self:
+        if type(added_unit_placement) is not UnitPlacement:
+            raise PlacementError("added_unit_placement must be a UnitPlacement.")
+        if added_unit_placement.unit_instance_id in {
+            unit_placement.unit_instance_id
+            for placed_army in self.placed_armies
+            for unit_placement in placed_army.unit_placements
+        }:
+            raise PlacementError("BattlefieldRuntimeState added unit is already placed.")
+        added_model_ids = {
+            placement.model_instance_id for placement in added_unit_placement.model_placements
+        }
+        if added_model_ids & set(self.placed_model_ids()):
+            raise PlacementError("BattlefieldRuntimeState added model is already placed.")
+        if added_model_ids & set(self.removed_model_ids):
+            raise PlacementError("BattlefieldRuntimeState added model is already removed.")
+
+        placed_armies: list[PlacedArmy] = []
+        did_add = False
+        for placed_army in self.placed_armies:
+            if placed_army.army_id != added_unit_placement.army_id:
+                placed_armies.append(placed_army)
+                continue
+            placed_armies.append(
+                PlacedArmy(
+                    army_id=placed_army.army_id,
+                    player_id=placed_army.player_id,
+                    unit_placements=(*placed_army.unit_placements, added_unit_placement),
+                )
+            )
+            did_add = True
+        if not did_add:
+            placed_armies.append(
+                PlacedArmy(
+                    army_id=added_unit_placement.army_id,
+                    player_id=added_unit_placement.player_id,
+                    unit_placements=(added_unit_placement,),
+                )
+            )
+        return type(self)(
+            battlefield_id=self.battlefield_id,
+            placed_armies=tuple(placed_armies),
+            removed_model_ids=self.removed_model_ids,
+        )
+
+    def without_unit_placement(self, unit_instance_id: str) -> Self:
+        requested_unit_id = _validate_unprefixed_identifier(
+            "unit_instance_id",
+            unit_instance_id,
+            "unit:",
+        )
+        placed_armies: list[PlacedArmy] = []
+        did_remove = False
+        for placed_army in self.placed_armies:
+            surviving_unit_placements = tuple(
+                unit_placement
+                for unit_placement in placed_army.unit_placements
+                if unit_placement.unit_instance_id != requested_unit_id
+            )
+            if len(surviving_unit_placements) == len(placed_army.unit_placements):
+                placed_armies.append(placed_army)
+                continue
+            did_remove = True
+            if surviving_unit_placements:
+                placed_armies.append(
+                    PlacedArmy(
+                        army_id=placed_army.army_id,
+                        player_id=placed_army.player_id,
+                        unit_placements=surviving_unit_placements,
+                    )
+                )
+        if not did_remove:
+            raise PlacementError("BattlefieldRuntimeState removed unit is not placed.")
+        return type(self)(
+            battlefield_id=self.battlefield_id,
+            placed_armies=tuple(placed_armies),
+            removed_model_ids=self.removed_model_ids,
+        )
+
     def with_removed_models(self, model_instance_ids: tuple[str, ...]) -> Self:
         removed_model_ids = _validate_identifier_tuple(
             "model_instance_ids",
@@ -927,6 +1006,26 @@ class BattlefieldRuntimeState:
         return type(self)(
             battlefield_id=self.battlefield_id,
             placed_armies=tuple(placed_armies),
+            removed_model_ids=tuple(sorted((*self.removed_model_ids, *removed_model_ids))),
+        )
+
+    def with_unplaced_models_marked_removed(self, model_instance_ids: tuple[str, ...]) -> Self:
+        removed_model_ids = _validate_identifier_tuple(
+            "model_instance_ids",
+            model_instance_ids,
+        )
+        if not removed_model_ids:
+            return self
+        placed_model_ids = set(self.placed_model_ids())
+        current_removed_model_ids = set(self.removed_model_ids)
+        for model_id in removed_model_ids:
+            if model_id in placed_model_ids:
+                raise PlacementError("BattlefieldRuntimeState removed model is still placed.")
+            if model_id in current_removed_model_ids:
+                raise PlacementError("BattlefieldRuntimeState model is already removed.")
+        return type(self)(
+            battlefield_id=self.battlefield_id,
+            placed_armies=self.placed_armies,
             removed_model_ids=tuple(sorted((*self.removed_model_ids, *removed_model_ids))),
         )
 
@@ -1009,6 +1108,41 @@ class BattlefieldScenario:
         if unplaced_model_ids:
             raise PlacementError(
                 f"BattlefieldScenario has unplaced model IDs: {', '.join(unplaced_model_ids)}"
+            )
+
+    def assert_all_mustered_models_placed_or_accounted(
+        self,
+        accounted_unplaced_model_ids: tuple[str, ...],
+    ) -> None:
+        accounted_ids = set(
+            _validate_identifier_tuple(
+                "accounted_unplaced_model_ids",
+                accounted_unplaced_model_ids,
+            )
+        )
+        known_model_ids = {
+            model.model_instance_id
+            for army in self.armies
+            for unit in army.units
+            for model in unit.own_models
+        }
+        unknown_ids = accounted_ids - known_model_ids
+        if unknown_ids:
+            raise PlacementError(
+                "BattlefieldScenario accounted model IDs are unknown: "
+                f"{', '.join(sorted(unknown_ids))}"
+            )
+        unplaced_ids = set(self.unplaced_model_ids())
+        already_resolved_ids = accounted_ids - unplaced_ids
+        if already_resolved_ids:
+            raise PlacementError(
+                "BattlefieldScenario accounted model IDs are not unplaced: "
+                f"{', '.join(sorted(already_resolved_ids))}"
+            )
+        unaccounted_ids = unplaced_ids - accounted_ids
+        if unaccounted_ids:
+            raise PlacementError(
+                f"BattlefieldScenario has unplaced model IDs: {', '.join(sorted(unaccounted_ids))}"
             )
 
     def to_payload(self) -> BattlefieldScenarioPayload:

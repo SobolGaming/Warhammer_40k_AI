@@ -83,6 +83,11 @@ class MissionDeploymentZoneSource(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
+class ReserveDestructionTimingKind(StrEnum):
+    END_OF_BATTLE = "end_of_battle"
+    END_OF_BATTLE_ROUND_N = "end_of_battle_round_n"
+
+
 class CoherencyPolicyKind(StrEnum):
     NEIGHBOR_COUNT = "neighbor_count"
     ALL_MODELS_WITHIN_DISTANCE = "all_models_within_distance"
@@ -195,6 +200,12 @@ class MissionPolicyDescriptorPayload(TypedDict):
     fixed_objective_missions_supported: bool
     terrain_objective_missions_supported: bool
     deployment_zone_source: str
+    reserves_arrival_blocked_battle_rounds: list[int]
+    reserves_arrival_excludes_during_battle_strategic_reserves: bool
+    reserve_destruction_timing: str
+    reserve_destruction_battle_round: int | None
+    reserve_destruction_excludes_during_battle_strategic_reserves: bool
+    reserve_destruction_only_declare_battle_formations: bool
 
 
 class SetupSequenceDescriptorPayload(TypedDict):
@@ -1029,6 +1040,14 @@ class MissionPolicyDescriptor:
     fixed_objective_missions_supported: bool
     terrain_objective_missions_supported: bool
     deployment_zone_source: MissionDeploymentZoneSource
+    reserves_arrival_blocked_battle_rounds: tuple[int, ...] = ()
+    reserves_arrival_excludes_during_battle_strategic_reserves: bool = False
+    reserve_destruction_timing: ReserveDestructionTimingKind = (
+        ReserveDestructionTimingKind.END_OF_BATTLE
+    )
+    reserve_destruction_battle_round: int | None = None
+    reserve_destruction_excludes_during_battle_strategic_reserves: bool = False
+    reserve_destruction_only_declare_battle_formations: bool = False
 
     def __post_init__(self) -> None:
         _validate_bool(
@@ -1044,12 +1063,98 @@ class MissionPolicyDescriptor:
             "deployment_zone_source",
             mission_deployment_zone_source_from_token(self.deployment_zone_source),
         )
+        object.__setattr__(
+            self,
+            "reserves_arrival_blocked_battle_rounds",
+            _validate_positive_int_tuple(
+                "MissionPolicyDescriptor reserves_arrival_blocked_battle_rounds",
+                self.reserves_arrival_blocked_battle_rounds,
+            ),
+        )
+        _validate_bool(
+            "MissionPolicyDescriptor reserves_arrival_excludes_during_battle_strategic_reserves",
+            self.reserves_arrival_excludes_during_battle_strategic_reserves,
+        )
+        timing = reserve_destruction_timing_kind_from_token(self.reserve_destruction_timing)
+        object.__setattr__(self, "reserve_destruction_timing", timing)
+        object.__setattr__(
+            self,
+            "reserve_destruction_battle_round",
+            _validate_optional_positive_int(
+                "MissionPolicyDescriptor reserve_destruction_battle_round",
+                self.reserve_destruction_battle_round,
+            ),
+        )
+        _validate_bool(
+            "MissionPolicyDescriptor reserve_destruction_excludes_during_battle_strategic_reserves",
+            self.reserve_destruction_excludes_during_battle_strategic_reserves,
+        )
+        _validate_bool(
+            "MissionPolicyDescriptor reserve_destruction_only_declare_battle_formations",
+            self.reserve_destruction_only_declare_battle_formations,
+        )
+        if (
+            timing is ReserveDestructionTimingKind.END_OF_BATTLE
+            and self.reserve_destruction_battle_round is not None
+        ):
+            raise RulesetDescriptorError(
+                "END_OF_BATTLE reserve destruction must not set a battle round."
+            )
+        if (
+            timing is ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N
+            and self.reserve_destruction_battle_round is None
+        ):
+            raise RulesetDescriptorError(
+                "END_OF_BATTLE_ROUND_N reserve destruction requires a battle round."
+            )
+
+    @classmethod
+    def core_rules_default(cls) -> Self:
+        return cls(
+            fixed_objective_missions_supported=True,
+            terrain_objective_missions_supported=False,
+            deployment_zone_source=MissionDeploymentZoneSource.MISSION,
+            reserves_arrival_blocked_battle_rounds=(),
+            reserves_arrival_excludes_during_battle_strategic_reserves=False,
+            reserve_destruction_timing=ReserveDestructionTimingKind.END_OF_BATTLE,
+            reserve_destruction_battle_round=None,
+            reserve_destruction_excludes_during_battle_strategic_reserves=False,
+            reserve_destruction_only_declare_battle_formations=False,
+        )
+
+    @classmethod
+    def chapter_approved_2025_26(cls) -> Self:
+        return cls(
+            fixed_objective_missions_supported=True,
+            terrain_objective_missions_supported=True,
+            deployment_zone_source=MissionDeploymentZoneSource.MISSION,
+            reserves_arrival_blocked_battle_rounds=(1,),
+            reserves_arrival_excludes_during_battle_strategic_reserves=True,
+            reserve_destruction_timing=ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N,
+            reserve_destruction_battle_round=3,
+            reserve_destruction_excludes_during_battle_strategic_reserves=True,
+            reserve_destruction_only_declare_battle_formations=True,
+        )
 
     def to_payload(self) -> MissionPolicyDescriptorPayload:
         return {
             "fixed_objective_missions_supported": self.fixed_objective_missions_supported,
             "terrain_objective_missions_supported": self.terrain_objective_missions_supported,
             "deployment_zone_source": self.deployment_zone_source.value,
+            "reserves_arrival_blocked_battle_rounds": list(
+                self.reserves_arrival_blocked_battle_rounds
+            ),
+            "reserves_arrival_excludes_during_battle_strategic_reserves": (
+                self.reserves_arrival_excludes_during_battle_strategic_reserves
+            ),
+            "reserve_destruction_timing": self.reserve_destruction_timing.value,
+            "reserve_destruction_battle_round": self.reserve_destruction_battle_round,
+            "reserve_destruction_excludes_during_battle_strategic_reserves": (
+                self.reserve_destruction_excludes_during_battle_strategic_reserves
+            ),
+            "reserve_destruction_only_declare_battle_formations": (
+                self.reserve_destruction_only_declare_battle_formations
+            ),
         }
 
     @classmethod
@@ -1060,6 +1165,22 @@ class MissionPolicyDescriptor:
             deployment_zone_source=mission_deployment_zone_source_from_token(
                 payload["deployment_zone_source"]
             ),
+            reserves_arrival_blocked_battle_rounds=tuple(
+                payload["reserves_arrival_blocked_battle_rounds"]
+            ),
+            reserves_arrival_excludes_during_battle_strategic_reserves=payload[
+                "reserves_arrival_excludes_during_battle_strategic_reserves"
+            ],
+            reserve_destruction_timing=reserve_destruction_timing_kind_from_token(
+                payload["reserve_destruction_timing"]
+            ),
+            reserve_destruction_battle_round=payload["reserve_destruction_battle_round"],
+            reserve_destruction_excludes_during_battle_strategic_reserves=payload[
+                "reserve_destruction_excludes_during_battle_strategic_reserves"
+            ],
+            reserve_destruction_only_declare_battle_formations=payload[
+                "reserve_destruction_only_declare_battle_formations"
+            ],
         )
 
 
@@ -1203,13 +1324,36 @@ class RulesetDescriptor:
                 may_move_through_models=True,
                 may_move_through_terrain=False,
             ),
-            mission_policy=MissionPolicyDescriptor(
-                fixed_objective_missions_supported=True,
-                terrain_objective_missions_supported=False,
-                deployment_zone_source=MissionDeploymentZoneSource.MISSION,
-            ),
+            mission_policy=MissionPolicyDescriptor.core_rules_default(),
             setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
             battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
+        )
+
+    @classmethod
+    def warhammer_40000_tenth_chapter_approved_2025_26(
+        cls,
+        source_date: str | date = "2025-06-01",
+        descriptor_version: str = "core-v2-phase10p-ca2025-26",
+    ) -> Self:
+        core = cls.warhammer_40000_tenth(
+            source_date=source_date,
+            descriptor_version=descriptor_version,
+        )
+        return cls(
+            ruleset_id=core.ruleset_id,
+            source_date=core.source_date,
+            descriptor_version=core.descriptor_version,
+            engagement_policy=core.engagement_policy,
+            movement_policy=core.movement_policy,
+            charge_policy=core.charge_policy,
+            terrain_movement_policy=core.terrain_movement_policy,
+            terrain_visibility_policy=core.terrain_visibility_policy,
+            objective_policy=core.objective_policy,
+            coherency_policy=core.coherency_policy,
+            fly_policy=core.fly_policy,
+            mission_policy=MissionPolicyDescriptor.chapter_approved_2025_26(),
+            setup_sequence=core.setup_sequence,
+            battle_phase_sequence=core.battle_phase_sequence,
         )
 
     @classmethod
@@ -1269,6 +1413,12 @@ class RulesetDescriptor:
                 fixed_objective_missions_supported=True,
                 terrain_objective_missions_supported=True,
                 deployment_zone_source=MissionDeploymentZoneSource.MISSION,
+                reserves_arrival_blocked_battle_rounds=(),
+                reserves_arrival_excludes_during_battle_strategic_reserves=False,
+                reserve_destruction_timing=ReserveDestructionTimingKind.END_OF_BATTLE,
+                reserve_destruction_battle_round=None,
+                reserve_destruction_excludes_during_battle_strategic_reserves=False,
+                reserve_destruction_only_declare_battle_formations=False,
             ),
             setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
             battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
@@ -1433,6 +1583,19 @@ def mission_deployment_zone_source_from_token(token: object) -> MissionDeploymen
     except ValueError as exc:
         raise RulesetDescriptorError(
             f"Unsupported MissionDeploymentZoneSource token: {token}."
+        ) from exc
+
+
+def reserve_destruction_timing_kind_from_token(token: object) -> ReserveDestructionTimingKind:
+    if type(token) is ReserveDestructionTimingKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("ReserveDestructionTimingKind token must be a string.")
+    try:
+        return ReserveDestructionTimingKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(
+            f"Unsupported ReserveDestructionTimingKind token: {token}."
         ) from exc
 
 
@@ -1905,6 +2068,21 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise RulesetDescriptorError(f"{field_name} must be at least 1.")
     return value
+
+
+def _validate_positive_int_tuple(field_name: str, values: object) -> tuple[int, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(f"{field_name} must be a tuple.")
+    validated = tuple(
+        _validate_positive_int(f"{field_name} value", value)
+        for value in cast(tuple[object, ...], values)
+    )
+    seen: set[int] = set()
+    for value in validated:
+        if value in seen:
+            raise RulesetDescriptorError(f"{field_name} must not contain duplicates.")
+        seen.add(value)
+    return tuple(sorted(validated))
 
 
 def _validate_optional_positive_int(field_name: str, value: object | None) -> int | None:
