@@ -206,6 +206,14 @@ class DistanceMeasurementContext:
             self.target_pose,
         )
 
+    def contact_plane_footprints_overlap(self) -> bool:
+        return self.footprints_overlap() and math.isclose(
+            self.target_pose.position.z,
+            self.source_pose.position.z,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+
     def target_wholly_within_distance(
         self,
         distance_inches: float,
@@ -452,7 +460,7 @@ def objective_marker_endpoint_is_clear(
         model=model,
         marker_diameter_inches=marker_diameter_inches,
     )
-    return not context.footprints_overlap()
+    return not context.contact_plane_footprints_overlap()
 
 
 def millimeters_to_inches(value_mm: object) -> float:

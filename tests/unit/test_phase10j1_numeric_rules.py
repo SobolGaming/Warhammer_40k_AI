@@ -122,6 +122,21 @@ def test_objective_marker_range_and_endpoint_overlap_use_core_dimensions() -> No
     assert objective_marker_endpoint_is_clear(marker_pose, clear_endpoint)
 
 
+def test_elevated_model_can_control_objective_without_ending_on_marker() -> None:
+    marker_pose = Pose.at(0.0, 0.0)
+    elevated = _model("elevated", 0.0, 0.0, z=5.0)
+
+    assert objective_marker_controls_model(marker_pose, elevated)
+    assert objective_marker_endpoint_is_clear(marker_pose, elevated)
+
+
+def test_same_level_model_cannot_end_on_objective_marker() -> None:
+    marker_pose = Pose.at(0.0, 0.0)
+    overlapping = _model("overlap", 0.0, 0.0, z=0.0)
+
+    assert not objective_marker_endpoint_is_clear(marker_pose, overlapping)
+
+
 @pytest.mark.parametrize(
     ("characteristic", "raw", "operand", "expected"),
     [
