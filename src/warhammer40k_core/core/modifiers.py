@@ -67,6 +67,14 @@ class ModifierStackPayload(TypedDict):
     modifiers: list[ModifierPayload]
 
 
+class RollModifierPayload(TypedDict):
+    modifier_id: str
+    source_id: str | None
+    operation: str
+    operand: int
+    priority: int
+
+
 _MODIFIER_TIMING_ORDER = {
     ModifierTiming.BASE: 0,
     ModifierTiming.MULTIPLICATIVE: 1,
@@ -81,6 +89,13 @@ _OPERATION_TIMINGS = {
     ModifierOperation.FLOOR: frozenset({ModifierTiming.FINAL}),
     ModifierOperation.CEILING: frozenset({ModifierTiming.FINAL}),
 }
+
+
+class RollModifierOperation(StrEnum):
+    ADD = "add"
+    SET = "set"
+    FLOOR = "floor"
+    CEILING = "ceiling"
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,6 +187,64 @@ class ModifierScope:
             )
         )
         return cls(characteristics=characteristics, target_ids=target_ids)
+
+
+@dataclass(frozen=True, slots=True)
+class RollModifier:
+    modifier_id: str
+    operand: int
+    source_id: str | None = None
+    operation: RollModifierOperation = RollModifierOperation.ADD
+    priority: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "modifier_id",
+            _validate_identifier("RollModifier modifier_id", self.modifier_id),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_optional_identifier("RollModifier source_id", self.source_id),
+        )
+        object.__setattr__(self, "operation", roll_modifier_operation_from_token(self.operation))
+        if type(self.operand) is not int:
+            raise ModifierError("RollModifier operand must be an integer.")
+        if type(self.priority) is not int:
+            raise ModifierError("RollModifier priority must be an integer.")
+
+    def apply(self, value: int) -> int:
+        if type(value) is not int:
+            raise ModifierError("RollModifier value must be an integer.")
+        if self.operation is RollModifierOperation.ADD:
+            return value + self.operand
+        if self.operation is RollModifierOperation.SET:
+            return self.operand
+        if self.operation is RollModifierOperation.FLOOR:
+            return max(value, self.operand)
+        if self.operation is RollModifierOperation.CEILING:
+            return min(value, self.operand)
+        raise ModifierError("Unsupported roll modifier operation.")
+
+    def to_payload(self) -> RollModifierPayload:
+        return {
+            "modifier_id": self.modifier_id,
+            "source_id": self.source_id,
+            "operation": self.operation.value,
+            "operand": self.operand,
+            "priority": self.priority,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: RollModifierPayload) -> Self:
+        return cls(
+            modifier_id=payload["modifier_id"],
+            source_id=payload["source_id"],
+            operation=roll_modifier_operation_from_token(payload["operation"]),
+            operand=payload["operand"],
+            priority=payload["priority"],
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -360,6 +433,37 @@ def modifier_operation_from_token(token: object) -> ModifierOperation:
         raise ModifierError(f"Unsupported modifier operation token: {token}.") from exc
 
 
+def roll_modifier_operation_from_token(token: object) -> RollModifierOperation:
+    if type(token) is RollModifierOperation:
+        return token
+    if type(token) is not str:
+        raise ModifierError("RollModifierOperation token must be a string.")
+    try:
+        return RollModifierOperation(token)
+    except ValueError as exc:
+        raise ModifierError(f"Unsupported roll modifier operation token: {token}.") from exc
+
+
+def apply_roll_modifiers(
+    value: int,
+    modifiers: Iterable[RollModifier],
+) -> tuple[int, tuple[str, ...]]:
+    if type(value) is not int:
+        raise ModifierError("Roll modifier input value must be an integer.")
+    modifier_tuple = tuple(modifiers)
+    for modifier in modifier_tuple:
+        if type(modifier) is not RollModifier:
+            raise ModifierError("Roll modifiers must contain RollModifier instances.")
+    _validate_unique_roll_modifier_ids(modifier_tuple)
+
+    final = value
+    applied_modifier_ids: list[str] = []
+    for modifier in sorted(modifier_tuple, key=_roll_modifier_order_key):
+        final = modifier.apply(final)
+        applied_modifier_ids.append(modifier.modifier_id)
+    return final, tuple(applied_modifier_ids)
+
+
 def _validate_characteristic(characteristic: object) -> Characteristic:
     if type(characteristic) is not Characteristic:
         raise ModifierError("Expected a Characteristic.")
@@ -413,6 +517,14 @@ def _validate_unique_modifier_ids(modifiers: tuple[Modifier, ...]) -> None:
         seen.add(modifier.modifier_id)
 
 
+def _validate_unique_roll_modifier_ids(modifiers: tuple[RollModifier, ...]) -> None:
+    seen: set[str] = set()
+    for modifier in modifiers:
+        if modifier.modifier_id in seen:
+            raise ModifierStackingError("RollModifier IDs must be unique.")
+        seen.add(modifier.modifier_id)
+
+
 def _validate_supported_stacking(modifiers: tuple[Modifier, ...]) -> None:
     base_setters = [
         modifier
@@ -435,3 +547,7 @@ def _validate_supported_stacking(modifiers: tuple[Modifier, ...]) -> None:
 
 def _modifier_order_key(modifier: Modifier) -> tuple[int, int, str]:
     return (modifier.timing.order, modifier.priority, modifier.modifier_id)
+
+
+def _roll_modifier_order_key(modifier: RollModifier) -> tuple[int, str]:
+    return (modifier.priority, modifier.modifier_id)
