@@ -34,6 +34,23 @@ class CharacteristicValuePayload(TypedDict):
     applied_modifier_ids: list[str]
 
 
+class CharacteristicBoundPolicyPayload(TypedDict):
+    characteristic: str
+    minimum: int | None
+    maximum: int | None
+    damage_zero_permitted: bool
+
+
+class BoundedCharacteristicValuePayload(TypedDict):
+    characteristic: str
+    raw: int
+    base: int
+    unbounded_final: int
+    final: int
+    applied_modifier_ids: list[str]
+    bound_policy: CharacteristicBoundPolicyPayload
+
+
 _NON_NEGATIVE_CHARACTERISTICS = frozenset(
     characteristic
     for characteristic in Characteristic
@@ -88,6 +105,181 @@ class CharacteristicValue:
             base=payload["base"],
             final=payload["final"],
             applied_modifier_ids=tuple(payload["applied_modifier_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CharacteristicBoundPolicy:
+    characteristic: Characteristic
+    minimum: int | None
+    maximum: int | None
+    damage_zero_permitted: bool = False
+
+    def __post_init__(self) -> None:
+        characteristic = _ensure_characteristic(self.characteristic)
+        object.__setattr__(self, "characteristic", characteristic)
+        object.__setattr__(
+            self,
+            "minimum",
+            _validate_optional_bound(characteristic, "minimum", self.minimum),
+        )
+        object.__setattr__(
+            self,
+            "maximum",
+            _validate_optional_bound(characteristic, "maximum", self.maximum),
+        )
+        if type(self.damage_zero_permitted) is not bool:
+            raise CharacteristicError(
+                "CharacteristicBoundPolicy damage_zero_permitted must be bool."
+            )
+        if self.damage_zero_permitted and characteristic is not Characteristic.DAMAGE:
+            raise CharacteristicError("Only Damage bound policies can permit Damage 0.")
+        minimum = self.minimum
+        maximum = self.maximum
+        if minimum is not None and maximum is not None and minimum > maximum:
+            raise CharacteristicError("CharacteristicBoundPolicy minimum cannot exceed maximum.")
+
+    @classmethod
+    def for_characteristic(
+        cls,
+        characteristic: Characteristic,
+        *,
+        damage_zero_permitted: bool = False,
+    ) -> Self:
+        valid_characteristic = _ensure_characteristic(characteristic)
+        minimum = _DEFAULT_MINIMUMS.get(valid_characteristic)
+        maximum = _DEFAULT_MAXIMUMS.get(valid_characteristic)
+        if valid_characteristic is Characteristic.DAMAGE and damage_zero_permitted:
+            minimum = 0
+        return cls(
+            characteristic=valid_characteristic,
+            minimum=minimum,
+            maximum=maximum,
+            damage_zero_permitted=damage_zero_permitted,
+        )
+
+    def apply(self, value: int) -> int:
+        if type(value) is not int:
+            raise CharacteristicError("CharacteristicBoundPolicy value must be an integer.")
+        bounded = value
+        if self.minimum is not None:
+            bounded = max(bounded, self.minimum)
+        if self.maximum is not None:
+            bounded = min(bounded, self.maximum)
+        return bounded
+
+    def to_payload(self) -> CharacteristicBoundPolicyPayload:
+        return {
+            "characteristic": self.characteristic.value,
+            "minimum": self.minimum,
+            "maximum": self.maximum,
+            "damage_zero_permitted": self.damage_zero_permitted,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: CharacteristicBoundPolicyPayload) -> Self:
+        return cls(
+            characteristic=characteristic_from_token(payload["characteristic"]),
+            minimum=payload["minimum"],
+            maximum=payload["maximum"],
+            damage_zero_permitted=payload["damage_zero_permitted"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class BoundedCharacteristicValue:
+    characteristic: Characteristic
+    raw: int
+    base: int
+    unbounded_final: int
+    final: int
+    applied_modifier_ids: tuple[str, ...]
+    bound_policy: CharacteristicBoundPolicy
+
+    def __post_init__(self) -> None:
+        characteristic = _ensure_characteristic(self.characteristic)
+        object.__setattr__(self, "characteristic", characteristic)
+        _validate_characteristic_number(characteristic, "raw", self.raw)
+        _validate_characteristic_number(characteristic, "base", self.base)
+        if type(self.unbounded_final) is not int:
+            raise CharacteristicError("BoundedCharacteristicValue unbounded_final must be int.")
+        _validate_characteristic_number(characteristic, "final", self.final)
+        ids = _validate_identifier_tuple(
+            "BoundedCharacteristicValue applied_modifier_ids",
+            self.applied_modifier_ids,
+        )
+        if ids != self.applied_modifier_ids:
+            object.__setattr__(self, "applied_modifier_ids", ids)
+        if type(self.bound_policy) is not CharacteristicBoundPolicy:
+            raise CharacteristicError(
+                "BoundedCharacteristicValue bound_policy must be a CharacteristicBoundPolicy."
+            )
+        if self.bound_policy.characteristic is not characteristic:
+            raise CharacteristicError(
+                "BoundedCharacteristicValue bound_policy must match characteristic."
+            )
+        if self.bound_policy.apply(self.unbounded_final) != self.final:
+            raise CharacteristicError(
+                "BoundedCharacteristicValue final must match bound policy application."
+            )
+
+    @classmethod
+    def from_values(
+        cls,
+        *,
+        characteristic: Characteristic,
+        raw: int,
+        base: int,
+        unbounded_final: int,
+        applied_modifier_ids: tuple[str, ...] = (),
+        bound_policy: CharacteristicBoundPolicy | None = None,
+    ) -> Self:
+        valid_characteristic = _ensure_characteristic(characteristic)
+        policy = (
+            CharacteristicBoundPolicy.for_characteristic(valid_characteristic)
+            if bound_policy is None
+            else bound_policy
+        )
+        return cls(
+            characteristic=valid_characteristic,
+            raw=raw,
+            base=base,
+            unbounded_final=unbounded_final,
+            final=policy.apply(unbounded_final),
+            applied_modifier_ids=applied_modifier_ids,
+            bound_policy=policy,
+        )
+
+    def to_characteristic_value(self) -> CharacteristicValue:
+        return CharacteristicValue(
+            characteristic=self.characteristic,
+            raw=self.raw,
+            base=self.base,
+            final=self.final,
+            applied_modifier_ids=self.applied_modifier_ids,
+        )
+
+    def to_payload(self) -> BoundedCharacteristicValuePayload:
+        return {
+            "characteristic": self.characteristic.value,
+            "raw": self.raw,
+            "base": self.base,
+            "unbounded_final": self.unbounded_final,
+            "final": self.final,
+            "applied_modifier_ids": list(self.applied_modifier_ids),
+            "bound_policy": self.bound_policy.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: BoundedCharacteristicValuePayload) -> Self:
+        return cls(
+            characteristic=characteristic_from_token(payload["characteristic"]),
+            raw=payload["raw"],
+            base=payload["base"],
+            unbounded_final=payload["unbounded_final"],
+            final=payload["final"],
+            applied_modifier_ids=tuple(payload["applied_modifier_ids"]),
+            bound_policy=CharacteristicBoundPolicy.from_payload(payload["bound_policy"]),
         )
 
 
@@ -157,3 +349,34 @@ def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tupl
         seen.add(identifier)
         validated.append(identifier)
     return tuple(validated)
+
+
+def _validate_optional_bound(
+    characteristic: Characteristic,
+    field_name: str,
+    value: object | None,
+) -> int | None:
+    if value is None:
+        return None
+    return _validate_characteristic_number(characteristic, field_name, value)
+
+
+_DEFAULT_MINIMUMS = {
+    Characteristic.MOVEMENT: 1,
+    Characteristic.TOUGHNESS: 1,
+    Characteristic.SAVE: 2,
+    Characteristic.INVULNERABLE_SAVE: 2,
+    Characteristic.LEADERSHIP: 4,
+    Characteristic.OBJECTIVE_CONTROL: 0,
+    Characteristic.WEAPON_SKILL: 2,
+    Characteristic.BALLISTIC_SKILL: 2,
+    Characteristic.STRENGTH: 1,
+    Characteristic.ATTACKS: 1,
+    Characteristic.DAMAGE: 1,
+    Characteristic.RANGE: 1,
+}
+
+_DEFAULT_MAXIMUMS = {
+    Characteristic.LEADERSHIP: 9,
+    Characteristic.ARMOR_PENETRATION: 0,
+}
