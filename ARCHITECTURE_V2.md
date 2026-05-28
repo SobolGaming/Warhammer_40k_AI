@@ -364,14 +364,20 @@ Invariants:
 - Normal Move cannot move within enemy Engagement Range unless an explicit rule permits it;
 - Normal Move cannot transit enemy model bases unless `FLY` or another explicit capability permits it;
 - Normal Move consumes precise distance, pivot, terrain, pathing, and coherency validators;
+- Normal Move movement-distance witnesses must use a model/rules-aware `PivotCostPolicy` derived from `MovementLegalityContext`, not a default policy;
 - Normal Move cannot end on another model, inside terrain, outside the battlefield, or out of coherency;
-- Normal Move emits displacement records only after all validators pass.
+- Normal Move emits displacement records only after all validators pass;
+- Advance, Fall Back, Charge, Pile-in, Consolidate, Scout, and triggered movement must consume the same movement-distance and terrain-legality infrastructure instead of implementing independent distance accounting.
 
 Required tests:
 
 - action options outside Engagement Range are Remain Stationary, Normal Move, Advance;
 - action options inside Engagement Range are Remain Stationary, Fall Back;
 - Normal Move validates pathing, terrain, pivot cost, and coherency;
+- Normal Move for a non-round `VEHICLE`/`MONSTER` consumes the 2" pivot cost when its path pivots;
+- Normal Move for a round-base large flying-stem/hover-stand `VEHICLE` consumes the 2" pivot cost when its path pivots;
+- Normal Move for `AIRCRAFT` uses the aircraft pivot policy;
+- Normal Move replay payload rejects movement-distance witness drift if pivot policy classification is wrong;
 - failed Normal Move does not mutate battlefield state;
 - successful Normal Move emits displacement records and terminal activation event.
 
