@@ -474,6 +474,16 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
         base_size = model_movement["base_size"]
         assert isinstance(base_size, dict)
         assert base_size["diameter_mm"] == 32.0
+        movement_distance_witness = model_movement["movement_distance_witness"]
+        assert isinstance(movement_distance_witness, dict)
+        witness_payload = cast(dict[str, object], movement_distance_witness)
+        budget = witness_payload["budget"]
+        assert isinstance(budget, dict)
+        budget_payload = cast(dict[str, object], budget)
+        assert budget_payload["straight_line_distance_inches"] == 6.0
+        assert budget_payload["pivot_cost_inches"] == 0.0
+        assert budget_payload["total_distance_inches"] == 6.0
+        assert budget_payload["remaining_distance_inches"] == 0.0
 
     follow_up = _submit_result(
         lifecycle,

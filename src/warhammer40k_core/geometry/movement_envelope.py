@@ -1,18 +1,70 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from itertools import pairwise
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.measurement import MILLIMETERS_PER_INCH
 from warhammer40k_core.geometry.pose import (
     Facing,
     GeometryError,
     Point3,
     Pose,
+    PosePayload,
     validate_finite_number,
     validate_pose,
 )
 from warhammer40k_core.geometry.volume import Model
+
+_SEGMENT_MEASUREMENT_POINT = "pose_anchor"
+
+
+class MovementSegmentPayload(TypedDict):
+    model_id: str
+    segment_index: int
+    start_pose: PosePayload
+    end_pose: PosePayload
+    measurement_point: str
+    distance_inches: float
+
+
+class PivotEventPayload(TypedDict):
+    model_id: str
+    pivot_index: int
+    start_pose: PosePayload
+    end_pose: PosePayload
+    pivot_value_inches: float
+    applied_cost_inches: float
+    first_pivot_for_model: bool
+
+
+class MovementDistanceBudgetPayload(TypedDict):
+    max_distance_inches: float
+    straight_line_distance_inches: float
+    pivot_cost_inches: float
+    total_distance_inches: float
+    remaining_distance_inches: float
+    exceeded_by_inches: float
+
+
+class MovementDistanceWitnessPayload(TypedDict):
+    model_id: str
+    segments: list[MovementSegmentPayload]
+    pivot_events: list[PivotEventPayload]
+    budget: MovementDistanceBudgetPayload | None
+
+
+class PivotCostPolicyPayload(TypedDict):
+    non_round_pivot_cost_inches: float
+    vehicle_or_monster_pivot_cost_inches: float
+    round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches: float
+    aircraft_pivot_cost_inches: float
+    round_base_large_vehicle_threshold_mm: float
+    vehicle_or_monster_model_ids: list[str]
+    aircraft_model_ids: list[str]
+    round_base_flying_stem_or_hover_stand_vehicle_model_ids: list[str]
 
 
 class MovementEnvelopePayload(TypedDict):
@@ -23,6 +75,550 @@ class MovementEnvelopePayload(TypedDict):
     required_coherency_neighbors: int
     engagement_horizontal_inches: float
     engagement_vertical_inches: float
+    pivot_cost_policy: PivotCostPolicyPayload
+
+
+@dataclass(frozen=True, slots=True)
+class MovementSegment:
+    model_id: str
+    segment_index: int
+    start_pose: Pose
+    end_pose: Pose
+    measurement_point: str
+    distance_inches: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_id",
+            _validate_identifier("MovementSegment model_id", self.model_id),
+        )
+        object.__setattr__(
+            self,
+            "segment_index",
+            _validate_non_negative_int("MovementSegment segment_index", self.segment_index),
+        )
+        object.__setattr__(
+            self,
+            "start_pose",
+            validate_pose("MovementSegment start_pose", self.start_pose),
+        )
+        object.__setattr__(
+            self,
+            "end_pose",
+            validate_pose("MovementSegment end_pose", self.end_pose),
+        )
+        object.__setattr__(
+            self,
+            "measurement_point",
+            _validate_segment_measurement_point(self.measurement_point),
+        )
+        distance = _validate_non_negative_number(
+            "MovementSegment distance_inches",
+            self.distance_inches,
+        )
+        expected_distance = _same_point_segment_distance(self.start_pose, self.end_pose)
+        if not math.isclose(distance, expected_distance, rel_tol=0.0, abs_tol=1e-9):
+            raise GeometryError("MovementSegment distance_inches must match same-point distance.")
+        object.__setattr__(self, "distance_inches", distance)
+
+    @classmethod
+    def from_poses(
+        cls,
+        *,
+        model_id: str,
+        segment_index: int,
+        start_pose: Pose,
+        end_pose: Pose,
+    ) -> Self:
+        return cls(
+            model_id=model_id,
+            segment_index=segment_index,
+            start_pose=start_pose,
+            end_pose=end_pose,
+            measurement_point=_SEGMENT_MEASUREMENT_POINT,
+            distance_inches=_same_point_segment_distance(start_pose, end_pose),
+        )
+
+    def to_payload(self) -> MovementSegmentPayload:
+        return {
+            "model_id": self.model_id,
+            "segment_index": self.segment_index,
+            "start_pose": self.start_pose.to_payload(),
+            "end_pose": self.end_pose.to_payload(),
+            "measurement_point": self.measurement_point,
+            "distance_inches": self.distance_inches,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MovementSegmentPayload) -> Self:
+        return cls(
+            model_id=payload["model_id"],
+            segment_index=payload["segment_index"],
+            start_pose=Pose.from_payload(payload["start_pose"]),
+            end_pose=Pose.from_payload(payload["end_pose"]),
+            measurement_point=payload["measurement_point"],
+            distance_inches=payload["distance_inches"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PivotEvent:
+    model_id: str
+    pivot_index: int
+    start_pose: Pose
+    end_pose: Pose
+    pivot_value_inches: float
+    applied_cost_inches: float
+    first_pivot_for_model: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_id",
+            _validate_identifier("PivotEvent model_id", self.model_id),
+        )
+        object.__setattr__(
+            self,
+            "pivot_index",
+            _validate_non_negative_int("PivotEvent pivot_index", self.pivot_index),
+        )
+        object.__setattr__(
+            self,
+            "start_pose",
+            validate_pose("PivotEvent start_pose", self.start_pose),
+        )
+        object.__setattr__(
+            self,
+            "end_pose",
+            validate_pose("PivotEvent end_pose", self.end_pose),
+        )
+        if self.start_pose.facing == self.end_pose.facing:
+            raise GeometryError("PivotEvent requires a facing change.")
+        pivot_value = _validate_non_negative_number(
+            "PivotEvent pivot_value_inches",
+            self.pivot_value_inches,
+        )
+        applied_cost = _validate_non_negative_number(
+            "PivotEvent applied_cost_inches",
+            self.applied_cost_inches,
+        )
+        _validate_bool("PivotEvent first_pivot_for_model", self.first_pivot_for_model)
+        if applied_cost > pivot_value:
+            raise GeometryError(
+                "PivotEvent applied_cost_inches must not exceed pivot_value_inches."
+            )
+        if not self.first_pivot_for_model and applied_cost != 0.0:
+            raise GeometryError("Only the first pivot for a model may apply pivot cost.")
+        object.__setattr__(self, "pivot_value_inches", pivot_value)
+        object.__setattr__(self, "applied_cost_inches", applied_cost)
+
+    def to_payload(self) -> PivotEventPayload:
+        return {
+            "model_id": self.model_id,
+            "pivot_index": self.pivot_index,
+            "start_pose": self.start_pose.to_payload(),
+            "end_pose": self.end_pose.to_payload(),
+            "pivot_value_inches": self.pivot_value_inches,
+            "applied_cost_inches": self.applied_cost_inches,
+            "first_pivot_for_model": self.first_pivot_for_model,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PivotEventPayload) -> Self:
+        return cls(
+            model_id=payload["model_id"],
+            pivot_index=payload["pivot_index"],
+            start_pose=Pose.from_payload(payload["start_pose"]),
+            end_pose=Pose.from_payload(payload["end_pose"]),
+            pivot_value_inches=payload["pivot_value_inches"],
+            applied_cost_inches=payload["applied_cost_inches"],
+            first_pivot_for_model=payload["first_pivot_for_model"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MovementDistanceBudget:
+    max_distance_inches: float
+    straight_line_distance_inches: float
+    pivot_cost_inches: float
+    total_distance_inches: float
+    remaining_distance_inches: float
+    exceeded_by_inches: float
+
+    def __post_init__(self) -> None:
+        max_distance = _validate_non_negative_number(
+            "MovementDistanceBudget max_distance_inches",
+            self.max_distance_inches,
+        )
+        straight_line_distance = _validate_non_negative_number(
+            "MovementDistanceBudget straight_line_distance_inches",
+            self.straight_line_distance_inches,
+        )
+        pivot_cost = _validate_non_negative_number(
+            "MovementDistanceBudget pivot_cost_inches",
+            self.pivot_cost_inches,
+        )
+        total_distance = _validate_non_negative_number(
+            "MovementDistanceBudget total_distance_inches",
+            self.total_distance_inches,
+        )
+        remaining = _validate_non_negative_number(
+            "MovementDistanceBudget remaining_distance_inches",
+            self.remaining_distance_inches,
+        )
+        exceeded_by = _validate_non_negative_number(
+            "MovementDistanceBudget exceeded_by_inches",
+            self.exceeded_by_inches,
+        )
+        if not math.isclose(
+            total_distance,
+            straight_line_distance + pivot_cost,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        ):
+            raise GeometryError("MovementDistanceBudget total must equal segment plus pivot cost.")
+        expected_remaining = max(max_distance - total_distance, 0.0)
+        expected_exceeded = max(total_distance - max_distance, 0.0)
+        if not math.isclose(remaining, expected_remaining, rel_tol=0.0, abs_tol=1e-9):
+            raise GeometryError("MovementDistanceBudget remaining distance is inconsistent.")
+        if not math.isclose(exceeded_by, expected_exceeded, rel_tol=0.0, abs_tol=1e-9):
+            raise GeometryError("MovementDistanceBudget exceeded distance is inconsistent.")
+        object.__setattr__(self, "max_distance_inches", max_distance)
+        object.__setattr__(self, "straight_line_distance_inches", straight_line_distance)
+        object.__setattr__(self, "pivot_cost_inches", pivot_cost)
+        object.__setattr__(self, "total_distance_inches", total_distance)
+        object.__setattr__(self, "remaining_distance_inches", remaining)
+        object.__setattr__(self, "exceeded_by_inches", exceeded_by)
+
+    @classmethod
+    def from_totals(
+        cls,
+        *,
+        max_distance_inches: float,
+        straight_line_distance_inches: float,
+        pivot_cost_inches: float,
+    ) -> Self:
+        total_distance = straight_line_distance_inches + pivot_cost_inches
+        return cls(
+            max_distance_inches=max_distance_inches,
+            straight_line_distance_inches=straight_line_distance_inches,
+            pivot_cost_inches=pivot_cost_inches,
+            total_distance_inches=total_distance,
+            remaining_distance_inches=max(max_distance_inches - total_distance, 0.0),
+            exceeded_by_inches=max(total_distance - max_distance_inches, 0.0),
+        )
+
+    @property
+    def is_within_budget(self) -> bool:
+        return self.exceeded_by_inches == 0.0
+
+    def to_payload(self) -> MovementDistanceBudgetPayload:
+        return {
+            "max_distance_inches": self.max_distance_inches,
+            "straight_line_distance_inches": self.straight_line_distance_inches,
+            "pivot_cost_inches": self.pivot_cost_inches,
+            "total_distance_inches": self.total_distance_inches,
+            "remaining_distance_inches": self.remaining_distance_inches,
+            "exceeded_by_inches": self.exceeded_by_inches,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MovementDistanceBudgetPayload) -> Self:
+        return cls(
+            max_distance_inches=payload["max_distance_inches"],
+            straight_line_distance_inches=payload["straight_line_distance_inches"],
+            pivot_cost_inches=payload["pivot_cost_inches"],
+            total_distance_inches=payload["total_distance_inches"],
+            remaining_distance_inches=payload["remaining_distance_inches"],
+            exceeded_by_inches=payload["exceeded_by_inches"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PivotCostPolicy:
+    non_round_pivot_cost_inches: float = 1.0
+    vehicle_or_monster_pivot_cost_inches: float = 2.0
+    round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches: float = 2.0
+    aircraft_pivot_cost_inches: float = 0.0
+    round_base_large_vehicle_threshold_mm: float = 32.0
+    vehicle_or_monster_model_ids: tuple[str, ...] = ()
+    aircraft_model_ids: tuple[str, ...] = ()
+    round_base_flying_stem_or_hover_stand_vehicle_model_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "non_round_pivot_cost_inches",
+            _validate_non_negative_number(
+                "PivotCostPolicy non_round_pivot_cost_inches",
+                self.non_round_pivot_cost_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "vehicle_or_monster_pivot_cost_inches",
+            _validate_non_negative_number(
+                "PivotCostPolicy vehicle_or_monster_pivot_cost_inches",
+                self.vehicle_or_monster_pivot_cost_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches",
+            _validate_non_negative_number(
+                "PivotCostPolicy "
+                "round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches",
+                self.round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "aircraft_pivot_cost_inches",
+            _validate_non_negative_number(
+                "PivotCostPolicy aircraft_pivot_cost_inches",
+                self.aircraft_pivot_cost_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "round_base_large_vehicle_threshold_mm",
+            _validate_positive_number(
+                "PivotCostPolicy round_base_large_vehicle_threshold_mm",
+                self.round_base_large_vehicle_threshold_mm,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "vehicle_or_monster_model_ids",
+            _validate_identifier_tuple(
+                "PivotCostPolicy vehicle_or_monster_model_ids",
+                self.vehicle_or_monster_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "aircraft_model_ids",
+            _validate_identifier_tuple(
+                "PivotCostPolicy aircraft_model_ids",
+                self.aircraft_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "round_base_flying_stem_or_hover_stand_vehicle_model_ids",
+            _validate_identifier_tuple(
+                "PivotCostPolicy round_base_flying_stem_or_hover_stand_vehicle_model_ids",
+                self.round_base_flying_stem_or_hover_stand_vehicle_model_ids,
+            ),
+        )
+
+    def pivot_value_for_model(self, model: Model) -> float:
+        valid_model = _validate_model("PivotCostPolicy model", model)
+        if valid_model.model_id in self.aircraft_model_ids:
+            return self.aircraft_pivot_cost_inches
+        if type(valid_model.base) is CircularBase:
+            if (
+                valid_model.model_id in self.round_base_flying_stem_or_hover_stand_vehicle_model_ids
+                and _circular_base_diameter_mm(valid_model.base)
+                > self.round_base_large_vehicle_threshold_mm
+            ):
+                return self.round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches
+            return 0.0
+        if valid_model.model_id in self.vehicle_or_monster_model_ids:
+            return self.vehicle_or_monster_pivot_cost_inches
+        return self.non_round_pivot_cost_inches
+
+    def to_payload(self) -> PivotCostPolicyPayload:
+        return {
+            "non_round_pivot_cost_inches": self.non_round_pivot_cost_inches,
+            "vehicle_or_monster_pivot_cost_inches": self.vehicle_or_monster_pivot_cost_inches,
+            "round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches": (
+                self.round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches
+            ),
+            "aircraft_pivot_cost_inches": self.aircraft_pivot_cost_inches,
+            "round_base_large_vehicle_threshold_mm": self.round_base_large_vehicle_threshold_mm,
+            "vehicle_or_monster_model_ids": list(self.vehicle_or_monster_model_ids),
+            "aircraft_model_ids": list(self.aircraft_model_ids),
+            "round_base_flying_stem_or_hover_stand_vehicle_model_ids": list(
+                self.round_base_flying_stem_or_hover_stand_vehicle_model_ids
+            ),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PivotCostPolicyPayload) -> Self:
+        return cls(
+            non_round_pivot_cost_inches=payload["non_round_pivot_cost_inches"],
+            vehicle_or_monster_pivot_cost_inches=payload["vehicle_or_monster_pivot_cost_inches"],
+            round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches=payload[
+                "round_base_large_flying_stem_or_hover_stand_vehicle_pivot_cost_inches"
+            ],
+            aircraft_pivot_cost_inches=payload["aircraft_pivot_cost_inches"],
+            round_base_large_vehicle_threshold_mm=payload["round_base_large_vehicle_threshold_mm"],
+            vehicle_or_monster_model_ids=tuple(payload["vehicle_or_monster_model_ids"]),
+            aircraft_model_ids=tuple(payload["aircraft_model_ids"]),
+            round_base_flying_stem_or_hover_stand_vehicle_model_ids=tuple(
+                payload["round_base_flying_stem_or_hover_stand_vehicle_model_ids"]
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MovementDistanceWitness:
+    model_id: str
+    segments: tuple[MovementSegment, ...]
+    pivot_events: tuple[PivotEvent, ...] = ()
+    budget: MovementDistanceBudget | None = None
+
+    def __post_init__(self) -> None:
+        model_id = _validate_identifier("MovementDistanceWitness model_id", self.model_id)
+        segments = _validate_movement_segments("MovementDistanceWitness segments", self.segments)
+        pivot_events = _validate_pivot_events(
+            "MovementDistanceWitness pivot_events",
+            self.pivot_events,
+        )
+        if not segments:
+            raise GeometryError("MovementDistanceWitness segments must not be empty.")
+        if any(segment.model_id != model_id for segment in segments):
+            raise GeometryError("MovementDistanceWitness segments must match model_id.")
+        if any(event.model_id != model_id for event in pivot_events):
+            raise GeometryError("MovementDistanceWitness pivot events must match model_id.")
+        expected_segment_indexes = tuple(range(len(segments)))
+        if tuple(segment.segment_index for segment in segments) != expected_segment_indexes:
+            raise GeometryError("MovementDistanceWitness segment indexes must be contiguous.")
+        if tuple(sorted(event.pivot_index for event in pivot_events)) != tuple(
+            event.pivot_index for event in pivot_events
+        ):
+            raise GeometryError("MovementDistanceWitness pivot events must be ordered.")
+        _validate_segments_form_contiguous_path(segments)
+        _validate_pivot_events_match_segments(
+            model_id=model_id,
+            segments=segments,
+            pivot_events=pivot_events,
+        )
+        if self.budget is not None:
+            if type(self.budget) is not MovementDistanceBudget:
+                raise GeometryError("MovementDistanceWitness budget must be a budget.")
+            if not math.isclose(
+                self.budget.straight_line_distance_inches,
+                sum(segment.distance_inches for segment in segments),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            ):
+                raise GeometryError("MovementDistanceWitness budget segment distance drift.")
+            if not math.isclose(
+                self.budget.pivot_cost_inches,
+                sum(event.applied_cost_inches for event in pivot_events),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            ):
+                raise GeometryError("MovementDistanceWitness budget pivot distance drift.")
+        object.__setattr__(self, "model_id", model_id)
+        object.__setattr__(self, "segments", segments)
+        object.__setattr__(self, "pivot_events", pivot_events)
+
+    @classmethod
+    def for_model_path(
+        cls,
+        *,
+        model: Model,
+        poses: tuple[Pose, ...],
+        pivot_cost_policy: PivotCostPolicy,
+        max_distance_inches: float | None = None,
+    ) -> Self:
+        valid_model = _validate_model("MovementDistanceWitness model", model)
+        path = _validate_pose_path("MovementDistanceWitness poses", poses)
+        if type(pivot_cost_policy) is not PivotCostPolicy:
+            raise GeometryError("MovementDistanceWitness pivot_cost_policy must be a policy.")
+        pivot_value = pivot_cost_policy.pivot_value_for_model(valid_model)
+        segments = tuple(
+            MovementSegment.from_poses(
+                model_id=valid_model.model_id,
+                segment_index=segment_index,
+                start_pose=start_pose,
+                end_pose=end_pose,
+            )
+            for segment_index, (start_pose, end_pose) in enumerate(pairwise(path))
+        )
+        pivot_events: list[PivotEvent] = []
+        pivot_already_paid = False
+        for pivot_index, (start_pose, end_pose) in enumerate(pairwise(path)):
+            if start_pose.facing == end_pose.facing:
+                continue
+            first_pivot = not pivot_already_paid
+            pivot_events.append(
+                PivotEvent(
+                    model_id=valid_model.model_id,
+                    pivot_index=pivot_index,
+                    start_pose=start_pose,
+                    end_pose=end_pose,
+                    pivot_value_inches=pivot_value,
+                    applied_cost_inches=pivot_value if first_pivot else 0.0,
+                    first_pivot_for_model=first_pivot,
+                )
+            )
+            pivot_already_paid = True
+        straight_line_distance = sum(segment.distance_inches for segment in segments)
+        pivot_cost = sum(event.applied_cost_inches for event in pivot_events)
+        budget = (
+            None
+            if max_distance_inches is None
+            else MovementDistanceBudget.from_totals(
+                max_distance_inches=max_distance_inches,
+                straight_line_distance_inches=straight_line_distance,
+                pivot_cost_inches=pivot_cost,
+            )
+        )
+        return cls(
+            model_id=valid_model.model_id,
+            segments=segments,
+            pivot_events=tuple(pivot_events),
+            budget=budget,
+        )
+
+    @property
+    def straight_line_distance_inches(self) -> float:
+        return sum(segment.distance_inches for segment in self.segments)
+
+    @property
+    def pivot_cost_inches(self) -> float:
+        return sum(event.applied_cost_inches for event in self.pivot_events)
+
+    @property
+    def total_distance_inches(self) -> float:
+        return self.straight_line_distance_inches + self.pivot_cost_inches
+
+    @property
+    def is_within_budget(self) -> bool:
+        return self.budget is None or self.budget.is_within_budget
+
+    def to_payload(self) -> MovementDistanceWitnessPayload:
+        return {
+            "model_id": self.model_id,
+            "segments": [segment.to_payload() for segment in self.segments],
+            "pivot_events": [event.to_payload() for event in self.pivot_events],
+            "budget": None if self.budget is None else self.budget.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MovementDistanceWitnessPayload) -> Self:
+        budget_payload = payload["budget"]
+        return cls(
+            model_id=payload["model_id"],
+            segments=tuple(
+                MovementSegment.from_payload(segment) for segment in payload["segments"]
+            ),
+            pivot_events=tuple(PivotEvent.from_payload(event) for event in payload["pivot_events"]),
+            budget=(
+                None
+                if budget_payload is None
+                else MovementDistanceBudget.from_payload(budget_payload)
+            ),
+        )
+
+
+def _new_pivot_cost_policy() -> PivotCostPolicy:
+    return PivotCostPolicy()
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,6 +630,7 @@ class MovementEnvelope:
     required_coherency_neighbors: int = 1
     engagement_horizontal_inches: float = 1.0
     engagement_vertical_inches: float = 5.0
+    pivot_cost_policy: PivotCostPolicy = field(default_factory=_new_pivot_cost_policy)
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -92,15 +689,32 @@ class MovementEnvelope:
                 self.required_coherency_neighbors,
             ),
         )
+        if type(self.pivot_cost_policy) is not PivotCostPolicy:
+            raise GeometryError("MovementEnvelope pivot_cost_policy must be a PivotCostPolicy.")
 
-    def path_distance(self, poses: tuple[Pose, ...]) -> float:
+    def path_distance(self, poses: tuple[Pose, ...], *, model: Model | None = None) -> float:
         path = _validate_pose_path("poses", poses)
+        if model is not None:
+            return self.movement_distance_witness(model=model, poses=path).total_distance_inches
         distance = 0.0
         previous = path[0]
         for pose in path[1:]:
-            distance += previous.distance_3d_to(pose)
+            distance += _same_point_segment_distance(previous, pose)
             previous = pose
         return distance
+
+    def movement_distance_witness(
+        self,
+        *,
+        model: Model,
+        poses: tuple[Pose, ...],
+    ) -> MovementDistanceWitness:
+        return MovementDistanceWitness.for_model_path(
+            model=model,
+            poses=poses,
+            pivot_cost_policy=self.pivot_cost_policy,
+            max_distance_inches=self.max_distance_inches,
+        )
 
     def sampled_path(self, poses: tuple[Pose, ...]) -> tuple[Pose, ...]:
         path = _validate_pose_path("poses", poses)
@@ -139,6 +753,7 @@ class MovementEnvelope:
             "required_coherency_neighbors": self.required_coherency_neighbors,
             "engagement_horizontal_inches": self.engagement_horizontal_inches,
             "engagement_vertical_inches": self.engagement_vertical_inches,
+            "pivot_cost_policy": self.pivot_cost_policy.to_payload(),
         }
 
     @classmethod
@@ -151,6 +766,7 @@ class MovementEnvelope:
             required_coherency_neighbors=payload["required_coherency_neighbors"],
             engagement_horizontal_inches=payload["engagement_horizontal_inches"],
             engagement_vertical_inches=payload["engagement_vertical_inches"],
+            pivot_cost_policy=PivotCostPolicy.from_payload(payload["pivot_cost_policy"]),
         )
 
     def _models_are_coherent_pair(self, first: Model, second: Model) -> bool:
@@ -177,6 +793,94 @@ def _validate_model(field_name: str, value: object) -> Model:
     return value
 
 
+def _validate_movement_segments(
+    field_name: str,
+    values: object,
+) -> tuple[MovementSegment, ...]:
+    if type(values) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    return tuple(
+        _validate_movement_segment(f"{field_name} segment", value)
+        for value in cast(tuple[object, ...], values)
+    )
+
+
+def _validate_movement_segment(field_name: str, value: object) -> MovementSegment:
+    if type(value) is not MovementSegment:
+        raise GeometryError(f"{field_name} must be a MovementSegment.")
+    return value
+
+
+def _validate_pivot_events(field_name: str, values: object) -> tuple[PivotEvent, ...]:
+    if type(values) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    return tuple(
+        _validate_pivot_event(f"{field_name} pivot_event", value)
+        for value in cast(tuple[object, ...], values)
+    )
+
+
+def _validate_pivot_event(field_name: str, value: object) -> PivotEvent:
+    if type(value) is not PivotEvent:
+        raise GeometryError(f"{field_name} must be a PivotEvent.")
+    return value
+
+
+def _validate_segments_form_contiguous_path(segments: tuple[MovementSegment, ...]) -> None:
+    for previous, current in pairwise(segments):
+        if previous.end_pose != current.start_pose:
+            raise GeometryError("MovementDistanceWitness segments must form a contiguous path.")
+
+
+def _validate_pivot_events_match_segments(
+    *,
+    model_id: str,
+    segments: tuple[MovementSegment, ...],
+    pivot_events: tuple[PivotEvent, ...],
+) -> None:
+    pivot_by_index = {event.pivot_index: event for event in pivot_events}
+    if len(pivot_by_index) != len(pivot_events):
+        raise GeometryError(
+            "MovementDistanceWitness pivot events must not contain duplicate indexes."
+        )
+    expected_indexes = tuple(
+        segment.segment_index
+        for segment in segments
+        if segment.start_pose.facing != segment.end_pose.facing
+    )
+    if tuple(event.pivot_index for event in pivot_events) != expected_indexes:
+        raise GeometryError(
+            "MovementDistanceWitness pivot events must match facing-change segments."
+        )
+    for event in pivot_events:
+        if event.pivot_index >= len(segments):
+            raise GeometryError("MovementDistanceWitness pivot event index is out of range.")
+        segment = segments[event.pivot_index]
+        if event.model_id != model_id:
+            raise GeometryError("MovementDistanceWitness pivot event model_id mismatch.")
+        if event.start_pose != segment.start_pose or event.end_pose != segment.end_pose:
+            raise GeometryError(
+                "MovementDistanceWitness pivot event poses must match segment poses."
+            )
+    if not pivot_events:
+        return
+    first = pivot_events[0]
+    if not first.first_pivot_for_model:
+        raise GeometryError("First pivot event must be marked first_pivot_for_model.")
+    if not math.isclose(
+        first.applied_cost_inches,
+        first.pivot_value_inches,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    ):
+        raise GeometryError("First pivot event must apply the full pivot value.")
+    for event in pivot_events[1:]:
+        if event.first_pivot_for_model:
+            raise GeometryError("Only one pivot event may be first_pivot_for_model.")
+        if event.applied_cost_inches != 0.0:
+            raise GeometryError("Only first pivot event may apply pivot cost.")
+
+
 def _validate_positive_number(field_name: str, value: object) -> float:
     number = validate_finite_number(field_name, value)
     if number <= 0.0:
@@ -197,6 +901,59 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GeometryError(f"{field_name} must be at least 1.")
     return value
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GeometryError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise GeometryError(f"{field_name} must not be negative.")
+    return value
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GeometryError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GeometryError(f"{field_name} must not be empty.")
+    return stripped
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    seen: set[str] = set()
+    identifiers: list[str] = []
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GeometryError(f"{field_name} must not contain duplicate identifiers.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    return tuple(sorted(identifiers))
+
+
+def _validate_bool(field_name: str, value: object) -> None:
+    if type(value) is not bool:
+        raise GeometryError(f"{field_name} must be a bool.")
+
+
+def _validate_segment_measurement_point(value: object) -> str:
+    measurement_point = _validate_identifier("MovementSegment measurement_point", value)
+    if measurement_point != _SEGMENT_MEASUREMENT_POINT:
+        raise GeometryError("MovementSegment measurement_point must be pose_anchor.")
+    return measurement_point
+
+
+def _same_point_segment_distance(start: Pose, end: Pose) -> float:
+    start_pose = validate_pose("start", start)
+    end_pose = validate_pose("end", end)
+    return start_pose.distance_3d_to(end_pose)
+
+
+def _circular_base_diameter_mm(base: CircularBase) -> float:
+    return base.radius * 2.0 * MILLIMETERS_PER_INCH
 
 
 def _interpolate_pose(start: Pose, end: Pose, t: float) -> Pose:

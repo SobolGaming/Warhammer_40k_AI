@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10J.1 work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10K work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10J.1** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10K unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10K** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10L unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -54,6 +54,7 @@ Completed / implemented foundation:
 | 10I | Complete | Terrain movement semantics and endpoint support |
 | 10J | Complete | Core dice, roll-off, reroll, random-characteristic, and modifier order semantics |
 | 10J.1 | Complete | Measurement predicates and characteristic modifier bounds |
+| 10K | Complete | Precise movement distance, straight-line segments, and pivot costs |
 
 ## Cross-cutting architectural rules
 
@@ -241,6 +242,8 @@ CORE V1 relevant areas:
 
 ## Phase 10K: precise movement distance, straight-line segments, and pivot costs
 
+Status: Complete.
+
 This phase replaces pivot-cost placeholders with real 10e movement-distance accounting. It must land before Advance, Fall Back, Charge movement, Pile-in, Consolidate, or triggered movement become authoritative.
 
 Modules:
@@ -361,14 +364,20 @@ Invariants:
 - Normal Move cannot move within enemy Engagement Range unless an explicit rule permits it;
 - Normal Move cannot transit enemy model bases unless `FLY` or another explicit capability permits it;
 - Normal Move consumes precise distance, pivot, terrain, pathing, and coherency validators;
+- Normal Move movement-distance witnesses must use a model/rules-aware `PivotCostPolicy` derived from `MovementLegalityContext`, not a default policy;
 - Normal Move cannot end on another model, inside terrain, outside the battlefield, or out of coherency;
-- Normal Move emits displacement records only after all validators pass.
+- Normal Move emits displacement records only after all validators pass;
+- Advance, Fall Back, Charge, Pile-in, Consolidate, Scout, and triggered movement must consume the same movement-distance and terrain-legality infrastructure instead of implementing independent distance accounting.
 
 Required tests:
 
 - action options outside Engagement Range are Remain Stationary, Normal Move, Advance;
 - action options inside Engagement Range are Remain Stationary, Fall Back;
 - Normal Move validates pathing, terrain, pivot cost, and coherency;
+- Normal Move for a non-round `VEHICLE`/`MONSTER` consumes the 2" pivot cost when its path pivots;
+- Normal Move for a round-base large flying-stem/hover-stand `VEHICLE` consumes the 2" pivot cost when its path pivots;
+- Normal Move for `AIRCRAFT` uses the aircraft pivot policy;
+- Normal Move replay payload rejects movement-distance witness drift if pivot policy classification is wrong;
 - failed Normal Move does not mutate battlefield state;
 - successful Normal Move emits displacement records and terminal activation event.
 

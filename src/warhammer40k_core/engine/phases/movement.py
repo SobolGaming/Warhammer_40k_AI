@@ -26,8 +26,11 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
+from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness, PivotCostPolicy
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.volume import Model as GeometryModel
+from warhammer40k_core.geometry.volume import ModelVolume
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -626,6 +629,17 @@ def _normal_move_plan(
         movement_inches = _model_movement_inches(model)
         max_movement_inches = max(max_movement_inches, movement_inches)
         end_pose = _translated_pose(placement.pose, movement_inches=movement_inches)
+        path = _straight_line_path(
+            model_instance_id=placement.model_instance_id,
+            start_pose=placement.pose,
+            end_pose=end_pose,
+        )
+        movement_distance_witness = MovementDistanceWitness.for_model_path(
+            model=_geometry_model_for_placement(model=model, placement=placement),
+            poses=path,
+            pivot_cost_policy=PivotCostPolicy(),
+            max_distance_inches=float(movement_inches),
+        )
         moved_placements.append(placement.with_pose(end_pose))
         model_paths.append((placement.model_instance_id, placement.pose, end_pose))
         model_movements.append(
@@ -636,6 +650,7 @@ def _normal_move_plan(
                     "base_size": model.base_size.to_payload(),
                     "start_pose": placement.pose.to_payload(),
                     "end_pose": end_pose.to_payload(),
+                    "movement_distance_witness": movement_distance_witness.to_payload(),
                 }
             )
         )
@@ -800,6 +815,34 @@ def _translated_pose(pose: Pose, *, movement_inches: int) -> Pose:
         y=pose.position.y,
         z=pose.position.z,
         facing_degrees=pose.facing.degrees,
+    )
+
+
+def _straight_line_path(
+    *,
+    model_instance_id: str,
+    start_pose: Pose,
+    end_pose: Pose,
+) -> tuple[Pose, ...]:
+    return PathWitness.for_straight_line_endpoints(
+        ((_validate_identifier("model_instance_id", model_instance_id), start_pose, end_pose),)
+    ).poses_for_model(model_instance_id)
+
+
+def _geometry_model_for_placement(
+    *,
+    model: ModelInstance,
+    placement: ModelPlacement,
+) -> GeometryModel:
+    if type(model) is not ModelInstance:
+        raise GameLifecycleError("movement distance witness model must be a ModelInstance.")
+    if type(placement) is not ModelPlacement:
+        raise GameLifecycleError("movement distance witness placement must be a ModelPlacement.")
+    return GeometryModel(
+        model_id=placement.model_instance_id,
+        pose=placement.pose,
+        base=model.geometry.base_shape(),
+        volume=ModelVolume(height=model.geometry.height_inches),
     )
 
 
