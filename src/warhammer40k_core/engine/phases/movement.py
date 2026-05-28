@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from enum import StrEnum
+from itertools import combinations
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -17,13 +19,16 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRemovalKind,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
     ModelDisplacementKind,
     ModelDisplacementRecord,
     ModelPlacement,
+    ModelRemovalRecord,
     PlacementError,
     UnitPlacement,
+    UnitPlacementPayload,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -40,15 +45,20 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
+    MovementRollbackRecordPayload,
     UnitCoherencyResult,
+    UnitCoherencyResultPayload,
     resolve_unit_movement_endpoint_coherency,
+    unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
+    PathValidationResultPayload,
     PathWitness,
     PathWitnessPayload,
     TerrainPathLegalityResult,
+    TerrainPathLegalityResultPayload,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
@@ -60,6 +70,7 @@ if TYPE_CHECKING:
 
 SELECT_MOVEMENT_UNIT_DECISION_TYPE = "select_movement_unit"
 SELECT_MOVEMENT_ACTION_DECISION_TYPE = "select_movement_action"
+SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE = "select_desperate_escape_model"
 
 
 class MovementPhaseStepKind(StrEnum):
@@ -72,6 +83,11 @@ class MovementPhaseActionKind(StrEnum):
     NORMAL_MOVE = "normal_move"
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
+
+
+class DesperateEscapeRequirementReason(StrEnum):
+    ENEMY_MODEL_OVERFLIGHT = "enemy_model_overflight"
+    BATTLE_SHOCKED = "battle_shocked"
 
 
 _SUPPORTED_MOVEMENT_PHASE_ACTIONS = (
@@ -95,6 +111,8 @@ _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
 _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
 _ADVANCE_REROLL_KEYWORD = "ADVANCE_REROLL"
 _ADVANCED_UNIT_CLEANUP_POINT = "end_of_turn"
+_FELL_BACK_UNIT_CLEANUP_POINT = "end_of_turn"
+_DESPERATE_ESCAPE_ROLL_TYPE = "desperate_escape_roll"
 
 
 class MovementUnitSelectionPayload(TypedDict):
@@ -158,6 +176,45 @@ class AdvancedUnitStatePayload(TypedDict):
     can_shoot: bool
     can_declare_charge: bool
     cleanup_point: str
+
+
+class DesperateEscapeRequirementPayload(TypedDict):
+    requirement_id: str
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    model_instance_id: str
+    reasons: list[str]
+    enemy_model_ids: list[str]
+
+
+class DesperateEscapeRollPayload(TypedDict):
+    requirement: DesperateEscapeRequirementPayload
+    roll_state: DiceRollStatePayload
+    value: int
+
+
+class FellBackUnitStatePayload(TypedDict):
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    desperate_escape_rolls: list[DesperateEscapeRollPayload]
+    can_shoot: bool
+    can_declare_charge: bool
+    cleanup_point: str
+
+
+class FallBackActionResultPayload(TypedDict):
+    unit_instance_id: str
+    attempted_placement: UnitPlacementPayload
+    witness: PathWitnessPayload
+    desperate_escape_requirements: list[DesperateEscapeRequirementPayload]
+    desperate_escape_rolls: list[DesperateEscapeRollPayload]
+    path_validation_results: list[PathValidationResultPayload]
+    terrain_path_legality_results: list[TerrainPathLegalityResultPayload]
+    coherency_result: UnitCoherencyResultPayload
+    rollback_record: MovementRollbackRecordPayload | None
+    movement_payload: dict[str, JsonValue]
 
 
 @dataclass(frozen=True, slots=True)
@@ -586,6 +643,253 @@ class AdvancedUnitState:
 
 
 @dataclass(frozen=True, slots=True)
+class DesperateEscapeRequirement:
+    requirement_id: str
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    model_instance_id: str
+    reasons: tuple[DesperateEscapeRequirementReason, ...]
+    enemy_model_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "requirement_id",
+            _validate_identifier(
+                "DesperateEscapeRequirement requirement_id",
+                self.requirement_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("DesperateEscapeRequirement player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("DesperateEscapeRequirement battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "DesperateEscapeRequirement unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_identifier(
+                "DesperateEscapeRequirement model_instance_id",
+                self.model_instance_id,
+            ),
+        )
+        if not self.model_instance_id.startswith(f"{self.unit_instance_id}:"):
+            raise GameLifecycleError(
+                "DesperateEscapeRequirement model_instance_id must belong to unit_instance_id."
+            )
+        object.__setattr__(
+            self,
+            "reasons",
+            _validate_desperate_escape_reason_tuple(
+                "DesperateEscapeRequirement reasons",
+                self.reasons,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "enemy_model_ids",
+            _validate_identifier_tuple(
+                "DesperateEscapeRequirement enemy_model_ids",
+                self.enemy_model_ids,
+            ),
+        )
+        if (
+            DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT in self.reasons
+            and not self.enemy_model_ids
+        ):
+            raise GameLifecycleError(
+                "DesperateEscapeRequirement enemy overflight requires enemy_model_ids."
+            )
+
+    def roll_spec(self) -> DiceRollSpec:
+        return DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Desperate Escape roll for {self.model_instance_id}",
+            roll_type=_DESPERATE_ESCAPE_ROLL_TYPE,
+            actor_id=self.model_instance_id,
+        )
+
+    def to_payload(self) -> DesperateEscapeRequirementPayload:
+        return {
+            "requirement_id": self.requirement_id,
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "unit_instance_id": self.unit_instance_id,
+            "model_instance_id": self.model_instance_id,
+            "reasons": [reason.value for reason in self.reasons],
+            "enemy_model_ids": list(self.enemy_model_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DesperateEscapeRequirementPayload) -> Self:
+        return cls(
+            requirement_id=payload["requirement_id"],
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            unit_instance_id=payload["unit_instance_id"],
+            model_instance_id=payload["model_instance_id"],
+            reasons=tuple(
+                desperate_escape_requirement_reason_from_token(reason)
+                for reason in payload["reasons"]
+            ),
+            enemy_model_ids=tuple(payload["enemy_model_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DesperateEscapeRoll:
+    requirement: DesperateEscapeRequirement
+    roll_state: DiceRollState
+    value: int
+
+    def __post_init__(self) -> None:
+        if type(self.requirement) is not DesperateEscapeRequirement:
+            raise GameLifecycleError(
+                "DesperateEscapeRoll requirement must be a DesperateEscapeRequirement."
+            )
+        if type(self.roll_state) is not DiceRollState:
+            raise GameLifecycleError("DesperateEscapeRoll roll_state must be a DiceRollState.")
+        if self.roll_state.original_result.spec != self.requirement.roll_spec():
+            raise GameLifecycleError("DesperateEscapeRoll roll_state spec must match requirement.")
+        if self.value != self.roll_state.current_total:
+            raise GameLifecycleError("DesperateEscapeRoll value must match roll_state total.")
+        if self.value < 1 or self.value > 6:
+            raise GameLifecycleError("DesperateEscapeRoll value must be between 1 and 6.")
+
+    @classmethod
+    def from_roll_state(
+        cls,
+        *,
+        requirement: DesperateEscapeRequirement,
+        roll_state: DiceRollState,
+    ) -> Self:
+        return cls(
+            requirement=requirement,
+            roll_state=roll_state,
+            value=roll_state.current_total,
+        )
+
+    @property
+    def is_failed(self) -> bool:
+        return self.value <= 2
+
+    def to_payload(self) -> DesperateEscapeRollPayload:
+        return {
+            "requirement": self.requirement.to_payload(),
+            "roll_state": self.roll_state.to_payload(),
+            "value": self.value,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DesperateEscapeRollPayload) -> Self:
+        return cls(
+            requirement=DesperateEscapeRequirement.from_payload(payload["requirement"]),
+            roll_state=DiceRollState.from_payload(payload["roll_state"]),
+            value=payload["value"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class FellBackUnitState:
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    desperate_escape_rolls: tuple[DesperateEscapeRoll, ...] = ()
+    can_shoot: bool = False
+    can_declare_charge: bool = False
+    cleanup_point: str = _FELL_BACK_UNIT_CLEANUP_POINT
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("FellBackUnitState player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("FellBackUnitState battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("FellBackUnitState unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "desperate_escape_rolls",
+            _validate_desperate_escape_roll_tuple(
+                "FellBackUnitState desperate_escape_rolls",
+                self.desperate_escape_rolls,
+            ),
+        )
+        for roll in self.desperate_escape_rolls:
+            requirement = roll.requirement
+            if requirement.player_id != self.player_id:
+                raise GameLifecycleError("FellBackUnitState roll player_id drift.")
+            if requirement.battle_round != self.battle_round:
+                raise GameLifecycleError("FellBackUnitState roll battle_round drift.")
+            if requirement.unit_instance_id != self.unit_instance_id:
+                raise GameLifecycleError("FellBackUnitState roll unit drift.")
+        object.__setattr__(
+            self,
+            "can_shoot",
+            _validate_bool("FellBackUnitState can_shoot", self.can_shoot),
+        )
+        object.__setattr__(
+            self,
+            "can_declare_charge",
+            _validate_bool("FellBackUnitState can_declare_charge", self.can_declare_charge),
+        )
+        object.__setattr__(
+            self,
+            "cleanup_point",
+            _validate_identifier("FellBackUnitState cleanup_point", self.cleanup_point),
+        )
+        if self.cleanup_point != _FELL_BACK_UNIT_CLEANUP_POINT:
+            raise GameLifecycleError("FellBackUnitState cleanup_point must be end_of_turn.")
+
+    def to_payload(self) -> FellBackUnitStatePayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "unit_instance_id": self.unit_instance_id,
+            "desperate_escape_rolls": [roll.to_payload() for roll in self.desperate_escape_rolls],
+            "can_shoot": self.can_shoot,
+            "can_declare_charge": self.can_declare_charge,
+            "cleanup_point": self.cleanup_point,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: FellBackUnitStatePayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            unit_instance_id=payload["unit_instance_id"],
+            desperate_escape_rolls=tuple(
+                DesperateEscapeRoll.from_payload(roll) for roll in payload["desperate_escape_rolls"]
+            ),
+            can_shoot=payload["can_shoot"],
+            can_declare_charge=payload["can_declare_charge"],
+            cleanup_point=payload["cleanup_point"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MovementUnitSelection:
     player_id: str
     battle_round: int
@@ -959,6 +1263,286 @@ class AdvanceMoveResolution:
 
 
 @dataclass(frozen=True, slots=True)
+class FallBackActionResult:
+    unit_instance_id: str
+    attempted_placement: UnitPlacement
+    witness: PathWitness
+    desperate_escape_requirements: tuple[DesperateEscapeRequirement, ...]
+    desperate_escape_rolls: tuple[DesperateEscapeRoll, ...]
+    path_validation_results: tuple[PathValidationResult, ...]
+    terrain_path_legality_results: tuple[TerrainPathLegalityResult, ...]
+    coherency_result: UnitCoherencyResult
+    rollback_record: MovementRollbackRecord | None
+    movement_payload: dict[str, JsonValue]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("FallBackActionResult unit_instance_id", self.unit_instance_id),
+        )
+        if type(self.attempted_placement) is not UnitPlacement:
+            raise GameLifecycleError(
+                "FallBackActionResult attempted_placement must be a UnitPlacement."
+            )
+        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
+            raise GameLifecycleError(
+                "FallBackActionResult attempted_placement must match unit_instance_id."
+            )
+        if type(self.witness) is not PathWitness:
+            raise GameLifecycleError("FallBackActionResult witness must be a PathWitness.")
+        object.__setattr__(
+            self,
+            "desperate_escape_requirements",
+            _validate_desperate_escape_requirement_tuple(
+                "FallBackActionResult desperate_escape_requirements",
+                self.desperate_escape_requirements,
+            ),
+        )
+        for requirement in self.desperate_escape_requirements:
+            if requirement.unit_instance_id != self.unit_instance_id:
+                raise GameLifecycleError("FallBackActionResult requirement unit drift.")
+        object.__setattr__(
+            self,
+            "desperate_escape_rolls",
+            _validate_desperate_escape_roll_tuple(
+                "FallBackActionResult desperate_escape_rolls",
+                self.desperate_escape_rolls,
+            ),
+        )
+        requirement_by_id = {
+            requirement.requirement_id: requirement
+            for requirement in self.desperate_escape_requirements
+        }
+        for roll in self.desperate_escape_rolls:
+            expected_requirement = requirement_by_id.get(roll.requirement.requirement_id)
+            if expected_requirement is None:
+                raise GameLifecycleError(
+                    "FallBackActionResult roll must match a Desperate Escape requirement."
+                )
+            if roll.requirement != expected_requirement:
+                raise GameLifecycleError("FallBackActionResult roll requirement drift.")
+        if len(self.desperate_escape_rolls) not in {0, len(self.desperate_escape_requirements)}:
+            raise GameLifecycleError(
+                "FallBackActionResult must roll either no Desperate Escape tests or every "
+                "requirement."
+            )
+        object.__setattr__(
+            self,
+            "path_validation_results",
+            _validate_path_validation_result_tuple(
+                "FallBackActionResult path_validation_results",
+                self.path_validation_results,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "terrain_path_legality_results",
+            _validate_terrain_path_legality_result_tuple(
+                "FallBackActionResult terrain_path_legality_results",
+                self.terrain_path_legality_results,
+            ),
+        )
+        if type(self.coherency_result) is not UnitCoherencyResult:
+            raise GameLifecycleError(
+                "FallBackActionResult coherency_result must be a UnitCoherencyResult."
+            )
+        if self.rollback_record is not None and type(self.rollback_record) is not (
+            MovementRollbackRecord
+        ):
+            raise GameLifecycleError(
+                "FallBackActionResult rollback_record must be a MovementRollbackRecord."
+            )
+        object.__setattr__(
+            self,
+            "movement_payload",
+            _validate_json_object(
+                "FallBackActionResult movement_payload",
+                self.movement_payload,
+            ),
+        )
+
+    @classmethod
+    def unresolved(
+        cls,
+        *,
+        unit_instance_id: str,
+        attempted_placement: UnitPlacement,
+        witness: PathWitness,
+        desperate_escape_requirements: tuple[DesperateEscapeRequirement, ...],
+        path_validation_results: tuple[PathValidationResult, ...],
+        terrain_path_legality_results: tuple[TerrainPathLegalityResult, ...],
+        coherency_result: UnitCoherencyResult,
+        rollback_record: MovementRollbackRecord | None,
+        movement_payload: dict[str, JsonValue],
+    ) -> Self:
+        return cls(
+            unit_instance_id=unit_instance_id,
+            attempted_placement=attempted_placement,
+            witness=witness,
+            desperate_escape_requirements=desperate_escape_requirements,
+            desperate_escape_rolls=(),
+            path_validation_results=path_validation_results,
+            terrain_path_legality_results=terrain_path_legality_results,
+            coherency_result=coherency_result,
+            rollback_record=rollback_record,
+            movement_payload=movement_payload,
+        )
+
+    @classmethod
+    def with_desperate_escape_rolls(
+        cls,
+        *,
+        resolution: FallBackActionResult,
+        desperate_escape_rolls: tuple[DesperateEscapeRoll, ...],
+    ) -> Self:
+        if type(resolution) is not FallBackActionResult:
+            raise GameLifecycleError("Fall Back resolution must be a FallBackActionResult.")
+        return cls(
+            unit_instance_id=resolution.unit_instance_id,
+            attempted_placement=resolution.attempted_placement,
+            witness=resolution.witness,
+            desperate_escape_requirements=resolution.desperate_escape_requirements,
+            desperate_escape_rolls=desperate_escape_rolls,
+            path_validation_results=resolution.path_validation_results,
+            terrain_path_legality_results=resolution.terrain_path_legality_results,
+            coherency_result=resolution.coherency_result,
+            rollback_record=resolution.rollback_record,
+            movement_payload={
+                **resolution.movement_payload,
+                "desperate_escape_rolls": validate_json_value(
+                    [roll.to_payload() for roll in desperate_escape_rolls]
+                ),
+            },
+        )
+
+    @property
+    def is_valid(self) -> bool:
+        return (
+            all(result.is_valid for result in self.path_validation_results)
+            and all(result.is_valid for result in self.terrain_path_legality_results)
+            and self.rollback_record is None
+        )
+
+    @property
+    def failed_desperate_escape_rolls(self) -> tuple[DesperateEscapeRoll, ...]:
+        return tuple(roll for roll in self.desperate_escape_rolls if roll.is_failed)
+
+    def transition_batch(
+        self,
+        *,
+        before: UnitPlacement,
+        destroyed_model_ids: tuple[str, ...],
+    ) -> BattlefieldTransitionBatch:
+        if not self.is_valid:
+            raise GameLifecycleError("Invalid Fall Back cannot emit transition records.")
+        if self.desperate_escape_requirements and not self.desperate_escape_rolls:
+            raise GameLifecycleError(
+                "Fall Back cannot emit transition records before Desperate Escape rolls are "
+                "resolved."
+            )
+        destroyed_ids = _validate_identifier_tuple("destroyed_model_ids", destroyed_model_ids)
+        failed_model_ids = tuple(
+            roll.requirement.model_instance_id for roll in self.failed_desperate_escape_rolls
+        )
+        if len(destroyed_ids) != len(failed_model_ids):
+            raise GameLifecycleError(
+                "Fall Back must select one model for every failed Desperate Escape roll."
+            )
+        eligible_model_ids = {
+            placement.model_instance_id for placement in self.attempted_placement.model_placements
+        }
+        for destroyed_id in destroyed_ids:
+            if destroyed_id not in eligible_model_ids:
+                raise GameLifecycleError(
+                    "Fall Back destroyed_model_ids must be eligible falling-back models."
+                )
+        return _fall_back_transition_batch(
+            before=before,
+            after=self.attempted_placement,
+            witness=self.witness,
+            destroyed_model_ids=destroyed_ids,
+        )
+
+    def surviving_attempted_placement(
+        self,
+        *,
+        destroyed_model_ids: tuple[str, ...],
+    ) -> UnitPlacement | None:
+        destroyed_ids = set(_validate_identifier_tuple("destroyed_model_ids", destroyed_model_ids))
+        surviving_placements = tuple(
+            placement
+            for placement in self.attempted_placement.model_placements
+            if placement.model_instance_id not in destroyed_ids
+        )
+        if not surviving_placements:
+            return None
+        return self.attempted_placement.with_model_placements(surviving_placements)
+
+    def selected_payload_drift_code(self, payload: dict[str, JsonValue]) -> str | None:
+        selected_payload = _validate_json_object("Fall Back selected payload", payload)
+        if selected_payload.get("witness") != self.witness.to_payload():
+            return "fall_back_witness_drift"
+        expected_model_movements = self.movement_payload["model_movements"]
+        if selected_payload.get("model_movements") != expected_model_movements:
+            return "fall_back_model_movement_witness_drift"
+        return None
+
+    def to_payload(self) -> FallBackActionResultPayload:
+        return {
+            "unit_instance_id": self.unit_instance_id,
+            "attempted_placement": self.attempted_placement.to_payload(),
+            "witness": self.witness.to_payload(),
+            "desperate_escape_requirements": [
+                requirement.to_payload() for requirement in self.desperate_escape_requirements
+            ],
+            "desperate_escape_rolls": [roll.to_payload() for roll in self.desperate_escape_rolls],
+            "path_validation_results": [
+                result.to_payload() for result in self.path_validation_results
+            ],
+            "terrain_path_legality_results": [
+                result.to_payload() for result in self.terrain_path_legality_results
+            ],
+            "coherency_result": self.coherency_result.to_payload(),
+            "rollback_record": (
+                None if self.rollback_record is None else self.rollback_record.to_payload()
+            ),
+            "movement_payload": self.movement_payload,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: FallBackActionResultPayload) -> Self:
+        rollback_payload = payload["rollback_record"]
+        return cls(
+            unit_instance_id=payload["unit_instance_id"],
+            attempted_placement=UnitPlacement.from_payload(payload["attempted_placement"]),
+            witness=PathWitness.from_payload(payload["witness"]),
+            desperate_escape_requirements=tuple(
+                DesperateEscapeRequirement.from_payload(requirement)
+                for requirement in payload["desperate_escape_requirements"]
+            ),
+            desperate_escape_rolls=tuple(
+                DesperateEscapeRoll.from_payload(roll) for roll in payload["desperate_escape_rolls"]
+            ),
+            path_validation_results=tuple(
+                PathValidationResult.from_payload(result)
+                for result in payload["path_validation_results"]
+            ),
+            terrain_path_legality_results=tuple(
+                TerrainPathLegalityResult.from_payload(result)
+                for result in payload["terrain_path_legality_results"]
+            ),
+            coherency_result=UnitCoherencyResult.from_payload(payload["coherency_result"]),
+            rollback_record=(
+                None
+                if rollback_payload is None
+                else MovementRollbackRecord.from_payload(rollback_payload)
+            ),
+            movement_payload=payload["movement_payload"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class _ResolvedUnitMove:
     attempted_placement: UnitPlacement
     witness: PathWitness
@@ -1064,6 +1648,13 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
+        if result.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE:
+            return _apply_desperate_escape_model_selection_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
         if result.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return _apply_movement_action_decision(
                 state=state,
@@ -1137,6 +1728,8 @@ def _request_movement_action(
             scenario=scenario,
             unit_placement=unit_placement,
             ruleset_descriptor=ruleset_descriptor,
+            battle_round=state.battle_round,
+            battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         ),
     )
     decisions.request_decision(request)
@@ -1153,7 +1746,7 @@ def _request_movement_action(
     )
 
 
-def _apply_movement_action_decision(
+def _apply_movement_action_decision(  # noqa: RET503
     *,
     state: GameState,
     result: DecisionResult,
@@ -1338,34 +1931,112 @@ def _apply_movement_action_decision(
             advance_roll=advance_roll,
         )
 
-    decisions.event_log.append(
-        "movement_action_unsupported",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": active_player_id,
-            "phase": BattlePhase.MOVEMENT.value,
-            "unit_instance_id": active_selection.unit_instance_id,
-            "movement_phase_action": action.value,
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-            "phase_body_status": "movement_action_unsupported",
-        },
-    )
-    return LifecycleStatus.unsupported(
-        stage=GameLifecycleStage.BATTLE,
-        message=(
-            f"Movement action is not supported by the current implementation slice: {action.value}."
-        ),
-        payload={
-            "phase": BattlePhase.MOVEMENT.value,
-            "phase_body_status": "movement_action_unsupported",
-            "battle_round": state.battle_round,
-            "active_player_id": active_player_id,
-            "unit_instance_id": active_selection.unit_instance_id,
-            "movement_phase_action": action.value,
-        },
-    )
+    if action is MovementPhaseActionKind.FALL_BACK:
+        witness = _payload_path_witness(payload, key="witness")
+        fall_back_resolution = resolve_fall_back_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            path_witness=witness,
+            battle_round=state.battle_round,
+            battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+        )
+        drift_code = fall_back_resolution.selected_payload_drift_code(payload)
+        if drift_code is not None:
+            decisions.event_log.append(
+                "movement_action_invalid",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                    "movement_phase_action": action.value,
+                    "request_id": result.request_id,
+                    "result_id": result.result_id,
+                    "phase_body_status": "movement_action_invalid",
+                    "violation_code": drift_code,
+                    **fall_back_resolution.movement_payload,
+                },
+            )
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Fall Back replay payload drift.",
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "movement_action_invalid",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                    "movement_phase_action": action.value,
+                    "violation_code": drift_code,
+                },
+            )
+        if not fall_back_resolution.is_valid:
+            violation_code = _normal_move_violation_code(fall_back_resolution)
+            invalid_payload = _movement_action_invalid_payload(
+                state=state,
+                active_player_id=active_player_id,
+                unit_instance_id=active_selection.unit_instance_id,
+                action=action,
+                result=result,
+                violation_code=violation_code,
+                movement_payload=fall_back_resolution.movement_payload,
+                rollback_record=fall_back_resolution.rollback_record,
+            )
+            decisions.event_log.append("movement_action_invalid", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message=_normal_move_invalid_message(violation_code).replace(
+                    "Normal Move",
+                    "Fall Back",
+                ),
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "movement_action_invalid",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                    "movement_phase_action": action.value,
+                    "violation_code": violation_code,
+                },
+            )
+        desperate_escape_rolls = _roll_desperate_escape_dice(
+            state=state,
+            decisions=decisions,
+            resolution=fall_back_resolution,
+        )
+        fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
+            resolution=fall_back_resolution,
+            desperate_escape_rolls=desperate_escape_rolls,
+        )
+        if fall_back_result.failed_desperate_escape_rolls:
+            request = _desperate_escape_model_selection_request(
+                state=state,
+                fall_back_result=fall_back_result,
+                action_result=result,
+            )
+            decisions.request_decision(request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=request,
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "desperate_escape_model_selection_pending",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                },
+            )
+        return _apply_fall_back_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+            unit_placement=unit_placement,
+            fall_back_result=fall_back_result,
+            destroyed_model_ids=(),
+            ruleset_descriptor=ruleset_descriptor,
+        )
 
 
 def _apply_advance_roll_reroll_decision(
@@ -1524,6 +2195,155 @@ def _resolve_and_apply_advance_move(
     return None
 
 
+def _apply_desperate_escape_model_selection_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Desperate Escape selection actor must be the active player.")
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.active_selection is None:
+        raise GameLifecycleError("Desperate Escape selection requires active movement selection.")
+
+    record = decisions.record_for_result(result)
+    request_payload = _decision_payload_object(record.request.payload)
+    context_payload = _payload_object(request_payload, key="fall_back_context")
+    unit_instance_id = _payload_string(context_payload, key="unit_instance_id")
+    if unit_instance_id != movement_state.active_selection.unit_instance_id:
+        raise GameLifecycleError("Desperate Escape selection unit must match active selection.")
+    fall_back_result_payload = cast(
+        FallBackActionResultPayload,
+        _payload_object(context_payload, key="fall_back_result"),
+    )
+    fall_back_result = FallBackActionResult.from_payload(fall_back_result_payload)
+    destroyed_model_ids = tuple(
+        cast(
+            list[str],
+            _payload_json_array(
+                _decision_payload_object(result.payload),
+                key="destroyed_model_ids",
+            ),
+        )
+    )
+    scenario = _battlefield_scenario(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    action_result = DecisionResult(
+        result_id=_payload_string(context_payload, key="action_result_id"),
+        request_id=_payload_string(context_payload, key="action_request_id"),
+        decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        actor_id=active_player_id,
+        selected_option_id=MovementPhaseActionKind.FALL_BACK.value,
+        payload={
+            "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+            "unit_instance_id": unit_instance_id,
+            "witness": validate_json_value(fall_back_result.witness.to_payload()),
+            **fall_back_result.movement_payload,
+        },
+    )
+    return _apply_fall_back_result(
+        state=state,
+        decisions=decisions,
+        result=action_result,
+        unit_placement=unit_placement,
+        fall_back_result=fall_back_result,
+        destroyed_model_ids=destroyed_model_ids,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+
+
+def _apply_fall_back_result(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    unit_placement: UnitPlacement,
+    fall_back_result: FallBackActionResult,
+    destroyed_model_ids: tuple[str, ...],
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    active_player_id = _active_player_id(state)
+    scenario = _battlefield_scenario(state)
+    surviving_placement = fall_back_result.surviving_attempted_placement(
+        destroyed_model_ids=destroyed_model_ids,
+    )
+    if surviving_placement is not None:
+        survivor_coherency_result = unit_placement_coherency_result(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=surviving_placement,
+        )
+        if not survivor_coherency_result.is_coherent:
+            violation_code = "unit_coherency_broken"
+            invalid_payload = _movement_action_invalid_payload(
+                state=state,
+                active_player_id=active_player_id,
+                unit_instance_id=unit_placement.unit_instance_id,
+                action=MovementPhaseActionKind.FALL_BACK,
+                result=result,
+                violation_code=violation_code,
+                movement_payload={
+                    **fall_back_result.movement_payload,
+                    "destroyed_model_ids": list(destroyed_model_ids),
+                    "surviving_coherency_result": validate_json_value(
+                        survivor_coherency_result.to_payload()
+                    ),
+                },
+                rollback_record=None,
+            )
+            decisions.event_log.append("movement_action_invalid", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Fall Back surviving endpoint violates unit coherency.",
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "movement_action_invalid",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                    "violation_code": violation_code,
+                },
+            )
+    transition_batch = fall_back_result.transition_batch(
+        before=unit_placement,
+        destroyed_model_ids=destroyed_model_ids,
+    )
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Fall Back requires battlefield_state.")
+    state.battlefield_state = battlefield_state.with_unit_placement(
+        fall_back_result.attempted_placement
+    ).with_removed_models(destroyed_model_ids)
+    if surviving_placement is not None:
+        state.record_fell_back_unit_state(
+            FellBackUnitState(
+                player_id=active_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_placement.unit_instance_id,
+                desperate_escape_rolls=fall_back_result.desperate_escape_rolls,
+            )
+        )
+    _complete_movement_activation(
+        state=state,
+        decisions=decisions,
+        result=result,
+        action=MovementPhaseActionKind.FALL_BACK,
+        witness=fall_back_result.witness,
+        movement_payload={
+            **fall_back_result.movement_payload,
+            "destroyed_model_ids": list(destroyed_model_ids),
+        },
+        displacement_kind=ModelDisplacementKind.FALL_BACK,
+        transition_batch=transition_batch,
+    )
+    return None
+
+
 def _complete_movement_activation(
     *,
     state: GameState,
@@ -1567,6 +2387,8 @@ def _movement_action_options(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
+    battle_round: int = 1,
+    battle_shocked_unit_ids: tuple[str, ...] = (),
 ) -> tuple[DecisionOption, ...]:
     availability_result = _movement_action_availability_result(
         scenario=scenario,
@@ -1608,6 +2430,31 @@ def _movement_action_options(
                             "unit_instance_id": unit_placement.unit_instance_id,
                             "witness": resolution.witness.to_payload(),
                             **resolution.movement_payload,
+                        }
+                    ),
+                )
+            )
+            continue
+        if action is MovementPhaseActionKind.FALL_BACK:
+            fall_back_resolution = resolve_fall_back_move(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_placement=unit_placement,
+                path_witness=None,
+                battle_round=battle_round,
+                battle_shocked_unit_ids=battle_shocked_unit_ids,
+            )
+            options.append(
+                DecisionOption(
+                    option_id=MovementPhaseActionKind.FALL_BACK.value,
+                    label="Fall Back",
+                    payload=validate_json_value(
+                        {
+                            "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                            "displacement_kind": ModelDisplacementKind.FALL_BACK.value,
+                            "unit_instance_id": unit_placement.unit_instance_id,
+                            "witness": fall_back_resolution.witness.to_payload(),
+                            **fall_back_resolution.movement_payload,
                         }
                     ),
                 )
@@ -1750,6 +2597,111 @@ def _advance_reroll_permission_for_unit(
     )
 
 
+def _roll_desperate_escape_dice(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    resolution: FallBackActionResult,
+) -> tuple[DesperateEscapeRoll, ...]:
+    rolls: list[DesperateEscapeRoll] = []
+    manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
+    for requirement in resolution.desperate_escape_requirements:
+        decisions.event_log.append(
+            "desperate_escape_roll_requested",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": requirement.unit_instance_id,
+                "model_instance_id": requirement.model_instance_id,
+                "desperate_escape_requirement": validate_json_value(requirement.to_payload()),
+            },
+        )
+        roll = DesperateEscapeRoll.from_roll_state(
+            requirement=requirement,
+            roll_state=manager.roll(requirement.roll_spec()),
+        )
+        decisions.event_log.append(
+            "desperate_escape_roll_resolved",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": requirement.unit_instance_id,
+                "model_instance_id": requirement.model_instance_id,
+                "desperate_escape_roll": validate_json_value(roll.to_payload()),
+            },
+        )
+        rolls.append(roll)
+    return tuple(rolls)
+
+
+def _desperate_escape_model_selection_request(
+    *,
+    state: GameState,
+    fall_back_result: FallBackActionResult,
+    action_result: DecisionResult,
+) -> DecisionRequest:
+    failed_model_ids = tuple(
+        roll.requirement.model_instance_id
+        for roll in fall_back_result.failed_desperate_escape_rolls
+    )
+    if not failed_model_ids:
+        raise GameLifecycleError("Desperate Escape model selection requires failed rolls.")
+    return DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+        actor_id=_active_player_id(state),
+        payload={
+            "fall_back_context": {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": fall_back_result.unit_instance_id,
+                "action_request_id": action_result.request_id,
+                "action_result_id": action_result.result_id,
+                "fall_back_result": validate_json_value(fall_back_result.to_payload()),
+                "failed_model_ids": list(failed_model_ids),
+            }
+        },
+        options=_desperate_escape_model_selection_options(
+            fall_back_result=fall_back_result,
+        ),
+    )
+
+
+def _desperate_escape_model_selection_options(
+    *,
+    fall_back_result: FallBackActionResult,
+) -> tuple[DecisionOption, ...]:
+    failed_model_ids = tuple(
+        roll.requirement.model_instance_id
+        for roll in fall_back_result.failed_desperate_escape_rolls
+    )
+    destroyed_count = len(failed_model_ids)
+    eligible_model_ids = tuple(
+        placement.model_instance_id
+        for placement in fall_back_result.attempted_placement.model_placements
+    )
+    options: list[DecisionOption] = []
+    for selected_ids in combinations(eligible_model_ids, destroyed_count):
+        option_id = "destroy:" + ",".join(selected_ids)
+        options.append(
+            DecisionOption(
+                option_id=option_id,
+                label="Destroy " + ", ".join(selected_ids),
+                payload={
+                    "unit_instance_id": fall_back_result.unit_instance_id,
+                    "destroyed_model_ids": list(selected_ids),
+                    "failed_model_ids": list(failed_model_ids),
+                },
+            )
+        )
+    return tuple(options)
+
+
 def resolve_normal_move(
     *,
     scenario: BattlefieldScenario,
@@ -1775,6 +2727,7 @@ def resolve_normal_move(
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
         action_label="Normal Move",
+        rollback_on_endpoint_coherency=True,
     )
     return NormalMoveResolution(
         unit_instance_id=unit_placement.unit_instance_id,
@@ -1816,6 +2769,7 @@ def resolve_advance_move(
         movement_phase_action=MovementPhaseActionKind.ADVANCE,
         displacement_kind=ModelDisplacementKind.ADVANCE,
         action_label="Advance",
+        rollback_on_endpoint_coherency=True,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -1826,6 +2780,68 @@ def resolve_advance_move(
         attempted_placement=resolved.attempted_placement,
         witness=resolved.witness,
         advance_roll=advance_roll,
+        path_validation_results=resolved.path_validation_results,
+        terrain_path_legality_results=resolved.terrain_path_legality_results,
+        coherency_result=resolved.coherency_result,
+        rollback_record=resolved.rollback_record,
+        movement_payload=movement_payload,
+    )
+
+
+def resolve_fall_back_move(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    path_witness: PathWitness | None = None,
+    battle_round: int = 1,
+    battle_shocked_unit_ids: tuple[str, ...] = (),
+    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    terrain: tuple[TerrainVolume, ...] = (),
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+) -> FallBackActionResult:
+    fall_back_witness = (
+        _default_fall_back_witness(scenario=scenario, unit_placement=unit_placement)
+        if path_witness is None
+        else path_witness
+    )
+    resolved = _resolve_unit_move(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        path_witness=fall_back_witness,
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+        terrain=terrain,
+        terrain_features=terrain_features,
+        movement_bonus_inches=0,
+        movement_mode=MovementMode.FALL_BACK,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        displacement_kind=ModelDisplacementKind.FALL_BACK,
+        action_label="Fall Back",
+        rollback_on_endpoint_coherency=False,
+    )
+    desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        witness=resolved.witness,
+        battle_round=battle_round,
+        battle_shocked_unit_ids=battle_shocked_unit_ids,
+    )
+    movement_payload = {
+        **resolved.movement_payload,
+        "desperate_escape_requirements": validate_json_value(
+            [requirement.to_payload() for requirement in desperate_escape_requirements]
+        ),
+        "desperate_escape_rolls": [],
+    }
+    return FallBackActionResult.unresolved(
+        unit_instance_id=unit_placement.unit_instance_id,
+        attempted_placement=resolved.attempted_placement,
+        witness=resolved.witness,
+        desperate_escape_requirements=desperate_escape_requirements,
         path_validation_results=resolved.path_validation_results,
         terrain_path_legality_results=resolved.terrain_path_legality_results,
         coherency_result=resolved.coherency_result,
@@ -1849,6 +2865,7 @@ def _resolve_unit_move(
     movement_phase_action: MovementPhaseActionKind,
     displacement_kind: ModelDisplacementKind,
     action_label: str,
+    rollback_on_endpoint_coherency: bool,
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -1954,15 +2971,21 @@ def _resolve_unit_move(
                 }
             )
         )
-    _resolved_placement, coherency_result, rollback_record = (
-        resolve_unit_movement_endpoint_coherency(
+    if rollback_on_endpoint_coherency:
+        _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             before=unit_placement,
             attempted=attempted_placement,
             displacement_kind=displacement_kind,
         )
-    )
+    else:
+        coherency_result = unit_placement_coherency_result(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=attempted_placement,
+        )
+        rollback_record = None
     movement_payload: dict[str, JsonValue] = {
         "movement_inches": max_movement_inches,
         "model_movements": model_movements,
@@ -2005,6 +3028,30 @@ def _default_move_witness(
     return PathWitness.for_straight_line_endpoints(tuple(model_paths))
 
 
+def _default_fall_back_witness(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+) -> PathWitness:
+    model_paths: list[tuple[str, Pose, Pose]] = []
+    for placement in unit_placement.model_placements:
+        model = scenario.model_instance_for_placement(placement)
+        movement_inches = _model_movement_inches(model)
+        model_paths.append(
+            (
+                placement.model_instance_id,
+                placement.pose,
+                Pose.at(
+                    x=placement.pose.position.x,
+                    y=placement.pose.position.y + movement_inches,
+                    z=placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                ),
+            )
+        )
+    return PathWitness.for_straight_line_endpoints(tuple(model_paths))
+
+
 def _movement_transition_batch(
     *,
     before: UnitPlacement,
@@ -2034,6 +3081,55 @@ def _movement_transition_batch(
             )
         )
     return BattlefieldTransitionBatch(displacements=tuple(displacement_records))
+
+
+def _fall_back_transition_batch(
+    *,
+    before: UnitPlacement,
+    after: UnitPlacement,
+    witness: PathWitness,
+    destroyed_model_ids: tuple[str, ...],
+) -> BattlefieldTransitionBatch:
+    before_poses = {
+        placement.model_instance_id: placement.pose for placement in before.model_placements
+    }
+    destroyed_id_set = set(_validate_identifier_tuple("destroyed_model_ids", destroyed_model_ids))
+    displacement_records: list[ModelDisplacementRecord] = []
+    removal_records: list[ModelRemovalRecord] = []
+    for placement in after.model_placements:
+        if placement.model_instance_id not in before_poses:
+            raise GameLifecycleError("Fall Back transition references an unknown model.")
+        if placement.model_instance_id in destroyed_id_set:
+            removal_records.append(
+                ModelRemovalRecord(
+                    model_instance_id=placement.model_instance_id,
+                    removal_kind=BattlefieldRemovalKind.DESTROYED,
+                    source_phase=BattlePhase.MOVEMENT.value,
+                    source_step=MovementPhaseStepKind.MOVE_UNITS.value,
+                    source_rule_id="desperate_escape",
+                    source_event_id=None,
+                    destination_id=None,
+                )
+            )
+            continue
+        model_path = witness.poses_for_model(placement.model_instance_id)
+        displacement_records.append(
+            ModelDisplacementRecord(
+                model_instance_id=placement.model_instance_id,
+                displacement_kind=ModelDisplacementKind.FALL_BACK,
+                start_pose=before_poses[placement.model_instance_id],
+                end_pose=placement.pose,
+                path_witness=PathWitness.for_paths(((placement.model_instance_id, model_path),)),
+                source_phase=BattlePhase.MOVEMENT.value,
+                source_step=MovementPhaseStepKind.MOVE_UNITS.value,
+                source_rule_id=None,
+                source_event_id=None,
+            )
+        )
+    return BattlefieldTransitionBatch(
+        removals=tuple(removal_records),
+        displacements=tuple(displacement_records),
+    )
 
 
 def _normal_move_transition_batch(
@@ -2111,6 +3207,137 @@ def _enemy_engagement_model_ids_for_unit(
             ):
                 enemy_model_ids.add(enemy_model.model_id)
     return tuple(sorted(enemy_model_ids))
+
+
+def _desperate_escape_requirements_for_fall_back(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    witness: PathWitness,
+    battle_round: int,
+    battle_shocked_unit_ids: tuple[str, ...],
+) -> tuple[DesperateEscapeRequirement, ...]:
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("Desperate Escape requirements require a scenario.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Desperate Escape requirements require a RulesetDescriptor.")
+    if type(unit_placement) is not UnitPlacement:
+        raise GameLifecycleError("Desperate Escape requirements require a UnitPlacement.")
+    if type(witness) is not PathWitness:
+        raise GameLifecycleError("Desperate Escape requirements require a PathWitness.")
+    requirement_battle_round = _validate_positive_int(
+        "Desperate Escape requirements battle_round",
+        battle_round,
+    )
+    battle_shocked_ids = set(
+        _validate_identifier_tuple(
+            "battle_shocked_unit_ids",
+            battle_shocked_unit_ids,
+        )
+    )
+    unit = scenario.unit_instance_for_placement(unit_placement)
+    unit_keyword_set = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    overflight_exempt = "FLY" in unit_keyword_set or "TITANIC" in unit_keyword_set
+    enemy_models = _enemy_geometry_models_for_player(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+    )
+    requirements: list[DesperateEscapeRequirement] = []
+    for index, placement in enumerate(unit_placement.model_placements, start=1):
+        reasons: list[DesperateEscapeRequirementReason] = []
+        enemy_model_ids: tuple[str, ...] = ()
+        if unit_placement.unit_instance_id in battle_shocked_ids:
+            reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
+        if not overflight_exempt:
+            moving_model = geometry_model_for_placement(
+                model=scenario.model_instance_for_placement(placement),
+                placement=placement,
+            )
+            enemy_model_ids = _enemy_model_ids_crossed_by_witness(
+                moving_model=moving_model,
+                witness=witness,
+                enemy_models=enemy_models,
+            )
+            if enemy_model_ids:
+                reasons.append(DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT)
+        if not reasons:
+            continue
+        requirements.append(
+            DesperateEscapeRequirement(
+                requirement_id=f"{unit_placement.unit_instance_id}:desperate-escape:{index:03d}",
+                player_id=unit_placement.player_id,
+                battle_round=requirement_battle_round,
+                unit_instance_id=unit_placement.unit_instance_id,
+                model_instance_id=placement.model_instance_id,
+                reasons=tuple(reasons),
+                enemy_model_ids=enemy_model_ids,
+            )
+        )
+    return tuple(requirements)
+
+
+def _enemy_model_ids_crossed_by_witness(
+    *,
+    moving_model: Model,
+    witness: PathWitness,
+    enemy_models: tuple[Model, ...],
+) -> tuple[str, ...]:
+    crossed_enemy_ids: set[str] = set()
+    for pose in _sampled_witness_transit_poses(
+        witness.poses_for_model(moving_model.model_id),
+        sample_interval_inches=0.5,
+    ):
+        sampled_model = _model_at_pose(moving_model, pose)
+        for enemy_model in enemy_models:
+            if sampled_model.base_overlaps(enemy_model):
+                crossed_enemy_ids.add(enemy_model.model_id)
+    return tuple(sorted(crossed_enemy_ids))
+
+
+def _sampled_witness_transit_poses(
+    poses: tuple[Pose, ...],
+    *,
+    sample_interval_inches: float,
+) -> tuple[Pose, ...]:
+    if type(poses) is not tuple:
+        raise GameLifecycleError("Fall Back witness poses must be a tuple.")
+    if len(poses) < 2:
+        raise GameLifecycleError("Fall Back witness poses must include start and end.")
+    interval = float(sample_interval_inches)
+    if not math.isfinite(interval) or interval <= 0:
+        raise GameLifecycleError("sample_interval_inches must be greater than 0.")
+    sampled: list[Pose] = [poses[0]]
+    previous = poses[0]
+    for pose in poses[1:]:
+        distance = previous.distance_3d_to(pose)
+        steps = max(1, math.ceil(distance / interval))
+        for step in range(1, steps + 1):
+            sampled.append(_interpolate_pose(previous, pose, step / steps))
+        previous = pose
+    return tuple(sampled[1:-1])
+
+
+def _interpolate_pose(start: Pose, end: Pose, t: float) -> Pose:
+    return Pose.at(
+        x=start.position.x + ((end.position.x - start.position.x) * t),
+        y=start.position.y + ((end.position.y - start.position.y) * t),
+        z=start.position.z + ((end.position.z - start.position.z) * t),
+        facing_degrees=start.facing.degrees + ((end.facing.degrees - start.facing.degrees) * t),
+    )
+
+
+def _model_at_pose(model: Model, pose: Pose) -> Model:
+    if type(model) is not Model:
+        raise GameLifecycleError("model must be a geometry Model.")
+    if type(pose) is not Pose:
+        raise GameLifecycleError("pose must be a Pose.")
+    return Model(
+        model_id=model.model_id,
+        pose=pose,
+        base=model.base,
+        volume=model.volume,
+    )
 
 
 def _geometry_models_for_unit_placement(
@@ -2226,7 +3453,9 @@ def _validate_move_witness_matches_unit(
         raise GameLifecycleError(f"{action_label} witness must match the selected unit models.")
 
 
-def _normal_move_violation_code(resolution: NormalMoveResolution | AdvanceMoveResolution) -> str:
+def _normal_move_violation_code(
+    resolution: NormalMoveResolution | AdvanceMoveResolution | FallBackActionResult,
+) -> str:
     for path_result in resolution.path_validation_results:
         if path_result.is_valid:
             continue
@@ -2238,6 +3467,35 @@ def _normal_move_violation_code(resolution: NormalMoveResolution | AdvanceMoveRe
     if resolution.rollback_record is not None:
         return "unit_coherency_broken"
     return "normal_move_invalid"
+
+
+def _movement_action_invalid_payload(
+    *,
+    state: GameState,
+    active_player_id: str,
+    unit_instance_id: str,
+    action: MovementPhaseActionKind,
+    result: DecisionResult,
+    violation_code: str,
+    movement_payload: dict[str, JsonValue],
+    rollback_record: MovementRollbackRecord | None,
+) -> dict[str, JsonValue]:
+    invalid_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": active_player_id,
+        "phase": BattlePhase.MOVEMENT.value,
+        "unit_instance_id": unit_instance_id,
+        "movement_phase_action": action.value,
+        "request_id": result.request_id,
+        "result_id": result.result_id,
+        "phase_body_status": "movement_action_invalid",
+        "violation_code": violation_code,
+        **movement_payload,
+    }
+    if rollback_record is not None:
+        invalid_payload["rollback_record"] = validate_json_value(rollback_record.to_payload())
+    return invalid_payload
 
 
 def _normal_move_invalid_message(violation_code: str) -> str:
@@ -2344,6 +3602,21 @@ def movement_phase_action_kind_from_token(token: object) -> MovementPhaseActionK
         raise GameLifecycleError(f"Unsupported MovementPhaseActionKind token: {token}.") from exc
 
 
+def desperate_escape_requirement_reason_from_token(
+    token: object,
+) -> DesperateEscapeRequirementReason:
+    if type(token) is DesperateEscapeRequirementReason:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("DesperateEscapeRequirementReason token must be a string.")
+    try:
+        return DesperateEscapeRequirementReason(token)
+    except ValueError as exc:
+        raise GameLifecycleError(
+            f"Unsupported DesperateEscapeRequirementReason token: {token}."
+        ) from exc
+
+
 def movement_mode_for_phase_action(action: object) -> MovementMode | None:
     action_kind = movement_phase_action_kind_from_token(action)
     if action_kind is MovementPhaseActionKind.REMAIN_STATIONARY:
@@ -2420,6 +3693,15 @@ def _payload_path_witness(payload: dict[str, JsonValue], *, key: str) -> PathWit
     return PathWitness.from_payload(cast(PathWitnessPayload, value))
 
 
+def _payload_json_array(payload: dict[str, JsonValue], *, key: str) -> list[JsonValue]:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Decision payload key must be an array: {key}.")
+    return value
+
+
 def _validate_json_object(field_name: str, value: object) -> dict[str, JsonValue]:
     json_value = validate_json_value(value)
     if not isinstance(json_value, dict):
@@ -2474,6 +3756,69 @@ def _validate_terrain_path_legality_result_tuple(
     if not results:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return tuple(results)
+
+
+def _validate_desperate_escape_reason_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DesperateEscapeRequirementReason, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    reasons = tuple(
+        desperate_escape_requirement_reason_from_token(value)
+        for value in cast(tuple[object, ...], values)
+    )
+    if not reasons:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    seen: set[DesperateEscapeRequirementReason] = set()
+    for reason in reasons:
+        if reason in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(reason)
+    return tuple(sorted(reasons, key=lambda reason: reason.value))
+
+
+def _validate_desperate_escape_requirement_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DesperateEscapeRequirement, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    requirements: list[DesperateEscapeRequirement] = []
+    seen_requirement_ids: set[str] = set()
+    seen_model_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DesperateEscapeRequirement:
+            raise GameLifecycleError(
+                f"{field_name} must contain DesperateEscapeRequirement values."
+            )
+        if value.requirement_id in seen_requirement_ids:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate requirement IDs.")
+        if value.model_instance_id in seen_model_ids:
+            raise GameLifecycleError(f"{field_name} must not test the same model twice.")
+        seen_requirement_ids.add(value.requirement_id)
+        seen_model_ids.add(value.model_instance_id)
+        requirements.append(value)
+    return tuple(sorted(requirements, key=lambda requirement: requirement.requirement_id))
+
+
+def _validate_desperate_escape_roll_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DesperateEscapeRoll, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    rolls: list[DesperateEscapeRoll] = []
+    seen_requirement_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DesperateEscapeRoll:
+            raise GameLifecycleError(f"{field_name} must contain DesperateEscapeRoll values.")
+        requirement_id = value.requirement.requirement_id
+        if requirement_id in seen_requirement_ids:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate requirements.")
+        seen_requirement_ids.add(requirement_id)
+        rolls.append(value)
+    return tuple(sorted(rolls, key=lambda roll: roll.requirement.requirement_id))
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

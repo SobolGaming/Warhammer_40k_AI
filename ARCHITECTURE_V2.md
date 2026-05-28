@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10N** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10O unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10O** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10P unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -58,6 +58,7 @@ Completed / implemented foundation:
 | 10L | Complete | Unit coherency runtime validation and movement rollback |
 | 10M | Complete | Engagement-aware Movement action options and Normal Move finalization |
 | 10N | Complete | Advance action, dice, rerolls, and advanced-state restrictions |
+| 10O | Complete | Fall Back action and Desperate Escape resolution |
 
 ## Cross-cutting architectural rules
 
@@ -439,6 +440,8 @@ CORE V1 relevant areas:
 
 ## Phase 10O: Fall Back action and Desperate Escape resolution
 
+Status: Complete.
+
 Modules:
 
 - `engine/phases/movement.py`
@@ -462,6 +465,9 @@ Invariants:
 - moving over enemy models during Fall Back requires Desperate Escape tests unless the model is `TITANIC` or can `FLY`;
 - Battle-shocked units selected to Fall Back require Desperate Escape tests for every model;
 - Desperate Escape rolls of 1-2 destroy one model from the falling-back unit, selected by the controlling player;
+- post-destruction Fall Back endpoint coherency is validated against the surviving models before any battlefield mutation;
+- if Desperate Escape destroys every model in the falling-back unit, removal records remain authoritative and no stale `FellBackUnitState` is recorded;
+- unresolved Desperate Escape requirements cannot emit Fall Back transition records;
 - the same model can trigger only one Desperate Escape test per phase;
 - units that Fall Back cannot shoot or declare a charge that turn unless a rule permits it;
 - destroyed models emit removal records with correct destruction context.
@@ -475,6 +481,10 @@ Required tests:
 - `FLY`/`TITANIC` exceptions avoid Desperate Escape for crossing enemy models;
 - Battle-shocked Fall Back requires tests for every model;
 - failed Desperate Escape destroys a selected model;
+- survivor coherency is revalidated after Desperate Escape destruction selection;
+- Desperate Escape destruction can make an otherwise incoherent attempted endpoint legal;
+- all-model Desperate Escape destruction round-trips through lifecycle replay without stale Fell Back state;
+- unresolved Desperate Escape requirements cannot emit transition batches;
 - Fall Back emits displacement and removal records where applicable.
 
 CORE V1 relevant areas:

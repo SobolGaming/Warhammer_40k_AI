@@ -35,6 +35,7 @@ from warhammer40k_core.engine.phases.command import (
     CommandPhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseHandler,
@@ -54,6 +55,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
     (
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
 )
@@ -235,6 +237,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_battlefield_state_consistency(state=state, config=config)
     _validate_movement_phase_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
+    _validate_fell_back_unit_state_consistency(state=state)
     if config is None:
         return
     if state.game_id != config.game_id:
@@ -340,8 +343,20 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         placement.unit_instance_id for placement in placed_army.unit_placements
     }
+    removed_model_ids = set(state.battlefield_state.removed_model_ids)
+    fully_removed_active_player_unit_ids: set[str] = set()
+    for army_definition in state.army_definitions:
+        if army_definition.player_id != state.active_player_id:
+            continue
+        for unit in army_definition.units:
+            unit_model_ids = {model.model_instance_id for model in unit.own_models}
+            if unit_model_ids and unit_model_ids <= removed_model_ids:
+                fully_removed_active_player_unit_ids.add(unit.unit_instance_id)
     for unit_id in (*movement_state.selected_unit_ids, *movement_state.moved_unit_ids):
-        if unit_id not in active_player_unit_ids:
+        if (
+            unit_id not in active_player_unit_ids
+            and unit_id not in fully_removed_active_player_unit_ids
+        ):
             raise GameLifecycleError(
                 "movement_phase_state selected unit is not active player's unit."
             )
@@ -384,6 +399,36 @@ def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:
             raise GameLifecycleError("advanced_unit_states battle round drift.")
         if advanced_state.unit_instance_id not in active_player_unit_ids:
             raise GameLifecycleError("advanced_unit_states unit is not active player's unit.")
+
+
+def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:
+    if not state.fell_back_unit_states:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("fell_back_unit_states require battle stage.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("fell_back_unit_states require active player.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("fell_back_unit_states require battlefield_state.")
+    try:
+        scenario = BattlefieldScenario(
+            armies=tuple(state.army_definitions),
+            battlefield_state=state.battlefield_state,
+        )
+        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
+    except PlacementError as exc:
+        raise GameLifecycleError("Lifecycle state fell_back_unit_states are invalid.") from exc
+
+    active_player_unit_ids = {
+        placement.unit_instance_id for placement in placed_army.unit_placements
+    }
+    for fell_back_state in state.fell_back_unit_states:
+        if fell_back_state.player_id != state.active_player_id:
+            raise GameLifecycleError("fell_back_unit_states player drift.")
+        if fell_back_state.battle_round != state.battle_round:
+            raise GameLifecycleError("fell_back_unit_states battle round drift.")
+        if fell_back_state.unit_instance_id not in active_player_unit_ids:
+            raise GameLifecycleError("fell_back_unit_states unit is not active player's unit.")
 
 
 def _state_requires_mustered_armies(state: GameState) -> bool:

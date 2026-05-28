@@ -41,6 +41,7 @@ class MovementCapabilitySetPayload(TypedDict):
     ruleset_descriptor_hash: str
     keywords: list[str]
     has_fly: bool
+    is_titanic: bool
     is_infantry: bool
     is_beast: bool
     is_vehicle: bool
@@ -96,6 +97,7 @@ class MovementCapabilitySet:
     ruleset_descriptor_hash: str
     keywords: tuple[str, ...]
     has_fly: bool
+    is_titanic: bool
     is_infantry: bool
     is_beast: bool
     is_vehicle: bool
@@ -125,6 +127,7 @@ class MovementCapabilitySet:
         )
         for field_name, value in (
             ("has_fly", self.has_fly),
+            ("is_titanic", self.is_titanic),
             ("is_infantry", self.is_infantry),
             ("is_beast", self.is_beast),
             ("is_vehicle", self.is_vehicle),
@@ -157,6 +160,7 @@ class MovementCapabilitySet:
         )
         keyword_set = set(normalized_keywords)
         has_fly = "FLY" in keyword_set
+        is_titanic = "TITANIC" in keyword_set
         is_infantry = "INFANTRY" in keyword_set
         is_beast = "BEAST" in keyword_set
         is_vehicle = "VEHICLE" in keyword_set
@@ -179,6 +183,7 @@ class MovementCapabilitySet:
             ruleset_descriptor_hash=descriptor.descriptor_hash,
             keywords=normalized_keywords,
             has_fly=has_fly,
+            is_titanic=is_titanic,
             is_infantry=is_infantry,
             is_beast=is_beast,
             is_vehicle=is_vehicle,
@@ -198,6 +203,7 @@ class MovementCapabilitySet:
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
             "keywords": list(self.keywords),
             "has_fly": self.has_fly,
+            "is_titanic": self.is_titanic,
             "is_infantry": self.is_infantry,
             "is_beast": self.is_beast,
             "is_vehicle": self.is_vehicle,
@@ -223,6 +229,7 @@ class MovementCapabilitySet:
             ruleset_descriptor_hash=raw_payload["ruleset_descriptor_hash"],
             keywords=tuple(raw_payload["keywords"]),
             has_fly=raw_payload["has_fly"],
+            is_titanic=raw_payload["is_titanic"],
             is_infantry=raw_payload["is_infantry"],
             is_beast=raw_payload["is_beast"],
             is_vehicle=raw_payload["is_vehicle"],
@@ -506,7 +513,9 @@ class MovementLegalityContext:
         movement_distance_budget_inches: float | None = None,
     ) -> PathValidationContext:
         fly_transit_applies = self._fly_transit_applies()
-        may_transit_enemy_models = self.capabilities.can_move_through_models and fly_transit_applies
+        may_transit_enemy_models = (
+            self.capabilities.can_move_through_models and fly_transit_applies
+        ) or self.movement_mode is MovementMode.FALL_BACK
         may_transit_enemy_engagement = (
             self.engagement_policy.may_transit_enemy_engagement or fly_transit_applies
         )
