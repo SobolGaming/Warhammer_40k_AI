@@ -490,6 +490,12 @@ class MovementDistanceWitness:
             event.pivot_index for event in pivot_events
         ):
             raise GeometryError("MovementDistanceWitness pivot events must be ordered.")
+        _validate_segments_form_contiguous_path(segments)
+        _validate_pivot_events_match_segments(
+            model_id=model_id,
+            segments=segments,
+            pivot_events=pivot_events,
+        )
         if self.budget is not None:
             if type(self.budget) is not MovementDistanceBudget:
                 raise GeometryError("MovementDistanceWitness budget must be a budget.")
@@ -818,6 +824,61 @@ def _validate_pivot_event(field_name: str, value: object) -> PivotEvent:
     if type(value) is not PivotEvent:
         raise GeometryError(f"{field_name} must be a PivotEvent.")
     return value
+
+
+def _validate_segments_form_contiguous_path(segments: tuple[MovementSegment, ...]) -> None:
+    for previous, current in pairwise(segments):
+        if previous.end_pose != current.start_pose:
+            raise GeometryError("MovementDistanceWitness segments must form a contiguous path.")
+
+
+def _validate_pivot_events_match_segments(
+    *,
+    model_id: str,
+    segments: tuple[MovementSegment, ...],
+    pivot_events: tuple[PivotEvent, ...],
+) -> None:
+    pivot_by_index = {event.pivot_index: event for event in pivot_events}
+    if len(pivot_by_index) != len(pivot_events):
+        raise GeometryError(
+            "MovementDistanceWitness pivot events must not contain duplicate indexes."
+        )
+    expected_indexes = tuple(
+        segment.segment_index
+        for segment in segments
+        if segment.start_pose.facing != segment.end_pose.facing
+    )
+    if tuple(event.pivot_index for event in pivot_events) != expected_indexes:
+        raise GeometryError(
+            "MovementDistanceWitness pivot events must match facing-change segments."
+        )
+    for event in pivot_events:
+        if event.pivot_index >= len(segments):
+            raise GeometryError("MovementDistanceWitness pivot event index is out of range.")
+        segment = segments[event.pivot_index]
+        if event.model_id != model_id:
+            raise GeometryError("MovementDistanceWitness pivot event model_id mismatch.")
+        if event.start_pose != segment.start_pose or event.end_pose != segment.end_pose:
+            raise GeometryError(
+                "MovementDistanceWitness pivot event poses must match segment poses."
+            )
+    if not pivot_events:
+        return
+    first = pivot_events[0]
+    if not first.first_pivot_for_model:
+        raise GeometryError("First pivot event must be marked first_pivot_for_model.")
+    if not math.isclose(
+        first.applied_cost_inches,
+        first.pivot_value_inches,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    ):
+        raise GeometryError("First pivot event must apply the full pivot value.")
+    for event in pivot_events[1:]:
+        if event.first_pivot_for_model:
+            raise GeometryError("Only one pivot event may be first_pivot_for_model.")
+        if event.applied_cost_inches != 0.0:
+            raise GeometryError("Only first pivot event may apply pivot cost.")
 
 
 def _validate_positive_number(field_name: str, value: object) -> float:
