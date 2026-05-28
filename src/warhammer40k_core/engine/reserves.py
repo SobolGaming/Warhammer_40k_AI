@@ -10,7 +10,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MissionPolicyDescriptor,
     ReserveDestructionTimingKind,
     RulesetDescriptor,
-    TerrainEndpointSupportPolicy,
     reserve_destruction_timing_kind_from_token,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError
@@ -28,6 +27,7 @@ from warhammer40k_core.engine.battlefield_state import (
     battlefield_placement_kind_from_token,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placement_violation
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
@@ -36,7 +36,7 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainSupportSurface
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -1818,108 +1818,22 @@ def _terrain_endpoint_violation(
     ruleset_descriptor: RulesetDescriptor,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> ReservePlacementViolation | None:
-    movement_keywords = {_canonical_keyword(keyword) for keyword in unit.keywords}
-    for feature in terrain_features:
-        feature_policy = ruleset_descriptor.terrain_movement_policy.policy_for_feature_kind(
-            feature.feature_kind
-        )
-        support_surfaces = feature.support_surfaces(
-            no_overhang_required=feature_policy.no_overhang_required
-        )
-        touched_surfaces = tuple(
-            surface
-            for surface in support_surfaces
-            if _model_endpoint_is_on_support_surface(model, surface)
-        )
-        for terrain in feature.terrain_volumes():
-            if terrain.intersects_model(model) and not touched_surfaces:
-                return ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
-                    message="Reserve placement endpoint intersects terrain.",
-                    model_instance_id=model.model_id,
-                    blocker_id=terrain.terrain_id,
-                )
-        if not touched_surfaces:
-            if (
-                model.pose.position.z > 0.0
-                and feature_policy.no_overhang_required
-                and shapely_backend.base_footprint_intersects_bounds(
-                    model.base,
-                    model.pose,
-                    feature.bounds(),
-                )
-            ):
-                return ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
-                    message="Reserve placement endpoint has no support surface.",
-                    model_instance_id=model.model_id,
-                    blocker_id=feature.feature_id,
-                )
-            continue
-        for surface in touched_surfaces:
-            elevated = surface.z_inches > 0.0
-            if (
-                feature_policy.endpoint_support_policy
-                is TerrainEndpointSupportPolicy.NOT_ALLOWED_ON_TOP
-            ):
-                return ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
-                    message="Reserve placement cannot end on this terrain feature.",
-                    model_instance_id=model.model_id,
-                    blocker_id=surface.surface_id,
-                )
-            if (
-                feature_policy.endpoint_support_policy
-                is TerrainEndpointSupportPolicy.ALLOWED_ON_GROUND_FLOOR_ONLY
-                and elevated
-            ):
-                return ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
-                    message="Reserve placement cannot end on an elevated surface.",
-                    model_instance_id=model.model_id,
-                    blocker_id=surface.surface_id,
-                )
-            if (
-                elevated
-                and feature_policy.ground_floor_only_unless_keyword
-                and not movement_keywords.intersection(feature_policy.upper_floor_allowed_keywords)
-            ):
-                return ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
-                    message="Reserve placement lacks a keyword for the upper floor.",
-                    model_instance_id=model.model_id,
-                    blocker_id=surface.surface_id,
-                )
-            support_containment_required = surface.no_overhang_required and (
-                elevated
-                or feature_policy.endpoint_support_policy
-                is TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG
-            )
-            if support_containment_required and not shapely_backend.base_footprint_within_bounds(
-                model.base,
-                model.pose,
-                surface.bounds(),
-            ):
-                return ReservePlacementViolation(
-                    violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
-                    message="Reserve placement base overhangs support surface.",
-                    model_instance_id=model.model_id,
-                    blocker_id=surface.surface_id,
-                )
-    return None
-
-
-def _model_endpoint_is_on_support_surface(
-    model: Model,
-    surface: TerrainSupportSurface,
-) -> bool:
-    return math.isclose(
-        model.pose.position.z, surface.z_inches, rel_tol=0.0, abs_tol=_EPSILON
-    ) and shapely_backend.base_footprint_intersects_bounds(
-        model.base,
-        model.pose,
-        surface.bounds(),
+    violation = terrain_endpoint_placement_violation(
+        model=model,
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+        terrain_features=terrain_features,
+        violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL.value,
+        placement_label="Reserve placement",
     )
+    if violation is not None:
+        return ReservePlacementViolation(
+            violation_code=ReservePlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL,
+            message=violation.message,
+            model_instance_id=violation.model_instance_id,
+            blocker_id=violation.blocker_id,
+        )
+    return None
 
 
 def _model_wholly_within_any_edge_band(

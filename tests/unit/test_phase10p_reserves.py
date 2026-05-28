@@ -1168,7 +1168,7 @@ def test_replay_load_rejects_arrived_reserve_with_unaccounted_embarked_units() -
         },
     )
 
-    with pytest.raises(GameLifecycleError, match="arrived reserve with embarked cargo"):
+    with pytest.raises(GameLifecycleError, match="battlefield_state is invalid"):
         GameLifecycle.from_payload(payload)
 
 

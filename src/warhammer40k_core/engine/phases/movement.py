@@ -55,6 +55,7 @@ from warhammer40k_core.engine.reserves import (
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
+from warhammer40k_core.engine.transports import DisembarkedUnitState
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     MovementRollbackRecordPayload,
@@ -1703,7 +1704,7 @@ class MovementPhaseHandler:
         scenario = _battlefield_scenario(state)
         legal_unit_ids = movement_state.legal_unit_ids(
             scenario,
-            accounted_unplaced_model_ids=state.unarrived_reserve_model_ids(),
+            accounted_unplaced_model_ids=state.unavailable_model_ids(),
         )
         if not legal_unit_ids:
             state.movement_phase_state = movement_state.with_step(
@@ -1803,7 +1804,7 @@ class MovementPhaseHandler:
         scenario = _battlefield_scenario(state)
         if unit_instance_id not in movement_state.legal_unit_ids(
             scenario,
-            accounted_unplaced_model_ids=state.unarrived_reserve_model_ids(),
+            accounted_unplaced_model_ids=state.unavailable_model_ids(),
         ):
             raise GameLifecycleError("Movement unit selection is not currently legal.")
 
@@ -2308,6 +2309,11 @@ def _request_movement_action(
             ruleset_descriptor=ruleset_descriptor,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            disembarked_unit_state=state.disembarked_unit_state_for_unit(
+                player_id=_active_player_id(state),
+                battle_round=state.battle_round,
+                unit_instance_id=active_selection.unit_instance_id,
+            ),
         ),
     )
     decisions.request_decision(request)
@@ -2359,6 +2365,22 @@ def _apply_movement_action_decision(  # noqa: RET503
     )
     if not availability_result.is_available(action):
         raise GameLifecycleError("Movement action is not currently legal for the selected unit.")
+    disembarked_state = state.disembarked_unit_state_for_unit(
+        player_id=active_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
+    if disembarked_state is not None:
+        if (
+            action is MovementPhaseActionKind.REMAIN_STATIONARY
+            and not disembarked_state.can_choose_remain_stationary
+        ):
+            raise GameLifecycleError("Disembarked unit cannot Remain Stationary.")
+        if (
+            action is not MovementPhaseActionKind.REMAIN_STATIONARY
+            and not disembarked_state.can_move_further
+        ):
+            raise GameLifecycleError("Disembarked unit cannot move further.")
 
     if action is MovementPhaseActionKind.REMAIN_STATIONARY:
         _complete_movement_activation(
@@ -2967,7 +2989,14 @@ def _movement_action_options(
     ruleset_descriptor: RulesetDescriptor,
     battle_round: int = 1,
     battle_shocked_unit_ids: tuple[str, ...] = (),
+    disembarked_unit_state: DisembarkedUnitState | None = None,
 ) -> tuple[DecisionOption, ...]:
+    if disembarked_unit_state is not None and type(disembarked_unit_state) is not (
+        DisembarkedUnitState
+    ):
+        raise GameLifecycleError(
+            "Movement action options disembarked_unit_state must be DisembarkedUnitState."
+        )
     availability_result = _movement_action_availability_result(
         scenario=scenario,
         unit_placement=unit_placement,
@@ -2975,6 +3004,17 @@ def _movement_action_options(
     )
     options: list[DecisionOption] = []
     for action in availability_result.available_actions:
+        if disembarked_unit_state is not None:
+            if (
+                action is MovementPhaseActionKind.REMAIN_STATIONARY
+                and not disembarked_unit_state.can_choose_remain_stationary
+            ):
+                continue
+            if (
+                action is not MovementPhaseActionKind.REMAIN_STATIONARY
+                and not disembarked_unit_state.can_move_further
+            ):
+                continue
         if action is MovementPhaseActionKind.REMAIN_STATIONARY:
             options.append(
                 DecisionOption(
