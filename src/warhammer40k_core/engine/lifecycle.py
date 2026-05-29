@@ -35,8 +35,11 @@ from warhammer40k_core.engine.phases.command import (
     CommandPhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
+    PLACE_DISEMBARK_UNIT_DECISION_TYPE,
     PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+    SELECT_DISEMBARK_UNIT_DECISION_TYPE,
+    SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
@@ -61,6 +64,9 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
         SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
         PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
+        SELECT_DISEMBARK_UNIT_DECISION_TYPE,
+        PLACE_DISEMBARK_UNIT_DECISION_TYPE,
+        SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
 )
@@ -420,9 +426,19 @@ def _validate_transport_cargo_state_consistency(*, state: GameState) -> None:
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         return
+    placed_unit_ids = {
+        placement.unit_instance_id
+        for army in battlefield_state.placed_armies
+        for placement in army.unit_placements
+    }
     placed_model_ids = set(battlefield_state.placed_model_ids())
     removed_model_ids = set(battlefield_state.removed_model_ids)
     for cargo_state in state.transport_cargo_states:
+        if cargo_state.transport_unit_instance_id not in placed_unit_ids:
+            raise GameLifecycleError("transport_cargo_states transport unit must be placed.")
+        transport_model_ids = set(model_ids_by_unit_id[cargo_state.transport_unit_instance_id])
+        if transport_model_ids & removed_model_ids:
+            raise GameLifecycleError("transport_cargo_states transport models must not be removed.")
         for embarked_unit_id in cargo_state.embarked_unit_instance_ids:
             model_ids = set(model_ids_by_unit_id[embarked_unit_id])
             if model_ids & placed_model_ids:
@@ -464,6 +480,12 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
     except PlacementError:
         active_player_unit_ids = set()
     removed_model_ids = set(state.battlefield_state.removed_model_ids)
+    active_player_embarked_unit_ids = {
+        unit_id
+        for cargo_state in state.transport_cargo_states
+        if cargo_state.player_id == state.active_player_id
+        for unit_id in cargo_state.embarked_unit_instance_ids
+    }
     fully_removed_active_player_unit_ids: set[str] = set()
     for army_definition in state.army_definitions:
         if army_definition.player_id != state.active_player_id:
@@ -476,6 +498,7 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
         if (
             unit_id not in active_player_unit_ids
             and unit_id not in fully_removed_active_player_unit_ids
+            and unit_id not in active_player_embarked_unit_ids
         ):
             raise GameLifecycleError(
                 "movement_phase_state selected unit is not active player's unit."

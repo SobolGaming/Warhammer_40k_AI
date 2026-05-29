@@ -24,6 +24,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
+    BattlefieldTransitionBatchPayload,
     ModelPlacementRecord,
     ModelRemovalRecord,
     UnitPlacement,
@@ -35,6 +36,7 @@ from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placeme
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
+    UnitCoherencyResultPayload,
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -135,7 +137,7 @@ class EmbarkResolutionPayload(TypedDict):
     is_valid: bool
     violations: list[TransportOperationViolationPayload]
     updated_cargo_state: TransportCargoStatePayload | None
-    transition_batch: dict[str, object] | None
+    transition_batch: BattlefieldTransitionBatchPayload | None
 
 
 class DisembarkSelectionPayload(TypedDict):
@@ -165,10 +167,10 @@ class DisembarkResolutionPayload(TypedDict):
     selection: DisembarkSelectionPayload
     is_valid: bool
     violations: list[TransportOperationViolationPayload]
-    coherency_result: dict[str, object]
+    coherency_result: UnitCoherencyResultPayload
     updated_cargo_state: TransportCargoStatePayload | None
     disembarked_unit_state: DisembarkedUnitStatePayload | None
-    transition_batch: dict[str, object] | None
+    transition_batch: BattlefieldTransitionBatchPayload | None
 
 
 class DestroyedTransportModelRollPayload(TypedDict):
@@ -696,8 +698,32 @@ class EmbarkResolution:
             ),
             "transition_batch": None
             if self.transition_batch is None
-            else cast(dict[str, object], self.transition_batch.to_payload()),
+            else self.transition_batch.to_payload(),
         }
+
+    @classmethod
+    def from_payload(cls, payload: EmbarkResolutionPayload) -> Self:
+        transition_payload = payload["transition_batch"]
+        resolution = cls(
+            selection=EmbarkSelection.from_payload(payload["selection"]),
+            violations=tuple(
+                TransportOperationViolation.from_payload(violation)
+                for violation in payload["violations"]
+            ),
+            updated_cargo_state=(
+                None
+                if payload["updated_cargo_state"] is None
+                else TransportCargoState.from_payload(payload["updated_cargo_state"])
+            ),
+            transition_batch=(
+                None
+                if transition_payload is None
+                else BattlefieldTransitionBatch.from_payload(transition_payload)
+            ),
+        )
+        if resolution.is_valid != payload["is_valid"]:
+            raise GameLifecycleError("EmbarkResolution payload validity drift.")
+        return resolution
 
 
 @dataclass(frozen=True, slots=True)
@@ -1025,7 +1051,7 @@ class DisembarkResolution:
             "selection": self.selection.to_payload(),
             "is_valid": self.is_valid,
             "violations": [violation.to_payload() for violation in self.violations],
-            "coherency_result": cast(dict[str, object], self.coherency_result.to_payload()),
+            "coherency_result": self.coherency_result.to_payload(),
             "updated_cargo_state": (
                 None if self.updated_cargo_state is None else self.updated_cargo_state.to_payload()
             ),
@@ -1034,8 +1060,38 @@ class DisembarkResolution:
             else self.disembarked_unit_state.to_payload(),
             "transition_batch": None
             if self.transition_batch is None
-            else cast(dict[str, object], self.transition_batch.to_payload()),
+            else self.transition_batch.to_payload(),
         }
+
+    @classmethod
+    def from_payload(cls, payload: DisembarkResolutionPayload) -> Self:
+        transition_payload = payload["transition_batch"]
+        resolution = cls(
+            selection=DisembarkSelection.from_payload(payload["selection"]),
+            violations=tuple(
+                TransportOperationViolation.from_payload(violation)
+                for violation in payload["violations"]
+            ),
+            coherency_result=UnitCoherencyResult.from_payload(payload["coherency_result"]),
+            updated_cargo_state=(
+                None
+                if payload["updated_cargo_state"] is None
+                else TransportCargoState.from_payload(payload["updated_cargo_state"])
+            ),
+            disembarked_unit_state=(
+                None
+                if payload["disembarked_unit_state"] is None
+                else DisembarkedUnitState.from_payload(payload["disembarked_unit_state"])
+            ),
+            transition_batch=(
+                None
+                if transition_payload is None
+                else BattlefieldTransitionBatch.from_payload(transition_payload)
+            ),
+        )
+        if resolution.is_valid != payload["is_valid"]:
+            raise GameLifecycleError("DisembarkResolution payload validity drift.")
+        return resolution
 
 
 @dataclass(frozen=True, slots=True)
@@ -1071,6 +1127,14 @@ class DestroyedTransportModelRoll:
             "roll_state": self.roll_state.to_payload(),
             "mortal_wound_inflicted": self.mortal_wound_inflicted,
         }
+
+    @classmethod
+    def from_payload(cls, payload: DestroyedTransportModelRollPayload) -> Self:
+        return cls(
+            model_instance_id=payload["model_instance_id"],
+            roll_state=DiceRollState.from_payload(payload["roll_state"]),
+            mortal_wound_inflicted=payload["mortal_wound_inflicted"],
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -1145,6 +1209,18 @@ class DestroyedTransportDisembark:
         )
         if self.roll_threshold != (3 if self.emergency else 1):
             raise GameLifecycleError("DestroyedTransportDisembark roll threshold drift.")
+        for roll in self.model_rolls:
+            expected_mortal_wound = roll.roll_state.current_total <= self.roll_threshold
+            if roll.mortal_wound_inflicted != expected_mortal_wound:
+                raise GameLifecycleError("DestroyedTransportDisembark mortal wound roll drift.")
+        if self.placement.is_valid:
+            placed_model_ids = {
+                placement.model_instance_id
+                for placement in self.placement.selection.attempted_placement.model_placements
+            }
+            rolled_model_ids = {roll.model_instance_id for roll in self.model_rolls}
+            if rolled_model_ids != placed_model_ids:
+                raise GameLifecycleError("DestroyedTransportDisembark roll model drift.")
 
     @property
     def mortal_wound_count(self) -> int:
@@ -1170,6 +1246,35 @@ class DestroyedTransportDisembark:
             if self.disembarked_unit_state is None
             else self.disembarked_unit_state.to_payload(),
         }
+
+    @classmethod
+    def from_payload(cls, payload: DestroyedTransportDisembarkPayload) -> Self:
+        result = cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            unit_instance_id=payload["unit_instance_id"],
+            transport_unit_instance_id=payload["transport_unit_instance_id"],
+            emergency=payload["emergency"],
+            placement=DisembarkResolution.from_payload(payload["placement"]),
+            roll_threshold=payload["roll_threshold"],
+            model_rolls=tuple(
+                DestroyedTransportModelRoll.from_payload(roll) for roll in payload["model_rolls"]
+            ),
+            destroyed_model_instance_ids=tuple(payload["destroyed_model_instance_ids"]),
+        )
+        if result.mortal_wound_count != payload["mortal_wound_count"]:
+            raise GameLifecycleError("DestroyedTransportDisembark mortal wound count drift.")
+        expected_disembarked_state = (
+            None if result.disembarked_unit_state is None else result.disembarked_unit_state
+        )
+        payload_disembarked_state = (
+            None
+            if payload["disembarked_unit_state"] is None
+            else DisembarkedUnitState.from_payload(payload["disembarked_unit_state"])
+        )
+        if expected_disembarked_state != payload_disembarked_state:
+            raise GameLifecycleError("DestroyedTransportDisembark disembarked state drift.")
+        return result
 
 
 @dataclass(frozen=True, slots=True)
@@ -1339,6 +1444,22 @@ class FiringDeckResolution:
             self.selection.weapon_selections
         ):
             raise GameLifecycleError("Valid FiringDeckResolution weapon count drift.")
+        if not self.violations:
+            expected_profiles = tuple(
+                selection.weapon_profile for selection in self.selection.weapon_selections
+            )
+            if self.temporary_weapon_profiles != expected_profiles:
+                raise GameLifecycleError("Valid FiringDeckResolution weapon profile drift.")
+            expected_unit_ids = tuple(
+                sorted(
+                    {
+                        selection.embarked_unit_instance_id
+                        for selection in self.selection.weapon_selections
+                    }
+                )
+            )
+            if self.ineligible_unit_instance_ids != expected_unit_ids:
+                raise GameLifecycleError("Valid FiringDeckResolution ineligible unit drift.")
 
     @property
     def is_valid(self) -> bool:
@@ -1354,6 +1475,24 @@ class FiringDeckResolution:
             ],
             "ineligible_unit_instance_ids": list(self.ineligible_unit_instance_ids),
         }
+
+    @classmethod
+    def from_payload(cls, payload: FiringDeckResolutionPayload) -> Self:
+        resolution = cls(
+            selection=FiringDeckSelection.from_payload(payload["selection"]),
+            violations=tuple(
+                TransportOperationViolation.from_payload(violation)
+                for violation in payload["violations"]
+            ),
+            temporary_weapon_profiles=tuple(
+                WeaponProfile.from_payload(profile)
+                for profile in payload["temporary_weapon_profiles"]
+            ),
+            ineligible_unit_instance_ids=tuple(payload["ineligible_unit_instance_ids"]),
+        )
+        if resolution.is_valid != payload["is_valid"]:
+            raise GameLifecycleError("FiringDeckResolution payload validity drift.")
+        return resolution
 
 
 def resolve_embark(

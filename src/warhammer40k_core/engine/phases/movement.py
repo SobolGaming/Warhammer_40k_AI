@@ -23,6 +23,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
+    BattlefieldTransitionBatchPayload,
     ModelDisplacementKind,
     ModelDisplacementRecord,
     ModelPlacement,
@@ -32,6 +33,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacementPayload,
     battlefield_placement_kind_from_token,
     geometry_model_for_placement,
+    model_displacement_kind_from_token,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -55,7 +57,23 @@ from warhammer40k_core.engine.reserves import (
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
-from warhammer40k_core.engine.transports import DisembarkedUnitState
+from warhammer40k_core.engine.transports import (
+    DisembarkedUnitState,
+    DisembarkResolution,
+    DisembarkSelection,
+    EmbarkResolution,
+    EmbarkSelection,
+    EmbarkSelectionPayload,
+    TransportMovementStatus,
+    TransportOperationViolation,
+    TransportRestrictionOverride,
+    TransportRestrictionOverridePayload,
+    apply_disembark_to_battlefield,
+    apply_embark_to_battlefield,
+    resolve_disembark,
+    resolve_embark,
+    transport_movement_status_from_token,
+)
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     MovementRollbackRecordPayload,
@@ -86,7 +104,12 @@ SELECT_MOVEMENT_ACTION_DECISION_TYPE = "select_movement_action"
 SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE = "select_desperate_escape_model"
 SELECT_REINFORCEMENT_UNIT_DECISION_TYPE = "select_reinforcement_unit"
 PLACE_REINFORCEMENT_UNIT_DECISION_TYPE = "place_reinforcement_unit"
+SELECT_DISEMBARK_UNIT_DECISION_TYPE = "select_disembark_unit"
+PLACE_DISEMBARK_UNIT_DECISION_TYPE = "place_disembark_unit"
+SELECT_EMBARK_TRANSPORT_DECISION_TYPE = "select_embark_transport"
 COMPLETE_REINFORCEMENTS_OPTION_ID = "complete_reinforcements"
+COMPLETE_DISEMBARKS_OPTION_ID = "complete_disembarks"
+DECLINE_EMBARK_OPTION_ID = "decline_embark"
 
 
 class MovementPhaseStepKind(StrEnum):
@@ -144,6 +167,7 @@ class MovementPhaseStatePayload(TypedDict):
     active_player_id: str
     step: str
     reinforcements_completed: bool
+    declined_disembark_unit_ids: list[str]
     selected_unit_ids: list[str]
     moved_unit_ids: list[str]
     active_selection: MovementUnitSelectionPayload | None
@@ -968,6 +992,7 @@ class MovementPhaseState:
     active_player_id: str
     step: MovementPhaseStepKind = MovementPhaseStepKind.MOVE_UNITS
     reinforcements_completed: bool = False
+    declined_disembark_unit_ids: tuple[str, ...] = ()
     selected_unit_ids: tuple[str, ...] = ()
     moved_unit_ids: tuple[str, ...] = ()
     active_selection: MovementUnitSelection | None = None
@@ -990,6 +1015,14 @@ class MovementPhaseState:
             _validate_bool(
                 "MovementPhaseState reinforcements_completed",
                 self.reinforcements_completed,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "declined_disembark_unit_ids",
+            _validate_identifier_tuple(
+                "MovementPhaseState declined_disembark_unit_ids",
+                self.declined_disembark_unit_ids,
             ),
         )
         object.__setattr__(
@@ -1086,9 +1119,29 @@ class MovementPhaseState:
             active_player_id=self.active_player_id,
             step=self.step,
             reinforcements_completed=self.reinforcements_completed,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
             selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
             moved_unit_ids=self.moved_unit_ids,
             active_selection=selection,
+        )
+
+    def with_disembark_declined(self, unit_instance_ids: tuple[str, ...]) -> Self:
+        declined_ids = _validate_identifier_tuple("unit_instance_ids", unit_instance_ids)
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("Disembark decline requires Move Units step.")
+        if self.active_selection is not None:
+            raise GameLifecycleError("Disembark decline requires no active_selection.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            reinforcements_completed=self.reinforcements_completed,
+            declined_disembark_unit_ids=tuple(
+                sorted((*self.declined_disembark_unit_ids, *declined_ids))
+            ),
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
+            active_selection=None,
         )
 
     def with_activation_complete(self, unit_instance_id: str) -> Self:
@@ -1106,6 +1159,7 @@ class MovementPhaseState:
             active_player_id=self.active_player_id,
             step=self.step,
             reinforcements_completed=self.reinforcements_completed,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=(*self.moved_unit_ids, completed_unit_id),
             active_selection=None,
@@ -1124,6 +1178,7 @@ class MovementPhaseState:
             active_player_id=self.active_player_id,
             step=requested_step,
             reinforcements_completed=False,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
             active_selection=None,
@@ -1146,6 +1201,7 @@ class MovementPhaseState:
             active_player_id=self.active_player_id,
             step=self.step,
             reinforcements_completed=self.reinforcements_completed,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
             selected_unit_ids=selected,
             moved_unit_ids=moved,
             active_selection=None,
@@ -1161,6 +1217,7 @@ class MovementPhaseState:
             active_player_id=self.active_player_id,
             step=self.step,
             reinforcements_completed=True,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
             active_selection=None,
@@ -1172,6 +1229,7 @@ class MovementPhaseState:
             "active_player_id": self.active_player_id,
             "step": self.step.value,
             "reinforcements_completed": self.reinforcements_completed,
+            "declined_disembark_unit_ids": list(self.declined_disembark_unit_ids),
             "selected_unit_ids": list(self.selected_unit_ids),
             "moved_unit_ids": list(self.moved_unit_ids),
             "active_selection": (
@@ -1187,6 +1245,7 @@ class MovementPhaseState:
             active_player_id=payload["active_player_id"],
             step=movement_phase_step_kind_from_token(payload["step"]),
             reinforcements_completed=payload["reinforcements_completed"],
+            declined_disembark_unit_ids=tuple(payload["declined_disembark_unit_ids"]),
             selected_unit_ids=tuple(payload["selected_unit_ids"]),
             moved_unit_ids=tuple(payload["moved_unit_ids"]),
             active_selection=(
@@ -1690,6 +1749,7 @@ class MovementPhaseHandler:
     ) -> LifecycleStatus:
         _validate_movement_phase_state(state)
         movement_state = _ensure_movement_phase_state(state=state, decisions=decisions)
+        _ensure_transport_cargo_phase_states(state)
         if movement_state.step is MovementPhaseStepKind.REINFORCEMENTS:
             return _begin_reinforcements_step(state=state, decisions=decisions)
         active_selection = movement_state.active_selection
@@ -1700,6 +1760,16 @@ class MovementPhaseHandler:
                 active_selection=active_selection,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
+
+        if state.transport_cargo_states:
+            disembark_status = _request_pre_move_disembark_if_available(
+                state=state,
+                decisions=decisions,
+                movement_state=movement_state,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
+            if disembark_status is not None:
+                return disembark_status
 
         scenario = _battlefield_scenario(state)
         legal_unit_ids = movement_state.legal_unit_ids(
@@ -1788,6 +1858,26 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
+        if result.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE:
+            return _apply_disembark_unit_selection_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
+        if result.decision_type == PLACE_DISEMBARK_UNIT_DECISION_TYPE:
+            return _apply_disembark_placement_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
+        if result.decision_type == SELECT_EMBARK_TRANSPORT_DECISION_TYPE:
+            return _apply_embark_transport_selection_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
             )
         if result.decision_type != SELECT_MOVEMENT_UNIT_DECISION_TYPE:
             raise GameLifecycleError("MovementPhaseHandler received an unsupported decision_type.")
@@ -2281,6 +2371,375 @@ def _apply_valid_reinforcement_placement(
     )
 
 
+def _request_pre_move_disembark_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    movement_state: MovementPhaseState,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    entries = _pre_move_disembark_entries(
+        state=state,
+        movement_state=movement_state,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+    if not entries:
+        return None
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_DISEMBARK_UNIT_DECISION_TYPE,
+        actor_id=_active_player_id(state),
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": _active_player_id(state),
+        },
+        options=_pre_move_disembark_options(entries),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "phase_body_status": "disembark_unit_selection_required",
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "eligible_disembark_unit_count": len(entries),
+        },
+    )
+
+
+def _pre_move_disembark_entries(
+    *,
+    state: GameState,
+    movement_state: MovementPhaseState,
+    ruleset_descriptor: RulesetDescriptor,
+) -> tuple[DisembarkSelection, ...]:
+    scenario = _battlefield_scenario(state)
+    declined_unit_ids = set(movement_state.declined_disembark_unit_ids)
+    entries: list[DisembarkSelection] = []
+    for cargo_state in state.transport_cargo_states:
+        if cargo_state.player_id != _active_player_id(state):
+            continue
+        active_cargo = cargo_state.for_movement_phase(battle_round=state.battle_round)
+        transport_placement = scenario.battlefield_state.unit_placement_by_id(
+            active_cargo.transport_unit_instance_id
+        )
+        for unit_instance_id in active_cargo.embarked_unit_instance_ids:
+            if unit_instance_id in declined_unit_ids:
+                continue
+            if not active_cargo.unit_started_phase_embarked(unit_instance_id):
+                continue
+            if (
+                state.disembarked_unit_state_for_unit(
+                    player_id=active_cargo.player_id,
+                    battle_round=state.battle_round,
+                    unit_instance_id=unit_instance_id,
+                )
+                is not None
+            ):
+                continue
+            unit = _unit_instance_by_id(state=state, unit_instance_id=unit_instance_id)
+            selection = DisembarkSelection(
+                player_id=active_cargo.player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_instance_id,
+                transport_unit_instance_id=active_cargo.transport_unit_instance_id,
+                attempted_placement=_deterministic_disembark_placement(
+                    unit=unit,
+                    transport_placement=transport_placement,
+                ),
+                transport_movement_status=TransportMovementStatus.NOT_MOVED,
+            )
+            resolution = resolve_disembark(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                cargo_state=active_cargo,
+                selection=selection,
+                unit=unit,
+                transport_placement=transport_placement,
+            )
+            if resolution.is_valid:
+                entries.append(selection)
+    return tuple(sorted(entries, key=lambda selection: selection.unit_instance_id))
+
+
+def _pre_move_disembark_options(
+    selections: tuple[DisembarkSelection, ...],
+) -> tuple[DecisionOption, ...]:
+    unit_ids = tuple(selection.unit_instance_id for selection in selections)
+    options = [
+        DecisionOption(
+            option_id=COMPLETE_DISEMBARKS_OPTION_ID,
+            label="Complete Disembarks",
+            payload={
+                "transport_decision": COMPLETE_DISEMBARKS_OPTION_ID,
+                "declined_unit_instance_ids": list(unit_ids),
+            },
+        )
+    ]
+    options.extend(
+        DecisionOption(
+            option_id=selection.unit_instance_id,
+            label=f"Disembark {selection.unit_instance_id}",
+            payload={
+                "transport_decision": "select_disembark_unit",
+                "unit_instance_id": selection.unit_instance_id,
+                "transport_unit_instance_id": selection.transport_unit_instance_id,
+            },
+        )
+        for selection in selections
+    )
+    return tuple(options)
+
+
+def _apply_disembark_unit_selection_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Disembark selection actor must be the active player.")
+    movement_state = state.movement_phase_state
+    if (
+        movement_state is None
+        or movement_state.step is not MovementPhaseStepKind.MOVE_UNITS
+        or movement_state.active_selection is not None
+    ):
+        raise GameLifecycleError("Disembark selection requires inactive Move Units step.")
+
+    payload = _decision_payload_object(result.payload)
+    transport_decision = _payload_string(payload, key="transport_decision")
+    entries = _pre_move_disembark_entries(
+        state=state,
+        movement_state=movement_state,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+    if transport_decision == COMPLETE_DISEMBARKS_OPTION_ID:
+        declined_unit_ids = tuple(
+            cast(list[str], _payload_json_array(payload, key="declined_unit_instance_ids"))
+        )
+        legal_decline_ids = {selection.unit_instance_id for selection in entries}
+        if set(declined_unit_ids) != legal_decline_ids:
+            raise GameLifecycleError("Disembark decline payload drift.")
+        state.movement_phase_state = movement_state.with_disembark_declined(declined_unit_ids)
+        decisions.event_log.append(
+            "disembark_choices_declined",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "declined_unit_instance_ids": list(declined_unit_ids),
+                "phase_body_status": "disembark_choices_declined",
+            },
+        )
+        return None
+    if transport_decision != "select_disembark_unit":
+        raise GameLifecycleError("Unsupported Disembark selection payload.")
+    unit_instance_id = _payload_string(payload, key="unit_instance_id")
+    transport_unit_instance_id = _payload_string(payload, key="transport_unit_instance_id")
+    matching = tuple(
+        selection
+        for selection in entries
+        if selection.unit_instance_id == unit_instance_id
+        and selection.transport_unit_instance_id == transport_unit_instance_id
+    )
+    if len(matching) != 1:
+        raise GameLifecycleError("Disembark selection is not currently legal.")
+    decisions.event_log.append(
+        "disembark_unit_selected",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": unit_instance_id,
+            "transport_unit_instance_id": transport_unit_instance_id,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "disembark_unit_selected",
+        },
+    )
+    return _request_disembark_placement(
+        state=state,
+        decisions=decisions,
+        selection=matching[0],
+        ruleset_descriptor=ruleset_descriptor,
+    )
+
+
+def _request_disembark_placement(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    selection: DisembarkSelection,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus:
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACE_DISEMBARK_UNIT_DECISION_TYPE,
+        actor_id=_active_player_id(state),
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": _active_player_id(state),
+            "unit_instance_id": selection.unit_instance_id,
+            "transport_unit_instance_id": selection.transport_unit_instance_id,
+            "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
+        },
+        options=(
+            DecisionOption(
+                option_id=BattlefieldPlacementKind.DISEMBARK.value,
+                label="Place Disembarking Unit",
+                payload=validate_json_value(
+                    {
+                        "transport_decision": "place_disembark_unit",
+                        "unit_instance_id": selection.unit_instance_id,
+                        "transport_unit_instance_id": selection.transport_unit_instance_id,
+                        "attempted_placement": selection.attempted_placement.to_payload(),
+                        "transport_movement_status": selection.transport_movement_status.value,
+                        "restriction_overrides": [
+                            override.to_payload() for override in selection.restriction_overrides
+                        ],
+                    }
+                ),
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "phase_body_status": "disembark_placement_required",
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "unit_instance_id": selection.unit_instance_id,
+            "transport_unit_instance_id": selection.transport_unit_instance_id,
+        },
+    )
+
+
+def _apply_disembark_placement_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Disembark placement actor must be the active player.")
+    payload = _decision_payload_object(result.payload)
+    if _payload_string(payload, key="transport_decision") != "place_disembark_unit":
+        raise GameLifecycleError("Unsupported Disembark placement payload.")
+    unit_instance_id = _payload_string(payload, key="unit_instance_id")
+    transport_unit_instance_id = _payload_string(payload, key="transport_unit_instance_id")
+    attempted_placement = _payload_unit_placement(payload, key="attempted_placement")
+    selection = DisembarkSelection(
+        player_id=active_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=unit_instance_id,
+        transport_unit_instance_id=transport_unit_instance_id,
+        attempted_placement=attempted_placement,
+        transport_movement_status=transport_movement_status_from_token(
+            _payload_string(payload, key="transport_movement_status")
+        ),
+        restriction_overrides=_payload_transport_overrides(payload, key="restriction_overrides"),
+    )
+    cargo_state = state.transport_cargo_state_for_transport(transport_unit_instance_id)
+    if cargo_state is None:
+        raise GameLifecycleError("Disembark placement requires TransportCargoState.")
+    scenario = _battlefield_scenario(state)
+    transport_placement = scenario.battlefield_state.unit_placement_by_id(
+        transport_unit_instance_id
+    )
+    resolution = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        cargo_state=cargo_state,
+        selection=selection,
+        unit=_unit_instance_by_id(state=state, unit_instance_id=unit_instance_id),
+        transport_placement=transport_placement,
+    )
+    if not resolution.is_valid:
+        invalid_payload = _transport_operation_invalid_payload(
+            state=state,
+            active_player_id=active_player_id,
+            unit_instance_id=unit_instance_id,
+            transport_unit_instance_id=transport_unit_instance_id,
+            result=result,
+            phase_body_status="disembark_placement_invalid",
+            violations=resolution.violations,
+        )
+        decisions.event_log.append("disembark_placement_invalid", invalid_payload)
+        return LifecycleStatus.invalid(
+            stage=GameLifecycleStage.BATTLE,
+            message="Disembark placement is invalid.",
+            payload=invalid_payload,
+        )
+    _apply_valid_disembark(
+        state=state,
+        decisions=decisions,
+        disembark=resolution,
+        result=result,
+    )
+    return None
+
+
+def _apply_valid_disembark(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    disembark: DisembarkResolution,
+    result: DecisionResult,
+) -> None:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Disembark placement requires battlefield_state.")
+    if disembark.updated_cargo_state is None or disembark.disembarked_unit_state is None:
+        raise GameLifecycleError("Valid DisembarkResolution requires state records.")
+    state.battlefield_state = apply_disembark_to_battlefield(
+        battlefield_state=battlefield_state,
+        disembark=disembark,
+    )
+    state.replace_transport_cargo_state(disembark.updated_cargo_state)
+    state.record_disembarked_unit_state(disembark.disembarked_unit_state)
+    decisions.event_log.append(
+        "unit_disembarked",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": disembark.selection.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": disembark.selection.unit_instance_id,
+            "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "unit_disembarked",
+            "updated_cargo_state": validate_json_value(disembark.updated_cargo_state.to_payload()),
+            "disembarked_unit_state": validate_json_value(
+                disembark.disembarked_unit_state.to_payload()
+            ),
+            "transition_batch": validate_json_value(disembark.transition_batch.to_payload())
+            if disembark.transition_batch is not None
+            else None,
+        },
+    )
+
+
 def _request_movement_action(
     *,
     state: GameState,
@@ -2474,7 +2933,7 @@ def _apply_movement_action_decision(  # noqa: RET503
         state.battlefield_state = battlefield_state.with_unit_placement(
             resolution.attempted_placement
         )
-        _complete_movement_activation(
+        return _request_embark_after_move_or_complete_activation(
             state=state,
             decisions=decisions,
             result=result,
@@ -2484,7 +2943,6 @@ def _apply_movement_action_decision(  # noqa: RET503
             displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
             transition_batch=transition_batch,
         )
-        return None
 
     if action is MovementPhaseActionKind.ADVANCE:
         advance_roll_request = _advance_roll_request_for_action(
@@ -2782,7 +3240,7 @@ def _resolve_and_apply_advance_move(
             movement_dice_record=dice_record,
         )
     )
-    _complete_movement_activation(
+    return _request_embark_after_move_or_complete_activation(
         state=state,
         decisions=decisions,
         result=result,
@@ -2792,7 +3250,6 @@ def _resolve_and_apply_advance_move(
         displacement_kind=ModelDisplacementKind.ADVANCE,
         transition_batch=transition_batch,
     )
-    return None
 
 
 def _apply_desperate_escape_model_selection_decision(
@@ -2928,7 +3385,7 @@ def _apply_fall_back_result(
                 desperate_escape_rolls=fall_back_result.desperate_escape_rolls,
             )
         )
-    _complete_movement_activation(
+    return _request_embark_after_move_or_complete_activation(
         state=state,
         decisions=decisions,
         result=result,
@@ -2941,7 +3398,316 @@ def _apply_fall_back_result(
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         transition_batch=transition_batch,
     )
+
+
+def _request_embark_after_move_or_complete_activation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    action: MovementPhaseActionKind,
+    witness: PathWitness | None,
+    movement_payload: dict[str, JsonValue],
+    displacement_kind: ModelDisplacementKind,
+    transition_batch: BattlefieldTransitionBatch,
+) -> LifecycleStatus | None:
+    active_selection = _active_movement_selection(state)
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Movement activation completion requires battlefield_state.")
+    if active_selection.unit_instance_id not in {
+        placement.unit_instance_id
+        for army in battlefield_state.placed_armies
+        for placement in army.unit_placements
+    }:
+        _complete_movement_activation(
+            state=state,
+            decisions=decisions,
+            result=result,
+            action=action,
+            witness=witness,
+            movement_payload=movement_payload,
+            displacement_kind=displacement_kind,
+            transition_batch=transition_batch,
+        )
+        return None
+    options = _post_move_embark_options(
+        state=state,
+        unit_instance_id=active_selection.unit_instance_id,
+        movement_phase_action=_transport_status_for_movement_action(action),
+    )
+    if not options:
+        _complete_movement_activation(
+            state=state,
+            decisions=decisions,
+            result=result,
+            action=action,
+            witness=witness,
+            movement_payload=movement_payload,
+            displacement_kind=displacement_kind,
+            transition_batch=transition_batch,
+        )
+        return None
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
+        actor_id=active_selection.player_id,
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": active_selection.player_id,
+            "unit_instance_id": active_selection.unit_instance_id,
+            "movement_context": _movement_completion_context_payload(
+                result=result,
+                action=action,
+                witness=witness,
+                movement_payload=movement_payload,
+                displacement_kind=displacement_kind,
+                transition_batch=transition_batch,
+            ),
+        },
+        options=(
+            DecisionOption(
+                option_id=DECLINE_EMBARK_OPTION_ID,
+                label="Decline Embark",
+                payload={
+                    "transport_decision": DECLINE_EMBARK_OPTION_ID,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                },
+            ),
+            *options,
+        ),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "phase_body_status": "embark_choice_required",
+            "battle_round": state.battle_round,
+            "active_player_id": active_selection.player_id,
+            "unit_instance_id": active_selection.unit_instance_id,
+            "eligible_transport_count": len(options),
+        },
+    )
+
+
+def _post_move_embark_options(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    movement_phase_action: TransportMovementStatus,
+) -> tuple[DecisionOption, ...]:
+    scenario = _battlefield_scenario(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    options: list[DecisionOption] = []
+    for cargo_state in state.transport_cargo_states:
+        if cargo_state.player_id != unit_placement.player_id:
+            continue
+        transport_placement = scenario.battlefield_state.unit_placement_by_id(
+            cargo_state.transport_unit_instance_id
+        )
+        selection = EmbarkSelection(
+            player_id=unit_placement.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_instance_id,
+            transport_unit_instance_id=cargo_state.transport_unit_instance_id,
+            movement_phase_action=movement_phase_action,
+        )
+        resolution = resolve_embark(
+            scenario=scenario,
+            cargo_state=cargo_state,
+            selection=selection,
+            unit_placement=unit_placement,
+            transport_placement=transport_placement,
+        )
+        if not resolution.is_valid:
+            continue
+        options.append(
+            DecisionOption(
+                option_id=cargo_state.transport_unit_instance_id,
+                label=f"Embark {cargo_state.transport_unit_instance_id}",
+                payload=validate_json_value(
+                    {
+                        "transport_decision": "embark_unit",
+                        **selection.to_payload(),
+                    }
+                ),
+            )
+        )
+    return tuple(sorted(options, key=lambda option: option.option_id))
+
+
+def _apply_embark_transport_selection_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_selection = _active_movement_selection(state)
+    if result.actor_id != active_selection.player_id:
+        raise GameLifecycleError("Embark selection actor must be the active player.")
+    request_payload = _request_payload_for_result(decisions=decisions, result=result)
+    context_payload = _payload_object(request_payload, key="movement_context")
+    action = movement_phase_action_kind_from_token(
+        _payload_string(context_payload, key="movement_phase_action")
+    )
+    witness = _optional_payload_path_witness(context_payload, key="witness")
+    movement_payload = _payload_json_object(context_payload, key="movement_payload")
+    displacement_kind = _payload_model_displacement_kind(context_payload, key="displacement_kind")
+    transition_batch = _payload_transition_batch(context_payload, key="transition_batch")
+
+    payload = _decision_payload_object(result.payload)
+    transport_decision = _payload_string(payload, key="transport_decision")
+    if transport_decision == DECLINE_EMBARK_OPTION_ID:
+        if _payload_string(payload, key="unit_instance_id") != active_selection.unit_instance_id:
+            raise GameLifecycleError("Embark decline unit drift.")
+        _complete_movement_activation_with_record_ids(
+            state=state,
+            decisions=decisions,
+            request_id=_payload_string(context_payload, key="action_request_id"),
+            result_id=_payload_string(context_payload, key="action_result_id"),
+            action=action,
+            witness=witness,
+            movement_payload=movement_payload,
+            displacement_kind=displacement_kind,
+            transition_batch=transition_batch,
+        )
+        decisions.event_log.append(
+            "embark_declined",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": active_selection.player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": active_selection.unit_instance_id,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "phase_body_status": "embark_declined",
+            },
+        )
+        return None
+    if transport_decision != "embark_unit":
+        raise GameLifecycleError("Unsupported Embark selection payload.")
+    selection = EmbarkSelection.from_payload(
+        cast(
+            EmbarkSelectionPayload,
+            {
+                "player_id": _payload_string(payload, key="player_id"),
+                "battle_round": _payload_positive_int(payload, key="battle_round"),
+                "unit_instance_id": _payload_string(payload, key="unit_instance_id"),
+                "transport_unit_instance_id": _payload_string(
+                    payload, key="transport_unit_instance_id"
+                ),
+                "movement_phase_action": _payload_string(payload, key="movement_phase_action"),
+                "restriction_overrides": cast(
+                    list[TransportRestrictionOverridePayload],
+                    _payload_json_array(payload, key="restriction_overrides"),
+                ),
+            },
+        )
+    )
+    cargo_state = state.transport_cargo_state_for_transport(selection.transport_unit_instance_id)
+    if cargo_state is None:
+        raise GameLifecycleError("Embark requires TransportCargoState.")
+    scenario = _battlefield_scenario(state)
+    resolution = resolve_embark(
+        scenario=scenario,
+        cargo_state=cargo_state,
+        selection=selection,
+        unit_placement=scenario.battlefield_state.unit_placement_by_id(
+            active_selection.unit_instance_id
+        ),
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            selection.transport_unit_instance_id
+        ),
+    )
+    if not resolution.is_valid:
+        invalid_payload = _transport_operation_invalid_payload(
+            state=state,
+            active_player_id=active_selection.player_id,
+            unit_instance_id=selection.unit_instance_id,
+            transport_unit_instance_id=selection.transport_unit_instance_id,
+            result=result,
+            phase_body_status="embark_selection_invalid",
+            violations=resolution.violations,
+        )
+        decisions.event_log.append("embark_selection_invalid", invalid_payload)
+        return LifecycleStatus.invalid(
+            stage=GameLifecycleStage.BATTLE,
+            message="Embark selection is invalid.",
+            payload=invalid_payload,
+        )
+    _apply_valid_embark(
+        state=state,
+        decisions=decisions,
+        embark=resolution,
+        result=result,
+        context_payload=context_payload,
+        action=action,
+        witness=witness,
+        movement_payload=movement_payload,
+        displacement_kind=displacement_kind,
+        transition_batch=transition_batch,
+    )
     return None
+
+
+def _apply_valid_embark(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    embark: EmbarkResolution,
+    result: DecisionResult,
+    context_payload: dict[str, JsonValue],
+    action: MovementPhaseActionKind,
+    witness: PathWitness | None,
+    movement_payload: dict[str, JsonValue],
+    displacement_kind: ModelDisplacementKind,
+    transition_batch: BattlefieldTransitionBatch,
+) -> None:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Embark requires battlefield_state.")
+    if embark.updated_cargo_state is None:
+        raise GameLifecycleError("Valid EmbarkResolution requires updated cargo state.")
+    state.battlefield_state = apply_embark_to_battlefield(
+        battlefield_state=battlefield_state,
+        embark=embark,
+    )
+    state.replace_transport_cargo_state(embark.updated_cargo_state)
+    decisions.event_log.append(
+        "unit_embarked",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": embark.selection.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": embark.selection.unit_instance_id,
+            "transport_unit_instance_id": embark.selection.transport_unit_instance_id,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "unit_embarked",
+            "updated_cargo_state": validate_json_value(embark.updated_cargo_state.to_payload()),
+            "transition_batch": validate_json_value(embark.transition_batch.to_payload())
+            if embark.transition_batch is not None
+            else None,
+        },
+    )
+    _complete_movement_activation_with_record_ids(
+        state=state,
+        decisions=decisions,
+        request_id=_payload_string(context_payload, key="action_request_id"),
+        result_id=_payload_string(context_payload, key="action_result_id"),
+        action=action,
+        witness=witness,
+        movement_payload=movement_payload,
+        displacement_kind=displacement_kind,
+        transition_batch=transition_batch,
+    )
 
 
 def _complete_movement_activation(
@@ -2949,6 +3715,31 @@ def _complete_movement_activation(
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
+    action: MovementPhaseActionKind,
+    witness: PathWitness | None,
+    movement_payload: dict[str, JsonValue],
+    displacement_kind: ModelDisplacementKind | None = None,
+    transition_batch: BattlefieldTransitionBatch | None = None,
+) -> None:
+    _complete_movement_activation_with_record_ids(
+        state=state,
+        decisions=decisions,
+        request_id=result.request_id,
+        result_id=result.result_id,
+        action=action,
+        witness=witness,
+        movement_payload=movement_payload,
+        displacement_kind=displacement_kind,
+        transition_batch=transition_batch,
+    )
+
+
+def _complete_movement_activation_with_record_ids(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request_id: str,
+    result_id: str,
     action: MovementPhaseActionKind,
     witness: PathWitness | None,
     movement_payload: dict[str, JsonValue],
@@ -2969,8 +3760,8 @@ def _complete_movement_activation(
         "phase": BattlePhase.MOVEMENT.value,
         "unit_instance_id": active_selection.unit_instance_id,
         "movement_phase_action": action.value,
-        "request_id": result.request_id,
-        "result_id": result.result_id,
+        "request_id": request_id,
+        "result_id": result_id,
         "phase_body_status": "activation_complete",
         "witness": None if witness is None else validate_json_value(witness.to_payload()),
     }
@@ -4295,6 +5086,152 @@ def _ruleset_descriptor_for_handler(handler: MovementPhaseHandler) -> RulesetDes
     return handler.ruleset_descriptor
 
 
+def _active_movement_selection(state: GameState) -> MovementUnitSelection:
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.active_selection is None:
+        raise GameLifecycleError("Movement transport decision requires active_selection.")
+    return movement_state.active_selection
+
+
+def _ensure_transport_cargo_phase_states(state: GameState) -> None:
+    for cargo_state in tuple(state.transport_cargo_states):
+        active_cargo_state = cargo_state.for_movement_phase(battle_round=state.battle_round)
+        if active_cargo_state != cargo_state:
+            state.replace_transport_cargo_state(active_cargo_state)
+
+
+def _unit_instance_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit_id:
+                return unit
+    raise GameLifecycleError("Unknown unit_instance_id.")
+
+
+def _deterministic_disembark_placement(
+    *,
+    unit: UnitInstance,
+    transport_placement: UnitPlacement,
+) -> UnitPlacement:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Disembark placement requires a UnitInstance.")
+    if type(transport_placement) is not UnitPlacement:
+        raise GameLifecycleError("Disembark placement requires a Transport UnitPlacement.")
+    if not transport_placement.model_placements:
+        raise GameLifecycleError("Disembark placement requires a placed Transport model.")
+    origin = transport_placement.model_placements[0].pose
+    offsets = (
+        (3.1, -1.5),
+        (4.0, -0.2),
+        (4.0, 1.2),
+        (3.1, 2.5),
+        (2.8, 0.5),
+    )
+    model_placements: list[ModelPlacement] = []
+    for index, model in enumerate(unit.own_models):
+        offset_x, offset_y = offsets[index % len(offsets)]
+        row = index // len(offsets)
+        pose = Pose.at(
+            x=origin.position.x + offset_x + (row * 1.0),
+            y=origin.position.y + offset_y,
+            z=origin.position.z,
+            facing_degrees=origin.facing.degrees,
+        )
+        army_id = unit.unit_instance_id.split(":", maxsplit=1)[0]
+        model_placements.append(
+            ModelPlacement(
+                army_id=army_id,
+                player_id=transport_placement.player_id,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                pose=pose,
+            )
+        )
+    return UnitPlacement(
+        army_id=unit.unit_instance_id.split(":", maxsplit=1)[0],
+        player_id=transport_placement.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=tuple(model_placements),
+    )
+
+
+def _transport_status_for_movement_action(
+    action: MovementPhaseActionKind,
+) -> TransportMovementStatus:
+    action_kind = movement_phase_action_kind_from_token(action)
+    if action_kind is MovementPhaseActionKind.NORMAL_MOVE:
+        return TransportMovementStatus.NORMAL_MOVE
+    if action_kind is MovementPhaseActionKind.ADVANCE:
+        return TransportMovementStatus.ADVANCE
+    if action_kind is MovementPhaseActionKind.FALL_BACK:
+        return TransportMovementStatus.FALL_BACK
+    if action_kind is MovementPhaseActionKind.REMAIN_STATIONARY:
+        return TransportMovementStatus.REMAIN_STATIONARY
+    raise GameLifecycleError(f"Unsupported transport movement status action: {action_kind.value}.")
+
+
+def _movement_completion_context_payload(
+    *,
+    result: DecisionResult,
+    action: MovementPhaseActionKind,
+    witness: PathWitness | None,
+    movement_payload: dict[str, JsonValue],
+    displacement_kind: ModelDisplacementKind,
+    transition_batch: BattlefieldTransitionBatch,
+) -> dict[str, JsonValue]:
+    return {
+        "action_request_id": result.request_id,
+        "action_result_id": result.result_id,
+        "movement_phase_action": action.value,
+        "witness": None if witness is None else validate_json_value(witness.to_payload()),
+        "movement_payload": validate_json_value(movement_payload),
+        "displacement_kind": displacement_kind.value,
+        "transition_batch": validate_json_value(transition_batch.to_payload()),
+    }
+
+
+def _transport_operation_invalid_payload(
+    *,
+    state: GameState,
+    active_player_id: str,
+    unit_instance_id: str,
+    transport_unit_instance_id: str,
+    result: DecisionResult,
+    phase_body_status: str,
+    violations: tuple[TransportOperationViolation, ...],
+) -> dict[str, JsonValue]:
+    return _validate_json_object(
+        "transport invalid payload",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": unit_instance_id,
+            "transport_unit_instance_id": transport_unit_instance_id,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": phase_body_status,
+            "violations": [violation.to_payload() for violation in violations],
+        },
+    )
+
+
+def _request_payload_for_result(
+    *,
+    decisions: DecisionController,
+    result: DecisionResult,
+) -> dict[str, JsonValue]:
+    for request in decisions.queue.pending_requests:
+        if request.request_id == result.request_id:
+            return _decision_payload_object(request.payload)
+    for record in reversed(decisions.records):
+        if record.result == result:
+            return _decision_payload_object(record.request.payload)
+    raise GameLifecycleError("DecisionResult does not match a known Movement request.")
+
+
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Decision payload must be an object.")
@@ -4317,6 +5254,19 @@ def _payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, Jso
     if not isinstance(value, dict):
         raise GameLifecycleError(f"Decision payload key must be an object: {key}.")
     return value
+
+
+def _payload_json_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
+    return _payload_object(payload, key=key)
+
+
+def _payload_positive_int(payload: dict[str, JsonValue], *, key: str) -> int:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if type(value) is not int:
+        raise GameLifecycleError(f"Decision payload key must be an integer: {key}.")
+    return _validate_positive_int(key, value)
 
 
 def _payload_unit_placement(payload: dict[str, JsonValue], *, key: str) -> UnitPlacement:
@@ -4349,6 +5299,56 @@ def _payload_path_witness(payload: dict[str, JsonValue], *, key: str) -> PathWit
     if not isinstance(value, dict):
         raise GameLifecycleError(f"Decision payload key must be a PathWitness payload: {key}.")
     return PathWitness.from_payload(cast(PathWitnessPayload, value))
+
+
+def _optional_payload_path_witness(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> PathWitness | None:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"Decision payload key must be a PathWitness payload: {key}.")
+    return PathWitness.from_payload(cast(PathWitnessPayload, value))
+
+
+def _payload_model_displacement_kind(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> ModelDisplacementKind:
+    return model_displacement_kind_from_token(_payload_string(payload, key=key))
+
+
+def _payload_transition_batch(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> BattlefieldTransitionBatch:
+    value = _payload_object(payload, key=key)
+    return BattlefieldTransitionBatch.from_payload(cast(BattlefieldTransitionBatchPayload, value))
+
+
+def _payload_transport_overrides(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> tuple[TransportRestrictionOverride, ...]:
+    values = _payload_json_array(payload, key=key)
+    overrides: list[TransportRestrictionOverride] = []
+    for value in values:
+        if not isinstance(value, dict):
+            raise GameLifecycleError("restriction_overrides must contain objects.")
+        overrides.append(
+            TransportRestrictionOverride.from_payload(
+                cast(TransportRestrictionOverridePayload, value)
+            )
+        )
+    return tuple(overrides)
 
 
 def _payload_json_array(payload: dict[str, JsonValue], *, key: str) -> list[JsonValue]:
