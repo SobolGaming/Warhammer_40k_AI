@@ -114,7 +114,7 @@ Rules audited against the 10e Core Rules page are assigned to explicit future ph
 | Fast dice rolling constraints, including no fast dice for random damage where order matters | Phase 13C, 18A |
 | Full common weapon ability list from Core Rules | Phase 13D |
 | Transports: Firing Deck, Embark, Disembark, Destroyed Transport, Emergency Disembarkation | Phase 10Q, 13B, 13E |
-| Strategic Reserves limits, turn restrictions, horizontal setup distances, edge/deployment-zone restrictions, end-of-battle destroyed | Phase 10P, 11E, 15C |
+| Strategic Reserves limits, turn restrictions, horizontal setup distances, edge/deployment-zone restrictions, end-of-battle destroyed | Phase 10P, 11F, 15C |
 | Aircraft movement, minimum move, pivot, reserve transition, movement of other models, charge/fight restrictions | Phase 10R, 14B, 14D |
 | Terrain engagement exceptions for Barricades/Fuel Pipes in Charge and Fight phases | Phase 14B, 14D |
 | Terrain visibility/cover including Woods, Ruins, Plunging Fire, Benefit of Cover non-stacking and AP 0 / 3+ save exception | Phase 13A, 13C |
@@ -848,7 +848,7 @@ Deferred wiring contracts:
 
 - Phase 11A must provide mission deployment-zone geometry to live Reinforcements so battle-round-2 Strategic Reserves pass enemy deployment zones into `resolve_reserve_arrival`;
 - Phase 11A/11B must provide instantiated terrain features to live Reinforcements and deployment placement validation, not only resolver tests;
-- Phase 11D/11E must call unarrived-reserve destruction at the appropriate game-end or mission-pack deadline;
+- Phase 11E/11F must call unarrived-reserve destruction at the appropriate game-end or mission-pack deadline;
 - Phase 13B must consume Firing Deck selections during Shooting and validate selected weapons against the embarked model's wargear;
 - Phase 13E/14D must orchestrate destroyed Transport disembark from real destruction events before removing the Transport model;
 - Phase 15D must make attached-unit coherency group-aware by validating the attached rules unit, not a single `UnitPlacement`;
@@ -1014,7 +1014,113 @@ Required tests:
 - Starting Strength and Below Half-strength logic works for single-model and multi-model units;
 - Command phase stops at required dice/decision requests.
 
-## Phase 11D: mission actions, primary/secondary scoring, and end-of-turn cleanup
+## Phase 11D: adapter scaffold and parameterized movement/placement proposal requests
+
+This phase creates the engine-owned contract that allows UI work to proceed in parallel without UI-owned state mutation. It separates finite decision choices, such as selecting a movement action, from parameterized movement and placement proposals, such as per-model endpoints and path witnesses.
+
+This phase does not build a visual UI. It creates the adapter and proposal contracts that a later CLI, local visual UI, network client, or AI policy can consume.
+
+Modules:
+
+- `adapters/contracts.py`
+- `adapters/projection.py`
+- `adapters/decisions.py`
+- `adapters/local_session.py`
+- `adapters/event_stream.py`
+- `engine/decision_request.py`
+- `engine/decision_result.py`
+- `engine/decision_record.py`
+- `engine/lifecycle.py`
+- `engine/movement_proposals.py`
+- `engine/phases/movement.py`
+
+Objects:
+
+- `GameViewPayload`
+- `DecisionRequestViewPayload`
+- `DecisionSubmission`
+- `FiniteOptionSubmission`
+- `ParameterizedSubmission`
+- `MovementProposalRequest`
+- `MovementProposalPayload`
+- `ModelMovementProposalPayload`
+- `PlacementProposalPayload`
+- `ProposalValidationResult`
+- `ProposalViolation`
+- `LocalGameSession`
+- `EventStreamCursor`
+
+Invariants:
+
+- adapters are leaf modules: `adapters` may import engine/core/geometry/rules payload types, but core, geometry, rules, and engine modules must not import adapters;
+- UI, CLI, network, and AI clients submit decisions through engine-owned request/result contracts and never mutate `GameState`, `BattlefieldRuntimeState`, `UnitPlacement`, model poses, objective state, mission state, or event logs directly;
+- finite decisions remain finite: unit selection, movement action selection, secondary mission selection, reroll choices, and similar bounded choices continue to use finite `DecisionRequest` options;
+- exact movement and placement realization is parameterized, not finite-option enumerated;
+- after a finite movement action selection such as `NORMAL_MOVE`, `ADVANCE`, or `FALL_BACK`, the engine can emit a follow-up parameterized proposal request for the selected unit/action;
+- parameterized proposal requests carry JSON-safe input contracts rather than precomputed option payloads;
+- movement proposal payloads include the selected unit, selected movement action, per-model movement data, path witness data, pivot/facing data where applicable, and any required source context;
+- placement proposal payloads include unit/model placement data and placement kind, with enough context for deployment, reserve arrival, Deep Strike, Disembark, redeploy, or later setup/mission placement flows;
+- proposal payloads are validated by engine-owned movement, pathing, terrain, placement, coherency, reserve, and transport validators before any state mutation;
+- invalid proposals return typed invalid status and diagnostics without mutating authoritative state;
+- valid proposals emit ordinary placement, displacement, removal, event, and decision records;
+- proposal requests and proposal results are replay-facing and JSON-safe, with no Python object reprs or memory-address payloads;
+- existing deterministic bridge behavior may remain available for headless tests or smoke flows, but it must not be the only contract for human movement/placement input;
+- unknown or unsupported proposal kinds fail explicitly;
+- adapter projections are viewer-scoped and must not leak hidden information;
+- adapter projections expose read-only game state, pending decision/proposal views, event-stream deltas, and lifecycle status;
+- adapter submission helpers support both finite option submissions and parameterized proposal submissions.
+
+Initial parameterized request coverage:
+
+- Normal Move proposal;
+- Advance move proposal after Advance action and dice/reroll resolution;
+- Fall Back proposal, including Desperate Escape follow-up decisions where applicable;
+- Reinforcement placement proposal;
+- Deep Strike placement proposal;
+- Strategic Reserves placement proposal;
+- Disembark placement proposal.
+
+Later phases must reuse the same proposal contract for:
+
+- deployment placement;
+- redeployment;
+- Scout moves;
+- charge movement;
+- pile-in;
+- consolidate;
+- mission action placement or movement-like effects where applicable.
+
+Required tests:
+
+- finite `SELECT_MOVEMENT_ACTION` still presents only finite movement action choices;
+- selecting `NORMAL_MOVE` can produce a follow-up parameterized movement proposal request;
+- selecting `ADVANCE` resolves required dice/reroll flow and then can produce a parameterized movement proposal request;
+- selecting `FALL_BACK` can produce a parameterized movement proposal request and preserves Desperate Escape follow-up behavior;
+- valid Normal Move proposal mutates battlefield state only through engine validation and emits normal displacement records;
+- invalid movement proposal returns typed invalid status and does not mutate battlefield state;
+- invalid placement proposal returns typed invalid status and does not mutate battlefield state;
+- valid reserve/Deep Strike/Strategic Reserves placement proposal emits placement records;
+- valid Disembark placement proposal emits placement records and transport/cargo state updates;
+- proposal result payloads round-trip without Python object reprs;
+- parameterized proposal decisions produce normal replay-facing records;
+- stale proposal submission is rejected if it does not match the current pending request;
+- adapter projection exposes public game state for a viewer without leaking hidden opponent information;
+- adapter projection exposes pending finite decisions and pending parameterized proposal requests in a UI-readable shape;
+- `LocalGameSession.submit_option(...)` handles finite decisions;
+- `LocalGameSession.submit_payload(...)` or equivalent handles parameterized proposal decisions;
+- event cursor returns deterministic event payloads since a supplied cursor;
+- import-boundary tests confirm core, geometry, rules, and engine modules do not import adapters;
+- golden JSON fixtures cover finite movement action selection, parameterized Normal Move proposal, invalid movement proposal, reserve placement proposal, Disembark placement proposal, and viewer-scoped projection.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/pathing/types.py`
+- `src/warhammer40k_ai/engine/game_setup_flow.py`
+- movement, deployment, reserve, Disembark, replay, UI/headless, and decision-dispatch tests
+
+## Phase 11E: mission actions, primary/secondary scoring, and end-of-turn cleanup
 
 Modules:
 
@@ -1054,7 +1160,7 @@ Required tests:
 - victory point ledger round-trips;
 - game ends after configured battle rounds.
 
-## Phase 11E: battle-round/game-end scoring and winner determination
+## Phase 11F: battle-round/game-end scoring and winner determination
 
 Invariants:
 
@@ -2155,7 +2261,7 @@ Required tests:
 | Deployment zones | 11A, 15A |
 | Redeployments | 10D, 15B |
 | Engagement Range | 10G, 10M, 10N, 10O, 14B |
-| Unit Coherency | 10G/10H descriptors, 10L runtime, 11D cleanup |
+| Unit Coherency | 10G/10H descriptors, 10L runtime, 11E cleanup |
 | Terrain movement | 10F, 10H, 10I |
 | Terrain visibility/cover, including TOWERING/AIRCRAFT terrain exceptions | 13A |
 | Movement phase Move Units | 10B-10T |
@@ -2164,7 +2270,7 @@ Required tests:
 | Aircraft | 10R |
 | Command phase | 11C |
 | Battle-shock | 11C, 12B |
-| Mission scoring | 11A-11E |
+| Mission scoring | 11A-11C, 11E-11F |
 | Stratagems | 12B, 12C, 16E |
 | Shooting phase | 13A-13F |
 | Weapon abilities | 8D, 13D, 16F |
@@ -2173,7 +2279,7 @@ Required tests:
 | Fight phase | 14C-14F |
 | Leader/attached units | 6, 15D, 16A |
 | Faction/detachment/enhancement rules | 16C-16F |
-| Chapter Approved 2025-26 | 11A, 11D, 11E, 15A, 19A |
+| Chapter Approved 2025-26 | 11A, 11E, 11F, 15A, 19A |
 | Human CLI/UI | 17A, 17C |
 | Network play | 17D |
 | Replay | 17B, all state-changing phases |
