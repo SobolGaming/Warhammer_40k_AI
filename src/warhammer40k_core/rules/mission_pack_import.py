@@ -511,6 +511,8 @@ def _ruins_feature_from_slot(
     world_origin: tuple[float, float],
     source_id: str,
 ) -> TerrainFeatureTemplate:
+    # Phase 11A preserves source rotation provenance, but runtime occupancy is
+    # intentionally conservative until exact rotated terrain geometry is built.
     min_x, min_y, max_x, max_y = _rotated_rect_bounds(
         width=_preset_width(preset),
         depth=_preset_depth(preset),

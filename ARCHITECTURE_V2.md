@@ -873,6 +873,8 @@ Status: Complete.
 
 This phase brings in Chapter Approved 2025-26 mission data: mission sequence, deployment maps, objective marker positions, mission pool, mission decks, secondary mission cards, Challenger cards, terrain layout templates, and tournament scoring caps.
 
+Phase 11A terrain layout import preserves source slot rotations in terrain feature `source_id` metadata for audit/replay provenance. Runtime `TerrainFeatureTemplate` geometry intentionally instantiates the conservative axis-aligned bounding footprint of each rotated slot, with axis-aligned ruins walls/floors inside that footprint. Exact rotated ruin walls, floor polygons, and visibility/pathing polygons are deferred to the terrain/visibility geometry slices rather than treated as complete in Phase 11A.
+
 Modules:
 
 - `rules/mission_pack_import.py`
@@ -900,7 +902,7 @@ Invariants:
 - deployment zones are geometry objects tied to deployment maps;
 - objective marker positions are source-defined and use center-point measurement;
 - Chapter Approved objective markers are flat 40mm markers and do not impede movement/placement;
-- terrain layout templates are data and can instantiate pregenerated terrain pieces;
+- terrain layout templates are data and can instantiate pregenerated terrain pieces with conservative axis-aligned occupancy footprints;
 - live Reinforcements receives mission deployment-zone geometry for reserve placement validation;
 - live placement validators receive instantiated terrain features instead of resolver-local test fixtures;
 - tournament mission pool is deterministic and replay-facing;
