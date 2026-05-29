@@ -27,6 +27,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupPayload
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -66,6 +67,7 @@ class GameConfigPayload(TypedDict):
     turn_order: list[str]
     fixed_secondary_mission_ids: list[str]
     tactical_secondary_draw_count: int
+    mission_setup: MissionSetupPayload | None
 
 
 class SecondaryMissionChoicePayload(TypedDict):
@@ -98,6 +100,7 @@ class GameStatePayload(TypedDict):
     tactical_secondary_draw_count: int
     army_definitions: list[ArmyDefinitionPayload]
     battlefield_state: BattlefieldRuntimeStatePayload | None
+    mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
     reserve_states: list[ReserveStatePayload]
     hover_mode_states: list[HoverModeStatePayload]
@@ -165,6 +168,7 @@ class GameConfig:
     turn_order: tuple[str, ...]
     fixed_secondary_mission_ids: tuple[str, ...]
     tactical_secondary_draw_count: int = 2
+    mission_setup: MissionSetup | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -217,6 +221,14 @@ class GameConfig:
                 self.tactical_secondary_draw_count,
             ),
         )
+        object.__setattr__(
+            self,
+            "mission_setup",
+            _validate_optional_mission_setup(
+                self.mission_setup,
+                player_ids=self.player_ids,
+            ),
+        )
         _validate_lifecycle_sequences(self.ruleset_descriptor)
 
     def to_payload(self) -> GameConfigPayload:
@@ -229,6 +241,9 @@ class GameConfig:
             "turn_order": list(self.turn_order),
             "fixed_secondary_mission_ids": list(self.fixed_secondary_mission_ids),
             "tactical_secondary_draw_count": self.tactical_secondary_draw_count,
+            "mission_setup": (
+                None if self.mission_setup is None else self.mission_setup.to_payload()
+            ),
         }
 
     @classmethod
@@ -245,6 +260,11 @@ class GameConfig:
             turn_order=tuple(payload["turn_order"]),
             fixed_secondary_mission_ids=tuple(payload["fixed_secondary_mission_ids"]),
             tactical_secondary_draw_count=payload["tactical_secondary_draw_count"],
+            mission_setup=(
+                None
+                if payload["mission_setup"] is None
+                else MissionSetup.from_payload(payload["mission_setup"])
+            ),
         )
 
 
@@ -380,6 +400,7 @@ class GameState:
     decision_request_count: int = 0
     army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
     battlefield_state: BattlefieldRuntimeState | None = None
+    mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
@@ -450,6 +471,10 @@ class GameState:
             player_ids=self.player_ids,
         )
         self.battlefield_state = _validate_optional_battlefield_state(self.battlefield_state)
+        self.mission_setup = _validate_optional_mission_setup(
+            self.mission_setup,
+            player_ids=self.player_ids,
+        )
         self.movement_phase_state = _validate_optional_movement_phase_state(
             self.movement_phase_state
         )
@@ -511,6 +536,7 @@ class GameState:
             player_ids=config.player_ids,
             turn_order=config.turn_order,
             tactical_secondary_draw_count=config.tactical_secondary_draw_count,
+            mission_setup=config.mission_setup,
         )
 
     @property
@@ -625,6 +651,14 @@ class GameState:
         if self.battlefield_state is not None:
             raise GameLifecycleError("GameState battlefield_state already exists.")
         self.battlefield_state = battlefield_state
+
+    def record_mission_setup(self, mission_setup: MissionSetup) -> None:
+        if self.mission_setup is not None:
+            raise GameLifecycleError("GameState mission_setup already exists.")
+        self.mission_setup = _validate_optional_mission_setup(
+            mission_setup,
+            player_ids=self.player_ids,
+        )
 
     def record_tactical_secondary_draw(self, draw: TacticalSecondaryDraw) -> None:
         if draw.player_id not in self.player_ids:
@@ -964,6 +998,9 @@ class GameState:
             "battlefield_state": (
                 None if self.battlefield_state is None else self.battlefield_state.to_payload()
             ),
+            "mission_setup": None
+            if self.mission_setup is None
+            else self.mission_setup.to_payload(),
             "movement_phase_state": (
                 None
                 if self.movement_phase_state is None
@@ -1035,6 +1072,11 @@ class GameState:
                 None
                 if payload["battlefield_state"] is None
                 else _battlefield_state_from_payload(payload["battlefield_state"])
+            ),
+            mission_setup=(
+                None
+                if payload["mission_setup"] is None
+                else MissionSetup.from_payload(payload["mission_setup"])
             ),
             movement_phase_state=(
                 None
@@ -1233,6 +1275,22 @@ def _validate_optional_battlefield_state(
         return None
     if type(value) is not BattlefieldRuntimeState:
         raise GameLifecycleError("GameState battlefield_state must be a BattlefieldRuntimeState.")
+    return value
+
+
+def _validate_optional_mission_setup(
+    value: object | None,
+    *,
+    player_ids: tuple[str, ...],
+) -> MissionSetup | None:
+    if value is None:
+        return None
+    if type(value) is not MissionSetup:
+        raise GameLifecycleError("mission_setup must be a MissionSetup.")
+    if value.attacker_player_id not in player_ids:
+        raise GameLifecycleError("mission_setup attacker_player_id is not in this game.")
+    if value.defender_player_id not in player_ids:
+        raise GameLifecycleError("mission_setup defender_player_id is not in this game.")
     return value
 
 

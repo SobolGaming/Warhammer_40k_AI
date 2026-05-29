@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10V** is treated as implemented at the time this file was updated. Phase 11A is the next build slice.
+Everything through **Phase 11A** is treated as implemented at the time this file was updated. Phase 11B is the next build slice.
 
 Completed / implemented foundation:
 
@@ -66,6 +66,7 @@ Completed / implemented foundation:
 | 10T | Complete | Movement phase completion gate |
 | 10U | Complete | Movement/pathing/terrain profiling and hotspot budget gate |
 | 10V | Complete | Movement audit hardening and deferred-wiring contracts |
+| 11A | Complete | Chapter Approved 2025-26 mission pack data |
 
 ## Cross-cutting architectural rules
 
@@ -868,7 +869,11 @@ Required tests:
 
 ## Phase 11A: Chapter Approved 2025-26 mission pack data
 
+Status: Complete.
+
 This phase brings in Chapter Approved 2025-26 mission data: mission sequence, deployment maps, objective marker positions, mission pool, mission decks, secondary mission cards, Challenger cards, terrain layout templates, and tournament scoring caps.
+
+Phase 11A terrain layout import preserves source slot rotations in terrain feature `source_id` metadata for audit/replay provenance. Runtime `TerrainFeatureTemplate` geometry intentionally instantiates the conservative axis-aligned bounding footprint of each rotated slot, with axis-aligned ruins walls/floors inside that footprint. Exact rotated ruin walls, floor polygons, and visibility/pathing polygons are deferred to the terrain/visibility geometry slices rather than treated as complete in Phase 11A.
 
 Modules:
 
@@ -897,7 +902,7 @@ Invariants:
 - deployment zones are geometry objects tied to deployment maps;
 - objective marker positions are source-defined and use center-point measurement;
 - Chapter Approved objective markers are flat 40mm markers and do not impede movement/placement;
-- terrain layout templates are data and can instantiate pregenerated terrain pieces;
+- terrain layout templates are data and can instantiate pregenerated terrain pieces with conservative axis-aligned occupancy footprints;
 - live Reinforcements receives mission deployment-zone geometry for reserve placement validation;
 - live placement validators receive instantiated terrain features instead of resolver-local test fixtures;
 - tournament mission pool is deterministic and replay-facing;
