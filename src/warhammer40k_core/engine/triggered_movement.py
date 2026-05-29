@@ -10,6 +10,11 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     movement_mode_from_token,
 )
+from warhammer40k_core.engine.aircraft import (
+    AircraftMovementPolicy,
+    HoverModeState,
+    aircraft_model_ids_for_scenario,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
@@ -444,6 +449,9 @@ class TriggeredMovementResolution:
             return "triggered_movement_descriptor_drift"
         if selected_payload.get("witness") != self.witness.to_payload():
             return "triggered_movement_witness_drift"
+        expected_aircraft_policy = self.movement_payload.get("aircraft_movement_policy")
+        if selected_payload.get("aircraft_movement_policy") != expected_aircraft_policy:
+            return "triggered_movement_aircraft_policy_drift"
         if selected_payload.get("model_movements") != self.movement_payload["model_movements"]:
             return "triggered_movement_model_movement_witness_drift"
         return None
@@ -601,6 +609,7 @@ class TriggeredMovementHandler:
         ruleset_descriptor = _ruleset_descriptor_for_handler(self)
         if type(descriptor) is not TriggeredMovementDescriptor:
             raise GameLifecycleError("Triggered movement requires a descriptor.")
+        _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
         candidate_witness_tuple = _validate_path_witness_tuple(candidate_witnesses)
         if not candidate_witness_tuple:
             raise GameLifecycleError("Triggered movement requires at least one movement choice.")
@@ -616,6 +625,7 @@ class TriggeredMovementHandler:
                 battle_round=state.battle_round,
                 battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
                 surge_move_states=tuple(state.surge_move_states),
+                hover_mode_states=tuple(state.hover_mode_states),
             )
             for witness in candidate_witness_tuple
         )
@@ -661,6 +671,7 @@ class TriggeredMovementHandler:
         descriptor = TriggeredMovementDescriptor.from_payload(
             cast(TriggeredMovementDescriptorPayload, _payload_object(request_payload, "descriptor"))
         )
+        _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
         payload = _decision_payload_object(result.payload)
         unit_instance_id = _payload_string(payload, "unit_instance_id")
         if unit_instance_id != _payload_string(request_payload, "unit_instance_id"):
@@ -679,6 +690,7 @@ class TriggeredMovementHandler:
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             surge_move_states=tuple(state.surge_move_states),
+            hover_mode_states=tuple(state.hover_mode_states),
         )
         drift_code = resolution.selected_payload_drift_code(payload)
         if drift_code is not None:
@@ -754,6 +766,7 @@ def resolve_triggered_movement(
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...] = (),
     surge_move_states: tuple[SurgeMoveState, ...] = (),
+    hover_mode_states: tuple[HoverModeState, ...] = (),
     battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
@@ -789,6 +802,19 @@ def resolve_triggered_movement(
     )
     attempted_placement = unit_placement.with_model_placements(moved_placements)
     unit = scenario.unit_instance_for_placement(unit_placement)
+    hover_mode_state = _hover_mode_state_for_unit(
+        hover_mode_states=hover_mode_states,
+        unit_instance_id=unit_placement.unit_instance_id,
+    )
+    aircraft_policy = AircraftMovementPolicy.from_unit(
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+        hover_mode_state=hover_mode_state,
+    )
+    aircraft_model_ids = aircraft_model_ids_for_scenario(
+        scenario,
+        hover_mode_states=hover_mode_states,
+    )
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
     model_movements: list[JsonValue] = []
@@ -798,7 +824,7 @@ def resolve_triggered_movement(
         model_poses = path_witness.poses_for_model(placement.model_instance_id)
         model_witness = PathWitness.for_paths(((placement.model_instance_id, model_poses),))
         legality_context = MovementLegalityContext.from_keywords(
-            keywords=unit.keywords,
+            keywords=aircraft_policy.effective_keywords,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=descriptor.movement_mode,
             movement_phase_action=None,
@@ -825,7 +851,11 @@ def resolve_triggered_movement(
                 player_id=unit_placement.player_id,
                 moving_model_instance_id=placement.model_instance_id,
             ),
-            aircraft_model_ids=(),
+            aircraft_model_ids=tuple(
+                model_id
+                for model_id in aircraft_model_ids
+                if model_id != placement.model_instance_id
+            ),
             movement_distance_budget_inches=descriptor.max_distance_inches,
         ).validate()
         terrain_result = legality_context.to_terrain_path_legality_context(
@@ -878,6 +908,10 @@ def resolve_triggered_movement(
         ),
         "coherency_result": validate_json_value(coherency_result.to_payload()),
     }
+    if aircraft_policy.has_aircraft_keyword:
+        movement_payload["aircraft_movement_policy"] = validate_json_value(
+            aircraft_policy.to_payload()
+        )
     if restriction_violations:
         movement_payload["restriction_violations"] = validate_json_value(
             [violation.to_payload() for violation in restriction_violations]
@@ -1232,6 +1266,22 @@ def _validate_triggered_movement_state_ready(state: GameState) -> None:
         raise GameLifecycleError("Triggered movement requires battlefield_state.")
 
 
+def _validate_reaction_window_matches_state(
+    *,
+    state: GameState,
+    descriptor: TriggeredMovementDescriptor,
+) -> None:
+    if type(descriptor) is not TriggeredMovementDescriptor:
+        raise GameLifecycleError("Triggered movement requires a descriptor.")
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise GameLifecycleError("Triggered movement requires current battle phase.")
+    if descriptor.trigger_timing.phase is not current_phase:
+        raise GameLifecycleError(
+            "Triggered movement trigger phase must match current battle phase."
+        )
+
+
 def _ruleset_descriptor_for_handler(handler: TriggeredMovementHandler) -> RulesetDescriptor:
     if type(handler) is not TriggeredMovementHandler:
         raise GameLifecycleError("Triggered movement requires a TriggeredMovementHandler.")
@@ -1252,6 +1302,26 @@ def _validate_move_witness_matches_unit(
     )
     if tuple(sorted(witness.model_ids())) != expected_model_ids:
         raise GameLifecycleError("Triggered movement witness must match selected unit models.")
+
+
+def _hover_mode_state_for_unit(
+    *,
+    hover_mode_states: tuple[HoverModeState, ...],
+    unit_instance_id: str,
+) -> HoverModeState | None:
+    if type(hover_mode_states) is not tuple:
+        raise GameLifecycleError("hover_mode_states must be a tuple.")
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    found: HoverModeState | None = None
+    for hover_mode_state in cast(tuple[object, ...], hover_mode_states):
+        if type(hover_mode_state) is not HoverModeState:
+            raise GameLifecycleError("hover_mode_states must contain HoverModeState values.")
+        if hover_mode_state.unit_instance_id != requested_unit_id:
+            continue
+        if found is not None:
+            raise GameLifecycleError("hover_mode_states must be unique by unit.")
+        found = hover_mode_state
+    return found if found is not None and found.active else None
 
 
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:

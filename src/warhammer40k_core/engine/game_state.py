@@ -909,6 +909,10 @@ class GameState:
             raise GameLifecycleError("SurgeMoveState player_id is not in this game.")
         if any(stored.result_id == state.result_id for stored in self.surge_move_states):
             raise GameLifecycleError("SurgeMoveState already exists for result_id.")
+        if any(
+            stored.same_phase_key() == state.same_phase_key() for stored in self.surge_move_states
+        ):
+            raise GameLifecycleError("SurgeMoveState already exists for unit in this phase.")
         self.surge_move_states.append(state)
         self.surge_move_states.sort(
             key=lambda stored: (
@@ -1428,7 +1432,8 @@ def _validate_surge_move_states(
     if not isinstance(values, list):
         raise GameLifecycleError("GameState surge_move_states must be a list.")
     validated: list[SurgeMoveState] = []
-    seen: set[str] = set()
+    seen_result_ids: set[str] = set()
+    seen_same_phase_keys: set[tuple[int, str, str, str]] = set()
     for value in cast(list[object], values):
         if type(value) is not SurgeMoveState:
             raise GameLifecycleError(
@@ -1436,9 +1441,13 @@ def _validate_surge_move_states(
             )
         if value.player_id not in player_ids:
             raise GameLifecycleError("SurgeMoveState player_id is not in this game.")
-        if value.result_id in seen:
+        if value.result_id in seen_result_ids:
             raise GameLifecycleError("GameState surge_move_states must be unique by result.")
-        seen.add(value.result_id)
+        seen_result_ids.add(value.result_id)
+        same_phase_key = value.same_phase_key()
+        if same_phase_key in seen_same_phase_keys:
+            raise GameLifecycleError("GameState surge_move_states must be unique by unit phase.")
+        seen_same_phase_keys.add(same_phase_key)
         validated.append(value)
     return sorted(
         validated,

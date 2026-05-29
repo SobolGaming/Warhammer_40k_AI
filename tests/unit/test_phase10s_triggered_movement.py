@@ -8,7 +8,8 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.aircraft import HoverModeState
+from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
@@ -37,11 +38,13 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseActionKind,
 )
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     SurgeMoveState,
+    SurgeMoveStatePayload,
     TriggeredMovementDescriptor,
     TriggeredMovementHandler,
     TriggeredMovementKind,
@@ -58,6 +61,7 @@ from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
     PathWitness,
@@ -69,7 +73,7 @@ from warhammer40k_core.geometry.pose import Pose
 def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
 
@@ -122,14 +126,92 @@ def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() ->
     displacements = cast(list[dict[str, JsonValue]], transition_batch["displacements"])
     assert resolved_payload["source_rule_id"] == "blood_surge"
     trigger_timing = cast(dict[str, JsonValue], resolved_payload["trigger_timing"])
-    assert trigger_timing["phase"] == "shooting"
+    assert trigger_timing["phase"] == "movement"
     assert len(displacements) == len(unit_placement.model_placements)
     assert {cast(str, record["displacement_kind"]) for record in displacements} == {"surge_move"}
     assert {cast(str, record["source_rule_id"]) for record in displacements} == {"blood_surge"}
 
 
-def test_triggered_payloads_round_trip_without_object_reprs() -> None:
+def test_triggered_movement_request_rejects_reaction_window_phase_mismatch() -> None:
+    state = _battle_ready_state()
+    unit_placement = _unit_placement(state)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Triggered movement trigger phase must match current battle phase",
+    ):
+        TriggeredMovementHandler(ruleset_descriptor=_ruleset()).request_from_state(
+            state=state,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=_blood_surge_descriptor(max_distance_inches=3.0),
+            candidate_witnesses=(_shift_witness(unit_placement, dx=3.0),),
+        )
+
+
+def test_triggered_movement_apply_rejects_reaction_window_phase_drift() -> None:
+    state = _battle_ready_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    unit_placement = _unit_placement(state)
     descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    request = handler.request_from_state(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=descriptor,
+        candidate_witnesses=(_shift_witness(unit_placement, dx=3.0),),
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase10s-result-phase-drift-001",
+        request=request,
+        selected_option_id="surge_move_001",
+    )
+    decisions.submit_result(result)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Triggered movement trigger phase must match current battle phase",
+    ):
+        handler.apply_decision(state=state, result=result, decisions=decisions)
+
+
+def test_shooting_reaction_window_resolves_with_matching_event_and_transition_phase() -> None:
+    state = _battle_ready_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    unit_placement = _unit_placement(state)
+    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    request = handler.request_from_state(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=descriptor,
+        candidate_witnesses=(_shift_witness(unit_placement, dx=3.0),),
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase10s-result-shooting-001",
+        request=request,
+        selected_option_id="surge_move_001",
+    )
+    decisions.submit_result(result)
+
+    status = handler.apply_decision(state=state, result=result, decisions=decisions)
+
+    assert status is None
+    resolved_payload = _last_event_payload(decisions, "triggered_movement_resolved")
+    transition_batch = cast(dict[str, JsonValue], resolved_payload["transition_batch"])
+    displacements = cast(list[dict[str, JsonValue]], transition_batch["displacements"])
+    assert resolved_payload["phase"] == BattlePhase.SHOOTING.value
+    assert {cast(str, record["source_phase"]) for record in displacements} == {
+        BattlePhase.SHOOTING.value
+    }
+
+
+def test_triggered_payloads_round_trip_without_object_reprs() -> None:
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     state = SurgeMoveState.from_resolution(
         player_id="player-a",
         battle_round=1,
@@ -162,7 +244,7 @@ def test_triggered_resolution_payloads_include_model_destinations_without_reprs(
         scenario=_scenario_from_state(state),
         ruleset_descriptor=_ruleset(),
         unit_placement=unit_placement,
-        descriptor=_blood_surge_descriptor(max_distance_inches=3.0),
+        descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
     )
@@ -261,7 +343,7 @@ def test_apply_triggered_movement_to_battlefield_uses_valid_resolution() -> None
         scenario=_scenario_from_state(state),
         ruleset_descriptor=_ruleset(),
         unit_placement=unit_placement,
-        descriptor=_blood_surge_descriptor(max_distance_inches=3.0),
+        descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
         path_witness=_shift_witness(unit_placement, dx=3.0),
         battle_round=state.battle_round,
     )
@@ -280,7 +362,7 @@ def test_apply_triggered_movement_to_battlefield_uses_valid_resolution() -> None
 def test_triggered_movement_apply_invalidates_if_state_changes_after_request() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     request = handler.request_from_state(
@@ -309,7 +391,7 @@ def test_triggered_movement_apply_invalidates_if_state_changes_after_request() -
 def test_triggered_movement_apply_invalidates_if_restrictions_change_after_request() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     request = handler.request_from_state(
@@ -341,7 +423,7 @@ def test_triggered_movement_apply_invalidates_if_restrictions_change_after_reque
 def test_invalid_triggered_resolution_cannot_mutate_or_emit_transitions() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     state.battle_shocked_unit_ids.append(unit_placement.unit_instance_id)
     assert state.battlefield_state is not None
     resolution = resolve_triggered_movement(
@@ -375,7 +457,7 @@ def test_lifecycle_submit_decision_routes_triggered_movement_choice() -> None:
     state = lifecycle.state
     assert state is not None
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     request = TriggeredMovementHandler(ruleset_descriptor=_ruleset()).request_from_state(
         state=state,
         unit_instance_id=unit_placement.unit_instance_id,
@@ -403,7 +485,7 @@ def test_lifecycle_submit_decision_routes_triggered_movement_choice() -> None:
 def test_triggered_movement_request_rejects_invalid_candidate() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     state.battle_shocked_unit_ids.append(unit_placement.unit_instance_id)
 
     with pytest.raises(GameLifecycleError, match="battle_shocked_surge_forbidden"):
@@ -418,7 +500,7 @@ def test_triggered_movement_request_rejects_invalid_candidate() -> None:
 def test_triggered_movement_handler_rejects_malformed_requests_and_results() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     witness = _shift_witness(unit_placement, dx=3.0)
     handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
 
@@ -577,7 +659,7 @@ def test_triggered_movement_handler_rejects_malformed_requests_and_results() -> 
 def test_surge_movement_cannot_occur_if_battle_shocked() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     state.battle_shocked_unit_ids.append(unit_placement.unit_instance_id)
 
     resolution = resolve_triggered_movement(
@@ -600,7 +682,7 @@ def test_surge_movement_cannot_occur_while_within_engagement_range() -> None:
     state = _battle_ready_state()
     _move_first_enemy_model_into_engagement(state)
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
 
     resolution = resolve_triggered_movement(
         scenario=_scenario_from_state(state),
@@ -620,7 +702,7 @@ def test_surge_movement_cannot_occur_while_within_engagement_range() -> None:
 def test_one_surge_move_per_phase_is_enforced() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     state.record_surge_move_state(
         SurgeMoveState.from_resolution(
             player_id=unit_placement.player_id,
@@ -648,6 +730,100 @@ def test_one_surge_move_per_phase_is_enforced() -> None:
     )
 
 
+def test_record_surge_move_state_rejects_duplicate_same_phase_unit_state() -> None:
+    state = _battle_ready_state()
+    unit_placement = _unit_placement(state)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
+    state.record_surge_move_state(
+        SurgeMoveState.from_resolution(
+            player_id=unit_placement.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=descriptor,
+            request_id="decision-request-existing",
+            result_id="phase10s-result-existing",
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="already exists for unit in this phase"):
+        state.record_surge_move_state(
+            SurgeMoveState.from_resolution(
+                player_id=unit_placement.player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_placement.unit_instance_id,
+                descriptor=descriptor,
+                request_id="decision-request-duplicate-phase",
+                result_id="phase10s-result-duplicate-phase",
+            )
+        )
+
+
+def test_lifecycle_payload_rejects_duplicate_same_phase_surge_states() -> None:
+    lifecycle, _movement_status = _advance_to_movement_unit_selection(_config())
+    state = lifecycle.state
+    assert state is not None
+    unit_placement = _unit_placement(state)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
+    state.record_surge_move_state(
+        SurgeMoveState.from_resolution(
+            player_id=unit_placement.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=descriptor,
+            request_id="decision-request-existing",
+            result_id="phase10s-result-existing",
+        )
+    )
+    payload = lifecycle.to_payload()
+    duplicate_payload = dict(payload["state"]["surge_move_states"][0])
+    duplicate_payload["request_id"] = "decision-request-duplicate-phase"
+    duplicate_payload["result_id"] = "phase10s-result-duplicate-phase"
+    payload["state"]["surge_move_states"].append(cast(SurgeMoveStatePayload, duplicate_payload))
+
+    with pytest.raises(GameLifecycleError, match="unique by unit phase"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_surge_move_state_allows_same_unit_in_different_phases_or_rounds() -> None:
+    state = _battle_ready_state()
+    unit_placement = _unit_placement(state)
+    movement_descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
+    shooting_descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+
+    state.record_surge_move_state(
+        SurgeMoveState.from_resolution(
+            player_id=unit_placement.player_id,
+            battle_round=1,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=movement_descriptor,
+            request_id="decision-request-movement-round-one",
+            result_id="phase10s-result-movement-round-one",
+        )
+    )
+    state.record_surge_move_state(
+        SurgeMoveState.from_resolution(
+            player_id=unit_placement.player_id,
+            battle_round=1,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=shooting_descriptor,
+            request_id="decision-request-shooting-round-one",
+            result_id="phase10s-result-shooting-round-one",
+        )
+    )
+    state.record_surge_move_state(
+        SurgeMoveState.from_resolution(
+            player_id=unit_placement.player_id,
+            battle_round=2,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=movement_descriptor,
+            request_id="decision-request-movement-round-two",
+            result_id="phase10s-result-movement-round-two",
+        )
+    )
+
+    assert len(state.surge_move_states) == 3
+
+
 def test_triggered_movement_does_not_appear_in_select_movement_action() -> None:
     _lifecycle, action_request = _advance_to_movement_action_request(_config())
 
@@ -669,8 +845,115 @@ def test_triggered_movement_does_not_appear_in_select_movement_action() -> None:
     }
 
 
+def test_triggered_movement_can_transit_enemy_aircraft_but_not_end_in_engagement() -> None:
+    state, mover, enemy_aircraft = _aircraft_transit_battle_state()
+    scenario = _scenario_from_state(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(mover.unit_instance_id)
+    model_placement = unit_placement.model_placements[0]
+    aircraft_placement = scenario.battlefield_state.unit_placement_by_id(
+        enemy_aircraft.unit_instance_id
+    ).model_placements[0]
+    descriptor = _reactive_step_descriptor(max_distance_inches=12.0)
+    transit_witness = PathWitness.for_straight_line_endpoints(
+        (
+            (
+                model_placement.model_instance_id,
+                model_placement.pose,
+                Pose.at(12.0, model_placement.pose.position.y),
+            ),
+        )
+    )
+    endpoint_witness = PathWitness.for_straight_line_endpoints(
+        (
+            (
+                model_placement.model_instance_id,
+                model_placement.pose,
+                Pose.at(
+                    aircraft_placement.pose.position.x,
+                    model_placement.pose.position.y,
+                ),
+            ),
+        )
+    )
+
+    transit_result = resolve_triggered_movement(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        unit_placement=unit_placement,
+        descriptor=descriptor,
+        path_witness=transit_witness,
+        battle_round=state.battle_round,
+        hover_mode_states=tuple(state.hover_mode_states),
+    )
+    endpoint_result = resolve_triggered_movement(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        unit_placement=unit_placement,
+        descriptor=descriptor,
+        path_witness=endpoint_witness,
+        battle_round=state.battle_round,
+        hover_mode_states=tuple(state.hover_mode_states),
+    )
+
+    assert transit_result.is_valid
+    assert not endpoint_result.is_valid
+    assert endpoint_result.path_validation_results[0].violations[0].violation_code == (
+        "enemy_engagement_range_end_forbidden"
+    )
+
+
+def test_triggered_movement_uses_hover_effective_keywords_for_moving_aircraft() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    state.record_hover_mode_state(_hover_state_for_aircraft(aircraft))
+    scenario = _scenario_from_state(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+
+    request = TriggeredMovementHandler(ruleset_descriptor=_ruleset()).request_from_state(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=_reactive_step_descriptor(max_distance_inches=10.0),
+        candidate_witnesses=(_shift_witness(unit_placement, dx=6.0),),
+    )
+
+    option_payload = _option_payload(request, "triggered_move_001")
+    aircraft_policy = cast(dict[str, JsonValue], option_payload["aircraft_movement_policy"])
+    effective_keywords = cast(list[str], aircraft_policy["effective_keywords"])
+    assert aircraft_policy["hover_mode_active"] is True
+    assert aircraft_policy["uses_aircraft_rules"] is False
+    assert "AIRCRAFT" not in effective_keywords
+
+
+def test_triggered_movement_rejects_stale_hover_aircraft_policy_payload() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    scenario = _scenario_from_state(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    request = handler.request_from_state(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=_reactive_step_descriptor(max_distance_inches=10.0),
+        candidate_witnesses=(_shift_witness(unit_placement, dx=6.0),),
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase10s-result-stale-hover-policy-001",
+        request=request,
+        selected_option_id="triggered_move_001",
+    )
+    decisions.submit_result(result)
+    state.record_hover_mode_state(_hover_state_for_aircraft(aircraft))
+
+    status = handler.apply_decision(state=state, result=result, decisions=decisions)
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    invalid_payload = _last_event_payload(decisions, "triggered_movement_invalid")
+    assert invalid_payload["violation_code"] == "triggered_movement_aircraft_policy_drift"
+
+
 def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> None:
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
 
     with pytest.raises(GameLifecycleError, match="trigger_timing must be a ReactionWindow"):
         TriggeredMovementDescriptor(
@@ -716,7 +999,7 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
         SurgeMoveState(
             player_id="player-a",
             battle_round=1,
-            phase=BattlePhase.MOVEMENT.value,
+            phase=BattlePhase.SHOOTING.value,
             unit_instance_id="army-alpha:intercessor-unit-1",
             source_rule_id="blood_surge",
             trigger_timing=descriptor.trigger_timing,
@@ -844,7 +1127,7 @@ def test_triggered_movement_state_readiness_is_fail_fast() -> None:
         handler.request_from_state(
             state=setup_state,
             unit_instance_id=setup_unit_placement.unit_instance_id,
-            descriptor=_blood_surge_descriptor(max_distance_inches=3.0),
+            descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
             candidate_witnesses=(_shift_witness(setup_unit_placement, dx=3.0),),
         )
 
@@ -855,7 +1138,7 @@ def test_triggered_movement_state_readiness_is_fail_fast() -> None:
         handler.request_from_state(
             state=phase_state,
             unit_instance_id=phase_unit_placement.unit_instance_id,
-            descriptor=_blood_surge_descriptor(max_distance_inches=3.0),
+            descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
             candidate_witnesses=(_shift_witness(phase_unit_placement, dx=3.0),),
         )
 
@@ -866,7 +1149,7 @@ def test_triggered_movement_state_readiness_is_fail_fast() -> None:
         handler.request_from_state(
             state=active_player_state,
             unit_instance_id=active_player_unit_placement.unit_instance_id,
-            descriptor=_blood_surge_descriptor(max_distance_inches=3.0),
+            descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
             candidate_witnesses=(_shift_witness(active_player_unit_placement, dx=3.0),),
         )
 
@@ -877,7 +1160,7 @@ def test_triggered_movement_state_readiness_is_fail_fast() -> None:
         handler.request_from_state(
             state=battlefield_state,
             unit_instance_id=battlefield_unit_placement.unit_instance_id,
-            descriptor=_blood_surge_descriptor(max_distance_inches=3.0),
+            descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
             candidate_witnesses=(_shift_witness(battlefield_unit_placement, dx=3.0),),
         )
 
@@ -885,7 +1168,7 @@ def test_triggered_movement_state_readiness_is_fail_fast() -> None:
 def test_triggered_movement_request_rejects_invalid_resolution_sets() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     resolution = resolve_triggered_movement(
         scenario=_scenario_from_state(state),
         ruleset_descriptor=_ruleset(),
@@ -957,7 +1240,7 @@ def test_triggered_movement_request_rejects_invalid_resolution_sets() -> None:
             active_player_id=state.active_player_id,
             current_phase=state.current_battle_phase.value,
             unit_instance_id=unit_placement.unit_instance_id,
-            descriptor=_blood_surge_descriptor(max_distance_inches=2.0),
+            descriptor=_movement_surge_descriptor(max_distance_inches=2.0),
             resolutions=(resolution,),
         )
 
@@ -987,7 +1270,7 @@ def test_triggered_movement_request_rejects_invalid_resolution_sets() -> None:
 def test_triggered_movement_resolution_rejects_invalid_components() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
-    descriptor = _blood_surge_descriptor(max_distance_inches=3.0)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
     resolution = resolve_triggered_movement(
         scenario=_scenario_from_state(state),
         ruleset_descriptor=_ruleset(),
@@ -1193,17 +1476,252 @@ def _blood_surge_descriptor(*, max_distance_inches: float) -> TriggeredMovementD
     )
 
 
+def _movement_surge_descriptor(*, max_distance_inches: float) -> TriggeredMovementDescriptor:
+    return TriggeredMovementDescriptor(
+        movement_kind=TriggeredMovementKind.SURGE,
+        source_rule_id="blood_surge",
+        trigger_timing=ReactionWindow(
+            phase=BattlePhase.MOVEMENT,
+            window_kind=ReactionWindowKind.RULE_TRIGGER,
+            source_step="movement_step",
+            source_event_id="event-source-movement-000001",
+        ),
+        max_distance_inches=max_distance_inches,
+    )
+
+
 def _reactive_step_descriptor(*, max_distance_inches: float) -> TriggeredMovementDescriptor:
     return TriggeredMovementDescriptor(
         movement_kind=TriggeredMovementKind.TRIGGERED,
         source_rule_id="reactive_step",
         trigger_timing=ReactionWindow(
-            phase=BattlePhase.CHARGE,
+            phase=BattlePhase.MOVEMENT,
             window_kind=ReactionWindowKind.RULE_TRIGGER,
             source_step=None,
             source_event_id=None,
         ),
         max_distance_inches=max_distance_inches,
+    )
+
+
+def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+
+
+def _aircraft_battle_state(*, aircraft_pose: Pose) -> tuple[GameState, UnitInstance]:
+    scenario, aircraft, _enemy = _aircraft_scenario()
+    scenario = _with_unit_first_model_pose(
+        scenario=scenario,
+        unit_instance_id=aircraft.unit_instance_id,
+        pose=aircraft_pose,
+    )
+    return _battle_state_from_scenario(scenario), aircraft
+
+
+def _aircraft_transit_battle_state() -> tuple[GameState, UnitInstance, UnitInstance]:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    alpha = muster_army(
+        catalog=catalog,
+        request=_army_muster_request_for_units(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-alpha",
+            unit_selections=(
+                _unit_selection(
+                    unit_selection_id="mover-unit",
+                    datasheet_id="core-vehicle-monster",
+                    model_profile_id="core-vehicle-monster",
+                    model_count=1,
+                ),
+            ),
+        ),
+    )
+    beta = muster_army(
+        catalog=catalog,
+        request=_army_muster_request_for_units(
+            catalog=catalog,
+            player_id="player-b",
+            army_id="army-beta",
+            unit_selections=(
+                _unit_selection(
+                    unit_selection_id="enemy-aircraft",
+                    datasheet_id="core-vehicle-monster",
+                    model_profile_id="core-vehicle-monster",
+                    model_count=1,
+                ),
+            ),
+        ),
+    )
+    enemy_aircraft = replace(
+        beta.unit_by_id("army-beta:enemy-aircraft"),
+        keywords=("Aircraft", "Fly", "Vehicle"),
+    )
+    beta = replace(
+        beta,
+        units=tuple(
+            enemy_aircraft if unit.unit_instance_id == enemy_aircraft.unit_instance_id else unit
+            for unit in beta.units
+        ),
+    )
+    mover = alpha.unit_by_id("army-alpha:mover-unit")
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase10s-aircraft-transit",
+        armies=(alpha, beta),
+    )
+    scenario = _with_unit_first_model_pose(
+        scenario=scenario,
+        unit_instance_id=mover.unit_instance_id,
+        pose=Pose.at(6.0, 20.0),
+    )
+    mover_radius = _first_model_radius_x(mover)
+    aircraft_radius = _first_model_radius_x(enemy_aircraft)
+    scenario = _with_unit_first_model_pose(
+        scenario=scenario,
+        unit_instance_id=enemy_aircraft.unit_instance_id,
+        pose=Pose.at(9.0, 20.0 + mover_radius + aircraft_radius + 0.5),
+    )
+    return _battle_state_from_scenario(scenario), mover, enemy_aircraft
+
+
+def _aircraft_scenario() -> tuple[BattlefieldScenario, UnitInstance, UnitInstance]:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    alpha = muster_army(
+        catalog=catalog,
+        request=_army_muster_request_for_units(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-alpha",
+            unit_selections=(
+                _unit_selection(
+                    unit_selection_id="aircraft-unit",
+                    datasheet_id="core-vehicle-monster",
+                    model_profile_id="core-vehicle-monster",
+                    model_count=1,
+                ),
+            ),
+        ),
+    )
+    beta = muster_army(
+        catalog=catalog,
+        request=_army_muster_request_for_units(
+            catalog=catalog,
+            player_id="player-b",
+            army_id="army-beta",
+            unit_selections=(
+                _unit_selection(
+                    unit_selection_id="enemy-unit",
+                    datasheet_id="core-intercessor-like-infantry",
+                    model_profile_id="core-intercessor-like",
+                    model_count=5,
+                ),
+            ),
+        ),
+    )
+    aircraft = replace(
+        alpha.unit_by_id("army-alpha:aircraft-unit"),
+        keywords=("Aircraft", "Fly", "Hover", "Vehicle"),
+    )
+    alpha = replace(
+        alpha,
+        units=tuple(
+            aircraft if unit.unit_instance_id == aircraft.unit_instance_id else unit
+            for unit in alpha.units
+        ),
+    )
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase10s-aircraft",
+        armies=(alpha, beta),
+    )
+    return scenario, aircraft, beta.unit_by_id("army-beta:enemy-unit")
+
+
+def _battle_state_from_scenario(scenario: BattlefieldScenario) -> GameState:
+    ruleset = _ruleset()
+    return GameState(
+        game_id="phase10s-aircraft-game",
+        ruleset_descriptor_hash=ruleset.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(ruleset.setup_sequence.steps),
+        battle_phase_sequence=tuple(ruleset.battle_phase_sequence.phases),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+        setup_step_index=None,
+        battle_phase_index=tuple(ruleset.battle_phase_sequence.phases).index(BattlePhase.MOVEMENT),
+        battle_round=1,
+        active_player_id="player-a",
+        army_definitions=list(scenario.armies),
+        battlefield_state=scenario.battlefield_state,
+    )
+
+
+def _army_muster_request_for_units(
+    *,
+    catalog: ArmyCatalog,
+    player_id: str,
+    army_id: str,
+    unit_selections: tuple[UnitMusterSelection, ...],
+) -> ArmyMusterRequest:
+    return ArmyMusterRequest(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_id="core-combined-arms",
+        ),
+        unit_selections=unit_selections,
+    )
+
+
+def _unit_selection(
+    *,
+    unit_selection_id: str,
+    datasheet_id: str,
+    model_profile_id: str,
+    model_count: int,
+) -> UnitMusterSelection:
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id=model_profile_id,
+                model_count=model_count,
+            ),
+        ),
+    )
+
+
+def _with_unit_first_model_pose(
+    *,
+    scenario: BattlefieldScenario,
+    unit_instance_id: str,
+    pose: Pose,
+) -> BattlefieldScenario:
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    first_placement = unit_placement.model_placements[0].with_pose(pose)
+    updated_placement = unit_placement.with_model_placements(
+        (first_placement, *unit_placement.model_placements[1:])
+    )
+    return BattlefieldScenario(
+        armies=scenario.armies,
+        battlefield_state=scenario.battlefield_state.with_unit_placement(updated_placement),
+    )
+
+
+def _first_model_radius_x(unit: UnitInstance) -> float:
+    return unit.own_models[0].geometry.primary_part().radius_x_inches
+
+
+def _hover_state_for_aircraft(aircraft: UnitInstance) -> HoverModeState:
+    return HoverModeState.active_for_unit(
+        player_id="player-a",
+        unit_instance_id=aircraft.unit_instance_id,
+        decision_request_id="phase10s-hover-request",
+        decision_result_id="phase10s-hover-result",
     )
 
 
