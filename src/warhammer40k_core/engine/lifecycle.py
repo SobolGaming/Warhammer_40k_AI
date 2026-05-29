@@ -479,21 +479,14 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
         }
     except PlacementError:
         active_player_unit_ids = set()
-    removed_model_ids = set(state.battlefield_state.removed_model_ids)
-    active_player_embarked_unit_ids = {
-        unit_id
-        for cargo_state in state.transport_cargo_states
-        if cargo_state.player_id == state.active_player_id
-        for unit_id in cargo_state.embarked_unit_instance_ids
-    }
-    fully_removed_active_player_unit_ids: set[str] = set()
-    for army_definition in state.army_definitions:
-        if army_definition.player_id != state.active_player_id:
-            continue
-        for unit in army_definition.units:
-            unit_model_ids = {model.model_instance_id for model in unit.own_models}
-            if unit_model_ids and unit_model_ids <= removed_model_ids:
-                fully_removed_active_player_unit_ids.add(unit.unit_instance_id)
+    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
+    fully_removed_active_player_unit_ids = _fully_removed_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
     for unit_id in (*movement_state.selected_unit_ids, *movement_state.moved_unit_ids):
         if (
             unit_id not in active_player_unit_ids
@@ -535,12 +528,24 @@ def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         placement.unit_instance_id for placement in placed_army.unit_placements
     }
+    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
+    fully_removed_active_player_unit_ids = _fully_removed_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
     for advanced_state in state.advanced_unit_states:
         if advanced_state.player_id != state.active_player_id:
             raise GameLifecycleError("advanced_unit_states player drift.")
         if advanced_state.battle_round != state.battle_round:
             raise GameLifecycleError("advanced_unit_states battle round drift.")
-        if advanced_state.unit_instance_id not in active_player_unit_ids:
+        if (
+            advanced_state.unit_instance_id not in active_player_unit_ids
+            and advanced_state.unit_instance_id not in active_player_embarked_unit_ids
+            and advanced_state.unit_instance_id not in fully_removed_active_player_unit_ids
+        ):
             raise GameLifecycleError("advanced_unit_states unit is not active player's unit.")
 
 
@@ -588,13 +593,49 @@ def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         placement.unit_instance_id for placement in placed_army.unit_placements
     }
+    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
+    fully_removed_active_player_unit_ids = _fully_removed_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
     for fell_back_state in state.fell_back_unit_states:
         if fell_back_state.player_id != state.active_player_id:
             raise GameLifecycleError("fell_back_unit_states player drift.")
         if fell_back_state.battle_round != state.battle_round:
             raise GameLifecycleError("fell_back_unit_states battle round drift.")
-        if fell_back_state.unit_instance_id not in active_player_unit_ids:
+        if (
+            fell_back_state.unit_instance_id not in active_player_unit_ids
+            and fell_back_state.unit_instance_id not in active_player_embarked_unit_ids
+            and fell_back_state.unit_instance_id not in fully_removed_active_player_unit_ids
+        ):
             raise GameLifecycleError("fell_back_unit_states unit is not active player's unit.")
+
+
+def _embarked_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:
+    return {
+        unit_id
+        for cargo_state in state.transport_cargo_states
+        if cargo_state.player_id == player_id
+        for unit_id in cargo_state.embarked_unit_instance_ids
+    }
+
+
+def _fully_removed_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:
+    if state.battlefield_state is None:
+        raise GameLifecycleError("removed unit accounting requires battlefield_state.")
+    removed_model_ids = set(state.battlefield_state.removed_model_ids)
+    fully_removed_unit_ids: set[str] = set()
+    for army_definition in state.army_definitions:
+        if army_definition.player_id != player_id:
+            continue
+        for unit in army_definition.units:
+            unit_model_ids = {model.model_instance_id for model in unit.own_models}
+            if unit_model_ids and unit_model_ids <= removed_model_ids:
+                fully_removed_unit_ids.add(unit.unit_instance_id)
+    return fully_removed_unit_ids
 
 
 def _state_requires_mustered_armies(state: GameState) -> bool:

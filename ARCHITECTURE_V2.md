@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10N work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10Q work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10O** is treated as implemented or in final review at the time this file was updated. Do not insert new work before Phase 10P unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10Q** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10R unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -59,6 +59,8 @@ Completed / implemented foundation:
 | 10M | Complete | Engagement-aware Movement action options and Normal Move finalization |
 | 10N | Complete | Advance action, dice, rerolls, and advanced-state restrictions |
 | 10O | Complete | Fall Back action and Desperate Escape resolution |
+| 10P | Complete | Reinforcements, Strategic Reserves, Deep Strike, and reserve placement |
+| 10Q | Complete | Transport Embark/Disembark, Firing Deck, and destroyed transport emergency disembark |
 
 ## Cross-cutting architectural rules
 
@@ -495,6 +497,8 @@ CORE V1 relevant areas:
 
 ## Phase 10P: Reinforcements, Strategic Reserves, Deep Strike, and reserve placement
 
+Status: Complete.
+
 Modules:
 
 - `engine/phases/movement.py`
@@ -554,6 +558,8 @@ CORE V1 relevant areas:
 
 ## Phase 10Q: transport embark/disembark, Firing Deck, and destroyed transport emergency disembark
 
+Status: Complete.
+
 Modules:
 
 - `engine/transports.py`
@@ -575,15 +581,16 @@ Invariants:
 - Transport capacity is data-driven by datasheet restrictions;
 - units can start the battle embarked within a Transport and must declare that before setup;
 - Embark is battlefield removal into transport cargo;
-- Embark requires every model in the unit to end a Normal, Advance, or Fall Back move within 3" of the friendly Transport;
-- a unit cannot Embark if it already Disembarked from a Transport in the same phase;
+- by default, Embark is available only after a unit makes a Normal, Advance, or Fall Back move and every model in that unit ends that move within 3" of a friendly `TRANSPORT` with sufficient capacity;
+- Remain Stationary does not satisfy the Core Rules Embark trigger; a zero-distance Normal Move is still represented as a Normal Move;
+- by default, a unit that Disembarked from a `TRANSPORT` in the current phase cannot Embark in that same phase; explicit rule overrides must be represented as typed permissions;
 - embarked units normally cannot do anything or be affected unless a rule says otherwise;
 - Disembark is battlefield placement from transport cargo;
 - Disembark is available only to units that started the Movement phase embarked;
 - Disembark placement must be wholly within 3" of the Transport and not within enemy Engagement Range;
 - units disembarking before a stationary/not-yet-moved Transport moves can act normally but cannot choose Remain Stationary;
 - units disembarking after a Transport made a Normal move count as having made a Normal move, cannot move further this phase, and cannot declare a charge that turn;
-- units cannot disembark from a Transport that Advanced or Fell Back this turn;
+- by default, units cannot Disembark from a `TRANSPORT` that Advanced or Fell Back this turn; explicit rule overrides must be represented as typed permissions;
 - destroyed Transport disembark occurs before the Transport model is removed;
 - destroyed Transport disembark ignores that Transport's Deadly Demise effect for embarked units;
 - destroyed Transport disembark rolls one D6 per disembarking model, inflicting mortal wounds on 1s;
@@ -591,12 +598,14 @@ Invariants:
 - Emergency Disembarkation uses 6" instead of 3" and mortal wounds on 1-3 when normal destroyed-transport disembark is impossible;
 - any model that still cannot be set up during Emergency Disembarkation is destroyed;
 - Firing Deck selects up to X embarked models whose units have not shot, selects one non-One-Shot ranged weapon from each, temporarily equips the Transport with those weapons, and makes those embarked units ineligible to shoot until end of phase.
+- Movement lifecycle exposes voluntary pre-move Disembark, post-Transport-Normal-Move Disembark, and post-move Embark through `DecisionRequest` / `DecisionResult`.
 
 Required tests:
 
 - Embark removes placed models and emits removal records;
 - embarked unit is unavailable for Movement unit selection;
 - Disembark places models and emits placement records;
+- post-Transport-Normal-Move Disembark records the passenger as having moved and prevents later Movement activation;
 - illegal Disembark fails without mutation;
 - disembark-before-move, disembark-after-Normal-move, Advanced/Fell-Back Transport restrictions are enforced;
 - destroyed Transport disembark occurs before Transport removal and applies Battle-shock/Normal-move/no-charge state;

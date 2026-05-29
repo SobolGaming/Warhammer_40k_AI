@@ -37,18 +37,25 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
+    COMPLETE_DISEMBARKS_OPTION_ID,
     DECLINE_EMBARK_OPTION_ID,
     PLACE_DISEMBARK_UNIT_DECISION_TYPE,
     SELECT_DISEMBARK_UNIT_DECISION_TYPE,
     SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    AdvancedUnitState,
+    AdvanceRollRequest,
+    AdvanceRollResult,
+    FellBackUnitState,
+    MovementDiceRecord,
     MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
     MovementUnitSelection,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.transports import (
     DestroyedTransportDisembark,
     DisembarkResolution,
@@ -273,6 +280,107 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
     assert lifecycle.state.to_payload() == state.to_payload()
 
 
+def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _advance_embark_ready_scenario()
+    state = _battle_state(scenario)
+    state.record_transport_cargo_state(_cargo_state(transport=transport))
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=passenger.unit_instance_id,
+    )
+
+    embark_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=action_request,
+            option_id=MovementPhaseActionKind.ADVANCE.value,
+            result_id="phase10q-advance",
+        )
+    )
+    assert embark_request.decision_type == SELECT_EMBARK_TRANSPORT_DECISION_TYPE
+    result = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=embark_request,
+        option_id=transport.unit_instance_id,
+        result_id="phase10q-advance-embark",
+    )
+
+    assert result is None
+    assert passenger.unit_instance_id not in _placed_unit_ids(state)
+    assert (
+        state.advanced_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+        )
+        is not None
+    )
+    payload: GameLifecyclePayload = {
+        "config": None,
+        "state": state.to_payload(),
+        "decisions": decisions.to_payload(),
+    }
+    lifecycle = GameLifecycle.from_payload(payload)
+    assert lifecycle.state is not None
+    assert lifecycle.state.to_payload() == state.to_payload()
+
+
+def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _fall_back_embark_ready_scenario()
+    state = _battle_state(scenario)
+    state.record_transport_cargo_state(_cargo_state(transport=transport))
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=passenger.unit_instance_id,
+    )
+    assert MovementPhaseActionKind.FALL_BACK.value in {
+        option.option_id for option in action_request.options
+    }
+
+    embark_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=action_request,
+            option_id=MovementPhaseActionKind.FALL_BACK.value,
+            result_id="phase10q-fall-back",
+        )
+    )
+    assert embark_request.decision_type == SELECT_EMBARK_TRANSPORT_DECISION_TYPE
+    result = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=embark_request,
+        option_id=transport.unit_instance_id,
+        result_id="phase10q-fall-back-embark",
+    )
+
+    assert result is None
+    assert passenger.unit_instance_id not in _placed_unit_ids(state)
+    assert (
+        state.fell_back_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+        )
+        is not None
+    )
+    payload: GameLifecyclePayload = {
+        "config": None,
+        "state": state.to_payload(),
+        "decisions": decisions.to_payload(),
+    }
+    lifecycle = GameLifecycle.from_payload(payload)
+    assert lifecycle.state is not None
+    assert lifecycle.state.to_payload() == state.to_payload()
+
+
 def test_lifecycle_embark_decline_leaves_unit_placed_and_completes_activation() -> None:
     scenario, passenger, transport, _enemy, _catalog = _embark_ready_scenario()
     state = _battle_state(scenario)
@@ -442,6 +550,134 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
     assert lifecycle.state.to_payload() == state.to_payload()
 
 
+def test_transport_normal_move_emits_post_move_disembark_decision_after_pre_move_decline() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        )
+    )
+
+    handler, decisions, post_move_disembark_request = (
+        _post_normal_move_disembark_request_after_transport_normal_move(
+            state=state,
+            passenger=passenger,
+            transport=transport,
+        )
+    )
+
+    assert handler is not None
+    assert decisions is not None
+    assert post_move_disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
+    post_move_payload = cast(dict[str, object], post_move_disembark_request.payload)
+    assert post_move_payload["transport_movement_status"] == (
+        TransportMovementStatus.NORMAL_MOVE.value
+    )
+    assert post_move_payload["transport_unit_instance_id"] == transport.unit_instance_id
+    assert {option.option_id for option in post_move_disembark_request.options} == {
+        COMPLETE_DISEMBARKS_OPTION_ID,
+        passenger.unit_instance_id,
+    }
+    assert state.movement_phase_state is not None
+    assert state.movement_phase_state.declined_disembark_unit_ids == (passenger.unit_instance_id,)
+    assert state.movement_phase_state.declined_post_normal_move_disembark_unit_ids == ()
+    assert state.movement_phase_state.moved_unit_ids == (transport.unit_instance_id,)
+
+
+def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and_replay() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        )
+    )
+    handler, decisions, post_move_disembark_request = (
+        _post_normal_move_disembark_request_after_transport_normal_move(
+            state=state,
+            passenger=passenger,
+            transport=transport,
+        )
+    )
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=post_move_disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase10q-select-post-normal-disembark",
+        )
+    )
+    assert placement_request.decision_type == PLACE_DISEMBARK_UNIT_DECISION_TYPE
+
+    status = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        option_id=BattlefieldPlacementKind.DISEMBARK.value,
+        result_id="phase10q-place-post-normal-disembark",
+    )
+
+    assert status is None
+    assert passenger.unit_instance_id in _placed_unit_ids(state)
+    stored_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert stored_cargo is not None
+    assert stored_cargo.embarked_unit_instance_ids == ()
+    assert stored_cargo.disembarked_this_phase_unit_instance_ids == (passenger.unit_instance_id,)
+    disembarked_state = state.disembarked_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+    )
+    assert disembarked_state is not None
+    assert disembarked_state.timing_kind is DisembarkTimingKind.AFTER_TRANSPORT_NORMAL_MOVE
+    assert not disembarked_state.can_move_further
+    assert not disembarked_state.can_declare_charge
+    assert state.movement_phase_state is not None
+    assert state.movement_phase_state.selected_unit_ids == (
+        transport.unit_instance_id,
+        passenger.unit_instance_id,
+    )
+    assert state.movement_phase_state.moved_unit_ids == (
+        transport.unit_instance_id,
+        passenger.unit_instance_id,
+    )
+    scenario_after = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    assert passenger.unit_instance_id not in state.movement_phase_state.legal_unit_ids(
+        scenario_after,
+        accounted_unplaced_model_ids=state.unavailable_model_ids(),
+    )
+
+    payload: GameLifecyclePayload = {
+        "config": None,
+        "state": state.to_payload(),
+        "decisions": decisions.to_payload(),
+    }
+    lifecycle = GameLifecycle.from_payload(payload)
+    assert lifecycle.state is not None
+    assert lifecycle.state.to_payload() == state.to_payload()
+
+
 def test_replay_rejects_transport_cargo_when_transport_is_not_placed() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     state = _battle_state(scenario)
@@ -490,6 +726,62 @@ def test_replay_rejects_transport_cargo_when_transport_model_is_removed() -> Non
     }
 
     with pytest.raises(GameLifecycleError, match="transport unit must be placed"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_replay_rejects_advanced_state_for_unplaced_unremoved_unembarked_unit() -> None:
+    scenario, passenger, _transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_reserve_state(
+        ReserveState.declared_before_battle(
+            player_id="player-a",
+            unit_instance_id=passenger.unit_instance_id,
+            reserve_kind=ReserveKind.RESERVES,
+        )
+    )
+    state.record_advanced_unit_state(_advanced_unit_state(passenger.unit_instance_id))
+    payload: GameLifecyclePayload = {
+        "config": None,
+        "state": state.to_payload(),
+        "decisions": DecisionController().to_payload(),
+    }
+
+    with pytest.raises(GameLifecycleError, match="advanced_unit_states unit"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_replay_rejects_fell_back_state_for_unplaced_unremoved_unembarked_unit() -> None:
+    scenario, passenger, _transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_reserve_state(
+        ReserveState.declared_before_battle(
+            player_id="player-a",
+            unit_instance_id=passenger.unit_instance_id,
+            reserve_kind=ReserveKind.RESERVES,
+        )
+    )
+    state.record_fell_back_unit_state(
+        FellBackUnitState(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+        )
+    )
+    payload: GameLifecyclePayload = {
+        "config": None,
+        "state": state.to_payload(),
+        "decisions": DecisionController().to_payload(),
+    }
+
+    with pytest.raises(GameLifecycleError, match="fell_back_unit_states unit"):
         GameLifecycle.from_payload(payload)
 
 
@@ -1455,6 +1747,99 @@ def _embark_ready_scenario() -> tuple[
     )
 
 
+def _advance_embark_ready_scenario() -> tuple[
+    BattlefieldScenario,
+    UnitInstance,
+    UnitInstance,
+    UnitInstance,
+    ArmyCatalog,
+]:
+    scenario, passenger, transport, enemy, catalog = _transport_scenario()
+    battlefield = scenario.battlefield_state.with_unit_placement(
+        _unit_placement_at(
+            passenger,
+            army_id="army-alpha",
+            player_id="player-a",
+            poses=(
+                Pose.at(1.6, 9.0),
+                Pose.at(3.0, 9.0),
+                Pose.at(4.4, 9.0),
+                Pose.at(2.3, 10.2),
+                Pose.at(3.7, 10.2),
+            ),
+        )
+    ).with_unit_placement(
+        _unit_placement_at(
+            transport,
+            army_id="army-alpha",
+            player_id="player-a",
+            poses=(Pose.at(12.0, 13.0),),
+        )
+    )
+    return (
+        BattlefieldScenario(armies=scenario.armies, battlefield_state=battlefield),
+        passenger,
+        transport,
+        enemy,
+        catalog,
+    )
+
+
+def _fall_back_embark_ready_scenario() -> tuple[
+    BattlefieldScenario,
+    UnitInstance,
+    UnitInstance,
+    UnitInstance,
+    ArmyCatalog,
+]:
+    scenario, passenger, transport, enemy, catalog = _transport_scenario()
+    battlefield = (
+        scenario.battlefield_state.with_unit_placement(
+            _unit_placement_at(
+                passenger,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=(
+                    Pose.at(2.6, 9.0),
+                    Pose.at(4.0, 9.0),
+                    Pose.at(5.4, 9.0),
+                    Pose.at(3.3, 10.2),
+                    Pose.at(4.7, 10.2),
+                ),
+            )
+        )
+        .with_unit_placement(
+            _unit_placement_at(
+                transport,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=(Pose.at(4.0, 19.0),),
+            )
+        )
+        .with_unit_placement(
+            _unit_placement_at(
+                enemy,
+                army_id="army-beta",
+                player_id="player-b",
+                poses=(
+                    Pose.at(2.6, 7.5),
+                    Pose.at(35.0, 35.0),
+                    Pose.at(37.0, 35.0),
+                    Pose.at(39.0, 35.0),
+                    Pose.at(41.0, 35.0),
+                ),
+            )
+        )
+    )
+    return (
+        BattlefieldScenario(armies=scenario.armies, battlefield_state=battlefield),
+        passenger,
+        transport,
+        enemy,
+        catalog,
+    )
+
+
 def _movement_action_request_for_unit(
     *,
     state: GameState,
@@ -1479,6 +1864,58 @@ def _movement_action_request_for_unit(
     action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     return handler, decisions, action_request
+
+
+def _post_normal_move_disembark_request_after_transport_normal_move(
+    *,
+    state: GameState,
+    passenger: UnitInstance,
+    transport: UnitInstance,
+) -> tuple[MovementPhaseHandler, DecisionController, DecisionRequest]:
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    pre_move_disembark_request = _decision_request(
+        handler.begin_phase(state=state, decisions=decisions)
+    )
+    assert pre_move_disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
+    assert passenger.unit_instance_id in {
+        option.option_id for option in pre_move_disembark_request.options
+    }
+    pre_move_decline_status = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=pre_move_disembark_request,
+        option_id=COMPLETE_DISEMBARKS_OPTION_ID,
+        result_id="phase10q-decline-pre-move-disembark",
+    )
+    assert pre_move_decline_status is None
+    movement_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    transport_selection_status = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=movement_request,
+        option_id=transport.unit_instance_id,
+        result_id="phase10q-select-transport-normal-move",
+    )
+    assert transport_selection_status is None
+    action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    post_move_disembark_status = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        result_id="phase10q-transport-normal-move",
+    )
+    return handler, decisions, _decision_request(post_move_disembark_status)
 
 
 def _submit_handler_decision(
@@ -1517,6 +1954,33 @@ def _placed_unit_ids(state: GameState) -> set[str]:
         for army in state.battlefield_state.placed_armies
         for placement in army.unit_placements
     }
+
+
+def _advanced_unit_state(unit_instance_id: str) -> AdvancedUnitState:
+    request = AdvanceRollRequest.for_unit(
+        request_id="phase10q-invalid-advanced-state-roll",
+        game_id="phase10q-game",
+        battle_round=1,
+        player_id="player-a",
+        unit_instance_id=unit_instance_id,
+    )
+    roll_state = DiceRollManager("phase10q-invalid-advanced-state").roll_fixed(
+        request.spec,
+        [3],
+    )
+    advance_roll = AdvanceRollResult.from_roll_state(request=request, roll_state=roll_state)
+    return AdvancedUnitState(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=unit_instance_id,
+        movement_dice_record=MovementDiceRecord(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            advance_roll=advance_roll,
+        ),
+    )
 
 
 def _transport_scenario(
