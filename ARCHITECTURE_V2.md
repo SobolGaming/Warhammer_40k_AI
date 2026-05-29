@@ -624,11 +624,12 @@ CORE V1 relevant areas:
 
 Status: Complete.
 
-This phase adds typed `AIRCRAFT` movement policy, Hover-mode policy switching, aircraft reserve transitions, aircraft-aware pathing for other models, and reserve arrival validation through the same placement legality path used by Phase 10P.
+This phase adds typed `AIRCRAFT` movement policy, persisted Hover-mode policy switching, lifecycle aircraft reserve transitions, aircraft-aware pathing for other models, and reserve arrival validation through the same placement legality path used by Phase 10P.
 
 Modules:
 
 - `engine/aircraft.py`
+- `engine/game_state.py`
 - `engine/phases/movement.py`
 - `engine/reserves.py`
 - `geometry/pathing.py`
@@ -642,17 +643,27 @@ Objects:
 Invariants:
 
 - `AIRCRAFT` have special pivot and movement behavior;
-- `AIRCRAFT` that leave the battlefield transition into reserves where rules permit;
-- `HOVER` mode changes movement policy;
+- non-Hover `AIRCRAFT` that cross a battlefield edge or cannot satisfy minimum move during a Movement phase Normal Move transition into Strategic Reserves through the lifecycle path;
+- aircraft reserve transitions remove the unit from the battlefield, record mandatory next-controller-turn arrival metadata, and complete the movement activation without ordinary displacement records or post-move Embark;
+- `HOVER` mode is stored in `GameState`, round-trips through replay payloads, and changes movement policy;
 - other models' movement around `AIRCRAFT` follows the aircraft movement policy;
+- enemy `AIRCRAFT` engagement is tracked separately so non-Aircraft units engaged only by enemy Aircraft can still choose Normal Move or Advance while endpoint validation remains strict;
 - aircraft restrictions in Charge/Fight are exposed for later phases.
 
 Required tests:
 
 - aircraft pivot policy uses 0" in generic pivot accounting;
 - aircraft reserve transition emits removal/placement records as appropriate;
-- hover state changes movement policy;
+- Movement phase Normal Move lifecycle transitions edge/minimum-move Aircraft into Strategic Reserves;
+- Aircraft transition ReserveState is eligible and required in the controller's next Movement phase only;
+- persisted hover state changes movement availability and disables Aircraft minimum-move/pivot restrictions;
+- replay rejects HoverModeState owner/unit/source drift and stale selected Aircraft policy payloads;
+- non-Aircraft units engaged only by enemy Aircraft can choose Normal Move and Advance, but cannot end within enemy Aircraft Engagement Range;
 - aircraft setup/arrival validates battlefield and terrain restrictions.
+
+Tracked follow-up:
+
+- base-geometry minimum-move validation should eventually confirm that every part of a non-circular Aircraft base ends at least 20" from its starting position, not only the current center/path translation witness.
 
 CORE V1 relevant areas:
 

@@ -131,6 +131,9 @@ class ReserveStatePayload(TypedDict):
     declared_during_step: str | None
     entered_reserves_battle_round: int | None
     entered_reserves_phase: str | None
+    required_arrival_battle_round: int | None
+    required_arrival_phase: str | None
+    required_arrival_source_rule_id: str | None
     destruction_deadline_policy: ReserveDestructionTimingPolicyPayload
     status: str
     embarked_unit_instance_ids: list[str]
@@ -356,6 +359,9 @@ class ReserveState:
     entered_reserves_battle_round: int | None
     entered_reserves_phase: str | None
     destruction_deadline_policy: ReserveDestructionTimingPolicy
+    required_arrival_battle_round: int | None = None
+    required_arrival_phase: str | None = None
+    required_arrival_source_rule_id: str | None = None
     status: ReserveStatus = ReserveStatus.IN_RESERVES
     embarked_unit_instance_ids: tuple[str, ...] = ()
     arrived_battle_round: int | None = None
@@ -400,6 +406,30 @@ class ReserveState:
             _validate_optional_identifier(
                 "ReserveState entered_reserves_phase",
                 self.entered_reserves_phase,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "required_arrival_battle_round",
+            _validate_optional_positive_int(
+                "ReserveState required_arrival_battle_round",
+                self.required_arrival_battle_round,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "required_arrival_phase",
+            _validate_optional_identifier(
+                "ReserveState required_arrival_phase",
+                self.required_arrival_phase,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "required_arrival_source_rule_id",
+            _validate_optional_identifier(
+                "ReserveState required_arrival_source_rule_id",
+                self.required_arrival_source_rule_id,
             ),
         )
         if type(self.destruction_deadline_policy) is not ReserveDestructionTimingPolicy:
@@ -475,6 +505,9 @@ class ReserveState:
             declared_during_step=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
             entered_reserves_battle_round=None,
             entered_reserves_phase=None,
+            required_arrival_battle_round=None,
+            required_arrival_phase=None,
+            required_arrival_source_rule_id=None,
             destruction_deadline_policy=(
                 destruction_deadline_policy or ReserveDestructionTimingPolicy.core_rules_default()
             ),
@@ -493,6 +526,9 @@ class ReserveState:
         reserve_origin: ReserveOrigin = ReserveOrigin.DURING_BATTLE_OTHER,
         destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
         embarked_unit_instance_ids: tuple[str, ...] = (),
+        required_arrival_battle_round: int | None = None,
+        required_arrival_phase: BattlePhase | str | None = None,
+        required_arrival_source_rule_id: str | None = None,
     ) -> Self:
         return cls(
             player_id=player_id,
@@ -502,6 +538,13 @@ class ReserveState:
             declared_during_step=None,
             entered_reserves_battle_round=_validate_positive_int("battle_round", battle_round),
             entered_reserves_phase=battle_phase_token(phase),
+            required_arrival_battle_round=required_arrival_battle_round,
+            required_arrival_phase=(
+                None
+                if required_arrival_phase is None
+                else battle_phase_token(required_arrival_phase)
+            ),
+            required_arrival_source_rule_id=required_arrival_source_rule_id,
             destruction_deadline_policy=(
                 destruction_deadline_policy or ReserveDestructionTimingPolicy.core_rules_default()
             ),
@@ -511,6 +554,33 @@ class ReserveState:
     @property
     def is_unarrived(self) -> bool:
         return self.status is ReserveStatus.IN_RESERVES
+
+    @property
+    def has_required_arrival(self) -> bool:
+        return self.required_arrival_battle_round is not None
+
+    def arrival_is_required_at(self, *, battle_round: int, phase: BattlePhase) -> bool:
+        if not self.has_required_arrival:
+            return False
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        requested_phase = battle_phase_token(phase)
+        return (
+            self.status is ReserveStatus.IN_RESERVES
+            and self.required_arrival_battle_round == requested_round
+            and self.required_arrival_phase == requested_phase
+        )
+
+    def arrival_is_eligible_at(self, *, battle_round: int, phase: BattlePhase) -> bool:
+        if self.status is not ReserveStatus.IN_RESERVES:
+            return False
+        if not self.has_required_arrival:
+            return True
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        requested_phase = battle_phase_token(phase)
+        return (
+            self.required_arrival_battle_round == requested_round
+            and self.required_arrival_phase == requested_phase
+        )
 
     def mark_arrived(
         self,
@@ -573,6 +643,9 @@ class ReserveState:
             "declared_during_step": self.declared_during_step,
             "entered_reserves_battle_round": self.entered_reserves_battle_round,
             "entered_reserves_phase": self.entered_reserves_phase,
+            "required_arrival_battle_round": self.required_arrival_battle_round,
+            "required_arrival_phase": self.required_arrival_phase,
+            "required_arrival_source_rule_id": self.required_arrival_source_rule_id,
             "destruction_deadline_policy": self.destruction_deadline_policy.to_payload(),
             "status": self.status.value,
             "embarked_unit_instance_ids": list(self.embarked_unit_instance_ids),
@@ -596,6 +669,9 @@ class ReserveState:
             declared_during_step=payload["declared_during_step"],
             entered_reserves_battle_round=payload["entered_reserves_battle_round"],
             entered_reserves_phase=payload["entered_reserves_phase"],
+            required_arrival_battle_round=payload["required_arrival_battle_round"],
+            required_arrival_phase=payload["required_arrival_phase"],
+            required_arrival_source_rule_id=payload["required_arrival_source_rule_id"],
             destruction_deadline_policy=ReserveDestructionTimingPolicy.from_payload(
                 payload["destruction_deadline_policy"]
             ),
@@ -613,6 +689,15 @@ class ReserveState:
         )
 
     def _validate_status_fields(self) -> None:
+        required_arrival_fields = (
+            self.required_arrival_battle_round,
+            self.required_arrival_phase,
+            self.required_arrival_source_rule_id,
+        )
+        if any(value is None for value in required_arrival_fields) and any(
+            value is not None for value in required_arrival_fields
+        ):
+            raise GameLifecycleError("ReserveState required arrival fields must be complete.")
         if self.status is ReserveStatus.IN_RESERVES:
             if self.arrived_battle_round is not None or self.arrived_phase is not None:
                 raise GameLifecycleError("Unarrived ReserveState must not have arrival fields.")
@@ -623,6 +708,11 @@ class ReserveState:
                 raise GameLifecycleError("Arrived ReserveState requires arrival fields.")
             if self.destroyed_battle_round is not None:
                 raise GameLifecycleError("Arrived ReserveState must not have destruction fields.")
+            if self.has_required_arrival and (
+                self.arrived_battle_round != self.required_arrival_battle_round
+                or self.arrived_phase != self.required_arrival_phase
+            ):
+                raise GameLifecycleError("Arrived ReserveState must satisfy required arrival.")
         if self.status is ReserveStatus.DESTROYED:
             if self.destroyed_battle_round is None:
                 raise GameLifecycleError("Destroyed ReserveState requires destroyed_battle_round.")
@@ -1507,6 +1597,16 @@ def _append_reserve_state_violations(
             ReservePlacementViolation(
                 violation_code=ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN,
                 message="Mission policy forbids this Reserve arrival battle round.",
+            )
+        )
+    if not reserve_state.arrival_is_eligible_at(
+        battle_round=battle_round,
+        phase=BattlePhase.MOVEMENT,
+    ):
+        violations.append(
+            ReservePlacementViolation(
+                violation_code=ReservePlacementViolationCode.RESERVE_ARRIVAL_BATTLE_ROUND_FORBIDDEN,
+                message="Reserve arrival is required in a different battle round or phase.",
             )
         )
     if reserve_state.embarked_unit_instance_ids:

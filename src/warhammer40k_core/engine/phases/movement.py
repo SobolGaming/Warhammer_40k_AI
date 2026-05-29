@@ -22,7 +22,11 @@ from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
     AircraftMovementPolicyPayload,
     AircraftMovementViolation,
+    AircraftReserveTransitionReason,
+    HoverModeState,
     aircraft_model_ids_for_scenario,
+    apply_aircraft_reserve_transition_to_battlefield,
+    resolve_aircraft_reserve_transition,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -178,6 +182,7 @@ class MovementActionAvailabilityContextPayload(TypedDict):
     unit_instance_id: str
     player_id: str
     enemy_engagement_model_ids: list[str]
+    enemy_aircraft_engagement_model_ids: NotRequired[list[str]]
     aircraft_movement_policy: NotRequired[AircraftMovementPolicyPayload]
 
 
@@ -266,6 +271,7 @@ class MovementActionAvailabilityContext:
     unit_instance_id: str
     player_id: str
     enemy_engagement_model_ids: tuple[str, ...] = ()
+    enemy_aircraft_engagement_model_ids: tuple[str, ...] = ()
     aircraft_movement_policy: AircraftMovementPolicy | None = None
 
     def __post_init__(self) -> None:
@@ -296,6 +302,14 @@ class MovementActionAvailabilityContext:
             _validate_identifier_tuple(
                 "MovementActionAvailabilityContext enemy_engagement_model_ids",
                 self.enemy_engagement_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "enemy_aircraft_engagement_model_ids",
+            _validate_identifier_tuple(
+                "MovementActionAvailabilityContext enemy_aircraft_engagement_model_ids",
+                self.enemy_aircraft_engagement_model_ids,
             ),
         )
         if self.aircraft_movement_policy is not None:
@@ -347,6 +361,10 @@ class MovementActionAvailabilityContext:
             "player_id": self.player_id,
             "enemy_engagement_model_ids": list(self.enemy_engagement_model_ids),
         }
+        if self.enemy_aircraft_engagement_model_ids:
+            payload["enemy_aircraft_engagement_model_ids"] = list(
+                self.enemy_aircraft_engagement_model_ids
+            )
         if self.aircraft_movement_policy is not None:
             payload["aircraft_movement_policy"] = self.aircraft_movement_policy.to_payload()
         return payload
@@ -354,11 +372,15 @@ class MovementActionAvailabilityContext:
     @classmethod
     def from_payload(cls, payload: MovementActionAvailabilityContextPayload) -> Self:
         aircraft_policy_payload = payload.get("aircraft_movement_policy")
+        aircraft_engagement_payload = payload.get("enemy_aircraft_engagement_model_ids")
         return cls(
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
             unit_instance_id=payload["unit_instance_id"],
             player_id=payload["player_id"],
             enemy_engagement_model_ids=tuple(payload["enemy_engagement_model_ids"]),
+            enemy_aircraft_engagement_model_ids=()
+            if aircraft_engagement_payload is None
+            else tuple(aircraft_engagement_payload),
             aircraft_movement_policy=None
             if aircraft_policy_payload is None
             else AircraftMovementPolicy.from_payload(aircraft_policy_payload),
@@ -1455,6 +1477,9 @@ class NormalMoveResolution:
         selected_payload = _validate_json_object("Normal Move selected payload", payload)
         if selected_payload.get("witness") != self.witness.to_payload():
             return "normal_move_witness_drift"
+        expected_aircraft_policy = self.movement_payload.get("aircraft_movement_policy")
+        if selected_payload.get("aircraft_movement_policy") != expected_aircraft_policy:
+            return "normal_move_aircraft_policy_drift"
         expected_model_movements = self.movement_payload["model_movements"]
         if selected_payload.get("model_movements") != expected_model_movements:
             return "normal_move_model_movement_witness_drift"
@@ -1773,6 +1798,9 @@ class FallBackActionResult:
         expected_model_movements = self.movement_payload["model_movements"]
         if selected_payload.get("model_movements") != expected_model_movements:
             return "fall_back_model_movement_witness_drift"
+        expected_aircraft_policy = self.movement_payload.get("aircraft_movement_policy")
+        if selected_payload.get("aircraft_movement_policy") != expected_aircraft_policy:
+            return "fall_back_aircraft_policy_drift"
         return None
 
     def to_payload(self) -> FallBackActionResultPayload:
@@ -2049,7 +2077,11 @@ def _begin_reinforcements_step(
     if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
         raise GameLifecycleError("Reinforcements step requires movement phase state.")
     unarrived_reserve_states = state.unarrived_reserve_states_for_player(active_player_id)
-    if movement_state.reinforcements_completed or not unarrived_reserve_states:
+    if _overdue_required_reinforcement_reserve_states(state=state):
+        raise GameLifecycleError("Required Reinforcements arrival was missed.")
+    eligible_reserve_states = _eligible_reinforcement_reserve_states(state=state)
+    required_reserve_states = _required_reinforcement_reserve_states(state=state)
+    if movement_state.reinforcements_completed or not eligible_reserve_states:
         return _complete_reinforcements_step(
             state=state,
             decisions=decisions,
@@ -2067,7 +2099,10 @@ def _begin_reinforcements_step(
             "step": MovementPhaseStepKind.REINFORCEMENTS.value,
             "active_player_id": active_player_id,
         },
-        options=_reinforcement_unit_options(unarrived_reserve_states),
+        options=_reinforcement_unit_options(
+            eligible_reserve_states,
+            completion_allowed=not required_reserve_states,
+        ),
     )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
@@ -2080,6 +2115,8 @@ def _begin_reinforcements_step(
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
             "unarrived_reserve_count": len(unarrived_reserve_states),
+            "eligible_reserve_count": len(eligible_reserve_states),
+            "required_reserve_count": len(required_reserve_states),
         },
     )
 
@@ -2118,16 +2155,20 @@ def _complete_reinforcements_step(
 
 def _reinforcement_unit_options(
     reserve_states: tuple[ReserveState, ...],
+    *,
+    completion_allowed: bool = True,
 ) -> tuple[DecisionOption, ...]:
-    options = [
-        DecisionOption(
-            option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
-            label="Complete Reinforcements",
-            payload={
-                "reinforcement_decision": COMPLETE_REINFORCEMENTS_OPTION_ID,
-            },
+    options: list[DecisionOption] = []
+    if completion_allowed:
+        options.append(
+            DecisionOption(
+                option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
+                label="Complete Reinforcements",
+                payload={
+                    "reinforcement_decision": COMPLETE_REINFORCEMENTS_OPTION_ID,
+                },
+            )
         )
-    ]
     options.extend(
         DecisionOption(
             option_id=reserve_state.unit_instance_id,
@@ -2142,6 +2183,42 @@ def _reinforcement_unit_options(
         for reserve_state in reserve_states
     )
     return tuple(options)
+
+
+def _eligible_reinforcement_reserve_states(*, state: GameState) -> tuple[ReserveState, ...]:
+    active_player_id = _active_player_id(state)
+    return tuple(
+        reserve_state
+        for reserve_state in state.unarrived_reserve_states_for_player(active_player_id)
+        if reserve_state.arrival_is_eligible_at(
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+        )
+    )
+
+
+def _required_reinforcement_reserve_states(*, state: GameState) -> tuple[ReserveState, ...]:
+    active_player_id = _active_player_id(state)
+    return tuple(
+        reserve_state
+        for reserve_state in state.unarrived_reserve_states_for_player(active_player_id)
+        if reserve_state.arrival_is_required_at(
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+        )
+    )
+
+
+def _overdue_required_reinforcement_reserve_states(*, state: GameState) -> tuple[ReserveState, ...]:
+    active_player_id = _active_player_id(state)
+    return tuple(
+        reserve_state
+        for reserve_state in state.unarrived_reserve_states_for_player(active_player_id)
+        if reserve_state.has_required_arrival
+        and reserve_state.required_arrival_phase == BattlePhase.MOVEMENT.value
+        and reserve_state.required_arrival_battle_round is not None
+        and reserve_state.required_arrival_battle_round < state.battle_round
+    )
 
 
 def _apply_reinforcement_unit_selection_decision(
@@ -2164,6 +2241,8 @@ def _apply_reinforcement_unit_selection_decision(
     payload = _decision_payload_object(result.payload)
     reinforcement_decision = _payload_string(payload, key="reinforcement_decision")
     if reinforcement_decision == COMPLETE_REINFORCEMENTS_OPTION_ID:
+        if _required_reinforcement_reserve_states(state=state):
+            raise GameLifecycleError("Required Reinforcements arrival cannot be skipped.")
         state.movement_phase_state = movement_state.with_reinforcements_completed()
         decisions.event_log.append(
             "reinforcements_completion_selected",
@@ -2186,7 +2265,7 @@ def _apply_reinforcement_unit_selection_decision(
     reserve_state = state.reserve_state_for_unit(unit_instance_id)
     if reserve_state is None:
         raise GameLifecycleError("Reinforcement selection requires ReserveState.")
-    if reserve_state not in state.unarrived_reserve_states_for_player(active_player_id):
+    if reserve_state not in _eligible_reinforcement_reserve_states(state=state):
         raise GameLifecycleError("Reinforcement selection is not currently legal.")
 
     decisions.event_log.append(
@@ -2388,7 +2467,7 @@ def _apply_reinforcement_placement_decision(
     reserve_state = state.reserve_state_for_unit(unit_instance_id)
     if reserve_state is None:
         raise GameLifecycleError("Reinforcement placement requires ReserveState.")
-    if reserve_state not in state.unarrived_reserve_states_for_player(active_player_id):
+    if reserve_state not in _eligible_reinforcement_reserve_states(state=state):
         raise GameLifecycleError("Reinforcement placement is not currently legal.")
     placement_kind = battlefield_placement_kind_from_token(
         _payload_string(payload, key="placement_kind")
@@ -3027,6 +3106,7 @@ def _request_movement_action(
             unit_placement=unit_placement,
             ruleset_descriptor=ruleset_descriptor,
             battle_round=state.battle_round,
+            hover_mode_states=tuple(state.hover_mode_states),
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             disembarked_unit_state=state.disembarked_unit_state_for_unit(
                 player_id=_active_player_id(state),
@@ -3081,6 +3161,7 @@ def _apply_movement_action_decision(  # noqa: RET503
         scenario=scenario,
         unit_placement=unit_placement,
         ruleset_descriptor=ruleset_descriptor,
+        hover_mode_states=tuple(state.hover_mode_states),
     )
     if not availability_result.is_available(action):
         raise GameLifecycleError("Movement action is not currently legal for the selected unit.")
@@ -3121,6 +3202,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
             path_witness=witness,
+            hover_mode_states=tuple(state.hover_mode_states),
         )
         drift_code = resolution.selected_payload_drift_code(payload)
         if drift_code is not None:
@@ -3153,6 +3235,19 @@ def _apply_movement_action_decision(  # noqa: RET503
                     "violation_code": drift_code,
                 },
             )
+        transition_reason = _aircraft_reserve_transition_reason_for_normal_move(resolution)
+        if transition_reason is not None:
+            _apply_aircraft_reserve_transition_for_normal_move(
+                state=state,
+                decisions=decisions,
+                result=result,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_placement=unit_placement,
+                resolution=resolution,
+                witness=witness,
+                reason=transition_reason,
+            )
+            return None
         if not resolution.is_valid:
             violation_code = _normal_move_violation_code(resolution)
             invalid_payload: dict[str, JsonValue] = {
@@ -3259,6 +3354,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             path_witness=witness,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            hover_mode_states=tuple(state.hover_mode_states),
         )
         drift_code = fall_back_resolution.selected_payload_drift_code(payload)
         if drift_code is not None:
@@ -3447,6 +3543,7 @@ def _resolve_and_apply_advance_move(
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
         advance_roll=advance_roll,
+        hover_mode_states=tuple(state.hover_mode_states),
     )
     if not resolution.is_valid:
         violation_code = _normal_move_violation_code(resolution)
@@ -3511,6 +3608,84 @@ def _resolve_and_apply_advance_move(
         displacement_kind=ModelDisplacementKind.ADVANCE,
         transition_batch=transition_batch,
         ruleset_descriptor=ruleset_descriptor,
+    )
+
+
+def _aircraft_reserve_transition_reason_for_normal_move(
+    resolution: NormalMoveResolution,
+) -> AircraftReserveTransitionReason | None:
+    if type(resolution) is not NormalMoveResolution:
+        raise GameLifecycleError("Aircraft reserve transition requires NormalMoveResolution.")
+    policy_payload = resolution.movement_payload.get("aircraft_movement_policy")
+    if policy_payload is None:
+        return None
+    policy = AircraftMovementPolicy.from_payload(
+        cast(
+            AircraftMovementPolicyPayload,
+            _validate_json_object("aircraft policy", policy_payload),
+        )
+    )
+    if not policy.uses_aircraft_rules:
+        return None
+    violation_codes = {
+        violation.violation_code
+        for path_result in resolution.path_validation_results
+        for violation in path_result.violations
+    }
+    if "battlefield_edge_crossed" in violation_codes:
+        return AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED
+    if "aircraft_minimum_move_required" in violation_codes:
+        return AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE
+    return None
+
+
+def _apply_aircraft_reserve_transition_for_normal_move(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    resolution: NormalMoveResolution,
+    witness: PathWitness,
+    reason: AircraftReserveTransitionReason,
+) -> None:
+    transition = resolve_aircraft_reserve_transition(
+        scenario=_battlefield_scenario(state),
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        battle_round=state.battle_round,
+        reason=reason,
+        source_event_id=result.result_id,
+        hover_mode_state=state.hover_mode_state_for_unit(unit_placement.unit_instance_id),
+    )
+    if not transition.is_valid:
+        raise GameLifecycleError("Aircraft reserve transition must be valid for lifecycle apply.")
+    if transition.reserve_state is None or transition.transition_batch is None:
+        raise GameLifecycleError("Aircraft reserve transition requires mutation data.")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Aircraft reserve transition requires battlefield_state.")
+    state.battlefield_state = apply_aircraft_reserve_transition_to_battlefield(
+        battlefield_state=battlefield_state,
+        transition=transition,
+    )
+    if state.reserve_state_for_unit(transition.reserve_state.unit_instance_id) is None:
+        state.record_reserve_state(transition.reserve_state)
+    else:
+        state.replace_reserve_state(transition.reserve_state)
+    _complete_movement_activation(
+        state=state,
+        decisions=decisions,
+        result=result,
+        action=MovementPhaseActionKind.NORMAL_MOVE,
+        witness=witness,
+        movement_payload={
+            **resolution.movement_payload,
+            "aircraft_reserve_transition": validate_json_value(transition.to_payload()),
+        },
+        displacement_kind=None,
+        transition_batch=transition.transition_batch,
     )
 
 
@@ -4094,6 +4269,7 @@ def _movement_action_options(
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
     battle_round: int = 1,
+    hover_mode_states: tuple[HoverModeState, ...] = (),
     battle_shocked_unit_ids: tuple[str, ...] = (),
     disembarked_unit_state: DisembarkedUnitState | None = None,
 ) -> tuple[DecisionOption, ...]:
@@ -4107,6 +4283,7 @@ def _movement_action_options(
         scenario=scenario,
         unit_placement=unit_placement,
         ruleset_descriptor=ruleset_descriptor,
+        hover_mode_states=hover_mode_states,
     )
     options: list[DecisionOption] = []
     for action in availability_result.available_actions:
@@ -4142,6 +4319,7 @@ def _movement_action_options(
                 ruleset_descriptor=ruleset_descriptor,
                 unit_placement=unit_placement,
                 path_witness=None,
+                hover_mode_states=hover_mode_states,
             )
             options.append(
                 DecisionOption(
@@ -4167,6 +4345,7 @@ def _movement_action_options(
                 path_witness=None,
                 battle_round=battle_round,
                 battle_shocked_unit_ids=battle_shocked_unit_ids,
+                hover_mode_states=hover_mode_states,
             )
             options.append(
                 DecisionOption(
@@ -4432,6 +4611,7 @@ def resolve_normal_move(
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
     path_witness: PathWitness | None = None,
+    hover_mode_states: tuple[HoverModeState, ...] = (),
     battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
@@ -4452,6 +4632,7 @@ def resolve_normal_move(
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
         action_label="Normal Move",
         rollback_on_endpoint_coherency=True,
+        hover_mode_states=hover_mode_states,
     )
     return NormalMoveResolution(
         unit_instance_id=unit_placement.unit_instance_id,
@@ -4472,6 +4653,7 @@ def resolve_advance_move(
     unit_placement: UnitPlacement,
     advance_roll: AdvanceRollResult,
     path_witness: PathWitness | None = None,
+    hover_mode_states: tuple[HoverModeState, ...] = (),
     battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
@@ -4494,6 +4676,7 @@ def resolve_advance_move(
         displacement_kind=ModelDisplacementKind.ADVANCE,
         action_label="Advance",
         rollback_on_endpoint_coherency=True,
+        hover_mode_states=hover_mode_states,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -4520,6 +4703,7 @@ def resolve_fall_back_move(
     path_witness: PathWitness | None = None,
     battle_round: int = 1,
     battle_shocked_unit_ids: tuple[str, ...] = (),
+    hover_mode_states: tuple[HoverModeState, ...] = (),
     battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
@@ -4545,6 +4729,7 @@ def resolve_fall_back_move(
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         action_label="Fall Back",
         rollback_on_endpoint_coherency=False,
+        hover_mode_states=hover_mode_states,
     )
     desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
@@ -4590,6 +4775,7 @@ def _resolve_unit_move(
     displacement_kind: ModelDisplacementKind,
     action_label: str,
     rollback_on_endpoint_coherency: bool,
+    hover_mode_states: tuple[HoverModeState, ...],
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -4616,11 +4802,19 @@ def _resolve_unit_move(
         action_label=action_label,
     )
     unit = scenario.unit_instance_for_placement(unit_placement)
+    hover_mode_state = _hover_mode_state_for_unit(
+        hover_mode_states=hover_mode_states,
+        unit_instance_id=unit_placement.unit_instance_id,
+    )
     aircraft_policy = AircraftMovementPolicy.from_unit(
         unit=unit,
         ruleset_descriptor=ruleset_descriptor,
+        hover_mode_state=hover_mode_state,
     )
-    aircraft_model_ids = aircraft_model_ids_for_scenario(scenario)
+    aircraft_model_ids = aircraft_model_ids_for_scenario(
+        scenario,
+        hover_mode_states=hover_mode_states,
+    )
     moved_placements: list[ModelPlacement] = []
     for placement in unit_placement.model_placements:
         moved_placements.append(
@@ -4641,7 +4835,7 @@ def _resolve_unit_move(
             ((placement.model_instance_id, witness.poses_for_model(placement.model_instance_id)),)
         )
         legality_context = MovementLegalityContext.from_keywords(
-            keywords=unit.keywords,
+            keywords=aircraft_policy.effective_keywords,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
@@ -4903,11 +5097,13 @@ def _movement_action_availability_result(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
+    hover_mode_states: tuple[HoverModeState, ...] = (),
 ) -> MovementActionAvailabilityResult:
     return _movement_action_availability_context(
         scenario=scenario,
         unit_placement=unit_placement,
         ruleset_descriptor=ruleset_descriptor,
+        hover_mode_states=hover_mode_states,
     ).evaluate()
 
 
@@ -4916,6 +5112,7 @@ def _movement_action_availability_context(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
+    hover_mode_states: tuple[HoverModeState, ...] = (),
 ) -> MovementActionAvailabilityContext:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Movement action availability requires a scenario.")
@@ -4924,19 +5121,29 @@ def _movement_action_availability_context(
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Movement action availability requires a RulesetDescriptor.")
     unit = scenario.unit_instance_for_placement(unit_placement)
+    hover_mode_state = _hover_mode_state_for_unit(
+        hover_mode_states=hover_mode_states,
+        unit_instance_id=unit_placement.unit_instance_id,
+    )
     aircraft_policy = AircraftMovementPolicy.from_unit(
         unit=unit,
         ruleset_descriptor=ruleset_descriptor,
+        hover_mode_state=hover_mode_state,
+    )
+    enemy_engagement_model_ids, enemy_aircraft_engagement_model_ids = (
+        _enemy_engagement_model_ids_for_unit(
+            scenario=scenario,
+            unit_placement=unit_placement,
+            ruleset_descriptor=ruleset_descriptor,
+            hover_mode_states=hover_mode_states,
+        )
     )
     return MovementActionAvailabilityContext(
         ruleset_descriptor_hash=ruleset_descriptor.descriptor_hash,
         unit_instance_id=unit_placement.unit_instance_id,
         player_id=unit_placement.player_id,
-        enemy_engagement_model_ids=_enemy_engagement_model_ids_for_unit(
-            scenario=scenario,
-            unit_placement=unit_placement,
-            ruleset_descriptor=ruleset_descriptor,
-        ),
+        enemy_engagement_model_ids=enemy_engagement_model_ids,
+        enemy_aircraft_engagement_model_ids=enemy_aircraft_engagement_model_ids,
         aircraft_movement_policy=aircraft_policy if aircraft_policy.has_aircraft_keyword else None,
     )
 
@@ -4946,7 +5153,8 @@ def _enemy_engagement_model_ids_for_unit(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
-) -> tuple[str, ...]:
+    hover_mode_states: tuple[HoverModeState, ...] = (),
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
     friendly_models = _geometry_models_for_unit_placement(
         scenario=scenario,
         unit_placement=unit_placement,
@@ -4955,7 +5163,14 @@ def _enemy_engagement_model_ids_for_unit(
         scenario=scenario,
         player_id=unit_placement.player_id,
     )
+    aircraft_model_ids = set(
+        aircraft_model_ids_for_scenario(
+            scenario,
+            hover_mode_states=hover_mode_states,
+        )
+    )
     enemy_model_ids: set[str] = set()
+    enemy_aircraft_model_ids: set[str] = set()
     for friendly_model in friendly_models:
         for enemy_model in enemy_models:
             if friendly_model.is_within_engagement_range(
@@ -4963,8 +5178,31 @@ def _enemy_engagement_model_ids_for_unit(
                 horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
                 vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
             ):
-                enemy_model_ids.add(enemy_model.model_id)
-    return tuple(sorted(enemy_model_ids))
+                if enemy_model.model_id in aircraft_model_ids:
+                    enemy_aircraft_model_ids.add(enemy_model.model_id)
+                else:
+                    enemy_model_ids.add(enemy_model.model_id)
+    return tuple(sorted(enemy_model_ids)), tuple(sorted(enemy_aircraft_model_ids))
+
+
+def _hover_mode_state_for_unit(
+    *,
+    hover_mode_states: tuple[HoverModeState, ...],
+    unit_instance_id: str,
+) -> HoverModeState | None:
+    if type(hover_mode_states) is not tuple:
+        raise GameLifecycleError("hover_mode_states must be a tuple.")
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    found: HoverModeState | None = None
+    for hover_mode_state in cast(tuple[object, ...], hover_mode_states):
+        if type(hover_mode_state) is not HoverModeState:
+            raise GameLifecycleError("hover_mode_states must contain HoverModeState values.")
+        if hover_mode_state.unit_instance_id != requested_unit_id:
+            continue
+        if found is not None:
+            raise GameLifecycleError("hover_mode_states must be unique by unit.")
+        found = hover_mode_state
+    return found if found is not None and found.active else None
 
 
 def _desperate_escape_requirements_for_fall_back(

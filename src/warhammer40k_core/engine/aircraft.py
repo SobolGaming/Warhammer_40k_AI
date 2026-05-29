@@ -589,6 +589,7 @@ def resolve_aircraft_reserve_transition(
     battle_round: int,
     reason: AircraftReserveTransitionReason,
     source_event_id: str | None = None,
+    hover_mode_state: HoverModeState | None = None,
 ) -> AircraftReserveTransition:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Aircraft reserve transition requires a BattlefieldScenario.")
@@ -603,6 +604,7 @@ def resolve_aircraft_reserve_transition(
     policy = AircraftMovementPolicy.from_unit(
         unit=unit,
         ruleset_descriptor=ruleset_descriptor,
+        hover_mode_state=hover_mode_state,
     )
     violations: tuple[AircraftMovementViolation, ...] = ()
     if not policy.has_aircraft_keyword:
@@ -633,6 +635,9 @@ def resolve_aircraft_reserve_transition(
         reserve_kind=ReserveKind.STRATEGIC_RESERVES,
         battle_round=requested_round,
         phase=BattlePhase.MOVEMENT,
+        required_arrival_battle_round=requested_round + 1,
+        required_arrival_phase=BattlePhase.MOVEMENT,
+        required_arrival_source_rule_id=transition_reason.value,
         destruction_deadline_policy=(
             ReserveDestructionTimingPolicy.from_mission_policy(ruleset_descriptor.mission_policy)
         ),
@@ -693,9 +698,14 @@ def resolve_aircraft_arrival(
     )
 
 
-def aircraft_model_ids_for_scenario(scenario: BattlefieldScenario) -> tuple[str, ...]:
+def aircraft_model_ids_for_scenario(
+    scenario: BattlefieldScenario,
+    *,
+    hover_mode_states: tuple[HoverModeState, ...] = (),
+) -> tuple[str, ...]:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("aircraft_model_ids_for_scenario requires a scenario.")
+    hover_states_by_unit_id = _active_hover_states_by_unit_id(hover_mode_states)
     aircraft_model_ids: list[str] = []
     for placed_army in scenario.battlefield_state.placed_armies:
         for unit_placement in placed_army.unit_placements:
@@ -704,6 +714,8 @@ def aircraft_model_ids_for_scenario(scenario: BattlefieldScenario) -> tuple[str,
                 "aircraft unit keywords",
                 unit.keywords,
             ):
+                continue
+            if unit.unit_instance_id in hover_states_by_unit_id:
                 continue
             aircraft_model_ids.extend(
                 placement.model_instance_id for placement in unit_placement.model_placements
@@ -737,6 +749,23 @@ def aircraft_movement_violation_code_from_token(token: object) -> AircraftMoveme
         raise GameLifecycleError(
             f"Unsupported AircraftMovementViolationCode token: {token}."
         ) from exc
+
+
+def _active_hover_states_by_unit_id(
+    hover_mode_states: tuple[HoverModeState, ...],
+) -> dict[str, HoverModeState]:
+    if type(hover_mode_states) is not tuple:
+        raise GameLifecycleError("hover_mode_states must be a tuple.")
+    states_by_unit_id: dict[str, HoverModeState] = {}
+    for hover_state in cast(tuple[object, ...], hover_mode_states):
+        if type(hover_state) is not HoverModeState:
+            raise GameLifecycleError("hover_mode_states must contain HoverModeState values.")
+        if not hover_state.active:
+            continue
+        if hover_state.unit_instance_id in states_by_unit_id:
+            raise GameLifecycleError("hover_mode_states must be unique by unit.")
+        states_by_unit_id[hover_state.unit_instance_id] = hover_state
+    return states_by_unit_id
 
 
 def _aircraft_reserve_transition_batch(
