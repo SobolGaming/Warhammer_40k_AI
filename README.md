@@ -139,7 +139,7 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
-Current roadmap implementation status: phases 1-10S are complete, including Aircraft-policy movement budgets, persisted Hover movement policy, and the triggered/surge movement foundation. Phase 10T is the next planned build slice.
+Current roadmap implementation status: phases 1-10T are complete, including Aircraft-policy movement budgets, persisted Hover movement policy, the triggered/surge movement foundation, and the Movement phase completion gate. Phase 10U is the next planned build slice.
 
 ## 5. Test policy
 
