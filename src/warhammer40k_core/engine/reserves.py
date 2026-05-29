@@ -481,6 +481,33 @@ class ReserveState:
             embarked_unit_instance_ids=embarked_unit_instance_ids,
         )
 
+    @classmethod
+    def entered_during_battle(
+        cls,
+        *,
+        player_id: str,
+        unit_instance_id: str,
+        reserve_kind: ReserveKind,
+        battle_round: int,
+        phase: BattlePhase,
+        reserve_origin: ReserveOrigin = ReserveOrigin.DURING_BATTLE_OTHER,
+        destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
+        embarked_unit_instance_ids: tuple[str, ...] = (),
+    ) -> Self:
+        return cls(
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+            reserve_origin=reserve_origin,
+            reserve_kind=reserve_kind,
+            declared_during_step=None,
+            entered_reserves_battle_round=_validate_positive_int("battle_round", battle_round),
+            entered_reserves_phase=battle_phase_token(phase),
+            destruction_deadline_policy=(
+                destruction_deadline_policy or ReserveDestructionTimingPolicy.core_rules_default()
+            ),
+            embarked_unit_instance_ids=embarked_unit_instance_ids,
+        )
+
     @property
     def is_unarrived(self) -> bool:
         return self.status is ReserveStatus.IN_RESERVES

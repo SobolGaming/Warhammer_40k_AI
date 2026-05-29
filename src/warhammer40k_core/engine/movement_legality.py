@@ -509,6 +509,7 @@ class MovementLegalityContext:
         enemy_models: tuple[Model, ...] = (),
         terrain: tuple[TerrainVolume, ...] = (),
         friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
+        aircraft_model_ids: tuple[str, ...] = (),
         sample_interval_inches: float = 0.5,
         movement_distance_budget_inches: float | None = None,
     ) -> PathValidationContext:
@@ -533,6 +534,7 @@ class MovementLegalityContext:
             enemy_models=enemy_models,
             terrain=terrain,
             friendly_vehicle_monster_model_ids=friendly_vehicle_monster_blockers,
+            aircraft_model_ids=aircraft_model_ids,
             may_transit_enemy_models=may_transit_enemy_models,
             may_transit_enemy_engagement=may_transit_enemy_engagement,
             may_end_in_enemy_engagement=self.engagement_policy.may_end_in_enemy_engagement,

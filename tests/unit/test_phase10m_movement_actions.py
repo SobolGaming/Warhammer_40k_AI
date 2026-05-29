@@ -106,6 +106,7 @@ def test_movement_action_availability_payload_round_trips_without_object_reprs()
     context_blob = json.dumps(context.to_payload(), sort_keys=True)
     result_blob = json.dumps(result.to_payload(), sort_keys=True)
 
+    assert "aircraft_movement_policy" not in context.to_payload()
     assert "<" not in context_blob
     assert "object at 0x" not in context_blob
     assert "<" not in result_blob
@@ -323,7 +324,7 @@ def test_aircraft_normal_move_uses_aircraft_pivot_policy() -> None:
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
         unit_placement=unit_placement,
-        path_witness=_single_model_pivot_witness(unit_placement, movement_inches=8.0),
+        path_witness=_single_model_aircraft_pivot_witness(unit_placement, movement_inches=20.0),
     )
 
     movement_distance_witness = resolution.path_validation_results[0].movement_distance_witness
@@ -670,6 +671,28 @@ def _single_model_pivot_witness(
         facing_degrees=start.facing.degrees + 45.0,
     )
     return PathWitness.for_paths(((placement.model_instance_id, (start, midpoint, end)),))
+
+
+def _single_model_aircraft_pivot_witness(
+    unit_placement: UnitPlacement,
+    *,
+    movement_inches: float,
+) -> PathWitness:
+    placement = unit_placement.model_placements[0]
+    start = placement.pose
+    moved = Pose.at(
+        start.position.x + movement_inches,
+        start.position.y,
+        start.position.z,
+        facing_degrees=start.facing.degrees,
+    )
+    pivoted = Pose.at(
+        moved.position.x,
+        moved.position.y,
+        moved.position.z,
+        facing_degrees=start.facing.degrees + 90.0,
+    )
+    return PathWitness.for_paths(((placement.model_instance_id, (start, moved, pivoted)),))
 
 
 def _single_model_witness_to_pose(

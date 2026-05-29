@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10Q work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10R work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10Q** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10R unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10R** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10S unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -61,6 +61,7 @@ Completed / implemented foundation:
 | 10O | Complete | Fall Back action and Desperate Escape resolution |
 | 10P | Complete | Reinforcements, Strategic Reserves, Deep Strike, and reserve placement |
 | 10Q | Complete | Transport Embark/Disembark, Firing Deck, and destroyed transport emergency disembark |
+| 10R | Complete | Aircraft and Hover movement/reserve behavior |
 
 ## Cross-cutting architectural rules
 
@@ -276,7 +277,7 @@ Invariants:
 - non-round-base non-`MONSTER`/non-`VEHICLE` models pay 1";
 - non-round-base `MONSTER`/`VEHICLE` models pay 2";
 - round-base `VEHICLE` models wider than 32mm with a flying stem or hover stand pay 2";
-- `AIRCRAFT` pivot cost is 0" in generic pivot accounting, with aircraft-specific movement deferred to Phase 10Q;
+- `AIRCRAFT` pivot cost is 0" in generic pivot accounting, with aircraft-specific movement owned by Phase 10R;
 - if insufficient movement remains to pay a required pivot cost, the move is invalid;
 - pivot-cost and movement-distance witnesses serialize without object reprs.
 
@@ -620,6 +621,10 @@ CORE V1 relevant areas:
 - transport, Firing Deck, destroyed Transport, and emergency disembark tests
 
 ## Phase 10R: Aircraft and Hover movement/reserve behavior
+
+Status: Complete.
+
+This phase adds typed `AIRCRAFT` movement policy, Hover-mode policy switching, aircraft reserve transitions, aircraft-aware pathing for other models, and reserve arrival validation through the same placement legality path used by Phase 10P.
 
 Modules:
 

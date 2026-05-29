@@ -137,6 +137,7 @@ class PathValidationContextPayload(TypedDict):
     enemy_models: list[ModelPayload]
     terrain: list[TerrainVolumePayload]
     friendly_vehicle_monster_model_ids: list[str]
+    aircraft_model_ids: list[str]
     may_transit_enemy_models: bool
     may_transit_enemy_engagement: bool
     may_end_in_enemy_engagement: bool
@@ -400,6 +401,7 @@ class PathValidationContext:
     enemy_models: tuple[Model, ...] = ()
     terrain: tuple[TerrainVolume, ...] = ()
     friendly_vehicle_monster_model_ids: tuple[str, ...] = ()
+    aircraft_model_ids: tuple[str, ...] = ()
     may_transit_enemy_models: bool = False
     may_transit_enemy_engagement: bool = False
     may_end_in_enemy_engagement: bool = False
@@ -469,6 +471,16 @@ class PathValidationContext:
             "friendly_vehicle_monster_model_ids",
             friendly_vehicle_monster_model_ids,
         )
+        aircraft_model_ids = _validate_identifier_tuple(
+            "PathValidationContext aircraft_model_ids",
+            self.aircraft_model_ids,
+        )
+        blocker_model_ids = {model.model_id for model in (*friendly_models, *enemy_models)}
+        if any(model_id not in blocker_model_ids for model_id in aircraft_model_ids):
+            raise GeometryError(
+                "PathValidationContext aircraft_model_ids must reference blocker models."
+            )
+        object.__setattr__(self, "aircraft_model_ids", aircraft_model_ids)
         _validate_bool(
             "PathValidationContext may_transit_enemy_models",
             self.may_transit_enemy_models,
@@ -568,6 +580,8 @@ class PathValidationContext:
             sampled_model = _model_at_pose(self.moving_model, pose)
             for enemy_model in self.enemy_models:
                 metrics.model_collision_check_count += 1
+                if enemy_model.model_id in self.aircraft_model_ids:
+                    continue
                 if _models_overlap_with_volume(sampled_model, enemy_model):
                     if self.may_transit_enemy_models:
                         continue
@@ -581,6 +595,8 @@ class PathValidationContext:
                     )
             for friendly_model in self.friendly_models:
                 metrics.model_collision_check_count += 1
+                if friendly_model.model_id in self.aircraft_model_ids:
+                    continue
                 if friendly_model.model_id not in self.friendly_vehicle_monster_model_ids:
                     continue
                 if _models_overlap_with_volume(sampled_model, friendly_model):
@@ -611,6 +627,8 @@ class PathValidationContext:
             sampled_model = _model_at_pose(self.moving_model, pose)
             for enemy_model in self.enemy_models:
                 metrics.engagement_check_count += 1
+                if enemy_model.model_id in self.aircraft_model_ids:
+                    continue
                 if not _models_are_in_enemy_engagement_range(
                     sampled_model,
                     enemy_model,
@@ -682,6 +700,7 @@ class PathValidationContext:
             "enemy_models": [model.to_payload() for model in self.enemy_models],
             "terrain": [terrain.to_payload() for terrain in self.terrain],
             "friendly_vehicle_monster_model_ids": list(self.friendly_vehicle_monster_model_ids),
+            "aircraft_model_ids": list(self.aircraft_model_ids),
             "may_transit_enemy_models": self.may_transit_enemy_models,
             "may_transit_enemy_engagement": self.may_transit_enemy_engagement,
             "may_end_in_enemy_engagement": self.may_end_in_enemy_engagement,
@@ -705,6 +724,7 @@ class PathValidationContext:
             enemy_models=tuple(Model.from_payload(model) for model in payload["enemy_models"]),
             terrain=tuple(terrain_volume_from_payload(terrain) for terrain in payload["terrain"]),
             friendly_vehicle_monster_model_ids=tuple(payload["friendly_vehicle_monster_model_ids"]),
+            aircraft_model_ids=tuple(payload["aircraft_model_ids"]),
             may_transit_enemy_models=payload["may_transit_enemy_models"],
             may_transit_enemy_engagement=payload["may_transit_enemy_engagement"],
             may_end_in_enemy_engagement=payload["may_end_in_enemy_engagement"],

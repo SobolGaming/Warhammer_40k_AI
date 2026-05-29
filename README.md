@@ -139,6 +139,8 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
+Current roadmap implementation status: phases 1-10R are complete, including Aircraft and Hover movement/reserve behavior. Phase 10S is the next planned build slice.
+
 ## 5. Test policy
 
 ### Pure tests

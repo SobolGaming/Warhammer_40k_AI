@@ -4,7 +4,7 @@ import math
 from dataclasses import dataclass
 from enum import StrEnum
 from itertools import combinations
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -18,6 +18,12 @@ from warhammer40k_core.core.dice import (
     RerollPermissionPayload,
 )
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.aircraft import (
+    AircraftMovementPolicy,
+    AircraftMovementPolicyPayload,
+    AircraftMovementViolation,
+    aircraft_model_ids_for_scenario,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRemovalKind,
@@ -84,6 +90,7 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pathing import (
+    PathConstraintViolation,
     PathValidationResult,
     PathValidationResultPayload,
     PathWitness,
@@ -171,6 +178,7 @@ class MovementActionAvailabilityContextPayload(TypedDict):
     unit_instance_id: str
     player_id: str
     enemy_engagement_model_ids: list[str]
+    aircraft_movement_policy: NotRequired[AircraftMovementPolicyPayload]
 
 
 class MovementActionAvailabilityResultPayload(TypedDict):
@@ -258,6 +266,7 @@ class MovementActionAvailabilityContext:
     unit_instance_id: str
     player_id: str
     enemy_engagement_model_ids: tuple[str, ...] = ()
+    aircraft_movement_policy: AircraftMovementPolicy | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -289,6 +298,23 @@ class MovementActionAvailabilityContext:
                 self.enemy_engagement_model_ids,
             ),
         )
+        if self.aircraft_movement_policy is not None:
+            if type(self.aircraft_movement_policy) is not AircraftMovementPolicy:
+                raise GameLifecycleError(
+                    "MovementActionAvailabilityContext aircraft_movement_policy must be "
+                    "AircraftMovementPolicy."
+                )
+            if self.aircraft_movement_policy.unit_instance_id != self.unit_instance_id:
+                raise GameLifecycleError(
+                    "MovementActionAvailabilityContext aircraft_movement_policy unit drift."
+                )
+            if (
+                self.aircraft_movement_policy.ruleset_descriptor_hash
+                != self.ruleset_descriptor_hash
+            ):
+                raise GameLifecycleError(
+                    "MovementActionAvailabilityContext aircraft_movement_policy descriptor drift."
+                )
 
     @property
     def is_within_enemy_engagement_range(self) -> bool:
@@ -296,7 +322,12 @@ class MovementActionAvailabilityContext:
 
     def evaluate(self) -> MovementActionAvailabilityResult:
         available_actions: tuple[MovementPhaseActionKind, ...]
-        if self.is_within_enemy_engagement_range:
+        if (
+            self.aircraft_movement_policy is not None
+            and self.aircraft_movement_policy.uses_aircraft_rules
+        ):
+            available_actions = (MovementPhaseActionKind.NORMAL_MOVE,)
+        elif self.is_within_enemy_engagement_range:
             available_actions = _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT
         else:
             available_actions = _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT
@@ -310,20 +341,27 @@ class MovementActionAvailabilityContext:
         )
 
     def to_payload(self) -> MovementActionAvailabilityContextPayload:
-        return {
+        payload: MovementActionAvailabilityContextPayload = {
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
             "unit_instance_id": self.unit_instance_id,
             "player_id": self.player_id,
             "enemy_engagement_model_ids": list(self.enemy_engagement_model_ids),
         }
+        if self.aircraft_movement_policy is not None:
+            payload["aircraft_movement_policy"] = self.aircraft_movement_policy.to_payload()
+        return payload
 
     @classmethod
     def from_payload(cls, payload: MovementActionAvailabilityContextPayload) -> Self:
+        aircraft_policy_payload = payload.get("aircraft_movement_policy")
         return cls(
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
             unit_instance_id=payload["unit_instance_id"],
             player_id=payload["player_id"],
             enemy_engagement_model_ids=tuple(payload["enemy_engagement_model_ids"]),
+            aircraft_movement_policy=None
+            if aircraft_policy_payload is None
+            else AircraftMovementPolicy.from_payload(aircraft_policy_payload),
         )
 
 
@@ -4578,6 +4616,11 @@ def _resolve_unit_move(
         action_label=action_label,
     )
     unit = scenario.unit_instance_for_placement(unit_placement)
+    aircraft_policy = AircraftMovementPolicy.from_unit(
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+    aircraft_model_ids = aircraft_model_ids_for_scenario(scenario)
     moved_placements: list[ModelPlacement] = []
     for placement in unit_placement.model_placements:
         moved_placements.append(
@@ -4625,8 +4668,28 @@ def _resolve_unit_move(
                 player_id=unit_placement.player_id,
                 moving_model_instance_id=placement.model_instance_id,
             ),
-            movement_distance_budget_inches=movement_inches,
+            aircraft_model_ids=tuple(
+                model_id
+                for model_id in aircraft_model_ids
+                if model_id != placement.model_instance_id
+            ),
+            movement_distance_budget_inches=(
+                None if aircraft_policy.uses_aircraft_rules else movement_inches
+            ),
         ).validate()
+        aircraft_violations: tuple[AircraftMovementViolation, ...] = ()
+        if (
+            aircraft_policy.uses_aircraft_rules
+            and movement_phase_action is MovementPhaseActionKind.NORMAL_MOVE
+        ):
+            aircraft_violations = aircraft_policy.validate_normal_move_witness(
+                moving_model=moving_model,
+                witness=model_witness,
+            )
+            path_result = _path_result_with_aircraft_violations(
+                path_result=path_result,
+                aircraft_violations=aircraft_violations,
+            )
         terrain_result = legality_context.to_terrain_path_legality_context(
             moving_model=moving_model,
             witness=model_witness,
@@ -4635,28 +4698,27 @@ def _resolve_unit_move(
         ).validate()
         path_validation_results.append(path_result)
         terrain_path_legality_results.append(terrain_result)
-        model_movements.append(
-            validate_json_value(
-                {
-                    "model_instance_id": placement.model_instance_id,
-                    "movement_inches": movement_inches,
-                    "base_movement_inches": base_movement_inches,
-                    "movement_bonus_inches": movement_bonus_inches,
-                    "base_size": model.base_size.to_payload(),
-                    "start_pose": placement.pose.to_payload(),
-                    "end_pose": witness.final_pose_for_model(
-                        placement.model_instance_id
-                    ).to_payload(),
-                    "movement_distance_witness": (
-                        None
-                        if path_result.movement_distance_witness is None
-                        else path_result.movement_distance_witness.to_payload()
-                    ),
-                    "path_validation_result": path_result.to_payload(),
-                    "terrain_path_legality_result": terrain_result.to_payload(),
-                }
-            )
-        )
+        model_movement_payload: dict[str, object] = {
+            "model_instance_id": placement.model_instance_id,
+            "movement_inches": movement_inches,
+            "base_movement_inches": base_movement_inches,
+            "movement_bonus_inches": movement_bonus_inches,
+            "base_size": model.base_size.to_payload(),
+            "start_pose": placement.pose.to_payload(),
+            "end_pose": witness.final_pose_for_model(placement.model_instance_id).to_payload(),
+            "movement_distance_witness": (
+                None
+                if path_result.movement_distance_witness is None
+                else path_result.movement_distance_witness.to_payload()
+            ),
+            "path_validation_result": path_result.to_payload(),
+            "terrain_path_legality_result": terrain_result.to_payload(),
+        }
+        if aircraft_violations:
+            model_movement_payload["aircraft_movement_violations"] = [
+                violation.to_payload() for violation in aircraft_violations
+            ]
+        model_movements.append(validate_json_value(model_movement_payload))
     if rollback_on_endpoint_coherency:
         _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
             scenario=scenario,
@@ -4683,6 +4745,10 @@ def _resolve_unit_move(
         ),
         "coherency_result": validate_json_value(coherency_result.to_payload()),
     }
+    if aircraft_policy.has_aircraft_keyword:
+        movement_payload["aircraft_movement_policy"] = validate_json_value(
+            aircraft_policy.to_payload()
+        )
     return _ResolvedUnitMove(
         attempted_placement=attempted_placement,
         witness=witness,
@@ -4857,6 +4923,11 @@ def _movement_action_availability_context(
         raise GameLifecycleError("Movement action availability requires a UnitPlacement.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Movement action availability requires a RulesetDescriptor.")
+    unit = scenario.unit_instance_for_placement(unit_placement)
+    aircraft_policy = AircraftMovementPolicy.from_unit(
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+    )
     return MovementActionAvailabilityContext(
         ruleset_descriptor_hash=ruleset_descriptor.descriptor_hash,
         unit_instance_id=unit_placement.unit_instance_id,
@@ -4866,6 +4937,7 @@ def _movement_action_availability_context(
             unit_placement=unit_placement,
             ruleset_descriptor=ruleset_descriptor,
         ),
+        aircraft_movement_policy=aircraft_policy if aircraft_policy.has_aircraft_keyword else None,
     )
 
 
@@ -5143,6 +5215,39 @@ def _validate_move_witness_matches_unit(
     )
     if tuple(sorted(witness.model_ids())) != expected_model_ids:
         raise GameLifecycleError(f"{action_label} witness must match the selected unit models.")
+
+
+def _path_result_with_aircraft_violations(
+    *,
+    path_result: PathValidationResult,
+    aircraft_violations: tuple[AircraftMovementViolation, ...],
+) -> PathValidationResult:
+    if type(path_result) is not PathValidationResult:
+        raise GameLifecycleError("Aircraft path validation requires a PathValidationResult.")
+    if type(aircraft_violations) is not tuple:
+        raise GameLifecycleError("aircraft_violations must be a tuple.")
+    if not aircraft_violations:
+        return path_result
+    return PathValidationResult(
+        violations=(
+            *path_result.violations,
+            *(
+                PathConstraintViolation(
+                    violation_code=violation.violation_code.value,
+                    message=violation.message,
+                    model_id=violation.model_instance_id,
+                )
+                for violation in aircraft_violations
+            ),
+        ),
+        sampled_pose_count=path_result.sampled_pose_count,
+        model_collision_check_count=path_result.model_collision_check_count,
+        terrain_collision_check_count=path_result.terrain_collision_check_count,
+        engagement_check_count=path_result.engagement_check_count,
+        pivot_cost_inches=path_result.pivot_cost_inches,
+        pivot_cost_pending=path_result.pivot_cost_pending,
+        movement_distance_witness=path_result.movement_distance_witness,
+    )
 
 
 def _normal_move_violation_code(
