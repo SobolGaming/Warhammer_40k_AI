@@ -96,7 +96,8 @@ def test_benchmark_path_query_five_model_group_with_model_blockers(
     result = benchmark(query.evaluate)
 
     assert result.is_valid
-    assert result.metrics.model_collision_check_count >= 1_000
+    assert result.metrics.model_collision_broadphase_check_count >= 1_000
+    assert result.metrics.model_collision_broadphase_rejection_count >= 1_000
 
 
 def test_benchmark_path_query_five_model_group_with_terrain_blockers(
@@ -120,7 +121,8 @@ def test_benchmark_path_query_five_model_group_with_terrain_blockers(
     result = benchmark(query.evaluate)
 
     assert result.is_valid
-    assert result.metrics.terrain_collision_check_count >= 1_000
+    assert result.metrics.terrain_collision_broadphase_check_count >= 1_000
+    assert result.metrics.terrain_collision_broadphase_rejection_count >= 1_000
 
 
 def test_benchmark_path_query_attached_group_validation(benchmark: BenchmarkFixture) -> None:

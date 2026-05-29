@@ -218,6 +218,9 @@ def test_path_query_checks_model_collision_along_witness_path() -> None:
     assert result.failure.reason is PathFailureReason.MODEL_COLLISION
     assert result.failure.blocker_id == "blocker"
     assert result.metrics.model_collision_check_count > 0
+    assert result.metrics.model_collision_broadphase_check_count >= (
+        result.metrics.model_collision_check_count
+    )
 
 
 def test_path_query_checks_terrain_collision_along_witness_path() -> None:

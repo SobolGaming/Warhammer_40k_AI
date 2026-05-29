@@ -72,6 +72,42 @@ def test_collision_set_orders_blockers_and_filters_queries_by_geometry() -> None
     ) == ("enemy-a", "enemy-b")
 
 
+def test_collision_queries_report_broadphase_rejections_before_exact_checks() -> None:
+    mover = _model("mover", 0.0, 0.0)
+    overlapping = _model("overlap", 0.5, 0.0)
+    far_model = _model("far-model", 20.0, 0.0)
+    colliding_terrain = _terrain("colliding-terrain", 0.0, 0.0)
+    far_terrain = _terrain("far-terrain", 20.0, 0.0)
+    near_enemy = _model("near-enemy", 1.25, 0.0)
+    far_enemy = _model("far-enemy", 20.0, 0.0)
+    collision_set = CollisionSet(
+        model_blockers=(far_model, overlapping),
+        terrain_blockers=(far_terrain, colliding_terrain),
+        engagement_blockers=(far_enemy, near_enemy),
+    )
+
+    model_result = collision_set.model_collision_query(mover)
+    terrain_result = collision_set.terrain_collision_query(mover)
+    engagement_result = collision_set.engagement_query(
+        mover,
+        horizontal_inches=1.0,
+        vertical_inches=5.0,
+    )
+
+    assert model_result.blocker_ids == ("overlap",)
+    assert model_result.broadphase_check_count == 2
+    assert model_result.exact_check_count == 1
+    assert model_result.broadphase_rejection_count == 1
+    assert terrain_result.blocker_ids == ("colliding-terrain",)
+    assert terrain_result.broadphase_check_count == 2
+    assert terrain_result.exact_check_count == 1
+    assert terrain_result.broadphase_rejection_count == 1
+    assert engagement_result.blocker_ids == ("near-enemy",)
+    assert engagement_result.broadphase_check_count == 2
+    assert engagement_result.exact_check_count == 1
+    assert engagement_result.broadphase_rejection_count == 1
+
+
 def test_collision_set_from_spatial_index_excludes_movers_and_selects_engagement() -> None:
     mover = _model("mover", 0.0, 0.0)
     support = _model("support", 3.0, 0.0)

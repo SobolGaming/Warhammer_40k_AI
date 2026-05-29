@@ -34,7 +34,9 @@ def test_phase10u_pathing_smoke_profiles_crowded_infantry_validation() -> None:
     assert result.valid_path_count == 1
     assert result.invalid_path_count == 0
     assert result.path_sampled_pose_count > 0
-    assert result.model_collision_check_count > 0
+    assert result.model_collision_broadphase_check_count > 0
+    assert result.model_collision_broadphase_rejection_count > 0
+    assert result.dominant_work_counter == "model_collision_broadphase_check_count"
 
 
 def test_phase10u_terrain_legality_smoke_profiles_ruins_validation() -> None:
@@ -68,6 +70,7 @@ def test_phase10u_hotspot_report_round_trips_and_covers_required_scenarios() -> 
     assert "object at 0x" not in blob
     assert HotspotReport.from_payload(payload).to_payload() == payload
     assert report.budget_violations == ()
+    assert all(result.dominant_work_count > 0 for result in report.results)
 
 
 def test_phase10u_same_seed_and_scenario_produce_same_benchmark_result() -> None:
@@ -81,6 +84,22 @@ def test_phase10u_same_seed_and_scenario_produce_same_benchmark_result() -> None
     second = run_performance_scenario(scenario, timer=_StepTimer(start_ns=50, step_ns=25))
 
     assert first.to_payload() == second.to_payload()
+
+
+def test_phase10u_report_id_is_execution_artifact_not_workload_identity() -> None:
+    scenario = PerformanceScenario.for_kind(
+        PerformanceScenarioKind.CROWDED_INFANTRY,
+        seed=10_014,
+        iteration_count=1,
+    )
+
+    first = run_hotspot_profile((scenario,), timer=_StepTimer(start_ns=50, step_ns=25))
+    second = run_hotspot_profile((scenario,), timer=_StepTimer(start_ns=50, step_ns=50))
+
+    assert first.results[0].elapsed_ns != second.results[0].elapsed_ns
+    assert first.report_id != second.report_id
+    assert first.results[0].scenario_hash == second.results[0].scenario_hash
+    assert first.results[0].workload_digest == second.results[0].workload_digest
 
 
 def test_phase10u_cli_exits_nonzero_when_configured_budget_is_exceeded() -> None:
