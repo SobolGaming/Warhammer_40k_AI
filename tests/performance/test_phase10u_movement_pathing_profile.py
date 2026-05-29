@@ -34,7 +34,9 @@ def test_phase10u_pathing_smoke_profiles_crowded_infantry_validation() -> None:
     assert result.valid_path_count == 1
     assert result.invalid_path_count == 0
     assert result.path_sampled_pose_count > 0
-    assert result.model_collision_check_count > 0
+    assert result.model_collision_broadphase_check_count > 0
+    assert result.model_collision_broadphase_rejection_count > 0
+    assert result.dominant_work_counter == "model_collision_broadphase_check_count"
 
 
 def test_phase10u_terrain_legality_smoke_profiles_ruins_validation() -> None:
@@ -68,6 +70,7 @@ def test_phase10u_hotspot_report_round_trips_and_covers_required_scenarios() -> 
     assert "object at 0x" not in blob
     assert HotspotReport.from_payload(payload).to_payload() == payload
     assert report.budget_violations == ()
+    assert all(result.dominant_work_count > 0 for result in report.results)
 
 
 def test_phase10u_same_seed_and_scenario_produce_same_benchmark_result() -> None:

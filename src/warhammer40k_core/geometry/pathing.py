@@ -96,8 +96,11 @@ class PathResultPayload(TypedDict):
 
 class PathMetricsPayload(TypedDict):
     sampled_pose_count: int
+    model_collision_broadphase_check_count: int
     model_collision_check_count: int
+    terrain_collision_broadphase_check_count: int
     terrain_collision_check_count: int
+    engagement_broadphase_check_count: int
     engagement_check_count: int
 
 
@@ -1478,8 +1481,11 @@ class PathFailure:
 @dataclass(frozen=True, slots=True)
 class PathMetrics:
     sampled_pose_count: int = 0
+    model_collision_broadphase_check_count: int = 0
     model_collision_check_count: int = 0
+    terrain_collision_broadphase_check_count: int = 0
     terrain_collision_check_count: int = 0
+    engagement_broadphase_check_count: int = 0
     engagement_check_count: int = 0
 
     def __post_init__(self) -> None:
@@ -1490,10 +1496,26 @@ class PathMetrics:
         )
         object.__setattr__(
             self,
+            "model_collision_broadphase_check_count",
+            _validate_non_negative_int(
+                "PathMetrics model_collision_broadphase_check_count",
+                self.model_collision_broadphase_check_count,
+            ),
+        )
+        object.__setattr__(
+            self,
             "model_collision_check_count",
             _validate_non_negative_int(
                 "PathMetrics model_collision_check_count",
                 self.model_collision_check_count,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "terrain_collision_broadphase_check_count",
+            _validate_non_negative_int(
+                "PathMetrics terrain_collision_broadphase_check_count",
+                self.terrain_collision_broadphase_check_count,
             ),
         )
         object.__setattr__(
@@ -1506,18 +1528,51 @@ class PathMetrics:
         )
         object.__setattr__(
             self,
+            "engagement_broadphase_check_count",
+            _validate_non_negative_int(
+                "PathMetrics engagement_broadphase_check_count",
+                self.engagement_broadphase_check_count,
+            ),
+        )
+        object.__setattr__(
+            self,
             "engagement_check_count",
             _validate_non_negative_int(
                 "PathMetrics engagement_check_count",
                 self.engagement_check_count,
             ),
         )
+        if self.model_collision_check_count > self.model_collision_broadphase_check_count:
+            raise GeometryError("PathMetrics model exact checks cannot exceed broadphase checks.")
+        if self.terrain_collision_check_count > self.terrain_collision_broadphase_check_count:
+            raise GeometryError("PathMetrics terrain exact checks cannot exceed broadphase checks.")
+        if self.engagement_check_count > self.engagement_broadphase_check_count:
+            raise GeometryError(
+                "PathMetrics engagement exact checks cannot exceed broadphase checks."
+            )
+
+    @property
+    def model_collision_broadphase_rejection_count(self) -> int:
+        return self.model_collision_broadphase_check_count - self.model_collision_check_count
+
+    @property
+    def terrain_collision_broadphase_rejection_count(self) -> int:
+        return self.terrain_collision_broadphase_check_count - self.terrain_collision_check_count
+
+    @property
+    def engagement_broadphase_rejection_count(self) -> int:
+        return self.engagement_broadphase_check_count - self.engagement_check_count
 
     def to_payload(self) -> PathMetricsPayload:
         return {
             "sampled_pose_count": self.sampled_pose_count,
+            "model_collision_broadphase_check_count": (self.model_collision_broadphase_check_count),
             "model_collision_check_count": self.model_collision_check_count,
+            "terrain_collision_broadphase_check_count": (
+                self.terrain_collision_broadphase_check_count
+            ),
             "terrain_collision_check_count": self.terrain_collision_check_count,
+            "engagement_broadphase_check_count": self.engagement_broadphase_check_count,
             "engagement_check_count": self.engagement_check_count,
         }
 
@@ -1525,8 +1580,15 @@ class PathMetrics:
     def from_payload(cls, payload: PathMetricsPayload) -> Self:
         return cls(
             sampled_pose_count=payload["sampled_pose_count"],
+            model_collision_broadphase_check_count=payload[
+                "model_collision_broadphase_check_count"
+            ],
             model_collision_check_count=payload["model_collision_check_count"],
+            terrain_collision_broadphase_check_count=payload[
+                "terrain_collision_broadphase_check_count"
+            ],
             terrain_collision_check_count=payload["terrain_collision_check_count"],
+            engagement_broadphase_check_count=payload["engagement_broadphase_check_count"],
             engagement_check_count=payload["engagement_check_count"],
         )
 
@@ -1659,38 +1721,45 @@ class PathQuery:
             metrics.sampled_pose_count += len(sampled_path)
             for sampled_pose in sampled_path:
                 sampled_model = _model_at_pose(current_model, sampled_pose)
-                metrics.model_collision_check_count += len(self.collision_set.model_blockers)
-                model_collisions = self.collision_set.colliding_model_ids(sampled_model)
-                if model_collisions:
+                model_collision = self.collision_set.model_collision_query(sampled_model)
+                metrics.model_collision_broadphase_check_count += (
+                    model_collision.broadphase_check_count
+                )
+                metrics.model_collision_check_count += model_collision.exact_check_count
+                if model_collision.blocker_ids:
                     return _invalid(
                         PathFailureReason.MODEL_COLLISION,
                         "PathWitness collides with a model blocker.",
                         model_id=model_id,
-                        blocker_id=model_collisions[0],
+                        blocker_id=model_collision.blocker_ids[0],
                         metrics=metrics.to_metrics(),
                     )
-                metrics.terrain_collision_check_count += len(self.collision_set.terrain_blockers)
-                terrain_collisions = self.collision_set.colliding_terrain_ids(sampled_model)
-                if terrain_collisions:
+                terrain_collision = self.collision_set.terrain_collision_query(sampled_model)
+                metrics.terrain_collision_broadphase_check_count += (
+                    terrain_collision.broadphase_check_count
+                )
+                metrics.terrain_collision_check_count += terrain_collision.exact_check_count
+                if terrain_collision.blocker_ids:
                     return _invalid(
                         PathFailureReason.TERRAIN_COLLISION,
                         "PathWitness collides with terrain.",
                         model_id=model_id,
-                        blocker_id=terrain_collisions[0],
+                        blocker_id=terrain_collision.blocker_ids[0],
                         metrics=metrics.to_metrics(),
                     )
-                metrics.engagement_check_count += len(self.collision_set.engagement_blockers)
-                engagement_blockers = self.collision_set.engagement_model_ids(
+                engagement = self.collision_set.engagement_query(
                     sampled_model,
                     horizontal_inches=self.movement_envelope.engagement_horizontal_inches,
                     vertical_inches=self.movement_envelope.engagement_vertical_inches,
                 )
-                if engagement_blockers:
+                metrics.engagement_broadphase_check_count += engagement.broadphase_check_count
+                metrics.engagement_check_count += engagement.exact_check_count
+                if engagement.blocker_ids:
                     return _invalid(
                         PathFailureReason.ENGAGEMENT_RANGE,
                         "PathWitness enters engagement range.",
                         model_id=model_id,
-                        blocker_id=engagement_blockers[0],
+                        blocker_id=engagement.blocker_ids[0],
                         metrics=metrics.to_metrics(),
                     )
 
@@ -2027,15 +2096,21 @@ def _validate_terrain(field_name: str, value: object) -> TerrainVolume:
 @dataclass(slots=True)
 class _PathMetricCounts:
     sampled_pose_count: int = 0
+    model_collision_broadphase_check_count: int = 0
     model_collision_check_count: int = 0
+    terrain_collision_broadphase_check_count: int = 0
     terrain_collision_check_count: int = 0
+    engagement_broadphase_check_count: int = 0
     engagement_check_count: int = 0
 
     def to_metrics(self) -> PathMetrics:
         return PathMetrics(
             sampled_pose_count=self.sampled_pose_count,
+            model_collision_broadphase_check_count=self.model_collision_broadphase_check_count,
             model_collision_check_count=self.model_collision_check_count,
+            terrain_collision_broadphase_check_count=self.terrain_collision_broadphase_check_count,
             terrain_collision_check_count=self.terrain_collision_check_count,
+            engagement_broadphase_check_count=self.engagement_broadphase_check_count,
             engagement_check_count=self.engagement_check_count,
         )
 

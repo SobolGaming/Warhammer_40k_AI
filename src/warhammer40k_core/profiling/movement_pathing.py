@@ -43,7 +43,7 @@ from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 type BenchmarkTimer = Callable[[], int]
 
-_REPORT_SCHEMA_VERSION = "phase10u-hotspot-report-v1"
+_REPORT_SCHEMA_VERSION = "phase10u-hotspot-report-v2"
 _NORMAL_MOVE_TOKEN = "normal_move"
 
 
@@ -81,12 +81,20 @@ class PathingBenchmarkResultPayload(TypedDict):
     valid_path_count: int
     invalid_path_count: int
     path_sampled_pose_count: int
+    model_collision_broadphase_check_count: int
     model_collision_check_count: int
+    model_collision_broadphase_rejection_count: int
+    terrain_collision_broadphase_check_count: int
     terrain_collision_check_count: int
+    terrain_collision_broadphase_rejection_count: int
+    engagement_broadphase_check_count: int
     engagement_check_count: int
+    engagement_broadphase_rejection_count: int
     terrain_sampled_pose_count: int
     terrain_segment_count: int
     terrain_violation_count: int
+    dominant_work_counter: str
+    dominant_work_count: int
     scenario_hash: str
     workload_digest: str
 
@@ -236,8 +244,11 @@ class PathingBenchmarkResult:
     valid_path_count: int
     invalid_path_count: int
     path_sampled_pose_count: int
+    model_collision_broadphase_check_count: int
     model_collision_check_count: int
+    terrain_collision_broadphase_check_count: int
     terrain_collision_check_count: int
+    engagement_broadphase_check_count: int
     engagement_check_count: int
     terrain_sampled_pose_count: int
     terrain_segment_count: int
@@ -269,8 +280,17 @@ class PathingBenchmarkResult:
             ("valid_path_count", self.valid_path_count),
             ("invalid_path_count", self.invalid_path_count),
             ("path_sampled_pose_count", self.path_sampled_pose_count),
+            (
+                "model_collision_broadphase_check_count",
+                self.model_collision_broadphase_check_count,
+            ),
             ("model_collision_check_count", self.model_collision_check_count),
+            (
+                "terrain_collision_broadphase_check_count",
+                self.terrain_collision_broadphase_check_count,
+            ),
             ("terrain_collision_check_count", self.terrain_collision_check_count),
+            ("engagement_broadphase_check_count", self.engagement_broadphase_check_count),
             ("engagement_check_count", self.engagement_check_count),
             ("terrain_sampled_pose_count", self.terrain_sampled_pose_count),
             ("terrain_segment_count", self.terrain_segment_count),
@@ -290,6 +310,12 @@ class PathingBenchmarkResult:
             raise ProfilingError(
                 "PathingBenchmarkResult path counts must equal path_validation_runs."
             )
+        if self.model_collision_check_count > self.model_collision_broadphase_check_count:
+            raise ProfilingError("Model exact checks cannot exceed broadphase checks.")
+        if self.terrain_collision_check_count > self.terrain_collision_broadphase_check_count:
+            raise ProfilingError("Terrain exact checks cannot exceed broadphase checks.")
+        if self.engagement_check_count > self.engagement_broadphase_check_count:
+            raise ProfilingError("Engagement exact checks cannot exceed broadphase checks.")
         expected_digest = _pathing_workload_digest(self)
         if self.workload_digest != expected_digest:
             raise ProfilingError("PathingBenchmarkResult workload_digest drift.")
@@ -305,8 +331,11 @@ class PathingBenchmarkResult:
         valid_path_count: int,
         invalid_path_count: int,
         path_sampled_pose_count: int,
+        model_collision_broadphase_check_count: int,
         model_collision_check_count: int,
+        terrain_collision_broadphase_check_count: int,
         terrain_collision_check_count: int,
+        engagement_broadphase_check_count: int,
         engagement_check_count: int,
         terrain_sampled_pose_count: int,
         terrain_segment_count: int,
@@ -323,8 +352,11 @@ class PathingBenchmarkResult:
             valid_path_count=valid_path_count,
             invalid_path_count=invalid_path_count,
             path_sampled_pose_count=path_sampled_pose_count,
+            model_collision_broadphase_check_count=model_collision_broadphase_check_count,
             model_collision_check_count=model_collision_check_count,
+            terrain_collision_broadphase_check_count=terrain_collision_broadphase_check_count,
             terrain_collision_check_count=terrain_collision_check_count,
+            engagement_broadphase_check_count=engagement_broadphase_check_count,
             engagement_check_count=engagement_check_count,
             terrain_sampled_pose_count=terrain_sampled_pose_count,
             terrain_segment_count=terrain_segment_count,
@@ -342,8 +374,11 @@ class PathingBenchmarkResult:
             valid_path_count=valid_path_count,
             invalid_path_count=invalid_path_count,
             path_sampled_pose_count=path_sampled_pose_count,
+            model_collision_broadphase_check_count=model_collision_broadphase_check_count,
             model_collision_check_count=model_collision_check_count,
+            terrain_collision_broadphase_check_count=terrain_collision_broadphase_check_count,
             terrain_collision_check_count=terrain_collision_check_count,
+            engagement_broadphase_check_count=engagement_broadphase_check_count,
             engagement_check_count=engagement_check_count,
             terrain_sampled_pose_count=terrain_sampled_pose_count,
             terrain_segment_count=terrain_segment_count,
@@ -354,6 +389,28 @@ class PathingBenchmarkResult:
                 provisional.to_payload(),
             ),
         )
+
+    @property
+    def model_collision_broadphase_rejection_count(self) -> int:
+        return self.model_collision_broadphase_check_count - self.model_collision_check_count
+
+    @property
+    def terrain_collision_broadphase_rejection_count(self) -> int:
+        return self.terrain_collision_broadphase_check_count - self.terrain_collision_check_count
+
+    @property
+    def engagement_broadphase_rejection_count(self) -> int:
+        return self.engagement_broadphase_check_count - self.engagement_check_count
+
+    @property
+    def dominant_work_counter(self) -> str:
+        counter_name, _counter_value = self._dominant_work_counter()
+        return counter_name
+
+    @property
+    def dominant_work_count(self) -> int:
+        _counter_name, counter_value = self._dominant_work_counter()
+        return counter_value
 
     def to_payload(self) -> PathingBenchmarkResultPayload:
         return {
@@ -367,19 +424,33 @@ class PathingBenchmarkResult:
             "valid_path_count": self.valid_path_count,
             "invalid_path_count": self.invalid_path_count,
             "path_sampled_pose_count": self.path_sampled_pose_count,
+            "model_collision_broadphase_check_count": (self.model_collision_broadphase_check_count),
             "model_collision_check_count": self.model_collision_check_count,
+            "model_collision_broadphase_rejection_count": (
+                self.model_collision_broadphase_rejection_count
+            ),
+            "terrain_collision_broadphase_check_count": (
+                self.terrain_collision_broadphase_check_count
+            ),
             "terrain_collision_check_count": self.terrain_collision_check_count,
+            "terrain_collision_broadphase_rejection_count": (
+                self.terrain_collision_broadphase_rejection_count
+            ),
+            "engagement_broadphase_check_count": self.engagement_broadphase_check_count,
             "engagement_check_count": self.engagement_check_count,
+            "engagement_broadphase_rejection_count": (self.engagement_broadphase_rejection_count),
             "terrain_sampled_pose_count": self.terrain_sampled_pose_count,
             "terrain_segment_count": self.terrain_segment_count,
             "terrain_violation_count": self.terrain_violation_count,
+            "dominant_work_counter": self.dominant_work_counter,
+            "dominant_work_count": self.dominant_work_count,
             "scenario_hash": self.scenario_hash,
             "workload_digest": self.workload_digest,
         }
 
     @classmethod
     def from_payload(cls, payload: PathingBenchmarkResultPayload) -> Self:
-        return cls(
+        result = cls(
             scenario_id=payload["scenario_id"],
             scenario_kind=performance_scenario_kind_from_token(payload["scenario_kind"]),
             seed=payload["seed"],
@@ -390,8 +461,15 @@ class PathingBenchmarkResult:
             valid_path_count=payload["valid_path_count"],
             invalid_path_count=payload["invalid_path_count"],
             path_sampled_pose_count=payload["path_sampled_pose_count"],
+            model_collision_broadphase_check_count=payload[
+                "model_collision_broadphase_check_count"
+            ],
             model_collision_check_count=payload["model_collision_check_count"],
+            terrain_collision_broadphase_check_count=payload[
+                "terrain_collision_broadphase_check_count"
+            ],
             terrain_collision_check_count=payload["terrain_collision_check_count"],
+            engagement_broadphase_check_count=payload["engagement_broadphase_check_count"],
             engagement_check_count=payload["engagement_check_count"],
             terrain_sampled_pose_count=payload["terrain_sampled_pose_count"],
             terrain_segment_count=payload["terrain_segment_count"],
@@ -399,6 +477,45 @@ class PathingBenchmarkResult:
             scenario_hash=payload["scenario_hash"],
             workload_digest=payload["workload_digest"],
         )
+        _validate_derived_counter(
+            "model_collision_broadphase_rejection_count",
+            payload["model_collision_broadphase_rejection_count"],
+            result.model_collision_broadphase_rejection_count,
+        )
+        _validate_derived_counter(
+            "terrain_collision_broadphase_rejection_count",
+            payload["terrain_collision_broadphase_rejection_count"],
+            result.terrain_collision_broadphase_rejection_count,
+        )
+        _validate_derived_counter(
+            "engagement_broadphase_rejection_count",
+            payload["engagement_broadphase_rejection_count"],
+            result.engagement_broadphase_rejection_count,
+        )
+        if payload["dominant_work_counter"] != result.dominant_work_counter:
+            raise ProfilingError("PathingBenchmarkResult dominant_work_counter drift.")
+        _validate_derived_counter(
+            "dominant_work_count",
+            payload["dominant_work_count"],
+            result.dominant_work_count,
+        )
+        return result
+
+    def _dominant_work_counter(self) -> tuple[str, int]:
+        counters = (
+            ("model_collision_broadphase_check_count", self.model_collision_broadphase_check_count),
+            ("model_collision_check_count", self.model_collision_check_count),
+            (
+                "terrain_collision_broadphase_check_count",
+                self.terrain_collision_broadphase_check_count,
+            ),
+            ("terrain_collision_check_count", self.terrain_collision_check_count),
+            ("engagement_broadphase_check_count", self.engagement_broadphase_check_count),
+            ("engagement_check_count", self.engagement_check_count),
+            ("terrain_sampled_pose_count", self.terrain_sampled_pose_count),
+            ("path_sampled_pose_count", self.path_sampled_pose_count),
+        )
+        return max(counters, key=lambda item: (item[1], item[0]))
 
 
 @dataclass(frozen=True, slots=True)
@@ -634,8 +751,11 @@ def run_performance_scenario(
     valid_path_count = 0
     invalid_path_count = 0
     path_sampled_pose_count = 0
+    model_collision_broadphase_check_count = 0
     model_collision_check_count = 0
+    terrain_collision_broadphase_check_count = 0
     terrain_collision_check_count = 0
+    engagement_broadphase_check_count = 0
     engagement_check_count = 0
     terrain_sampled_pose_count = 0
     terrain_segment_count = 0
@@ -650,8 +770,15 @@ def run_performance_scenario(
         else:
             invalid_path_count += 1
         path_sampled_pose_count += path_result.metrics.sampled_pose_count
+        model_collision_broadphase_check_count += (
+            path_result.metrics.model_collision_broadphase_check_count
+        )
         model_collision_check_count += path_result.metrics.model_collision_check_count
+        terrain_collision_broadphase_check_count += (
+            path_result.metrics.terrain_collision_broadphase_check_count
+        )
         terrain_collision_check_count += path_result.metrics.terrain_collision_check_count
+        engagement_broadphase_check_count += path_result.metrics.engagement_broadphase_check_count
         engagement_check_count += path_result.metrics.engagement_check_count
 
         for terrain_context in terrain_contexts:
@@ -670,8 +797,11 @@ def run_performance_scenario(
         valid_path_count=valid_path_count,
         invalid_path_count=invalid_path_count,
         path_sampled_pose_count=path_sampled_pose_count,
+        model_collision_broadphase_check_count=model_collision_broadphase_check_count,
         model_collision_check_count=model_collision_check_count,
+        terrain_collision_broadphase_check_count=terrain_collision_broadphase_check_count,
         terrain_collision_check_count=terrain_collision_check_count,
+        engagement_broadphase_check_count=engagement_broadphase_check_count,
         engagement_check_count=engagement_check_count,
         terrain_sampled_pose_count=terrain_sampled_pose_count,
         terrain_segment_count=terrain_segment_count,
@@ -711,8 +841,11 @@ class _PathingWorkloadDigestInput:
     valid_path_count: int
     invalid_path_count: int
     path_sampled_pose_count: int
+    model_collision_broadphase_check_count: int
     model_collision_check_count: int
+    terrain_collision_broadphase_check_count: int
     terrain_collision_check_count: int
+    engagement_broadphase_check_count: int
     engagement_check_count: int
     terrain_sampled_pose_count: int
     terrain_segment_count: int
@@ -730,8 +863,13 @@ class _PathingWorkloadDigestInput:
             "valid_path_count": self.valid_path_count,
             "invalid_path_count": self.invalid_path_count,
             "path_sampled_pose_count": self.path_sampled_pose_count,
+            "model_collision_broadphase_check_count": (self.model_collision_broadphase_check_count),
             "model_collision_check_count": self.model_collision_check_count,
+            "terrain_collision_broadphase_check_count": (
+                self.terrain_collision_broadphase_check_count
+            ),
             "terrain_collision_check_count": self.terrain_collision_check_count,
+            "engagement_broadphase_check_count": self.engagement_broadphase_check_count,
             "engagement_check_count": self.engagement_check_count,
             "terrain_sampled_pose_count": self.terrain_sampled_pose_count,
             "terrain_segment_count": self.terrain_segment_count,
@@ -1048,8 +1186,11 @@ def _pathing_workload_digest(result: PathingBenchmarkResult) -> str:
         valid_path_count=result.valid_path_count,
         invalid_path_count=result.invalid_path_count,
         path_sampled_pose_count=result.path_sampled_pose_count,
+        model_collision_broadphase_check_count=result.model_collision_broadphase_check_count,
         model_collision_check_count=result.model_collision_check_count,
+        terrain_collision_broadphase_check_count=result.terrain_collision_broadphase_check_count,
         terrain_collision_check_count=result.terrain_collision_check_count,
+        engagement_broadphase_check_count=result.engagement_broadphase_check_count,
         engagement_check_count=result.engagement_check_count,
         terrain_sampled_pose_count=result.terrain_sampled_pose_count,
         terrain_segment_count=result.terrain_segment_count,
@@ -1153,6 +1294,12 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     if number < 0:
         raise ProfilingError(f"{field_name} must not be negative.")
     return number
+
+
+def _validate_derived_counter(field_name: str, actual: object, expected: int) -> None:
+    actual_count = _validate_non_negative_int(field_name, actual)
+    if actual_count != expected:
+        raise ProfilingError(f"PathingBenchmarkResult {field_name} drift.")
 
 
 def _validate_optional_non_negative_int(value: object | None) -> int | None:
