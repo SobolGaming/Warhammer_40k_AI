@@ -2502,6 +2502,7 @@ def _apply_reinforcement_placement_decision(
         payload,
         key="large_model_exceptions",
     )
+    mission_setup = state.mission_setup
     placement = resolve_reserve_arrival(
         scenario=_battlefield_scenario(state),
         ruleset_descriptor=ruleset_descriptor,
@@ -2509,6 +2510,20 @@ def _apply_reinforcement_placement_decision(
         attempted_placement=attempted_placement,
         battle_round=state.battle_round,
         placement_kind=placement_kind,
+        battlefield_width_inches=(
+            _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES
+            if mission_setup is None
+            else mission_setup.battlefield_width_inches
+        ),
+        battlefield_depth_inches=(
+            _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES
+            if mission_setup is None
+            else mission_setup.battlefield_depth_inches
+        ),
+        terrain_features=() if mission_setup is None else mission_setup.terrain_features,
+        enemy_deployment_zones=()
+        if mission_setup is None
+        else mission_setup.enemy_deployment_zones_for_player(reserve_state.player_id),
         large_model_exceptions=large_model_exceptions,
     )
     if not placement.is_valid:

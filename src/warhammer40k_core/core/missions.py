@@ -1,0 +1,1328 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+from collections.abc import Callable
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import Self, TypedDict, cast
+
+from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZonePayload
+from warhammer40k_core.core.objectives import Objective
+from warhammer40k_core.core.terrain_layouts import (
+    TerrainLayoutTemplate,
+    TerrainLayoutTemplatePayload,
+)
+
+
+class MissionPackError(ValueError):
+    """Raised when mission pack data violates CORE V2 invariants."""
+
+
+class SecondaryMissionAvailability(StrEnum):
+    TACTICAL = "tactical"
+    FIXED = "fixed"
+    BOTH = "both"
+
+
+class ChapterApprovedMissionSequencePayload(TypedDict):
+    sequence_id: str
+    steps: list[str]
+    source_id: str
+
+
+class ObjectiveMarkerDefinitionPayload(TypedDict):
+    objective_marker_id: str
+    name: str
+    x_inches: float
+    y_inches: float
+    z_inches: float
+    marker_diameter_mm: float
+    measurement_anchor: str
+    is_flat: bool
+    blocks_movement: bool
+    blocks_placement: bool
+    source_id: str
+
+
+class DeploymentMapDefinitionPayload(TypedDict):
+    deployment_map_id: str
+    name: str
+    battlefield_width_inches: float
+    battlefield_depth_inches: float
+    objective_markers: list[ObjectiveMarkerDefinitionPayload]
+    deployment_zones: list[DeploymentZonePayload]
+    source_id: str
+
+
+class PrimaryMissionDefinitionPayload(TypedDict):
+    primary_mission_id: str
+    name: str
+    source_id: str
+    max_vp_per_turn: int | None
+
+
+class SecondaryMissionDefinitionPayload(TypedDict):
+    secondary_mission_id: str
+    name: str
+    availability: str
+    tournament_fixed_allowed: bool
+    source_id: str
+
+
+class ChallengerCardDefinitionPayload(TypedDict):
+    challenger_card_id: str
+    name: str
+    source_id: str
+
+
+class MissionDeckDefinitionPayload(TypedDict):
+    mission_deck_id: str
+    primary_mission_ids: list[str]
+    secondary_mission_ids: list[str]
+    challenger_card_ids: list[str]
+    deployment_map_ids: list[str]
+    source_id: str
+
+
+class MissionPoolEntryPayload(TypedDict):
+    mission_pool_entry_id: str
+    primary_mission_id: str
+    deployment_map_id: str
+    terrain_layout_ids: list[str]
+    source_id: str
+
+
+class TournamentScoringCapsPayload(TypedDict):
+    primary_vp_cap: int
+    secondary_vp_cap: int
+    battle_ready_vp: int
+    total_vp_cap: int
+    source_id: str
+
+
+class MissionPackDefinitionPayload(TypedDict):
+    mission_pack_id: str
+    name: str
+    source_version: str
+    source_id: str
+    sequence: ChapterApprovedMissionSequencePayload
+    deployment_maps: list[DeploymentMapDefinitionPayload]
+    terrain_layout_templates: list[TerrainLayoutTemplatePayload]
+    mission_deck: MissionDeckDefinitionPayload
+    primary_missions: list[PrimaryMissionDefinitionPayload]
+    secondary_missions: list[SecondaryMissionDefinitionPayload]
+    challenger_cards: list[ChallengerCardDefinitionPayload]
+    mission_pool_entries: list[MissionPoolEntryPayload]
+    scoring_caps: TournamentScoringCapsPayload
+
+
+type PublicCardPayload = dict[str, bool | str]
+
+
+@dataclass(frozen=True, slots=True)
+class ChapterApprovedMissionSequence:
+    sequence_id: str
+    steps: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "sequence_id",
+            _validate_unprefixed_identifier(
+                "ChapterApprovedMissionSequence sequence_id",
+                self.sequence_id,
+                reserved_prefix="mission-sequence:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "steps",
+            _validate_identifier_tuple(
+                "ChapterApprovedMissionSequence steps",
+                self.steps,
+                min_length=1,
+                sort_values=False,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("ChapterApprovedMissionSequence source_id", self.source_id),
+        )
+
+    def to_payload(self) -> ChapterApprovedMissionSequencePayload:
+        return {
+            "sequence_id": self.sequence_id,
+            "steps": list(self.steps),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ChapterApprovedMissionSequencePayload) -> Self:
+        return cls(
+            sequence_id=payload["sequence_id"],
+            steps=tuple(payload["steps"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class ObjectiveMarkerDefinition:
+    objective_marker_id: str
+    name: str
+    x_inches: float
+    y_inches: float
+    z_inches: float = 0.0
+    marker_diameter_mm: float = 40.0
+    measurement_anchor: str = "center"
+    is_flat: bool = True
+    blocks_movement: bool = False
+    blocks_placement: bool = False
+    source_id: str = "chapter_approved_2025_26"
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "objective_marker_id",
+            _validate_unprefixed_identifier(
+                "ObjectiveMarkerDefinition objective_marker_id",
+                self.objective_marker_id,
+                reserved_prefix="objective:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("ObjectiveMarkerDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "x_inches",
+            _validate_finite_number("ObjectiveMarkerDefinition x_inches", self.x_inches),
+        )
+        object.__setattr__(
+            self,
+            "y_inches",
+            _validate_finite_number("ObjectiveMarkerDefinition y_inches", self.y_inches),
+        )
+        object.__setattr__(
+            self,
+            "z_inches",
+            _validate_finite_number("ObjectiveMarkerDefinition z_inches", self.z_inches),
+        )
+        object.__setattr__(
+            self,
+            "marker_diameter_mm",
+            _validate_positive_number(
+                "ObjectiveMarkerDefinition marker_diameter_mm",
+                self.marker_diameter_mm,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "measurement_anchor",
+            _validate_required_token(
+                "ObjectiveMarkerDefinition measurement_anchor",
+                self.measurement_anchor,
+                expected_token="center",
+            ),
+        )
+        _validate_bool("ObjectiveMarkerDefinition is_flat", self.is_flat)
+        _validate_bool("ObjectiveMarkerDefinition blocks_movement", self.blocks_movement)
+        _validate_bool("ObjectiveMarkerDefinition blocks_placement", self.blocks_placement)
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("ObjectiveMarkerDefinition source_id", self.source_id),
+        )
+        if self.marker_diameter_mm != 40.0:
+            raise MissionPackError("Chapter Approved objective markers must be 40mm.")
+        if not self.is_flat or self.blocks_movement or self.blocks_placement:
+            raise MissionPackError("Chapter Approved objective markers must be flat/non-blocking.")
+
+    def to_objective(self) -> Objective:
+        return Objective.point(
+            objective_id=self.objective_marker_id,
+            name=self.name,
+            x=self.x_inches,
+            y=self.y_inches,
+            z=self.z_inches,
+        )
+
+    def to_payload(self) -> ObjectiveMarkerDefinitionPayload:
+        return {
+            "objective_marker_id": self.objective_marker_id,
+            "name": self.name,
+            "x_inches": self.x_inches,
+            "y_inches": self.y_inches,
+            "z_inches": self.z_inches,
+            "marker_diameter_mm": self.marker_diameter_mm,
+            "measurement_anchor": self.measurement_anchor,
+            "is_flat": self.is_flat,
+            "blocks_movement": self.blocks_movement,
+            "blocks_placement": self.blocks_placement,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ObjectiveMarkerDefinitionPayload) -> Self:
+        return cls(
+            objective_marker_id=payload["objective_marker_id"],
+            name=payload["name"],
+            x_inches=payload["x_inches"],
+            y_inches=payload["y_inches"],
+            z_inches=payload["z_inches"],
+            marker_diameter_mm=payload["marker_diameter_mm"],
+            measurement_anchor=payload["measurement_anchor"],
+            is_flat=payload["is_flat"],
+            blocks_movement=payload["blocks_movement"],
+            blocks_placement=payload["blocks_placement"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DeploymentMapDefinition:
+    deployment_map_id: str
+    name: str
+    battlefield_width_inches: float
+    battlefield_depth_inches: float
+    objective_markers: tuple[ObjectiveMarkerDefinition, ...]
+    deployment_zones: tuple[DeploymentZone, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "deployment_map_id",
+            _validate_unprefixed_identifier(
+                "DeploymentMapDefinition deployment_map_id",
+                self.deployment_map_id,
+                reserved_prefix="deployment-map:",
+            ),
+        )
+        object.__setattr__(
+            self, "name", _validate_identifier("DeploymentMapDefinition name", self.name)
+        )
+        object.__setattr__(
+            self,
+            "battlefield_width_inches",
+            _validate_positive_number(
+                "DeploymentMapDefinition battlefield_width_inches",
+                self.battlefield_width_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battlefield_depth_inches",
+            _validate_positive_number(
+                "DeploymentMapDefinition battlefield_depth_inches",
+                self.battlefield_depth_inches,
+            ),
+        )
+        markers = _validate_objective_marker_tuple(self.objective_markers)
+        zones = _validate_deployment_zone_tuple(
+            "DeploymentMapDefinition deployment_zones",
+            self.deployment_zones,
+        )
+        _validate_markers_within_battlefield(
+            markers=markers,
+            width=self.battlefield_width_inches,
+            depth=self.battlefield_depth_inches,
+        )
+        _validate_zones_within_battlefield(
+            zones=zones,
+            width=self.battlefield_width_inches,
+            depth=self.battlefield_depth_inches,
+        )
+        object.__setattr__(self, "objective_markers", markers)
+        object.__setattr__(self, "deployment_zones", zones)
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("DeploymentMapDefinition source_id", self.source_id),
+        )
+
+    def objectives(self) -> tuple[Objective, ...]:
+        return tuple(marker.to_objective() for marker in self.objective_markers)
+
+    def deployment_zones_for_players(
+        self,
+        *,
+        attacker_player_id: str,
+        defender_player_id: str,
+    ) -> tuple[DeploymentZone, ...]:
+        attacker = _validate_identifier("attacker_player_id", attacker_player_id)
+        defender = _validate_identifier("defender_player_id", defender_player_id)
+        if attacker == defender:
+            raise MissionPackError("Attacker and defender player IDs must differ.")
+        zones: list[DeploymentZone] = []
+        for zone in self.deployment_zones:
+            player_id = zone.player_id
+            if player_id == "attacker":
+                player_id = attacker
+            elif player_id == "defender":
+                player_id = defender
+            zones.append(
+                DeploymentZone(
+                    deployment_zone_id=zone.deployment_zone_id,
+                    player_id=player_id,
+                    min_x=zone.min_x,
+                    min_y=zone.min_y,
+                    max_x=zone.max_x,
+                    max_y=zone.max_y,
+                )
+            )
+        return tuple(sorted(zones, key=lambda item: item.deployment_zone_id))
+
+    def to_payload(self) -> DeploymentMapDefinitionPayload:
+        return {
+            "deployment_map_id": self.deployment_map_id,
+            "name": self.name,
+            "battlefield_width_inches": self.battlefield_width_inches,
+            "battlefield_depth_inches": self.battlefield_depth_inches,
+            "objective_markers": [marker.to_payload() for marker in self.objective_markers],
+            "deployment_zones": [zone.to_payload() for zone in self.deployment_zones],
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DeploymentMapDefinitionPayload) -> Self:
+        return cls(
+            deployment_map_id=payload["deployment_map_id"],
+            name=payload["name"],
+            battlefield_width_inches=payload["battlefield_width_inches"],
+            battlefield_depth_inches=payload["battlefield_depth_inches"],
+            objective_markers=tuple(
+                ObjectiveMarkerDefinition.from_payload(marker)
+                for marker in payload["objective_markers"]
+            ),
+            deployment_zones=tuple(
+                DeploymentZone.from_payload(zone) for zone in payload["deployment_zones"]
+            ),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PrimaryMissionDefinition:
+    primary_mission_id: str
+    name: str
+    source_id: str
+    max_vp_per_turn: int | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "primary_mission_id",
+            _validate_unprefixed_identifier(
+                "PrimaryMissionDefinition primary_mission_id",
+                self.primary_mission_id,
+                reserved_prefix="primary-mission:",
+            ),
+        )
+        object.__setattr__(
+            self, "name", _validate_identifier("PrimaryMissionDefinition name", self.name)
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("PrimaryMissionDefinition source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "max_vp_per_turn",
+            _validate_optional_positive_int(
+                "PrimaryMissionDefinition max_vp_per_turn",
+                self.max_vp_per_turn,
+            ),
+        )
+
+    def to_payload(self) -> PrimaryMissionDefinitionPayload:
+        return {
+            "primary_mission_id": self.primary_mission_id,
+            "name": self.name,
+            "source_id": self.source_id,
+            "max_vp_per_turn": self.max_vp_per_turn,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PrimaryMissionDefinitionPayload) -> Self:
+        return cls(
+            primary_mission_id=payload["primary_mission_id"],
+            name=payload["name"],
+            source_id=payload["source_id"],
+            max_vp_per_turn=payload["max_vp_per_turn"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class SecondaryMissionDefinition:
+    secondary_mission_id: str
+    name: str
+    availability: SecondaryMissionAvailability
+    tournament_fixed_allowed: bool
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "secondary_mission_id",
+            _validate_unprefixed_identifier(
+                "SecondaryMissionDefinition secondary_mission_id",
+                self.secondary_mission_id,
+                reserved_prefix="secondary-mission:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("SecondaryMissionDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "availability",
+            secondary_mission_availability_from_token(self.availability),
+        )
+        _validate_bool(
+            "SecondaryMissionDefinition tournament_fixed_allowed",
+            self.tournament_fixed_allowed,
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("SecondaryMissionDefinition source_id", self.source_id),
+        )
+
+    def to_public_payload(
+        self,
+        *,
+        owner_player_id: str,
+        viewer_player_id: str,
+        revealed: bool,
+    ) -> PublicCardPayload:
+        owner = _validate_identifier("owner_player_id", owner_player_id)
+        viewer = _validate_identifier("viewer_player_id", viewer_player_id)
+        if owner != viewer and not _validate_bool("revealed", revealed):
+            return {
+                "owner_player_id": owner,
+                "hidden": True,
+                "card_kind": "secondary",
+            }
+        return {
+            "owner_player_id": owner,
+            "hidden": False,
+            "card_kind": "secondary",
+            "secondary_mission_id": self.secondary_mission_id,
+            "name": self.name,
+            "availability": self.availability.value,
+        }
+
+    def to_payload(self) -> SecondaryMissionDefinitionPayload:
+        return {
+            "secondary_mission_id": self.secondary_mission_id,
+            "name": self.name,
+            "availability": self.availability.value,
+            "tournament_fixed_allowed": self.tournament_fixed_allowed,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SecondaryMissionDefinitionPayload) -> Self:
+        return cls(
+            secondary_mission_id=payload["secondary_mission_id"],
+            name=payload["name"],
+            availability=secondary_mission_availability_from_token(payload["availability"]),
+            tournament_fixed_allowed=payload["tournament_fixed_allowed"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class ChallengerCardDefinition:
+    challenger_card_id: str
+    name: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "challenger_card_id",
+            _validate_unprefixed_identifier(
+                "ChallengerCardDefinition challenger_card_id",
+                self.challenger_card_id,
+                reserved_prefix="challenger-card:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("ChallengerCardDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("ChallengerCardDefinition source_id", self.source_id),
+        )
+
+    def to_public_payload(
+        self,
+        *,
+        owner_player_id: str,
+        viewer_player_id: str,
+        revealed: bool,
+    ) -> PublicCardPayload:
+        owner = _validate_identifier("owner_player_id", owner_player_id)
+        viewer = _validate_identifier("viewer_player_id", viewer_player_id)
+        if owner != viewer and not _validate_bool("revealed", revealed):
+            return {
+                "owner_player_id": owner,
+                "hidden": True,
+                "card_kind": "challenger",
+            }
+        return {
+            "owner_player_id": owner,
+            "hidden": False,
+            "card_kind": "challenger",
+            "challenger_card_id": self.challenger_card_id,
+            "name": self.name,
+        }
+
+    def to_payload(self) -> ChallengerCardDefinitionPayload:
+        return {
+            "challenger_card_id": self.challenger_card_id,
+            "name": self.name,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ChallengerCardDefinitionPayload) -> Self:
+        return cls(
+            challenger_card_id=payload["challenger_card_id"],
+            name=payload["name"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MissionDeckDefinition:
+    mission_deck_id: str
+    primary_mission_ids: tuple[str, ...]
+    secondary_mission_ids: tuple[str, ...]
+    challenger_card_ids: tuple[str, ...]
+    deployment_map_ids: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "mission_deck_id",
+            _validate_unprefixed_identifier(
+                "MissionDeckDefinition mission_deck_id",
+                self.mission_deck_id,
+                reserved_prefix="mission-deck:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_mission_ids",
+            _validate_identifier_tuple(
+                "MissionDeckDefinition primary_mission_ids",
+                self.primary_mission_ids,
+                min_length=1,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "secondary_mission_ids",
+            _validate_identifier_tuple(
+                "MissionDeckDefinition secondary_mission_ids",
+                self.secondary_mission_ids,
+                min_length=1,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "challenger_card_ids",
+            _validate_identifier_tuple(
+                "MissionDeckDefinition challenger_card_ids",
+                self.challenger_card_ids,
+                min_length=1,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "deployment_map_ids",
+            _validate_identifier_tuple(
+                "MissionDeckDefinition deployment_map_ids",
+                self.deployment_map_ids,
+                min_length=1,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("MissionDeckDefinition source_id", self.source_id),
+        )
+
+    def to_payload(self) -> MissionDeckDefinitionPayload:
+        return {
+            "mission_deck_id": self.mission_deck_id,
+            "primary_mission_ids": list(self.primary_mission_ids),
+            "secondary_mission_ids": list(self.secondary_mission_ids),
+            "challenger_card_ids": list(self.challenger_card_ids),
+            "deployment_map_ids": list(self.deployment_map_ids),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionDeckDefinitionPayload) -> Self:
+        return cls(
+            mission_deck_id=payload["mission_deck_id"],
+            primary_mission_ids=tuple(payload["primary_mission_ids"]),
+            secondary_mission_ids=tuple(payload["secondary_mission_ids"]),
+            challenger_card_ids=tuple(payload["challenger_card_ids"]),
+            deployment_map_ids=tuple(payload["deployment_map_ids"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MissionPoolEntry:
+    mission_pool_entry_id: str
+    primary_mission_id: str
+    deployment_map_id: str
+    terrain_layout_ids: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "mission_pool_entry_id",
+            _validate_unprefixed_identifier(
+                "MissionPoolEntry mission_pool_entry_id",
+                self.mission_pool_entry_id,
+                reserved_prefix="mission-pool-entry:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_mission_id",
+            _validate_identifier("MissionPoolEntry primary_mission_id", self.primary_mission_id),
+        )
+        object.__setattr__(
+            self,
+            "deployment_map_id",
+            _validate_identifier("MissionPoolEntry deployment_map_id", self.deployment_map_id),
+        )
+        object.__setattr__(
+            self,
+            "terrain_layout_ids",
+            _validate_identifier_tuple(
+                "MissionPoolEntry terrain_layout_ids",
+                self.terrain_layout_ids,
+                min_length=1,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("MissionPoolEntry source_id", self.source_id),
+        )
+
+    def to_payload(self) -> MissionPoolEntryPayload:
+        return {
+            "mission_pool_entry_id": self.mission_pool_entry_id,
+            "primary_mission_id": self.primary_mission_id,
+            "deployment_map_id": self.deployment_map_id,
+            "terrain_layout_ids": list(self.terrain_layout_ids),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionPoolEntryPayload) -> Self:
+        return cls(
+            mission_pool_entry_id=payload["mission_pool_entry_id"],
+            primary_mission_id=payload["primary_mission_id"],
+            deployment_map_id=payload["deployment_map_id"],
+            terrain_layout_ids=tuple(payload["terrain_layout_ids"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TournamentScoringCaps:
+    primary_vp_cap: int
+    secondary_vp_cap: int
+    battle_ready_vp: int
+    total_vp_cap: int
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "primary_vp_cap",
+            _validate_positive_int("TournamentScoringCaps primary_vp_cap", self.primary_vp_cap),
+        )
+        object.__setattr__(
+            self,
+            "secondary_vp_cap",
+            _validate_positive_int(
+                "TournamentScoringCaps secondary_vp_cap",
+                self.secondary_vp_cap,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_ready_vp",
+            _validate_non_negative_int(
+                "TournamentScoringCaps battle_ready_vp",
+                self.battle_ready_vp,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "total_vp_cap",
+            _validate_positive_int("TournamentScoringCaps total_vp_cap", self.total_vp_cap),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("TournamentScoringCaps source_id", self.source_id),
+        )
+        if self.primary_vp_cap + self.secondary_vp_cap + self.battle_ready_vp > self.total_vp_cap:
+            raise MissionPackError("Tournament scoring caps exceed total VP cap.")
+
+    def to_payload(self) -> TournamentScoringCapsPayload:
+        return {
+            "primary_vp_cap": self.primary_vp_cap,
+            "secondary_vp_cap": self.secondary_vp_cap,
+            "battle_ready_vp": self.battle_ready_vp,
+            "total_vp_cap": self.total_vp_cap,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TournamentScoringCapsPayload) -> Self:
+        return cls(
+            primary_vp_cap=payload["primary_vp_cap"],
+            secondary_vp_cap=payload["secondary_vp_cap"],
+            battle_ready_vp=payload["battle_ready_vp"],
+            total_vp_cap=payload["total_vp_cap"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MissionPackDefinition:
+    mission_pack_id: str
+    name: str
+    source_version: str
+    source_id: str
+    sequence: ChapterApprovedMissionSequence
+    deployment_maps: tuple[DeploymentMapDefinition, ...]
+    terrain_layout_templates: tuple[TerrainLayoutTemplate, ...]
+    mission_deck: MissionDeckDefinition
+    primary_missions: tuple[PrimaryMissionDefinition, ...]
+    secondary_missions: tuple[SecondaryMissionDefinition, ...]
+    challenger_cards: tuple[ChallengerCardDefinition, ...]
+    mission_pool_entries: tuple[MissionPoolEntry, ...]
+    scoring_caps: TournamentScoringCaps
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "mission_pack_id",
+            _validate_unprefixed_identifier(
+                "MissionPackDefinition mission_pack_id",
+                self.mission_pack_id,
+                reserved_prefix="mission-pack:",
+            ),
+        )
+        object.__setattr__(
+            self, "name", _validate_identifier("MissionPackDefinition name", self.name)
+        )
+        object.__setattr__(
+            self,
+            "source_version",
+            _validate_identifier("MissionPackDefinition source_version", self.source_version),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("MissionPackDefinition source_id", self.source_id),
+        )
+        if type(self.sequence) is not ChapterApprovedMissionSequence:
+            raise MissionPackError("MissionPackDefinition sequence must be a sequence.")
+        deployment_maps = _validate_deployment_maps(self.deployment_maps)
+        terrain_layouts = _validate_terrain_layout_templates(self.terrain_layout_templates)
+        if type(self.mission_deck) is not MissionDeckDefinition:
+            raise MissionPackError("MissionPackDefinition mission_deck must be a deck.")
+        primary_missions = _validate_primary_missions(self.primary_missions)
+        secondary_missions = _validate_secondary_missions(self.secondary_missions)
+        challenger_cards = _validate_challenger_cards(self.challenger_cards)
+        mission_pool_entries = _validate_mission_pool_entries(self.mission_pool_entries)
+        if type(self.scoring_caps) is not TournamentScoringCaps:
+            raise MissionPackError("MissionPackDefinition scoring_caps must be scoring caps.")
+        _validate_deck_references(
+            mission_deck=self.mission_deck,
+            deployment_maps=deployment_maps,
+            primary_missions=primary_missions,
+            secondary_missions=secondary_missions,
+            challenger_cards=challenger_cards,
+        )
+        _validate_mission_pool_references(
+            mission_pool_entries=mission_pool_entries,
+            deployment_maps=deployment_maps,
+            primary_missions=primary_missions,
+            terrain_layouts=terrain_layouts,
+        )
+        object.__setattr__(self, "deployment_maps", deployment_maps)
+        object.__setattr__(self, "terrain_layout_templates", terrain_layouts)
+        object.__setattr__(self, "primary_missions", primary_missions)
+        object.__setattr__(self, "secondary_missions", secondary_missions)
+        object.__setattr__(self, "challenger_cards", challenger_cards)
+        object.__setattr__(self, "mission_pool_entries", mission_pool_entries)
+
+    def deployment_map(self, deployment_map_id: str) -> DeploymentMapDefinition:
+        requested_id = _validate_identifier("deployment_map_id", deployment_map_id)
+        for deployment_map in self.deployment_maps:
+            if deployment_map.deployment_map_id == requested_id:
+                return deployment_map
+        raise MissionPackError("MissionPackDefinition does not contain deployment_map_id.")
+
+    def terrain_layout_template(self, terrain_layout_id: str) -> TerrainLayoutTemplate:
+        requested_id = _validate_identifier("terrain_layout_id", terrain_layout_id)
+        for template in self.terrain_layout_templates:
+            if template.terrain_layout_id == requested_id:
+                return template
+        raise MissionPackError("MissionPackDefinition does not contain terrain_layout_id.")
+
+    def secondary_mission(self, secondary_mission_id: str) -> SecondaryMissionDefinition:
+        requested_id = _validate_identifier("secondary_mission_id", secondary_mission_id)
+        for mission in self.secondary_missions:
+            if mission.secondary_mission_id == requested_id:
+                return mission
+        raise MissionPackError("MissionPackDefinition does not contain secondary_mission_id.")
+
+    def challenger_card(self, challenger_card_id: str) -> ChallengerCardDefinition:
+        requested_id = _validate_identifier("challenger_card_id", challenger_card_id)
+        for card in self.challenger_cards:
+            if card.challenger_card_id == requested_id:
+                return card
+        raise MissionPackError("MissionPackDefinition does not contain challenger_card_id.")
+
+    def deterministic_mission_pool_order(self, *, seed: str) -> tuple[MissionPoolEntry, ...]:
+        seed_value = _validate_identifier("seed", seed)
+        return tuple(
+            sorted(
+                self.mission_pool_entries,
+                key=lambda entry: _stable_order_key(
+                    seed=seed_value, entry_id=entry.mission_pool_entry_id
+                ),
+            )
+        )
+
+    def select_mission_pool_entry(self, *, seed: str, index: int = 0) -> MissionPoolEntry:
+        requested_index = _validate_non_negative_int("index", index)
+        order = self.deterministic_mission_pool_order(seed=seed)
+        if requested_index >= len(order):
+            raise MissionPackError("Mission pool index is outside the deterministic pool.")
+        return order[requested_index]
+
+    def to_payload(self) -> MissionPackDefinitionPayload:
+        return {
+            "mission_pack_id": self.mission_pack_id,
+            "name": self.name,
+            "source_version": self.source_version,
+            "source_id": self.source_id,
+            "sequence": self.sequence.to_payload(),
+            "deployment_maps": [
+                deployment_map.to_payload() for deployment_map in self.deployment_maps
+            ],
+            "terrain_layout_templates": [
+                template.to_payload() for template in self.terrain_layout_templates
+            ],
+            "mission_deck": self.mission_deck.to_payload(),
+            "primary_missions": [mission.to_payload() for mission in self.primary_missions],
+            "secondary_missions": [mission.to_payload() for mission in self.secondary_missions],
+            "challenger_cards": [card.to_payload() for card in self.challenger_cards],
+            "mission_pool_entries": [entry.to_payload() for entry in self.mission_pool_entries],
+            "scoring_caps": self.scoring_caps.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionPackDefinitionPayload) -> Self:
+        return cls(
+            mission_pack_id=payload["mission_pack_id"],
+            name=payload["name"],
+            source_version=payload["source_version"],
+            source_id=payload["source_id"],
+            sequence=ChapterApprovedMissionSequence.from_payload(payload["sequence"]),
+            deployment_maps=tuple(
+                DeploymentMapDefinition.from_payload(deployment_map)
+                for deployment_map in payload["deployment_maps"]
+            ),
+            terrain_layout_templates=tuple(
+                TerrainLayoutTemplate.from_payload(template)
+                for template in payload["terrain_layout_templates"]
+            ),
+            mission_deck=MissionDeckDefinition.from_payload(payload["mission_deck"]),
+            primary_missions=tuple(
+                PrimaryMissionDefinition.from_payload(mission)
+                for mission in payload["primary_missions"]
+            ),
+            secondary_missions=tuple(
+                SecondaryMissionDefinition.from_payload(mission)
+                for mission in payload["secondary_missions"]
+            ),
+            challenger_cards=tuple(
+                ChallengerCardDefinition.from_payload(card) for card in payload["challenger_cards"]
+            ),
+            mission_pool_entries=tuple(
+                MissionPoolEntry.from_payload(entry) for entry in payload["mission_pool_entries"]
+            ),
+            scoring_caps=TournamentScoringCaps.from_payload(payload["scoring_caps"]),
+        )
+
+
+def secondary_mission_availability_from_token(token: object) -> SecondaryMissionAvailability:
+    if type(token) is SecondaryMissionAvailability:
+        return token
+    if type(token) is not str:
+        raise MissionPackError("SecondaryMissionAvailability token must be a string.")
+    try:
+        return SecondaryMissionAvailability(token)
+    except ValueError as exc:
+        raise MissionPackError(f"Unsupported SecondaryMissionAvailability token: {token}.") from exc
+
+
+def _stable_order_key(*, seed: str, entry_id: str) -> str:
+    encoded = json.dumps(
+        {"seed": seed, "mission_pool_entry_id": entry_id},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _validate_objective_marker_tuple(
+    values: object,
+) -> tuple[ObjectiveMarkerDefinition, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError("DeploymentMapDefinition objective_markers must be a tuple.")
+    markers: list[ObjectiveMarkerDefinition] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ObjectiveMarkerDefinition:
+            raise MissionPackError(
+                "objective_markers must contain ObjectiveMarkerDefinition values."
+            )
+        if value.objective_marker_id in seen:
+            raise MissionPackError("objective_markers must not contain duplicate marker IDs.")
+        seen.add(value.objective_marker_id)
+        markers.append(value)
+    return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
+
+
+def _validate_deployment_zone_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DeploymentZone, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError(f"{field_name} must be a tuple.")
+    zones: list[DeploymentZone] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DeploymentZone:
+            raise MissionPackError(f"{field_name} must contain DeploymentZone values.")
+        if value.deployment_zone_id in seen:
+            raise MissionPackError(f"{field_name} must not contain duplicate zone IDs.")
+        seen.add(value.deployment_zone_id)
+        zones.append(value)
+    return tuple(sorted(zones, key=lambda zone: zone.deployment_zone_id))
+
+
+def _validate_deployment_maps(
+    values: object,
+) -> tuple[DeploymentMapDefinition, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError("MissionPackDefinition deployment_maps must be a tuple.")
+    return _validate_unique_values(
+        field_name="MissionPackDefinition deployment_maps",
+        values=cast(tuple[object, ...], values),
+        expected_type=DeploymentMapDefinition,
+        identity=lambda item: item.deployment_map_id,
+    )
+
+
+def _validate_terrain_layout_templates(
+    values: object,
+) -> tuple[TerrainLayoutTemplate, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError("MissionPackDefinition terrain_layout_templates must be a tuple.")
+    return _validate_unique_values(
+        field_name="MissionPackDefinition terrain_layout_templates",
+        values=cast(tuple[object, ...], values),
+        expected_type=TerrainLayoutTemplate,
+        identity=lambda item: item.terrain_layout_id,
+    )
+
+
+def _validate_primary_missions(values: object) -> tuple[PrimaryMissionDefinition, ...]:
+    return _validate_unique_values(
+        field_name="MissionPackDefinition primary_missions",
+        values=values,
+        expected_type=PrimaryMissionDefinition,
+        identity=lambda item: item.primary_mission_id,
+    )
+
+
+def _validate_secondary_missions(values: object) -> tuple[SecondaryMissionDefinition, ...]:
+    return _validate_unique_values(
+        field_name="MissionPackDefinition secondary_missions",
+        values=values,
+        expected_type=SecondaryMissionDefinition,
+        identity=lambda item: item.secondary_mission_id,
+    )
+
+
+def _validate_challenger_cards(values: object) -> tuple[ChallengerCardDefinition, ...]:
+    return _validate_unique_values(
+        field_name="MissionPackDefinition challenger_cards",
+        values=values,
+        expected_type=ChallengerCardDefinition,
+        identity=lambda item: item.challenger_card_id,
+    )
+
+
+def _validate_mission_pool_entries(values: object) -> tuple[MissionPoolEntry, ...]:
+    return _validate_unique_values(
+        field_name="MissionPackDefinition mission_pool_entries",
+        values=values,
+        expected_type=MissionPoolEntry,
+        identity=lambda item: item.mission_pool_entry_id,
+    )
+
+
+def _validate_unique_values[T](
+    *,
+    field_name: str,
+    values: object,
+    expected_type: type[T],
+    identity: Callable[[T], str],
+) -> tuple[T, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError(f"{field_name} must be a tuple.")
+    entries: list[T] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not expected_type:
+            raise MissionPackError(f"{field_name} must contain {expected_type.__name__} values.")
+        typed_value = value
+        entry_id = identity(typed_value)
+        if entry_id in seen:
+            raise MissionPackError(f"{field_name} must not contain duplicate IDs.")
+        seen.add(entry_id)
+        entries.append(typed_value)
+    if not entries:
+        raise MissionPackError(f"{field_name} must not be empty.")
+    return tuple(sorted(entries, key=identity))
+
+
+def _validate_deck_references(
+    *,
+    mission_deck: MissionDeckDefinition,
+    deployment_maps: tuple[DeploymentMapDefinition, ...],
+    primary_missions: tuple[PrimaryMissionDefinition, ...],
+    secondary_missions: tuple[SecondaryMissionDefinition, ...],
+    challenger_cards: tuple[ChallengerCardDefinition, ...],
+) -> None:
+    _validate_known_ids(
+        "MissionDeckDefinition primary_mission_ids",
+        mission_deck.primary_mission_ids,
+        {mission.primary_mission_id for mission in primary_missions},
+    )
+    _validate_known_ids(
+        "MissionDeckDefinition secondary_mission_ids",
+        mission_deck.secondary_mission_ids,
+        {mission.secondary_mission_id for mission in secondary_missions},
+    )
+    _validate_known_ids(
+        "MissionDeckDefinition challenger_card_ids",
+        mission_deck.challenger_card_ids,
+        {card.challenger_card_id for card in challenger_cards},
+    )
+    _validate_known_ids(
+        "MissionDeckDefinition deployment_map_ids",
+        mission_deck.deployment_map_ids,
+        {deployment_map.deployment_map_id for deployment_map in deployment_maps},
+    )
+
+
+def _validate_mission_pool_references(
+    *,
+    mission_pool_entries: tuple[MissionPoolEntry, ...],
+    deployment_maps: tuple[DeploymentMapDefinition, ...],
+    primary_missions: tuple[PrimaryMissionDefinition, ...],
+    terrain_layouts: tuple[TerrainLayoutTemplate, ...],
+) -> None:
+    deployment_map_ids = {deployment_map.deployment_map_id for deployment_map in deployment_maps}
+    primary_mission_ids = {mission.primary_mission_id for mission in primary_missions}
+    terrain_layout_ids = {layout.terrain_layout_id for layout in terrain_layouts}
+    for entry in mission_pool_entries:
+        _validate_known_ids(
+            "MissionPoolEntry primary_mission_id",
+            (entry.primary_mission_id,),
+            primary_mission_ids,
+        )
+        _validate_known_ids(
+            "MissionPoolEntry deployment_map_id",
+            (entry.deployment_map_id,),
+            deployment_map_ids,
+        )
+        _validate_known_ids(
+            "MissionPoolEntry terrain_layout_ids",
+            entry.terrain_layout_ids,
+            terrain_layout_ids,
+        )
+
+
+def _validate_known_ids(
+    field_name: str, requested_ids: tuple[str, ...], known_ids: set[str]
+) -> None:
+    unknown_ids = set(requested_ids) - known_ids
+    if unknown_ids:
+        raise MissionPackError(
+            f"{field_name} references unknown IDs: {', '.join(sorted(unknown_ids))}."
+        )
+
+
+def _validate_markers_within_battlefield(
+    *,
+    markers: tuple[ObjectiveMarkerDefinition, ...],
+    width: float,
+    depth: float,
+) -> None:
+    for marker in markers:
+        if marker.x_inches < 0.0 or marker.x_inches > width:
+            raise MissionPackError("Objective marker x must be within the battlefield.")
+        if marker.y_inches < 0.0 or marker.y_inches > depth:
+            raise MissionPackError("Objective marker y must be within the battlefield.")
+
+
+def _validate_zones_within_battlefield(
+    *,
+    zones: tuple[DeploymentZone, ...],
+    width: float,
+    depth: float,
+) -> None:
+    for zone in zones:
+        if zone.min_x < 0.0 or zone.max_x > width:
+            raise MissionPackError("Deployment zone x bounds must be within the battlefield.")
+        if zone.min_y < 0.0 or zone.max_y > depth:
+            raise MissionPackError("Deployment zone y bounds must be within the battlefield.")
+
+
+def _validate_unprefixed_identifier(
+    field_name: str,
+    value: object,
+    *,
+    reserved_prefix: str,
+) -> str:
+    identifier = _validate_identifier(field_name, value)
+    if identifier.startswith(reserved_prefix):
+        raise MissionPackError(f"{field_name} must not include the stable identity prefix.")
+    return identifier
+
+
+def _validate_identifier_tuple(
+    field_name: str,
+    values: object,
+    *,
+    min_length: int,
+    sort_values: bool,
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise MissionPackError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        validated.append(identifier)
+    if len(validated) < min_length:
+        raise MissionPackError(f"{field_name} must contain at least {min_length} values.")
+    if sort_values:
+        return tuple(sorted(validated))
+    return tuple(validated)
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise MissionPackError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise MissionPackError(f"{field_name} must not be empty.")
+    return stripped
+
+
+def _validate_required_token(field_name: str, value: object, *, expected_token: str) -> str:
+    token = _validate_identifier(field_name, value)
+    if token != expected_token:
+        raise MissionPackError(f"{field_name} must be {expected_token}.")
+    return token
+
+
+def _validate_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise MissionPackError(f"{field_name} must be a bool.")
+    return value
+
+
+def _validate_finite_number(field_name: str, value: object) -> float:
+    if not isinstance(value, int | float) or type(value) is bool:
+        raise MissionPackError(f"{field_name} must be a number.")
+    number = float(value)
+    if not math.isfinite(number):
+        raise MissionPackError(f"{field_name} must be finite.")
+    return number
+
+
+def _validate_positive_number(field_name: str, value: object) -> float:
+    number = _validate_finite_number(field_name, value)
+    if number <= 0.0:
+        raise MissionPackError(f"{field_name} must be greater than 0.")
+    return number
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise MissionPackError(f"{field_name} must be an integer.")
+    if value < 1:
+        raise MissionPackError(f"{field_name} must be at least 1.")
+    return value
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise MissionPackError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise MissionPackError(f"{field_name} must not be negative.")
+    return value
+
+
+def _validate_optional_positive_int(field_name: str, value: object | None) -> int | None:
+    if value is None:
+        return None
+    return _validate_positive_int(field_name, value)

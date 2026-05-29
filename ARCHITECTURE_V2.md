@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10V** is treated as implemented at the time this file was updated. Phase 11A is the next build slice.
+Everything through **Phase 11A** is treated as implemented at the time this file was updated. Phase 11B is the next build slice.
 
 Completed / implemented foundation:
 
@@ -66,6 +66,7 @@ Completed / implemented foundation:
 | 10T | Complete | Movement phase completion gate |
 | 10U | Complete | Movement/pathing/terrain profiling and hotspot budget gate |
 | 10V | Complete | Movement audit hardening and deferred-wiring contracts |
+| 11A | Complete | Chapter Approved 2025-26 mission pack data |
 
 ## Cross-cutting architectural rules
 
@@ -867,6 +868,8 @@ Required tests:
 # Mission pack, objectives, Command phase, and scoring
 
 ## Phase 11A: Chapter Approved 2025-26 mission pack data
+
+Status: Complete.
 
 This phase brings in Chapter Approved 2025-26 mission data: mission sequence, deployment maps, objective marker positions, mission pool, mission decks, secondary mission cards, Challenger cards, terrain layout templates, and tournament scoring caps.
 
