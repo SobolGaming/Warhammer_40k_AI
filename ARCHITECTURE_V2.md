@@ -696,6 +696,8 @@ Invariants:
 
 - triggered movement is not a Movement phase action;
 - surge-like movement is a triggered displacement;
+- optional triggered movement can be declined through the same decision path;
+- mandatory triggered movement omits decline choices;
 - each unit can only make one surge move per phase unless a rule says otherwise;
 - Battle-shocked units cannot make surge moves unless a rule says otherwise;
 - units within Engagement Range cannot make surge moves unless a rule says otherwise;
@@ -709,6 +711,7 @@ Required tests:
 - surge movement cannot occur while within Engagement Range;
 - one surge move per phase is enforced;
 - triggered movement emits displacement records;
+- declined triggered movement emits a deterministic event without battlefield mutation;
 - triggered movement records source rule and trigger timing;
 - triggered movement does not appear in `SELECT_MOVEMENT_ACTION`.
 

@@ -42,6 +42,7 @@ from warhammer40k_core.engine.placement import create_deterministic_battlefield_
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.triggered_movement import (
+    DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     SurgeMoveState,
     SurgeMoveStatePayload,
@@ -90,6 +91,7 @@ def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() ->
     assert request.decision_type == SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
     assert request.actor_id == "player-a"
     assert {option.option_id for option in request.options} == {
+        DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
         "surge_move_001",
         "surge_move_002",
     }
@@ -130,6 +132,91 @@ def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() ->
     assert len(displacements) == len(unit_placement.model_placements)
     assert {cast(str, record["displacement_kind"]) for record in displacements} == {"surge_move"}
     assert {cast(str, record["source_rule_id"]) for record in displacements} == {"blood_surge"}
+
+
+def test_optional_triggered_movement_can_be_declined_without_mutation() -> None:
+    state = _battle_ready_state()
+    unit_placement = _unit_placement(state)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0)
+    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    request = handler.request_from_state(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=descriptor,
+        candidate_witnesses=(_shift_witness(unit_placement, dx=3.0),),
+    )
+
+    assert DECLINE_TRIGGERED_MOVEMENT_OPTION_ID in {option.option_id for option in request.options}
+
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase10s-result-decline-001",
+        request=request,
+        selected_option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+    )
+    decisions.submit_result(result)
+    status = handler.apply_decision(state=state, result=result, decisions=decisions)
+
+    assert status is None
+    assert _unit_placement(state).to_payload() == unit_placement.to_payload()
+    assert state.surge_move_states == []
+    declined_payload = _last_event_payload(decisions, "triggered_movement_declined")
+    assert declined_payload["phase_body_status"] == "triggered_movement_declined"
+    assert declined_payload["declined"] is True
+    assert declined_payload["movement_phase_action"] is None
+    assert declined_payload["unit_instance_id"] == unit_placement.unit_instance_id
+
+
+def test_mandatory_triggered_movement_omits_decline_choice() -> None:
+    state = _battle_ready_state()
+    unit_placement = _unit_placement(state)
+    descriptor = _movement_surge_descriptor(max_distance_inches=3.0, optional=False)
+
+    request = TriggeredMovementHandler(ruleset_descriptor=_ruleset()).request_from_state(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=descriptor,
+        candidate_witnesses=(_shift_witness(unit_placement, dx=3.0),),
+    )
+
+    assert DECLINE_TRIGGERED_MOVEMENT_OPTION_ID not in {
+        option.option_id for option in request.options
+    }
+    assert {option.option_id for option in request.options} == {"surge_move_001"}
+
+
+def test_declined_triggered_movement_event_payload_is_replay_safe() -> None:
+    state = _battle_ready_state()
+    unit_placement = _unit_placement(state)
+    descriptor = _reactive_step_descriptor(max_distance_inches=2.0)
+    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    request = handler.request_from_state(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=descriptor,
+        candidate_witnesses=(_shift_witness(unit_placement, dx=2.0),),
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase10s-result-decline-payload-001",
+        request=request,
+        selected_option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+    )
+    decisions.submit_result(result)
+
+    handler.apply_decision(state=state, result=result, decisions=decisions)
+
+    declined_payload = _last_event_payload(decisions, "triggered_movement_declined")
+    blob = json.dumps(declined_payload, sort_keys=True)
+    assert "<" not in blob
+    assert "object at 0x" not in blob
+    assert declined_payload["triggered_movement_kind"] == TriggeredMovementKind.TRIGGERED.value
+    assert declined_payload["source_rule_id"] == "reactive_step"
+    assert declined_payload["request_id"] == request.request_id
+    assert declined_payload["result_id"] == result.result_id
+    assert declined_payload["descriptor"] == descriptor.to_payload()
 
 
 def test_triggered_movement_request_rejects_reaction_window_phase_mismatch() -> None:
@@ -984,6 +1071,14 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
             max_distance_inches=3.0,
             allow_battle_shocked=cast(bool, "yes"),
         )
+    with pytest.raises(GameLifecycleError, match="optional must be a bool"):
+        TriggeredMovementDescriptor(
+            movement_kind=TriggeredMovementKind.SURGE,
+            source_rule_id="blood_surge",
+            trigger_timing=descriptor.trigger_timing,
+            max_distance_inches=3.0,
+            optional=cast(bool, "yes"),
+        )
     with pytest.raises(GameLifecycleError, match="trigger_timing must be a ReactionWindow"):
         SurgeMoveState(
             player_id="player-a",
@@ -1462,7 +1557,11 @@ def _ruleset() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase10s-test")
 
 
-def _blood_surge_descriptor(*, max_distance_inches: float) -> TriggeredMovementDescriptor:
+def _blood_surge_descriptor(
+    *,
+    max_distance_inches: float,
+    optional: bool = True,
+) -> TriggeredMovementDescriptor:
     return TriggeredMovementDescriptor(
         movement_kind=TriggeredMovementKind.SURGE,
         source_rule_id="blood_surge",
@@ -1473,10 +1572,15 @@ def _blood_surge_descriptor(*, max_distance_inches: float) -> TriggeredMovementD
             source_event_id="event-source-000001",
         ),
         max_distance_inches=max_distance_inches,
+        optional=optional,
     )
 
 
-def _movement_surge_descriptor(*, max_distance_inches: float) -> TriggeredMovementDescriptor:
+def _movement_surge_descriptor(
+    *,
+    max_distance_inches: float,
+    optional: bool = True,
+) -> TriggeredMovementDescriptor:
     return TriggeredMovementDescriptor(
         movement_kind=TriggeredMovementKind.SURGE,
         source_rule_id="blood_surge",
@@ -1487,10 +1591,15 @@ def _movement_surge_descriptor(*, max_distance_inches: float) -> TriggeredMoveme
             source_event_id="event-source-movement-000001",
         ),
         max_distance_inches=max_distance_inches,
+        optional=optional,
     )
 
 
-def _reactive_step_descriptor(*, max_distance_inches: float) -> TriggeredMovementDescriptor:
+def _reactive_step_descriptor(
+    *,
+    max_distance_inches: float,
+    optional: bool = True,
+) -> TriggeredMovementDescriptor:
     return TriggeredMovementDescriptor(
         movement_kind=TriggeredMovementKind.TRIGGERED,
         source_rule_id="reactive_step",
@@ -1501,6 +1610,7 @@ def _reactive_step_descriptor(*, max_distance_inches: float) -> TriggeredMovemen
             source_event_id=None,
         ),
         max_distance_inches=max_distance_inches,
+        optional=optional,
     )
 
 

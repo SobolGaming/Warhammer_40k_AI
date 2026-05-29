@@ -54,6 +54,7 @@ if TYPE_CHECKING:
 
 
 SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE = "select_triggered_movement"
+DECLINE_TRIGGERED_MOVEMENT_OPTION_ID = "decline_triggered_movement"
 _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
 _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
 
@@ -78,6 +79,7 @@ class TriggeredMovementDescriptorPayload(TypedDict):
     allow_battle_shocked: bool
     allow_within_engagement_range: bool
     one_per_phase: bool
+    optional: bool
 
 
 class TriggeredMovementViolationPayload(TypedDict):
@@ -119,6 +121,7 @@ class TriggeredMovementDescriptor:
     allow_battle_shocked: bool = False
     allow_within_engagement_range: bool = False
     one_per_phase: bool = True
+    optional: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -169,6 +172,11 @@ class TriggeredMovementDescriptor:
             "one_per_phase",
             _validate_bool("TriggeredMovementDescriptor one_per_phase", self.one_per_phase),
         )
+        object.__setattr__(
+            self,
+            "optional",
+            _validate_bool("TriggeredMovementDescriptor optional", self.optional),
+        )
 
     @property
     def displacement_kind(self) -> ModelDisplacementKind:
@@ -186,6 +194,7 @@ class TriggeredMovementDescriptor:
             "allow_battle_shocked": self.allow_battle_shocked,
             "allow_within_engagement_range": self.allow_within_engagement_range,
             "one_per_phase": self.one_per_phase,
+            "optional": self.optional,
         }
 
     @classmethod
@@ -199,6 +208,7 @@ class TriggeredMovementDescriptor:
             allow_battle_shocked=payload["allow_battle_shocked"],
             allow_within_engagement_range=payload["allow_within_engagement_range"],
             one_per_phase=payload["one_per_phase"],
+            optional=payload["optional"],
         )
 
 
@@ -572,6 +582,25 @@ class TriggeredMovementRequest:
 
     def _decision_options(self) -> tuple[DecisionOption, ...]:
         options: list[DecisionOption] = []
+        if self.descriptor.optional:
+            options.append(
+                DecisionOption(
+                    option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+                    label="Decline Triggered Movement",
+                    payload=validate_json_value(
+                        {
+                            "triggered_movement_kind": self.descriptor.movement_kind.value,
+                            "displacement_kind": self.descriptor.displacement_kind.value,
+                            "unit_instance_id": self.unit_instance_id,
+                            "descriptor": self.descriptor.to_payload(),
+                            "source_rule_id": self.descriptor.source_rule_id,
+                            "trigger_timing": self.descriptor.trigger_timing.to_payload(),
+                            "movement_phase_action": None,
+                            "declined": True,
+                        }
+                    ),
+                )
+            )
         for index, resolution in enumerate(self.resolutions, start=1):
             option_id = f"{self.descriptor.movement_kind.value}_move_{index:03d}"
             options.append(
@@ -680,6 +709,26 @@ class TriggeredMovementHandler:
         unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
         if result.actor_id != unit_placement.player_id:
             raise GameLifecycleError("Triggered movement actor must own the moving unit.")
+        if _payload_optional_bool(payload, "declined"):
+            if result.selected_option_id != DECLINE_TRIGGERED_MOVEMENT_OPTION_ID:
+                raise GameLifecycleError("Declined triggered movement result option drift.")
+            if not descriptor.optional:
+                raise GameLifecycleError("Mandatory triggered movement cannot be declined.")
+            _validate_triggered_movement_declined_payload(
+                payload=payload,
+                descriptor=descriptor,
+                unit_instance_id=unit_instance_id,
+            )
+            decisions.event_log.append(
+                "triggered_movement_declined",
+                _triggered_movement_declined_payload(
+                    state=state,
+                    result=result,
+                    unit_instance_id=unit_instance_id,
+                    descriptor=descriptor,
+                ),
+            )
+            return None
         witness = _payload_path_witness(payload, "witness")
         resolution = resolve_triggered_movement(
             scenario=scenario,
@@ -1212,6 +1261,34 @@ def _triggered_movement_resolved_payload(
     )
 
 
+def _triggered_movement_declined_payload(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    unit_instance_id: str,
+    descriptor: TriggeredMovementDescriptor,
+) -> dict[str, JsonValue]:
+    return _validate_json_object(
+        "triggered movement declined payload",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": _current_battle_phase_value(state),
+            "unit_instance_id": unit_instance_id,
+            "triggered_movement_kind": descriptor.movement_kind.value,
+            "source_rule_id": descriptor.source_rule_id,
+            "trigger_timing": descriptor.trigger_timing.to_payload(),
+            "descriptor": descriptor.to_payload(),
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "triggered_movement_declined",
+            "movement_phase_action": None,
+            "declined": True,
+        },
+    )
+
+
 def _triggered_movement_violation_code(resolution: TriggeredMovementResolution) -> str:
     if resolution.restriction_violations:
         return resolution.restriction_violations[0].violation_code.value
@@ -1348,6 +1425,15 @@ def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
     return value
 
 
+def _payload_optional_bool(payload: dict[str, JsonValue], key: str) -> bool:
+    if key not in payload:
+        return False
+    value = payload[key]
+    if type(value) is not bool:
+        raise GameLifecycleError(f"Decision payload key must be a bool: {key}.")
+    return value
+
+
 def _payload_path_witness(payload: dict[str, JsonValue], key: str) -> PathWitness:
     if key not in payload:
         raise GameLifecycleError(f"Decision payload missing required key: {key}.")
@@ -1355,6 +1441,28 @@ def _payload_path_witness(payload: dict[str, JsonValue], key: str) -> PathWitnes
     if not isinstance(value, dict):
         raise GameLifecycleError(f"Decision payload key must be a PathWitness payload: {key}.")
     return PathWitness.from_payload(cast(PathWitnessPayload, value))
+
+
+def _validate_triggered_movement_declined_payload(
+    *,
+    payload: dict[str, JsonValue],
+    descriptor: TriggeredMovementDescriptor,
+    unit_instance_id: str,
+) -> None:
+    if payload.get("triggered_movement_kind") != descriptor.movement_kind.value:
+        raise GameLifecycleError("Declined triggered movement kind drift.")
+    if payload.get("displacement_kind") != descriptor.displacement_kind.value:
+        raise GameLifecycleError("Declined triggered movement displacement drift.")
+    if payload.get("unit_instance_id") != unit_instance_id:
+        raise GameLifecycleError("Declined triggered movement unit drift.")
+    if payload.get("descriptor") != descriptor.to_payload():
+        raise GameLifecycleError("Declined triggered movement descriptor drift.")
+    if payload.get("source_rule_id") != descriptor.source_rule_id:
+        raise GameLifecycleError("Declined triggered movement source rule drift.")
+    if payload.get("trigger_timing") != descriptor.trigger_timing.to_payload():
+        raise GameLifecycleError("Declined triggered movement trigger timing drift.")
+    if payload.get("movement_phase_action") is not None:
+        raise GameLifecycleError("Declined triggered movement cannot include a movement action.")
 
 
 def _validate_triggered_movement_resolutions(
