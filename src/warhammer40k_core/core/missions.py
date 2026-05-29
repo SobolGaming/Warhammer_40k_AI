@@ -633,7 +633,7 @@ class MissionDeckDefinition:
                 "MissionDeckDefinition primary_mission_ids",
                 self.primary_mission_ids,
                 min_length=1,
-                sort_values=True,
+                sort_values=False,
             ),
         )
         object.__setattr__(
@@ -643,7 +643,7 @@ class MissionDeckDefinition:
                 "MissionDeckDefinition secondary_mission_ids",
                 self.secondary_mission_ids,
                 min_length=1,
-                sort_values=True,
+                sort_values=False,
             ),
         )
         object.__setattr__(
@@ -653,7 +653,7 @@ class MissionDeckDefinition:
                 "MissionDeckDefinition challenger_card_ids",
                 self.challenger_card_ids,
                 min_length=1,
-                sort_values=True,
+                sort_values=False,
             ),
         )
         object.__setattr__(
@@ -663,7 +663,7 @@ class MissionDeckDefinition:
                 "MissionDeckDefinition deployment_map_ids",
                 self.deployment_map_ids,
                 min_length=1,
-                sort_values=True,
+                sort_values=False,
             ),
         )
         object.__setattr__(
@@ -729,7 +729,7 @@ class MissionPoolEntry:
                 "MissionPoolEntry terrain_layout_ids",
                 self.terrain_layout_ids,
                 min_length=1,
-                sort_values=True,
+                sort_values=False,
             ),
         )
         object.__setattr__(

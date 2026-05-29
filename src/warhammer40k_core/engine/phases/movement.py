@@ -17,7 +17,11 @@ from warhammer40k_core.core.dice import (
     RerollPermission,
     RerollPermissionPayload,
 )
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    MissionDeploymentZoneSource,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.engine.aircraft import (
     AircraftMinimumMoveResult,
     AircraftMovementPolicy,
@@ -110,6 +114,7 @@ from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.mission_setup import MissionSetup
 
 
 SELECT_MOVEMENT_UNIT_DECISION_TYPE = "select_movement_unit"
@@ -2502,7 +2507,10 @@ def _apply_reinforcement_placement_decision(
         payload,
         key="large_model_exceptions",
     )
-    mission_setup = state.mission_setup
+    mission_setup = _mission_setup_for_live_reinforcements(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+    )
     placement = resolve_reserve_arrival(
         scenario=_battlefield_scenario(state),
         ruleset_descriptor=ruleset_descriptor,
@@ -2510,20 +2518,12 @@ def _apply_reinforcement_placement_decision(
         attempted_placement=attempted_placement,
         battle_round=state.battle_round,
         placement_kind=placement_kind,
-        battlefield_width_inches=(
-            _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES
-            if mission_setup is None
-            else mission_setup.battlefield_width_inches
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
+        enemy_deployment_zones=mission_setup.enemy_deployment_zones_for_player(
+            reserve_state.player_id,
         ),
-        battlefield_depth_inches=(
-            _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES
-            if mission_setup is None
-            else mission_setup.battlefield_depth_inches
-        ),
-        terrain_features=() if mission_setup is None else mission_setup.terrain_features,
-        enemy_deployment_zones=()
-        if mission_setup is None
-        else mission_setup.enemy_deployment_zones_for_player(reserve_state.player_id),
         large_model_exceptions=large_model_exceptions,
     )
     if not placement.is_valid:
@@ -5961,6 +5961,28 @@ def _ruleset_descriptor_for_handler(handler: MovementPhaseHandler) -> RulesetDes
     if handler.ruleset_descriptor is None:
         raise GameLifecycleError("Movement phase requires a RulesetDescriptor.")
     return handler.ruleset_descriptor
+
+
+def _mission_setup_for_live_reinforcements(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+) -> MissionSetup:
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Live Reinforcements requires a RulesetDescriptor.")
+    if (
+        ruleset_descriptor.mission_policy.deployment_zone_source
+        is not MissionDeploymentZoneSource.MISSION
+    ):
+        raise GameLifecycleError(
+            "Live Reinforcements requires mission-sourced deployment-zone geometry."
+        )
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise GameLifecycleError(
+            "Live Reinforcements requires MissionSetup with deployment zones and terrain features."
+        )
+    return mission_setup
 
 
 def _active_movement_selection(state: GameState) -> MovementUnitSelection:
