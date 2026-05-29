@@ -2224,14 +2224,26 @@ def _model_is_within_battlefield(
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
 ) -> bool:
+    return model_is_within_battlefield_footprint(
+        model,
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+    )
+
+
+def model_is_within_battlefield_footprint(
+    model: Model,
+    *,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
+) -> bool:
+    if type(model) is not Model:
+        raise GeometryError("Battlefield containment requires a geometry Model.")
+    width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
+    depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
     footprint_bounds = shapely_backend.footprint_for_base(model.base, model.pose).bounds
     min_x, min_y, max_x, max_y = footprint_bounds
-    return (
-        min_x >= 0.0
-        and min_y >= 0.0
-        and max_x <= battlefield_width_inches
-        and max_y <= battlefield_depth_inches
-    )
+    return min_x >= 0.0 and min_y >= 0.0 and max_x <= width and max_y <= depth
 
 
 def _models_overlap_with_volume(first: Model, second: Model) -> bool:

@@ -5,7 +5,15 @@ from dataclasses import dataclass, field
 from itertools import pairwise
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.base import (
+    BaseShape,
+    BaseShapePayload,
+    CircularBase,
+    OvalBase,
+    RectangularBase,
+    base_shape_from_payload,
+    validate_base_shape,
+)
 from warhammer40k_core.geometry.measurement import MILLIMETERS_PER_INCH
 from warhammer40k_core.geometry.pose import (
     Facing,
@@ -19,6 +27,7 @@ from warhammer40k_core.geometry.pose import (
 from warhammer40k_core.geometry.volume import Model
 
 _SEGMENT_MEASUREMENT_POINT = "pose_anchor"
+_AIRCRAFT_BASE_POINT_SAMPLE_DEGREES = tuple(range(0, 360, 5))
 
 
 class MovementSegmentPayload(TypedDict):
@@ -56,6 +65,27 @@ class MovementDistanceWitnessPayload(TypedDict):
     budget: MovementDistanceBudgetPayload | None
 
 
+class BasePointDistanceWitnessPayload(TypedDict):
+    point_id: str
+    start_x_inches: float
+    start_y_inches: float
+    end_x_inches: float
+    end_y_inches: float
+    distance_inches: float
+
+
+class AircraftBaseMovementWitnessPayload(TypedDict):
+    model_id: str
+    base: BaseShapePayload
+    start_pose: PosePayload
+    movement_end_pose: PosePayload
+    minimum_move_inches: float
+    used_circular_center_shortcut: bool
+    point_distances: list[BasePointDistanceWitnessPayload]
+    minimum_point_distance_inches: float
+    minimum_move_satisfied: bool
+
+
 class PivotCostPolicyPayload(TypedDict):
     non_round_pivot_cost_inches: float
     vehicle_or_monster_pivot_cost_inches: float
@@ -76,6 +106,234 @@ class MovementEnvelopePayload(TypedDict):
     engagement_horizontal_inches: float
     engagement_vertical_inches: float
     pivot_cost_policy: PivotCostPolicyPayload
+
+
+@dataclass(frozen=True, slots=True)
+class BasePointDistanceWitness:
+    point_id: str
+    start_x_inches: float
+    start_y_inches: float
+    end_x_inches: float
+    end_y_inches: float
+    distance_inches: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "point_id",
+            _validate_identifier("BasePointDistanceWitness point_id", self.point_id),
+        )
+        start_x = validate_finite_number(
+            "BasePointDistanceWitness start_x_inches",
+            self.start_x_inches,
+        )
+        start_y = validate_finite_number(
+            "BasePointDistanceWitness start_y_inches",
+            self.start_y_inches,
+        )
+        end_x = validate_finite_number(
+            "BasePointDistanceWitness end_x_inches",
+            self.end_x_inches,
+        )
+        end_y = validate_finite_number(
+            "BasePointDistanceWitness end_y_inches",
+            self.end_y_inches,
+        )
+        distance = _validate_non_negative_number(
+            "BasePointDistanceWitness distance_inches",
+            self.distance_inches,
+        )
+        expected_distance = math.hypot(end_x - start_x, end_y - start_y)
+        if not math.isclose(distance, expected_distance, rel_tol=0.0, abs_tol=1e-9):
+            raise GeometryError("BasePointDistanceWitness distance_inches drift.")
+        object.__setattr__(self, "start_x_inches", start_x)
+        object.__setattr__(self, "start_y_inches", start_y)
+        object.__setattr__(self, "end_x_inches", end_x)
+        object.__setattr__(self, "end_y_inches", end_y)
+        object.__setattr__(self, "distance_inches", distance)
+
+    @classmethod
+    def from_points(
+        cls,
+        *,
+        point_id: str,
+        start_x_inches: float,
+        start_y_inches: float,
+        end_x_inches: float,
+        end_y_inches: float,
+    ) -> Self:
+        return cls(
+            point_id=point_id,
+            start_x_inches=start_x_inches,
+            start_y_inches=start_y_inches,
+            end_x_inches=end_x_inches,
+            end_y_inches=end_y_inches,
+            distance_inches=math.hypot(
+                end_x_inches - start_x_inches,
+                end_y_inches - start_y_inches,
+            ),
+        )
+
+    def to_payload(self) -> BasePointDistanceWitnessPayload:
+        return {
+            "point_id": self.point_id,
+            "start_x_inches": self.start_x_inches,
+            "start_y_inches": self.start_y_inches,
+            "end_x_inches": self.end_x_inches,
+            "end_y_inches": self.end_y_inches,
+            "distance_inches": self.distance_inches,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: BasePointDistanceWitnessPayload) -> Self:
+        return cls(
+            point_id=payload["point_id"],
+            start_x_inches=payload["start_x_inches"],
+            start_y_inches=payload["start_y_inches"],
+            end_x_inches=payload["end_x_inches"],
+            end_y_inches=payload["end_y_inches"],
+            distance_inches=payload["distance_inches"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AircraftBaseMovementWitness:
+    model_id: str
+    base: BaseShape
+    start_pose: Pose
+    movement_end_pose: Pose
+    minimum_move_inches: float
+    used_circular_center_shortcut: bool
+    point_distances: tuple[BasePointDistanceWitness, ...]
+
+    def __post_init__(self) -> None:
+        model_id = _validate_identifier("AircraftBaseMovementWitness model_id", self.model_id)
+        base = validate_base_shape("AircraftBaseMovementWitness base", self.base)
+        start_pose = validate_pose("AircraftBaseMovementWitness start_pose", self.start_pose)
+        movement_end_pose = validate_pose(
+            "AircraftBaseMovementWitness movement_end_pose",
+            self.movement_end_pose,
+        )
+        minimum_move_inches = _validate_positive_number(
+            "AircraftBaseMovementWitness minimum_move_inches",
+            self.minimum_move_inches,
+        )
+        _validate_bool(
+            "AircraftBaseMovementWitness used_circular_center_shortcut",
+            self.used_circular_center_shortcut,
+        )
+        point_distances = _validate_base_point_distance_witnesses(
+            "AircraftBaseMovementWitness point_distances",
+            self.point_distances,
+        )
+        circular_shortcut_expected = type(base) is CircularBase
+        if self.used_circular_center_shortcut != circular_shortcut_expected:
+            raise GeometryError(
+                "AircraftBaseMovementWitness circular shortcut must match base shape."
+            )
+        if self.used_circular_center_shortcut and (
+            len(point_distances) != 1 or point_distances[0].point_id != "center"
+        ):
+            raise GeometryError(
+                "AircraftBaseMovementWitness circular shortcut must use only center."
+            )
+        object.__setattr__(self, "model_id", model_id)
+        object.__setattr__(self, "base", base)
+        object.__setattr__(self, "start_pose", start_pose)
+        object.__setattr__(self, "movement_end_pose", movement_end_pose)
+        object.__setattr__(self, "minimum_move_inches", minimum_move_inches)
+        object.__setattr__(
+            self,
+            "point_distances",
+            tuple(sorted(point_distances, key=lambda point: point.point_id)),
+        )
+
+    @classmethod
+    def for_model_movement(
+        cls,
+        *,
+        model: Model,
+        movement_end_pose: Pose,
+        minimum_move_inches: float,
+    ) -> Self:
+        valid_model = _validate_model("AircraftBaseMovementWitness model", model)
+        end_pose = validate_pose("AircraftBaseMovementWitness movement_end_pose", movement_end_pose)
+        point_distances = tuple(
+            BasePointDistanceWitness.from_points(
+                point_id=point_id,
+                start_x_inches=start_x,
+                start_y_inches=start_y,
+                end_x_inches=end_x,
+                end_y_inches=end_y,
+            )
+            for point_id, start_x, start_y, end_x, end_y in _base_point_movements(
+                base=valid_model.base,
+                start_pose=valid_model.pose,
+                movement_end_pose=end_pose,
+            )
+        )
+        return cls(
+            model_id=valid_model.model_id,
+            base=valid_model.base,
+            start_pose=valid_model.pose,
+            movement_end_pose=end_pose,
+            minimum_move_inches=minimum_move_inches,
+            used_circular_center_shortcut=type(valid_model.base) is CircularBase,
+            point_distances=point_distances,
+        )
+
+    @property
+    def minimum_point_distance_inches(self) -> float:
+        return min(point.distance_inches for point in self.point_distances)
+
+    @property
+    def minimum_move_satisfied(self) -> bool:
+        return self.minimum_point_distance_inches + 1e-9 >= self.minimum_move_inches
+
+    def to_payload(self) -> AircraftBaseMovementWitnessPayload:
+        return {
+            "model_id": self.model_id,
+            "base": self.base.to_payload(),
+            "start_pose": self.start_pose.to_payload(),
+            "movement_end_pose": self.movement_end_pose.to_payload(),
+            "minimum_move_inches": self.minimum_move_inches,
+            "used_circular_center_shortcut": self.used_circular_center_shortcut,
+            "point_distances": [point.to_payload() for point in self.point_distances],
+            "minimum_point_distance_inches": self.minimum_point_distance_inches,
+            "minimum_move_satisfied": self.minimum_move_satisfied,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AircraftBaseMovementWitnessPayload) -> Self:
+        witness = cls(
+            model_id=payload["model_id"],
+            base=base_shape_from_payload(payload["base"]),
+            start_pose=Pose.from_payload(payload["start_pose"]),
+            movement_end_pose=Pose.from_payload(payload["movement_end_pose"]),
+            minimum_move_inches=payload["minimum_move_inches"],
+            used_circular_center_shortcut=payload["used_circular_center_shortcut"],
+            point_distances=tuple(
+                BasePointDistanceWitness.from_payload(point) for point in payload["point_distances"]
+            ),
+        )
+        payload_minimum = _validate_non_negative_number(
+            "AircraftBaseMovementWitness minimum_point_distance_inches",
+            payload["minimum_point_distance_inches"],
+        )
+        if not math.isclose(
+            payload_minimum,
+            witness.minimum_point_distance_inches,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        ):
+            raise GeometryError("AircraftBaseMovementWitness minimum distance drift.")
+        _validate_bool(
+            "AircraftBaseMovementWitness minimum_move_satisfied",
+            payload["minimum_move_satisfied"],
+        )
+        if payload["minimum_move_satisfied"] != witness.minimum_move_satisfied:
+            raise GeometryError("AircraftBaseMovementWitness satisfaction drift.")
+        return witness
 
 
 @dataclass(frozen=True, slots=True)
@@ -793,6 +1051,26 @@ def _validate_model(field_name: str, value: object) -> Model:
     return value
 
 
+def _validate_base_point_distance_witnesses(
+    field_name: str,
+    values: object,
+) -> tuple[BasePointDistanceWitness, ...]:
+    if type(values) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    witnesses: list[BasePointDistanceWitness] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not BasePointDistanceWitness:
+            raise GeometryError(f"{field_name} must contain BasePointDistanceWitness values.")
+        if value.point_id in seen:
+            raise GeometryError(f"{field_name} must not contain duplicate point IDs.")
+        seen.add(value.point_id)
+        witnesses.append(value)
+    if not witnesses:
+        raise GeometryError(f"{field_name} must not be empty.")
+    return tuple(witnesses)
+
+
 def _validate_movement_segments(
     field_name: str,
     values: object,
@@ -950,6 +1228,96 @@ def _same_point_segment_distance(start: Pose, end: Pose) -> float:
     start_pose = validate_pose("start", start)
     end_pose = validate_pose("end", end)
     return start_pose.distance_3d_to(end_pose)
+
+
+def _base_point_movements(
+    *,
+    base: BaseShape,
+    start_pose: Pose,
+    movement_end_pose: Pose,
+) -> tuple[tuple[str, float, float, float, float], ...]:
+    valid_base = validate_base_shape("base", base)
+    start = validate_pose("start_pose", start_pose)
+    end = validate_pose("movement_end_pose", movement_end_pose)
+    movements: list[tuple[str, float, float, float, float]] = []
+    for point_id, local_x, local_y in _base_point_offsets(valid_base):
+        start_x, start_y = _world_point_from_local_offset(
+            pose=start,
+            local_x=local_x,
+            local_y=local_y,
+        )
+        end_x, end_y = _world_point_from_local_offset(
+            pose=end,
+            local_x=local_x,
+            local_y=local_y,
+        )
+        movements.append((point_id, start_x, start_y, end_x, end_y))
+    return tuple(movements)
+
+
+def _base_point_offsets(base: BaseShape) -> tuple[tuple[str, float, float], ...]:
+    valid_base = validate_base_shape("base", base)
+    if type(valid_base) is CircularBase:
+        return (("center", 0.0, 0.0),)
+    if type(valid_base) is RectangularBase:
+        half_length = valid_base.length / 2.0
+        half_width = valid_base.width / 2.0
+        fixed_offsets = (
+            ("corner_back_left", -half_length, -half_width),
+            ("corner_back_right", -half_length, half_width),
+            ("corner_front_left", half_length, -half_width),
+            ("corner_front_right", half_length, half_width),
+            ("edge_back", -half_length, 0.0),
+            ("edge_front", half_length, 0.0),
+            ("edge_left", 0.0, -half_width),
+            ("edge_right", 0.0, half_width),
+            ("center", 0.0, 0.0),
+        )
+        radial_offsets = tuple(
+            _radial_base_point_offset(base=valid_base, angle_degrees=angle_degrees)
+            for angle_degrees in _AIRCRAFT_BASE_POINT_SAMPLE_DEGREES
+        )
+        return (*fixed_offsets, *radial_offsets)
+    radial_offsets = tuple(
+        _radial_base_point_offset(base=valid_base, angle_degrees=angle_degrees)
+        for angle_degrees in _AIRCRAFT_BASE_POINT_SAMPLE_DEGREES
+    )
+    return (("center", 0.0, 0.0), *radial_offsets)
+
+
+def _radial_base_point_offset(
+    *,
+    base: BaseShape,
+    angle_degrees: int,
+) -> tuple[str, float, float]:
+    angle = validate_finite_number("angle_degrees", angle_degrees)
+    angle_radians = math.radians(angle)
+    if type(base) is OvalBase:
+        local_x = (base.length / 2.0) * math.cos(angle_radians)
+        local_y = (base.width / 2.0) * math.sin(angle_radians)
+    else:
+        radius = base.radius_at_angle(angle, Facing(0.0))
+        local_x = radius * math.cos(angle_radians)
+        local_y = radius * math.sin(angle_radians)
+    return (f"radial_{angle_degrees:03d}", local_x, local_y)
+
+
+def _world_point_from_local_offset(
+    *,
+    pose: Pose,
+    local_x: float,
+    local_y: float,
+) -> tuple[float, float]:
+    valid_pose = validate_pose("pose", pose)
+    valid_local_x = validate_finite_number("local_x", local_x)
+    valid_local_y = validate_finite_number("local_y", local_y)
+    facing_radians = math.radians(valid_pose.facing.degrees)
+    cos_facing = math.cos(facing_radians)
+    sin_facing = math.sin(facing_radians)
+    return (
+        valid_pose.position.x + (valid_local_x * cos_facing) - (valid_local_y * sin_facing),
+        valid_pose.position.y + (valid_local_x * sin_facing) + (valid_local_y * cos_facing),
+    )
 
 
 def _circular_base_diameter_mm(base: CircularBase) -> float:

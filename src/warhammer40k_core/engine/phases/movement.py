@@ -19,6 +19,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.aircraft import (
+    AircraftMinimumMoveResult,
     AircraftMovementPolicy,
     AircraftMovementPolicyPayload,
     AircraftMovementViolation,
@@ -93,7 +94,6 @@ from warhammer40k_core.engine.unit_coherency import (
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pathing import (
     PathConstraintViolation,
     PathValidationResult,
@@ -102,6 +102,7 @@ from warhammer40k_core.geometry.pathing import (
     PathWitnessPayload,
     TerrainPathLegalityResult,
     TerrainPathLegalityResultPayload,
+    model_is_within_battlefield_footprint,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
@@ -1482,9 +1483,35 @@ class NormalMoveResolution:
         if selected_payload.get("aircraft_movement_policy") != expected_aircraft_policy:
             return "normal_move_aircraft_policy_drift"
         expected_model_movements = self.movement_payload["model_movements"]
+        expected_aircraft_minimum = _aircraft_minimum_move_payloads(expected_model_movements)
+        if expected_aircraft_minimum:
+            selected_aircraft_minimum = _aircraft_minimum_move_payloads(
+                selected_payload.get("model_movements")
+            )
+            if selected_aircraft_minimum != expected_aircraft_minimum:
+                return "normal_move_aircraft_minimum_move_witness_drift"
         if selected_payload.get("model_movements") != expected_model_movements:
             return "normal_move_model_movement_witness_drift"
         return None
+
+
+def _aircraft_minimum_move_payloads(
+    model_movements: object,
+) -> dict[str, JsonValue] | None:
+    validated_model_movements = validate_json_value(model_movements)
+    if not isinstance(validated_model_movements, list):
+        return None
+    payloads: dict[str, JsonValue] = {}
+    for value in validated_model_movements:
+        if not isinstance(value, dict):
+            return None
+        model_instance_id = value.get("model_instance_id")
+        if type(model_instance_id) is not str:
+            return None
+        minimum_move_payload = value.get("aircraft_minimum_move_result")
+        if minimum_move_payload is not None:
+            payloads[model_instance_id] = minimum_move_payload
+    return payloads
 
 
 @dataclass(frozen=True, slots=True)
@@ -4913,11 +4940,15 @@ def _resolve_unit_move(
             movement_distance_budget_inches=movement_distance_budget_inches,
         ).validate()
         aircraft_violations: tuple[AircraftMovementViolation, ...] = ()
+        aircraft_minimum_move_result: AircraftMinimumMoveResult | None = None
         if (
             aircraft_policy.uses_aircraft_rules
             and movement_phase_action is MovementPhaseActionKind.NORMAL_MOVE
         ):
-            aircraft_violations = aircraft_policy.validate_normal_move_witness(
+            (
+                aircraft_violations,
+                aircraft_minimum_move_result,
+            ) = aircraft_policy.validate_normal_move_witness_with_minimum_result(
                 moving_model=moving_model,
                 witness=model_witness,
             )
@@ -4949,6 +4980,10 @@ def _resolve_unit_move(
             "path_validation_result": path_result.to_payload(),
             "terrain_path_legality_result": terrain_result.to_payload(),
         }
+        if aircraft_minimum_move_result is not None:
+            model_movement_payload["aircraft_minimum_move_result"] = (
+                aircraft_minimum_move_result.to_payload()
+            )
         if aircraft_violations:
             model_movement_payload["aircraft_movement_violations"] = [
                 violation.to_payload() for violation in aircraft_violations
@@ -5823,26 +5858,13 @@ def _aircraft_minimum_move_unavailable(
     if type(moving_model) is not Model:
         raise GameLifecycleError("Aircraft minimum move requires a geometry Model.")
     endpoint = _translated_forward_pose(moving_model.pose, movement_inches=minimum_move_inches)
-    return not _model_is_within_battlefield(
-        _model_at_pose(moving_model, endpoint),
-        battlefield_width_inches=battlefield_width_inches,
-        battlefield_depth_inches=battlefield_depth_inches,
-    )
-
-
-def _model_is_within_battlefield(
-    model: Model,
-    *,
-    battlefield_width_inches: float,
-    battlefield_depth_inches: float,
-) -> bool:
-    if type(model) is not Model:
-        raise GameLifecycleError("Battlefield containment requires a geometry Model.")
     width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
     depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
-    footprint_bounds = shapely_backend.footprint_for_base(model.base, model.pose).bounds
-    min_x, min_y, max_x, max_y = footprint_bounds
-    return min_x >= 0.0 and min_y >= 0.0 and max_x <= width and max_y <= depth
+    return not model_is_within_battlefield_footprint(
+        _model_at_pose(moving_model, endpoint),
+        battlefield_width_inches=width,
+        battlefield_depth_inches=depth,
+    )
 
 
 def _translated_forward_pose(pose: Pose, *, movement_inches: float) -> Pose:

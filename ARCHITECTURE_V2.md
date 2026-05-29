@@ -637,6 +637,9 @@ Modules:
 Objects:
 
 - `AircraftMovementPolicy`
+- `AircraftMinimumMoveResult`
+- `AircraftBaseMovementWitness`
+- `BasePointDistanceWitness`
 - `AircraftReserveTransition`
 - `HoverModeState`
 
@@ -644,6 +647,7 @@ Invariants:
 
 - `AIRCRAFT` have special pivot and movement behavior;
 - non-Hover `AIRCRAFT` use aircraft-policy movement distance resolution, with no upper Normal Move budget and a default 20" straight-forward witness instead of datasheet `M`;
+- non-Hover `AIRCRAFT` minimum-move validation is base-geometry aware: circular bases may use the center-distance shortcut, while oval, rectangular, and other non-circular bases serialize deterministic point-distance witnesses for the pre-pivot movement endpoint;
 - non-Hover `AIRCRAFT` that cross a battlefield edge or cannot satisfy minimum move during a Movement phase Normal Move transition into Strategic Reserves through the lifecycle path, while short submitted witnesses remain invalid when a legal 20" move is available;
 - aircraft reserve transitions remove the unit from the battlefield, record mandatory next-controller-turn arrival metadata, and complete the movement activation without ordinary displacement records or post-move Embark;
 - `HOVER` mode is stored in `GameState`, round-trips through replay payloads, changes movement policy, and uses a Hover-derived 20" Move characteristic for Normal Move and Advance budgets;
@@ -654,18 +658,15 @@ Invariants:
 Required tests:
 
 - aircraft pivot policy uses 0" in generic pivot accounting;
+- circular and non-circular Aircraft bases validate the 20" minimum with deterministic base-movement witnesses, and pivot-after-move never contributes to the minimum;
 - aircraft reserve transition emits removal/placement records as appropriate;
 - Movement phase Normal Move lifecycle transitions edge/minimum-move-unavailable Aircraft into Strategic Reserves;
 - central non-Hover Aircraft get a default 20" straight-forward Normal Move witness with no movement-distance budget, and short submitted witnesses are invalid rather than reserve transitions when 20" fits;
 - Aircraft transition ReserveState is eligible and required in the controller's next Movement phase only;
 - persisted hover state changes movement availability, uses 20"/20"+D6 movement budgets, and disables Aircraft minimum-move/pivot restrictions;
-- replay rejects HoverModeState owner/unit/source drift and stale selected Aircraft policy payloads;
+- replay rejects HoverModeState owner/unit/source drift, stale selected Aircraft policy payloads, and stale Aircraft minimum-move witness payloads;
 - non-Aircraft units engaged only by enemy Aircraft can choose Normal Move and Advance, but cannot end within enemy Aircraft Engagement Range;
 - aircraft setup/arrival validates battlefield and terrain restrictions.
-
-Tracked follow-up:
-
-- base-geometry minimum-move validation should eventually confirm that every part of a non-circular Aircraft base ends at least 20" from its starting position, not only the current center/path translation witness.
 
 CORE V1 relevant areas:
 

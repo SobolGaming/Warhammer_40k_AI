@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import math
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import replace
 from typing import cast
 
@@ -80,8 +80,11 @@ from warhammer40k_core.engine.reserves import (
     ReservePlacementViolationCode,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.geometry.base import CircularBase
-from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness
+from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase
+from warhammer40k_core.geometry.movement_envelope import (
+    AircraftBaseMovementWitness,
+    MovementDistanceWitness,
+)
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
@@ -134,6 +137,143 @@ def test_aircraft_policy_uses_zero_pivot_cost_and_validates_forward_move() -> No
     assert policy.maximum_pivot_degrees == 90.0
     assert distance.pivot_cost_inches == 0.0
     assert policy.validate_normal_move_witness(moving_model=moving_model, witness=witness) == ()
+
+
+def test_circular_aircraft_base_twenty_inch_translation_satisfies_minimum() -> None:
+    _scenario, aircraft, _enemy = _aircraft_scenario()
+    moving_model = _aircraft_geometry_model(
+        aircraft=aircraft,
+        base=CircularBase(radius=1.0),
+        pose=Pose.at(10.0, 10.0),
+    )
+    witness = _model_path_witness(moving_model, Pose.at(30.0, 10.0))
+    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
+
+    violations, minimum_result = policy.validate_normal_move_witness_with_minimum_result(
+        moving_model=moving_model,
+        witness=witness,
+    )
+
+    assert violations == ()
+    assert minimum_result is not None
+    assert minimum_result.minimum_move_satisfied
+    assert minimum_result.base_movement_witness.used_circular_center_shortcut
+    assert math.isclose(
+        minimum_result.base_movement_witness.minimum_point_distance_inches,
+        20.0,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    )
+    payload = minimum_result.base_movement_witness.to_payload()
+    assert AircraftBaseMovementWitness.from_payload(payload).to_payload() == payload
+
+
+def test_circular_aircraft_base_short_translation_fails_minimum() -> None:
+    _scenario, aircraft, _enemy = _aircraft_scenario()
+    moving_model = _aircraft_geometry_model(
+        aircraft=aircraft,
+        base=CircularBase(radius=1.0),
+        pose=Pose.at(10.0, 10.0),
+    )
+    witness = _model_path_witness(moving_model, Pose.at(29.99, 10.0))
+    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
+
+    violations, minimum_result = policy.validate_normal_move_witness_with_minimum_result(
+        moving_model=moving_model,
+        witness=witness,
+    )
+
+    assert minimum_result is not None
+    assert not minimum_result.minimum_move_satisfied
+    assert math.isclose(
+        minimum_result.base_movement_witness.minimum_point_distance_inches,
+        19.99,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    )
+    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED in {
+        violation.violation_code for violation in violations
+    }
+
+
+def test_non_circular_aircraft_base_uses_footprint_aware_minimum_move() -> None:
+    _scenario, aircraft, _enemy = _aircraft_scenario()
+    moving_model = _aircraft_geometry_model(
+        aircraft=aircraft,
+        base=OvalBase(length=8.0, width=2.0),
+        pose=Pose.at(10.0, 10.0),
+    )
+    center_translation_with_rotation = _model_path_witness(
+        moving_model,
+        Pose.at(30.0, 10.0, facing_degrees=180.0),
+    )
+    pure_translation = _model_path_witness(moving_model, Pose.at(30.0, 10.0))
+    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
+
+    failing_violations, failing_result = policy.validate_normal_move_witness_with_minimum_result(
+        moving_model=moving_model,
+        witness=center_translation_with_rotation,
+    )
+    passing_violations, passing_result = policy.validate_normal_move_witness_with_minimum_result(
+        moving_model=moving_model,
+        witness=pure_translation,
+    )
+
+    assert failing_result is not None
+    assert failing_result.base_movement_witness.minimum_point_distance_inches < 20.0
+    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED in {
+        violation.violation_code for violation in failing_violations
+    }
+    assert passing_result is not None
+    assert passing_result.minimum_move_satisfied
+    assert math.isclose(
+        passing_result.base_movement_witness.minimum_point_distance_inches,
+        20.0,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    )
+    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED not in {
+        violation.violation_code for violation in passing_violations
+    }
+
+
+def test_aircraft_pivot_after_move_does_not_satisfy_minimum_move() -> None:
+    _scenario, aircraft, _enemy = _aircraft_scenario()
+    moving_model = _aircraft_geometry_model(
+        aircraft=aircraft,
+        base=CircularBase(radius=1.0),
+        pose=Pose.at(10.0, 10.0),
+    )
+    witness = PathWitness.for_paths(
+        (
+            (
+                moving_model.model_id,
+                (
+                    moving_model.pose,
+                    Pose.at(29.0, 10.0),
+                    Pose.at(29.0, 10.0, facing_degrees=90.0),
+                ),
+            ),
+        )
+    )
+    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
+
+    violations, minimum_result = policy.validate_normal_move_witness_with_minimum_result(
+        moving_model=moving_model,
+        witness=witness,
+    )
+
+    assert minimum_result is not None
+    assert minimum_result.base_movement_witness.movement_end_pose == Pose.at(29.0, 10.0)
+    assert math.isclose(
+        minimum_result.base_movement_witness.minimum_point_distance_inches,
+        19.0,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    )
+    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED in {
+        violation.violation_code for violation in violations
+    }
 
 
 def test_hover_mode_state_changes_aircraft_policy_and_round_trips() -> None:
@@ -793,6 +933,47 @@ def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() 
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
 
 
+def test_aircraft_edge_transition_uses_full_base_footprint_containment() -> None:
+    scenario, aircraft, _enemy = _aircraft_scenario()
+    aircraft_radius = _first_model_radius_x(aircraft)
+    aircraft_pose = Pose.at(
+        60.0 - aircraft_radius + 0.1 - 20.0,
+        10.0,
+    )
+    state = _battle_state_from_scenario(
+        _with_unit_first_model_pose(
+            scenario=scenario,
+            unit_instance_id=aircraft.unit_instance_id,
+            pose=aircraft_pose,
+        )
+    )
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=aircraft.unit_instance_id,
+    )
+
+    status = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        result_id="phase10r-aircraft-footprint-edge",
+    )
+
+    assert status is None
+    reserve_state = state.reserve_state_for_unit(aircraft.unit_instance_id)
+    assert reserve_state is not None
+    assert reserve_state.required_arrival_source_rule_id == (
+        AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED.value
+    )
+    completed_payload = _last_event_payload(decisions, "movement_activation_completed")
+    transition_payload = cast(dict[str, object], completed_payload["aircraft_reserve_transition"])
+    assert transition_payload["reason"] == (
+        AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED.value
+    )
+
+
 def test_aircraft_submitted_short_witness_is_invalid_when_minimum_move_fits() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
     assert state.battlefield_state is not None
@@ -823,6 +1004,41 @@ def test_aircraft_submitted_short_witness_is_invalid_when_minimum_move_fits() ->
     assert state.reserve_state_for_unit(aircraft.unit_instance_id) is None
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == original_battlefield_payload
+
+
+def test_normal_move_rejects_aircraft_minimum_move_witness_replay_drift() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=aircraft.unit_instance_id,
+    )
+    unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
+        aircraft.unit_instance_id
+    )
+    witness = _single_model_forward_witness(unit_placement, movement_inches=20.0)
+
+    def mutate_minimum_move_witness(payload: dict[str, object]) -> None:
+        model_movements = cast(list[object], payload["model_movements"])
+        model_payload = cast(dict[str, object], model_movements[0])
+        minimum_result = cast(dict[str, object], model_payload["aircraft_minimum_move_result"])
+        base_witness = cast(dict[str, object], minimum_result["base_movement_witness"])
+        base_witness["minimum_point_distance_inches"] = 19.0
+
+    status = _submit_custom_normal_move_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        unit_placement=unit_placement,
+        witness=witness,
+        result_id="phase10r-aircraft-minimum-witness-drift",
+        payload_mutation=mutate_minimum_move_witness,
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    status_payload = cast(dict[str, object], status.payload)
+    assert status_payload["violation_code"] == "normal_move_aircraft_minimum_move_witness_drift"
 
 
 def test_aircraft_short_witness_transitions_when_mandatory_minimum_move_cannot_fit() -> None:
@@ -1282,6 +1498,7 @@ def _submit_custom_normal_move_decision(
     unit_placement: UnitPlacement,
     witness: PathWitness,
     result_id: str,
+    payload_mutation: Callable[[dict[str, object]], None] | None = None,
 ) -> LifecycleStatus | None:
     resolution = resolve_normal_move(
         scenario=_scenario_from_state(state),
@@ -1290,15 +1507,16 @@ def _submit_custom_normal_move_decision(
         path_witness=witness,
         hover_mode_states=tuple(state.hover_mode_states),
     )
-    custom_payload = validate_json_value(
-        {
-            "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
-            "displacement_kind": "normal_move",
-            "unit_instance_id": unit_placement.unit_instance_id,
-            "witness": resolution.witness.to_payload(),
-            **resolution.movement_payload,
-        }
-    )
+    custom_payload_data: dict[str, object] = {
+        "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+        "displacement_kind": "normal_move",
+        "unit_instance_id": unit_placement.unit_instance_id,
+        "witness": resolution.witness.to_payload(),
+        **resolution.movement_payload,
+    }
+    if payload_mutation is not None:
+        payload_mutation(custom_payload_data)
+    custom_payload = validate_json_value(custom_payload_data)
     custom_options = tuple(
         DecisionOption(
             option_id=option.option_id,
@@ -1607,6 +1825,24 @@ def _geometry_model(model_id: str, *, x: float, y: float) -> Model:
         base=CircularBase(radius=0.5),
         volume=ModelVolume(height=2.0),
     )
+
+
+def _aircraft_geometry_model(
+    *,
+    aircraft: UnitInstance,
+    base: BaseShape,
+    pose: Pose,
+) -> Model:
+    return Model(
+        model_id=aircraft.own_models[0].model_instance_id,
+        pose=pose,
+        base=base,
+        volume=ModelVolume(height=2.0),
+    )
+
+
+def _model_path_witness(model: Model, end_pose: Pose) -> PathWitness:
+    return PathWitness.for_paths(((model.model_id, (model.pose, end_pose)),))
 
 
 def _ruleset() -> RulesetDescriptor:
