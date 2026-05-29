@@ -511,6 +511,11 @@ def test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary() -
         "current_phase": BattlePhase.SHOOTING.value,
     }
     assert tuple(event.event_type for event in decisions.event_log.records) == (
+        "command_points_gained",
+        "command_points_gained",
+        "command_step_started",
+        "command_phase_scoring_hooks_resolved",
+        "battle_shock_step_completed",
         "battle_phase_completed",
         "phase_body_placeholder_noop",
         "battle_phase_completed",
@@ -795,6 +800,7 @@ def test_lifecycle_from_payload_rejects_mustered_army_state_drift() -> None:
 
     missing_armies = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
     missing_armies["state"]["army_definitions"] = []
+    missing_armies["state"]["starting_strength_records"] = []
     with pytest.raises(GameLifecycleError, match="mustered army definitions"):
         GameLifecycle.from_payload(missing_armies)
 

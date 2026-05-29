@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 11B** is treated as implemented at the time this file was updated. Phase 11C is the next build slice.
+Everything through **Phase 11C** is treated as implemented at the time this file was updated. Phase 11D is the next build slice.
 
 Completed / implemented foundation:
 
@@ -68,6 +68,7 @@ Completed / implemented foundation:
 | 10V | Complete | Movement audit hardening and deferred-wiring contracts |
 | 11A | Complete | Chapter Approved 2025-26 mission pack data |
 | 11B | Complete | Objective control geometry and mission objective model |
+| 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
 
 ## Cross-cutting architectural rules
 
@@ -969,6 +970,8 @@ Required tests:
 
 ## Phase 11C: Command phase body: Command step, CP, Battle-shock, and OC updates
 
+Status: Complete.
+
 Modules:
 
 - `engine/phases/command.py`
@@ -993,6 +996,7 @@ Invariants:
 - outside the normal Command-phase CP gain, each player can gain only 1CP per battle round, regardless of source, unless a rule explicitly overrides this;
 - below-half-strength units on the battlefield create Battle-shock test requests during the Battle-shock step;
 - a Battle-shock test rolls 2D6 and passes if the total is greater than or equal to the best Leadership in that unit;
+- non-reroll Battle-shock dice are deterministic engine-internal dice; future reroll or choice hooks must pause through `DecisionRequest` before mutation;
 - if a unit is forced to test for being below Starting Strength, it does not also test for being Below Half-strength unless a rule says otherwise;
 - failed Battle-shock marks the unit and all its models Battle-shocked until the start of the controlling player's next Command phase;
 - Battle-shocked units have OC 0;
@@ -1012,7 +1016,8 @@ Required tests:
 - passed Battle-shock avoids Battle-shocked state;
 - Battle-shocked unit cannot be targeted by friendly Stratagems by default;
 - Starting Strength and Below Half-strength logic works for single-model and multi-model units;
-- Command phase stops at required dice/decision requests.
+- Attached-unit split recovery restores surviving component units to their original Starting Strength records;
+- Command phase stops at required decision requests and resolves non-reroll Battle-shock dice deterministically without a player-choice pause.
 
 ## Phase 11D: adapter scaffold and parameterized movement/placement proposal requests
 

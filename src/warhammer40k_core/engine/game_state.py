@@ -21,12 +21,26 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     ArmyMusterRequestPayload,
 )
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockedUnitState,
+    BattleShockedUnitStatePayload,
+    BattleShockResult,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldRuntimeStatePayload,
     BattlefieldScenario,
     PlacementError,
     geometry_model_for_placement,
+)
+from warhammer40k_core.engine.command_points import (
+    CommandPointGainResult,
+    CommandPointLedger,
+    CommandPointLedgerPayload,
+    CommandPointSourceKind,
+    CommandStepState,
+    CommandStepStatePayload,
+    initial_command_point_ledgers,
 )
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
@@ -63,6 +77,12 @@ from warhammer40k_core.engine.transports import (
     TransportCargoStatePayload,
 )
 from warhammer40k_core.engine.triggered_movement import SurgeMoveState, SurgeMoveStatePayload
+from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_state import (
+    StartingStrengthRecord,
+    StartingStrengthRecordPayload,
+    starting_strength_records_for_units,
+)
 
 
 class SecondaryMissionMode(StrEnum):
@@ -110,7 +130,10 @@ class GameStatePayload(TypedDict):
     turn_order: list[str]
     decision_request_count: int
     tactical_secondary_draw_count: int
+    command_step_state: CommandStepStatePayload | None
+    command_point_ledgers: list[CommandPointLedgerPayload]
     army_definitions: list[ArmyDefinitionPayload]
+    starting_strength_records: list[StartingStrengthRecordPayload]
     battlefield_state: BattlefieldRuntimeStatePayload | None
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
@@ -122,6 +145,7 @@ class GameStatePayload(TypedDict):
     fell_back_unit_states: list[FellBackUnitStatePayload]
     surge_move_states: list[SurgeMoveStatePayload]
     battle_shocked_unit_ids: list[str]
+    battle_shocked_unit_states: list[BattleShockedUnitStatePayload]
     objective_control_records: list[ObjectiveControlRecordPayload]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
@@ -147,6 +171,14 @@ def _new_surge_move_states() -> list[SurgeMoveState]:
     return []
 
 
+def _new_command_point_ledgers() -> list[CommandPointLedger]:
+    return []
+
+
+def _new_starting_strength_records() -> list[StartingStrengthRecord]:
+    return []
+
+
 def _new_reserve_states() -> list[ReserveState]:
     return []
 
@@ -164,6 +196,10 @@ def _new_disembarked_unit_states() -> list[DisembarkedUnitState]:
 
 
 def _new_battle_shocked_unit_ids() -> list[str]:
+    return []
+
+
+def _new_battle_shocked_unit_states() -> list[BattleShockedUnitState]:
     return []
 
 
@@ -415,7 +451,14 @@ class GameState:
     battle_round: int = 0
     active_player_id: str | None = None
     decision_request_count: int = 0
+    command_step_state: CommandStepState | None = None
+    command_point_ledgers: list[CommandPointLedger] = field(
+        default_factory=_new_command_point_ledgers
+    )
     army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
+    starting_strength_records: list[StartingStrengthRecord] = field(
+        default_factory=_new_starting_strength_records
+    )
     battlefield_state: BattlefieldRuntimeState | None = None
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
@@ -433,6 +476,9 @@ class GameState:
     )
     surge_move_states: list[SurgeMoveState] = field(default_factory=_new_surge_move_states)
     battle_shocked_unit_ids: list[str] = field(default_factory=_new_battle_shocked_unit_ids)
+    battle_shocked_unit_states: list[BattleShockedUnitState] = field(
+        default_factory=_new_battle_shocked_unit_states
+    )
     objective_control_records: list[ObjectiveControlRecord] = field(
         default_factory=_new_objective_control_records
     )
@@ -486,8 +532,18 @@ class GameState:
             "GameState decision_request_count",
             self.decision_request_count,
         )
+        self.command_step_state = _validate_optional_command_step_state(self.command_step_state)
+        self.command_point_ledgers = _validate_command_point_ledgers(
+            self.command_point_ledgers,
+            player_ids=self.player_ids,
+        )
         self.army_definitions = _validate_army_definitions(
             self.army_definitions,
+            player_ids=self.player_ids,
+        )
+        self.starting_strength_records = _validate_starting_strength_records(
+            self.starting_strength_records,
+            army_definitions=self.army_definitions,
             player_ids=self.player_ids,
         )
         self.battlefield_state = _validate_optional_battlefield_state(self.battlefield_state)
@@ -534,6 +590,12 @@ class GameState:
                 sort_values=True,
             )
         )
+        self.battle_shocked_unit_states = _validate_battle_shocked_unit_states(
+            self.battle_shocked_unit_states,
+            army_definitions=self.army_definitions,
+            battle_shocked_unit_ids=tuple(self.battle_shocked_unit_ids),
+            player_ids=self.player_ids,
+        )
         self.objective_control_records = _validate_objective_control_records(
             self.objective_control_records,
             game_id=self.game_id,
@@ -561,6 +623,7 @@ class GameState:
             player_ids=config.player_ids,
             turn_order=config.turn_order,
             tactical_secondary_draw_count=config.tactical_secondary_draw_count,
+            command_point_ledgers=initial_command_point_ledgers(config.player_ids),
             mission_setup=config.mission_setup,
         )
 
@@ -612,6 +675,8 @@ class GameState:
             timing=ObjectiveControlTiming.PHASE_END,
         )
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
+            if completed_phase is BattlePhase.COMMAND:
+                self.command_step_state = None
             if completed_phase is BattlePhase.MOVEMENT:
                 self.movement_phase_state = None
             self.battle_phase_index += 1
@@ -627,6 +692,8 @@ class GameState:
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.TURN_END,
         )
+        if completed_phase is BattlePhase.COMMAND:
+            self.command_step_state = None
         if completed_phase is BattlePhase.MOVEMENT:
             self.movement_phase_state = None
         self.battle_phase_index = 0
@@ -664,6 +731,7 @@ class GameState:
             raise GameLifecycleError("ArmyDefinition already exists for player.")
         self.army_definitions.append(army_definition)
         self.army_definitions.sort(key=lambda stored: stored.player_id)
+        self._record_starting_strength_records_for_army(army_definition)
 
     def army_definition_for_player(self, player_id: str) -> ArmyDefinition | None:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
@@ -675,6 +743,153 @@ class GameState:
     def missing_army_player_ids(self) -> tuple[str, ...]:
         mustered = {army_definition.player_id for army_definition in self.army_definitions}
         return tuple(player_id for player_id in self.player_ids if player_id not in mustered)
+
+    def command_point_ledger_for_player(self, player_id: str) -> CommandPointLedger:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        for ledger in self.command_point_ledgers:
+            if ledger.player_id == requested_player_id:
+                return ledger
+        raise GameLifecycleError("CommandPointLedger player_id was not found.")
+
+    def command_point_total(self, player_id: str) -> int:
+        return self.command_point_ledger_for_player(player_id).command_points
+
+    def gain_command_points(
+        self,
+        *,
+        player_id: str,
+        amount: int,
+        source_id: str,
+        source_kind: CommandPointSourceKind,
+        cap_exempt: bool = False,
+    ) -> CommandPointGainResult:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        ledger = self.command_point_ledger_for_player(requested_player_id)
+        updated, result = ledger.gain(
+            battle_round=self.battle_round,
+            amount=amount,
+            source_id=source_id,
+            source_kind=source_kind,
+            cap_exempt=cap_exempt,
+        )
+        if updated is not ledger:
+            self.command_point_ledgers = [
+                updated if stored.player_id == requested_player_id else stored
+                for stored in self.command_point_ledgers
+            ]
+            self.command_point_ledgers.sort(key=lambda stored: stored.player_id)
+        return result
+
+    def starting_strength_record_for_unit(self, unit_instance_id: str) -> StartingStrengthRecord:
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        for record in self.starting_strength_records:
+            if record.unit_instance_id == requested_unit_id:
+                return record
+        raise GameLifecycleError("StartingStrengthRecord unit_instance_id was not found.")
+
+    def recover_starting_strength_after_attached_unit_split(
+        self,
+        *,
+        player_id: str,
+        attached_unit_instance_id: str,
+        surviving_unit_instance_ids: tuple[str, ...],
+    ) -> tuple[StartingStrengthRecord, ...]:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_attached_unit_id = _validate_identifier(
+            "attached_unit_instance_id",
+            attached_unit_instance_id,
+        )
+        surviving_ids = _validate_identifier_tuple(
+            "surviving_unit_instance_ids",
+            surviving_unit_instance_ids,
+            min_length=1,
+            sort_values=True,
+        )
+        if requested_attached_unit_id in surviving_ids:
+            raise GameLifecycleError(
+                "Attached-unit split survivors must not include attached_unit_instance_id."
+            )
+        attached_record = None
+        for record in self.starting_strength_records:
+            if record.unit_instance_id == requested_attached_unit_id:
+                attached_record = record
+                break
+        if attached_record is None:
+            raise GameLifecycleError(
+                "Attached-unit split requires an existing StartingStrengthRecord for "
+                "attached_unit_instance_id."
+            )
+        if attached_record.player_id != requested_player_id:
+            raise GameLifecycleError("Attached-unit split attached record player_id drift.")
+        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        recovered_records: list[StartingStrengthRecord] = []
+        for unit_id in surviving_ids:
+            owner = unit_owner_by_id.get(unit_id)
+            if owner is None:
+                raise GameLifecycleError("Attached-unit split survivor unit is unknown.")
+            if owner != requested_player_id:
+                raise GameLifecycleError("Attached-unit split survivor player_id drift.")
+            recovered_records.append(
+                StartingStrengthRecord.from_unit(
+                    player_id=requested_player_id,
+                    unit=self._unit_by_id(unit_id),
+                )
+            )
+        replaced_ids = {*surviving_ids, requested_attached_unit_id}
+        self.starting_strength_records = [
+            record
+            for record in self.starting_strength_records
+            if record.unit_instance_id not in replaced_ids
+        ]
+        self.starting_strength_records.extend(recovered_records)
+        self.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
+        return tuple(sorted(recovered_records, key=lambda record: record.unit_instance_id))
+
+    def clear_battle_shock_for_player(self, player_id: str) -> tuple[str, ...]:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        cleared_ids = tuple(
+            unit_id
+            for unit_id in self.battle_shocked_unit_ids
+            if unit_owner_by_id.get(unit_id) == requested_player_id
+        )
+        if not cleared_ids:
+            return ()
+        cleared_set = set(cleared_ids)
+        self.battle_shocked_unit_ids = [
+            unit_id for unit_id in self.battle_shocked_unit_ids if unit_id not in cleared_set
+        ]
+        self.battle_shocked_unit_states = [
+            state
+            for state in self.battle_shocked_unit_states
+            if state.unit_instance_id not in cleared_set
+        ]
+        return tuple(sorted(cleared_ids))
+
+    def record_battle_shock_result(self, result: BattleShockResult) -> None:
+        if type(result) is not BattleShockResult:
+            raise GameLifecycleError("GameState battle_shock_result must be a BattleShockResult.")
+        if result.request.game_id != self.game_id:
+            raise GameLifecycleError("BattleShockResult game_id drift.")
+        if result.request.battle_round != self.battle_round:
+            raise GameLifecycleError("BattleShockResult battle_round drift.")
+        if result.request.player_id not in self.player_ids:
+            raise GameLifecycleError("BattleShockResult player_id is not in this game.")
+        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        owner = unit_owner_by_id.get(result.request.unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("BattleShockResult unit is unknown.")
+        if owner != result.request.player_id:
+            raise GameLifecycleError("BattleShockResult unit owner drift.")
+        unit = self._unit_by_id(result.request.unit_instance_id)
+        if not result.passed:
+            if result.request.unit_instance_id in self.battle_shocked_unit_ids:
+                raise GameLifecycleError("Battle-shocked unit is already marked.")
+            shocked_state = BattleShockedUnitState.from_result(result=result, unit=unit)
+            self.battle_shocked_unit_ids.append(result.request.unit_instance_id)
+            self.battle_shocked_unit_ids.sort()
+            self.battle_shocked_unit_states.append(shocked_state)
+            self.battle_shocked_unit_states.sort(key=lambda state: state.unit_instance_id)
 
     def record_battlefield_state(self, battlefield_state: BattlefieldRuntimeState) -> None:
         if type(battlefield_state) is not BattlefieldRuntimeState:
@@ -1055,7 +1270,14 @@ class GameState:
             "turn_order": list(self.turn_order),
             "decision_request_count": self.decision_request_count,
             "tactical_secondary_draw_count": self.tactical_secondary_draw_count,
+            "command_step_state": (
+                None if self.command_step_state is None else self.command_step_state.to_payload()
+            ),
+            "command_point_ledgers": [ledger.to_payload() for ledger in self.command_point_ledgers],
             "army_definitions": [army.to_payload() for army in self.army_definitions],
+            "starting_strength_records": [
+                record.to_payload() for record in self.starting_strength_records
+            ],
             "battlefield_state": (
                 None if self.battlefield_state is None else self.battlefield_state.to_payload()
             ),
@@ -1077,6 +1299,9 @@ class GameState:
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
             "surge_move_states": [state.to_payload() for state in self.surge_move_states],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
+            "battle_shocked_unit_states": [
+                state.to_payload() for state in self.battle_shocked_unit_states
+            ],
             "objective_control_records": [
                 record.to_payload() for record in self.objective_control_records
             ],
@@ -1129,8 +1354,21 @@ class GameState:
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
             decision_request_count=payload["decision_request_count"],
+            command_step_state=(
+                None
+                if payload["command_step_state"] is None
+                else CommandStepState.from_payload(payload["command_step_state"])
+            ),
+            command_point_ledgers=[
+                CommandPointLedger.from_payload(ledger)
+                for ledger in payload["command_point_ledgers"]
+            ],
             army_definitions=[
                 _army_definition_from_payload(army) for army in payload["army_definitions"]
+            ],
+            starting_strength_records=[
+                StartingStrengthRecord.from_payload(record)
+                for record in payload["starting_strength_records"]
             ],
             battlefield_state=(
                 None
@@ -1171,6 +1409,10 @@ class GameState:
                 SurgeMoveState.from_payload(state) for state in payload["surge_move_states"]
             ],
             battle_shocked_unit_ids=list(payload["battle_shocked_unit_ids"]),
+            battle_shocked_unit_states=[
+                BattleShockedUnitState.from_payload(state)
+                for state in payload["battle_shocked_unit_states"]
+            ],
             objective_control_records=[
                 ObjectiveControlRecord.from_payload(record)
                 for record in payload["objective_control_records"]
@@ -1194,6 +1436,29 @@ class GameState:
             return
         self.active_player_id = self.turn_order[0]
         self.battle_round += 1
+
+    def _record_starting_strength_records_for_army(
+        self,
+        army_definition: ArmyDefinition,
+    ) -> None:
+        records = starting_strength_records_for_units(
+            player_id=army_definition.player_id,
+            units=army_definition.units,
+        )
+        existing_unit_ids = {record.unit_instance_id for record in self.starting_strength_records}
+        for record in records:
+            if record.unit_instance_id in existing_unit_ids:
+                raise GameLifecycleError("StartingStrengthRecord already exists for unit.")
+            self.starting_strength_records.append(record)
+        self.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
+
+    def _unit_by_id(self, unit_instance_id: str) -> UnitInstance:
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        for army_definition in self.army_definitions:
+            for unit in army_definition.units:
+                if unit.unit_instance_id == requested_unit_id:
+                    return unit
+        raise GameLifecycleError("GameState unit_instance_id was not found.")
 
     def _record_objective_control_boundary(
         self,
@@ -1426,6 +1691,86 @@ def _validate_optional_movement_phase_state(
     return value
 
 
+def _validate_optional_command_step_state(
+    value: object | None,
+) -> CommandStepState | None:
+    if value is None:
+        return None
+    if type(value) is not CommandStepState:
+        raise GameLifecycleError("GameState command_step_state must be a CommandStepState.")
+    return value
+
+
+def _validate_command_point_ledgers(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[CommandPointLedger]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState command_point_ledgers must be a list.")
+    if not values:
+        return initial_command_point_ledgers(player_ids)
+    validated: list[CommandPointLedger] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not CommandPointLedger:
+            raise GameLifecycleError(
+                "GameState command_point_ledgers must contain CommandPointLedger values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("CommandPointLedger player_id is not in this game.")
+        if value.player_id in seen:
+            raise GameLifecycleError("GameState command_point_ledgers must be unique.")
+        seen.add(value.player_id)
+        validated.append(value)
+    if set(seen) != set(player_ids):
+        raise GameLifecycleError("GameState command_point_ledgers must include every player.")
+    return sorted(validated, key=lambda ledger: ledger.player_id)
+
+
+def _validate_starting_strength_records(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    player_ids: tuple[str, ...],
+) -> list[StartingStrengthRecord]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState starting_strength_records must be a list.")
+    if not values and army_definitions:
+        derived: list[StartingStrengthRecord] = []
+        for army_definition in army_definitions:
+            derived.extend(
+                starting_strength_records_for_units(
+                    player_id=army_definition.player_id,
+                    units=army_definition.units,
+                )
+            )
+        return sorted(derived, key=lambda record: record.unit_instance_id)
+
+    unit_owner_by_id = _unit_owner_by_id(army_definitions)
+    validated: list[StartingStrengthRecord] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not StartingStrengthRecord:
+            raise GameLifecycleError(
+                "GameState starting_strength_records must contain StartingStrengthRecord values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("StartingStrengthRecord player_id is not in this game.")
+        owner = unit_owner_by_id.get(value.unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("StartingStrengthRecord unit is unknown.")
+        if owner != value.player_id:
+            raise GameLifecycleError("StartingStrengthRecord player_id drift.")
+        if value.unit_instance_id in seen:
+            raise GameLifecycleError("GameState starting_strength_records must be unique.")
+        seen.add(value.unit_instance_id)
+        validated.append(value)
+    if set(unit_owner_by_id) != seen:
+        raise GameLifecycleError("GameState starting_strength_records must include every unit.")
+    return sorted(validated, key=lambda record: record.unit_instance_id)
+
+
 def _validate_reserve_states(
     values: object,
     *,
@@ -1641,6 +1986,44 @@ def _validate_surge_move_states(
     )
 
 
+def _validate_battle_shocked_unit_states(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    battle_shocked_unit_ids: tuple[str, ...],
+    player_ids: tuple[str, ...],
+) -> list[BattleShockedUnitState]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState battle_shocked_unit_states must be a list.")
+    unit_owner_by_id = _unit_owner_by_id(army_definitions)
+    shocked_ids = set(battle_shocked_unit_ids)
+    validated: list[BattleShockedUnitState] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not BattleShockedUnitState:
+            raise GameLifecycleError(
+                "GameState battle_shocked_unit_states must contain BattleShockedUnitState values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("BattleShockedUnitState player_id is not in this game.")
+        owner = unit_owner_by_id.get(value.unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("BattleShockedUnitState unit is unknown.")
+        if owner != value.player_id:
+            raise GameLifecycleError("BattleShockedUnitState player_id drift.")
+        if value.unit_instance_id not in shocked_ids:
+            raise GameLifecycleError("BattleShockedUnitState missing battle_shocked_unit_id.")
+        if value.unit_instance_id in seen:
+            raise GameLifecycleError("GameState battle_shocked_unit_states must be unique.")
+        seen.add(value.unit_instance_id)
+        validated.append(value)
+    if seen != shocked_ids:
+        raise GameLifecycleError(
+            "GameState battle_shocked_unit_ids must match BattleShockedUnitState records."
+        )
+    return sorted(validated, key=lambda state: state.unit_instance_id)
+
+
 def _unit_has_aircraft_hover_keywords(keywords: tuple[str, ...]) -> bool:
     keyword_set = {
         _validate_identifier("unit keyword", keyword).upper().replace(" ", "_").replace("-", "_")
@@ -1669,6 +2052,16 @@ def _validate_state_stage_indexes(state: GameState) -> None:
             raise GameLifecycleError("GameState battle stage requires battle_round >= 1.")
         if state.active_player_id is None:
             raise GameLifecycleError("GameState battle stage requires an active player.")
+        if (
+            state.command_step_state is not None
+            and state.current_battle_phase is not BattlePhase.COMMAND
+        ):
+            raise GameLifecycleError("command_step_state requires COMMAND phase.")
+        if state.command_step_state is not None:
+            if state.command_step_state.active_player_id != state.active_player_id:
+                raise GameLifecycleError("command_step_state active player drift.")
+            if state.command_step_state.battle_round != state.battle_round:
+                raise GameLifecycleError("command_step_state battle round drift.")
         return
     if state.setup_step_index is not None or state.battle_phase_index is not None:
         raise GameLifecycleError("GameState complete stage must not have active indexes.")
@@ -1755,6 +2148,12 @@ def _validate_tactical_draws(
         seen.add(key)
         validated.append(draw)
     return sorted(validated, key=lambda stored: (stored.battle_round, stored.player_id))
+
+
+def _unit_owner_by_id(army_definitions: list[ArmyDefinition]) -> dict[str, str]:
+    return {
+        unit.unit_instance_id: army.player_id for army in army_definitions for unit in army.units
+    }
 
 
 def _validate_objective_control_records(
