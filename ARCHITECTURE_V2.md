@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10S** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10T unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10T** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10U unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -63,6 +63,7 @@ Completed / implemented foundation:
 | 10Q | Complete | Transport Embark/Disembark, Firing Deck, and destroyed transport emergency disembark |
 | 10R | Complete | Aircraft and Hover movement/reserve behavior |
 | 10S | Complete | Triggered and surge movement foundation |
+| 10T | Complete | Movement phase completion gate |
 
 ## Cross-cutting architectural rules
 
@@ -721,6 +722,8 @@ CORE V1 relevant areas:
 - surge/reactive movement tests.
 
 ## Phase 10T: Movement phase completion gate
+
+Status: Complete.
 
 This phase is a compliance gate for the full Movement phase.
 

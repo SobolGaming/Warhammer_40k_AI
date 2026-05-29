@@ -229,6 +229,50 @@ class PlaceholderPhaseHandler:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class UnsupportedPhaseHandler:
+    phase: BattlePhase
+    message: str = "Phase body is not implemented."
+
+    def __post_init__(self) -> None:
+        if type(self.phase) is not BattlePhase:
+            raise GameLifecycleError("UnsupportedPhaseHandler phase must be a BattlePhase.")
+        object.__setattr__(
+            self,
+            "message",
+            _validate_required_message("UnsupportedPhaseHandler message", self.message),
+        )
+
+    def begin_phase(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+    ) -> LifecycleStatus:
+        if state.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("UnsupportedPhaseHandler can run only during battle.")
+        if state.current_battle_phase is not self.phase:
+            raise GameLifecycleError("UnsupportedPhaseHandler phase does not match state.")
+        decisions.event_log.append(
+            "phase_body_unsupported",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": self.phase.value,
+                "phase_body_status": "unsupported",
+            },
+        )
+        return LifecycleStatus.unsupported(
+            stage=GameLifecycleStage.BATTLE,
+            message=self.message,
+            payload={
+                "phase": self.phase.value,
+                "phase_body_status": "unsupported",
+            },
+        )
+
+
 def game_lifecycle_stage_from_token(token: object) -> GameLifecycleStage:
     if type(token) is GameLifecycleStage:
         return token
@@ -254,6 +298,10 @@ def lifecycle_status_kind_from_token(token: object) -> LifecycleStatusKind:
 def _validate_optional_message(field_name: str, value: object | None) -> str | None:
     if value is None:
         return None
+    return _validate_required_message(field_name, value)
+
+
+def _validate_required_message(field_name: str, value: object) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"{field_name} must be a string.")
     stripped = value.strip()

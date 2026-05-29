@@ -473,11 +473,12 @@ def test_advanced_state_clears_at_end_of_active_player_turn() -> None:
 
     assert action_status.status_kind is LifecycleStatusKind.UNSUPPORTED
     state = _state(lifecycle)
-    assert state.current_battle_phase is BattlePhase.CHARGE
+    assert state.current_battle_phase is BattlePhase.SHOOTING
     assert state.advanced_unit_states
 
-    lifecycle.advance_until_decision_or_terminal()
-    lifecycle.advance_until_decision_or_terminal()
+    state.advance_to_next_battle_phase()
+    state.advance_to_next_battle_phase()
+    state.advance_to_next_battle_phase()
 
     updated_state = _state(lifecycle)
     assert updated_state.active_player_id == "player-b"

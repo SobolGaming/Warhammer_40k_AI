@@ -27,8 +27,8 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
     PhaseHandler,
-    PlaceholderPhaseHandler,
     SetupStep,
+    UnsupportedPhaseHandler,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -44,6 +44,8 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     MovementPhaseHandler,
+    MovementPhaseStepKind,
+    assert_move_units_step_complete_for_reinforcements,
 )
 from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
@@ -240,9 +242,9 @@ class GameLifecycle:
         return {
             BattlePhase.COMMAND: self._command_phase_handler,
             BattlePhase.MOVEMENT: self._movement_phase_handler,
-            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
-            BattlePhase.CHARGE: PlaceholderPhaseHandler(BattlePhase.CHARGE),
-            BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
+            BattlePhase.SHOOTING: UnsupportedPhaseHandler(BattlePhase.SHOOTING),
+            BattlePhase.CHARGE: UnsupportedPhaseHandler(BattlePhase.CHARGE),
+            BattlePhase.FIGHT: UnsupportedPhaseHandler(BattlePhase.FIGHT),
         }
 
     def _pending_decision_request(self) -> DecisionRequest | None:
@@ -495,6 +497,13 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
         scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
     except PlacementError as exc:
         raise GameLifecycleError("Lifecycle state movement_phase_state is invalid.") from exc
+
+    if movement_state.step is MovementPhaseStepKind.REINFORCEMENTS:
+        assert_move_units_step_complete_for_reinforcements(
+            state=state,
+            movement_state=movement_state,
+            message="Move Units step is incomplete before Reinforcements.",
+        )
 
     try:
         placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)

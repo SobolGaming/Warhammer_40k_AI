@@ -1146,23 +1146,11 @@ class MovementPhaseState:
     ) -> tuple[str, ...]:
         if self.step is not MovementPhaseStepKind.MOVE_UNITS:
             return ()
-        if type(scenario) is not BattlefieldScenario:
-            raise GameLifecycleError("MovementPhaseState scenario must be a BattlefieldScenario.")
-        try:
-            scenario.assert_all_mustered_models_placed_or_accounted(accounted_unplaced_model_ids)
-        except PlacementError as exc:
-            raise GameLifecycleError("Movement phase requires complete placed armies.") from exc
-        try:
-            placed_army = scenario.battlefield_state.placed_army_for_player(
-                self.active_player_id,
-            )
-        except PlacementError:
-            return ()
-        selected = set(self.selected_unit_ids)
-        return tuple(
-            placement.unit_instance_id
-            for placement in placed_army.unit_placements
-            if placement.unit_instance_id not in selected
+        return _remaining_move_units_unit_ids(
+            scenario=scenario,
+            active_player_id=self.active_player_id,
+            selected_unit_ids=self.selected_unit_ids,
+            accounted_unplaced_model_ids=accounted_unplaced_model_ids,
         )
 
     def with_unit_selection(self, selection: MovementUnitSelection) -> Self:
@@ -1923,6 +1911,10 @@ class MovementPhaseHandler:
         movement_state = _ensure_movement_phase_state(state=state, decisions=decisions)
         _ensure_transport_cargo_phase_states(state)
         if movement_state.step is MovementPhaseStepKind.REINFORCEMENTS:
+            assert_move_units_step_complete_for_reinforcements(
+                state=state,
+                movement_state=movement_state,
+            )
             return _begin_reinforcements_step(state=state, decisions=decisions)
         active_selection = movement_state.active_selection
         if active_selection is not None:
@@ -2156,6 +2148,11 @@ def _complete_reinforcements_step(
     unarrived_reserve_count: int,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
+        raise GameLifecycleError("Completing Reinforcements requires Reinforcements step.")
+    if not movement_state.reinforcements_completed:
+        state.movement_phase_state = movement_state.with_reinforcements_completed()
     decisions.event_log.append(
         "reinforcements_step_completed",
         {
@@ -5618,6 +5615,65 @@ def _movement_action_invalid_payload(
     if rollback_record is not None:
         invalid_payload["rollback_record"] = validate_json_value(rollback_record.to_payload())
     return invalid_payload
+
+
+def assert_move_units_step_complete_for_reinforcements(
+    *,
+    state: GameState,
+    movement_state: MovementPhaseState,
+    message: str = "Move Units step must be complete before Reinforcements.",
+) -> None:
+    if type(movement_state) is not MovementPhaseState:
+        raise GameLifecycleError("Move Units completion check requires MovementPhaseState.")
+    if movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
+        raise GameLifecycleError("Move Units completion check requires Reinforcements step.")
+    if movement_state.active_selection is not None:
+        raise GameLifecycleError(message)
+    incomplete_selected_unit_ids = tuple(
+        unit_id
+        for unit_id in movement_state.selected_unit_ids
+        if unit_id not in movement_state.moved_unit_ids
+    )
+    if incomplete_selected_unit_ids:
+        raise GameLifecycleError(message)
+    remaining_unit_ids = _remaining_move_units_unit_ids(
+        scenario=_battlefield_scenario(state),
+        active_player_id=movement_state.active_player_id,
+        selected_unit_ids=movement_state.selected_unit_ids,
+        accounted_unplaced_model_ids=state.unavailable_model_ids(),
+    )
+    if remaining_unit_ids:
+        raise GameLifecycleError(message)
+
+
+def _remaining_move_units_unit_ids(
+    *,
+    scenario: BattlefieldScenario,
+    active_player_id: str,
+    selected_unit_ids: tuple[str, ...],
+    accounted_unplaced_model_ids: tuple[str, ...] = (),
+) -> tuple[str, ...]:
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("MovementPhaseState scenario must be a BattlefieldScenario.")
+    player_id = _validate_identifier("active_player_id", active_player_id)
+    selected = set(_validate_identifier_tuple("selected_unit_ids", selected_unit_ids))
+    accounted_ids = _validate_identifier_tuple(
+        "accounted_unplaced_model_ids",
+        accounted_unplaced_model_ids,
+    )
+    try:
+        scenario.assert_all_mustered_models_placed_or_accounted(accounted_ids)
+    except PlacementError as exc:
+        raise GameLifecycleError("Movement phase requires complete placed armies.") from exc
+    try:
+        placed_army = scenario.battlefield_state.placed_army_for_player(player_id)
+    except PlacementError:
+        return ()
+    return tuple(
+        placement.unit_instance_id
+        for placement in placed_army.unit_placements
+        if placement.unit_instance_id not in selected
+    )
 
 
 def _normal_move_invalid_message(violation_code: str) -> str:
