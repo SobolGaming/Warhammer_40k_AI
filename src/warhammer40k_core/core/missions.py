@@ -9,7 +9,7 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZonePayload
-from warhammer40k_core.core.objectives import Objective
+from warhammer40k_core.core.objectives import Objective, ObjectiveMarker
 from warhammer40k_core.core.terrain_layouts import (
     TerrainLayoutTemplate,
     TerrainLayoutTemplatePayload,
@@ -250,6 +250,21 @@ class ObjectiveMarkerDefinition:
             x=self.x_inches,
             y=self.y_inches,
             z=self.z_inches,
+        )
+
+    def to_objective_marker(self) -> ObjectiveMarker:
+        return ObjectiveMarker(
+            objective_marker_id=self.objective_marker_id,
+            name=self.name,
+            x_inches=self.x_inches,
+            y_inches=self.y_inches,
+            z_inches=self.z_inches,
+            marker_diameter_mm=self.marker_diameter_mm,
+            measurement_anchor=self.measurement_anchor,
+            is_flat=self.is_flat,
+            blocks_movement=self.blocks_movement,
+            blocks_placement=self.blocks_placement,
+            source_id=self.source_id,
         )
 
     def to_payload(self) -> ObjectiveMarkerDefinitionPayload:

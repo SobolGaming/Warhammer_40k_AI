@@ -30,6 +30,28 @@ class ObjectivePayload(TypedDict):
     control_radius_inches: float
 
 
+class ObjectiveMarkerPayload(TypedDict):
+    objective_marker_id: str
+    name: str
+    x_inches: float
+    y_inches: float
+    z_inches: float
+    marker_diameter_mm: float
+    control_horizontal_inches: float
+    control_vertical_inches: float
+    measurement_anchor: str
+    is_flat: bool
+    blocks_movement: bool
+    blocks_placement: bool
+    source_id: str
+
+
+MILLIMETERS_PER_INCH = 25.4
+DEFAULT_OBJECTIVE_MARKER_DIAMETER_MM = 40.0
+DEFAULT_OBJECTIVE_CONTROL_HORIZONTAL_INCHES = 3.0
+DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES = 5.0
+
+
 @dataclass(frozen=True, slots=True)
 class PointObjectiveAnchor:
     x: float
@@ -106,6 +128,145 @@ class TerrainObjectiveAnchor:
 
 
 type ObjectiveAnchor = PointObjectiveAnchor | TerrainObjectiveAnchor
+
+
+@dataclass(frozen=True, slots=True)
+class ObjectiveMarker:
+    objective_marker_id: str
+    name: str
+    x_inches: float
+    y_inches: float
+    z_inches: float = 0.0
+    marker_diameter_mm: float = DEFAULT_OBJECTIVE_MARKER_DIAMETER_MM
+    control_horizontal_inches: float = DEFAULT_OBJECTIVE_CONTROL_HORIZONTAL_INCHES
+    control_vertical_inches: float = DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES
+    measurement_anchor: str = "center"
+    is_flat: bool = True
+    blocks_movement: bool = False
+    blocks_placement: bool = False
+    source_id: str = "core-rules"
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "objective_marker_id",
+            _validate_objective_id(self.objective_marker_id),
+        )
+        object.__setattr__(self, "name", _validate_identifier("ObjectiveMarker name", self.name))
+        object.__setattr__(
+            self,
+            "x_inches",
+            _validate_finite_number("ObjectiveMarker x_inches", self.x_inches),
+        )
+        object.__setattr__(
+            self,
+            "y_inches",
+            _validate_finite_number("ObjectiveMarker y_inches", self.y_inches),
+        )
+        object.__setattr__(
+            self,
+            "z_inches",
+            _validate_finite_number("ObjectiveMarker z_inches", self.z_inches),
+        )
+        object.__setattr__(
+            self,
+            "marker_diameter_mm",
+            _validate_positive_number(
+                "ObjectiveMarker marker_diameter_mm",
+                self.marker_diameter_mm,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "control_horizontal_inches",
+            _validate_non_negative_number(
+                "ObjectiveMarker control_horizontal_inches",
+                self.control_horizontal_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "control_vertical_inches",
+            _validate_non_negative_number(
+                "ObjectiveMarker control_vertical_inches",
+                self.control_vertical_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "measurement_anchor",
+            _validate_required_token(
+                "ObjectiveMarker measurement_anchor",
+                self.measurement_anchor,
+                expected_token="center",
+            ),
+        )
+        _validate_bool("ObjectiveMarker is_flat", self.is_flat)
+        _validate_bool("ObjectiveMarker blocks_movement", self.blocks_movement)
+        _validate_bool("ObjectiveMarker blocks_placement", self.blocks_placement)
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("ObjectiveMarker source_id", self.source_id),
+        )
+
+    @classmethod
+    def from_objective(cls, objective: Objective) -> Self:
+        if type(objective) is not Objective:
+            raise ObjectiveError("ObjectiveMarker.from_objective requires an Objective.")
+        if type(objective.anchor) is not PointObjectiveAnchor:
+            raise ObjectiveError("Only point objectives can become ObjectiveMarker values.")
+        return cls(
+            objective_marker_id=objective.objective_id,
+            name=objective.name,
+            x_inches=objective.anchor.x,
+            y_inches=objective.anchor.y,
+            z_inches=objective.anchor.z,
+            control_horizontal_inches=objective.control_radius_inches,
+            source_id=objective.objective_id,
+        )
+
+    @property
+    def marker_diameter_inches(self) -> float:
+        return self.marker_diameter_mm / MILLIMETERS_PER_INCH
+
+    def stable_identity(self) -> str:
+        return f"objective-marker:{self.objective_marker_id}"
+
+    def to_payload(self) -> ObjectiveMarkerPayload:
+        return {
+            "objective_marker_id": self.objective_marker_id,
+            "name": self.name,
+            "x_inches": self.x_inches,
+            "y_inches": self.y_inches,
+            "z_inches": self.z_inches,
+            "marker_diameter_mm": self.marker_diameter_mm,
+            "control_horizontal_inches": self.control_horizontal_inches,
+            "control_vertical_inches": self.control_vertical_inches,
+            "measurement_anchor": self.measurement_anchor,
+            "is_flat": self.is_flat,
+            "blocks_movement": self.blocks_movement,
+            "blocks_placement": self.blocks_placement,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ObjectiveMarkerPayload) -> Self:
+        return cls(
+            objective_marker_id=payload["objective_marker_id"],
+            name=payload["name"],
+            x_inches=payload["x_inches"],
+            y_inches=payload["y_inches"],
+            z_inches=payload["z_inches"],
+            marker_diameter_mm=payload["marker_diameter_mm"],
+            control_horizontal_inches=payload["control_horizontal_inches"],
+            control_vertical_inches=payload["control_vertical_inches"],
+            measurement_anchor=payload["measurement_anchor"],
+            is_flat=payload["is_flat"],
+            blocks_movement=payload["blocks_movement"],
+            blocks_placement=payload["blocks_placement"],
+            source_id=payload["source_id"],
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -246,3 +407,23 @@ def _validate_positive_number(field_name: str, value: object) -> float:
     if number <= 0.0:
         raise ObjectiveError(f"{field_name} must be greater than 0.")
     return number
+
+
+def _validate_non_negative_number(field_name: str, value: object) -> float:
+    number = _validate_finite_number(field_name, value)
+    if number < 0.0:
+        raise ObjectiveError(f"{field_name} must not be negative.")
+    return number
+
+
+def _validate_required_token(field_name: str, value: object, *, expected_token: str) -> str:
+    token = _validate_identifier(field_name, value)
+    if token != expected_token:
+        raise ObjectiveError(f"{field_name} must be {expected_token}.")
+    return token
+
+
+def _validate_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise ObjectiveError(f"{field_name} must be a bool.")
+    return value

@@ -3,7 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
-from warhammer40k_core.geometry.pose import GeometryError, Point3, validate_point3
+from warhammer40k_core.core.objectives import ObjectiveMarker
+from warhammer40k_core.geometry.measurement import (
+    objective_marker_controls_model,
+    objective_marker_endpoint_is_clear,
+)
+from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose, validate_point3
 from warhammer40k_core.geometry.terrain import (
     TerrainVolume,
     TerrainVolumePayload,
@@ -88,6 +93,42 @@ class SpatialIndex:
     def has_clear_line_of_sight(self, start: Point3, end: Point3) -> bool:
         return not self.line_of_sight_blockers(start, end)
 
+    def models_controlling_objective_marker(
+        self,
+        objective_marker: ObjectiveMarker,
+    ) -> tuple[Model, ...]:
+        marker = _validate_objective_marker("objective_marker", objective_marker)
+        marker_pose = Pose.at(marker.x_inches, marker.y_inches, marker.z_inches)
+        return tuple(
+            model
+            for model in self.models
+            if objective_marker_controls_model(
+                marker_pose,
+                model,
+                marker_id=marker.objective_marker_id,
+                horizontal_inches=marker.control_horizontal_inches,
+                vertical_inches=marker.control_vertical_inches,
+                marker_diameter_inches=marker.marker_diameter_inches,
+            )
+        )
+
+    def models_overlapping_objective_marker_endpoint(
+        self,
+        objective_marker: ObjectiveMarker,
+    ) -> tuple[Model, ...]:
+        marker = _validate_objective_marker("objective_marker", objective_marker)
+        marker_pose = Pose.at(marker.x_inches, marker.y_inches, marker.z_inches)
+        return tuple(
+            model
+            for model in self.models
+            if not objective_marker_endpoint_is_clear(
+                marker_pose,
+                model,
+                marker_id=marker.objective_marker_id,
+                marker_diameter_inches=marker.marker_diameter_inches,
+            )
+        )
+
     def to_payload(self) -> SpatialIndexPayload:
         return {
             "models": [model.to_payload() for model in self.models],
@@ -107,6 +148,12 @@ class SpatialIndex:
 def _validate_model(field_name: str, value: object) -> Model:
     if type(value) is not Model:
         raise GeometryError(f"{field_name} must be a Model.")
+    return value
+
+
+def _validate_objective_marker(field_name: str, value: object) -> ObjectiveMarker:
+    if type(value) is not ObjectiveMarker:
+        raise GeometryError(f"{field_name} must be an ObjectiveMarker.")
     return value
 
 

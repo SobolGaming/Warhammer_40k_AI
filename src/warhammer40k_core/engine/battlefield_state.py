@@ -1091,6 +1091,20 @@ class BattlefieldScenario:
                 return model
         raise PlacementError("BattlefieldScenario model_instance_id was not found.")
 
+    def placed_geometry_models(self) -> tuple[GeometryModel, ...]:
+        return tuple(
+            geometry_model_for_placement(
+                model=self.model_instance_for_placement(model_placement),
+                placement=model_placement,
+            )
+            for placed_army in self.battlefield_state.placed_armies
+            for unit_placement in placed_army.unit_placements
+            for model_placement in unit_placement.model_placements
+        )
+
+    def spatial_index(self) -> SpatialIndex:
+        return SpatialIndex(models=self.placed_geometry_models())
+
     def unplaced_model_ids(self) -> tuple[str, ...]:
         placed_model_ids = set(self.battlefield_state.placed_model_ids())
         removed_model_ids = set(self.battlefield_state.removed_model_ids)
