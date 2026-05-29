@@ -2280,6 +2280,7 @@ Required tests:
 | Leader/attached units | 6, 15D, 16A |
 | Faction/detachment/enhancement rules | 16C-16F |
 | Chapter Approved 2025-26 | 11A, 11E, 11F, 15A, 19A |
+| Adapter/UI contract | 11D |
 | Human CLI/UI | 17A, 17C |
 | Network play | 17D |
 | Replay | 17B, all state-changing phases |
