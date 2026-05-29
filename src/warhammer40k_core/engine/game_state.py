@@ -42,6 +42,12 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStatePayload,
 )
 from warhammer40k_core.engine.reserves import ReserveState, ReserveStatePayload, ReserveStatus
+from warhammer40k_core.engine.transports import (
+    DisembarkedUnitState,
+    DisembarkedUnitStatePayload,
+    TransportCargoState,
+    TransportCargoStatePayload,
+)
 
 
 class SecondaryMissionMode(StrEnum):
@@ -92,6 +98,8 @@ class GameStatePayload(TypedDict):
     battlefield_state: BattlefieldRuntimeStatePayload | None
     movement_phase_state: MovementPhaseStatePayload | None
     reserve_states: list[ReserveStatePayload]
+    transport_cargo_states: list[TransportCargoStatePayload]
+    disembarked_unit_states: list[DisembarkedUnitStatePayload]
     advanced_unit_states: list[AdvancedUnitStatePayload]
     fell_back_unit_states: list[FellBackUnitStatePayload]
     battle_shocked_unit_ids: list[str]
@@ -116,6 +124,14 @@ def _new_fell_back_unit_states() -> list[FellBackUnitState]:
 
 
 def _new_reserve_states() -> list[ReserveState]:
+    return []
+
+
+def _new_transport_cargo_states() -> list[TransportCargoState]:
+    return []
+
+
+def _new_disembarked_unit_states() -> list[DisembarkedUnitState]:
     return []
 
 
@@ -354,6 +370,12 @@ class GameState:
     battlefield_state: BattlefieldRuntimeState | None = None
     movement_phase_state: MovementPhaseState | None = None
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
+    transport_cargo_states: list[TransportCargoState] = field(
+        default_factory=_new_transport_cargo_states
+    )
+    disembarked_unit_states: list[DisembarkedUnitState] = field(
+        default_factory=_new_disembarked_unit_states
+    )
     advanced_unit_states: list[AdvancedUnitState] = field(default_factory=_new_advanced_unit_states)
     fell_back_unit_states: list[FellBackUnitState] = field(
         default_factory=_new_fell_back_unit_states
@@ -419,6 +441,14 @@ class GameState:
         )
         self.reserve_states = _validate_reserve_states(
             self.reserve_states,
+            player_ids=self.player_ids,
+        )
+        self.transport_cargo_states = _validate_transport_cargo_states(
+            self.transport_cargo_states,
+            player_ids=self.player_ids,
+        )
+        self.disembarked_unit_states = _validate_disembarked_unit_states(
+            self.disembarked_unit_states,
             player_ids=self.player_ids,
         )
         self.advanced_unit_states = _validate_advanced_unit_states(
@@ -651,6 +681,102 @@ class GameState:
                 model_ids.extend(model.model_instance_id for model in unit.own_models)
         return tuple(sorted(model_ids))
 
+    def embarked_model_ids(self) -> tuple[str, ...]:
+        if not self.transport_cargo_states:
+            return ()
+        unit_by_id = {
+            unit.unit_instance_id: unit for army in self.army_definitions for unit in army.units
+        }
+        model_ids: list[str] = []
+        for cargo_state in self.transport_cargo_states:
+            for unit_id in cargo_state.embarked_unit_instance_ids:
+                unit = unit_by_id.get(unit_id)
+                if unit is None:
+                    raise GameLifecycleError("TransportCargoState references an unknown unit.")
+                model_ids.extend(model.model_instance_id for model in unit.own_models)
+        return tuple(sorted(model_ids))
+
+    def unavailable_model_ids(self) -> tuple[str, ...]:
+        return tuple(sorted((*self.unarrived_reserve_model_ids(), *self.embarked_model_ids())))
+
+    def record_transport_cargo_state(self, cargo_state: TransportCargoState) -> None:
+        if type(cargo_state) is not TransportCargoState:
+            raise GameLifecycleError("cargo_state must be a TransportCargoState.")
+        if cargo_state.player_id not in self.player_ids:
+            raise GameLifecycleError("TransportCargoState player_id is not in this game.")
+        if (
+            self.transport_cargo_state_for_transport(cargo_state.transport_unit_instance_id)
+            is not None
+        ):
+            raise GameLifecycleError("TransportCargoState already exists for transport.")
+        self.transport_cargo_states.append(cargo_state)
+        self.transport_cargo_states.sort(key=lambda state: state.transport_unit_instance_id)
+
+    def transport_cargo_state_for_transport(
+        self,
+        transport_unit_instance_id: str,
+    ) -> TransportCargoState | None:
+        requested_transport_id = _validate_identifier(
+            "transport_unit_instance_id",
+            transport_unit_instance_id,
+        )
+        for cargo_state in self.transport_cargo_states:
+            if cargo_state.transport_unit_instance_id == requested_transport_id:
+                return cargo_state
+        return None
+
+    def replace_transport_cargo_state(self, cargo_state: TransportCargoState) -> None:
+        if type(cargo_state) is not TransportCargoState:
+            raise GameLifecycleError("cargo_state must be a TransportCargoState.")
+        for index, stored in enumerate(self.transport_cargo_states):
+            if stored.transport_unit_instance_id == cargo_state.transport_unit_instance_id:
+                self.transport_cargo_states[index] = cargo_state
+                self.transport_cargo_states.sort(key=lambda state: state.transport_unit_instance_id)
+                return
+        raise GameLifecycleError("TransportCargoState does not exist for transport.")
+
+    def record_disembarked_unit_state(self, state: DisembarkedUnitState) -> None:
+        if type(state) is not DisembarkedUnitState:
+            raise GameLifecycleError("Disembarked unit state must be a DisembarkedUnitState.")
+        if state.player_id not in self.player_ids:
+            raise GameLifecycleError("DisembarkedUnitState player_id is not in this game.")
+        if (
+            self.disembarked_unit_state_for_unit(
+                player_id=state.player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=state.unit_instance_id,
+            )
+            is not None
+        ):
+            raise GameLifecycleError("DisembarkedUnitState already exists for unit and turn.")
+        self.disembarked_unit_states.append(state)
+        self.disembarked_unit_states.sort(
+            key=lambda stored: (
+                stored.battle_round,
+                stored.player_id,
+                stored.unit_instance_id,
+            )
+        )
+
+    def disembarked_unit_state_for_unit(
+        self,
+        *,
+        player_id: str,
+        battle_round: int,
+        unit_instance_id: str,
+    ) -> DisembarkedUnitState | None:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        for state in self.disembarked_unit_states:
+            if (
+                state.player_id == requested_player_id
+                and state.battle_round == requested_round
+                and state.unit_instance_id == requested_unit_id
+            ):
+                return state
+        return None
+
     def record_advanced_unit_state(self, state: AdvancedUnitState) -> None:
         if type(state) is not AdvancedUnitState:
             raise GameLifecycleError("Advanced unit state must be an AdvancedUnitState.")
@@ -760,6 +886,10 @@ class GameState:
                 else self.movement_phase_state.to_payload()
             ),
             "reserve_states": [state.to_payload() for state in self.reserve_states],
+            "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
+            "disembarked_unit_states": [
+                state.to_payload() for state in self.disembarked_unit_states
+            ],
             "advanced_unit_states": [state.to_payload() for state in self.advanced_unit_states],
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
@@ -828,6 +958,14 @@ class GameState:
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]
             ],
+            transport_cargo_states=[
+                TransportCargoState.from_payload(state)
+                for state in payload["transport_cargo_states"]
+            ],
+            disembarked_unit_states=[
+                DisembarkedUnitState.from_payload(state)
+                for state in payload["disembarked_unit_states"]
+            ],
             advanced_unit_states=[
                 AdvancedUnitState.from_payload(state) for state in payload["advanced_unit_states"]
             ],
@@ -868,6 +1006,13 @@ class GameState:
         self.fell_back_unit_states = [
             state
             for state in self.fell_back_unit_states
+            if not (
+                state.player_id == requested_player_id and state.battle_round == requested_round
+            )
+        ]
+        self.disembarked_unit_states = [
+            state
+            for state in self.disembarked_unit_states
             if not (
                 state.player_id == requested_player_id and state.battle_round == requested_round
             )
@@ -1028,6 +1173,56 @@ def _validate_reserve_states(
         seen.add(value.unit_instance_id)
         validated.append(value)
     return sorted(validated, key=lambda state: state.unit_instance_id)
+
+
+def _validate_transport_cargo_states(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[TransportCargoState]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState transport_cargo_states must be a list.")
+    validated: list[TransportCargoState] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not TransportCargoState:
+            raise GameLifecycleError(
+                "GameState transport_cargo_states must contain TransportCargoState values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("TransportCargoState player_id is not in this game.")
+        if value.transport_unit_instance_id in seen:
+            raise GameLifecycleError("GameState transport_cargo_states must be unique.")
+        seen.add(value.transport_unit_instance_id)
+        validated.append(value)
+    return sorted(validated, key=lambda state: state.transport_unit_instance_id)
+
+
+def _validate_disembarked_unit_states(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[DisembarkedUnitState]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState disembarked_unit_states must be a list.")
+    validated: list[DisembarkedUnitState] = []
+    seen: set[tuple[int, str, str]] = set()
+    for value in cast(list[object], values):
+        if type(value) is not DisembarkedUnitState:
+            raise GameLifecycleError(
+                "GameState disembarked_unit_states must contain DisembarkedUnitState values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("DisembarkedUnitState player_id is not in this game.")
+        key = (value.battle_round, value.player_id, value.unit_instance_id)
+        if key in seen:
+            raise GameLifecycleError("GameState disembarked_unit_states must be unique.")
+        seen.add(key)
+        validated.append(value)
+    return sorted(
+        validated,
+        key=lambda state: (state.battle_round, state.player_id, state.unit_instance_id),
+    )
 
 
 def _validate_advanced_unit_states(

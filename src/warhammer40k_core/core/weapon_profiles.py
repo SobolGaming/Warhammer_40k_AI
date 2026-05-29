@@ -36,6 +36,7 @@ class WeaponKeyword(StrEnum):
     HEAVY = "Heavy"
     BLAST = "Blast"
     MELTA = "Melta"
+    ONE_SHOT = "One Shot"
 
 
 class AbilityKind(StrEnum):
