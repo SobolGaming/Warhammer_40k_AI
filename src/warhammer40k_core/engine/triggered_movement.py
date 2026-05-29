@@ -777,8 +777,8 @@ class TriggeredMovementHandler:
         battlefield_state = state.battlefield_state
         if battlefield_state is None:
             raise GameLifecycleError("Triggered movement requires battlefield_state.")
-        state.battlefield_state = battlefield_state.with_unit_placement(
-            resolution.attempted_placement
+        state.replace_battlefield_state(
+            battlefield_state.with_unit_placement(resolution.attempted_placement)
         )
         if descriptor.movement_kind is TriggeredMovementKind.SURGE:
             state.record_surge_move_state(

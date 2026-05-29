@@ -17,6 +17,7 @@ from warhammer40k_core.core.dice import (
     RerollPermission,
     RerollPermissionPayload,
 )
+from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     MissionDeploymentZoneSource,
     MovementMode,
@@ -54,6 +55,9 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.endpoint_placement import (
+    objective_marker_endpoint_placement_violation,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phase import (
@@ -2521,6 +2525,7 @@ def _apply_reinforcement_placement_decision(
         battlefield_width_inches=mission_setup.battlefield_width_inches,
         battlefield_depth_inches=mission_setup.battlefield_depth_inches,
         terrain_features=mission_setup.terrain_features,
+        objective_markers=_objective_markers_for_state(state),
         enemy_deployment_zones=mission_setup.enemy_deployment_zones_for_player(
             reserve_state.player_id,
         ),
@@ -2571,9 +2576,11 @@ def _apply_valid_reinforcement_placement(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Reinforcement placement requires battlefield_state.")
-    state.battlefield_state = apply_reinforcement_placement_to_battlefield(
-        battlefield_state=battlefield_state,
-        placement=placement,
+    state.replace_battlefield_state(
+        apply_reinforcement_placement_to_battlefield(
+            battlefield_state=battlefield_state,
+            placement=placement,
+        )
     )
     arrived_state = placement.arrived_reserve_state()
     state.replace_reserve_state(arrived_state)
@@ -2742,6 +2749,7 @@ def _pre_move_disembark_entries(
                 selection=selection,
                 unit=unit,
                 transport_placement=transport_placement,
+                objective_markers=_objective_markers_for_state(state),
             )
             if resolution.is_valid:
                 entries.append(selection)
@@ -2802,6 +2810,7 @@ def _post_normal_move_disembark_entries(
             selection=selection,
             unit=unit,
             transport_placement=transport_placement,
+            objective_markers=_objective_markers_for_state(state),
         )
         if resolution.is_valid:
             entries.append(selection)
@@ -3042,6 +3051,7 @@ def _apply_disembark_placement_decision(
         selection=selection,
         unit=_unit_instance_by_id(state=state, unit_instance_id=unit_instance_id),
         transport_placement=transport_placement,
+        objective_markers=_objective_markers_for_state(state),
     )
     if not resolution.is_valid:
         invalid_payload = _transport_operation_invalid_payload(
@@ -3080,9 +3090,11 @@ def _apply_valid_disembark(
         raise GameLifecycleError("Disembark placement requires battlefield_state.")
     if disembark.updated_cargo_state is None or disembark.disembarked_unit_state is None:
         raise GameLifecycleError("Valid DisembarkResolution requires state records.")
-    state.battlefield_state = apply_disembark_to_battlefield(
-        battlefield_state=battlefield_state,
-        disembark=disembark,
+    state.replace_battlefield_state(
+        apply_disembark_to_battlefield(
+            battlefield_state=battlefield_state,
+            disembark=disembark,
+        )
     )
     state.replace_transport_cargo_state(disembark.updated_cargo_state)
     state.record_disembarked_unit_state(disembark.disembarked_unit_state)
@@ -3148,6 +3160,7 @@ def _request_movement_action(
             battle_round=state.battle_round,
             hover_mode_states=tuple(state.hover_mode_states),
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            objective_markers=_objective_markers_for_state(state),
             disembarked_unit_state=state.disembarked_unit_state_for_unit(
                 player_id=_active_player_id(state),
                 battle_round=state.battle_round,
@@ -3242,6 +3255,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
             path_witness=witness,
+            objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
         )
         drift_code = resolution.selected_payload_drift_code(payload)
@@ -3331,8 +3345,8 @@ def _apply_movement_action_decision(  # noqa: RET503
         battlefield_state = state.battlefield_state
         if battlefield_state is None:
             raise GameLifecycleError("Normal Move requires battlefield_state.")
-        state.battlefield_state = battlefield_state.with_unit_placement(
-            resolution.attempted_placement
+        state.replace_battlefield_state(
+            battlefield_state.with_unit_placement(resolution.attempted_placement)
         )
         return _request_embark_after_move_or_complete_activation(
             state=state,
@@ -3400,6 +3414,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             path_witness=witness,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
         )
         drift_code = fall_back_resolution.selected_payload_drift_code(payload)
@@ -3589,6 +3604,7 @@ def _resolve_and_apply_advance_move(
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
         advance_roll=advance_roll,
+        objective_markers=_objective_markers_for_state(state),
         hover_mode_states=tuple(state.hover_mode_states),
     )
     if not resolution.is_valid:
@@ -3628,7 +3644,9 @@ def _resolve_and_apply_advance_move(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Advance requires battlefield_state.")
-    state.battlefield_state = battlefield_state.with_unit_placement(resolution.attempted_placement)
+    state.replace_battlefield_state(
+        battlefield_state.with_unit_placement(resolution.attempted_placement)
+    )
     dice_record = MovementDiceRecord(
         player_id=active_player_id,
         battle_round=state.battle_round,
@@ -3732,9 +3750,11 @@ def _apply_aircraft_reserve_transition_for_normal_move(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Aircraft reserve transition requires battlefield_state.")
-    state.battlefield_state = apply_aircraft_reserve_transition_to_battlefield(
-        battlefield_state=battlefield_state,
-        transition=transition,
+    state.replace_battlefield_state(
+        apply_aircraft_reserve_transition_to_battlefield(
+            battlefield_state=battlefield_state,
+            transition=transition,
+        )
     )
     if state.reserve_state_for_unit(transition.reserve_state.unit_instance_id) is None:
         state.record_reserve_state(transition.reserve_state)
@@ -3876,9 +3896,11 @@ def _apply_fall_back_result(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Fall Back requires battlefield_state.")
-    state.battlefield_state = battlefield_state.with_unit_placement(
-        fall_back_result.attempted_placement
-    ).with_removed_models(destroyed_model_ids)
+    state.replace_battlefield_state(
+        battlefield_state.with_unit_placement(
+            fall_back_result.attempted_placement
+        ).with_removed_models(destroyed_model_ids)
+    )
     if surviving_placement is not None:
         state.record_fell_back_unit_state(
             FellBackUnitState(
@@ -4230,9 +4252,11 @@ def _apply_valid_embark(
         raise GameLifecycleError("Embark requires battlefield_state.")
     if embark.updated_cargo_state is None:
         raise GameLifecycleError("Valid EmbarkResolution requires updated cargo state.")
-    state.battlefield_state = apply_embark_to_battlefield(
-        battlefield_state=battlefield_state,
-        embark=embark,
+    state.replace_battlefield_state(
+        apply_embark_to_battlefield(
+            battlefield_state=battlefield_state,
+            embark=embark,
+        )
     )
     state.replace_transport_cargo_state(embark.updated_cargo_state)
     decisions.event_log.append(
@@ -4337,6 +4361,7 @@ def _movement_action_options(
     battle_round: int = 1,
     hover_mode_states: tuple[HoverModeState, ...] = (),
     battle_shocked_unit_ids: tuple[str, ...] = (),
+    objective_markers: tuple[ObjectiveMarker, ...] = (),
     disembarked_unit_state: DisembarkedUnitState | None = None,
 ) -> tuple[DecisionOption, ...]:
     if disembarked_unit_state is not None and type(disembarked_unit_state) is not (
@@ -4385,6 +4410,7 @@ def _movement_action_options(
                 ruleset_descriptor=ruleset_descriptor,
                 unit_placement=unit_placement,
                 path_witness=None,
+                objective_markers=objective_markers,
                 hover_mode_states=hover_mode_states,
             )
             options.append(
@@ -4411,6 +4437,7 @@ def _movement_action_options(
                 path_witness=None,
                 battle_round=battle_round,
                 battle_shocked_unit_ids=battle_shocked_unit_ids,
+                objective_markers=objective_markers,
                 hover_mode_states=hover_mode_states,
             )
             options.append(
@@ -4682,6 +4709,7 @@ def resolve_normal_move(
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> NormalMoveResolution:
     resolved = _resolve_unit_move(
         scenario=scenario,
@@ -4692,6 +4720,7 @@ def resolve_normal_move(
         battlefield_depth_inches=battlefield_depth_inches,
         terrain=terrain,
         terrain_features=terrain_features,
+        objective_markers=objective_markers,
         movement_bonus_inches=0,
         movement_mode=MovementMode.NORMAL,
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
@@ -4724,6 +4753,7 @@ def resolve_advance_move(
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> AdvanceMoveResolution:
     if type(advance_roll) is not AdvanceRollResult:
         raise GameLifecycleError("Advance requires an AdvanceRollResult.")
@@ -4736,6 +4766,7 @@ def resolve_advance_move(
         battlefield_depth_inches=battlefield_depth_inches,
         terrain=terrain,
         terrain_features=terrain_features,
+        objective_markers=objective_markers,
         movement_bonus_inches=advance_roll.value,
         movement_mode=MovementMode.ADVANCE,
         movement_phase_action=MovementPhaseActionKind.ADVANCE,
@@ -4774,6 +4805,7 @@ def resolve_fall_back_move(
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> FallBackActionResult:
     fall_back_witness = (
         _default_fall_back_witness(scenario=scenario, unit_placement=unit_placement)
@@ -4789,6 +4821,7 @@ def resolve_fall_back_move(
         battlefield_depth_inches=battlefield_depth_inches,
         terrain=terrain,
         terrain_features=terrain_features,
+        objective_markers=objective_markers,
         movement_bonus_inches=0,
         movement_mode=MovementMode.FALL_BACK,
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
@@ -4835,6 +4868,7 @@ def _resolve_unit_move(
     battlefield_depth_inches: float,
     terrain: tuple[TerrainVolume, ...],
     terrain_features: tuple[TerrainFeatureDefinition, ...],
+    objective_markers: tuple[ObjectiveMarker, ...],
     movement_bonus_inches: int,
     movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
@@ -4853,6 +4887,10 @@ def _resolve_unit_move(
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must be an integer.")
     if movement_bonus_inches < 0:
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must not be negative.")
+    markers = _validate_objective_marker_tuple(
+        f"{action_label} objective_markers",
+        objective_markers,
+    )
     unit = scenario.unit_instance_for_placement(unit_placement)
     hover_mode_state = _hover_mode_state_for_unit(
         hover_mode_states=hover_mode_states,
@@ -4974,6 +5012,34 @@ def _resolve_unit_move(
             terrain=terrain,
             terrain_features=terrain_features,
         ).validate()
+        end_model = geometry_model_for_placement(
+            model=model,
+            placement=placement.with_pose(
+                witness.final_pose_for_model(placement.model_instance_id)
+            ),
+        )
+        objective_marker_violation = objective_marker_endpoint_placement_violation(
+            model=end_model,
+            objective_markers=markers,
+            violation_code="objective_marker_endpoint_overlap",
+            placement_label=action_label,
+        )
+        if objective_marker_violation is not None and path_result.is_valid:
+            path_result = PathValidationResult.invalid(
+                PathConstraintViolation(
+                    violation_code=objective_marker_violation.violation_code,
+                    message=objective_marker_violation.message,
+                    model_id=objective_marker_violation.model_instance_id,
+                    blocker_id=objective_marker_violation.blocker_id,
+                ),
+                sampled_pose_count=path_result.sampled_pose_count,
+                model_collision_check_count=path_result.model_collision_check_count,
+                terrain_collision_check_count=path_result.terrain_collision_check_count,
+                engagement_check_count=path_result.engagement_check_count,
+                pivot_cost_inches=path_result.pivot_cost_inches,
+                pivot_cost_pending=path_result.pivot_cost_pending,
+                movement_distance_witness=path_result.movement_distance_witness,
+            )
         path_validation_results.append(path_result)
         terrain_path_legality_results.append(terrain_result)
         model_movement_payload: dict[str, object] = {
@@ -5695,6 +5761,8 @@ def _normal_move_invalid_message(violation_code: str) -> str:
     code = _validate_identifier("Normal Move violation_code", violation_code)
     if code == "unit_coherency_broken":
         return "Normal Move endpoint violates unit coherency."
+    if code == "objective_marker_endpoint_overlap":
+        return "Normal Move endpoint overlaps an objective marker."
     if code.startswith("terrain") or code in {
         "end_on_forbidden_terrain",
         "upper_floor_keyword_forbidden",
@@ -5983,6 +6051,16 @@ def _mission_setup_for_live_reinforcements(
             "Live Reinforcements requires MissionSetup with deployment zones and terrain features."
         )
     return mission_setup
+
+
+def _objective_markers_for_state(state: GameState) -> tuple[ObjectiveMarker, ...]:
+    from warhammer40k_core.engine.game_state import GameState as RuntimeGameState
+
+    if type(state) is not RuntimeGameState:
+        raise GameLifecycleError("Objective marker lookup requires a GameState.")
+    if state.mission_setup is None:
+        return ()
+    return tuple(marker.to_objective_marker() for marker in state.mission_setup.objective_markers)
 
 
 def _active_movement_selection(state: GameState) -> MovementUnitSelection:
@@ -6390,6 +6468,24 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
         seen.add(identifier)
         validated.append(identifier)
     return tuple(validated)
+
+
+def _validate_objective_marker_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[ObjectiveMarker, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    markers: list[ObjectiveMarker] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ObjectiveMarker:
+            raise GameLifecycleError(f"{field_name} must contain ObjectiveMarker values.")
+        if value.objective_marker_id in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate markers.")
+        seen.add(value.objective_marker_id)
+        markers.append(value)
+    return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
 
 
 def _validate_advance_roll_spec(spec: DiceRollSpec, *, unit_instance_id: str) -> None:

@@ -13,8 +13,14 @@ from warhammer40k_core.core.objectives import Objective, ObjectiveMarker, Object
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRuntimeState,
     BattlefieldScenario,
     UnitPlacement,
+)
+from warhammer40k_core.engine.endpoint_placement import (
+    ObjectiveMarkerEndpointPlacementViolation,
+    ObjectiveMarkerEndpointPlacementViolationPayload,
+    objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
@@ -40,8 +46,11 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phases.movement import resolve_normal_move
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -236,6 +245,94 @@ def test_model_endpoint_on_objective_marker_is_rejected() -> None:
     assert ObjectiveMarkerEndpointViolation.from_payload(violation_payload) == violations[0]
 
 
+def test_normal_move_endpoint_on_objective_marker_is_rejected_by_shared_resolver() -> None:
+    state = _battle_state_with_center_objective_positions(
+        player_a_offsets=((4.0, 0.0), (4.0, 2.0), (4.0, 4.0), (4.0, 6.0), (4.0, 8.0)),
+    )
+    scenario = _scenario_from_state(state)
+    marker = _center_marker_definition(state).to_objective_marker()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        unit_placement=unit_placement,
+        path_witness=_straight_line_witness(unit_placement, delta_x=-4.0),
+        objective_markers=(marker,),
+    )
+
+    assert not resolution.is_valid
+    assert any(
+        violation.violation_code == "objective_marker_endpoint_overlap"
+        and violation.blocker_id == marker.objective_marker_id
+        for path_result in resolution.path_validation_results
+        for violation in path_result.violations
+    )
+
+
+def test_setup_placement_endpoint_on_objective_marker_is_rejected_by_game_state() -> None:
+    mission_setup = _mission_setup()
+    config = _config(mission_setup=mission_setup)
+    armies = _mustered_armies(config)
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase11b-invalid-setup-battlefield",
+        armies=armies,
+    )
+    marker = _center_marker_definition(state)
+    player_a = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    battlefield_state = scenario.battlefield_state.with_unit_placement(
+        _with_model_offsets(player_a, marker, offsets=((0.0, 0.0),))
+    )
+
+    with pytest.raises(GameLifecycleError, match="objective marker"):
+        state.record_battlefield_state(battlefield_state)
+
+
+def test_objective_marker_endpoint_placement_violation_payload_round_trips() -> None:
+    violation = ObjectiveMarkerEndpointPlacementViolation(
+        violation_code="objective_marker_endpoint_overlap",
+        message="Normal Move cannot end on an objective marker.",
+        model_instance_id="army-alpha:intercessor-unit-1:core-intercessor-like:001",
+        blocker_id="mission-a-center",
+    )
+    payload = cast(
+        ObjectiveMarkerEndpointPlacementViolationPayload,
+        json.loads(json.dumps(violation.to_payload(), sort_keys=True)),
+    )
+
+    assert ObjectiveMarkerEndpointPlacementViolation.from_payload(payload) == violation
+
+
+def test_battlefield_state_replacement_requires_existing_battlefield_state() -> None:
+    mission_setup = _mission_setup()
+    config = _config(mission_setup=mission_setup)
+    armies = _mustered_armies(config)
+    state = GameState.from_config(config)
+    battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="phase11b-replace-missing-battlefield",
+        armies=armies,
+    ).battlefield_state
+
+    with pytest.raises(GameLifecycleError, match="BattlefieldRuntimeState"):
+        state.replace_battlefield_state(cast(BattlefieldRuntimeState, object()))
+    with pytest.raises(GameLifecycleError, match="does not exist"):
+        state.replace_battlefield_state(battlefield_state)
+    with pytest.raises(GameLifecycleError, match="already exists"):
+        state.record_mission_setup(_mission_setup())
+    with pytest.raises(GameLifecycleError, match="geometry Model"):
+        objective_marker_endpoint_placement_violation(
+            model=cast(GeometryModel, object()),
+            objective_markers=(),
+            violation_code="objective_marker_endpoint_overlap",
+            placement_label="Normal Move",
+        )
+
+
 def test_objective_control_records_update_at_phase_and_turn_end() -> None:
     state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
 
@@ -256,6 +353,14 @@ def test_objective_control_records_update_at_phase_and_turn_end() -> None:
     ]
     assert state.objective_control_records[-1].phase == BattlePhase.FIGHT.value
     assert state.objective_control_records[-1].active_player_id == "player-a"
+
+
+def test_objective_control_boundary_requires_mission_setup() -> None:
+    state = GameState.from_config(_config(mission_setup=None))
+    state.enter_battle()
+
+    with pytest.raises(GameLifecycleError, match="MissionSetup"):
+        state.advance_to_next_battle_phase()
 
 
 def test_objective_control_payloads_round_trip_without_object_reprs() -> None:
@@ -404,13 +509,7 @@ def _battle_state_with_center_objective_positions(
     player_b_offsets: tuple[tuple[float, float], ...] = (),
     battle_shocked_unit_ids: tuple[str, ...] = (),
 ) -> GameState:
-    mission_setup = MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
-        mission_pool_entry_id="mission-a",
-        terrain_layout_id="layout-1",
-        attacker_player_id="player-a",
-        defender_player_id="player-b",
-    )
+    mission_setup = _mission_setup()
     config = _config(mission_setup=mission_setup)
     armies = _mustered_armies(config)
     state = GameState.from_config(config)
@@ -459,6 +558,38 @@ def _with_model_offsets(
     return unit_placement.with_model_placements(tuple(placements))
 
 
+def _straight_line_witness(
+    unit_placement: UnitPlacement,
+    *,
+    delta_x: float,
+) -> PathWitness:
+    return PathWitness.for_straight_line_endpoints(
+        tuple(
+            (
+                placement.model_instance_id,
+                placement.pose,
+                Pose.at(
+                    placement.pose.position.x + delta_x,
+                    placement.pose.position.y,
+                    placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                ),
+            )
+            for placement in unit_placement.model_placements
+        )
+    )
+
+
+def _mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pool_entry_id="mission-a",
+        terrain_layout_id="layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+
+
 def _center_marker_definition(state: GameState) -> ObjectiveMarkerDefinition:
     if state.mission_setup is None:
         raise AssertionError("test state requires mission setup")
@@ -484,7 +615,7 @@ def _scenario_from_state(state: GameState) -> BattlefieldScenario:
     )
 
 
-def _config(*, mission_setup: MissionSetup) -> GameConfig:
+def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11b-game",

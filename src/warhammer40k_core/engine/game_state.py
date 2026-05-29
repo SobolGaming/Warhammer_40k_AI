@@ -24,7 +24,12 @@ from warhammer40k_core.engine.army_mustering import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldRuntimeStatePayload,
+    BattlefieldScenario,
     PlacementError,
+    geometry_model_for_placement,
+)
+from warhammer40k_core.engine.endpoint_placement import (
+    objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupPayload
@@ -678,6 +683,17 @@ class GameState:
             )
         if self.battlefield_state is not None:
             raise GameLifecycleError("GameState battlefield_state already exists.")
+        self._assert_battlefield_state_clear_of_objective_markers(battlefield_state)
+        self.battlefield_state = battlefield_state
+
+    def replace_battlefield_state(self, battlefield_state: BattlefieldRuntimeState) -> None:
+        if type(battlefield_state) is not BattlefieldRuntimeState:
+            raise GameLifecycleError(
+                "GameState battlefield_state must be a BattlefieldRuntimeState."
+            )
+        if self.battlefield_state is None:
+            raise GameLifecycleError("GameState battlefield_state does not exist.")
+        self._assert_battlefield_state_clear_of_objective_markers(battlefield_state)
         self.battlefield_state = battlefield_state
 
     def record_mission_setup(self, mission_setup: MissionSetup) -> None:
@@ -1186,7 +1202,7 @@ class GameState:
         timing: ObjectiveControlTiming,
     ) -> None:
         if self.mission_setup is None:
-            return
+            raise GameLifecycleError("Objective control updates require MissionSetup.")
         if self.battlefield_state is None:
             raise GameLifecycleError("Objective control updates require battlefield_state.")
         if self.active_player_id is None:
@@ -1199,6 +1215,39 @@ class GameState:
             )
         )
         self.record_objective_control_record(record)
+
+    def _assert_battlefield_state_clear_of_objective_markers(
+        self,
+        battlefield_state: BattlefieldRuntimeState,
+    ) -> None:
+        if self.mission_setup is None:
+            return
+        markers = tuple(
+            marker.to_objective_marker() for marker in self.mission_setup.objective_markers
+        )
+        if not markers:
+            return
+        scenario = BattlefieldScenario(
+            armies=tuple(self.army_definitions),
+            battlefield_state=battlefield_state,
+        )
+        for placed_army in battlefield_state.placed_armies:
+            for unit_placement in placed_army.unit_placements:
+                for model_placement in unit_placement.model_placements:
+                    model = geometry_model_for_placement(
+                        model=scenario.model_instance_for_placement(model_placement),
+                        placement=model_placement,
+                    )
+                    violation = objective_marker_endpoint_placement_violation(
+                        model=model,
+                        objective_markers=markers,
+                        violation_code="objective_marker_endpoint_overlap",
+                        placement_label="Battlefield placement",
+                    )
+                    if violation is not None:
+                        raise GameLifecycleError(
+                            "Battlefield placement cannot end on an objective marker."
+                        )
 
     def _clear_turn_action_states(self, *, player_id: str, battle_round: int) -> None:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
