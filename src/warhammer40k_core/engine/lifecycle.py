@@ -47,6 +47,10 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
+from warhammer40k_core.engine.triggered_movement import (
+    SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+    TriggeredMovementHandler,
+)
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 
@@ -70,6 +74,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         DICE_REROLL_DECISION_TYPE,
     )
 )
+_TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,))
 
 
 def _new_decision_controller() -> DecisionController:
@@ -84,6 +89,9 @@ class GameLifecycle:
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
     _movement_phase_handler: MovementPhaseHandler = field(default_factory=MovementPhaseHandler)
+    _triggered_movement_handler: TriggeredMovementHandler = field(
+        default_factory=TriggeredMovementHandler
+    )
     _battle_round_flow: BattleRoundFlow | None = None
 
     def start(self, config: GameConfig) -> LifecycleStatus:
@@ -93,6 +101,9 @@ class GameLifecycle:
             raise GameLifecycleError("GameLifecycle has already started.")
         self._config = config
         self._movement_phase_handler = MovementPhaseHandler(
+            ruleset_descriptor=config.ruleset_descriptor
+        )
+        self._triggered_movement_handler = TriggeredMovementHandler(
             ruleset_descriptor=config.ruleset_descriptor
         )
         self.state = GameState.from_config(config)
@@ -187,6 +198,15 @@ class GameLifecycle:
             if movement_status is not None:
                 return movement_status
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
+            triggered_status = self._triggered_movement_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if triggered_status is not None:
+                return triggered_status
+            return self.advance_until_decision_or_terminal()
         raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
 
     def to_payload(self) -> GameLifecyclePayload:
@@ -206,6 +226,9 @@ class GameLifecycle:
             state=GameState.from_payload(payload["state"]),
             _config=config,
             _movement_phase_handler=MovementPhaseHandler(
+                ruleset_descriptor=None if config is None else config.ruleset_descriptor
+            ),
+            _triggered_movement_handler=TriggeredMovementHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
         )
@@ -252,6 +275,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
+    _validate_surge_move_state_consistency(state=state)
     if config is None:
         return
     if state.game_id != config.game_id:
@@ -617,6 +641,24 @@ def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:
             and fell_back_state.unit_instance_id not in fully_removed_active_player_unit_ids
         ):
             raise GameLifecycleError("fell_back_unit_states unit is not active player's unit.")
+
+
+def _validate_surge_move_state_consistency(*, state: GameState) -> None:
+    if not state.surge_move_states:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("surge_move_states require battle stage.")
+    unit_owner_by_id = {
+        unit.unit_instance_id: army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    for surge_state in state.surge_move_states:
+        owner = unit_owner_by_id.get(surge_state.unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("surge_move_states unit is unknown.")
+        if owner != surge_state.player_id:
+            raise GameLifecycleError("surge_move_states player_id does not match unit owner.")
 
 
 def _embarked_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:

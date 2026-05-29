@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10R** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10S unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10S** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10T unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -62,6 +62,7 @@ Completed / implemented foundation:
 | 10P | Complete | Reinforcements, Strategic Reserves, Deep Strike, and reserve placement |
 | 10Q | Complete | Transport Embark/Disembark, Firing Deck, and destroyed transport emergency disembark |
 | 10R | Complete | Aircraft and Hover movement/reserve behavior |
+| 10S | Complete | Triggered and surge movement foundation |
 
 ## Cross-cutting architectural rules
 
@@ -676,6 +677,8 @@ CORE V1 relevant areas:
 
 ## Phase 10S: triggered and surge movement foundation
 
+Status: Complete.
+
 Modules:
 
 - `engine/triggered_movement.py`
@@ -693,6 +696,8 @@ Invariants:
 
 - triggered movement is not a Movement phase action;
 - surge-like movement is a triggered displacement;
+- optional triggered movement can be declined through the same decision path;
+- mandatory triggered movement omits decline choices;
 - each unit can only make one surge move per phase unless a rule says otherwise;
 - Battle-shocked units cannot make surge moves unless a rule says otherwise;
 - units within Engagement Range cannot make surge moves unless a rule says otherwise;
@@ -706,6 +711,7 @@ Required tests:
 - surge movement cannot occur while within Engagement Range;
 - one surge move per phase is enforced;
 - triggered movement emits displacement records;
+- declined triggered movement emits a deterministic event without battlefield mutation;
 - triggered movement records source rule and trigger timing;
 - triggered movement does not appear in `SELECT_MOVEMENT_ACTION`.
 
