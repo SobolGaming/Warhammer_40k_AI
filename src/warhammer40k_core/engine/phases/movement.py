@@ -129,14 +129,6 @@ class DesperateEscapeRequirementReason(StrEnum):
     BATTLE_SHOCKED = "battle_shocked"
 
 
-_SUPPORTED_MOVEMENT_PHASE_ACTIONS = (
-    MovementPhaseActionKind.REMAIN_STATIONARY,
-    MovementPhaseActionKind.NORMAL_MOVE,
-)
-_UNSUPPORTED_MOVEMENT_PHASE_ACTIONS = (
-    MovementPhaseActionKind.ADVANCE,
-    MovementPhaseActionKind.FALL_BACK,
-)
 _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT = (
     MovementPhaseActionKind.REMAIN_STATIONARY,
     MovementPhaseActionKind.NORMAL_MOVE,
