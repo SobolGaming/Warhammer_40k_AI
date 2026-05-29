@@ -349,6 +349,53 @@ def test_oversized_strategic_reserve_exception_still_rejects_enemy_distance() ->
     assert _violation_codes(result) == (ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE,)
 
 
+def test_strategic_reserves_enemy_distance_message_is_limit_agnostic() -> None:
+    _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
+        reserve_base_diameter_mm=32.0,
+    )
+    radius = _base_radius_inches(32.0)
+    reserve_pose = _south_edge_touching_pose(base_diameter_mm=32.0, x=15.0)
+    enemy_model_id = (
+        scenario.army_by_id("army-beta")
+        .unit_by_id("army-beta:intercessor-unit-3")
+        .own_models[0]
+        .model_instance_id
+    )
+    scenario = _with_model_pose(
+        scenario,
+        model_instance_id=enemy_model_id,
+        pose=Pose.at(
+            x=reserve_pose.position.x + (radius * 2.0) + 0.25,
+            y=reserve_pose.position.y,
+            z=10.0,
+            facing_degrees=180.0,
+        ),
+    )
+
+    result = resolve_reserve_arrival(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        reserve_state=reserve_state,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=reserve_pose,
+        ),
+        battle_round=3,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        strategic_reserve_rule=StrategicReserveRule(enemy_horizontal_distance_inches=0.5),
+    )
+
+    distance_violations = tuple(
+        violation
+        for violation in result.violations
+        if violation.violation_code is ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE
+    )
+    assert len(distance_violations) == 1
+    assert distance_violations[0].message == (
+        "Reserve placement is within the configured reserve enemy-distance limit."
+    )
+
+
 def test_strategic_reserves_reject_setup_within_enemy_engagement_range() -> None:
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
         reserve_base_diameter_mm=32.0,

@@ -1883,7 +1883,10 @@ def _append_common_reserve_placement_violations(
                 violations.append(
                     ReservePlacementViolation(
                         violation_code=ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE,
-                        message="Reserve placement is within 9 inches horizontally of an enemy.",
+                        message=(
+                            "Reserve placement is within the configured reserve "
+                            "enemy-distance limit."
+                        ),
                         model_instance_id=model.model_id,
                         blocker_id=enemy_model.model_id,
                     )
