@@ -93,6 +93,7 @@ from warhammer40k_core.engine.unit_coherency import (
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pathing import (
     PathConstraintViolation,
     PathValidationResult,
@@ -3235,7 +3236,13 @@ def _apply_movement_action_decision(  # noqa: RET503
                     "violation_code": drift_code,
                 },
             )
-        transition_reason = _aircraft_reserve_transition_reason_for_normal_move(resolution)
+        transition_reason = _aircraft_reserve_transition_reason_for_normal_move(
+            resolution=resolution,
+            scenario=scenario,
+            unit_placement=unit_placement,
+            battlefield_width_inches=_DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+            battlefield_depth_inches=_DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+        )
         if transition_reason is not None:
             _apply_aircraft_reserve_transition_for_normal_move(
                 state=state,
@@ -3612,10 +3619,19 @@ def _resolve_and_apply_advance_move(
 
 
 def _aircraft_reserve_transition_reason_for_normal_move(
+    *,
     resolution: NormalMoveResolution,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
 ) -> AircraftReserveTransitionReason | None:
     if type(resolution) is not NormalMoveResolution:
         raise GameLifecycleError("Aircraft reserve transition requires NormalMoveResolution.")
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("Aircraft reserve transition requires a BattlefieldScenario.")
+    if type(unit_placement) is not UnitPlacement:
+        raise GameLifecycleError("Aircraft reserve transition requires a UnitPlacement.")
     policy_payload = resolution.movement_payload.get("aircraft_movement_policy")
     if policy_payload is None:
         return None
@@ -3634,7 +3650,18 @@ def _aircraft_reserve_transition_reason_for_normal_move(
     }
     if "battlefield_edge_crossed" in violation_codes:
         return AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED
-    if "aircraft_minimum_move_required" in violation_codes:
+    if "aircraft_minimum_move_required" in violation_codes and any(
+        _aircraft_minimum_move_unavailable(
+            moving_model=geometry_model_for_placement(
+                model=scenario.model_instance_for_placement(placement),
+                placement=placement,
+            ),
+            battlefield_width_inches=battlefield_width_inches,
+            battlefield_depth_inches=battlefield_depth_inches,
+            minimum_move_inches=_aircraft_minimum_move_inches(policy),
+        )
+        for placement in unit_placement.model_placements
+    ):
         return AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE
     return None
 
@@ -4787,20 +4814,6 @@ def _resolve_unit_move(
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must be an integer.")
     if movement_bonus_inches < 0:
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must not be negative.")
-    witness = (
-        _default_move_witness(
-            scenario=scenario,
-            unit_placement=unit_placement,
-            movement_bonus_inches=movement_bonus_inches,
-        )
-        if path_witness is None
-        else path_witness
-    )
-    _validate_move_witness_matches_unit(
-        witness=witness,
-        unit_placement=unit_placement,
-        action_label=action_label,
-    )
     unit = scenario.unit_instance_for_placement(unit_placement)
     hover_mode_state = _hover_mode_state_for_unit(
         hover_mode_states=hover_mode_states,
@@ -4810,6 +4823,22 @@ def _resolve_unit_move(
         unit=unit,
         ruleset_descriptor=ruleset_descriptor,
         hover_mode_state=hover_mode_state,
+    )
+    witness = (
+        _default_move_witness(
+            scenario=scenario,
+            unit_placement=unit_placement,
+            aircraft_policy=aircraft_policy,
+            movement_bonus_inches=movement_bonus_inches,
+            movement_phase_action=movement_phase_action,
+        )
+        if path_witness is None
+        else path_witness
+    )
+    _validate_move_witness_matches_unit(
+        witness=witness,
+        unit_placement=unit_placement,
+        action_label=action_label,
     )
     aircraft_model_ids = aircraft_model_ids_for_scenario(
         scenario,
@@ -4827,8 +4856,22 @@ def _resolve_unit_move(
     max_movement_inches = 0.0
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
-        base_movement_inches = _model_movement_inches(model)
-        movement_inches = float(base_movement_inches + movement_bonus_inches)
+        base_movement_inches = _model_base_movement_inches(
+            model=model,
+            aircraft_policy=aircraft_policy,
+        )
+        movement_inches = _model_default_movement_distance_inches(
+            model=model,
+            aircraft_policy=aircraft_policy,
+            movement_bonus_inches=movement_bonus_inches,
+            movement_phase_action=movement_phase_action,
+        )
+        movement_distance_budget_inches = _model_movement_budget_inches(
+            model=model,
+            aircraft_policy=aircraft_policy,
+            movement_bonus_inches=movement_bonus_inches,
+            movement_phase_action=movement_phase_action,
+        )
         max_movement_inches = max(max_movement_inches, movement_inches)
         moving_model = geometry_model_for_placement(model=model, placement=placement)
         model_witness = PathWitness.for_paths(
@@ -4867,9 +4910,7 @@ def _resolve_unit_move(
                 for model_id in aircraft_model_ids
                 if model_id != placement.model_instance_id
             ),
-            movement_distance_budget_inches=(
-                None if aircraft_policy.uses_aircraft_rules else movement_inches
-            ),
+            movement_distance_budget_inches=movement_distance_budget_inches,
         ).validate()
         aircraft_violations: tuple[AircraftMovementViolation, ...] = ()
         if (
@@ -4958,17 +4999,28 @@ def _default_move_witness(
     *,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
+    aircraft_policy: AircraftMovementPolicy,
     movement_bonus_inches: int,
+    movement_phase_action: MovementPhaseActionKind,
 ) -> PathWitness:
     model_paths: list[tuple[str, Pose, Pose]] = []
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
-        movement_inches = _model_movement_inches(model) + movement_bonus_inches
+        movement_inches = _model_default_movement_distance_inches(
+            model=model,
+            aircraft_policy=aircraft_policy,
+            movement_bonus_inches=movement_bonus_inches,
+            movement_phase_action=movement_phase_action,
+        )
         model_paths.append(
             (
                 placement.model_instance_id,
                 placement.pose,
-                _translated_pose(placement.pose, movement_inches=movement_inches),
+                _default_move_end_pose(
+                    start_pose=placement.pose,
+                    aircraft_policy=aircraft_policy,
+                    movement_inches=movement_inches,
+                ),
             )
         )
     return PathWitness.for_straight_line_endpoints(tuple(model_paths))
@@ -5685,14 +5737,126 @@ def _model_movement_inches(model: ModelInstance) -> int:
     raise GameLifecycleError("Normal Move requires a Movement characteristic.")
 
 
-def _translated_pose(pose: Pose, *, movement_inches: int) -> Pose:
-    if type(movement_inches) is not int:
-        raise GameLifecycleError("movement_inches must be an integer.")
-    if movement_inches < 1:
-        raise GameLifecycleError("movement_inches must be at least 1.")
+def _model_base_movement_inches(
+    *,
+    model: ModelInstance,
+    aircraft_policy: AircraftMovementPolicy,
+) -> float:
+    if type(model) is not ModelInstance:
+        raise GameLifecycleError("Movement model must be a ModelInstance.")
+    if type(aircraft_policy) is not AircraftMovementPolicy:
+        raise GameLifecycleError("Movement budget requires an AircraftMovementPolicy.")
+    if aircraft_policy.hover_mode_active:
+        return 20.0
+    return _model_movement_inches(model)
+
+
+def _model_movement_budget_inches(
+    *,
+    model: ModelInstance,
+    aircraft_policy: AircraftMovementPolicy,
+    movement_bonus_inches: int,
+    movement_phase_action: MovementPhaseActionKind,
+) -> float | None:
+    if type(movement_phase_action) is not MovementPhaseActionKind:
+        raise GameLifecycleError("movement_phase_action must be a MovementPhaseActionKind.")
+    if aircraft_policy.uses_aircraft_rules:
+        return None
+    return _model_base_movement_inches(
+        model=model,
+        aircraft_policy=aircraft_policy,
+    ) + float(movement_bonus_inches)
+
+
+def _model_default_movement_distance_inches(
+    *,
+    model: ModelInstance,
+    aircraft_policy: AircraftMovementPolicy,
+    movement_bonus_inches: int,
+    movement_phase_action: MovementPhaseActionKind,
+) -> float:
+    if aircraft_policy.uses_aircraft_rules:
+        return _aircraft_minimum_move_inches(aircraft_policy)
+    movement_budget = _model_movement_budget_inches(
+        model=model,
+        aircraft_policy=aircraft_policy,
+        movement_bonus_inches=movement_bonus_inches,
+        movement_phase_action=movement_phase_action,
+    )
+    if movement_budget is None:
+        raise GameLifecycleError("Default movement distance requires a finite movement budget.")
+    return movement_budget
+
+
+def _default_move_end_pose(
+    *,
+    start_pose: Pose,
+    aircraft_policy: AircraftMovementPolicy,
+    movement_inches: float,
+) -> Pose:
+    if aircraft_policy.uses_aircraft_rules:
+        return _translated_forward_pose(start_pose, movement_inches=movement_inches)
     return Pose.at(
-        x=pose.position.x + movement_inches,
-        y=pose.position.y,
+        x=start_pose.position.x + movement_inches,
+        y=start_pose.position.y,
+        z=start_pose.position.z,
+        facing_degrees=start_pose.facing.degrees,
+    )
+
+
+def _aircraft_minimum_move_inches(aircraft_policy: AircraftMovementPolicy) -> float:
+    if type(aircraft_policy) is not AircraftMovementPolicy:
+        raise GameLifecycleError("Aircraft minimum move requires an AircraftMovementPolicy.")
+    minimum_move_inches = aircraft_policy.minimum_move_inches
+    if minimum_move_inches is None:
+        raise GameLifecycleError("AIRCRAFT movement policy requires minimum_move_inches.")
+    return minimum_move_inches
+
+
+def _aircraft_minimum_move_unavailable(
+    *,
+    moving_model: Model,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
+    minimum_move_inches: float,
+) -> bool:
+    if type(moving_model) is not Model:
+        raise GameLifecycleError("Aircraft minimum move requires a geometry Model.")
+    endpoint = _translated_forward_pose(moving_model.pose, movement_inches=minimum_move_inches)
+    return not _model_is_within_battlefield(
+        _model_at_pose(moving_model, endpoint),
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+    )
+
+
+def _model_is_within_battlefield(
+    model: Model,
+    *,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
+) -> bool:
+    if type(model) is not Model:
+        raise GameLifecycleError("Battlefield containment requires a geometry Model.")
+    width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
+    depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
+    footprint_bounds = shapely_backend.footprint_for_base(model.base, model.pose).bounds
+    min_x, min_y, max_x, max_y = footprint_bounds
+    return min_x >= 0.0 and min_y >= 0.0 and max_x <= width and max_y <= depth
+
+
+def _translated_forward_pose(pose: Pose, *, movement_inches: float) -> Pose:
+    if type(movement_inches) not in (int, float):
+        raise GameLifecycleError("movement_inches must be a number.")
+    distance = float(movement_inches)
+    if not math.isfinite(distance):
+        raise GameLifecycleError("movement_inches must be finite.")
+    if distance < 1.0:
+        raise GameLifecycleError("movement_inches must be at least 1.")
+    facing_radians = math.radians(pose.facing.degrees)
+    return Pose.at(
+        x=pose.position.x + (distance * math.cos(facing_radians)),
+        y=pose.position.y + (distance * math.sin(facing_radians)),
         z=pose.position.z,
         facing_degrees=pose.facing.degrees,
     )
@@ -6131,6 +6295,20 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_positive_number(field_name: str, value: object) -> float:
+    if type(value) is int:
+        number = float(value)
+    elif type(value) is float:
+        number = value
+    else:
+        raise GameLifecycleError(f"{field_name} must be a number.")
+    if not math.isfinite(number):
+        raise GameLifecycleError(f"{field_name} must be finite.")
+    if number <= 0.0:
+        raise GameLifecycleError(f"{field_name} must be greater than 0.")
+    return number
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import math
+from collections.abc import Mapping
 from dataclasses import replace
 from typing import cast
 
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceRollResult, DiceRollState
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
 from warhammer40k_core.engine.aircraft import (
@@ -35,8 +38,9 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -62,6 +66,10 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseHandler,
     MovementPhaseState,
     MovementPhaseStepKind,
+    _aircraft_minimum_move_unavailable,  # pyright: ignore[reportPrivateUsage]
+    _model_base_movement_inches,  # pyright: ignore[reportPrivateUsage]
+    _model_movement_budget_inches,  # pyright: ignore[reportPrivateUsage]
+    _translated_forward_pose,  # pyright: ignore[reportPrivateUsage]
     resolve_advance_move,
     resolve_normal_move,
 )
@@ -71,10 +79,14 @@ from warhammer40k_core.engine.reserves import (
     ReserveOrigin,
     ReservePlacementViolationCode,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness
-from warhammer40k_core.geometry.pathing import PathValidationContext, PathWitness
+from warhammer40k_core.geometry.pathing import (
+    PathValidationContext,
+    PathWitness,
+    PathWitnessPayload,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 from warhammer40k_core.geometry.volume import Model, ModelVolume
@@ -229,6 +241,97 @@ def test_persisted_hover_mode_disables_aircraft_minimum_move_and_pivot_restricti
         for path_result in result.path_validation_results
         for violation in path_result.violations
     )
+
+
+def test_hover_aircraft_uses_twenty_inch_move_budget_for_normal_move() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    state.record_hover_mode_state(_hover_state_for_aircraft(aircraft))
+    assert _model_movement_inches(aircraft.own_models[0]) < 20
+
+    scenario = _scenario_from_state(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    hover_witness = _single_model_forward_witness(unit_placement, movement_inches=20.0)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        unit_placement=unit_placement,
+        path_witness=hover_witness,
+        hover_mode_states=tuple(state.hover_mode_states),
+    )
+
+    assert resolution.is_valid
+    model_payload = _single_model_movement_payload(resolution.movement_payload)
+    assert model_payload["base_movement_inches"] == 20.0
+    assert model_payload["movement_inches"] == 20.0
+    distance_witness = cast(dict[str, object], model_payload["movement_distance_witness"])
+    budget = cast(dict[str, object], distance_witness["budget"])
+    assert budget["max_distance_inches"] == 20.0
+
+
+def test_hover_aircraft_can_advance_twenty_plus_d6() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    state.record_hover_mode_state(_hover_state_for_aircraft(aircraft))
+
+    scenario = _scenario_from_state(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    hover_witness = _single_model_forward_witness(unit_placement, movement_inches=21.0)
+
+    resolution = resolve_advance_move(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        unit_placement=unit_placement,
+        advance_roll=_advance_roll_result(aircraft.unit_instance_id),
+        path_witness=hover_witness,
+        hover_mode_states=tuple(state.hover_mode_states),
+    )
+
+    assert resolution.is_valid
+    model_payload = _single_model_movement_payload(resolution.movement_payload)
+    assert model_payload["base_movement_inches"] == 20.0
+    assert model_payload["movement_inches"] == 21.0
+    distance_witness = cast(dict[str, object], model_payload["movement_distance_witness"])
+    budget = cast(dict[str, object], distance_witness["budget"])
+    assert budget["max_distance_inches"] == 21.0
+
+
+def test_aircraft_movement_budget_helpers_fail_fast() -> None:
+    scenario, aircraft, _enemy = _aircraft_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    model_placement = unit_placement.model_placements[0]
+    model = scenario.model_instance_for_placement(model_placement)
+    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
+
+    with pytest.raises(GameLifecycleError, match="Movement model must be"):
+        _model_base_movement_inches(
+            model=cast(ModelInstance, object()),
+            aircraft_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="AircraftMovementPolicy"):
+        _model_base_movement_inches(
+            model=model,
+            aircraft_policy=cast(AircraftMovementPolicy, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="movement_phase_action"):
+        _model_movement_budget_inches(
+            model=model,
+            aircraft_policy=policy,
+            movement_bonus_inches=0,
+            movement_phase_action=cast(MovementPhaseActionKind, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="geometry Model"):
+        _aircraft_minimum_move_unavailable(
+            moving_model=cast(Model, object()),
+            battlefield_width_inches=60.0,
+            battlefield_depth_inches=44.0,
+            minimum_move_inches=20.0,
+        )
+    with pytest.raises(GameLifecycleError, match="movement_inches must be a number"):
+        _translated_forward_pose(Pose.at(0.0, 0.0), movement_inches=cast(float, object()))
+    with pytest.raises(GameLifecycleError, match="movement_inches must be finite"):
+        _translated_forward_pose(Pose.at(0.0, 0.0), movement_inches=float("inf"))
+    with pytest.raises(GameLifecycleError, match="movement_inches must be at least 1"):
+        _translated_forward_pose(Pose.at(0.0, 0.0), movement_inches=0.0)
 
 
 def test_persisted_hover_mode_state_round_trips_through_lifecycle_payload() -> None:
@@ -597,23 +700,48 @@ def test_invalid_aircraft_reserve_transition_is_typed_and_cannot_mutate() -> Non
         )
 
 
-@pytest.mark.parametrize(
-    ("pose", "expected_reason"),
-    [
-        (
-            Pose.at(55.0, 10.0),
-            AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED,
-        ),
-        (
-            Pose.at(10.0, 10.0),
-            AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE,
-        ),
-    ],
-)
-def test_aircraft_normal_move_lifecycle_transitions_to_reserves_and_completes_activation(
-    pose: Pose,
-    expected_reason: AircraftReserveTransitionReason,
-) -> None:
+def test_aircraft_default_normal_move_witness_moves_twenty_forward_without_reserves() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=aircraft.unit_instance_id,
+    )
+    normal_payload = cast(
+        dict[str, object],
+        action_request.option_by_id(MovementPhaseActionKind.NORMAL_MOVE.value).payload,
+    )
+    default_witness = PathWitness.from_payload(cast(PathWitnessPayload, normal_payload["witness"]))
+    model_id = aircraft.own_models[0].model_instance_id
+
+    assert default_witness.final_pose_for_model(model_id) == Pose.at(30.0, 10.0)
+
+    status = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        result_id="phase10r-aircraft-default-normal-move",
+    )
+
+    assert status is None
+    assert state.reserve_state_for_unit(aircraft.unit_instance_id) is None
+    assert state.battlefield_state is not None
+    moved_placement = state.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    assert moved_placement.model_placements[0].pose == Pose.at(30.0, 10.0)
+    completed_payload = _last_event_payload(decisions, "movement_activation_completed")
+    assert completed_payload["displacement_kind"] == "normal_move"
+    transition_batch = cast(dict[str, object], completed_payload["transition_batch"])
+    assert len(cast(list[object], transition_batch["displacements"])) == 1
+    assert transition_batch["removals"] == []
+    model_payload = _single_model_movement_payload(completed_payload)
+    distance_witness = cast(dict[str, object], model_payload["movement_distance_witness"])
+    assert distance_witness["budget"] is None
+
+
+def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() -> None:
+    pose = Pose.at(55.0, 10.0)
+    expected_reason = AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED
     state, aircraft = _aircraft_battle_state(aircraft_pose=pose)
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
@@ -665,6 +793,76 @@ def test_aircraft_normal_move_lifecycle_transitions_to_reserves_and_completes_ac
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
 
 
+def test_aircraft_submitted_short_witness_is_invalid_when_minimum_move_fits() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    assert state.battlefield_state is not None
+    original_battlefield_payload = state.battlefield_state.to_payload()
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=aircraft.unit_instance_id,
+    )
+    unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
+        aircraft.unit_instance_id
+    )
+    short_witness = _single_model_forward_witness(unit_placement, movement_inches=10.0)
+
+    status = _submit_custom_normal_move_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        unit_placement=unit_placement,
+        witness=short_witness,
+        result_id="phase10r-aircraft-short-witness-invalid",
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    status_payload = cast(dict[str, object], status.payload)
+    assert status_payload["violation_code"] == "aircraft_minimum_move_required"
+    assert state.reserve_state_for_unit(aircraft.unit_instance_id) is None
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == original_battlefield_payload
+
+
+def test_aircraft_short_witness_transitions_when_mandatory_minimum_move_cannot_fit() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(40.0, 10.0))
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=aircraft.unit_instance_id,
+    )
+    unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
+        aircraft.unit_instance_id
+    )
+    short_witness = _single_model_forward_witness(unit_placement, movement_inches=10.0)
+
+    status = _submit_custom_normal_move_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        unit_placement=unit_placement,
+        witness=short_witness,
+        result_id="phase10r-aircraft-short-witness-minimum-unavailable",
+    )
+
+    assert status is None
+    assert state.battlefield_state is not None
+    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
+        state.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    reserve_state = state.reserve_state_for_unit(aircraft.unit_instance_id)
+    assert reserve_state is not None
+    assert reserve_state.required_arrival_source_rule_id == (
+        AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE.value
+    )
+    completed_payload = _last_event_payload(decisions, "movement_activation_completed")
+    transition_payload = cast(dict[str, object], completed_payload["aircraft_reserve_transition"])
+    assert (
+        transition_payload["reason"]
+        == AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE.value
+    )
+
+
 def test_aircraft_arrival_uses_reserve_battlefield_and_terrain_validation() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
@@ -708,7 +906,7 @@ def test_aircraft_arrival_uses_reserve_battlefield_and_terrain_validation() -> N
 
 
 def test_aircraft_transition_reserve_state_is_required_next_controller_turn_only() -> None:
-    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(55.0, 10.0))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
         unit_instance_id=aircraft.unit_instance_id,
@@ -719,7 +917,7 @@ def test_aircraft_transition_reserve_state_is_required_next_controller_turn_only
         decisions=decisions,
         request=action_request,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-        result_id="phase10r-aircraft-minimum-transition",
+        result_id="phase10r-aircraft-edge-transition",
     )
     reserve_state = state.reserve_state_for_unit(aircraft.unit_instance_id)
     assert reserve_state is not None
@@ -1026,6 +1224,110 @@ def _battle_state_from_scenario(scenario: BattlefieldScenario) -> GameState:
         active_player_id="player-a",
         army_definitions=list(scenario.armies),
         battlefield_state=scenario.battlefield_state,
+    )
+
+
+def _scenario_from_state(state: GameState) -> BattlefieldScenario:
+    assert state.battlefield_state is not None
+    return BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+
+
+def _single_model_forward_witness(
+    unit_placement: UnitPlacement,
+    *,
+    movement_inches: float,
+) -> PathWitness:
+    model_placement = unit_placement.model_placements[0]
+    facing_radians = math.radians(model_placement.pose.facing.degrees)
+    return PathWitness.for_straight_line_endpoints(
+        (
+            (
+                model_placement.model_instance_id,
+                model_placement.pose,
+                Pose.at(
+                    model_placement.pose.position.x + (movement_inches * math.cos(facing_radians)),
+                    model_placement.pose.position.y + (movement_inches * math.sin(facing_radians)),
+                    z=model_placement.pose.position.z,
+                    facing_degrees=model_placement.pose.facing.degrees,
+                ),
+            ),
+        )
+    )
+
+
+def _single_model_movement_payload(
+    movement_payload: Mapping[str, object],
+) -> dict[str, object]:
+    model_movements = cast(list[object], movement_payload["model_movements"])
+    assert len(model_movements) == 1
+    return cast(dict[str, object], model_movements[0])
+
+
+def _model_movement_inches(model: ModelInstance) -> int:
+    for characteristic in model.characteristics:
+        if characteristic.characteristic is Characteristic.MOVEMENT:
+            return characteristic.final
+    raise AssertionError("Missing Movement characteristic.")
+
+
+def _submit_custom_normal_move_decision(
+    handler: MovementPhaseHandler,
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    unit_placement: UnitPlacement,
+    witness: PathWitness,
+    result_id: str,
+) -> LifecycleStatus | None:
+    resolution = resolve_normal_move(
+        scenario=_scenario_from_state(state),
+        ruleset_descriptor=_ruleset(),
+        unit_placement=unit_placement,
+        path_witness=witness,
+        hover_mode_states=tuple(state.hover_mode_states),
+    )
+    custom_payload = validate_json_value(
+        {
+            "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+            "displacement_kind": "normal_move",
+            "unit_instance_id": unit_placement.unit_instance_id,
+            "witness": resolution.witness.to_payload(),
+            **resolution.movement_payload,
+        }
+    )
+    custom_options = tuple(
+        DecisionOption(
+            option_id=option.option_id,
+            label=option.label,
+            payload=custom_payload,
+        )
+        if option.option_id == MovementPhaseActionKind.NORMAL_MOVE.value
+        else option
+        for option in request.options
+    )
+    custom_request = DecisionRequest(
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        payload=request.payload,
+        options=custom_options,
+    )
+    decisions.queue.remove_by_id(request.request_id)
+    decisions.request_decision(custom_request)
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=custom_request,
+        selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+    )
+    decisions.submit_result(result)
+    return handler.apply_decision(
+        state=state,
+        result=result,
+        decisions=decisions,
     )
 
 

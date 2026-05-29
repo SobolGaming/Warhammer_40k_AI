@@ -643,9 +643,10 @@ Objects:
 Invariants:
 
 - `AIRCRAFT` have special pivot and movement behavior;
-- non-Hover `AIRCRAFT` that cross a battlefield edge or cannot satisfy minimum move during a Movement phase Normal Move transition into Strategic Reserves through the lifecycle path;
+- non-Hover `AIRCRAFT` use aircraft-policy movement distance resolution, with no upper Normal Move budget and a default 20" straight-forward witness instead of datasheet `M`;
+- non-Hover `AIRCRAFT` that cross a battlefield edge or cannot satisfy minimum move during a Movement phase Normal Move transition into Strategic Reserves through the lifecycle path, while short submitted witnesses remain invalid when a legal 20" move is available;
 - aircraft reserve transitions remove the unit from the battlefield, record mandatory next-controller-turn arrival metadata, and complete the movement activation without ordinary displacement records or post-move Embark;
-- `HOVER` mode is stored in `GameState`, round-trips through replay payloads, and changes movement policy;
+- `HOVER` mode is stored in `GameState`, round-trips through replay payloads, changes movement policy, and uses a Hover-derived 20" Move characteristic for Normal Move and Advance budgets;
 - other models' movement around `AIRCRAFT` follows the aircraft movement policy;
 - enemy `AIRCRAFT` engagement is tracked separately so non-Aircraft units engaged only by enemy Aircraft can still choose Normal Move or Advance while endpoint validation remains strict;
 - aircraft restrictions in Charge/Fight are exposed for later phases.
@@ -654,9 +655,10 @@ Required tests:
 
 - aircraft pivot policy uses 0" in generic pivot accounting;
 - aircraft reserve transition emits removal/placement records as appropriate;
-- Movement phase Normal Move lifecycle transitions edge/minimum-move Aircraft into Strategic Reserves;
+- Movement phase Normal Move lifecycle transitions edge/minimum-move-unavailable Aircraft into Strategic Reserves;
+- central non-Hover Aircraft get a default 20" straight-forward Normal Move witness with no movement-distance budget, and short submitted witnesses are invalid rather than reserve transitions when 20" fits;
 - Aircraft transition ReserveState is eligible and required in the controller's next Movement phase only;
-- persisted hover state changes movement availability and disables Aircraft minimum-move/pivot restrictions;
+- persisted hover state changes movement availability, uses 20"/20"+D6 movement budgets, and disables Aircraft minimum-move/pivot restrictions;
 - replay rejects HoverModeState owner/unit/source drift and stale selected Aircraft policy payloads;
 - non-Aircraft units engaged only by enemy Aircraft can choose Normal Move and Advance, but cannot end within enemy Aircraft Engagement Range;
 - aircraft setup/arrival validates battlefield and terrain restrictions.
