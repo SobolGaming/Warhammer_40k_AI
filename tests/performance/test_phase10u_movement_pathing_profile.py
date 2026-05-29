@@ -83,6 +83,22 @@ def test_phase10u_same_seed_and_scenario_produce_same_benchmark_result() -> None
     assert first.to_payload() == second.to_payload()
 
 
+def test_phase10u_report_id_is_execution_artifact_not_workload_identity() -> None:
+    scenario = PerformanceScenario.for_kind(
+        PerformanceScenarioKind.CROWDED_INFANTRY,
+        seed=10_014,
+        iteration_count=1,
+    )
+
+    first = run_hotspot_profile((scenario,), timer=_StepTimer(start_ns=50, step_ns=25))
+    second = run_hotspot_profile((scenario,), timer=_StepTimer(start_ns=50, step_ns=50))
+
+    assert first.results[0].elapsed_ns != second.results[0].elapsed_ns
+    assert first.report_id != second.report_id
+    assert first.results[0].scenario_hash == second.results[0].scenario_hash
+    assert first.results[0].workload_digest == second.results[0].workload_digest
+
+
 def test_phase10u_cli_exits_nonzero_when_configured_budget_is_exceeded() -> None:
     env = os.environ.copy()
     src_path = str(ROOT / "src")

@@ -1,3 +1,9 @@
+"""Deterministic workload counters and execution reports for Phase 10U profiling.
+
+`report_id` includes measured elapsed time and identifies one profiler execution. Use
+`scenario_hash` and `workload_digest` for deterministic workload comparison across runs.
+"""
+
 from __future__ import annotations
 
 import json
