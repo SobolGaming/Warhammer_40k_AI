@@ -49,6 +49,7 @@ from warhammer40k_core.engine.transports import (
     TransportCargoState,
     TransportCargoStatePayload,
 )
+from warhammer40k_core.engine.triggered_movement import SurgeMoveState, SurgeMoveStatePayload
 
 
 class SecondaryMissionMode(StrEnum):
@@ -104,6 +105,7 @@ class GameStatePayload(TypedDict):
     disembarked_unit_states: list[DisembarkedUnitStatePayload]
     advanced_unit_states: list[AdvancedUnitStatePayload]
     fell_back_unit_states: list[FellBackUnitStatePayload]
+    surge_move_states: list[SurgeMoveStatePayload]
     battle_shocked_unit_ids: list[str]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
@@ -122,6 +124,10 @@ def _new_advanced_unit_states() -> list[AdvancedUnitState]:
 
 
 def _new_fell_back_unit_states() -> list[FellBackUnitState]:
+    return []
+
+
+def _new_surge_move_states() -> list[SurgeMoveState]:
     return []
 
 
@@ -387,6 +393,7 @@ class GameState:
     fell_back_unit_states: list[FellBackUnitState] = field(
         default_factory=_new_fell_back_unit_states
     )
+    surge_move_states: list[SurgeMoveState] = field(default_factory=_new_surge_move_states)
     battle_shocked_unit_ids: list[str] = field(default_factory=_new_battle_shocked_unit_ids)
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
@@ -468,6 +475,10 @@ class GameState:
         )
         self.fell_back_unit_states = _validate_fell_back_unit_states(
             self.fell_back_unit_states,
+            player_ids=self.player_ids,
+        )
+        self.surge_move_states = _validate_surge_move_states(
+            self.surge_move_states,
             player_ids=self.player_ids,
         )
         self.battle_shocked_unit_ids = list(
@@ -891,6 +902,45 @@ class GameState:
                 return state
         return None
 
+    def record_surge_move_state(self, state: SurgeMoveState) -> None:
+        if type(state) is not SurgeMoveState:
+            raise GameLifecycleError("Surge move state must be a SurgeMoveState.")
+        if state.player_id not in self.player_ids:
+            raise GameLifecycleError("SurgeMoveState player_id is not in this game.")
+        if any(stored.result_id == state.result_id for stored in self.surge_move_states):
+            raise GameLifecycleError("SurgeMoveState already exists for result_id.")
+        self.surge_move_states.append(state)
+        self.surge_move_states.sort(
+            key=lambda stored: (
+                stored.battle_round,
+                stored.phase,
+                stored.player_id,
+                stored.unit_instance_id,
+                stored.result_id,
+            )
+        )
+
+    def surge_move_states_for_unit_phase(
+        self,
+        *,
+        player_id: str,
+        battle_round: int,
+        phase: str,
+        unit_instance_id: str,
+    ) -> tuple[SurgeMoveState, ...]:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        requested_phase = _validate_identifier("phase", phase)
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        return tuple(
+            state
+            for state in self.surge_move_states
+            if state.player_id == requested_player_id
+            and state.battle_round == requested_round
+            and state.phase == requested_phase
+            and state.unit_instance_id == requested_unit_id
+        )
+
     def to_payload(self) -> GameStatePayload:
         return {
             "game_id": self.game_id,
@@ -923,6 +973,7 @@ class GameState:
             ],
             "advanced_unit_states": [state.to_payload() for state in self.advanced_unit_states],
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
+            "surge_move_states": [state.to_payload() for state in self.surge_move_states],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
@@ -1005,6 +1056,9 @@ class GameState:
             ],
             fell_back_unit_states=[
                 FellBackUnitState.from_payload(state) for state in payload["fell_back_unit_states"]
+            ],
+            surge_move_states=[
+                SurgeMoveState.from_payload(state) for state in payload["surge_move_states"]
             ],
             battle_shocked_unit_ids=list(payload["battle_shocked_unit_ids"]),
             secondary_mission_choices=[
@@ -1363,6 +1417,38 @@ def _validate_fell_back_unit_states(
     return sorted(
         validated,
         key=lambda state: (state.battle_round, state.player_id, state.unit_instance_id),
+    )
+
+
+def _validate_surge_move_states(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[SurgeMoveState]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState surge_move_states must be a list.")
+    validated: list[SurgeMoveState] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not SurgeMoveState:
+            raise GameLifecycleError(
+                "GameState surge_move_states must contain SurgeMoveState values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("SurgeMoveState player_id is not in this game.")
+        if value.result_id in seen:
+            raise GameLifecycleError("GameState surge_move_states must be unique by result.")
+        seen.add(value.result_id)
+        validated.append(value)
+    return sorted(
+        validated,
+        key=lambda state: (
+            state.battle_round,
+            state.phase,
+            state.player_id,
+            state.unit_instance_id,
+            state.result_id,
+        ),
     )
 
 

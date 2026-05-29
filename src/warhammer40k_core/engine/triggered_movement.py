@@ -1,0 +1,1443 @@
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import TYPE_CHECKING, Self, TypedDict, cast
+
+from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
+    RulesetDescriptor,
+    movement_mode_from_token,
+)
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRuntimeState,
+    BattlefieldScenario,
+    BattlefieldTransitionBatch,
+    ModelDisplacementKind,
+    ModelDisplacementRecord,
+    UnitPlacement,
+    geometry_model_for_placement,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.movement_legality import MovementLegalityContext
+from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
+from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowPayload
+from warhammer40k_core.engine.unit_coherency import (
+    MovementRollbackRecord,
+    MovementRollbackRecordPayload,
+    UnitCoherencyResult,
+    UnitCoherencyResultPayload,
+    resolve_unit_movement_endpoint_coherency,
+)
+from warhammer40k_core.geometry.pathing import (
+    PathValidationResult,
+    PathValidationResultPayload,
+    PathWitness,
+    PathWitnessPayload,
+    TerrainPathLegalityResult,
+    TerrainPathLegalityResultPayload,
+)
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
+from warhammer40k_core.geometry.volume import Model
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
+
+
+SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE = "select_triggered_movement"
+_DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
+_DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
+
+
+class TriggeredMovementKind(StrEnum):
+    SURGE = "surge"
+    TRIGGERED = "triggered"
+
+
+class TriggeredMovementViolationCode(StrEnum):
+    BATTLE_SHOCKED_SURGE_FORBIDDEN = "battle_shocked_surge_forbidden"
+    ENGAGEMENT_RANGE_SURGE_FORBIDDEN = "engagement_range_surge_forbidden"
+    SURGE_MOVE_ALREADY_USED_THIS_PHASE = "surge_move_already_used_this_phase"
+
+
+class TriggeredMovementDescriptorPayload(TypedDict):
+    movement_kind: str
+    source_rule_id: str
+    trigger_timing: ReactionWindowPayload
+    max_distance_inches: float
+    movement_mode: str
+    allow_battle_shocked: bool
+    allow_within_engagement_range: bool
+    one_per_phase: bool
+
+
+class TriggeredMovementViolationPayload(TypedDict):
+    violation_code: str
+    message: str
+
+
+class SurgeMoveStatePayload(TypedDict):
+    player_id: str
+    battle_round: int
+    phase: str
+    unit_instance_id: str
+    source_rule_id: str
+    trigger_timing: ReactionWindowPayload
+    request_id: str
+    result_id: str
+
+
+class TriggeredMovementResolutionPayload(TypedDict):
+    unit_instance_id: str
+    descriptor: TriggeredMovementDescriptorPayload
+    attempted_placement: dict[str, JsonValue]
+    witness: PathWitnessPayload
+    restriction_violations: list[TriggeredMovementViolationPayload]
+    path_validation_results: list[PathValidationResultPayload]
+    terrain_path_legality_results: list[TerrainPathLegalityResultPayload]
+    coherency_result: UnitCoherencyResultPayload
+    rollback_record: MovementRollbackRecordPayload | None
+    movement_payload: dict[str, JsonValue]
+
+
+@dataclass(frozen=True, slots=True)
+class TriggeredMovementDescriptor:
+    movement_kind: TriggeredMovementKind
+    source_rule_id: str
+    trigger_timing: ReactionWindow
+    max_distance_inches: float
+    movement_mode: MovementMode = MovementMode.NORMAL
+    allow_battle_shocked: bool = False
+    allow_within_engagement_range: bool = False
+    one_per_phase: bool = True
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "movement_kind",
+            triggered_movement_kind_from_token(self.movement_kind),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("TriggeredMovementDescriptor source_rule_id", self.source_rule_id),
+        )
+        if type(self.trigger_timing) is not ReactionWindow:
+            raise GameLifecycleError(
+                "TriggeredMovementDescriptor trigger_timing must be a ReactionWindow."
+            )
+        object.__setattr__(
+            self,
+            "max_distance_inches",
+            _validate_positive_number(
+                "TriggeredMovementDescriptor max_distance_inches",
+                self.max_distance_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "movement_mode",
+            movement_mode_from_token(self.movement_mode),
+        )
+        object.__setattr__(
+            self,
+            "allow_battle_shocked",
+            _validate_bool(
+                "TriggeredMovementDescriptor allow_battle_shocked",
+                self.allow_battle_shocked,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "allow_within_engagement_range",
+            _validate_bool(
+                "TriggeredMovementDescriptor allow_within_engagement_range",
+                self.allow_within_engagement_range,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "one_per_phase",
+            _validate_bool("TriggeredMovementDescriptor one_per_phase", self.one_per_phase),
+        )
+
+    @property
+    def displacement_kind(self) -> ModelDisplacementKind:
+        if self.movement_kind is TriggeredMovementKind.SURGE:
+            return ModelDisplacementKind.SURGE_MOVE
+        return ModelDisplacementKind.TRIGGERED_MOVE
+
+    def to_payload(self) -> TriggeredMovementDescriptorPayload:
+        return {
+            "movement_kind": self.movement_kind.value,
+            "source_rule_id": self.source_rule_id,
+            "trigger_timing": self.trigger_timing.to_payload(),
+            "max_distance_inches": self.max_distance_inches,
+            "movement_mode": self.movement_mode.value,
+            "allow_battle_shocked": self.allow_battle_shocked,
+            "allow_within_engagement_range": self.allow_within_engagement_range,
+            "one_per_phase": self.one_per_phase,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TriggeredMovementDescriptorPayload) -> Self:
+        return cls(
+            movement_kind=triggered_movement_kind_from_token(payload["movement_kind"]),
+            source_rule_id=payload["source_rule_id"],
+            trigger_timing=ReactionWindow.from_payload(payload["trigger_timing"]),
+            max_distance_inches=payload["max_distance_inches"],
+            movement_mode=movement_mode_from_token(payload["movement_mode"]),
+            allow_battle_shocked=payload["allow_battle_shocked"],
+            allow_within_engagement_range=payload["allow_within_engagement_range"],
+            one_per_phase=payload["one_per_phase"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TriggeredMovementViolation:
+    violation_code: TriggeredMovementViolationCode
+    message: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "violation_code",
+            triggered_movement_violation_code_from_token(self.violation_code),
+        )
+        object.__setattr__(
+            self,
+            "message",
+            _validate_identifier("TriggeredMovementViolation message", self.message),
+        )
+
+    def to_payload(self) -> TriggeredMovementViolationPayload:
+        return {
+            "violation_code": self.violation_code.value,
+            "message": self.message,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TriggeredMovementViolationPayload) -> Self:
+        return cls(
+            violation_code=triggered_movement_violation_code_from_token(payload["violation_code"]),
+            message=payload["message"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class SurgeMoveState:
+    player_id: str
+    battle_round: int
+    phase: str
+    unit_instance_id: str
+    source_rule_id: str
+    trigger_timing: ReactionWindow
+    request_id: str
+    result_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("SurgeMoveState player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("SurgeMoveState battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "phase",
+            _validate_identifier("SurgeMoveState phase", self.phase),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("SurgeMoveState unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("SurgeMoveState source_rule_id", self.source_rule_id),
+        )
+        if type(self.trigger_timing) is not ReactionWindow:
+            raise GameLifecycleError("SurgeMoveState trigger_timing must be a ReactionWindow.")
+        if self.trigger_timing.phase.value != self.phase:
+            raise GameLifecycleError("SurgeMoveState phase must match trigger_timing phase.")
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("SurgeMoveState request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("SurgeMoveState result_id", self.result_id),
+        )
+
+    @classmethod
+    def from_resolution(
+        cls,
+        *,
+        player_id: str,
+        battle_round: int,
+        unit_instance_id: str,
+        descriptor: TriggeredMovementDescriptor,
+        request_id: str,
+        result_id: str,
+    ) -> Self:
+        if type(descriptor) is not TriggeredMovementDescriptor:
+            raise GameLifecycleError("SurgeMoveState requires a TriggeredMovementDescriptor.")
+        if descriptor.movement_kind is not TriggeredMovementKind.SURGE:
+            raise GameLifecycleError("SurgeMoveState can record only surge movement.")
+        return cls(
+            player_id=player_id,
+            battle_round=battle_round,
+            phase=descriptor.trigger_timing.phase.value,
+            unit_instance_id=unit_instance_id,
+            source_rule_id=descriptor.source_rule_id,
+            trigger_timing=descriptor.trigger_timing,
+            request_id=request_id,
+            result_id=result_id,
+        )
+
+    def same_phase_key(self) -> tuple[int, str, str, str]:
+        return (self.battle_round, self.phase, self.player_id, self.unit_instance_id)
+
+    def to_payload(self) -> SurgeMoveStatePayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "phase": self.phase,
+            "unit_instance_id": self.unit_instance_id,
+            "source_rule_id": self.source_rule_id,
+            "trigger_timing": self.trigger_timing.to_payload(),
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SurgeMoveStatePayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            phase=payload["phase"],
+            unit_instance_id=payload["unit_instance_id"],
+            source_rule_id=payload["source_rule_id"],
+            trigger_timing=ReactionWindow.from_payload(payload["trigger_timing"]),
+            request_id=payload["request_id"],
+            result_id=payload["result_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TriggeredMovementResolution:
+    unit_instance_id: str
+    descriptor: TriggeredMovementDescriptor
+    attempted_placement: UnitPlacement
+    witness: PathWitness
+    restriction_violations: tuple[TriggeredMovementViolation, ...]
+    path_validation_results: tuple[PathValidationResult, ...]
+    terrain_path_legality_results: tuple[TerrainPathLegalityResult, ...]
+    coherency_result: UnitCoherencyResult
+    rollback_record: MovementRollbackRecord | None
+    movement_payload: dict[str, JsonValue]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "TriggeredMovementResolution unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        if type(self.descriptor) is not TriggeredMovementDescriptor:
+            raise GameLifecycleError("TriggeredMovementResolution descriptor must be a descriptor.")
+        if type(self.attempted_placement) is not UnitPlacement:
+            raise GameLifecycleError(
+                "TriggeredMovementResolution attempted_placement must be a UnitPlacement."
+            )
+        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
+            raise GameLifecycleError("TriggeredMovementResolution attempted placement drift.")
+        if type(self.witness) is not PathWitness:
+            raise GameLifecycleError("TriggeredMovementResolution witness must be a PathWitness.")
+        object.__setattr__(
+            self,
+            "restriction_violations",
+            _validate_triggered_movement_violations(self.restriction_violations),
+        )
+        object.__setattr__(
+            self,
+            "path_validation_results",
+            _validate_path_validation_result_tuple(self.path_validation_results),
+        )
+        object.__setattr__(
+            self,
+            "terrain_path_legality_results",
+            _validate_terrain_path_legality_result_tuple(self.terrain_path_legality_results),
+        )
+        if type(self.coherency_result) is not UnitCoherencyResult:
+            raise GameLifecycleError(
+                "TriggeredMovementResolution coherency_result must be UnitCoherencyResult."
+            )
+        if self.rollback_record is not None and type(self.rollback_record) is not (
+            MovementRollbackRecord
+        ):
+            raise GameLifecycleError(
+                "TriggeredMovementResolution rollback_record must be MovementRollbackRecord."
+            )
+        object.__setattr__(
+            self,
+            "movement_payload",
+            _validate_json_object(
+                "TriggeredMovementResolution movement_payload",
+                self.movement_payload,
+            ),
+        )
+
+    @property
+    def is_valid(self) -> bool:
+        return (
+            not self.restriction_violations
+            and all(result.is_valid for result in self.path_validation_results)
+            and all(result.is_valid for result in self.terrain_path_legality_results)
+            and self.rollback_record is None
+        )
+
+    def transition_batch(self, *, before: UnitPlacement) -> BattlefieldTransitionBatch:
+        if not self.is_valid:
+            raise GameLifecycleError("Invalid triggered movement cannot emit displacement records.")
+        before_poses = {
+            placement.model_instance_id: placement.pose for placement in before.model_placements
+        }
+        displacement_records: list[ModelDisplacementRecord] = []
+        for placement in self.attempted_placement.model_placements:
+            if placement.model_instance_id not in before_poses:
+                raise GameLifecycleError("Triggered movement references an unknown model.")
+            model_path = self.witness.poses_for_model(placement.model_instance_id)
+            displacement_records.append(
+                ModelDisplacementRecord(
+                    model_instance_id=placement.model_instance_id,
+                    displacement_kind=self.descriptor.displacement_kind,
+                    start_pose=before_poses[placement.model_instance_id],
+                    end_pose=placement.pose,
+                    path_witness=PathWitness.for_paths(
+                        ((placement.model_instance_id, model_path),)
+                    ),
+                    source_phase=self.descriptor.trigger_timing.phase.value,
+                    source_step=self.descriptor.trigger_timing.source_step,
+                    source_rule_id=self.descriptor.source_rule_id,
+                    source_event_id=self.descriptor.trigger_timing.source_event_id,
+                )
+            )
+        return BattlefieldTransitionBatch(displacements=tuple(displacement_records))
+
+    def selected_payload_drift_code(self, payload: dict[str, JsonValue]) -> str | None:
+        selected_payload = _validate_json_object("Triggered movement selected payload", payload)
+        if selected_payload.get("descriptor") != self.descriptor.to_payload():
+            return "triggered_movement_descriptor_drift"
+        if selected_payload.get("witness") != self.witness.to_payload():
+            return "triggered_movement_witness_drift"
+        if selected_payload.get("model_movements") != self.movement_payload["model_movements"]:
+            return "triggered_movement_model_movement_witness_drift"
+        return None
+
+    def to_payload(self) -> TriggeredMovementResolutionPayload:
+        return {
+            "unit_instance_id": self.unit_instance_id,
+            "descriptor": self.descriptor.to_payload(),
+            "attempted_placement": cast(
+                dict[str, JsonValue],
+                self.attempted_placement.to_payload(),
+            ),
+            "witness": self.witness.to_payload(),
+            "restriction_violations": [
+                violation.to_payload() for violation in self.restriction_violations
+            ],
+            "path_validation_results": [
+                result.to_payload() for result in self.path_validation_results
+            ],
+            "terrain_path_legality_results": [
+                result.to_payload() for result in self.terrain_path_legality_results
+            ],
+            "coherency_result": self.coherency_result.to_payload(),
+            "rollback_record": (
+                None if self.rollback_record is None else self.rollback_record.to_payload()
+            ),
+            "movement_payload": self.movement_payload,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class TriggeredMovementRequest:
+    request_id: str
+    game_id: str
+    battle_round: int
+    player_id: str
+    active_player_id: str
+    current_phase: str
+    unit_instance_id: str
+    descriptor: TriggeredMovementDescriptor
+    resolutions: tuple[TriggeredMovementResolution, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("TriggeredMovementRequest request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "game_id",
+            _validate_identifier("TriggeredMovementRequest game_id", self.game_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("TriggeredMovementRequest battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("TriggeredMovementRequest player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier(
+                "TriggeredMovementRequest active_player_id",
+                self.active_player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "current_phase",
+            _validate_identifier("TriggeredMovementRequest current_phase", self.current_phase),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "TriggeredMovementRequest unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        if type(self.descriptor) is not TriggeredMovementDescriptor:
+            raise GameLifecycleError(
+                "TriggeredMovementRequest descriptor must be a TriggeredMovementDescriptor."
+            )
+        object.__setattr__(
+            self,
+            "resolutions",
+            _validate_triggered_movement_resolutions(
+                self.resolutions,
+                unit_instance_id=self.unit_instance_id,
+                descriptor=self.descriptor,
+            ),
+        )
+
+    def to_decision_request(self) -> DecisionRequest:
+        return DecisionRequest(
+            request_id=self.request_id,
+            decision_type=SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+            actor_id=self.player_id,
+            payload={
+                "game_id": self.game_id,
+                "battle_round": self.battle_round,
+                "active_player_id": self.active_player_id,
+                "current_phase": self.current_phase,
+                "player_id": self.player_id,
+                "unit_instance_id": self.unit_instance_id,
+                "descriptor": validate_json_value(self.descriptor.to_payload()),
+                "triggered_movement_kind": self.descriptor.movement_kind.value,
+                "source_rule_id": self.descriptor.source_rule_id,
+                "trigger_timing": validate_json_value(self.descriptor.trigger_timing.to_payload()),
+            },
+            options=self._decision_options(),
+        )
+
+    def _decision_options(self) -> tuple[DecisionOption, ...]:
+        options: list[DecisionOption] = []
+        for index, resolution in enumerate(self.resolutions, start=1):
+            option_id = f"{self.descriptor.movement_kind.value}_move_{index:03d}"
+            options.append(
+                DecisionOption(
+                    option_id=option_id,
+                    label=f"{self.descriptor.movement_kind.value.title()} Move {index}",
+                    payload=validate_json_value(
+                        {
+                            "triggered_movement_kind": self.descriptor.movement_kind.value,
+                            "displacement_kind": self.descriptor.displacement_kind.value,
+                            "unit_instance_id": self.unit_instance_id,
+                            "descriptor": self.descriptor.to_payload(),
+                            "witness": resolution.witness.to_payload(),
+                            **resolution.movement_payload,
+                        }
+                    ),
+                )
+            )
+        return tuple(options)
+
+
+@dataclass(frozen=True, slots=True)
+class TriggeredMovementHandler:
+    ruleset_descriptor: RulesetDescriptor | None = None
+
+    def request_from_state(
+        self,
+        *,
+        state: GameState,
+        unit_instance_id: str,
+        descriptor: TriggeredMovementDescriptor,
+        candidate_witnesses: tuple[PathWitness, ...],
+    ) -> DecisionRequest:
+        _validate_triggered_movement_state_ready(state)
+        ruleset_descriptor = _ruleset_descriptor_for_handler(self)
+        if type(descriptor) is not TriggeredMovementDescriptor:
+            raise GameLifecycleError("Triggered movement requires a descriptor.")
+        candidate_witness_tuple = _validate_path_witness_tuple(candidate_witnesses)
+        if not candidate_witness_tuple:
+            raise GameLifecycleError("Triggered movement requires at least one movement choice.")
+        scenario = _battlefield_scenario(state)
+        unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+        resolutions = tuple(
+            resolve_triggered_movement(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_placement=unit_placement,
+                descriptor=descriptor,
+                path_witness=witness,
+                battle_round=state.battle_round,
+                battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+                surge_move_states=tuple(state.surge_move_states),
+            )
+            for witness in candidate_witness_tuple
+        )
+        invalid_resolutions = tuple(
+            resolution for resolution in resolutions if not resolution.is_valid
+        )
+        if invalid_resolutions:
+            first_invalid = invalid_resolutions[0]
+            raise GameLifecycleError(
+                "Triggered movement request candidates must all be valid: "
+                f"{_triggered_movement_violation_code(first_invalid)}."
+            )
+        current_phase = state.current_battle_phase
+        if current_phase is None:
+            raise GameLifecycleError("Triggered movement requires current battle phase.")
+        active_player_id = state.active_player_id
+        if active_player_id is None:
+            raise GameLifecycleError("Triggered movement requires active_player_id.")
+        return TriggeredMovementRequest(
+            request_id=state.next_decision_request_id(),
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            player_id=unit_placement.player_id,
+            active_player_id=active_player_id,
+            current_phase=current_phase.value,
+            unit_instance_id=unit_placement.unit_instance_id,
+            descriptor=descriptor,
+            resolutions=resolutions,
+        ).to_decision_request()
+
+    def apply_decision(
+        self,
+        *,
+        state: GameState,
+        result: DecisionResult,
+        decisions: DecisionController,
+    ) -> LifecycleStatus | None:
+        _validate_triggered_movement_state_ready(state)
+        if result.decision_type != SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE:
+            raise GameLifecycleError("TriggeredMovementHandler received unsupported decision_type.")
+        ruleset_descriptor = _ruleset_descriptor_for_handler(self)
+        request_payload = _request_payload_for_result(decisions=decisions, result=result)
+        descriptor = TriggeredMovementDescriptor.from_payload(
+            cast(TriggeredMovementDescriptorPayload, _payload_object(request_payload, "descriptor"))
+        )
+        payload = _decision_payload_object(result.payload)
+        unit_instance_id = _payload_string(payload, "unit_instance_id")
+        if unit_instance_id != _payload_string(request_payload, "unit_instance_id"):
+            raise GameLifecycleError("Triggered movement result unit drift.")
+        scenario = _battlefield_scenario(state)
+        unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+        if result.actor_id != unit_placement.player_id:
+            raise GameLifecycleError("Triggered movement actor must own the moving unit.")
+        witness = _payload_path_witness(payload, "witness")
+        resolution = resolve_triggered_movement(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            descriptor=descriptor,
+            path_witness=witness,
+            battle_round=state.battle_round,
+            battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            surge_move_states=tuple(state.surge_move_states),
+        )
+        drift_code = resolution.selected_payload_drift_code(payload)
+        if drift_code is not None:
+            invalid_payload = _triggered_movement_invalid_payload(
+                state=state,
+                result=result,
+                unit_instance_id=unit_instance_id,
+                descriptor=descriptor,
+                resolution=resolution,
+                violation_code=drift_code,
+            )
+            decisions.event_log.append("triggered_movement_invalid", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Triggered movement replay payload drift.",
+                payload=invalid_payload,
+            )
+        if not resolution.is_valid:
+            violation_code = _triggered_movement_violation_code(resolution)
+            invalid_payload = _triggered_movement_invalid_payload(
+                state=state,
+                result=result,
+                unit_instance_id=unit_instance_id,
+                descriptor=descriptor,
+                resolution=resolution,
+                violation_code=violation_code,
+            )
+            decisions.event_log.append("triggered_movement_invalid", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Triggered movement is invalid.",
+                payload=invalid_payload,
+            )
+        transition_batch = resolution.transition_batch(before=unit_placement)
+        battlefield_state = state.battlefield_state
+        if battlefield_state is None:
+            raise GameLifecycleError("Triggered movement requires battlefield_state.")
+        state.battlefield_state = battlefield_state.with_unit_placement(
+            resolution.attempted_placement
+        )
+        if descriptor.movement_kind is TriggeredMovementKind.SURGE:
+            state.record_surge_move_state(
+                SurgeMoveState.from_resolution(
+                    player_id=unit_placement.player_id,
+                    battle_round=state.battle_round,
+                    unit_instance_id=unit_instance_id,
+                    descriptor=descriptor,
+                    request_id=result.request_id,
+                    result_id=result.result_id,
+                )
+            )
+        decisions.event_log.append(
+            "triggered_movement_resolved",
+            _triggered_movement_resolved_payload(
+                state=state,
+                result=result,
+                unit_instance_id=unit_instance_id,
+                descriptor=descriptor,
+                resolution=resolution,
+                transition_batch=transition_batch,
+            ),
+        )
+        return None
+
+
+def resolve_triggered_movement(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    descriptor: TriggeredMovementDescriptor,
+    path_witness: PathWitness,
+    battle_round: int,
+    battle_shocked_unit_ids: tuple[str, ...] = (),
+    surge_move_states: tuple[SurgeMoveState, ...] = (),
+    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    terrain: tuple[TerrainVolume, ...] = (),
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+) -> TriggeredMovementResolution:
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("Triggered movement requires a BattlefieldScenario.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Triggered movement requires a RulesetDescriptor.")
+    if type(unit_placement) is not UnitPlacement:
+        raise GameLifecycleError("Triggered movement requires a UnitPlacement.")
+    if type(descriptor) is not TriggeredMovementDescriptor:
+        raise GameLifecycleError("Triggered movement requires a descriptor.")
+    if type(path_witness) is not PathWitness:
+        raise GameLifecycleError("Triggered movement requires a PathWitness.")
+    triggered_round = _validate_positive_int("battle_round", battle_round)
+    _validate_move_witness_matches_unit(
+        witness=path_witness,
+        unit_placement=unit_placement,
+    )
+    restriction_violations = _triggered_movement_restriction_violations(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        descriptor=descriptor,
+        battle_round=triggered_round,
+        battle_shocked_unit_ids=battle_shocked_unit_ids,
+        surge_move_states=surge_move_states,
+    )
+    moved_placements = tuple(
+        placement.with_pose(path_witness.final_pose_for_model(placement.model_instance_id))
+        for placement in unit_placement.model_placements
+    )
+    attempted_placement = unit_placement.with_model_placements(moved_placements)
+    unit = scenario.unit_instance_for_placement(unit_placement)
+    path_validation_results: list[PathValidationResult] = []
+    terrain_path_legality_results: list[TerrainPathLegalityResult] = []
+    model_movements: list[JsonValue] = []
+    for placement in unit_placement.model_placements:
+        model = scenario.model_instance_for_placement(placement)
+        moving_model = geometry_model_for_placement(model=model, placement=placement)
+        model_poses = path_witness.poses_for_model(placement.model_instance_id)
+        model_witness = PathWitness.for_paths(((placement.model_instance_id, model_poses),))
+        legality_context = MovementLegalityContext.from_keywords(
+            keywords=unit.keywords,
+            ruleset_descriptor=ruleset_descriptor,
+            movement_mode=descriptor.movement_mode,
+            movement_phase_action=None,
+            displacement_kind=descriptor.displacement_kind,
+        )
+        path_result = legality_context.to_path_validation_context(
+            moving_model=moving_model,
+            witness=model_witness,
+            battlefield_width_inches=battlefield_width_inches,
+            battlefield_depth_inches=battlefield_depth_inches,
+            friendly_models=_friendly_geometry_models_for_path(
+                scenario=scenario,
+                unit_placement=unit_placement,
+                attempted_placement=attempted_placement,
+                moving_model_instance_id=placement.model_instance_id,
+            ),
+            enemy_models=_enemy_geometry_models_for_player(
+                scenario=scenario,
+                player_id=unit_placement.player_id,
+            ),
+            terrain=(),
+            friendly_vehicle_monster_model_ids=_friendly_vehicle_monster_model_ids(
+                scenario=scenario,
+                player_id=unit_placement.player_id,
+                moving_model_instance_id=placement.model_instance_id,
+            ),
+            aircraft_model_ids=(),
+            movement_distance_budget_inches=descriptor.max_distance_inches,
+        ).validate()
+        terrain_result = legality_context.to_terrain_path_legality_context(
+            moving_model=moving_model,
+            witness=model_witness,
+            terrain=terrain,
+            terrain_features=terrain_features,
+        ).validate()
+        path_validation_results.append(path_result)
+        terrain_path_legality_results.append(terrain_result)
+        model_movements.append(
+            validate_json_value(
+                {
+                    "model_instance_id": placement.model_instance_id,
+                    "movement_inches": descriptor.max_distance_inches,
+                    "start_pose": placement.pose.to_payload(),
+                    "end_pose": path_witness.final_pose_for_model(
+                        placement.model_instance_id
+                    ).to_payload(),
+                    "movement_distance_witness": (
+                        None
+                        if path_result.movement_distance_witness is None
+                        else path_result.movement_distance_witness.to_payload()
+                    ),
+                    "path_validation_result": path_result.to_payload(),
+                    "terrain_path_legality_result": terrain_result.to_payload(),
+                }
+            )
+        )
+    _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        before=unit_placement,
+        attempted=attempted_placement,
+        displacement_kind=descriptor.displacement_kind,
+    )
+    movement_payload: dict[str, JsonValue] = {
+        "triggered_movement_kind": descriptor.movement_kind.value,
+        "displacement_kind": descriptor.displacement_kind.value,
+        "source_rule_id": descriptor.source_rule_id,
+        "trigger_timing": validate_json_value(descriptor.trigger_timing.to_payload()),
+        "movement_phase_action": None,
+        "movement_inches": descriptor.max_distance_inches,
+        "model_movements": model_movements,
+        "path_validation_results": validate_json_value(
+            [result.to_payload() for result in path_validation_results]
+        ),
+        "terrain_path_legality_results": validate_json_value(
+            [result.to_payload() for result in terrain_path_legality_results]
+        ),
+        "coherency_result": validate_json_value(coherency_result.to_payload()),
+    }
+    if restriction_violations:
+        movement_payload["restriction_violations"] = validate_json_value(
+            [violation.to_payload() for violation in restriction_violations]
+        )
+    return TriggeredMovementResolution(
+        unit_instance_id=unit_placement.unit_instance_id,
+        descriptor=descriptor,
+        attempted_placement=attempted_placement,
+        witness=path_witness,
+        restriction_violations=restriction_violations,
+        path_validation_results=tuple(path_validation_results),
+        terrain_path_legality_results=tuple(terrain_path_legality_results),
+        coherency_result=coherency_result,
+        rollback_record=rollback_record,
+        movement_payload=movement_payload,
+    )
+
+
+def apply_triggered_movement_to_battlefield(
+    *,
+    battlefield_state: BattlefieldRuntimeState,
+    resolution: TriggeredMovementResolution,
+) -> BattlefieldRuntimeState:
+    if type(battlefield_state) is not BattlefieldRuntimeState:
+        raise GameLifecycleError("Triggered movement apply requires battlefield_state.")
+    if type(resolution) is not TriggeredMovementResolution:
+        raise GameLifecycleError("Triggered movement apply requires a resolution.")
+    if not resolution.is_valid:
+        raise GameLifecycleError("Invalid triggered movement cannot mutate battlefield_state.")
+    return battlefield_state.with_unit_placement(resolution.attempted_placement)
+
+
+def triggered_movement_kind_from_token(token: object) -> TriggeredMovementKind:
+    if type(token) is TriggeredMovementKind:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("TriggeredMovementKind token must be a string.")
+    try:
+        return TriggeredMovementKind(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported TriggeredMovementKind token: {token}.") from exc
+
+
+def triggered_movement_violation_code_from_token(
+    token: object,
+) -> TriggeredMovementViolationCode:
+    if type(token) is TriggeredMovementViolationCode:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("TriggeredMovementViolationCode token must be a string.")
+    try:
+        return TriggeredMovementViolationCode(token)
+    except ValueError as exc:
+        raise GameLifecycleError(
+            f"Unsupported TriggeredMovementViolationCode token: {token}."
+        ) from exc
+
+
+def _triggered_movement_restriction_violations(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    descriptor: TriggeredMovementDescriptor,
+    battle_round: int,
+    battle_shocked_unit_ids: tuple[str, ...],
+    surge_move_states: tuple[SurgeMoveState, ...],
+) -> tuple[TriggeredMovementViolation, ...]:
+    if descriptor.movement_kind is not TriggeredMovementKind.SURGE:
+        return ()
+    violations: list[TriggeredMovementViolation] = []
+    battle_shocked_ids = set(
+        _validate_identifier_tuple("battle_shocked_unit_ids", battle_shocked_unit_ids)
+    )
+    if (
+        unit_placement.unit_instance_id in battle_shocked_ids
+        and not descriptor.allow_battle_shocked
+    ):
+        violations.append(
+            TriggeredMovementViolation(
+                violation_code=TriggeredMovementViolationCode.BATTLE_SHOCKED_SURGE_FORBIDDEN,
+                message="Battle-shocked units cannot make surge moves.",
+            )
+        )
+    if (
+        _enemy_engagement_model_ids_for_unit(
+            scenario=scenario,
+            unit_placement=unit_placement,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+        and not descriptor.allow_within_engagement_range
+    ):
+        violations.append(
+            TriggeredMovementViolation(
+                violation_code=TriggeredMovementViolationCode.ENGAGEMENT_RANGE_SURGE_FORBIDDEN,
+                message="Units within Engagement Range cannot make surge moves.",
+            )
+        )
+    if descriptor.one_per_phase:
+        requested_key = (
+            battle_round,
+            descriptor.trigger_timing.phase.value,
+            unit_placement.player_id,
+            unit_placement.unit_instance_id,
+        )
+        for state in _validate_surge_move_state_tuple(surge_move_states):
+            if state.same_phase_key() == requested_key:
+                violations.append(
+                    TriggeredMovementViolation(
+                        violation_code=(
+                            TriggeredMovementViolationCode.SURGE_MOVE_ALREADY_USED_THIS_PHASE
+                        ),
+                        message="Unit already made a surge move this phase.",
+                    )
+                )
+                break
+    return tuple(violations)
+
+
+def _enemy_engagement_model_ids_for_unit(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+) -> tuple[str, ...]:
+    friendly_models = _geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+    )
+    enemy_models = _enemy_geometry_models_for_player(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+    )
+    enemy_model_ids: set[str] = set()
+    for friendly_model in friendly_models:
+        for enemy_model in enemy_models:
+            if friendly_model.is_within_engagement_range(
+                enemy_model,
+                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
+                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+            ):
+                enemy_model_ids.add(enemy_model.model_id)
+    return tuple(sorted(enemy_model_ids))
+
+
+def _geometry_models_for_unit_placement(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+) -> tuple[Model, ...]:
+    return tuple(
+        geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(placement),
+            placement=placement,
+        )
+        for placement in unit_placement.model_placements
+    )
+
+
+def _friendly_geometry_models_for_path(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+    attempted_placement: UnitPlacement,
+    moving_model_instance_id: str,
+) -> tuple[Model, ...]:
+    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
+    friendly_models: list[Model] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id != unit_placement.player_id:
+            continue
+        for current_unit_placement in placed_army.unit_placements:
+            placements = (
+                attempted_placement.model_placements
+                if current_unit_placement.unit_instance_id == unit_placement.unit_instance_id
+                else current_unit_placement.model_placements
+            )
+            for placement in placements:
+                if placement.model_instance_id == moving_model_id:
+                    continue
+                friendly_models.append(
+                    geometry_model_for_placement(
+                        model=scenario.model_instance_for_placement(placement),
+                        placement=placement,
+                    )
+                )
+    return tuple(friendly_models)
+
+
+def _enemy_geometry_models_for_player(
+    *,
+    scenario: BattlefieldScenario,
+    player_id: str,
+) -> tuple[Model, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    enemy_models: list[Model] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id == requested_player_id:
+            continue
+        for unit_placement in placed_army.unit_placements:
+            enemy_models.extend(
+                geometry_model_for_placement(
+                    model=scenario.model_instance_for_placement(placement),
+                    placement=placement,
+                )
+                for placement in unit_placement.model_placements
+            )
+    return tuple(enemy_models)
+
+
+def _friendly_vehicle_monster_model_ids(
+    *,
+    scenario: BattlefieldScenario,
+    player_id: str,
+    moving_model_instance_id: str,
+) -> tuple[str, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
+    model_ids: list[str] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id != requested_player_id:
+            continue
+        for unit_placement in placed_army.unit_placements:
+            unit = scenario.unit_instance_for_placement(unit_placement)
+            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
+                continue
+            model_ids.extend(
+                placement.model_instance_id
+                for placement in unit_placement.model_placements
+                if placement.model_instance_id != moving_model_id
+            )
+    return tuple(sorted(model_ids))
+
+
+def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
+    keyword_set = {
+        _validate_identifier("unit keyword", keyword).upper().replace(" ", "_").replace("-", "_")
+        for keyword in keywords
+    }
+    return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
+
+
+def _triggered_movement_invalid_payload(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    unit_instance_id: str,
+    descriptor: TriggeredMovementDescriptor,
+    resolution: TriggeredMovementResolution,
+    violation_code: str,
+) -> dict[str, JsonValue]:
+    return _validate_json_object(
+        "triggered movement invalid payload",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": _current_battle_phase_value(state),
+            "unit_instance_id": unit_instance_id,
+            "triggered_movement_kind": descriptor.movement_kind.value,
+            "source_rule_id": descriptor.source_rule_id,
+            "trigger_timing": descriptor.trigger_timing.to_payload(),
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "triggered_movement_invalid",
+            "violation_code": violation_code,
+            **resolution.movement_payload,
+        },
+    )
+
+
+def _triggered_movement_resolved_payload(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    unit_instance_id: str,
+    descriptor: TriggeredMovementDescriptor,
+    resolution: TriggeredMovementResolution,
+    transition_batch: BattlefieldTransitionBatch,
+) -> dict[str, JsonValue]:
+    return _validate_json_object(
+        "triggered movement resolved payload",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": _current_battle_phase_value(state),
+            "unit_instance_id": unit_instance_id,
+            "triggered_movement_kind": descriptor.movement_kind.value,
+            "source_rule_id": descriptor.source_rule_id,
+            "trigger_timing": descriptor.trigger_timing.to_payload(),
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "triggered_movement_resolved",
+            "transition_batch": validate_json_value(transition_batch.to_payload()),
+            **resolution.movement_payload,
+        },
+    )
+
+
+def _triggered_movement_violation_code(resolution: TriggeredMovementResolution) -> str:
+    if resolution.restriction_violations:
+        return resolution.restriction_violations[0].violation_code.value
+    for path_result in resolution.path_validation_results:
+        if path_result.violations:
+            return path_result.violations[0].violation_code
+    for terrain_result in resolution.terrain_path_legality_results:
+        if terrain_result.violations:
+            return terrain_result.violations[0].violation_code
+    if resolution.rollback_record is not None:
+        return "unit_coherency_broken"
+    return "triggered_movement_invalid"
+
+
+def _request_payload_for_result(
+    *,
+    decisions: DecisionController,
+    result: DecisionResult,
+) -> dict[str, JsonValue]:
+    for request in decisions.queue.pending_requests:
+        if request.request_id == result.request_id:
+            return _decision_payload_object(request.payload)
+    for record in reversed(decisions.records):
+        if record.result == result:
+            return _decision_payload_object(record.request.payload)
+    raise GameLifecycleError("DecisionResult does not match a known triggered movement request.")
+
+
+def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Triggered movement requires battlefield_state.")
+    return BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=battlefield_state,
+    )
+
+
+def _current_battle_phase_value(state: GameState) -> str | None:
+    current_phase = state.current_battle_phase
+    return None if current_phase is None else current_phase.value
+
+
+def _validate_triggered_movement_state_ready(state: GameState) -> None:
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("Triggered movement requires battle stage.")
+    if state.current_battle_phase is None:
+        raise GameLifecycleError("Triggered movement requires current battle phase.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("Triggered movement requires active_player_id.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Triggered movement requires battlefield_state.")
+
+
+def _ruleset_descriptor_for_handler(handler: TriggeredMovementHandler) -> RulesetDescriptor:
+    if type(handler) is not TriggeredMovementHandler:
+        raise GameLifecycleError("Triggered movement requires a TriggeredMovementHandler.")
+    if handler.ruleset_descriptor is None:
+        raise GameLifecycleError("Triggered movement requires a RulesetDescriptor.")
+    return handler.ruleset_descriptor
+
+
+def _validate_move_witness_matches_unit(
+    *,
+    witness: PathWitness,
+    unit_placement: UnitPlacement,
+) -> None:
+    if type(witness) is not PathWitness:
+        raise GameLifecycleError("Triggered movement requires a PathWitness.")
+    expected_model_ids = tuple(
+        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
+    )
+    if tuple(sorted(witness.model_ids())) != expected_model_ids:
+        raise GameLifecycleError("Triggered movement witness must match selected unit models.")
+
+
+def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Decision payload must be an object.")
+    return payload
+
+
+def _payload_object(payload: dict[str, JsonValue], key: str) -> dict[str, JsonValue]:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"Decision payload key must be an object: {key}.")
+    return value
+
+
+def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if type(value) is not str:
+        raise GameLifecycleError(f"Decision payload key must be a string: {key}.")
+    return value
+
+
+def _payload_path_witness(payload: dict[str, JsonValue], key: str) -> PathWitness:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"Decision payload key must be a PathWitness payload: {key}.")
+    return PathWitness.from_payload(cast(PathWitnessPayload, value))
+
+
+def _validate_triggered_movement_resolutions(
+    values: object,
+    *,
+    unit_instance_id: str,
+    descriptor: TriggeredMovementDescriptor,
+) -> tuple[TriggeredMovementResolution, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("TriggeredMovementRequest resolutions must be a tuple.")
+    if not values:
+        raise GameLifecycleError("TriggeredMovementRequest requires at least one resolution.")
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    validated: list[TriggeredMovementResolution] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TriggeredMovementResolution:
+            raise GameLifecycleError(
+                "TriggeredMovementRequest resolutions must contain resolutions."
+            )
+        if value.unit_instance_id != requested_unit_id:
+            raise GameLifecycleError("TriggeredMovementRequest resolution unit drift.")
+        if value.descriptor != descriptor:
+            raise GameLifecycleError("TriggeredMovementRequest resolution descriptor drift.")
+        if not value.is_valid:
+            raise GameLifecycleError("TriggeredMovementRequest options must be valid choices.")
+        validated.append(value)
+    return tuple(validated)
+
+
+def _validate_triggered_movement_violations(
+    values: object,
+) -> tuple[TriggeredMovementViolation, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Triggered movement violations must be a tuple.")
+    return tuple(
+        _validate_triggered_movement_violation(value) for value in cast(tuple[object, ...], values)
+    )
+
+
+def _validate_triggered_movement_violation(value: object) -> TriggeredMovementViolation:
+    if type(value) is not TriggeredMovementViolation:
+        raise GameLifecycleError("Triggered movement violations must contain violations.")
+    return value
+
+
+def _validate_path_validation_result_tuple(
+    values: object,
+) -> tuple[PathValidationResult, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("path_validation_results must be a tuple.")
+    return tuple(
+        _validate_path_validation_result(value) for value in cast(tuple[object, ...], values)
+    )
+
+
+def _validate_path_validation_result(value: object) -> PathValidationResult:
+    if type(value) is not PathValidationResult:
+        raise GameLifecycleError("path_validation_results must contain PathValidationResult.")
+    return value
+
+
+def _validate_terrain_path_legality_result_tuple(
+    values: object,
+) -> tuple[TerrainPathLegalityResult, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("terrain_path_legality_results must be a tuple.")
+    return tuple(
+        _validate_terrain_path_legality_result(value) for value in cast(tuple[object, ...], values)
+    )
+
+
+def _validate_terrain_path_legality_result(value: object) -> TerrainPathLegalityResult:
+    if type(value) is not TerrainPathLegalityResult:
+        raise GameLifecycleError(
+            "terrain_path_legality_results must contain TerrainPathLegalityResult."
+        )
+    return value
+
+
+def _validate_path_witness_tuple(values: object) -> tuple[PathWitness, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("candidate_witnesses must be a tuple.")
+    return tuple(_validate_path_witness(value) for value in cast(tuple[object, ...], values))
+
+
+def _validate_path_witness(value: object) -> PathWitness:
+    if type(value) is not PathWitness:
+        raise GameLifecycleError("candidate_witnesses must contain PathWitness values.")
+    return value
+
+
+def _validate_surge_move_state_tuple(values: object) -> tuple[SurgeMoveState, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("surge_move_states must be a tuple.")
+    return tuple(_validate_surge_move_state(value) for value in cast(tuple[object, ...], values))
+
+
+def _validate_surge_move_state(value: object) -> SurgeMoveState:
+    if type(value) is not SurgeMoveState:
+        raise GameLifecycleError("surge_move_states must contain SurgeMoveState values.")
+    return value
+
+
+def _validate_json_object(field_name: str, value: object) -> dict[str, JsonValue]:
+    validated = validate_json_value(value)
+    if not isinstance(validated, dict):
+        raise GameLifecycleError(f"{field_name} must be a JSON object.")
+    return validated
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return stripped
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(field_name, value)
+        if identifier in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate values.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    return tuple(sorted(identifiers))
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value <= 0:
+        raise GameLifecycleError(f"{field_name} must be positive.")
+    return value
+
+
+def _validate_positive_number(field_name: str, value: object) -> float:
+    if not isinstance(value, int | float) or type(value) is bool:
+        raise GameLifecycleError(f"{field_name} must be a number.")
+    number = float(value)
+    if not math.isfinite(number):
+        raise GameLifecycleError(f"{field_name} must be finite.")
+    if number <= 0.0:
+        raise GameLifecycleError(f"{field_name} must be positive.")
+    return number
+
+
+def _validate_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise GameLifecycleError(f"{field_name} must be a bool.")
+    return value
