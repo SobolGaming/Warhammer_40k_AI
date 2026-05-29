@@ -88,6 +88,7 @@ class ReservePlacementViolationCode(StrEnum):
     STRATEGIC_RESERVES_ENEMY_DEPLOYMENT_ZONE = "strategic_reserves_enemy_deployment_zone"
     DEEP_STRIKE_KEYWORD_REQUIRED = "deep_strike_keyword_required"
     RESERVE_ENEMY_DISTANCE = "reserve_enemy_distance"
+    RESERVE_ENEMY_ENGAGEMENT_RANGE = "reserve_enemy_engagement_range"
     BATTLEFIELD_EDGE_CROSSED = "battlefield_edge_crossed"
     MODEL_OVERLAP = "end_on_model_overlap"
     TERRAIN_ENDPOINT_ILLEGAL = "terrain_endpoint_illegal"
@@ -1882,7 +1883,25 @@ def _append_common_reserve_placement_violations(
                 violations.append(
                     ReservePlacementViolation(
                         violation_code=ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE,
-                        message="Reserve placement is within 9 inches horizontally of an enemy.",
+                        message=(
+                            "Reserve placement is within the configured reserve "
+                            "enemy-distance limit."
+                        ),
+                        model_instance_id=model.model_id,
+                        blocker_id=enemy_model.model_id,
+                    )
+                )
+            if model.is_within_engagement_range(
+                enemy_model,
+                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
+                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+            ):
+                violations.append(
+                    ReservePlacementViolation(
+                        violation_code=(
+                            ReservePlacementViolationCode.RESERVE_ENEMY_ENGAGEMENT_RANGE
+                        ),
+                        message="Reserve placement is within enemy Engagement Range.",
                         model_instance_id=model.model_id,
                         blocker_id=enemy_model.model_id,
                     )

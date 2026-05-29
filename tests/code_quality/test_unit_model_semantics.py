@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 CORE = ROOT / "src" / "warhammer40k_core" / "core"
+MOVEMENT_LEGALITY = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_legality.py"
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
 UNIT_MODULES = (
     CORE / "unit.py",
@@ -50,3 +51,40 @@ def test_pathing_uses_alive_group_model_ids_for_movement() -> None:
 
     assert uses_group_movement_ids, "Pathing must use UnitGroup.model_ids_for_movement()."
     assert not forbidden, "Pathing must not move destroyed/all models:\n" + "\n".join(forbidden)
+
+
+def test_movement_legality_gates_friendly_vehicle_monster_blockers_by_mover() -> None:
+    tree = ast.parse(
+        MOVEMENT_LEGALITY.read_text(encoding="utf-8"),
+        filename=str(MOVEMENT_LEGALITY),
+    )
+    contexts = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "to_path_validation_context"
+    ]
+    assert len(contexts) == 1, "MovementLegalityContext must own pathing-context conversion."
+    context = contexts[0]
+
+    gates_on_mover_keyword = any(
+        isinstance(node, ast.Attribute)
+        and node.attr == "blocks_friendly_vehicle_monster_pass_through"
+        for node in ast.walk(context)
+    )
+    passes_filtered_blockers = False
+    for node in ast.walk(context):
+        if not isinstance(node, ast.Call):
+            continue
+        if not isinstance(node.func, ast.Name) or node.func.id != "PathValidationContext":
+            continue
+        for keyword in node.keywords:
+            if keyword.arg != "friendly_vehicle_monster_model_ids":
+                continue
+            if (
+                isinstance(keyword.value, ast.Name)
+                and keyword.value.id == "friendly_vehicle_monster_blockers"
+            ):
+                passes_filtered_blockers = True
+
+    assert gates_on_mover_keyword, "Friendly VEHICLE/MONSTER transit blockers must gate on mover."
+    assert passes_filtered_blockers, "Pathing must receive the filtered blocker set."
