@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10R work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10V work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10U** is treated as implemented at the time this file was updated. Do not insert new work before Phase 11A unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10V** is treated as implemented at the time this file was updated. Phase 11A is the next build slice.
 
 Completed / implemented foundation:
 
@@ -65,6 +65,7 @@ Completed / implemented foundation:
 | 10S | Complete | Triggered and surge movement foundation |
 | 10T | Complete | Movement phase completion gate |
 | 10U | Complete | Movement/pathing/terrain profiling and hotspot budget gate |
+| 10V | Complete | Movement audit hardening and deferred-wiring contracts |
 
 ## Cross-cutting architectural rules
 
@@ -562,7 +563,7 @@ CORE V1 relevant areas:
 
 ## Phase 10Q: transport embark/disembark, Firing Deck, and destroyed transport emergency disembark
 
-Status: Complete.
+Status: Complete foundation; later consumers are explicitly deferred.
 
 Modules:
 
@@ -579,6 +580,21 @@ Objects:
 - `FiringDeckSelection`
 - `DestroyedTransportDisembark`
 - `EmergencyDisembarkationResolution`
+
+Complete foundation scope:
+
+- voluntary Embark/Disembark lifecycle;
+- post-Transport-Normal-Move Disembark;
+- cargo accounting;
+- Firing Deck selection validator;
+- destroyed Transport and Emergency Disembarkation resolver.
+
+Deferred consumers:
+
+- destroyed Transport orchestration from actual damage/destruction events is owned by Phase 13E/14D;
+- destroyed Transport Battle-shock write-through to `GameState.battle_shocked_unit_ids` is owned by Phase 11C/13E;
+- Deadly Demise ordering and the destroyed-Transport ignore interaction are owned by Phase 13E;
+- Firing Deck attack-generation consumption, one-weapon-per-embarked-model validation, and transport temporary weapon attachment are owned by Phase 13B.
 
 Invariants:
 
@@ -625,7 +641,7 @@ CORE V1 relevant areas:
 
 ## Phase 10R: Aircraft and Hover movement/reserve behavior
 
-Status: Complete.
+Status: Complete foundation; setup-phase declarations are explicitly deferred.
 
 This phase adds typed `AIRCRAFT` movement policy, persisted Hover-mode policy switching, lifecycle aircraft reserve transitions, aircraft-aware pathing for other models, and reserve arrival validation through the same placement legality path used by Phase 10P.
 
@@ -645,6 +661,18 @@ Objects:
 - `BasePointDistanceWitness`
 - `AircraftReserveTransition`
 - `HoverModeState`
+
+Complete foundation scope:
+
+- Aircraft/Hover movement policy;
+- aircraft reserve transitions;
+- mandatory next-turn reserve arrival metadata;
+- aircraft base-geometry minimum-move witness.
+
+Deferred setup consumers:
+
+- Aircraft mandatory reserve declaration during Declare Battle Formations is owned by Phase 15C;
+- Hover declaration decisions during Declare Battle Formations are owned by Phase 15C/15E.
 
 Invariants:
 
@@ -793,6 +821,47 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/engine/tier2_orchestrator.py`
 - `src/warhammer40k_ai/engine/movement_solver.py`
 
+## Phase 10V: movement audit hardening and deferred-wiring contracts
+
+Status: Complete.
+
+This phase closes immediate movement-audit correctness findings and records explicit owners for rules paths whose resolver foundations exist before their lifecycle consumers.
+
+Modules:
+
+- `engine/movement_legality.py`
+- `engine/reserves.py`
+- `engine/phases/movement.py`
+- `geometry/pathing.py`
+- `engine/unit_coherency.py`
+
+Implemented hardening:
+
+- friendly `VEHICLE`/`MONSTER` transit blockers apply only when the moving model is itself a `VEHICLE` or `MONSTER`;
+- `FLY` `VEHICLE`/`MONSTER` movers keep their transit exemption when the ruleset permits moving through models;
+- endpoint model-overlap prohibition remains universal;
+- reserve setup rejects placements within enemy Engagement Range, separately from reserve horizontal-distance restrictions.
+
+Deferred wiring contracts:
+
+- Phase 11A must provide mission deployment-zone geometry to live Reinforcements so battle-round-2 Strategic Reserves pass enemy deployment zones into `resolve_reserve_arrival`;
+- Phase 11A/11B must provide instantiated terrain features to live Reinforcements and deployment placement validation, not only resolver tests;
+- Phase 11D/11E must call unarrived-reserve destruction at the appropriate game-end or mission-pack deadline;
+- Phase 13B must consume Firing Deck selections during Shooting and validate selected weapons against the embarked model's wargear;
+- Phase 13E/14D must orchestrate destroyed Transport disembark from real destruction events before removing the Transport model;
+- Phase 15D must make attached-unit coherency group-aware by validating the attached rules unit, not a single `UnitPlacement`;
+- before Charge/Fight movement consumes terrain pathing broadly, FLY air-path distance budgeting and climb counted-distance budgeting must either feed the movement budget or return typed unsupported/invalid results;
+- non-`WALKER` `VEHICLE` gap/squeeze restrictions must be represented explicitly before vehicle movement coverage is claimed complete.
+
+Required tests:
+
+- `INFANTRY` can transit through a friendly `VEHICLE`;
+- non-`FLY` `VEHICLE` cannot transit through a friendly `VEHICLE`/`MONSTER`;
+- `FLY` `VEHICLE` can transit over friendly `VEHICLE`/`MONSTER` blockers when permitted;
+- no model can end overlapping another model;
+- reserve setup within enemy Engagement Range is invalid even when a separate reserve-distance rule would not reject it;
+- code-quality audit keeps friendly `VEHICLE`/`MONSTER` transit gating in movement legality.
+
 ---
 
 # Mission pack, objectives, Command phase, and scoring
@@ -829,6 +898,8 @@ Invariants:
 - objective marker positions are source-defined and use center-point measurement;
 - Chapter Approved objective markers are flat 40mm markers and do not impede movement/placement;
 - terrain layout templates are data and can instantiate pregenerated terrain pieces;
+- live Reinforcements receives mission deployment-zone geometry for reserve placement validation;
+- live placement validators receive instantiated terrain features instead of resolver-local test fixtures;
 - tournament mission pool is deterministic and replay-facing;
 - Fixed/Tactical/Challenger card behavior remains hidden/public-safe.
 
@@ -839,6 +910,8 @@ Required tests:
 - objective marker positions round-trip;
 - objective marker terrain/movement policy is flat/non-blocking for Chapter Approved;
 - terrain layout template instantiates deterministic terrain features;
+- live Reinforcements rejects battle-round-2 Strategic Reserves in enemy deployment zones using mission data;
+- live Reinforcements rejects illegal terrain endpoints using instantiated terrain layout data;
 - mission pool selection is deterministic;
 - hidden Tactical/Fixed state does not leak to opponent public payload.
 
@@ -959,6 +1032,7 @@ Invariants:
 - objective control feeds scoring;
 - end-of-turn coherency cleanup removes models until each affected unit has one coherent group;
 - coherency-cleanup removals count as destroyed but do not trigger destroyed-model rules;
+- unarrived Reserves destruction resolver is invoked at the mission-defined deadline;
 - game end after configured battle rounds produces winner/draw result.
 
 Required tests:
@@ -968,6 +1042,7 @@ Required tests:
 - Tactical secondary draw/score/discard flow works;
 - mission Action can start, complete, be interrupted, and score;
 - end-of-turn coherency cleanup removes models without destroyed triggers;
+- unarrived Reserves are destroyed at the configured deadline through the lifecycle hook;
 - victory point ledger round-trips;
 - game ends after configured battle rounds.
 
@@ -1183,6 +1258,7 @@ Invariants:
 - model visible, unit visible, model fully visible, and unit fully visible are separate results;
 - terrain visibility rules are descriptor-driven;
 - Ruins and Woods visibility policies are explicit;
+- `AIRCRAFT` and `TOWERING` visibility exceptions for Woods/Ruins are explicit;
 - Benefit of Cover is a policy result, not a shooting side effect;
 - cover eligibility is visible in attack allocation context;
 - LoS and cover checks use spatial index/cache revision data;
@@ -1193,6 +1269,7 @@ Required tests:
 - terrain visibility fixture can block LoS deterministically;
 - Ruins wall/floor interactions are represented in LoS context;
 - Woods visibility behavior is represented;
+- `TOWERING` and `AIRCRAFT` terrain visibility exceptions are represented;
 - model volume participates in visibility checks;
 - terrain visibility cache key changes when terrain revision changes;
 - Benefit of Cover policy result round-trips;
@@ -1495,6 +1572,7 @@ Invariants:
 - Leader attachment restrictions are validated before battle;
 - each Bodyguard unit can have at most one Leader attached;
 - while attached, the Attached unit is treated as one unit for rules purposes except destroyed-unit triggers;
+- coherency for an Attached unit is validated over the attached rules unit's alive models, not per component `UnitPlacement`;
 - attacks against Attached units use Bodyguard Toughness until the attacking unit resolves all attacks;
 - attacks cannot be allocated to Character models in Attached units until the Bodyguard is destroyed unless a rule such as Precision permits it;
 - when Bodyguard or Leader components are destroyed, surviving units split at the correct timing and recover original Starting Strength;
@@ -1507,6 +1585,7 @@ Required tests:
 - Enhancement count, uniqueness, Character-only, and one-per-unit restrictions;
 - Dedicated Transport empty-at-start consequence;
 - Leader/Bodyguard legal attachment and one-Leader-per-Bodyguard enforcement;
+- Attached-unit coherency uses `UnitGroup.alive_models()`/group-aware placement data across Leader and Bodyguard models;
 - Attached-unit Toughness and Character allocation protection;
 - Attached-unit split timing after attacks resolve;
 - destroyed-unit trigger identity for Leader vs Bodyguard components.
@@ -1661,6 +1740,7 @@ Initial supported language families:
 - conditional weapon ability grant;
 - movement distance modification;
 - placement permission/restriction;
+- Aura source, range, eligible-target, and effect clauses;
 - model/unit destruction trigger;
 - once per phase/turn/battle restriction.
 
@@ -1693,6 +1773,7 @@ Invariants:
 
 - IR clauses execute through registered generic handlers;
 - handlers declare required timing, state inputs, and target bindings;
+- Aura abilities have a defined evaluation model that recomputes affected units from current positions, range, visibility/coherency gates, and source state as required by the descriptor;
 - execution emits source-linked events;
 - unsupported IR cannot execute;
 - specific named handlers are allowed only when backed by source-linked tests and an unsupported generic shape is documented.
@@ -1703,6 +1784,7 @@ Required tests:
 - generic reroll permission executes;
 - generic VP scoring rule executes;
 - generic Stratagem target binding executes;
+- Aura evaluation updates affected units when movement-derived positions change;
 - unsupported IR produces typed unsupported status.
 
 ## Phase 16E: faction, detachment, enhancement, and army-rule coverage
@@ -2067,7 +2149,7 @@ Required tests:
 | Engagement Range | 10G, 10M, 10N, 10O, 14B |
 | Unit Coherency | 10G/10H descriptors, 10L runtime, 11D cleanup |
 | Terrain movement | 10F, 10H, 10I |
-| Terrain visibility/cover | 13A |
+| Terrain visibility/cover, including TOWERING/AIRCRAFT terrain exceptions | 13A |
 | Movement phase Move Units | 10B-10T |
 | Movement phase Reinforcements | 10P |
 | Transports | 10Q |
@@ -2078,6 +2160,7 @@ Required tests:
 | Stratagems | 12B, 12C, 16E |
 | Shooting phase | 13A-13F |
 | Weapon abilities | 8D, 13D, 16F |
+| Aura abilities | 16C, 16D, 16F |
 | Charge phase | 14A, 14B |
 | Fight phase | 14C-14F |
 | Leader/attached units | 6, 15D, 16A |

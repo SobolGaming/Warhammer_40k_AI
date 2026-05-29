@@ -349,6 +349,47 @@ def test_oversized_strategic_reserve_exception_still_rejects_enemy_distance() ->
     assert _violation_codes(result) == (ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE,)
 
 
+def test_strategic_reserves_reject_setup_within_enemy_engagement_range() -> None:
+    _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
+        reserve_base_diameter_mm=32.0,
+    )
+    radius = _base_radius_inches(32.0)
+    reserve_pose = _south_edge_touching_pose(base_diameter_mm=32.0, x=15.0)
+    enemy_model_id = (
+        scenario.army_by_id("army-beta")
+        .unit_by_id("army-beta:intercessor-unit-3")
+        .own_models[0]
+        .model_instance_id
+    )
+    scenario = _with_model_pose(
+        scenario,
+        model_instance_id=enemy_model_id,
+        pose=Pose.at(
+            x=reserve_pose.position.x + (radius * 2.0) + 0.75,
+            y=reserve_pose.position.y,
+            z=3.0,
+            facing_degrees=180.0,
+        ),
+    )
+
+    result = resolve_reserve_arrival(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        reserve_state=reserve_state,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=reserve_pose,
+        ),
+        battle_round=3,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        strategic_reserve_rule=StrategicReserveRule(enemy_horizontal_distance_inches=0.5),
+    )
+
+    codes = set(_violation_codes(result))
+    assert ReservePlacementViolationCode.RESERVE_ENEMY_ENGAGEMENT_RANGE in codes
+    assert ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE not in codes
+
+
 def test_oversized_exception_preserves_other_placement_limits() -> None:
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
         reserve_base_diameter_mm=200.0,

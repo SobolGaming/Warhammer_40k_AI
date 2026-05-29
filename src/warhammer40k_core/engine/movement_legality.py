@@ -520,11 +520,11 @@ class MovementLegalityContext:
         may_transit_enemy_engagement = (
             self.engagement_policy.may_transit_enemy_engagement or fly_transit_applies
         )
-        friendly_vehicle_monster_blockers = (
-            ()
-            if fly_transit_applies and self.capabilities.can_move_through_models
-            else friendly_vehicle_monster_model_ids
-        )
+        friendly_vehicle_monster_blockers = friendly_vehicle_monster_model_ids
+        if not self.capabilities.blocks_friendly_vehicle_monster_pass_through or (
+            fly_transit_applies and self.capabilities.can_move_through_models
+        ):
+            friendly_vehicle_monster_blockers = ()
         return PathValidationContext(
             moving_model=moving_model,
             witness=witness,

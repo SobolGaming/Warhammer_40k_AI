@@ -59,6 +59,39 @@ def test_circular_infantry_can_transit_friendly_infantry_but_not_end_overlapping
     assert PathValidationResult.from_payload(result_payload).to_payload() == result_payload
 
 
+def test_infantry_can_transit_friendly_vehicle_but_not_end_overlapping() -> None:
+    mover = _model("infantry-mover", 1.0, 1.0, radius=0.7)
+    friendly_vehicle = _model("friendly-vehicle", 3.0, 1.0, radius=0.9)
+    context = _normal_legality_context(keywords=("INFANTRY",))
+
+    transit_context = _path_context(
+        context,
+        moving_model=mover,
+        friendly_models=(friendly_vehicle,),
+        friendly_vehicle_monster_model_ids=("friendly-vehicle",),
+        end_pose=Pose.at(5.0, 1.0),
+    )
+    overlap_context = _path_context(
+        context,
+        moving_model=mover,
+        friendly_models=(friendly_vehicle,),
+        friendly_vehicle_monster_model_ids=("friendly-vehicle",),
+        middle_pose=Pose.at(2.0, 1.0),
+        end_pose=friendly_vehicle.pose,
+        sample_interval_inches=10.0,
+    )
+
+    transit_result = transit_context.validate()
+    overlap_result = overlap_context.validate()
+
+    assert not context.capabilities.blocks_friendly_vehicle_monster_pass_through
+    assert transit_context.friendly_vehicle_monster_model_ids == ()
+    assert transit_result.is_valid
+    assert not overlap_result.is_valid
+    assert overlap_result.violations[0].violation_code == "end_on_model_overlap"
+    assert overlap_result.violations[0].blocker_id == "friendly-vehicle"
+
+
 def test_vehicle_cannot_transit_friendly_vehicle_or_monster_blocker() -> None:
     mover = _model("mover", 1.0, 1.0, radius=0.7)
     friendly_vehicle = _model("friendly-vehicle", 3.0, 1.0, radius=0.9)
