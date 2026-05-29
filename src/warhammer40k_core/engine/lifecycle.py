@@ -483,6 +483,10 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
         state=state,
         player_id=state.active_player_id,
     )
+    active_player_reserve_unit_ids = _unarrived_reserve_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
     fully_removed_active_player_unit_ids = _fully_removed_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
@@ -492,6 +496,7 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
             unit_id not in active_player_unit_ids
             and unit_id not in fully_removed_active_player_unit_ids
             and unit_id not in active_player_embarked_unit_ids
+            and unit_id not in active_player_reserve_unit_ids
         ):
             raise GameLifecycleError(
                 "movement_phase_state selected unit is not active player's unit."
@@ -620,6 +625,13 @@ def _embarked_unit_ids_for_player(*, state: GameState, player_id: str) -> set[st
         for cargo_state in state.transport_cargo_states
         if cargo_state.player_id == player_id
         for unit_id in cargo_state.embarked_unit_instance_ids
+    }
+
+
+def _unarrived_reserve_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:
+    return {
+        reserve_state.unit_instance_id
+        for reserve_state in state.unarrived_reserve_states_for_player(player_id)
     }
 
 

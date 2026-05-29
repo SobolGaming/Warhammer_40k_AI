@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10Q work.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-10R work.
 
 The roadmap is intentionally rules-engine first:
 
@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 10Q** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10R unless a merged implementation invalidates the phase boundary.
+Everything through **Phase 10R** is treated as implemented at the time this file was updated. Do not insert new work before Phase 10S unless a merged implementation invalidates the phase boundary.
 
 Completed / implemented foundation:
 
@@ -61,6 +61,7 @@ Completed / implemented foundation:
 | 10O | Complete | Fall Back action and Desperate Escape resolution |
 | 10P | Complete | Reinforcements, Strategic Reserves, Deep Strike, and reserve placement |
 | 10Q | Complete | Transport Embark/Disembark, Firing Deck, and destroyed transport emergency disembark |
+| 10R | Complete | Aircraft and Hover movement/reserve behavior |
 
 ## Cross-cutting architectural rules
 
@@ -276,7 +277,7 @@ Invariants:
 - non-round-base non-`MONSTER`/non-`VEHICLE` models pay 1";
 - non-round-base `MONSTER`/`VEHICLE` models pay 2";
 - round-base `VEHICLE` models wider than 32mm with a flying stem or hover stand pay 2";
-- `AIRCRAFT` pivot cost is 0" in generic pivot accounting, with aircraft-specific movement deferred to Phase 10Q;
+- `AIRCRAFT` pivot cost is 0" in generic pivot accounting, with aircraft-specific movement owned by Phase 10R;
 - if insufficient movement remains to pay a required pivot cost, the move is invalid;
 - pivot-cost and movement-distance witnesses serialize without object reprs.
 
@@ -621,9 +622,14 @@ CORE V1 relevant areas:
 
 ## Phase 10R: Aircraft and Hover movement/reserve behavior
 
+Status: Complete.
+
+This phase adds typed `AIRCRAFT` movement policy, persisted Hover-mode policy switching, lifecycle aircraft reserve transitions, aircraft-aware pathing for other models, and reserve arrival validation through the same placement legality path used by Phase 10P.
+
 Modules:
 
 - `engine/aircraft.py`
+- `engine/game_state.py`
 - `engine/phases/movement.py`
 - `engine/reserves.py`
 - `geometry/pathing.py`
@@ -631,22 +637,35 @@ Modules:
 Objects:
 
 - `AircraftMovementPolicy`
+- `AircraftMinimumMoveResult`
+- `AircraftBaseMovementWitness`
+- `BasePointDistanceWitness`
 - `AircraftReserveTransition`
 - `HoverModeState`
 
 Invariants:
 
 - `AIRCRAFT` have special pivot and movement behavior;
-- `AIRCRAFT` that leave the battlefield transition into reserves where rules permit;
-- `HOVER` mode changes movement policy;
+- non-Hover `AIRCRAFT` use aircraft-policy movement distance resolution, with no upper Normal Move budget and a default 20" straight-forward witness instead of datasheet `M`;
+- non-Hover `AIRCRAFT` minimum-move validation is base-geometry aware: circular bases may use the center-distance shortcut, while oval, rectangular, and other non-circular bases serialize deterministic point-distance witnesses for the pre-pivot movement endpoint;
+- non-Hover `AIRCRAFT` that cross a battlefield edge or cannot satisfy minimum move during a Movement phase Normal Move transition into Strategic Reserves through the lifecycle path, while short submitted witnesses remain invalid when a legal 20" move is available;
+- aircraft reserve transitions remove the unit from the battlefield, record mandatory next-controller-turn arrival metadata, and complete the movement activation without ordinary displacement records or post-move Embark;
+- `HOVER` mode is stored in `GameState`, round-trips through replay payloads, changes movement policy, and uses a Hover-derived 20" Move characteristic for Normal Move and Advance budgets;
 - other models' movement around `AIRCRAFT` follows the aircraft movement policy;
+- enemy `AIRCRAFT` engagement is tracked separately so non-Aircraft units engaged only by enemy Aircraft can still choose Normal Move or Advance while endpoint validation remains strict;
 - aircraft restrictions in Charge/Fight are exposed for later phases.
 
 Required tests:
 
 - aircraft pivot policy uses 0" in generic pivot accounting;
+- circular and non-circular Aircraft bases validate the 20" minimum with deterministic base-movement witnesses, and pivot-after-move never contributes to the minimum;
 - aircraft reserve transition emits removal/placement records as appropriate;
-- hover state changes movement policy;
+- Movement phase Normal Move lifecycle transitions edge/minimum-move-unavailable Aircraft into Strategic Reserves;
+- central non-Hover Aircraft get a default 20" straight-forward Normal Move witness with no movement-distance budget, and short submitted witnesses are invalid rather than reserve transitions when 20" fits;
+- Aircraft transition ReserveState is eligible and required in the controller's next Movement phase only;
+- persisted hover state changes movement availability, uses 20"/20"+D6 movement budgets, and disables Aircraft minimum-move/pivot restrictions;
+- replay rejects HoverModeState owner/unit/source drift, stale selected Aircraft policy payloads, and stale Aircraft minimum-move witness payloads;
+- non-Aircraft units engaged only by enemy Aircraft can choose Normal Move and Advance, but cannot end within enemy Aircraft Engagement Range;
 - aircraft setup/arrival validates battlefield and terrain restrictions.
 
 CORE V1 relevant areas:
