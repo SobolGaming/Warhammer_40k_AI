@@ -24,10 +24,22 @@ from warhammer40k_core.engine.army_mustering import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldRuntimeStatePayload,
+    BattlefieldScenario,
     PlacementError,
+    geometry_model_for_placement,
+)
+from warhammer40k_core.engine.endpoint_placement import (
+    objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupPayload
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
+    ObjectiveControlRecord,
+    ObjectiveControlRecordPayload,
+    ObjectiveControlTiming,
+    resolve_objective_control,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -110,6 +122,7 @@ class GameStatePayload(TypedDict):
     fell_back_unit_states: list[FellBackUnitStatePayload]
     surge_move_states: list[SurgeMoveStatePayload]
     battle_shocked_unit_ids: list[str]
+    objective_control_records: list[ObjectiveControlRecordPayload]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
 
@@ -151,6 +164,10 @@ def _new_disembarked_unit_states() -> list[DisembarkedUnitState]:
 
 
 def _new_battle_shocked_unit_ids() -> list[str]:
+    return []
+
+
+def _new_objective_control_records() -> list[ObjectiveControlRecord]:
     return []
 
 
@@ -416,6 +433,9 @@ class GameState:
     )
     surge_move_states: list[SurgeMoveState] = field(default_factory=_new_surge_move_states)
     battle_shocked_unit_ids: list[str] = field(default_factory=_new_battle_shocked_unit_ids)
+    objective_control_records: list[ObjectiveControlRecord] = field(
+        default_factory=_new_objective_control_records
+    )
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
@@ -514,6 +534,11 @@ class GameState:
                 sort_values=True,
             )
         )
+        self.objective_control_records = _validate_objective_control_records(
+            self.objective_control_records,
+            game_id=self.game_id,
+            player_ids=self.player_ids,
+        )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
             player_ids=self.player_ids,
@@ -582,6 +607,10 @@ class GameState:
         if self.battle_phase_index is None:
             raise GameLifecycleError("GameState has no current battle phase.")
         completed_phase = self.battle_phase_sequence[self.battle_phase_index]
+        self._record_objective_control_boundary(
+            completed_phase=completed_phase,
+            timing=ObjectiveControlTiming.PHASE_END,
+        )
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
             if completed_phase is BattlePhase.MOVEMENT:
                 self.movement_phase_state = None
@@ -593,6 +622,10 @@ class GameState:
         self._clear_turn_action_states(
             player_id=completed_player_id,
             battle_round=self.battle_round,
+        )
+        self._record_objective_control_boundary(
+            completed_phase=completed_phase,
+            timing=ObjectiveControlTiming.TURN_END,
         )
         if completed_phase is BattlePhase.MOVEMENT:
             self.movement_phase_state = None
@@ -650,6 +683,17 @@ class GameState:
             )
         if self.battlefield_state is not None:
             raise GameLifecycleError("GameState battlefield_state already exists.")
+        self._assert_battlefield_state_clear_of_objective_markers(battlefield_state)
+        self.battlefield_state = battlefield_state
+
+    def replace_battlefield_state(self, battlefield_state: BattlefieldRuntimeState) -> None:
+        if type(battlefield_state) is not BattlefieldRuntimeState:
+            raise GameLifecycleError(
+                "GameState battlefield_state must be a BattlefieldRuntimeState."
+            )
+        if self.battlefield_state is None:
+            raise GameLifecycleError("GameState battlefield_state does not exist.")
+        self._assert_battlefield_state_clear_of_objective_markers(battlefield_state)
         self.battlefield_state = battlefield_state
 
     def record_mission_setup(self, mission_setup: MissionSetup) -> None:
@@ -680,6 +724,23 @@ class GameState:
             draw.player_id == requested_player_id and draw.battle_round == requested_round
             for draw in self.tactical_secondary_draws
         )
+
+    def record_objective_control_record(self, record: ObjectiveControlRecord) -> None:
+        if type(record) is not ObjectiveControlRecord:
+            raise GameLifecycleError(
+                "GameState objective_control_record must be an ObjectiveControlRecord."
+            )
+        if record.game_id != self.game_id:
+            raise GameLifecycleError("ObjectiveControlRecord game_id drift.")
+        if record.active_player_id not in self.player_ids:
+            raise GameLifecycleError("ObjectiveControlRecord active_player_id is not in this game.")
+        if record.battle_round != self.battle_round:
+            raise GameLifecycleError("ObjectiveControlRecord battle_round drift.")
+        if record.phase not in {phase.value for phase in self.battle_phase_sequence}:
+            raise GameLifecycleError("ObjectiveControlRecord phase is not in this game.")
+        if any(stored.record_id == record.record_id for stored in self.objective_control_records):
+            raise GameLifecycleError("ObjectiveControlRecord already exists.")
+        self.objective_control_records.append(record)
 
     def record_reserve_state(self, reserve_state: ReserveState) -> None:
         if type(reserve_state) is not ReserveState:
@@ -1016,6 +1077,9 @@ class GameState:
             "fell_back_unit_states": [state.to_payload() for state in self.fell_back_unit_states],
             "surge_move_states": [state.to_payload() for state in self.surge_move_states],
             "battle_shocked_unit_ids": list(self.battle_shocked_unit_ids),
+            "objective_control_records": [
+                record.to_payload() for record in self.objective_control_records
+            ],
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
@@ -1107,6 +1171,10 @@ class GameState:
                 SurgeMoveState.from_payload(state) for state in payload["surge_move_states"]
             ],
             battle_shocked_unit_ids=list(payload["battle_shocked_unit_ids"]),
+            objective_control_records=[
+                ObjectiveControlRecord.from_payload(record)
+                for record in payload["objective_control_records"]
+            ],
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -1126,6 +1194,60 @@ class GameState:
             return
         self.active_player_id = self.turn_order[0]
         self.battle_round += 1
+
+    def _record_objective_control_boundary(
+        self,
+        *,
+        completed_phase: BattlePhase,
+        timing: ObjectiveControlTiming,
+    ) -> None:
+        if self.mission_setup is None:
+            raise GameLifecycleError("Objective control updates require MissionSetup.")
+        if self.battlefield_state is None:
+            raise GameLifecycleError("Objective control updates require battlefield_state.")
+        if self.active_player_id is None:
+            raise GameLifecycleError("Objective control updates require an active player.")
+        record = resolve_objective_control(
+            ObjectiveControlContext.from_game_state(
+                self,
+                timing=timing,
+                phase=completed_phase,
+            )
+        )
+        self.record_objective_control_record(record)
+
+    def _assert_battlefield_state_clear_of_objective_markers(
+        self,
+        battlefield_state: BattlefieldRuntimeState,
+    ) -> None:
+        if self.mission_setup is None:
+            return
+        markers = tuple(
+            marker.to_objective_marker() for marker in self.mission_setup.objective_markers
+        )
+        if not markers:
+            return
+        scenario = BattlefieldScenario(
+            armies=tuple(self.army_definitions),
+            battlefield_state=battlefield_state,
+        )
+        for placed_army in battlefield_state.placed_armies:
+            for unit_placement in placed_army.unit_placements:
+                for model_placement in unit_placement.model_placements:
+                    model = geometry_model_for_placement(
+                        model=scenario.model_instance_for_placement(model_placement),
+                        placement=model_placement,
+                    )
+                    violation = objective_marker_endpoint_placement_violation(
+                        model=model,
+                        objective_markers=markers,
+                        violation_code="objective_marker_endpoint_overlap",
+                        placement_label="Battlefield placement",
+                    )
+                    if violation is not None:
+                        raise GameLifecycleError(
+                            "Battlefield placement cannot end on an objective marker."
+                        )
 
     def _clear_turn_action_states(self, *, player_id: str, battle_round: int) -> None:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
@@ -1633,6 +1755,32 @@ def _validate_tactical_draws(
         seen.add(key)
         validated.append(draw)
     return sorted(validated, key=lambda stored: (stored.battle_round, stored.player_id))
+
+
+def _validate_objective_control_records(
+    records: object,
+    *,
+    game_id: str,
+    player_ids: tuple[str, ...],
+) -> list[ObjectiveControlRecord]:
+    if not isinstance(records, list):
+        raise GameLifecycleError("GameState objective_control_records must be a list.")
+    validated: list[ObjectiveControlRecord] = []
+    seen: set[str] = set()
+    for record in cast(list[object], records):
+        if type(record) is not ObjectiveControlRecord:
+            raise GameLifecycleError(
+                "GameState objective_control_records must contain ObjectiveControlRecord values."
+            )
+        if record.game_id != game_id:
+            raise GameLifecycleError("ObjectiveControlRecord game_id drift.")
+        if record.active_player_id not in player_ids:
+            raise GameLifecycleError("ObjectiveControlRecord active_player_id is not in this game.")
+        if record.record_id in seen:
+            raise GameLifecycleError("GameState objective_control_records must be unique.")
+        seen.add(record.record_id)
+        validated.append(record)
+    return validated
 
 
 def _validate_optional_index(field_name: str, value: object | None, *, length: int) -> int | None:

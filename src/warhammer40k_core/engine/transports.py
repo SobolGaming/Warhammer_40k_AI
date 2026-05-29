@@ -11,6 +11,7 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
+from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
@@ -32,7 +33,10 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placement_violation
+from warhammer40k_core.engine.endpoint_placement import (
+    objective_marker_endpoint_placement_violation,
+    terrain_endpoint_placement_violation,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
@@ -81,6 +85,7 @@ class TransportOperationViolationCode(StrEnum):
     MODEL_OVERLAP = "model_overlap"
     BATTLEFIELD_EDGE_CROSSED = "battlefield_edge_crossed"
     TERRAIN_ENDPOINT_ILLEGAL = "terrain_endpoint_illegal"
+    OBJECTIVE_MARKER_ENDPOINT_OVERLAP = "objective_marker_endpoint_overlap"
     ENEMY_ENGAGEMENT_RANGE = "enemy_engagement_range"
     UNIT_COHERENCY_BROKEN = "unit_coherency_broken"
     FIRING_DECK_CAPACITY_EXCEEDED = "firing_deck_capacity_exceeded"
@@ -1650,6 +1655,7 @@ def resolve_disembark(
     battlefield_width_inches: float = _DEFAULT_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> DisembarkResolution:
     return _resolve_disembark(
         scenario=scenario,
@@ -1664,6 +1670,7 @@ def resolve_disembark(
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
+        objective_markers=objective_markers,
     )
 
 
@@ -1694,6 +1701,7 @@ def resolve_destroyed_transport_disembark(
     battlefield_width_inches: float = _DEFAULT_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> DestroyedTransportDisembark:
     if type(dice_manager) is not DiceRollManager:
         raise GameLifecycleError("Destroyed Transport disembark requires a DiceRollManager.")
@@ -1718,6 +1726,7 @@ def resolve_destroyed_transport_disembark(
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
+        objective_markers=objective_markers,
     )
     roll_threshold = 3 if emergency_value else 1
     model_rolls: list[DestroyedTransportModelRoll] = []
@@ -1948,6 +1957,7 @@ def _resolve_disembark(
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
+    objective_markers: tuple[ObjectiveMarker, ...],
 ) -> DisembarkResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("resolve_disembark requires a BattlefieldScenario.")
@@ -1964,6 +1974,7 @@ def _resolve_disembark(
     width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
     depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
     features = _validate_terrain_feature_tuple("terrain_features", terrain_features)
+    markers = _validate_objective_marker_tuple("objective_markers", objective_markers)
     active_cargo = cargo_state.for_movement_phase(battle_round=selection.battle_round)
     transport = scenario.unit_instance_for_placement(transport_placement)
     violations: list[TransportOperationViolation] = []
@@ -2043,6 +2054,7 @@ def _resolve_disembark(
         battlefield_width_inches=width,
         battlefield_depth_inches=depth,
         terrain_features=features,
+        objective_markers=markers,
     )
     coherency_result = unit_placement_coherency_result(
         scenario=scenario,
@@ -2194,6 +2206,7 @@ def _append_disembark_endpoint_violations(
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
+    objective_markers: tuple[ObjectiveMarker, ...],
 ) -> None:
     placed_models = _placed_geometry_models(scenario)
     own_model_ids = {model.model_id for model in models}
@@ -2270,6 +2283,23 @@ def _append_disembark_endpoint_violations(
                     message=terrain_violation.message,
                     model_instance_id=terrain_violation.model_instance_id,
                     blocker_id=terrain_violation.blocker_id,
+                )
+            )
+        objective_marker_violation = objective_marker_endpoint_placement_violation(
+            model=model,
+            objective_markers=objective_markers,
+            violation_code=TransportOperationViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP.value,
+            placement_label="Disembark placement",
+        )
+        if objective_marker_violation is not None:
+            violations.append(
+                TransportOperationViolation(
+                    violation_code=(
+                        TransportOperationViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP
+                    ),
+                    message=objective_marker_violation.message,
+                    model_instance_id=objective_marker_violation.model_instance_id,
+                    blocker_id=objective_marker_violation.blocker_id,
                 )
             )
     overlap = _moving_models_overlap(models)
@@ -2550,6 +2580,24 @@ def _validate_terrain_feature_tuple(
             raise GameLifecycleError(f"{field_name} must contain TerrainFeatureDefinition values.")
         features.append(value)
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _validate_objective_marker_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[ObjectiveMarker, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    markers: list[ObjectiveMarker] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ObjectiveMarker:
+            raise GameLifecycleError(f"{field_name} must contain ObjectiveMarker values.")
+        if value.objective_marker_id in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate markers.")
+        seen.add(value.objective_marker_id)
+        markers.append(value)
+    return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
 
 
 def _canonical_keyword(value: str) -> str:

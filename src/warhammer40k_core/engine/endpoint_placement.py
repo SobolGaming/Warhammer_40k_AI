@@ -4,6 +4,7 @@ import math
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainEndpointSupportPolicy,
@@ -11,11 +12,20 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry.measurement import objective_marker_endpoint_is_clear
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainSupportSurface
 from warhammer40k_core.geometry.volume import Model
 
 
 class TerrainEndpointPlacementViolationPayload(TypedDict):
+    violation_code: str
+    message: str
+    model_instance_id: str
+    blocker_id: str
+
+
+class ObjectiveMarkerEndpointPlacementViolationPayload(TypedDict):
     violation_code: str
     message: str
     model_instance_id: str
@@ -70,6 +80,65 @@ class TerrainEndpointPlacementViolation:
 
     @classmethod
     def from_payload(cls, payload: TerrainEndpointPlacementViolationPayload) -> Self:
+        return cls(
+            violation_code=payload["violation_code"],
+            message=payload["message"],
+            model_instance_id=payload["model_instance_id"],
+            blocker_id=payload["blocker_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class ObjectiveMarkerEndpointPlacementViolation:
+    violation_code: str
+    message: str
+    model_instance_id: str
+    blocker_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "violation_code",
+            _validate_identifier(
+                "ObjectiveMarkerEndpointPlacementViolation violation_code",
+                self.violation_code,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "message",
+            _validate_identifier(
+                "ObjectiveMarkerEndpointPlacementViolation message",
+                self.message,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_identifier(
+                "ObjectiveMarkerEndpointPlacementViolation model_instance_id",
+                self.model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "blocker_id",
+            _validate_identifier(
+                "ObjectiveMarkerEndpointPlacementViolation blocker_id",
+                self.blocker_id,
+            ),
+        )
+
+    def to_payload(self) -> ObjectiveMarkerEndpointPlacementViolationPayload:
+        return {
+            "violation_code": self.violation_code,
+            "message": self.message,
+            "model_instance_id": self.model_instance_id,
+            "blocker_id": self.blocker_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ObjectiveMarkerEndpointPlacementViolationPayload) -> Self:
         return cls(
             violation_code=payload["violation_code"],
             message=payload["message"],
@@ -187,6 +256,36 @@ def terrain_endpoint_placement_violation(
     return None
 
 
+def objective_marker_endpoint_placement_violation(
+    *,
+    model: Model,
+    objective_markers: tuple[ObjectiveMarker, ...],
+    violation_code: str,
+    placement_label: str,
+) -> ObjectiveMarkerEndpointPlacementViolation | None:
+    if type(model) is not Model:
+        raise GameLifecycleError("objective marker endpoint placement requires a geometry Model.")
+    markers = _validate_objective_marker_tuple("objective_markers", objective_markers)
+    code = _validate_identifier("violation_code", violation_code)
+    label = _validate_identifier("placement_label", placement_label)
+    for marker in markers:
+        marker_pose = Pose.at(marker.x_inches, marker.y_inches, marker.z_inches)
+        if objective_marker_endpoint_is_clear(
+            marker_pose,
+            model,
+            marker_id=marker.objective_marker_id,
+            marker_diameter_inches=marker.marker_diameter_inches,
+        ):
+            continue
+        return ObjectiveMarkerEndpointPlacementViolation(
+            violation_code=code,
+            message=f"{label} cannot end on an objective marker.",
+            model_instance_id=model.model_id,
+            blocker_id=marker.objective_marker_id,
+        )
+    return None
+
+
 def _model_endpoint_is_on_support_surface(
     model: Model,
     surface: TerrainSupportSurface,
@@ -215,6 +314,24 @@ def _validate_terrain_feature_tuple(
             raise GameLifecycleError(f"{field_name} must contain TerrainFeatureDefinition values.")
         features.append(value)
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _validate_objective_marker_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[ObjectiveMarker, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    markers: list[ObjectiveMarker] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ObjectiveMarker:
+            raise GameLifecycleError(f"{field_name} must contain ObjectiveMarker values.")
+        if value.objective_marker_id in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate markers.")
+        seen.add(value.objective_marker_id)
+        markers.append(value)
+    return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
 
 
 def _canonical_keyword(value: str) -> str:

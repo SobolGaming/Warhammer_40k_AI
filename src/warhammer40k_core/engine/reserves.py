@@ -6,6 +6,7 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.deployment_zones import DeploymentZone
+from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     MissionPolicyDescriptor,
     ReserveDestructionTimingKind,
@@ -27,7 +28,10 @@ from warhammer40k_core.engine.battlefield_state import (
     battlefield_placement_kind_from_token,
     geometry_model_for_placement,
 )
-from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placement_violation
+from warhammer40k_core.engine.endpoint_placement import (
+    objective_marker_endpoint_placement_violation,
+    terrain_endpoint_placement_violation,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
@@ -92,6 +96,7 @@ class ReservePlacementViolationCode(StrEnum):
     BATTLEFIELD_EDGE_CROSSED = "battlefield_edge_crossed"
     MODEL_OVERLAP = "end_on_model_overlap"
     TERRAIN_ENDPOINT_ILLEGAL = "terrain_endpoint_illegal"
+    OBJECTIVE_MARKER_ENDPOINT_OVERLAP = "objective_marker_endpoint_overlap"
     UNIT_COHERENCY_BROKEN = "unit_coherency_broken"
     LARGE_MODEL_EXCEPTION_UNNEEDED = "large_model_exception_unneeded"
     LARGE_MODEL_EXCEPTION_MODEL_CAN_FIT = "large_model_exception_model_can_fit"
@@ -1260,6 +1265,7 @@ def resolve_reserve_arrival(
     battlefield_width_inches: float = _DEFAULT_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    objective_markers: tuple[ObjectiveMarker, ...] = (),
     enemy_deployment_zones: tuple[DeploymentZone, ...] = (),
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...] = (),
     strategic_reserve_rule: StrategicReserveRule | None = None,
@@ -1279,6 +1285,7 @@ def resolve_reserve_arrival(
     width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
     depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
     features = _validate_terrain_feature_tuple("terrain_features", terrain_features)
+    markers = _validate_objective_marker_tuple("objective_markers", objective_markers)
     deployment_zones = _validate_deployment_zone_tuple(
         "enemy_deployment_zones",
         enemy_deployment_zones,
@@ -1347,6 +1354,7 @@ def resolve_reserve_arrival(
         battlefield_width_inches=width,
         battlefield_depth_inches=depth,
         terrain_features=features,
+        objective_markers=markers,
         enemy_distance_inches=(
             strategic_rule.enemy_horizontal_distance_inches
             if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES
@@ -1844,6 +1852,7 @@ def _append_common_reserve_placement_violations(
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
+    objective_markers: tuple[ObjectiveMarker, ...],
     enemy_distance_inches: float,
 ) -> None:
     placed_models = _placed_geometry_models(scenario)
@@ -1914,6 +1923,23 @@ def _append_common_reserve_placement_violations(
         )
         if terrain_violation is not None:
             violations.append(terrain_violation)
+        objective_marker_violation = objective_marker_endpoint_placement_violation(
+            model=model,
+            objective_markers=objective_markers,
+            violation_code=ReservePlacementViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP.value,
+            placement_label="Reserve placement",
+        )
+        if objective_marker_violation is not None:
+            violations.append(
+                ReservePlacementViolation(
+                    violation_code=(
+                        ReservePlacementViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP
+                    ),
+                    message=objective_marker_violation.message,
+                    model_instance_id=objective_marker_violation.model_instance_id,
+                    blocker_id=objective_marker_violation.blocker_id,
+                )
+            )
     overlap = _moving_models_overlap(models)
     if overlap is not None:
         first_id, second_id = overlap
@@ -2275,6 +2301,24 @@ def _validate_terrain_feature_tuple(
             raise GameLifecycleError(f"{field_name} must contain TerrainFeatureDefinition values.")
         features.append(value)
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _validate_objective_marker_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[ObjectiveMarker, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    markers: list[ObjectiveMarker] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ObjectiveMarker:
+            raise GameLifecycleError(f"{field_name} must contain ObjectiveMarker values.")
+        if value.objective_marker_id in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate markers.")
+        seen.add(value.objective_marker_id)
+        markers.append(value)
+    return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
 
 
 def _validate_deployment_zone_tuple(
