@@ -62,11 +62,18 @@ from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_
 
 class GameLifecyclePayload(TypedDict):
     config: GameConfigPayload | None
+    parameterized_movement_proposals: bool
     state: GameStatePayload
     decisions: DecisionControllerPayload
 
 
 MAX_LIFECYCLE_TRANSITIONS = 128
+_MOVEMENT_PROPOSAL_DECISION_TYPES = frozenset(
+    (
+        MOVEMENT_PROPOSAL_DECISION_TYPE,
+        PLACEMENT_PROPOSAL_DECISION_TYPE,
+    )
+)
 _MOVEMENT_DECISION_TYPES = frozenset(
     (
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
@@ -184,6 +191,21 @@ class GameLifecycle:
 
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
         state = self._require_state()
+        pending_request = self._pending_decision_request()
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES
+        ):
+            result.validate_for_request(pending_request)
+            malformed_status = self._movement_phase_handler.invalid_proposal_submission_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if malformed_status is not None:
+                return malformed_status
         record = self.decision_controller.submit_result(result)
         if record.request.decision_type == SECONDARY_MISSION_DECISION_TYPE:
             self._setup_flow.apply_decision(
@@ -223,6 +245,7 @@ class GameLifecycle:
         state = self._require_state()
         return {
             "config": None if self._config is None else self._config.to_payload(),
+            "parameterized_movement_proposals": self.parameterized_movement_proposals,
             "state": state.to_payload(),
             "decisions": self.decision_controller.to_payload(),
         }
@@ -231,13 +254,18 @@ class GameLifecycle:
     def from_payload(cls, payload: GameLifecyclePayload) -> Self:
         config_payload = payload["config"]
         config = None if config_payload is None else GameConfig.from_payload(config_payload)
+        parameterized_movement_proposals = _payload_bool(
+            "GameLifecycle parameterized_movement_proposals",
+            payload["parameterized_movement_proposals"],
+        )
         lifecycle = cls(
             decision_controller=DecisionController.from_payload(payload["decisions"]),
             state=GameState.from_payload(payload["state"]),
+            parameterized_movement_proposals=parameterized_movement_proposals,
             _config=config,
             _movement_phase_handler=MovementPhaseHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor,
-                parameterized_proposals=False,
+                parameterized_proposals=parameterized_movement_proposals,
             ),
             _triggered_movement_handler=TriggeredMovementHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
@@ -276,6 +304,12 @@ class GameLifecycle:
         if self._battle_round_flow is None:
             raise GameLifecycleError("GameLifecycle battle round flow is unavailable.")
         return self._battle_round_flow
+
+
+def _payload_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise GameLifecycleError(f"{field_name} must be a bool.")
+    return value
 
 
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:

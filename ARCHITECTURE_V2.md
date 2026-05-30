@@ -1088,6 +1088,8 @@ Initial parameterized request coverage:
 - Strategic Reserves placement proposal;
 - Disembark placement proposal.
 
+Reserve arrival proposal requests use distinct proposal kinds for general Reinforcement, Deep Strike, and Strategic Reserves flows. The request's `placement_kinds` field enumerates the legal physical placement methods available to that reserve state and unit.
+
 Later phases must reuse the same proposal contract for:
 
 - deployment placement;
@@ -1118,7 +1120,7 @@ Required tests:
 - `LocalGameSession.submit_payload(...)` or equivalent handles parameterized proposal decisions;
 - event cursor returns deterministic event payloads since a supplied cursor;
 - import-boundary tests confirm core, geometry, rules, and engine modules do not import adapters;
-- golden JSON fixtures cover finite movement action selection, parameterized Normal Move proposal, invalid movement proposal, reserve placement proposal, Disembark placement proposal, and viewer-scoped projection.
+- a golden JSON fixture covers the parameterized Normal Move proposal request; inline JSON-shape regressions cover finite movement action selection, invalid movement and placement proposals, reserve placement, Disembark placement, and viewer-scoped projection/event deltas.
 
 CORE V1 relevant areas:
 

@@ -47,7 +47,37 @@ class LocalGameSession:
             viewer_player_id=viewer_player_id,
         )
 
-    def events_since(self, cursor: EventStreamCursor) -> EventStreamDeltaPayload:
+    def events_since(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer_player_id: str,
+    ) -> EventStreamDeltaPayload:
         if type(cursor) is not EventStreamCursor:
             raise GameLifecycleError("LocalGameSession events_since requires EventStreamCursor.")
-        return cursor.events_since(self.lifecycle.decision_controller.event_log)
+        viewer = _validate_viewer_player_id(
+            lifecycle=self.lifecycle,
+            viewer_player_id=viewer_player_id,
+        )
+        return cursor.events_since(
+            self.lifecycle.decision_controller.event_log,
+            viewer_player_id=viewer,
+        )
+
+
+def _validate_viewer_player_id(
+    *,
+    lifecycle: GameLifecycle,
+    viewer_player_id: object,
+) -> str:
+    state = lifecycle.state
+    if state is None:
+        raise GameLifecycleError("LocalGameSession event stream requires a started lifecycle.")
+    if type(viewer_player_id) is not str:
+        raise GameLifecycleError("viewer_player_id must be a string.")
+    viewer = viewer_player_id.strip()
+    if not viewer:
+        raise GameLifecycleError("viewer_player_id must not be empty.")
+    if viewer not in state.player_ids:
+        raise GameLifecycleError("viewer_player_id must be a player in this game.")
+    return viewer

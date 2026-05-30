@@ -195,6 +195,7 @@ def test_lifecycle_replay_accepts_embarked_models_accounted_by_transport_cargo_s
     )
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
     }
@@ -272,6 +273,7 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
 
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
     }
@@ -321,6 +323,7 @@ def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None
     )
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
     }
@@ -373,6 +376,7 @@ def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> N
     )
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
     }
@@ -542,6 +546,7 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
 
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
     }
@@ -670,6 +675,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
 
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
     }
@@ -695,6 +701,7 @@ def test_replay_rejects_transport_cargo_when_transport_is_not_placed() -> None:
     )
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
     }
@@ -721,6 +728,7 @@ def test_replay_rejects_transport_cargo_when_transport_model_is_removed() -> Non
     )
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
     }
@@ -746,6 +754,7 @@ def test_replay_rejects_advanced_state_for_unplaced_unremoved_unembarked_unit() 
     state.record_advanced_unit_state(_advanced_unit_state(passenger.unit_instance_id))
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
     }
@@ -777,6 +786,7 @@ def test_replay_rejects_fell_back_state_for_unplaced_unremoved_unembarked_unit()
     )
     payload: GameLifecyclePayload = {
         "config": None,
+        "parameterized_movement_proposals": False,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
     }

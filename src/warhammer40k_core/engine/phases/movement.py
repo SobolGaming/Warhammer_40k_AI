@@ -123,7 +123,7 @@ from warhammer40k_core.geometry.pathing import (
     TerrainPathLegalityResultPayload,
     model_is_within_battlefield_footprint,
 )
-from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
 from warhammer40k_core.geometry.volume import Model
 
@@ -177,6 +177,13 @@ _ADVANCE_REROLL_KEYWORD = "ADVANCE_REROLL"
 _ADVANCED_UNIT_CLEANUP_POINT = "end_of_turn"
 _FELL_BACK_UNIT_CLEANUP_POINT = "end_of_turn"
 _DESPERATE_ESCAPE_ROLL_TYPE = "desperate_escape_roll"
+
+type _MovementProposalParseResult = (
+    tuple[MovementProposalRequest, MovementProposalPayload] | LifecycleStatus
+)
+type _PlacementProposalParseResult = (
+    tuple[MovementProposalRequest, PlacementProposalPayload] | LifecycleStatus
+)
 
 
 class MovementUnitSelectionPayload(TypedDict):
@@ -2005,6 +2012,36 @@ class MovementPhaseHandler:
             },
         )
 
+    def invalid_proposal_submission_status(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+        result: DecisionResult,
+        decisions: DecisionController,
+    ) -> LifecycleStatus | None:
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            movement_parsed = _parse_movement_proposal_submission_or_invalid(
+                state=state,
+                request=request,
+                result=result,
+                decisions=decisions,
+            )
+            if isinstance(movement_parsed, LifecycleStatus):
+                return movement_parsed
+            return None
+        if request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
+            placement_parsed = _parse_placement_proposal_submission_or_invalid(
+                state=state,
+                request=request,
+                result=result,
+                decisions=decisions,
+            )
+            if isinstance(placement_parsed, LifecycleStatus):
+                return placement_parsed
+            return None
+        raise GameLifecycleError("Movement proposal prevalidation received unsupported request.")
+
     def apply_decision(
         self,
         *,
@@ -2376,6 +2413,7 @@ def _request_reinforcement_placement(
     )
     if parameterized_proposals:
         placement_kinds = _reserve_placement_kinds_for_unit(reserve_state=reserve_state, unit=unit)
+        proposal_kind = _reserve_proposal_kind(reserve_state)
         proposal_request = MovementProposalRequest(
             request_id=state.next_decision_request_id(),
             decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -2384,7 +2422,7 @@ def _request_reinforcement_placement(
             battle_round=state.battle_round,
             phase=BattlePhase.MOVEMENT.value,
             unit_instance_id=reserve_state.unit_instance_id,
-            proposal_kind=ProposalKind.REINFORCEMENT,
+            proposal_kind=proposal_kind,
             source_decision_request_id=result.request_id,
             source_decision_result_id=result.result_id,
             placement_kinds=placement_kinds,
@@ -2404,7 +2442,7 @@ def _request_reinforcement_placement(
                 "phase": BattlePhase.MOVEMENT.value,
                 "step": MovementPhaseStepKind.REINFORCEMENTS.value,
                 "unit_instance_id": reserve_state.unit_instance_id,
-                "proposal_kind": ProposalKind.REINFORCEMENT.value,
+                "proposal_kind": proposal_kind.value,
                 "placement_kinds": [kind.value for kind in placement_kinds],
                 "request_id": request.request_id,
                 "source_decision_request_id": result.request_id,
@@ -2422,7 +2460,7 @@ def _request_reinforcement_placement(
                 "battle_round": state.battle_round,
                 "active_player_id": active_player_id,
                 "unit_instance_id": reserve_state.unit_instance_id,
-                "proposal_kind": ProposalKind.REINFORCEMENT.value,
+                "proposal_kind": proposal_kind.value,
                 "placement_kinds": [kind.value for kind in placement_kinds],
                 "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
             },
@@ -2496,6 +2534,14 @@ def _reserve_placement_kinds_for_unit(
     if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
         return (BattlefieldPlacementKind.DEEP_STRIKE,)
     return (BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,)
+
+
+def _reserve_proposal_kind(reserve_state: ReserveState) -> ProposalKind:
+    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
+        return ProposalKind.DEEP_STRIKE
+    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
+        return ProposalKind.STRATEGIC_RESERVES
+    return ProposalKind.REINFORCEMENT
 
 
 def _reinforcement_placement_payload(
@@ -3230,6 +3276,107 @@ def _apply_disembark_placement_decision(
     return None
 
 
+def _parse_movement_proposal_submission_or_invalid(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> _MovementProposalParseResult:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    try:
+        submission = MovementProposalPayload.from_payload(
+            cast(MovementProposalPayloadPayload, _decision_payload_object(result.payload))
+        )
+    except (GameLifecycleError, GeometryError, KeyError, TypeError) as exc:
+        return _reject_invalid_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_validation=_proposal_payload_parse_failure(
+                proposal_request=proposal_request,
+                error=exc,
+                default_field="witness",
+            ),
+            event_type="movement_proposal_invalid",
+            message="Movement proposal payload is malformed.",
+        )
+    return (proposal_request, submission)
+
+
+def _parse_placement_proposal_submission_or_invalid(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> _PlacementProposalParseResult:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    try:
+        submission = PlacementProposalPayload.from_payload(
+            cast(PlacementProposalPayloadPayload, _decision_payload_object(result.payload))
+        )
+    except (GameLifecycleError, GeometryError, PlacementError, KeyError, TypeError) as exc:
+        return _reject_invalid_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_validation=_proposal_payload_parse_failure(
+                proposal_request=proposal_request,
+                error=exc,
+                default_field="attempted_placement",
+            ),
+            event_type="placement_proposal_invalid",
+            message="Placement proposal payload is malformed.",
+        )
+    return (proposal_request, submission)
+
+
+def _proposal_payload_parse_failure(
+    *,
+    proposal_request: MovementProposalRequest,
+    error: GameLifecycleError | GeometryError | PlacementError | KeyError | TypeError,
+    default_field: str,
+) -> ProposalValidationResult:
+    violation_code = "proposal_payload_malformed"
+    field: str | None = default_field
+    if type(error) is KeyError:
+        missing = _key_error_field(error)
+        return ProposalValidationResult.invalid(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            violation_code="proposal_payload_missing_field",
+            message=f"Proposal payload missing required field: {missing}.",
+            field=missing,
+        )
+    message = str(error)
+    if "Unsupported ProposalKind token" in message:
+        violation_code = "unsupported_proposal_kind"
+        field = "proposal_kind"
+    elif "proposal_kind" in message:
+        field = "proposal_kind"
+    elif "witness" in message or "PathWitness" in message:
+        field = "witness"
+    elif "attempted_placement" in message or "UnitPlacement" in message:
+        field = "attempted_placement"
+    return ProposalValidationResult.invalid(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        violation_code=violation_code,
+        message=f"Proposal payload is malformed: {message}",
+        field=field,
+    )
+
+
+def _key_error_field(error: KeyError) -> str:
+    if len(error.args) != 1:
+        return "payload"
+    key = error.args[0]
+    if type(key) is str and key.strip():
+        return key.strip()
+    return "payload"
+
+
 def _apply_placement_proposal_decision(
     *,
     state: GameState,
@@ -3242,10 +3389,15 @@ def _apply_placement_proposal_decision(
     if result.actor_id != active_player_id:
         raise GameLifecycleError("Placement proposal actor must be the active player.")
     record = decisions.record_for_result(result)
-    proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
-    submission = PlacementProposalPayload.from_payload(
-        cast(PlacementProposalPayloadPayload, _decision_payload_object(result.payload))
+    parsed = _parse_placement_proposal_submission_or_invalid(
+        state=state,
+        request=record.request,
+        result=result,
+        decisions=decisions,
     )
+    if isinstance(parsed, LifecycleStatus):
+        return parsed
+    proposal_request, submission = parsed
     proposal_validation = submission.validation_result_for_request(proposal_request)
     if not proposal_validation.is_valid:
         return _reject_invalid_proposal(
@@ -3257,7 +3409,11 @@ def _apply_placement_proposal_decision(
             message="Placement proposal does not match the pending request.",
         )
 
-    if proposal_request.proposal_kind is ProposalKind.REINFORCEMENT:
+    if proposal_request.proposal_kind in (
+        ProposalKind.REINFORCEMENT,
+        ProposalKind.DEEP_STRIKE,
+        ProposalKind.STRATEGIC_RESERVES,
+    ):
         legacy_payload = {
             "reinforcement_decision": "place_reinforcement_unit",
             "unit_instance_id": submission.unit_instance_id,
@@ -3872,10 +4028,15 @@ def _apply_movement_proposal_decision(
         raise GameLifecycleError("Movement proposal requires active movement selection.")
 
     record = decisions.record_for_result(result)
-    proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
-    submission = MovementProposalPayload.from_payload(
-        cast(MovementProposalPayloadPayload, _decision_payload_object(result.payload))
+    parsed = _parse_movement_proposal_submission_or_invalid(
+        state=state,
+        request=record.request,
+        result=result,
+        decisions=decisions,
     )
+    if isinstance(parsed, LifecycleStatus):
+        return parsed
+    proposal_request, submission = parsed
     proposal_validation = submission.validation_result_for_request(proposal_request)
     if not proposal_validation.is_valid:
         return _reject_invalid_proposal(
