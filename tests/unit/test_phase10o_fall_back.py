@@ -9,6 +9,7 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battle_shock import BattleShockedUnitState
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldScenario,
@@ -365,7 +366,7 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-result-000004",
+        result_id="phase10o-result-candidate-00001",
     )
     removal_request = _decision_request(fall_back_status)
     destroyed_model_ids = (
@@ -629,7 +630,7 @@ def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-all-destroy-candidate-00244",
+        result_id="test-00008",
     )
     removal_request = _decision_request(fall_back_status)
     unit_model_ids = tuple(
@@ -771,7 +772,7 @@ def test_desperate_escape_domain_validators_fail_fast() -> None:
 
 def _advance_to_fall_back_action_request() -> tuple[GameLifecycle, DecisionRequest]:
     lifecycle, movement_status = _advance_to_movement_unit_selection(_config())
-    _state(lifecycle).battle_shocked_unit_ids = ["army-alpha:intercessor-unit-1"]
+    _mark_first_unit_battle_shocked(_state(lifecycle))
     _move_first_enemy_model_into_overflight_engagement(lifecycle)
     action_status = _submit_result(
         lifecycle,
@@ -786,6 +787,25 @@ def _advance_to_fall_back_action_request() -> tuple[GameLifecycle, DecisionReque
         MovementPhaseActionKind.FALL_BACK.value,
     }
     return lifecycle, action_request
+
+
+def _mark_first_unit_battle_shocked(state: GameState) -> None:
+    unit_id = "army-alpha:intercessor-unit-1"
+    army = state.army_definition_for_player("player-a")
+    assert army is not None
+    unit = army.unit_by_id(unit_id)
+    state.battle_shocked_unit_ids = [unit_id]
+    state.battle_shocked_unit_states = [
+        BattleShockedUnitState(
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            model_instance_ids=unit.own_model_ids(),
+            source_result_id="phase10o-battle-shock-fixture",
+            battle_round_started=1,
+            expires_at_player_command_phase_start="player-a",
+            expires_at_battle_round=2,
+        )
+    ]
 
 
 def _advance_to_movement_unit_selection(
