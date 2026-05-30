@@ -1256,6 +1256,7 @@ def test_replay_load_rejects_arrived_reserve_with_unaccounted_embarked_units() -
             "parameterized_movement_proposals": False,
             "state": state.to_payload(),
             "decisions": DecisionController().to_payload(),
+            "reaction_queue": {"frames": []},
         },
     )
 

@@ -56,7 +56,17 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStepKind,
     assert_move_units_step_complete_for_reinforcements,
 )
+from warhammer40k_core.engine.reaction_queue import (
+    REACTION_DECISION_TYPE,
+    ReactionQueue,
+    ReactionQueuePayload,
+)
 from warhammer40k_core.engine.reserves import ReserveStatus
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    SequencingDecision,
+    apply_sequencing_decision_from_request,
+)
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
@@ -70,6 +80,7 @@ class GameLifecyclePayload(TypedDict):
     parameterized_movement_proposals: bool
     state: GameStatePayload
     decisions: DecisionControllerPayload
+    reaction_queue: ReactionQueuePayload
 
 
 MAX_LIFECYCLE_TRANSITIONS = 128
@@ -104,6 +115,7 @@ def _new_decision_controller() -> DecisionController:
 @dataclass(slots=True)
 class GameLifecycle:
     decision_controller: DecisionController = field(default_factory=_new_decision_controller)
+    reaction_queue: ReactionQueue = field(default_factory=ReactionQueue)
     state: GameState | None = None
     parameterized_movement_proposals: bool = False
     _config: GameConfig | None = None
@@ -197,6 +209,7 @@ class GameLifecycle:
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
         state = self._require_state()
         pending_request = self._pending_decision_request()
+        sequencing_decision: SequencingDecision | None = None
         if (
             type(result) is DecisionResult
             and pending_request is not None
@@ -224,6 +237,23 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == REACTION_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            self.reaction_queue.validate_result(result)
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SEQUENCING_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            sequencing_decision = apply_sequencing_decision_from_request(
+                request=pending_request,
+                result=result,
+            )
         record = self.decision_controller.submit_result(result)
         if record.request.decision_type == SECONDARY_MISSION_DECISION_TYPE:
             self._setup_flow.apply_decision(
@@ -264,6 +294,23 @@ class GameLifecycle:
             if triggered_status is not None:
                 return triggered_status
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == REACTION_DECISION_TYPE:
+            self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SEQUENCING_DECISION_TYPE:
+            if sequencing_decision is None:
+                sequencing_decision = apply_sequencing_decision_from_request(
+                    request=record.request,
+                    result=result,
+                )
+            self.decision_controller.event_log.append(
+                "sequencing_order_resolved",
+                sequencing_decision.to_payload(),
+            )
+            return self.advance_until_decision_or_terminal()
         raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
 
     def to_payload(self) -> GameLifecyclePayload:
@@ -273,6 +320,7 @@ class GameLifecycle:
             "parameterized_movement_proposals": self.parameterized_movement_proposals,
             "state": state.to_payload(),
             "decisions": self.decision_controller.to_payload(),
+            "reaction_queue": self.reaction_queue.to_payload(),
         }
 
     @classmethod
@@ -285,6 +333,7 @@ class GameLifecycle:
         )
         lifecycle = cls(
             decision_controller=DecisionController.from_payload(payload["decisions"]),
+            reaction_queue=ReactionQueue.from_payload(payload["reaction_queue"]),
             state=GameState.from_payload(payload["state"]),
             parameterized_movement_proposals=parameterized_movement_proposals,
             _config=config,
@@ -297,6 +346,11 @@ class GameLifecycle:
             ),
         )
         _validate_payload_consistency(state=lifecycle._require_state(), config=lifecycle._config)
+        _validate_reaction_queue_consistency(
+            state=lifecycle._require_state(),
+            reaction_queue=lifecycle.reaction_queue,
+            pending_request=lifecycle._pending_decision_request(),
+        )
         lifecycle._battle_round_flow = BattleRoundFlow(phase_handlers=lifecycle._phase_handlers())
         return lifecycle
 
@@ -391,6 +445,40 @@ def _validate_mustered_army_consistency(*, state: GameState, config: GameConfig)
         raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
     if state_payloads and state_payloads != expected_payloads:
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")
+
+
+def _validate_reaction_queue_consistency(
+    *,
+    state: GameState,
+    reaction_queue: ReactionQueue,
+    pending_request: DecisionRequest | None,
+) -> None:
+    frames = reaction_queue.frames
+    if not frames:
+        if pending_request is not None and pending_request.decision_type == REACTION_DECISION_TYPE:
+            raise GameLifecycleError("Lifecycle pending reaction decision requires a frame.")
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("Lifecycle reaction queue requires battle stage.")
+    if state.current_battle_phase is None:
+        raise GameLifecycleError("Lifecycle reaction queue requires a current battle phase.")
+    if pending_request is None:
+        raise GameLifecycleError("Lifecycle reaction queue requires a pending decision.")
+    if pending_request.decision_type != REACTION_DECISION_TYPE:
+        raise GameLifecycleError("Lifecycle reaction queue pending decision_type drift.")
+    seen_request_ids: set[str] = set()
+    for frame in frames:
+        if frame.request_id is None:
+            raise GameLifecycleError("Lifecycle reaction queue frame requires request_id.")
+        if frame.request_id in seen_request_ids:
+            raise GameLifecycleError("Lifecycle reaction queue request_ids must be unique.")
+        seen_request_ids.add(frame.request_id)
+        if frame.reaction_window.timing_window.game_id != state.game_id:
+            raise GameLifecycleError("Lifecycle reaction queue frame game_id drift.")
+        if frame.parent_phase is not state.current_battle_phase:
+            raise GameLifecycleError("Lifecycle reaction queue frame phase drift.")
+    if frames[-1].request_id != pending_request.request_id:
+        raise GameLifecycleError("Lifecycle reaction queue active frame request_id drift.")
 
 
 def _validate_battlefield_state_consistency(

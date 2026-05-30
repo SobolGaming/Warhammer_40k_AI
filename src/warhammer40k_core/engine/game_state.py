@@ -43,6 +43,11 @@ from warhammer40k_core.engine.command_points import (
     CommandStepStatePayload,
     initial_command_point_ledgers,
 )
+from warhammer40k_core.engine.effects import (
+    EffectExpirationBoundary,
+    PersistingEffect,
+    PersistingEffectPayload,
+)
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
@@ -188,6 +193,7 @@ class GameStatePayload(TypedDict):
     mission_action_states: list[MissionActionStatePayload]
     end_turn_cleanup_states: list[EndTurnCleanupStatePayload]
     scoring_window_states: list[ScoringWindowStatePayload]
+    persisting_effects: list[PersistingEffectPayload]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
     secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
@@ -270,6 +276,10 @@ def _new_army_definitions() -> list[ArmyDefinition]:
 
 
 def _new_secondary_mission_card_states() -> list[SecondaryMissionCardState]:
+    return []
+
+
+def _new_persisting_effects() -> list[PersistingEffect]:
     return []
 
 
@@ -561,6 +571,7 @@ class GameState:
     scoring_window_states: list[ScoringWindowState] = field(
         default_factory=_new_scoring_window_states
     )
+    persisting_effects: list[PersistingEffect] = field(default_factory=_new_persisting_effects)
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
@@ -700,6 +711,12 @@ class GameState:
             self.scoring_window_states,
             game_id=self.game_id,
         )
+        self.persisting_effects = _validate_persisting_effects(
+            self.persisting_effects,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
             player_ids=self.player_ids,
@@ -767,6 +784,9 @@ class GameState:
         self.battle_round = 1
         self.active_player_id = self.turn_order[0]
         self.battle_phase_index = 0
+        self._expire_persisting_effects_at_current_battle_round_start()
+        self._expire_persisting_effects_at_current_turn_start()
+        self._expire_persisting_effects_at_current_phase_start()
 
     def advance_to_next_battle_phase(self) -> BattlePhase:
         if self.stage is not GameLifecycleStage.BATTLE:
@@ -774,21 +794,29 @@ class GameState:
         if self.battle_phase_index is None:
             raise GameLifecycleError("GameState has no current battle phase.")
         completed_phase = self.battle_phase_sequence[self.battle_phase_index]
+        completed_player_id = self.active_player_id
+        if completed_player_id is None:
+            raise GameLifecycleError("GameState active player is required during battle.")
         phase_end_record = self._record_objective_control_boundary(
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.PHASE_END,
         )
         self._score_objective_control_boundary(phase_end_record)
+        self.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.phase_end(
+                battle_round=self.battle_round,
+                phase=completed_phase,
+                player_id=completed_player_id,
+            )
+        )
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
             if completed_phase is BattlePhase.COMMAND:
                 self.command_step_state = None
             if completed_phase is BattlePhase.MOVEMENT:
                 self.movement_phase_state = None
             self.battle_phase_index += 1
+            self._expire_persisting_effects_at_current_phase_start()
             return completed_phase
-        completed_player_id = self.active_player_id
-        if completed_player_id is None:
-            raise GameLifecycleError("GameState active player is required during battle.")
         self._clear_turn_action_states(
             player_id=completed_player_id,
             battle_round=self.battle_round,
@@ -799,6 +827,12 @@ class GameState:
         )
         self._score_objective_control_boundary(turn_end_record)
         self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
+        self.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.turn_end(
+                battle_round=self.battle_round,
+                player_id=completed_player_id,
+            )
+        )
         if completed_phase is BattlePhase.COMMAND:
             self.command_step_state = None
         if completed_phase is BattlePhase.MOVEMENT:
@@ -808,9 +842,13 @@ class GameState:
         if battle_round_ended:
             self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_ROUND)
             self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=False)
+            self.expire_persisting_effects_at_boundary(
+                EffectExpirationBoundary.battle_round_end(battle_round=completed_round)
+            )
         if battle_round_ended and self._game_ends_after_completed_round(completed_round):
             self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=True)
             self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_GAME)
+            self.expire_persisting_effects_at_boundary(EffectExpirationBoundary.battle_end())
             self.stage = GameLifecycleStage.COMPLETE
             self.battle_phase_index = None
             self.active_player_id = None
@@ -819,6 +857,10 @@ class GameState:
             return completed_phase
         self.battle_phase_index = 0
         self._advance_active_player_after_completed_turn()
+        if battle_round_ended:
+            self._expire_persisting_effects_at_current_battle_round_start()
+        self._expire_persisting_effects_at_current_turn_start()
+        self._expire_persisting_effects_at_current_phase_start()
         return completed_phase
 
     def record_secondary_mission_choice(self, choice: SecondaryMissionChoice) -> None:
@@ -1004,6 +1046,84 @@ class GameState:
         self.replace_mission_action_state(interrupted)
         return interrupted
 
+    def record_persisting_effect(self, effect: PersistingEffect) -> None:
+        if type(effect) is not PersistingEffect:
+            raise GameLifecycleError("persisting_effect must be a PersistingEffect.")
+        if effect.owner_player_id not in self.player_ids:
+            raise GameLifecycleError("PersistingEffect owner_player_id is not in this game.")
+        unit_ids = _known_rules_unit_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
+        if not unit_ids:
+            raise GameLifecycleError("PersistingEffect requires mustered army definitions.")
+        if any(unit_id not in unit_ids for unit_id in effect.target_unit_instance_ids):
+            raise GameLifecycleError("PersistingEffect target unit is unknown.")
+        if any(stored.effect_id == effect.effect_id for stored in self.persisting_effects):
+            raise GameLifecycleError("PersistingEffect already exists for effect_id.")
+        self.persisting_effects.append(effect)
+        self.persisting_effects.sort(key=lambda stored: stored.effect_id)
+
+    def persisting_effects_for_unit(self, unit_instance_id: str) -> tuple[PersistingEffect, ...]:
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        return tuple(
+            effect
+            for effect in self.persisting_effects
+            if effect.applies_to_unit(requested_unit_id)
+        )
+
+    def expire_persisting_effects_at_boundary(
+        self,
+        boundary: EffectExpirationBoundary,
+    ) -> tuple[PersistingEffect, ...]:
+        if type(boundary) is not EffectExpirationBoundary:
+            raise GameLifecycleError("effect expiration boundary must be EffectExpirationBoundary.")
+        expired = tuple(effect for effect in self.persisting_effects if effect.expires_at(boundary))
+        if not expired:
+            return ()
+        expired_ids = {effect.effect_id for effect in expired}
+        self.persisting_effects = [
+            effect for effect in self.persisting_effects if effect.effect_id not in expired_ids
+        ]
+        return tuple(sorted(expired, key=lambda effect: effect.effect_id))
+
+    def transfer_persisting_effects_after_attached_unit_split(
+        self,
+        *,
+        attached_unit_instance_id: str,
+        surviving_unit_instance_ids: tuple[str, ...],
+    ) -> tuple[PersistingEffect, ...]:
+        requested_attached_id = _validate_identifier(
+            "attached_unit_instance_id",
+            attached_unit_instance_id,
+        )
+        survivor_ids = _validate_identifier_tuple(
+            "surviving_unit_instance_ids",
+            surviving_unit_instance_ids,
+            min_length=1,
+            sort_values=True,
+        )
+        unit_ids = _known_rules_unit_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
+        if requested_attached_id not in unit_ids:
+            raise GameLifecycleError("Attached-unit split source unit is unknown.")
+        if any(unit_id not in unit_ids for unit_id in survivor_ids):
+            raise GameLifecycleError("Attached-unit split survivor unit is unknown.")
+        updated: list[PersistingEffect] = []
+        changed: list[PersistingEffect] = []
+        for effect in self.persisting_effects:
+            replacement = effect.with_attached_unit_split(
+                attached_unit_instance_id=requested_attached_id,
+                surviving_unit_instance_ids=survivor_ids,
+            )
+            updated.append(replacement)
+            if replacement is not effect:
+                changed.append(replacement)
+        self.persisting_effects = sorted(updated, key=lambda effect: effect.effect_id)
+        return tuple(sorted(changed, key=lambda effect: effect.effect_id))
+
     def starting_strength_record_for_unit(self, unit_instance_id: str) -> StartingStrengthRecord:
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
         for record in self.starting_strength_records:
@@ -1059,6 +1179,10 @@ class GameState:
                     unit=self._unit_by_id(unit_id),
                 )
             )
+        self.transfer_persisting_effects_after_attached_unit_split(
+            attached_unit_instance_id=requested_attached_unit_id,
+            surviving_unit_instance_ids=surviving_ids,
+        )
         replaced_ids = {*surviving_ids, requested_attached_unit_id}
         self.starting_strength_records = [
             record
@@ -1741,6 +1865,7 @@ class GameState:
                 state.to_payload() for state in self.end_turn_cleanup_states
             ],
             "scoring_window_states": [state.to_payload() for state in self.scoring_window_states],
+            "persisting_effects": [effect.to_payload() for effect in self.persisting_effects],
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
@@ -1935,6 +2060,9 @@ class GameState:
             scoring_window_states=[
                 ScoringWindowState.from_payload(state) for state in payload["scoring_window_states"]
             ],
+            persisting_effects=[
+                PersistingEffect.from_payload(effect) for effect in payload["persisting_effects"]
+            ],
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -1958,6 +2086,41 @@ class GameState:
             return
         self.active_player_id = self.turn_order[0]
         self.battle_round += 1
+
+    def _expire_persisting_effects_at_current_battle_round_start(self) -> None:
+        if self.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("GameState can expire battle-round effects only in battle.")
+        self.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.battle_round_start(battle_round=self.battle_round)
+        )
+
+    def _expire_persisting_effects_at_current_turn_start(self) -> None:
+        if self.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("GameState can expire turn effects only in battle.")
+        if self.active_player_id is None:
+            raise GameLifecycleError("GameState active player is required during battle.")
+        self.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.turn_start(
+                battle_round=self.battle_round,
+                player_id=self.active_player_id,
+            )
+        )
+
+    def _expire_persisting_effects_at_current_phase_start(self) -> None:
+        if self.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("GameState can expire phase effects only in battle.")
+        if self.active_player_id is None:
+            raise GameLifecycleError("GameState active player is required during battle.")
+        current_phase = self.current_battle_phase
+        if current_phase is None:
+            raise GameLifecycleError("GameState has no current battle phase.")
+        self.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.phase_start(
+                battle_round=self.battle_round,
+                phase=current_phase,
+                player_id=self.active_player_id,
+            )
+        )
 
     def _record_starting_strength_records_for_army(
         self,
@@ -2921,6 +3084,49 @@ def _validate_scoring_window_states(
         seen.add(state.window_id)
         validated.append(state)
     return sorted(validated, key=lambda state: state.window_id)
+
+
+def _validate_persisting_effects(
+    effects: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+    player_ids: tuple[str, ...],
+) -> list[PersistingEffect]:
+    if not isinstance(effects, list):
+        raise GameLifecycleError("GameState persisting_effects must be a list.")
+    unit_ids = _known_rules_unit_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
+    validated: list[PersistingEffect] = []
+    seen: set[str] = set()
+    for effect in cast(list[object], effects):
+        if type(effect) is not PersistingEffect:
+            raise GameLifecycleError(
+                "GameState persisting_effects must contain PersistingEffect values."
+            )
+        if effect.owner_player_id not in player_ids:
+            raise GameLifecycleError("PersistingEffect owner_player_id is not in this game.")
+        if not unit_ids:
+            raise GameLifecycleError("PersistingEffect requires mustered army definitions.")
+        if any(unit_id not in unit_ids for unit_id in effect.target_unit_instance_ids):
+            raise GameLifecycleError("PersistingEffect target unit is unknown.")
+        if effect.effect_id in seen:
+            raise GameLifecycleError("GameState persisting_effects must be unique.")
+        seen.add(effect.effect_id)
+        validated.append(effect)
+    return sorted(validated, key=lambda effect: effect.effect_id)
+
+
+def _known_rules_unit_ids(
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+) -> set[str]:
+    return {unit.unit_instance_id for army in army_definitions for unit in army.units} | {
+        record.unit_instance_id for record in starting_strength_records
+    }
 
 
 def _validate_secondary_mission_card_states(
