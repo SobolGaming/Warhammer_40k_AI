@@ -86,6 +86,8 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
         secondary_vp_cap=scoring.secondary_vp_cap,
         battle_ready_vp=caps.battle_ready_vp,
         total_vp_cap=scoring.total_vp_cap,
+        end_of_round_scoring_windows=scoring.end_of_round_scoring_windows,
+        end_of_game_scoring_windows=scoring.end_of_game_scoring_windows,
         source_id=f"{mission_setup.source_id}:scoring:{mission_setup.primary_mission_id}",
     )
 

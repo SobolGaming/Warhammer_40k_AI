@@ -83,6 +83,10 @@ from warhammer40k_core.engine.reserves import (
     resolve_unarrived_reserve_destruction,
 )
 from warhammer40k_core.engine.scoring import (
+    FinalScoringResult,
+    ScoringWindowKind,
+    ScoringWindowState,
+    ScoringWindowStatePayload,
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     SecondaryMissionCardStatePayload,
@@ -183,6 +187,7 @@ class GameStatePayload(TypedDict):
     objective_control_records: list[ObjectiveControlRecordPayload]
     mission_action_states: list[MissionActionStatePayload]
     end_turn_cleanup_states: list[EndTurnCleanupStatePayload]
+    scoring_window_states: list[ScoringWindowStatePayload]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
     secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
@@ -253,6 +258,10 @@ def _new_mission_action_states() -> list[MissionActionState]:
 
 
 def _new_end_turn_cleanup_states() -> list[EndTurnCleanupState]:
+    return []
+
+
+def _new_scoring_window_states() -> list[ScoringWindowState]:
     return []
 
 
@@ -549,6 +558,9 @@ class GameState:
     end_turn_cleanup_states: list[EndTurnCleanupState] = field(
         default_factory=_new_end_turn_cleanup_states
     )
+    scoring_window_states: list[ScoringWindowState] = field(
+        default_factory=_new_scoring_window_states
+    )
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
@@ -684,6 +696,10 @@ class GameState:
             game_id=self.game_id,
             player_ids=self.player_ids,
         )
+        self.scoring_window_states = _validate_scoring_window_states(
+            self.scoring_window_states,
+            game_id=self.game_id,
+        )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
             player_ids=self.player_ids,
@@ -790,9 +806,11 @@ class GameState:
         completed_round = self.battle_round
         battle_round_ended = self._active_player_is_last_in_round(completed_player_id)
         if battle_round_ended:
+            self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_ROUND)
             self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=False)
         if battle_round_ended and self._game_ends_after_completed_round(completed_round):
             self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=True)
+            self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_GAME)
             self.stage = GameLifecycleStage.COMPLETE
             self.battle_phase_index = None
             self.active_player_id = None
@@ -902,7 +920,19 @@ class GameState:
             raise GameLifecycleError("GameState award must be a VictoryPointAward.")
         requested_player_id = _validate_player_id(award.player_id, player_ids=self.player_ids)
         ledger = self.victory_point_ledger_for_player(requested_player_id)
-        updated, transaction = ledger.award(award)
+        applied_amount = award.amount
+        transaction_metadata = award.metadata
+        if self.mission_setup is not None:
+            policy = mission_scoring_policy_from_setup(self.mission_setup)
+            applied_amount, transaction_metadata = policy.capped_award_for_ledger(
+                ledger=ledger,
+                award=award,
+            )
+        updated, transaction = ledger.award(
+            award,
+            applied_amount=applied_amount,
+            metadata=transaction_metadata,
+        )
         self.victory_point_ledgers = [
             updated if stored.player_id == requested_player_id else stored
             for stored in self.victory_point_ledgers
@@ -1710,6 +1740,7 @@ class GameState:
             "end_turn_cleanup_states": [
                 state.to_payload() for state in self.end_turn_cleanup_states
             ],
+            "scoring_window_states": [state.to_payload() for state in self.scoring_window_states],
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
@@ -1901,6 +1932,9 @@ class GameState:
                 EndTurnCleanupState.from_payload(state)
                 for state in payload["end_turn_cleanup_states"]
             ],
+            scoring_window_states=[
+                ScoringWindowState.from_payload(state) for state in payload["scoring_window_states"]
+            ],
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -2043,28 +2077,50 @@ class GameState:
         return requested_round >= policy.game_length_battle_rounds
 
     def game_result_payload(self) -> dict[str, JsonValue]:
-        totals: list[JsonValue] = [
-            validate_json_value(
-                {"player_id": ledger.player_id, "victory_points": ledger.victory_points}
-            )
-            for ledger in self.victory_point_ledgers
-        ]
-        if not totals:
-            raise GameLifecycleError("Game result requires victory point ledgers.")
-        max_score = max(ledger.victory_points for ledger in self.victory_point_ledgers)
-        winner_ids = tuple(
-            ledger.player_id
-            for ledger in self.victory_point_ledgers
-            if ledger.victory_points == max_score
+        if self.stage is not GameLifecycleStage.COMPLETE:
+            raise GameLifecycleError("Game result requires complete stage.")
+        if self.mission_setup is None:
+            raise GameLifecycleError("Game result requires MissionSetup.")
+        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        result = FinalScoringResult.from_ledgers(
+            game_id=self.game_id,
+            battle_round=self.battle_round,
+            policy=policy,
+            ledgers=tuple(self.victory_point_ledgers),
+            scoring_windows=tuple(self.scoring_window_states),
         )
-        payload: dict[str, JsonValue] = {
-            "game_id": self.game_id,
-            "battle_round": self.battle_round,
-            "final_scores": totals,
-            "winner_player_ids": list(winner_ids),
-            "is_draw": len(winner_ids) != 1,
-        }
-        return payload
+        return cast(dict[str, JsonValue], result.to_payload())
+
+    def _record_scoring_windows_boundary(self, window_kind: ScoringWindowKind) -> None:
+        if self.mission_setup is None:
+            raise GameLifecycleError("Scoring windows require MissionSetup.")
+        kind = ScoringWindowKind(window_kind)
+        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        windows = (
+            policy.end_of_round_scoring_windows
+            if kind is ScoringWindowKind.END_OF_ROUND
+            else policy.end_of_game_scoring_windows
+        )
+        for window in windows:
+            state = ScoringWindowState(
+                window_id=(
+                    f"scoring-window:{self.game_id}:round-{self.battle_round:02d}:"
+                    f"{kind.value}:{window}"
+                ),
+                game_id=self.game_id,
+                battle_round=self.battle_round,
+                window_kind=kind,
+                window=window,
+                source_id=f"{policy.source_id}:window:{kind.value}:{window}",
+            )
+            if self._has_scoring_window_state(state.window_id):
+                continue
+            self.scoring_window_states.append(state)
+        self.scoring_window_states.sort(key=lambda state: state.window_id)
+
+    def _has_scoring_window_state(self, window_id: str) -> bool:
+        requested_id = _validate_identifier("window_id", window_id)
+        return any(state.window_id == requested_id for state in self.scoring_window_states)
 
     def _assert_battlefield_state_clear_of_objective_markers(
         self,
@@ -2841,6 +2897,30 @@ def _validate_end_turn_cleanup_states(
         seen.add(state.cleanup_id)
         validated.append(state)
     return sorted(validated, key=lambda state: state.cleanup_id)
+
+
+def _validate_scoring_window_states(
+    states: object,
+    *,
+    game_id: str,
+) -> list[ScoringWindowState]:
+    if not isinstance(states, list):
+        raise GameLifecycleError("GameState scoring_window_states must be a list.")
+    requested_game_id = _validate_identifier("game_id", game_id)
+    validated: list[ScoringWindowState] = []
+    seen: set[str] = set()
+    for state in cast(list[object], states):
+        if type(state) is not ScoringWindowState:
+            raise GameLifecycleError(
+                "GameState scoring_window_states must contain ScoringWindowState values."
+            )
+        if state.game_id != requested_game_id:
+            raise GameLifecycleError("ScoringWindowState game_id drift.")
+        if state.window_id in seen:
+            raise GameLifecycleError("GameState scoring_window_states must be unique.")
+        seen.add(state.window_id)
+        validated.append(state)
+    return sorted(validated, key=lambda state: state.window_id)
 
 
 def _validate_secondary_mission_card_states(
