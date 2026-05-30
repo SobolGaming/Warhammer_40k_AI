@@ -145,7 +145,7 @@ If the selected option is legal and the action requires exact movement input, th
 Phase 11E mission-scoring decisions that are player-facing are finite decisions:
 
 - `discard_tactical_secondary_mission`: the engine emits one option for each legal active Tactical secondary card the player can discard. The selected option payload includes the game, player, battle round, phase, and `secondary_mission_id`. The lifecycle applies the discard and emits `tactical_secondary_mission_discarded`.
-- `start_mission_action`: the engine emits legal source-backed Mission Action start options. Current Phase 11E support enumerates action/unit/objective-target options for source-backed objective-marker actions such as Cleanse. Mission Action target policies that are not yet represented as finite options must return a typed `unsupported` status instead of exposing an adapter mutation path.
+- `start_mission_action`: the engine emits legal source-backed Mission Action start options. Current Phase 11E support enumerates action/unit/objective-target options for source-backed objective-marker actions such as Cleanse, filters units through the source `eligible_unit_policy`, and persists the selected `target_id` in `MissionActionState`. Mission Action target policies that are not yet represented as finite options must return a typed `unsupported` status instead of exposing an adapter mutation path.
 
 Both decision types must be submitted through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. Tests, replay, UI, CLI, network, and headless adapters must not call `GameState.discard_tactical_secondary(...)` or `GameState.record_mission_action_state(...)` directly for player choices; those methods are engine-owned primitives used by validated decision handlers and automatic rule hooks.
 
@@ -389,6 +389,11 @@ transactions are public to every viewer. Adapters may display totals and public
 scoring audit entries from these fields. Future hidden mission rules must mark
 their data hidden explicitly and define their own reveal timing in the same
 contract update that introduces them.
+
+Phase 11E scoring amounts and supported timing gates are source-backed. Primary
+mission scoring must honor the selected mission's source scoring-rule condition,
+and secondary scoring must use the selected card's Fixed or Tactical scoring
+rule instead of a flat adapter default.
 
 Adapters should consume a `GameViewPayload` for a viewer by default:
 

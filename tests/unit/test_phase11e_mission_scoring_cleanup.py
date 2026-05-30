@@ -93,7 +93,7 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
-def test_primary_scoring_uses_objective_control_at_configured_command_timing() -> None:
+def test_take_and_hold_does_not_score_before_battle_round_two() -> None:
     state = _battle_state_with_center_objective_positions(
         player_a_offsets=((2.0, 0.0),),
         player_b_offsets=((20.0, 20.0),),
@@ -104,12 +104,30 @@ def test_primary_scoring_uses_objective_control_at_configured_command_timing() -
 
     assert completed_phase is BattlePhase.COMMAND
     assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.victory_point_total("player-a") == 0
+    assert ledger.transactions == ()
+
+
+def test_take_and_hold_scores_from_battle_round_two_at_configured_command_timing() -> None:
+    state = _battle_state_with_center_objective_positions(
+        player_a_offsets=((2.0, 0.0),),
+        player_b_offsets=((20.0, 20.0),),
+    )
+    state.battle_round = 2
+
+    completed_phase = state.advance_to_next_battle_phase()
+    ledger = state.victory_point_ledger_for_player("player-a")
+
+    assert completed_phase is BattlePhase.COMMAND
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
     assert state.victory_point_total("player-a") == 5
     assert ledger.transactions[0].source_kind is VictoryPointSourceKind.PRIMARY
     assert ledger.transactions[0].source_id == "take-and-hold"
     assert ledger.transactions[0].metadata == {
-        "objective_control_record_id": ("objective-control:round-01:player-a:command:phase_end"),
+        "objective_control_record_id": ("objective-control:round-02:player-a:command:phase_end"),
         "controlled_objective_ids": ["tipping-point-center"],
+        "scoring_rule_id": "take-and-hold-control",
+        "scoring_rule_condition": "each_controlled_objective_from_battle_round_two",
     }
 
 
@@ -126,7 +144,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
     opponent_payload = state.to_public_payload(viewer_player_id="player-b")
 
     assert scored.status is SecondaryMissionCardStatus.SCORED
-    assert state.victory_point_total("player-a") == 5
+    assert state.victory_point_total("player-a") == 4
     own_ledger = _public_ledger(own_payload, player_id="player-a")
     opponent_ledger = _public_ledger(opponent_payload, player_id="player-a")
     own_transactions = cast(list[JsonValue], own_ledger["transactions"])
@@ -138,12 +156,16 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
         "player_id": "player-a",
         "battle_round": 1,
         "phase": "command",
-        "amount": 5,
+        "amount": 4,
         "source_kind": "fixed_secondary",
         "source_id": "assassination",
         "scoring_timing": "secondary_mission_score",
         "hidden": False,
-        "metadata": {"secondary_mission_id": "assassination"},
+        "metadata": {
+            "secondary_mission_id": "assassination",
+            "scoring_rule_id": "assassination-fixed",
+            "scoring_rule_condition": "fixed_secondary_condition",
+        },
     }
     assert any(
         card_payload["player_id"] == "player-a"
@@ -152,6 +174,50 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
         and card_payload["hidden"] is False
         for card_payload in _public_card_states(opponent_payload)
     )
+
+
+def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -> None:
+    fixed_state = _battle_state()
+
+    fixed_state.score_secondary_mission(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.COMMAND,
+    )
+
+    tactical_state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    tactical_state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            battle_round=1,
+            source_result_id="phase11e-test-draw",
+        )
+    )
+    tactical_state.score_secondary_mission(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.COMMAND,
+    )
+
+    assert fixed_state.victory_point_total("player-a") == 2
+    assert tactical_state.victory_point_total("player-a") == 4
+    fixed_transaction = fixed_state.victory_point_ledger_for_player("player-a").transactions[0]
+    tactical_transaction = tactical_state.victory_point_ledger_for_player("player-a").transactions[
+        0
+    ]
+    assert fixed_transaction.metadata == {
+        "secondary_mission_id": "bring-it-down",
+        "scoring_rule_id": "bring-it-down-fixed",
+        "scoring_rule_condition": "fixed_secondary_condition",
+    }
+    assert tactical_transaction.metadata == {
+        "secondary_mission_id": "bring-it-down",
+        "scoring_rule_id": "bring-it-down-tactical",
+        "scoring_rule_condition": "tactical_secondary_condition",
+    }
 
 
 def test_secondary_choices_remain_secret_until_all_players_select() -> None:
@@ -411,7 +477,8 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
 
     assert scored.status is SecondaryMissionCardStatus.SCORED
     assert discarded_record.status is SecondaryMissionCardStatus.DISCARDED
-    assert state.victory_point_total("player-a") == 5
+    expected_score = state.victory_point_ledger_for_player("player-a").transactions[0].amount
+    assert state.victory_point_total("player-a") == expected_score
     assert decisions.records[-1].request.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE
     assert decisions.records[-1].result.result_id == "phase11e-discard-tactical"
     draw_event = next(
@@ -453,7 +520,11 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     transaction = cast(dict[str, JsonValue], transactions[0])
     assert transaction["source_kind"] == "tactical_secondary"
     assert transaction["source_id"] == active_cards[0].secondary_mission_id
-    assert transaction["metadata"] == {"secondary_mission_id": active_cards[0].secondary_mission_id}
+    assert transaction["metadata"] == {
+        "secondary_mission_id": active_cards[0].secondary_mission_id,
+        "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
+        "scoring_rule_condition": "tactical_secondary_condition",
+    }
     round_tripped = GameLifecycle.from_payload(lifecycle.to_payload())
     encoded = json.dumps(round_tripped.to_payload(), sort_keys=True)
     assert "<" not in encoded
@@ -535,7 +606,9 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
 
     assert completed.status is MissionActionStatus.COMPLETED
     assert completed.score_transaction_id == "victory-point:player-a:round-01:000001"
+    assert completed.target_id.endswith("center")
     assert interrupted.status is MissionActionStatus.INTERRUPTED
+    assert interrupted.target_id.endswith("northwest")
     assert interrupted.interrupted_reason == "unit_moved"
     assert state.victory_point_total("player-a") == 5
     assert lifecycle.decision_controller.records[-2].request.decision_type == (
@@ -557,6 +630,13 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
     assert cast(dict[str, JsonValue], action_events[0]["payload"])["mission_action_id"] == (
         "cleanse-objective"
     )
+    round_tripped = GameLifecycle.from_payload(lifecycle.to_payload())
+    round_tripped_state = round_tripped.state
+    assert round_tripped_state is not None
+    assert (
+        round_tripped_state.mission_action_state_by_id(completed.action_id).target_id
+        == completed.target_id
+    )
 
 
 def test_mission_action_start_rejects_drifted_lifecycle_option() -> None:
@@ -565,6 +645,11 @@ def test_mission_action_start_rejects_drifted_lifecycle_option() -> None:
     assert state is not None
     assert state.battlefield_state is not None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
     waiting = request_mission_action_start(
         state=state,
         decisions=lifecycle.decision_controller,
@@ -588,6 +673,43 @@ def test_mission_action_start_rejects_drifted_lifecycle_option() -> None:
     assert status.status_kind.value == "invalid"
     assert not lifecycle.decision_controller.records
     assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+
+
+def test_cleanse_mission_action_filters_ineligible_vehicle_units() -> None:
+    lifecycle = _battle_lifecycle_with_player_a_vehicle()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:vehicle-unit-2",
+        target_suffix="center",
+    )
+
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="cleanse-objective",
+    )
+    request = waiting.decision_request
+    assert request is not None
+
+    option_payloads = [cast(dict[str, JsonValue], option.payload) for option in request.options]
+    assert option_payloads
+    assert {
+        cast(str, option_payload["unit_instance_id"]) for option_payload in option_payloads
+    } == {"army-alpha:intercessor-unit-1"}
+    assert all(
+        "army-alpha:vehicle-unit-2"
+        not in cast(list[JsonValue], option_payload["eligible_unit_instance_ids"])
+        for option_payload in option_payloads
+    )
 
 
 def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() -> None:
@@ -698,6 +820,10 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     assert policy.game_length_battle_rounds == mission_pack.scoring.game_length_battle_rounds
     assert policy.primary_max_vp_per_turn == primary.max_vp_per_turn
     assert policy.primary_vp_per_controlled_objective == primary.vp_per_controlled_objective
+    assert policy.primary_scoring_rule_id == "take-and-hold-control"
+    assert policy.primary_scoring_rule_condition == (
+        "each_controlled_objective_from_battle_round_two"
+    )
     assert policy.primary_vp_cap == mission_pack.scoring.primary_vp_cap
     assert policy.total_vp_cap == mission_pack.scoring.total_vp_cap
     assert award.to_payload()["source_kind"] == "mission_action"
@@ -734,6 +860,10 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             secondary_mission_id="assassination",
             source_kind=VictoryPointSourceKind.PRIMARY,
             hidden=True,
+        )
+    with pytest.raises(GameLifecycleError):
+        mission_scoring_policy_from_setup(
+            replace(_mission_setup(), primary_mission_id="the-ritual")
         )
     with pytest.raises(GameLifecycleError):
         ledger.award(cast(VictoryPointAward, "not-an-award"))
@@ -903,6 +1033,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:invalid:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
+            target_id="tipping-point-center",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -918,6 +1049,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:started-with-completion:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
+            target_id="tipping-point-center",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -934,6 +1066,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:completed-without-round:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
+            target_id="tipping-point-center",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -951,6 +1084,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:interrupted-with-score:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
+            target_id="tipping-point-center",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -1179,6 +1313,7 @@ def _mission_action_state(*, action_id: str) -> MissionActionState:
         action_id=action_id,
         player_id="player-a",
         unit_instance_id="army-alpha:intercessor-unit-1",
+        target_id="tipping-point-center",
         mission_id="cleanse",
         battle_round=1,
         phase=BattlePhase.MOVEMENT.value,
@@ -1252,6 +1387,11 @@ def _start_mission_action_via_lifecycle(
 ) -> MissionActionState:
     state = lifecycle.state
     assert state is not None
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix=target_suffix,
+    )
     waiting = request_mission_action_start(
         state=state,
         decisions=lifecycle.decision_controller,
@@ -1275,6 +1415,30 @@ def _start_mission_action_via_lifecycle(
     return state.mission_action_state_by_id(action_id)
 
 
+def _place_unit_near_objective(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    target_suffix: str,
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield state")
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    marker = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_marker_id.endswith(target_suffix)
+    )
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
+    offsets = tuple(
+        (2.0 + float(index), 0.0) for index in range(len(unit_placement.model_placements))
+    )
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        _with_model_offsets(unit_placement, marker, offsets=offsets)
+    )
+
+
 def _battle_lifecycle(
     *,
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
@@ -1289,12 +1453,33 @@ def _battle_lifecycle(
     return lifecycle
 
 
+def _battle_lifecycle_with_player_a_vehicle() -> GameLifecycle:
+    config = _config_with_player_a_vehicle()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(config)
+    return lifecycle
+
+
 def _battle_state(
     *,
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
 ) -> GameState:
     config = _config()
+    return _battle_state_from_config(
+        config,
+        player_a_secondary=player_a_secondary,
+        player_b_secondary=player_b_secondary,
+    )
+
+
+def _battle_state_from_config(
+    config: GameConfig,
+    *,
+    player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+) -> GameState:
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
         state.record_army_definition(army)
@@ -1353,6 +1538,52 @@ def _config() -> GameConfig:
     )
 
 
+def _config_with_player_a_vehicle() -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase11e-game",
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            ArmyMusterRequest(
+                army_id="army-alpha",
+                player_id="player-a",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_id="core-combined-arms",
+                ),
+                unit_selections=(
+                    _unit_muster_selection(
+                        unit_selection_id="intercessor-unit-1",
+                        datasheet_id="core-intercessor-like-infantry",
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                    _unit_muster_selection(
+                        unit_selection_id="vehicle-unit-2",
+                        datasheet_id="core-vehicle-monster",
+                        model_profile_id="core-vehicle-monster",
+                        model_count=1,
+                    ),
+                ),
+            ),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_ids=("intercessor-unit-3",),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
+        mission_setup=_mission_setup(),
+    )
+
+
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2025_26_mission_pack(),
@@ -1387,17 +1618,32 @@ def _army_muster_request(
             detachment_id="core-combined-arms",
         ),
         unit_selections=tuple(
-            UnitMusterSelection(
+            _unit_muster_selection(
                 unit_selection_id=unit_selection_id,
                 datasheet_id="core-intercessor-like-infantry",
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
-                    ),
-                ),
+                model_profile_id="core-intercessor-like",
+                model_count=5,
             )
             for unit_selection_id in unit_selection_ids
+        ),
+    )
+
+
+def _unit_muster_selection(
+    *,
+    unit_selection_id: str,
+    datasheet_id: str,
+    model_profile_id: str,
+    model_count: int,
+) -> UnitMusterSelection:
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id=model_profile_id,
+                model_count=model_count,
+            ),
         ),
     )
 

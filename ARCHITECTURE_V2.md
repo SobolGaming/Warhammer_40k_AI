@@ -1162,9 +1162,13 @@ Invariants:
 - scoring, game length, caps, reserve deadline policy, secondary deck eligibility,
   and supported mission Action timing/effects are source-backed
   `warhammer_40000_10th` mission-pack data, not hard-coded phase logic;
+- primary and secondary VP awards consume source scoring-rule conditions and
+  per-card Fixed/Tactical VP values; unsupported conditions fail fast instead of
+  using default scoring amounts;
 - player-facing Tactical discard and supported mission Action start selections use
   finite `DecisionRequest` options through `GameLifecycle.submit_decision(...)`;
-- mission Actions have source-backed start timing, eligible units, interruption conditions, completion timing, and scoring effects;
+- mission Actions have source-backed start timing, eligible units, target IDs,
+  interruption conditions, completion timing, and scoring effects;
 - Select Secondary Missions uses a simultaneous-secret reveal gate; secondary
   mode, Fixed IDs, Tactical draws/card states, and normal secondary scoring are
   public after every player has selected;
@@ -1176,11 +1180,13 @@ Invariants:
 
 Required tests:
 
-- primary scoring at correct timing;
+- primary scoring at correct timing and source-backed battle-round gates;
+- secondary scoring uses source-backed Fixed/Tactical card VP values;
 - secondary choices stay hidden until every player has selected, then reveal to all viewers;
 - Tactical secondary draw/score/discard flow is public after the reveal gate;
 - Tactical secondary discard emits deterministic decision/event records through the lifecycle path;
-- mission Action can start through the lifecycle decision path, complete, be interrupted, and score;
+- mission Action can start through the lifecycle decision path, persist its target,
+  filter ineligible units, complete, be interrupted, and score;
 - source package payloads round-trip and preserve 10th Edition mission/scoring/action snapshots;
 - end-of-turn coherency cleanup removes models without destroyed triggers;
 - unarrived Reserves are destroyed at the configured deadline through the lifecycle hook;

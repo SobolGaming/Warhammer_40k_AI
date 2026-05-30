@@ -18,6 +18,7 @@ class MissionActionStatePayload(TypedDict):
     action_id: str
     player_id: str
     unit_instance_id: str
+    target_id: str
     mission_id: str
     battle_round_started: int
     phase_started: str
@@ -39,6 +40,7 @@ class MissionActionState:
     action_id: str
     player_id: str
     unit_instance_id: str
+    target_id: str
     mission_id: str
     battle_round_started: int
     phase_started: str
@@ -69,6 +71,11 @@ class MissionActionState:
             self,
             "unit_instance_id",
             _validate_identifier("MissionActionState unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "target_id",
+            _validate_identifier("MissionActionState target_id", self.target_id),
         )
         object.__setattr__(
             self,
@@ -167,6 +174,7 @@ class MissionActionState:
         action_id: str,
         player_id: str,
         unit_instance_id: str,
+        target_id: str,
         mission_id: str,
         battle_round: int,
         phase: str,
@@ -181,6 +189,7 @@ class MissionActionState:
             action_id=action_id,
             player_id=player_id,
             unit_instance_id=unit_instance_id,
+            target_id=target_id,
             mission_id=mission_id,
             battle_round_started=battle_round,
             phase_started=phase,
@@ -218,6 +227,7 @@ class MissionActionState:
             action_id=self.action_id,
             player_id=self.player_id,
             unit_instance_id=self.unit_instance_id,
+            target_id=self.target_id,
             mission_id=self.mission_id,
             battle_round_started=self.battle_round_started,
             phase_started=self.phase_started,
@@ -244,6 +254,7 @@ class MissionActionState:
             action_id=self.action_id,
             player_id=self.player_id,
             unit_instance_id=self.unit_instance_id,
+            target_id=self.target_id,
             mission_id=self.mission_id,
             battle_round_started=self.battle_round_started,
             phase_started=self.phase_started,
@@ -262,6 +273,7 @@ class MissionActionState:
             "action_id": self.action_id,
             "player_id": self.player_id,
             "unit_instance_id": self.unit_instance_id,
+            "target_id": self.target_id,
             "mission_id": self.mission_id,
             "battle_round_started": self.battle_round_started,
             "phase_started": self.phase_started,
@@ -284,6 +296,7 @@ class MissionActionState:
             action_id=payload["action_id"],
             player_id=payload["player_id"],
             unit_instance_id=payload["unit_instance_id"],
+            target_id=payload["target_id"],
             mission_id=payload["mission_id"],
             battle_round_started=payload["battle_round_started"],
             phase_started=payload["phase_started"],

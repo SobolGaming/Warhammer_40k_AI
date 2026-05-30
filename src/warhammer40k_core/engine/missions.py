@@ -4,18 +4,30 @@ import hashlib
 import json
 from typing import cast
 
-from warhammer40k_core.core.missions import SecondaryMissionAvailability
+from warhammer40k_core.core.missions import (
+    MissionScoringRuleDefinition,
+    PrimaryMissionDefinition,
+    SecondaryMissionAvailability,
+)
 from warhammer40k_core.core.ruleset_descriptor import reserve_destruction_timing_kind_from_token
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
+    SecondaryMissionScoringRule,
+    VictoryPointSourceKind,
     objective_control_timing_from_token,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 _CONTROL_OBJECTIVES_PRIMARY_SCORING_KIND = "control_objectives"
+_SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS = frozenset(
+    (
+        "each_controlled_objective",
+        "each_controlled_objective_from_battle_round_two",
+    )
+)
 
 
 def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionScoringPolicy:
@@ -37,8 +49,15 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
         raise GameLifecycleError(
             f"Unsupported primary mission scoring policy: {mission_setup.primary_mission_id}."
         )
-    if primary.vp_per_controlled_objective is None:
-        raise GameLifecycleError("Primary mission scoring data is incomplete.")
+    primary_rule = _supported_control_objective_primary_rule(primary)
+    primary_vp = _required_scoring_int(
+        "Supported primary scoring rule requires VP data.",
+        primary_rule.victory_points,
+    )
+    primary_cap = _required_scoring_int(
+        "Supported primary scoring rule requires cap data.",
+        primary_rule.cap,
+    )
     scoring = mission_pack.scoring
     caps = mission_pack.scoring_caps
     return MissionScoringPolicy(
@@ -47,9 +66,13 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
         game_length_battle_rounds=scoring.game_length_battle_rounds,
         primary_scoring_phase=scoring.primary_scoring_phase,
         primary_scoring_timing=objective_control_timing_from_token(scoring.primary_scoring_timing),
-        primary_vp_per_controlled_objective=primary.vp_per_controlled_objective,
-        primary_max_vp_per_turn=primary.max_vp_per_turn,
+        primary_scoring_rule_id=primary_rule.rule_id,
+        primary_scoring_rule_condition=primary_rule.condition,
+        primary_scoring_rule_source_id=primary_rule.source_id,
+        primary_vp_per_controlled_objective=primary_vp,
+        primary_max_vp_per_turn=primary_cap,
         secondary_vp_per_score=scoring.secondary_vp_per_score,
+        secondary_scoring_rules=_secondary_scoring_rules_from_mission_pack(mission_pack),
         mission_action_vp=scoring.mission_action_vp,
         reserve_destruction_timing=scoring.reserve_destruction_timing,
         reserve_destruction_battle_round=scoring.reserve_destruction_battle_round,
@@ -65,6 +88,65 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
         total_vp_cap=scoring.total_vp_cap,
         source_id=f"{mission_setup.source_id}:scoring:{mission_setup.primary_mission_id}",
     )
+
+
+def _supported_control_objective_primary_rule(
+    primary: PrimaryMissionDefinition,
+) -> MissionScoringRuleDefinition:
+    rules = tuple(
+        rule
+        for rule in primary.scoring_rules
+        if rule.source_kind == "primary" and rule.timing == "command_phase"
+    )
+    if len(rules) != 1:
+        raise GameLifecycleError("Supported primary scoring policy requires one command rule.")
+    rule = rules[0]
+    if rule.victory_points is None or rule.cap is None:
+        raise GameLifecycleError("Supported primary scoring rule requires VP and cap data.")
+    if primary.vp_per_controlled_objective != rule.victory_points:
+        raise GameLifecycleError("Primary mission VP data does not match its scoring rule.")
+    if primary.max_vp_per_turn != rule.cap:
+        raise GameLifecycleError("Primary mission cap data does not match its scoring rule.")
+    if rule.condition not in _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS:
+        raise GameLifecycleError("Unsupported primary scoring rule condition.")
+    return rule
+
+
+def _required_scoring_int(message: str, value: int | None) -> int:
+    if value is None:
+        raise GameLifecycleError(message)
+    return value
+
+
+def _secondary_scoring_rules_from_mission_pack(
+    mission_pack: object,
+) -> tuple[SecondaryMissionScoringRule, ...]:
+    from warhammer40k_core.core.missions import MissionPackDefinition
+
+    if type(mission_pack) is not MissionPackDefinition:
+        raise GameLifecycleError("Secondary scoring rules require MissionPackDefinition.")
+    rules: list[SecondaryMissionScoringRule] = []
+    for mission in mission_pack.secondary_missions:
+        for rule in mission.scoring_rules:
+            if rule.source_kind == VictoryPointSourceKind.FIXED_SECONDARY.value:
+                source_kind = VictoryPointSourceKind.FIXED_SECONDARY
+            elif rule.source_kind == VictoryPointSourceKind.TACTICAL_SECONDARY.value:
+                source_kind = VictoryPointSourceKind.TACTICAL_SECONDARY
+            else:
+                continue
+            if rule.victory_points is None:
+                raise GameLifecycleError("Secondary scoring rule requires VP data.")
+            rules.append(
+                SecondaryMissionScoringRule(
+                    secondary_mission_id=mission.secondary_mission_id,
+                    source_kind=source_kind,
+                    victory_points=rule.victory_points,
+                    condition=rule.condition,
+                    rule_id=rule.rule_id,
+                    source_id=rule.source_id,
+                )
+            )
+    return tuple(rules)
 
 
 def reserve_destruction_policy_from_scoring_policy(

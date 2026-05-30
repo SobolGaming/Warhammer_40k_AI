@@ -5,12 +5,17 @@ from typing import cast
 
 from warhammer40k_core.core.missions import MissionActionDefinition
 from warhammer40k_core.engine.actions import MissionActionState
-from warhammer40k_core.engine.battlefield_state import PlacementError
+from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
+    ObjectiveControlTiming,
+    resolve_objective_control,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -337,6 +342,7 @@ def _apply_start_mission_action(
         action_id=f"mission-action:{result.result_id}",
         player_id=player_id,
         unit_instance_id=_payload_string(payload, key="unit_instance_id"),
+        target_id=_payload_string(payload, key="target_id"),
         mission_id=mission_action.mission_id,
         battle_round=state.battle_round,
         phase=_current_phase(state).value,
@@ -375,16 +381,32 @@ def _mission_action_start_options(
         raise GameLifecycleError("Mission Action start requires battlefield_state.")
     if state.mission_setup is None:
         raise GameLifecycleError("Mission Action start requires MissionSetup.")
+    if action.target_policy != "objective_marker":
+        raise GameLifecycleError("Unsupported Mission Action target policy.")
     try:
         placed_army = battlefield_state.placed_army_for_player(player_id)
     except PlacementError:
         return ()
-    eligible_unit_ids = tuple(
-        sorted(placement.unit_instance_id for placement in placed_army.unit_placements)
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=battlefield_state,
     )
-    target_ids = tuple(
-        sorted(marker.objective_marker_id for marker in state.mission_setup.objective_markers)
+    eligible_unit_ids = _eligible_unit_instance_ids_for_action(
+        scenario=scenario,
+        unit_placements=placed_army.unit_placements,
+        action=action,
     )
+    target_ids_by_unit = _objective_marker_target_ids_by_unit(
+        state=state,
+        player_id=player_id,
+    )
+    eligible_target_pairs = tuple(
+        (unit_id, target_id)
+        for unit_id in eligible_unit_ids
+        for target_id in target_ids_by_unit.get(unit_id, ())
+    )
+    if not eligible_target_pairs:
+        return ()
     return tuple(
         MissionActionStartOption(
             action=action,
@@ -392,9 +414,69 @@ def _mission_action_start_options(
             target_id=target_id,
             eligible_unit_instance_ids=eligible_unit_ids,
         )
-        for unit_id in eligible_unit_ids
-        for target_id in target_ids
+        for unit_id, target_id in eligible_target_pairs
     )
+
+
+def _eligible_unit_instance_ids_for_action(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placements: tuple[object, ...],
+    action: MissionActionDefinition,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.battlefield_state import UnitPlacement
+
+    eligible_ids: list[str] = []
+    for placement in unit_placements:
+        if type(placement) is not UnitPlacement:
+            raise GameLifecycleError("Mission Action options require UnitPlacement values.")
+        unit = scenario.unit_instance_for_placement(placement)
+        if _unit_matches_eligible_policy(unit.keywords, action.eligible_unit_policy):
+            eligible_ids.append(placement.unit_instance_id)
+    return tuple(sorted(eligible_ids))
+
+
+def _unit_matches_eligible_policy(
+    keywords: tuple[str, ...],
+    eligible_unit_policy: str,
+) -> bool:
+    policy = _validate_identifier("eligible_unit_policy", eligible_unit_policy)
+    keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
+    if policy == "active_player_unit":
+        return True
+    if policy == "active_player_infantry_or_battleline_unit":
+        return bool(keyword_set.intersection({"INFANTRY", "BATTLELINE"}))
+    raise GameLifecycleError("Unsupported Mission Action eligible unit policy.")
+
+
+def _objective_marker_target_ids_by_unit(
+    *,
+    state: GameState,
+    player_id: str,
+) -> dict[str, tuple[str, ...]]:
+    record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=_current_phase(state),
+        )
+    )
+    targets_by_unit: dict[str, set[str]] = {}
+    for result in record.results:
+        for contribution in result.contributors:
+            if contribution.player_id != player_id:
+                continue
+            targets_by_unit.setdefault(contribution.unit_instance_id, set()).add(
+                result.objective_id
+            )
+    return {
+        unit_id: tuple(sorted(target_ids))
+        for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
+    }
+
+
+def _canonical_keyword(keyword: str) -> str:
+    return _validate_identifier("keyword", keyword).replace("-", " ").replace("_", " ").upper()
 
 
 def _active_tactical_secondary_cards(

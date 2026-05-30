@@ -68,9 +68,13 @@ class MissionScoringPolicyPayload(TypedDict):
     game_length_battle_rounds: int
     primary_scoring_phase: str
     primary_scoring_timing: str
+    primary_scoring_rule_id: str
+    primary_scoring_rule_condition: str
+    primary_scoring_rule_source_id: str
     primary_vp_per_controlled_objective: int
     primary_max_vp_per_turn: int
     secondary_vp_per_score: int
+    secondary_scoring_rules: list[SecondaryMissionScoringRulePayload]
     mission_action_vp: int
     reserve_destruction_timing: str
     reserve_destruction_battle_round: int | None
@@ -80,6 +84,15 @@ class MissionScoringPolicyPayload(TypedDict):
     secondary_vp_cap: int
     battle_ready_vp: int
     total_vp_cap: int
+    source_id: str
+
+
+class SecondaryMissionScoringRulePayload(TypedDict):
+    secondary_mission_id: str
+    source_kind: str
+    victory_points: int
+    condition: str
+    rule_id: str
     source_id: str
 
 
@@ -393,15 +406,101 @@ class VictoryPointLedger:
 
 
 @dataclass(frozen=True, slots=True)
+class SecondaryMissionScoringRule:
+    secondary_mission_id: str
+    source_kind: VictoryPointSourceKind
+    victory_points: int
+    condition: str
+    rule_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "secondary_mission_id",
+            _validate_identifier(
+                "SecondaryMissionScoringRule secondary_mission_id",
+                self.secondary_mission_id,
+            ),
+        )
+        source_kind = victory_point_source_kind_from_token(self.source_kind)
+        if source_kind not in {
+            VictoryPointSourceKind.FIXED_SECONDARY,
+            VictoryPointSourceKind.TACTICAL_SECONDARY,
+        }:
+            raise GameLifecycleError(
+                "SecondaryMissionScoringRule source_kind must be a secondary source kind."
+            )
+        object.__setattr__(self, "source_kind", source_kind)
+        object.__setattr__(
+            self,
+            "victory_points",
+            _validate_positive_int(
+                "SecondaryMissionScoringRule victory_points",
+                self.victory_points,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "condition",
+            _validate_identifier("SecondaryMissionScoringRule condition", self.condition),
+        )
+        object.__setattr__(
+            self,
+            "rule_id",
+            _validate_identifier("SecondaryMissionScoringRule rule_id", self.rule_id),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("SecondaryMissionScoringRule source_id", self.source_id),
+        )
+        expected_condition = (
+            "fixed_secondary_condition"
+            if source_kind is VictoryPointSourceKind.FIXED_SECONDARY
+            else "tactical_secondary_condition"
+        )
+        if self.condition != expected_condition:
+            raise GameLifecycleError(
+                "Unsupported secondary scoring rule condition for source kind."
+            )
+
+    def to_payload(self) -> SecondaryMissionScoringRulePayload:
+        return {
+            "secondary_mission_id": self.secondary_mission_id,
+            "source_kind": self.source_kind.value,
+            "victory_points": self.victory_points,
+            "condition": self.condition,
+            "rule_id": self.rule_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SecondaryMissionScoringRulePayload) -> Self:
+        return cls(
+            secondary_mission_id=payload["secondary_mission_id"],
+            source_kind=victory_point_source_kind_from_token(payload["source_kind"]),
+            victory_points=payload["victory_points"],
+            condition=payload["condition"],
+            rule_id=payload["rule_id"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MissionScoringPolicy:
     mission_pack_id: str
     primary_mission_id: str
     game_length_battle_rounds: int
     primary_scoring_phase: str
     primary_scoring_timing: ObjectiveControlTiming
+    primary_scoring_rule_id: str
+    primary_scoring_rule_condition: str
+    primary_scoring_rule_source_id: str
     primary_vp_per_controlled_objective: int
     primary_max_vp_per_turn: int
     secondary_vp_per_score: int
+    secondary_scoring_rules: tuple[SecondaryMissionScoringRule, ...]
     mission_action_vp: int
     reserve_destruction_timing: str
     reserve_destruction_battle_round: int | None
@@ -450,6 +549,30 @@ class MissionScoringPolicy:
         )
         object.__setattr__(
             self,
+            "primary_scoring_rule_id",
+            _validate_identifier(
+                "MissionScoringPolicy primary_scoring_rule_id",
+                self.primary_scoring_rule_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_scoring_rule_condition",
+            _validate_identifier(
+                "MissionScoringPolicy primary_scoring_rule_condition",
+                self.primary_scoring_rule_condition,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_scoring_rule_source_id",
+            _validate_identifier(
+                "MissionScoringPolicy primary_scoring_rule_source_id",
+                self.primary_scoring_rule_source_id,
+            ),
+        )
+        object.__setattr__(
+            self,
             "primary_vp_per_controlled_objective",
             _validate_positive_int(
                 "MissionScoringPolicy primary_vp_per_controlled_objective",
@@ -471,6 +594,11 @@ class MissionScoringPolicy:
                 "MissionScoringPolicy secondary_vp_per_score",
                 self.secondary_vp_per_score,
             ),
+        )
+        object.__setattr__(
+            self,
+            "secondary_scoring_rules",
+            _validate_secondary_scoring_rule_tuple(self.secondary_scoring_rules),
         )
         object.__setattr__(
             self,
@@ -554,6 +682,13 @@ class MissionScoringPolicy:
             return None
         if record.timing is not self.primary_scoring_timing:
             return None
+        if self.primary_scoring_rule_condition == (
+            "each_controlled_objective_from_battle_round_two"
+        ):
+            if record.battle_round < 2:
+                return None
+        elif self.primary_scoring_rule_condition != "each_controlled_objective":
+            raise GameLifecycleError("Unsupported primary scoring rule condition.")
         controlled_objective_ids = tuple(
             result.objective_id
             for result in record.results
@@ -578,6 +713,8 @@ class MissionScoringPolicy:
             metadata={
                 "objective_control_record_id": record.record_id,
                 "controlled_objective_ids": list(controlled_objective_ids),
+                "scoring_rule_id": self.primary_scoring_rule_id,
+                "scoring_rule_condition": self.primary_scoring_rule_condition,
             },
         )
 
@@ -597,16 +734,25 @@ class MissionScoringPolicy:
             VictoryPointSourceKind.TACTICAL_SECONDARY,
         }:
             raise GameLifecycleError("Secondary scoring requires a secondary source kind.")
+        requested_secondary_id = _validate_identifier("secondary_mission_id", secondary_mission_id)
+        rule = self._secondary_scoring_rule(
+            secondary_mission_id=requested_secondary_id,
+            source_kind=kind,
+        )
         return VictoryPointAward(
             player_id=_validate_identifier("player_id", player_id),
             battle_round=_validate_positive_int("battle_round", battle_round),
             phase=_validate_identifier("phase", phase),
-            amount=self.secondary_vp_per_score,
+            amount=rule.victory_points,
             source_kind=kind,
-            source_id=_validate_identifier("secondary_mission_id", secondary_mission_id),
+            source_id=requested_secondary_id,
             scoring_timing="secondary_mission_score",
             hidden=hidden,
-            metadata={"secondary_mission_id": secondary_mission_id},
+            metadata={
+                "secondary_mission_id": requested_secondary_id,
+                "scoring_rule_id": rule.rule_id,
+                "scoring_rule_condition": rule.condition,
+            },
         )
 
     def mission_action_award(
@@ -640,9 +786,13 @@ class MissionScoringPolicy:
             "game_length_battle_rounds": self.game_length_battle_rounds,
             "primary_scoring_phase": self.primary_scoring_phase,
             "primary_scoring_timing": self.primary_scoring_timing.value,
+            "primary_scoring_rule_id": self.primary_scoring_rule_id,
+            "primary_scoring_rule_condition": self.primary_scoring_rule_condition,
+            "primary_scoring_rule_source_id": self.primary_scoring_rule_source_id,
             "primary_vp_per_controlled_objective": self.primary_vp_per_controlled_objective,
             "primary_max_vp_per_turn": self.primary_max_vp_per_turn,
             "secondary_vp_per_score": self.secondary_vp_per_score,
+            "secondary_scoring_rules": [rule.to_payload() for rule in self.secondary_scoring_rules],
             "mission_action_vp": self.mission_action_vp,
             "reserve_destruction_timing": self.reserve_destruction_timing,
             "reserve_destruction_battle_round": self.reserve_destruction_battle_round,
@@ -669,9 +819,16 @@ class MissionScoringPolicy:
             primary_scoring_timing=objective_control_timing_from_token(
                 payload["primary_scoring_timing"]
             ),
+            primary_scoring_rule_id=payload["primary_scoring_rule_id"],
+            primary_scoring_rule_condition=payload["primary_scoring_rule_condition"],
+            primary_scoring_rule_source_id=payload["primary_scoring_rule_source_id"],
             primary_vp_per_controlled_objective=payload["primary_vp_per_controlled_objective"],
             primary_max_vp_per_turn=payload["primary_max_vp_per_turn"],
             secondary_vp_per_score=payload["secondary_vp_per_score"],
+            secondary_scoring_rules=tuple(
+                SecondaryMissionScoringRule.from_payload(rule)
+                for rule in payload["secondary_scoring_rules"]
+            ),
             mission_action_vp=payload["mission_action_vp"],
             reserve_destruction_timing=payload["reserve_destruction_timing"],
             reserve_destruction_battle_round=payload["reserve_destruction_battle_round"],
@@ -687,6 +844,25 @@ class MissionScoringPolicy:
             total_vp_cap=payload["total_vp_cap"],
             source_id=payload["source_id"],
         )
+
+    def _secondary_scoring_rule(
+        self,
+        *,
+        secondary_mission_id: str,
+        source_kind: VictoryPointSourceKind,
+    ) -> SecondaryMissionScoringRule:
+        match: SecondaryMissionScoringRule | None = None
+        for rule in self.secondary_scoring_rules:
+            if rule.secondary_mission_id != secondary_mission_id or rule.source_kind is not (
+                source_kind
+            ):
+                continue
+            if match is not None:
+                raise GameLifecycleError("Multiple secondary scoring rules matched.")
+            match = rule
+        if match is None:
+            raise GameLifecycleError("Secondary scoring rule is not source-backed.")
+        return match
 
 
 @dataclass(frozen=True, slots=True)
@@ -928,6 +1104,33 @@ def _validate_victory_point_transaction_tuple(
         seen.add(value.transaction_id)
         validated.append(value)
     return tuple(validated)
+
+
+def _validate_secondary_scoring_rule_tuple(
+    values: object,
+) -> tuple[SecondaryMissionScoringRule, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("MissionScoringPolicy secondary_scoring_rules must be a tuple.")
+    validated: list[SecondaryMissionScoringRule] = []
+    seen: set[tuple[str, VictoryPointSourceKind]] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not SecondaryMissionScoringRule:
+            raise GameLifecycleError(
+                "MissionScoringPolicy secondary_scoring_rules must contain scoring rules."
+            )
+        key = (value.secondary_mission_id, value.source_kind)
+        if key in seen:
+            raise GameLifecycleError(
+                "MissionScoringPolicy secondary_scoring_rules must not contain duplicates."
+            )
+        seen.add(key)
+        validated.append(value)
+    return tuple(
+        sorted(
+            validated,
+            key=lambda rule: (rule.secondary_mission_id, rule.source_kind.value),
+        )
+    )
 
 
 def _validate_identifier(field_name: str, value: object) -> str:
