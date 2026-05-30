@@ -60,6 +60,17 @@ from warhammer40k_core.engine.endpoint_placement import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalPayload,
+    MovementProposalPayloadPayload,
+    MovementProposalRequest,
+    PlacementProposalPayload,
+    PlacementProposalPayloadPayload,
+    ProposalKind,
+    ProposalValidationResult,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -1896,6 +1907,7 @@ class _ResolvedUnitMove:
 @dataclass(frozen=True, slots=True)
 class MovementPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
+    parameterized_proposals: bool = False
 
     def __post_init__(self) -> None:
         if (
@@ -1905,6 +1917,8 @@ class MovementPhaseHandler:
             raise GameLifecycleError(
                 "MovementPhaseHandler ruleset_descriptor must be a RulesetDescriptor."
             )
+        if type(self.parameterized_proposals) is not bool:
+            raise GameLifecycleError("MovementPhaseHandler parameterized_proposals must be a bool.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -1932,6 +1946,7 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 active_selection=active_selection,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                parameterized_proposals=self.parameterized_proposals,
             )
 
         if state.transport_cargo_states:
@@ -2003,6 +2018,7 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                parameterized_proposals=self.parameterized_proposals,
             )
         if result.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE:
             return _apply_desperate_escape_model_selection_decision(
@@ -2017,6 +2033,14 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                parameterized_proposals=self.parameterized_proposals,
+            )
+        if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            return _apply_movement_proposal_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
         if result.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
             return _apply_reinforcement_unit_selection_decision(
@@ -2024,9 +2048,17 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                parameterized_proposals=self.parameterized_proposals,
             )
         if result.decision_type == PLACE_REINFORCEMENT_UNIT_DECISION_TYPE:
             return _apply_reinforcement_placement_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
+        if result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
+            return _apply_placement_proposal_decision(
                 state=state,
                 result=result,
                 decisions=decisions,
@@ -2038,6 +2070,7 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                parameterized_proposals=self.parameterized_proposals,
             )
         if result.decision_type == PLACE_DISEMBARK_UNIT_DECISION_TYPE:
             return _apply_disembark_placement_decision(
@@ -2261,6 +2294,7 @@ def _apply_reinforcement_unit_selection_decision(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -2319,8 +2353,10 @@ def _apply_reinforcement_unit_selection_decision(
     return _request_reinforcement_placement(
         state=state,
         decisions=decisions,
+        result=result,
         reserve_state=reserve_state,
         ruleset_descriptor=ruleset_descriptor,
+        parameterized_proposals=parameterized_proposals,
     )
 
 
@@ -2328,14 +2364,69 @@ def _request_reinforcement_placement(
     *,
     state: GameState,
     decisions: DecisionController,
+    result: DecisionResult,
     reserve_state: ReserveState,
     ruleset_descriptor: RulesetDescriptor,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     scenario = _battlefield_scenario(state)
     unit = scenario.army_by_id(reserve_state.unit_instance_id.split(":", maxsplit=1)[0]).unit_by_id(
         reserve_state.unit_instance_id
     )
+    if parameterized_proposals:
+        placement_kinds = _reserve_placement_kinds_for_unit(reserve_state=reserve_state, unit=unit)
+        proposal_request = MovementProposalRequest(
+            request_id=state.next_decision_request_id(),
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=active_player_id,
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT.value,
+            unit_instance_id=reserve_state.unit_instance_id,
+            proposal_kind=ProposalKind.REINFORCEMENT,
+            source_decision_request_id=result.request_id,
+            source_decision_result_id=result.result_id,
+            placement_kinds=placement_kinds,
+            context={
+                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "reserve_state": validate_json_value(reserve_state.to_payload()),
+            },
+        )
+        request = proposal_request.to_decision_request()
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "placement_proposal_requested",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "unit_instance_id": reserve_state.unit_instance_id,
+                "proposal_kind": ProposalKind.REINFORCEMENT.value,
+                "placement_kinds": [kind.value for kind in placement_kinds],
+                "request_id": request.request_id,
+                "source_decision_request_id": result.request_id,
+                "source_decision_result_id": result.result_id,
+                "phase_body_status": "placement_proposal_required",
+            },
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "phase_body_status": "placement_proposal_required",
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "unit_instance_id": reserve_state.unit_instance_id,
+                "proposal_kind": ProposalKind.REINFORCEMENT.value,
+                "placement_kinds": [kind.value for kind in placement_kinds],
+                "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
+            },
+        )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
@@ -2852,6 +2943,7 @@ def _apply_disembark_unit_selection_decision(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -2950,8 +3042,10 @@ def _apply_disembark_unit_selection_decision(
     return _request_disembark_placement(
         state=state,
         decisions=decisions,
+        result=result,
         selection=matching[0],
         ruleset_descriptor=ruleset_descriptor,
+        parameterized_proposals=parameterized_proposals,
     )
 
 
@@ -2959,9 +3053,67 @@ def _request_disembark_placement(
     *,
     state: GameState,
     decisions: DecisionController,
+    result: DecisionResult,
     selection: DisembarkSelection,
     ruleset_descriptor: RulesetDescriptor,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus:
+    if parameterized_proposals:
+        proposal_request = MovementProposalRequest(
+            request_id=state.next_decision_request_id(),
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=_active_player_id(state),
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT.value,
+            unit_instance_id=selection.unit_instance_id,
+            proposal_kind=ProposalKind.DISEMBARK,
+            source_decision_request_id=result.request_id,
+            source_decision_result_id=result.result_id,
+            placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
+            context={
+                "transport_unit_instance_id": selection.transport_unit_instance_id,
+                "transport_movement_status": selection.transport_movement_status.value,
+                "restriction_overrides": [
+                    validate_json_value(override.to_payload())
+                    for override in selection.restriction_overrides
+                ],
+            },
+        )
+        request = proposal_request.to_decision_request()
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "placement_proposal_requested",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": selection.unit_instance_id,
+                "transport_unit_instance_id": selection.transport_unit_instance_id,
+                "proposal_kind": ProposalKind.DISEMBARK.value,
+                "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
+                "request_id": request.request_id,
+                "source_decision_request_id": result.request_id,
+                "source_decision_result_id": result.result_id,
+                "phase_body_status": "placement_proposal_required",
+            },
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "phase_body_status": "placement_proposal_required",
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "unit_instance_id": selection.unit_instance_id,
+                "transport_unit_instance_id": selection.transport_unit_instance_id,
+                "proposal_kind": ProposalKind.DISEMBARK.value,
+                "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
+                "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
+            },
+        )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=PLACE_DISEMBARK_UNIT_DECISION_TYPE,
@@ -3078,6 +3230,115 @@ def _apply_disembark_placement_decision(
     return None
 
 
+def _apply_placement_proposal_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Placement proposal actor must be the active player.")
+    record = decisions.record_for_result(result)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
+    submission = PlacementProposalPayload.from_payload(
+        cast(PlacementProposalPayloadPayload, _decision_payload_object(result.payload))
+    )
+    proposal_validation = submission.validation_result_for_request(proposal_request)
+    if not proposal_validation.is_valid:
+        return _reject_invalid_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_validation=proposal_validation,
+            event_type="placement_proposal_invalid",
+            message="Placement proposal does not match the pending request.",
+        )
+
+    if proposal_request.proposal_kind is ProposalKind.REINFORCEMENT:
+        legacy_payload = {
+            "reinforcement_decision": "place_reinforcement_unit",
+            "unit_instance_id": submission.unit_instance_id,
+            "placement_kind": submission.placement_kind.value,
+            "attempted_placement": validate_json_value(submission.attempted_placement.to_payload()),
+            "large_model_exceptions": [
+                validate_json_value(exception.to_payload())
+                for exception in submission.large_model_exceptions
+            ],
+            "proposal_request_id": proposal_request.request_id,
+        }
+        return _apply_reinforcement_placement_decision(
+            state=state,
+            result=DecisionResult(
+                result_id=result.result_id,
+                request_id=result.request_id,
+                decision_type=PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
+                actor_id=result.actor_id,
+                selected_option_id=submission.placement_kind.value,
+                payload=validate_json_value(legacy_payload),
+            ),
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+
+    if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+        missing = _missing_disembark_proposal_field(submission)
+        if missing is not None:
+            return _reject_invalid_proposal(
+                state=state,
+                decisions=decisions,
+                result=result,
+                proposal_validation=ProposalValidationResult.invalid(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=proposal_request.proposal_kind,
+                    violation_code="proposal_payload_missing_field",
+                    message=f"Disembark placement proposal missing {missing}.",
+                    field=missing,
+                ),
+                event_type="placement_proposal_invalid",
+                message="Disembark placement proposal is incomplete.",
+            )
+        legacy_payload = {
+            "transport_decision": "place_disembark_unit",
+            "unit_instance_id": submission.unit_instance_id,
+            "transport_unit_instance_id": submission.transport_unit_instance_id,
+            "attempted_placement": validate_json_value(submission.attempted_placement.to_payload()),
+            "transport_movement_status": submission.transport_movement_status.value
+            if submission.transport_movement_status is not None
+            else None,
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in submission.restriction_overrides
+            ],
+            "proposal_request_id": proposal_request.request_id,
+        }
+        return _apply_disembark_placement_decision(
+            state=state,
+            result=DecisionResult(
+                result_id=result.result_id,
+                request_id=result.request_id,
+                decision_type=PLACE_DISEMBARK_UNIT_DECISION_TYPE,
+                actor_id=result.actor_id,
+                selected_option_id=BattlefieldPlacementKind.DISEMBARK.value,
+                payload=validate_json_value(legacy_payload),
+            ),
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+
+    raise GameLifecycleError("Unsupported placement proposal kind.")
+
+
+def _missing_disembark_proposal_field(submission: PlacementProposalPayload) -> str | None:
+    if submission.transport_unit_instance_id is None:
+        return "transport_unit_instance_id"
+    if submission.transport_movement_status is None:
+        return "transport_movement_status"
+    return None
+
+
 def _apply_valid_disembark(
     *,
     state: GameState,
@@ -3137,6 +3398,7 @@ def _request_movement_action(
     decisions: DecisionController,
     active_selection: MovementUnitSelection,
     ruleset_descriptor: RulesetDescriptor,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
@@ -3166,6 +3428,7 @@ def _request_movement_action(
                 battle_round=state.battle_round,
                 unit_instance_id=active_selection.unit_instance_id,
             ),
+            parameterized_proposals=parameterized_proposals,
         ),
     )
     decisions.request_decision(request)
@@ -3188,6 +3451,7 @@ def _apply_movement_action_decision(  # noqa: RET503
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -3249,6 +3513,15 @@ def _apply_movement_action_decision(  # noqa: RET503
         )
         return None
     if action is MovementPhaseActionKind.NORMAL_MOVE:
+        if parameterized_proposals:
+            return _request_movement_proposal(
+                state=state,
+                decisions=decisions,
+                result=result,
+                unit_instance_id=active_selection.unit_instance_id,
+                action=MovementPhaseActionKind.NORMAL_MOVE,
+                proposal_kind=ProposalKind.NORMAL_MOVE,
+            )
         witness = _payload_path_witness(payload, key="witness")
         resolution = resolve_normal_move(
             scenario=scenario,
@@ -3403,9 +3676,19 @@ def _apply_movement_action_decision(  # noqa: RET503
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
             advance_roll=advance_roll,
+            parameterized_proposals=parameterized_proposals,
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
+        if parameterized_proposals:
+            return _request_movement_proposal(
+                state=state,
+                decisions=decisions,
+                result=result,
+                unit_instance_id=active_selection.unit_instance_id,
+                action=MovementPhaseActionKind.FALL_BACK,
+                proposal_kind=ProposalKind.FALL_BACK,
+            )
         witness = _payload_path_witness(payload, key="witness")
         fall_back_resolution = resolve_fall_back_move(
             scenario=scenario,
@@ -3515,12 +3798,451 @@ def _apply_movement_action_decision(  # noqa: RET503
         )
 
 
+def _request_movement_proposal(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    unit_instance_id: str,
+    action: MovementPhaseActionKind,
+    proposal_kind: ProposalKind,
+    context: dict[str, JsonValue] | None = None,
+) -> LifecycleStatus:
+    active_player_id = _active_player_id(state)
+    proposal_request = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=active_player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=unit_instance_id,
+        proposal_kind=proposal_kind,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        movement_phase_action=action.value,
+        context=context,
+    )
+    request = proposal_request.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "movement_proposal_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": unit_instance_id,
+            "movement_phase_action": action.value,
+            "proposal_kind": proposal_kind.value,
+            "request_id": request.request_id,
+            "source_decision_request_id": result.request_id,
+            "source_decision_result_id": result.result_id,
+            "phase_body_status": "movement_proposal_required",
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "phase_body_status": "movement_proposal_required",
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "unit_instance_id": unit_instance_id,
+            "movement_phase_action": action.value,
+            "proposal_kind": proposal_kind.value,
+        },
+    )
+
+
+def _apply_movement_proposal_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Movement proposal actor must be the active player.")
+    movement_state = state.movement_phase_state
+    if movement_state is None or movement_state.active_selection is None:
+        raise GameLifecycleError("Movement proposal requires active movement selection.")
+
+    record = decisions.record_for_result(result)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
+    submission = MovementProposalPayload.from_payload(
+        cast(MovementProposalPayloadPayload, _decision_payload_object(result.payload))
+    )
+    proposal_validation = submission.validation_result_for_request(proposal_request)
+    if not proposal_validation.is_valid:
+        return _reject_invalid_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_validation=proposal_validation,
+            event_type="movement_proposal_invalid",
+            message="Movement proposal does not match the pending request.",
+        )
+
+    if proposal_request.unit_instance_id != movement_state.active_selection.unit_instance_id:
+        raise GameLifecycleError("Movement proposal unit must match active selection.")
+    scenario = _battlefield_scenario(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        proposal_request.unit_instance_id
+    )
+    action = movement_phase_action_kind_from_token(submission.movement_phase_action)
+
+    if action is MovementPhaseActionKind.NORMAL_MOVE:
+        resolution = resolve_normal_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            path_witness=submission.witness,
+            objective_markers=_objective_markers_for_state(state),
+            hover_mode_states=tuple(state.hover_mode_states),
+        )
+        transition_reason = _aircraft_reserve_transition_reason_for_normal_move(
+            resolution=resolution,
+            scenario=scenario,
+            unit_placement=unit_placement,
+            battlefield_width_inches=_DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+            battlefield_depth_inches=_DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+        )
+        if transition_reason is not None:
+            _apply_aircraft_reserve_transition_for_normal_move(
+                state=state,
+                decisions=decisions,
+                result=_action_result_from_proposal_request(
+                    proposal_request=proposal_request,
+                    actor_id=active_player_id,
+                    selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+                    payload={
+                        "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                        "unit_instance_id": proposal_request.unit_instance_id,
+                        "witness": validate_json_value(submission.witness.to_payload()),
+                        **resolution.movement_payload,
+                    },
+                ),
+                ruleset_descriptor=ruleset_descriptor,
+                unit_placement=unit_placement,
+                resolution=resolution,
+                witness=submission.witness,
+                reason=transition_reason,
+            )
+            return None
+        if not resolution.is_valid:
+            return _reject_invalid_movement_resolution(
+                state=state,
+                decisions=decisions,
+                result=result,
+                unit_instance_id=proposal_request.unit_instance_id,
+                action=action,
+                movement_payload=resolution.movement_payload,
+                rollback_record=resolution.rollback_record,
+                violation_code=_normal_move_violation_code(resolution),
+                message=_normal_move_invalid_message(_normal_move_violation_code(resolution)),
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+            )
+        transition_batch = resolution.transition_batch(before=unit_placement)
+        battlefield_state = state.battlefield_state
+        if battlefield_state is None:
+            raise GameLifecycleError("Normal Move proposal requires battlefield_state.")
+        state.replace_battlefield_state(
+            battlefield_state.with_unit_placement(resolution.attempted_placement)
+        )
+        return _request_embark_after_move_or_complete_activation(
+            state=state,
+            decisions=decisions,
+            result=_action_result_from_proposal_request(
+                proposal_request=proposal_request,
+                actor_id=active_player_id,
+                selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+                payload={
+                    "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "witness": validate_json_value(submission.witness.to_payload()),
+                    **resolution.movement_payload,
+                },
+            ),
+            action=MovementPhaseActionKind.NORMAL_MOVE,
+            witness=submission.witness,
+            movement_payload={
+                **resolution.movement_payload,
+                "proposal_request_id": proposal_request.request_id,
+            },
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            transition_batch=transition_batch,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+
+    if action is MovementPhaseActionKind.ADVANCE:
+        advance_roll_payload = _payload_object(proposal_request.context or {}, key="advance_roll")
+        advance_roll = AdvanceRollResult.from_payload(
+            cast(AdvanceRollResultPayload, advance_roll_payload)
+        )
+        advance_resolution = resolve_advance_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            advance_roll=advance_roll,
+            path_witness=submission.witness,
+            objective_markers=_objective_markers_for_state(state),
+            hover_mode_states=tuple(state.hover_mode_states),
+        )
+        if not advance_resolution.is_valid:
+            violation_code = _normal_move_violation_code(advance_resolution)
+            return _reject_invalid_movement_resolution(
+                state=state,
+                decisions=decisions,
+                result=result,
+                unit_instance_id=proposal_request.unit_instance_id,
+                action=action,
+                movement_payload=advance_resolution.movement_payload,
+                rollback_record=advance_resolution.rollback_record,
+                violation_code=violation_code,
+                message=_normal_move_invalid_message(violation_code).replace(
+                    "Normal Move",
+                    "Advance",
+                ),
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+            )
+        transition_batch = advance_resolution.transition_batch(before=unit_placement)
+        battlefield_state = state.battlefield_state
+        if battlefield_state is None:
+            raise GameLifecycleError("Advance proposal requires battlefield_state.")
+        state.replace_battlefield_state(
+            battlefield_state.with_unit_placement(advance_resolution.attempted_placement)
+        )
+        state.record_advanced_unit_state(
+            AdvancedUnitState(
+                player_id=active_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_placement.unit_instance_id,
+                movement_dice_record=MovementDiceRecord(
+                    player_id=active_player_id,
+                    battle_round=state.battle_round,
+                    unit_instance_id=unit_placement.unit_instance_id,
+                    movement_phase_action=MovementPhaseActionKind.ADVANCE,
+                    advance_roll=advance_roll,
+                ),
+            )
+        )
+        return _request_embark_after_move_or_complete_activation(
+            state=state,
+            decisions=decisions,
+            result=_action_result_from_proposal_request(
+                proposal_request=proposal_request,
+                actor_id=active_player_id,
+                selected_option_id=MovementPhaseActionKind.ADVANCE.value,
+                payload={
+                    "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "witness": validate_json_value(submission.witness.to_payload()),
+                    **advance_resolution.movement_payload,
+                },
+            ),
+            action=MovementPhaseActionKind.ADVANCE,
+            witness=submission.witness,
+            movement_payload={
+                **advance_resolution.movement_payload,
+                "proposal_request_id": proposal_request.request_id,
+            },
+            displacement_kind=ModelDisplacementKind.ADVANCE,
+            transition_batch=transition_batch,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+
+    if action is MovementPhaseActionKind.FALL_BACK:
+        fall_back_resolution = resolve_fall_back_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            path_witness=submission.witness,
+            battle_round=state.battle_round,
+            battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            objective_markers=_objective_markers_for_state(state),
+            hover_mode_states=tuple(state.hover_mode_states),
+        )
+        if not fall_back_resolution.is_valid:
+            violation_code = _normal_move_violation_code(fall_back_resolution)
+            return _reject_invalid_movement_resolution(
+                state=state,
+                decisions=decisions,
+                result=result,
+                unit_instance_id=proposal_request.unit_instance_id,
+                action=action,
+                movement_payload=fall_back_resolution.movement_payload,
+                rollback_record=fall_back_resolution.rollback_record,
+                violation_code=violation_code,
+                message=_normal_move_invalid_message(violation_code).replace(
+                    "Normal Move",
+                    "Fall Back",
+                ),
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+            )
+        desperate_escape_rolls = _roll_desperate_escape_dice(
+            state=state,
+            decisions=decisions,
+            resolution=fall_back_resolution,
+        )
+        fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
+            resolution=fall_back_resolution,
+            desperate_escape_rolls=desperate_escape_rolls,
+        )
+        action_result = _action_result_from_proposal_request(
+            proposal_request=proposal_request,
+            actor_id=active_player_id,
+            selected_option_id=MovementPhaseActionKind.FALL_BACK.value,
+            payload={
+                "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                "unit_instance_id": proposal_request.unit_instance_id,
+                "witness": validate_json_value(submission.witness.to_payload()),
+                **fall_back_result.movement_payload,
+            },
+        )
+        if fall_back_result.failed_desperate_escape_rolls:
+            request = _desperate_escape_model_selection_request(
+                state=state,
+                fall_back_result=fall_back_result,
+                action_result=action_result,
+            )
+            decisions.request_decision(request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=request,
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "desperate_escape_model_selection_pending",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "proposal_request_id": proposal_request.request_id,
+                },
+            )
+        return _apply_fall_back_result(
+            state=state,
+            decisions=decisions,
+            result=action_result,
+            unit_placement=unit_placement,
+            fall_back_result=fall_back_result,
+            destroyed_model_ids=(),
+            ruleset_descriptor=ruleset_descriptor,
+        )
+
+    raise GameLifecycleError("Unsupported movement proposal action.")
+
+
+def _action_result_from_proposal_request(
+    *,
+    proposal_request: MovementProposalRequest,
+    actor_id: str,
+    selected_option_id: str,
+    payload: JsonValue,
+) -> DecisionResult:
+    return DecisionResult(
+        result_id=proposal_request.source_decision_result_id,
+        request_id=proposal_request.source_decision_request_id,
+        decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        actor_id=actor_id,
+        selected_option_id=selected_option_id,
+        payload=validate_json_value(payload),
+    )
+
+
+def _reject_invalid_proposal(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    proposal_validation: ProposalValidationResult,
+    event_type: str,
+    message: str,
+) -> LifecycleStatus:
+    payload = validate_json_value(
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "phase": BattlePhase.MOVEMENT.value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": proposal_validation.status,
+            "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+        }
+    )
+    decisions.event_log.append(event_type, payload)
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message=message,
+        payload=payload,
+    )
+
+
+def _reject_invalid_movement_resolution(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    unit_instance_id: str,
+    action: MovementPhaseActionKind,
+    movement_payload: dict[str, JsonValue],
+    rollback_record: MovementRollbackRecord | None,
+    violation_code: str,
+    message: str,
+    proposal_request_id: str,
+    proposal_kind: ProposalKind,
+) -> LifecycleStatus:
+    proposal_validation = ProposalValidationResult.invalid(
+        proposal_request_id=proposal_request_id,
+        proposal_kind=proposal_kind,
+        violation_code=violation_code,
+        message=message,
+        field="witness",
+    )
+    invalid_payload = _movement_action_invalid_payload(
+        state=state,
+        active_player_id=_active_player_id(state),
+        unit_instance_id=unit_instance_id,
+        action=action,
+        result=result,
+        violation_code=violation_code,
+        movement_payload={
+            **movement_payload,
+            "proposal_request_id": proposal_request_id,
+            "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+        },
+        rollback_record=rollback_record,
+    )
+    decisions.event_log.append("movement_proposal_invalid", invalid_payload)
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message=message,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "phase_body_status": "movement_proposal_invalid",
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "unit_instance_id": unit_instance_id,
+            "movement_phase_action": action.value,
+            "violation_code": violation_code,
+            "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+        },
+    )
+
+
 def _apply_advance_roll_reroll_decision(
     *,
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -3581,6 +4303,7 @@ def _apply_advance_roll_reroll_decision(
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
         advance_roll=advance_roll,
+        parameterized_proposals=parameterized_proposals,
     )
 
 
@@ -3592,6 +4315,7 @@ def _resolve_and_apply_advance_move(
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
     advance_roll: AdvanceRollResult,
+    parameterized_proposals: bool,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     _record_advance_roll_resolved_event(
@@ -3599,6 +4323,16 @@ def _resolve_and_apply_advance_move(
         decisions=decisions,
         advance_roll=advance_roll,
     )
+    if parameterized_proposals:
+        return _request_movement_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            unit_instance_id=unit_placement.unit_instance_id,
+            action=MovementPhaseActionKind.ADVANCE,
+            proposal_kind=ProposalKind.ADVANCE,
+            context={"advance_roll": validate_json_value(advance_roll.to_payload())},
+        )
     resolution = resolve_advance_move(
         scenario=_battlefield_scenario(state),
         ruleset_descriptor=ruleset_descriptor,
@@ -4363,6 +5097,7 @@ def _movement_action_options(
     battle_shocked_unit_ids: tuple[str, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     disembarked_unit_state: DisembarkedUnitState | None = None,
+    parameterized_proposals: bool = False,
 ) -> tuple[DecisionOption, ...]:
     if disembarked_unit_state is not None and type(disembarked_unit_state) is not (
         DisembarkedUnitState
@@ -4405,6 +5140,18 @@ def _movement_action_options(
             )
             continue
         if action is MovementPhaseActionKind.NORMAL_MOVE:
+            if parameterized_proposals:
+                options.append(
+                    DecisionOption(
+                        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+                        label="Normal Move",
+                        payload={
+                            "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                            "unit_instance_id": unit_placement.unit_instance_id,
+                        },
+                    )
+                )
+                continue
             resolution = resolve_normal_move(
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
@@ -4430,6 +5177,18 @@ def _movement_action_options(
             )
             continue
         if action is MovementPhaseActionKind.FALL_BACK:
+            if parameterized_proposals:
+                options.append(
+                    DecisionOption(
+                        option_id=MovementPhaseActionKind.FALL_BACK.value,
+                        label="Fall Back",
+                        payload={
+                            "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                            "unit_instance_id": unit_placement.unit_instance_id,
+                        },
+                    )
+                )
+                continue
             fall_back_resolution = resolve_fall_back_move(
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,

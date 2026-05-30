@@ -10,6 +10,10 @@ class DecisionError(ValueError):
     """Raised when a decision request, result, queue, controller, or record is invalid."""
 
 
+PARAMETERIZED_DECISION_OPTION_ID = "submit_parameterized_payload"
+PARAMETERIZED_DECISION_OPTION_PAYLOAD: JsonValue = {"submission_kind": "parameterized"}
+
+
 class DecisionOptionPayload(TypedDict):
     option_id: str
     label: str
@@ -85,6 +89,9 @@ class DecisionRequest:
     def history_token(self) -> str:
         return canonical_json(self.to_payload())
 
+    def is_parameterized_submission_request(self) -> bool:
+        return self.options == (parameterized_decision_option(),)
+
     def option_by_id(self, option_id: object) -> DecisionOption:
         requested_id = _validate_identifier("DecisionRequest option_id", option_id)
         for option in self.options:
@@ -110,6 +117,14 @@ class DecisionRequest:
             payload=payload["payload"],
             options=tuple(DecisionOption.from_payload(option) for option in payload["options"]),
         )
+
+
+def parameterized_decision_option() -> DecisionOption:
+    return DecisionOption(
+        option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        label="Submit Parameterized Payload",
+        payload=PARAMETERIZED_DECISION_OPTION_PAYLOAD,
+    )
 
 
 def _validate_decision_options(options: object) -> tuple[DecisionOption, ...]:

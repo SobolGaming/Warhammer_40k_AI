@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 11C** is treated as implemented at the time this file was updated. Phase 11D is the next build slice.
+Everything through **Phase 11D** is treated as implemented at the time this file was updated. Phase 11E is the next build slice.
 
 Completed / implemented foundation:
 
@@ -69,6 +69,7 @@ Completed / implemented foundation:
 | 11A | Complete | Chapter Approved 2025-26 mission pack data |
 | 11B | Complete | Objective control geometry and mission objective model |
 | 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
+| 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
 
 ## Cross-cutting architectural rules
 
@@ -1020,6 +1021,8 @@ Required tests:
 - Command phase stops at required decision requests and resolves non-reroll Battle-shock dice deterministically without a player-choice pause.
 
 ## Phase 11D: adapter scaffold and parameterized movement/placement proposal requests
+
+Status: Complete.
 
 This phase creates the engine-owned contract that allows UI work to proceed in parallel without UI-owned state mutation. It separates finite decision choices, such as selecting a movement action, from parameterized movement and placement proposals, such as per-model endpoints and path witnesses.
 

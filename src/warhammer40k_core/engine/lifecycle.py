@@ -20,6 +20,10 @@ from warhammer40k_core.engine.game_state import (
     GameState,
     GameStatePayload,
 )
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -74,6 +78,8 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         PLACE_DISEMBARK_UNIT_DECISION_TYPE,
         SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
+        MOVEMENT_PROPOSAL_DECISION_TYPE,
+        PLACEMENT_PROPOSAL_DECISION_TYPE,
     )
 )
 _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,))
@@ -87,6 +93,7 @@ def _new_decision_controller() -> DecisionController:
 class GameLifecycle:
     decision_controller: DecisionController = field(default_factory=_new_decision_controller)
     state: GameState | None = None
+    parameterized_movement_proposals: bool = False
     _config: GameConfig | None = None
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
@@ -103,7 +110,8 @@ class GameLifecycle:
             raise GameLifecycleError("GameLifecycle has already started.")
         self._config = config
         self._movement_phase_handler = MovementPhaseHandler(
-            ruleset_descriptor=config.ruleset_descriptor
+            ruleset_descriptor=config.ruleset_descriptor,
+            parameterized_proposals=self.parameterized_movement_proposals,
         )
         self._triggered_movement_handler = TriggeredMovementHandler(
             ruleset_descriptor=config.ruleset_descriptor
@@ -228,7 +236,8 @@ class GameLifecycle:
             state=GameState.from_payload(payload["state"]),
             _config=config,
             _movement_phase_handler=MovementPhaseHandler(
-                ruleset_descriptor=None if config is None else config.ruleset_descriptor
+                ruleset_descriptor=None if config is None else config.ruleset_descriptor,
+                parameterized_proposals=False,
             ),
             _triggered_movement_handler=TriggeredMovementHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
