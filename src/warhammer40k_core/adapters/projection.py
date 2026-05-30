@@ -77,13 +77,31 @@ def project_game_view(
         ],
         "pending_decision": None
         if pending_request is None
-        else _decision_request_view(pending_request),
-        "pending_proposal": None if pending_request is None else _proposal_view(pending_request),
+        else _decision_request_view(pending_request, viewer_player_id=viewer),
+        "pending_proposal": None
+        if pending_request is None
+        else _proposal_view(pending_request, viewer_player_id=viewer),
         "event_count": len(lifecycle.decision_controller.event_log.records),
     }
 
 
-def _decision_request_view(request: DecisionRequest) -> DecisionRequestViewPayload:
+def _decision_request_view(
+    request: DecisionRequest,
+    *,
+    viewer_player_id: str,
+) -> DecisionRequestViewPayload:
+    if _secret_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
+        return {
+            "request_id": request.request_id,
+            "decision_type": request.decision_type,
+            "actor_id": request.actor_id,
+            "payload": {
+                "secret": True,
+                "hidden": True,
+            },
+            "options": [],
+            "is_parameterized": False,
+        }
     return {
         "request_id": request.request_id,
         "decision_type": request.decision_type,
@@ -94,7 +112,13 @@ def _decision_request_view(request: DecisionRequest) -> DecisionRequestViewPaylo
     }
 
 
-def _proposal_view(request: DecisionRequest) -> MovementProposalRequestPayload | None:
+def _proposal_view(
+    request: DecisionRequest,
+    *,
+    viewer_player_id: str,
+) -> MovementProposalRequestPayload | None:
+    if _secret_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
+        return None
     if not request.is_parameterized_submission_request():
         return None
     if not isinstance(request.payload, dict):
@@ -108,6 +132,24 @@ def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest | None:
     if not pending_requests:
         return None
     return pending_requests[0]
+
+
+def _secret_request_hidden_from_viewer(
+    *,
+    request: DecisionRequest,
+    viewer_player_id: str,
+) -> bool:
+    if request.actor_id == viewer_player_id:
+        return False
+    payload = request.payload
+    if not isinstance(payload, dict):
+        return False
+    secret = payload.get("secret")
+    if secret is None:
+        return False
+    if type(secret) is not bool:
+        raise GameLifecycleError("Secret DecisionRequest payload flag must be a bool.")
+    return secret
 
 
 def _validate_viewer(*, state: GameState, viewer_player_id: object) -> str:

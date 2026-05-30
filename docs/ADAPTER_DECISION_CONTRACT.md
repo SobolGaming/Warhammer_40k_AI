@@ -297,6 +297,8 @@ Example Strategic Reserves submission shape:
 }
 ```
 
+Serialized payload helpers may omit empty optional collections such as `large_model_exceptions` or `restriction_overrides`; inbound parsing accepts omitted empty optional fields.
+
 The engine validates placement, coherency, reserve restrictions, transport state, and any rule-specific exceptions before mutating battlefield state.
 
 ## Validation and Invalid Results

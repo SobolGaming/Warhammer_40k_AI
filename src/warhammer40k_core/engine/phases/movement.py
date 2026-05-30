@@ -76,6 +76,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+    LifecycleStatusKind,
 )
 from warhammer40k_core.engine.reserves import (
     BattlefieldEdge,
@@ -2029,6 +2030,19 @@ class MovementPhaseHandler:
             )
             if isinstance(movement_parsed, LifecycleStatus):
                 return movement_parsed
+            proposal_request, movement_submission = movement_parsed
+            proposal_validation = movement_submission.validation_result_for_request(
+                proposal_request
+            )
+            if not proposal_validation.is_valid:
+                return _reject_invalid_proposal(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                    proposal_validation=proposal_validation,
+                    event_type="movement_proposal_invalid",
+                    message="Movement proposal does not match the pending request.",
+                )
             return None
         if request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
             placement_parsed = _parse_placement_proposal_submission_or_invalid(
@@ -2039,6 +2053,36 @@ class MovementPhaseHandler:
             )
             if isinstance(placement_parsed, LifecycleStatus):
                 return placement_parsed
+            proposal_request, placement_submission = placement_parsed
+            proposal_validation = placement_submission.validation_result_for_request(
+                proposal_request
+            )
+            if not proposal_validation.is_valid:
+                return _reject_invalid_proposal(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                    proposal_validation=proposal_validation,
+                    event_type="placement_proposal_invalid",
+                    message="Placement proposal does not match the pending request.",
+                )
+            if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+                missing = _missing_disembark_proposal_field(placement_submission)
+                if missing is not None:
+                    return _reject_invalid_proposal(
+                        state=state,
+                        decisions=decisions,
+                        result=result,
+                        proposal_validation=ProposalValidationResult.invalid(
+                            proposal_request_id=proposal_request.request_id,
+                            proposal_kind=proposal_request.proposal_kind,
+                            violation_code="proposal_payload_missing_field",
+                            message=f"Disembark placement proposal missing {missing}.",
+                            field=missing,
+                        ),
+                        event_type="placement_proposal_invalid",
+                        message="Disembark placement proposal is incomplete.",
+                    )
             return None
         raise GameLifecycleError("Movement proposal prevalidation received unsupported request.")
 
@@ -2542,6 +2586,71 @@ def _reserve_proposal_kind(reserve_state: ReserveState) -> ProposalKind:
     if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
         return ProposalKind.STRATEGIC_RESERVES
     return ProposalKind.REINFORCEMENT
+
+
+def _request_placement_proposal_retry(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    proposal_request: MovementProposalRequest,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    active_player_id = _active_player_id(state)
+    retry_proposal = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=proposal_request.proposal_kind,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        placement_kinds=proposal_request.placement_kinds,
+        context=dict(proposal_request.context or {}),
+    )
+    request = retry_proposal.to_decision_request()
+    decisions.request_decision(request)
+    event_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": active_player_id,
+        "phase": BattlePhase.MOVEMENT.value,
+        "unit_instance_id": proposal_request.unit_instance_id,
+        "proposal_kind": proposal_request.proposal_kind.value,
+        "placement_kinds": [kind.value for kind in proposal_request.placement_kinds],
+        "request_id": request.request_id,
+        "source_decision_request_id": proposal_request.source_decision_request_id,
+        "source_decision_result_id": proposal_request.source_decision_result_id,
+        "previous_proposal_request_id": proposal_request.request_id,
+        "rejected_result_id": rejected_result.result_id,
+        "phase_body_status": "placement_proposal_required",
+    }
+    for key in (
+        "step",
+        "transport_unit_instance_id",
+        "transport_movement_status",
+    ):
+        context_value = _optional_proposal_context_string(proposal_request, key=key)
+        if context_value is not None:
+            event_payload[key] = context_value
+    decisions.event_log.append("placement_proposal_requested", event_payload)
+    return request
+
+
+def _optional_proposal_context_string(
+    proposal_request: MovementProposalRequest,
+    *,
+    key: str,
+) -> str | None:
+    context = proposal_request.context or {}
+    if key not in context:
+        return None
+    value = context[key]
+    if type(value) is not str:
+        raise GameLifecycleError(f"Proposal request context key must be a string: {key}.")
+    return value
 
 
 def _reinforcement_placement_payload(
@@ -3425,7 +3534,7 @@ def _apply_placement_proposal_decision(
             ],
             "proposal_request_id": proposal_request.request_id,
         }
-        return _apply_reinforcement_placement_decision(
+        status = _apply_reinforcement_placement_decision(
             state=state,
             result=DecisionResult(
                 result_id=result.result_id,
@@ -3438,6 +3547,18 @@ def _apply_placement_proposal_decision(
             decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
         )
+        if (
+            status is not None
+            and status.status_kind is LifecycleStatusKind.INVALID
+            and proposal_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+        ):
+            _request_placement_proposal_retry(
+                state=state,
+                decisions=decisions,
+                proposal_request=proposal_request,
+                rejected_result=result,
+            )
+        return status
 
     if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
         missing = _missing_disembark_proposal_field(submission)
@@ -3470,7 +3591,7 @@ def _apply_placement_proposal_decision(
             ],
             "proposal_request_id": proposal_request.request_id,
         }
-        return _apply_disembark_placement_decision(
+        status = _apply_disembark_placement_decision(
             state=state,
             result=DecisionResult(
                 result_id=result.result_id,
@@ -3483,6 +3604,18 @@ def _apply_placement_proposal_decision(
             decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
         )
+        if (
+            status is not None
+            and status.status_kind is LifecycleStatusKind.INVALID
+            and proposal_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+        ):
+            _request_placement_proposal_retry(
+                state=state,
+                decisions=decisions,
+                proposal_request=proposal_request,
+                rejected_result=result,
+            )
+        return status
 
     raise GameLifecycleError("Unsupported placement proposal kind.")
 
@@ -4012,6 +4145,53 @@ def _request_movement_proposal(
     )
 
 
+def _request_movement_proposal_retry(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    proposal_request: MovementProposalRequest,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    active_player_id = _active_player_id(state)
+    if proposal_request.movement_phase_action is None:
+        raise GameLifecycleError("Movement proposal retry requires movement_phase_action.")
+    retry_proposal = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=proposal_request.proposal_kind,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        movement_phase_action=proposal_request.movement_phase_action,
+        context=dict(proposal_request.context or {}),
+    )
+    request = retry_proposal.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "movement_proposal_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": proposal_request.unit_instance_id,
+            "movement_phase_action": proposal_request.movement_phase_action,
+            "proposal_kind": proposal_request.proposal_kind.value,
+            "request_id": request.request_id,
+            "source_decision_request_id": proposal_request.source_decision_request_id,
+            "source_decision_result_id": proposal_request.source_decision_result_id,
+            "previous_proposal_request_id": proposal_request.request_id,
+            "rejected_result_id": rejected_result.result_id,
+            "phase_body_status": "movement_proposal_required",
+        },
+    )
+    return request
+
+
 def _apply_movement_proposal_decision(
     *,
     state: GameState,
@@ -4105,8 +4285,7 @@ def _apply_movement_proposal_decision(
                 rollback_record=resolution.rollback_record,
                 violation_code=_normal_move_violation_code(resolution),
                 message=_normal_move_invalid_message(_normal_move_violation_code(resolution)),
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
+                proposal_request=proposal_request,
             )
         transition_batch = resolution.transition_batch(before=unit_placement)
         battlefield_state = state.battlefield_state
@@ -4169,8 +4348,7 @@ def _apply_movement_proposal_decision(
                     "Normal Move",
                     "Advance",
                 ),
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
+                proposal_request=proposal_request,
             )
         transition_batch = advance_resolution.transition_batch(before=unit_placement)
         battlefield_state = state.battlefield_state
@@ -4244,8 +4422,7 @@ def _apply_movement_proposal_decision(
                     "Normal Move",
                     "Fall Back",
                 ),
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
+                proposal_request=proposal_request,
             )
         desperate_escape_rolls = _roll_desperate_escape_dice(
             state=state,
@@ -4356,12 +4533,11 @@ def _reject_invalid_movement_resolution(
     rollback_record: MovementRollbackRecord | None,
     violation_code: str,
     message: str,
-    proposal_request_id: str,
-    proposal_kind: ProposalKind,
+    proposal_request: MovementProposalRequest,
 ) -> LifecycleStatus:
     proposal_validation = ProposalValidationResult.invalid(
-        proposal_request_id=proposal_request_id,
-        proposal_kind=proposal_kind,
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
         violation_code=violation_code,
         message=message,
         field="witness",
@@ -4375,12 +4551,18 @@ def _reject_invalid_movement_resolution(
         violation_code=violation_code,
         movement_payload={
             **movement_payload,
-            "proposal_request_id": proposal_request_id,
+            "proposal_request_id": proposal_request.request_id,
             "proposal_validation": validate_json_value(proposal_validation.to_payload()),
         },
         rollback_record=rollback_record,
     )
     decisions.event_log.append("movement_proposal_invalid", invalid_payload)
+    retry_request = _request_movement_proposal_retry(
+        state=state,
+        decisions=decisions,
+        proposal_request=proposal_request,
+        rejected_result=result,
+    )
     return LifecycleStatus.invalid(
         stage=GameLifecycleStage.BATTLE,
         message=message,
@@ -4392,6 +4574,7 @@ def _reject_invalid_movement_resolution(
             "unit_instance_id": unit_instance_id,
             "movement_phase_action": action.value,
             "violation_code": violation_code,
+            "next_request_id": retry_request.request_id,
             "proposal_validation": validate_json_value(proposal_validation.to_payload()),
         },
     )

@@ -181,6 +181,7 @@ def test_invalid_movement_proposal_returns_typed_invalid_without_mutation() -> N
     state = _session_state(session)
     before = _unit_placement(state, proposal.unit_instance_id)
     before_payload = state.battlefield_state.to_payload() if state.battlefield_state else None
+    before_record_count = len(session.lifecycle.decision_controller.records)
 
     status = session.submit_payload(
         payload=_json(
@@ -202,6 +203,17 @@ def test_invalid_movement_proposal_returns_typed_invalid_without_mutation() -> N
     assert proposal_validation["is_valid"] is False
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == before_payload
+    assert len(session.lifecycle.decision_controller.records) == before_record_count + 1
+    pending_requests = session.lifecycle.decision_controller.queue.pending_requests
+    assert len(pending_requests) == 1
+    retry_proposal = MovementProposalRequest.from_decision_request_payload(
+        pending_requests[0].payload
+    )
+    assert retry_proposal.request_id != proposal.request_id
+    assert retry_proposal.proposal_kind is proposal.proposal_kind
+    assert retry_proposal.unit_instance_id == proposal.unit_instance_id
+    assert retry_proposal.source_decision_request_id == proposal.source_decision_request_id
+    assert retry_proposal.source_decision_result_id == proposal.source_decision_result_id
 
 
 def test_stale_proposal_submission_is_rejected() -> None:
@@ -215,6 +227,7 @@ def test_stale_proposal_submission_is_rejected() -> None:
     proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
     state = _session_state(session)
     before = _unit_placement(state, proposal.unit_instance_id)
+    before_record_count = len(session.lifecycle.decision_controller.records)
 
     status = session.submit_payload(
         payload=_json(
@@ -236,6 +249,58 @@ def test_stale_proposal_submission_is_rejected() -> None:
     assert cast(list[dict[str, object]], validation["violations"])[0]["violation_code"] == (
         "stale_proposal_request"
     )
+    assert len(session.lifecycle.decision_controller.records) == before_record_count
+    assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
+
+
+def test_movement_proposal_drift_rejections_keep_pending_request_and_records_clean() -> None:
+    session, _action_request = _local_session_at_first_movement_action()
+    proposal_request = _decision_request(
+        session.submit_option(
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            result_id="phase11d-drift-normal-action",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _session_state(session)
+    before = _unit_placement(state, proposal.unit_instance_id)
+    base_payload = MovementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=ProposalKind.NORMAL_MOVE,
+        unit_instance_id=proposal.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+        witness=_shift_witness(before, dx=3.0),
+    ).to_payload()
+    drift_cases = (
+        (
+            "phase11d-kind-drift",
+            {**base_payload, "proposal_kind": ProposalKind.ADVANCE.value},
+            "proposal_kind_drift",
+        ),
+        (
+            "phase11d-unit-drift",
+            {**base_payload, "unit_instance_id": "army-alpha:wrong-unit"},
+            "proposal_unit_drift",
+        ),
+        (
+            "phase11d-action-drift",
+            {**base_payload, "movement_phase_action": MovementPhaseActionKind.ADVANCE.value},
+            "proposal_action_drift",
+        ),
+    )
+    before_record_count = len(session.lifecycle.decision_controller.records)
+
+    for result_id, payload, violation_code in drift_cases:
+        status = session.submit_payload(payload=_json(payload), result_id=result_id)
+        violation = cast(
+            list[dict[str, object]],
+            _proposal_validation(status)["violations"],
+        )[0]
+
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert violation["violation_code"] == violation_code
+        assert len(session.lifecycle.decision_controller.records) == before_record_count
+        assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
 
 
 def test_malformed_movement_proposal_payload_returns_typed_invalid_and_keeps_request() -> None:
@@ -466,6 +531,7 @@ def test_invalid_placement_proposal_returns_invalid_without_mutation() -> None:
         )
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    before_record_count = len(decisions.records)
 
     status = _submit_parameterized_handler_payload(
         handler=handler,
@@ -488,6 +554,17 @@ def test_invalid_placement_proposal_returns_invalid_without_mutation() -> None:
     assert status.status_kind is LifecycleStatusKind.INVALID
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == before
+    assert len(decisions.records) == before_record_count + 1
+    pending_requests = decisions.queue.pending_requests
+    assert len(pending_requests) == 1
+    retry_proposal = MovementProposalRequest.from_decision_request_payload(
+        pending_requests[0].payload
+    )
+    assert retry_proposal.request_id != proposal.request_id
+    assert retry_proposal.proposal_kind is proposal.proposal_kind
+    assert retry_proposal.unit_instance_id == proposal.unit_instance_id
+    assert retry_proposal.source_decision_request_id == proposal.source_decision_request_id
+    assert retry_proposal.source_decision_result_id == proposal.source_decision_result_id
 
 
 def test_malformed_placement_proposal_payload_returns_typed_invalid_without_mutation() -> None:
@@ -531,6 +608,72 @@ def test_malformed_placement_proposal_payload_returns_typed_invalid_without_muta
     assert violation["field"] == "attempted_placement"
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == before
+
+
+def test_placement_proposal_drift_rejections_keep_pending_request_and_records_clean() -> None:
+    state, reserve_state, reserve_unit = _battle_state_with_reserve()
+    handler, decisions, selection_request = _enter_reinforcements_choice(state=state)
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=reserve_state.unit_instance_id,
+            result_id="phase11d-select-drift-reserve",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    base_payload = PlacementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=proposal.proposal_kind,
+        unit_instance_id=reserve_state.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=_reserve_placement(reserve_unit=reserve_unit),
+    ).to_payload()
+    drift_cases = (
+        (
+            "phase11d-place-stale",
+            {**base_payload, "proposal_request_id": "stale-placement-request"},
+            "stale_proposal_request",
+        ),
+        (
+            "phase11d-place-kind-drift",
+            {**base_payload, "proposal_kind": ProposalKind.REINFORCEMENT.value},
+            "proposal_kind_drift",
+        ),
+        (
+            "phase11d-place-unit-drift",
+            {**base_payload, "unit_instance_id": "army-alpha:wrong-unit"},
+            "PlacementProposalPayload attempted_placement unit drift",
+        ),
+        (
+            "phase11d-place-placement-kind-drift",
+            {**base_payload, "placement_kind": BattlefieldPlacementKind.DEEP_STRIKE.value},
+            "proposal_placement_kind_drift",
+        ),
+    )
+    before_record_count = len(decisions.records)
+
+    for result_id, payload, violation_text in drift_cases:
+        status = _submit_parameterized_handler_payload(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=placement_request,
+            payload=_json(payload),
+            result_id=result_id,
+        )
+        assert status is not None
+        violation = cast(
+            list[dict[str, object]],
+            _proposal_validation(status)["violations"],
+        )[0]
+
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert violation_text in json.dumps(violation, sort_keys=True)
+        assert len(decisions.records) == before_record_count
+        assert decisions.queue.pending_requests == (placement_request,)
 
 
 def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> None:
@@ -581,6 +724,57 @@ def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> N
     assert cargo.embarked_unit_instance_ids == ()
 
 
+def test_disembark_placement_missing_required_field_keeps_pending_request_clean() -> None:
+    state, passenger, _transport = _battle_state_with_embarked_passenger()
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        parameterized_proposals=True,
+    )
+    decisions = DecisionController()
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase11d-select-disembark-missing-field",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    before_record_count = len(decisions.records)
+
+    status = _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        payload=_json(
+            PlacementProposalPayload(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=ProposalKind.DISEMBARK,
+                unit_instance_id=passenger.unit_instance_id,
+                placement_kind=BattlefieldPlacementKind.DISEMBARK,
+                attempted_placement=_disembark_placement(passenger),
+                transport_movement_status=TransportMovementStatus.NOT_MOVED,
+            ).to_payload()
+        ),
+        result_id="phase11d-place-disembark-missing-field",
+    )
+    assert status is not None
+    violation = cast(
+        list[dict[str, object]],
+        _proposal_validation(status)["violations"],
+    )[0]
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert violation["violation_code"] == "proposal_payload_missing_field"
+    assert violation["field"] == "transport_unit_instance_id"
+    assert len(decisions.records) == before_record_count
+    assert decisions.queue.pending_requests == (placement_request,)
+
+
 def test_projection_submission_helpers_and_event_cursor_are_viewer_scoped() -> None:
     session, action_request = _local_session_at_first_movement_action()
     view = session.view(viewer_player_id="player-b")
@@ -604,6 +798,37 @@ def test_projection_submission_helpers_and_event_cursor_are_viewer_scoped() -> N
     assert event_delta["events"]
     assert "<" not in json.dumps(view, sort_keys=True)
     assert "object at 0x" not in json.dumps(view, sort_keys=True)
+
+
+def test_projection_redacts_secret_pending_decisions_for_non_actor_viewers() -> None:
+    session = LocalGameSession()
+    session.start(_config())
+    first_status = session.advance_until_decision_or_terminal()
+    request = _decision_request(first_status)
+
+    player_b_view = session.view(viewer_player_id="player-b")
+    player_a_view = session.view(viewer_player_id="player-a")
+    redacted_pending = player_b_view["pending_decision"]
+
+    assert request.decision_type == SECONDARY_MISSION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert redacted_pending == {
+        "request_id": request.request_id,
+        "decision_type": SECONDARY_MISSION_DECISION_TYPE,
+        "actor_id": "player-a",
+        "payload": {
+            "secret": True,
+            "hidden": True,
+        },
+        "options": [],
+        "is_parameterized": False,
+    }
+    assert player_b_view["pending_proposal"] is None
+    assert "assassination" not in json.dumps(player_b_view, sort_keys=True)
+    assert "bring_it_down" not in json.dumps(player_b_view, sort_keys=True)
+    assert player_a_view["pending_decision"] is not None
+    assert "assassination" in json.dumps(player_a_view["pending_decision"], sort_keys=True)
+    assert "bring_it_down" in json.dumps(player_a_view["pending_decision"], sort_keys=True)
 
 
 def test_viewer_scoped_event_cursor_redacts_opponent_secret_decision_payloads() -> None:
@@ -876,6 +1101,14 @@ def _submit_parameterized_handler_payload(
         selected_option_id="submit_parameterized_payload",
         payload=payload,
     )
+    invalid_status = handler.invalid_proposal_submission_status(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+    )
+    if invalid_status is not None:
+        return invalid_status
     decisions.submit_result(result)
     return handler.apply_decision(state=state, result=result, decisions=decisions)
 
