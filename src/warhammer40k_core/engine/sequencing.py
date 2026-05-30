@@ -378,6 +378,41 @@ def apply_sequencing_decision(
     )
 
 
+def apply_sequencing_decision_from_request(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> SequencingDecision:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Sequencing request must be a DecisionRequest.")
+    payload = request.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Sequencing request payload must be an object.")
+    context_payload = payload.get("sequencing_conflict")
+    if not isinstance(context_payload, dict):
+        raise GameLifecycleError("Sequencing request payload requires sequencing_conflict.")
+    participant_payloads = payload.get("participants")
+    if not isinstance(participant_payloads, list):
+        raise GameLifecycleError("Sequencing request payload requires participants.")
+    participants: list[SequencingParticipant] = []
+    for participant_payload in participant_payloads:
+        if not isinstance(participant_payload, dict):
+            raise GameLifecycleError("Sequencing request participants must be objects.")
+        participants.append(
+            SequencingParticipant.from_payload(
+                cast(SequencingParticipantPayload, participant_payload)
+            )
+        )
+    return apply_sequencing_decision(
+        request=request,
+        result=result,
+        context=SequencingConflictContext.from_payload(
+            cast(SequencingConflictContextPayload, context_payload)
+        ),
+        participants=tuple(participants),
+    )
+
+
 def _roll_off_result_for_context(
     *,
     request_id: str,

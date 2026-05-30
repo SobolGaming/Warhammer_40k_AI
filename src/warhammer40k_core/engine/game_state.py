@@ -714,6 +714,7 @@ class GameState:
         self.persisting_effects = _validate_persisting_effects(
             self.persisting_effects,
             army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
             player_ids=self.player_ids,
         )
         self.secondary_mission_choices = _validate_secondary_choices(
@@ -1050,7 +1051,10 @@ class GameState:
             raise GameLifecycleError("persisting_effect must be a PersistingEffect.")
         if effect.owner_player_id not in self.player_ids:
             raise GameLifecycleError("PersistingEffect owner_player_id is not in this game.")
-        unit_ids = {unit.unit_instance_id for army in self.army_definitions for unit in army.units}
+        unit_ids = _known_rules_unit_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
         if not unit_ids:
             raise GameLifecycleError("PersistingEffect requires mustered army definitions.")
         if any(unit_id not in unit_ids for unit_id in effect.target_unit_instance_ids):
@@ -1099,7 +1103,10 @@ class GameState:
             min_length=1,
             sort_values=True,
         )
-        unit_ids = {unit.unit_instance_id for army in self.army_definitions for unit in army.units}
+        unit_ids = _known_rules_unit_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
         if requested_attached_id not in unit_ids:
             raise GameLifecycleError("Attached-unit split source unit is unknown.")
         if any(unit_id not in unit_ids for unit_id in survivor_ids):
@@ -1172,6 +1179,10 @@ class GameState:
                     unit=self._unit_by_id(unit_id),
                 )
             )
+        self.transfer_persisting_effects_after_attached_unit_split(
+            attached_unit_instance_id=requested_attached_unit_id,
+            surviving_unit_instance_ids=surviving_ids,
+        )
         replaced_ids = {*surviving_ids, requested_attached_unit_id}
         self.starting_strength_records = [
             record
@@ -3079,11 +3090,15 @@ def _validate_persisting_effects(
     effects: object,
     *,
     army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
     player_ids: tuple[str, ...],
 ) -> list[PersistingEffect]:
     if not isinstance(effects, list):
         raise GameLifecycleError("GameState persisting_effects must be a list.")
-    unit_ids = {unit.unit_instance_id for army in army_definitions for unit in army.units}
+    unit_ids = _known_rules_unit_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
     validated: list[PersistingEffect] = []
     seen: set[str] = set()
     for effect in cast(list[object], effects):
@@ -3102,6 +3117,16 @@ def _validate_persisting_effects(
         seen.add(effect.effect_id)
         validated.append(effect)
     return sorted(validated, key=lambda effect: effect.effect_id)
+
+
+def _known_rules_unit_ids(
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+) -> set[str]:
+    return {unit.unit_instance_id for army in army_definitions for unit in army.units} | {
+        record.unit_instance_id for record in starting_strength_records
+    }
 
 
 def _validate_secondary_mission_card_states(

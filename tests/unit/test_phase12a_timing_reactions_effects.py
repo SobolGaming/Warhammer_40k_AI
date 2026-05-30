@@ -24,13 +24,19 @@ from warhammer40k_core.engine.effects import (
 )
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
@@ -57,6 +63,7 @@ from warhammer40k_core.engine.timing_windows import (
     timing_trigger_kind_from_token,
 )
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -121,6 +128,128 @@ def test_reaction_window_emits_interrupt_decision_and_resumes_parent_phase() -> 
     assert _last_event_payload(decisions, "reaction_parent_resumed")["resume_token"] == (
         "resume-after-reaction"
     )
+
+
+def test_lifecycle_submit_decision_resolves_reaction_after_replay_restore() -> None:
+    lifecycle = _battle_lifecycle(unit_selection_ids=("intercessor-unit-1",))
+    state = lifecycle.state
+    assert state is not None
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    reaction_window = ReactionWindow(
+        timing_window=_timing_window(
+            state=state,
+            trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+            phase=BattlePhase.MOVEMENT,
+            window_id="phase12a-lifecycle-reaction-window",
+        ),
+        eligible_player_ids=("player-b",),
+    )
+
+    triggered = lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=reaction_window,
+        parent_phase=BattlePhase.MOVEMENT,
+        parent_step="move_units",
+        resume_token="resume-after-replay",
+        actor_id="player-b",
+        options=(
+            DecisionOption(
+                option_id="decline",
+                label="Decline",
+                payload={"reaction": "decline"},
+            ),
+            DecisionOption(
+                option_id="react",
+                label="React",
+                payload={"reaction": "react"},
+            ),
+        ),
+    )
+    waiting = lifecycle.advance_until_decision_or_terminal()
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert waiting.decision_request == triggered.decision_request
+
+    restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
+    restored_waiting = restored.advance_until_decision_or_terminal()
+    assert restored_waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert restored_waiting.decision_request is not None
+    result = DecisionResult.for_request(
+        result_id="phase12a-restored-reaction-result",
+        request=restored_waiting.decision_request,
+        selected_option_id="decline",
+    )
+
+    resumed = restored.submit_decision(result)
+
+    assert restored.reaction_queue.frames == ()
+    assert resumed.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert (
+        _last_event_payload(
+            restored.decision_controller,
+            "reaction_parent_resumed",
+        )["resume_token"]
+        == "resume-after-replay"
+    )
+
+
+def test_lifecycle_rejects_pending_reaction_payload_without_matching_frame() -> None:
+    lifecycle = _battle_lifecycle(unit_selection_ids=("intercessor-unit-1",))
+    state = lifecycle.state
+    assert state is not None
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    reaction_window = ReactionWindow(
+        timing_window=_timing_window(
+            state=state,
+            trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+            phase=BattlePhase.MOVEMENT,
+            window_id="phase12a-lifecycle-reaction-drift-window",
+        ),
+        eligible_player_ids=("player-b",),
+    )
+
+    triggered = lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=reaction_window,
+        parent_phase=BattlePhase.MOVEMENT,
+        parent_step="move_units",
+        resume_token="resume-after-drift-check",
+        actor_id="player-b",
+        options=(
+            DecisionOption(
+                option_id="decline",
+                label="Decline",
+                payload={"reaction": "decline"},
+            ),
+        ),
+    )
+    assert triggered.decision_request.decision_type == REACTION_DECISION_TYPE
+    payload = _lifecycle_payload_copy(lifecycle)
+
+    missing_frame_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    missing_frame_payload["reaction_queue"] = {"frames": []}
+    with pytest.raises(
+        GameLifecycleError,
+        match="pending reaction decision requires a frame",
+    ):
+        GameLifecycle.from_payload(missing_frame_payload)
+
+    drift_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    reaction_queue_payload = cast(dict[str, object], drift_payload["reaction_queue"])
+    frames = cast(list[dict[str, object]], reaction_queue_payload["frames"])
+    frames[0]["request_id"] = "phase12a-other-reaction-request"
+    with pytest.raises(
+        GameLifecycleError,
+        match="active frame request_id drift",
+    ):
+        GameLifecycle.from_payload(drift_payload)
 
 
 def test_out_of_phase_shooting_does_not_trigger_unrelated_shooting_phase_abilities() -> None:
@@ -190,6 +319,49 @@ def test_active_player_chooses_order_for_simultaneous_during_battle_rules() -> N
     assert decision.ordered_participant_ids == ("rule-beta", "rule-alpha")
     assert decision.roll_off_result is None
     assert SequencingDecision.from_payload(decision.to_payload()) == decision
+
+
+def test_lifecycle_submit_decision_resolves_sequencing_decision() -> None:
+    lifecycle = _battle_lifecycle(unit_selection_ids=("intercessor-unit-1",))
+    state = lifecycle.state
+    assert state is not None
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    context = SequencingConflictContext(
+        conflict_id="phase12a-lifecycle-sequencing-conflict",
+        game_id=state.game_id,
+        timing_window=_timing_window(
+            state=state,
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+            phase=BattlePhase.MOVEMENT,
+            window_id="phase12a-lifecycle-sequencing-window",
+        ),
+        player_ids=state.player_ids,
+        active_player_id=state.active_player_id,
+    )
+
+    request = request_sequencing_decision(
+        context=context,
+        participants=_sequencing_participants(),
+        decisions=lifecycle.decision_controller,
+        request_id=state.next_decision_request_id(),
+    )
+    waiting = lifecycle.advance_until_decision_or_terminal()
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert waiting.decision_request == request
+    result = DecisionResult.for_request(
+        result_id="phase12a-lifecycle-sequencing-result",
+        request=request,
+        selected_option_id="order:rule-beta,rule-alpha",
+    )
+
+    status = lifecycle.submit_decision(result)
+    payload = _last_event_payload(lifecycle.decision_controller, "sequencing_order_resolved")
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert payload["ordered_participant_ids"] == ["rule-beta", "rule-alpha"]
+    assert lifecycle.decision_controller.records[-1].request.decision_type == (
+        SEQUENCING_DECISION_TYPE
+    )
 
 
 def test_roll_off_decides_simultaneous_start_or_end_battle_round_rules() -> None:
@@ -276,21 +448,47 @@ def test_persisting_effect_survives_embark_and_disembark() -> None:
 
 def test_persisting_effect_survives_attached_unit_split() -> None:
     state = _battle_state(unit_selection_ids=("intercessor-unit-1", "intercessor-unit-2"))
+    attached_id = "attached-unit:phase12a-intercessors"
+    state.starting_strength_records.append(
+        StartingStrengthRecord(
+            player_id="player-a",
+            unit_instance_id=attached_id,
+            starting_model_count=10,
+            single_model_starting_wounds=None,
+            source_id="phase12a-attached-unit-join",
+        )
+    )
+    state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
     effect = _persisting_effect(
         effect_id="phase12a-effect-attached-split",
-        target_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+        target_unit_instance_ids=(attached_id,),
         expiration=EffectExpiration.end_battle_round(battle_round=1),
     )
     state.record_persisting_effect(effect)
 
-    changed = state.transfer_persisting_effects_after_attached_unit_split(
-        attached_unit_instance_id="army-alpha:intercessor-unit-1",
-        surviving_unit_instance_ids=("army-alpha:intercessor-unit-2",),
+    recovered = state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(
+            "army-alpha:intercessor-unit-1",
+            "army-alpha:intercessor-unit-2",
+        ),
     )
 
-    assert len(changed) == 1
-    assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-1") == ()
-    assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-2") == changed
+    assert tuple(record.unit_instance_id for record in recovered) == (
+        "army-alpha:intercessor-unit-1",
+        "army-alpha:intercessor-unit-2",
+    )
+    assert state.persisting_effects_for_unit(attached_id) == ()
+    expected = effect.with_attached_unit_split(
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(
+            "army-alpha:intercessor-unit-1",
+            "army-alpha:intercessor-unit-2",
+        ),
+    )
+    assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-1") == (expected,)
+    assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-2") == (expected,)
 
 
 def test_persisting_effects_expire_at_deterministic_lifecycle_boundaries() -> None:
@@ -768,6 +966,27 @@ def _battle_state(*, unit_selection_ids: tuple[str, ...]) -> GameState:
         state.complete_current_setup_step()
     assert state.stage is GameLifecycleStage.BATTLE
     return state
+
+
+def _battle_lifecycle(*, unit_selection_ids: tuple[str, ...]) -> GameLifecycle:
+    config = _config(unit_selection_ids=unit_selection_ids)
+    state = _battle_state(unit_selection_ids=unit_selection_ids)
+    return GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": False,
+            "state": state.to_payload(),
+            "decisions": DecisionController().to_payload(),
+            "reaction_queue": {"frames": []},
+        }
+    )
+
+
+def _lifecycle_payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
+    return cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
 
 
 def _transport_state_with_embarked_passenger() -> tuple[GameState, str, str]:

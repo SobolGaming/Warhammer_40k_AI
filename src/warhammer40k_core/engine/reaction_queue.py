@@ -262,11 +262,8 @@ class ReactionQueue:
             raise GameLifecycleError("ReactionQueue result must be a DecisionResult.")
         if type(decisions) is not DecisionController:
             raise GameLifecycleError("ReactionQueue requires a DecisionController.")
-        if not self._frames:
-            raise GameLifecycleError("ReactionQueue has no open reaction window.")
+        self.validate_result(result)
         frame = self._frames[-1]
-        if frame.request_id != result.request_id:
-            raise GameLifecycleError("ReactionQueue result does not resolve the active frame.")
         record = decisions.record_for_result(result)
         self._frames.pop()
         resume = ReactionResume(
@@ -279,6 +276,15 @@ class ReactionQueue:
         decisions.event_log.append("reaction_window_resolved", resume.to_payload())
         decisions.event_log.append("reaction_parent_resumed", resume.to_payload())
         return resume
+
+    def validate_result(self, result: DecisionResult) -> None:
+        if type(result) is not DecisionResult:
+            raise GameLifecycleError("ReactionQueue result must be a DecisionResult.")
+        if not self._frames:
+            raise GameLifecycleError("ReactionQueue has no open reaction window.")
+        frame = self._frames[-1]
+        if frame.request_id != result.request_id:
+            raise GameLifecycleError("ReactionQueue result does not resolve the active frame.")
 
     def to_payload(self) -> ReactionQueuePayload:
         return {"frames": [frame.to_payload() for frame in self._frames]}

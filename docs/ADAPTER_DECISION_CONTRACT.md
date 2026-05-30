@@ -170,7 +170,7 @@ Reaction windows that require a player choice emit an interrupt-style finite `De
 - parent phase, parent step, and resume token;
 - handler-specific JSON-safe context under `handler_payload`.
 
-Adapters answer only by selecting one of the emitted option IDs. The reaction queue blocks parent phase execution until the engine records the `DecisionResult` and emits `reaction_parent_resumed`. Adapters must not resume or mutate the parent phase themselves.
+Adapters answer only by selecting one of the emitted option IDs. The reaction queue is lifecycle-persisted state and blocks parent phase execution until the engine records the `DecisionResult` through `GameLifecycle.submit_decision(...)` and emits `reaction_parent_resumed`. Adapters must not resume or mutate the parent phase themselves.
 
 Sequencing conflicts use the finite decision type `resolve_sequencing_order`. During battle, the acting player is the active player. Before or after the battle, or at the start or end of a battle round, the engine first resolves a Phase 10J roll-off and makes the roll-off winner the request actor. Options enumerate deterministic participant orderings. Adapters must select one emitted ordering option and must not invent participant IDs or sort rule effects locally.
 
