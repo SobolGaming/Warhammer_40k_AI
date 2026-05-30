@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 11F** is treated as implemented at the time this file was updated. Phase 12A is the next build slice.
+Everything through **Phase 12A** is treated as implemented at the time this file was updated. Phase 12B is the next build slice.
 
 Completed / implemented foundation:
 
@@ -72,6 +72,7 @@ Completed / implemented foundation:
 | 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
 | 11E | Complete | Mission actions, primary/secondary scoring, and end-of-turn cleanup |
 | 11F | Complete | Battle-round/game-end scoring windows, VP caps, final audit, and winner determination |
+| 12A | Complete | Timing windows, reaction queue, sequencing, and persisting effects |
 
 ## Cross-cutting architectural rules
 
@@ -1227,6 +1228,8 @@ Required tests:
 # Timing windows, Stratagems, and abilities
 
 ## Phase 12A: timing windows, reaction queue, sequencing, and persisting effects
+
+Status: Complete.
 
 Modules:
 

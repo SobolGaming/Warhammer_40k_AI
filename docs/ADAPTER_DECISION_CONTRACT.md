@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions and Phase 12 Stratagem decision requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, and Phase 12 Stratagem decision requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules and Phase 12 Stratagem decision rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, and Phase 12 Stratagem decision rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -48,6 +48,9 @@ The shared contract uses these objects and payloads:
 - `EventStreamDeltaPayload`: viewer-scoped adapter event delta.
 - `SecondaryMissionCardState`: reveal-gated Fixed/Tactical secondary mission card state.
 - `VictoryPointLedger`: viewer-scoped scoring ledger with reveal-gated secondary source visibility and generic hidden-transaction support.
+- `ReactionWindow` and `TriggeredDecisionRequest`: interrupt-style finite decisions emitted from typed timing windows.
+- `SequencingDecision`: finite order choice for simultaneous rule conflicts after active-player or roll-off ownership is determined.
+- `PersistingEffect`: replay-safe effect state with deterministic expiration and unit-ID ownership across Embark/Disembark and Attached-unit splits.
 
 Relevant modules:
 
@@ -60,6 +63,10 @@ Relevant modules:
 - `src/warhammer40k_core/engine/decision_result.py`
 - `src/warhammer40k_core/engine/decision_record.py`
 - `src/warhammer40k_core/engine/movement_proposals.py`
+- `src/warhammer40k_core/engine/timing_windows.py`
+- `src/warhammer40k_core/engine/reaction_queue.py`
+- `src/warhammer40k_core/engine/sequencing.py`
+- `src/warhammer40k_core/engine/effects.py`
 - `src/warhammer40k_core/engine/scoring.py`
 - `src/warhammer40k_core/engine/lifecycle.py`
 
@@ -95,6 +102,8 @@ Finite decisions are bounded option choices already enumerated by the engine. Ex
 - Stratagem use choices;
 - decline/accept choices;
 - triggered movement choices.
+- reaction-window interrupt choices;
+- sequencing order choices.
 
 Adapters must not invent option IDs. They must select one of the pending request's option IDs.
 
@@ -149,6 +158,31 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
 - `start_mission_action`: the engine emits legal source-backed Mission Action start options. Current Phase 11E support enumerates action/unit/objective-target options for source-backed objective-marker actions such as Cleanse, filters units through the source `eligible_unit_policy`, and persists the selected `target_id` in `MissionActionState`. Mission Action target policies that are not yet represented as finite options must return a typed `unsupported` status instead of exposing an adapter mutation path.
 
 Both decision types must be submitted through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. Tests, replay, UI, CLI, network, and headless adapters must not call `GameState.discard_tactical_secondary(...)` or `GameState.record_mission_action_state(...)` directly for player choices; those methods are engine-owned primitives used by validated decision handlers and automatic rule hooks.
+
+## Phase 12A Reaction And Sequencing Decisions
+
+Phase 12A adds typed timing windows, reaction windows, sequencing conflict resolution, and persisting effects. These mechanics do not create a second adapter path.
+
+Reaction windows that require a player choice emit an interrupt-style finite `DecisionRequest`. The current finite decision type is `resolve_reaction_window`. The request payload includes:
+
+- `reaction_window`: the typed timing window payload;
+- `interrupts_parent: true`;
+- parent phase, parent step, and resume token;
+- handler-specific JSON-safe context under `handler_payload`.
+
+Adapters answer only by selecting one of the emitted option IDs. The reaction queue blocks parent phase execution until the engine records the `DecisionResult` and emits `reaction_parent_resumed`. Adapters must not resume or mutate the parent phase themselves.
+
+Sequencing conflicts use the finite decision type `resolve_sequencing_order`. During battle, the acting player is the active player. Before or after the battle, or at the start or end of a battle round, the engine first resolves a Phase 10J roll-off and makes the roll-off winner the request actor. Options enumerate deterministic participant orderings. Adapters must select one emitted ordering option and must not invent participant IDs or sort rule effects locally.
+
+Persisting effects are authoritative engine state, not adapter state. Effects target stable unit IDs, remain associated with those IDs while units Embark/Disembark, transfer to surviving unit IDs when an Attached unit splits, and expire at deterministic lifecycle boundaries. Adapter projections may display public effect payloads, but clients must not apply or expire effects directly.
+
+Required Phase 12A adapter-contract tests:
+
+- reaction-window finite option round-trip and parent resume event;
+- sequencing finite option round-trip for active-player ordering;
+- sequencing roll-off ownership for start/end battle-round conflicts;
+- deterministic JSON-safe payload round-trip for reaction windows, sequencing decisions, and persisting effects;
+- viewer-scoped redaction tests for any future hidden reaction, sequencing, or persisting-effect payload.
 
 ## Phase 12 Stratagem Decisions
 
