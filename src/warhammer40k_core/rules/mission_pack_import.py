@@ -10,6 +10,7 @@ from warhammer40k_core.core.missions import (
     MissionDeckDefinition,
     MissionPackDefinition,
     MissionPackError,
+    MissionPackScoringDefinition,
     MissionPoolEntry,
     ObjectiveMarkerDefinition,
     PrimaryMissionDefinition,
@@ -86,6 +87,18 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
             battle_ready_vp=10,
             total_vp_cap=100,
             source_id="chapter_approved_2025_26_tournament_scoring",
+        ),
+        scoring=MissionPackScoringDefinition(
+            game_length_battle_rounds=5,
+            primary_scoring_phase="command",
+            primary_scoring_timing="phase_end",
+            secondary_vp_per_score=5,
+            mission_action_vp=5,
+            reserve_destruction_timing="end_of_battle_round_n",
+            reserve_destruction_battle_round=3,
+            reserve_destruction_excludes_during_battle_strategic_reserves=True,
+            reserve_destruction_only_declare_battle_formations=True,
+            source_id="chapter_approved_2025_26_scoring",
         ),
     )
 
@@ -652,25 +665,27 @@ def _terrain_slot_id(preset: str) -> str:
 
 def _primary_missions() -> tuple[PrimaryMissionDefinition, ...]:
     names = (
-        ("burden-of-trust", "Burden of Trust", None),
-        ("hidden-supplies", "Hidden Supplies", None),
-        ("linchpin", "Linchpin", 15),
-        ("purge-the-foe", "Purge the Foe", None),
-        ("scorched-earth", "Scorched Earth", None),
-        ("supply-drop", "Supply Drop", None),
-        ("take-and-hold", "Take and Hold", 15),
-        ("terraform", "Terraform", None),
-        ("the-ritual", "The Ritual", None),
-        ("unexploded-ordnance", "Unexploded Ordnance", None),
+        ("burden-of-trust", "Burden of Trust", None, None, None),
+        ("hidden-supplies", "Hidden Supplies", None, None, None),
+        ("linchpin", "Linchpin", 15, None, None),
+        ("purge-the-foe", "Purge the Foe", None, None, None),
+        ("scorched-earth", "Scorched Earth", None, None, None),
+        ("supply-drop", "Supply Drop", None, None, None),
+        ("take-and-hold", "Take and Hold", 15, "control_objectives", 5),
+        ("terraform", "Terraform", None, None, None),
+        ("the-ritual", "The Ritual", None, None, None),
+        ("unexploded-ordnance", "Unexploded Ordnance", None, None, None),
     )
     return tuple(
         PrimaryMissionDefinition(
             primary_mission_id=mission_id,
             name=name,
             max_vp_per_turn=max_vp,
+            scoring_kind=scoring_kind,
+            vp_per_controlled_objective=vp_per_objective,
             source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary:{mission_id}",
         )
-        for mission_id, name, max_vp in names
+        for mission_id, name, max_vp, scoring_kind, vp_per_objective in names
     )
 
 

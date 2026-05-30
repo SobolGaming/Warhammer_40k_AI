@@ -124,6 +124,10 @@ class CommandPhaseHandler:
                 draw_count=draw_count,
             )
         )
+        card_states = state.draw_tactical_secondary_cards(
+            player_id=active_player_id,
+            source_result_id=result.result_id,
+        )
         decisions.event_log.append(
             "tactical_secondary_missions_drawn",
             {
@@ -132,6 +136,9 @@ class CommandPhaseHandler:
                 "battle_round": battle_round,
                 "draw_count": draw_count,
                 "phase": BattlePhase.COMMAND.value,
+                "secondary_mission_card_states": [
+                    validate_json_value(card_state.to_payload()) for card_state in card_states
+                ],
             },
         )
         command_state = _command_step_state(state)

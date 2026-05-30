@@ -58,6 +58,16 @@ class BattleRoundFlow:
                 "phase_body_status": _phase_body_status(status),
             },
         )
+        if _state_is_complete(state):
+            decisions.event_log.append(
+                "game_completed",
+                state.game_result_payload(),
+            )
+            return LifecycleStatus.terminal(
+                stage=GameLifecycleStage.COMPLETE,
+                message="Game ended after configured battle rounds.",
+                payload=state.game_result_payload(),
+            )
         if status.status_kind is LifecycleStatusKind.UNSUPPORTED:
             return LifecycleStatus.unsupported(
                 stage=GameLifecycleStage.BATTLE,
@@ -87,6 +97,10 @@ def _current_battle_phase_payload(state: GameState) -> str | None:
     if current_phase is None:
         return None
     return current_phase.value
+
+
+def _state_is_complete(state: GameState) -> bool:
+    return state.stage is GameLifecycleStage.COMPLETE
 
 
 def _is_placeholder_noop_status(status: LifecycleStatus) -> bool:

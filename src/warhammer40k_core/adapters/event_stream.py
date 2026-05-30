@@ -42,17 +42,11 @@ class EventStreamCursor:
         if self.value > len(records):
             raise GameLifecycleError("EventStreamCursor is ahead of the event log.")
         events: list[EventRecordPayload] = [
-            cast(
-                EventRecordPayload,
-                {
-                    "event_id": record.event_id,
-                    "event_type": record.event_type,
-                    "payload": _public_event_payload(
-                        event_type=record.event_type,
-                        payload=record.payload,
-                        viewer_player_id=viewer,
-                    ),
-                },
+            _public_event_record_payload(
+                event_id=record.event_id,
+                event_type=record.event_type,
+                payload=record.payload,
+                viewer_player_id=viewer,
             )
             for record in records[self.value :]
         ]
@@ -62,6 +56,31 @@ class EventStreamCursor:
             "next_cursor": len(records),
             "events": events,
         }
+
+
+def _public_event_record_payload(
+    *,
+    event_id: str,
+    event_type: str,
+    payload: JsonValue,
+    viewer_player_id: str,
+) -> EventRecordPayload:
+    public_type = event_type
+    public_payload = _public_event_payload(
+        event_type=event_type,
+        payload=payload,
+        viewer_player_id=viewer_player_id,
+    )
+    if _is_generic_hidden_event_payload(public_payload):
+        public_type = "hidden_event"
+    return cast(
+        EventRecordPayload,
+        {
+            "event_id": event_id,
+            "event_type": public_type,
+            "payload": public_payload,
+        },
+    )
 
 
 def _public_event_payload(
@@ -79,7 +98,34 @@ def _public_event_payload(
             payload,
             viewer_player_id=viewer_player_id,
         )
+    if event_type == "tactical_secondary_missions_drawn":
+        return _public_tactical_secondary_drawn_payload(
+            payload,
+            viewer_player_id=viewer_player_id,
+        )
+    if event_type == "tactical_secondary_mission_discarded":
+        return _public_tactical_secondary_discarded_payload(
+            payload,
+            viewer_player_id=viewer_player_id,
+        )
+    if event_type == "mission_action_started":
+        return _public_hidden_player_event_payload(
+            "mission_action_started",
+            payload,
+            viewer_player_id=viewer_player_id,
+        )
     return validate_json_value(payload)
+
+
+def _is_generic_hidden_event_payload(payload: JsonValue) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    hidden_event = payload.get("hidden_event")
+    if hidden_event is None:
+        return False
+    if type(hidden_event) is not bool:
+        raise GameLifecycleError("Hidden event payload flag must be a bool.")
+    return hidden_event
 
 
 def _public_decision_request_payload(
@@ -112,14 +158,7 @@ def _public_decision_record_payload(
     return {
         "record_id": _required_string(record_payload, key="record_id"),
         "request": _redacted_request_payload(request_payload),
-        "result": {
-            "result_id": _required_string(result_payload, key="result_id"),
-            "request_id": _required_string(result_payload, key="request_id"),
-            "decision_type": _required_string(result_payload, key="decision_type"),
-            "actor_id": _optional_string(result_payload, key="actor_id"),
-            "secret": True,
-            "hidden": True,
-        },
+        "result": _redacted_result_payload(result_payload),
     }
 
 
@@ -141,6 +180,64 @@ def _public_secondary_mission_choice_recorded_payload(
     }
 
 
+def _public_tactical_secondary_drawn_payload(
+    payload: JsonValue,
+    *,
+    viewer_player_id: str,
+) -> JsonValue:
+    draw_payload = _json_object("tactical_secondary_missions_drawn payload", payload)
+    player_id = _required_string(draw_payload, key="player_id")
+    hidden = draw_payload.get("hidden")
+    if hidden is not None and type(hidden) is not bool:
+        raise GameLifecycleError("Tactical secondary draw hidden flag must be a bool.")
+    if player_id == viewer_player_id or hidden is not True:
+        return validate_json_value(draw_payload)
+    return {
+        "game_id": _required_string(draw_payload, key="game_id"),
+        "hidden": True,
+        "hidden_event": True,
+    }
+
+
+def _public_tactical_secondary_discarded_payload(
+    payload: JsonValue,
+    *,
+    viewer_player_id: str,
+) -> JsonValue:
+    discard_payload = _json_object("tactical_secondary_mission_discarded payload", payload)
+    player_id = _required_string(discard_payload, key="player_id")
+    hidden = discard_payload.get("hidden")
+    if hidden is not None and type(hidden) is not bool:
+        raise GameLifecycleError("Tactical secondary discard hidden flag must be a bool.")
+    if player_id == viewer_player_id or hidden is not True:
+        return validate_json_value(discard_payload)
+    return {
+        "game_id": _required_string(discard_payload, key="game_id"),
+        "hidden": True,
+        "hidden_event": True,
+    }
+
+
+def _public_hidden_player_event_payload(
+    event_name: str,
+    payload: JsonValue,
+    *,
+    viewer_player_id: str,
+) -> JsonValue:
+    event_payload = _json_object(f"{event_name} payload", payload)
+    player_id = _required_string(event_payload, key="player_id")
+    hidden = event_payload.get("hidden")
+    if hidden is not None and type(hidden) is not bool:
+        raise GameLifecycleError("Hidden player event payload flag must be a bool.")
+    if player_id == viewer_player_id or hidden is not True:
+        return validate_json_value(event_payload)
+    return {
+        "game_id": _required_string(event_payload, key="game_id"),
+        "hidden": True,
+        "hidden_event": True,
+    }
+
+
 def _secret_request_hidden_from_viewer(
     *,
     request_payload: dict[str, JsonValue],
@@ -159,12 +256,43 @@ def _secret_request_hidden_from_viewer(
 
 
 def _redacted_request_payload(request_payload: dict[str, JsonValue]) -> JsonValue:
+    decision_type = _required_string(request_payload, key="decision_type")
+    if _redact_decision_type_for_hidden_viewer(decision_type):
+        return {
+            "request_id": _required_string(request_payload, key="request_id"),
+            "decision_type": "hidden_decision",
+            "actor_id": _optional_string(request_payload, key="actor_id"),
+            "secret": True,
+            "hidden": True,
+        }
     return {
         "request_id": _required_string(request_payload, key="request_id"),
-        "decision_type": _required_string(request_payload, key="decision_type"),
+        "decision_type": decision_type,
         "actor_id": _optional_string(request_payload, key="actor_id"),
         "secret": True,
         "hidden": True,
+    }
+
+
+def _redacted_result_payload(result_payload: dict[str, JsonValue]) -> JsonValue:
+    decision_type = _required_string(result_payload, key="decision_type")
+    if _redact_decision_type_for_hidden_viewer(decision_type):
+        decision_type = "hidden_decision"
+    return {
+        "result_id": _required_string(result_payload, key="result_id"),
+        "request_id": _required_string(result_payload, key="request_id"),
+        "decision_type": decision_type,
+        "actor_id": _optional_string(result_payload, key="actor_id"),
+        "secret": True,
+        "hidden": True,
+    }
+
+
+def _redact_decision_type_for_hidden_viewer(decision_type: str) -> bool:
+    return decision_type in {
+        "draw_tactical_secondary_missions",
+        "discard_tactical_secondary_mission",
+        "start_mission_action",
     }
 
 

@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 11D** is treated as implemented at the time this file was updated. Phase 11E is the next build slice.
+Everything through **Phase 11E** is treated as implemented at the time this file was updated. Phase 11F is the next build slice.
 
 Completed / implemented foundation:
 
@@ -70,6 +70,7 @@ Completed / implemented foundation:
 | 11B | Complete | Objective control geometry and mission objective model |
 | 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
 | 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
+| 11E | Complete | Mission actions, primary/secondary scoring, and end-of-turn cleanup |
 
 ## Cross-cutting architectural rules
 
@@ -1134,6 +1135,8 @@ CORE V1 relevant areas:
 
 ## Phase 11E: mission actions, primary/secondary scoring, and end-of-turn cleanup
 
+Status: Complete.
+
 Modules:
 
 - `engine/scoring.py`
@@ -1154,7 +1157,9 @@ Invariants:
 
 - scoring is mission-pack data, not hard-coded phase logic;
 - mission Actions have start timing, eligible units, interruption conditions, completion timing, and scoring effects;
-- Fixed and Tactical secondary scoring use hidden/public payload boundaries;
+- Select Secondary Missions uses a simultaneous-secret reveal gate; secondary
+  mode, Fixed IDs, Tactical draws/card states, and normal secondary scoring are
+  public after every player has selected;
 - objective control feeds scoring;
 - end-of-turn coherency cleanup removes models until each affected unit has one coherent group;
 - coherency-cleanup removals count as destroyed but do not trigger destroyed-model rules;
@@ -1164,8 +1169,8 @@ Invariants:
 Required tests:
 
 - primary scoring at correct timing;
-- Fixed secondary scoring preserves hidden/public boundaries;
-- Tactical secondary draw/score/discard flow works;
+- secondary choices stay hidden until every player has selected, then reveal to all viewers;
+- Tactical secondary draw/score/discard flow is public after the reveal gate;
 - mission Action can start, complete, be interrupted, and score;
 - end-of-turn coherency cleanup removes models without destroyed triggers;
 - unarrived Reserves are destroyed at the configured deadline through the lifecycle hook;
@@ -1178,7 +1183,7 @@ Invariants:
 
 - game length is mission/ruleset data;
 - end-of-round and end-of-game scoring windows are explicit;
-- final VP ledger determines winner/draw;
+- final VP ledger audit verifies winner/draw payloads;
 - Chapter Approved 100VP cap and per-source caps are represented in scoring policy;
 - game-end payload includes public final score and replay-safe scoring audit.
 

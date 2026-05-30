@@ -37,7 +37,13 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequestPayload,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventLog,
+    EventRecord,
+    JsonValue,
+    canonical_json,
+    validate_json_value,
+)
 
 __all__ = [
     "DICE_REROLL_DECISION_TYPE",
@@ -50,6 +56,14 @@ __all__ = [
 
 
 DICE_REROLL_DECISION_TYPE = "select_dice_reroll"
+
+_RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
+    {
+        "secondary_missions_revealed",
+    }
+)
+
+_EVENT_ID_PREFIX = "event-"
 
 
 def _new_injected_results() -> deque[DiceRollResult]:
@@ -67,6 +81,26 @@ def _new_random_move_characteristic_rolls() -> dict[
     return {}
 
 
+def _rng_history_token(event: EventRecord, *, neutral_event_count: int) -> str:
+    if neutral_event_count == 0:
+        return event.history_token()
+    history_sequence_number = _event_sequence_number(event.event_id) - neutral_event_count
+    if history_sequence_number <= 0:
+        raise DecisionError("RNG history-neutral event count exceeds event sequence.")
+    payload = event.to_payload()
+    payload["event_id"] = f"{_EVENT_ID_PREFIX}{history_sequence_number:06d}"
+    return canonical_json(payload)
+
+
+def _event_sequence_number(event_id: str) -> int:
+    if not event_id.startswith(_EVENT_ID_PREFIX):
+        raise DecisionError("EventRecord event_id must use the event sequence prefix.")
+    raw_sequence = event_id.removeprefix(_EVENT_ID_PREFIX)
+    if not raw_sequence.isdecimal():
+        raise DecisionError("EventRecord event_id sequence must be decimal.")
+    return int(raw_sequence)
+
+
 @dataclass(slots=True)
 class DiceRollManager:
     rng: RandomSource
@@ -79,6 +113,7 @@ class DiceRollManager:
     ] = field(default_factory=_new_random_move_characteristic_rolls)
     _roll_counter: int = 0
     _decision_request_counter: int = 0
+    _rng_history_neutral_event_count: int = 0
 
     def __init__(
         self,
@@ -97,6 +132,7 @@ class DiceRollManager:
         self._random_move_characteristic_rolls = {}
         self._roll_counter = 0
         self._decision_request_counter = 0
+        self._rng_history_neutral_event_count = 0
         self._seed_existing_event_history()
 
     @property
@@ -193,7 +229,7 @@ class DiceRollManager:
                     winner_player_id=winner,
                 )
                 event = self.event_log.append("roll_off_resolved", result.to_payload())
-                self.rng.append_history(event.history_token())
+                self._append_event_history(event)
                 return result
 
     @staticmethod
@@ -296,7 +332,7 @@ class DiceRollManager:
         self._decision_records.append(record)
         self.rng.append_history(record.history_token())
         event = self.event_log.append("decision_recorded", record.to_payload())
-        self.rng.append_history(event.history_token())
+        self._append_event_history(event)
         return record
 
     def request_reroll(
@@ -315,7 +351,7 @@ class DiceRollManager:
         )
         event = self.event_log.append("decision_requested", request.to_payload())
         self.rng.append_history(request.history_token())
-        self.rng.append_history(event.history_token())
+        self._append_event_history(event)
         return request
 
     def build_reroll_request(
@@ -384,7 +420,7 @@ class DiceRollManager:
                     "request_id": request.request_id,
                 },
             )
-            self.rng.append_history(event.history_token())
+            self._append_event_history(event)
             return state
 
         replacement_spec = DiceRollSpec(
@@ -405,7 +441,7 @@ class DiceRollManager:
             replacement_result=replacement_result,
         )
         event = self.event_log.append("dice_reroll_resolved", updated_state.to_payload())
-        self.rng.append_history(event.history_token())
+        self._append_event_history(event)
         return updated_state
 
     def _produce_result(self, spec: DiceRollSpec) -> DiceRollResult:
@@ -435,11 +471,11 @@ class DiceRollManager:
 
     def _record_roll(self, result: DiceRollResult) -> None:
         event = self.event_log.append("dice_rolled", result.to_payload())
-        self.rng.append_history(event.history_token())
+        self._append_event_history(event)
 
     def _record_d3_result(self, result: D3RollResult) -> None:
         event = self.event_log.append("d3_roll_resolved", result.to_payload())
-        self.rng.append_history(event.history_token())
+        self._append_event_history(event)
 
     def _random_move_characteristic_roll(
         self,
@@ -475,20 +511,40 @@ class DiceRollManager:
         ):
             self._random_move_characteristic_rolls[(scope_id, characteristic)] = result
         event = self.event_log.append("random_characteristic_rolled", result.to_payload())
-        self.rng.append_history(event.history_token())
+        self._append_event_history(event)
         return result
 
     def _next_roll_id(self) -> str:
         self._roll_counter += 1
         return f"roll-{self._roll_counter:06d}"
 
+    def _append_event_history(self, event: EventRecord) -> None:
+        if event.event_type in _RNG_HISTORY_NEUTRAL_EVENT_TYPES:
+            self._rng_history_neutral_event_count += 1
+            return
+        self.rng.append_history(
+            _rng_history_token(
+                event,
+                neutral_event_count=self._rng_history_neutral_event_count,
+            )
+        )
+
     def _seed_existing_event_history(self) -> None:
+        neutral_event_count = 0
         for event in self.event_log.records:
+            if event.event_type in _RNG_HISTORY_NEUTRAL_EVENT_TYPES:
+                neutral_event_count += 1
+                continue
+
+            event_history_token = _rng_history_token(
+                event,
+                neutral_event_count=neutral_event_count,
+            )
             if event.event_type == "decision_requested":
                 request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
                 self._decision_request_counter += 1
                 self.rng.append_history(request.history_token())
-                self.rng.append_history(event.history_token())
+                self.rng.append_history(event_history_token)
                 continue
 
             if event.event_type == "decision_recorded":
@@ -498,13 +554,14 @@ class DiceRollManager:
                     raise DecisionError("Decision records must be sequential.")
                 self._decision_records.append(record)
                 self.rng.append_history(record.history_token())
-                self.rng.append_history(event.history_token())
+                self.rng.append_history(event_history_token)
                 continue
 
-            self.rng.append_history(event.history_token())
+            self.rng.append_history(event_history_token)
             if event.event_type == "dice_rolled":
                 self._roll_counter += 1
                 self.rng.draw_count += _restored_rng_draw_count(event.payload)
+        self._rng_history_neutral_event_count = neutral_event_count
 
     def _validate_reroll_decision(
         self,

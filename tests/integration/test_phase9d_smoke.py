@@ -67,7 +67,7 @@ def test_minimal_catalog_game_reaches_battle_round_one_with_mustered_armies() ->
     assert state.battle_round == 1
     assert state.active_player_id == "player-a"
     assert state.current_battle_phase is BattlePhase.COMMAND
-    _assert_hidden_secondaries_do_not_leak(state)
+    _assert_secondaries_revealed_after_both_players_select(state)
     assert command_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert command_status.decision_request is not None
     assert command_status.decision_request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE
@@ -242,20 +242,22 @@ def _assert_datasheet_backed_infantry(army: ArmyDefinition) -> None:
     )
 
 
-def _assert_hidden_secondaries_do_not_leak(state: GameState) -> None:
+def _assert_secondaries_revealed_after_both_players_select(state: GameState) -> None:
     player_a_public_payload = state.to_public_payload(viewer_player_id="player-a")
     player_a_blob = json.dumps(player_a_public_payload, sort_keys=True)
     secondary_choices = player_a_public_payload["secondary_mission_choices"]
     assert isinstance(secondary_choices, list)
 
-    assert "assassination" not in player_a_blob
-    assert "bring_it_down" not in player_a_blob
+    assert "assassination" in player_a_blob
+    assert "bring_it_down" in player_a_blob
     assert any(
         choice
         == {
             "player_id": "player-b",
             "selected": True,
-            "hidden": True,
+            "hidden": False,
+            "mode": "fixed",
+            "fixed_mission_ids": ["assassination", "bring_it_down"],
         }
         for choice in secondary_choices
     )
@@ -268,6 +270,7 @@ def _assert_smoke_event_log(lifecycle: GameLifecycle) -> None:
 
     assert event_types.count("army_mustered") == 2
     assert event_types.count("secondary_mission_choice_recorded") == 2
+    assert event_types.count("secondary_missions_revealed") == 1
     assert event_types.count("tactical_secondary_missions_drawn") == 1
     assert event_types.count("battlefield_placement_created") == 1
     assert event_types.count("movement_phase_entered") == 1

@@ -139,9 +139,9 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
-Current roadmap implementation status: phases 1-11D are complete, including Aircraft-policy movement budgets, persisted Hover movement policy, the triggered/surge movement foundation, the Movement phase completion gate, the movement/pathing/terrain profiling budget gate, Movement audit hardening, Chapter Approved 2025-26 mission pack data, objective control geometry, the Command phase body, and the adapter/proposal scaffold.
+Current roadmap implementation status: phases 1-11E are complete, including Aircraft-policy movement budgets, persisted Hover movement policy, the triggered/surge movement foundation, the Movement phase completion gate, the movement/pathing/terrain profiling budget gate, Movement audit hardening, Chapter Approved 2025-26 mission pack data, objective control geometry, the Command phase body, the adapter/proposal scaffold, mission action state, primary/secondary scoring, and end-of-turn cleanup.
 
-Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract and viewer-scoped projection/event rules.
+Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus Phase 11E viewer-scoped scoring projection/event rules.
 
 ## 5. Test policy
 

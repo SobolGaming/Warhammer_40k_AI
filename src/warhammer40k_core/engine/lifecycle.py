@@ -176,7 +176,7 @@ class GameLifecycle:
             return LifecycleStatus.terminal(
                 stage=GameLifecycleStage.COMPLETE,
                 message="Game lifecycle is complete.",
-                payload={"game_id": state.game_id},
+                payload=state.game_result_payload(),
             )
         if state.stage is GameLifecycleStage.SETUP:
             return self._setup_flow.advance(

@@ -592,7 +592,7 @@ def test_select_secondary_missions_emits_secret_requests_for_both_players() -> N
     assert lifecycle.state.missing_secondary_mission_player_ids() == ()
 
 
-def test_secondary_mission_public_payload_does_not_leak_hidden_opponent_choices() -> None:
+def test_secondary_mission_public_payload_reveals_after_all_choices() -> None:
     lifecycle = _start_lifecycle()
     _choose_secondaries(
         lifecycle,
@@ -603,15 +603,20 @@ def test_secondary_mission_public_payload_does_not_leak_hidden_opponent_choices(
 
     player_a_payload = lifecycle.state.to_public_payload(viewer_player_id="player-a")
     player_b_payload = lifecycle.state.to_public_payload(viewer_player_id="player-b")
-    player_a_blob = json.dumps(player_a_payload, sort_keys=True)
-
-    assert "bring_it_down" not in player_a_blob
-    assert "cleanse" not in player_a_blob
     assert {
         "player_id": "player-b",
         "selected": True,
-        "hidden": True,
+        "hidden": False,
+        "mode": "fixed",
+        "fixed_mission_ids": ["bring_it_down", "cleanse"],
     } in _public_secondary_choices(player_a_payload)
+    assert {
+        "player_id": "player-a",
+        "selected": True,
+        "hidden": False,
+        "mode": "tactical",
+        "fixed_mission_ids": [],
+    } in _public_secondary_choices(player_b_payload)
     assert "bring_it_down" in json.dumps(player_b_payload, sort_keys=True)
     assert "cleanse" in json.dumps(player_b_payload, sort_keys=True)
 

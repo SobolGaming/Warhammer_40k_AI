@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection and event-stream additions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D contract for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -46,6 +46,8 @@ The shared contract uses these objects and payloads:
 - `EventRecord`: deterministic event-log payload.
 - `GameViewPayload`: read-only viewer projection for adapters.
 - `EventStreamDeltaPayload`: viewer-scoped adapter event delta.
+- `SecondaryMissionCardState`: reveal-gated Fixed/Tactical secondary mission card state.
+- `VictoryPointLedger`: viewer-scoped scoring ledger with reveal-gated secondary source visibility and generic hidden-transaction support.
 
 Relevant modules:
 
@@ -58,6 +60,7 @@ Relevant modules:
 - `src/warhammer40k_core/engine/decision_result.py`
 - `src/warhammer40k_core/engine/decision_record.py`
 - `src/warhammer40k_core/engine/movement_proposals.py`
+- `src/warhammer40k_core/engine/scoring.py`
 - `src/warhammer40k_core/engine/lifecycle.py`
 
 ## Same Contract, Different Producers
@@ -359,6 +362,25 @@ Important behavior:
 
 The submission contract is shared. The information available to a producer is not always identical.
 
+Phase 11E adds scoring state to the viewer projection:
+
+- `public_secondary_mission_card_states`: Fixed and Tactical card state payloads scoped
+  through the secondary-mission reveal gate.
+- `public_victory_point_ledgers`: victory point ledgers scoped to the viewer.
+
+Chapter Approved 2025-26 secondary selection is simultaneous-secret. A player's
+Fixed/Tactical mode and Fixed mission IDs are secret only until every player has
+submitted their `select_secondary_missions` decision. Before that reveal point,
+non-owning viewers receive a hidden placeholder for submitted opposing choices,
+no opposing secondary card states, and no opposing Tactical draw records.
+
+After every player has selected, secondary mode, Fixed mission IDs, Tactical
+status, Tactical draws, secondary card states, and normal secondary scoring
+transactions are public to every viewer. Adapters may display totals and public
+scoring audit entries from these fields. Future hidden mission rules must mark
+their data hidden explicitly and define their own reveal timing in the same
+contract update that introduces them.
+
 Adapters should consume a `GameViewPayload` for a viewer by default:
 
 ```python
@@ -395,11 +417,12 @@ delta = session.events_since(
 )
 ```
 
-Viewer-scoped event deltas must not leak hidden opponent choices. In Phase 11D this includes:
+Viewer-scoped event deltas must not leak hidden opponent choices before their
+reveal gate. In Phase 11D and Phase 11E this includes:
 
 - hidden `decision_requested` payloads;
 - hidden `decision_recorded` payloads;
-- `secondary_mission_choice_recorded` metadata that would reveal Fixed versus Tactical selection.
+- `secondary_mission_choice_recorded` metadata that would reveal Fixed versus Tactical selection before all players have selected.
 
 Example opponent-visible secondary-choice event:
 
@@ -417,6 +440,71 @@ Example opponent-visible secondary-choice event:
 ```
 
 The owning player or internal replay stream may retain full details. Public adapter streams must follow the same visibility model as `SecondaryMissionChoice.to_public_payload(...)`.
+
+When the final secondary choice is submitted, the public event stream emits
+`secondary_missions_revealed` with each player's mode and Fixed mission IDs.
+This reveal event is the adapter-facing public audit record; older secret
+`decision_requested` and `decision_recorded` events may remain redacted.
+
+Example secondary reveal event:
+
+```json
+{
+  "event_type": "secondary_missions_revealed",
+  "payload": {
+    "game_id": "phase11e-game",
+    "setup_step": "select_secondary_missions",
+    "choices": [
+      {
+        "player_id": "player-a",
+        "mode": "tactical",
+        "fixed_mission_ids": []
+      },
+      {
+        "player_id": "player-b",
+        "mode": "fixed",
+        "fixed_mission_ids": ["assassination", "bring_it_down"]
+      }
+    ]
+  }
+}
+```
+
+Tactical secondary draws happen after the secondary reveal point in normal
+Chapter Approved play, so they are public unless a future mission rule explicitly
+marks a draw hidden.
+
+Example public Tactical secondary draw event:
+
+```json
+{
+  "event_type": "tactical_secondary_missions_drawn",
+  "payload": {
+    "game_id": "phase11e-game",
+    "player_id": "player-a",
+    "battle_round": 1,
+    "draw_count": 2,
+    "phase": "command",
+    "secondary_mission_card_states": [
+      {
+        "player_id": "player-a",
+        "secondary_mission_id": "area-denial",
+        "mode": "tactical",
+        "battle_round": 1,
+        "status": "active",
+        "source_result_id": "phase11e-tactical-draw",
+        "scored_transaction_id": null,
+        "discarded_result_id": null
+      }
+    ]
+  }
+}
+```
+
+Public adapter streams must follow the same visibility model as
+`SecondaryMissionChoice.to_public_payload(...)`,
+`SecondaryMissionCardState.to_public_payload(...)`, and
+`VictoryPointLedger.to_public_payload(...)`.
 
 ## Replay and Resume
 
@@ -512,8 +600,8 @@ Network client:
 
 Public event stream:
 
-- Owning player may see full choice details.
-- Opponent sees only `{selected: true, hidden: true}` style metadata.
+- Before every player has selected, opponents see only `{selected: true, hidden: true}` style metadata.
+- After every player has selected, `secondary_missions_revealed` exposes each player's mode and Fixed mission IDs, and projections show the revealed secondary choices to all viewers.
 
 ### Normal Move
 
