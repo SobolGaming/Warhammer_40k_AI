@@ -74,6 +74,11 @@ def _public_event_payload(
         return _public_decision_request_payload(payload, viewer_player_id=viewer_player_id)
     if event_type == "decision_recorded":
         return _public_decision_record_payload(payload, viewer_player_id=viewer_player_id)
+    if event_type == "secondary_mission_choice_recorded":
+        return _public_secondary_mission_choice_recorded_payload(
+            payload,
+            viewer_player_id=viewer_player_id,
+        )
     return validate_json_value(payload)
 
 
@@ -115,6 +120,24 @@ def _public_decision_record_payload(
             "secret": True,
             "hidden": True,
         },
+    }
+
+
+def _public_secondary_mission_choice_recorded_payload(
+    payload: JsonValue,
+    *,
+    viewer_player_id: str,
+) -> JsonValue:
+    choice_payload = _json_object("secondary_mission_choice_recorded payload", payload)
+    player_id = _required_string(choice_payload, key="player_id")
+    if player_id == viewer_player_id:
+        return validate_json_value(choice_payload)
+    return {
+        "game_id": _required_string(choice_payload, key="game_id"),
+        "player_id": player_id,
+        "setup_step": _required_string(choice_payload, key="setup_step"),
+        "selected": True,
+        "hidden": True,
     }
 
 

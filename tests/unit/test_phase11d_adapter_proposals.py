@@ -623,13 +623,35 @@ def test_viewer_scoped_event_cursor_redacts_opponent_secret_decision_payloads() 
         for event in player_b_delta["events"]
         if "player-a" in json.dumps(event["payload"], sort_keys=True)
     ]
+    player_a_events_for_player_b_blob = json.dumps(player_a_events_for_player_b, sort_keys=True)
+    secondary_event_payloads_for_player_b: list[dict[str, object]] = []
+    for event in player_b_delta["events"]:
+        if event["event_type"] != "secondary_mission_choice_recorded":
+            continue
+        payload = cast(dict[str, object], event["payload"])
+        if payload["player_id"] == "player-a":
+            secondary_event_payloads_for_player_b.append(payload)
+    player_a_blob = json.dumps(player_a_delta, sort_keys=True)
 
-    assert "fixed_mission_ids" not in json.dumps(player_a_events_for_player_b, sort_keys=True)
-    assert "assassination" not in json.dumps(player_a_events_for_player_b, sort_keys=True)
-    assert "bring_it_down" not in json.dumps(player_a_events_for_player_b, sort_keys=True)
-    assert "fixed_mission_ids" in json.dumps(player_a_delta, sort_keys=True)
-    assert "assassination" in json.dumps(player_a_delta, sort_keys=True)
-    assert "bring_it_down" in json.dumps(player_a_delta, sort_keys=True)
+    assert secondary_event_payloads_for_player_b == [
+        {
+            "game_id": "phase11d-game",
+            "player_id": "player-a",
+            "setup_step": "select_secondary_missions",
+            "selected": True,
+            "hidden": True,
+        }
+    ]
+    assert "fixed_mission_ids" not in player_a_events_for_player_b_blob
+    assert "fixed_choice_count" not in player_a_events_for_player_b_blob
+    assert "mode" not in player_a_events_for_player_b_blob
+    assert "fixed" not in player_a_events_for_player_b_blob.lower()
+    assert "assassination" not in player_a_events_for_player_b_blob
+    assert "bring_it_down" not in player_a_events_for_player_b_blob
+    assert "fixed_mission_ids" in player_a_blob
+    assert "fixed_choice_count" in player_a_blob
+    assert "assassination" in player_a_blob
+    assert "bring_it_down" in player_a_blob
 
 
 def test_adapter_submission_contracts_are_fail_fast() -> None:
