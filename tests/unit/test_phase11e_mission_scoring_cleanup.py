@@ -33,6 +33,7 @@ from warhammer40k_core.engine.game_state import (
     GameStatePayload,
     SecondaryMissionChoice,
     SecondaryMissionMode,
+    TacticalSecondaryDraw,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -91,6 +92,9 @@ from warhammer40k_core.engine.turn_cleanup import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+
+SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
+SEEDED_TACTICAL_DRAW_RESULT_ID = "phase11e-seeded-tactical-draw"
 
 
 def test_take_and_hold_does_not_score_before_battle_round_two() -> None:
@@ -425,10 +429,39 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         request=request,
         selected_option_id="draw",
     )
-    lifecycle.submit_decision(result)
-    automatic_follow_up = decisions.queue.pop_next()
+    draw_status = lifecycle.submit_decision(result)
+    automatic_follow_up = draw_status.decision_request
+    assert automatic_follow_up is not None
     assert automatic_follow_up.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
 
+    drawn_cards = [
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a" and card.mode is SecondaryMissionCardMode.TACTICAL
+    ]
+    assert len(drawn_cards) == state.tactical_secondary_draw_count
+    draw_opponent_events = EventStreamCursor().events_since(
+        decisions.event_log,
+        viewer_player_id="player-b",
+    )
+    draw_event = next(
+        event
+        for event in draw_opponent_events["events"]
+        if event["event_type"] == "tactical_secondary_missions_drawn"
+    )
+    draw_payload = cast(dict[str, JsonValue], draw_event["payload"])
+    drawn_card_payloads = cast(list[JsonValue], draw_payload["secondary_mission_card_states"])
+    assert draw_payload["player_id"] == "player-a"
+    assert draw_payload["draw_count"] == 2
+    assert {
+        str(cast(dict[str, JsonValue], card)["secondary_mission_id"])
+        for card in drawn_card_payloads
+    } == {card.secondary_mission_id for card in drawn_cards}
+
+    discard_lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = discard_lifecycle.state
+    assert state is not None
+    decisions = discard_lifecycle.decision_controller
     active_cards = [
         card
         for card in state.secondary_mission_card_states
@@ -455,7 +488,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         selected_option_id=discard_option_id,
         result_id="phase11e-discard-tactical",
     ).to_result(discard_request)
-    lifecycle.submit_decision(discard_result)
+    discard_lifecycle.submit_decision(discard_result)
     discarded = state.secondary_mission_card_state(
         player_id="player-a",
         secondary_mission_id=active_cards[1].secondary_mission_id,
@@ -469,7 +502,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         and card.secondary_mission_id == active_cards[1].secondary_mission_id
         and card.mode is SecondaryMissionCardMode.TACTICAL
     )
-    opponent_events = EventStreamCursor().events_since(
+    discard_opponent_events = EventStreamCursor().events_since(
         decisions.event_log,
         viewer_player_id="player-b",
     )
@@ -481,21 +514,9 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     assert state.victory_point_total("player-a") == expected_score
     assert decisions.records[-1].request.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE
     assert decisions.records[-1].result.result_id == "phase11e-discard-tactical"
-    draw_event = next(
-        event
-        for event in opponent_events["events"]
-        if event["event_type"] == "tactical_secondary_missions_drawn"
-    )
-    draw_payload = cast(dict[str, JsonValue], draw_event["payload"])
-    drawn_cards = cast(list[JsonValue], draw_payload["secondary_mission_card_states"])
-    assert draw_payload["player_id"] == "player-a"
-    assert draw_payload["draw_count"] == 2
-    assert {
-        str(cast(dict[str, JsonValue], card)["secondary_mission_id"]) for card in drawn_cards
-    } == {card.secondary_mission_id for card in active_cards}
     discard_event = next(
         event
-        for event in opponent_events["events"]
+        for event in discard_opponent_events["events"]
         if event["event_type"] == "tactical_secondary_mission_discarded"
     )
     assert cast(dict[str, JsonValue], discard_event["payload"])["player_id"] == "player-a"
@@ -503,8 +524,8 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         {
             "player_id": "player-a",
             "battle_round": 1,
-            "request_id": request.request_id,
-            "result_id": "phase11e-tactical-draw",
+            "request_id": SEEDED_TACTICAL_DRAW_REQUEST_ID,
+            "result_id": SEEDED_TACTICAL_DRAW_RESULT_ID,
             "draw_count": 2,
         }
     ]
@@ -525,7 +546,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
         "scoring_rule_condition": "tactical_secondary_condition",
     }
-    round_tripped = GameLifecycle.from_payload(lifecycle.to_payload())
+    round_tripped = GameLifecycle.from_payload(discard_lifecycle.to_payload())
     encoded = json.dumps(round_tripped.to_payload(), sort_keys=True)
     assert "<" not in encoded
     assert "object at 0x" not in encoded
@@ -544,9 +565,15 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
         selected_option_id="draw",
         result_id="phase11e-drift-draw",
     ).to_result(draw_request)
-    lifecycle.submit_decision(draw_result)
-    automatic_follow_up = decisions.queue.pop_next()
+    draw_status = lifecycle.submit_decision(draw_result)
+    automatic_follow_up = draw_status.decision_request
+    assert automatic_follow_up is not None
     assert automatic_follow_up.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+
+    discard_lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = discard_lifecycle.state
+    assert state is not None
+    decisions = discard_lifecycle.decision_controller
     active_card = next(
         card
         for card in state.secondary_mission_card_states
@@ -573,10 +600,10 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
         phase=BattlePhase.COMMAND,
     )
 
-    status = lifecycle.submit_decision(discard_result)
+    status = discard_lifecycle.submit_decision(discard_result)
 
     assert status.status_kind.value == "invalid"
-    assert decisions.records[-1].result.result_id == "phase11e-drift-draw"
+    assert not decisions.records
     assert decisions.queue.peek_next().request_id == discard_request.request_id
 
 
@@ -1450,6 +1477,26 @@ def _battle_lifecycle(
     lifecycle.state = _battle_state(
         player_a_secondary=player_a_secondary,
         player_b_secondary=player_b_secondary,
+    )
+    return lifecycle
+
+
+def _battle_lifecycle_with_active_tactical_cards() -> GameLifecycle:
+    lifecycle = _battle_lifecycle(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state = lifecycle.state
+    assert state is not None
+    state.record_tactical_secondary_draw(
+        TacticalSecondaryDraw(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            request_id=SEEDED_TACTICAL_DRAW_REQUEST_ID,
+            result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
+            draw_count=state.tactical_secondary_draw_count,
+        )
+    )
+    state.draw_tactical_secondary_cards(
+        player_id="player-a",
+        source_result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
     )
     return lifecycle
 
