@@ -1239,6 +1239,8 @@ Objects:
 
 - `TimingWindow`
 - `ReactionWindow`
+- `TimingWindowDescriptor`
+- `TimingTriggerKind`
 - `PersistingEffect`
 - `EffectExpiration`
 - `TriggeredDecisionRequest`
@@ -1248,6 +1250,7 @@ Objects:
 Invariants:
 
 - out-of-phase rules use typed timing windows;
+- timing descriptors cover explicit trigger families needed by Stratagems and reactive rules, including any phase, start/end phase, start/end turn, start/end battle round, after a unit is selected as a target, after an enemy unit ends a move, after a unit is destroyed, just after an enemy unit has fought, and after dice/roll events;
 - out-of-phase actions perform only the specified action and do not trigger other rules normally used in that phase unless the rule explicitly says so;
 - reaction windows can block and resume parent phase execution;
 - sequencing conflicts during battle are ordered by the player whose turn it is;
@@ -1269,6 +1272,7 @@ Required tests:
 - persisting effect survives Embark/Disembark;
 - persisting effect survives Attached-unit split;
 - unsupported timing windows fail explicitly;
+- unsupported timing descriptor trigger families fail explicitly before any option is emitted;
 - sequencing conflict creates a deterministic resolver decision when needed.
 
 CORE V1 relevant areas:
@@ -1279,36 +1283,68 @@ CORE V1 relevant areas:
 
 ## Phase 12B: Command Point ledger and Stratagem framework
 
-Modules:
+Modules/documents:
 
 - `engine/stratagems.py`
 - `engine/command_points.py`
 - `engine/timing_windows.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
 
 Objects:
 
 - `CommandPointLedger`
+- `CommandPointTransaction`
+- `CommandPointSpendResult`
+- `CommandPointGainResult`
+- `CommandPointRefundResult`
+- `StratagemDefinition`
+- `StratagemCatalogRecord`
+- `StratagemTimingDescriptor`
+- `StratagemRestrictionPolicy`
+- `StratagemTargetSpec`
 - `StratagemUseRequest`
 - `StratagemUseRecord`
 - `StratagemEligibilityContext`
 - `StratagemTargetBinding`
+- `StratagemTargetProposal`
 
 Invariants:
 
-- Stratagems consume CP through a ledger;
-- once-per-phase/turn/battle restrictions are enforced;
+- Stratagem use is a player-facing decision and must use the Phase 11D adapter decision contract: `DecisionRequest` -> `FiniteOptionSubmission` or `ParameterizedSubmission` -> `DecisionResult` -> `GameLifecycle.submit_decision(...)` -> engine validation -> engine mutation;
+- the finite decision type is `use_stratagem`; the engine enumerates deterministic, JSON-safe options only for currently eligible Stratagem, timing-window, CP, restriction, and fully validated target-binding combinations;
+- adapters, UI, CLI, network clients, headless AI, replay, and tests must not invent Stratagem option IDs, bind targets from option payloads outside engine validation, spend/refund CP directly, or mutate state from Stratagem payloads;
+- Stratagem target bindings that cannot be safely enumerated as finite choices use typed parameterized proposals, validate stale/drift/malformed/schema-invalid/wrong-context submissions before queue pop, and return typed invalid diagnostics without CP spend or state mutation;
+- Stratagem decisions can be offered to the non-active player inside Phase 12A reaction windows, and eligibility context is computed per player for the active timing window;
+- core Stratagems are source-backed `StratagemDefinition`/`StratagemCatalogRecord` descriptors and are always available unless a ruleset disables them;
+- detachment Stratagems are usable only when the player's army selected the matching detachment or another explicit source grants them;
+- Stratagem definitions include CP cost, category, source ID, normalized WHEN/TARGET/EFFECT/RESTRICTIONS descriptors, timing descriptor, target spec, restriction policy, faction/detachment gate, and handler binding;
+- Stratagems spend, gain, and refund CP only through a bidirectional ledger with deterministic transaction IDs and replay-safe payloads;
+- starting CP, Command-phase +1 CP gain from Phase 11C, non-Command CP gain caps, CP refunds, and CP-granting Stratagem/effect results are ledger transactions, not local counters;
+- insufficient CP is a typed invalid result and must never underflow a ledger;
+- matched-play same-Stratagem-once-per-phase restrictions are tracked separately from per-Stratagem once-per-turn, once-per-battle, per-target, and per-fight restrictions;
 - Battle-shocked units cannot be selected for Stratagems unless rules permit;
-- target binding is typed and validated before a Stratagem option appears;
-- Stratagem timing is descriptor-driven;
-- Stratagem effects execute only through registered handlers;
-- invalid or missing target context suppresses the option rather than emitting illegal choices.
+- finite target binding is typed and validated before a finite Stratagem option appears, and parameterized target proposals carry typed validation context before adapters answer them;
+- Stratagem timing is descriptor-driven and unsupported timing descriptors fail explicitly;
+- Stratagem effects execute through Phase 12A persisting-effect machinery or source-linked named handlers in Phase 12B/12C; Phase 16D can replace representable named handlers with generic IR handlers without changing the decision/ledger contract;
+- invalid or missing target context suppresses the option rather than emitting illegal choices;
+- CP totals, CP transactions, and normal Stratagem-use events are public viewer-scoped adapter data in matched play unless a future source-backed hidden rule marks a specific pending decision or event hidden.
 
 Required tests:
 
-- insufficient CP hides/rejects Stratagem;
-- repeated-use restriction works;
+- adapter contract doc is updated for `use_stratagem` finite options, Stratagem target proposals, CP transaction visibility, and public Stratagem events;
+- finite `use_stratagem` option enumeration and `FiniteOptionSubmission` round-trip through `GameLifecycle.submit_decision(...)`;
+- parameterized Stratagem target proposal valid submission plus stale, drifted, malformed, schema-invalid, and wrong-context invalid diagnostics;
+- insufficient CP suppresses legal options where possible and rejects attempted use with a typed invalid result;
+- CP ledger cannot underflow;
+- Command-phase +1 CP gain from Phase 11C is represented as a ledger transaction and Stratagem spend consumes from that ledger;
+- CP-granting/refunding effects create deterministic gain/refund transactions and obey the non-Command CP gain cap unless an explicit rule overrides it;
+- matched-play same-Stratagem-twice-per-phase rejection is distinct from per-Stratagem own restrictions;
 - Battle-shocked unit eligibility restriction works;
 - target-required Stratagem does not appear without legal target binding;
+- reactive non-active-player Stratagem use is emitted and resolved inside a Phase 12A reaction window;
+- nested reactions such as Command Re-roll during another Stratagem's dice resolution resume deterministically;
+- detachment Stratagems are gated by selected detachment, while core Stratagems are available;
+- viewer-scoped projection/event stream exposes public CP and Stratagem data and redacts any future hidden Stratagem data by explicit policy;
 - Stratagem use round-trips in replay.
 
 CORE V1 relevant areas:
@@ -1317,37 +1353,46 @@ CORE V1 relevant areas:
 - stratagem tests;
 - headless tool-action context audits.
 
-## Phase 12C: Core Stratagems
+## Phase 12C: Phase-12-resolvable Core Stratagems
 
-Initial supported Core Stratagem groups:
+Initial supported Core Stratagem groups at this build slice:
 
 - Command Re-roll;
 - Insane Bravery;
-- Fire Overwatch;
-- Go to Ground;
-- Smokescreen where applicable;
-- Heroic Intervention;
-- Counter-offensive;
-- Epic Challenge;
-- Grenade;
-- Tank Shock;
 - Rapid Ingress;
 - New Orders from Chapter Approved Tactical missions.
 
+Deferred phase-coupled Core Stratagems:
+
+- Fire Overwatch, Go to Ground, Smokescreen, and Grenade are implemented at the Shooting-phase gate after visibility, Benefit of Cover, attack sequencing, and damage allocation exist;
+- Heroic Intervention, Counter-offensive, Epic Challenge, and Tank Shock are implemented at the Charge/Fight gates after charge movement, fight ordering, melee attacks, and model-target binding exist;
+- deferred Core Stratagem descriptors still exist as explicit unsupported descriptors until their owning phase gate implements them.
+
 Invariants:
 
-- each Core Stratagem has a timing descriptor;
-- each Core Stratagem has explicit target-binding rules;
-- each Core Stratagem consumes CP and records use;
-- damage/dice Stratagems use deterministic dice/replay plumbing;
+- each supported Core Stratagem has a source-backed definition, timing descriptor, target spec, restriction policy, CP cost, and handler binding;
+- each supported Core Stratagem has explicit finite or parameterized target-binding rules;
+- each supported Core Stratagem consumes CP and records use;
+- Command Re-roll uses Phase 10J reroll semantics and can be offered as a nested reaction without breaking the parent timing window;
+- Insane Bravery integrates with Phase 11C Battle-shock results without bypassing `DecisionRequest`/`DecisionResult`;
+- Rapid Ingress reuses reserves/reinforcement placement validators and, where exact placement is required, emits the existing placement proposal request after the Stratagem decision is accepted;
+- New Orders reuses Phase 11E source-backed Tactical secondary discard/draw/scoring state;
+- supported dice/mission/reserves Stratagems use deterministic dice/replay plumbing and source IDs;
+- Phase 12C reuses Phase 12A persisting-effect/reaction machinery and Phase 12B ledger/decision framework; it does not depend on the later Phase 12D ability registry or Phase 16D generic handlers;
 - unsupported Core Stratagems remain explicit unsupported descriptors.
 
 Required tests:
 
-- one legal use per supported timing window;
+- one legal use per supported Phase-12 timing window;
+- per-Stratagem golden replay for Command Re-roll, Insane Bravery, Rapid Ingress, and New Orders;
+- decision-contract round-trip for option enumeration, submission, recording, event emission, and replay;
 - CP consumption and repeat-use restriction;
 - target-binding validation;
-- dice/damage records for relevant Stratagems;
+- CP-underflow rejection;
+- same-Stratagem-twice-per-phase rejection;
+- reactive non-active-player use where timing allows;
+- nested Command Re-roll during another Stratagem's dice resolution;
+- dice/mission/reserves records for relevant Stratagems;
 - unsupported Core Stratagems fail explicitly.
 
 ## Phase 12D: ability handler registry and keyword-gated rule execution
@@ -1536,7 +1581,7 @@ Required tests:
 - model destruction emits removal records;
 - damage allocation payload round-trips.
 
-## Phase 13D: weapon abilities and shooting/fight modifiers
+## Phase 13D: weapon abilities, shooting/fight modifiers, and shooting Stratagems
 
 Initial Core Rules weapon ability coverage:
 
@@ -1559,10 +1604,18 @@ Initial Core Rules weapon ability coverage:
 - Extra Attacks;
 - Anti-KEYWORD X+.
 
+Initial shooting-coupled Core Stratagem coverage:
+
+- Fire Overwatch;
+- Go to Ground;
+- Smokescreen where applicable;
+- Grenade.
+
 Invariants:
 
 - weapon abilities are structured descriptors;
 - ability handlers modify the attack sequence only in declared timing windows;
+- shooting-coupled Core Stratagems reuse the Phase 12B Stratagem definition, decision, target-binding, CP ledger, and replay contract;
 - Assault changes shooting eligibility and restricts attacks to Assault weapons after Advance;
 - Rapid Fire, Blast, Melta, Heavy, Lance, and Indirect Fire modify characteristics/rolls through typed modifier stacks;
 - Twin-linked grants a Wound-roll reroll permission and consumes Phase 10J reroll semantics;
@@ -1574,18 +1627,25 @@ Invariants:
 - Hazardous tests occur after the unit has resolved all its attacks and allocate mortal wounds to eligible Hazardous-equipped models;
 - Devastating Wounds converts damage to mortal wounds and handles allocation timing;
 - Extra Attacks weapons are additional melee weapons and their Attacks cannot be modified unless the modifying rule names that weapon;
+- Fire Overwatch uses a Phase 12A out-of-phase shooting context and does not trigger unrelated Shooting-phase rules;
+- Go to Ground and Smokescreen grant structured, expiring effects through Phase 12A effect machinery and the Benefit of Cover/Hit-roll modifier systems;
+- Grenade uses deterministic mortal-wound/damage application records and target binding from the shooting context;
 - unsupported weapon ability shapes fail explicitly;
 - source IDs are preserved in emitted events.
 
 Required tests:
 
 - each supported weapon ability has at least one focused attack-sequence test;
+- each supported shooting-coupled Core Stratagem has decision-contract, CP, target-binding, and replay coverage;
 - unsupported weapon ability descriptor does not execute;
 - modifier interactions are deterministic;
 - Twin-linked cannot reroll a Wound roll twice;
 - Indirect Fire applies no-visibility hit penalty, unmodified 1-3 fail, and Benefit of Cover;
 - Pistol and Big Guns Never Tire restrictions interact correctly;
 - Hazardous and Devastating Wounds mortal-wound allocation ordering is correct.
+- Fire Overwatch cannot fire outside its legal timing and resumes the parent phase;
+- Go to Ground and Smokescreen expire at the correct timing endpoint;
+- Grenade rejects invalid target bindings without mutation.
 
 ## Phase 13E: damage allocation, destroyed models, and destruction reactions
 
@@ -1662,12 +1722,31 @@ Invariants:
 
 Initial coverage:
 
+- Heroic Intervention;
+- Tank Shock;
 - Counter-offensive;
 - Epic Challenge;
 - Fight First;
 - fight-on-death;
 - melee weapon abilities;
 - pile-in/consolidate modifiers.
+
+Invariants:
+
+- charge/fight-coupled Core Stratagems reuse the Phase 12B Stratagem definition, decision, target-binding, CP ledger, and replay contract;
+- Heroic Intervention uses charge movement validators and requires a `PathWitness` or typed invalid result;
+- Tank Shock uses deterministic dice/damage records and charge-context target binding;
+- Counter-offensive is a fight-order interrupt, not a duplicate private fight-order path;
+- Epic Challenge binds to an eligible Character model through explicit model-target binding and records the per-fight restriction separately from matched-play same-Stratagem-per-phase restrictions;
+- Fight First, fight-on-death, melee weapon abilities, and pile-in/consolidate modifiers execute through typed timing/effect machinery.
+
+Required tests:
+
+- each supported charge/fight-coupled Core Stratagem has decision-contract, CP, target-binding, and replay coverage;
+- Heroic Intervention rejects endpoint-only movement and accepts only validator-approved `PathWitness` movement;
+- Tank Shock records deterministic dice/damage results and rejects invalid charge-context targets;
+- Counter-offensive interrupts fight order once at the legal timing and resumes the parent fight sequence;
+- Epic Challenge validates eligible Character model target binding and enforces its own per-fight restriction separately from matched-play same-Stratagem-per-phase restrictions.
 
 ## Phase 14F: Charge/Fight completion gate
 
@@ -2315,7 +2394,7 @@ Required tests:
 | Command phase | 11C |
 | Battle-shock | 11C, 12B |
 | Mission scoring | 11A-11C, 11E-11F |
-| Stratagems | 12B, 12C, 16E |
+| Stratagems | 12B, 12C, 13D, 14E, 16E |
 | Shooting phase | 13A-13F |
 | Weapon abilities | 8D, 13D, 16F |
 | Aura abilities | 16C, 16D, 16F |
@@ -2324,7 +2403,7 @@ Required tests:
 | Leader/attached units | 6, 15D, 16A |
 | Faction/detachment/enhancement rules | 16C-16F |
 | Chapter Approved 2025-26 | 11A, 11E, 11F, 15A, 19A |
-| Adapter/UI contract | 11D |
+| Adapter/UI contract | 11D, 12B |
 | Human CLI/UI | 17A, 17C |
 | Network play | 17D |
 | Replay | 17B, all state-changing phases |

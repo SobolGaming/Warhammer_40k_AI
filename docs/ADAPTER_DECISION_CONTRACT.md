@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection and event-stream additions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions and Phase 12 Stratagem decision requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules and Phase 12 Stratagem decision rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -92,6 +92,7 @@ Finite decisions are bounded option choices already enumerated by the engine. Ex
 - unit selection;
 - movement action selection;
 - reroll choices;
+- Stratagem use choices;
 - decline/accept choices;
 - triggered movement choices.
 
@@ -149,11 +150,51 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
 
 Both decision types must be submitted through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. Tests, replay, UI, CLI, network, and headless adapters must not call `GameState.discard_tactical_secondary(...)` or `GameState.record_mission_action_state(...)` directly for player choices; those methods are engine-owned primitives used by validated decision handlers and automatic rule hooks.
 
+## Phase 12 Stratagem Decisions
+
+Stratagem use is a player-facing choice. Adapters must handle it through the same contract as every other choice:
+
+- finite eligible choices use `DecisionRequest` option enumeration and `FiniteOptionSubmission`;
+- non-enumerable target or placement details use `ParameterizedSubmission`;
+- every accepted answer goes through `GameLifecycle.submit_decision(...)`;
+- CP spend/refund/gain, target validation, event emission, and state mutation remain engine-owned.
+
+The finite decision type is `use_stratagem`. A pending request exposes one option for each currently legal fully bound Stratagem use. Each option ID must be deterministic and stable for the pending request. Each option payload must be JSON-safe and include enough replay context for validation, including:
+
+- game ID, player ID, battle round, phase, and timing-window ID;
+- `stratagem_id`, source ID, CP cost, and availability source such as core or selected detachment;
+- target-binding payload for fully enumerated targets;
+- restriction context such as same-Stratagem-per-phase and any own once-per-turn/battle/per-target rule already checked by the engine.
+
+Adapters must not invent `use_stratagem` option IDs, derive new target bindings from displayed payloads, spend CP directly, apply effects directly, or bypass the lifecycle to call lower-level state mutation APIs.
+
+Stratagem decisions may be offered to the non-active player from a reaction window. The acting player on the `DecisionRequest` is authoritative; adapters should not assume the turn player is the player answering the request.
+
+Some Stratagems need target or placement details that are not safe to pre-enumerate. Those requests use a parameterized proposal instead of a finite bound option. The request must embed a typed proposal request payload with a Stratagem-specific proposal kind, the source `use_stratagem` context, and replay-safe target context. Examples include:
+
+- exact reinforcement placement after a Stratagem grants a reserves placement;
+- geometric, line-of-sight, model-target, or path-dependent target proposals once the owning phase has the required validators;
+- any future Stratagem whose legal target binding cannot be represented as a finite option set.
+
+Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule: stale, drifted, malformed, schema-invalid, or wrong-context payloads are rejected before the queue is popped or a `DecisionRecord` is created. They must not spend CP or mutate state. Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the specific proposal contract explicitly allows that behavior and emits a fresh pending request for retry.
+
+CP totals, CP ledger transactions, and normal Stratagem-use events are public in matched play. Viewer-scoped projections and adapter event deltas may expose them to every player unless a future source-backed hidden rule explicitly marks a pending decision, record, or event hidden. Any hidden Stratagem rule must update this document before implementation and must not leak hidden information through option counts, payload fields, event metadata, or derived projection data.
+
+Required Phase 12 adapter-contract tests:
+
+- finite `use_stratagem` option enumeration and `FiniteOptionSubmission` round-trip;
+- stale/drift/malformed/schema-invalid/wrong-context parameterized Stratagem proposal rejection;
+- insufficient CP typed invalid result with no ledger underflow;
+- same-Stratagem-twice-per-phase rejection separate from own Stratagem restrictions;
+- reactive non-active-player Stratagem use;
+- replay/payload round-trip with deterministic JSON-safe records;
+- viewer-scoped projection/event coverage for public CP and Stratagem events, plus redaction tests for any hidden Stratagem policy.
+
 ## Parameterized Proposals
 
 Parameterized proposals are used when the exact physical result cannot be safely enumerated as finite options.
 
-Phase 11D covers:
+The contract currently covers these proposal families:
 
 - Normal Move;
 - Advance after dice/reroll resolution;
@@ -161,9 +202,10 @@ Phase 11D covers:
 - Reinforcement placement;
 - Deep Strike placement;
 - Strategic Reserves placement;
-- Disembark placement.
+- Disembark placement;
+- Stratagem target or placement proposals introduced by Phase 12 and later phase gates.
 
-Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, charge movement, pile-in, consolidate, and mission movement or placement effects where applicable.
+Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, charge movement, pile-in, consolidate, Stratagem target binding, and mission movement or placement effects where applicable.
 
 Parameterized requests are still `DecisionRequest`s. They contain a single `submit_parameterized_payload` option and embed a neutral `ProposalRequestPayload` inside `DecisionRequest.payload`.
 
