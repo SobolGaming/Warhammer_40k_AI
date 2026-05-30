@@ -5,6 +5,7 @@ import json
 from typing import cast
 
 from warhammer40k_core.core.missions import (
+    MissionPackDefinition,
     MissionScoringRuleDefinition,
     PrimaryMissionDefinition,
     SecondaryMissionAvailability,
@@ -14,8 +15,10 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
 from warhammer40k_core.engine.scoring import (
+    MissionActionScoringRule,
     MissionScoringPolicy,
     SecondaryMissionScoringRule,
+    VictoryPointCapBucket,
     VictoryPointSourceKind,
     objective_control_timing_from_token,
 )
@@ -73,6 +76,7 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
         primary_max_vp_per_turn=primary_cap,
         secondary_vp_per_score=scoring.secondary_vp_per_score,
         secondary_scoring_rules=_secondary_scoring_rules_from_mission_pack(mission_pack),
+        mission_action_scoring_rules=_mission_action_scoring_rules_from_mission_pack(mission_pack),
         mission_action_vp=scoring.mission_action_vp,
         reserve_destruction_timing=scoring.reserve_destruction_timing,
         reserve_destruction_battle_round=scoring.reserve_destruction_battle_round,
@@ -121,10 +125,8 @@ def _required_scoring_int(message: str, value: int | None) -> int:
 
 
 def _secondary_scoring_rules_from_mission_pack(
-    mission_pack: object,
+    mission_pack: MissionPackDefinition,
 ) -> tuple[SecondaryMissionScoringRule, ...]:
-    from warhammer40k_core.core.missions import MissionPackDefinition
-
     if type(mission_pack) is not MissionPackDefinition:
         raise GameLifecycleError("Secondary scoring rules require MissionPackDefinition.")
     rules: list[SecondaryMissionScoringRule] = []
@@ -148,6 +150,33 @@ def _secondary_scoring_rules_from_mission_pack(
                     source_id=rule.source_id,
                 )
             )
+    return tuple(rules)
+
+
+def _mission_action_scoring_rules_from_mission_pack(
+    mission_pack: MissionPackDefinition,
+) -> tuple[MissionActionScoringRule, ...]:
+    if type(mission_pack) is not MissionPackDefinition:
+        raise GameLifecycleError("Mission Action scoring rules require MissionPackDefinition.")
+    rules: list[MissionActionScoringRule] = []
+    for action in mission_pack.mission_actions:
+        if action.mission_kind == "primary":
+            cap_bucket = VictoryPointCapBucket.PRIMARY
+        elif action.mission_kind == "secondary":
+            cap_bucket = VictoryPointCapBucket.SECONDARY
+        else:
+            raise GameLifecycleError("Mission Action kind is unsupported for VP caps.")
+        rules.append(
+            MissionActionScoringRule(
+                mission_action_id=action.mission_action_id,
+                mission_id=action.mission_id,
+                mission_kind=action.mission_kind,
+                scoring_source_id=action.scoring_source_id,
+                victory_points=action.victory_points,
+                cap_bucket=cap_bucket,
+                source_id=action.source_id,
+            )
+        )
     return tuple(rules)
 
 

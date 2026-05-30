@@ -21,6 +21,12 @@ class VictoryPointSourceKind(StrEnum):
     BATTLE_READY = "battle_ready"
 
 
+class VictoryPointCapBucket(StrEnum):
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    BATTLE_READY = "battle_ready"
+
+
 class ScoringWindowKind(StrEnum):
     END_OF_ROUND = "end_of_round"
     END_OF_GAME = "end_of_game"
@@ -81,6 +87,7 @@ class MissionScoringPolicyPayload(TypedDict):
     primary_max_vp_per_turn: int
     secondary_vp_per_score: int
     secondary_scoring_rules: list[SecondaryMissionScoringRulePayload]
+    mission_action_scoring_rules: list[MissionActionScoringRulePayload]
     mission_action_vp: int
     reserve_destruction_timing: str
     reserve_destruction_battle_round: int | None
@@ -101,6 +108,16 @@ class SecondaryMissionScoringRulePayload(TypedDict):
     victory_points: int
     condition: str
     rule_id: str
+    source_id: str
+
+
+class MissionActionScoringRulePayload(TypedDict):
+    mission_action_id: str
+    mission_id: str
+    mission_kind: str
+    scoring_source_id: str
+    victory_points: int
+    cap_bucket: str
     source_id: str
 
 
@@ -562,6 +579,92 @@ class SecondaryMissionScoringRule:
 
 
 @dataclass(frozen=True, slots=True)
+class MissionActionScoringRule:
+    mission_action_id: str
+    mission_id: str
+    mission_kind: str
+    scoring_source_id: str
+    victory_points: int
+    cap_bucket: VictoryPointCapBucket
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "mission_action_id",
+            _validate_identifier(
+                "MissionActionScoringRule mission_action_id",
+                self.mission_action_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "mission_id",
+            _validate_identifier("MissionActionScoringRule mission_id", self.mission_id),
+        )
+        mission_kind = _validate_identifier(
+            "MissionActionScoringRule mission_kind",
+            self.mission_kind,
+        )
+        if mission_kind not in {"primary", "secondary"}:
+            raise GameLifecycleError("MissionActionScoringRule mission_kind is unsupported.")
+        object.__setattr__(self, "mission_kind", mission_kind)
+        object.__setattr__(
+            self,
+            "scoring_source_id",
+            _validate_identifier(
+                "MissionActionScoringRule scoring_source_id",
+                self.scoring_source_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "victory_points",
+            _validate_positive_int(
+                "MissionActionScoringRule victory_points",
+                self.victory_points,
+            ),
+        )
+        cap_bucket = victory_point_cap_bucket_from_token(self.cap_bucket)
+        expected_bucket = (
+            VictoryPointCapBucket.PRIMARY
+            if mission_kind == "primary"
+            else VictoryPointCapBucket.SECONDARY
+        )
+        if cap_bucket is not expected_bucket:
+            raise GameLifecycleError("MissionActionScoringRule cap_bucket does not match kind.")
+        object.__setattr__(self, "cap_bucket", cap_bucket)
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("MissionActionScoringRule source_id", self.source_id),
+        )
+
+    def to_payload(self) -> MissionActionScoringRulePayload:
+        return {
+            "mission_action_id": self.mission_action_id,
+            "mission_id": self.mission_id,
+            "mission_kind": self.mission_kind,
+            "scoring_source_id": self.scoring_source_id,
+            "victory_points": self.victory_points,
+            "cap_bucket": self.cap_bucket.value,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionActionScoringRulePayload) -> Self:
+        return cls(
+            mission_action_id=payload["mission_action_id"],
+            mission_id=payload["mission_id"],
+            mission_kind=payload["mission_kind"],
+            scoring_source_id=payload["scoring_source_id"],
+            victory_points=payload["victory_points"],
+            cap_bucket=victory_point_cap_bucket_from_token(payload["cap_bucket"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class ScoringWindowState:
     window_id: str
     game_id: str
@@ -723,9 +826,18 @@ class FinalScoreLine:
             raise GameLifecycleError("FinalScoreLine requires a VictoryPointLedger.")
         if type(policy) is not MissionScoringPolicy:
             raise GameLifecycleError("FinalScoreLine requires a MissionScoringPolicy.")
-        raw_primary = ledger.points_from_source_kind(VictoryPointSourceKind.PRIMARY)
-        raw_secondary = _secondary_cap_source_points(ledger)
-        raw_battle_ready = ledger.points_from_source_kind(VictoryPointSourceKind.BATTLE_READY)
+        raw_primary = policy.ledger_points_from_cap_bucket(
+            ledger=ledger,
+            cap_bucket=VictoryPointCapBucket.PRIMARY,
+        )
+        raw_secondary = policy.ledger_points_from_cap_bucket(
+            ledger=ledger,
+            cap_bucket=VictoryPointCapBucket.SECONDARY,
+        )
+        raw_battle_ready = policy.ledger_points_from_cap_bucket(
+            ledger=ledger,
+            cap_bucket=VictoryPointCapBucket.BATTLE_READY,
+        )
         raw_other = ledger.victory_points - raw_primary - raw_secondary - raw_battle_ready
         if raw_other < 0:
             raise GameLifecycleError("FinalScoreLine source totals exceed raw ledger total.")
@@ -917,6 +1029,12 @@ class FinalScoringResult:
             raise GameLifecycleError("Final scoring requires a MissionScoringPolicy.")
         requested_game_id = _validate_identifier("game_id", game_id)
         requested_round = _validate_positive_int("battle_round", battle_round)
+        validated_windows = _validate_required_final_scoring_windows(
+            scoring_windows=scoring_windows,
+            policy=policy,
+            game_id=requested_game_id,
+            battle_round=requested_round,
+        )
         final_scores = tuple(
             sorted(
                 (FinalScoreLine.from_ledger(ledger=ledger, policy=policy) for ledger in ledgers),
@@ -941,7 +1059,7 @@ class FinalScoringResult:
             secondary_vp_cap=policy.secondary_vp_cap,
             battle_ready_vp_cap=policy.battle_ready_vp,
             total_vp_cap=policy.total_vp_cap,
-            scoring_windows=scoring_windows,
+            scoring_windows=validated_windows,
         )
 
     def to_payload(self) -> FinalScoringResultPayload:
@@ -1011,6 +1129,7 @@ class MissionScoringPolicy:
     primary_max_vp_per_turn: int
     secondary_vp_per_score: int
     secondary_scoring_rules: tuple[SecondaryMissionScoringRule, ...]
+    mission_action_scoring_rules: tuple[MissionActionScoringRule, ...]
     mission_action_vp: int
     reserve_destruction_timing: str
     reserve_destruction_battle_round: int | None
@@ -1111,6 +1230,11 @@ class MissionScoringPolicy:
             self,
             "secondary_scoring_rules",
             _validate_secondary_scoring_rule_tuple(self.secondary_scoring_rules),
+        )
+        object.__setattr__(
+            self,
+            "mission_action_scoring_rules",
+            _validate_mission_action_scoring_rule_tuple(self.mission_action_scoring_rules),
         )
         object.__setattr__(
             self,
@@ -1295,15 +1419,19 @@ class MissionScoringPolicy:
         source_id: str,
         amount: int | None = None,
     ) -> VictoryPointAward:
+        source_rule = self._mission_action_scoring_rule_for_source_id(source_id)
+        requested_amount = (
+            source_rule.victory_points
+            if amount is None
+            else _validate_positive_int("amount", amount)
+        )
         return VictoryPointAward(
             player_id=_validate_identifier("player_id", player_id),
             battle_round=_validate_positive_int("battle_round", battle_round),
             phase=_validate_identifier("phase", phase),
-            amount=self.mission_action_vp
-            if amount is None
-            else _validate_positive_int("amount", amount),
+            amount=requested_amount,
             source_kind=VictoryPointSourceKind.MISSION_ACTION,
-            source_id=_validate_identifier("source_id", source_id),
+            source_id=source_rule.scoring_source_id,
             scoring_timing="mission_action_complete",
             hidden=False,
             metadata={"action_id": _validate_identifier("action_id", action_id)},
@@ -1322,8 +1450,15 @@ class MissionScoringPolicy:
         if ledger.player_id != award.player_id:
             raise GameLifecycleError("VP cap resolution player_id drift.")
 
-        source_points_before = self._source_cap_points_before(ledger, award.source_kind)
-        source_cap = self._source_cap_for_kind(award.source_kind)
+        cap_bucket = self.cap_bucket_for_victory_point_source(
+            source_kind=award.source_kind,
+            source_id=award.source_id,
+        )
+        source_points_before = self.ledger_points_from_cap_bucket(
+            ledger=ledger,
+            cap_bucket=cap_bucket,
+        )
+        source_cap = self._source_cap_for_bucket(cap_bucket)
         source_remaining = max(source_cap - source_points_before, 0)
         total_remaining = max(self.total_vp_cap - ledger.victory_points, 0)
         applied_amount = min(award.amount, source_remaining, total_remaining)
@@ -1332,7 +1467,7 @@ class MissionScoringPolicy:
 
         capped_reasons: list[str] = []
         if source_remaining < award.amount:
-            capped_reasons.append(self._source_cap_reason(award.source_kind))
+            capped_reasons.append(self._source_cap_reason(cap_bucket))
         if total_remaining < award.amount:
             capped_reasons.append("total_vp_cap")
         return (
@@ -1365,6 +1500,9 @@ class MissionScoringPolicy:
             "primary_max_vp_per_turn": self.primary_max_vp_per_turn,
             "secondary_vp_per_score": self.secondary_vp_per_score,
             "secondary_scoring_rules": [rule.to_payload() for rule in self.secondary_scoring_rules],
+            "mission_action_scoring_rules": [
+                rule.to_payload() for rule in self.mission_action_scoring_rules
+            ],
             "mission_action_vp": self.mission_action_vp,
             "reserve_destruction_timing": self.reserve_destruction_timing,
             "reserve_destruction_battle_round": self.reserve_destruction_battle_round,
@@ -1403,6 +1541,10 @@ class MissionScoringPolicy:
                 SecondaryMissionScoringRule.from_payload(rule)
                 for rule in payload["secondary_scoring_rules"]
             ),
+            mission_action_scoring_rules=tuple(
+                MissionActionScoringRule.from_payload(rule)
+                for rule in payload["mission_action_scoring_rules"]
+            ),
             mission_action_vp=payload["mission_action_vp"],
             reserve_destruction_timing=payload["reserve_destruction_timing"],
             reserve_destruction_battle_round=payload["reserve_destruction_battle_round"],
@@ -1421,51 +1563,87 @@ class MissionScoringPolicy:
             source_id=payload["source_id"],
         )
 
-    def _source_cap_for_kind(self, source_kind: VictoryPointSourceKind) -> int:
-        kind = victory_point_source_kind_from_token(source_kind)
-        if kind is VictoryPointSourceKind.PRIMARY:
-            return self.primary_vp_cap
-        if kind in {
-            VictoryPointSourceKind.FIXED_SECONDARY,
-            VictoryPointSourceKind.TACTICAL_SECONDARY,
-            VictoryPointSourceKind.MISSION_ACTION,
-        }:
-            return self.secondary_vp_cap
-        if kind is VictoryPointSourceKind.BATTLE_READY:
-            return self.battle_ready_vp
-        raise GameLifecycleError("Unsupported VictoryPointSourceKind for cap policy.")
-
-    def _source_cap_points_before(
+    def cap_bucket_for_victory_point_source(
         self,
-        ledger: VictoryPointLedger,
+        *,
         source_kind: VictoryPointSourceKind,
-    ) -> int:
+        source_id: str,
+    ) -> VictoryPointCapBucket:
         kind = victory_point_source_kind_from_token(source_kind)
         if kind is VictoryPointSourceKind.PRIMARY:
-            return ledger.points_from_source_kind(VictoryPointSourceKind.PRIMARY)
+            return VictoryPointCapBucket.PRIMARY
         if kind in {
             VictoryPointSourceKind.FIXED_SECONDARY,
             VictoryPointSourceKind.TACTICAL_SECONDARY,
-            VictoryPointSourceKind.MISSION_ACTION,
         }:
-            return _secondary_cap_source_points(ledger)
+            return VictoryPointCapBucket.SECONDARY
+        if kind is VictoryPointSourceKind.MISSION_ACTION:
+            return self._mission_action_scoring_rule_for_source_id(source_id).cap_bucket
         if kind is VictoryPointSourceKind.BATTLE_READY:
-            return ledger.points_from_source_kind(VictoryPointSourceKind.BATTLE_READY)
+            return VictoryPointCapBucket.BATTLE_READY
         raise GameLifecycleError("Unsupported VictoryPointSourceKind for cap policy.")
 
-    def _source_cap_reason(self, source_kind: VictoryPointSourceKind) -> str:
-        kind = victory_point_source_kind_from_token(source_kind)
-        if kind is VictoryPointSourceKind.PRIMARY:
+    def ledger_points_from_cap_bucket(
+        self,
+        *,
+        ledger: VictoryPointLedger,
+        cap_bucket: VictoryPointCapBucket,
+    ) -> int:
+        if type(ledger) is not VictoryPointLedger:
+            raise GameLifecycleError("VP cap bucket accounting requires a VictoryPointLedger.")
+        requested_bucket = victory_point_cap_bucket_from_token(cap_bucket)
+        return sum(
+            transaction.amount
+            for transaction in ledger.transactions
+            if self.cap_bucket_for_victory_point_source(
+                source_kind=transaction.source_kind,
+                source_id=transaction.source_id,
+            )
+            is requested_bucket
+        )
+
+    def _source_cap_for_bucket(self, cap_bucket: VictoryPointCapBucket) -> int:
+        bucket = victory_point_cap_bucket_from_token(cap_bucket)
+        if bucket is VictoryPointCapBucket.PRIMARY:
+            return self.primary_vp_cap
+        if bucket is VictoryPointCapBucket.SECONDARY:
+            return self.secondary_vp_cap
+        if bucket is VictoryPointCapBucket.BATTLE_READY:
+            return self.battle_ready_vp
+        raise GameLifecycleError("Unsupported VictoryPointCapBucket for cap policy.")
+
+    def _source_cap_reason(self, cap_bucket: VictoryPointCapBucket) -> str:
+        bucket = victory_point_cap_bucket_from_token(cap_bucket)
+        if bucket is VictoryPointCapBucket.PRIMARY:
             return "primary_vp_cap"
-        if kind in {
-            VictoryPointSourceKind.FIXED_SECONDARY,
-            VictoryPointSourceKind.TACTICAL_SECONDARY,
-            VictoryPointSourceKind.MISSION_ACTION,
-        }:
+        if bucket is VictoryPointCapBucket.SECONDARY:
             return "secondary_vp_cap"
-        if kind is VictoryPointSourceKind.BATTLE_READY:
+        if bucket is VictoryPointCapBucket.BATTLE_READY:
             return "battle_ready_vp_cap"
-        raise GameLifecycleError("Unsupported VictoryPointSourceKind for cap policy.")
+        raise GameLifecycleError("Unsupported VictoryPointCapBucket for cap policy.")
+
+    def _mission_action_scoring_rule_for_source_id(
+        self,
+        source_id: str,
+    ) -> MissionActionScoringRule:
+        requested_source_id = _validate_identifier("source_id", source_id)
+        match: MissionActionScoringRule | None = None
+        for rule in self.mission_action_scoring_rules:
+            if rule.scoring_source_id != requested_source_id:
+                continue
+            if match is not None:
+                raise GameLifecycleError("Multiple Mission Action scoring rules matched.")
+            match = rule
+        if match is None:
+            raise GameLifecycleError("Mission Action scoring source is not source-backed.")
+        if (
+            match.cap_bucket is VictoryPointCapBucket.PRIMARY
+            and match.mission_id != self.primary_mission_id
+        ):
+            raise GameLifecycleError(
+                "Primary Mission Action scoring source does not match active primary mission."
+            )
+        return match
 
     def _secondary_scoring_rule(
         self,
@@ -1673,6 +1851,17 @@ def victory_point_source_kind_from_token(token: object) -> VictoryPointSourceKin
         raise GameLifecycleError(f"Unsupported VictoryPointSourceKind token: {token}.") from exc
 
 
+def victory_point_cap_bucket_from_token(token: object) -> VictoryPointCapBucket:
+    if type(token) is VictoryPointCapBucket:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("VictoryPointCapBucket token must be a string.")
+    try:
+        return VictoryPointCapBucket(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported VictoryPointCapBucket token: {token}.") from exc
+
+
 def secondary_mission_card_status_from_token(token: object) -> SecondaryMissionCardStatus:
     if type(token) is SecondaryMissionCardStatus:
         return token
@@ -1766,6 +1955,41 @@ def _validate_secondary_scoring_rule_tuple(
     )
 
 
+def _validate_mission_action_scoring_rule_tuple(
+    values: object,
+) -> tuple[MissionActionScoringRule, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(
+            "MissionScoringPolicy mission_action_scoring_rules must be a tuple."
+        )
+    validated: list[MissionActionScoringRule] = []
+    seen_action_ids: set[str] = set()
+    seen_scoring_source_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not MissionActionScoringRule:
+            raise GameLifecycleError(
+                "MissionScoringPolicy mission_action_scoring_rules must contain scoring rules."
+            )
+        if value.mission_action_id in seen_action_ids:
+            raise GameLifecycleError(
+                "MissionScoringPolicy mission_action_scoring_rules must not duplicate action IDs."
+            )
+        if value.scoring_source_id in seen_scoring_source_ids:
+            raise GameLifecycleError(
+                "MissionScoringPolicy mission_action_scoring_rules must not duplicate scoring "
+                "source IDs."
+            )
+        seen_action_ids.add(value.mission_action_id)
+        seen_scoring_source_ids.add(value.scoring_source_id)
+        validated.append(value)
+    return tuple(
+        sorted(
+            validated,
+            key=lambda rule: rule.mission_action_id,
+        )
+    )
+
+
 def _validate_scoring_window_tuple(
     values: object,
     *,
@@ -1811,17 +2035,39 @@ def _winner_player_ids_from_scores(scores: tuple[FinalScoreLine, ...]) -> tuple[
     return tuple(score.player_id for score in final_scores if score.victory_points == max_score)
 
 
-def _secondary_cap_source_points(ledger: VictoryPointLedger) -> int:
-    if type(ledger) is not VictoryPointLedger:
-        raise GameLifecycleError("Secondary VP cap accounting requires a VictoryPointLedger.")
-    return sum(
-        ledger.points_from_source_kind(kind)
-        for kind in (
-            VictoryPointSourceKind.FIXED_SECONDARY,
-            VictoryPointSourceKind.TACTICAL_SECONDARY,
-            VictoryPointSourceKind.MISSION_ACTION,
-        )
+def _validate_required_final_scoring_windows(
+    *,
+    scoring_windows: tuple[ScoringWindowState, ...],
+    policy: MissionScoringPolicy,
+    game_id: str,
+    battle_round: int,
+) -> tuple[ScoringWindowState, ...]:
+    if type(policy) is not MissionScoringPolicy:
+        raise GameLifecycleError("Final scoring window validation requires MissionScoringPolicy.")
+    requested_game_id = _validate_identifier("game_id", game_id)
+    requested_round = _validate_positive_int("battle_round", battle_round)
+    validated_windows = _validate_scoring_window_tuple(
+        scoring_windows,
+        game_id=requested_game_id,
     )
+    recorded = {
+        (window.window_kind, window.window, window.battle_round) for window in validated_windows
+    }
+    required = {
+        (ScoringWindowKind.END_OF_ROUND, window, requested_round)
+        for window in policy.end_of_round_scoring_windows
+    } | {
+        (ScoringWindowKind.END_OF_GAME, window, requested_round)
+        for window in policy.end_of_game_scoring_windows
+    }
+    missing = tuple(sorted(required - recorded, key=lambda item: (item[0].value, item[1], item[2])))
+    if missing:
+        missing_text = ", ".join(
+            f"{kind.value}:{window}:round-{round_number:02d}"
+            for kind, window, round_number in missing
+        )
+        raise GameLifecycleError(f"Final scoring requires recorded policy windows: {missing_text}.")
+    return validated_windows
 
 
 def _metadata_with_vp_cap_audit(

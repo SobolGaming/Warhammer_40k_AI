@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from typing import cast
 
+import pytest
+
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -18,7 +20,8 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
+from warhammer40k_core.engine.missions import mission_scoring_policy_from_setup
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.scoring import (
     FinalScoringResult,
@@ -143,6 +146,96 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     assert _cap_reasons(battle_ready_transaction) == ["battle_ready_vp_cap", "total_vp_cap"]
 
 
+def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
+    state = _battle_state(mission_pool_entry_id="mission-o")
+    assert state.mission_setup is not None
+    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    state.award_victory_points(
+        VictoryPointAward(
+            player_id="player-a",
+            battle_round=1,
+            phase=BattlePhase.COMMAND.value,
+            amount=49,
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id="terraform",
+            scoring_timing="phase_end",
+            metadata={"scoring_rule_id": "phase11f-primary-action-base"},
+        )
+    )
+    state.award_victory_points(
+        VictoryPointAward(
+            player_id="player-a",
+            battle_round=1,
+            phase=BattlePhase.COMMAND.value,
+            amount=39,
+            source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+            source_id="cleanse",
+            scoring_timing="secondary_mission_score",
+            metadata={"scoring_rule_id": "phase11f-secondary-action-base"},
+        )
+    )
+
+    terraform_transaction = state.award_victory_points(
+        policy.mission_action_award(
+            player_id="player-a",
+            battle_round=1,
+            phase=BattlePhase.SHOOTING.value,
+            action_id="terraform:center:player-a",
+            source_id="terraform",
+            amount=5,
+        )
+    )
+    cleanse_transaction = state.award_victory_points(
+        policy.mission_action_award(
+            player_id="player-a",
+            battle_round=1,
+            phase=BattlePhase.SHOOTING.value,
+            action_id="cleanse:center:player-a",
+            source_id="cleanse",
+            amount=5,
+        )
+    )
+    state.battle_round = 5
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+
+    state.advance_to_next_battle_phase()
+    result = state.game_result_payload()
+    audit = cast(dict[str, object], result["scoring_audit"])
+    player_scores = cast(list[dict[str, object]], audit["player_scores"])
+    player_a_score = next(score for score in player_scores if score["player_id"] == "player-a")
+
+    assert terraform_transaction.amount == 1
+    assert cleanse_transaction.amount == 1
+    assert _cap_reasons(terraform_transaction) == ["primary_vp_cap"]
+    assert _cap_reasons(cleanse_transaction) == ["secondary_vp_cap"]
+    assert player_a_score["raw_primary_vp"] == 50
+    assert player_a_score["raw_secondary_vp"] == 40
+    assert player_a_score["capped_primary_vp"] == 50
+    assert player_a_score["capped_secondary_vp"] == 40
+    assert (
+        state.victory_point_ledger_for_player("player-a").points_from_source_kind(
+            VictoryPointSourceKind.MISSION_ACTION
+        )
+        == 2
+    )
+
+
+def test_phase11f_final_result_requires_policy_scoring_windows() -> None:
+    state = _battle_state()
+    state.battle_round = 5
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+
+    state.advance_to_next_battle_phase()
+    state.scoring_window_states = [
+        window for window in state.scoring_window_states if window.window != "end_of_battle"
+    ]
+
+    with pytest.raises(GameLifecycleError, match="Final scoring requires recorded policy windows"):
+        state.game_result_payload()
+
+
 def _cap_reasons(transaction: VictoryPointTransaction) -> list[str]:
     payload = transaction.metadata
     assert isinstance(payload, dict)
@@ -153,8 +246,8 @@ def _cap_reasons(transaction: VictoryPointTransaction) -> list[str]:
     return [str(reason) for reason in reasons]
 
 
-def _battle_state() -> GameState:
-    config = _config()
+def _battle_state(*, mission_pool_entry_id: str = "mission-a") -> GameState:
+    config = _config(mission_pool_entry_id=mission_pool_entry_id)
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
         state.record_army_definition(army)
@@ -183,7 +276,7 @@ def _battle_state() -> GameState:
     return GameState.from_payload(state.to_payload())
 
 
-def _config() -> GameConfig:
+def _config(*, mission_pool_entry_id: str = "mission-a") -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11f-game",
@@ -208,7 +301,7 @@ def _config() -> GameConfig:
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
         mission_setup=MissionSetup.from_mission_pack(
             mission_pack=chapter_approved_2025_26_mission_pack(),
-            mission_pool_entry_id="mission-a",
+            mission_pool_entry_id=mission_pool_entry_id,
             terrain_layout_id="layout-1",
             attacker_player_id="player-a",
             defender_player_id="player-b",
