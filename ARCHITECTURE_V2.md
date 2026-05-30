@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 11E** is treated as implemented at the time this file was updated. Phase 11F is the next build slice.
+Everything through **Phase 11F** is treated as implemented at the time this file was updated. Phase 12A is the next build slice.
 
 Completed / implemented foundation:
 
@@ -71,6 +71,7 @@ Completed / implemented foundation:
 | 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
 | 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
 | 11E | Complete | Mission actions, primary/secondary scoring, and end-of-turn cleanup |
+| 11F | Complete | Battle-round/game-end scoring windows, VP caps, final audit, and winner determination |
 
 ## Cross-cutting architectural rules
 
@@ -1194,6 +1195,16 @@ Required tests:
 - game ends after configured battle rounds.
 
 ## Phase 11F: battle-round/game-end scoring and winner determination
+
+Status: Complete.
+
+Implemented coverage:
+
+- game length is consumed from mission scoring policy;
+- end-of-round and end-of-game scoring windows are recorded once as replay-safe state;
+- Chapter Approved primary, secondary, Battle Ready, and total VP caps are enforced at award time;
+- final scoring result payloads include public capped scores, winner/draw determination, and scoring audit data;
+- final scoring payloads round-trip without Python object reprs.
 
 Invariants:
 
