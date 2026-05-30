@@ -1,5 +1,7 @@
 # Adapter Decision Contract
 
+Status: Planned Phase 11D contract. This document is authoritative for Phase 11D implementation work after Phase 11B and 11C, but the listed adapter/proposal modules are not assumed to exist before Phase 11D lands.
+
 This document is the Phase 11D contract for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
@@ -37,7 +39,7 @@ The shared contract uses these objects and payloads:
 - `ParameterizedSubmission`: adapter wrapper for submitting JSON-safe proposal payloads.
 - `DecisionResult`: engine-facing result created from a submission and pending request.
 - `DecisionRecord`: replay-facing record of a request/result pair.
-- `MovementProposalRequest`: parameterized movement or placement request embedded inside a `DecisionRequest`.
+- `ProposalRequestPayload`: neutral parameterized physical-action request embedded inside a `DecisionRequest.payload`.
 - `MovementProposalPayload`: parameterized movement answer, including `PathWitness`.
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
@@ -125,10 +127,13 @@ The adapter helper equivalent is:
 ```python
 status = submit_option(
     lifecycle=lifecycle,
-    option_id="normal_move",
+    request_id="decision-request-000004",
+    selected_option_id="normal_move",
     result_id="ui-result-000017",
 )
 ```
+
+Adapter helper APIs should take `request_id` explicitly even when a local wrapper can infer the current pending request. Explicit request IDs let network, replay, and UI adapters fail fast on stale-client drift before constructing a `DecisionRecord`.
 
 If the selected option is legal and the action requires exact movement input, the engine may emit a follow-up parameterized proposal request.
 
@@ -148,7 +153,7 @@ Phase 11D covers:
 
 Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, charge movement, pile-in, consolidate, and mission movement or placement effects where applicable.
 
-Parameterized requests are still `DecisionRequest`s. They contain a single `submit_parameterized_payload` option and embed a proposal request payload.
+Parameterized requests are still `DecisionRequest`s. They contain a single `submit_parameterized_payload` option and embed a neutral `ProposalRequestPayload` inside `DecisionRequest.payload`.
 
 Example proposal request:
 
@@ -157,16 +162,30 @@ Example proposal request:
   "request_id": "decision-request-000005",
   "decision_type": "submit_movement_proposal",
   "actor_id": "player-a",
-  "game_id": "phase11d-game",
-  "battle_round": 1,
-  "phase": "movement",
-  "unit_instance_id": "army-alpha:intercessor-unit-1",
-  "proposal_kind": "normal_move",
-  "source_decision_request_id": "decision-request-000004",
-  "source_decision_result_id": "phase11d-golden-normal-action",
-  "movement_phase_action": "normal_move",
-  "placement_kinds": [],
-  "context": {}
+  "payload": {
+    "proposal_request": {
+      "request_id": "decision-request-000005",
+      "decision_type": "submit_movement_proposal",
+      "actor_id": "player-a",
+      "game_id": "phase11d-game",
+      "battle_round": 1,
+      "phase": "movement",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "proposal_kind": "normal_move",
+      "source_decision_request_id": "decision-request-000004",
+      "source_decision_result_id": "phase11d-golden-normal-action",
+      "movement_phase_action": "normal_move",
+      "placement_kinds": [],
+      "context": {}
+    }
+  },
+  "options": [
+    {
+      "option_id": "submit_parameterized_payload",
+      "label": "Submit Parameterized Payload",
+      "payload": {"submission_kind": "parameterized"}
+    }
+  ]
 }
 ```
 
@@ -230,6 +249,7 @@ The adapter helper equivalent is:
 ```python
 status = submit_payload(
     lifecycle=lifecycle,
+    request_id="decision-request-000005",
     payload=movement_payload,
     result_id="ui-result-000018",
 )
@@ -282,6 +302,24 @@ The engine validates placement, coherency, reserve restrictions, transport state
 ## Validation and Invalid Results
 
 Adapters should treat invalid proposal responses as authoritative diagnostics, not as local validation suggestions.
+
+Finite requests use the existing selected-option equality rule: `DecisionResult.selected_option_id` must name one option on the pending `DecisionRequest`, and `DecisionResult.payload` must equal that option's payload.
+
+Parameterized proposal requests use a different validation rule. The pending request still contains the fixed `submit_parameterized_payload` option, and the submitted `DecisionResult.selected_option_id` must be `submit_parameterized_payload`. For parameterized requests, `DecisionResult.payload` is the adapter's movement or placement proposal. It is validated against the embedded `ProposalRequestPayload`; it is not required to equal the fixed option payload `{"submission_kind": "parameterized"}`.
+
+Before the queue is popped or a `DecisionRecord` is created, Phase 11D must validate:
+
+- request ID drift;
+- actor drift;
+- decision type drift;
+- proposal kind drift;
+- unit drift;
+- required proposal context drift;
+- JSON shape and required-field validity.
+
+Malformed, stale, schema-invalid, or context-drift submissions leave the pending request unresolved. They return typed invalid diagnostics and may append adapter-visible invalid-proposal events, but they must not create a `DecisionRecord`.
+
+Phase 11D chooses a different policy for rule-invalid but well-formed proposals. If the payload is well-formed and matches the pending request, but movement, pathing, terrain, placement, coherency, reserve, or transport validators reject it, the engine records the rejected attempt as a normal request/result pair, appends typed invalid diagnostics, and emits a fresh pending proposal request with the same authoritative validation context and a new request ID. This preserves replay of failed legal-shape attempts while still giving the actor a live request to answer.
 
 Invalid and stale proposals return `LifecycleStatus.invalid(...)` with a `proposal_validation` payload. The engine must not mutate authoritative state for invalid proposal payloads.
 
@@ -387,7 +425,7 @@ Replay-facing payloads must remain deterministic and JSON-safe:
 - stable IDs for entities, decisions, events, and proposals;
 - stable lifecycle payloads.
 
-`GameLifecyclePayload` persists `parameterized_movement_proposals`. Restoring a lifecycle before a finite movement-action request is answered must preserve whether that action will produce a parameterized proposal request.
+Phase 11D must ensure replay/resume preserves pending parameterized proposal requests. Restoring after a finite movement-action result has been accepted but before the proposal has been submitted must reproduce the same pending proposal request and validation context.
 
 Replay and tests may choose decisions differently from a human UI, but they must submit the same `DecisionResult` shape through the same lifecycle path.
 
@@ -400,8 +438,11 @@ Adapters may:
 - collect user input;
 - generate AI candidates;
 - serialize submissions over a network;
+- provide non-authoritative previews, snapping, measurement overlays, and client-side convenience checks;
 - track client-side cursors for viewer-scoped event deltas;
 - display typed invalid diagnostics returned by the engine.
+
+Adapter previews and convenience checks are advisory only. They may improve UX or candidate generation, but they cannot replace engine validation and must not mutate authoritative state.
 
 Adapters must not:
 
@@ -431,13 +472,15 @@ while status is not None:
     if request.is_parameterized_submission_request():
         payload = build_parameterized_payload_from_view(view, request)
         status = session.submit_payload(
+            request_id=request.request_id,
             payload=payload,
             result_id=next_result_id(),
         )
     else:
         option_id = choose_finite_option_from_view(view, request)
         status = session.submit_option(
-            option_id=option_id,
+            request_id=request.request_id,
+            selected_option_id=option_id,
             result_id=next_result_id(),
         )
 ```
