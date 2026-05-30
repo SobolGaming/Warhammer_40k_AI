@@ -60,8 +60,8 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
-    CommandPhaseHandler,
 )
+from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
@@ -415,8 +415,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     state = lifecycle.state
     assert state is not None
     decisions = lifecycle.decision_controller
-    handler = CommandPhaseHandler()
-    waiting = handler.begin_phase(state=state, decisions=decisions)
+    waiting = lifecycle.advance_until_decision_or_terminal()
     request = waiting.decision_request
     assert request is not None
     assert request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE
@@ -426,8 +425,9 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         request=request,
         selected_option_id="draw",
     )
-    decisions.submit_result(result)
-    handler.apply_decision(state=state, result=result, decisions=decisions)
+    lifecycle.submit_decision(result)
+    automatic_follow_up = decisions.queue.pop_next()
+    assert automatic_follow_up.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
 
     active_cards = [
         card
@@ -536,7 +536,7 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
     state = lifecycle.state
     assert state is not None
     decisions = lifecycle.decision_controller
-    waiting = CommandPhaseHandler().begin_phase(state=state, decisions=decisions)
+    waiting = lifecycle.advance_until_decision_or_terminal()
     draw_request = waiting.decision_request
     assert draw_request is not None
     draw_result = FiniteOptionSubmission(
@@ -544,8 +544,9 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
         selected_option_id="draw",
         result_id="phase11e-drift-draw",
     ).to_result(draw_request)
-    decisions.submit_result(draw_result)
-    CommandPhaseHandler().apply_decision(state=state, result=draw_result, decisions=decisions)
+    lifecycle.submit_decision(draw_result)
+    automatic_follow_up = decisions.queue.pop_next()
+    assert automatic_follow_up.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     active_card = next(
         card
         for card in state.secondary_mission_card_states
