@@ -111,6 +111,29 @@ UI, network, headless, AI, and replay may choose decisions differently, but they
 
 Replay and determinism are core features. Same code, seed, config, and inputs must produce the same logical result. It is acceptable for CORE V2 to differ from the legacy repo.
 
+## Adapter decision contract policy
+
+All new player-facing choices must use the Phase 11D adapter decision contract in `docs/ADAPTER_DECISION_CONTRACT.md`.
+
+A player-facing choice must be one of:
+
+- a finite engine-enumerated `DecisionRequest` option selected through `FiniteOptionSubmission -> DecisionResult`; or
+- a parameterized proposal request submitted through `ParameterizedSubmission -> DecisionResult`.
+
+Adapters, UI, CLI, network clients, headless AI, replay, and tests must not bypass `GameLifecycle.submit_decision(...)`, `DecisionController`, `DecisionRecord`, `EventRecord`, proposal validation, or engine-owned mutation.
+
+Finite decisions must expose deterministic option IDs and JSON-safe option payloads on the pending `DecisionRequest`. Adapters must select one pending option ID. Adapters must not invent option IDs or mutate state from option payloads.
+
+Parameterized decisions must define or reuse typed proposal payloads with replay-safe source context. They must validate stale, drifted, malformed, schema-invalid, or wrong-context submissions before queue pop when required by the adapter contract. They must return typed invalid diagnostics and must not mutate authoritative state unless engine-owned validators accept the proposal.
+
+Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the adapter contract explicitly allows that behavior and a fresh pending proposal request is emitted for retry.
+
+Any new decision type, finite option family, proposal kind, adapter-visible payload shape, or viewer-visibility behavior must update `docs/ADAPTER_DECISION_CONTRACT.md` in the same PR, or the PR must explicitly justify why the existing contract already covers it.
+
+Hidden or secret pending decisions, proposal requests, decision records, domain events, projections, and adapter event deltas must remain viewer-scoped. They must not leak hidden opponent information through payloads, metadata, counts, option lists, event details, or derived fields.
+
+Tests for new decision work must cover valid submission, stale/drift/malformed invalid submission, replay/payload round-trip, deterministic JSON-safe records, and viewer-scoped projection/event redaction when visibility can differ by viewer.
+
 ## Architecture boundaries
 
 Dependency direction:
@@ -164,6 +187,7 @@ Stop before coding if the change would:
 - copy legacy code wholesale;
 - make UI/headless/network paths diverge;
 - use endpoint-only movement validation;
+- add or change a player-facing decision, finite option family, proposal kind, or adapter-visible payload without updating or confirming `docs/ADAPTER_DECISION_CONTRACT.md`;
 - weaken a CORE V2 invariant.
 
 Agents should prefer review, tests, audit scripts, small typed modules, and migration plans over large production-code changes.

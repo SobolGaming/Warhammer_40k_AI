@@ -1,6 +1,6 @@
 # Adapter Decision Contract
 
-Status: Planned Phase 11D contract. This document is authoritative for Phase 11D implementation work after Phase 11B and 11C, but the listed adapter/proposal modules are not assumed to exist before Phase 11D lands.
+Status: Phase 11D contract. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
 This document is the Phase 11D contract for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
