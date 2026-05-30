@@ -1028,6 +1028,8 @@ This phase creates the engine-owned contract that allows UI work to proceed in p
 
 This phase does not build a visual UI. It creates the adapter and proposal contracts that a later CLI, local visual UI, network client, or AI policy can consume.
 
+Design note: [Adapter Decision Contract](docs/ADAPTER_DECISION_CONTRACT.md) defines the shared submission path, producer responsibilities, viewer-scoped projections/events, and examples for UI, CLI, headless, network, AI, replay, and test adapters.
+
 Modules:
 
 - `adapters/contracts.py`
