@@ -113,6 +113,9 @@ from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecordPayload,
     starting_strength_records_for_units,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+    chapter_approved_2025_26 as tenth_ca_2025_26_source,
+)
 
 
 class SecondaryMissionMode(StrEnum):
@@ -2023,7 +2026,7 @@ class GameState:
 
     def _ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
         if self.mission_setup is not None and (
-            self.mission_setup.mission_pack_id == "chapter-approved-2025-26"
+            self.mission_setup.mission_pack_id == tenth_ca_2025_26_source.MISSION_PACK_ID
         ):
             return RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26()
         return RulesetDescriptor.warhammer_40000_tenth()

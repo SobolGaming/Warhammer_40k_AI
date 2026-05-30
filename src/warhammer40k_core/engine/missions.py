@@ -15,16 +15,15 @@ from warhammer40k_core.engine.scoring import (
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
-_CHAPTER_APPROVED_2025_26_MISSION_PACK_ID = "chapter-approved-2025-26"
 _CONTROL_OBJECTIVES_PRIMARY_SCORING_KIND = "control_objectives"
 
 
 def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionScoringPolicy:
     if type(mission_setup) is not MissionSetup:
         raise GameLifecycleError("Mission scoring policy requires MissionSetup.")
-    if mission_setup.mission_pack_id != _CHAPTER_APPROVED_2025_26_MISSION_PACK_ID:
-        raise GameLifecycleError("Unsupported mission pack for scoring policy.")
     mission_pack = chapter_approved_2025_26_mission_pack()
+    if mission_setup.mission_pack_id != mission_pack.mission_pack_id:
+        raise GameLifecycleError("Unsupported mission pack for scoring policy.")
     primary = None
     for mission in mission_pack.primary_missions:
         if mission.primary_mission_id == mission_setup.primary_mission_id:
@@ -60,10 +59,10 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
         reserve_destruction_only_declare_battle_formations=(
             scoring.reserve_destruction_only_declare_battle_formations
         ),
-        primary_vp_cap=caps.primary_vp_cap,
-        secondary_vp_cap=caps.secondary_vp_cap,
+        primary_vp_cap=scoring.primary_vp_cap,
+        secondary_vp_cap=scoring.secondary_vp_cap,
         battle_ready_vp=caps.battle_ready_vp,
-        total_vp_cap=caps.total_vp_cap,
+        total_vp_cap=scoring.total_vp_cap,
         source_id=f"{mission_setup.source_id}:scoring:{mission_setup.primary_mission_id}",
     )
 
@@ -101,10 +100,9 @@ def deterministic_tactical_secondary_draw(
         "excluded_secondary_mission_ids",
         excluded_secondary_mission_ids,
     )
-    if mission_setup.mission_pack_id != _CHAPTER_APPROVED_2025_26_MISSION_PACK_ID:
-        raise GameLifecycleError("Unsupported mission pack for tactical secondary draw.")
-
     mission_pack = chapter_approved_2025_26_mission_pack()
+    if mission_setup.mission_pack_id != mission_pack.mission_pack_id:
+        raise GameLifecycleError("Unsupported mission pack for tactical secondary draw.")
     candidates = tuple(
         mission.secondary_mission_id
         for mission in mission_pack.secondary_missions

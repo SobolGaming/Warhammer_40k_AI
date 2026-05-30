@@ -8,7 +8,11 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
-from warhammer40k_core.core.missions import MissionPackDefinition, MissionPackDefinitionPayload
+from warhammer40k_core.core.missions import (
+    MissionPackDefinition,
+    MissionPackDefinitionPayload,
+    MissionSourcePackageDefinition,
+)
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
@@ -49,6 +53,9 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+    chapter_approved_2025_26 as source_data,
+)
 
 
 def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> None:
@@ -65,6 +72,83 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
     assert len(mission_pack.mission_pool_entries) == 20
     assert len(mission_pack.secondary_missions) == 19
     assert len(mission_pack.challenger_cards) == 9
+
+
+def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None:
+    mission_pack = chapter_approved_2025_26_mission_pack()
+    source_package = mission_pack.source_package
+
+    payload = source_package.to_payload()
+    encoded = json.dumps(payload, sort_keys=True)
+
+    assert "<" not in encoded
+    assert "object at 0x" not in encoded
+    assert MissionSourcePackageDefinition.from_payload(payload).to_payload() == payload
+    assert payload == {
+        "edition_id": "warhammer_40000_10th",
+        "mission_pack_id": "10e-chapter-approved-2025-26",
+        "source_package_id": "gw-10e-chapter-approved-2025-26",
+        "source_title": "Warhammer 40,000 10th Edition Chapter Approved 2025-26",
+        "source_version": "2025-26",
+        "source_commit_or_import_hash": source_package.source_commit_or_import_hash,
+        "imported_at_schema_version": "core-v2-mission-source-v1",
+    }
+    assert len(source_package.source_commit_or_import_hash) == 64
+    assert mission_pack.mission_pack_id == "10e-chapter-approved-2025-26"
+
+
+def test_chapter_approved_10th_edition_scoring_action_source_snapshot() -> None:
+    mission_pack = chapter_approved_2025_26_mission_pack()
+    take_and_hold = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "take-and-hold"
+    )
+    cleanse = mission_pack.secondary_mission("cleanse")
+    cleanse_action = mission_pack.mission_action("cleanse-objective")
+
+    assert take_and_hold.scoring_kind == "control_objectives"
+    assert take_and_hold.vp_per_controlled_objective == 5
+    assert take_and_hold.max_vp_per_turn == 15
+    assert take_and_hold.scoring_rules[0].to_payload() == {
+        "rule_id": "take-and-hold-control",
+        "timing": "command_phase",
+        "source_kind": "primary",
+        "victory_points": 5,
+        "cap": 15,
+        "condition": "each_controlled_objective_from_battle_round_two",
+        "source_id": (
+            "gw-10e-chapter-approved-2025-26:primary:take-and-hold:"
+            "scoring-rule:take-and-hold-control"
+        ),
+    }
+    assert {(rule.source_kind, rule.victory_points) for rule in cleanse.scoring_rules} >= {
+        ("fixed_secondary", 4),
+        ("tactical_secondary", 5),
+    }
+    assert cleanse_action.start_phase == "shooting"
+    assert cleanse_action.target_policy == "objective_marker"
+    assert cleanse_action.victory_points == 5
+    assert mission_pack.scoring.end_of_game_scoring_windows == (
+        "turn_end_round_five_going_second",
+        "end_of_battle",
+    )
+
+
+def test_future_edition_source_identity_cannot_collide_with_tenth_edition() -> None:
+    tenth = source_data.source_package_definition()
+    future = MissionSourcePackageDefinition(
+        edition_id="warhammer_40000_11th",
+        mission_pack_id=tenth.mission_pack_id,
+        source_package_id=tenth.source_package_id,
+        source_title="Warhammer 40,000 11th Edition Preview",
+        source_version=tenth.source_version,
+        source_commit_or_import_hash=tenth.source_commit_or_import_hash,
+        imported_at_schema_version=tenth.imported_at_schema_version,
+    )
+
+    assert tenth.source_namespace_key() != future.source_namespace_key()
+    source_data.assert_distinct_source_package_identity(tenth, future)
 
 
 def test_deployment_map_and_objective_marker_policy_round_trip() -> None:

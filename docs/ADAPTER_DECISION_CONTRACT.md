@@ -87,6 +87,8 @@ The lifecycle should not care whether a result came from a person, AI, CLI, netw
 Finite decisions are bounded option choices already enumerated by the engine. Examples include:
 
 - secondary mission selection;
+- Tactical secondary discard;
+- Mission Action start selection;
 - unit selection;
 - movement action selection;
 - reroll choices;
@@ -139,6 +141,13 @@ status = submit_option(
 Adapter helper APIs should take `request_id` explicitly even when a local wrapper can infer the current pending request. Explicit request IDs let network, replay, and UI adapters fail fast on stale-client drift before constructing a `DecisionRecord`.
 
 If the selected option is legal and the action requires exact movement input, the engine may emit a follow-up parameterized proposal request.
+
+Phase 11E mission-scoring decisions that are player-facing are finite decisions:
+
+- `discard_tactical_secondary_mission`: the engine emits one option for each legal active Tactical secondary card the player can discard. The selected option payload includes the game, player, battle round, phase, and `secondary_mission_id`. The lifecycle applies the discard and emits `tactical_secondary_mission_discarded`.
+- `start_mission_action`: the engine emits legal source-backed Mission Action start options. Current Phase 11E support enumerates action/unit/objective-target options for source-backed objective-marker actions such as Cleanse. Mission Action target policies that are not yet represented as finite options must return a typed `unsupported` status instead of exposing an adapter mutation path.
+
+Both decision types must be submitted through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. Tests, replay, UI, CLI, network, and headless adapters must not call `GameState.discard_tactical_secondary(...)` or `GameState.record_mission_action_state(...)` directly for player choices; those methods are engine-owned primitives used by validated decision handlers and automatic rule hooks.
 
 ## Parameterized Proposals
 

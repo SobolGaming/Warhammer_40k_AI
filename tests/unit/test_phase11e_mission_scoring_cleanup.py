@@ -25,7 +25,6 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
-from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import (
@@ -40,6 +39,12 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
+)
+from warhammer40k_core.engine.mission_decisions import (
+    START_MISSION_ACTION_DECISION_TYPE,
+    TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
+    request_mission_action_start,
+    request_tactical_secondary_discard,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import (
@@ -340,8 +345,10 @@ def test_secondary_reveal_event_does_not_perturb_later_dice_history() -> None:
 
 
 def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> None:
-    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
-    decisions = DecisionController()
+    lifecycle = _battle_lifecycle(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state = lifecycle.state
+    assert state is not None
+    decisions = lifecycle.decision_controller
     handler = CommandPhaseHandler()
     waiting = handler.begin_phase(state=state, decisions=decisions)
     request = waiting.decision_request
@@ -368,20 +375,33 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.COMMAND,
     )
-    discarded = state.discard_tactical_secondary(
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=decisions,
+        player_id="player-a",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    assert discard_request.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE
+    discard_option_id = f"discard:{active_cards[1].secondary_mission_id}"
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=discard_option_id,
+        result_id="phase11e-discard-tactical",
+    ).to_result(discard_request)
+    lifecycle.submit_decision(discard_result)
+    discarded = state.secondary_mission_card_state(
         player_id="player-a",
         secondary_mission_id=active_cards[1].secondary_mission_id,
-        result_id="phase11e-discard-tactical",
+        mode=SecondaryMissionCardMode.TACTICAL,
     )
-    decisions.event_log.append(
-        "tactical_secondary_mission_discarded",
-        {
-            "game_id": state.game_id,
-            "player_id": "player-a",
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.COMMAND.value,
-            "secondary_mission_card_state": discarded.to_payload(),
-        },
+    assert discarded is None
+    discarded_record = next(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a"
+        and card.secondary_mission_id == active_cards[1].secondary_mission_id
+        and card.mode is SecondaryMissionCardMode.TACTICAL
     )
     opponent_events = EventStreamCursor().events_since(
         decisions.event_log,
@@ -390,8 +410,10 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     opponent_payload = state.to_public_payload(viewer_player_id="player-b")
 
     assert scored.status is SecondaryMissionCardStatus.SCORED
-    assert discarded.status is SecondaryMissionCardStatus.DISCARDED
+    assert discarded_record.status is SecondaryMissionCardStatus.DISCARDED
     assert state.victory_point_total("player-a") == 5
+    assert decisions.records[-1].request.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE
+    assert decisions.records[-1].result.result_id == "phase11e-discard-tactical"
     draw_event = next(
         event
         for event in opponent_events["events"]
@@ -432,40 +454,75 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     assert transaction["source_kind"] == "tactical_secondary"
     assert transaction["source_id"] == active_cards[0].secondary_mission_id
     assert transaction["metadata"] == {"secondary_mission_id": active_cards[0].secondary_mission_id}
+    round_tripped = GameLifecycle.from_payload(lifecycle.to_payload())
+    encoded = json.dumps(round_tripped.to_payload(), sort_keys=True)
+    assert "<" not in encoded
+    assert "object at 0x" not in encoded
+
+
+def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
+    lifecycle = _battle_lifecycle(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state = lifecycle.state
+    assert state is not None
+    decisions = lifecycle.decision_controller
+    waiting = CommandPhaseHandler().begin_phase(state=state, decisions=decisions)
+    draw_request = waiting.decision_request
+    assert draw_request is not None
+    draw_result = FiniteOptionSubmission(
+        request_id=draw_request.request_id,
+        selected_option_id="draw",
+        result_id="phase11e-drift-draw",
+    ).to_result(draw_request)
+    decisions.submit_result(draw_result)
+    CommandPhaseHandler().apply_decision(state=state, result=draw_result, decisions=decisions)
+    active_card = next(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a"
+        and card.mode is SecondaryMissionCardMode.TACTICAL
+        and card.status is SecondaryMissionCardStatus.ACTIVE
+    )
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=decisions,
+        player_id="player-a",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=f"discard:{active_card.secondary_mission_id}",
+        result_id="phase11e-drift-discard",
+    ).to_result(discard_request)
+    state.score_secondary_mission(
+        player_id="player-a",
+        secondary_mission_id=active_card.secondary_mission_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.COMMAND,
+    )
+
+    status = lifecycle.submit_decision(discard_result)
+
+    assert status.status_kind.value == "invalid"
+    assert decisions.records[-1].result.result_id == "phase11e-drift-draw"
+    assert decisions.queue.peek_next().request_id == discard_request.request_id
 
 
 def test_mission_action_can_complete_interrupt_and_score() -> None:
-    state = _battle_state()
-    completed_action = MissionActionState.start(
-        action_id="cleanse:center:player-a",
-        player_id="player-a",
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        mission_id="cleanse",
-        battle_round=1,
-        phase=BattlePhase.MOVEMENT.value,
-        start_timing="movement_phase_unit_selected",
-        completion_timing="turn_end",
-        eligible_unit_instance_ids=("army-alpha:intercessor-unit-1",),
-        interruption_conditions=("unit_moved", "unit_destroyed"),
-        scoring_source_id="cleanse",
-        victory_points=5,
+    lifecycle = _battle_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    completed_action = _start_mission_action_via_lifecycle(
+        lifecycle=lifecycle,
+        target_suffix="center",
+        result_id="phase11e-start-cleanse-center",
     )
-    interrupted_action = MissionActionState.start(
-        action_id="cleanse:west:player-a",
-        player_id="player-a",
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        mission_id="cleanse",
-        battle_round=1,
-        phase=BattlePhase.MOVEMENT.value,
-        start_timing="movement_phase_unit_selected",
-        completion_timing="turn_end",
-        eligible_unit_instance_ids=("army-alpha:intercessor-unit-1",),
-        interruption_conditions=("unit_moved", "unit_destroyed"),
-        scoring_source_id="cleanse",
-        victory_points=5,
+    interrupted_action = _start_mission_action_via_lifecycle(
+        lifecycle=lifecycle,
+        target_suffix="northwest",
+        result_id="phase11e-start-cleanse-northwest",
     )
-    state.record_mission_action_state(completed_action)
-    state.record_mission_action_state(interrupted_action)
 
     completed = state.complete_mission_action(
         action_id=completed_action.action_id,
@@ -481,6 +538,56 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
     assert interrupted.status is MissionActionStatus.INTERRUPTED
     assert interrupted.interrupted_reason == "unit_moved"
     assert state.victory_point_total("player-a") == 5
+    assert lifecycle.decision_controller.records[-2].request.decision_type == (
+        START_MISSION_ACTION_DECISION_TYPE
+    )
+    assert lifecycle.decision_controller.records[-1].request.decision_type == (
+        START_MISSION_ACTION_DECISION_TYPE
+    )
+    opponent_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-b",
+    )
+    action_events = [
+        event
+        for event in opponent_events["events"]
+        if event["event_type"] == "mission_action_started"
+    ]
+    assert len(action_events) == 2
+    assert cast(dict[str, JsonValue], action_events[0]["payload"])["mission_action_id"] == (
+        "cleanse-objective"
+    )
+
+
+def test_mission_action_start_rejects_drifted_lifecycle_option() -> None:
+    lifecycle = _battle_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="cleanse-objective",
+    )
+    request = waiting.decision_request
+    assert request is not None
+    option = request.options[0]
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=option.option_id,
+        result_id="phase11e-drift-start-action",
+    ).to_result(request)
+    unit_id = cast(dict[str, JsonValue], option.payload)["unit_instance_id"]
+    assert isinstance(unit_id, str)
+    state.battlefield_state = state.battlefield_state.without_unit_placement(unit_id)
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind.value == "invalid"
+    assert not lifecycle.decision_controller.records
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
 
 
 def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() -> None:
@@ -564,6 +671,12 @@ def test_game_ends_after_configured_battle_rounds_with_draw_result() -> None:
 
 
 def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
+    mission_pack = chapter_approved_2025_26_mission_pack()
+    primary = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "take-and-hold"
+    )
     policy = mission_scoring_policy_from_setup(_mission_setup())
     award = policy.mission_action_award(
         player_id="player-a",
@@ -581,6 +694,12 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     scored_card = fixed_card.score(transaction_id=transaction.transaction_id)
 
     assert MissionScoringPolicy.from_payload(policy.to_payload()) == policy
+    assert policy.mission_pack_id == mission_pack.mission_pack_id
+    assert policy.game_length_battle_rounds == mission_pack.scoring.game_length_battle_rounds
+    assert policy.primary_max_vp_per_turn == primary.max_vp_per_turn
+    assert policy.primary_vp_per_controlled_objective == primary.vp_per_controlled_objective
+    assert policy.primary_vp_cap == mission_pack.scoring.primary_vp_cap
+    assert policy.total_vp_cap == mission_pack.scoring.total_vp_cap
     assert award.to_payload()["source_kind"] == "mission_action"
     assert VictoryPointTransaction.from_payload(transaction.to_payload()) == transaction
     assert ledger.points_from_source_kind(VictoryPointSourceKind.MISSION_ACTION) == 5
@@ -1123,6 +1242,51 @@ def _advance_to_secondary_request(lifecycle: GameLifecycle) -> LifecycleStatus:
         if request is not None and request.decision_type == SECONDARY_MISSION_DECISION_TYPE:
             return status
     raise AssertionError("lifecycle did not reach secondary mission selection")
+
+
+def _start_mission_action_via_lifecycle(
+    *,
+    lifecycle: GameLifecycle,
+    target_suffix: str,
+    result_id: str,
+) -> MissionActionState:
+    state = lifecycle.state
+    assert state is not None
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="cleanse-objective",
+    )
+    request = waiting.decision_request
+    assert request is not None
+    option = next(
+        option
+        for option in request.options
+        if str(cast(dict[str, JsonValue], option.payload)["target_id"]).endswith(target_suffix)
+    )
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=option.option_id,
+        result_id=result_id,
+    ).to_result(request)
+    lifecycle.submit_decision(result)
+    action_id = f"mission-action:{result_id}"
+    return state.mission_action_state_by_id(action_id)
+
+
+def _battle_lifecycle(
+    *,
+    player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+) -> GameLifecycle:
+    lifecycle = GameLifecycle()
+    lifecycle.start(_config())
+    lifecycle.state = _battle_state(
+        player_a_secondary=player_a_secondary,
+        player_b_secondary=player_b_secondary,
+    )
+    return lifecycle
 
 
 def _battle_state(

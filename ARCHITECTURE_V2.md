@@ -1141,22 +1141,30 @@ Modules:
 
 - `engine/scoring.py`
 - `engine/missions.py`
+- `engine/mission_decisions.py`
 - `engine/actions.py`
 - `engine/turn_cleanup.py`
 - `engine/unit_coherency.py`
+- `rules/source_packages/warhammer_40000_10th/chapter_approved_2025_26.py`
 
 Objects:
 
 - `MissionScoringPolicy`
 - `VictoryPointLedger`
 - `MissionActionState`
+- `MissionSourcePackageDefinition`
+- `MissionActionDefinition`
 - `EndTurnCleanupState`
 - `CoherencyCleanupRemoval`
 
 Invariants:
 
-- scoring is mission-pack data, not hard-coded phase logic;
-- mission Actions have start timing, eligible units, interruption conditions, completion timing, and scoring effects;
+- scoring, game length, caps, reserve deadline policy, secondary deck eligibility,
+  and supported mission Action timing/effects are source-backed
+  `warhammer_40000_10th` mission-pack data, not hard-coded phase logic;
+- player-facing Tactical discard and supported mission Action start selections use
+  finite `DecisionRequest` options through `GameLifecycle.submit_decision(...)`;
+- mission Actions have source-backed start timing, eligible units, interruption conditions, completion timing, and scoring effects;
 - Select Secondary Missions uses a simultaneous-secret reveal gate; secondary
   mode, Fixed IDs, Tactical draws/card states, and normal secondary scoring are
   public after every player has selected;
@@ -1171,7 +1179,9 @@ Required tests:
 - primary scoring at correct timing;
 - secondary choices stay hidden until every player has selected, then reveal to all viewers;
 - Tactical secondary draw/score/discard flow is public after the reveal gate;
-- mission Action can start, complete, be interrupted, and score;
+- Tactical secondary discard emits deterministic decision/event records through the lifecycle path;
+- mission Action can start through the lifecycle decision path, complete, be interrupted, and score;
+- source package payloads round-trip and preserve 10th Edition mission/scoring/action snapshots;
 - end-of-turn coherency cleanup removes models without destroyed triggers;
 - unarrived Reserves are destroyed at the configured deadline through the lifecycle hook;
 - victory point ledger round-trips;

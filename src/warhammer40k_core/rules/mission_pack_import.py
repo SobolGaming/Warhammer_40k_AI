@@ -7,11 +7,13 @@ from warhammer40k_core.core.missions import (
     ChallengerCardDefinition,
     ChapterApprovedMissionSequence,
     DeploymentMapDefinition,
+    MissionActionDefinition,
     MissionDeckDefinition,
     MissionPackDefinition,
     MissionPackError,
     MissionPackScoringDefinition,
     MissionPoolEntry,
+    MissionScoringRuleDefinition,
     ObjectiveMarkerDefinition,
     PrimaryMissionDefinition,
     SecondaryMissionAvailability,
@@ -25,9 +27,12 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainLayoutTemplate,
     TerrainWallTemplate,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+    chapter_approved_2025_26 as source_data,
+)
 
-CHAPTER_APPROVED_2025_26_SOURCE_ID = "chapter_approved_2025_26_mission_deck_v1_5"
-CHAPTER_APPROVED_2025_26_SOURCE_VERSION = "1.5"
+CHAPTER_APPROVED_2025_26_SOURCE_ID = source_data.SOURCE_PACKAGE_ID
+CHAPTER_APPROVED_2025_26_SOURCE_VERSION = source_data.SOURCE_VERSION
 STRIKE_FORCE_BATTLEFIELD_WIDTH_INCHES = 60.0
 STRIKE_FORCE_BATTLEFIELD_DEPTH_INCHES = 44.0
 
@@ -39,12 +44,15 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
     terrain_layouts = _terrain_layouts()
     primary_missions = _primary_missions()
     secondary_missions = _secondary_missions()
+    mission_actions = _mission_actions()
     challenger_cards = _challenger_cards()
+    scoring = source_data.mission_pack_scoring_row()
     return MissionPackDefinition(
-        mission_pack_id="chapter-approved-2025-26",
+        mission_pack_id=source_data.MISSION_PACK_ID,
         name="Chapter Approved 2025-26",
         source_version=CHAPTER_APPROVED_2025_26_SOURCE_VERSION,
         source_id=CHAPTER_APPROVED_2025_26_SOURCE_ID,
+        source_package=source_data.source_package_definition(),
         sequence=ChapterApprovedMissionSequence(
             sequence_id="chapter-approved-tournament-sequence",
             steps=(
@@ -79,26 +87,36 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
         ),
         primary_missions=primary_missions,
         secondary_missions=secondary_missions,
+        mission_actions=mission_actions,
         challenger_cards=challenger_cards,
         mission_pool_entries=_mission_pool_entries(),
         scoring_caps=TournamentScoringCaps(
-            primary_vp_cap=50,
-            secondary_vp_cap=40,
+            primary_vp_cap=scoring.primary_vp_cap,
+            secondary_vp_cap=scoring.secondary_vp_cap,
             battle_ready_vp=10,
-            total_vp_cap=100,
-            source_id="chapter_approved_2025_26_tournament_scoring",
+            total_vp_cap=scoring.total_vp_cap,
+            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:tournament-scoring",
         ),
         scoring=MissionPackScoringDefinition(
-            game_length_battle_rounds=5,
-            primary_scoring_phase="command",
-            primary_scoring_timing="phase_end",
-            secondary_vp_per_score=5,
-            mission_action_vp=5,
-            reserve_destruction_timing="end_of_battle_round_n",
-            reserve_destruction_battle_round=3,
-            reserve_destruction_excludes_during_battle_strategic_reserves=True,
-            reserve_destruction_only_declare_battle_formations=True,
-            source_id="chapter_approved_2025_26_scoring",
+            game_length_battle_rounds=scoring.game_length_battle_rounds,
+            primary_scoring_phase=scoring.primary_scoring_phase,
+            primary_scoring_timing=scoring.primary_scoring_timing,
+            secondary_vp_per_score=scoring.secondary_vp_per_score,
+            mission_action_vp=scoring.mission_action_vp,
+            primary_vp_cap=scoring.primary_vp_cap,
+            secondary_vp_cap=scoring.secondary_vp_cap,
+            total_vp_cap=scoring.total_vp_cap,
+            end_of_round_scoring_windows=scoring.end_of_round_scoring_windows,
+            end_of_game_scoring_windows=scoring.end_of_game_scoring_windows,
+            reserve_destruction_timing=scoring.reserve_destruction_timing,
+            reserve_destruction_battle_round=scoring.reserve_destruction_battle_round,
+            reserve_destruction_excludes_during_battle_strategic_reserves=(
+                scoring.reserve_destruction_excludes_during_battle_strategic_reserves
+            ),
+            reserve_destruction_only_declare_battle_formations=(
+                scoring.reserve_destruction_only_declare_battle_formations
+            ),
+            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:scoring",
         ),
     )
 
@@ -664,82 +682,79 @@ def _terrain_slot_id(preset: str) -> str:
 
 
 def _primary_missions() -> tuple[PrimaryMissionDefinition, ...]:
-    names = (
-        ("burden-of-trust", "Burden of Trust", None, None, None),
-        ("hidden-supplies", "Hidden Supplies", None, None, None),
-        ("linchpin", "Linchpin", 15, None, None),
-        ("purge-the-foe", "Purge the Foe", None, None, None),
-        ("scorched-earth", "Scorched Earth", None, None, None),
-        ("supply-drop", "Supply Drop", None, None, None),
-        ("take-and-hold", "Take and Hold", 15, "control_objectives", 5),
-        ("terraform", "Terraform", None, None, None),
-        ("the-ritual", "The Ritual", None, None, None),
-        ("unexploded-ordnance", "Unexploded Ordnance", None, None, None),
-    )
     return tuple(
         PrimaryMissionDefinition(
-            primary_mission_id=mission_id,
-            name=name,
-            max_vp_per_turn=max_vp,
-            scoring_kind=scoring_kind,
-            vp_per_controlled_objective=vp_per_objective,
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary:{mission_id}",
+            primary_mission_id=row.primary_mission_id,
+            name=row.name,
+            max_vp_per_turn=row.max_vp_per_turn,
+            scoring_kind=row.scoring_kind,
+            vp_per_controlled_objective=row.vp_per_controlled_objective,
+            scoring_rules=_scoring_rules(
+                row.scoring_rules,
+                source_prefix=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary:{row.primary_mission_id}",
+            ),
+            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary:{row.primary_mission_id}",
         )
-        for mission_id, name, max_vp, scoring_kind, vp_per_objective in names
+        for row in source_data.primary_mission_rows()
     )
 
 
 def _secondary_missions() -> tuple[SecondaryMissionDefinition, ...]:
-    missions = (
-        ("a-tempting-target", "A Tempting Target", SecondaryMissionAvailability.TACTICAL, False),
-        ("area-denial", "Area Denial", SecondaryMissionAvailability.TACTICAL, False),
-        ("assassination", "Assassination", SecondaryMissionAvailability.BOTH, True),
-        ("behind-enemy-lines", "Behind Enemy Lines", SecondaryMissionAvailability.TACTICAL, False),
-        ("bring-it-down", "Bring It Down", SecondaryMissionAvailability.BOTH, True),
-        ("cleanse", "Cleanse", SecondaryMissionAvailability.BOTH, True),
-        ("cull-the-horde", "Cull the Horde", SecondaryMissionAvailability.BOTH, True),
-        ("defend-stronghold", "Defend Stronghold", SecondaryMissionAvailability.TACTICAL, False),
-        ("display-of-might", "Display of Might", SecondaryMissionAvailability.TACTICAL, False),
-        (
-            "engage-on-all-fronts",
-            "Engage on All Fronts",
-            SecondaryMissionAvailability.TACTICAL,
-            False,
-        ),
-        ("establish-locus", "Establish Locus", SecondaryMissionAvailability.TACTICAL, False),
-        (
-            "extend-battle-lines",
-            "Extend Battle Lines",
-            SecondaryMissionAvailability.TACTICAL,
-            False,
-        ),
-        ("marked-for-death", "Marked for Death", SecondaryMissionAvailability.TACTICAL, False),
-        ("no-prisoners", "No Prisoners", SecondaryMissionAvailability.BOTH, False),
-        ("overwhelming-force", "Overwhelming Force", SecondaryMissionAvailability.TACTICAL, False),
-        ("recover-assets", "Recover Assets", SecondaryMissionAvailability.TACTICAL, False),
-        ("sabotage", "Sabotage", SecondaryMissionAvailability.TACTICAL, False),
-        (
-            "secure-no-mans-land",
-            "Secure No Man's Land",
-            SecondaryMissionAvailability.TACTICAL,
-            False,
-        ),
-        (
-            "storm-hostile-objective",
-            "Storm Hostile Objective",
-            SecondaryMissionAvailability.TACTICAL,
-            False,
-        ),
-    )
     return tuple(
         SecondaryMissionDefinition(
-            secondary_mission_id=mission_id,
-            name=name,
-            availability=availability,
-            tournament_fixed_allowed=tournament_fixed_allowed,
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:secondary:{mission_id}",
+            secondary_mission_id=row.secondary_mission_id,
+            name=row.name,
+            availability=SecondaryMissionAvailability(row.availability),
+            tournament_fixed_allowed=row.tournament_fixed_allowed,
+            scoring_rules=_scoring_rules(
+                row.scoring_rules,
+                source_prefix=(
+                    f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:secondary:{row.secondary_mission_id}"
+                ),
+            ),
+            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:secondary:{row.secondary_mission_id}",
         )
-        for mission_id, name, availability, tournament_fixed_allowed in missions
+        for row in source_data.secondary_mission_rows()
+    )
+
+
+def _mission_actions() -> tuple[MissionActionDefinition, ...]:
+    return tuple(
+        MissionActionDefinition(
+            mission_action_id=row.mission_action_id,
+            mission_id=row.mission_id,
+            mission_kind=row.mission_kind,
+            name=row.name,
+            start_phase=row.start_phase,
+            start_timing=row.start_timing,
+            completion_timing=row.completion_timing,
+            eligible_unit_policy=row.eligible_unit_policy,
+            target_policy=row.target_policy,
+            interruption_conditions=row.interruption_conditions,
+            victory_points=row.victory_points,
+            scoring_source_id=row.scoring_source_id,
+            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:action:{row.mission_action_id}",
+        )
+        for row in source_data.mission_action_rows()
+    )
+
+
+def _scoring_rules(
+    rows: tuple[source_data.SourceScoringRuleRow, ...],
+    *,
+    source_prefix: str,
+) -> tuple[MissionScoringRuleDefinition, ...]:
+    return tuple(
+        MissionScoringRuleDefinition(
+            rule_id=row.rule_id,
+            timing=row.timing,
+            source_kind=row.source_kind,
+            victory_points=row.victory_points,
+            cap=row.cap,
+            condition=row.condition,
+            source_id=f"{source_prefix}:scoring-rule:{row.rule_id}",
+        )
+        for row in rows
     )
 
 
