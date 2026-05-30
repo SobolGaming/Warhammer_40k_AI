@@ -26,6 +26,16 @@ class SecondaryMissionAvailability(StrEnum):
     BOTH = "both"
 
 
+class MissionSourcePackageDefinitionPayload(TypedDict):
+    edition_id: str
+    mission_pack_id: str
+    source_package_id: str
+    source_title: str
+    source_version: str
+    source_commit_or_import_hash: str
+    imported_at_schema_version: str
+
+
 class ChapterApprovedMissionSequencePayload(TypedDict):
     sequence_id: str
     steps: list[str]
@@ -61,6 +71,9 @@ class PrimaryMissionDefinitionPayload(TypedDict):
     name: str
     source_id: str
     max_vp_per_turn: int | None
+    scoring_kind: str | None
+    vp_per_controlled_objective: int | None
+    scoring_rules: list[MissionScoringRuleDefinitionPayload]
 
 
 class SecondaryMissionDefinitionPayload(TypedDict):
@@ -68,6 +81,33 @@ class SecondaryMissionDefinitionPayload(TypedDict):
     name: str
     availability: str
     tournament_fixed_allowed: bool
+    source_id: str
+    scoring_rules: list[MissionScoringRuleDefinitionPayload]
+
+
+class MissionScoringRuleDefinitionPayload(TypedDict):
+    rule_id: str
+    timing: str
+    source_kind: str
+    victory_points: int | None
+    cap: int | None
+    condition: str
+    source_id: str
+
+
+class MissionActionDefinitionPayload(TypedDict):
+    mission_action_id: str
+    mission_id: str
+    mission_kind: str
+    name: str
+    start_phase: str
+    start_timing: str
+    completion_timing: str
+    eligible_unit_policy: str
+    target_policy: str
+    interruption_conditions: list[str]
+    victory_points: int
+    scoring_source_id: str
     source_id: str
 
 
@@ -102,20 +142,41 @@ class TournamentScoringCapsPayload(TypedDict):
     source_id: str
 
 
+class MissionPackScoringDefinitionPayload(TypedDict):
+    game_length_battle_rounds: int
+    primary_scoring_phase: str
+    primary_scoring_timing: str
+    secondary_vp_per_score: int
+    mission_action_vp: int
+    primary_vp_cap: int
+    secondary_vp_cap: int
+    total_vp_cap: int
+    end_of_round_scoring_windows: list[str]
+    end_of_game_scoring_windows: list[str]
+    reserve_destruction_timing: str
+    reserve_destruction_battle_round: int | None
+    reserve_destruction_excludes_during_battle_strategic_reserves: bool
+    reserve_destruction_only_declare_battle_formations: bool
+    source_id: str
+
+
 class MissionPackDefinitionPayload(TypedDict):
     mission_pack_id: str
     name: str
     source_version: str
     source_id: str
+    source_package: MissionSourcePackageDefinitionPayload
     sequence: ChapterApprovedMissionSequencePayload
     deployment_maps: list[DeploymentMapDefinitionPayload]
     terrain_layout_templates: list[TerrainLayoutTemplatePayload]
     mission_deck: MissionDeckDefinitionPayload
     primary_missions: list[PrimaryMissionDefinitionPayload]
     secondary_missions: list[SecondaryMissionDefinitionPayload]
+    mission_actions: list[MissionActionDefinitionPayload]
     challenger_cards: list[ChallengerCardDefinitionPayload]
     mission_pool_entries: list[MissionPoolEntryPayload]
     scoring_caps: TournamentScoringCapsPayload
+    scoring: MissionPackScoringDefinitionPayload
 
 
 type PublicCardPayload = dict[str, bool | str]
@@ -423,11 +484,180 @@ class DeploymentMapDefinition:
 
 
 @dataclass(frozen=True, slots=True)
+class MissionSourcePackageDefinition:
+    edition_id: str
+    mission_pack_id: str
+    source_package_id: str
+    source_title: str
+    source_version: str
+    source_commit_or_import_hash: str
+    imported_at_schema_version: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "edition_id",
+            _validate_identifier("MissionSourcePackageDefinition edition_id", self.edition_id),
+        )
+        object.__setattr__(
+            self,
+            "mission_pack_id",
+            _validate_identifier(
+                "MissionSourcePackageDefinition mission_pack_id",
+                self.mission_pack_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_package_id",
+            _validate_identifier(
+                "MissionSourcePackageDefinition source_package_id",
+                self.source_package_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_title",
+            _validate_identifier(
+                "MissionSourcePackageDefinition source_title",
+                self.source_title,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_version",
+            _validate_identifier(
+                "MissionSourcePackageDefinition source_version",
+                self.source_version,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_commit_or_import_hash",
+            _validate_identifier(
+                "MissionSourcePackageDefinition source_commit_or_import_hash",
+                self.source_commit_or_import_hash,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "imported_at_schema_version",
+            _validate_identifier(
+                "MissionSourcePackageDefinition imported_at_schema_version",
+                self.imported_at_schema_version,
+            ),
+        )
+
+    def source_namespace_key(self) -> str:
+        return f"{self.edition_id}:{self.source_package_id}:{self.mission_pack_id}"
+
+    def to_payload(self) -> MissionSourcePackageDefinitionPayload:
+        return {
+            "edition_id": self.edition_id,
+            "mission_pack_id": self.mission_pack_id,
+            "source_package_id": self.source_package_id,
+            "source_title": self.source_title,
+            "source_version": self.source_version,
+            "source_commit_or_import_hash": self.source_commit_or_import_hash,
+            "imported_at_schema_version": self.imported_at_schema_version,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionSourcePackageDefinitionPayload) -> Self:
+        return cls(
+            edition_id=payload["edition_id"],
+            mission_pack_id=payload["mission_pack_id"],
+            source_package_id=payload["source_package_id"],
+            source_title=payload["source_title"],
+            source_version=payload["source_version"],
+            source_commit_or_import_hash=payload["source_commit_or_import_hash"],
+            imported_at_schema_version=payload["imported_at_schema_version"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MissionScoringRuleDefinition:
+    rule_id: str
+    timing: str
+    source_kind: str
+    victory_points: int | None
+    cap: int | None
+    condition: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "rule_id",
+            _validate_identifier("MissionScoringRuleDefinition rule_id", self.rule_id),
+        )
+        object.__setattr__(
+            self,
+            "timing",
+            _validate_identifier("MissionScoringRuleDefinition timing", self.timing),
+        )
+        object.__setattr__(
+            self,
+            "source_kind",
+            _validate_identifier("MissionScoringRuleDefinition source_kind", self.source_kind),
+        )
+        object.__setattr__(
+            self,
+            "victory_points",
+            _validate_optional_positive_int(
+                "MissionScoringRuleDefinition victory_points",
+                self.victory_points,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "cap",
+            _validate_optional_positive_int("MissionScoringRuleDefinition cap", self.cap),
+        )
+        object.__setattr__(
+            self,
+            "condition",
+            _validate_identifier("MissionScoringRuleDefinition condition", self.condition),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("MissionScoringRuleDefinition source_id", self.source_id),
+        )
+
+    def to_payload(self) -> MissionScoringRuleDefinitionPayload:
+        return {
+            "rule_id": self.rule_id,
+            "timing": self.timing,
+            "source_kind": self.source_kind,
+            "victory_points": self.victory_points,
+            "cap": self.cap,
+            "condition": self.condition,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionScoringRuleDefinitionPayload) -> Self:
+        return cls(
+            rule_id=payload["rule_id"],
+            timing=payload["timing"],
+            source_kind=payload["source_kind"],
+            victory_points=payload["victory_points"],
+            cap=payload["cap"],
+            condition=payload["condition"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class PrimaryMissionDefinition:
     primary_mission_id: str
     name: str
     source_id: str
     max_vp_per_turn: int | None = None
+    scoring_kind: str | None = None
+    vp_per_controlled_objective: int | None = None
+    scoring_rules: tuple[MissionScoringRuleDefinition, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -455,6 +685,36 @@ class PrimaryMissionDefinition:
                 self.max_vp_per_turn,
             ),
         )
+        object.__setattr__(
+            self,
+            "scoring_kind",
+            _validate_optional_identifier(
+                "PrimaryMissionDefinition scoring_kind",
+                self.scoring_kind,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "vp_per_controlled_objective",
+            _validate_optional_positive_int(
+                "PrimaryMissionDefinition vp_per_controlled_objective",
+                self.vp_per_controlled_objective,
+            ),
+        )
+        if self.scoring_kind is None and self.vp_per_controlled_objective is not None:
+            raise MissionPackError("PrimaryMissionDefinition scoring kind is required for VP data.")
+        if self.scoring_kind == "control_objectives" and self.vp_per_controlled_objective is None:
+            raise MissionPackError(
+                "PrimaryMissionDefinition control-objective scoring requires VP data."
+            )
+        object.__setattr__(
+            self,
+            "scoring_rules",
+            _validate_scoring_rule_tuple(
+                "PrimaryMissionDefinition scoring_rules",
+                self.scoring_rules,
+            ),
+        )
 
     def to_payload(self) -> PrimaryMissionDefinitionPayload:
         return {
@@ -462,6 +722,9 @@ class PrimaryMissionDefinition:
             "name": self.name,
             "source_id": self.source_id,
             "max_vp_per_turn": self.max_vp_per_turn,
+            "scoring_kind": self.scoring_kind,
+            "vp_per_controlled_objective": self.vp_per_controlled_objective,
+            "scoring_rules": [rule.to_payload() for rule in self.scoring_rules],
         }
 
     @classmethod
@@ -471,6 +734,11 @@ class PrimaryMissionDefinition:
             name=payload["name"],
             source_id=payload["source_id"],
             max_vp_per_turn=payload["max_vp_per_turn"],
+            scoring_kind=payload["scoring_kind"],
+            vp_per_controlled_objective=payload["vp_per_controlled_objective"],
+            scoring_rules=tuple(
+                MissionScoringRuleDefinition.from_payload(rule) for rule in payload["scoring_rules"]
+            ),
         )
 
 
@@ -481,6 +749,7 @@ class SecondaryMissionDefinition:
     availability: SecondaryMissionAvailability
     tournament_fixed_allowed: bool
     source_id: str
+    scoring_rules: tuple[MissionScoringRuleDefinition, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -510,6 +779,14 @@ class SecondaryMissionDefinition:
             self,
             "source_id",
             _validate_identifier("SecondaryMissionDefinition source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "scoring_rules",
+            _validate_scoring_rule_tuple(
+                "SecondaryMissionDefinition scoring_rules",
+                self.scoring_rules,
+            ),
         )
 
     def to_public_payload(
@@ -543,6 +820,7 @@ class SecondaryMissionDefinition:
             "availability": self.availability.value,
             "tournament_fixed_allowed": self.tournament_fixed_allowed,
             "source_id": self.source_id,
+            "scoring_rules": [rule.to_payload() for rule in self.scoring_rules],
         }
 
     @classmethod
@@ -552,6 +830,146 @@ class SecondaryMissionDefinition:
             name=payload["name"],
             availability=secondary_mission_availability_from_token(payload["availability"]),
             tournament_fixed_allowed=payload["tournament_fixed_allowed"],
+            source_id=payload["source_id"],
+            scoring_rules=tuple(
+                MissionScoringRuleDefinition.from_payload(rule) for rule in payload["scoring_rules"]
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class MissionActionDefinition:
+    mission_action_id: str
+    mission_id: str
+    mission_kind: str
+    name: str
+    start_phase: str
+    start_timing: str
+    completion_timing: str
+    eligible_unit_policy: str
+    target_policy: str
+    interruption_conditions: tuple[str, ...]
+    victory_points: int
+    scoring_source_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "mission_action_id",
+            _validate_unprefixed_identifier(
+                "MissionActionDefinition mission_action_id",
+                self.mission_action_id,
+                reserved_prefix="mission-action:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "mission_id",
+            _validate_identifier("MissionActionDefinition mission_id", self.mission_id),
+        )
+        object.__setattr__(
+            self,
+            "mission_kind",
+            _validate_identifier("MissionActionDefinition mission_kind", self.mission_kind),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("MissionActionDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "start_phase",
+            _validate_identifier("MissionActionDefinition start_phase", self.start_phase),
+        )
+        object.__setattr__(
+            self,
+            "start_timing",
+            _validate_identifier("MissionActionDefinition start_timing", self.start_timing),
+        )
+        object.__setattr__(
+            self,
+            "completion_timing",
+            _validate_identifier(
+                "MissionActionDefinition completion_timing",
+                self.completion_timing,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "eligible_unit_policy",
+            _validate_identifier(
+                "MissionActionDefinition eligible_unit_policy",
+                self.eligible_unit_policy,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_policy",
+            _validate_identifier("MissionActionDefinition target_policy", self.target_policy),
+        )
+        object.__setattr__(
+            self,
+            "interruption_conditions",
+            _validate_identifier_tuple(
+                "MissionActionDefinition interruption_conditions",
+                self.interruption_conditions,
+                min_length=0,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "victory_points",
+            _validate_positive_int("MissionActionDefinition victory_points", self.victory_points),
+        )
+        object.__setattr__(
+            self,
+            "scoring_source_id",
+            _validate_identifier(
+                "MissionActionDefinition scoring_source_id",
+                self.scoring_source_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("MissionActionDefinition source_id", self.source_id),
+        )
+
+    def to_payload(self) -> MissionActionDefinitionPayload:
+        return {
+            "mission_action_id": self.mission_action_id,
+            "mission_id": self.mission_id,
+            "mission_kind": self.mission_kind,
+            "name": self.name,
+            "start_phase": self.start_phase,
+            "start_timing": self.start_timing,
+            "completion_timing": self.completion_timing,
+            "eligible_unit_policy": self.eligible_unit_policy,
+            "target_policy": self.target_policy,
+            "interruption_conditions": list(self.interruption_conditions),
+            "victory_points": self.victory_points,
+            "scoring_source_id": self.scoring_source_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionActionDefinitionPayload) -> Self:
+        return cls(
+            mission_action_id=payload["mission_action_id"],
+            mission_id=payload["mission_id"],
+            mission_kind=payload["mission_kind"],
+            name=payload["name"],
+            start_phase=payload["start_phase"],
+            start_timing=payload["start_timing"],
+            completion_timing=payload["completion_timing"],
+            eligible_unit_policy=payload["eligible_unit_policy"],
+            target_policy=payload["target_policy"],
+            interruption_conditions=tuple(payload["interruption_conditions"]),
+            victory_points=payload["victory_points"],
+            scoring_source_id=payload["scoring_source_id"],
             source_id=payload["source_id"],
         )
 
@@ -837,20 +1255,213 @@ class TournamentScoringCaps:
 
 
 @dataclass(frozen=True, slots=True)
+class MissionPackScoringDefinition:
+    game_length_battle_rounds: int
+    primary_scoring_phase: str
+    primary_scoring_timing: str
+    secondary_vp_per_score: int
+    mission_action_vp: int
+    primary_vp_cap: int
+    secondary_vp_cap: int
+    total_vp_cap: int
+    end_of_round_scoring_windows: tuple[str, ...]
+    end_of_game_scoring_windows: tuple[str, ...]
+    reserve_destruction_timing: str
+    reserve_destruction_battle_round: int | None
+    reserve_destruction_excludes_during_battle_strategic_reserves: bool
+    reserve_destruction_only_declare_battle_formations: bool
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "game_length_battle_rounds",
+            _validate_positive_int(
+                "MissionPackScoringDefinition game_length_battle_rounds",
+                self.game_length_battle_rounds,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_scoring_phase",
+            _validate_identifier(
+                "MissionPackScoringDefinition primary_scoring_phase",
+                self.primary_scoring_phase,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_scoring_timing",
+            _validate_identifier(
+                "MissionPackScoringDefinition primary_scoring_timing",
+                self.primary_scoring_timing,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "secondary_vp_per_score",
+            _validate_positive_int(
+                "MissionPackScoringDefinition secondary_vp_per_score",
+                self.secondary_vp_per_score,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "mission_action_vp",
+            _validate_positive_int(
+                "MissionPackScoringDefinition mission_action_vp",
+                self.mission_action_vp,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_vp_cap",
+            _validate_positive_int(
+                "MissionPackScoringDefinition primary_vp_cap",
+                self.primary_vp_cap,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "secondary_vp_cap",
+            _validate_positive_int(
+                "MissionPackScoringDefinition secondary_vp_cap",
+                self.secondary_vp_cap,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "total_vp_cap",
+            _validate_positive_int(
+                "MissionPackScoringDefinition total_vp_cap",
+                self.total_vp_cap,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "end_of_round_scoring_windows",
+            _validate_identifier_tuple(
+                "MissionPackScoringDefinition end_of_round_scoring_windows",
+                self.end_of_round_scoring_windows,
+                min_length=1,
+                sort_values=False,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "end_of_game_scoring_windows",
+            _validate_identifier_tuple(
+                "MissionPackScoringDefinition end_of_game_scoring_windows",
+                self.end_of_game_scoring_windows,
+                min_length=1,
+                sort_values=False,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "reserve_destruction_timing",
+            _validate_identifier(
+                "MissionPackScoringDefinition reserve_destruction_timing",
+                self.reserve_destruction_timing,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "reserve_destruction_battle_round",
+            _validate_optional_positive_int(
+                "MissionPackScoringDefinition reserve_destruction_battle_round",
+                self.reserve_destruction_battle_round,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "reserve_destruction_excludes_during_battle_strategic_reserves",
+            _validate_bool(
+                "MissionPackScoringDefinition "
+                "reserve_destruction_excludes_during_battle_strategic_reserves",
+                self.reserve_destruction_excludes_during_battle_strategic_reserves,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "reserve_destruction_only_declare_battle_formations",
+            _validate_bool(
+                "MissionPackScoringDefinition reserve_destruction_only_declare_battle_formations",
+                self.reserve_destruction_only_declare_battle_formations,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("MissionPackScoringDefinition source_id", self.source_id),
+        )
+
+    def to_payload(self) -> MissionPackScoringDefinitionPayload:
+        return {
+            "game_length_battle_rounds": self.game_length_battle_rounds,
+            "primary_scoring_phase": self.primary_scoring_phase,
+            "primary_scoring_timing": self.primary_scoring_timing,
+            "secondary_vp_per_score": self.secondary_vp_per_score,
+            "mission_action_vp": self.mission_action_vp,
+            "primary_vp_cap": self.primary_vp_cap,
+            "secondary_vp_cap": self.secondary_vp_cap,
+            "total_vp_cap": self.total_vp_cap,
+            "end_of_round_scoring_windows": list(self.end_of_round_scoring_windows),
+            "end_of_game_scoring_windows": list(self.end_of_game_scoring_windows),
+            "reserve_destruction_timing": self.reserve_destruction_timing,
+            "reserve_destruction_battle_round": self.reserve_destruction_battle_round,
+            "reserve_destruction_excludes_during_battle_strategic_reserves": (
+                self.reserve_destruction_excludes_during_battle_strategic_reserves
+            ),
+            "reserve_destruction_only_declare_battle_formations": (
+                self.reserve_destruction_only_declare_battle_formations
+            ),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MissionPackScoringDefinitionPayload) -> Self:
+        return cls(
+            game_length_battle_rounds=payload["game_length_battle_rounds"],
+            primary_scoring_phase=payload["primary_scoring_phase"],
+            primary_scoring_timing=payload["primary_scoring_timing"],
+            secondary_vp_per_score=payload["secondary_vp_per_score"],
+            mission_action_vp=payload["mission_action_vp"],
+            primary_vp_cap=payload["primary_vp_cap"],
+            secondary_vp_cap=payload["secondary_vp_cap"],
+            total_vp_cap=payload["total_vp_cap"],
+            end_of_round_scoring_windows=tuple(payload["end_of_round_scoring_windows"]),
+            end_of_game_scoring_windows=tuple(payload["end_of_game_scoring_windows"]),
+            reserve_destruction_timing=payload["reserve_destruction_timing"],
+            reserve_destruction_battle_round=payload["reserve_destruction_battle_round"],
+            reserve_destruction_excludes_during_battle_strategic_reserves=payload[
+                "reserve_destruction_excludes_during_battle_strategic_reserves"
+            ],
+            reserve_destruction_only_declare_battle_formations=payload[
+                "reserve_destruction_only_declare_battle_formations"
+            ],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MissionPackDefinition:
     mission_pack_id: str
     name: str
     source_version: str
     source_id: str
+    source_package: MissionSourcePackageDefinition
     sequence: ChapterApprovedMissionSequence
     deployment_maps: tuple[DeploymentMapDefinition, ...]
     terrain_layout_templates: tuple[TerrainLayoutTemplate, ...]
     mission_deck: MissionDeckDefinition
     primary_missions: tuple[PrimaryMissionDefinition, ...]
     secondary_missions: tuple[SecondaryMissionDefinition, ...]
+    mission_actions: tuple[MissionActionDefinition, ...]
     challenger_cards: tuple[ChallengerCardDefinition, ...]
     mission_pool_entries: tuple[MissionPoolEntry, ...]
     scoring_caps: TournamentScoringCaps
+    scoring: MissionPackScoringDefinition
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -875,6 +1486,14 @@ class MissionPackDefinition:
             "source_id",
             _validate_identifier("MissionPackDefinition source_id", self.source_id),
         )
+        if type(self.source_package) is not MissionSourcePackageDefinition:
+            raise MissionPackError("MissionPackDefinition source_package must be source package.")
+        if self.source_package.mission_pack_id != self.mission_pack_id:
+            raise MissionPackError("MissionPackDefinition source_package mission_pack_id drift.")
+        if self.source_package.source_package_id != self.source_id:
+            raise MissionPackError("MissionPackDefinition source_package source_id drift.")
+        if self.source_package.source_version != self.source_version:
+            raise MissionPackError("MissionPackDefinition source_package source_version drift.")
         if type(self.sequence) is not ChapterApprovedMissionSequence:
             raise MissionPackError("MissionPackDefinition sequence must be a sequence.")
         deployment_maps = _validate_deployment_maps(self.deployment_maps)
@@ -883,10 +1502,13 @@ class MissionPackDefinition:
             raise MissionPackError("MissionPackDefinition mission_deck must be a deck.")
         primary_missions = _validate_primary_missions(self.primary_missions)
         secondary_missions = _validate_secondary_missions(self.secondary_missions)
+        mission_actions = _validate_mission_actions(self.mission_actions)
         challenger_cards = _validate_challenger_cards(self.challenger_cards)
         mission_pool_entries = _validate_mission_pool_entries(self.mission_pool_entries)
         if type(self.scoring_caps) is not TournamentScoringCaps:
             raise MissionPackError("MissionPackDefinition scoring_caps must be scoring caps.")
+        if type(self.scoring) is not MissionPackScoringDefinition:
+            raise MissionPackError("MissionPackDefinition scoring must be a scoring definition.")
         _validate_deck_references(
             mission_deck=self.mission_deck,
             deployment_maps=deployment_maps,
@@ -904,6 +1526,7 @@ class MissionPackDefinition:
         object.__setattr__(self, "terrain_layout_templates", terrain_layouts)
         object.__setattr__(self, "primary_missions", primary_missions)
         object.__setattr__(self, "secondary_missions", secondary_missions)
+        object.__setattr__(self, "mission_actions", mission_actions)
         object.__setattr__(self, "challenger_cards", challenger_cards)
         object.__setattr__(self, "mission_pool_entries", mission_pool_entries)
 
@@ -927,6 +1550,13 @@ class MissionPackDefinition:
             if mission.secondary_mission_id == requested_id:
                 return mission
         raise MissionPackError("MissionPackDefinition does not contain secondary_mission_id.")
+
+    def mission_action(self, mission_action_id: str) -> MissionActionDefinition:
+        requested_id = _validate_identifier("mission_action_id", mission_action_id)
+        for action in self.mission_actions:
+            if action.mission_action_id == requested_id:
+                return action
+        raise MissionPackError("MissionPackDefinition does not contain mission_action_id.")
 
     def challenger_card(self, challenger_card_id: str) -> ChallengerCardDefinition:
         requested_id = _validate_identifier("challenger_card_id", challenger_card_id)
@@ -959,6 +1589,7 @@ class MissionPackDefinition:
             "name": self.name,
             "source_version": self.source_version,
             "source_id": self.source_id,
+            "source_package": self.source_package.to_payload(),
             "sequence": self.sequence.to_payload(),
             "deployment_maps": [
                 deployment_map.to_payload() for deployment_map in self.deployment_maps
@@ -969,9 +1600,11 @@ class MissionPackDefinition:
             "mission_deck": self.mission_deck.to_payload(),
             "primary_missions": [mission.to_payload() for mission in self.primary_missions],
             "secondary_missions": [mission.to_payload() for mission in self.secondary_missions],
+            "mission_actions": [action.to_payload() for action in self.mission_actions],
             "challenger_cards": [card.to_payload() for card in self.challenger_cards],
             "mission_pool_entries": [entry.to_payload() for entry in self.mission_pool_entries],
             "scoring_caps": self.scoring_caps.to_payload(),
+            "scoring": self.scoring.to_payload(),
         }
 
     @classmethod
@@ -981,6 +1614,7 @@ class MissionPackDefinition:
             name=payload["name"],
             source_version=payload["source_version"],
             source_id=payload["source_id"],
+            source_package=MissionSourcePackageDefinition.from_payload(payload["source_package"]),
             sequence=ChapterApprovedMissionSequence.from_payload(payload["sequence"]),
             deployment_maps=tuple(
                 DeploymentMapDefinition.from_payload(deployment_map)
@@ -999,6 +1633,10 @@ class MissionPackDefinition:
                 SecondaryMissionDefinition.from_payload(mission)
                 for mission in payload["secondary_missions"]
             ),
+            mission_actions=tuple(
+                MissionActionDefinition.from_payload(action)
+                for action in payload["mission_actions"]
+            ),
             challenger_cards=tuple(
                 ChallengerCardDefinition.from_payload(card) for card in payload["challenger_cards"]
             ),
@@ -1006,6 +1644,7 @@ class MissionPackDefinition:
                 MissionPoolEntry.from_payload(entry) for entry in payload["mission_pool_entries"]
             ),
             scoring_caps=TournamentScoringCaps.from_payload(payload["scoring_caps"]),
+            scoring=MissionPackScoringDefinition.from_payload(payload["scoring"]),
         )
 
 
@@ -1107,6 +1746,33 @@ def _validate_secondary_missions(values: object) -> tuple[SecondaryMissionDefini
         values=values,
         expected_type=SecondaryMissionDefinition,
         identity=lambda item: item.secondary_mission_id,
+    )
+
+
+def _validate_scoring_rule_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[MissionScoringRuleDefinition, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError(f"{field_name} must be a tuple.")
+    entries: list[MissionScoringRuleDefinition] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not MissionScoringRuleDefinition:
+            raise MissionPackError(f"{field_name} must contain scoring rule values.")
+        if value.rule_id in seen:
+            raise MissionPackError(f"{field_name} must not contain duplicate rule IDs.")
+        seen.add(value.rule_id)
+        entries.append(value)
+    return tuple(sorted(entries, key=lambda item: item.rule_id))
+
+
+def _validate_mission_actions(values: object) -> tuple[MissionActionDefinition, ...]:
+    return _validate_unique_values(
+        field_name="MissionPackDefinition mission_actions",
+        values=values,
+        expected_type=MissionActionDefinition,
+        identity=lambda item: item.mission_action_id,
     )
 
 
@@ -1290,6 +1956,12 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise MissionPackError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
 
 
 def _validate_required_token(field_name: str, value: object, *, expected_token: str) -> str:

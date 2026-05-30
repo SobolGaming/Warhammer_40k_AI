@@ -788,7 +788,9 @@ def test_projection_submission_helpers_and_event_cursor_are_viewer_scoped() -> N
     assert view["public_secondary_mission_choices"][0] == {
         "player_id": "player-a",
         "selected": True,
-        "hidden": True,
+        "mode": "fixed",
+        "fixed_mission_ids": ["assassination", "bring_it_down"],
+        "hidden": False,
     }
     assert event_delta["cursor"] == 0
     assert event_delta["viewer_player_id"] == "player-b"

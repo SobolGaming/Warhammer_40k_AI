@@ -133,6 +133,18 @@ class SetupFlow:
                 "fixed_choice_count": len(choice.fixed_mission_ids),
             },
         )
+        if state.secondary_mission_choices_are_revealed():
+            decisions.event_log.append(
+                "secondary_missions_revealed",
+                {
+                    "game_id": state.game_id,
+                    "setup_step": SetupStep.SELECT_SECONDARY_MISSIONS.value,
+                    "choices": [
+                        selected_choice.to_payload()
+                        for selected_choice in state.secondary_mission_choices
+                    ],
+                },
+            )
 
     def _next_secondary_mission_player_id(self, state: GameState) -> str | None:
         missing_players = state.missing_secondary_mission_player_ids()

@@ -20,6 +20,11 @@ from warhammer40k_core.engine.game_state import (
     GameState,
     GameStatePayload,
 )
+from warhammer40k_core.engine.mission_decisions import (
+    MISSION_DECISION_TYPES,
+    apply_mission_decision,
+    invalid_mission_decision_status,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -176,7 +181,7 @@ class GameLifecycle:
             return LifecycleStatus.terminal(
                 stage=GameLifecycleStage.COMPLETE,
                 message="Game lifecycle is complete.",
-                payload={"game_id": state.game_id},
+                payload=state.game_result_payload(),
             )
         if state.stage is GameLifecycleStage.SETUP:
             return self._setup_flow.advance(
@@ -206,6 +211,19 @@ class GameLifecycle:
             )
             if malformed_status is not None:
                 return malformed_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type in MISSION_DECISION_TYPES
+        ):
+            result.validate_for_request(pending_request)
+            invalid_status = invalid_mission_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
         record = self.decision_controller.submit_result(result)
         if record.request.decision_type == SECONDARY_MISSION_DECISION_TYPE:
             self._setup_flow.apply_decision(
@@ -216,6 +234,13 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
             self._command_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type in MISSION_DECISION_TYPES:
+            apply_mission_decision(
                 state=state,
                 result=result,
                 decisions=self.decision_controller,

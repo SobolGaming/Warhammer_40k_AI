@@ -37,6 +37,8 @@ class GameViewPayload(TypedDict):
     battlefield_state: JsonValue
     mission_setup: JsonValue
     public_secondary_mission_choices: list[JsonValue]
+    public_secondary_mission_card_states: list[JsonValue]
+    public_victory_point_ledgers: list[JsonValue]
     pending_decision: DecisionRequestViewPayload | None
     pending_proposal: MovementProposalRequestPayload | None
     event_count: int
@@ -54,6 +56,7 @@ def project_game_view(
         raise GameLifecycleError("Game projection requires a started lifecycle.")
     viewer = _validate_viewer(state=state, viewer_player_id=viewer_player_id)
     pending_request = _pending_request(lifecycle)
+    secondary_mission_choices_revealed = state.secondary_mission_choices_are_revealed()
     battlefield_payload = (
         None if state.battlefield_state is None else state.battlefield_state.to_payload()
     )
@@ -72,8 +75,28 @@ def project_game_view(
         "battlefield_state": validate_json_value(battlefield_payload),
         "mission_setup": validate_json_value(mission_payload),
         "public_secondary_mission_choices": [
-            validate_json_value(choice.to_public_payload(viewer_player_id=viewer))
+            validate_json_value(
+                choice.to_public_payload(
+                    viewer_player_id=viewer,
+                    secondary_mission_choices_revealed=secondary_mission_choices_revealed,
+                )
+            )
             for choice in state.secondary_mission_choices
+        ],
+        "public_secondary_mission_card_states": [
+            validate_json_value(card_state_payload)
+            for card_state_payload in state.public_secondary_mission_card_states(
+                viewer_player_id=viewer
+            )
+        ],
+        "public_victory_point_ledgers": [
+            validate_json_value(
+                ledger.to_public_payload(
+                    viewer_player_id=viewer,
+                    secondary_mission_choices_revealed=secondary_mission_choices_revealed,
+                )
+            )
+            for ledger in state.victory_point_ledgers
         ],
         "pending_decision": None
         if pending_request is None
@@ -93,7 +116,7 @@ def _decision_request_view(
     if _secret_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
         return {
             "request_id": request.request_id,
-            "decision_type": request.decision_type,
+            "decision_type": _redacted_decision_type(request.decision_type),
             "actor_id": request.actor_id,
             "payload": {
                 "secret": True,
@@ -150,6 +173,16 @@ def _secret_request_hidden_from_viewer(
     if type(secret) is not bool:
         raise GameLifecycleError("Secret DecisionRequest payload flag must be a bool.")
     return secret
+
+
+def _redacted_decision_type(decision_type: str) -> str:
+    if decision_type in {
+        "draw_tactical_secondary_missions",
+        "discard_tactical_secondary_mission",
+        "start_mission_action",
+    }:
+        return "hidden_decision"
+    return decision_type
 
 
 def _validate_viewer(*, state: GameState, viewer_player_id: object) -> str:

@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 11D** is treated as implemented at the time this file was updated. Phase 11E is the next build slice.
+Everything through **Phase 11E** is treated as implemented at the time this file was updated. Phase 11F is the next build slice.
 
 Completed / implemented foundation:
 
@@ -70,6 +70,7 @@ Completed / implemented foundation:
 | 11B | Complete | Objective control geometry and mission objective model |
 | 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
 | 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
+| 11E | Complete | Mission actions, primary/secondary scoring, and end-of-turn cleanup |
 
 ## Cross-cutting architectural rules
 
@@ -1134,27 +1135,43 @@ CORE V1 relevant areas:
 
 ## Phase 11E: mission actions, primary/secondary scoring, and end-of-turn cleanup
 
+Status: Complete.
+
 Modules:
 
 - `engine/scoring.py`
 - `engine/missions.py`
+- `engine/mission_decisions.py`
 - `engine/actions.py`
 - `engine/turn_cleanup.py`
 - `engine/unit_coherency.py`
+- `rules/source_packages/warhammer_40000_10th/chapter_approved_2025_26.py`
 
 Objects:
 
 - `MissionScoringPolicy`
 - `VictoryPointLedger`
 - `MissionActionState`
+- `MissionSourcePackageDefinition`
+- `MissionActionDefinition`
 - `EndTurnCleanupState`
 - `CoherencyCleanupRemoval`
 
 Invariants:
 
-- scoring is mission-pack data, not hard-coded phase logic;
-- mission Actions have start timing, eligible units, interruption conditions, completion timing, and scoring effects;
-- Fixed and Tactical secondary scoring use hidden/public payload boundaries;
+- scoring, game length, caps, reserve deadline policy, secondary deck eligibility,
+  and supported mission Action timing/effects are source-backed
+  `warhammer_40000_10th` mission-pack data, not hard-coded phase logic;
+- primary and secondary VP awards consume source scoring-rule conditions and
+  per-card Fixed/Tactical VP values; unsupported conditions fail fast instead of
+  using default scoring amounts;
+- player-facing Tactical discard and supported mission Action start selections use
+  finite `DecisionRequest` options through `GameLifecycle.submit_decision(...)`;
+- mission Actions have source-backed start timing, eligible units, target IDs,
+  interruption conditions, completion timing, and scoring effects;
+- Select Secondary Missions uses a simultaneous-secret reveal gate; secondary
+  mode, Fixed IDs, Tactical draws/card states, and normal secondary scoring are
+  public after every player has selected;
 - objective control feeds scoring;
 - end-of-turn coherency cleanup removes models until each affected unit has one coherent group;
 - coherency-cleanup removals count as destroyed but do not trigger destroyed-model rules;
@@ -1163,10 +1180,14 @@ Invariants:
 
 Required tests:
 
-- primary scoring at correct timing;
-- Fixed secondary scoring preserves hidden/public boundaries;
-- Tactical secondary draw/score/discard flow works;
-- mission Action can start, complete, be interrupted, and score;
+- primary scoring at correct timing and source-backed battle-round gates;
+- secondary scoring uses source-backed Fixed/Tactical card VP values;
+- secondary choices stay hidden until every player has selected, then reveal to all viewers;
+- Tactical secondary draw/score/discard flow is public after the reveal gate;
+- Tactical secondary discard emits deterministic decision/event records through the lifecycle path;
+- mission Action can start through the lifecycle decision path, persist its target,
+  filter ineligible units, complete, be interrupted, and score;
+- source package payloads round-trip and preserve 10th Edition mission/scoring/action snapshots;
 - end-of-turn coherency cleanup removes models without destroyed triggers;
 - unarrived Reserves are destroyed at the configured deadline through the lifecycle hook;
 - victory point ledger round-trips;
@@ -1178,7 +1199,7 @@ Invariants:
 
 - game length is mission/ruleset data;
 - end-of-round and end-of-game scoring windows are explicit;
-- final VP ledger determines winner/draw;
+- final VP ledger audit verifies winner/draw payloads;
 - Chapter Approved 100VP cap and per-source caps are represented in scoring policy;
 - game-end payload includes public final score and replay-safe scoring audit.
 

@@ -13,6 +13,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     battle_phase_kind_from_token,
     setup_step_kind_from_token,
 )
+from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatePayload
 from warhammer40k_core.engine.aircraft import HoverModeState, HoverModeStatePayload
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -47,6 +48,11 @@ from warhammer40k_core.engine.endpoint_placement import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupPayload
+from warhammer40k_core.engine.missions import (
+    deterministic_tactical_secondary_draw,
+    mission_scoring_policy_from_setup,
+    reserve_destruction_policy_from_scoring_policy,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -69,7 +75,26 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseState,
     MovementPhaseStatePayload,
 )
-from warhammer40k_core.engine.reserves import ReserveState, ReserveStatePayload, ReserveStatus
+from warhammer40k_core.engine.reserves import (
+    ReserveState,
+    ReserveStatePayload,
+    ReserveStatus,
+    apply_reserve_destruction_to_battlefield,
+    resolve_unarrived_reserve_destruction,
+)
+from warhammer40k_core.engine.scoring import (
+    SecondaryMissionCardMode,
+    SecondaryMissionCardState,
+    SecondaryMissionCardStatePayload,
+    SecondaryMissionCardStatus,
+    VictoryPointAward,
+    VictoryPointLedger,
+    VictoryPointLedgerPayload,
+    VictoryPointSourceKind,
+    VictoryPointTransaction,
+    initial_victory_point_ledgers,
+    secondary_mission_card_mode_from_token,
+)
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
     DisembarkedUnitStatePayload,
@@ -77,11 +102,19 @@ from warhammer40k_core.engine.transports import (
     TransportCargoStatePayload,
 )
 from warhammer40k_core.engine.triggered_movement import SurgeMoveState, SurgeMoveStatePayload
+from warhammer40k_core.engine.turn_cleanup import (
+    EndTurnCleanupState,
+    EndTurnCleanupStatePayload,
+    resolve_end_turn_cleanup,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecord,
     StartingStrengthRecordPayload,
     starting_strength_records_for_units,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+    chapter_approved_2025_26 as tenth_ca_2025_26_source,
 )
 
 
@@ -132,6 +165,7 @@ class GameStatePayload(TypedDict):
     tactical_secondary_draw_count: int
     command_step_state: CommandStepStatePayload | None
     command_point_ledgers: list[CommandPointLedgerPayload]
+    victory_point_ledgers: list[VictoryPointLedgerPayload]
     army_definitions: list[ArmyDefinitionPayload]
     starting_strength_records: list[StartingStrengthRecordPayload]
     battlefield_state: BattlefieldRuntimeStatePayload | None
@@ -147,8 +181,11 @@ class GameStatePayload(TypedDict):
     battle_shocked_unit_ids: list[str]
     battle_shocked_unit_states: list[BattleShockedUnitStatePayload]
     objective_control_records: list[ObjectiveControlRecordPayload]
+    mission_action_states: list[MissionActionStatePayload]
+    end_turn_cleanup_states: list[EndTurnCleanupStatePayload]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
+    secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
 
 
 def _new_secondary_mission_choices() -> list[SecondaryMissionChoice]:
@@ -172,6 +209,10 @@ def _new_surge_move_states() -> list[SurgeMoveState]:
 
 
 def _new_command_point_ledgers() -> list[CommandPointLedger]:
+    return []
+
+
+def _new_victory_point_ledgers() -> list[VictoryPointLedger]:
     return []
 
 
@@ -207,7 +248,19 @@ def _new_objective_control_records() -> list[ObjectiveControlRecord]:
     return []
 
 
+def _new_mission_action_states() -> list[MissionActionState]:
+    return []
+
+
+def _new_end_turn_cleanup_states() -> list[EndTurnCleanupState]:
+    return []
+
+
 def _new_army_definitions() -> list[ArmyDefinition]:
+    return []
+
+
+def _new_secondary_mission_card_states() -> list[SecondaryMissionCardState]:
     return []
 
 
@@ -365,8 +418,13 @@ class SecondaryMissionChoice:
             fixed_mission_ids=tuple(payload["fixed_mission_ids"]),
         )
 
-    def to_public_payload(self, *, viewer_player_id: str) -> dict[str, JsonValue]:
-        if self.player_id != viewer_player_id:
+    def to_public_payload(
+        self,
+        *,
+        viewer_player_id: str,
+        secondary_mission_choices_revealed: bool,
+    ) -> dict[str, JsonValue]:
+        if self.player_id != viewer_player_id and not secondary_mission_choices_revealed:
             return {
                 "player_id": self.player_id,
                 "selected": True,
@@ -455,6 +513,9 @@ class GameState:
     command_point_ledgers: list[CommandPointLedger] = field(
         default_factory=_new_command_point_ledgers
     )
+    victory_point_ledgers: list[VictoryPointLedger] = field(
+        default_factory=_new_victory_point_ledgers
+    )
     army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
     starting_strength_records: list[StartingStrengthRecord] = field(
         default_factory=_new_starting_strength_records
@@ -482,11 +543,20 @@ class GameState:
     objective_control_records: list[ObjectiveControlRecord] = field(
         default_factory=_new_objective_control_records
     )
+    mission_action_states: list[MissionActionState] = field(
+        default_factory=_new_mission_action_states
+    )
+    end_turn_cleanup_states: list[EndTurnCleanupState] = field(
+        default_factory=_new_end_turn_cleanup_states
+    )
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
     tactical_secondary_draws: list[TacticalSecondaryDraw] = field(
         default_factory=_new_tactical_secondary_draws
+    )
+    secondary_mission_card_states: list[SecondaryMissionCardState] = field(
+        default_factory=_new_secondary_mission_card_states
     )
 
     def __post_init__(self) -> None:
@@ -535,6 +605,10 @@ class GameState:
         self.command_step_state = _validate_optional_command_step_state(self.command_step_state)
         self.command_point_ledgers = _validate_command_point_ledgers(
             self.command_point_ledgers,
+            player_ids=self.player_ids,
+        )
+        self.victory_point_ledgers = _validate_victory_point_ledgers(
+            self.victory_point_ledgers,
             player_ids=self.player_ids,
         )
         self.army_definitions = _validate_army_definitions(
@@ -601,12 +675,25 @@ class GameState:
             game_id=self.game_id,
             player_ids=self.player_ids,
         )
+        self.mission_action_states = _validate_mission_action_states(
+            self.mission_action_states,
+            player_ids=self.player_ids,
+        )
+        self.end_turn_cleanup_states = _validate_end_turn_cleanup_states(
+            self.end_turn_cleanup_states,
+            game_id=self.game_id,
+            player_ids=self.player_ids,
+        )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
             player_ids=self.player_ids,
         )
         self.tactical_secondary_draws = _validate_tactical_draws(
             self.tactical_secondary_draws,
+            player_ids=self.player_ids,
+        )
+        self.secondary_mission_card_states = _validate_secondary_mission_card_states(
+            self.secondary_mission_card_states,
             player_ids=self.player_ids,
         )
         _validate_hover_mode_state_references(self)
@@ -624,6 +711,7 @@ class GameState:
             turn_order=config.turn_order,
             tactical_secondary_draw_count=config.tactical_secondary_draw_count,
             command_point_ledgers=initial_command_point_ledgers(config.player_ids),
+            victory_point_ledgers=initial_victory_point_ledgers(config.player_ids),
             mission_setup=config.mission_setup,
         )
 
@@ -670,10 +758,11 @@ class GameState:
         if self.battle_phase_index is None:
             raise GameLifecycleError("GameState has no current battle phase.")
         completed_phase = self.battle_phase_sequence[self.battle_phase_index]
-        self._record_objective_control_boundary(
+        phase_end_record = self._record_objective_control_boundary(
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.PHASE_END,
         )
+        self._score_objective_control_boundary(phase_end_record)
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
             if completed_phase is BattlePhase.COMMAND:
                 self.command_step_state = None
@@ -688,14 +777,28 @@ class GameState:
             player_id=completed_player_id,
             battle_round=self.battle_round,
         )
-        self._record_objective_control_boundary(
+        turn_end_record = self._record_objective_control_boundary(
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.TURN_END,
         )
+        self._score_objective_control_boundary(turn_end_record)
+        self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
         if completed_phase is BattlePhase.COMMAND:
             self.command_step_state = None
         if completed_phase is BattlePhase.MOVEMENT:
             self.movement_phase_state = None
+        completed_round = self.battle_round
+        battle_round_ended = self._active_player_is_last_in_round(completed_player_id)
+        if battle_round_ended:
+            self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=False)
+        if battle_round_ended and self._game_ends_after_completed_round(completed_round):
+            self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=True)
+            self.stage = GameLifecycleStage.COMPLETE
+            self.battle_phase_index = None
+            self.active_player_id = None
+            self.command_step_state = None
+            self.movement_phase_state = None
+            return completed_phase
         self.battle_phase_index = 0
         self._advance_active_player_after_completed_turn()
         return completed_phase
@@ -707,6 +810,7 @@ class GameState:
             raise GameLifecycleError("SecondaryMissionChoice already exists for player.")
         self.secondary_mission_choices.append(choice)
         self.secondary_mission_choices.sort(key=lambda stored: stored.player_id)
+        self.record_fixed_secondary_cards_for_choice(choice)
 
     def secondary_mission_choice_for_player(
         self,
@@ -717,6 +821,9 @@ class GameState:
             if choice.player_id == requested_player_id:
                 return choice
         return None
+
+    def secondary_mission_choices_are_revealed(self) -> bool:
+        return not self.missing_secondary_mission_player_ids()
 
     def missing_secondary_mission_player_ids(self) -> tuple[str, ...]:
         selected = {choice.player_id for choice in self.secondary_mission_choices}
@@ -779,6 +886,93 @@ class GameState:
             ]
             self.command_point_ledgers.sort(key=lambda stored: stored.player_id)
         return result
+
+    def victory_point_ledger_for_player(self, player_id: str) -> VictoryPointLedger:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        for ledger in self.victory_point_ledgers:
+            if ledger.player_id == requested_player_id:
+                return ledger
+        raise GameLifecycleError("VictoryPointLedger player_id was not found.")
+
+    def victory_point_total(self, player_id: str) -> int:
+        return self.victory_point_ledger_for_player(player_id).victory_points
+
+    def award_victory_points(self, award: VictoryPointAward) -> VictoryPointTransaction:
+        if type(award) is not VictoryPointAward:
+            raise GameLifecycleError("GameState award must be a VictoryPointAward.")
+        requested_player_id = _validate_player_id(award.player_id, player_ids=self.player_ids)
+        ledger = self.victory_point_ledger_for_player(requested_player_id)
+        updated, transaction = ledger.award(award)
+        self.victory_point_ledgers = [
+            updated if stored.player_id == requested_player_id else stored
+            for stored in self.victory_point_ledgers
+        ]
+        self.victory_point_ledgers.sort(key=lambda stored: stored.player_id)
+        return transaction
+
+    def record_mission_action_state(self, action_state: MissionActionState) -> None:
+        if type(action_state) is not MissionActionState:
+            raise GameLifecycleError("mission_action_state must be a MissionActionState.")
+        if action_state.player_id not in self.player_ids:
+            raise GameLifecycleError("MissionActionState player_id is not in this game.")
+        if any(stored.action_id == action_state.action_id for stored in self.mission_action_states):
+            raise GameLifecycleError("MissionActionState already exists for action_id.")
+        self.mission_action_states.append(action_state)
+        self.mission_action_states.sort(key=lambda state: state.action_id)
+
+    def mission_action_state_by_id(self, action_id: str) -> MissionActionState:
+        requested_action_id = _validate_identifier("action_id", action_id)
+        for action_state in self.mission_action_states:
+            if action_state.action_id == requested_action_id:
+                return action_state
+        raise GameLifecycleError("MissionActionState action_id was not found.")
+
+    def replace_mission_action_state(self, action_state: MissionActionState) -> None:
+        if type(action_state) is not MissionActionState:
+            raise GameLifecycleError("mission_action_state must be a MissionActionState.")
+        for index, stored in enumerate(self.mission_action_states):
+            if stored.action_id == action_state.action_id:
+                self.mission_action_states[index] = action_state
+                self.mission_action_states.sort(key=lambda state: state.action_id)
+                return
+        raise GameLifecycleError("MissionActionState does not exist for action_id.")
+
+    def complete_mission_action(
+        self,
+        *,
+        action_id: str,
+        completion_phase: BattlePhase,
+    ) -> MissionActionState:
+        if self.mission_setup is None:
+            raise GameLifecycleError("Mission Action scoring requires MissionSetup.")
+        if type(completion_phase) is not BattlePhase:
+            raise GameLifecycleError("completion_phase must be a BattlePhase.")
+        action_state = self.mission_action_state_by_id(action_id)
+        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        award = policy.mission_action_award(
+            player_id=action_state.player_id,
+            battle_round=self.battle_round,
+            phase=completion_phase.value,
+            action_id=action_state.action_id,
+            source_id=action_state.scoring_source_id,
+            amount=action_state.victory_points,
+        )
+        transaction = self.award_victory_points(award)
+        completed = action_state.complete(
+            battle_round=self.battle_round,
+            phase=completion_phase.value,
+            completion_timing=action_state.completion_timing,
+            award=award,
+            transaction_id=transaction.transaction_id,
+        )
+        self.replace_mission_action_state(completed)
+        return completed
+
+    def interrupt_mission_action(self, *, action_id: str, reason: str) -> MissionActionState:
+        action_state = self.mission_action_state_by_id(action_id)
+        interrupted = action_state.interrupt(reason=reason)
+        self.replace_mission_action_state(interrupted)
+        return interrupted
 
     def starting_strength_record_for_unit(self, unit_instance_id: str) -> StartingStrengthRecord:
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
@@ -939,6 +1133,212 @@ class GameState:
             draw.player_id == requested_player_id and draw.battle_round == requested_round
             for draw in self.tactical_secondary_draws
         )
+
+    def draw_tactical_secondary_cards(
+        self,
+        *,
+        player_id: str,
+        source_result_id: str,
+    ) -> tuple[SecondaryMissionCardState, ...]:
+        if self.mission_setup is None:
+            raise GameLifecycleError("Tactical secondary draw requires MissionSetup.")
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        result_id = _validate_identifier("source_result_id", source_result_id)
+        excluded_ids = tuple(
+            state.secondary_mission_id
+            for state in self.secondary_mission_card_states
+            if state.player_id == requested_player_id
+        )
+        secondary_ids = deterministic_tactical_secondary_draw(
+            mission_setup=self.mission_setup,
+            player_id=requested_player_id,
+            battle_round=self.battle_round,
+            draw_count=self.tactical_secondary_draw_count,
+            excluded_secondary_mission_ids=excluded_ids,
+        )
+        card_states = tuple(
+            SecondaryMissionCardState.active_tactical(
+                player_id=requested_player_id,
+                secondary_mission_id=secondary_id,
+                battle_round=self.battle_round,
+                source_result_id=result_id,
+            )
+            for secondary_id in secondary_ids
+        )
+        for card_state in card_states:
+            self.record_secondary_mission_card_state(card_state)
+        return card_states
+
+    def record_fixed_secondary_cards_for_choice(self, choice: SecondaryMissionChoice) -> None:
+        if type(choice) is not SecondaryMissionChoice:
+            raise GameLifecycleError("choice must be a SecondaryMissionChoice.")
+        if choice.mode is not SecondaryMissionMode.FIXED:
+            return
+        for secondary_id in choice.fixed_mission_ids:
+            if (
+                self.secondary_mission_card_state(
+                    player_id=choice.player_id,
+                    secondary_mission_id=secondary_id,
+                    mode=SecondaryMissionCardMode.FIXED,
+                )
+                is not None
+            ):
+                continue
+            self.record_secondary_mission_card_state(
+                SecondaryMissionCardState.active_fixed(
+                    player_id=choice.player_id,
+                    secondary_mission_id=secondary_id,
+                )
+            )
+
+    def record_secondary_mission_card_state(
+        self,
+        card_state: SecondaryMissionCardState,
+    ) -> None:
+        if type(card_state) is not SecondaryMissionCardState:
+            raise GameLifecycleError("card_state must be a SecondaryMissionCardState.")
+        if card_state.player_id not in self.player_ids:
+            raise GameLifecycleError("SecondaryMissionCardState player_id is not in this game.")
+        key = (
+            card_state.player_id,
+            card_state.secondary_mission_id,
+            card_state.mode,
+            card_state.battle_round,
+        )
+        if any(
+            (
+                stored.player_id,
+                stored.secondary_mission_id,
+                stored.mode,
+                stored.battle_round,
+            )
+            == key
+            for stored in self.secondary_mission_card_states
+        ):
+            raise GameLifecycleError("SecondaryMissionCardState already exists.")
+        self.secondary_mission_card_states.append(card_state)
+        self.secondary_mission_card_states.sort(
+            key=lambda state: (
+                state.player_id,
+                state.battle_round,
+                state.mode.value,
+                state.secondary_mission_id,
+            )
+        )
+
+    def secondary_mission_card_state(
+        self,
+        *,
+        player_id: str,
+        secondary_mission_id: str,
+        mode: SecondaryMissionCardMode,
+    ) -> SecondaryMissionCardState | None:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_secondary_id = _validate_identifier("secondary_mission_id", secondary_mission_id)
+        requested_mode = secondary_mission_card_mode_from_token(mode)
+        active_matches = [
+            state
+            for state in self.secondary_mission_card_states
+            if state.player_id == requested_player_id
+            and state.secondary_mission_id == requested_secondary_id
+            and state.mode is requested_mode
+            and state.status is SecondaryMissionCardStatus.ACTIVE
+        ]
+        if not active_matches:
+            return None
+        if len(active_matches) > 1:
+            raise GameLifecycleError("Multiple active secondary card states found.")
+        return active_matches[0]
+
+    def score_secondary_mission(
+        self,
+        *,
+        player_id: str,
+        secondary_mission_id: str,
+        mode: SecondaryMissionCardMode,
+        phase: BattlePhase,
+    ) -> SecondaryMissionCardState:
+        if self.mission_setup is None:
+            raise GameLifecycleError("Secondary mission scoring requires MissionSetup.")
+        if type(phase) is not BattlePhase:
+            raise GameLifecycleError("Secondary mission scoring phase must be a BattlePhase.")
+        requested_mode = secondary_mission_card_mode_from_token(mode)
+        card_state = self.secondary_mission_card_state(
+            player_id=player_id,
+            secondary_mission_id=secondary_mission_id,
+            mode=requested_mode,
+        )
+        if card_state is None:
+            raise GameLifecycleError("Secondary mission card is not active.")
+        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        source_kind = (
+            VictoryPointSourceKind.FIXED_SECONDARY
+            if requested_mode is SecondaryMissionCardMode.FIXED
+            else VictoryPointSourceKind.TACTICAL_SECONDARY
+        )
+        transaction = self.award_victory_points(
+            policy.secondary_award(
+                player_id=card_state.player_id,
+                battle_round=self.battle_round,
+                phase=phase.value,
+                secondary_mission_id=card_state.secondary_mission_id,
+                source_kind=source_kind,
+                hidden=False,
+            )
+        )
+        scored = card_state.score(transaction_id=transaction.transaction_id)
+        self._replace_secondary_mission_card_state(scored)
+        return scored
+
+    def discard_tactical_secondary(
+        self,
+        *,
+        player_id: str,
+        secondary_mission_id: str,
+        result_id: str,
+    ) -> SecondaryMissionCardState:
+        card_state = self.secondary_mission_card_state(
+            player_id=player_id,
+            secondary_mission_id=secondary_mission_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+        )
+        if card_state is None:
+            raise GameLifecycleError("Tactical secondary card is not active.")
+        discarded = card_state.discard(result_id=result_id)
+        self._replace_secondary_mission_card_state(discarded)
+        return discarded
+
+    def _replace_secondary_mission_card_state(
+        self,
+        card_state: SecondaryMissionCardState,
+    ) -> None:
+        if type(card_state) is not SecondaryMissionCardState:
+            raise GameLifecycleError("card_state must be a SecondaryMissionCardState.")
+        key = (
+            card_state.player_id,
+            card_state.secondary_mission_id,
+            card_state.mode,
+            card_state.battle_round,
+        )
+        for index, stored in enumerate(self.secondary_mission_card_states):
+            stored_key = (
+                stored.player_id,
+                stored.secondary_mission_id,
+                stored.mode,
+                stored.battle_round,
+            )
+            if stored_key == key:
+                self.secondary_mission_card_states[index] = card_state
+                self.secondary_mission_card_states.sort(
+                    key=lambda state: (
+                        state.player_id,
+                        state.battle_round,
+                        state.mode.value,
+                        state.secondary_mission_id,
+                    )
+                )
+                return
+        raise GameLifecycleError("SecondaryMissionCardState does not exist.")
 
     def record_objective_control_record(self, record: ObjectiveControlRecord) -> None:
         if type(record) is not ObjectiveControlRecord:
@@ -1274,6 +1674,7 @@ class GameState:
                 None if self.command_step_state is None else self.command_step_state.to_payload()
             ),
             "command_point_ledgers": [ledger.to_payload() for ledger in self.command_point_ledgers],
+            "victory_point_ledgers": [ledger.to_payload() for ledger in self.victory_point_ledgers],
             "army_definitions": [army.to_payload() for army in self.army_definitions],
             "starting_strength_records": [
                 record.to_payload() for record in self.starting_strength_records
@@ -1305,16 +1706,24 @@ class GameState:
             "objective_control_records": [
                 record.to_payload() for record in self.objective_control_records
             ],
+            "mission_action_states": [state.to_payload() for state in self.mission_action_states],
+            "end_turn_cleanup_states": [
+                state.to_payload() for state in self.end_turn_cleanup_states
+            ],
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
             "tactical_secondary_draws": [
                 draw.to_payload() for draw in self.tactical_secondary_draws
             ],
+            "secondary_mission_card_states": [
+                state.to_payload() for state in self.secondary_mission_card_states
+            ],
         }
 
     def to_public_payload(self, *, viewer_player_id: str) -> dict[str, JsonValue]:
         viewer = _validate_player_id(viewer_player_id, player_ids=self.player_ids)
+        secondary_mission_choices_revealed = self.secondary_mission_choices_are_revealed()
         public_choices: list[dict[str, JsonValue]] = []
         for player_id in self.player_ids:
             choice = self.secondary_mission_choice_for_player(player_id)
@@ -1327,12 +1736,76 @@ class GameState:
                     }
                 )
                 continue
-            public_choices.append(choice.to_public_payload(viewer_player_id=viewer))
+            public_choices.append(
+                choice.to_public_payload(
+                    viewer_player_id=viewer,
+                    secondary_mission_choices_revealed=secondary_mission_choices_revealed,
+                )
+            )
 
         payload = cast(dict[str, JsonValue], self.to_payload())
         payload["secondary_mission_choices"] = cast(JsonValue, public_choices)
+        payload["victory_point_ledgers"] = [
+            ledger.to_public_payload(
+                viewer_player_id=viewer,
+                secondary_mission_choices_revealed=secondary_mission_choices_revealed,
+            )
+            for ledger in self.victory_point_ledgers
+        ]
+        payload["secondary_mission_card_states"] = cast(
+            JsonValue,
+            self.public_secondary_mission_card_states(viewer_player_id=viewer),
+        )
+        payload["tactical_secondary_draws"] = cast(
+            JsonValue,
+            self.public_tactical_secondary_draws(viewer_player_id=viewer),
+        )
+        payload["mission_action_states"] = cast(
+            JsonValue,
+            self.public_mission_action_states(viewer_player_id=viewer),
+        )
         validate_json_value(payload)
         return payload
+
+    def public_secondary_mission_card_states(
+        self,
+        *,
+        viewer_player_id: str,
+    ) -> list[dict[str, JsonValue]]:
+        viewer = _validate_player_id(viewer_player_id, player_ids=self.player_ids)
+        secondary_mission_choices_revealed = self.secondary_mission_choices_are_revealed()
+        return [
+            state.to_public_payload(
+                viewer_player_id=viewer,
+                secondary_mission_choices_revealed=secondary_mission_choices_revealed,
+            )
+            for state in self.secondary_mission_card_states
+            if secondary_mission_choices_revealed or state.player_id == viewer
+        ]
+
+    def public_tactical_secondary_draws(
+        self,
+        *,
+        viewer_player_id: str,
+    ) -> list[dict[str, JsonValue]]:
+        viewer = _validate_player_id(viewer_player_id, player_ids=self.player_ids)
+        secondary_mission_choices_revealed = self.secondary_mission_choices_are_revealed()
+        return [
+            cast(dict[str, JsonValue], draw.to_payload())
+            for draw in self.tactical_secondary_draws
+            if secondary_mission_choices_revealed or draw.player_id == viewer
+        ]
+
+    def public_mission_action_states(
+        self,
+        *,
+        viewer_player_id: str,
+    ) -> list[dict[str, JsonValue]]:
+        _validate_player_id(viewer_player_id, player_ids=self.player_ids)
+        return [
+            cast(dict[str, JsonValue], action_state.to_payload())
+            for action_state in self.mission_action_states
+        ]
 
     @classmethod
     def from_payload(cls, payload: GameStatePayload) -> Self:
@@ -1362,6 +1835,10 @@ class GameState:
             command_point_ledgers=[
                 CommandPointLedger.from_payload(ledger)
                 for ledger in payload["command_point_ledgers"]
+            ],
+            victory_point_ledgers=[
+                VictoryPointLedger.from_payload(ledger)
+                for ledger in payload["victory_point_ledgers"]
             ],
             army_definitions=[
                 _army_definition_from_payload(army) for army in payload["army_definitions"]
@@ -1417,6 +1894,13 @@ class GameState:
                 ObjectiveControlRecord.from_payload(record)
                 for record in payload["objective_control_records"]
             ],
+            mission_action_states=[
+                MissionActionState.from_payload(state) for state in payload["mission_action_states"]
+            ],
+            end_turn_cleanup_states=[
+                EndTurnCleanupState.from_payload(state)
+                for state in payload["end_turn_cleanup_states"]
+            ],
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -1424,6 +1908,10 @@ class GameState:
             tactical_secondary_draws=[
                 TacticalSecondaryDraw.from_payload(draw)
                 for draw in payload["tactical_secondary_draws"]
+            ],
+            secondary_mission_card_states=[
+                SecondaryMissionCardState.from_payload(state)
+                for state in payload["secondary_mission_card_states"]
             ],
         )
 
@@ -1465,7 +1953,7 @@ class GameState:
         *,
         completed_phase: BattlePhase,
         timing: ObjectiveControlTiming,
-    ) -> None:
+    ) -> ObjectiveControlRecord:
         if self.mission_setup is None:
             raise GameLifecycleError("Objective control updates require MissionSetup.")
         if self.battlefield_state is None:
@@ -1480,6 +1968,103 @@ class GameState:
             )
         )
         self.record_objective_control_record(record)
+        return record
+
+    def _score_objective_control_boundary(self, record: ObjectiveControlRecord) -> None:
+        if self.mission_setup is None:
+            raise GameLifecycleError("Mission scoring requires MissionSetup.")
+        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        award = policy.primary_award_from_objective_control(record)
+        if award is None:
+            return
+        self.award_victory_points(award)
+
+    def _resolve_end_turn_cleanup_boundary(self, *, completed_phase: BattlePhase) -> None:
+        if self.battlefield_state is None:
+            raise GameLifecycleError("End-turn cleanup requires battlefield_state.")
+        if self.active_player_id is None:
+            raise GameLifecycleError("End-turn cleanup requires an active player.")
+        scenario = BattlefieldScenario(
+            armies=tuple(self.army_definitions),
+            battlefield_state=self.battlefield_state,
+        )
+        cleanup, updated_battlefield = resolve_end_turn_cleanup(
+            game_id=self.game_id,
+            scenario=scenario,
+            ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            phase=completed_phase,
+        )
+        self.battlefield_state = updated_battlefield
+        self.end_turn_cleanup_states.append(cleanup)
+        self.end_turn_cleanup_states.sort(key=lambda state: state.cleanup_id)
+
+    def _resolve_unarrived_reserve_destruction_boundary(self, *, end_of_battle: bool) -> None:
+        if self.mission_setup is None:
+            raise GameLifecycleError("Reserve destruction requires MissionSetup.")
+        if self.battlefield_state is None:
+            raise GameLifecycleError("Reserve destruction requires battlefield_state.")
+        policy = reserve_destruction_policy_from_scoring_policy(
+            mission_scoring_policy_from_setup(self.mission_setup)
+        )
+        destruction = resolve_unarrived_reserve_destruction(
+            reserve_states=tuple(self.reserve_states),
+            armies=tuple(self.army_definitions),
+            battlefield_state=self.battlefield_state,
+            policy=policy,
+            battle_round=self.battle_round,
+            end_of_battle=end_of_battle,
+        )
+        if not destruction.destroyed_model_instance_ids:
+            return
+        self.battlefield_state = apply_reserve_destruction_to_battlefield(
+            battlefield_state=self.battlefield_state,
+            destruction=destruction,
+        )
+        self.reserve_states = list(destruction.updated_reserve_states)
+
+    def _ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
+        if self.mission_setup is not None and (
+            self.mission_setup.mission_pack_id == tenth_ca_2025_26_source.MISSION_PACK_ID
+        ):
+            return RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26()
+        return RulesetDescriptor.warhammer_40000_tenth()
+
+    def _active_player_is_last_in_round(self, player_id: str) -> bool:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        return self.turn_order.index(requested_player_id) + 1 == len(self.turn_order)
+
+    def _game_ends_after_completed_round(self, battle_round: int) -> bool:
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        if self.mission_setup is None:
+            raise GameLifecycleError("Game-end policy requires MissionSetup.")
+        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        return requested_round >= policy.game_length_battle_rounds
+
+    def game_result_payload(self) -> dict[str, JsonValue]:
+        totals: list[JsonValue] = [
+            validate_json_value(
+                {"player_id": ledger.player_id, "victory_points": ledger.victory_points}
+            )
+            for ledger in self.victory_point_ledgers
+        ]
+        if not totals:
+            raise GameLifecycleError("Game result requires victory point ledgers.")
+        max_score = max(ledger.victory_points for ledger in self.victory_point_ledgers)
+        winner_ids = tuple(
+            ledger.player_id
+            for ledger in self.victory_point_ledgers
+            if ledger.victory_points == max_score
+        )
+        payload: dict[str, JsonValue] = {
+            "game_id": self.game_id,
+            "battle_round": self.battle_round,
+            "final_scores": totals,
+            "winner_player_ids": list(winner_ids),
+            "is_draw": len(winner_ids) != 1,
+        }
+        return payload
 
     def _assert_battlefield_state_clear_of_objective_markers(
         self,
@@ -1725,6 +2310,33 @@ def _validate_command_point_ledgers(
         validated.append(value)
     if set(seen) != set(player_ids):
         raise GameLifecycleError("GameState command_point_ledgers must include every player.")
+    return sorted(validated, key=lambda ledger: ledger.player_id)
+
+
+def _validate_victory_point_ledgers(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[VictoryPointLedger]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState victory_point_ledgers must be a list.")
+    if not values:
+        return initial_victory_point_ledgers(player_ids)
+    validated: list[VictoryPointLedger] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not VictoryPointLedger:
+            raise GameLifecycleError(
+                "GameState victory_point_ledgers must contain VictoryPointLedger values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("VictoryPointLedger player_id is not in this game.")
+        if value.player_id in seen:
+            raise GameLifecycleError("GameState victory_point_ledgers must be unique.")
+        seen.add(value.player_id)
+        validated.append(value)
+    if set(seen) != set(player_ids):
+        raise GameLifecycleError("GameState victory_point_ledgers must include every player.")
     return sorted(validated, key=lambda ledger: ledger.player_id)
 
 
@@ -2180,6 +2792,92 @@ def _validate_objective_control_records(
         seen.add(record.record_id)
         validated.append(record)
     return validated
+
+
+def _validate_mission_action_states(
+    states: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[MissionActionState]:
+    if not isinstance(states, list):
+        raise GameLifecycleError("GameState mission_action_states must be a list.")
+    validated: list[MissionActionState] = []
+    seen: set[str] = set()
+    for state in cast(list[object], states):
+        if type(state) is not MissionActionState:
+            raise GameLifecycleError(
+                "GameState mission_action_states must contain MissionActionState values."
+            )
+        if state.player_id not in player_ids:
+            raise GameLifecycleError("MissionActionState player_id is not in this game.")
+        if state.action_id in seen:
+            raise GameLifecycleError("GameState mission_action_states must be unique.")
+        seen.add(state.action_id)
+        validated.append(state)
+    return sorted(validated, key=lambda state: state.action_id)
+
+
+def _validate_end_turn_cleanup_states(
+    states: object,
+    *,
+    game_id: str,
+    player_ids: tuple[str, ...],
+) -> list[EndTurnCleanupState]:
+    if not isinstance(states, list):
+        raise GameLifecycleError("GameState end_turn_cleanup_states must be a list.")
+    validated: list[EndTurnCleanupState] = []
+    seen: set[str] = set()
+    for state in cast(list[object], states):
+        if type(state) is not EndTurnCleanupState:
+            raise GameLifecycleError(
+                "GameState end_turn_cleanup_states must contain EndTurnCleanupState values."
+            )
+        if state.game_id != game_id:
+            raise GameLifecycleError("EndTurnCleanupState game_id drift.")
+        if state.active_player_id not in player_ids:
+            raise GameLifecycleError("EndTurnCleanupState active_player_id is not in this game.")
+        if state.cleanup_id in seen:
+            raise GameLifecycleError("GameState end_turn_cleanup_states must be unique.")
+        seen.add(state.cleanup_id)
+        validated.append(state)
+    return sorted(validated, key=lambda state: state.cleanup_id)
+
+
+def _validate_secondary_mission_card_states(
+    states: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[SecondaryMissionCardState]:
+    if not isinstance(states, list):
+        raise GameLifecycleError("GameState secondary_mission_card_states must be a list.")
+    validated: list[SecondaryMissionCardState] = []
+    seen: set[tuple[str, str, SecondaryMissionCardMode, int]] = set()
+    for state in cast(list[object], states):
+        if type(state) is not SecondaryMissionCardState:
+            raise GameLifecycleError(
+                "GameState secondary_mission_card_states must contain card states."
+            )
+        if state.player_id not in player_ids:
+            raise GameLifecycleError("SecondaryMissionCardState player_id is not in this game.")
+        key = (
+            state.player_id,
+            state.secondary_mission_id,
+            state.mode,
+            state.battle_round,
+        )
+        if key in seen:
+            raise GameLifecycleError("GameState secondary_mission_card_states must be unique.")
+        seen.add(key)
+        validated.append(state)
+    return sorted(
+        validated,
+        key=lambda state: (
+            state.player_id,
+            state.battle_round,
+            state.mode.value,
+            state.secondary_mission_id,
+        ),
+    )
 
 
 def _validate_optional_index(field_name: str, value: object | None, *, length: int) -> int | None:
