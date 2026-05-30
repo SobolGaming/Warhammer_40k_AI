@@ -3,7 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
-from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionError,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 
 
@@ -78,6 +82,12 @@ class DecisionResult:
             raise DecisionError("DecisionResult decision_type does not match request.")
         if self.actor_id != request.actor_id:
             raise DecisionError("DecisionResult actor_id does not match request.")
+        if request.is_parameterized_submission_request():
+            if self.selected_option_id != PARAMETERIZED_DECISION_OPTION_ID:
+                raise DecisionError(
+                    "DecisionResult selected_option_id must submit parameterized payload."
+                )
+            return
         selected_option = request.option_by_id(self.selected_option_id)
         if self.payload != selected_option.payload:
             raise DecisionError("DecisionResult payload must match the selected option payload.")

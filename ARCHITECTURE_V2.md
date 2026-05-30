@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 11C** is treated as implemented at the time this file was updated. Phase 11D is the next build slice.
+Everything through **Phase 11D** is treated as implemented at the time this file was updated. Phase 11E is the next build slice.
 
 Completed / implemented foundation:
 
@@ -69,6 +69,7 @@ Completed / implemented foundation:
 | 11A | Complete | Chapter Approved 2025-26 mission pack data |
 | 11B | Complete | Objective control geometry and mission objective model |
 | 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
+| 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
 
 ## Cross-cutting architectural rules
 
@@ -1021,9 +1022,13 @@ Required tests:
 
 ## Phase 11D: adapter scaffold and parameterized movement/placement proposal requests
 
+Status: Complete.
+
 This phase creates the engine-owned contract that allows UI work to proceed in parallel without UI-owned state mutation. It separates finite decision choices, such as selecting a movement action, from parameterized movement and placement proposals, such as per-model endpoints and path witnesses.
 
 This phase does not build a visual UI. It creates the adapter and proposal contracts that a later CLI, local visual UI, network client, or AI policy can consume.
+
+Design note: [Adapter Decision Contract](docs/ADAPTER_DECISION_CONTRACT.md) defines the shared submission path, producer responsibilities, viewer-scoped projections/events, and examples for UI, CLI, headless, network, AI, replay, and test adapters.
 
 Modules:
 
@@ -1085,6 +1090,8 @@ Initial parameterized request coverage:
 - Strategic Reserves placement proposal;
 - Disembark placement proposal.
 
+Reserve arrival proposal requests use distinct proposal kinds for general Reinforcement, Deep Strike, and Strategic Reserves flows. The request's `placement_kinds` field enumerates the legal physical placement methods available to that reserve state and unit.
+
 Later phases must reuse the same proposal contract for:
 
 - deployment placement;
@@ -1115,7 +1122,7 @@ Required tests:
 - `LocalGameSession.submit_payload(...)` or equivalent handles parameterized proposal decisions;
 - event cursor returns deterministic event payloads since a supplied cursor;
 - import-boundary tests confirm core, geometry, rules, and engine modules do not import adapters;
-- golden JSON fixtures cover finite movement action selection, parameterized Normal Move proposal, invalid movement proposal, reserve placement proposal, Disembark placement proposal, and viewer-scoped projection.
+- a golden JSON fixture covers the parameterized Normal Move proposal request; inline JSON-shape regressions cover finite movement action selection, invalid movement and placement proposals, reserve placement, Disembark placement, and viewer-scoped projection/event deltas.
 
 CORE V1 relevant areas:
 
