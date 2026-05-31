@@ -1381,11 +1381,17 @@ class GameState:
         *,
         player_id: str,
         source_result_id: str,
+        draw_count: int | None = None,
     ) -> tuple[SecondaryMissionCardState, ...]:
         if self.mission_setup is None:
             raise GameLifecycleError("Tactical secondary draw requires MissionSetup.")
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         result_id = _validate_identifier("source_result_id", source_result_id)
+        requested_draw_count = (
+            self.tactical_secondary_draw_count
+            if draw_count is None
+            else _validate_positive_int("draw_count", draw_count)
+        )
         excluded_ids = tuple(
             state.secondary_mission_id
             for state in self.secondary_mission_card_states
@@ -1395,7 +1401,7 @@ class GameState:
             mission_setup=self.mission_setup,
             player_id=requested_player_id,
             battle_round=self.battle_round,
-            draw_count=self.tactical_secondary_draw_count,
+            draw_count=requested_draw_count,
             excluded_secondary_mission_ids=excluded_ids,
         )
         card_states = tuple(

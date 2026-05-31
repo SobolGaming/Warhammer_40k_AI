@@ -153,7 +153,7 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             "battle_tactic",
             "gw-10e-core-stratagems:core:command-reroll",
             "none",
-            "unsupported:phase-12c:command-reroll",
+            "core:command-reroll",
             "core",
             None,
         ),
@@ -163,8 +163,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "epic_deed",
             "gw-10e-core-stratagems:core:insane-bravery",
-            "unsupported:phase-12c:battle-shock-test-unit",
-            "unsupported:phase-12c:insane-bravery",
+            "battle_shock_test_unit",
+            "core:insane-bravery",
             "core",
             None,
         ),
@@ -174,8 +174,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "strategic_ploy",
             "gw-10e-core-stratagems:core:new-orders",
-            "none",
-            "unsupported:phase-12c:new-orders",
+            "active_tactical_secondary_card",
+            "core:new-orders",
             "core",
             None,
         ),
@@ -185,8 +185,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "strategic_ploy",
             "gw-10e-core-stratagems:core:rapid-ingress",
-            "unsupported:phase-12c:reserves-unit",
-            "unsupported:phase-12c:rapid-ingress",
+            "reserves_unit",
+            "core:rapid-ingress",
             "core",
             None,
         ),
@@ -238,15 +238,15 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
         player_id="player-a",
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     )
-    command_reroll = _source_stratagem_record("command-reroll")
+    armour_of_contempt = _source_stratagem_record("armour-of-contempt")
     finite_request = create_stratagem_use_decision_request(
         state=finite_state,
         context=finite_context,
         options=(
             _stratagem_option_for_record(
-                record=command_reroll,
+                record=armour_of_contempt,
                 context=finite_context,
-                binding=StratagemTargetBinding.none(),
+                binding=_friendly_binding(),
             ),
         ),
     )
@@ -269,7 +269,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     parameterized_state = _state(parameterized_lifecycle)
     _set_current_battle_phase(parameterized_state, BattlePhase.MOVEMENT)
     _grant_cp(parameterized_state, player_id="player-a", amount=1)
-    rapid_ingress = _source_stratagem_record("rapid-ingress")
+    armour_of_contempt = _source_stratagem_record("armour-of-contempt")
     parameterized_context = _context(
         state=parameterized_state,
         player_id="player-a",
@@ -277,7 +277,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     )
     proposal_request = StratagemTargetProposal.for_request(
         context=parameterized_context,
-        catalog_record=rapid_ingress,
+        catalog_record=armour_of_contempt,
     )
     unavailable_proposal = request_stratagem_target_proposal(
         state=parameterized_state,
@@ -288,7 +288,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     assert unavailable_proposal.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert unavailable_proposal.payload == {
         "player_id": "player-a",
-        "stratagem_id": "rapid-ingress",
+        "stratagem_id": "armour-of-contempt",
         "unavailable_reason": "unsupported_handler",
     }
     assert parameterized_state.command_point_total("player-a") == 1

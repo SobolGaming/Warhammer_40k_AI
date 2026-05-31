@@ -15,6 +15,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     GameState,
@@ -286,6 +287,23 @@ def _request_tactical_secondary_draw(
     )
 
 
+def _battle_shock_auto_pass_effect(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> PersistingEffect | None:
+    matched_effect: PersistingEffect | None = None
+    for effect in state.persisting_effects_for_unit(unit_instance_id):
+        if not isinstance(effect.effect_payload, dict):
+            continue
+        if effect.effect_payload.get("effect_kind") != "battle_shock_auto_pass":
+            continue
+        if matched_effect is not None:
+            raise GameLifecycleError("Multiple Battle-shock auto-pass effects matched.")
+        matched_effect = effect
+    return matched_effect
+
+
 def _resolve_battle_shock_step(
     *,
     state: GameState,
@@ -321,7 +339,25 @@ def _resolve_battle_shock_step(
                 "battle_shock_test_request": validate_json_value(request.to_payload()),
             },
         )
-        roll_state = manager.roll(request.spec)
+        auto_pass_effect = _battle_shock_auto_pass_effect(
+            state=state,
+            unit_instance_id=request.unit_instance_id,
+        )
+        if auto_pass_effect is None:
+            roll_state = manager.roll(request.spec)
+        else:
+            roll_state = manager.roll_fixed(request.spec, [6, 6])
+            decisions.event_log.append(
+                "battle_shock_test_auto_passed",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "phase": BattlePhase.COMMAND.value,
+                    "unit_instance_id": request.unit_instance_id,
+                    "persisting_effect": validate_json_value(auto_pass_effect.to_payload()),
+                },
+            )
         result = BattleShockResult.from_roll_state(
             result_id=f"{request.request_id}:result",
             request=request,
@@ -338,6 +374,7 @@ def _resolve_battle_shock_step(
                 "active_player_id": active_player_id,
                 "phase": BattlePhase.COMMAND.value,
                 "battle_shock_result": result_payload,
+                "auto_passed": auto_pass_effect is not None,
             },
         )
     state.command_step_state = _command_step_state(state).with_battle_shock_step_resolved()

@@ -72,9 +72,12 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     apply_stratagem_decision,
+    apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
+    invalid_stratagem_placement_proposal_status,
     invalid_stratagem_target_proposal_status,
     invalid_stratagem_use_status,
+    is_stratagem_placement_proposal_request,
 )
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
@@ -219,10 +222,27 @@ class GameLifecycle:
         state = self._require_state()
         pending_request = self._pending_decision_request()
         sequencing_decision: SequencingDecision | None = None
+        stratagem_placement_request: DecisionRequest | None = None
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and is_stratagem_placement_proposal_request(pending_request)
+        ):
+            stratagem_placement_request = pending_request
+        if stratagem_placement_request is not None:
+            result.validate_for_request(stratagem_placement_request)
+            invalid_status = invalid_stratagem_placement_proposal_status(
+                state=state,
+                request=stratagem_placement_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
         if (
             type(result) is DecisionResult
             and pending_request is not None
             and pending_request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES
+            and stratagem_placement_request is None
         ):
             result.validate_for_request(pending_request)
             malformed_status = self._movement_phase_handler.invalid_proposal_submission_status(
@@ -312,6 +332,17 @@ class GameLifecycle:
                 result=result,
                 decisions=self.decision_controller,
             )
+            return self.advance_until_decision_or_terminal()
+        if is_stratagem_placement_proposal_request(record.request):
+            placement_status = apply_stratagem_placement_proposal(
+                state=state,
+                request=record.request,
+                result=result,
+                decisions=self.decision_controller,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if placement_status is not None:
+                return placement_status
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
             movement_status = self._movement_phase_handler.apply_decision(
