@@ -225,18 +225,24 @@ class ReactionQueue:
             resume_token=resume_token,
             request_id=request_id,
         )
-        request_payload = validate_json_value(
-            {
-                "reaction_window": reaction_window.to_payload(),
-                "interrupts_parent": True,
-                "parent": {
+        handler_payload = validate_json_value(payload)
+        request_payload_base: dict[str, JsonValue] = {
+            "reaction_window": validate_json_value(reaction_window.to_payload()),
+            "interrupts_parent": True,
+            "parent": validate_json_value(
+                {
                     "phase": parent.value,
                     "step": frame.parent_step,
                     "resume_token": frame.resume_token,
-                },
-                "handler_payload": validate_json_value(payload),
-            }
-        )
+                }
+            ),
+            "handler_payload": handler_payload,
+        }
+        if isinstance(handler_payload, dict):
+            for key, value in handler_payload.items():
+                if key not in request_payload_base:
+                    request_payload_base[key] = value
+        request_payload = validate_json_value(request_payload_base)
         request = DecisionRequest(
             request_id=request_id,
             decision_type=_validate_identifier("decision_type", decision_type),
@@ -251,6 +257,35 @@ class ReactionQueue:
             reaction_window=reaction_window,
             decision_request=queued,
         )
+
+    def continue_reaction(
+        self,
+        *,
+        result: DecisionResult,
+        next_request_id: str,
+        decisions: DecisionController,
+    ) -> ReactionQueueFrame:
+        if type(result) is not DecisionResult:
+            raise GameLifecycleError("ReactionQueue result must be a DecisionResult.")
+        if type(decisions) is not DecisionController:
+            raise GameLifecycleError("ReactionQueue requires a DecisionController.")
+        self.validate_result(result)
+        frame = self._frames[-1]
+        continued = frame.with_request_id(next_request_id)
+        self._frames[-1] = continued
+        record = decisions.record_for_result(result)
+        decisions.event_log.append(
+            "reaction_window_continued",
+            {
+                "reaction_window": frame.reaction_window.to_payload(),
+                "parent_phase": frame.parent_phase.value,
+                "parent_step": frame.parent_step,
+                "resume_token": frame.resume_token,
+                "decision_record": record.to_payload(),
+                "next_request_id": continued.request_id,
+            },
+        )
+        return continued
 
     def resolve_reaction(
         self,

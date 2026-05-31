@@ -1384,9 +1384,9 @@ Invariants:
 - each supported Core Stratagem has a source-backed definition, timing descriptor, target spec, restriction policy, CP cost, and handler binding;
 - each supported Core Stratagem has explicit finite or parameterized target-binding rules;
 - each supported Core Stratagem consumes CP and records use;
-- Command Re-roll uses Phase 10J reroll semantics and can be offered as a nested reaction without breaking the parent timing window;
+- Command Re-roll uses source-backed edition-specific eligible roll classes plus Phase 10J reroll semantics and can be offered as a nested reaction without breaking the parent timing window;
 - Insane Bravery integrates with Phase 11C Battle-shock results without bypassing `DecisionRequest`/`DecisionResult`;
-- Rapid Ingress reuses reserves/reinforcement placement validators and, where exact placement is required, emits the existing placement proposal request after the Stratagem decision is accepted;
+- Rapid Ingress reuses reserves/reinforcement placement validators and, where exact placement is required, emits the existing placement proposal request after the Stratagem decision is accepted; when offered from a reaction window, the parent remains blocked until the placement proposal resolves;
 - New Orders reuses Phase 11E source-backed Tactical secondary discard/draw/scoring state;
 - supported dice/mission/reserves Stratagems use deterministic dice/replay plumbing and source IDs;
 - Phase 12C reuses Phase 12A persisting-effect/reaction machinery and Phase 12B ledger/decision framework; it does not depend on the later Phase 12D ability registry or Phase 16D generic handlers;

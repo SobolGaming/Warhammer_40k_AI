@@ -60,6 +60,7 @@ def _record_from_source_row(row: source_data.SourceStratagemRow) -> StratagemCat
                 target_policy_id=row.target_policy_id,
             ),
             handler_id=row.handler_id,
+            eligible_roll_types=row.eligible_roll_types,
         ),
         availability_kind=StratagemAvailabilityKind(row.availability_kind),
         detachment_id=row.detachment_id,

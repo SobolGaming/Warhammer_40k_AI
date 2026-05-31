@@ -158,6 +158,72 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             None,
         ),
         (
+            "gw-10e-core-stratagems:core:counter-offensive",
+            "counter-offensive",
+            2,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:counter-offensive",
+            "unsupported:phase-14e:fight-order-interrupt-unit",
+            "unsupported:phase-14e:counter-offensive",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:epic-challenge",
+            "epic-challenge",
+            1,
+            "epic_deed",
+            "gw-10e-core-stratagems:core:epic-challenge",
+            "unsupported:phase-14e:character-model-fight-binding",
+            "unsupported:phase-14e:epic-challenge",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:fire-overwatch",
+            "fire-overwatch",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:fire-overwatch",
+            "unsupported:phase-13d:out-of-phase-shooting-unit",
+            "unsupported:phase-13d:fire-overwatch",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:go-to-ground",
+            "go-to-ground",
+            1,
+            "battle_tactic",
+            "gw-10e-core-stratagems:core:go-to-ground",
+            "unsupported:phase-13d:infantry-selected-target-unit",
+            "unsupported:phase-13d:go-to-ground",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:grenade",
+            "grenade",
+            1,
+            "wargear",
+            "gw-10e-core-stratagems:core:grenade",
+            "unsupported:phase-13d:grenades-unit-and-enemy-target",
+            "unsupported:phase-13d:grenade",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:heroic-intervention",
+            "heroic-intervention",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:heroic-intervention",
+            "unsupported:phase-14e:heroic-intervention-charge-unit",
+            "unsupported:phase-14e:heroic-intervention",
+            "core",
+            None,
+        ),
+        (
             "gw-10e-core-stratagems:core:insane-bravery",
             "insane-bravery",
             1,
@@ -191,6 +257,28 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             None,
         ),
         (
+            "gw-10e-core-stratagems:core:smokescreen",
+            "smokescreen",
+            1,
+            "wargear",
+            "gw-10e-core-stratagems:core:smokescreen",
+            "unsupported:phase-13d:smoke-selected-target-unit",
+            "unsupported:phase-13d:smokescreen",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:tank-shock",
+            "tank-shock",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:tank-shock",
+            "unsupported:phase-14e:vehicle-charge-target-binding",
+            "unsupported:phase-14e:tank-shock",
+            "core",
+            None,
+        ),
+        (
             "gw-10e-core-stratagems:detachment:armour-of-contempt",
             "armour-of-contempt",
             1,
@@ -202,7 +290,7 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             "gladius-task-force",
         ),
     )
-    assert len(core_catalog) == 4
+    assert len(core_catalog) == 12
     assert len(detachment_catalog) == 1
 
     lifecycle = _battle_lifecycle()
@@ -238,13 +326,13 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
         player_id="player-a",
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     )
-    armour_of_contempt = _source_stratagem_record("armour-of-contempt")
+    deferred_core_stratagem = _source_stratagem_record("fire-overwatch")
     finite_request = create_stratagem_use_decision_request(
         state=finite_state,
         context=finite_context,
         options=(
             _stratagem_option_for_record(
-                record=armour_of_contempt,
+                record=deferred_core_stratagem,
                 context=finite_context,
                 binding=_friendly_binding(),
             ),
@@ -269,7 +357,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     parameterized_state = _state(parameterized_lifecycle)
     _set_current_battle_phase(parameterized_state, BattlePhase.MOVEMENT)
     _grant_cp(parameterized_state, player_id="player-a", amount=1)
-    armour_of_contempt = _source_stratagem_record("armour-of-contempt")
+    deferred_core_stratagem = _source_stratagem_record("fire-overwatch")
     parameterized_context = _context(
         state=parameterized_state,
         player_id="player-a",
@@ -277,7 +365,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     )
     proposal_request = StratagemTargetProposal.for_request(
         context=parameterized_context,
-        catalog_record=armour_of_contempt,
+        catalog_record=deferred_core_stratagem,
     )
     unavailable_proposal = request_stratagem_target_proposal(
         state=parameterized_state,
@@ -288,7 +376,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     assert unavailable_proposal.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert unavailable_proposal.payload == {
         "player_id": "player-a",
-        "stratagem_id": "armour-of-contempt",
+        "stratagem_id": "fire-overwatch",
         "unavailable_reason": "unsupported_handler",
     }
     assert parameterized_state.command_point_total("player-a") == 1

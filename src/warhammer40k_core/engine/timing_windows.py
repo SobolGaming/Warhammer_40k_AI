@@ -27,6 +27,7 @@ class TimingTriggerKind(StrEnum):
     AFTER_BATTLE = "after_battle"
     AFTER_UNIT_SELECTED_AS_TARGET = "after_unit_selected_as_target"
     AFTER_ENEMY_UNIT_ENDS_MOVE = "after_enemy_unit_ends_move"
+    AFTER_UNIT_ENDS_CHARGE_MOVE = "after_unit_ends_charge_move"
     AFTER_UNIT_DESTROYED = "after_unit_destroyed"
     JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT = "just_after_enemy_unit_has_fought"
     AFTER_DICE_ROLL = "after_dice_roll"

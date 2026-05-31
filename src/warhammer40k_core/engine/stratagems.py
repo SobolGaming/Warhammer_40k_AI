@@ -162,6 +162,7 @@ class StratagemDefinitionPayload(TypedDict):
     restriction_policy: StratagemRestrictionPolicyPayload
     target_spec: StratagemTargetSpecPayload
     handler_id: str
+    eligible_roll_types: list[str]
     effect_payload: JsonValue
 
 
@@ -381,6 +382,7 @@ class StratagemDefinition:
     )
     target_spec: StratagemTargetSpec = field(default_factory=StratagemTargetSpec)
     handler_id: str = "record_only"
+    eligible_roll_types: tuple[str, ...] = ()
     effect_payload: JsonValue = None
 
     def __post_init__(self) -> None:
@@ -446,6 +448,14 @@ class StratagemDefinition:
             "handler_id",
             _validate_identifier("StratagemDefinition handler_id", self.handler_id),
         )
+        object.__setattr__(
+            self,
+            "eligible_roll_types",
+            _validate_identifier_tuple(
+                "StratagemDefinition eligible_roll_types",
+                self.eligible_roll_types,
+            ),
+        )
         object.__setattr__(self, "effect_payload", validate_json_value(self.effect_payload))
 
     def to_payload(self) -> StratagemDefinitionPayload:
@@ -463,6 +473,7 @@ class StratagemDefinition:
             "restriction_policy": self.restriction_policy.to_payload(),
             "target_spec": self.target_spec.to_payload(),
             "handler_id": self.handler_id,
+            "eligible_roll_types": list(self.eligible_roll_types),
             "effect_payload": self.effect_payload,
         }
 
@@ -484,6 +495,7 @@ class StratagemDefinition:
             ),
             target_spec=StratagemTargetSpec.from_payload(payload["target_spec"]),
             handler_id=payload["handler_id"],
+            eligible_roll_types=tuple(payload["eligible_roll_types"]),
             effect_payload=payload["effect_payload"],
         )
 
@@ -1594,7 +1606,7 @@ def _handler_unavailable_reason(
     target_binding: StratagemTargetBinding | None,
 ) -> str | None:
     if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
-        return _command_reroll_context_error(context)
+        return _command_reroll_context_error(definition=definition, context=context)
     if definition.handler_id == CORE_INSANE_BRAVERY_HANDLER_ID:
         if target_binding is None:
             if _battle_shock_test_unit_ids(state=state, player_id=context.player_id):
@@ -1857,14 +1869,21 @@ def _rapid_ingress_unit_ids(*, state: GameState, player_id: str) -> tuple[str, .
     )
 
 
-def _command_reroll_context_error(context: StratagemEligibilityContext) -> str | None:
+def _command_reroll_context_error(
+    *,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+) -> str | None:
     try:
         roll_state = _command_reroll_state(context)
+        roll_type = roll_state.original_result.spec.roll_type
+        if roll_type not in definition.eligible_roll_types:
+            return "ineligible_dice_roll_type"
         permission = RerollPermission(
             source_id=CORE_COMMAND_REROLL_HANDLER_ID,
             timing_window=context.timing_window_id or context.trigger_kind.value,
             owning_player_id=context.player_id,
-            eligible_roll_type=roll_state.original_result.spec.roll_type,
+            eligible_roll_type=roll_type,
             component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
         )
         permission.legal_selections_for_state(roll_state)
@@ -2077,10 +2096,18 @@ def _apply_rapid_ingress_placement(
             "rapid_ingress_placement_invalid",
             validate_json_value(invalid_payload),
         )
+        retry_request = _request_rapid_ingress_placement_retry(
+            state=state,
+            decisions=decisions,
+            proposal_request=proposal_request,
+            rejected_result=result,
+        )
         return LifecycleStatus.invalid(
             stage=state.stage,
             message="Rapid Ingress placement is invalid.",
-            payload=validate_json_value(invalid_payload),
+            payload=validate_json_value(
+                {**invalid_payload, "next_request_id": retry_request.request_id}
+            ),
         )
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
@@ -2120,6 +2147,51 @@ def _apply_rapid_ingress_placement(
     return None
 
 
+def _request_rapid_ingress_placement_retry(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    proposal_request: MovementProposalRequest,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    retry_proposal = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=proposal_request.proposal_kind,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        placement_kinds=proposal_request.placement_kinds,
+        context=dict(proposal_request.context or {}),
+    )
+    request = retry_proposal.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "placement_proposal_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": retry_proposal.actor_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": retry_proposal.unit_instance_id,
+            "proposal_kind": retry_proposal.proposal_kind.value,
+            "placement_kinds": [kind.value for kind in retry_proposal.placement_kinds],
+            "request_id": request.request_id,
+            "source_decision_request_id": retry_proposal.source_decision_request_id,
+            "source_decision_result_id": retry_proposal.source_decision_result_id,
+            "previous_proposal_request_id": proposal_request.request_id,
+            "rejected_result_id": rejected_result.result_id,
+            "phase_body_status": "rapid_ingress_placement_proposal_required",
+        },
+    )
+    return request
+
+
 def _stratagem_use_from_proposal_context(
     proposal_request: MovementProposalRequest,
 ) -> StratagemUseRecord:
@@ -2147,6 +2219,7 @@ def _apply_supported_stratagem_handler(
             state=state,
             decisions=decisions,
             context=context,
+            definition=definition,
             use_record=use_record,
         )
         return
@@ -2184,14 +2257,18 @@ def _apply_command_reroll_handler(
     state: GameState,
     decisions: DecisionController,
     context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
     use_record: StratagemUseRecord,
 ) -> None:
     roll_state = _command_reroll_state(context)
+    roll_type = roll_state.original_result.spec.roll_type
+    if roll_type not in definition.eligible_roll_types:
+        raise GameLifecycleError("Command Re-roll roll type was not prevalidated.")
     permission = RerollPermission(
         source_id=use_record.source_id,
         timing_window=context.timing_window_id or context.trigger_kind.value,
         owning_player_id=context.player_id,
-        eligible_roll_type=roll_state.original_result.spec.roll_type,
+        eligible_roll_type=roll_type,
         component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
@@ -2518,6 +2595,14 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     if value is None:
         return None
     return _validate_identifier(field_name, value)
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    return tuple(
+        _validate_identifier(field_name, value) for value in cast(tuple[object, ...], values)
+    )
 
 
 def _validate_optional_phase(field_name: str, value: object | None) -> BattlePhaseKind | None:

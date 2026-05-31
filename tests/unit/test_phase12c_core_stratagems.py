@@ -23,7 +23,9 @@ from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionOption,
     DecisionRequest,
+    parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -71,6 +73,7 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetKind,
     StratagemTargetProposal,
     StratagemTargetProposalPayload,
+    create_stratagem_use_decision_request,
     request_stratagem_target_proposal,
     request_stratagem_use,
     stratagem_use_options,
@@ -91,6 +94,9 @@ def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     _grant_cp(state, player_id="player-a", amount=1)
+    command_reroll = _source_stratagem_record("command-reroll")
+    assert "advance_roll" in command_reroll.definition.eligible_roll_types
+    assert "desperate_escape_roll" in command_reroll.definition.eligible_roll_types
     roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-a")
     trigger_payload = validate_json_value(
         {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
@@ -105,7 +111,7 @@ def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None
     waiting = request_stratagem_use(
         state=state,
         decisions=lifecycle.decision_controller,
-        catalog_records=(_source_stratagem_record("command-reroll"),),
+        catalog_records=(command_reroll,),
         context=context,
     )
     request = _decision_request(waiting)
@@ -132,6 +138,63 @@ def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None
         == restored_state.stratagem_use_records[0].to_payload()
     )
     assert "<" not in json.dumps(restored.to_payload(), sort_keys=True)
+
+
+def test_command_reroll_source_eligibility_rejects_unlisted_roll_type_before_queue_pop() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=1)
+    command_reroll = _source_stratagem_record("command-reroll")
+    roll_state = _roll_command_reroll_candidate(
+        lifecycle,
+        actor_id="player-a",
+        roll_type="validation_roll",
+    )
+    trigger_payload = validate_json_value(
+        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
+    )
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=trigger_payload,
+    )
+
+    assert (
+        stratagem_use_options(
+            state=state,
+            catalog_records=(command_reroll,),
+            context=context,
+        )
+        == ()
+    )
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(
+            _handcrafted_stratagem_option(
+                record=command_reroll,
+                context=context,
+                binding=StratagemTargetBinding.none(),
+            ),
+        ),
+    )
+    lifecycle.decision_controller.request_decision(request)
+
+    rejected = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-command-reroll-ineligible-roll",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+    )
+
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    assert rejected.payload == {"invalid_reason": "ineligible_dice_roll_type"}
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
 
 
 def test_command_reroll_source_handler_can_resume_reaction_parent() -> None:
@@ -333,6 +396,145 @@ def test_tactical_secondary_target_binding_requires_card_fields() -> None:
         )
 
 
+def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None:
+    deferred_ids = {
+        "counter-offensive",
+        "epic-challenge",
+        "fire-overwatch",
+        "go-to-ground",
+        "grenade",
+        "heroic-intervention",
+        "smokescreen",
+        "tank-shock",
+    }
+    deferred_records = tuple(
+        _source_stratagem_record(stratagem_id) for stratagem_id in deferred_ids
+    )
+    assert {record.definition.stratagem_id for record in deferred_records} == deferred_ids
+    assert all(record.availability_kind.value == "core" for record in deferred_records)
+    assert all(
+        record.definition.handler_id.startswith("unsupported:")
+        and record.definition.target_spec.target_policy_id.startswith("unsupported:")
+        for record in deferred_records
+    )
+
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=3)
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+    )
+    assert (
+        stratagem_use_options(
+            state=state,
+            catalog_records=deferred_records,
+            context=context,
+        )
+        == ()
+    )
+    for record in deferred_records:
+        proposal_request = StratagemTargetProposal.for_request(
+            context=context,
+            catalog_record=record,
+        )
+        unavailable = request_stratagem_target_proposal(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            proposal_request=proposal_request,
+        )
+        assert unavailable.status_kind is LifecycleStatusKind.UNSUPPORTED
+        assert unavailable.payload == {
+            "player_id": "player-a",
+            "stratagem_id": record.definition.stratagem_id,
+            "unavailable_reason": "unsupported_handler",
+        }
+    assert len(lifecycle.decision_controller.queue.pending_requests) == 0
+
+    finite_lifecycle = _battle_lifecycle()
+    finite_state = _state(finite_lifecycle)
+    _set_current_battle_phase(finite_state, BattlePhase.MOVEMENT)
+    _grant_cp(finite_state, player_id="player-a", amount=3)
+    finite_context = _context(
+        state=finite_state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+    )
+    handcraft_record = _source_stratagem_record("fire-overwatch")
+    handcraft_request = create_stratagem_use_decision_request(
+        state=finite_state,
+        context=finite_context,
+        options=(
+            _handcrafted_stratagem_option(
+                record=handcraft_record,
+                context=finite_context,
+                binding=StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-a",
+                    target_unit_instance_id="army-alpha:intercessor-unit-1",
+                ),
+            ),
+        ),
+    )
+    finite_lifecycle.decision_controller.request_decision(handcraft_request)
+    rejected_finite = finite_lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-deferred-core-finite",
+            request=handcraft_request,
+            selected_option_id=handcraft_request.options[0].option_id,
+        )
+    )
+    assert rejected_finite.status_kind is LifecycleStatusKind.INVALID
+    assert rejected_finite.payload == {"invalid_reason": "unsupported_handler"}
+    assert finite_state.command_point_total("player-a") == 3
+    assert finite_state.stratagem_use_records == []
+    assert finite_lifecycle.decision_controller.queue.pending_requests == (handcraft_request,)
+
+    parameterized_lifecycle = _battle_lifecycle()
+    parameterized_state = _state(parameterized_lifecycle)
+    _set_current_battle_phase(parameterized_state, BattlePhase.MOVEMENT)
+    _grant_cp(parameterized_state, player_id="player-a", amount=1)
+    parameterized_context = _context(
+        state=parameterized_state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+    )
+    parameterized_proposal = StratagemTargetProposal.for_request(
+        context=parameterized_context,
+        catalog_record=handcraft_record,
+    )
+    pending_proposal_request = DecisionRequest(
+        request_id=parameterized_state.next_decision_request_id(),
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=parameterized_proposal.player_id,
+        payload=validate_json_value({"proposal_request": parameterized_proposal.to_payload()}),
+        options=(parameterized_decision_option(),),
+    )
+    parameterized_lifecycle.decision_controller.request_decision(pending_proposal_request)
+    rejected_parameterized = parameterized_lifecycle.submit_decision(
+        _target_proposal_result(
+            request=pending_proposal_request,
+            result_id="phase12c-deferred-core-parameterized",
+            proposal=parameterized_proposal.with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-a",
+                    target_unit_instance_id="army-alpha:intercessor-unit-1",
+                )
+            ),
+        )
+    )
+    assert rejected_parameterized.status_kind is LifecycleStatusKind.INVALID
+    assert rejected_parameterized.payload == {"invalid_reason": "unsupported_handler"}
+    assert parameterized_state.command_point_total("player-a") == 1
+    assert parameterized_state.stratagem_use_records == []
+    assert parameterized_lifecycle.decision_controller.queue.pending_requests == (
+        pending_proposal_request,
+    )
+
+
 def test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle() -> None:
     lifecycle = _battle_lifecycle()
     state, reserve_state, reserve_unit, reserve_army, placement_request = (
@@ -383,6 +585,119 @@ def test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle(
     assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
 
 
+def test_rapid_ingress_reaction_target_and_placement_restore_before_parent_resumes() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.battle_round = 2
+    _grant_cp(state, player_id="player-b", amount=1)
+    reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
+        state,
+        player_id="player-b",
+        unit_instance_id="army-beta:enemy-unit",
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=_context(
+            state=state,
+            player_id="player-b",
+            trigger_kind=TimingTriggerKind.END_PHASE,
+        ),
+        catalog_record=_source_stratagem_record("rapid-ingress"),
+    )
+    lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=_reaction_window_for_trigger(
+            state,
+            eligible_player_id="player-b",
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            source_rule_id="phase12c-rapid-ingress-reaction",
+            window_id="phase12c-rapid-ingress-window",
+        ),
+        parent_phase=BattlePhase.MOVEMENT,
+        parent_step="end_movement_phase_reactions",
+        resume_token="phase12c_rapid_ingress_resume_token",
+        actor_id="player-b",
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        options=(parameterized_decision_option(),),
+        payload=validate_json_value(
+            {"proposal_request": validate_json_value(proposal_request.to_payload())}
+        ),
+    )
+    restored_target = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
+    target_request = _decision_request(restored_target.advance_until_decision_or_terminal())
+
+    target_status = restored_target.submit_decision(
+        _target_proposal_result(
+            request=target_request,
+            result_id="phase12c-rapid-ingress-reaction-target",
+            proposal=_proposal_request_from_decision(target_request).with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-b",
+                    target_unit_instance_id=reserve_state.unit_instance_id,
+                )
+            ),
+        )
+    )
+    placement_request = _decision_request(target_status)
+
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    assert len(restored_target.reaction_queue.frames) == 1
+    assert restored_target.reaction_queue.frames[0].request_id == placement_request.request_id
+    assert not _has_event(restored_target.decision_controller, "reaction_parent_resumed")
+    assert _has_event(restored_target.decision_controller, "reaction_window_continued")
+
+    restored_placement = GameLifecycle.from_payload(_lifecycle_payload_copy(restored_target))
+    restored_state = _state(restored_placement)
+    restored_reserve_state = restored_state.reserve_state_for_unit(reserve_state.unit_instance_id)
+    assert restored_reserve_state is not None
+    restored_army = restored_state.army_definition_for_player("player-b")
+    assert restored_army is not None
+    restored_reserve_unit = restored_army.unit_by_id(reserve_state.unit_instance_id)
+    restored_placement_request = _decision_request(
+        restored_placement.advance_until_decision_or_terminal()
+    )
+    placement = _reserve_placement(
+        army=restored_army,
+        reserve_unit=restored_reserve_unit,
+        poses=tuple(
+            Pose.at(x=12.0 + index * 2.0, y=40.0, z=0.0, facing_degrees=180.0)
+            for index, _model in enumerate(restored_reserve_unit.own_models)
+        ),
+    )
+    placement_payload = PlacementProposalPayload(
+        proposal_request_id=restored_placement_request.request_id,
+        proposal_kind=ProposalKind.REINFORCEMENT,
+        unit_instance_id=restored_reserve_state.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,
+        attempted_placement=placement,
+    )
+
+    resumed = restored_placement.submit_decision(
+        DecisionResult(
+            result_id="phase12c-rapid-ingress-reaction-placement",
+            request_id=restored_placement_request.request_id,
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=restored_placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(placement_payload.to_payload()),
+        )
+    )
+
+    assert restored_placement.reaction_queue.frames == ()
+    assert resumed.status_kind is not LifecycleStatusKind.INVALID
+    resumed_payload = _last_event_payload(
+        restored_placement.decision_controller,
+        "reaction_parent_resumed",
+    )
+    assert resumed_payload["resume_token"] == "phase12c_rapid_ingress_resume_token"
+    assert _has_event(restored_placement.decision_controller, "rapid_ingress_resolved")
+    arrived_state = restored_state.reserve_state_for_unit(restored_reserve_state.unit_instance_id)
+    assert arrived_state is not None
+    assert arrived_state.status is ReserveStatus.ARRIVED
+
+
 def test_rapid_ingress_invalid_placement_is_typed_invalid_without_arrival() -> None:
     lifecycle = _battle_lifecycle()
     state, reserve_state, reserve_unit, reserve_army, placement_request = (
@@ -418,6 +733,11 @@ def test_rapid_ingress_invalid_placement_is_typed_invalid_without_arrival() -> N
     assert status.status_kind is LifecycleStatusKind.INVALID
     assert isinstance(status.payload, dict)
     assert status.payload["phase_body_status"] == "rapid_ingress_placement_invalid"
+    next_request_id = status.payload["next_request_id"]
+    assert type(next_request_id) is str
+    retry_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert retry_request.request_id == next_request_id
+    assert retry_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
     assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
     assert state.battlefield_state is not None
     assert not any(
@@ -426,6 +746,48 @@ def test_rapid_ingress_invalid_placement_is_typed_invalid_without_arrival() -> N
         for unit_placement in placed_army.unit_placements
     )
     assert _has_event(lifecycle.decision_controller, "rapid_ingress_placement_invalid")
+
+
+def test_rapid_ingress_reaction_invalid_placement_keeps_parent_blocked_for_retry() -> None:
+    lifecycle = _battle_lifecycle()
+    state, reserve_state, reserve_unit, reserve_army, placement_request = (
+        _request_rapid_ingress_reaction_placement(lifecycle)
+    )
+    invalid_placement = _reserve_placement(
+        army=reserve_army,
+        reserve_unit=reserve_unit,
+        poses=tuple(
+            Pose.at(x=12.0 + index * 2.0, y=8.0, z=0.0, facing_degrees=180.0)
+            for index, _model in enumerate(reserve_unit.own_models)
+        ),
+    )
+    placement_payload = PlacementProposalPayload(
+        proposal_request_id=placement_request.request_id,
+        proposal_kind=ProposalKind.REINFORCEMENT,
+        unit_instance_id=reserve_state.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,
+        attempted_placement=invalid_placement,
+    )
+
+    status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase12c-rapid-ingress-reaction-invalid-placement",
+            request_id=placement_request.request_id,
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(placement_payload.to_payload()),
+        )
+    )
+    retry_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(status.payload, dict)
+    assert status.payload["next_request_id"] == retry_request.request_id
+    assert len(lifecycle.reaction_queue.frames) == 1
+    assert lifecycle.reaction_queue.frames[0].request_id == retry_request.request_id
+    assert not _has_event(lifecycle.decision_controller, "reaction_parent_resumed")
+    assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
 
 
 def test_rapid_ingress_stale_placement_proposal_rejects_before_queue_pop() -> None:
@@ -506,6 +868,7 @@ def _roll_command_reroll_candidate(
     lifecycle: GameLifecycle,
     *,
     actor_id: str,
+    roll_type: str = "advance_roll",
 ) -> DiceRollState:
     state = _state(lifecycle)
     return DiceRollManager(
@@ -515,7 +878,7 @@ def _roll_command_reroll_candidate(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
             reason="Phase 12C Command Re-roll candidate",
-            roll_type="advance_roll",
+            roll_type=roll_type,
             actor_id=actor_id,
         ),
         [1],
@@ -538,14 +901,31 @@ def _context(
 
 
 def _reaction_window(state: GameState, *, eligible_player_id: str) -> ReactionWindow:
-    descriptor = TimingWindowDescriptor(
-        descriptor_id="phase12c-reaction-window",
+    return _reaction_window_for_trigger(
+        state=state,
+        eligible_player_id=eligible_player_id,
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
         source_rule_id="phase12c-command-reroll-reaction",
+        window_id="phase12c-reaction-window-instance",
+    )
+
+
+def _reaction_window_for_trigger(
+    state: GameState,
+    *,
+    eligible_player_id: str,
+    trigger_kind: TimingTriggerKind,
+    source_rule_id: str,
+    window_id: str,
+) -> ReactionWindow:
+    descriptor = TimingWindowDescriptor(
+        descriptor_id="phase12c-reaction-window",
+        trigger_kind=trigger_kind,
+        source_rule_id=source_rule_id,
         phase=BattlePhase.MOVEMENT,
     )
     window = TimingWindow(
-        window_id="phase12c-reaction-window-instance",
+        window_id=window_id,
         descriptor=descriptor,
         game_id=state.game_id,
         battle_round=state.battle_round,
@@ -572,6 +952,26 @@ def _target_proposal_result(
         actor_id=request.actor_id,
         selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
         payload=validate_json_value({"proposal": proposal.to_payload()}),
+    )
+
+
+def _handcrafted_stratagem_option(
+    *,
+    record: StratagemCatalogRecord,
+    context: StratagemEligibilityContext,
+    binding: StratagemTargetBinding,
+) -> DecisionOption:
+    return DecisionOption(
+        option_id=f"use-stratagem:{record.definition.stratagem_id}:target:handcrafted",
+        label=record.definition.name,
+        payload=validate_json_value(
+            {
+                "submission_kind": STRATAGEM_DECISION_TYPE,
+                "context": context.to_payload(),
+                "catalog_record": record.to_payload(),
+                "target_binding": binding.to_payload(),
+            }
+        ),
     )
 
 
@@ -644,6 +1044,66 @@ def _request_rapid_ingress_placement(
     )
     placement_request = _decision_request(target_status)
     assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    return state, reserve_state, reserve_unit, reserve_army, placement_request
+
+
+def _request_rapid_ingress_reaction_placement(
+    lifecycle: GameLifecycle,
+) -> tuple[GameState, ReserveState, UnitInstance, ArmyDefinition, DecisionRequest]:
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.battle_round = 2
+    _grant_cp(state, player_id="player-b", amount=1)
+    reserve_state, reserve_unit, reserve_army = _move_unit_to_reserves(
+        state,
+        player_id="player-b",
+        unit_instance_id="army-beta:enemy-unit",
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=_context(
+            state=state,
+            player_id="player-b",
+            trigger_kind=TimingTriggerKind.END_PHASE,
+        ),
+        catalog_record=_source_stratagem_record("rapid-ingress"),
+    )
+    lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=_reaction_window_for_trigger(
+            state,
+            eligible_player_id="player-b",
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            source_rule_id="phase12c-rapid-ingress-retry-reaction",
+            window_id="phase12c-rapid-ingress-retry-window",
+        ),
+        parent_phase=BattlePhase.MOVEMENT,
+        parent_step="end_movement_phase_reactions",
+        resume_token="phase12c_rapid_ingress_retry_resume_token",
+        actor_id="player-b",
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        options=(parameterized_decision_option(),),
+        payload=validate_json_value(
+            {"proposal_request": validate_json_value(proposal_request.to_payload())}
+        ),
+    )
+    target_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    target_status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=target_request,
+            result_id="phase12c-rapid-ingress-reaction-retry-target",
+            proposal=_proposal_request_from_decision(target_request).with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-b",
+                    target_unit_instance_id=reserve_state.unit_instance_id,
+                )
+            ),
+        )
+    )
+    placement_request = _decision_request(target_status)
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    assert lifecycle.reaction_queue.frames[0].request_id == placement_request.request_id
     return state, reserve_state, reserve_unit, reserve_army, placement_request
 
 
