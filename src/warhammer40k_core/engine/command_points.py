@@ -15,9 +15,21 @@ class CommandPhaseStep(StrEnum):
 class CommandPointSourceKind(StrEnum):
     COMMAND_PHASE_START = "command_phase_start"
     OTHER = "other"
+    STRATAGEM_SPEND = "stratagem_spend"
+    STRATAGEM_REFUND = "stratagem_refund"
 
 
 class CommandPointGainStatus(StrEnum):
+    APPLIED = "applied"
+    CAPPED = "capped"
+
+
+class CommandPointSpendStatus(StrEnum):
+    APPLIED = "applied"
+    INSUFFICIENT = "insufficient"
+
+
+class CommandPointRefundStatus(StrEnum):
     APPLIED = "applied"
     CAPPED = "capped"
 
@@ -49,6 +61,30 @@ class CommandPointLedgerPayload(TypedDict):
 
 
 class CommandPointGainResultPayload(TypedDict):
+    player_id: str
+    battle_round: int
+    requested_amount: int
+    applied_amount: int
+    status: str
+    source_id: str
+    source_kind: str
+    transaction: CommandPointTransactionPayload | None
+    capped_reason: str | None
+
+
+class CommandPointSpendResultPayload(TypedDict):
+    player_id: str
+    battle_round: int
+    requested_amount: int
+    applied_amount: int
+    status: str
+    source_id: str
+    source_kind: str
+    transaction: CommandPointTransactionPayload | None
+    insufficient_reason: str | None
+
+
+class CommandPointRefundResultPayload(TypedDict):
     player_id: str
     battle_round: int
     requested_amount: int
@@ -234,7 +270,7 @@ class CommandPointTransaction:
         object.__setattr__(
             self,
             "amount",
-            _validate_positive_int("CommandPointTransaction amount", self.amount),
+            _validate_non_zero_int("CommandPointTransaction amount", self.amount),
         )
         object.__setattr__(
             self,
@@ -389,6 +425,250 @@ class CommandPointGainResult:
 
 
 @dataclass(frozen=True, slots=True)
+class CommandPointSpendResult:
+    player_id: str
+    battle_round: int
+    requested_amount: int
+    applied_amount: int
+    status: CommandPointSpendStatus
+    source_id: str
+    source_kind: CommandPointSourceKind
+    transaction: CommandPointTransaction | None = None
+    insufficient_reason: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("CommandPointSpendResult player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("CommandPointSpendResult battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "requested_amount",
+            _validate_positive_int(
+                "CommandPointSpendResult requested_amount",
+                self.requested_amount,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "applied_amount",
+            _validate_non_negative_int(
+                "CommandPointSpendResult applied_amount",
+                self.applied_amount,
+            ),
+        )
+        object.__setattr__(self, "status", command_point_spend_status_from_token(self.status))
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("CommandPointSpendResult source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "source_kind",
+            command_point_source_kind_from_token(self.source_kind),
+        )
+        if self.source_kind is not CommandPointSourceKind.STRATAGEM_SPEND:
+            raise GameLifecycleError("CommandPointSpendResult source_kind must be stratagem_spend.")
+        if self.transaction is not None and type(self.transaction) is not CommandPointTransaction:
+            raise GameLifecycleError(
+                "CommandPointSpendResult transaction must be a CommandPointTransaction."
+            )
+        object.__setattr__(
+            self,
+            "insufficient_reason",
+            _validate_optional_identifier(
+                "CommandPointSpendResult insufficient_reason",
+                self.insufficient_reason,
+            ),
+        )
+        if self.status is CommandPointSpendStatus.APPLIED:
+            if self.transaction is None:
+                raise GameLifecycleError("Applied CommandPointSpendResult requires a transaction.")
+            if self.transaction.amount != -self.requested_amount:
+                raise GameLifecycleError(
+                    "Applied CommandPointSpendResult transaction amount drift."
+                )
+            if self.applied_amount != self.requested_amount:
+                raise GameLifecycleError("Applied CommandPointSpendResult amount drift.")
+            if self.insufficient_reason is not None:
+                raise GameLifecycleError(
+                    "Applied CommandPointSpendResult cannot have insufficient_reason."
+                )
+        if self.status is CommandPointSpendStatus.INSUFFICIENT:
+            if self.transaction is not None:
+                raise GameLifecycleError(
+                    "Insufficient CommandPointSpendResult cannot have a transaction."
+                )
+            if self.applied_amount != 0:
+                raise GameLifecycleError("Insufficient CommandPointSpendResult applies no CP.")
+            if self.insufficient_reason is None:
+                raise GameLifecycleError(
+                    "Insufficient CommandPointSpendResult requires insufficient_reason."
+                )
+
+    def to_payload(self) -> CommandPointSpendResultPayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "requested_amount": self.requested_amount,
+            "applied_amount": self.applied_amount,
+            "status": self.status.value,
+            "source_id": self.source_id,
+            "source_kind": self.source_kind.value,
+            "transaction": None if self.transaction is None else self.transaction.to_payload(),
+            "insufficient_reason": self.insufficient_reason,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: CommandPointSpendResultPayload) -> Self:
+        transaction_payload = payload["transaction"]
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            requested_amount=payload["requested_amount"],
+            applied_amount=payload["applied_amount"],
+            status=command_point_spend_status_from_token(payload["status"]),
+            source_id=payload["source_id"],
+            source_kind=command_point_source_kind_from_token(payload["source_kind"]),
+            transaction=(
+                None
+                if transaction_payload is None
+                else CommandPointTransaction.from_payload(transaction_payload)
+            ),
+            insufficient_reason=payload["insufficient_reason"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CommandPointRefundResult:
+    player_id: str
+    battle_round: int
+    requested_amount: int
+    applied_amount: int
+    status: CommandPointRefundStatus
+    source_id: str
+    source_kind: CommandPointSourceKind
+    transaction: CommandPointTransaction | None = None
+    capped_reason: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("CommandPointRefundResult player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("CommandPointRefundResult battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "requested_amount",
+            _validate_positive_int(
+                "CommandPointRefundResult requested_amount",
+                self.requested_amount,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "applied_amount",
+            _validate_non_negative_int(
+                "CommandPointRefundResult applied_amount",
+                self.applied_amount,
+            ),
+        )
+        object.__setattr__(self, "status", command_point_refund_status_from_token(self.status))
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("CommandPointRefundResult source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "source_kind",
+            command_point_source_kind_from_token(self.source_kind),
+        )
+        if self.source_kind is not CommandPointSourceKind.STRATAGEM_REFUND:
+            raise GameLifecycleError(
+                "CommandPointRefundResult source_kind must be stratagem_refund."
+            )
+        if self.transaction is not None and type(self.transaction) is not CommandPointTransaction:
+            raise GameLifecycleError(
+                "CommandPointRefundResult transaction must be a CommandPointTransaction."
+            )
+        object.__setattr__(
+            self,
+            "capped_reason",
+            _validate_optional_identifier(
+                "CommandPointRefundResult capped_reason",
+                self.capped_reason,
+            ),
+        )
+        if self.status is CommandPointRefundStatus.APPLIED:
+            if self.transaction is None:
+                raise GameLifecycleError("Applied CommandPointRefundResult requires a transaction.")
+            if self.transaction.amount != self.requested_amount:
+                raise GameLifecycleError(
+                    "Applied CommandPointRefundResult transaction amount drift."
+                )
+            if self.applied_amount != self.requested_amount:
+                raise GameLifecycleError("Applied CommandPointRefundResult amount drift.")
+            if self.capped_reason is not None:
+                raise GameLifecycleError(
+                    "Applied CommandPointRefundResult cannot have capped_reason."
+                )
+        if self.status is CommandPointRefundStatus.CAPPED:
+            if self.transaction is not None:
+                raise GameLifecycleError(
+                    "Capped CommandPointRefundResult cannot have a transaction."
+                )
+            if self.applied_amount != 0:
+                raise GameLifecycleError("Capped CommandPointRefundResult applies no CP.")
+            if self.capped_reason is None:
+                raise GameLifecycleError("Capped CommandPointRefundResult requires capped_reason.")
+
+    def to_payload(self) -> CommandPointRefundResultPayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "requested_amount": self.requested_amount,
+            "applied_amount": self.applied_amount,
+            "status": self.status.value,
+            "source_id": self.source_id,
+            "source_kind": self.source_kind.value,
+            "transaction": None if self.transaction is None else self.transaction.to_payload(),
+            "capped_reason": self.capped_reason,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: CommandPointRefundResultPayload) -> Self:
+        transaction_payload = payload["transaction"]
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            requested_amount=payload["requested_amount"],
+            applied_amount=payload["applied_amount"],
+            status=command_point_refund_status_from_token(payload["status"]),
+            source_id=payload["source_id"],
+            source_kind=command_point_source_kind_from_token(payload["source_kind"]),
+            transaction=(
+                None
+                if transaction_payload is None
+                else CommandPointTransaction.from_payload(transaction_payload)
+            ),
+            capped_reason=payload["capped_reason"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class CommandPointLedger:
     player_id: str
     command_points: int = 0
@@ -433,9 +713,11 @@ class CommandPointLedger:
         requested_source = _validate_identifier("source_id", source_id)
         requested_kind = command_point_source_kind_from_token(source_kind)
         requested_cap_exempt = _validate_bool("cap_exempt", cap_exempt)
+        if requested_kind is CommandPointSourceKind.STRATAGEM_SPEND:
+            raise GameLifecycleError("CommandPointLedger.gain cannot use stratagem_spend.")
 
         if (
-            requested_kind is CommandPointSourceKind.OTHER
+            _source_kind_counts_toward_non_command_gain_cap(requested_kind)
             and not requested_cap_exempt
             and self.non_command_points_gained_in_round(requested_round) + requested_amount > 1
         ):
@@ -480,13 +762,122 @@ class CommandPointLedger:
         )
         return updated, result
 
+    def spend(
+        self,
+        *,
+        battle_round: int,
+        amount: int,
+        source_id: str,
+    ) -> tuple[Self, CommandPointSpendResult]:
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        requested_amount = _validate_positive_int("amount", amount)
+        requested_source = _validate_identifier("source_id", source_id)
+        if self.command_points < requested_amount:
+            result = CommandPointSpendResult(
+                player_id=self.player_id,
+                battle_round=requested_round,
+                requested_amount=requested_amount,
+                applied_amount=0,
+                status=CommandPointSpendStatus.INSUFFICIENT,
+                source_id=requested_source,
+                source_kind=CommandPointSourceKind.STRATAGEM_SPEND,
+                insufficient_reason="insufficient_command_points",
+            )
+            return self, result
+
+        transaction = CommandPointTransaction(
+            transaction_id=(
+                f"command-point:{self.player_id}:round-{requested_round:02d}:"
+                f"{len(self.transactions) + 1:06d}"
+            ),
+            player_id=self.player_id,
+            battle_round=requested_round,
+            amount=-requested_amount,
+            source_id=requested_source,
+            source_kind=CommandPointSourceKind.STRATAGEM_SPEND,
+        )
+        updated = type(self)(
+            player_id=self.player_id,
+            command_points=self.command_points - requested_amount,
+            transactions=(*self.transactions, transaction),
+        )
+        result = CommandPointSpendResult(
+            player_id=self.player_id,
+            battle_round=requested_round,
+            requested_amount=requested_amount,
+            applied_amount=requested_amount,
+            status=CommandPointSpendStatus.APPLIED,
+            source_id=requested_source,
+            source_kind=CommandPointSourceKind.STRATAGEM_SPEND,
+            transaction=transaction,
+        )
+        return updated, result
+
+    def refund(
+        self,
+        *,
+        battle_round: int,
+        amount: int,
+        source_id: str,
+        cap_exempt: bool = False,
+    ) -> tuple[Self, CommandPointRefundResult]:
+        requested_round = _validate_positive_int("battle_round", battle_round)
+        requested_amount = _validate_positive_int("amount", amount)
+        requested_source = _validate_identifier("source_id", source_id)
+        requested_cap_exempt = _validate_bool("cap_exempt", cap_exempt)
+        if (
+            not requested_cap_exempt
+            and self.non_command_points_gained_in_round(requested_round) + requested_amount > 1
+        ):
+            result = CommandPointRefundResult(
+                player_id=self.player_id,
+                battle_round=requested_round,
+                requested_amount=requested_amount,
+                applied_amount=0,
+                status=CommandPointRefundStatus.CAPPED,
+                source_id=requested_source,
+                source_kind=CommandPointSourceKind.STRATAGEM_REFUND,
+                capped_reason="non_command_cp_gain_cap_reached",
+            )
+            return self, result
+
+        transaction = CommandPointTransaction(
+            transaction_id=(
+                f"command-point:{self.player_id}:round-{requested_round:02d}:"
+                f"{len(self.transactions) + 1:06d}"
+            ),
+            player_id=self.player_id,
+            battle_round=requested_round,
+            amount=requested_amount,
+            source_id=requested_source,
+            source_kind=CommandPointSourceKind.STRATAGEM_REFUND,
+            cap_exempt=requested_cap_exempt,
+        )
+        updated = type(self)(
+            player_id=self.player_id,
+            command_points=self.command_points + requested_amount,
+            transactions=(*self.transactions, transaction),
+        )
+        result = CommandPointRefundResult(
+            player_id=self.player_id,
+            battle_round=requested_round,
+            requested_amount=requested_amount,
+            applied_amount=requested_amount,
+            status=CommandPointRefundStatus.APPLIED,
+            source_id=requested_source,
+            source_kind=CommandPointSourceKind.STRATAGEM_REFUND,
+            transaction=transaction,
+        )
+        return updated, result
+
     def non_command_points_gained_in_round(self, battle_round: int) -> int:
         requested_round = _validate_positive_int("battle_round", battle_round)
         return sum(
             transaction.amount
             for transaction in self.transactions
             if transaction.battle_round == requested_round
-            and transaction.source_kind is CommandPointSourceKind.OTHER
+            and transaction.amount > 0
+            and _source_kind_counts_toward_non_command_gain_cap(transaction.source_kind)
             and not transaction.cap_exempt
         )
 
@@ -542,6 +933,28 @@ def command_point_gain_status_from_token(token: object) -> CommandPointGainStatu
         raise GameLifecycleError(f"Unsupported CommandPointGainStatus token: {token}.") from exc
 
 
+def command_point_spend_status_from_token(token: object) -> CommandPointSpendStatus:
+    if type(token) is CommandPointSpendStatus:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("CommandPointSpendStatus token must be a string.")
+    try:
+        return CommandPointSpendStatus(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported CommandPointSpendStatus token: {token}.") from exc
+
+
+def command_point_refund_status_from_token(token: object) -> CommandPointRefundStatus:
+    if type(token) is CommandPointRefundStatus:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("CommandPointRefundStatus token must be a string.")
+    try:
+        return CommandPointRefundStatus(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported CommandPointRefundStatus token: {token}.") from exc
+
+
 def initial_command_point_ledgers(player_ids: tuple[str, ...]) -> list[CommandPointLedger]:
     return [CommandPointLedger.initial(player_id=player_id) for player_id in player_ids]
 
@@ -591,6 +1004,14 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     return value
 
 
+def _validate_non_zero_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value == 0:
+        raise GameLifecycleError(f"{field_name} must not be zero.")
+    return value
+
+
 def _validate_non_negative_int(field_name: str, value: object) -> int:
     if type(value) is not int:
         raise GameLifecycleError(f"{field_name} must be an integer.")
@@ -603,3 +1024,7 @@ def _validate_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+def _source_kind_counts_toward_non_command_gain_cap(source_kind: CommandPointSourceKind) -> bool:
+    return source_kind is not CommandPointSourceKind.COMMAND_PHASE_START

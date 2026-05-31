@@ -38,7 +38,9 @@ from warhammer40k_core.engine.command_points import (
     CommandPointGainResult,
     CommandPointLedger,
     CommandPointLedgerPayload,
+    CommandPointRefundResult,
     CommandPointSourceKind,
+    CommandPointSpendResult,
     CommandStepState,
     CommandStepStatePayload,
     initial_command_point_ledgers,
@@ -104,6 +106,7 @@ from warhammer40k_core.engine.scoring import (
     initial_victory_point_ledgers,
     secondary_mission_card_mode_from_token,
 )
+from warhammer40k_core.engine.stratagems import StratagemUseRecord, StratagemUseRecordPayload
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
     DisembarkedUnitStatePayload,
@@ -175,6 +178,7 @@ class GameStatePayload(TypedDict):
     command_step_state: CommandStepStatePayload | None
     command_point_ledgers: list[CommandPointLedgerPayload]
     victory_point_ledgers: list[VictoryPointLedgerPayload]
+    stratagem_use_records: list[StratagemUseRecordPayload]
     army_definitions: list[ArmyDefinitionPayload]
     starting_strength_records: list[StartingStrengthRecordPayload]
     battlefield_state: BattlefieldRuntimeStatePayload | None
@@ -224,6 +228,10 @@ def _new_command_point_ledgers() -> list[CommandPointLedger]:
 
 
 def _new_victory_point_ledgers() -> list[VictoryPointLedger]:
+    return []
+
+
+def _new_stratagem_use_records() -> list[StratagemUseRecord]:
     return []
 
 
@@ -535,6 +543,9 @@ class GameState:
     victory_point_ledgers: list[VictoryPointLedger] = field(
         default_factory=_new_victory_point_ledgers
     )
+    stratagem_use_records: list[StratagemUseRecord] = field(
+        default_factory=_new_stratagem_use_records
+    )
     army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
     starting_strength_records: list[StartingStrengthRecord] = field(
         default_factory=_new_starting_strength_records
@@ -632,6 +643,10 @@ class GameState:
         )
         self.victory_point_ledgers = _validate_victory_point_ledgers(
             self.victory_point_ledgers,
+            player_ids=self.player_ids,
+        )
+        self.stratagem_use_records = _validate_stratagem_use_records(
+            self.stratagem_use_records,
             player_ids=self.player_ids,
         )
         self.army_definitions = _validate_army_definitions(
@@ -946,6 +961,79 @@ class GameState:
             ]
             self.command_point_ledgers.sort(key=lambda stored: stored.player_id)
         return result
+
+    def spend_command_points(
+        self,
+        *,
+        player_id: str,
+        amount: int,
+        source_id: str,
+    ) -> CommandPointSpendResult:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        ledger = self.command_point_ledger_for_player(requested_player_id)
+        updated, result = ledger.spend(
+            battle_round=self.battle_round,
+            amount=amount,
+            source_id=source_id,
+        )
+        if updated is not ledger:
+            self.command_point_ledgers = [
+                updated if stored.player_id == requested_player_id else stored
+                for stored in self.command_point_ledgers
+            ]
+            self.command_point_ledgers.sort(key=lambda stored: stored.player_id)
+        return result
+
+    def refund_command_points(
+        self,
+        *,
+        player_id: str,
+        amount: int,
+        source_id: str,
+        cap_exempt: bool = False,
+    ) -> CommandPointRefundResult:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        ledger = self.command_point_ledger_for_player(requested_player_id)
+        updated, result = ledger.refund(
+            battle_round=self.battle_round,
+            amount=amount,
+            source_id=source_id,
+            cap_exempt=cap_exempt,
+        )
+        if updated is not ledger:
+            self.command_point_ledgers = [
+                updated if stored.player_id == requested_player_id else stored
+                for stored in self.command_point_ledgers
+            ]
+            self.command_point_ledgers.sort(key=lambda stored: stored.player_id)
+        return result
+
+    def record_stratagem_use(self, use_record: StratagemUseRecord) -> None:
+        if type(use_record) is not StratagemUseRecord:
+            raise GameLifecycleError("GameState stratagem use must be a StratagemUseRecord.")
+        if use_record.player_id not in self.player_ids:
+            raise GameLifecycleError("StratagemUseRecord player_id is not in this game.")
+        if self.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("StratagemUseRecord can be recorded only during battle.")
+        if use_record.battle_round != self.battle_round:
+            raise GameLifecycleError("StratagemUseRecord battle_round drift.")
+        if use_record.phase is not self.current_battle_phase:
+            raise GameLifecycleError("StratagemUseRecord phase drift.")
+        if any(stored.use_id == use_record.use_id for stored in self.stratagem_use_records):
+            raise GameLifecycleError("StratagemUseRecord use_id must be unique.")
+        self.stratagem_use_records.append(use_record)
+        self.stratagem_use_records.sort(key=lambda stored: stored.use_id)
+
+    def stratagem_use_records_for_player(
+        self,
+        player_id: str,
+    ) -> tuple[StratagemUseRecord, ...]:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        return tuple(
+            record
+            for record in self.stratagem_use_records
+            if record.player_id == requested_player_id
+        )
 
     def victory_point_ledger_for_player(self, player_id: str) -> VictoryPointLedger:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
@@ -1829,6 +1917,7 @@ class GameState:
             ),
             "command_point_ledgers": [ledger.to_payload() for ledger in self.command_point_ledgers],
             "victory_point_ledgers": [ledger.to_payload() for ledger in self.victory_point_ledgers],
+            "stratagem_use_records": [record.to_payload() for record in self.stratagem_use_records],
             "army_definitions": [army.to_payload() for army in self.army_definitions],
             "starting_strength_records": [
                 record.to_payload() for record in self.starting_strength_records
@@ -1907,6 +1996,12 @@ class GameState:
                 secondary_mission_choices_revealed=secondary_mission_choices_revealed,
             )
             for ledger in self.victory_point_ledgers
+        ]
+        payload["command_point_ledgers"] = [
+            cast(JsonValue, ledger.to_payload()) for ledger in self.command_point_ledgers
+        ]
+        payload["stratagem_use_records"] = [
+            cast(JsonValue, record.to_payload()) for record in self.stratagem_use_records
         ]
         payload["secondary_mission_card_states"] = cast(
             JsonValue,
@@ -1995,6 +2090,10 @@ class GameState:
             victory_point_ledgers=[
                 VictoryPointLedger.from_payload(ledger)
                 for ledger in payload["victory_point_ledgers"]
+            ],
+            stratagem_use_records=[
+                StratagemUseRecord.from_payload(record)
+                for record in payload["stratagem_use_records"]
             ],
             army_definitions=[
                 _army_definition_from_payload(army) for army in payload["army_definitions"]
@@ -2557,6 +2656,29 @@ def _validate_victory_point_ledgers(
     if set(seen) != set(player_ids):
         raise GameLifecycleError("GameState victory_point_ledgers must include every player.")
     return sorted(validated, key=lambda ledger: ledger.player_id)
+
+
+def _validate_stratagem_use_records(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[StratagemUseRecord]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState stratagem_use_records must be a list.")
+    validated: list[StratagemUseRecord] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not StratagemUseRecord:
+            raise GameLifecycleError(
+                "GameState stratagem_use_records must contain StratagemUseRecord values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("StratagemUseRecord player_id is not in this game.")
+        if value.use_id in seen:
+            raise GameLifecycleError("GameState stratagem_use_records must be unique.")
+        seen.add(value.use_id)
+        validated.append(value)
+    return sorted(validated, key=lambda record: record.use_id)
 
 
 def _validate_starting_strength_records(

@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 12A** is treated as implemented at the time this file was updated. Phase 12B is the next build slice.
+Everything through **Phase 12B** is treated as implemented at the time this file was updated. Phase 12C is the next build slice.
 
 Completed / implemented foundation:
 
@@ -73,6 +73,7 @@ Completed / implemented foundation:
 | 11E | Complete | Mission actions, primary/secondary scoring, and end-of-turn cleanup |
 | 11F | Complete | Battle-round/game-end scoring windows, VP caps, final audit, and winner determination |
 | 12A | Complete | Timing windows, reaction queue, sequencing, and persisting effects |
+| 12B | Complete | Command Point ledger and Stratagem framework |
 
 ## Cross-cutting architectural rules
 
@@ -1285,6 +1286,8 @@ CORE V1 relevant areas:
 - phase/reaction/persisting-effect tests.
 
 ## Phase 12B: Command Point ledger and Stratagem framework
+
+Status: Complete.
 
 Modules/documents:
 

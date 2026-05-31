@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, and Phase 12 Stratagem decision requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, and Phase 12B Stratagem decision requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, and Phase 12 Stratagem decision rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, and Phase 12B Stratagem decision rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -67,6 +67,8 @@ Relevant modules:
 - `src/warhammer40k_core/engine/reaction_queue.py`
 - `src/warhammer40k_core/engine/sequencing.py`
 - `src/warhammer40k_core/engine/effects.py`
+- `src/warhammer40k_core/engine/command_points.py`
+- `src/warhammer40k_core/engine/stratagems.py`
 - `src/warhammer40k_core/engine/scoring.py`
 - `src/warhammer40k_core/engine/lifecycle.py`
 
@@ -210,9 +212,11 @@ Some Stratagems need target or placement details that are not safe to pre-enumer
 - geometric, line-of-sight, model-target, or path-dependent target proposals once the owning phase has the required validators;
 - any future Stratagem whose legal target binding cannot be represented as a finite option set.
 
+Phase 12B introduces the initial parameterized Stratagem target-binding decision type `submit_stratagem_target_proposal` with proposal kind `stratagem_target_binding`. Adapters answer only with the fixed `submit_parameterized_payload` option and a payload containing the typed `proposal` object. Stale phase/round, malformed shape, schema-invalid missing target binding, wrong player/game/Stratagem context, and illegal target binding are rejected before queue pop and before any CP transaction or Stratagem-use record is created.
+
 Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule: stale, drifted, malformed, schema-invalid, or wrong-context payloads are rejected before the queue is popped or a `DecisionRecord` is created. They must not spend CP or mutate state. Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the specific proposal contract explicitly allows that behavior and emits a fresh pending request for retry.
 
-CP totals, CP ledger transactions, and normal Stratagem-use events are public in matched play. Viewer-scoped projections and adapter event deltas may expose them to every player unless a future source-backed hidden rule explicitly marks a pending decision, record, or event hidden. Any hidden Stratagem rule must update this document before implementation and must not leak hidden information through option counts, payload fields, event metadata, or derived projection data.
+CP totals, CP ledger transactions, and normal Stratagem-use events are public in matched play. Viewer-scoped projections expose public CP ledger data under `public_command_point_ledgers` and public Stratagem-use records under `public_stratagem_use_records`. Adapter event deltas may expose normal CP and Stratagem events to every player unless a future source-backed hidden rule explicitly marks a pending decision, record, or event hidden. Any hidden Stratagem rule must update this document before implementation and must not leak hidden information through option counts, payload fields, event metadata, or derived projection data.
 
 Required Phase 12 adapter-contract tests:
 
