@@ -234,6 +234,23 @@ def test_model_volume_participates_in_los_visibility_and_full_visibility() -> No
     )
 
 
+def test_phase13a_model_silhouette_sampling_budget_is_explicit() -> None:
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:manual-sampling-budget",
+        observer_model=_model("observer", -3.0, 0.0, height=4.0),
+        target_models=(_model("target", 3.0, 0.0, height=4.0),),
+    )
+
+    witness = context.resolve_line_of_sight()
+    record = witness.model_records[0]
+
+    assert record.checked_ray_count == 49
+    assert tuple(record.clear_ray_indices) == tuple(range(49))
+    assert witness.unit_visible
+    assert witness.unit_fully_visible
+
+
 def test_los_cache_key_changes_when_terrain_revision_changes() -> None:
     observer = _model("observer", -5.0, 0.0)
     target = _model("target", 5.0, 0.0)
