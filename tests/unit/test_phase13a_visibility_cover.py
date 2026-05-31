@@ -303,6 +303,33 @@ def test_observer_wholly_within_woods_sees_out_without_granting_target_cover() -
     assert not cover.has_benefit
 
 
+def test_woods_target_wholly_within_same_feature_is_not_fully_visible_from_inside() -> None:
+    feature = TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0]
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", -1.0, 0.0),
+        target_models=(_model("target", 1.0, 0.0),),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    cover = context.benefit_of_cover(witness)
+
+    assert witness.unit_visible
+    assert not witness.unit_fully_visible
+    assert all(
+        not record.blocks_model_visibility
+        and record.blocks_full_visibility
+        and record.exception_applied is None
+        for record in witness.all_blocker_records()
+    )
+    assert cover.has_benefit
+    assert CoverSourceReason.WHOLLY_WITHIN_FEATURE in {
+        record.reason for record in cover.source_records
+    }
+
+
 def test_towering_and_aircraft_use_true_los_through_woods_without_cover_source() -> None:
     feature = TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0]
     cache_key = SpatialIndexState.from_terrain_features((feature,)).los_cache_key()

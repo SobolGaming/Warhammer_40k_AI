@@ -1787,7 +1787,15 @@ def _terrain_feature_visibility_exception(
         or ("TOWERING" in target_keyword_set and target_wholly_within)
     ):
         return "towering_wholly_within"
-    if policy.uses_true_los_when_observer_wholly_within_feature and observer_wholly_within:
+    if (
+        policy.uses_true_los_when_observer_wholly_within_feature
+        and observer_wholly_within
+        and not (
+            target_wholly_within
+            and policy.blocks_full_visibility_through_footprint
+            and not policy.blocks_model_visibility_through_footprint
+        )
+    ):
         return "observer_wholly_within"
     if policy.uses_true_los_when_target_intersects_feature and target_intersects:
         return "target_intersects"
