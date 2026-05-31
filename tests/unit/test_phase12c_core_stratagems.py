@@ -50,10 +50,12 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
+    GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.movement import MovementPhaseState, MovementPhaseStepKind
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserves import (
@@ -65,6 +67,7 @@ from warhammer40k_core.engine.reserves import (
 from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_catalog_records
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_DICE_CONTEXT_KEY,
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogRecord,
@@ -73,10 +76,15 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetKind,
     StratagemTargetProposal,
     StratagemTargetProposalPayload,
+    create_stratagem_target_proposal_decision_request,
     create_stratagem_use_decision_request,
     request_stratagem_target_proposal,
     request_stratagem_use,
+    stratagem_decline_payload,
+    stratagem_target_proposal_request_payload,
     stratagem_use_options,
+    stratagem_window_decline_allowed,
+    stratagem_window_decline_event_payload,
 )
 from warhammer40k_core.engine.timing_windows import (
     ReactionWindow,
@@ -451,6 +459,186 @@ def test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock()
     assert target_unit_id not in state.battle_shocked_unit_ids
 
 
+def test_parameterized_stratagem_decline_requires_engine_marked_optional_window() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _record_secondary_choices(
+        state,
+        player_a_mode=SecondaryMissionMode.FIXED,
+        player_b_mode=SecondaryMissionMode.FIXED,
+    )
+    _set_command_step_ready_for_battle_shock(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
+    proposal_request = StratagemTargetProposal.for_request(
+        context=_context(
+            state=state,
+            player_id="player-a",
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+        catalog_record=_source_stratagem_record("insane-bravery"),
+    )
+    waiting = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+    request = _decision_request(waiting)
+
+    rejected = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase12c-nondeclinable-insane-bravery",
+            request_id=request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
+        )
+    )
+
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    assert rejected.payload == {"invalid_reason": "decline_not_allowed"}
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+
+
+def test_stratagem_decline_helpers_require_decline_results_and_marked_requests() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    proposal_request = StratagemTargetProposal.for_request(
+        context=_context(
+            state=state,
+            player_id="player-a",
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+        catalog_record=_source_stratagem_record("insane-bravery"),
+    )
+    declinable_payload = stratagem_target_proposal_request_payload(
+        proposal_request,
+        allow_decline=True,
+    )
+    assert isinstance(declinable_payload, dict)
+    assert declinable_payload["declinable"] is True
+    with pytest.raises(GameLifecycleError, match="decline allowance"):
+        stratagem_target_proposal_request_payload(
+            proposal_request,
+            allow_decline=cast(bool, "yes"),
+        )
+    request = create_stratagem_target_proposal_decision_request(
+        state=state,
+        proposal_request=proposal_request,
+        allow_decline=True,
+    )
+    decline_result = DecisionResult(
+        result_id="phase12c-decline-helper",
+        request_id=request.request_id,
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=stratagem_decline_payload(),
+    )
+    non_decline_result = DecisionResult(
+        result_id="phase12c-nondecline-helper",
+        request_id=request.request_id,
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=validate_json_value({"proposal": proposal_request.to_payload()}),
+    )
+
+    assert stratagem_window_decline_allowed(request=request, result=decline_result)
+    assert not stratagem_window_decline_allowed(request=request, result=non_decline_result)
+    event_payload = stratagem_window_decline_event_payload(
+        request=request,
+        result=decline_result,
+    )
+    assert isinstance(event_payload, dict)
+    assert event_payload["trigger_kind"] == TimingTriggerKind.START_PHASE.value
+    with pytest.raises(GameLifecycleError, match="decline result"):
+        stratagem_window_decline_event_payload(request=request, result=non_decline_result)
+
+
+def test_command_phase_progression_offers_insane_bravery_from_index_before_battle_shock() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _record_secondary_choices(
+        state,
+        player_a_mode=SecondaryMissionMode.FIXED,
+        player_b_mode=SecondaryMissionMode.FIXED,
+    )
+    _set_command_step_ready_for_battle_shock(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    proposal_request = _proposal_request_from_decision(request)
+    assert proposal_request.stratagem_id == "insane-bravery"
+    submitted = proposal_request.with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id=target_unit_id,
+        )
+    )
+
+    lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase12c-progressed-insane-bravery",
+            proposal=submitted,
+        )
+    )
+
+    assert state.command_point_total("player-a") == 0
+    assert state.stratagem_use_records[0].handler_id == "core:insane-bravery"
+    auto_passed = _last_event_payload(lifecycle.decision_controller, "battle_shock_test_resolved")
+    assert auto_passed["auto_passed"] is True
+    assert target_unit_id not in state.battle_shocked_unit_ids
+
+
+def test_command_phase_progression_declines_parameterized_stratagem_window() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _record_secondary_choices(
+        state,
+        player_a_mode=SecondaryMissionMode.FIXED,
+        player_b_mode=SecondaryMissionMode.FIXED,
+    )
+    _set_command_step_ready_for_battle_shock(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
+
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+
+    declined = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase12c-decline-insane-bravery",
+            request_id=request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
+        )
+    )
+
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert _has_event(lifecycle.decision_controller, "stratagem_window_declined")
+    battle_shock = _last_event_payload(lifecycle.decision_controller, "battle_shock_test_resolved")
+    assert battle_shock["auto_passed"] is False
+    follow_up = _decision_request(declined)
+    assert follow_up.decision_type == "select_movement_unit"
+
+
 def test_new_orders_finite_source_handler_discards_and_draws_replacement_card() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -523,6 +711,104 @@ def test_new_orders_finite_source_handler_discards_and_draws_replacement_card() 
         ]
         == target_card_id
     )
+
+
+def test_command_phase_progression_offers_new_orders_from_index() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _record_secondary_choices(
+        state,
+        player_a_mode=SecondaryMissionMode.TACTICAL,
+        player_b_mode=SecondaryMissionMode.FIXED,
+    )
+    _set_command_step_ready_for_tactical_secondary(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    state.record_tactical_secondary_draw(
+        TacticalSecondaryDraw(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            request_id="phase12c-progressed-new-orders-draw-request",
+            result_id="phase12c-progressed-new-orders-draw",
+            draw_count=state.tactical_secondary_draw_count,
+        )
+    )
+    initial_cards = state.draw_tactical_secondary_cards(
+        player_id="player-a",
+        source_result_id="phase12c-progressed-new-orders-draw",
+    )
+    target_card_id = initial_cards[0].secondary_mission_id
+
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    selected_option = next(
+        option
+        for option in request.options
+        if option.option_id.endswith(f"target:{target_card_id}")
+    )
+
+    assert request.decision_type == STRATAGEM_DECISION_TYPE
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-progressed-new-orders",
+            request=request,
+            selected_option_id=selected_option.option_id,
+        )
+    )
+
+    assert state.command_point_total("player-a") == 0
+    assert state.stratagem_use_records[0].handler_id == "core:new-orders"
+    assert (
+        _last_event_payload(lifecycle.decision_controller, "new_orders_resolved")[
+            "discarded_secondary_mission_id"
+        ]
+        == target_card_id
+    )
+
+
+def test_command_phase_progression_declines_finite_stratagem_window() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _record_secondary_choices(
+        state,
+        player_a_mode=SecondaryMissionMode.TACTICAL,
+        player_b_mode=SecondaryMissionMode.FIXED,
+    )
+    _set_command_step_ready_for_tactical_secondary(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    state.record_tactical_secondary_draw(
+        TacticalSecondaryDraw(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            request_id="phase12c-decline-new-orders-draw-request",
+            result_id="phase12c-decline-new-orders-draw",
+            draw_count=state.tactical_secondary_draw_count,
+        )
+    )
+    state.draw_tactical_secondary_cards(
+        player_id="player-a",
+        source_result_id="phase12c-decline-new-orders-draw",
+    )
+
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert request.decision_type == STRATAGEM_DECISION_TYPE
+    assert request.option_by_id(DECLINE_STRATAGEM_WINDOW_OPTION_ID).option_id == (
+        DECLINE_STRATAGEM_WINDOW_OPTION_ID
+    )
+
+    declined = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-decline-new-orders",
+            request=request,
+            selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        )
+    )
+
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert _has_event(lifecycle.decision_controller, "stratagem_window_declined")
+    follow_up = _decision_request(declined)
+    assert follow_up.decision_type == "select_movement_unit"
 
 
 def test_tactical_secondary_target_binding_requires_card_fields() -> None:
@@ -836,6 +1122,147 @@ def test_rapid_ingress_reaction_target_and_placement_restore_before_parent_resum
     arrived_state = restored_state.reserve_state_for_unit(restored_reserve_state.unit_instance_id)
     assert arrived_state is not None
     assert arrived_state.status is ReserveStatus.ARRIVED
+
+
+def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.battle_round = 2
+    _grant_cp(state, player_id="player-b", amount=1)
+    reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
+        state,
+        player_id="player-b",
+        unit_instance_id="army-beta:enemy-unit",
+    )
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        step=MovementPhaseStepKind.REINFORCEMENTS,
+        reinforcements_completed=True,
+        selected_unit_ids=("army-alpha:intercessor-unit-1",),
+        moved_unit_ids=("army-alpha:intercessor-unit-1",),
+    )
+
+    target_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    assert target_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert len(lifecycle.reaction_queue.frames) == 1
+    proposal_request = _proposal_request_from_decision(target_request)
+    assert proposal_request.stratagem_id == "rapid-ingress"
+    assert proposal_request.player_id == "player-b"
+
+    target_status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=target_request,
+            result_id="phase12c-progressed-rapid-ingress-target",
+            proposal=proposal_request.with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-b",
+                    target_unit_instance_id=reserve_state.unit_instance_id,
+                )
+            ),
+        )
+    )
+    placement_request = _decision_request(target_status)
+    restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
+    restored_state = _state(restored)
+    restored_reserve_state = restored_state.reserve_state_for_unit(reserve_state.unit_instance_id)
+    assert restored_reserve_state is not None
+    restored_army = restored_state.army_definition_for_player("player-b")
+    assert restored_army is not None
+    restored_reserve_unit = restored_army.unit_by_id(reserve_state.unit_instance_id)
+    restored_placement_request = _decision_request(restored.advance_until_decision_or_terminal())
+    assert restored_placement_request.request_id == placement_request.request_id
+    placement = _reserve_placement(
+        army=restored_army,
+        reserve_unit=restored_reserve_unit,
+        poses=tuple(
+            Pose.at(x=12.0 + index * 2.0, y=40.0, z=0.0, facing_degrees=180.0)
+            for index, _model in enumerate(restored_reserve_unit.own_models)
+        ),
+    )
+    placement_payload = PlacementProposalPayload(
+        proposal_request_id=restored_placement_request.request_id,
+        proposal_kind=ProposalKind.REINFORCEMENT,
+        unit_instance_id=restored_reserve_state.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,
+        attempted_placement=placement,
+    )
+
+    restored.submit_decision(
+        DecisionResult(
+            result_id="phase12c-progressed-rapid-ingress-placement",
+            request_id=restored_placement_request.request_id,
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=restored_placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(placement_payload.to_payload()),
+        )
+    )
+
+    assert restored.reaction_queue.frames == ()
+    assert (
+        _last_event_payload(restored.decision_controller, "reaction_parent_resumed")["resume_token"]
+        == "rapid-ingress-end-movement-round-02-player-player-b-resume"
+    )
+    assert _has_event(restored.decision_controller, "rapid_ingress_resolved")
+    arrived_state = restored_state.reserve_state_for_unit(restored_reserve_state.unit_instance_id)
+    assert arrived_state is not None
+    assert arrived_state.status is ReserveStatus.ARRIVED
+
+
+def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.battle_round = 2
+    _grant_cp(state, player_id="player-b", amount=1)
+    reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
+        state,
+        player_id="player-b",
+        unit_instance_id="army-beta:enemy-unit",
+    )
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        step=MovementPhaseStepKind.REINFORCEMENTS,
+        reinforcements_completed=True,
+        selected_unit_ids=("army-alpha:intercessor-unit-1",),
+        moved_unit_ids=("army-alpha:intercessor-unit-1",),
+    )
+
+    target_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert target_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
+    restored_request = _decision_request(restored.advance_until_decision_or_terminal())
+
+    declined = restored.submit_decision(
+        DecisionResult(
+            result_id="phase12c-decline-rapid-ingress",
+            request_id=restored_request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=restored_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
+        )
+    )
+
+    restored_state = _state(restored)
+    restored_reserve_state = restored_state.reserve_state_for_unit(reserve_state.unit_instance_id)
+    assert restored_reserve_state is not None
+    assert restored_reserve_state.status is ReserveStatus.IN_RESERVES
+    assert restored_state.command_point_total("player-b") == 1
+    assert restored_state.stratagem_use_records == []
+    assert restored.reaction_queue.frames == ()
+    assert _has_event(restored.decision_controller, "stratagem_window_declined")
+    assert (
+        _last_event_payload(restored.decision_controller, "reaction_parent_resumed")["resume_token"]
+        == "rapid-ingress-end-movement-round-02-player-player-b-resume"
+    )
+    assert declined.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert not _has_event(restored.decision_controller, "rapid_ingress_resolved")
 
 
 def test_rapid_ingress_invalid_placement_is_typed_invalid_without_arrival() -> None:

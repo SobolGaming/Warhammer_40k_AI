@@ -71,6 +71,7 @@ from warhammer40k_core.engine.phases.command import (
     CommandPhaseHandler,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContext,
@@ -87,7 +88,7 @@ def test_command_step_grants_both_players_cp_once_before_tactical_draw() -> None
         player_b_secondary=SecondaryMissionMode.FIXED,
     )
     decisions = DecisionController()
-    handler = CommandPhaseHandler()
+    handler = CommandPhaseHandler(stratagem_index=StratagemCatalogIndex.from_records(()))
 
     waiting = handler.begin_phase(state=state, decisions=decisions)
 
@@ -177,7 +178,7 @@ def test_below_half_strength_unit_emits_battle_shock_test_request() -> None:
 def test_command_phase_resolves_non_reroll_battle_shock_dice_without_decision_pause() -> None:
     state = _battle_state()
     decisions = DecisionController()
-    handler = CommandPhaseHandler()
+    handler = CommandPhaseHandler(stratagem_index=StratagemCatalogIndex.from_records(()))
     _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
 
     completed = handler.begin_phase(state=state, decisions=decisions)

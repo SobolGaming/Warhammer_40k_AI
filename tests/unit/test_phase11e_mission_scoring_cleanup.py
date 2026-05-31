@@ -84,6 +84,10 @@ from warhammer40k_core.engine.scoring import (
     victory_point_source_kind_from_token,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    STRATAGEM_DECISION_TYPE,
+)
 from warhammer40k_core.engine.turn_cleanup import (
     CoherencyCleanupRemoval,
     EndTurnCleanupState,
@@ -430,6 +434,11 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         selected_option_id="draw",
     )
     draw_status = lifecycle.submit_decision(result)
+    draw_status = _decline_stratagem_window_if_pending(
+        lifecycle,
+        draw_status,
+        result_id="phase11e-tactical-draw-decline-stratagem",
+    )
     automatic_follow_up = draw_status.decision_request
     assert automatic_follow_up is not None
     assert automatic_follow_up.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
@@ -566,6 +575,11 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
         result_id="phase11e-drift-draw",
     ).to_result(draw_request)
     draw_status = lifecycle.submit_decision(draw_result)
+    draw_status = _decline_stratagem_window_if_pending(
+        lifecycle,
+        draw_status,
+        result_id="phase11e-drift-draw-decline-stratagem",
+    )
     automatic_follow_up = draw_status.decision_request
     assert automatic_follow_up is not None
     assert automatic_follow_up.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
@@ -1464,6 +1478,24 @@ def _place_unit_near_objective(
     )
     state.battlefield_state = state.battlefield_state.with_unit_placement(
         _with_model_offsets(unit_placement, marker, offsets=offsets)
+    )
+
+
+def _decline_stratagem_window_if_pending(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id: str,
+) -> LifecycleStatus:
+    request = status.decision_request
+    if request is None or request.decision_type != STRATAGEM_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=result_id,
+            request=request,
+            selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        )
     )
 
 

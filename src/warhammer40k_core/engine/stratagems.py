@@ -82,6 +82,9 @@ if TYPE_CHECKING:
 STRATAGEM_DECISION_TYPE = "use_stratagem"
 STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE = "submit_stratagem_target_proposal"
 STRATAGEM_PROPOSAL_PAYLOAD_KIND = "stratagem_target_binding"
+DECLINE_STRATAGEM_WINDOW_OPTION_ID = "decline_stratagem_window"
+DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND = "decline_stratagem_window"
+STRATAGEM_WINDOW_DECLINED_EVENT_TYPE = "stratagem_window_declined"
 UNSUPPORTED_STRATAGEM_HANDLER_PREFIX = "unsupported:"
 CORE_COMMAND_REROLL_HANDLER_ID = "core:command-reroll"
 CORE_INSANE_BRAVERY_HANDLER_ID = "core:insane-bravery"
@@ -1142,6 +1145,124 @@ def create_stratagem_use_decision_request(
     )
 
 
+def stratagem_decline_option() -> DecisionOption:
+    return DecisionOption(
+        option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        label="Decline Stratagem Window",
+        payload=stratagem_decline_payload(),
+    )
+
+
+def stratagem_decline_payload() -> JsonValue:
+    return validate_json_value({"submission_kind": DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND})
+
+
+def is_stratagem_window_decline_result(result: DecisionResult) -> bool:
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Stratagem decline check requires a DecisionResult.")
+    return (
+        result.decision_type in (STRATAGEM_DECISION_TYPE, STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE)
+        and isinstance(result.payload, dict)
+        and result.payload.get("submission_kind") == DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND
+    )
+
+
+def stratagem_window_decline_allowed(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Stratagem decline allowance requires a DecisionRequest.")
+    if not is_stratagem_window_decline_result(result):
+        return False
+    if request.decision_type == STRATAGEM_DECISION_TYPE:
+        return any(
+            option.option_id == DECLINE_STRATAGEM_WINDOW_OPTION_ID for option in request.options
+        )
+    if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        if not isinstance(request.payload, dict):
+            return False
+        return request.payload.get("declinable") is True
+    return False
+
+
+def stratagem_window_context_from_request(request: DecisionRequest) -> StratagemEligibilityContext:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Stratagem window context requires a DecisionRequest.")
+    if request.decision_type == STRATAGEM_DECISION_TYPE:
+        if not isinstance(request.payload, dict):
+            raise GameLifecycleError("Stratagem decision request payload must be an object.")
+        context_payload = request.payload.get("stratagem_context")
+        if not isinstance(context_payload, dict):
+            raise GameLifecycleError("Stratagem decision request is missing context.")
+        try:
+            return StratagemEligibilityContext.from_payload(
+                cast(StratagemEligibilityContextPayload, context_payload)
+            )
+        except KeyError as exc:
+            raise GameLifecycleError("Stratagem decision context payload is malformed.") from exc
+    if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        proposal = _proposal_from_request_payload(request.payload)
+        if proposal is None:
+            raise GameLifecycleError("Stratagem proposal request is missing proposal context.")
+        return proposal.context
+    raise GameLifecycleError("DecisionRequest is not a Stratagem window request.")
+
+
+def stratagem_window_decline_event_payload(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> JsonValue:
+    if not is_stratagem_window_decline_result(result):
+        raise GameLifecycleError("Stratagem decline event requires a decline result.")
+    context = stratagem_window_context_from_request(request)
+    return validate_json_value(
+        {
+            "game_id": context.game_id,
+            "player_id": context.player_id,
+            "battle_round": context.battle_round,
+            "phase": context.phase.value,
+            "active_player_id": context.active_player_id,
+            "trigger_kind": context.trigger_kind.value,
+            "timing_window_id": context.timing_window_id,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "decision_type": result.decision_type,
+        }
+    )
+
+
+def stratagem_window_declined_for_context(
+    *,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+) -> bool:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Stratagem decline lookup requires a DecisionController.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem decline lookup requires an eligibility context.")
+    for event in decisions.event_log.records:
+        if event.event_type != STRATAGEM_WINDOW_DECLINED_EVENT_TYPE:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Stratagem decline event payload must be an object.")
+        payload = event.payload
+        _require_decline_event_fields(payload)
+        if (
+            payload["game_id"] == context.game_id
+            and payload["player_id"] == context.player_id
+            and payload["battle_round"] == context.battle_round
+            and payload["phase"] == context.phase.value
+            and payload["active_player_id"] == context.active_player_id
+            and payload["trigger_kind"] == context.trigger_kind.value
+            and payload["timing_window_id"] == context.timing_window_id
+        ):
+            return True
+    return False
+
+
 def stratagem_use_options(
     *,
     state: GameState,
@@ -1216,11 +1337,14 @@ def request_stratagem_target_proposal(
     state: GameState,
     decisions: DecisionController,
     proposal_request: StratagemTargetProposal,
+    allow_decline: bool = False,
 ) -> LifecycleStatus:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Stratagem proposal requires a DecisionController.")
     if type(proposal_request) is not StratagemTargetProposal:
         raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
+    if type(allow_decline) is not bool:
+        raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
     if proposal_request.target_binding is not None:
         raise GameLifecycleError("Stratagem proposal request cannot include a target binding.")
     violation = _stratagem_unavailable_reason(
@@ -1239,12 +1363,10 @@ def request_stratagem_target_proposal(
                 "unavailable_reason": violation,
             },
         )
-    request = DecisionRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-        actor_id=proposal_request.player_id,
-        payload=validate_json_value({"proposal_request": proposal_request.to_payload()}),
-        options=(parameterized_decision_option(),),
+    request = create_stratagem_target_proposal_decision_request(
+        state=state,
+        proposal_request=proposal_request,
+        allow_decline=allow_decline,
     )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
@@ -1252,6 +1374,73 @@ def request_stratagem_target_proposal(
         decision_request=request,
         payload={"pending_request_id": request.request_id},
     )
+
+
+def create_stratagem_target_proposal_decision_request(
+    *,
+    state: GameState,
+    proposal_request: StratagemTargetProposal,
+    allow_decline: bool = False,
+) -> DecisionRequest:
+    if type(proposal_request) is not StratagemTargetProposal:
+        raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
+    if type(allow_decline) is not bool:
+        raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
+    return DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.player_id,
+        payload=stratagem_target_proposal_request_payload(
+            proposal_request,
+            allow_decline=allow_decline,
+        ),
+        options=(parameterized_decision_option(),),
+    )
+
+
+def stratagem_target_proposal_request_payload(
+    proposal_request: StratagemTargetProposal,
+    *,
+    allow_decline: bool = False,
+) -> JsonValue:
+    if type(proposal_request) is not StratagemTargetProposal:
+        raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
+    if type(allow_decline) is not bool:
+        raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
+    payload: dict[str, JsonValue] = {
+        "proposal_request": validate_json_value(proposal_request.to_payload())
+    }
+    if allow_decline:
+        payload["declinable"] = True
+    return validate_json_value(payload)
+
+
+def stratagem_target_proposal_from_index(
+    *,
+    state: GameState,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+    handler_id: str,
+) -> StratagemTargetProposal | None:
+    if type(index) is not StratagemCatalogIndex:
+        raise GameLifecycleError("Stratagem target proposal requires a StratagemCatalogIndex.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem target proposal requires an eligibility context.")
+    requested_handler_id = _validate_identifier("handler_id", handler_id)
+    matches: list[StratagemCatalogRecord] = []
+    for record in index.records_for(context.trigger_kind):
+        definition = record.definition
+        if definition.handler_id != requested_handler_id:
+            continue
+        if definition.target_spec.enumerable:
+            continue
+        if _record_is_available_for_context(state=state, record=record, context=context):
+            matches.append(record)
+    if not matches:
+        return None
+    if len(matches) > 1:
+        raise GameLifecycleError("Stratagem target proposal index matched multiple records.")
+    return StratagemTargetProposal.for_request(context=context, catalog_record=matches[0])
 
 
 def invalid_stratagem_use_status(
@@ -1637,6 +1826,15 @@ def _stratagem_unavailable_reason(
     )
     if handler_reason is not None:
         return handler_reason
+    restriction = _restriction_violation(
+        state=state,
+        player_id=context.player_id,
+        definition=record.definition,
+        context=context,
+        target_binding=target_binding,
+    )
+    if restriction is not None:
+        return restriction
     if target_binding is not None:
         target_error = _target_binding_error(
             state=state,
@@ -1647,15 +1845,6 @@ def _stratagem_unavailable_reason(
         )
         if target_error is not None:
             return target_error
-        restriction = _restriction_violation(
-            state=state,
-            player_id=context.player_id,
-            definition=record.definition,
-            context=context,
-            target_binding=target_binding,
-        )
-        if restriction is not None:
-            return restriction
     return None
 
 
@@ -1737,7 +1926,7 @@ def _restriction_violation(
     player_id: str,
     definition: StratagemDefinition,
     context: StratagemEligibilityContext,
-    target_binding: StratagemTargetBinding,
+    target_binding: StratagemTargetBinding | None,
 ) -> str | None:
     policy = definition.restriction_policy
     previous_uses = state.stratagem_use_records_for_player(player_id)
@@ -1761,6 +1950,7 @@ def _restriction_violation(
         return "once_per_battle"
     if (
         policy.once_per_target_per_phase
+        and target_binding is not None
         and target_binding.target_unit_instance_id is not None
         and any(
             use.stratagem_id == definition.stratagem_id
@@ -2670,6 +2860,23 @@ def _validate_catalog_records(
         seen.add(value.record_id)
         validated.append(value)
     return tuple(sorted(validated, key=lambda record: record.record_id))
+
+
+def _require_decline_event_fields(payload: Mapping[str, JsonValue]) -> None:
+    for field_name in (
+        "game_id",
+        "player_id",
+        "battle_round",
+        "phase",
+        "active_player_id",
+        "trigger_kind",
+        "timing_window_id",
+        "request_id",
+        "result_id",
+        "decision_type",
+    ):
+        if field_name not in payload:
+            raise GameLifecycleError("Stratagem decline event payload is malformed.")
 
 
 def _invalid(state: GameState, message: str, reason: str) -> LifecycleStatus:

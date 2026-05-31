@@ -218,6 +218,8 @@ Some Stratagems need target or placement details that are not safe to pre-enumer
 
 Phase 12B introduces the initial parameterized Stratagem target-binding decision type `submit_stratagem_target_proposal` with proposal kind `stratagem_target_binding`. Adapters answer only with the fixed `submit_parameterized_payload` option and a payload containing the typed `proposal` object. Stale phase/round, malformed shape, schema-invalid missing target binding, wrong player/game/Stratagem/catalog context, CP drift, and illegal target binding are rejected before queue pop and before any CP transaction or Stratagem-use record is created.
 
+Phase-integrated optional Stratagem windows may also be declined through the same lifecycle path. Finite `use_stratagem` windows include the engine-emitted option ID `decline_stratagem_window` with payload `{"submission_kind": "decline_stratagem_window"}`. Parameterized `submit_stratagem_target_proposal` windows are declinable only when the engine marks the request payload with `declinable: true`; adapters decline by submitting the fixed `submit_parameterized_payload` option with the same decline payload instead of a typed `proposal`. A decline records a `DecisionRecord`, emits `stratagem_window_declined`, spends no CP, creates no `StratagemUseRecord`, applies no effect, and suppresses re-opening the same game/player/round/phase/trigger/timing-window. Reaction-window declines resolve the reaction frame and then emit `reaction_parent_resumed`.
+
 Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule: stale, drifted, malformed, schema-invalid, or wrong-context payloads are rejected before the queue is popped or a `DecisionRecord` is created. They must not spend CP or mutate state. Accepted parameterized submissions apply the Stratagem use atomically through `GameLifecycle.submit_decision(...)`: the engine re-checks timing, CP, restrictions, target validity, spends CP, records `StratagemUseRecord`, emits `stratagem_used`, and applies any Phase-12B-supported handler/effect payload. Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the specific proposal contract explicitly allows that behavior and emits a fresh pending request for retry.
 
 Phase 12C source-backed Core Stratagems are adapter-visible through these handler bindings:
@@ -238,6 +240,7 @@ Required Phase 12 adapter-contract tests:
 - insufficient CP typed invalid result with no ledger underflow;
 - same-Stratagem-twice-per-phase rejection separate from own Stratagem restrictions;
 - reactive non-active-player Stratagem use;
+- optional finite and parameterized Stratagem window decline through `GameLifecycle.submit_decision(...)`, including reaction-frame resume and no CP/state mutation;
 - replay/payload round-trip with deterministic JSON-safe records;
 - Phase 12C supported Core Stratagem handler coverage for Command Re-roll, Insane Bravery, Rapid Ingress, and New Orders;
 - Phase 12C deferred Core Stratagem descriptors exist but fail explicitly with `unsupported_handler`;

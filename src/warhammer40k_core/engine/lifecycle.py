@@ -71,6 +71,7 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE,
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
     apply_stratagem_decision,
     apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
@@ -78,6 +79,9 @@ from warhammer40k_core.engine.stratagems import (
     invalid_stratagem_target_proposal_status,
     invalid_stratagem_use_status,
     is_stratagem_placement_proposal_request,
+    is_stratagem_window_decline_result,
+    stratagem_window_decline_allowed,
+    stratagem_window_decline_event_payload,
 )
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
@@ -223,6 +227,7 @@ class GameLifecycle:
         return self._require_battle_round_flow().advance(
             state=state,
             decisions=self.decision_controller,
+            reaction_queue=self.reaction_queue,
         )
 
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
@@ -290,13 +295,23 @@ class GameLifecycle:
             result.validate_for_request(pending_request)
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
-            invalid_status = invalid_stratagem_use_status(
-                state=state,
+            if is_stratagem_window_decline_result(result) and not stratagem_window_decline_allowed(
                 request=pending_request,
                 result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
+            ):
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Stratagem window decline is not allowed for this request.",
+                    payload={"invalid_reason": "decline_not_allowed"},
+                )
+            if not is_stratagem_window_decline_result(result):
+                invalid_status = invalid_stratagem_use_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                )
+                if invalid_status is not None:
+                    return invalid_status
         if (
             type(result) is DecisionResult
             and pending_request is not None
@@ -305,13 +320,23 @@ class GameLifecycle:
             result.validate_for_request(pending_request)
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
-            invalid_status = invalid_stratagem_target_proposal_status(
-                state=state,
+            if is_stratagem_window_decline_result(result) and not stratagem_window_decline_allowed(
                 request=pending_request,
                 result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
+            ):
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Stratagem window decline is not allowed for this request.",
+                    payload={"invalid_reason": "decline_not_allowed"},
+                )
+            if not is_stratagem_window_decline_result(result):
+                invalid_status = invalid_stratagem_target_proposal_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                )
+                if invalid_status is not None:
+                    return invalid_status
         if (
             type(result) is DecisionResult
             and pending_request is not None
@@ -396,6 +421,14 @@ class GameLifecycle:
             )
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type == STRATAGEM_DECISION_TYPE:
+            if is_stratagem_window_decline_result(result):
+                self._record_stratagem_window_declined(result)
+                if self._result_resolves_active_reaction_frame(result):
+                    self.reaction_queue.resolve_reaction(
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
+                return self.advance_until_decision_or_terminal()
             apply_stratagem_decision(
                 state=state,
                 result=result,
@@ -409,6 +442,14 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            if is_stratagem_window_decline_result(result):
+                self._record_stratagem_window_declined(result)
+                if resolves_reaction_frame:
+                    self.reaction_queue.resolve_reaction(
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
+                return self.advance_until_decision_or_terminal()
             apply_stratagem_target_proposal(
                 state=state,
                 result=result,
@@ -519,6 +560,13 @@ class GameLifecycle:
             raise GameLifecycleError("Reaction frame check requires a DecisionResult.")
         frames = self.reaction_queue.frames
         return bool(frames and frames[-1].request_id == result.request_id)
+
+    def _record_stratagem_window_declined(self, result: DecisionResult) -> None:
+        record = self.decision_controller.record_for_result(result)
+        self.decision_controller.event_log.append(
+            STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
+            stratagem_window_decline_event_payload(request=record.request, result=result),
+        )
 
 
 def _payload_bool(field_name: str, value: object) -> bool:

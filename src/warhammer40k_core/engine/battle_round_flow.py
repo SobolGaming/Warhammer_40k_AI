@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.game_state import GameState
@@ -13,6 +14,9 @@ from warhammer40k_core.engine.phase import (
     PhaseHandler,
 )
 
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.reaction_queue import ReactionQueue
+
 
 class BattleRoundFlow:
     def __init__(self, *, phase_handlers: Mapping[BattlePhase, PhaseHandler]) -> None:
@@ -23,6 +27,7 @@ class BattleRoundFlow:
         *,
         state: GameState,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
         if state.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("BattleRoundFlow can advance only during battle.")
@@ -33,7 +38,11 @@ class BattleRoundFlow:
         handler = self._phase_handlers.get(current_phase)
         if handler is None:
             raise GameLifecycleError("BattleRoundFlow missing handler for current battle phase.")
-        status = handler.begin_phase(state=state, decisions=decisions)
+        status = handler.begin_phase(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+        )
         if status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
             return status
         if status.status_kind is LifecycleStatusKind.TERMINAL:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
@@ -28,12 +28,32 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_index
+from warhammer40k_core.engine.stratagems import (
+    CORE_INSANE_BRAVERY_HANDLER_ID,
+    StratagemCatalogIndex,
+    StratagemEligibilityContext,
+    create_stratagem_use_decision_request,
+    request_stratagem_target_proposal,
+    stratagem_decline_option,
+    stratagem_target_proposal_from_index,
+    stratagem_use_options_from_index,
+    stratagem_window_declined_for_context,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
 
 
 @dataclass(frozen=True, slots=True)
 class CommandPhaseHandler:
+    stratagem_index: StratagemCatalogIndex = field(default_factory=tenth_edition_stratagem_index)
+
+    def __post_init__(self) -> None:
+        if type(self.stratagem_index) is not StratagemCatalogIndex:
+            raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
+
     @property
     def phase(self) -> BattlePhase:
         return BattlePhase.COMMAND
@@ -43,6 +63,7 @@ class CommandPhaseHandler:
         *,
         state: GameState,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
         if state.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("CommandPhaseHandler can run only during battle.")
@@ -78,6 +99,15 @@ class CommandPhaseHandler:
         if not command_state.tactical_secondary_resolved:
             state.command_step_state = command_state.with_tactical_secondary_resolved()
             command_state = _command_step_state(state)
+
+        if not command_state.battle_shock_step_resolved:
+            stratagem_status = _request_command_start_stratagem_if_available(
+                state=state,
+                decisions=decisions,
+                stratagem_index=self.stratagem_index,
+            )
+            if stratagem_status is not None:
+                return stratagem_status
 
         if not command_state.battle_shock_step_resolved:
             _resolve_battle_shock_step(state=state, decisions=decisions)
@@ -284,6 +314,53 @@ def _request_tactical_secondary_draw(
             "active_player_id": active_player_id,
             "phase_body_status": "tactical_secondary_draw_pending",
         },
+    )
+
+
+def _request_command_start_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+) -> LifecycleStatus | None:
+    active_player_id = _active_player_id(state)
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=active_player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    finite_options = stratagem_use_options_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+    )
+    if finite_options:
+        request = create_stratagem_use_decision_request(
+            state=state,
+            context=context,
+            options=(*finite_options, stratagem_decline_option()),
+        )
+        decisions.request_decision(request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=state.stage,
+            decision_request=request,
+            payload={"pending_request_id": request.request_id},
+        )
+    proposal = stratagem_target_proposal_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+        handler_id=CORE_INSANE_BRAVERY_HANDLER_ID,
+    )
+    if proposal is None:
+        return None
+    return request_stratagem_target_proposal(
+        state=state,
+        decisions=decisions,
+        proposal_request=proposal,
+        allow_decline=True,
     )
 
 
