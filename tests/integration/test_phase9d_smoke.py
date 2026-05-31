@@ -28,6 +28,10 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.command import TACTICAL_SECONDARY_DRAW_DECISION_TYPE
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    STRATAGEM_DECISION_TYPE,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -78,6 +82,11 @@ def test_minimal_catalog_game_reaches_battle_round_one_with_mustered_armies() ->
         status=command_status,
         option_id="draw",
         result_id="phase9d-result-000003",
+    )
+    movement_status = _decline_stratagem_window_if_pending(
+        lifecycle,
+        status=movement_status,
+        result_id="phase9d-result-000004",
     )
 
     state = _require_state(lifecycle)
@@ -191,6 +200,24 @@ def _submit_result(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
+        )
+    )
+
+
+def _decline_stratagem_window_if_pending(
+    lifecycle: GameLifecycle,
+    *,
+    status: LifecycleStatus,
+    result_id: str,
+) -> LifecycleStatus:
+    request = status.decision_request
+    if request is None or request.decision_type != STRATAGEM_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=result_id,
+            request=request,
+            selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
         )
     )
 

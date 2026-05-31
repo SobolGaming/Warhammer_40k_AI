@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from itertools import combinations
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
@@ -52,7 +52,11 @@ from warhammer40k_core.engine.battlefield_state import (
     model_displacement_kind_from_token,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    DecisionOption,
+    DecisionRequest,
+    parameterized_decision_option,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.endpoint_placement import (
@@ -78,6 +82,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserves import (
     BattlefieldEdge,
     LargeModelReservePlacementException,
@@ -87,6 +92,22 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
+)
+from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_index
+from warhammer40k_core.engine.stratagems import (
+    CORE_RAPID_INGRESS_HANDLER_ID,
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemCatalogIndex,
+    StratagemEligibilityContext,
+    stratagem_target_proposal_from_index,
+    stratagem_target_proposal_request_payload,
+    stratagem_window_declined_for_context,
+)
+from warhammer40k_core.engine.timing_windows import (
+    ReactionWindow,
+    TimingTriggerKind,
+    TimingWindow,
+    TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
@@ -1916,6 +1937,7 @@ class _ResolvedUnitMove:
 class MovementPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     parameterized_proposals: bool = False
+    stratagem_index: StratagemCatalogIndex = field(default_factory=tenth_edition_stratagem_index)
 
     def __post_init__(self) -> None:
         if (
@@ -1927,6 +1949,8 @@ class MovementPhaseHandler:
             )
         if type(self.parameterized_proposals) is not bool:
             raise GameLifecycleError("MovementPhaseHandler parameterized_proposals must be a bool.")
+        if type(self.stratagem_index) is not StratagemCatalogIndex:
+            raise GameLifecycleError("MovementPhaseHandler stratagem_index must be an index.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -1937,6 +1961,7 @@ class MovementPhaseHandler:
         *,
         state: GameState,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
         _validate_movement_phase_state(state)
         movement_state = _ensure_movement_phase_state(state=state, decisions=decisions)
@@ -1946,7 +1971,12 @@ class MovementPhaseHandler:
                 state=state,
                 movement_state=movement_state,
             )
-            return _begin_reinforcements_step(state=state, decisions=decisions)
+            return _begin_reinforcements_step(
+                state=state,
+                decisions=decisions,
+                reaction_queue=reaction_queue,
+                stratagem_index=self.stratagem_index,
+            )
         active_selection = movement_state.active_selection
         if active_selection is not None:
             return _request_movement_action(
@@ -1987,7 +2017,12 @@ class MovementPhaseHandler:
                     "phase_body_status": "reinforcements_step_entered",
                 },
             )
-            return _begin_reinforcements_step(state=state, decisions=decisions)
+            return _begin_reinforcements_step(
+                state=state,
+                decisions=decisions,
+                reaction_queue=reaction_queue,
+                stratagem_index=self.stratagem_index,
+            )
 
         request = DecisionRequest(
             request_id=state.next_decision_request_id(),
@@ -2214,6 +2249,8 @@ def _begin_reinforcements_step(
     *,
     state: GameState,
     decisions: DecisionController,
+    reaction_queue: ReactionQueue | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     movement_state = state.movement_phase_state
@@ -2228,6 +2265,8 @@ def _begin_reinforcements_step(
         return _complete_reinforcements_step(
             state=state,
             decisions=decisions,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
             unarrived_reserve_count=len(unarrived_reserve_states),
         )
 
@@ -2268,12 +2307,22 @@ def _complete_reinforcements_step(
     *,
     state: GameState,
     decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
     unarrived_reserve_count: int,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
         raise GameLifecycleError("Completing Reinforcements requires Reinforcements step.")
+    rapid_ingress_status = _request_rapid_ingress_reaction_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
+    )
+    if rapid_ingress_status is not None:
+        return rapid_ingress_status
     if not movement_state.reinforcements_completed:
         state.movement_phase_state = movement_state.with_reinforcements_completed()
     decisions.event_log.append(
@@ -2299,6 +2348,83 @@ def _complete_reinforcements_step(
             "unarrived_reserve_count": unarrived_reserve_count,
         },
     )
+
+
+def _request_rapid_ingress_reaction_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+) -> LifecycleStatus | None:
+    if reaction_queue is None or stratagem_index is None:
+        return None
+    active_player_id = _active_player_id(state)
+    for player_id in state.player_ids:
+        if player_id == active_player_id:
+            continue
+        window_id = f"rapid-ingress-end-movement-round-{state.battle_round:02d}-player-{player_id}"
+        context = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=player_id,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            timing_window_id=window_id,
+        )
+        if stratagem_window_declined_for_context(decisions=decisions, context=context):
+            continue
+        proposal = stratagem_target_proposal_from_index(
+            state=state,
+            index=stratagem_index,
+            context=context,
+            handler_id=CORE_RAPID_INGRESS_HANDLER_ID,
+        )
+        if proposal is None:
+            continue
+        reaction_window = ReactionWindow(
+            timing_window=TimingWindow(
+                window_id=window_id,
+                descriptor=TimingWindowDescriptor(
+                    descriptor_id="core-rapid-ingress-end-movement",
+                    trigger_kind=TimingTriggerKind.END_PHASE,
+                    source_rule_id=CORE_RAPID_INGRESS_HANDLER_ID,
+                    phase=BattlePhase.MOVEMENT,
+                    source_step=MovementPhaseStepKind.REINFORCEMENTS.value,
+                ),
+                game_id=state.game_id,
+                battle_round=state.battle_round,
+                active_player_id=active_player_id,
+                phase=BattlePhase.MOVEMENT,
+            ),
+            eligible_player_ids=(player_id,),
+        )
+        triggered = reaction_queue.emit_decision_request(
+            state=state,
+            decisions=decisions,
+            reaction_window=reaction_window,
+            parent_phase=BattlePhase.MOVEMENT,
+            parent_step="end_movement_phase_reactions",
+            resume_token=f"{window_id}-resume",
+            actor_id=player_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            options=(parameterized_decision_option(),),
+            payload=stratagem_target_proposal_request_payload(
+                proposal,
+                allow_decline=True,
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=triggered.decision_request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "phase_body_status": "rapid_ingress_reaction_pending",
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "reacting_player_id": player_id,
+            },
+        )
+    return None
 
 
 def _reinforcement_unit_options(

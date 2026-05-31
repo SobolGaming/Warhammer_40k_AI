@@ -180,6 +180,7 @@ Every replay bug must add:
 Add scripts/tests for:
 
 - no broad exceptions;
+- no unparenthesized multi-exception handlers;
 - no silent fallback code;
 - no forbidden raw model access in physical engine paths;
 - no non-serializable decision payloads;

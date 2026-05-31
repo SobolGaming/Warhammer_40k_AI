@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import ast
+import io
+import tokenize
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -79,4 +81,39 @@ def test_no_except_pass_blocks() -> None:
 
     assert not violations, "`except: pass` / `except ...: pass` is forbidden:\n" + "\n".join(
         violations
+    )
+
+
+def test_multi_exception_handlers_are_parenthesized() -> None:
+    violations: list[str] = []
+
+    for path in _python_files():
+        rel = path.relative_to(ROOT).as_posix()
+        tokens = tokenize.generate_tokens(io.StringIO(path.read_text(encoding="utf-8")).readline)
+        in_except = False
+        depth = 0
+
+        for token in tokens:
+            if token.type == tokenize.NAME and token.string == "except":
+                in_except = True
+                depth = 0
+                continue
+
+            if not in_except:
+                continue
+
+            if token.type == tokenize.OP:
+                if token.string in {"(", "[", "{"}:
+                    depth += 1
+                elif token.string in {")", "]", "}"}:
+                    depth -= 1
+                elif token.string == ":" and depth == 0:
+                    in_except = False
+                elif token.string == "," and depth == 0:
+                    violations.append(f"{rel}:{token.start[0]}")
+                    in_except = False
+
+    assert not violations, (
+        "Multi-exception handlers must use tuple parentheses so the source remains "
+        "syntax-compatible with Python 3.13 parsers:\n" + "\n".join(violations)
     )

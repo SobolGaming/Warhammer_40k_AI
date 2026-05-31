@@ -48,14 +48,18 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.stratagem_catalog import (
+    build_player_stratagem_index,
     tenth_edition_core_stratagem_catalog_records,
+    tenth_edition_core_stratagem_index,
     tenth_edition_detachment_stratagem_catalog_records,
     tenth_edition_stratagem_catalog_records,
+    tenth_edition_stratagem_index,
 )
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemAvailabilityKind,
+    StratagemCatalogIndex,
     StratagemCatalogRecord,
     StratagemCategory,
     StratagemDefinition,
@@ -72,7 +76,10 @@ from warhammer40k_core.engine.stratagems import (
     invalid_stratagem_use_status,
     request_stratagem_target_proposal,
     request_stratagem_use,
+    request_stratagem_use_from_index,
     stratagem_use_options,
+    stratagem_use_options_for_handler_from_index,
+    stratagem_use_options_from_index,
 )
 from warhammer40k_core.engine.timing_windows import (
     ReactionWindow,
@@ -153,7 +160,73 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             "battle_tactic",
             "gw-10e-core-stratagems:core:command-reroll",
             "none",
-            "unsupported:phase-12c:command-reroll",
+            "core:command-reroll",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:counter-offensive",
+            "counter-offensive",
+            2,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:counter-offensive",
+            "unsupported:phase-14e:fight-order-interrupt-unit",
+            "unsupported:phase-14e:counter-offensive",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:epic-challenge",
+            "epic-challenge",
+            1,
+            "epic_deed",
+            "gw-10e-core-stratagems:core:epic-challenge",
+            "unsupported:phase-14e:character-model-fight-binding",
+            "unsupported:phase-14e:epic-challenge",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:fire-overwatch",
+            "fire-overwatch",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:fire-overwatch",
+            "unsupported:phase-13d:out-of-phase-shooting-unit",
+            "unsupported:phase-13d:fire-overwatch",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:go-to-ground",
+            "go-to-ground",
+            1,
+            "battle_tactic",
+            "gw-10e-core-stratagems:core:go-to-ground",
+            "unsupported:phase-13d:infantry-selected-target-unit",
+            "unsupported:phase-13d:go-to-ground",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:grenade",
+            "grenade",
+            1,
+            "wargear",
+            "gw-10e-core-stratagems:core:grenade",
+            "unsupported:phase-13d:grenades-unit-and-enemy-target",
+            "unsupported:phase-13d:grenade",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:heroic-intervention",
+            "heroic-intervention",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:heroic-intervention",
+            "unsupported:phase-14e:heroic-intervention-charge-unit",
+            "unsupported:phase-14e:heroic-intervention",
             "core",
             None,
         ),
@@ -163,8 +236,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "epic_deed",
             "gw-10e-core-stratagems:core:insane-bravery",
-            "unsupported:phase-12c:battle-shock-test-unit",
-            "unsupported:phase-12c:insane-bravery",
+            "battle_shock_test_unit",
+            "core:insane-bravery",
             "core",
             None,
         ),
@@ -174,8 +247,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "strategic_ploy",
             "gw-10e-core-stratagems:core:new-orders",
-            "none",
-            "unsupported:phase-12c:new-orders",
+            "active_tactical_secondary_card",
+            "core:new-orders",
             "core",
             None,
         ),
@@ -185,8 +258,30 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "strategic_ploy",
             "gw-10e-core-stratagems:core:rapid-ingress",
-            "unsupported:phase-12c:reserves-unit",
-            "unsupported:phase-12c:rapid-ingress",
+            "reserves_unit",
+            "core:rapid-ingress",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:smokescreen",
+            "smokescreen",
+            1,
+            "wargear",
+            "gw-10e-core-stratagems:core:smokescreen",
+            "unsupported:phase-13d:smoke-selected-target-unit",
+            "unsupported:phase-13d:smokescreen",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:tank-shock",
+            "tank-shock",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:tank-shock",
+            "unsupported:phase-14e:vehicle-charge-target-binding",
+            "unsupported:phase-14e:tank-shock",
             "core",
             None,
         ),
@@ -202,7 +297,7 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             "gladius-task-force",
         ),
     )
-    assert len(core_catalog) == 4
+    assert len(core_catalog) == 12
     assert len(detachment_catalog) == 1
 
     lifecycle = _battle_lifecycle()
@@ -228,6 +323,222 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
     _assert_no_pending(lifecycle)
 
 
+def test_source_backed_stratagem_index_matches_tuple_options_for_trigger_windows() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _grant_cp(state, player_id="player-a", amount=10)
+    catalog = tenth_edition_stratagem_catalog_records()
+    index = tenth_edition_stratagem_index()
+    phase_by_trigger = {
+        TimingTriggerKind.START_PHASE: BattlePhase.COMMAND,
+        TimingTriggerKind.END_PHASE: BattlePhase.MOVEMENT,
+        TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET: BattlePhase.SHOOTING,
+        TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE: BattlePhase.MOVEMENT,
+        TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE: BattlePhase.CHARGE,
+        TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT: BattlePhase.FIGHT,
+    }
+
+    assert index.all_records() == tuple(sorted(catalog, key=lambda record: record.record_id))
+    for trigger_kind in TimingTriggerKind:
+        _set_current_battle_phase(
+            state,
+            phase_by_trigger.get(trigger_kind, BattlePhase.MOVEMENT),
+        )
+        context = _context(state=state, player_id="player-a", trigger_kind=trigger_kind)
+
+        assert stratagem_use_options_from_index(state=state, index=index, context=context) == (
+            stratagem_use_options(state=state, catalog_records=catalog, context=context)
+        )
+
+
+def test_stratagem_catalog_index_partitions_by_trigger_and_rejects_invalid_inputs() -> None:
+    start_alpha = _core_stratagem(stratagem_id="start-alpha", command_point_cost=0)
+    start_zulu = _core_stratagem(stratagem_id="start-zulu", command_point_cost=0)
+    after_dice = _core_stratagem(
+        stratagem_id="after-dice",
+        command_point_cost=0,
+        timing=StratagemTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
+    )
+    catalog = (start_zulu, after_dice, start_alpha)
+    index = StratagemCatalogIndex.from_records(catalog)
+
+    assert index == StratagemCatalogIndex.from_records(catalog)
+    assert index.all_records() == tuple(sorted(catalog, key=lambda record: record.record_id))
+    assert index.records_for(TimingTriggerKind.START_PHASE) == (start_alpha, start_zulu)
+    assert index.records_for(TimingTriggerKind.AFTER_DICE_ROLL) == (after_dice,)
+    assert index.records_for(TimingTriggerKind.END_TURN) == ()
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    context = _context(state=state, player_id="player-a")
+    handler_options = stratagem_use_options_for_handler_from_index(
+        state=state,
+        index=index,
+        context=context,
+        handler_id="record_only",
+    )
+    assert tuple(option.option_id for option in handler_options) == (
+        "use-stratagem:start-alpha:target:none",
+        "use-stratagem:start-zulu:target:none",
+    )
+    assert (
+        stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=index,
+            context=context,
+            handler_id="missing-handler",
+        )
+        == ()
+    )
+    assert tenth_edition_core_stratagem_index().all_records() == tuple(
+        sorted(
+            tenth_edition_core_stratagem_catalog_records(),
+            key=lambda record: record.record_id,
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="duplicate IDs"):
+        StratagemCatalogIndex.from_records((start_alpha, start_alpha))
+    with pytest.raises(GameLifecycleError, match="StratagemCatalogRecord values"):
+        StratagemCatalogIndex.from_records(cast(tuple[StratagemCatalogRecord, ...], (object(),)))
+    with pytest.raises(GameLifecycleError, match="requires a TimingTriggerKind"):
+        index.records_for(cast(TimingTriggerKind, "start_phase"))
+    with pytest.raises(GameLifecycleError, match="require a StratagemCatalogIndex"):
+        stratagem_use_options_from_index(
+            state=_battle_state(),
+            index=cast(StratagemCatalogIndex, object()),
+            context=_context(state=_battle_state(), player_id="player-a"),
+        )
+    with pytest.raises(GameLifecycleError, match="require a StratagemCatalogIndex"):
+        stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=cast(StratagemCatalogIndex, object()),
+            context=context,
+            handler_id="record_only",
+        )
+    with pytest.raises(GameLifecycleError, match="require an eligibility context"):
+        stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=index,
+            context=cast(StratagemEligibilityContext, object()),
+            handler_id="record_only",
+        )
+
+
+def test_stratagem_catalog_index_preserves_any_phase_exact_match_semantics() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    catalog = (
+        _core_stratagem(stratagem_id="movement-start", command_point_cost=0),
+        _core_stratagem(
+            stratagem_id="any-phase",
+            command_point_cost=0,
+            timing=StratagemTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+        ),
+    )
+    index = StratagemCatalogIndex.from_records((catalog[1], catalog[0]))
+
+    start_context = _context(state=state, player_id="player-a")
+    any_phase_context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.ANY_PHASE,
+    )
+
+    assert tuple(
+        option.option_id
+        for option in stratagem_use_options_from_index(
+            state=state,
+            index=index,
+            context=start_context,
+        )
+    ) == ("use-stratagem:movement-start:target:none",)
+    assert stratagem_use_options_from_index(state=state, index=index, context=start_context) == (
+        stratagem_use_options(state=state, catalog_records=catalog, context=start_context)
+    )
+    assert tuple(
+        option.option_id
+        for option in stratagem_use_options_from_index(
+            state=state,
+            index=index,
+            context=any_phase_context,
+        )
+    ) == ("use-stratagem:any-phase:target:none",)
+    assert stratagem_use_options_from_index(
+        state=state,
+        index=index,
+        context=any_phase_context,
+    ) == stratagem_use_options(state=state, catalog_records=catalog, context=any_phase_context)
+
+
+def test_stratagem_request_from_index_has_empty_bucket_parity_with_tuple_scan() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    record = _core_stratagem(stratagem_id="movement-start", command_point_cost=0)
+    index = StratagemCatalogIndex.from_records((record,))
+    context = _context(state=state, player_id="player-a", trigger_kind=TimingTriggerKind.END_TURN)
+
+    tuple_status = request_stratagem_use(
+        state=state,
+        decisions=DecisionController(),
+        catalog_records=(record,),
+        context=context,
+    )
+    index_status = request_stratagem_use_from_index(
+        state=state,
+        decisions=DecisionController(),
+        index=index,
+        context=context,
+    )
+
+    assert index_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert index_status.message == tuple_status.message
+    assert index_status.payload == tuple_status.payload
+
+
+def test_player_stratagem_index_filters_detachments_without_changing_options() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=3)
+    alpha = state.army_definitions[0]
+    state.army_definitions[0] = replace(
+        alpha,
+        detachment_selection=DetachmentSelection(
+            faction_id=alpha.detachment_selection.faction_id,
+            detachment_id=alpha.detachment_selection.detachment_id,
+            stratagem_ids=("detachment-ambush",),
+        ),
+    )
+    catalog = (
+        _core_stratagem(stratagem_id="command-reroll", command_point_cost=1),
+        _detachment_stratagem(
+            stratagem_id="detachment-ambush",
+            command_point_cost=1,
+            detachment_id=alpha.detachment_selection.detachment_id,
+        ),
+        _detachment_stratagem(
+            stratagem_id="wrong-detachment-only",
+            command_point_cost=1,
+            detachment_id="other-detachment",
+        ),
+    )
+    player_index = build_player_stratagem_index(
+        catalog,
+        detachment_id=alpha.detachment_selection.detachment_id,
+        stratagem_ids=("detachment-ambush",),
+    )
+    context = _context(state=state, player_id="player-a")
+
+    assert tuple(record.definition.stratagem_id for record in player_index.all_records()) == (
+        "command-reroll",
+        "detachment-ambush",
+    )
+    assert stratagem_use_options_from_index(state=state, index=player_index, context=context) == (
+        stratagem_use_options(state=state, catalog_records=catalog, context=context)
+    )
+
+
 def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions() -> None:
     finite_lifecycle = _battle_lifecycle()
     finite_state = _state(finite_lifecycle)
@@ -238,15 +549,15 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
         player_id="player-a",
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     )
-    command_reroll = _source_stratagem_record("command-reroll")
+    deferred_core_stratagem = _source_stratagem_record("fire-overwatch")
     finite_request = create_stratagem_use_decision_request(
         state=finite_state,
         context=finite_context,
         options=(
             _stratagem_option_for_record(
-                record=command_reroll,
+                record=deferred_core_stratagem,
                 context=finite_context,
-                binding=StratagemTargetBinding.none(),
+                binding=_friendly_binding(),
             ),
         ),
     )
@@ -269,7 +580,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     parameterized_state = _state(parameterized_lifecycle)
     _set_current_battle_phase(parameterized_state, BattlePhase.MOVEMENT)
     _grant_cp(parameterized_state, player_id="player-a", amount=1)
-    rapid_ingress = _source_stratagem_record("rapid-ingress")
+    deferred_core_stratagem = _source_stratagem_record("fire-overwatch")
     parameterized_context = _context(
         state=parameterized_state,
         player_id="player-a",
@@ -277,7 +588,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     )
     proposal_request = StratagemTargetProposal.for_request(
         context=parameterized_context,
-        catalog_record=rapid_ingress,
+        catalog_record=deferred_core_stratagem,
     )
     unavailable_proposal = request_stratagem_target_proposal(
         state=parameterized_state,
@@ -288,7 +599,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     assert unavailable_proposal.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert unavailable_proposal.payload == {
         "player_id": "player-a",
-        "stratagem_id": "rapid-ingress",
+        "stratagem_id": "fire-overwatch",
         "unavailable_reason": "unsupported_handler",
     }
     assert parameterized_state.command_point_total("player-a") == 1

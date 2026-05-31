@@ -1,14 +1,31 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from types import MappingProxyType
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.dice import (
+    DiceRollSpecError,
+    DiceRollState,
+    DiceRollStatePayload,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
+    RulesetDescriptor,
     battle_phase_kind_from_token,
 )
-from warhammer40k_core.engine.battle_shock import friendly_stratagem_target_permission
+from warhammer40k_core.engine.battle_shock import (
+    collect_battle_shock_test_requests,
+    friendly_stratagem_target_permission,
+)
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    BattlefieldScenario,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointRefundStatus,
@@ -16,6 +33,7 @@ from warhammer40k_core.engine.command_points import (
     CommandPointSpendResult,
     CommandPointSpendStatus,
 )
+from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -24,16 +42,38 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.movement_proposals import (
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    PlacementProposalPayload,
+    PlacementProposalPayloadPayload,
+    ProposalKind,
+)
 from warhammer40k_core.engine.phase import (
+    BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.reserves import (
+    ReserveKind,
+    ReserveState,
+    ReserveStatus,
+    apply_reinforcement_placement_to_battlefield,
+    resolve_reserve_arrival,
+)
+from warhammer40k_core.engine.scoring import (
+    SecondaryMissionCardMode,
+    SecondaryMissionCardState,
+    SecondaryMissionCardStatus,
 )
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     timing_trigger_kind_from_token,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -42,7 +82,18 @@ if TYPE_CHECKING:
 STRATAGEM_DECISION_TYPE = "use_stratagem"
 STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE = "submit_stratagem_target_proposal"
 STRATAGEM_PROPOSAL_PAYLOAD_KIND = "stratagem_target_binding"
+DECLINE_STRATAGEM_WINDOW_OPTION_ID = "decline_stratagem_window"
+DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND = "decline_stratagem_window"
+STRATAGEM_WINDOW_DECLINED_EVENT_TYPE = "stratagem_window_declined"
 UNSUPPORTED_STRATAGEM_HANDLER_PREFIX = "unsupported:"
+CORE_COMMAND_REROLL_HANDLER_ID = "core:command-reroll"
+CORE_INSANE_BRAVERY_HANDLER_ID = "core:insane-bravery"
+CORE_RAPID_INGRESS_HANDLER_ID = "core:rapid-ingress"
+CORE_NEW_ORDERS_HANDLER_ID = "core:new-orders"
+COMMAND_REROLL_DICE_CONTEXT_KEY = "dice_roll_state"
+INSANE_BRAVERY_TARGET_POLICY_ID = "battle_shock_test_unit"
+RAPID_INGRESS_TARGET_POLICY_ID = "reserves_unit"
+NEW_ORDERS_TARGET_POLICY_ID = "active_tactical_secondary_card"
 
 
 class StratagemAvailabilityKind(StrEnum):
@@ -61,6 +112,7 @@ class StratagemTargetKind(StrEnum):
     NONE = "none"
     FRIENDLY_UNIT = "friendly_unit"
     ANY_UNIT = "any_unit"
+    TACTICAL_SECONDARY_CARD = "tactical_secondary_card"
 
 
 class StratagemUseRecordPayload(TypedDict):
@@ -115,6 +167,7 @@ class StratagemDefinitionPayload(TypedDict):
     restriction_policy: StratagemRestrictionPolicyPayload
     target_spec: StratagemTargetSpecPayload
     handler_id: str
+    eligible_roll_types: list[str]
     effect_payload: JsonValue
 
 
@@ -134,12 +187,14 @@ class StratagemEligibilityContextPayload(TypedDict):
     active_player_id: str | None
     trigger_kind: str
     timing_window_id: str | None
+    trigger_payload: NotRequired[JsonValue]
 
 
 class StratagemTargetBindingPayload(TypedDict):
     target_kind: str
     target_player_id: str | None
     target_unit_instance_id: str | None
+    target_secondary_mission_id: NotRequired[str | None]
 
 
 class StratagemTargetProposalPayload(TypedDict):
@@ -332,6 +387,7 @@ class StratagemDefinition:
     )
     target_spec: StratagemTargetSpec = field(default_factory=StratagemTargetSpec)
     handler_id: str = "record_only"
+    eligible_roll_types: tuple[str, ...] = ()
     effect_payload: JsonValue = None
 
     def __post_init__(self) -> None:
@@ -397,6 +453,14 @@ class StratagemDefinition:
             "handler_id",
             _validate_identifier("StratagemDefinition handler_id", self.handler_id),
         )
+        object.__setattr__(
+            self,
+            "eligible_roll_types",
+            _validate_identifier_tuple(
+                "StratagemDefinition eligible_roll_types",
+                self.eligible_roll_types,
+            ),
+        )
         object.__setattr__(self, "effect_payload", validate_json_value(self.effect_payload))
 
     def to_payload(self) -> StratagemDefinitionPayload:
@@ -414,6 +478,7 @@ class StratagemDefinition:
             "restriction_policy": self.restriction_policy.to_payload(),
             "target_spec": self.target_spec.to_payload(),
             "handler_id": self.handler_id,
+            "eligible_roll_types": list(self.eligible_roll_types),
             "effect_payload": self.effect_payload,
         }
 
@@ -435,6 +500,7 @@ class StratagemDefinition:
             ),
             target_spec=StratagemTargetSpec.from_payload(payload["target_spec"]),
             handler_id=payload["handler_id"],
+            eligible_roll_types=tuple(payload["eligible_roll_types"]),
             effect_payload=payload["effect_payload"],
         )
 
@@ -502,6 +568,38 @@ class StratagemCatalogRecord:
 
 
 @dataclass(frozen=True, slots=True)
+class StratagemCatalogIndex:
+    _records_by_trigger: Mapping[TimingTriggerKind, tuple[StratagemCatalogRecord, ...]]
+    _records: tuple[StratagemCatalogRecord, ...]
+
+    @classmethod
+    def from_records(cls, records: tuple[StratagemCatalogRecord, ...]) -> Self:
+        validated = _validate_catalog_records(records)
+        grouped: dict[TimingTriggerKind, list[StratagemCatalogRecord]] = {}
+        for record in validated:
+            grouped.setdefault(record.definition.timing.trigger_kind, []).append(record)
+        records_by_trigger = {
+            trigger_kind: tuple(records_for_trigger)
+            for trigger_kind, records_for_trigger in grouped.items()
+        }
+        return cls(
+            _records_by_trigger=MappingProxyType(records_by_trigger),
+            _records=validated,
+        )
+
+    def records_for(
+        self,
+        trigger_kind: TimingTriggerKind,
+    ) -> tuple[StratagemCatalogRecord, ...]:
+        if type(trigger_kind) is not TimingTriggerKind:
+            raise GameLifecycleError("StratagemCatalogIndex lookup requires a TimingTriggerKind.")
+        return self._records_by_trigger.get(trigger_kind, ())
+
+    def all_records(self) -> tuple[StratagemCatalogRecord, ...]:
+        return self._records
+
+
+@dataclass(frozen=True, slots=True)
 class StratagemEligibilityContext:
     game_id: str
     player_id: str
@@ -510,6 +608,7 @@ class StratagemEligibilityContext:
     active_player_id: str | None
     trigger_kind: TimingTriggerKind
     timing_window_id: str | None = None
+    trigger_payload: JsonValue = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -556,6 +655,7 @@ class StratagemEligibilityContext:
                 self.timing_window_id,
             ),
         )
+        object.__setattr__(self, "trigger_payload", validate_json_value(self.trigger_payload))
 
     @classmethod
     def from_state(
@@ -565,6 +665,7 @@ class StratagemEligibilityContext:
         player_id: str,
         trigger_kind: TimingTriggerKind,
         timing_window_id: str | None = None,
+        trigger_payload: JsonValue = None,
     ) -> Self:
         if state.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("StratagemEligibilityContext requires battle stage.")
@@ -579,10 +680,11 @@ class StratagemEligibilityContext:
             active_player_id=state.active_player_id,
             trigger_kind=trigger_kind,
             timing_window_id=timing_window_id,
+            trigger_payload=trigger_payload,
         )
 
     def to_payload(self) -> StratagemEligibilityContextPayload:
-        return {
+        payload: StratagemEligibilityContextPayload = {
             "game_id": self.game_id,
             "player_id": self.player_id,
             "battle_round": self.battle_round,
@@ -591,9 +693,15 @@ class StratagemEligibilityContext:
             "trigger_kind": self.trigger_kind.value,
             "timing_window_id": self.timing_window_id,
         }
+        if self.trigger_payload is not None:
+            payload["trigger_payload"] = self.trigger_payload
+        return payload
 
     @classmethod
     def from_payload(cls, payload: StratagemEligibilityContextPayload) -> Self:
+        trigger_payload: JsonValue = None
+        if "trigger_payload" in payload:
+            trigger_payload = payload["trigger_payload"]
         return cls(
             game_id=payload["game_id"],
             player_id=payload["player_id"],
@@ -602,6 +710,7 @@ class StratagemEligibilityContext:
             active_player_id=payload["active_player_id"],
             trigger_kind=timing_trigger_kind_from_token(payload["trigger_kind"]),
             timing_window_id=payload["timing_window_id"],
+            trigger_payload=trigger_payload,
         )
 
 
@@ -610,6 +719,7 @@ class StratagemTargetBinding:
     target_kind: StratagemTargetKind
     target_player_id: str | None = None
     target_unit_instance_id: str | None = None
+    target_secondary_mission_id: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -633,30 +743,61 @@ class StratagemTargetBinding:
                 self.target_unit_instance_id,
             ),
         )
+        object.__setattr__(
+            self,
+            "target_secondary_mission_id",
+            _validate_optional_identifier(
+                "StratagemTargetBinding target_secondary_mission_id",
+                self.target_secondary_mission_id,
+            ),
+        )
         if self.target_kind is StratagemTargetKind.NONE:
-            if self.target_player_id is not None or self.target_unit_instance_id is not None:
-                raise GameLifecycleError("Targetless StratagemTargetBinding cannot name a unit.")
+            if (
+                self.target_player_id is not None
+                or self.target_unit_instance_id is not None
+                or self.target_secondary_mission_id is not None
+            ):
+                raise GameLifecycleError("Targetless StratagemTargetBinding cannot name a target.")
+            return
+        if self.target_kind is StratagemTargetKind.TACTICAL_SECONDARY_CARD:
+            if self.target_player_id is None or self.target_secondary_mission_id is None:
+                raise GameLifecycleError(
+                    "Tactical secondary StratagemTargetBinding requires target card fields."
+                )
+            if self.target_unit_instance_id is not None:
+                raise GameLifecycleError(
+                    "Tactical secondary StratagemTargetBinding cannot name a unit."
+                )
             return
         if self.target_player_id is None or self.target_unit_instance_id is None:
             raise GameLifecycleError("Unit StratagemTargetBinding requires target unit fields.")
+        if self.target_secondary_mission_id is not None:
+            raise GameLifecycleError("Unit StratagemTargetBinding cannot name a secondary card.")
 
     @classmethod
     def none(cls) -> Self:
         return cls(target_kind=StratagemTargetKind.NONE)
 
     def to_payload(self) -> StratagemTargetBindingPayload:
-        return {
+        payload: StratagemTargetBindingPayload = {
             "target_kind": self.target_kind.value,
             "target_player_id": self.target_player_id,
             "target_unit_instance_id": self.target_unit_instance_id,
         }
+        if self.target_secondary_mission_id is not None:
+            payload["target_secondary_mission_id"] = self.target_secondary_mission_id
+        return payload
 
     @classmethod
     def from_payload(cls, payload: StratagemTargetBindingPayload) -> Self:
+        target_secondary_mission_id = None
+        if "target_secondary_mission_id" in payload:
+            target_secondary_mission_id = payload["target_secondary_mission_id"]
         return cls(
             target_kind=stratagem_target_kind_from_token(payload["target_kind"]),
             target_player_id=payload["target_player_id"],
             target_unit_instance_id=payload["target_unit_instance_id"],
+            target_secondary_mission_id=target_secondary_mission_id,
         )
 
 
@@ -924,11 +1065,45 @@ def request_stratagem_use(
 ) -> LifecycleStatus:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Stratagem use requires a DecisionController.")
-    options = stratagem_use_options(
+    records = _validate_catalog_records(catalog_records)
+    options = _stratagem_use_options_for_records(
         state=state,
-        catalog_records=catalog_records,
+        records=records,
         context=context,
     )
+    return _request_stratagem_use_with_options(
+        state=state,
+        decisions=decisions,
+        context=context,
+        options=options,
+    )
+
+
+def request_stratagem_use_from_index(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+) -> LifecycleStatus:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Stratagem use requires a DecisionController.")
+    options = stratagem_use_options_from_index(state=state, index=index, context=context)
+    return _request_stratagem_use_with_options(
+        state=state,
+        decisions=decisions,
+        context=context,
+        options=options,
+    )
+
+
+def _request_stratagem_use_with_options(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    options: tuple[DecisionOption, ...],
+) -> LifecycleStatus:
     if not options:
         return LifecycleStatus.unsupported(
             stage=state.stage,
@@ -970,6 +1145,124 @@ def create_stratagem_use_decision_request(
     )
 
 
+def stratagem_decline_option() -> DecisionOption:
+    return DecisionOption(
+        option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        label="Decline Stratagem Window",
+        payload=stratagem_decline_payload(),
+    )
+
+
+def stratagem_decline_payload() -> JsonValue:
+    return validate_json_value({"submission_kind": DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND})
+
+
+def is_stratagem_window_decline_result(result: DecisionResult) -> bool:
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Stratagem decline check requires a DecisionResult.")
+    return (
+        result.decision_type in (STRATAGEM_DECISION_TYPE, STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE)
+        and isinstance(result.payload, dict)
+        and result.payload.get("submission_kind") == DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND
+    )
+
+
+def stratagem_window_decline_allowed(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Stratagem decline allowance requires a DecisionRequest.")
+    if not is_stratagem_window_decline_result(result):
+        return False
+    if request.decision_type == STRATAGEM_DECISION_TYPE:
+        return any(
+            option.option_id == DECLINE_STRATAGEM_WINDOW_OPTION_ID for option in request.options
+        )
+    if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        if not isinstance(request.payload, dict):
+            return False
+        return request.payload.get("declinable") is True
+    return False
+
+
+def stratagem_window_context_from_request(request: DecisionRequest) -> StratagemEligibilityContext:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Stratagem window context requires a DecisionRequest.")
+    if request.decision_type == STRATAGEM_DECISION_TYPE:
+        if not isinstance(request.payload, dict):
+            raise GameLifecycleError("Stratagem decision request payload must be an object.")
+        context_payload = request.payload.get("stratagem_context")
+        if not isinstance(context_payload, dict):
+            raise GameLifecycleError("Stratagem decision request is missing context.")
+        try:
+            return StratagemEligibilityContext.from_payload(
+                cast(StratagemEligibilityContextPayload, context_payload)
+            )
+        except KeyError as exc:
+            raise GameLifecycleError("Stratagem decision context payload is malformed.") from exc
+    if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        proposal = _proposal_from_request_payload(request.payload)
+        if proposal is None:
+            raise GameLifecycleError("Stratagem proposal request is missing proposal context.")
+        return proposal.context
+    raise GameLifecycleError("DecisionRequest is not a Stratagem window request.")
+
+
+def stratagem_window_decline_event_payload(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> JsonValue:
+    if not is_stratagem_window_decline_result(result):
+        raise GameLifecycleError("Stratagem decline event requires a decline result.")
+    context = stratagem_window_context_from_request(request)
+    return validate_json_value(
+        {
+            "game_id": context.game_id,
+            "player_id": context.player_id,
+            "battle_round": context.battle_round,
+            "phase": context.phase.value,
+            "active_player_id": context.active_player_id,
+            "trigger_kind": context.trigger_kind.value,
+            "timing_window_id": context.timing_window_id,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "decision_type": result.decision_type,
+        }
+    )
+
+
+def stratagem_window_declined_for_context(
+    *,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+) -> bool:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Stratagem decline lookup requires a DecisionController.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem decline lookup requires an eligibility context.")
+    for event in decisions.event_log.records:
+        if event.event_type != STRATAGEM_WINDOW_DECLINED_EVENT_TYPE:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Stratagem decline event payload must be an object.")
+        payload = event.payload
+        _require_decline_event_fields(payload)
+        if (
+            payload["game_id"] == context.game_id
+            and payload["player_id"] == context.player_id
+            and payload["battle_round"] == context.battle_round
+            and payload["phase"] == context.phase.value
+            and payload["active_player_id"] == context.active_player_id
+            and payload["trigger_kind"] == context.trigger_kind.value
+            and payload["timing_window_id"] == context.timing_window_id
+        ):
+            return True
+    return False
+
+
 def stratagem_use_options(
     *,
     state: GameState,
@@ -977,6 +1270,55 @@ def stratagem_use_options(
     context: StratagemEligibilityContext,
 ) -> tuple[DecisionOption, ...]:
     records = _validate_catalog_records(catalog_records)
+    return _stratagem_use_options_for_records(state=state, records=records, context=context)
+
+
+def stratagem_use_options_from_index(
+    *,
+    state: GameState,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+) -> tuple[DecisionOption, ...]:
+    if type(index) is not StratagemCatalogIndex:
+        raise GameLifecycleError("Stratagem options require a StratagemCatalogIndex.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem options require an eligibility context.")
+    return _stratagem_use_options_for_records(
+        state=state,
+        records=index.records_for(context.trigger_kind),
+        context=context,
+    )
+
+
+def stratagem_use_options_for_handler_from_index(
+    *,
+    state: GameState,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+    handler_id: str,
+) -> tuple[DecisionOption, ...]:
+    if type(index) is not StratagemCatalogIndex:
+        raise GameLifecycleError("Stratagem options require a StratagemCatalogIndex.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem options require an eligibility context.")
+    requested_handler_id = _validate_identifier("handler_id", handler_id)
+    return _stratagem_use_options_for_records(
+        state=state,
+        records=tuple(
+            record
+            for record in index.records_for(context.trigger_kind)
+            if record.definition.handler_id == requested_handler_id
+        ),
+        context=context,
+    )
+
+
+def _stratagem_use_options_for_records(
+    *,
+    state: GameState,
+    records: tuple[StratagemCatalogRecord, ...],
+    context: StratagemEligibilityContext,
+) -> tuple[DecisionOption, ...]:
     if type(context) is not StratagemEligibilityContext:
         raise GameLifecycleError("Stratagem options require an eligibility context.")
     options: list[DecisionOption] = []
@@ -1018,11 +1360,14 @@ def request_stratagem_target_proposal(
     state: GameState,
     decisions: DecisionController,
     proposal_request: StratagemTargetProposal,
+    allow_decline: bool = False,
 ) -> LifecycleStatus:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Stratagem proposal requires a DecisionController.")
     if type(proposal_request) is not StratagemTargetProposal:
         raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
+    if type(allow_decline) is not bool:
+        raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
     if proposal_request.target_binding is not None:
         raise GameLifecycleError("Stratagem proposal request cannot include a target binding.")
     violation = _stratagem_unavailable_reason(
@@ -1041,12 +1386,10 @@ def request_stratagem_target_proposal(
                 "unavailable_reason": violation,
             },
         )
-    request = DecisionRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-        actor_id=proposal_request.player_id,
-        payload=validate_json_value({"proposal_request": proposal_request.to_payload()}),
-        options=(parameterized_decision_option(),),
+    request = create_stratagem_target_proposal_decision_request(
+        state=state,
+        proposal_request=proposal_request,
+        allow_decline=allow_decline,
     )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
@@ -1054,6 +1397,73 @@ def request_stratagem_target_proposal(
         decision_request=request,
         payload={"pending_request_id": request.request_id},
     )
+
+
+def create_stratagem_target_proposal_decision_request(
+    *,
+    state: GameState,
+    proposal_request: StratagemTargetProposal,
+    allow_decline: bool = False,
+) -> DecisionRequest:
+    if type(proposal_request) is not StratagemTargetProposal:
+        raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
+    if type(allow_decline) is not bool:
+        raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
+    return DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.player_id,
+        payload=stratagem_target_proposal_request_payload(
+            proposal_request,
+            allow_decline=allow_decline,
+        ),
+        options=(parameterized_decision_option(),),
+    )
+
+
+def stratagem_target_proposal_request_payload(
+    proposal_request: StratagemTargetProposal,
+    *,
+    allow_decline: bool = False,
+) -> JsonValue:
+    if type(proposal_request) is not StratagemTargetProposal:
+        raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
+    if type(allow_decline) is not bool:
+        raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
+    payload: dict[str, JsonValue] = {
+        "proposal_request": validate_json_value(proposal_request.to_payload())
+    }
+    if allow_decline:
+        payload["declinable"] = True
+    return validate_json_value(payload)
+
+
+def stratagem_target_proposal_from_index(
+    *,
+    state: GameState,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+    handler_id: str,
+) -> StratagemTargetProposal | None:
+    if type(index) is not StratagemCatalogIndex:
+        raise GameLifecycleError("Stratagem target proposal requires a StratagemCatalogIndex.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem target proposal requires an eligibility context.")
+    requested_handler_id = _validate_identifier("handler_id", handler_id)
+    matches: list[StratagemCatalogRecord] = []
+    for record in index.records_for(context.trigger_kind):
+        definition = record.definition
+        if definition.handler_id != requested_handler_id:
+            continue
+        if definition.target_spec.enumerable:
+            continue
+        if _record_is_available_for_context(state=state, record=record, context=context):
+            matches.append(record)
+    if not matches:
+        return None
+    if len(matches) > 1:
+        raise GameLifecycleError("Stratagem target proposal index matched multiple records.")
+    return StratagemTargetProposal.for_request(context=context, catalog_record=matches[0])
 
 
 def invalid_stratagem_use_status(
@@ -1159,6 +1569,15 @@ def _apply_stratagem_use(
         source_id=use_id,
         effect_payload=definition.effect_payload,
     )
+    _apply_supported_stratagem_handler(
+        state=state,
+        decisions=decisions,
+        result=result,
+        context=context,
+        definition=definition,
+        target_binding=target_binding,
+        use_record=use_record,
+    )
     return use_record
 
 
@@ -1220,6 +1639,68 @@ def apply_stratagem_target_proposal(
         context=proposal.context,
         catalog_record=proposal.catalog_record,
         target_binding=proposal.target_binding,
+    )
+
+
+def is_stratagem_placement_proposal_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Stratagem placement proposal check requires a request.")
+    if request.decision_type != PLACEMENT_PROPOSAL_DECISION_TYPE:
+        return False
+    proposal_request = _movement_proposal_request_from_payload(request.payload)
+    return proposal_request is not None and _proposal_request_is_rapid_ingress(proposal_request)
+
+
+def invalid_stratagem_placement_proposal_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if result.selected_option_id != PARAMETERIZED_DECISION_OPTION_ID:
+        return _invalid(state, "Stratagem placement proposal selected invalid option.", "malformed")
+    proposal_request = _movement_proposal_request_from_payload(request.payload)
+    if proposal_request is None or not _proposal_request_is_rapid_ingress(proposal_request):
+        return _invalid(state, "Malformed stratagem placement proposal request.", "malformed")
+    submitted = _placement_proposal_from_result_payload(result.payload)
+    if submitted is None:
+        return _invalid(state, "Malformed stratagem placement proposal payload.", "malformed")
+    validation = submitted.validation_result_for_request(proposal_request)
+    if not validation.is_valid:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Stratagem placement proposal context drift.",
+            payload=validate_json_value(
+                {"proposal_validation": validate_json_value(validation.to_payload())}
+            ),
+        )
+    reserve_state = state.reserve_state_for_unit(submitted.unit_instance_id)
+    if reserve_state is None or reserve_state.status is not ReserveStatus.IN_RESERVES:
+        return _invalid(state, "Stratagem placement proposal reserve drift.", "reserve_drift")
+    return None
+
+
+def apply_stratagem_placement_proposal(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    proposal_request = _movement_proposal_request_from_payload(request.payload)
+    if proposal_request is None or not _proposal_request_is_rapid_ingress(proposal_request):
+        raise GameLifecycleError("Stratagem placement proposal was not prevalidated.")
+    submitted = _placement_proposal_from_result_payload(result.payload)
+    if submitted is None:
+        raise GameLifecycleError("Stratagem placement proposal payload was not prevalidated.")
+    return _apply_rapid_ingress_placement(
+        state=state,
+        decisions=decisions,
+        result=result,
+        proposal_request=proposal_request,
+        submitted=submitted,
+        ruleset_descriptor=ruleset_descriptor,
     )
 
 
@@ -1308,7 +1789,7 @@ def _stratagem_selection_from_result_payload(
                 cast(StratagemTargetBindingPayload, binding_payload)
             ),
         )
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):  # fmt: skip
         return None
 
 
@@ -1360,6 +1841,23 @@ def _stratagem_unavailable_reason(
         return "insufficient_command_points"
     if not _detachment_gate_allows(state=state, record=record, player_id=context.player_id):
         return "detachment_gate_closed"
+    handler_reason = _handler_unavailable_reason(
+        state=state,
+        definition=record.definition,
+        context=context,
+        target_binding=target_binding,
+    )
+    if handler_reason is not None:
+        return handler_reason
+    restriction = _restriction_violation(
+        state=state,
+        player_id=context.player_id,
+        definition=record.definition,
+        context=context,
+        target_binding=target_binding,
+    )
+    if restriction is not None:
+        return restriction
     if target_binding is not None:
         target_error = _target_binding_error(
             state=state,
@@ -1370,15 +1868,6 @@ def _stratagem_unavailable_reason(
         )
         if target_error is not None:
             return target_error
-        restriction = _restriction_violation(
-            state=state,
-            player_id=context.player_id,
-            definition=record.definition,
-            context=context,
-            target_binding=target_binding,
-        )
-        if restriction is not None:
-            return restriction
     return None
 
 
@@ -1415,13 +1904,52 @@ def _detachment_gate_allows(
     return False
 
 
+def _handler_unavailable_reason(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> str | None:
+    if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
+        return _command_reroll_context_error(definition=definition, context=context)
+    if definition.handler_id == CORE_INSANE_BRAVERY_HANDLER_ID:
+        if target_binding is None:
+            if _battle_shock_test_unit_ids(state=state, player_id=context.player_id):
+                return None
+            return "no_eligible_battle_shock_test"
+        return None
+    if definition.handler_id == CORE_RAPID_INGRESS_HANDLER_ID:
+        if context.active_player_id == context.player_id:
+            return "rapid_ingress_requires_opponent_turn"
+        if target_binding is None:
+            return (
+                None
+                if _rapid_ingress_unit_ids(state=state, player_id=context.player_id)
+                else ("no_eligible_reserve_unit")
+            )
+        return None
+    if definition.handler_id == CORE_NEW_ORDERS_HANDLER_ID:
+        if target_binding is None:
+            return (
+                None
+                if _active_tactical_secondary_cards(
+                    state=state,
+                    player_id=context.player_id,
+                )
+                else "no_active_tactical_secondary_card"
+            )
+        return None
+    return None
+
+
 def _restriction_violation(
     *,
     state: GameState,
     player_id: str,
     definition: StratagemDefinition,
     context: StratagemEligibilityContext,
-    target_binding: StratagemTargetBinding,
+    target_binding: StratagemTargetBinding | None,
 ) -> str | None:
     policy = definition.restriction_policy
     previous_uses = state.stratagem_use_records_for_player(player_id)
@@ -1445,6 +1973,7 @@ def _restriction_violation(
         return "once_per_battle"
     if (
         policy.once_per_target_per_phase
+        and target_binding is not None
         and target_binding.target_unit_instance_id is not None
         and any(
             use.stratagem_id == definition.stratagem_id
@@ -1467,6 +1996,15 @@ def _enumerated_target_bindings(
     target_spec = definition.target_spec
     if target_spec.target_kind is StratagemTargetKind.NONE:
         return (StratagemTargetBinding.none(),)
+    if target_spec.target_kind is StratagemTargetKind.TACTICAL_SECONDARY_CARD:
+        return tuple(
+            StratagemTargetBinding(
+                target_kind=StratagemTargetKind.TACTICAL_SECONDARY_CARD,
+                target_player_id=card.player_id,
+                target_secondary_mission_id=card.secondary_mission_id,
+            )
+            for card in _active_tactical_secondary_cards(state=state, player_id=player_id)
+        )
     bindings: list[StratagemTargetBinding] = []
     for army in state.army_definitions:
         if (
@@ -1497,6 +2035,9 @@ def _enumerated_target_bindings(
             key=lambda binding: (
                 "" if binding.target_player_id is None else binding.target_player_id,
                 "" if binding.target_unit_instance_id is None else binding.target_unit_instance_id,
+                ""
+                if binding.target_secondary_mission_id is None
+                else binding.target_secondary_mission_id,
             ),
         )
     )
@@ -1518,6 +2059,21 @@ def _target_binding_error(
         return "target_required"
     if target_spec.target_policy_id.startswith("unsupported:"):
         return "unsupported_target_policy"
+    if target_spec.target_kind is StratagemTargetKind.TACTICAL_SECONDARY_CARD:
+        if target_binding.target_kind is not StratagemTargetKind.TACTICAL_SECONDARY_CARD:
+            return "target_kind_mismatch"
+        if target_binding.target_player_id != player_id:
+            return "target_not_controlled_by_player"
+        if _target_secondary_mission_id(target_binding) not in {
+            card.secondary_mission_id
+            for card in _active_tactical_secondary_cards(state=state, player_id=player_id)
+        }:
+            return "tactical_secondary_card_not_active"
+        if target_spec.target_policy_id != NEW_ORDERS_TARGET_POLICY_ID:
+            return "unsupported_target_policy"
+        return None
+    if target_binding.target_kind is StratagemTargetKind.TACTICAL_SECONDARY_CARD:
+        return "target_kind_mismatch"
     if (
         target_spec.target_kind is StratagemTargetKind.FRIENDLY_UNIT
         and target_binding.target_player_id != player_id
@@ -1539,6 +2095,22 @@ def _target_binding_error(
         if permission.denial_reason is None:
             raise GameLifecycleError("Denied stratagem target permission must explain denial.")
         return permission.denial_reason
+    if target_spec.target_policy_id == INSANE_BRAVERY_TARGET_POLICY_ID:
+        if _require_target_unit_id(target_binding) not in _battle_shock_test_unit_ids(
+            state=state,
+            player_id=player_id,
+        ):
+            return "unit_not_pending_battle_shock_test"
+        return None
+    if target_spec.target_policy_id == RAPID_INGRESS_TARGET_POLICY_ID:
+        if _require_target_unit_id(target_binding) not in _rapid_ingress_unit_ids(
+            state=state,
+            player_id=player_id,
+        ):
+            return "unit_not_eligible_for_rapid_ingress"
+        return None
+    if target_spec.target_policy_id not in {"friendly_unit", "any_unit"}:
+        return "unsupported_target_policy"
     return None
 
 
@@ -1557,6 +2129,151 @@ def _target_unit_owner(
     return None
 
 
+def _active_tactical_secondary_cards(
+    *,
+    state: GameState,
+    player_id: str,
+) -> tuple[SecondaryMissionCardState, ...]:
+    return tuple(
+        sorted(
+            (
+                card
+                for card in state.secondary_mission_card_states
+                if card.player_id == player_id
+                and card.mode is SecondaryMissionCardMode.TACTICAL
+                and card.status is SecondaryMissionCardStatus.ACTIVE
+            ),
+            key=lambda card: card.secondary_mission_id,
+        )
+    )
+
+
+def _battle_shock_test_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        return ()
+    army = state.army_definition_for_player(player_id)
+    if army is None:
+        return ()
+    requests = collect_battle_shock_test_requests(
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=player_id,
+        army=army,
+        battlefield_state=battlefield_state,
+        starting_strength_records=tuple(state.starting_strength_records),
+    )
+    return tuple(sorted({request.unit_instance_id for request in requests}))
+
+
+def _rapid_ingress_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            reserve_state.unit_instance_id
+            for reserve_state in state.unarrived_reserve_states_for_player(player_id)
+            if reserve_state.status is ReserveStatus.IN_RESERVES
+        )
+    )
+
+
+def _command_reroll_context_error(
+    *,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+) -> str | None:
+    try:
+        roll_state = _command_reroll_state(context)
+        if roll_state.original_result.spec.actor_id != context.player_id:
+            return "dice_roll_actor_drift"
+        roll_type = roll_state.original_result.spec.roll_type
+        if roll_type not in definition.eligible_roll_types:
+            return "ineligible_dice_roll_type"
+        permission = RerollPermission(
+            source_id=CORE_COMMAND_REROLL_HANDLER_ID,
+            timing_window=context.timing_window_id or context.trigger_kind.value,
+            owning_player_id=context.player_id,
+            eligible_roll_type=roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+        permission.legal_selections_for_state(roll_state)
+    except (DiceRollSpecError, GameLifecycleError):  # fmt: skip
+        return "invalid_dice_roll_context"
+    return None
+
+
+def _command_reroll_state(context: StratagemEligibilityContext) -> DiceRollState:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        raise GameLifecycleError("Command Re-roll requires dice roll trigger payload.")
+    roll_payload = trigger_payload.get(COMMAND_REROLL_DICE_CONTEXT_KEY)
+    if not isinstance(roll_payload, dict):
+        raise GameLifecycleError("Command Re-roll requires dice_roll_state payload.")
+    return DiceRollState.from_payload(cast(DiceRollStatePayload, roll_payload))
+
+
+def _reserve_state_for_target(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+) -> ReserveState:
+    reserve_state = state.reserve_state_for_unit(_require_target_unit_id(target_binding))
+    if reserve_state is None:
+        raise GameLifecycleError("Stratagem reserve target requires ReserveState.")
+    if reserve_state.status is not ReserveStatus.IN_RESERVES:
+        raise GameLifecycleError("Stratagem reserve target must be unarrived.")
+    return reserve_state
+
+
+def _unit_for_reserve_state(*, state: GameState, reserve_state: ReserveState) -> UnitInstance:
+    army = state.army_definition_for_player(reserve_state.player_id)
+    if army is None:
+        raise GameLifecycleError("ReserveState player has no army definition.")
+    for unit in army.units:
+        if unit.unit_instance_id == reserve_state.unit_instance_id:
+            return unit
+    raise GameLifecycleError("ReserveState references an unknown unit.")
+
+
+def _reserve_placement_kinds_for_unit(
+    *,
+    reserve_state: ReserveState,
+    unit: UnitInstance,
+) -> tuple[BattlefieldPlacementKind, ...]:
+    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
+        kinds = [BattlefieldPlacementKind.STRATEGIC_RESERVES]
+        if _unit_has_deep_strike_keyword(unit):
+            kinds.append(BattlefieldPlacementKind.DEEP_STRIKE)
+        return tuple(kinds)
+    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
+        return (BattlefieldPlacementKind.DEEP_STRIKE,)
+    return (BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,)
+
+
+def _reserve_proposal_kind(reserve_state: ReserveState) -> ProposalKind:
+    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
+        return ProposalKind.DEEP_STRIKE
+    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
+        return ProposalKind.STRATEGIC_RESERVES
+    return ProposalKind.REINFORCEMENT
+
+
+def _unit_has_deep_strike_keyword(unit: UnitInstance) -> bool:
+    return any(
+        keyword.replace("-", " ").replace("_", " ").upper() == "DEEP STRIKE"
+        for keyword in unit.keywords
+    )
+
+
+def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Stratagem placement requires battlefield_state.")
+    return BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=battlefield_state,
+    )
+
+
 def _proposal_from_request_payload(payload: JsonValue) -> StratagemTargetProposal | None:
     if not isinstance(payload, dict):
         return None
@@ -1567,7 +2284,7 @@ def _proposal_from_request_payload(payload: JsonValue) -> StratagemTargetProposa
         proposal = StratagemTargetProposal.from_payload(
             cast(StratagemTargetProposalPayload, proposal_payload)
         )
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):  # fmt: skip
         return None
     if proposal.target_binding is not None:
         return None
@@ -1584,7 +2301,7 @@ def _proposal_from_result_payload(payload: JsonValue) -> StratagemTargetProposal
         return StratagemTargetProposal.from_payload(
             cast(StratagemTargetProposalPayload, proposal_payload)
         )
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):  # fmt: skip
         return None
 
 
@@ -1609,6 +2326,458 @@ def _proposal_context_error(
     if submitted_proposal.phase is not request_proposal.phase:
         return "stale_phase"
     return _context_state_drift(state=state, context=request_proposal.context)
+
+
+def _movement_proposal_request_from_payload(payload: JsonValue) -> MovementProposalRequest | None:
+    try:
+        return MovementProposalRequest.from_decision_request_payload(payload)
+    except (KeyError, GameLifecycleError):  # fmt: skip
+        return None
+
+
+def _placement_proposal_from_result_payload(payload: JsonValue) -> PlacementProposalPayload | None:
+    if not isinstance(payload, dict):
+        return None
+    try:
+        return PlacementProposalPayload.from_payload(cast(PlacementProposalPayloadPayload, payload))
+    except (KeyError, GameLifecycleError):  # fmt: skip
+        return None
+
+
+def _proposal_request_is_rapid_ingress(proposal_request: MovementProposalRequest) -> bool:
+    context = proposal_request.context or {}
+    handler = context.get("stratagem_handler_id")
+    return handler == CORE_RAPID_INGRESS_HANDLER_ID
+
+
+def _apply_rapid_ingress_placement(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    proposal_request: MovementProposalRequest,
+    submitted: PlacementProposalPayload,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    reserve_state = state.reserve_state_for_unit(submitted.unit_instance_id)
+    if reserve_state is None:
+        raise GameLifecycleError("Rapid Ingress placement requires ReserveState.")
+    if reserve_state.status is not ReserveStatus.IN_RESERVES:
+        raise GameLifecycleError("Rapid Ingress placement requires an unarrived ReserveState.")
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise GameLifecycleError("Rapid Ingress placement requires MissionSetup.")
+    placement = resolve_reserve_arrival(
+        scenario=_battlefield_scenario(state),
+        ruleset_descriptor=ruleset_descriptor,
+        reserve_state=reserve_state,
+        attempted_placement=submitted.attempted_placement,
+        battle_round=state.battle_round,
+        placement_kind=submitted.placement_kind,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
+        objective_markers=tuple(
+            marker.to_objective_marker() for marker in mission_setup.objective_markers
+        ),
+        enemy_deployment_zones=mission_setup.enemy_deployment_zones_for_player(
+            reserve_state.player_id
+        ),
+        large_model_exceptions=submitted.large_model_exceptions,
+    )
+    if not placement.is_valid:
+        invalid_payload = {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": reserve_state.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": reserve_state.unit_instance_id,
+            "proposal_kind": proposal_request.proposal_kind.value,
+            "placement_kind": submitted.placement_kind.value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "rapid_ingress_placement_invalid",
+            "violations": [violation.to_payload() for violation in placement.violations],
+            "coherency_result": placement.coherency_result.to_payload(),
+        }
+        decisions.event_log.append(
+            "rapid_ingress_placement_invalid",
+            validate_json_value(invalid_payload),
+        )
+        retry_request = _request_rapid_ingress_placement_retry(
+            state=state,
+            decisions=decisions,
+            proposal_request=proposal_request,
+            rejected_result=result,
+        )
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Rapid Ingress placement is invalid.",
+            payload=validate_json_value(
+                {**invalid_payload, "next_request_id": retry_request.request_id}
+            ),
+        )
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Rapid Ingress placement requires battlefield_state.")
+    state.replace_battlefield_state(
+        apply_reinforcement_placement_to_battlefield(
+            battlefield_state=battlefield_state,
+            placement=placement,
+        )
+    )
+    arrived_state = placement.arrived_reserve_state()
+    state.replace_reserve_state(arrived_state)
+    stratagem_use = _stratagem_use_from_proposal_context(proposal_request)
+    event_payload = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": state.active_player_id,
+        "player_id": arrived_state.player_id,
+        "phase": BattlePhase.MOVEMENT.value,
+        "step": "rapid_ingress",
+        "unit_instance_id": arrived_state.unit_instance_id,
+        "placement_kind": placement.candidate.placement_kind.value,
+        "request_id": result.request_id,
+        "result_id": result.result_id,
+        "phase_body_status": "rapid_ingress_unit_arrived",
+        "transition_batch": validate_json_value(placement.transition_batch.to_payload())
+        if placement.transition_batch is not None
+        else None,
+        "large_model_exception_used": placement.large_model_exception_used,
+        "post_arrival_restrictions": [
+            restriction.value for restriction in placement.post_arrival_restrictions
+        ],
+        "stratagem_use": stratagem_use.to_payload(),
+    }
+    decisions.event_log.append("reinforcement_unit_arrived", validate_json_value(event_payload))
+    decisions.event_log.append("rapid_ingress_resolved", validate_json_value(event_payload))
+    return None
+
+
+def _request_rapid_ingress_placement_retry(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    proposal_request: MovementProposalRequest,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    retry_proposal = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=proposal_request.proposal_kind,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        placement_kinds=proposal_request.placement_kinds,
+        context=dict(proposal_request.context or {}),
+    )
+    request = retry_proposal.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "placement_proposal_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": retry_proposal.actor_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": retry_proposal.unit_instance_id,
+            "proposal_kind": retry_proposal.proposal_kind.value,
+            "placement_kinds": [kind.value for kind in retry_proposal.placement_kinds],
+            "request_id": request.request_id,
+            "source_decision_request_id": retry_proposal.source_decision_request_id,
+            "source_decision_result_id": retry_proposal.source_decision_result_id,
+            "previous_proposal_request_id": proposal_request.request_id,
+            "rejected_result_id": rejected_result.result_id,
+            "phase_body_status": "rapid_ingress_placement_proposal_required",
+        },
+    )
+    return request
+
+
+def _stratagem_use_from_proposal_context(
+    proposal_request: MovementProposalRequest,
+) -> StratagemUseRecord:
+    context = proposal_request.context or {}
+    use_payload = context.get("stratagem_use")
+    if not isinstance(use_payload, dict):
+        raise GameLifecycleError("Rapid Ingress placement context requires stratagem_use.")
+    return StratagemUseRecord.from_payload(cast(StratagemUseRecordPayload, use_payload))
+
+
+def _apply_supported_stratagem_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    if definition.handler_id == "record_only":
+        return
+    if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
+        _apply_command_reroll_handler(
+            state=state,
+            decisions=decisions,
+            context=context,
+            definition=definition,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == CORE_INSANE_BRAVERY_HANDLER_ID:
+        _apply_insane_bravery_handler(
+            state=state,
+            decisions=decisions,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == CORE_RAPID_INGRESS_HANDLER_ID:
+        _apply_rapid_ingress_handler(
+            state=state,
+            decisions=decisions,
+            result=result,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == CORE_NEW_ORDERS_HANDLER_ID:
+        _apply_new_orders_handler(
+            state=state,
+            decisions=decisions,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    raise GameLifecycleError("Stratagem handler is not supported.")
+
+
+def _apply_command_reroll_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    use_record: StratagemUseRecord,
+) -> None:
+    roll_state = _command_reroll_state(context)
+    if roll_state.original_result.spec.actor_id != context.player_id:
+        raise GameLifecycleError("Command Re-roll roll actor was not prevalidated.")
+    roll_type = roll_state.original_result.spec.roll_type
+    if roll_type not in definition.eligible_roll_types:
+        raise GameLifecycleError("Command Re-roll roll type was not prevalidated.")
+    permission = RerollPermission(
+        source_id=use_record.source_id,
+        timing_window=context.timing_window_id or context.trigger_kind.value,
+        owning_player_id=context.player_id,
+        eligible_roll_type=roll_type,
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    request = manager.build_reroll_request(
+        roll_state,
+        request_id=f"{use_record.use_id}:command-reroll-request",
+        actor_id=context.player_id,
+        permission=permission,
+        extra_payload={
+            "stratagem_use_id": use_record.use_id,
+            "stratagem_source_id": use_record.source_id,
+        },
+    )
+    reroll_option_ids = tuple(
+        option.option_id for option in request.options if option.option_id != "decline"
+    )
+    if len(reroll_option_ids) != 1:
+        raise GameLifecycleError("Command Re-roll must resolve exactly one reroll option.")
+    reroll_result = DecisionResult.for_request(
+        result_id=f"{use_record.use_id}:command-reroll-result",
+        request=request,
+        selected_option_id=reroll_option_ids[0],
+    )
+    updated_state = manager.resolve_reroll(
+        roll_state,
+        request=request,
+        result=reroll_result,
+        record_decision=False,
+    )
+    decisions.event_log.append(
+        "command_reroll_resolved",
+        {
+            "game_id": state.game_id,
+            "player_id": context.player_id,
+            "battle_round": context.battle_round,
+            "phase": context.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "reroll_request": request.to_payload(),
+            "reroll_result": reroll_result.to_payload(),
+            "updated_roll_state": updated_state.to_payload(),
+        },
+    )
+
+
+def _apply_insane_bravery_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    target_unit_id = _require_target_unit_id(target_binding)
+    effect = PersistingEffect(
+        effect_id=f"{use_record.use_id}:insane-bravery-auto-pass",
+        source_rule_id=use_record.source_id,
+        owner_player_id=use_record.player_id,
+        target_unit_instance_ids=(target_unit_id,),
+        started_battle_round=use_record.battle_round,
+        started_phase=use_record.phase,
+        expiration=EffectExpiration.end_phase(
+            battle_round=use_record.battle_round,
+            phase=use_record.phase,
+            player_id=use_record.player_id,
+        ),
+        effect_payload={
+            "effect_kind": "battle_shock_auto_pass",
+            "stratagem_use_id": use_record.use_id,
+        },
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "insane_bravery_auto_pass_registered",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "persisting_effect": effect.to_payload(),
+        },
+    )
+
+
+def _apply_rapid_ingress_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    reserve_state = _reserve_state_for_target(state=state, target_binding=target_binding)
+    unit = _unit_for_reserve_state(state=state, reserve_state=reserve_state)
+    placement_kinds = _reserve_placement_kinds_for_unit(reserve_state=reserve_state, unit=unit)
+    proposal_kind = _reserve_proposal_kind(reserve_state)
+    proposal_request = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=context.player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=reserve_state.unit_instance_id,
+        proposal_kind=proposal_kind,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        placement_kinds=placement_kinds,
+        context=cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    "stratagem_handler_id": CORE_RAPID_INGRESS_HANDLER_ID,
+                    "stratagem_use": validate_json_value(use_record.to_payload()),
+                    "reserve_state": validate_json_value(reserve_state.to_payload()),
+                }
+            ),
+        ),
+    )
+    request = proposal_request.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "placement_proposal_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": context.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": reserve_state.unit_instance_id,
+            "proposal_kind": proposal_kind.value,
+            "placement_kinds": [kind.value for kind in placement_kinds],
+            "request_id": request.request_id,
+            "source_decision_request_id": result.request_id,
+            "source_decision_result_id": result.result_id,
+            "stratagem_use_id": use_record.use_id,
+            "phase_body_status": "rapid_ingress_placement_proposal_required",
+        },
+    )
+
+
+def _apply_new_orders_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    secondary_mission_id = _target_secondary_mission_id(target_binding)
+    discarded = state.discard_tactical_secondary(
+        player_id=use_record.player_id,
+        secondary_mission_id=secondary_mission_id,
+        result_id=f"{use_record.result_id}:new-orders-discard",
+    )
+    drawn = state.draw_tactical_secondary_cards(
+        player_id=use_record.player_id,
+        source_result_id=f"{use_record.result_id}:new-orders-draw",
+        draw_count=1,
+    )
+    decisions.event_log.append(
+        "tactical_secondary_mission_discarded",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "secondary_mission_card_state": validate_json_value(discarded.to_payload()),
+            "source_stratagem_use_id": use_record.use_id,
+        },
+    )
+    decisions.event_log.append(
+        "tactical_secondary_missions_drawn",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "draw_count": 1,
+            "phase": use_record.phase.value,
+            "secondary_mission_card_states": [
+                validate_json_value(card_state.to_payload()) for card_state in drawn
+            ],
+            "source_stratagem_use_id": use_record.use_id,
+        },
+    )
+    decisions.event_log.append(
+        "new_orders_resolved",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "discarded_secondary_mission_id": secondary_mission_id,
+            "drawn_secondary_mission_ids": [
+                card_state.secondary_mission_id for card_state in drawn
+            ],
+        },
+    )
 
 
 def _apply_command_point_effects(
@@ -1680,6 +2849,8 @@ def _next_stratagem_use_id(*, state: GameState, player_id: str) -> str:
 def _target_binding_token(binding: StratagemTargetBinding) -> str:
     if binding.target_kind is StratagemTargetKind.NONE:
         return "none"
+    if binding.target_kind is StratagemTargetKind.TACTICAL_SECONDARY_CARD:
+        return _target_secondary_mission_id(binding)
     return _require_target_unit_id(binding)
 
 
@@ -1687,6 +2858,12 @@ def _require_target_unit_id(binding: StratagemTargetBinding) -> str:
     if binding.target_unit_instance_id is None:
         raise GameLifecycleError("Stratagem target binding requires a unit id.")
     return binding.target_unit_instance_id
+
+
+def _target_secondary_mission_id(binding: StratagemTargetBinding) -> str:
+    if binding.target_secondary_mission_id is None:
+        raise GameLifecycleError("Stratagem target binding requires a secondary mission id.")
+    return binding.target_secondary_mission_id
 
 
 def _validate_catalog_records(
@@ -1706,6 +2883,23 @@ def _validate_catalog_records(
         seen.add(value.record_id)
         validated.append(value)
     return tuple(sorted(validated, key=lambda record: record.record_id))
+
+
+def _require_decline_event_fields(payload: Mapping[str, JsonValue]) -> None:
+    for field_name in (
+        "game_id",
+        "player_id",
+        "battle_round",
+        "phase",
+        "active_player_id",
+        "trigger_kind",
+        "timing_window_id",
+        "request_id",
+        "result_id",
+        "decision_type",
+    ):
+        if field_name not in payload:
+            raise GameLifecycleError("Stratagem decline event payload is malformed.")
 
 
 def _invalid(state: GameState, message: str, reason: str) -> LifecycleStatus:
@@ -1731,6 +2925,14 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     return _validate_identifier(field_name, value)
 
 
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    return tuple(
+        _validate_identifier(field_name, value) for value in cast(tuple[object, ...], values)
+    )
+
+
 def _validate_optional_phase(field_name: str, value: object | None) -> BattlePhaseKind | None:
     if value is None:
         return None
@@ -1749,6 +2951,8 @@ def _validate_target_policy_id(
             return "friendly_unit"
         if target_kind is StratagemTargetKind.ANY_UNIT:
             return "any_unit"
+        if target_kind is StratagemTargetKind.TACTICAL_SECONDARY_CARD:
+            return NEW_ORDERS_TARGET_POLICY_ID
         raise GameLifecycleError("StratagemTargetSpec target_kind is unsupported.")
     policy_id = _validate_identifier("StratagemTargetSpec target_policy_id", target_policy_id)
     if target_kind is StratagemTargetKind.NONE and policy_id != "none":

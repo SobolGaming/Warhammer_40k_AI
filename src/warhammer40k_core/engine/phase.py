@@ -14,6 +14,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.reaction_queue import ReactionQueue
 
 SetupStep = SetupStepKind
 BattlePhase = BattlePhaseKind
@@ -186,6 +187,7 @@ class PhaseHandler(Protocol):
         *,
         state: GameState,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
         """Run deterministic phase-start work until a decision or boundary is reached."""
         ...
@@ -204,6 +206,7 @@ class PlaceholderPhaseHandler:
         *,
         state: GameState,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
         if state.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("PlaceholderPhaseHandler can run only during battle.")
@@ -248,6 +251,7 @@ class UnsupportedPhaseHandler:
         *,
         state: GameState,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
         if state.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("UnsupportedPhaseHandler can run only during battle.")

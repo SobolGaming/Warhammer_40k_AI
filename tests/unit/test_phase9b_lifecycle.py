@@ -52,6 +52,10 @@ from warhammer40k_core.engine.phases.command import (
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    STRATAGEM_DECISION_TYPE,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -218,6 +222,24 @@ def _submit_pending(lifecycle: GameLifecycle, *, option_id: str, result_number: 
         selected_option_id=option_id,
     )
     lifecycle.submit_decision(result)
+
+
+def _decline_stratagem_window_if_pending(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_number: int,
+) -> LifecycleStatus:
+    request = status.decision_request
+    if request is None or request.decision_type != STRATAGEM_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=f"decision-result-{result_number:06d}",
+            request=request,
+            selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        )
+    )
 
 
 def _advance_to_secondary_mission_step(lifecycle: GameLifecycle) -> None:
@@ -667,6 +689,11 @@ def test_tactical_secondary_draw_decision_records_command_draw_and_enters_moveme
         selected_option_id="draw",
     )
     follow_up_status = lifecycle.submit_decision(draw_result)
+    follow_up_status = _decline_stratagem_window_if_pending(
+        lifecycle,
+        follow_up_status,
+        result_number=4,
+    )
 
     assert lifecycle.state is not None
     assert follow_up_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -844,6 +871,11 @@ def test_lifecycle_and_command_handler_fail_fast_on_invalid_entry_points() -> No
     _advance_to_battle(lifecycle)
     assert CommandPhaseHandler().phase is BattlePhase.COMMAND
     _submit_pending(lifecycle, option_id="draw", result_number=3)
+    _submit_pending(
+        lifecycle,
+        option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        result_number=4,
+    )
     assert lifecycle.state is not None
     assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
     with pytest.raises(GameLifecycleError, match="only in the COMMAND phase"):

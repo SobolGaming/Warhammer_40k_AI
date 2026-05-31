@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
@@ -15,6 +15,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     GameState,
@@ -27,12 +28,33 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_index
+from warhammer40k_core.engine.stratagems import (
+    CORE_INSANE_BRAVERY_HANDLER_ID,
+    CORE_NEW_ORDERS_HANDLER_ID,
+    StratagemCatalogIndex,
+    StratagemEligibilityContext,
+    create_stratagem_use_decision_request,
+    request_stratagem_target_proposal,
+    stratagem_decline_option,
+    stratagem_target_proposal_from_index,
+    stratagem_use_options_for_handler_from_index,
+    stratagem_window_declined_for_context,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
 
 
 @dataclass(frozen=True, slots=True)
 class CommandPhaseHandler:
+    stratagem_index: StratagemCatalogIndex = field(default_factory=tenth_edition_stratagem_index)
+
+    def __post_init__(self) -> None:
+        if type(self.stratagem_index) is not StratagemCatalogIndex:
+            raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
+
     @property
     def phase(self) -> BattlePhase:
         return BattlePhase.COMMAND
@@ -42,6 +64,7 @@ class CommandPhaseHandler:
         *,
         state: GameState,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
         if state.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("CommandPhaseHandler can run only during battle.")
@@ -77,6 +100,15 @@ class CommandPhaseHandler:
         if not command_state.tactical_secondary_resolved:
             state.command_step_state = command_state.with_tactical_secondary_resolved()
             command_state = _command_step_state(state)
+
+        if not command_state.battle_shock_step_resolved:
+            stratagem_status = _request_command_start_stratagem_if_available(
+                state=state,
+                decisions=decisions,
+                stratagem_index=self.stratagem_index,
+            )
+            if stratagem_status is not None:
+                return stratagem_status
 
         if not command_state.battle_shock_step_resolved:
             _resolve_battle_shock_step(state=state, decisions=decisions)
@@ -286,6 +318,105 @@ def _request_tactical_secondary_draw(
     )
 
 
+def _request_command_start_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+) -> LifecycleStatus | None:
+    active_player_id = _active_player_id(state)
+    new_orders_context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=active_player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        timing_window_id=_new_orders_timing_window_id(
+            state=state,
+            active_player_id=active_player_id,
+        ),
+    )
+    if not stratagem_window_declined_for_context(decisions=decisions, context=new_orders_context):
+        finite_options = stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=stratagem_index,
+            context=new_orders_context,
+            handler_id=CORE_NEW_ORDERS_HANDLER_ID,
+        )
+        if finite_options:
+            request = create_stratagem_use_decision_request(
+                state=state,
+                context=new_orders_context,
+                options=(*finite_options, stratagem_decline_option()),
+            )
+            decisions.request_decision(request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=state.stage,
+                decision_request=request,
+                payload={"pending_request_id": request.request_id},
+            )
+
+    insane_bravery_context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=active_player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        timing_window_id=_insane_bravery_timing_window_id(
+            state=state,
+            active_player_id=active_player_id,
+        ),
+    )
+    if stratagem_window_declined_for_context(
+        decisions=decisions,
+        context=insane_bravery_context,
+    ):
+        return None
+    proposal = stratagem_target_proposal_from_index(
+        state=state,
+        index=stratagem_index,
+        context=insane_bravery_context,
+        handler_id=CORE_INSANE_BRAVERY_HANDLER_ID,
+    )
+    if proposal is None:
+        return None
+    return request_stratagem_target_proposal(
+        state=state,
+        decisions=decisions,
+        proposal_request=proposal,
+        allow_decline=True,
+    )
+
+
+def _new_orders_timing_window_id(
+    *,
+    state: GameState,
+    active_player_id: str,
+) -> str:
+    return f"new-orders-command-round-{state.battle_round}-player-{active_player_id}"
+
+
+def _insane_bravery_timing_window_id(
+    *,
+    state: GameState,
+    active_player_id: str,
+) -> str:
+    return f"insane-bravery-battle-shock-round-{state.battle_round}-player-{active_player_id}"
+
+
+def _battle_shock_auto_pass_effect(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> PersistingEffect | None:
+    matched_effect: PersistingEffect | None = None
+    for effect in state.persisting_effects_for_unit(unit_instance_id):
+        if not isinstance(effect.effect_payload, dict):
+            continue
+        if effect.effect_payload.get("effect_kind") != "battle_shock_auto_pass":
+            continue
+        if matched_effect is not None:
+            raise GameLifecycleError("Multiple Battle-shock auto-pass effects matched.")
+        matched_effect = effect
+    return matched_effect
+
+
 def _resolve_battle_shock_step(
     *,
     state: GameState,
@@ -321,7 +452,25 @@ def _resolve_battle_shock_step(
                 "battle_shock_test_request": validate_json_value(request.to_payload()),
             },
         )
-        roll_state = manager.roll(request.spec)
+        auto_pass_effect = _battle_shock_auto_pass_effect(
+            state=state,
+            unit_instance_id=request.unit_instance_id,
+        )
+        if auto_pass_effect is None:
+            roll_state = manager.roll(request.spec)
+        else:
+            roll_state = manager.roll_fixed(request.spec, [6, 6])
+            decisions.event_log.append(
+                "battle_shock_test_auto_passed",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "phase": BattlePhase.COMMAND.value,
+                    "unit_instance_id": request.unit_instance_id,
+                    "persisting_effect": validate_json_value(auto_pass_effect.to_payload()),
+                },
+            )
         result = BattleShockResult.from_roll_state(
             result_id=f"{request.request_id}:result",
             request=request,
@@ -338,6 +487,7 @@ def _resolve_battle_shock_step(
                 "active_player_id": active_player_id,
                 "phase": BattlePhase.COMMAND.value,
                 "battle_shock_result": result_payload,
+                "auto_passed": auto_pass_effect is not None,
             },
         )
     state.command_step_state = _command_step_state(state).with_battle_shock_step_resolved()
