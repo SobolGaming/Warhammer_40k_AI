@@ -87,6 +87,27 @@ class TerrainFactory:
         )
 
     @staticmethod
+    def woods_fixture(
+        *,
+        feature_id: str = "woods-alpha",
+        center_x_inches: float = 22.0,
+        center_y_inches: float = 30.0,
+    ) -> tuple[TerrainFeatureDefinition, ...]:
+        return (
+            TerrainFeatureDefinition(
+                feature_id=feature_id,
+                feature_kind=TerrainFeatureKind.WOODS,
+                footprint_center_x_inches=center_x_inches,
+                footprint_center_y_inches=center_y_inches,
+                footprint_width_inches=7.0,
+                footprint_depth_inches=5.0,
+                walls=(),
+                floors=(),
+                source_id="phase13a_deterministic_woods_fixture",
+            ),
+        )
+
+    @staticmethod
     def to_payloads(
         features: tuple[TerrainFeatureDefinition, ...],
     ) -> list[TerrainFeatureDefinitionPayload]:

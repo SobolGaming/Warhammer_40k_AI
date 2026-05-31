@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from enum import StrEnum
 from typing import Self, TypedDict, cast
@@ -75,6 +75,12 @@ class CoverEffect(StrEnum):
     SAVE_BONUS = "save_bonus"
     ATTACKER_BS_MODIFIER = "attacker_bs_modifier"
     UNSUPPORTED = "unsupported"
+
+
+class LineOfSightPolicy(StrEnum):
+    TRUE_LINE_OF_SIGHT = "true_line_of_sight"
+    AREA_OBSCURING = "area_obscuring"
+    DENSE_COVER = "dense_cover"
 
 
 class MissionDeploymentZoneSource(StrEnum):
@@ -169,6 +175,28 @@ class TerrainVisibilityPolicyDescriptorPayload(TypedDict):
     hidden_requires_terrain_area_occupancy: bool
     hidden_lost_after_shooting: bool
     cover_effect: str
+    cover_policy: CoverPolicyDescriptorPayload
+    feature_policies: list[TerrainFeatureVisibilityPolicyPayload]
+
+
+class CoverPolicyDescriptorPayload(TypedDict):
+    cover_effect: str
+    grants_benefit_of_cover: bool
+    non_stacking: bool
+    requires_visible_target: bool
+    requires_not_fully_visible: bool
+    ap_zero_save_bonus_excluded_for_save_3_plus_or_better: bool
+
+
+class TerrainFeatureVisibilityPolicyPayload(TypedDict):
+    terrain_feature_kind: str
+    line_of_sight_policy: str
+    blocks_model_visibility_through_footprint: bool
+    blocks_full_visibility_through_footprint: bool
+    uses_true_los_when_observer_or_target_inside: bool
+    aircraft_ignores_feature_visibility: bool
+    towering_ignores_feature_visibility: bool
+    cover_policy: CoverPolicyDescriptorPayload
 
 
 class ObjectivePolicyDescriptorPayload(TypedDict):
@@ -725,6 +753,164 @@ class TerrainMovementPolicy:
 
 
 @dataclass(frozen=True, slots=True)
+class CoverPolicyDescriptor:
+    cover_effect: CoverEffect
+    grants_benefit_of_cover: bool = True
+    non_stacking: bool = True
+    requires_visible_target: bool = True
+    requires_not_fully_visible: bool = True
+    ap_zero_save_bonus_excluded_for_save_3_plus_or_better: bool = True
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "cover_effect", cover_effect_from_token(self.cover_effect))
+        _validate_bool(
+            "CoverPolicyDescriptor grants_benefit_of_cover",
+            self.grants_benefit_of_cover,
+        )
+        _validate_bool("CoverPolicyDescriptor non_stacking", self.non_stacking)
+        _validate_bool(
+            "CoverPolicyDescriptor requires_visible_target",
+            self.requires_visible_target,
+        )
+        _validate_bool(
+            "CoverPolicyDescriptor requires_not_fully_visible",
+            self.requires_not_fully_visible,
+        )
+        _validate_bool(
+            "CoverPolicyDescriptor ap_zero_save_bonus_excluded_for_save_3_plus_or_better",
+            self.ap_zero_save_bonus_excluded_for_save_3_plus_or_better,
+        )
+        if self.cover_effect is CoverEffect.UNSUPPORTED and self.grants_benefit_of_cover:
+            raise RulesetDescriptorError(
+                "CoverPolicyDescriptor cannot grant unsupported Benefit of Cover."
+            )
+
+    @classmethod
+    def warhammer_40000_tenth_default(cls) -> Self:
+        return cls(cover_effect=CoverEffect.SAVE_BONUS)
+
+    def to_payload(self) -> CoverPolicyDescriptorPayload:
+        return {
+            "cover_effect": self.cover_effect.value,
+            "grants_benefit_of_cover": self.grants_benefit_of_cover,
+            "non_stacking": self.non_stacking,
+            "requires_visible_target": self.requires_visible_target,
+            "requires_not_fully_visible": self.requires_not_fully_visible,
+            "ap_zero_save_bonus_excluded_for_save_3_plus_or_better": (
+                self.ap_zero_save_bonus_excluded_for_save_3_plus_or_better
+            ),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: CoverPolicyDescriptorPayload) -> Self:
+        return cls(
+            cover_effect=cover_effect_from_token(payload["cover_effect"]),
+            grants_benefit_of_cover=payload["grants_benefit_of_cover"],
+            non_stacking=payload["non_stacking"],
+            requires_visible_target=payload["requires_visible_target"],
+            requires_not_fully_visible=payload["requires_not_fully_visible"],
+            ap_zero_save_bonus_excluded_for_save_3_plus_or_better=payload[
+                "ap_zero_save_bonus_excluded_for_save_3_plus_or_better"
+            ],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainFeatureVisibilityPolicy:
+    terrain_feature_kind: TerrainFeatureKind
+    line_of_sight_policy: LineOfSightPolicy
+    blocks_model_visibility_through_footprint: bool
+    blocks_full_visibility_through_footprint: bool
+    uses_true_los_when_observer_or_target_inside: bool
+    aircraft_ignores_feature_visibility: bool
+    towering_ignores_feature_visibility: bool
+    cover_policy: CoverPolicyDescriptor = field(
+        default_factory=CoverPolicyDescriptor.warhammer_40000_tenth_default
+    )
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "terrain_feature_kind",
+            terrain_feature_kind_from_token(self.terrain_feature_kind),
+        )
+        object.__setattr__(
+            self,
+            "line_of_sight_policy",
+            line_of_sight_policy_from_token(self.line_of_sight_policy),
+        )
+        _validate_bool(
+            "TerrainFeatureVisibilityPolicy blocks_model_visibility_through_footprint",
+            self.blocks_model_visibility_through_footprint,
+        )
+        _validate_bool(
+            "TerrainFeatureVisibilityPolicy blocks_full_visibility_through_footprint",
+            self.blocks_full_visibility_through_footprint,
+        )
+        _validate_bool(
+            "TerrainFeatureVisibilityPolicy uses_true_los_when_observer_or_target_inside",
+            self.uses_true_los_when_observer_or_target_inside,
+        )
+        _validate_bool(
+            "TerrainFeatureVisibilityPolicy aircraft_ignores_feature_visibility",
+            self.aircraft_ignores_feature_visibility,
+        )
+        _validate_bool(
+            "TerrainFeatureVisibilityPolicy towering_ignores_feature_visibility",
+            self.towering_ignores_feature_visibility,
+        )
+        if type(self.cover_policy) is not CoverPolicyDescriptor:
+            raise RulesetDescriptorError(
+                "TerrainFeatureVisibilityPolicy cover_policy must be a CoverPolicyDescriptor."
+            )
+        if (
+            self.blocks_model_visibility_through_footprint
+            and not self.blocks_full_visibility_through_footprint
+        ):
+            raise RulesetDescriptorError(
+                "TerrainFeatureVisibilityPolicy model-visibility blocking must also block "
+                "full visibility."
+            )
+
+    def to_payload(self) -> TerrainFeatureVisibilityPolicyPayload:
+        return {
+            "terrain_feature_kind": self.terrain_feature_kind.value,
+            "line_of_sight_policy": self.line_of_sight_policy.value,
+            "blocks_model_visibility_through_footprint": (
+                self.blocks_model_visibility_through_footprint
+            ),
+            "blocks_full_visibility_through_footprint": (
+                self.blocks_full_visibility_through_footprint
+            ),
+            "uses_true_los_when_observer_or_target_inside": (
+                self.uses_true_los_when_observer_or_target_inside
+            ),
+            "aircraft_ignores_feature_visibility": self.aircraft_ignores_feature_visibility,
+            "towering_ignores_feature_visibility": self.towering_ignores_feature_visibility,
+            "cover_policy": self.cover_policy.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainFeatureVisibilityPolicyPayload) -> Self:
+        return cls(
+            terrain_feature_kind=terrain_feature_kind_from_token(payload["terrain_feature_kind"]),
+            line_of_sight_policy=line_of_sight_policy_from_token(payload["line_of_sight_policy"]),
+            blocks_model_visibility_through_footprint=payload[
+                "blocks_model_visibility_through_footprint"
+            ],
+            blocks_full_visibility_through_footprint=payload[
+                "blocks_full_visibility_through_footprint"
+            ],
+            uses_true_los_when_observer_or_target_inside=payload[
+                "uses_true_los_when_observer_or_target_inside"
+            ],
+            aircraft_ignores_feature_visibility=payload["aircraft_ignores_feature_visibility"],
+            towering_ignores_feature_visibility=payload["towering_ignores_feature_visibility"],
+            cover_policy=CoverPolicyDescriptor.from_payload(payload["cover_policy"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class TerrainVisibilityPolicyDescriptor:
     hidden_supported: bool
     hidden_detection_range_inches: float | None
@@ -732,6 +918,10 @@ class TerrainVisibilityPolicyDescriptor:
     hidden_requires_terrain_area_occupancy: bool = False
     hidden_lost_after_shooting: bool = False
     cover_effect: CoverEffect = CoverEffect.SAVE_BONUS
+    cover_policy: CoverPolicyDescriptor = field(
+        default_factory=CoverPolicyDescriptor.warhammer_40000_tenth_default
+    )
+    feature_policies: tuple[TerrainFeatureVisibilityPolicy, ...] = ()
 
     def __post_init__(self) -> None:
         _validate_bool(
@@ -763,6 +953,31 @@ class TerrainVisibilityPolicyDescriptor:
             self.hidden_lost_after_shooting,
         )
         object.__setattr__(self, "cover_effect", cover_effect_from_token(self.cover_effect))
+        if type(self.cover_policy) is not CoverPolicyDescriptor:
+            raise RulesetDescriptorError(
+                "TerrainVisibilityPolicyDescriptor cover_policy must be a CoverPolicyDescriptor."
+            )
+        if self.cover_policy.cover_effect is not self.cover_effect:
+            raise RulesetDescriptorError(
+                "TerrainVisibilityPolicyDescriptor cover_policy must match cover_effect."
+            )
+        object.__setattr__(
+            self,
+            "feature_policies",
+            _validate_terrain_feature_visibility_policy_tuple(self.feature_policies),
+        )
+
+    def policy_for_feature_kind(
+        self,
+        terrain_feature_kind: TerrainFeatureKind,
+    ) -> TerrainFeatureVisibilityPolicy:
+        feature_kind = terrain_feature_kind_from_token(terrain_feature_kind)
+        for policy in self.feature_policies:
+            if policy.terrain_feature_kind is feature_kind:
+                return policy
+        raise RulesetDescriptorError(
+            f"TerrainVisibilityPolicyDescriptor does not define {feature_kind.value}."
+        )
 
     def to_payload(self) -> TerrainVisibilityPolicyDescriptorPayload:
         return {
@@ -772,6 +987,8 @@ class TerrainVisibilityPolicyDescriptor:
             "hidden_requires_terrain_area_occupancy": (self.hidden_requires_terrain_area_occupancy),
             "hidden_lost_after_shooting": self.hidden_lost_after_shooting,
             "cover_effect": self.cover_effect.value,
+            "cover_policy": self.cover_policy.to_payload(),
+            "feature_policies": [policy.to_payload() for policy in self.feature_policies],
         }
 
     @classmethod
@@ -785,6 +1002,11 @@ class TerrainVisibilityPolicyDescriptor:
             ],
             hidden_lost_after_shooting=payload["hidden_lost_after_shooting"],
             cover_effect=cover_effect_from_token(payload["cover_effect"]),
+            cover_policy=CoverPolicyDescriptor.from_payload(payload["cover_policy"]),
+            feature_policies=tuple(
+                TerrainFeatureVisibilityPolicy.from_payload(policy)
+                for policy in payload["feature_policies"]
+            ),
         )
 
 
@@ -1301,6 +1523,8 @@ class RulesetDescriptor:
                 hidden_requires_terrain_area_occupancy=False,
                 hidden_lost_after_shooting=False,
                 cover_effect=CoverEffect.SAVE_BONUS,
+                cover_policy=CoverPolicyDescriptor.warhammer_40000_tenth_default(),
+                feature_policies=_terrain_feature_visibility_policies_for_tenth(),
             ),
             objective_policy=ObjectivePolicyDescriptor(
                 supported_anchor_kinds=(ObjectiveAnchorKind.POINT,),
@@ -1383,6 +1607,16 @@ class RulesetDescriptor:
                 hidden_requires_terrain_area_occupancy=True,
                 hidden_lost_after_shooting=True,
                 cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
+                cover_policy=CoverPolicyDescriptor(
+                    cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
+                    ap_zero_save_bonus_excluded_for_save_3_plus_or_better=False,
+                ),
+                feature_policies=_terrain_feature_visibility_policies_for_tenth(
+                    CoverPolicyDescriptor(
+                        cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
+                        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=False,
+                    )
+                ),
             ),
             objective_policy=ObjectivePolicyDescriptor(
                 supported_anchor_kinds=(
@@ -1571,6 +1805,17 @@ def cover_effect_from_token(token: object) -> CoverEffect:
         return CoverEffect(token)
     except ValueError as exc:
         raise RulesetDescriptorError(f"Unsupported CoverEffect token: {token}.") from exc
+
+
+def line_of_sight_policy_from_token(token: object) -> LineOfSightPolicy:
+    if type(token) is LineOfSightPolicy:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("LineOfSightPolicy token must be a string.")
+    try:
+        return LineOfSightPolicy(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported LineOfSightPolicy token: {token}.") from exc
 
 
 def mission_deployment_zone_source_from_token(token: object) -> MissionDeploymentZoneSource:
@@ -1882,6 +2127,56 @@ def _terrain_feature_movement_policies_for_tenth() -> tuple[TerrainFeatureMoveme
     )
 
 
+def _terrain_feature_visibility_policies_for_tenth(
+    cover_policy: CoverPolicyDescriptor | None = None,
+) -> tuple[TerrainFeatureVisibilityPolicy, ...]:
+    resolved_cover_policy = (
+        CoverPolicyDescriptor.warhammer_40000_tenth_default()
+        if cover_policy is None
+        else cover_policy
+    )
+    physical_policy = tuple(
+        TerrainFeatureVisibilityPolicy(
+            terrain_feature_kind=feature_kind,
+            line_of_sight_policy=LineOfSightPolicy.TRUE_LINE_OF_SIGHT,
+            blocks_model_visibility_through_footprint=False,
+            blocks_full_visibility_through_footprint=False,
+            uses_true_los_when_observer_or_target_inside=False,
+            aircraft_ignores_feature_visibility=False,
+            towering_ignores_feature_visibility=False,
+            cover_policy=resolved_cover_policy,
+        )
+        for feature_kind in TerrainFeatureKind
+        if feature_kind not in {TerrainFeatureKind.RUINS, TerrainFeatureKind.WOODS}
+    )
+    ruins_policy = TerrainFeatureVisibilityPolicy(
+        terrain_feature_kind=TerrainFeatureKind.RUINS,
+        line_of_sight_policy=LineOfSightPolicy.AREA_OBSCURING,
+        blocks_model_visibility_through_footprint=True,
+        blocks_full_visibility_through_footprint=True,
+        uses_true_los_when_observer_or_target_inside=True,
+        aircraft_ignores_feature_visibility=True,
+        towering_ignores_feature_visibility=True,
+        cover_policy=resolved_cover_policy,
+    )
+    woods_policy = TerrainFeatureVisibilityPolicy(
+        terrain_feature_kind=TerrainFeatureKind.WOODS,
+        line_of_sight_policy=LineOfSightPolicy.DENSE_COVER,
+        blocks_model_visibility_through_footprint=False,
+        blocks_full_visibility_through_footprint=True,
+        uses_true_los_when_observer_or_target_inside=False,
+        aircraft_ignores_feature_visibility=True,
+        towering_ignores_feature_visibility=True,
+        cover_policy=resolved_cover_policy,
+    )
+    return tuple(
+        sorted(
+            (*physical_policy, ruins_policy, woods_policy),
+            key=lambda policy: policy.terrain_feature_kind.value,
+        )
+    )
+
+
 def _descriptor_hash(payload: RulesetDescriptorPayload) -> str:
     clean_payload = dict(payload)
     clean_payload["descriptor_hash"] = ""
@@ -2007,6 +2302,43 @@ def _validate_terrain_feature_movement_policy(
 ) -> TerrainFeatureMovementPolicy:
     if type(value) is not TerrainFeatureMovementPolicy:
         raise RulesetDescriptorError(f"{field_name} must be a TerrainFeatureMovementPolicy.")
+    return value
+
+
+def _validate_terrain_feature_visibility_policy_tuple(
+    values: object,
+) -> tuple[TerrainFeatureVisibilityPolicy, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(
+            "TerrainVisibilityPolicyDescriptor feature_policies must be a tuple."
+        )
+    policies = tuple(
+        _validate_terrain_feature_visibility_policy(
+            "TerrainVisibilityPolicyDescriptor feature_policy",
+            value,
+        )
+        for value in cast(tuple[object, ...], values)
+    )
+    if not policies:
+        raise RulesetDescriptorError(
+            "TerrainVisibilityPolicyDescriptor feature_policies must not be empty."
+        )
+    seen: set[TerrainFeatureKind] = set()
+    for policy in policies:
+        if policy.terrain_feature_kind in seen:
+            raise RulesetDescriptorError(
+                "TerrainVisibilityPolicyDescriptor feature_policies must be unique."
+            )
+        seen.add(policy.terrain_feature_kind)
+    return tuple(sorted(policies, key=lambda policy: policy.terrain_feature_kind.value))
+
+
+def _validate_terrain_feature_visibility_policy(
+    field_name: str,
+    value: object,
+) -> TerrainFeatureVisibilityPolicy:
+    if type(value) is not TerrainFeatureVisibilityPolicy:
+        raise RulesetDescriptorError(f"{field_name} must be a TerrainFeatureVisibilityPolicy.")
     return value
 
 

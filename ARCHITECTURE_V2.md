@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 12D** is treated as implemented at the time this file was updated. Phase 13A is the next build slice.
+Everything through **Phase 13A** is treated as implemented at the time this file was updated. Phase 13B is the next build slice.
 
 Completed / implemented foundation:
 
@@ -76,6 +76,7 @@ Completed / implemented foundation:
 | 12B | Complete | Command Point ledger and Stratagem framework |
 | 12C | Complete | Phase-12-resolvable Core Stratagems |
 | 12D | Complete | Ability handler registry and keyword-gated rule execution |
+| 13A | Complete | Terrain visibility, line of sight, and cover foundation |
 
 ## Cross-cutting architectural rules
 
@@ -1480,6 +1481,8 @@ Initial ability families:
 # Shooting phase
 
 ## Phase 13A: terrain visibility, line of sight, and cover foundation
+
+Status: Complete.
 
 Modules:
 
