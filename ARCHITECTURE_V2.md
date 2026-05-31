@@ -1292,8 +1292,10 @@ Status: Complete.
 Modules/documents:
 
 - `engine/stratagems.py`
+- `engine/stratagem_catalog.py`
 - `engine/command_points.py`
 - `engine/timing_windows.py`
+- `rules/source_packages/warhammer_40000_10th/core_stratagems.py`
 - `docs/ADAPTER_DECISION_CONTRACT.md`
 
 Objects:

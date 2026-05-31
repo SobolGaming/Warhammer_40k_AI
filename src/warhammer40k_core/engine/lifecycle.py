@@ -351,6 +351,7 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
             apply_stratagem_target_proposal(
+                state=state,
                 result=result,
                 decisions=self.decision_controller,
             )

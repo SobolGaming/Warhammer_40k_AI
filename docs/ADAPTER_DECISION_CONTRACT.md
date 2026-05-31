@@ -69,6 +69,8 @@ Relevant modules:
 - `src/warhammer40k_core/engine/effects.py`
 - `src/warhammer40k_core/engine/command_points.py`
 - `src/warhammer40k_core/engine/stratagems.py`
+- `src/warhammer40k_core/engine/stratagem_catalog.py`
+- `src/warhammer40k_core/rules/source_packages/warhammer_40000_10th/core_stratagems.py`
 - `src/warhammer40k_core/engine/scoring.py`
 - `src/warhammer40k_core/engine/lifecycle.py`
 
@@ -206,15 +208,15 @@ Adapters must not invent `use_stratagem` option IDs, derive new target bindings 
 
 Stratagem decisions may be offered to the non-active player from a reaction window. The acting player on the `DecisionRequest` is authoritative; adapters should not assume the turn player is the player answering the request.
 
-Some Stratagems need target or placement details that are not safe to pre-enumerate. Those requests use a parameterized proposal instead of a finite bound option. The request must embed a typed proposal request payload with a Stratagem-specific proposal kind, the source `use_stratagem` context, and replay-safe target context. Examples include:
+Some Stratagems need target or placement details that are not safe to pre-enumerate. Those requests use a parameterized proposal instead of a finite bound option. The request must embed a typed proposal request payload with a Stratagem-specific proposal kind, the same source `use_stratagem` context used by finite options, the source-backed catalog record, the timing context, the CP cost, the restriction policy, the handler binding, and replay-safe target context. Examples include:
 
 - exact reinforcement placement after a Stratagem grants a reserves placement;
 - geometric, line-of-sight, model-target, or path-dependent target proposals once the owning phase has the required validators;
 - any future Stratagem whose legal target binding cannot be represented as a finite option set.
 
-Phase 12B introduces the initial parameterized Stratagem target-binding decision type `submit_stratagem_target_proposal` with proposal kind `stratagem_target_binding`. Adapters answer only with the fixed `submit_parameterized_payload` option and a payload containing the typed `proposal` object. Stale phase/round, malformed shape, schema-invalid missing target binding, wrong player/game/Stratagem context, and illegal target binding are rejected before queue pop and before any CP transaction or Stratagem-use record is created.
+Phase 12B introduces the initial parameterized Stratagem target-binding decision type `submit_stratagem_target_proposal` with proposal kind `stratagem_target_binding`. Adapters answer only with the fixed `submit_parameterized_payload` option and a payload containing the typed `proposal` object. Stale phase/round, malformed shape, schema-invalid missing target binding, wrong player/game/Stratagem/catalog context, CP drift, and illegal target binding are rejected before queue pop and before any CP transaction or Stratagem-use record is created.
 
-Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule: stale, drifted, malformed, schema-invalid, or wrong-context payloads are rejected before the queue is popped or a `DecisionRecord` is created. They must not spend CP or mutate state. Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the specific proposal contract explicitly allows that behavior and emits a fresh pending request for retry.
+Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule: stale, drifted, malformed, schema-invalid, or wrong-context payloads are rejected before the queue is popped or a `DecisionRecord` is created. They must not spend CP or mutate state. Accepted parameterized submissions apply the Stratagem use atomically through `GameLifecycle.submit_decision(...)`: the engine re-checks timing, CP, restrictions, target validity, spends CP, records `StratagemUseRecord`, emits `stratagem_used`, and applies any Phase-12B-supported handler/effect payload. Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the specific proposal contract explicitly allows that behavior and emits a fresh pending request for retry.
 
 CP totals, CP ledger transactions, and normal Stratagem-use events are public in matched play. Viewer-scoped projections expose public CP ledger data under `public_command_point_ledgers` and public Stratagem-use records under `public_stratagem_use_records`. Adapter event deltas may expose normal CP and Stratagem events to every player unless a future source-backed hidden rule explicitly marks a pending decision, record, or event hidden. Any hidden Stratagem rule must update this document before implementation and must not leak hidden information through option counts, payload fields, event metadata, or derived projection data.
 

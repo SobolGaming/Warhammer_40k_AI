@@ -46,11 +46,17 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.stratagem_catalog import (
+    tenth_edition_core_stratagem_catalog_records,
+    tenth_edition_detachment_stratagem_catalog_records,
+    tenth_edition_stratagem_catalog_records,
+)
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemAvailabilityKind,
     StratagemCatalogRecord,
+    StratagemCategory,
     StratagemDefinition,
     StratagemEligibilityContext,
     StratagemRestrictionPolicy,
@@ -74,6 +80,9 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+    core_stratagems as source_stratagems,
+)
 
 
 def test_finite_stratagem_use_round_trips_through_lifecycle_and_spends_cp() -> None:
@@ -111,6 +120,121 @@ def test_finite_stratagem_use_round_trips_through_lifecycle_and_spends_cp() -> N
     assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
     assert GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle)).to_payload() == (
         lifecycle.to_payload()
+    )
+
+
+def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> None:
+    source_identity = source_stratagems.source_package_identity_payload()
+    source_catalog = tenth_edition_stratagem_catalog_records()
+    core_catalog = tenth_edition_core_stratagem_catalog_records()
+    detachment_catalog = tenth_edition_detachment_stratagem_catalog_records()
+    snapshot = tuple(
+        (
+            record.record_id,
+            record.definition.stratagem_id,
+            record.definition.command_point_cost,
+            record.definition.category.value,
+            record.definition.source_id,
+            record.definition.target_spec.target_policy_id,
+            record.definition.handler_id,
+            record.availability_kind.value,
+            record.detachment_id,
+        )
+        for record in source_catalog
+    )
+    assert source_identity["edition_id"] == "warhammer_40000_10th"
+    assert source_identity["source_package_id"] == "gw-10e-core-stratagems"
+    assert snapshot == (
+        (
+            "gw-10e-core-stratagems:core:command-reroll",
+            "command-reroll",
+            1,
+            "battle_tactic",
+            "gw-10e-core-stratagems:core:command-reroll",
+            "none",
+            "unsupported:phase-12c:command-reroll",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:insane-bravery",
+            "insane-bravery",
+            1,
+            "epic_deed",
+            "gw-10e-core-stratagems:core:insane-bravery",
+            "unsupported:phase-12c:battle-shock-test-unit",
+            "unsupported:phase-12c:insane-bravery",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:new-orders",
+            "new-orders",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:new-orders",
+            "none",
+            "unsupported:phase-12c:new-orders",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:core:rapid-ingress",
+            "rapid-ingress",
+            1,
+            "strategic_ploy",
+            "gw-10e-core-stratagems:core:rapid-ingress",
+            "unsupported:phase-12c:reserves-unit",
+            "unsupported:phase-12c:rapid-ingress",
+            "core",
+            None,
+        ),
+        (
+            "gw-10e-core-stratagems:detachment:armour-of-contempt",
+            "armour-of-contempt",
+            1,
+            "battle_tactic",
+            "gw-10e-core-stratagems:detachment:gladius-task-force:armour-of-contempt",
+            "unsupported:phase-13:selected-target-unit",
+            "unsupported:phase-13:armour-of-contempt",
+            "detachment",
+            "gladius-task-force",
+        ),
+    )
+    assert len(core_catalog) == 4
+    assert len(detachment_catalog) == 1
+
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=1)
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+    )
+    request = _decision_request(
+        request_stratagem_use(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            catalog_records=source_catalog,
+            context=context,
+        )
+    )
+
+    assert tuple(option.option_id for option in request.options) == (
+        "use-stratagem:command-reroll:target:none",
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12b-source-backed-use",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+    )
+
+    assert state.stratagem_use_records[0].source_id == (
+        "gw-10e-core-stratagems:core:command-reroll"
     )
 
 
@@ -288,6 +412,7 @@ def test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options() ->
 
 def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() -> None:
     valid_lifecycle = _battle_lifecycle()
+    valid_state = _state(valid_lifecycle)
     valid_request = _parameterized_request(valid_lifecycle)
     proposal_request = _proposal_request_from_decision(valid_request)
     valid_result = _proposal_result(
@@ -299,6 +424,12 @@ def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() ->
     valid_status = valid_lifecycle.submit_decision(valid_result)
 
     assert valid_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert valid_state.command_point_total("player-a") == 0
+    assert len(valid_state.stratagem_use_records) == 1
+    use_record = valid_state.stratagem_use_records[0]
+    assert use_record.stratagem_id == "parameterized-barrage"
+    assert use_record.command_point_cost == 1
+    assert use_record.command_point_transaction_id is not None
     assert (
         _last_event_payload(
             valid_lifecycle.decision_controller,
@@ -306,8 +437,15 @@ def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() ->
         )["result_id"]
         == "phase12b-valid-proposal"
     )
+    assert _last_event_payload(valid_lifecycle.decision_controller, "stratagem_used") == (
+        use_record.to_payload()
+    )
+    assert GameLifecycle.from_payload(_lifecycle_payload_copy(valid_lifecycle)).to_payload() == (
+        valid_lifecycle.to_payload()
+    )
 
     malformed_lifecycle = _battle_lifecycle()
+    malformed_state = _state(malformed_lifecycle)
     malformed_request = _parameterized_request(malformed_lifecycle)
     malformed = malformed_lifecycle.submit_decision(
         DecisionResult(
@@ -321,6 +459,8 @@ def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() ->
     )
     assert malformed.status_kind is LifecycleStatusKind.INVALID
     assert malformed.payload == {"invalid_reason": "malformed_payload"}
+    assert malformed_state.command_point_total("player-a") == 1
+    assert malformed_state.stratagem_use_records == []
     assert malformed_lifecycle.decision_controller.queue.pending_requests == (malformed_request,)
 
     schema_lifecycle = _battle_lifecycle()
@@ -338,9 +478,12 @@ def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() ->
 
     wrong_context_lifecycle = _battle_lifecycle()
     wrong_context_request = _parameterized_request(wrong_context_lifecycle)
+    wrong_context_base = _proposal_request_from_decision(wrong_context_request).with_binding(
+        _friendly_binding()
+    )
     wrong_context_proposal = replace(
-        _proposal_request_from_decision(wrong_context_request).with_binding(_friendly_binding()),
-        player_id="player-b",
+        wrong_context_base,
+        context=replace(wrong_context_base.context, player_id="player-b"),
     )
     wrong_context = wrong_context_lifecycle.submit_decision(
         _proposal_result(
@@ -368,6 +511,28 @@ def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() ->
     )
     assert stale.status_kind is LifecycleStatusKind.INVALID
     assert stale.payload == {"invalid_reason": "stale_phase"}
+
+
+def test_parameterized_stratagem_proposal_uses_actual_restriction_policy() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    state.battle_shocked_unit_ids = ["army-alpha:intercessor-unit-1"]
+    request = _parameterized_request(
+        lifecycle,
+        restriction_policy=StratagemRestrictionPolicy(allow_battle_shocked_targets=True),
+    )
+    proposal = _proposal_request_from_decision(request).with_binding(_friendly_binding())
+
+    accepted = lifecycle.submit_decision(
+        _proposal_result(
+            request=request,
+            result_id="phase12b-parameterized-policy",
+            proposal=proposal,
+        )
+    )
+
+    assert accepted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert len(state.stratagem_use_records) == 1
 
 
 def test_non_active_stratagem_can_resolve_inside_reaction_window_after_restore() -> None:
@@ -571,6 +736,11 @@ def test_phase12b_fail_fast_validation_branches() -> None:
             name="Bad Timing",
             source_id="bad-source",
             command_point_cost=0,
+            category=StratagemCategory.BATTLE_TACTIC,
+            when_descriptor="bad when",
+            target_descriptor="bad target",
+            effect_descriptor="bad effect",
+            restrictions_descriptor="bad restrictions",
             timing=cast(StratagemTimingDescriptor, object()),
         )
     with pytest.raises(GameLifecycleError, match="restriction_policy must be a policy"):
@@ -579,6 +749,11 @@ def test_phase12b_fail_fast_validation_branches() -> None:
             name="Bad Policy",
             source_id="bad-source",
             command_point_cost=0,
+            category=StratagemCategory.BATTLE_TACTIC,
+            when_descriptor="bad when",
+            target_descriptor="bad target",
+            effect_descriptor="bad effect",
+            restrictions_descriptor="bad restrictions",
             timing=timing,
             restriction_policy=cast(StratagemRestrictionPolicy, object()),
         )
@@ -588,6 +763,11 @@ def test_phase12b_fail_fast_validation_branches() -> None:
             name="Bad Target Spec",
             source_id="bad-source",
             command_point_cost=0,
+            category=StratagemCategory.BATTLE_TACTIC,
+            when_descriptor="bad when",
+            target_descriptor="bad target",
+            effect_descriptor="bad effect",
+            restrictions_descriptor="bad restrictions",
             timing=timing,
             target_spec=cast(StratagemTargetSpec, object()),
         )
@@ -617,35 +797,43 @@ def test_phase12b_fail_fast_validation_branches() -> None:
         )
     with pytest.raises(GameLifecycleError, match="Unit StratagemTargetBinding requires"):
         StratagemTargetBinding(target_kind=StratagemTargetKind.FRIENDLY_UNIT)
+    proposal_record = _core_stratagem(
+        stratagem_id="proposal",
+        command_point_cost=0,
+        target_spec=StratagemTargetSpec(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            enumerable=False,
+        ),
+    )
     with pytest.raises(GameLifecycleError, match="proposal_kind is unsupported"):
         StratagemTargetProposal(
             proposal_kind="bad-kind",
-            game_id=state.game_id,
-            player_id="player-a",
-            battle_round=state.battle_round,
-            phase=BattlePhase.MOVEMENT,
-            stratagem_id="proposal",
-            target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT),
+            context=context,
+            catalog_record=proposal_record,
         )
-    with pytest.raises(GameLifecycleError, match="target_spec must be a target spec"):
+    with pytest.raises(GameLifecycleError, match="context must be an eligibility context"):
         StratagemTargetProposal(
             proposal_kind="stratagem_target_binding",
-            game_id=state.game_id,
-            player_id="player-a",
-            battle_round=state.battle_round,
-            phase=BattlePhase.MOVEMENT,
-            stratagem_id="proposal",
-            target_spec=cast(StratagemTargetSpec, object()),
+            context=cast(StratagemEligibilityContext, object()),
+            catalog_record=proposal_record,
+        )
+    with pytest.raises(GameLifecycleError, match="catalog_record must be a catalog record"):
+        StratagemTargetProposal(
+            proposal_kind="stratagem_target_binding",
+            context=context,
+            catalog_record=cast(StratagemCatalogRecord, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="must require parameterized targets"):
+        StratagemTargetProposal(
+            proposal_kind="stratagem_target_binding",
+            context=context,
+            catalog_record=_core_stratagem(stratagem_id="finite-proposal", command_point_cost=0),
         )
     with pytest.raises(GameLifecycleError, match="target_binding must be a target binding"):
         StratagemTargetProposal(
             proposal_kind="stratagem_target_binding",
-            game_id=state.game_id,
-            player_id="player-a",
-            battle_round=state.battle_round,
-            phase=BattlePhase.MOVEMENT,
-            stratagem_id="proposal",
-            target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT),
+            context=context,
+            catalog_record=proposal_record,
             target_binding=cast(StratagemTargetBinding, object()),
         )
 
@@ -685,6 +873,13 @@ def test_command_point_spend_and_refund_results_validate_fail_fast() -> None:
     assert command_point_refund_status_from_token(CommandPointRefundStatus.CAPPED) == (
         CommandPointRefundStatus.CAPPED
     )
+    with pytest.raises(GameLifecycleError, match="cannot use stratagem spend/refund"):
+        ledger.gain(
+            battle_round=1,
+            amount=1,
+            source_id="phase12b-invalid-generic-refund",
+            source_kind=CommandPointSourceKind.STRATAGEM_REFUND,
+        )
     with pytest.raises(GameLifecycleError, match="CommandPointSpendStatus token must"):
         command_point_spend_status_from_token(cast(Any, 1))
     with pytest.raises(GameLifecycleError, match="Unsupported CommandPointSpendStatus"):
@@ -947,10 +1142,13 @@ def test_stratagem_request_and_prevalidation_guards_are_fail_fast() -> None:
 
     proposal = StratagemTargetProposal.for_request(
         context=context,
-        stratagem_id="guard-proposal",
-        target_spec=StratagemTargetSpec(
-            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
-            enumerable=False,
+        catalog_record=_core_stratagem(
+            stratagem_id="guard-proposal",
+            command_point_cost=0,
+            target_spec=StratagemTargetSpec(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                enumerable=False,
+            ),
         ),
     )
     with pytest.raises(GameLifecycleError, match="requires a DecisionController"):
@@ -989,6 +1187,11 @@ def _core_stratagem(
             name=stratagem_id.replace("-", " ").title(),
             source_id=f"source:{stratagem_id}",
             command_point_cost=command_point_cost,
+            category=StratagemCategory.BATTLE_TACTIC,
+            when_descriptor="test timing descriptor",
+            target_descriptor="test target descriptor",
+            effect_descriptor="test effect descriptor",
+            restrictions_descriptor="test restriction descriptor",
             timing=timing
             if timing is not None
             else StratagemTimingDescriptor(
@@ -1019,16 +1222,26 @@ def _detachment_stratagem(
     )
 
 
-def _parameterized_request(lifecycle: GameLifecycle) -> DecisionRequest:
+def _parameterized_request(
+    lifecycle: GameLifecycle,
+    *,
+    restriction_policy: StratagemRestrictionPolicy | None = None,
+) -> DecisionRequest:
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    proposal = StratagemTargetProposal.for_request(
-        context=_context(state=state, player_id="player-a"),
+    _grant_cp(state, player_id="player-a", amount=1)
+    record = _core_stratagem(
         stratagem_id="parameterized-barrage",
+        command_point_cost=1,
         target_spec=StratagemTargetSpec(
             target_kind=StratagemTargetKind.FRIENDLY_UNIT,
             enumerable=False,
         ),
+        restriction_policy=restriction_policy,
+    )
+    proposal = StratagemTargetProposal.for_request(
+        context=_context(state=state, player_id="player-a"),
+        catalog_record=record,
     )
     waiting = request_stratagem_target_proposal(
         state=state,

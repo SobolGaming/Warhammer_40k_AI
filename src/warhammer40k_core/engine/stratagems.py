@@ -49,6 +49,13 @@ class StratagemAvailabilityKind(StrEnum):
     DETACHMENT = "detachment"
 
 
+class StratagemCategory(StrEnum):
+    BATTLE_TACTIC = "battle_tactic"
+    EPIC_DEED = "epic_deed"
+    STRATEGIC_PLOY = "strategic_ploy"
+    WARGEAR = "wargear"
+
+
 class StratagemTargetKind(StrEnum):
     NONE = "none"
     FRIENDLY_UNIT = "friendly_unit"
@@ -90,6 +97,7 @@ class StratagemRestrictionPolicyPayload(TypedDict):
 class StratagemTargetSpecPayload(TypedDict):
     target_kind: str
     enumerable: bool
+    target_policy_id: str
 
 
 class StratagemDefinitionPayload(TypedDict):
@@ -97,6 +105,11 @@ class StratagemDefinitionPayload(TypedDict):
     name: str
     source_id: str
     command_point_cost: int
+    category: str
+    when_descriptor: str
+    target_descriptor: str
+    effect_descriptor: str
+    restrictions_descriptor: str
     timing: StratagemTimingDescriptorPayload
     restriction_policy: StratagemRestrictionPolicyPayload
     target_spec: StratagemTargetSpecPayload
@@ -130,12 +143,8 @@ class StratagemTargetBindingPayload(TypedDict):
 
 class StratagemTargetProposalPayload(TypedDict):
     proposal_kind: str
-    game_id: str
-    player_id: str
-    battle_round: int
-    phase: str
-    stratagem_id: str
-    target_spec: StratagemTargetSpecPayload
+    context: StratagemEligibilityContextPayload
+    catalog_record: StratagemCatalogRecordPayload
     target_binding: StratagemTargetBindingPayload | None
 
 
@@ -261,6 +270,7 @@ class StratagemRestrictionPolicy:
 class StratagemTargetSpec:
     target_kind: StratagemTargetKind = StratagemTargetKind.NONE
     enumerable: bool = True
+    target_policy_id: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -273,6 +283,14 @@ class StratagemTargetSpec:
             "enumerable",
             _validate_bool("StratagemTargetSpec enumerable", self.enumerable),
         )
+        object.__setattr__(
+            self,
+            "target_policy_id",
+            _validate_target_policy_id(
+                target_kind=self.target_kind,
+                target_policy_id=self.target_policy_id,
+            ),
+        )
         if self.target_kind is StratagemTargetKind.NONE and not self.enumerable:
             raise GameLifecycleError("Targetless StratagemTargetSpec must be enumerable.")
 
@@ -284,6 +302,7 @@ class StratagemTargetSpec:
         return {
             "target_kind": self.target_kind.value,
             "enumerable": self.enumerable,
+            "target_policy_id": self.target_policy_id,
         }
 
     @classmethod
@@ -291,6 +310,7 @@ class StratagemTargetSpec:
         return cls(
             target_kind=stratagem_target_kind_from_token(payload["target_kind"]),
             enumerable=payload["enumerable"],
+            target_policy_id=payload["target_policy_id"],
         )
 
 
@@ -300,6 +320,11 @@ class StratagemDefinition:
     name: str
     source_id: str
     command_point_cost: int
+    category: StratagemCategory
+    when_descriptor: str
+    target_descriptor: str
+    effect_descriptor: str
+    restrictions_descriptor: str
     timing: StratagemTimingDescriptor
     restriction_policy: StratagemRestrictionPolicy = field(
         default_factory=StratagemRestrictionPolicy
@@ -332,6 +357,34 @@ class StratagemDefinition:
                 self.command_point_cost,
             ),
         )
+        object.__setattr__(
+            self,
+            "category",
+            stratagem_category_from_token(self.category),
+        )
+        object.__setattr__(
+            self,
+            "when_descriptor",
+            _validate_identifier("StratagemDefinition when_descriptor", self.when_descriptor),
+        )
+        object.__setattr__(
+            self,
+            "target_descriptor",
+            _validate_identifier("StratagemDefinition target_descriptor", self.target_descriptor),
+        )
+        object.__setattr__(
+            self,
+            "effect_descriptor",
+            _validate_identifier("StratagemDefinition effect_descriptor", self.effect_descriptor),
+        )
+        object.__setattr__(
+            self,
+            "restrictions_descriptor",
+            _validate_identifier(
+                "StratagemDefinition restrictions_descriptor",
+                self.restrictions_descriptor,
+            ),
+        )
         if type(self.timing) is not StratagemTimingDescriptor:
             raise GameLifecycleError("StratagemDefinition timing must be a descriptor.")
         if type(self.restriction_policy) is not StratagemRestrictionPolicy:
@@ -351,6 +404,11 @@ class StratagemDefinition:
             "name": self.name,
             "source_id": self.source_id,
             "command_point_cost": self.command_point_cost,
+            "category": self.category.value,
+            "when_descriptor": self.when_descriptor,
+            "target_descriptor": self.target_descriptor,
+            "effect_descriptor": self.effect_descriptor,
+            "restrictions_descriptor": self.restrictions_descriptor,
             "timing": self.timing.to_payload(),
             "restriction_policy": self.restriction_policy.to_payload(),
             "target_spec": self.target_spec.to_payload(),
@@ -365,6 +423,11 @@ class StratagemDefinition:
             name=payload["name"],
             source_id=payload["source_id"],
             command_point_cost=payload["command_point_cost"],
+            category=stratagem_category_from_token(payload["category"]),
+            when_descriptor=payload["when_descriptor"],
+            target_descriptor=payload["target_descriptor"],
+            effect_descriptor=payload["effect_descriptor"],
+            restrictions_descriptor=payload["restrictions_descriptor"],
             timing=StratagemTimingDescriptor.from_payload(payload["timing"]),
             restriction_policy=StratagemRestrictionPolicy.from_payload(
                 payload["restriction_policy"]
@@ -599,12 +662,8 @@ class StratagemTargetBinding:
 @dataclass(frozen=True, slots=True)
 class StratagemTargetProposal:
     proposal_kind: str
-    game_id: str
-    player_id: str
-    battle_round: int
-    phase: BattlePhaseKind
-    stratagem_id: str
-    target_spec: StratagemTargetSpec
+    context: StratagemEligibilityContext
+    catalog_record: StratagemCatalogRecord
     target_binding: StratagemTargetBinding | None = None
 
     def __post_init__(self) -> None:
@@ -615,33 +674,18 @@ class StratagemTargetProposal:
         )
         if self.proposal_kind != STRATAGEM_PROPOSAL_PAYLOAD_KIND:
             raise GameLifecycleError("StratagemTargetProposal proposal_kind is unsupported.")
-        object.__setattr__(
-            self,
-            "game_id",
-            _validate_identifier("StratagemTargetProposal game_id", self.game_id),
-        )
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("StratagemTargetProposal player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("StratagemTargetProposal battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "phase",
-            battle_phase_kind_from_token(self.phase),
-        )
-        object.__setattr__(
-            self,
-            "stratagem_id",
-            _validate_identifier("StratagemTargetProposal stratagem_id", self.stratagem_id),
-        )
-        if type(self.target_spec) is not StratagemTargetSpec:
-            raise GameLifecycleError("StratagemTargetProposal target_spec must be a target spec.")
+        if type(self.context) is not StratagemEligibilityContext:
+            raise GameLifecycleError(
+                "StratagemTargetProposal context must be an eligibility context."
+            )
+        if type(self.catalog_record) is not StratagemCatalogRecord:
+            raise GameLifecycleError(
+                "StratagemTargetProposal catalog_record must be a catalog record."
+            )
+        if self.catalog_record.definition.target_spec.enumerable:
+            raise GameLifecycleError(
+                "StratagemTargetProposal catalog_record must require parameterized targets."
+            )
         if (
             self.target_binding is not None
             and type(self.target_binding) is not StratagemTargetBinding
@@ -650,45 +694,56 @@ class StratagemTargetProposal:
                 "StratagemTargetProposal target_binding must be a target binding."
             )
 
+    @property
+    def game_id(self) -> str:
+        return self.context.game_id
+
+    @property
+    def player_id(self) -> str:
+        return self.context.player_id
+
+    @property
+    def battle_round(self) -> int:
+        return self.context.battle_round
+
+    @property
+    def phase(self) -> BattlePhaseKind:
+        return self.context.phase
+
+    @property
+    def stratagem_id(self) -> str:
+        return self.catalog_record.definition.stratagem_id
+
+    @property
+    def target_spec(self) -> StratagemTargetSpec:
+        return self.catalog_record.definition.target_spec
+
     @classmethod
     def for_request(
         cls,
         *,
         context: StratagemEligibilityContext,
-        stratagem_id: str,
-        target_spec: StratagemTargetSpec,
+        catalog_record: StratagemCatalogRecord,
     ) -> Self:
         return cls(
             proposal_kind=STRATAGEM_PROPOSAL_PAYLOAD_KIND,
-            game_id=context.game_id,
-            player_id=context.player_id,
-            battle_round=context.battle_round,
-            phase=context.phase,
-            stratagem_id=stratagem_id,
-            target_spec=target_spec,
+            context=context,
+            catalog_record=catalog_record,
         )
 
     def with_binding(self, binding: StratagemTargetBinding) -> Self:
         return type(self)(
             proposal_kind=self.proposal_kind,
-            game_id=self.game_id,
-            player_id=self.player_id,
-            battle_round=self.battle_round,
-            phase=self.phase,
-            stratagem_id=self.stratagem_id,
-            target_spec=self.target_spec,
+            context=self.context,
+            catalog_record=self.catalog_record,
             target_binding=binding,
         )
 
     def to_payload(self) -> StratagemTargetProposalPayload:
         return {
             "proposal_kind": self.proposal_kind,
-            "game_id": self.game_id,
-            "player_id": self.player_id,
-            "battle_round": self.battle_round,
-            "phase": self.phase.value,
-            "stratagem_id": self.stratagem_id,
-            "target_spec": self.target_spec.to_payload(),
+            "context": self.context.to_payload(),
+            "catalog_record": self.catalog_record.to_payload(),
             "target_binding": (
                 None if self.target_binding is None else self.target_binding.to_payload()
             ),
@@ -699,12 +754,8 @@ class StratagemTargetProposal:
         binding_payload = payload["target_binding"]
         return cls(
             proposal_kind=payload["proposal_kind"],
-            game_id=payload["game_id"],
-            player_id=payload["player_id"],
-            battle_round=payload["battle_round"],
-            phase=battle_phase_kind_from_token(payload["phase"]),
-            stratagem_id=payload["stratagem_id"],
-            target_spec=StratagemTargetSpec.from_payload(payload["target_spec"]),
+            context=StratagemEligibilityContext.from_payload(payload["context"]),
+            catalog_record=StratagemCatalogRecord.from_payload(payload["catalog_record"]),
             target_binding=(
                 None
                 if binding_payload is None
@@ -973,6 +1024,22 @@ def request_stratagem_target_proposal(
         raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
     if proposal_request.target_binding is not None:
         raise GameLifecycleError("Stratagem proposal request cannot include a target binding.")
+    violation = _stratagem_unavailable_reason(
+        state=state,
+        record=proposal_request.catalog_record,
+        context=proposal_request.context,
+        target_binding=None,
+    )
+    if violation is not None:
+        return LifecycleStatus.unsupported(
+            stage=state.stage,
+            message="Stratagem target proposal is not available for this timing window.",
+            payload={
+                "player_id": proposal_request.player_id,
+                "stratagem_id": proposal_request.stratagem_id,
+                "unavailable_reason": violation,
+            },
+        )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -1028,6 +1095,25 @@ def apply_stratagem_decision(
         raise GameLifecycleError("Stratagem application requires a DecisionController.")
     selection = _require_stratagem_selection(result.payload)
     context, catalog_record, target_binding = selection
+    return _apply_stratagem_use(
+        state=state,
+        result=result,
+        decisions=decisions,
+        context=context,
+        catalog_record=catalog_record,
+        target_binding=target_binding,
+    )
+
+
+def _apply_stratagem_use(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    catalog_record: StratagemCatalogRecord,
+    target_binding: StratagemTargetBinding,
+) -> StratagemUseRecord:
     definition = catalog_record.definition
     use_id = _next_stratagem_use_id(state=state, player_id=context.player_id)
     spend_result: CommandPointSpendResult | None = None
@@ -1096,23 +1182,23 @@ def invalid_stratagem_target_proposal_status(
         return _invalid(state, "Stratagem target proposal context drift.", context_error)
     if submitted_proposal.target_binding is None:
         return _invalid(state, "Stratagem target proposal requires target binding.", "schema")
-    target_error = _target_binding_error(
+    violation = _stratagem_unavailable_reason(
         state=state,
-        player_id=submitted_proposal.player_id,
-        target_spec=submitted_proposal.target_spec,
-        policy=StratagemRestrictionPolicy(),
+        record=request_proposal.catalog_record,
+        context=request_proposal.context,
         target_binding=submitted_proposal.target_binding,
     )
-    if target_error is not None:
-        return _invalid(state, "Stratagem target proposal is not legal.", target_error)
+    if violation is not None:
+        return _invalid(state, "Stratagem target proposal is not legal.", violation)
     return None
 
 
 def apply_stratagem_target_proposal(
     *,
+    state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
-) -> StratagemTargetProposal:
+) -> StratagemUseRecord:
     proposal = _proposal_from_result_payload(result.payload)
     if proposal is None or proposal.target_binding is None:
         raise GameLifecycleError("Stratagem target proposal was not prevalidated.")
@@ -1124,7 +1210,14 @@ def apply_stratagem_target_proposal(
             "proposal": proposal.to_payload(),
         },
     )
-    return proposal
+    return _apply_stratagem_use(
+        state=state,
+        result=result,
+        decisions=decisions,
+        context=proposal.context,
+        catalog_record=proposal.catalog_record,
+        target_binding=proposal.target_binding,
+    )
 
 
 def stratagem_availability_kind_from_token(token: object) -> StratagemAvailabilityKind:
@@ -1136,6 +1229,17 @@ def stratagem_availability_kind_from_token(token: object) -> StratagemAvailabili
         return StratagemAvailabilityKind(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported StratagemAvailabilityKind token: {token}.") from exc
+
+
+def stratagem_category_from_token(token: object) -> StratagemCategory:
+    if type(token) is StratagemCategory:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("StratagemCategory token must be a string.")
+    try:
+        return StratagemCategory(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported StratagemCategory token: {token}.") from exc
 
 
 def stratagem_target_kind_from_token(token: object) -> StratagemTargetKind:
@@ -1407,6 +1511,8 @@ def _target_binding_error(
         return None
     if target_binding.target_kind is StratagemTargetKind.NONE:
         return "target_required"
+    if target_spec.target_policy_id.startswith("unsupported:"):
+        return "unsupported_target_policy"
     if (
         target_spec.target_kind is StratagemTargetKind.FRIENDLY_UNIT
         and target_binding.target_player_id != player_id
@@ -1491,19 +1597,13 @@ def _proposal_context_error(
         return "wrong_context"
     if submitted_proposal.stratagem_id != request_proposal.stratagem_id:
         return "wrong_context"
-    if submitted_proposal.target_spec != request_proposal.target_spec:
+    if submitted_proposal.catalog_record != request_proposal.catalog_record:
         return "wrong_context"
     if submitted_proposal.battle_round != request_proposal.battle_round:
         return "stale_battle_round"
     if submitted_proposal.phase is not request_proposal.phase:
         return "stale_phase"
-    if state.game_id != request_proposal.game_id:
-        return "wrong_context"
-    if state.battle_round != request_proposal.battle_round:
-        return "stale_battle_round"
-    if state.current_battle_phase is not request_proposal.phase:
-        return "stale_phase"
-    return None
+    return _context_state_drift(state=state, context=request_proposal.context)
 
 
 def _apply_command_point_effects(
@@ -1624,6 +1724,27 @@ def _validate_optional_phase(field_name: str, value: object | None) -> BattlePha
     if value is None:
         return None
     return battle_phase_kind_from_token(value)
+
+
+def _validate_target_policy_id(
+    *,
+    target_kind: StratagemTargetKind,
+    target_policy_id: object | None,
+) -> str:
+    if target_policy_id is None or target_policy_id == "":
+        if target_kind is StratagemTargetKind.NONE:
+            return "none"
+        if target_kind is StratagemTargetKind.FRIENDLY_UNIT:
+            return "friendly_unit"
+        if target_kind is StratagemTargetKind.ANY_UNIT:
+            return "any_unit"
+        raise GameLifecycleError("StratagemTargetSpec target_kind is unsupported.")
+    policy_id = _validate_identifier("StratagemTargetSpec target_policy_id", target_policy_id)
+    if target_kind is StratagemTargetKind.NONE and policy_id != "none":
+        raise GameLifecycleError("Targetless StratagemTargetSpec requires none target_policy_id.")
+    if target_kind is not StratagemTargetKind.NONE and policy_id == "none":
+        raise GameLifecycleError("Targeted StratagemTargetSpec cannot use none target_policy_id.")
+    return policy_id
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

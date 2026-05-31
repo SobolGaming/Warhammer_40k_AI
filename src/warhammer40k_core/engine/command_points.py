@@ -713,8 +713,13 @@ class CommandPointLedger:
         requested_source = _validate_identifier("source_id", source_id)
         requested_kind = command_point_source_kind_from_token(source_kind)
         requested_cap_exempt = _validate_bool("cap_exempt", cap_exempt)
-        if requested_kind is CommandPointSourceKind.STRATAGEM_SPEND:
-            raise GameLifecycleError("CommandPointLedger.gain cannot use stratagem_spend.")
+        if requested_kind in (
+            CommandPointSourceKind.STRATAGEM_SPEND,
+            CommandPointSourceKind.STRATAGEM_REFUND,
+        ):
+            raise GameLifecycleError(
+                "CommandPointLedger.gain cannot use stratagem spend/refund source kinds."
+            )
 
         if (
             _source_kind_counts_toward_non_command_gain_cap(requested_kind)
