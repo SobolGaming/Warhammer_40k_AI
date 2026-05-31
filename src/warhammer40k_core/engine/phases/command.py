@@ -32,13 +32,14 @@ from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
     CORE_INSANE_BRAVERY_HANDLER_ID,
+    CORE_NEW_ORDERS_HANDLER_ID,
     StratagemCatalogIndex,
     StratagemEligibilityContext,
     create_stratagem_use_decision_request,
     request_stratagem_target_proposal,
     stratagem_decline_option,
     stratagem_target_proposal_from_index,
-    stratagem_use_options_from_index,
+    stratagem_use_options_for_handler_from_index,
     stratagem_window_declined_for_context,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -324,34 +325,53 @@ def _request_command_start_stratagem_if_available(
     stratagem_index: StratagemCatalogIndex,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
-    context = StratagemEligibilityContext.from_state(
+    new_orders_context = StratagemEligibilityContext.from_state(
         state=state,
         player_id=active_player_id,
         trigger_kind=TimingTriggerKind.START_PHASE,
-    )
-    if stratagem_window_declined_for_context(decisions=decisions, context=context):
-        return None
-    finite_options = stratagem_use_options_from_index(
-        state=state,
-        index=stratagem_index,
-        context=context,
-    )
-    if finite_options:
-        request = create_stratagem_use_decision_request(
+        timing_window_id=_new_orders_timing_window_id(
             state=state,
-            context=context,
-            options=(*finite_options, stratagem_decline_option()),
+            active_player_id=active_player_id,
+        ),
+    )
+    if not stratagem_window_declined_for_context(decisions=decisions, context=new_orders_context):
+        finite_options = stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=stratagem_index,
+            context=new_orders_context,
+            handler_id=CORE_NEW_ORDERS_HANDLER_ID,
         )
-        decisions.request_decision(request)
-        return LifecycleStatus.waiting_for_decision(
-            stage=state.stage,
-            decision_request=request,
-            payload={"pending_request_id": request.request_id},
-        )
+        if finite_options:
+            request = create_stratagem_use_decision_request(
+                state=state,
+                context=new_orders_context,
+                options=(*finite_options, stratagem_decline_option()),
+            )
+            decisions.request_decision(request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=state.stage,
+                decision_request=request,
+                payload={"pending_request_id": request.request_id},
+            )
+
+    insane_bravery_context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=active_player_id,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        timing_window_id=_insane_bravery_timing_window_id(
+            state=state,
+            active_player_id=active_player_id,
+        ),
+    )
+    if stratagem_window_declined_for_context(
+        decisions=decisions,
+        context=insane_bravery_context,
+    ):
+        return None
     proposal = stratagem_target_proposal_from_index(
         state=state,
         index=stratagem_index,
-        context=context,
+        context=insane_bravery_context,
         handler_id=CORE_INSANE_BRAVERY_HANDLER_ID,
     )
     if proposal is None:
@@ -362,6 +382,22 @@ def _request_command_start_stratagem_if_available(
         proposal_request=proposal,
         allow_decline=True,
     )
+
+
+def _new_orders_timing_window_id(
+    *,
+    state: GameState,
+    active_player_id: str,
+) -> str:
+    return f"new-orders-command-round-{state.battle_round}-player-{active_player_id}"
+
+
+def _insane_bravery_timing_window_id(
+    *,
+    state: GameState,
+    active_player_id: str,
+) -> str:
+    return f"insane-bravery-battle-shock-round-{state.battle_round}-player-{active_player_id}"
 
 
 def _battle_shock_auto_pass_effect(

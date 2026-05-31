@@ -633,6 +633,13 @@ def test_command_phase_progression_declines_parameterized_stratagem_window() -> 
     assert state.command_point_total("player-a") == 1
     assert state.stratagem_use_records == []
     assert _has_event(lifecycle.decision_controller, "stratagem_window_declined")
+    declined_payload = _last_event_payload(
+        lifecycle.decision_controller,
+        "stratagem_window_declined",
+    )
+    assert declined_payload["timing_window_id"] == (
+        "insane-bravery-battle-shock-round-1-player-player-a"
+    )
     battle_shock = _last_event_payload(lifecycle.decision_controller, "battle_shock_test_resolved")
     assert battle_shock["auto_passed"] is False
     follow_up = _decision_request(declined)
@@ -807,8 +814,94 @@ def test_command_phase_progression_declines_finite_stratagem_window() -> None:
     assert state.command_point_total("player-a") == 1
     assert state.stratagem_use_records == []
     assert _has_event(lifecycle.decision_controller, "stratagem_window_declined")
+    declined_payload = _last_event_payload(
+        lifecycle.decision_controller,
+        "stratagem_window_declined",
+    )
+    assert declined_payload["timing_window_id"] == ("new-orders-command-round-1-player-player-a")
     follow_up = _decision_request(declined)
     assert follow_up.decision_type == "select_movement_unit"
+
+
+def test_command_phase_declining_new_orders_does_not_suppress_insane_bravery() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _record_secondary_choices(
+        state,
+        player_a_mode=SecondaryMissionMode.TACTICAL,
+        player_b_mode=SecondaryMissionMode.FIXED,
+    )
+    _set_command_step_ready_for_tactical_secondary(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    state.record_tactical_secondary_draw(
+        TacticalSecondaryDraw(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            request_id="phase12c-combined-window-draw-request",
+            result_id="phase12c-combined-window-draw",
+            draw_count=state.tactical_secondary_draw_count,
+        )
+    )
+    state.draw_tactical_secondary_cards(
+        player_id="player-a",
+        source_result_id="phase12c-combined-window-draw",
+    )
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+
+    new_orders_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    new_orders_payload = cast(dict[str, JsonValue], new_orders_request.payload)
+    new_orders_context_payload = cast(
+        dict[str, JsonValue],
+        new_orders_payload["stratagem_context"],
+    )
+
+    assert new_orders_request.decision_type == STRATAGEM_DECISION_TYPE
+    assert new_orders_context_payload["timing_window_id"] == (
+        "new-orders-command-round-1-player-player-a"
+    )
+
+    insane_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-decline-new-orders-before-insane-bravery",
+            request=new_orders_request,
+            selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        )
+    )
+    insane_request = _decision_request(insane_status)
+    insane_payload = cast(dict[str, JsonValue], insane_request.payload)
+    insane_proposal_request = _proposal_request_from_decision(insane_request)
+
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert not _has_event(lifecycle.decision_controller, "new_orders_resolved")
+    assert insane_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert insane_payload["declinable"] is True
+    assert insane_proposal_request.stratagem_id == "insane-bravery"
+    assert insane_proposal_request.context.timing_window_id == (
+        "insane-bravery-battle-shock-round-1-player-player-a"
+    )
+
+    lifecycle.submit_decision(
+        _target_proposal_result(
+            request=insane_request,
+            result_id="phase12c-accept-insane-after-new-orders-decline",
+            proposal=insane_proposal_request.with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-a",
+                    target_unit_instance_id=target_unit_id,
+                )
+            ),
+        )
+    )
+
+    assert state.command_point_total("player-a") == 0
+    assert [record.handler_id for record in state.stratagem_use_records] == ["core:insane-bravery"]
+    battle_shock = _last_event_payload(lifecycle.decision_controller, "battle_shock_test_resolved")
+    assert battle_shock["auto_passed"] is True
+    assert target_unit_id not in state.battle_shocked_unit_ids
 
 
 def test_tactical_secondary_target_binding_requires_card_fields() -> None:

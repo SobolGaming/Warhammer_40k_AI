@@ -1330,6 +1330,7 @@ Invariants:
 - Stratagem candidate dispatch uses a trigger-keyed `StratagemCatalogIndex`; the index is derived, deterministic, not authoritative state, and never replaces runtime timing, detachment, CP, target, restriction, or handler gates;
 - core and detachment Stratagem records can be partitioned per player before indexing to avoid considering records the selected detachment can never grant, while the runtime detachment gate remains authoritative;
 - every implemented phase that owns a source-backed Stratagem timing window must wire candidate discovery through the trigger-keyed index rather than scanning the whole catalog at event time;
+- phase hooks that own multiple optional Stratagem windows under the same phase and trigger must assign distinct deterministic `timing_window_id` values, and decline suppression must be scoped to that exact timing window rather than the broader phase/trigger;
 - Stratagem definitions include CP cost, category, source ID, normalized WHEN/TARGET/EFFECT/RESTRICTIONS descriptors, timing descriptor, target spec, restriction policy, faction/detachment gate, and handler binding;
 - Stratagems spend, gain, and refund CP only through a bidirectional ledger with deterministic transaction IDs and replay-safe payloads;
 - starting CP, Command-phase +1 CP gain from Phase 11C, non-Command CP gain caps, CP refunds, and CP-granting Stratagem/effect results are ledger transactions, not local counters;
@@ -1402,6 +1403,7 @@ Required tests:
 
 - one legal use per supported Phase-12 timing window;
 - one phase-progression regression per supported phase-owned Stratagem window, proving the window is emitted from the trigger-keyed index and resolves through `GameLifecycle.submit_decision(...)`;
+- combined-window regressions for phases with multiple optional Stratagem windows under the same phase/trigger, proving declining one timing window does not suppress a distinct later timing window;
 - per-Stratagem golden replay for Command Re-roll, Insane Bravery, Rapid Ingress, and New Orders;
 - decision-contract round-trip for option enumeration, submission, recording, event emission, and replay;
 - CP consumption and repeat-use restriction;

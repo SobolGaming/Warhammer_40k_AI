@@ -1290,6 +1290,29 @@ def stratagem_use_options_from_index(
     )
 
 
+def stratagem_use_options_for_handler_from_index(
+    *,
+    state: GameState,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+    handler_id: str,
+) -> tuple[DecisionOption, ...]:
+    if type(index) is not StratagemCatalogIndex:
+        raise GameLifecycleError("Stratagem options require a StratagemCatalogIndex.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem options require an eligibility context.")
+    requested_handler_id = _validate_identifier("handler_id", handler_id)
+    return _stratagem_use_options_for_records(
+        state=state,
+        records=tuple(
+            record
+            for record in index.records_for(context.trigger_kind)
+            if record.definition.handler_id == requested_handler_id
+        ),
+        context=context,
+    )
+
+
 def _stratagem_use_options_for_records(
     *,
     state: GameState,

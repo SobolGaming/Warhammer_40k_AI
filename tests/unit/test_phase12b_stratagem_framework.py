@@ -78,6 +78,7 @@ from warhammer40k_core.engine.stratagems import (
     request_stratagem_use,
     request_stratagem_use_from_index,
     stratagem_use_options,
+    stratagem_use_options_for_handler_from_index,
     stratagem_use_options_from_index,
 )
 from warhammer40k_core.engine.timing_windows import (
@@ -366,6 +367,28 @@ def test_stratagem_catalog_index_partitions_by_trigger_and_rejects_invalid_input
     assert index.records_for(TimingTriggerKind.START_PHASE) == (start_alpha, start_zulu)
     assert index.records_for(TimingTriggerKind.AFTER_DICE_ROLL) == (after_dice,)
     assert index.records_for(TimingTriggerKind.END_TURN) == ()
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    context = _context(state=state, player_id="player-a")
+    handler_options = stratagem_use_options_for_handler_from_index(
+        state=state,
+        index=index,
+        context=context,
+        handler_id="record_only",
+    )
+    assert tuple(option.option_id for option in handler_options) == (
+        "use-stratagem:start-alpha:target:none",
+        "use-stratagem:start-zulu:target:none",
+    )
+    assert (
+        stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=index,
+            context=context,
+            handler_id="missing-handler",
+        )
+        == ()
+    )
     assert tenth_edition_core_stratagem_index().all_records() == tuple(
         sorted(
             tenth_edition_core_stratagem_catalog_records(),
@@ -384,6 +407,20 @@ def test_stratagem_catalog_index_partitions_by_trigger_and_rejects_invalid_input
             state=_battle_state(),
             index=cast(StratagemCatalogIndex, object()),
             context=_context(state=_battle_state(), player_id="player-a"),
+        )
+    with pytest.raises(GameLifecycleError, match="require a StratagemCatalogIndex"):
+        stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=cast(StratagemCatalogIndex, object()),
+            context=context,
+            handler_id="record_only",
+        )
+    with pytest.raises(GameLifecycleError, match="require an eligibility context"):
+        stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=index,
+            context=cast(StratagemEligibilityContext, object()),
+            handler_id="record_only",
         )
 
 
