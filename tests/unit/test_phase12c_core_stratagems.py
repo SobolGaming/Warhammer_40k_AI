@@ -97,6 +97,8 @@ def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None
     command_reroll = _source_stratagem_record("command-reroll")
     assert "advance_roll" in command_reroll.definition.eligible_roll_types
     assert "desperate_escape_roll" in command_reroll.definition.eligible_roll_types
+    assert "number_of_attacks_roll" in command_reroll.definition.eligible_roll_types
+    assert "random_damage" not in command_reroll.definition.eligible_roll_types
     assert "battle_shock_roll" not in command_reroll.definition.eligible_roll_types
     roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-a")
     trigger_payload = validate_json_value(
@@ -283,6 +285,48 @@ def test_command_reroll_allows_tenth_edition_desperate_escape_roll_for_actor() -
     lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase12c-command-reroll-desperate-escape",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+    )
+
+    assert state.command_point_total("player-a") == 0
+    assert len(state.stratagem_use_records) == 1
+    assert _has_event(lifecycle.decision_controller, "command_reroll_resolved")
+
+
+def test_command_reroll_allows_tenth_edition_number_of_attacks_roll_for_actor() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _grant_cp(state, player_id="player-a", amount=1)
+    command_reroll = _source_stratagem_record("command-reroll")
+    roll_state = _roll_command_reroll_candidate(
+        lifecycle,
+        actor_id="player-a",
+        roll_type="number_of_attacks_roll",
+    )
+    trigger_payload = validate_json_value(
+        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
+    )
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=trigger_payload,
+    )
+
+    waiting = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=(command_reroll,),
+        context=context,
+    )
+    request = _decision_request(waiting)
+
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-command-reroll-number-of-attacks",
             request=request,
             selected_option_id=request.options[0].option_id,
         )
