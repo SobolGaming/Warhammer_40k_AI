@@ -63,6 +63,7 @@ Forbidden by default:
 - bare `except`
 - `except Exception`
 - `except BaseException`
+- unparenthesized multi-exception handlers such as `except A, B:`
 - `except ...: pass`
 - catching an error and returning `None`, `True`, `False`, or a default value to keep going
 - using `getattr(obj, "required_field", default)` to tolerate incomplete domain objects

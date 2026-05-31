@@ -1766,7 +1766,7 @@ def _stratagem_selection_from_result_payload(
                 cast(StratagemTargetBindingPayload, binding_payload)
             ),
         )
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):
         return None
 
 
@@ -2173,7 +2173,7 @@ def _command_reroll_context_error(
             component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
         )
         permission.legal_selections_for_state(roll_state)
-    except DiceRollSpecError, GameLifecycleError:
+    except (DiceRollSpecError, GameLifecycleError):
         return "invalid_dice_roll_context"
     return None
 
@@ -2261,7 +2261,7 @@ def _proposal_from_request_payload(payload: JsonValue) -> StratagemTargetProposa
         proposal = StratagemTargetProposal.from_payload(
             cast(StratagemTargetProposalPayload, proposal_payload)
         )
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):
         return None
     if proposal.target_binding is not None:
         return None
@@ -2278,7 +2278,7 @@ def _proposal_from_result_payload(payload: JsonValue) -> StratagemTargetProposal
         return StratagemTargetProposal.from_payload(
             cast(StratagemTargetProposalPayload, proposal_payload)
         )
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):
         return None
 
 
@@ -2308,7 +2308,7 @@ def _proposal_context_error(
 def _movement_proposal_request_from_payload(payload: JsonValue) -> MovementProposalRequest | None:
     try:
         return MovementProposalRequest.from_decision_request_payload(payload)
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):
         return None
 
 
@@ -2317,7 +2317,7 @@ def _placement_proposal_from_result_payload(payload: JsonValue) -> PlacementProp
         return None
     try:
         return PlacementProposalPayload.from_payload(cast(PlacementProposalPayloadPayload, payload))
-    except KeyError, GameLifecycleError:
+    except (KeyError, GameLifecycleError):
         return None
 
 
