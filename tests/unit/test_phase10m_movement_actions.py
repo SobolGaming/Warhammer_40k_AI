@@ -28,6 +28,7 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementActionAvailabilityContext,
@@ -65,7 +66,8 @@ def test_action_options_outside_engagement_are_remain_normal_and_advance() -> No
 
 
 def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
-    lifecycle, movement_status = _advance_to_movement_unit_selection(_infantry_config())
+    config = replace(_infantry_config(), game_id="phase10m-fallback-v2-0000")
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
     _move_first_enemy_model_into_engagement(lifecycle)
 
     action_status = _submit_result(
@@ -93,7 +95,10 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
         option_id=MovementPhaseActionKind.FALL_BACK.value,
         result_id="phase10m-result-000004",
     )
-    assert fall_back_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert fall_back_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert _decision_request(fall_back_status).decision_type == (
+        SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    )
 
 
 def test_movement_action_availability_payload_round_trips_without_object_reprs() -> None:

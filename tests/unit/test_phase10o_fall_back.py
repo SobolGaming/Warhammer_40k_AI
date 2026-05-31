@@ -61,6 +61,10 @@ from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
+_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-0000"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0000"
+_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0266"
+
 
 def test_fall_back_domain_payloads_round_trip_without_object_reprs() -> None:
     requirement = DesperateEscapeRequirement(
@@ -202,7 +206,9 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
 
 
 def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_state() -> None:
-    lifecycle, action_request = _advance_to_fall_back_action_request()
+    lifecycle, action_request = _advance_to_fall_back_action_request(
+        game_id=_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID,
+    )
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
@@ -357,7 +363,9 @@ def test_fall_back_payload_round_trip_and_drift_codes() -> None:
 
 
 def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_selection() -> None:
-    lifecycle, action_request = _advance_to_fall_back_action_request()
+    lifecycle, action_request = _advance_to_fall_back_action_request(
+        game_id=_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID,
+    )
     state = _state(lifecycle)
     battlefield_state = state.battlefield_state
     assert battlefield_state is not None
@@ -366,18 +374,21 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-result-candidate-00001",
+        result_id="phase10o-two-result-v2-00001",
     )
     removal_request = _decision_request(fall_back_status)
     destroyed_model_ids = (
         "army-alpha:intercessor-unit-1:core-intercessor-like:002",
         "army-alpha:intercessor-unit-1:core-intercessor-like:004",
     )
+    destroyed_option_id = "destroy:" + ",".join(destroyed_model_ids)
 
+    assert removal_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    assert destroyed_option_id in {option.option_id for option in removal_request.options}
     status = _submit_result(
         lifecycle,
         request=removal_request,
-        option_id="destroy:" + ",".join(destroyed_model_ids),
+        option_id=destroyed_option_id,
         result_id="phase10o-result-000008",
     )
     state = _state(lifecycle)
@@ -625,12 +636,14 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
 
 
 def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift() -> None:
-    lifecycle, action_request = _advance_to_fall_back_action_request()
+    lifecycle, action_request = _advance_to_fall_back_action_request(
+        game_id=_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID,
+    )
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="test-00008",
+        result_id="phase10o-five-result-v2-00113",
     )
     removal_request = _decision_request(fall_back_status)
     unit_model_ids = tuple(
@@ -638,6 +651,8 @@ def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift
     )
     destroyed_option_id = "destroy:" + ",".join(unit_model_ids)
 
+    assert removal_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    assert destroyed_option_id in {option.option_id for option in removal_request.options}
     status = _submit_result(
         lifecycle,
         request=removal_request,
@@ -770,8 +785,11 @@ def test_desperate_escape_domain_validators_fail_fast() -> None:
         )
 
 
-def _advance_to_fall_back_action_request() -> tuple[GameLifecycle, DecisionRequest]:
-    lifecycle, movement_status = _advance_to_movement_unit_selection(_config())
+def _advance_to_fall_back_action_request(
+    *,
+    game_id: str = "phase10o-desperate",
+) -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle, movement_status = _advance_to_movement_unit_selection(_config(game_id=game_id))
     _mark_first_unit_battle_shocked(_state(lifecycle))
     _move_first_enemy_model_into_overflight_engagement(lifecycle)
     action_status = _submit_result(
@@ -908,10 +926,10 @@ def _scenario() -> BattlefieldScenario:
     )
 
 
-def _config() -> GameConfig:
+def _config(*, game_id: str = "phase10o-desperate") -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
-        game_id="phase10o-desperate",
+        game_id=game_id,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
             descriptor_version="core-v2-phase10o-test"
         ),

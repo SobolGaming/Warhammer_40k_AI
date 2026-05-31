@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, and Phase 12C supported Core Stratagem handler requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, and Phase 13 shooting decision requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, and Phase 12C supported Core Stratagem handler rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, and Phase 13 shooting decision rules, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -102,6 +102,10 @@ Finite decisions are bounded option choices already enumerated by the engine. Ex
 - Mission Action start selection;
 - unit selection;
 - movement action selection;
+- shooting unit selection;
+- defender attack-allocation model selection;
+- armour-versus-invulnerable save choices;
+- optional defensive ability choices;
 - reroll choices;
 - Stratagem use choices;
 - decline/accept choices;
@@ -247,6 +251,53 @@ Required Phase 12 adapter-contract tests:
 - Phase 12C Rapid Ingress reaction-window target and placement proposals replay/restore without resuming the parent before valid placement;
 - viewer-scoped projection/event coverage for public CP and Stratagem events, plus redaction tests for any hidden Stratagem policy.
 
+## Phase 13 Shooting Decisions
+
+Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` includes deterministic `source_records` with terrain feature ID, feature kind, LoS policy kind, and cover-source reason (`wholly_within_feature` or `not_fully_visible_because_of_feature`). Phase 13C attack allocation must request cover evidence with a single allocated target model in `target_models`; multi-model target contexts are selection/debug evidence only and must not drive final save/AP modifiers.
+
+Phase 13B and later shooting slices add player-facing attacker and defender choices. They must not introduce UI, headless, replay, or network-specific mutation paths. Every accepted choice must pass through the same lifecycle submission path and produce deterministic replay-facing records.
+
+Attacker shooting decisions include:
+
+- finite `select_shooting_unit` choices for the active player when more than one unit can be selected or skipped;
+- finite or parameterized target and weapon declaration choices, depending on whether the full action space can be safely enumerated;
+- Firing Deck selections that bind each selected embarked model to at most one legal non-One-Shot ranged weapon, temporarily grant those attacks to the Transport, and mark the selected embarked units ineligible to shoot for the phase.
+
+Defender shooting decisions include:
+
+- finite `select_attack_allocation_model` choices when allocation is not forced;
+- finite `select_saving_throw_kind` choices when armour and invulnerable saves are both legal;
+- finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
+- shooting-coupled reactive Stratagem choices such as Go to Ground through the existing `use_stratagem` or Stratagem target-proposal contract.
+
+If a shooting declaration is parameterized, the request must embed a typed proposal request with replay-safe source context:
+
+- game ID, battle round, phase, active player, and acting unit ID;
+- source request/result IDs when the declaration follows a finite unit-selection decision;
+- selected model IDs, weapon IDs, profile IDs, target unit IDs, and any Firing Deck source model/weapon binding;
+- the ruleset descriptor hash and line-of-sight/cache evidence required by target validation;
+- visible viewer payloads that do not leak hidden opponent information.
+
+Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Accepted submissions validate target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Pistol, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
+
+Defender allocation/save/defensive decisions may auto-resolve only when the rules leave exactly one legal outcome and no optional player choice. Otherwise the defending controlling player is the `DecisionRequest.actor_id`, even though they may not be the active player. Adapters must not infer that Shooting phase decisions always belong to the active player.
+
+Shooting decision records, attack-resolution events, line-of-sight witnesses, cover results, allocation records, save records, and damage/removal records must be deterministic and JSON-safe. Viewer-scoped projections and event deltas must not leak hidden information through option counts, target lists, payload metadata, rejected-proposal diagnostics, or derived fields.
+
+Fire Overwatch is not emitted from the active player's normal Shooting phase. It is offered from legal opponent Movement or Charge reaction windows through the trigger-keyed Stratagem index, then resolves using an out-of-phase shooting context and resumes the parent phase through the Phase 12A reaction contract.
+
+Required Phase 13 adapter-contract tests:
+
+- valid attacker unit selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid shooting target/weapon declaration through the chosen finite or parameterized submission path;
+- stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, and invalid-visibility submission rejection without mutation where required;
+- Firing Deck declaration validation, replay, and end-of-phase ineligible-unit state;
+- defender attack-allocation and armour-versus-invulnerable save choice round-trip through finite decisions;
+- optional or competing Feel No Pain decisions through finite decisions;
+- Go to Ground and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
+- replay/payload round-trip with no Python object reprs or memory addresses;
+- viewer-scoped projection/event redaction for any hidden target, allocation, defensive ability, or reaction-window information.
+
 ## Parameterized Proposals
 
 Parameterized proposals are used when the exact physical result cannot be safely enumerated as finite options.
@@ -260,9 +311,10 @@ The contract currently covers these proposal families:
 - Deep Strike placement;
 - Strategic Reserves placement;
 - Disembark placement;
+- ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - Stratagem target or placement proposals introduced by Phase 12 and later phase gates.
 
-Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, charge movement, pile-in, consolidate, Stratagem target binding, and mission movement or placement effects where applicable.
+Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, shooting declaration, charge movement, pile-in, consolidate, Stratagem target binding, and mission movement or placement effects where applicable.
 
 Parameterized requests are still `DecisionRequest`s. They contain a single `submit_parameterized_payload` option and embed a neutral `ProposalRequestPayload` inside `DecisionRequest.payload`.
 

@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 12D** is treated as implemented at the time this file was updated. Phase 13A is the next build slice.
+Everything through **Phase 13A** is treated as implemented at the time this file was updated. Phase 13B is the next build slice.
 
 Completed / implemented foundation:
 
@@ -76,6 +76,7 @@ Completed / implemented foundation:
 | 12B | Complete | Command Point ledger and Stratagem framework |
 | 12C | Complete | Phase-12-resolvable Core Stratagems |
 | 12D | Complete | Ability handler registry and keyword-gated rule execution |
+| 13A | Complete | Terrain visibility, line of sight, and cover foundation |
 
 ## Cross-cutting architectural rules
 
@@ -1481,11 +1482,14 @@ Initial ability families:
 
 ## Phase 13A: terrain visibility, line of sight, and cover foundation
 
+Status: Complete.
+
 Modules:
 
 - `geometry/visibility.py`
-- `geometry/terrain.py`
-- `engine/battlefield_state.py`
+- `geometry/terrain.py` for terrain feature and volume inputs consumed by visibility
+- `geometry/terrain_factory.py` for canonical visibility fixtures
+- `engine/battlefield_state.py` for spatial revision and cache-key state
 - `core/ruleset_descriptor.py`
 
 Objects:
@@ -1494,6 +1498,7 @@ Objects:
 - `TerrainVisibilityContext`
 - `VisibilityBlockerRecord`
 - `LineOfSightWitness`
+- `CoverSourceRecord`
 - `CoverPolicyDescriptor`
 - `BenefitOfCoverResult`
 
@@ -1503,10 +1508,18 @@ Invariants:
 - model visible, unit visible, model fully visible, and unit fully visible are separate results;
 - terrain visibility rules are descriptor-driven;
 - Ruins and Woods visibility policies are explicit;
-- `AIRCRAFT` and `TOWERING` visibility exceptions for Woods/Ruins are explicit;
+- Ruins and Woods use rule-specific wholly-within, target-intersection, and keyword-through predicates instead of blanket keyword bypasses;
+- `AIRCRAFT` uses true LoS through 10e Ruins and Woods;
+- `TOWERING` uses true LoS through 10e Woods;
+- `TOWERING` uses true LoS through 10e Ruins only when the `TOWERING` model is wholly within the feature;
 - Benefit of Cover is a policy result, not a shooting side effect;
+- Benefit of Cover consumes independent cover-source evidence for target models wholly within terrain and for terrain that prevents full visibility;
+- Phase 13A cover results may be computed from multi-model target contexts for selection/debug evidence only; Phase 13C attack allocation must evaluate cover with a context scoped to the allocated model so 10e allocated-model cover is not widened to the whole target unit;
 - cover eligibility is visible in attack allocation context;
-- LoS and cover checks use spatial index/cache revision data;
+- LoS witnesses carry ruleset hash and spatial revision cache-key data;
+- 11e Hidden terrain fields are descriptor preparation only in Phase 13A; distance gates, shot-state loss, and Hidden eligibility/output must fail explicitly until a later shooting slice consumes them;
+- Phase 13A uses deterministic broad-phase candidate filtering and cache-key witnesses, but does not claim a persistent memoized shooting LoS cache; Phase 13B/13C must add or consume a real cache/index before high-volume shooting loops;
+- model silhouette sampling is an explicit deterministic approximation, not an exact hull; downstream cover and Plunging Fire behavior must carry accuracy tests for that sampling budget;
 - LoS witness/debug payloads are replay-safe.
 
 Required tests:
@@ -1514,9 +1527,13 @@ Required tests:
 - terrain visibility fixture can block LoS deterministically;
 - Ruins wall/floor interactions are represented in LoS context;
 - Woods visibility behavior is represented;
-- `TOWERING` and `AIRCRAFT` terrain visibility exceptions are represented;
+- outside `TOWERING` models do not ignore Ruins area visibility, while wholly-within `TOWERING` and Ruins `AIRCRAFT` true-LoS exceptions are represented;
+- Woods `AIRCRAFT` and `TOWERING` true-LoS-through-feature exceptions do not create not-fully-visible cover sources;
+- target-wholly-within and not-fully-visible terrain cover sources are represented independently of LoS-blocker exceptions;
+- Benefit of Cover rejects a LoS witness from a different observer/target query even when terrain cache keys match;
 - model volume participates in visibility checks;
 - terrain visibility cache key changes when terrain revision changes;
+- model silhouette sampling budget is explicit and regression-tested;
 - Benefit of Cover policy result round-trips;
 - LoS witness/debug payload round-trips.
 
@@ -1534,6 +1551,8 @@ Modules:
 - `engine/phases/shooting.py`
 - `engine/shooting_targets.py`
 - `engine/weapon_declaration.py`
+- `engine/transports.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
 
 Objects:
 
@@ -1541,27 +1560,37 @@ Objects:
 - `ShootingUnitSelection`
 - `ShootingTargetCandidate`
 - `WeaponDeclaration`
+- `ShootingDeclarationProposal`
+- `FiringDeckWeaponSelection`
 - `RangedAttackPool`
 
 Invariants:
 
+- all attacker shooting choices are player-facing decisions and must use `DecisionRequest` -> `FiniteOptionSubmission` or `ParameterizedSubmission` -> `DecisionResult` -> `GameLifecycle.submit_decision(...)` -> `DecisionRecord`/`EventRecord`;
+- Phase 13B must update `docs/ADAPTER_DECISION_CONTRACT.md` with every new shooting unit selection, target declaration, weapon declaration, Firing Deck selection, option payload, proposal payload, and viewer-visibility rule introduced;
+- finite shooting options use deterministic option IDs and JSON-safe payloads; parameterized declaration proposals reject stale, drifted, malformed, schema-invalid, or wrong-context submissions before queue pop unless the contract explicitly allows recorded rule-invalid retry attempts;
 - eligible shooting units are derived from current state;
 - units that Advanced/Fell Back cannot shoot unless a rule permits;
 - units locked in combat obey Locked in Combat / Big Guns Never Tire / Pistol restrictions;
 - Big Guns Never Tire applies the correct Hit-roll penalty unless the attack is made with a Pistol;
-- Lone Operative prevents ranged targeting outside its distance gate when applicable;
+- Lone Operative prevents ranged targeting unless the attacker is within the required distance and closest-eligible-target condition when applicable;
 - ranged weapons validate range and visibility at target selection time;
+- targets for all of a unit's ranged weapons are declared before any attack is resolved;
 - a weapon remains resolved against a target selected as visible/in range even if later attacks remove visible/in-range models before resolution;
 - attack declarations group by model, weapon, profile, and target;
+- Firing Deck attack-generation consumption, one-weapon-per-embarked-model validation, temporary Transport weapon attachment, and embarked-unit shot/ineligible state are resolved here from the Phase 10Q hand-off;
 - Hazardous and one-shot-style requirements are explicit descriptors.
 
 Required tests:
 
+- shooting unit selection goes through finite `DecisionRequest`/`DecisionResult` submission and records deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads;
+- weapon and target declaration goes through the adapter contract, including stale/drift/malformed invalid submission coverage and replay payload round-trip;
 - eligible unit selection;
 - Advanced/Fell Back restriction;
 - target range/visibility validation;
-- Lone Operative targeting gate;
+- Lone Operative targeting gate, including closest-eligible-target behavior;
 - Locked in Combat, Big Guns Never Tire, and Pistol interactions;
+- Firing Deck consumes selected embarked models/weapons, rejects duplicate or illegal embarked weapon use, attaches temporary Transport attacks, and marks selected embarked units ineligible to shoot;
 - selected target remains valid for declared weapon resolution after casualties;
 - weapon declaration payload round-trip;
 - invalid target declaration fails without mutation.
@@ -1573,7 +1602,7 @@ Modules:
 - `engine/attack_sequence.py`
 - `engine/damage_allocation.py`
 - `engine/saves.py`
-- `engine/dice.py`
+- `engine/dice.py` and Phase 10J dice/reroll helpers are consumed, not reimplemented
 
 Objects:
 
@@ -1581,7 +1610,11 @@ Objects:
 - `HitRoll`
 - `WoundRoll`
 - `AttackAllocation`
+- `AttackAllocationDecision`
 - `SavingThrow`
+- `SavingThrowDecision`
+- `FeelNoPainDecision`
+- `PlungingFireModifier`
 - `MortalWoundApplication`
 - `DamageApplication`
 - `FastDiceGroup`
@@ -1593,27 +1626,44 @@ Invariants:
 - unmodified Hit roll of 6 is a Critical Hit and always succeeds;
 - unmodified Hit roll of 1 always fails;
 - Hit roll modifiers are capped at +1/-1;
+- Wound roll modifiers are capped at +1/-1;
 - Wound roll target number derives from Strength vs Toughness using the 2+/3+/4+/5+/6+ table;
+- unmodified Wound roll of 6 always succeeds and unmodified Wound roll of 1 always fails;
+- unmodified saving throw roll of 1 always fails;
 - Critical Wounds and wound-roll modification are explicit attack events;
+- all defender allocation, save-kind, optional Feel No Pain, and defensive reaction choices are player-facing decisions routed through `GameLifecycle.submit_decision(...)`; no defender choice may be made by direct engine helper calls, adapters, tests, or UI code;
+- defender-facing requests set the defending controlling player as `actor_id`, are viewer-scoped, and produce deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads;
+- forced allocation/save paths may resolve automatically only when there is exactly one legal rules outcome and no optional player choice;
 - the defender allocates attacks one at a time unless fast dice conditions are satisfied;
 - wounded models or models already allocated attacks this phase must continue receiving allocations until destroyed or all attacks are resolved/saved;
-- armour saves apply AP modifiers and Benefit of Cover where eligible;
+- armour saves apply AP modifiers and Benefit of Cover where eligible, including the Phase 13A non-stacking rule and AP 0 / Save 3+ or better exception flag;
+- attack allocation must call Phase 13A Benefit of Cover with only the allocated model in `target_models`; unit-scoped cover contexts are invalid for final save/AP modifiers because 10e cover is allocated-model specific;
+- Plunging Fire is a descriptor-driven AP modifier that consumes Phase 13A line-of-sight, height, and full-visibility evidence; rulesets that do not support it must return typed unsupported diagnostics instead of silently ignoring it;
 - invulnerable saves ignore AP but otherwise follow saving throw rules; the controlling player may choose armour or invulnerable save where both are available;
 - mortal wounds are allocated one at a time, do not allow saves, and spill over unless the source rule says remaining mortal wounds are lost;
 - mortal wounds from attacks are applied after normal damage from that attacking unit, even if the normal damage was saved;
 - Feel No Pain rolls are per lost wound, including mortal wounds, and only one Feel No Pain ability can be used per lost wound;
 - normal attack excess damage is lost when a model is destroyed;
+- WS, BS, Strength, AP, Damage, and random Attacks/Damage characteristics consume existing descriptor/modifier and Phase 10J dice semantics, including reroll windows and characteristic caps/floors;
 - Fast Dice Rolling is allowed only when BS/WS, Strength, AP, Damage, abilities, and target are the same and order cannot affect the result;
 - random Damage attacks cannot use fast dice in cases where allocation order can affect destroyed/damaged model outcomes;
 - model destruction emits removal records and destruction timing windows.
 
 Required tests:
 
+- defender allocation choice is emitted as a `DecisionRequest`, resolved through `GameLifecycle.submit_decision(...)`, replayed from `DecisionRecord`, and redacted or scoped correctly for viewers;
+- armour-versus-invulnerable save choice is a finite defender `DecisionRequest` when both are legal;
+- optional or competing Feel No Pain choices are finite defender `DecisionRequest`s; forced single-source Feel No Pain paths remain engine-owned deterministic rolls;
+- stale/drift/malformed defender submissions are rejected without mutation;
 - hit/wound/save/damage deterministic dice flow;
 - Hit roll 6 critical/auto-success and 1 auto-fail;
 - Hit modifier cap of +1/-1;
+- Wound modifier cap of +1/-1;
+- unmodified Wound roll 6/1 and unmodified Save roll 1 semantics;
 - Wound roll table boundaries;
-- armour save, invulnerable save, and cover interaction;
+- armour save, invulnerable save, and cover interaction, including non-stacking and AP 0 / Save 3+ or better exception behavior;
+- allocated-model-scoped cover evaluation proves one target model's terrain occupancy cannot grant cover to a different allocated model;
+- Plunging Fire applies only with the required height/visibility evidence and fails explicitly when the selected ruleset does not support it;
 - mortal wound spillover and no-save path;
 - Devastating/Hazardous mortal-wound lost-remainder exceptions where applicable;
 - Feel No Pain per-wound roll path;
@@ -1660,7 +1710,7 @@ Invariants:
 - shooting-coupled Core Stratagems reuse the Phase 12B Stratagem definition, decision, target-binding, CP ledger, and replay contract;
 - every shooting-coupled Core Stratagem timing hook is registered through `StratagemCatalogIndex`; Shooting phase code must not scan the full catalog when a shooting event occurs;
 - Assault changes shooting eligibility and restricts attacks to Assault weapons after Advance;
-- Rapid Fire, Blast, Melta, Heavy, Lance, and Indirect Fire modify characteristics/rolls through typed modifier stacks;
+- Rapid Fire, Blast, Melta, Heavy, Lance, and Indirect Fire modify characteristics/rolls through typed modifier stacks and consume Phase 10J dice/random-characteristic semantics rather than reimplementing dice;
 - Twin-linked grants a Wound-roll reroll permission and consumes Phase 10J reroll semantics;
 - Pistol modifies Locked-in-Combat targeting and weapon selection restrictions;
 - Torrent bypasses Hit rolls and interacts correctly with Indirect Fire restrictions;
@@ -1668,11 +1718,13 @@ Invariants:
 - Anti modifies Critical Wound thresholds based on target keywords;
 - Precision modifies allocation to visible Character models in Attached units;
 - Hazardous tests occur after the unit has resolved all its attacks and allocate mortal wounds to eligible Hazardous-equipped models;
-- Devastating Wounds converts damage to mortal wounds and handles allocation timing;
+- Devastating Wounds behavior is ruleset-descriptor driven: launch 10th Edition may convert damage to mortal wounds, while later dataslate/source packages may instead mark the attack as allowing no saves of any kind; attack resolution must consume the descriptor and must not hard-code one edition's wording;
 - Extra Attacks weapons are additional melee weapons and their Attacks cannot be modified unless the modifying rule names that weapon;
-- Fire Overwatch uses a Phase 12A out-of-phase shooting context and does not trigger unrelated Shooting-phase rules;
+- Fire Overwatch is emitted from legal opponent Movement/Charge reaction windows through the trigger-keyed index, then uses a Phase 12A out-of-phase shooting context and does not trigger unrelated active-player Shooting phase rules;
 - Go to Ground and Smokescreen grant structured, expiring effects through Phase 12A effect machinery and the Benefit of Cover/Hit-roll modifier systems;
+- Go to Ground, Smokescreen, Grenade, and other reactive shooting-coupled Stratagem choices remain non-active-player `use_stratagem` or target-proposal decisions under the adapter contract;
 - Grenade uses deterministic mortal-wound/damage application records and target binding from the shooting context;
+- shooting at `AIRCRAFT` uses descriptor/ability-driven Hit modifier policy, including the applicable `FLY` exception where the selected ruleset enables it;
 - unsupported weapon ability shapes fail explicitly;
 - source IDs are preserved in emitted events.
 
@@ -1680,13 +1732,15 @@ Required tests:
 
 - each supported weapon ability has at least one focused attack-sequence test;
 - each supported shooting-coupled Core Stratagem has decision-contract, CP, target-binding, and replay coverage;
-- each supported shooting-coupled Core Stratagem has a phase-progression/reaction-window test proving the Shooting phase emits it from the trigger-keyed index and resolves it through `GameLifecycle.submit_decision(...)`;
+- Fire Overwatch has phase-progression/reaction-window tests proving Movement and Charge windows emit it from the trigger-keyed index and resolve it through `GameLifecycle.submit_decision(...)`, then resume the parent phase;
+- Go to Ground, Smokescreen, and Grenade have decision-contract tests from their legal shooting-resolution windows;
 - unsupported weapon ability descriptor does not execute;
 - modifier interactions are deterministic;
+- random Attacks and random Damage consume Phase 10J dice/reroll semantics;
 - Twin-linked cannot reroll a Wound roll twice;
 - Indirect Fire applies no-visibility hit penalty, unmodified 1-3 fail, and Benefit of Cover;
 - Pistol and Big Guns Never Tire restrictions interact correctly;
-- Hazardous and Devastating Wounds mortal-wound allocation ordering is correct.
+- Hazardous and descriptor-selected Devastating Wounds damage/no-save or mortal-wound allocation ordering is correct.
 - Fire Overwatch cannot fire outside its legal timing and resumes the parent phase;
 - Go to Ground and Smokescreen expire at the correct timing endpoint;
 - Grenade rejects invalid target bindings without mutation.
@@ -1695,6 +1749,9 @@ Required tests:
 
 Invariants:
 
+- defender allocation choices are emitted as `DecisionRequest`s unless allocation is forced by the rules;
+- save selection, optional Feel No Pain source/use, and destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code;
+- defender allocation and destruction records are viewer-scoped where hidden information can differ;
 - defender allocates attacks according to rules;
 - wounded models must continue receiving damage where applicable;
 - destroyed models are removed with removal records;
@@ -1703,6 +1760,9 @@ Invariants:
 
 Required tests:
 
+- defender allocation and optional defensive decisions produce `DecisionRecord`/`EventRecord` payloads and replay deterministically;
+- stale/drift/malformed defender allocation submissions fail without mutation;
+- viewer-scoped projection/event tests cover any hidden defensive or destruction-reaction payloads;
 - wounded-model allocation priority;
 - destroyed-model removal event;
 - destroyed-model reaction timing;
@@ -1714,6 +1774,7 @@ Required tests:
 
 - full Shooting phase can complete for both players;
 - shooting consumes visibility, cover, weapon declarations, attack sequence, damage allocation, and removal records;
+- shooting completion waits for all pending attacker, defender, and shooting-coupled reaction decisions to resolve through `GameLifecycle.submit_decision(...)`;
 - invalid declarations do not mutate state;
 - shooting phase exits only after all selected/eligible units have resolved or skipped.
 
