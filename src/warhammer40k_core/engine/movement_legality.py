@@ -13,6 +13,11 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainMovementPolicy,
     TerrainMovementPolicyPayload,
 )
+from warhammer40k_core.engine.abilities import (
+    AbilityCatalogIndex,
+    movement_capability_flags_from_index,
+)
+from warhammer40k_core.engine.ability_catalog import tenth_edition_ability_index
 from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     model_displacement_kind_from_token,
@@ -152,28 +157,29 @@ class MovementCapabilitySet:
         keywords: tuple[str, ...],
         *,
         ruleset_descriptor: object,
+        ability_index: AbilityCatalogIndex | None = None,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         normalized_keywords = _validate_keyword_tuple(
             "MovementCapabilitySet keywords",
             keywords,
         )
-        keyword_set = set(normalized_keywords)
-        has_fly = "FLY" in keyword_set
-        is_titanic = "TITANIC" in keyword_set
-        is_infantry = "INFANTRY" in keyword_set
-        is_beast = "BEAST" in keyword_set
-        is_vehicle = "VEHICLE" in keyword_set
-        is_monster = "MONSTER" in keyword_set
-        can_traverse_ruins_walls = bool(
-            keyword_set
-            & {
-                "BEAST",
-                "BELISARIUS_CAWL",
-                "IMPERIUM_PRIMARCH",
-                "INFANTRY",
-            }
+        resolved_ability_index = (
+            tenth_edition_ability_index() if ability_index is None else ability_index
         )
+        flags = set(
+            movement_capability_flags_from_index(
+                index=resolved_ability_index,
+                keywords=normalized_keywords,
+            )
+        )
+        has_fly = "has_fly" in flags
+        is_titanic = "is_titanic" in flags
+        is_infantry = "is_infantry" in flags
+        is_beast = "is_beast" in flags
+        is_vehicle = "is_vehicle" in flags
+        is_monster = "is_monster" in flags
+        can_traverse_ruins_walls = "can_traverse_ruins_walls" in flags
         can_move_through_models = has_fly and descriptor.fly_policy.may_move_through_models
         can_move_through_terrain = can_traverse_ruins_walls or (
             has_fly and descriptor.fly_policy.may_move_through_terrain
@@ -188,14 +194,16 @@ class MovementCapabilitySet:
             is_beast=is_beast,
             is_vehicle=is_vehicle,
             is_monster=is_monster,
-            is_walker="WALKER" in keyword_set,
-            is_aircraft="AIRCRAFT" in keyword_set,
-            is_hover="HOVER" in keyword_set,
+            is_walker="is_walker" in flags,
+            is_aircraft="is_aircraft" in flags,
+            is_hover="is_hover" in flags,
             can_traverse_ruins_walls=can_traverse_ruins_walls,
             can_move_through_models=can_move_through_models,
             can_move_through_terrain=can_move_through_terrain,
             ignores_vertical_distance=ignores_vertical_distance,
-            blocks_friendly_vehicle_monster_pass_through=is_vehicle or is_monster,
+            blocks_friendly_vehicle_monster_pass_through=(
+                "blocks_friendly_vehicle_monster_pass_through" in flags
+            ),
         )
 
     def to_payload(self) -> MovementCapabilitySetPayload:

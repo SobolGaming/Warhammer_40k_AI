@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 12C** is treated as implemented at the time this file was updated. Phase 12D is the next build slice.
+Everything through **Phase 12D** is treated as implemented at the time this file was updated. Phase 13A is the next build slice.
 
 Completed / implemented foundation:
 
@@ -75,6 +75,7 @@ Completed / implemented foundation:
 | 12A | Complete | Timing windows, reaction queue, sequencing, and persisting effects |
 | 12B | Complete | Command Point ledger and Stratagem framework |
 | 12C | Complete | Phase-12-resolvable Core Stratagems |
+| 12D | Complete | Ability handler registry and keyword-gated rule execution |
 
 ## Cross-cutting architectural rules
 
@@ -1417,9 +1418,13 @@ Required tests:
 
 ## Phase 12D: ability handler registry and keyword-gated rule execution
 
+Status: Complete.
+
 Modules:
 
 - `engine/abilities.py`
+- `engine/ability_catalog.py`
+- `rules/source_packages/warhammer_40000_10th/core_abilities.py`
 - `rules/timing.py`
 - `core/datasheet.py`
 - `core/weapon_profiles.py`
@@ -1427,17 +1432,34 @@ Modules:
 Objects:
 
 - `AbilityHandlerRegistry`
+- `AbilityCatalogRecord`
+- `AbilityCatalogIndex`
+- `AbilityTimingDescriptor`
 - `AbilityExecutionContext`
 - `AbilityResolutionResult`
 - `KeywordGate`
 
 Invariants:
 
+- core, keyword, faction, detachment, datasheet, wargear, and weapon abilities are represented as source-linked `AbilityDefinition`/`AbilityCatalogRecord` descriptors;
+- ability candidate dispatch uses a trigger-keyed `AbilityCatalogIndex`; the index is derived, deterministic, not authoritative state, and never replaces runtime timing, source-owner, keyword, input, or handler gates;
+- player/army ability indexes can be pre-partitioned from selected faction, detachment, datasheets, wargear, weapon profiles, and canonical unit/weapon keywords, while runtime gates remain authoritative;
+- every future phase that owns an ability timing window must wire candidate discovery through `AbilityCatalogIndex` and must add regression coverage proving the phase hook does not scan the full ability catalog at event time;
 - ability descriptors are inert until a registered handler executes them;
 - handlers declare timing windows and input requirements;
 - keyword-gated effects use canonical keywords;
+- movement keyword capabilities are resolved from source-backed keyword ability gates, not ad hoc phase-local keyword scans;
 - unsupported ability descriptors remain unsupported rather than fallback-parsed;
 - ability execution records source IDs and replay payloads.
+
+Required tests:
+
+- source-backed 10th Edition ability rows cover the Phase 12D ability families and round-trip without object reprs;
+- `AbilityCatalogIndex` partitions records by `TimingTriggerKind`, preserves deterministic ordering, rejects duplicate records, and produces option-equivalent context lookup to a full tuple scan;
+- `AbilityHandlerRegistry` rejects duplicate and unsupported registrations, validates timing/input/keyword gates, and returns typed unsupported for missing or future handlers;
+- movement keyword capabilities are derived through the ability index and fail closed when a test index omits the relevant keyword gate;
+- player/army ability indexes retain only selected core/keyword, faction, detachment, datasheet, wargear, and weapon-profile records;
+- ability records, execution contexts, and resolution results serialize as deterministic JSON-safe replay payloads.
 
 Initial ability families:
 
