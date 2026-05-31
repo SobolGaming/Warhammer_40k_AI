@@ -42,6 +42,7 @@ if TYPE_CHECKING:
 STRATAGEM_DECISION_TYPE = "use_stratagem"
 STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE = "submit_stratagem_target_proposal"
 STRATAGEM_PROPOSAL_PAYLOAD_KIND = "stratagem_target_binding"
+UNSUPPORTED_STRATAGEM_HANDLER_PREFIX = "unsupported:"
 
 
 class StratagemAvailabilityKind(StrEnum):
@@ -1115,6 +1116,8 @@ def _apply_stratagem_use(
     target_binding: StratagemTargetBinding,
 ) -> StratagemUseRecord:
     definition = catalog_record.definition
+    if _stratagem_handler_is_unsupported(definition):
+        raise GameLifecycleError("Unsupported stratagem handler cannot be applied.")
     use_id = _next_stratagem_use_id(state=state, player_id=context.player_id)
     spend_result: CommandPointSpendResult | None = None
     transaction_id: str | None = None
@@ -1349,6 +1352,8 @@ def _stratagem_unavailable_reason(
         return drift
     if record.disabled:
         return "stratagem_disabled"
+    if _stratagem_handler_is_unsupported(record.definition):
+        return "unsupported_handler"
     if not record.definition.timing.matches(context):
         return "timing_window_mismatch"
     if state.command_point_total(context.player_id) < record.definition.command_point_cost:
@@ -1657,6 +1662,12 @@ def _apply_command_point_effects(
             else "command_points_refund_capped"
         )
         decisions.event_log.append(event_type, refund.to_payload())
+
+
+def _stratagem_handler_is_unsupported(definition: StratagemDefinition) -> bool:
+    if type(definition) is not StratagemDefinition:
+        raise GameLifecycleError("Stratagem handler support check requires a definition.")
+    return definition.handler_id.startswith(UNSUPPORTED_STRATAGEM_HANDLER_PREFIX)
 
 
 def _next_stratagem_use_id(*, state: GameState, player_id: str) -> str:

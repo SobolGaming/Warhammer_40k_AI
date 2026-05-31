@@ -26,6 +26,7 @@ from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionOption,
     DecisionRequest,
+    parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -213,28 +214,109 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
         player_id="player-a",
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     )
-    request = _decision_request(
-        request_stratagem_use(
-            state=state,
-            decisions=lifecycle.decision_controller,
-            catalog_records=source_catalog,
-            context=context,
-        )
+    unavailable = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=source_catalog,
+        context=context,
     )
 
-    assert tuple(option.option_id for option in request.options) == (
-        "use-stratagem:command-reroll:target:none",
+    assert unavailable.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert unavailable.decision_request is None
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    _assert_no_pending(lifecycle)
+
+
+def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions() -> None:
+    finite_lifecycle = _battle_lifecycle()
+    finite_state = _state(finite_lifecycle)
+    _set_current_battle_phase(finite_state, BattlePhase.MOVEMENT)
+    _grant_cp(finite_state, player_id="player-a", amount=1)
+    finite_context = _context(
+        state=finite_state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     )
-    lifecycle.submit_decision(
+    command_reroll = _source_stratagem_record("command-reroll")
+    finite_request = create_stratagem_use_decision_request(
+        state=finite_state,
+        context=finite_context,
+        options=(
+            _stratagem_option_for_record(
+                record=command_reroll,
+                context=finite_context,
+                binding=StratagemTargetBinding.none(),
+            ),
+        ),
+    )
+    finite_lifecycle.decision_controller.request_decision(finite_request)
+    rejected_finite = finite_lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase12b-source-backed-use",
-            request=request,
-            selected_option_id=request.options[0].option_id,
+            result_id="phase12b-unsupported-source-finite",
+            request=finite_request,
+            selected_option_id=finite_request.options[0].option_id,
         )
     )
 
-    assert state.stratagem_use_records[0].source_id == (
-        "gw-10e-core-stratagems:core:command-reroll"
+    assert rejected_finite.status_kind is LifecycleStatusKind.INVALID
+    assert rejected_finite.payload == {"invalid_reason": "unsupported_handler"}
+    assert finite_state.command_point_total("player-a") == 1
+    assert finite_state.stratagem_use_records == []
+    assert finite_lifecycle.decision_controller.queue.pending_requests == (finite_request,)
+
+    parameterized_lifecycle = _battle_lifecycle()
+    parameterized_state = _state(parameterized_lifecycle)
+    _set_current_battle_phase(parameterized_state, BattlePhase.MOVEMENT)
+    _grant_cp(parameterized_state, player_id="player-a", amount=1)
+    rapid_ingress = _source_stratagem_record("rapid-ingress")
+    parameterized_context = _context(
+        state=parameterized_state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=parameterized_context,
+        catalog_record=rapid_ingress,
+    )
+    unavailable_proposal = request_stratagem_target_proposal(
+        state=parameterized_state,
+        decisions=parameterized_lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+
+    assert unavailable_proposal.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert unavailable_proposal.payload == {
+        "player_id": "player-a",
+        "stratagem_id": "rapid-ingress",
+        "unavailable_reason": "unsupported_handler",
+    }
+    assert parameterized_state.command_point_total("player-a") == 1
+    assert parameterized_state.stratagem_use_records == []
+    _assert_no_pending(parameterized_lifecycle)
+
+    pending_proposal_request = DecisionRequest(
+        request_id=parameterized_state.next_decision_request_id(),
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.player_id,
+        payload=validate_json_value({"proposal_request": proposal_request.to_payload()}),
+        options=(parameterized_decision_option(),),
+    )
+    parameterized_lifecycle.decision_controller.request_decision(pending_proposal_request)
+    rejected_parameterized = parameterized_lifecycle.submit_decision(
+        _proposal_result(
+            request=pending_proposal_request,
+            result_id="phase12b-unsupported-source-parameterized",
+            proposal=proposal_request.with_binding(_friendly_binding()),
+        )
+    )
+
+    assert rejected_parameterized.status_kind is LifecycleStatusKind.INVALID
+    assert rejected_parameterized.payload == {"invalid_reason": "unsupported_handler"}
+    assert parameterized_state.command_point_total("player-a") == 1
+    assert parameterized_state.stratagem_use_records == []
+    assert parameterized_lifecycle.decision_controller.queue.pending_requests == (
+        pending_proposal_request,
     )
 
 
@@ -1219,6 +1301,33 @@ def _detachment_stratagem(
         definition=record.definition,
         availability_kind=StratagemAvailabilityKind.DETACHMENT,
         detachment_id=detachment_id,
+    )
+
+
+def _source_stratagem_record(stratagem_id: str) -> StratagemCatalogRecord:
+    for record in tenth_edition_stratagem_catalog_records():
+        if record.definition.stratagem_id == stratagem_id:
+            return record
+    raise AssertionError(f"Missing source stratagem record: {stratagem_id}")
+
+
+def _stratagem_option_for_record(
+    *,
+    record: StratagemCatalogRecord,
+    context: StratagemEligibilityContext,
+    binding: StratagemTargetBinding,
+) -> DecisionOption:
+    return DecisionOption(
+        option_id=f"use-stratagem:{record.definition.stratagem_id}:target:none",
+        label=record.definition.name,
+        payload=validate_json_value(
+            {
+                "submission_kind": STRATAGEM_DECISION_TYPE,
+                "context": context.to_payload(),
+                "catalog_record": record.to_payload(),
+                "target_binding": binding.to_payload(),
+            }
+        ),
     )
 
 

@@ -204,6 +204,8 @@ The finite decision type is `use_stratagem`. A pending request exposes one optio
 - target-binding payload for fully enumerated targets;
 - restriction context such as same-Stratagem-per-phase and any own once-per-turn/battle/per-target rule already checked by the engine.
 
+Source-backed records whose `handler_id` starts with `unsupported:` are catalog descriptors only. They must not emit finite options, must not emit parameterized pending requests, and stale or hand-crafted submissions for them must be rejected with `unsupported_handler` before queue pop, CP spend, or Stratagem-use record creation.
+
 Adapters must not invent `use_stratagem` option IDs, derive new target bindings from displayed payloads, spend CP directly, apply effects directly, or bypass the lifecycle to call lower-level state mutation APIs.
 
 Stratagem decisions may be offered to the non-active player from a reaction window. The acting player on the `DecisionRequest` is authoritative; adapters should not assume the turn player is the player answering the request.
