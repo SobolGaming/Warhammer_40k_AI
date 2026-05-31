@@ -66,7 +66,7 @@ def test_action_options_outside_engagement_are_remain_normal_and_advance() -> No
 
 
 def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
-    config = replace(_infantry_config(), game_id="phase10m-fallback-scan-0006")
+    config = replace(_infantry_config(), game_id="phase10m-fallback-v2-0000")
     lifecycle, movement_status = _advance_to_movement_unit_selection(config)
     _move_first_enemy_model_into_engagement(lifecycle)
 

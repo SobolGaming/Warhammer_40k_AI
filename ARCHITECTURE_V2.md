@@ -1508,11 +1508,13 @@ Invariants:
 - model visible, unit visible, model fully visible, and unit fully visible are separate results;
 - terrain visibility rules are descriptor-driven;
 - Ruins and Woods visibility policies are explicit;
-- Ruins and Woods use rule-specific wholly-within predicates instead of footprint-intersection or blanket keyword bypasses;
-- `AIRCRAFT` uses true LoS through 10e Ruins; 10e Woods uses normal visibility for `AIRCRAFT` and `TOWERING`;
+- Ruins and Woods use rule-specific wholly-within, target-intersection, and keyword-through predicates instead of blanket keyword bypasses;
+- `AIRCRAFT` uses true LoS through 10e Ruins and Woods;
+- `TOWERING` uses true LoS through 10e Woods;
 - `TOWERING` uses true LoS through 10e Ruins only when the `TOWERING` model is wholly within the feature;
 - Benefit of Cover is a policy result, not a shooting side effect;
 - Benefit of Cover consumes independent cover-source evidence for target models wholly within terrain and for terrain that prevents full visibility;
+- Phase 13A cover results may be computed from multi-model target contexts for selection/debug evidence only; Phase 13C attack allocation must evaluate cover with a context scoped to the allocated model so 10e allocated-model cover is not widened to the whole target unit;
 - cover eligibility is visible in attack allocation context;
 - LoS witnesses carry ruleset hash and spatial revision cache-key data;
 - 11e Hidden terrain fields are descriptor preparation only in Phase 13A; distance gates, shot-state loss, and Hidden eligibility/output must fail explicitly until a later shooting slice consumes them;
@@ -1526,6 +1528,7 @@ Required tests:
 - Ruins wall/floor interactions are represented in LoS context;
 - Woods visibility behavior is represented;
 - outside `TOWERING` models do not ignore Ruins area visibility, while wholly-within `TOWERING` and Ruins `AIRCRAFT` true-LoS exceptions are represented;
+- Woods `AIRCRAFT` and `TOWERING` true-LoS-through-feature exceptions do not create not-fully-visible cover sources;
 - target-wholly-within and not-fully-visible terrain cover sources are represented independently of LoS-blocker exceptions;
 - Benefit of Cover rejects a LoS witness from a different observer/target query even when terrain cache keys match;
 - model volume participates in visibility checks;
@@ -1634,6 +1637,7 @@ Invariants:
 - the defender allocates attacks one at a time unless fast dice conditions are satisfied;
 - wounded models or models already allocated attacks this phase must continue receiving allocations until destroyed or all attacks are resolved/saved;
 - armour saves apply AP modifiers and Benefit of Cover where eligible, including the Phase 13A non-stacking rule and AP 0 / Save 3+ or better exception flag;
+- attack allocation must call Phase 13A Benefit of Cover with only the allocated model in `target_models`; unit-scoped cover contexts are invalid for final save/AP modifiers because 10e cover is allocated-model specific;
 - Plunging Fire is a descriptor-driven AP modifier that consumes Phase 13A line-of-sight, height, and full-visibility evidence; rulesets that do not support it must return typed unsupported diagnostics instead of silently ignoring it;
 - invulnerable saves ignore AP but otherwise follow saving throw rules; the controlling player may choose armour or invulnerable save where both are available;
 - mortal wounds are allocated one at a time, do not allow saves, and spill over unless the source rule says remaining mortal wounds are lost;
@@ -1658,6 +1662,7 @@ Required tests:
 - unmodified Wound roll 6/1 and unmodified Save roll 1 semantics;
 - Wound roll table boundaries;
 - armour save, invulnerable save, and cover interaction, including non-stacking and AP 0 / Save 3+ or better exception behavior;
+- allocated-model-scoped cover evaluation proves one target model's terrain occupancy cannot grant cover to a different allocated model;
 - Plunging Fire applies only with the required height/visibility evidence and fails explicitly when the selected ruleset does not support it;
 - mortal wound spillover and no-save path;
 - Devastating/Hazardous mortal-wound lost-remainder exceptions where applicable;

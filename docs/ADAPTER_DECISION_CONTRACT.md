@@ -253,7 +253,7 @@ Required Phase 12 adapter-contract tests:
 
 ## Phase 13 Shooting Decisions
 
-Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` includes deterministic `source_records` with terrain feature ID, feature kind, LoS policy kind, and cover-source reason (`wholly_within_feature` or `not_fully_visible_because_of_feature`).
+Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` includes deterministic `source_records` with terrain feature ID, feature kind, LoS policy kind, and cover-source reason (`wholly_within_feature` or `not_fully_visible_because_of_feature`). Phase 13C attack allocation must request cover evidence with a single allocated target model in `target_models`; multi-model target contexts are selection/debug evidence only and must not drive final save/AP modifiers.
 
 Phase 13B and later shooting slices add player-facing attacker and defender choices. They must not introduce UI, headless, replay, or network-specific mutation paths. Every accepted choice must pass through the same lifecycle submission path and produce deterministic replay-facing records.
 

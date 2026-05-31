@@ -1772,12 +1772,16 @@ def _terrain_feature_visibility_exception(
 ) -> str | None:
     observer_wholly_within = _model_footprint_wholly_within_feature(observer_model, feature)
     target_wholly_within = _model_footprint_wholly_within_feature(target_model, feature)
+    target_intersects = _model_footprint_intersects_feature(target_model, feature)
     observer_keyword_set = set(observer_keywords)
     target_keyword_set = set(target_keywords)
+    has_towering = "TOWERING" in observer_keyword_set or "TOWERING" in target_keyword_set
     if policy.aircraft_uses_true_los_through_feature and (
         "AIRCRAFT" in observer_keyword_set or "AIRCRAFT" in target_keyword_set
     ):
         return "aircraft"
+    if policy.towering_uses_true_los_through_feature and has_towering:
+        return "towering"
     if policy.towering_uses_true_los_when_wholly_within_feature and (
         ("TOWERING" in observer_keyword_set and observer_wholly_within)
         or ("TOWERING" in target_keyword_set and target_wholly_within)
@@ -1785,8 +1789,8 @@ def _terrain_feature_visibility_exception(
         return "towering_wholly_within"
     if policy.uses_true_los_when_observer_wholly_within_feature and observer_wholly_within:
         return "observer_wholly_within"
-    if policy.uses_true_los_when_target_wholly_within_feature and target_wholly_within:
-        return "target_wholly_within"
+    if policy.uses_true_los_when_target_intersects_feature and target_intersects:
+        return "target_intersects"
     return None
 
 

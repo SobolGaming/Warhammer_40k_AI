@@ -194,8 +194,9 @@ class TerrainFeatureVisibilityPolicyPayload(TypedDict):
     blocks_model_visibility_through_footprint: bool
     blocks_full_visibility_through_footprint: bool
     uses_true_los_when_observer_wholly_within_feature: bool
-    uses_true_los_when_target_wholly_within_feature: bool
+    uses_true_los_when_target_intersects_feature: bool
     aircraft_uses_true_los_through_feature: bool
+    towering_uses_true_los_through_feature: bool
     towering_uses_true_los_when_wholly_within_feature: bool
     cover_policy: CoverPolicyDescriptorPayload
 
@@ -823,8 +824,9 @@ class TerrainFeatureVisibilityPolicy:
     blocks_model_visibility_through_footprint: bool
     blocks_full_visibility_through_footprint: bool
     uses_true_los_when_observer_wholly_within_feature: bool
-    uses_true_los_when_target_wholly_within_feature: bool
+    uses_true_los_when_target_intersects_feature: bool
     aircraft_uses_true_los_through_feature: bool
+    towering_uses_true_los_through_feature: bool
     towering_uses_true_los_when_wholly_within_feature: bool
     cover_policy: CoverPolicyDescriptor = field(
         default_factory=CoverPolicyDescriptor.warhammer_40000_tenth_default
@@ -854,12 +856,16 @@ class TerrainFeatureVisibilityPolicy:
             self.uses_true_los_when_observer_wholly_within_feature,
         )
         _validate_bool(
-            "TerrainFeatureVisibilityPolicy uses_true_los_when_target_wholly_within_feature",
-            self.uses_true_los_when_target_wholly_within_feature,
+            "TerrainFeatureVisibilityPolicy uses_true_los_when_target_intersects_feature",
+            self.uses_true_los_when_target_intersects_feature,
         )
         _validate_bool(
             "TerrainFeatureVisibilityPolicy aircraft_uses_true_los_through_feature",
             self.aircraft_uses_true_los_through_feature,
+        )
+        _validate_bool(
+            "TerrainFeatureVisibilityPolicy towering_uses_true_los_through_feature",
+            self.towering_uses_true_los_through_feature,
         )
         _validate_bool(
             "TerrainFeatureVisibilityPolicy towering_uses_true_los_when_wholly_within_feature",
@@ -891,10 +897,11 @@ class TerrainFeatureVisibilityPolicy:
             "uses_true_los_when_observer_wholly_within_feature": (
                 self.uses_true_los_when_observer_wholly_within_feature
             ),
-            "uses_true_los_when_target_wholly_within_feature": (
-                self.uses_true_los_when_target_wholly_within_feature
+            "uses_true_los_when_target_intersects_feature": (
+                self.uses_true_los_when_target_intersects_feature
             ),
             "aircraft_uses_true_los_through_feature": (self.aircraft_uses_true_los_through_feature),
+            "towering_uses_true_los_through_feature": (self.towering_uses_true_los_through_feature),
             "towering_uses_true_los_when_wholly_within_feature": (
                 self.towering_uses_true_los_when_wholly_within_feature
             ),
@@ -915,11 +922,14 @@ class TerrainFeatureVisibilityPolicy:
             uses_true_los_when_observer_wholly_within_feature=payload[
                 "uses_true_los_when_observer_wholly_within_feature"
             ],
-            uses_true_los_when_target_wholly_within_feature=payload[
-                "uses_true_los_when_target_wholly_within_feature"
+            uses_true_los_when_target_intersects_feature=payload[
+                "uses_true_los_when_target_intersects_feature"
             ],
             aircraft_uses_true_los_through_feature=payload[
                 "aircraft_uses_true_los_through_feature"
+            ],
+            towering_uses_true_los_through_feature=payload[
+                "towering_uses_true_los_through_feature"
             ],
             towering_uses_true_los_when_wholly_within_feature=payload[
                 "towering_uses_true_los_when_wholly_within_feature"
@@ -2160,8 +2170,9 @@ def _terrain_feature_visibility_policies_for_tenth(
             blocks_model_visibility_through_footprint=False,
             blocks_full_visibility_through_footprint=False,
             uses_true_los_when_observer_wholly_within_feature=False,
-            uses_true_los_when_target_wholly_within_feature=False,
+            uses_true_los_when_target_intersects_feature=False,
             aircraft_uses_true_los_through_feature=False,
+            towering_uses_true_los_through_feature=False,
             towering_uses_true_los_when_wholly_within_feature=False,
             cover_policy=resolved_cover_policy,
         )
@@ -2174,8 +2185,9 @@ def _terrain_feature_visibility_policies_for_tenth(
         blocks_model_visibility_through_footprint=True,
         blocks_full_visibility_through_footprint=True,
         uses_true_los_when_observer_wholly_within_feature=True,
-        uses_true_los_when_target_wholly_within_feature=True,
+        uses_true_los_when_target_intersects_feature=True,
         aircraft_uses_true_los_through_feature=True,
+        towering_uses_true_los_through_feature=False,
         towering_uses_true_los_when_wholly_within_feature=True,
         cover_policy=resolved_cover_policy,
     )
@@ -2185,8 +2197,9 @@ def _terrain_feature_visibility_policies_for_tenth(
         blocks_model_visibility_through_footprint=False,
         blocks_full_visibility_through_footprint=True,
         uses_true_los_when_observer_wholly_within_feature=True,
-        uses_true_los_when_target_wholly_within_feature=False,
-        aircraft_uses_true_los_through_feature=False,
+        uses_true_los_when_target_intersects_feature=False,
+        aircraft_uses_true_los_through_feature=True,
+        towering_uses_true_los_through_feature=True,
         towering_uses_true_los_when_wholly_within_feature=False,
         cover_policy=resolved_cover_policy,
     )

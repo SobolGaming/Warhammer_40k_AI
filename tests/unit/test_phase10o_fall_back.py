@@ -61,7 +61,7 @@ from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
-_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-scan-0000"
+_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-0000"
 _TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0000"
 _ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0266"
 
@@ -374,7 +374,7 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-result-candidate-00001",
+        result_id="phase10o-two-result-v2-00001",
     )
     removal_request = _decision_request(fall_back_status)
     destroyed_model_ids = (
@@ -643,7 +643,7 @@ def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="test-00008",
+        result_id="phase10o-five-result-v2-00113",
     )
     removal_request = _decision_request(fall_back_status)
     unit_model_ids = tuple(

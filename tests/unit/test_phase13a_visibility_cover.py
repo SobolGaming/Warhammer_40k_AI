@@ -103,15 +103,17 @@ def test_tenth_ruleset_has_explicit_ruins_and_woods_visibility_policies() -> Non
     assert ruins.blocks_model_visibility_through_footprint
     assert ruins.blocks_full_visibility_through_footprint
     assert ruins.uses_true_los_when_observer_wholly_within_feature
-    assert ruins.uses_true_los_when_target_wholly_within_feature
+    assert ruins.uses_true_los_when_target_intersects_feature
     assert ruins.aircraft_uses_true_los_through_feature
+    assert not ruins.towering_uses_true_los_through_feature
     assert ruins.towering_uses_true_los_when_wholly_within_feature
     assert woods.line_of_sight_policy is LineOfSightPolicy.DENSE_COVER
     assert not woods.blocks_model_visibility_through_footprint
     assert woods.blocks_full_visibility_through_footprint
     assert woods.uses_true_los_when_observer_wholly_within_feature
-    assert not woods.uses_true_los_when_target_wholly_within_feature
-    assert not woods.aircraft_uses_true_los_through_feature
+    assert not woods.uses_true_los_when_target_intersects_feature
+    assert woods.aircraft_uses_true_los_through_feature
+    assert woods.towering_uses_true_los_through_feature
     assert not woods.towering_uses_true_los_when_wholly_within_feature
     assert woods.cover_policy.non_stacking
 
@@ -228,7 +230,7 @@ def test_ruins_target_wholly_within_is_visible_and_preserves_cover_source() -> N
     assert witness.unit_visible
     assert witness.unit_fully_visible
     assert {record.exception_applied for record in witness.all_blocker_records()} == {
-        "target_wholly_within"
+        "target_intersects"
     }
     assert cover.has_benefit
     assert cover.source_feature_ids == ("visibility-ruin",)
@@ -237,7 +239,7 @@ def test_ruins_target_wholly_within_is_visible_and_preserves_cover_source() -> N
     }
 
 
-def test_ruins_partial_footprint_intersection_does_not_count_as_wholly_within() -> None:
+def test_ruins_partial_footprint_intersection_is_visible_but_not_wholly_within_cover() -> None:
     feature = _visibility_ruin()
     context = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=_ruleset(),
@@ -250,8 +252,11 @@ def test_ruins_partial_footprint_intersection_does_not_count_as_wholly_within() 
     witness = context.resolve_line_of_sight()
     cover = context.benefit_of_cover(witness)
 
-    assert not witness.unit_visible
-    assert {record.exception_applied for record in witness.all_blocker_records()} == {None}
+    assert witness.unit_visible
+    assert witness.unit_fully_visible
+    assert {record.exception_applied for record in witness.all_blocker_records()} == {
+        "target_intersects"
+    }
     assert not cover.has_benefit
 
 
@@ -296,6 +301,43 @@ def test_observer_wholly_within_woods_sees_out_without_granting_target_cover() -
         "observer_wholly_within"
     }
     assert not cover.has_benefit
+
+
+def test_towering_and_aircraft_use_true_los_through_woods_without_cover_source() -> None:
+    feature = TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0]
+    cache_key = SpatialIndexState.from_terrain_features((feature,)).los_cache_key()
+    towering_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=cache_key,
+        observer_model=_model("observer", -5.0, 0.0),
+        target_models=(_model("target", 5.0, 0.0),),
+        terrain_features=(feature,),
+        observer_keywords=("TOWERING",),
+    )
+    aircraft_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=cache_key,
+        observer_model=_model("observer", -5.0, 0.0),
+        target_models=(_model("target", 5.0, 0.0),),
+        terrain_features=(feature,),
+        target_keywords=("AIRCRAFT",),
+    )
+
+    towering_witness = towering_context.resolve_line_of_sight()
+    aircraft_witness = aircraft_context.resolve_line_of_sight()
+
+    assert towering_witness.unit_visible
+    assert towering_witness.unit_fully_visible
+    assert {record.exception_applied for record in towering_witness.all_blocker_records()} == {
+        "towering"
+    }
+    assert not towering_context.benefit_of_cover(towering_witness).has_benefit
+    assert aircraft_witness.unit_visible
+    assert aircraft_witness.unit_fully_visible
+    assert {record.exception_applied for record in aircraft_witness.all_blocker_records()} == {
+        "aircraft"
+    }
+    assert not aircraft_context.benefit_of_cover(aircraft_witness).has_benefit
 
 
 def test_woods_visibility_blocks_full_visibility_and_grants_cover_policy_result() -> None:
