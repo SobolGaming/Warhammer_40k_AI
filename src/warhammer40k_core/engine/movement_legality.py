@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
+    AbilityHandlerRegistry,
     movement_capability_flags_from_index,
 )
 from warhammer40k_core.engine.ability_catalog import tenth_edition_ability_index
@@ -158,6 +159,7 @@ class MovementCapabilitySet:
         *,
         ruleset_descriptor: object,
         ability_index: AbilityCatalogIndex | None = None,
+        ability_registry: AbilityHandlerRegistry | None = None,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         normalized_keywords = _validate_keyword_tuple(
@@ -171,6 +173,7 @@ class MovementCapabilitySet:
             movement_capability_flags_from_index(
                 index=resolved_ability_index,
                 keywords=normalized_keywords,
+                registry=ability_registry,
             )
         )
         has_fly = "has_fly" in flags
@@ -445,6 +448,8 @@ class MovementLegalityContext:
         movement_mode: object,
         movement_phase_action: object | None,
         displacement_kind: object,
+        ability_index: AbilityCatalogIndex | None = None,
+        ability_registry: AbilityHandlerRegistry | None = None,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         mode = movement_mode_from_token(movement_mode)
@@ -456,6 +461,8 @@ class MovementLegalityContext:
             capabilities=MovementCapabilitySet.from_keywords(
                 keywords,
                 ruleset_descriptor=descriptor,
+                ability_index=ability_index,
+                ability_registry=ability_registry,
             ),
             engagement_policy=EngagementMovementPolicy.from_ruleset_descriptor(
                 descriptor,

@@ -79,7 +79,11 @@ def build_player_ability_index(
             has_weapon_profile_context=catalog is not None,
         ):
             continue
-        if not _record_keyword_gate_matches_army(record=record, army=army):
+        if not _record_keyword_gate_matches_player(
+            record=record,
+            army=army,
+            selected_weapon_keywords=selected_weapon_keywords,
+        ):
             continue
         player_records.append(record)
     return AbilityCatalogIndex.from_records(tuple(player_records))
@@ -152,13 +156,16 @@ def _record_source_matches_player(
     raise GameLifecycleError(f"Unsupported AbilitySourceKind: {source_kind}.")
 
 
-def _record_keyword_gate_matches_army(
+def _record_keyword_gate_matches_player(
     *,
     record: AbilityCatalogRecord,
     army: ArmyDefinition,
+    selected_weapon_keywords: frozenset[str],
 ) -> bool:
     if record.definition.keyword_gate.is_empty:
         return True
+    if record.source_kind is AbilitySourceKind.WEAPON:
+        return record.definition.keyword_gate.matches(tuple(selected_weapon_keywords))
     return any(
         record.definition.keyword_gate.matches((*unit.keywords, *unit.faction_keywords))
         for unit in army.units

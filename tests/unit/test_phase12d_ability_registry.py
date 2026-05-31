@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
+from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -33,14 +40,19 @@ from warhammer40k_core.engine.ability_catalog import (
     tenth_edition_core_ability_index,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.movement_legality import MovementCapabilitySet
+from warhammer40k_core.engine.movement_legality import (
+    MovementCapabilitySet,
+    MovementLegalityContext,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
     core_abilities as source_data,
@@ -245,6 +257,14 @@ def test_keyword_gated_movement_capabilities_are_dispatched_from_ability_index()
         index=full_index,
         keywords=("Fly", "Infantry"),
     ) == ("can_traverse_ruins_walls", "has_fly", "is_infantry")
+    assert (
+        movement_capability_flags_from_index(
+            index=full_index,
+            keywords=("Fly", "Infantry"),
+            registry=AbilityHandlerRegistry.empty(),
+        )
+        == ()
+    )
     assert capabilities.has_fly
     assert capabilities.is_infantry
     assert capabilities.can_move_through_models
@@ -252,6 +272,22 @@ def test_keyword_gated_movement_capabilities_are_dispatched_from_ability_index()
     assert not empty_capabilities.has_fly
     assert not empty_capabilities.can_traverse_ruins_walls
     assert empty_capabilities.keywords == ("FLY", "INFANTRY")
+    missing_handler_capabilities = MovementCapabilitySet.from_keywords(
+        ("Fly", "Infantry"),
+        ruleset_descriptor=descriptor,
+        ability_registry=AbilityHandlerRegistry.empty(),
+    )
+    assert not missing_handler_capabilities.has_fly
+    assert not missing_handler_capabilities.can_traverse_ruins_walls
+    legality_context = MovementLegalityContext.from_keywords(
+        keywords=("Fly", "Infantry"),
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        ability_index=empty_index,
+    )
+    assert not legality_context.capabilities.has_fly
 
     registry_results = execute_abilities_from_index(
         registry=default_ability_handler_registry(),
@@ -348,6 +384,72 @@ def test_player_ability_index_filters_selected_sources() -> None:
     assert tuple(record.definition.ability_id for record in index.all_records()) == tuple(
         sorted(record.definition.ability_id for record in matching)
     )
+
+
+def test_player_index_retains_source_backed_weapon_keyword_records() -> None:
+    records = tenth_edition_ability_catalog_records()
+    normal_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    normal_army = muster_army(
+        catalog=normal_catalog,
+        request=_muster_request(normal_catalog, unit_selections=(_unit_selection(),)),
+    )
+    normal_index = build_player_ability_index(records, army=normal_army, catalog=normal_catalog)
+    hazardous_catalog = _catalog_with_hazardous_bolt_rifle(normal_catalog)
+    hazardous_army = muster_army(
+        catalog=hazardous_catalog,
+        request=_muster_request(hazardous_catalog, unit_selections=(_unit_selection(),)),
+    )
+    hazardous_index = build_player_ability_index(
+        records,
+        army=hazardous_army,
+        catalog=hazardous_catalog,
+    )
+    profile_specific = _ability_record(
+        "selected-profile",
+        source_kind=AbilitySourceKind.WEAPON,
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    unselected_profile = _ability_record(
+        "unselected-profile",
+        source_kind=AbilitySourceKind.WEAPON,
+        weapon_profile_id="missing-profile",
+    )
+    profile_index = build_player_ability_index(
+        (unselected_profile, profile_specific),
+        army=normal_army,
+        catalog=normal_catalog,
+    )
+
+    assert "core-hazardous" not in {
+        record.definition.ability_id for record in normal_index.all_records()
+    }
+    assert "core-hazardous" in {
+        record.definition.ability_id for record in hazardous_index.all_records()
+    }
+    assert tuple(record.definition.ability_id for record in profile_index.all_records()) == (
+        "selected-profile",
+    )
+
+
+def test_weapon_ability_execution_enforces_weapon_event_keywords() -> None:
+    hazardous = _record_by_ability_id(tenth_edition_ability_catalog_records(), "core-hazardous")
+    registry = default_ability_handler_registry()
+    missing_keyword = registry.execute(
+        record=hazardous,
+        context=_context(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
+    )
+    matching_keyword = registry.execute(
+        record=hazardous,
+        context=_context(
+            trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+            source_keywords=("Hazardous",),
+        ),
+    )
+
+    assert missing_keyword.status is AbilityResolutionStatus.INVALID
+    assert missing_keyword.reason == "keyword_gate_closed"
+    assert matching_keyword.status is AbilityResolutionStatus.UNSUPPORTED
+    assert matching_keyword.reason == "unsupported_handler"
 
 
 def test_ability_records_context_and_results_round_trip_as_json_payloads() -> None:
@@ -498,3 +600,21 @@ def _unit_selection(
             ),
         ),
     )
+
+
+def _catalog_with_hazardous_bolt_rifle(catalog: ArmyCatalog) -> ArmyCatalog:
+    updated_wargear: list[Wargear] = []
+    for wargear in catalog.wargear:
+        if wargear.wargear_id != "core-bolt-rifle":
+            updated_wargear.append(wargear)
+            continue
+        updated_wargear.append(
+            replace(
+                wargear,
+                weapon_profiles=tuple(
+                    replace(profile, keywords=(WeaponKeyword.HAZARDOUS,))
+                    for profile in wargear.weapon_profiles
+                ),
+            )
+        )
+    return replace(catalog, wargear=tuple(updated_wargear))

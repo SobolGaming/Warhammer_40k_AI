@@ -822,27 +822,47 @@ def movement_capability_flags_from_index(
     *,
     index: AbilityCatalogIndex,
     keywords: tuple[str, ...],
+    registry: AbilityHandlerRegistry | None = None,
 ) -> tuple[str, ...]:
     if type(index) is not AbilityCatalogIndex:
         raise GameLifecycleError("Movement capability lookup requires an AbilityCatalogIndex.")
+    resolved_registry = default_ability_handler_registry() if registry is None else registry
+    if type(resolved_registry) is not AbilityHandlerRegistry:
+        raise GameLifecycleError("Movement capability lookup requires an AbilityHandlerRegistry.")
     context = AbilityExecutionContext.passive_keyword_gate(source_keywords=keywords)
     flags: list[str] = []
     seen: set[str] = set()
     for record in ability_records_for_context_from_index(index=index, context=context):
         if record.definition.handler_id != CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID:
             continue
-        payload = record.definition.replay_payload
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("Movement keyword ability requires a payload mapping.")
-        raw_flags = payload.get(MOVEMENT_CAPABILITY_FLAGS_PAYLOAD_KEY)
-        if not isinstance(raw_flags, list):
-            raise GameLifecycleError("Movement keyword ability requires capability flags.")
-        for raw_flag in raw_flags:
+        result = resolved_registry.execute(record=record, context=context)
+        for raw_flag in movement_capability_flags_from_result(result):
             flag = _validate_identifier("movement capability flag", raw_flag)
             if flag not in seen:
                 seen.add(flag)
                 flags.append(flag)
     return tuple(sorted(flags))
+
+
+def movement_capability_flags_from_result(
+    result: AbilityResolutionResult,
+) -> tuple[str, ...]:
+    if type(result) is not AbilityResolutionResult:
+        raise GameLifecycleError("Movement capability flags require an AbilityResolutionResult.")
+    if result.status is not AbilityResolutionStatus.APPLIED:
+        return ()
+    payload = result.replay_payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Movement keyword handler requires a replay payload mapping.")
+    raw_effect_payload = payload.get("effect_payload")
+    if not isinstance(raw_effect_payload, dict):
+        raise GameLifecycleError("Movement keyword handler requires an effect payload mapping.")
+    raw_flags = raw_effect_payload.get(MOVEMENT_CAPABILITY_FLAGS_PAYLOAD_KEY)
+    if not isinstance(raw_flags, list):
+        raise GameLifecycleError("Movement keyword handler requires capability flags.")
+    return tuple(
+        sorted(_validate_identifier("movement capability flag", flag) for flag in raw_flags)
+    )
 
 
 def ability_source_kind_from_token(token: object) -> AbilitySourceKind:
