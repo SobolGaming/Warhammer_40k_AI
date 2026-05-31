@@ -99,7 +99,6 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             handler_id="core:command-reroll",
             eligible_roll_types=(
                 "advance_roll",
-                "battle_shock_roll",
                 "charge_roll",
                 "damage_roll",
                 "desperate_escape_roll",

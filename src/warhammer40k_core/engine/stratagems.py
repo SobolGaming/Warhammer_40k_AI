@@ -1876,6 +1876,8 @@ def _command_reroll_context_error(
 ) -> str | None:
     try:
         roll_state = _command_reroll_state(context)
+        if roll_state.original_result.spec.actor_id != context.player_id:
+            return "dice_roll_actor_drift"
         roll_type = roll_state.original_result.spec.roll_type
         if roll_type not in definition.eligible_roll_types:
             return "ineligible_dice_roll_type"
@@ -2261,6 +2263,8 @@ def _apply_command_reroll_handler(
     use_record: StratagemUseRecord,
 ) -> None:
     roll_state = _command_reroll_state(context)
+    if roll_state.original_result.spec.actor_id != context.player_id:
+        raise GameLifecycleError("Command Re-roll roll actor was not prevalidated.")
     roll_type = roll_state.original_result.spec.roll_type
     if roll_type not in definition.eligible_roll_types:
         raise GameLifecycleError("Command Re-roll roll type was not prevalidated.")
