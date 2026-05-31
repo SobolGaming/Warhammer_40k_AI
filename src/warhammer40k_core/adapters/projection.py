@@ -38,7 +38,9 @@ class GameViewPayload(TypedDict):
     mission_setup: JsonValue
     public_secondary_mission_choices: list[JsonValue]
     public_secondary_mission_card_states: list[JsonValue]
+    public_command_point_ledgers: list[JsonValue]
     public_victory_point_ledgers: list[JsonValue]
+    public_stratagem_use_records: list[JsonValue]
     pending_decision: DecisionRequestViewPayload | None
     pending_proposal: MovementProposalRequestPayload | None
     event_count: int
@@ -89,6 +91,9 @@ def project_game_view(
                 viewer_player_id=viewer
             )
         ],
+        "public_command_point_ledgers": [
+            validate_json_value(ledger.to_payload()) for ledger in state.command_point_ledgers
+        ],
         "public_victory_point_ledgers": [
             validate_json_value(
                 ledger.to_public_payload(
@@ -97,6 +102,9 @@ def project_game_view(
                 )
             )
             for ledger in state.victory_point_ledgers
+        ],
+        "public_stratagem_use_records": [
+            validate_json_value(record.to_payload()) for record in state.stratagem_use_records
         ],
         "pending_decision": None
         if pending_request is None

@@ -68,6 +68,14 @@ from warhammer40k_core.engine.sequencing import (
     apply_sequencing_decision_from_request,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_DECISION_TYPE,
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    apply_stratagem_decision,
+    apply_stratagem_target_proposal,
+    invalid_stratagem_target_proposal_status,
+    invalid_stratagem_use_status,
+)
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     TriggeredMovementHandler,
@@ -106,6 +114,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
     )
 )
 _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,))
+_REACTION_FRAME_DECISION_TYPES = frozenset((REACTION_DECISION_TYPE, STRATAGEM_DECISION_TYPE))
 
 
 def _new_decision_controller() -> DecisionController:
@@ -247,6 +256,34 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and pending_request.decision_type == STRATAGEM_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            invalid_status = invalid_stratagem_use_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            invalid_status = invalid_stratagem_target_proposal_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type == SEQUENCING_DECISION_TYPE
         ):
             result.validate_for_request(pending_request)
@@ -296,6 +333,25 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type == REACTION_DECISION_TYPE:
             self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == STRATAGEM_DECISION_TYPE:
+            apply_stratagem_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            apply_stratagem_target_proposal(
+                state=state,
                 result=result,
                 decisions=self.decision_controller,
             )
@@ -384,6 +440,12 @@ class GameLifecycle:
             raise GameLifecycleError("GameLifecycle battle round flow is unavailable.")
         return self._battle_round_flow
 
+    def _result_resolves_active_reaction_frame(self, result: DecisionResult) -> bool:
+        if type(result) is not DecisionResult:
+            raise GameLifecycleError("Reaction frame check requires a DecisionResult.")
+        frames = self.reaction_queue.frames
+        return bool(frames and frames[-1].request_id == result.request_id)
+
 
 def _payload_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
@@ -464,7 +526,7 @@ def _validate_reaction_queue_consistency(
         raise GameLifecycleError("Lifecycle reaction queue requires a current battle phase.")
     if pending_request is None:
         raise GameLifecycleError("Lifecycle reaction queue requires a pending decision.")
-    if pending_request.decision_type != REACTION_DECISION_TYPE:
+    if pending_request.decision_type not in _REACTION_FRAME_DECISION_TYPES:
         raise GameLifecycleError("Lifecycle reaction queue pending decision_type drift.")
     seen_request_ids: set[str] = set()
     for frame in frames:
