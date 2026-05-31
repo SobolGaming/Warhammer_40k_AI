@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
+from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.dice import (
@@ -563,6 +565,38 @@ class StratagemCatalogRecord:
 
 
 @dataclass(frozen=True, slots=True)
+class StratagemCatalogIndex:
+    _records_by_trigger: Mapping[TimingTriggerKind, tuple[StratagemCatalogRecord, ...]]
+    _records: tuple[StratagemCatalogRecord, ...]
+
+    @classmethod
+    def from_records(cls, records: tuple[StratagemCatalogRecord, ...]) -> Self:
+        validated = _validate_catalog_records(records)
+        grouped: dict[TimingTriggerKind, list[StratagemCatalogRecord]] = {}
+        for record in validated:
+            grouped.setdefault(record.definition.timing.trigger_kind, []).append(record)
+        records_by_trigger = {
+            trigger_kind: tuple(records_for_trigger)
+            for trigger_kind, records_for_trigger in grouped.items()
+        }
+        return cls(
+            _records_by_trigger=MappingProxyType(records_by_trigger),
+            _records=validated,
+        )
+
+    def records_for(
+        self,
+        trigger_kind: TimingTriggerKind,
+    ) -> tuple[StratagemCatalogRecord, ...]:
+        if type(trigger_kind) is not TimingTriggerKind:
+            raise GameLifecycleError("StratagemCatalogIndex lookup requires a TimingTriggerKind.")
+        return self._records_by_trigger.get(trigger_kind, ())
+
+    def all_records(self) -> tuple[StratagemCatalogRecord, ...]:
+        return self._records
+
+
+@dataclass(frozen=True, slots=True)
 class StratagemEligibilityContext:
     game_id: str
     player_id: str
@@ -1028,11 +1062,45 @@ def request_stratagem_use(
 ) -> LifecycleStatus:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Stratagem use requires a DecisionController.")
-    options = stratagem_use_options(
+    records = _validate_catalog_records(catalog_records)
+    options = _stratagem_use_options_for_records(
         state=state,
-        catalog_records=catalog_records,
+        records=records,
         context=context,
     )
+    return _request_stratagem_use_with_options(
+        state=state,
+        decisions=decisions,
+        context=context,
+        options=options,
+    )
+
+
+def request_stratagem_use_from_index(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+) -> LifecycleStatus:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Stratagem use requires a DecisionController.")
+    options = stratagem_use_options_from_index(state=state, index=index, context=context)
+    return _request_stratagem_use_with_options(
+        state=state,
+        decisions=decisions,
+        context=context,
+        options=options,
+    )
+
+
+def _request_stratagem_use_with_options(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    options: tuple[DecisionOption, ...],
+) -> LifecycleStatus:
     if not options:
         return LifecycleStatus.unsupported(
             stage=state.stage,
@@ -1081,6 +1149,32 @@ def stratagem_use_options(
     context: StratagemEligibilityContext,
 ) -> tuple[DecisionOption, ...]:
     records = _validate_catalog_records(catalog_records)
+    return _stratagem_use_options_for_records(state=state, records=records, context=context)
+
+
+def stratagem_use_options_from_index(
+    *,
+    state: GameState,
+    index: StratagemCatalogIndex,
+    context: StratagemEligibilityContext,
+) -> tuple[DecisionOption, ...]:
+    if type(index) is not StratagemCatalogIndex:
+        raise GameLifecycleError("Stratagem options require a StratagemCatalogIndex.")
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem options require an eligibility context.")
+    return _stratagem_use_options_for_records(
+        state=state,
+        records=index.records_for(context.trigger_kind),
+        context=context,
+    )
+
+
+def _stratagem_use_options_for_records(
+    *,
+    state: GameState,
+    records: tuple[StratagemCatalogRecord, ...],
+    context: StratagemEligibilityContext,
+) -> tuple[DecisionOption, ...]:
     if type(context) is not StratagemEligibilityContext:
         raise GameLifecycleError("Stratagem options require an eligibility context.")
     options: list[DecisionOption] = []

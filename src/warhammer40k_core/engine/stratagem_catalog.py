@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import cast
+
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.stratagems import (
     StratagemAvailabilityKind,
+    StratagemCatalogIndex,
     StratagemCatalogRecord,
     StratagemCategory,
     StratagemDefinition,
@@ -23,12 +27,48 @@ def tenth_edition_core_stratagem_catalog_records() -> tuple[StratagemCatalogReco
     return tuple(_record_from_source_row(row) for row in source_data.core_stratagem_rows())
 
 
+def tenth_edition_core_stratagem_index() -> StratagemCatalogIndex:
+    return StratagemCatalogIndex.from_records(tenth_edition_core_stratagem_catalog_records())
+
+
 def tenth_edition_detachment_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
     return tuple(_record_from_source_row(row) for row in source_data.detachment_stratagem_rows())
 
 
 def tenth_edition_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
     return tuple(_record_from_source_row(row) for row in source_data.stratagem_rows())
+
+
+def tenth_edition_stratagem_index() -> StratagemCatalogIndex:
+    return StratagemCatalogIndex.from_records(tenth_edition_stratagem_catalog_records())
+
+
+def build_player_stratagem_index(
+    records: tuple[StratagemCatalogRecord, ...],
+    *,
+    detachment_id: str | None,
+    stratagem_ids: tuple[str, ...],
+) -> StratagemCatalogIndex:
+    validated_records = StratagemCatalogIndex.from_records(records).all_records()
+    selected_detachment_id = _validate_optional_identifier(
+        "Player Stratagem index detachment_id",
+        detachment_id,
+    )
+    selected_stratagem_ids = frozenset(
+        _validate_identifier_tuple("Player Stratagem index stratagem_ids", stratagem_ids)
+    )
+    player_records: list[StratagemCatalogRecord] = []
+    for record in validated_records:
+        if record.availability_kind is StratagemAvailabilityKind.CORE:
+            player_records.append(record)
+            continue
+        if (
+            selected_detachment_id is not None
+            and record.detachment_id == selected_detachment_id
+            and record.definition.stratagem_id in selected_stratagem_ids
+        ):
+            player_records.append(record)
+    return StratagemCatalogIndex.from_records(tuple(player_records))
 
 
 def _record_from_source_row(row: source_data.SourceStratagemRow) -> StratagemCatalogRecord:
@@ -66,3 +106,26 @@ def _record_from_source_row(row: source_data.SourceStratagemRow) -> StratagemCat
         detachment_id=row.detachment_id,
         disabled=row.disabled,
     )
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    return tuple(
+        _validate_identifier(field_name, value) for value in cast(tuple[object, ...], values)
+    )
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return stripped

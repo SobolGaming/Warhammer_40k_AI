@@ -1308,6 +1308,7 @@ Objects:
 - `CommandPointRefundResult`
 - `StratagemDefinition`
 - `StratagemCatalogRecord`
+- `StratagemCatalogIndex`
 - `StratagemTimingDescriptor`
 - `StratagemRestrictionPolicy`
 - `StratagemTargetSpec`
@@ -1326,6 +1327,8 @@ Invariants:
 - Stratagem decisions can be offered to the non-active player inside Phase 12A reaction windows, and eligibility context is computed per player for the active timing window;
 - core Stratagems are source-backed `StratagemDefinition`/`StratagemCatalogRecord` descriptors and are always available unless a ruleset disables them;
 - detachment Stratagems are usable only when the player's army selected the matching detachment or another explicit source grants them;
+- Stratagem candidate dispatch uses a trigger-keyed `StratagemCatalogIndex`; the index is derived, deterministic, not authoritative state, and never replaces runtime timing, detachment, CP, target, restriction, or handler gates;
+- core and detachment Stratagem records can be partitioned per player before indexing to avoid considering records the selected detachment can never grant, while the runtime detachment gate remains authoritative;
 - Stratagem definitions include CP cost, category, source ID, normalized WHEN/TARGET/EFFECT/RESTRICTIONS descriptors, timing descriptor, target spec, restriction policy, faction/detachment gate, and handler binding;
 - Stratagems spend, gain, and refund CP only through a bidirectional ledger with deterministic transaction IDs and replay-safe payloads;
 - starting CP, Command-phase +1 CP gain from Phase 11C, non-Command CP gain caps, CP refunds, and CP-granting Stratagem/effect results are ledger transactions, not local counters;
