@@ -1498,6 +1498,7 @@ Objects:
 - `TerrainVisibilityContext`
 - `VisibilityBlockerRecord`
 - `LineOfSightWitness`
+- `CoverSourceRecord`
 - `CoverPolicyDescriptor`
 - `BenefitOfCoverResult`
 
@@ -1507,10 +1508,14 @@ Invariants:
 - model visible, unit visible, model fully visible, and unit fully visible are separate results;
 - terrain visibility rules are descriptor-driven;
 - Ruins and Woods visibility policies are explicit;
-- `AIRCRAFT` and `TOWERING` visibility exceptions for Woods/Ruins are explicit;
+- Ruins and Woods use rule-specific wholly-within predicates instead of footprint-intersection or blanket keyword bypasses;
+- `AIRCRAFT` uses true LoS through 10e Ruins; 10e Woods uses normal visibility for `AIRCRAFT` and `TOWERING`;
+- `TOWERING` uses true LoS through 10e Ruins only when the `TOWERING` model is wholly within the feature;
 - Benefit of Cover is a policy result, not a shooting side effect;
+- Benefit of Cover consumes independent cover-source evidence for target models wholly within terrain and for terrain that prevents full visibility;
 - cover eligibility is visible in attack allocation context;
 - LoS witnesses carry ruleset hash and spatial revision cache-key data;
+- 11e Hidden terrain fields are descriptor preparation only in Phase 13A; distance gates, shot-state loss, and Hidden eligibility/output must fail explicitly until a later shooting slice consumes them;
 - Phase 13A uses deterministic broad-phase candidate filtering and cache-key witnesses, but does not claim a persistent memoized shooting LoS cache; Phase 13B/13C must add or consume a real cache/index before high-volume shooting loops;
 - model silhouette sampling is an explicit deterministic approximation, not an exact hull; downstream cover and Plunging Fire behavior must carry accuracy tests for that sampling budget;
 - LoS witness/debug payloads are replay-safe.
@@ -1520,7 +1525,9 @@ Required tests:
 - terrain visibility fixture can block LoS deterministically;
 - Ruins wall/floor interactions are represented in LoS context;
 - Woods visibility behavior is represented;
-- `TOWERING` and `AIRCRAFT` terrain visibility exceptions are represented;
+- outside `TOWERING` models do not ignore Ruins area visibility, while wholly-within `TOWERING` and Ruins `AIRCRAFT` true-LoS exceptions are represented;
+- target-wholly-within and not-fully-visible terrain cover sources are represented independently of LoS-blocker exceptions;
+- Benefit of Cover rejects a LoS witness from a different observer/target query even when terrain cache keys match;
 - model volume participates in visibility checks;
 - terrain visibility cache key changes when terrain revision changes;
 - model silhouette sampling budget is explicit and regression-tested;

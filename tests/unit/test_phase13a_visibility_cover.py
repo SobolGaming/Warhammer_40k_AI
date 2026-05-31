@@ -23,6 +23,8 @@ from warhammer40k_core.geometry.terrain_factory import TerrainFactory
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
     BenefitOfCoverResultPayload,
+    CoverSourceReason,
+    CoverSourceRecord,
     LineOfSightWitness,
     LineOfSightWitnessPayload,
     ModelLineOfSightRecord,
@@ -100,11 +102,17 @@ def test_tenth_ruleset_has_explicit_ruins_and_woods_visibility_policies() -> Non
     assert ruins.line_of_sight_policy is LineOfSightPolicy.AREA_OBSCURING
     assert ruins.blocks_model_visibility_through_footprint
     assert ruins.blocks_full_visibility_through_footprint
-    assert ruins.aircraft_ignores_feature_visibility
-    assert ruins.towering_ignores_feature_visibility
+    assert ruins.uses_true_los_when_observer_wholly_within_feature
+    assert ruins.uses_true_los_when_target_wholly_within_feature
+    assert ruins.aircraft_uses_true_los_through_feature
+    assert ruins.towering_uses_true_los_when_wholly_within_feature
     assert woods.line_of_sight_policy is LineOfSightPolicy.DENSE_COVER
     assert not woods.blocks_model_visibility_through_footprint
     assert woods.blocks_full_visibility_through_footprint
+    assert woods.uses_true_los_when_observer_wholly_within_feature
+    assert not woods.uses_true_los_when_target_wholly_within_feature
+    assert not woods.aircraft_uses_true_los_through_feature
+    assert not woods.towering_uses_true_los_when_wholly_within_feature
     assert woods.cover_policy.non_stacking
 
 
@@ -154,13 +162,33 @@ def test_ruins_wall_floor_context_records_physical_wall_blockers_not_floors() ->
     assert not any(":floor-" in blocker_id for blocker_id in volume_blocker_ids)
 
 
-def test_towering_and_aircraft_exceptions_are_represented_in_witness_records() -> None:
+def test_towering_outside_ruin_does_not_ignore_area_visibility() -> None:
     feature = _visibility_ruin()
     cache_key = SpatialIndexState.from_terrain_features((feature,)).los_cache_key()
-    towering = TerrainVisibilityContext.from_ruleset_descriptor(
+    witness = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=_ruleset(),
         los_cache_key=cache_key,
         observer_model=_model("observer", -5.0, 0.0),
+        target_models=(_model("target", 5.0, 0.0),),
+        terrain_features=(feature,),
+        observer_keywords=("TOWERING",),
+    ).resolve_line_of_sight()
+
+    assert not witness.unit_visible
+    assert any(
+        record.blocker_id == "visibility-ruin" and record.blocks_model_visibility
+        for record in witness.all_blocker_records()
+    )
+    assert {record.exception_applied for record in witness.all_blocker_records()} == {None}
+
+
+def test_towering_inside_ruin_and_aircraft_exceptions_are_represented_in_witness_records() -> None:
+    feature = _visibility_ruin()
+    cache_key = SpatialIndexState.from_terrain_features((feature,)).los_cache_key()
+    towering_inside = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=cache_key,
+        observer_model=_model("observer", 0.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
         terrain_features=(feature,),
         observer_keywords=("TOWERING",),
@@ -174,12 +202,100 @@ def test_towering_and_aircraft_exceptions_are_represented_in_witness_records() -
         target_keywords=("AIRCRAFT",),
     ).resolve_line_of_sight()
 
-    assert towering.unit_visible
-    assert towering.unit_fully_visible
-    assert {record.exception_applied for record in towering.all_blocker_records()} == {"towering"}
+    assert towering_inside.unit_visible
+    assert towering_inside.unit_fully_visible
+    assert {record.exception_applied for record in towering_inside.all_blocker_records()} == {
+        "towering_wholly_within"
+    }
     assert aircraft.unit_visible
     assert aircraft.unit_fully_visible
     assert {record.exception_applied for record in aircraft.all_blocker_records()} == {"aircraft"}
+
+
+def test_ruins_target_wholly_within_is_visible_and_preserves_cover_source() -> None:
+    feature = _visibility_ruin()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", -5.0, 0.0),
+        target_models=(_model("target", 0.0, 0.0),),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    cover = context.benefit_of_cover(witness)
+
+    assert witness.unit_visible
+    assert witness.unit_fully_visible
+    assert {record.exception_applied for record in witness.all_blocker_records()} == {
+        "target_wholly_within"
+    }
+    assert cover.has_benefit
+    assert cover.source_feature_ids == ("visibility-ruin",)
+    assert CoverSourceReason.WHOLLY_WITHIN_FEATURE in {
+        record.reason for record in cover.source_records
+    }
+
+
+def test_ruins_partial_footprint_intersection_does_not_count_as_wholly_within() -> None:
+    feature = _visibility_ruin()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", -5.0, 0.0),
+        target_models=(_model("target", 2.25, 0.0),),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    cover = context.benefit_of_cover(witness)
+
+    assert not witness.unit_visible
+    assert {record.exception_applied for record in witness.all_blocker_records()} == {None}
+    assert not cover.has_benefit
+
+
+def test_woods_target_wholly_within_preserves_cover_source() -> None:
+    feature = TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0]
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", -5.0, 0.0),
+        target_models=(_model("target", 0.0, 0.0),),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    cover = context.benefit_of_cover(witness)
+
+    assert witness.unit_visible
+    assert not witness.unit_fully_visible
+    assert cover.has_benefit
+    assert cover.source_feature_ids == ("woods-alpha",)
+    assert CoverSourceReason.WHOLLY_WITHIN_FEATURE in {
+        record.reason for record in cover.source_records
+    }
+
+
+def test_observer_wholly_within_woods_sees_out_without_granting_target_cover() -> None:
+    feature = TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0]
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", 0.0, 0.0),
+        target_models=(_model("target", 5.0, 0.0),),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    cover = context.benefit_of_cover(witness)
+
+    assert witness.unit_visible
+    assert witness.unit_fully_visible
+    assert {record.exception_applied for record in witness.all_blocker_records()} == {
+        "observer_wholly_within"
+    }
+    assert not cover.has_benefit
 
 
 def test_woods_visibility_blocks_full_visibility_and_grants_cover_policy_result() -> None:
@@ -204,6 +320,14 @@ def test_woods_visibility_blocks_full_visibility_and_grants_cover_policy_result(
     assert cover.has_benefit
     assert cover.source_feature_ids == ("woods-alpha",)
     assert cover.source_policy_kinds == (LineOfSightPolicy.DENSE_COVER,)
+    assert cover.source_records == (
+        CoverSourceRecord(
+            feature_id="woods-alpha",
+            feature_kind=TerrainFeatureKind.WOODS,
+            policy_kind=LineOfSightPolicy.DENSE_COVER,
+            reason=CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE,
+        ),
+    )
     assert cover.non_stacking
 
 
@@ -379,6 +503,7 @@ def test_phase13a_visibility_objects_fail_fast_on_invalid_shapes() -> None:
             cover_effect=_ruleset().terrain_visibility_policy.cover_effect,
             source_feature_ids=(),
             source_policy_kinds=(LineOfSightPolicy.DENSE_COVER,),
+            source_records=(),
             los_cache_key="los:key",
             target_unit_visible=True,
             target_unit_fully_visible=False,
@@ -391,6 +516,7 @@ def test_phase13a_visibility_objects_fail_fast_on_invalid_shapes() -> None:
             cover_effect=_ruleset().terrain_visibility_policy.cover_effect,
             source_feature_ids=("woods-alpha",),
             source_policy_kinds=(),
+            source_records=(),
             los_cache_key="los:key",
             target_unit_visible=True,
             target_unit_fully_visible=False,
@@ -448,6 +574,22 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
                 model_records=witness.model_records,
             )
         )
+    mismatched_target_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:manual",
+        observer_model=observer,
+        target_models=(_model("different-target", 5.0, 1.5),),
+    )
+    with pytest.raises(GeometryError, match="targets do not match"):
+        mismatched_target_context.benefit_of_cover(witness)
+    mismatched_observer_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:manual",
+        observer_model=_model("different-observer", -5.0, 1.5),
+        target_models=(target,),
+    )
+    with pytest.raises(GeometryError, match="observer does not match"):
+        mismatched_observer_context.benefit_of_cover(witness)
     with pytest.raises(GeometryError, match="VisibilityBlockerKind token"):
         visibility_blocker_kind_from_token("unsupported")
     with pytest.raises(GeometryError, match="must not be empty"):

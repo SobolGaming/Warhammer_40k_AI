@@ -61,8 +61,9 @@ from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-0002"
-_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-0072"
+_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-scan-0000"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0000"
+_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0266"
 
 
 def test_fall_back_domain_payloads_round_trip_without_object_reprs() -> None:
@@ -205,7 +206,9 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
 
 
 def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_state() -> None:
-    lifecycle, action_request = _advance_to_fall_back_action_request()
+    lifecycle, action_request = _advance_to_fall_back_action_request(
+        game_id=_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID,
+    )
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
