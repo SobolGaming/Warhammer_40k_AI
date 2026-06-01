@@ -2235,7 +2235,7 @@ def _roll_hit(
 ) -> HitRoll:
     skill = _hit_skill(pool.weapon_profile)
     is_fire_overwatch = FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
-    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT) and not is_fire_overwatch:
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
         return HitRoll.auto_hit(target_number=skill)
     modifier = pool.hit_roll_modifier + _persisting_hit_roll_modifier(
         state=state,

@@ -1262,6 +1262,78 @@ def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
         assert hit["successful"] is (roll_value == 6)
 
 
+def test_phase13d_fire_overwatch_torrent_weapons_auto_hit() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-fire-overwatch-torrent",
+        keywords=(WeaponKeyword.TORRENT,),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 6),
+    )
+    sequence_id = "phase13d-fire-overwatch-torrent"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    pool = replace(
+        _attack_pool_for_test(
+            attacker=attacker,
+            defender=defender,
+            weapon_profile=weapon_profile,
+            attacks=1,
+        ),
+        targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(pool,),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=wound_spec,
+                    value=1,
+                ),
+            ),
+        ),
+    )
+
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    hit = cast(dict[str, object], hit_payload["payload"])
+    assert remaining_sequence is None
+    assert status is None
+    assert hit["skipped"] is True
+    assert hit["successful"] is True
+    dice_events = [
+        cast(dict[str, object], record.payload)
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "dice_rolled"
+    ]
+    assert {
+        cast(str, cast(dict[str, object], event["spec"])["roll_type"]) for event in dice_events
+    } == {"attack_sequence.wound"}
+
+
 def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
