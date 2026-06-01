@@ -9,6 +9,8 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -57,7 +59,16 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
-from warhammer40k_core.engine.phases.movement import MovementPhaseState, MovementPhaseStepKind
+from warhammer40k_core.engine.phases.movement import (
+    AdvancedUnitState,
+    AdvanceRollRequest,
+    AdvanceRollResult,
+    FellBackUnitState,
+    MovementDiceRecord,
+    MovementPhaseActionKind,
+    MovementPhaseState,
+    MovementPhaseStepKind,
+)
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
@@ -1364,6 +1375,194 @@ def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> N
     assert state.out_of_phase_shooting_state.attack_sequence is None
 
 
+def test_phase13d_fire_overwatch_rejects_fell_back_unit_before_cp_spend() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    state.record_fell_back_unit_state(
+        FellBackUnitState(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            can_shoot=False,
+        )
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    request = _request_fire_overwatch_target_proposal(lifecycle)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+
+    status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-fire-overwatch-fell-back",
+            proposal=proposal,
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {"invalid_reason": "fire_overwatch_unit_ineligible_to_shoot"}
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert state.out_of_phase_shooting_state is None
+
+
+def test_phase13d_fire_overwatch_rejects_advanced_unit_without_assault_before_cp_spend() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    non_assault_profile = replace(
+        base_profile,
+        profile_id="phase13d-fire-overwatch-non-assault-rifle",
+        keywords=tuple(
+            keyword for keyword in base_profile.keywords if keyword is not WeaponKeyword.ASSAULT
+        ),
+    )
+    lifecycle = _battle_lifecycle(
+        config=_config(catalog=_catalog_with_replaced_bolt_profiles((non_assault_profile,)))
+    )
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    state.record_advanced_unit_state(
+        _advanced_unit_state(
+            state=state,
+            player_id="player-a",
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            can_shoot=False,
+        )
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    request = _request_fire_overwatch_target_proposal(lifecycle)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+
+    status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-fire-overwatch-advanced-no-assault",
+            proposal=proposal,
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {"invalid_reason": "fire_overwatch_unit_ineligible_to_shoot"}
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert state.out_of_phase_shooting_state is None
+
+
+def test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    non_assault_profile = replace(
+        base_profile,
+        profile_id="phase13d-fire-overwatch-non-assault-filtered-rifle",
+        keywords=tuple(
+            keyword for keyword in base_profile.keywords if keyword is not WeaponKeyword.ASSAULT
+        ),
+    )
+    assault_profile = replace(
+        base_profile,
+        profile_id="phase13d-fire-overwatch-assault-rifle",
+    )
+    lifecycle = _battle_lifecycle(
+        config=_config(
+            catalog=_catalog_with_replaced_bolt_profiles((non_assault_profile, assault_profile))
+        )
+    )
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    state.record_advanced_unit_state(
+        _advanced_unit_state(
+            state=state,
+            player_id="player-a",
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            can_shoot=False,
+        )
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    request = _request_fire_overwatch_target_proposal(lifecycle)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+
+    shooting_status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-fire-overwatch-advanced-assault",
+            proposal=proposal,
+        )
+    )
+    shooting_request = _decision_request(shooting_status)
+    request_payload = cast(dict[str, object], shooting_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    available_weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+
+    assert shooting_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert shooting_request.decision_type == "submit_shooting_declaration"
+    assert state.command_point_total("player-a") == 0
+    assert len(state.stratagem_use_records) == 1
+    assert state.out_of_phase_shooting_state is not None
+    assert {weapon["weapon_profile_id"] for weapon in available_weapons} == {
+        assault_profile.profile_id
+    }
+
+
 def test_phase13d_go_to_ground_and_smokescreen_register_defensive_effects() -> None:
     go_lifecycle = _battle_lifecycle()
     go_state = _state(go_lifecycle)
@@ -2207,6 +2406,39 @@ def _request_fire_overwatch_target_proposal(
     )
 
 
+def _advanced_unit_state(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+    can_shoot: bool,
+) -> AdvancedUnitState:
+    request = AdvanceRollRequest.for_unit(
+        request_id=f"{unit_instance_id}:advance-roll",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+    )
+    roll_state = DiceRollManager("phase12c-advanced-state").roll_fixed(request.spec, [3])
+    return AdvancedUnitState(
+        player_id=player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=unit_instance_id,
+        movement_dice_record=MovementDiceRecord(
+            player_id=player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            advance_roll=AdvanceRollResult.from_roll_state(
+                request=request,
+                roll_state=roll_state,
+            ),
+        ),
+        can_shoot=can_shoot,
+    )
+
+
 def _reaction_window(state: GameState, *, eligible_player_id: str) -> ReactionWindow:
     return _reaction_window_for_trigger(
         state=state,
@@ -2653,23 +2885,24 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
 def _config(
     *,
     beta_unit_selection_ids: tuple[str, ...] = ("enemy-unit",),
+    catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id="phase12c-game",
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
             descriptor_version="core-v2-phase12c-test"
         ),
-        army_catalog=catalog,
+        army_catalog=resolved_catalog,
         army_muster_requests=(
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_id="intercessor-unit-1",
             ),
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=beta_unit_selection_ids,
@@ -2686,6 +2919,34 @@ def _config(
             defender_player_id="player-b",
         ),
     )
+
+
+def _weapon_profile_by_wargear(
+    *,
+    wargear_id: str,
+    weapon_profile_id: str,
+) -> WeaponProfile:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    for wargear in catalog.wargear:
+        if wargear.wargear_id != wargear_id:
+            continue
+        for profile in wargear.weapon_profiles:
+            if profile.profile_id == weapon_profile_id:
+                return profile
+    raise AssertionError(f"Missing weapon profile {weapon_profile_id}.")
+
+
+def _catalog_with_replaced_bolt_profiles(
+    weapon_profiles: tuple[WeaponProfile, ...],
+) -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    updated_wargear: list[Wargear] = []
+    for wargear in catalog.wargear:
+        if wargear.wargear_id == "core-bolt-rifle":
+            updated_wargear.append(replace(wargear, weapon_profiles=weapon_profiles))
+            continue
+        updated_wargear.append(wargear)
+    return replace(catalog, wargear=tuple(updated_wargear))
 
 
 def _army_muster_request(

@@ -1747,7 +1747,7 @@ Required tests:
 
 - each supported weapon ability has at least one focused attack-sequence test;
 - each supported shooting-coupled Core Stratagem has decision-contract, CP, target-binding, and replay coverage;
-- Fire Overwatch has movement-reaction tests proving it creates an out-of-phase shooting state, rejects out-of-range and TITANIC triggering-unit target bindings before CP spend, constrains declarations to the triggering enemy unit, applies the unmodified-6 hit policy while preserving Torrent auto-hit behavior, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
+- Fire Overwatch has movement-reaction tests proving it creates an out-of-phase shooting state, rejects out-of-range, shooting-ineligible, no-legal-declaration, and TITANIC triggering-unit target bindings before CP spend, constrains declarations to the triggering enemy unit, applies the unmodified-6 hit policy while preserving Torrent auto-hit behavior, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
 - Go to Ground, Smokescreen, and Grenade have decision-contract tests from their legal shooting-resolution windows;
 - unsupported weapon ability descriptor does not execute;
 - modifier interactions are deterministic;

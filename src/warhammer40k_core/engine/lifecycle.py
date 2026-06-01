@@ -405,6 +405,8 @@ class GameLifecycle:
                     state=state,
                     request=pending_request,
                     result=result,
+                    ruleset_descriptor=self._require_config().ruleset_descriptor,
+                    army_catalog=self._require_config().army_catalog,
                 )
                 if invalid_status is not None:
                     return invalid_status

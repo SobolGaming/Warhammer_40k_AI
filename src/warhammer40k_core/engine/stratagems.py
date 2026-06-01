@@ -85,7 +85,11 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.phases.shooting import request_out_of_phase_shooting_declaration
+from warhammer40k_core.engine.phases.shooting import (
+    request_out_of_phase_shooting_declaration,
+    shooting_unit_can_select_to_shoot,
+    shooting_unit_has_legal_declaration_against_targets,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
@@ -1579,6 +1583,16 @@ def _apply_stratagem_use(
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
         raise GameLifecycleError("Unsupported stratagem handler cannot be applied.")
+    violation = _stratagem_unavailable_reason(
+        state=state,
+        record=catalog_record,
+        context=context,
+        target_binding=target_binding,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+    )
+    if violation is not None:
+        raise GameLifecycleError(f"Prevalidated stratagem is no longer legal: {violation}.")
     use_id = _next_stratagem_use_id(state=state, player_id=context.player_id)
     spend_result: CommandPointSpendResult | None = None
     transaction_id: str | None = None
@@ -1639,6 +1653,8 @@ def invalid_stratagem_target_proposal_status(
     state: GameState,
     request: DecisionRequest,
     result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> LifecycleStatus | None:
     if result.selected_option_id != PARAMETERIZED_DECISION_OPTION_ID:
         return _invalid(state, "Stratagem target proposal selected invalid option.", "malformed")
@@ -1662,6 +1678,8 @@ def invalid_stratagem_target_proposal_status(
         record=request_proposal.catalog_record,
         context=request_proposal.context,
         target_binding=submitted_proposal.target_binding,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
     if violation is not None:
         return _invalid(state, "Stratagem target proposal is not legal.", violation)
@@ -1882,6 +1900,8 @@ def _stratagem_unavailable_reason(
     record: StratagemCatalogRecord,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding | None,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
 ) -> str | None:
     if state.stage is not GameLifecycleStage.BATTLE:
         return "not_battle_stage"
@@ -1923,6 +1943,8 @@ def _stratagem_unavailable_reason(
             policy=record.definition.restriction_policy,
             target_binding=target_binding,
             context=context,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
         )
         if target_error is not None:
             return target_error
@@ -2109,6 +2131,8 @@ def _enumerated_target_bindings(
                     policy=definition.restriction_policy,
                     target_binding=binding,
                     context=None,
+                    ruleset_descriptor=None,
+                    army_catalog=None,
                 )
                 is None
             ):
@@ -2135,6 +2159,8 @@ def _target_binding_error(
     policy: StratagemRestrictionPolicy,
     target_binding: StratagemTargetBinding,
     context: StratagemEligibilityContext | None,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
 ) -> str | None:
     if target_spec.target_kind is StratagemTargetKind.NONE:
         if target_binding.target_kind is not StratagemTargetKind.NONE:
@@ -2226,6 +2252,8 @@ def _target_binding_error(
             player_id=player_id,
             context=context,
             target_binding=target_binding,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
         )
     if target_spec.target_policy_id not in {"friendly_unit", "any_unit"}:
         return "unsupported_target_policy"
@@ -2410,6 +2438,8 @@ def _fire_overwatch_target_binding_error(
     player_id: str,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
 ) -> str | None:
     triggering_unit_id = _fire_overwatch_triggering_enemy_unit_id_or_none(context)
     if triggering_unit_id is None:
@@ -2432,6 +2462,25 @@ def _fire_overwatch_target_binding_error(
         distance_inches=FIRE_OVERWATCH_MAX_RANGE_INCHES,
     ):
         return "fire_overwatch_unit_not_within_24"
+    if ruleset_descriptor is None or army_catalog is None:
+        return "fire_overwatch_requires_shooting_rules_context"
+    shooting_unit = _unit_by_id(state=state, unit_instance_id=shooting_unit_id)
+    if not shooting_unit_can_select_to_shoot(
+        state=state,
+        unit=shooting_unit,
+        army_catalog=army_catalog,
+        player_id=player_id,
+    ):
+        return "fire_overwatch_unit_ineligible_to_shoot"
+    if not shooting_unit_has_legal_declaration_against_targets(
+        state=state,
+        unit=shooting_unit,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        player_id=player_id,
+        target_unit_ids=(triggering_unit_id,),
+    ):
+        return "fire_overwatch_no_legal_shooting_declaration"
     return None
 
 

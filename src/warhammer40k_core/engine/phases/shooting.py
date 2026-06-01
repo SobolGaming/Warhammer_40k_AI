@@ -2135,11 +2135,23 @@ def _unit_has_legal_shooting_declaration(
     unit: UnitInstance,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    player_id: str | None = None,
+    target_unit_ids: tuple[str, ...] | None = None,
 ) -> bool:
-    target_unit_ids = _enemy_placed_unit_ids(state=state, player_id=_active_player_id(state))
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    resolved_target_unit_ids = (
+        _enemy_placed_unit_ids(state=state, player_id=actor_id)
+        if target_unit_ids is None
+        else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
+    )
     terrain_features = _terrain_features_for_state(state)
-    for weapon in _available_weapons_for_unit(state=state, unit=unit, army_catalog=army_catalog):
-        for target_unit_id in target_unit_ids:
+    for weapon in _available_weapons_for_unit(
+        state=state,
+        unit=unit,
+        army_catalog=army_catalog,
+        player_id=actor_id,
+    ):
+        for target_unit_id in resolved_target_unit_ids:
             candidate = shooting_target_candidate_for_model(
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
@@ -2152,6 +2164,41 @@ def _unit_has_legal_shooting_declaration(
             if candidate.is_legal:
                 return True
     return False
+
+
+def shooting_unit_can_select_to_shoot(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    army_catalog: ArmyCatalog,
+    player_id: str,
+) -> bool:
+    return _unit_can_select_to_shoot(
+        state=state,
+        unit=unit,
+        army_catalog=army_catalog,
+        player_id=player_id,
+    )
+
+
+def shooting_unit_has_legal_declaration_against_targets(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    player_id: str,
+    target_unit_ids: tuple[str, ...],
+) -> bool:
+    return _unit_has_legal_shooting_declaration(
+        state=state,
+        scenario=_battlefield_scenario(state),
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        player_id=player_id,
+        target_unit_ids=target_unit_ids,
+    )
 
 
 def _unit_can_select_to_shoot(
