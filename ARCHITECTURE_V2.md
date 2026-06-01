@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 13D** is treated as implemented at the time this file was updated, except explicitly deferred source-backed records such as Fire Overwatch's out-of-phase shooting host. Phase 13E is the next build slice.
+Everything through **Phase 13D** is treated as implemented at the time this file was updated. Phase 13E is the next build slice.
 
 Completed / implemented foundation:
 
@@ -1384,10 +1384,10 @@ Initial supported Core Stratagem groups at this build slice:
 - Rapid Ingress;
 - New Orders from Chapter Approved Tactical missions.
 
-Deferred phase-coupled Core Stratagems:
+Later phase-coupled Core Stratagems:
 
 - Go to Ground, Smokescreen, and Grenade are implemented at the Shooting-phase gate after visibility, Benefit of Cover, attack sequencing, and damage allocation exist;
-- Fire Overwatch remains an explicit unsupported descriptor until the engine has an out-of-phase shooting state that can resolve the attack sequence from Movement/Charge reaction windows and then resume the parent phase;
+- Fire Overwatch is implemented at the Phase 13D Shooting/Movement gate through a real out-of-phase shooting state that resolves shooting declaration and attack-sequence decisions from Movement reaction windows before resuming the parent phase;
 - Heroic Intervention, Counter-offensive, Epic Challenge, and Tank Shock are implemented at the Charge/Fight gates after charge movement, fight ordering, melee attacks, and model-target binding exist;
 - deferred Core Stratagem descriptors still exist as explicit unsupported descriptors until their owning phase gate implements them.
 
@@ -1715,11 +1715,8 @@ Initial shooting-coupled Core Stratagem coverage:
 
 - Go to Ground;
 - Smokescreen where applicable;
-- Grenade.
-
-Explicitly deferred shooting-coupled Core Stratagem coverage:
-
-- Fire Overwatch, until out-of-phase shooting state can host Movement/Charge reaction-window shooting without reusing the active player's normal Shooting phase state.
+- Grenade;
+- Fire Overwatch from Movement reaction windows through out-of-phase shooting.
 
 Invariants:
 
@@ -1738,9 +1735,9 @@ Invariants:
 - Hazardous tests occur after the unit has resolved all its attacks and allocate mortal wounds to eligible Hazardous-equipped models;
 - Devastating Wounds behavior is ruleset-descriptor driven: launch 10th Edition may convert damage to mortal wounds, while later dataslate/source packages may instead mark the attack as allowing no saves of any kind; attack resolution must consume the descriptor and must not hard-code one edition's wording;
 - Extra Attacks weapons are additional melee weapons and their Attacks cannot be modified unless the modifying rule names that weapon;
-- Fire Overwatch source descriptors remain explicit `unsupported:` records until a real out-of-phase shooting host exists; marker-only effects are forbidden;
+- Fire Overwatch source descriptors are bound to the out-of-phase shooting host; marker-only effects are forbidden, and the normal Shooting phase state must not be reused as the active player's phase state;
 - Go to Ground and Smokescreen grant structured, expiring effects through Phase 12A effect machinery and the Benefit of Cover/Hit-roll modifier systems, require the pending selected-as-target context, and expire at the active shooting player's phase endpoint;
-- Go to Ground, Smokescreen, and other reactive shooting-coupled Stratagem choices remain non-active-player target-proposal decisions under the adapter contract, while Grenade is an active-player Shooting phase target proposal;
+- Go to Ground, Smokescreen, Fire Overwatch, and other reactive shooting-coupled Stratagem choices remain non-active-player target-proposal decisions under the adapter contract, while Grenade is an active-player Shooting phase target proposal;
 - Grenade uses deterministic mortal-wound/damage application records and target binding from the shooting context, rejects Advanced, Fell Back, already-shot, engaged source, engaged target, out-of-range, and non-visible target contexts before CP spend;
 - shooting at `AIRCRAFT` uses descriptor/ability-driven Hit modifier policy, including the applicable `FLY` exception where the selected ruleset enables it;
 - unsupported weapon ability shapes fail explicitly;
@@ -1750,7 +1747,7 @@ Required tests:
 
 - each supported weapon ability has at least one focused attack-sequence test;
 - each supported shooting-coupled Core Stratagem has decision-contract, CP, target-binding, and replay coverage;
-- Fire Overwatch has explicit unsupported-descriptor tests proving it cannot create marker-only effects before a real out-of-phase shooting host exists;
+- Fire Overwatch has movement-reaction tests proving it creates an out-of-phase shooting state, spends CP only on accepted use, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
 - Go to Ground, Smokescreen, and Grenade have decision-contract tests from their legal shooting-resolution windows;
 - unsupported weapon ability descriptor does not execute;
 - modifier interactions are deterministic;
@@ -1759,7 +1756,7 @@ Required tests:
 - Indirect Fire applies no-visibility hit penalty, unmodified 1-3 fail, and Benefit of Cover;
 - Pistol and Big Guns Never Tire restrictions interact correctly;
 - Hazardous and descriptor-selected Devastating Wounds damage/no-save or deferred mortal-wound allocation ordering is correct.
-- Fire Overwatch cannot spend CP or mutate state while its out-of-phase shooting host is unsupported;
+- Fire Overwatch rejects invalid target bindings before CP spend and does not create marker-only effects;
 - Go to Ground and Smokescreen expire at the correct timing endpoint;
 - Grenade rejects invalid target bindings without mutation.
 

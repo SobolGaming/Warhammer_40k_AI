@@ -16,7 +16,10 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -50,6 +53,10 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -540,11 +547,16 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
 def test_next_movement_unit_is_queued_only_after_activation_terminal_event() -> None:
     lifecycle, action_request = _advance_to_movement_action_request()
 
-    _submit_result(
+    status = _submit_result(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         result_id="phase10c-result-000004",
+    )
+    _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=status,
+        result_id="phase10c-decline-fire-overwatch",
     )
 
     terminal_index = _event_index(lifecycle, "movement_activation_completed")
@@ -566,6 +578,11 @@ def test_advance_movement_mode_completes_activation_and_queues_next_unit() -> No
         request=action_request,
         option_id=MovementPhaseActionKind.ADVANCE.value,
         result_id="phase10c-result-000004",
+    )
+    status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=status,
+        result_id="phase10c-decline-fire-overwatch",
     )
 
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -655,6 +672,27 @@ def _submit_result(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
+        )
+    )
+
+
+def _decline_optional_stratagem_if_pending(
+    lifecycle: GameLifecycle,
+    *,
+    status: LifecycleStatus,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
         )
     )
 

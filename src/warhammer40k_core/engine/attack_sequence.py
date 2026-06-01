@@ -47,7 +47,9 @@ from warhammer40k_core.engine.core_stratagem_effects import (
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
     AttackAllocation,
+    AttackAllocationConstraint,
     AttackAllocationDecision,
     AttackAllocationPayload,
     AttackAllocationRuleContext,
@@ -58,18 +60,23 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainResolution,
     FeelNoPainSource,
     FeelNoPainSourcePayload,
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
     allocation_context_for_unit,
     apply_damage_to_model,
-    apply_mortal_wounds_to_unit,
     build_attack_allocation_request,
     build_feel_no_pain_request,
+    continue_mortal_wound_application,
     damage_kind_from_token,
+    is_mortal_wound_feel_no_pain_request,
     model_by_id,
     resolve_feel_no_pain_rolls,
+    resolve_mortal_wound_feel_no_pain_decision,
     unit_by_id,
     unit_owner_player_id,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -103,6 +110,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
     MELTA_RULE_ID,
+    PRECISION_RULE_ID,
     TWIN_LINKED_RULE_ID,
     DevastatingWoundsResolution,
     anti_keyword_critical_threshold,
@@ -126,6 +134,7 @@ if TYPE_CHECKING:
 ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
     (
         SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_SAVING_THROW_KIND_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     )
@@ -846,6 +855,19 @@ class AttackSequence:
             deferred_mortal_wounds=(*self.deferred_mortal_wounds, deferred),
         )
 
+    def without_deferred_mortal_wounds(self) -> Self:
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            pool_index=self.pool_index,
+            attack_index=self.attack_index,
+            generated_hit_index=self.generated_hit_index,
+            current_hit_roll=self.current_hit_roll,
+            deferred_mortal_wounds=(),
+        )
+
     def to_payload(self) -> AttackSequencePayload:
         return {
             "sequence_id": self.sequence_id,
@@ -1051,87 +1073,52 @@ def resolve_attack_sequence_until_blocked(
             current = devastating_sequence
             continue
 
-        allocation_context = allocation_context_for_unit(
+        precision_request = _precision_request_if_available(
             state=state,
-            target_unit_instance_id=attack_context["target_unit_instance_id"],
-            already_allocated_model_ids=tuple(
-                model_id
-                for model_id in allocated_model_ids
-                if _model_is_alive(state=state, model_instance_id=model_id)
-            ),
-            attacker_constraint=None,
+            attack_sequence=current,
+            attack_context=attack_context,
+            allocated_model_ids=allocated_model_ids,
         )
-        legal_model_ids = allocation_context.legal_model_ids()
-        if not legal_model_ids:
-            raise GameLifecycleError("Attack allocation has no legal target models.")
-        if len(legal_model_ids) > 1:
-            request = build_attack_allocation_request(
-                request_id=state.next_decision_request_id(),
-                defender_player_id=attack_context["defender_player_id"],
-                attack_context=validate_json_value(attack_context),
-                allocation_context=allocation_context,
-            )
-            decisions.request_decision(request)
-            _emit_event(
-                decisions=decisions,
-                hooks=active_hooks,
-                event=AttackSequenceEvent(
-                    step=AttackSequenceStep.ALLOCATE,
-                    sequence_id=current.sequence_id,
-                    attack_context_id=current.attack_context_id(),
-                    pool_index=current.pool_index,
-                    attack_index=current.attack_index,
-                    payload=validate_json_value(
-                        {
-                            "allocation_context": allocation_context.to_payload(),
-                            "forced": False,
-                        }
-                    ),
-                ),
-            )
+        if precision_request is not None:
+            decisions.request_decision(precision_request)
             return (
                 current,
                 allocated_model_ids,
                 LifecycleStatus.waiting_for_decision(
                     stage=GameLifecycleStage.BATTLE,
-                    decision_request=request,
+                    decision_request=precision_request,
                     payload={
                         "phase": BattlePhase.SHOOTING.value,
-                        "decision_type": SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+                        "decision_type": SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
                         "attack_context_id": current.attack_context_id(),
                     },
                 ),
             )
 
-        if len(legal_model_ids) != 1:
-            raise GameLifecycleError("Forced allocation requires exactly one legal model.")
-        allocation = AttackAllocation.from_context(
-            allocation_context,
-            allocated_model_id=legal_model_ids[0],
-            forced=True,
-        )
-        next_sequence, allocated_model_ids, status = _continue_after_allocation(
+        next_sequence, allocated_model_ids, status = _resolve_allocation_stage(
             state=state,
             decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
             manager=manager,
             attack_sequence=current,
             attack_context=attack_context,
-            allocation=allocation,
             allocated_model_ids=allocated_model_ids,
             hooks=active_hooks,
+            attacker_constraint=None,
         )
         if status is not None:
             return next_sequence, allocated_model_ids, status
         if next_sequence is None:
             return None, allocated_model_ids, None
         current = next_sequence
-    _apply_deferred_mortal_wounds(
+    current, status = _apply_deferred_mortal_wounds(
         state=state,
         decisions=decisions,
         manager=manager,
         attack_sequence=current,
     )
+    if status is not None:
+        return current, allocated_model_ids, status
     decisions.event_log.append(
         "attack_sequence_completed",
         {
@@ -1184,6 +1171,50 @@ def apply_attack_allocation_decision(
     )
 
 
+def apply_precision_allocation_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    record = decisions.record_for_result(result)
+    request = record.request
+    result.validate_for_request(request)
+    request_payload = _payload_object(request.payload)
+    attack_context = cast(AttackResolutionContextPayload, request_payload["attack_context"])
+    _validate_lost_wound_context_matches_sequence(
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+    )
+    selected_model_id = _precision_selected_model_id(result.payload)
+    eligible_character_ids = _precision_eligible_character_ids(request_payload)
+    attacker_constraint = None
+    if selected_model_id is not None:
+        if selected_model_id not in eligible_character_ids:
+            raise GameLifecycleError("Precision selected model is not eligible.")
+        attacker_constraint = AttackAllocationConstraint(
+            source_rule_ids=(PRECISION_RULE_ID,),
+            allowed_model_ids=(selected_model_id,),
+            can_allocate_protected_characters=True,
+            attacker_selected_model_id=selected_model_id,
+        )
+    return _resolve_allocation_stage(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        allocated_model_ids=already_allocated_model_ids,
+        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+        attacker_constraint=attacker_constraint,
+    )
+
+
 def apply_saving_throw_decision(
     *,
     state: GameState,
@@ -1232,6 +1263,16 @@ def apply_feel_no_pain_decision(
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
+    if is_mortal_wound_feel_no_pain_request(request):
+        return _apply_deferred_mortal_wound_feel_no_pain_decision(
+            state=state,
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            result=result,
+            request=request,
+            already_allocated_model_ids=already_allocated_model_ids,
+            dice_manager=dice_manager,
+        )
     decision = FeelNoPainDecision.from_result(request=request, result=result)
     request_payload = _payload_object(request.payload)
     source_payloads = request_payload["sources"]
@@ -1355,9 +1396,9 @@ def _apply_deferred_mortal_wounds(
     decisions: DecisionController,
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
-) -> None:
+) -> tuple[AttackSequence, LifecycleStatus | None]:
     if not attack_sequence.deferred_mortal_wounds:
-        return
+        return attack_sequence, None
     mortal_wounds_by_target: dict[str, int] = {}
     attack_context_ids_by_target: dict[str, list[str]] = {}
     for deferred in attack_sequence.deferred_mortal_wounds:
@@ -1366,30 +1407,321 @@ def _apply_deferred_mortal_wounds(
         attack_context_ids_by_target.setdefault(deferred.target_unit_instance_id, []).append(
             deferred.attack_context_id
         )
+    cleared_sequence = attack_sequence.without_deferred_mortal_wounds()
     for target_unit_id, mortal_wounds in mortal_wounds_by_target.items():
-        application = apply_mortal_wounds_to_unit(
-            state=state,
+        progress = MortalWoundApplicationProgress.start(
+            application_id=(
+                f"{attack_sequence.sequence_id}:devastating-wounds:{target_unit_id}:mortal-wounds"
+            ),
+            source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
+            source_context=validate_json_value(
+                {
+                    "source_kind": "devastating_wounds",
+                    "sequence_id": attack_sequence.sequence_id,
+                    "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                    "target_unit_instance_id": target_unit_id,
+                    "attack_context_ids": attack_context_ids_by_target[target_unit_id],
+                }
+            ),
             target_unit_instance_id=target_unit_id,
-            mortal_wounds=mortal_wounds,
-            spill_over=True,
-            dice_manager=manager,
             defender_player_id=unit_owner_player_id(
                 state=state,
                 unit_instance_id=target_unit_id,
             ),
+            mortal_wounds=mortal_wounds,
+            spill_over=True,
         )
-        decisions.event_log.append(
-            "devastating_wounds_mortal_wounds_applied",
+        routed = continue_mortal_wound_application(
+            state=state,
+            request_id=state.next_decision_request_id(),
+            progress=progress,
+            dice_manager=manager,
+        )
+        if routed.request is not None:
+            decisions.request_decision(routed.request)
+            return (
+                cleared_sequence,
+                LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=routed.request,
+                    payload={
+                        "phase": BattlePhase.SHOOTING.value,
+                        "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                        "sequence_id": attack_sequence.sequence_id,
+                        "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
+                    },
+                ),
+            )
+        if routed.application is None:
+            raise GameLifecycleError("Deferred mortal wounds did not produce application.")
+        _emit_deferred_mortal_wounds_applied(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            target_unit_id=target_unit_id,
+            attack_context_ids=tuple(attack_context_ids_by_target[target_unit_id]),
+            mortal_wounds=mortal_wounds,
+            application=routed.application,
+        )
+    return cleared_sequence, None
+
+
+def _emit_deferred_mortal_wounds_applied(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    target_unit_id: str,
+    attack_context_ids: tuple[str, ...],
+    mortal_wounds: int,
+    application: MortalWoundApplication,
+) -> None:
+    decisions.event_log.append(
+        "devastating_wounds_mortal_wounds_applied",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+            "target_unit_instance_id": target_unit_id,
+            "attack_context_ids": list(attack_context_ids),
+            "mortal_wounds": mortal_wounds,
+            "mortal_wound_application": application.to_payload(),
+            "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
+        },
+    )
+
+
+def _apply_deferred_mortal_wound_feel_no_pain_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    request: DecisionRequest,
+    already_allocated_model_ids: tuple[str, ...],
+    dice_manager: DiceRollManager | None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    manager = (
+        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        if dice_manager is None
+        else dice_manager
+    )
+    routed = resolve_mortal_wound_feel_no_pain_decision(
+        state=state,
+        request=request,
+        result=result,
+        next_request_id=state.next_decision_request_id(),
+        dice_manager=manager,
+    )
+    cleared_sequence = attack_sequence.without_deferred_mortal_wounds()
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        return (
+            cleared_sequence,
+            already_allocated_model_ids,
+            LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=routed.request,
+                payload={
+                    "phase": BattlePhase.SHOOTING.value,
+                    "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                    "sequence_id": attack_sequence.sequence_id,
+                    "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
+                },
+            ),
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Deferred mortal wound Feel No Pain did not finish routing.")
+    source_context = _payload_object(routed.progress.source_context)
+    raw_attack_context_ids = source_context.get("attack_context_ids")
+    if not isinstance(raw_attack_context_ids, list):
+        raise GameLifecycleError("Deferred mortal wound source context is missing attacks.")
+    attack_context_ids = tuple(
+        _validate_identifier("Deferred mortal wound attack_context_id", value)
+        for value in raw_attack_context_ids
+    )
+    _emit_deferred_mortal_wounds_applied(
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        target_unit_id=routed.progress.target_unit_instance_id,
+        attack_context_ids=attack_context_ids,
+        mortal_wounds=routed.progress.mortal_wounds,
+        application=routed.application,
+    )
+    return cleared_sequence, already_allocated_model_ids, None
+
+
+def _precision_request_if_available(
+    *,
+    state: GameState,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    allocated_model_ids: tuple[str, ...],
+) -> DecisionRequest | None:
+    pool = attack_sequence.current_pool()
+    if not has_weapon_keyword(pool.weapon_profile, WeaponKeyword.PRECISION):
+        return None
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=attack_context["target_unit_instance_id"],
+        already_allocated_model_ids=_alive_allocated_model_ids(
+            state=state,
+            allocated_model_ids=allocated_model_ids,
+        ),
+        attacker_constraint=None,
+    )
+    eligible_character_ids = tuple(
+        sorted(
+            set(allocation_context.attached_unit_character_model_ids)
+            & set(pool.target_visible_model_ids)
+        )
+    )
+    if not eligible_character_ids:
+        return None
+    return _build_precision_allocation_request(
+        request_id=state.next_decision_request_id(),
+        attacker_player_id=attack_context["attacker_player_id"],
+        attack_context=validate_json_value(attack_context),
+        allocation_context=allocation_context,
+        eligible_character_ids=eligible_character_ids,
+    )
+
+
+def _build_precision_allocation_request(
+    *,
+    request_id: str,
+    attacker_player_id: str,
+    attack_context: JsonValue,
+    allocation_context: AttackAllocationRuleContext,
+    eligible_character_ids: tuple[str, ...],
+) -> DecisionRequest:
+    character_ids = _validate_identifier_tuple(
+        "Precision eligible_character_ids",
+        eligible_character_ids,
+    )
+    if not character_ids:
+        raise GameLifecycleError("Precision allocation request requires eligible characters.")
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        actor_id=attacker_player_id,
+        payload=validate_json_value(
             {
-                "sequence_id": attack_sequence.sequence_id,
-                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                "target_unit_instance_id": target_unit_id,
-                "attack_context_ids": attack_context_ids_by_target[target_unit_id],
-                "mortal_wounds": mortal_wounds,
-                "mortal_wound_application": application.to_payload(),
-                "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
-            },
+                "attack_context": attack_context,
+                "allocation_context": allocation_context.to_payload(),
+                "eligible_character_model_ids": list(character_ids),
+                "decline_option_id": "decline_precision",
+                "source_rule_id": PRECISION_RULE_ID,
+            }
+        ),
+        options=(
+            DecisionOption(
+                option_id="decline_precision",
+                label="Decline Precision",
+                payload={"selected_model_id": None},
+            ),
+            *(
+                DecisionOption(
+                    option_id=model_id,
+                    label=model_id,
+                    payload={"selected_model_id": model_id},
+                )
+                for model_id in character_ids
+            ),
+        ),
+    )
+
+
+def _resolve_allocation_stage(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks,
+    attacker_constraint: AttackAllocationConstraint | None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=attack_context["target_unit_instance_id"],
+        already_allocated_model_ids=_alive_allocated_model_ids(
+            state=state,
+            allocated_model_ids=allocated_model_ids,
+        ),
+        attacker_constraint=attacker_constraint,
+    )
+    legal_model_ids = allocation_context.legal_model_ids()
+    if not legal_model_ids:
+        raise GameLifecycleError("Attack allocation has no legal target models.")
+    if len(legal_model_ids) > 1:
+        request = build_attack_allocation_request(
+            request_id=state.next_decision_request_id(),
+            defender_player_id=attack_context["defender_player_id"],
+            attack_context=validate_json_value(attack_context),
+            allocation_context=allocation_context,
         )
+        decisions.request_decision(request)
+        _emit_event(
+            decisions=decisions,
+            hooks=hooks,
+            event=AttackSequenceEvent(
+                step=AttackSequenceStep.ALLOCATE,
+                sequence_id=attack_sequence.sequence_id,
+                attack_context_id=attack_sequence.attack_context_id(),
+                pool_index=attack_sequence.pool_index,
+                attack_index=attack_sequence.attack_index,
+                payload=validate_json_value(
+                    {
+                        "allocation_context": allocation_context.to_payload(),
+                        "forced": False,
+                    }
+                ),
+            ),
+        )
+        return (
+            attack_sequence,
+            allocated_model_ids,
+            LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=request,
+                payload={
+                    "phase": BattlePhase.SHOOTING.value,
+                    "decision_type": SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+                    "attack_context_id": attack_sequence.attack_context_id(),
+                },
+            ),
+        )
+
+    if len(legal_model_ids) != 1:
+        raise GameLifecycleError("Forced allocation requires exactly one legal model.")
+    allocation = AttackAllocation.from_context(
+        allocation_context,
+        allocated_model_id=legal_model_ids[0],
+        forced=True,
+    )
+    return _continue_after_allocation(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        allocation=allocation,
+        allocated_model_ids=allocated_model_ids,
+        hooks=hooks,
+    )
+
+
+def _alive_allocated_model_ids(
+    *,
+    state: GameState,
+    allocated_model_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    return tuple(
+        model_id
+        for model_id in allocated_model_ids
+        if _model_is_alive(state=state, model_instance_id=model_id)
+    )
 
 
 def _continue_after_allocation(
@@ -2525,6 +2857,23 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Attack sequence payload must be an object.")
     return payload
+
+
+def _precision_selected_model_id(payload: JsonValue) -> str | None:
+    value = _payload_object(payload).get("selected_model_id")
+    if value is None:
+        return None
+    return _validate_identifier("Precision selected_model_id", value)
+
+
+def _precision_eligible_character_ids(payload: dict[str, JsonValue]) -> tuple[str, ...]:
+    raw_ids = payload.get("eligible_character_model_ids")
+    if not isinstance(raw_ids, list):
+        raise GameLifecycleError("Precision request eligible characters must be a list.")
+    return _validate_identifier_tuple(
+        "Precision eligible_character_model_ids",
+        tuple(raw_ids),
+    )
 
 
 def _lost_wound_context_payload(

@@ -87,6 +87,8 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStatePayload,
 )
 from warhammer40k_core.engine.phases.shooting import (
+    OutOfPhaseShootingState,
+    OutOfPhaseShootingStatePayload,
     ShootingPhaseState,
     ShootingPhaseStatePayload,
 )
@@ -193,6 +195,7 @@ class GameStatePayload(TypedDict):
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
     shooting_phase_state: ShootingPhaseStatePayload | None
+    out_of_phase_shooting_state: OutOfPhaseShootingStatePayload | None
     feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
     feel_no_pain_decline_allowed_model_ids: list[str]
     reserve_states: list[ReserveStatePayload]
@@ -573,6 +576,7 @@ class GameState:
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
     shooting_phase_state: ShootingPhaseState | None = None
+    out_of_phase_shooting_state: OutOfPhaseShootingState | None = None
     feel_no_pain_sources_by_model_id: dict[str, tuple[FeelNoPainSource, ...]] = field(
         default_factory=_new_feel_no_pain_sources_by_model_id
     )
@@ -694,6 +698,9 @@ class GameState:
         )
         self.shooting_phase_state = _validate_optional_shooting_phase_state(
             self.shooting_phase_state
+        )
+        self.out_of_phase_shooting_state = _validate_optional_out_of_phase_shooting_state(
+            self.out_of_phase_shooting_state
         )
         self.feel_no_pain_sources_by_model_id = _validate_feel_no_pain_sources_by_model_id(
             self.feel_no_pain_sources_by_model_id,
@@ -943,6 +950,7 @@ class GameState:
                 self.movement_phase_state = None
             if completed_phase is BattlePhase.SHOOTING:
                 self.shooting_phase_state = None
+            self.out_of_phase_shooting_state = None
             self.battle_phase_index += 1
             self._expire_persisting_effects_at_current_phase_start()
             return completed_phase
@@ -968,6 +976,7 @@ class GameState:
             self.movement_phase_state = None
         if completed_phase is BattlePhase.SHOOTING:
             self.shooting_phase_state = None
+        self.out_of_phase_shooting_state = None
         completed_round = self.battle_round
         battle_round_ended = self._active_player_is_last_in_round(completed_player_id)
         if battle_round_ended:
@@ -986,6 +995,7 @@ class GameState:
             self.command_step_state = None
             self.movement_phase_state = None
             self.shooting_phase_state = None
+            self.out_of_phase_shooting_state = None
             return completed_phase
         self.battle_phase_index = 0
         self._advance_active_player_after_completed_turn()
@@ -2061,6 +2071,11 @@ class GameState:
                 if self.shooting_phase_state is None
                 else self.shooting_phase_state.to_payload()
             ),
+            "out_of_phase_shooting_state": (
+                None
+                if self.out_of_phase_shooting_state is None
+                else self.out_of_phase_shooting_state.to_payload()
+            ),
             "feel_no_pain_sources_by_model_id": {
                 model_id: [source.to_payload() for source in sources]
                 for model_id, sources in self.feel_no_pain_sources_by_model_id.items()
@@ -2256,6 +2271,11 @@ class GameState:
                 None
                 if payload["shooting_phase_state"] is None
                 else ShootingPhaseState.from_payload(payload["shooting_phase_state"])
+            ),
+            out_of_phase_shooting_state=(
+                None
+                if payload["out_of_phase_shooting_state"] is None
+                else OutOfPhaseShootingState.from_payload(payload["out_of_phase_shooting_state"])
             ),
             feel_no_pain_sources_by_model_id={
                 model_id: tuple(FeelNoPainSource.from_payload(source) for source in sources)
@@ -2748,6 +2768,18 @@ def _validate_optional_shooting_phase_state(
         return None
     if type(value) is not ShootingPhaseState:
         raise GameLifecycleError("GameState shooting_phase_state must be a ShootingPhaseState.")
+    return value
+
+
+def _validate_optional_out_of_phase_shooting_state(
+    value: object | None,
+) -> OutOfPhaseShootingState | None:
+    if value is None:
+        return None
+    if type(value) is not OutOfPhaseShootingState:
+        raise GameLifecycleError(
+            "GameState out_of_phase_shooting_state must be an OutOfPhaseShootingState."
+        )
     return value
 
 

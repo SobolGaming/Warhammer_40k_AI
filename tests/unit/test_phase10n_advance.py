@@ -23,7 +23,10 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.game_state import GameConfig, GameState
@@ -55,6 +58,10 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
@@ -220,6 +227,11 @@ def test_advance_reroll_request_appears_only_with_legal_reroll_source() -> None:
         option_id=MovementPhaseActionKind.ADVANCE.value,
         result_id="phase10n-result-000004",
     )
+    no_reroll_status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=no_reroll_status,
+        result_id="phase10n-decline-fire-overwatch-no-reroll",
+    )
 
     assert _decision_request(no_reroll_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
 
@@ -251,6 +263,12 @@ def test_advance_reroll_request_appears_only_with_legal_reroll_source() -> None:
         request=reroll_request,
         option_id="reroll:0",
         result_id="phase10n-result-000005",
+    )
+    assert _decision_request(follow_up).decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    follow_up = _decline_optional_stratagem_if_pending(
+        reroll_lifecycle,
+        status=follow_up,
+        result_id="phase10n-decline-fire-overwatch-reroll",
     )
     advanced = _state(reroll_lifecycle).advanced_unit_state_for_unit(
         player_id="player-a",
@@ -459,6 +477,11 @@ def test_advanced_state_clears_at_end_of_active_player_turn() -> None:
         request=action_request,
         option_id=MovementPhaseActionKind.ADVANCE.value,
         result_id="phase10n-result-000004",
+    )
+    next_status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=next_status,
+        result_id="phase10n-decline-fire-overwatch",
     )
     second_unit_status = _submit_result(
         lifecycle,
@@ -755,6 +778,27 @@ def _submit_result(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
+        )
+    )
+
+
+def _decline_optional_stratagem_if_pending(
+    lifecycle: GameLifecycle,
+    *,
+    status: LifecycleStatus,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
         )
     )
 

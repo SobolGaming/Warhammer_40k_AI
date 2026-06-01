@@ -6,6 +6,7 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import (
     DiceExpression,
@@ -50,7 +51,16 @@ from warhammer40k_core.engine.core_stratagem_effects import (
     SMOKESCREEN_EFFECT_KIND,
     SMOKESCREEN_HIT_ROLL_MODIFIER,
 )
-from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.damage_allocation import (
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
+    continue_mortal_wound_application,
+    is_mortal_wound_feel_no_pain_request,
+    mortal_wound_feel_no_pain_source_context,
+    resolve_mortal_wound_feel_no_pain_decision,
+    unit_owner_player_id,
+)
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -75,6 +85,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.phases.shooting import request_out_of_phase_shooting_declaration
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
@@ -1530,6 +1541,8 @@ def apply_stratagem_decision(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> StratagemUseRecord:
     if type(result) is not DecisionResult:
         raise GameLifecycleError("Stratagem application requires a DecisionResult.")
@@ -1544,6 +1557,8 @@ def apply_stratagem_decision(
         context=context,
         catalog_record=catalog_record,
         target_binding=target_binding,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
 
 
@@ -1555,6 +1570,8 @@ def _apply_stratagem_use(
     context: StratagemEligibilityContext,
     catalog_record: StratagemCatalogRecord,
     target_binding: StratagemTargetBinding,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> StratagemUseRecord:
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
@@ -1608,6 +1625,8 @@ def _apply_stratagem_use(
         definition=definition,
         target_binding=target_binding,
         use_record=use_record,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
     return use_record
 
@@ -1651,6 +1670,8 @@ def apply_stratagem_target_proposal(
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> StratagemUseRecord:
     proposal = _proposal_from_result_payload(result.payload)
     if proposal is None or proposal.target_binding is None:
@@ -1670,6 +1691,8 @@ def apply_stratagem_target_proposal(
         context=proposal.context,
         catalog_record=proposal.catalog_record,
         target_binding=proposal.target_binding,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
 
 
@@ -1972,7 +1995,11 @@ def _handler_unavailable_reason(
             )
         return None
     if definition.handler_id == CORE_FIRE_OVERWATCH_HANDLER_ID:
-        return "fire_overwatch_out_of_phase_shooting_unsupported"
+        if context.trigger_kind is not TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE:
+            return "fire_overwatch_requires_enemy_move_trigger"
+        if context.active_player_id == context.player_id:
+            return "fire_overwatch_requires_opponent_turn"
+        return None
     if definition.handler_id in {
         CORE_GO_TO_GROUND_HANDLER_ID,
         CORE_SMOKESCREEN_HANDLER_ID,
@@ -2913,6 +2940,8 @@ def _apply_supported_stratagem_handler(
     definition: StratagemDefinition,
     target_binding: StratagemTargetBinding,
     use_record: StratagemUseRecord,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> None:
     if definition.handler_id == "record_only":
         return
@@ -2949,6 +2978,17 @@ def _apply_supported_stratagem_handler(
             decisions=decisions,
             target_binding=target_binding,
             use_record=use_record,
+        )
+        return
+    if definition.handler_id == CORE_FIRE_OVERWATCH_HANDLER_ID:
+        _apply_fire_overwatch_handler(
+            state=state,
+            decisions=decisions,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
         )
         return
     if definition.handler_id == CORE_GO_TO_GROUND_HANDLER_ID:
@@ -3200,6 +3240,52 @@ def _apply_new_orders_handler(
     )
 
 
+def _apply_fire_overwatch_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+) -> None:
+    if context.trigger_kind is not TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE:
+        raise GameLifecycleError("Fire Overwatch requires an enemy movement trigger.")
+    shooting_unit_id = _require_target_unit_id(target_binding)
+    request_out_of_phase_shooting_declaration(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        player_id=use_record.player_id,
+        unit_instance_id=shooting_unit_id,
+        parent_phase=context.phase,
+        source_rule_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+        source_decision_request_id=use_record.request_id,
+        source_decision_result_id=use_record.result_id,
+        source_context=validate_json_value(
+            {
+                "source_kind": "fire_overwatch",
+                "stratagem_use": use_record.to_payload(),
+                "trigger_kind": context.trigger_kind.value,
+                "trigger_payload": context.trigger_payload,
+            }
+        ),
+    )
+    decisions.event_log.append(
+        "fire_overwatch_shooting_requested",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "shooting_unit_instance_id": shooting_unit_id,
+        },
+    )
+
+
 def _apply_go_to_ground_handler(
     *,
     state: GameState,
@@ -3312,12 +3398,119 @@ def _apply_grenade_handler(
     mortal_wounds = sum(1 for value in roll_state.current_values if value >= 4)
     mortal_application = None
     if mortal_wounds > 0:
-        mortal_application = apply_mortal_wounds_to_unit(
-            state=state,
+        progress = MortalWoundApplicationProgress.start(
+            application_id=f"{use_record.use_id}:grenade:mortal-wounds",
+            source_rule_id=CORE_GRENADE_HANDLER_ID,
+            source_context=validate_json_value(
+                {
+                    "source_kind": "grenade",
+                    "stratagem_use": use_record.to_payload(),
+                    "grenades_unit_instance_id": _require_target_unit_id(target_binding),
+                    "target_unit_instance_id": target_unit_id,
+                    "roll_state": roll_state.to_payload(),
+                }
+            ),
             target_unit_instance_id=target_unit_id,
+            defender_player_id=unit_owner_player_id(
+                state=state,
+                unit_instance_id=target_unit_id,
+            ),
             mortal_wounds=mortal_wounds,
             spill_over=True,
         )
+        routed = continue_mortal_wound_application(
+            state=state,
+            request_id=state.next_decision_request_id(),
+            progress=progress,
+            dice_manager=manager,
+        )
+        if routed.request is not None:
+            decisions.request_decision(routed.request)
+            return
+        if routed.application is None:
+            raise GameLifecycleError("Grenade mortal wounds did not produce application.")
+        mortal_application = routed.application
+    _emit_grenade_resolved(
+        decisions=decisions,
+        state=state,
+        use_record=use_record,
+        grenades_unit_instance_id=_require_target_unit_id(target_binding),
+        target_unit_instance_id=target_unit_id,
+        roll_state=validate_json_value(roll_state.to_payload()),
+        mortal_wounds=mortal_wounds,
+        mortal_application=mortal_application,
+    )
+
+
+def apply_grenade_mortal_wound_feel_no_pain_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    record = decisions.record_for_result(result)
+    request = record.request
+    if not is_mortal_wound_feel_no_pain_request(request):
+        raise GameLifecycleError("Grenade Feel No Pain requires mortal wound context.")
+    source_context = mortal_wound_feel_no_pain_source_context(request)
+    if not isinstance(source_context, dict) or source_context.get("source_kind") != "grenade":
+        raise GameLifecycleError("Grenade Feel No Pain source context is invalid.")
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    routed = resolve_mortal_wound_feel_no_pain_decision(
+        state=state,
+        request=request,
+        result=result,
+        next_request_id=state.next_decision_request_id(),
+        dice_manager=manager,
+    )
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=state.stage,
+            decision_request=routed.request,
+            payload={
+                "phase": state.current_battle_phase.value
+                if state.current_battle_phase is not None
+                else None,
+                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "source_rule_id": CORE_GRENADE_HANDLER_ID,
+            },
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Grenade Feel No Pain did not finish routing.")
+    use_record = StratagemUseRecord.from_payload(
+        cast(StratagemUseRecordPayload, source_context["stratagem_use"])
+    )
+    roll_state_payload = source_context["roll_state"]
+    if not isinstance(roll_state_payload, dict):
+        raise GameLifecycleError("Grenade source context roll_state is invalid.")
+    _emit_grenade_resolved(
+        decisions=decisions,
+        state=state,
+        use_record=use_record,
+        grenades_unit_instance_id=_validate_identifier(
+            "grenades_unit_instance_id",
+            source_context["grenades_unit_instance_id"],
+        ),
+        target_unit_instance_id=routed.progress.target_unit_instance_id,
+        roll_state=validate_json_value(roll_state_payload),
+        mortal_wounds=routed.progress.mortal_wounds,
+        mortal_application=routed.application,
+    )
+    return None
+
+
+def _emit_grenade_resolved(
+    *,
+    decisions: DecisionController,
+    state: GameState,
+    use_record: StratagemUseRecord,
+    grenades_unit_instance_id: str,
+    target_unit_instance_id: str,
+    roll_state: JsonValue,
+    mortal_wounds: int,
+    mortal_application: MortalWoundApplication | None,
+) -> None:
     decisions.event_log.append(
         "grenade_resolved",
         {
@@ -3326,9 +3519,9 @@ def _apply_grenade_handler(
             "battle_round": use_record.battle_round,
             "phase": use_record.phase.value,
             "stratagem_use": use_record.to_payload(),
-            "grenades_unit_instance_id": _require_target_unit_id(target_binding),
-            "target_unit_instance_id": target_unit_id,
-            "roll_state": roll_state.to_payload(),
+            "grenades_unit_instance_id": grenades_unit_instance_id,
+            "target_unit_instance_id": target_unit_instance_id,
+            "roll_state": roll_state,
             "mortal_wounds": mortal_wounds,
             "mortal_wound_application": (
                 None if mortal_application is None else mortal_application.to_payload()

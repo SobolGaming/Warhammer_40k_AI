@@ -21,6 +21,7 @@ INDIRECT_FIRE_NO_VISIBLE_RULE_ID = "weapon-ability:indirect-fire:no-visible-targ
 INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID = "weapon-ability:indirect-fire:benefit-of-cover"
 LETHAL_HITS_RULE_ID = "weapon-ability:lethal-hits"
 MELTA_RULE_ID = "weapon-ability:melta"
+PRECISION_RULE_ID = "weapon-ability:precision"
 RAPID_FIRE_RULE_ID = "weapon-ability:rapid-fire"
 SUSTAINED_HITS_RULE_ID = "weapon-ability:sustained-hits"
 TORRENT_RULE_ID = "weapon-ability:torrent"
