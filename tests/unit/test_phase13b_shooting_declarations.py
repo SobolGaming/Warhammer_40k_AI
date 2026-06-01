@@ -142,6 +142,7 @@ from warhammer40k_core.engine.transports import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     BLAST_RULE_ID,
+    FIRE_OVERWATCH_RULE_ID,
     HEAVY_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
@@ -566,6 +567,119 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_feel_no_pain_choice()
         source_b.source_id,
     }
     assert not _event_payloads(lifecycle, "devastating_wounds_mortal_wounds_applied")
+
+
+def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            ("enemy-a", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            ("enemy-b", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    target_a = units["enemy-a"]
+    target_b = units["enemy-b"]
+    source = FeelNoPainSource(source_id="phase13d-dev-queue-fnp", threshold=5)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=target_a.own_models[0].model_instance_id,
+        sources=(source,),
+        decline_allowed=True,
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-dev-queue-profile",
+        keywords=(WeaponKeyword.DEVASTATING_WOUNDS,),
+        abilities=(AbilityDescriptor.devastating_wounds(),),
+    )
+    pool_a = _attack_pool_for_test(
+        attacker=attacker,
+        defender=target_a,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    pool_b = _attack_pool_for_test(
+        attacker=attacker,
+        defender=target_b,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    deferred_a = DeferredMortalWounds(
+        source_rule_id="weapon-ability:devastating-wounds",
+        target_unit_instance_id=target_a.unit_instance_id,
+        attack_context_id="phase13d-dev-queue:pool-001:attack-001",
+        mortal_wounds=1,
+    )
+    deferred_b = DeferredMortalWounds(
+        source_rule_id="weapon-ability:devastating-wounds",
+        target_unit_instance_id=target_b.unit_instance_id,
+        attack_context_id="phase13d-dev-queue:pool-002:attack-001",
+        mortal_wounds=1,
+    )
+    sequence = AttackSequence(
+        sequence_id="phase13d-dev-queue",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(pool_a, pool_b),
+        pool_index=2,
+        deferred_mortal_wounds=(deferred_a, deferred_b),
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13d-dev-queue",
+            event_log=lifecycle.decision_controller.event_log,
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+
+    assert remaining_sequence is not None
+    assert allocated_ids == ()
+    assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    assert request.options[0].option_id == "decline"
+    assert tuple(
+        deferred.target_unit_instance_id for deferred in remaining_sequence.deferred_mortal_wounds
+    ) == (target_b.unit_instance_id,)
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining_sequence.attack_pools,
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    restored_state = _state(restored)
+    restored_shooting_state = restored_state.shooting_phase_state
+    assert restored_shooting_state is not None
+    restored_sequence = restored_shooting_state.attack_sequence
+    assert restored_sequence is not None
+    assert tuple(
+        deferred.target_unit_instance_id for deferred in restored_sequence.deferred_mortal_wounds
+    ) == (target_b.unit_instance_id,)
+    assert len(restored.decision_controller.queue.pending_requests) == 1
+    restored_request = restored.decision_controller.queue.pending_requests[0]
+
+    restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-dev-queue-decline-fnp",
+            request=restored_request,
+            selected_option_id="decline",
+        )
+    )
+    applied_events = _event_payloads(restored, "devastating_wounds_mortal_wounds_applied")
+    applied_target_ids = {event["target_unit_instance_id"] for event in applied_events}
+
+    assert target_a.unit_instance_id in applied_target_ids
+    assert target_b.unit_instance_id in applied_target_ids
+    assert _state(restored).shooting_phase_state is None
 
 
 def test_phase13d_precision_allocation_can_select_visible_attached_character() -> None:
@@ -1070,6 +1184,82 @@ def test_phase13d_indirect_fire_targets_unseen_units_and_unmodified_one_to_three
     assert status is None
     assert cast(dict[str, object], hit_payload["payload"])["minimum_unmodified_success"] == 4
     assert cast(dict[str, object], hit_payload["payload"])["successful"] is False
+
+
+def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
+    for roll_value in (3, 4, 5, 6):
+        lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+        state = _state(lifecycle)
+        attacker = units["intercessor-1"]
+        defender = units["enemy"]
+        weapon_profile = replace(
+            _first_weapon_profile(lifecycle, attacker),
+            profile_id=f"phase13d-fire-overwatch-hit-{roll_value}",
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        )
+        sequence_id = f"phase13d-fire-overwatch-hit-{roll_value}"
+        attack_context_id = f"{sequence_id}:pool-001:attack-001"
+        hit_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.hit",
+            actor_id="player-a",
+        )
+        wound_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.wound",
+            actor_id="player-a",
+        )
+        pool = replace(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+            hit_roll_modifier=1,
+            targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
+        )
+
+        resolve_attack_sequence_until_blocked(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=AttackSequence.start(
+                sequence_id=sequence_id,
+                attacker_player_id="player-a",
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attack_pools=(pool,),
+            ),
+            already_allocated_model_ids=(),
+            dice_manager=DiceRollManager(
+                sequence_id,
+                event_log=lifecycle.decision_controller.event_log,
+                injected_results=(
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:hit",
+                        spec=hit_spec,
+                        value=roll_value,
+                    ),
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:wound",
+                        spec=wound_spec,
+                        value=1,
+                    ),
+                ),
+            ),
+        )
+
+        hit_payload = _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.HIT,
+        )
+        hit = cast(dict[str, object], hit_payload["payload"])
+        assert hit["minimum_unmodified_success"] == 6
+        assert hit["target_number"] == 3
+        assert hit["modifier"] == 1
+        assert hit["successful"] is (roll_value == 6)
 
 
 def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
@@ -4690,6 +4880,7 @@ def _shooting_lifecycle(
     alpha_unit_ids: tuple[str, ...],
     alpha_datasheets: dict[str, tuple[str, str, int]] | None = None,
     enemy_datasheet: tuple[str, str, int] | None = None,
+    enemy_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
     embarked_unit_ids: tuple[str, ...] = (),
     enemy_pose: Pose | None = None,
     catalog: ArmyCatalog | None = None,
@@ -4699,6 +4890,7 @@ def _shooting_lifecycle(
         alpha_unit_ids=alpha_unit_ids,
         alpha_datasheets=alpha_datasheets,
         enemy_datasheet=enemy_datasheet,
+        enemy_unit_specs=enemy_unit_specs,
         catalog=catalog,
     )
     armies = _mustered_armies(config)
@@ -4713,22 +4905,24 @@ def _shooting_lifecycle(
     }
     battlefield = scenario.battlefield_state
     friendly_unit_index = 0
+    enemy_unit_index = 0
     for unit_key, unit in units.items():
         if unit_key in embarked_unit_ids:
             battlefield = battlefield.without_unit_placement(unit.unit_instance_id)
             continue
         army_id = unit.unit_instance_id.split(":", maxsplit=1)[0]
         player_id = "player-a" if army_id == "army-alpha" else "player-b"
-        if unit_key == "enemy":
+        if army_id == "army-beta":
             poses = tuple(
                 Pose.at(
                     resolved_enemy_pose.position.x + (index * 1.4),
-                    resolved_enemy_pose.position.y,
+                    resolved_enemy_pose.position.y + (enemy_unit_index * 10.0),
                     resolved_enemy_pose.position.z,
                     facing_degrees=180.0,
                 )
                 for index in range(len(unit.own_models))
             )
+            enemy_unit_index += 1
         elif unit.datasheet_id == "core-transport":
             poses = (Pose.at(10.0, 35.0 + (friendly_unit_index * 10.0)),)
         else:
@@ -4822,6 +5016,7 @@ def _config(
     alpha_unit_ids: tuple[str, ...],
     alpha_datasheets: dict[str, tuple[str, str, int]] | None,
     enemy_datasheet: tuple[str, str, int] | None,
+    enemy_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
     catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
@@ -4829,6 +5024,11 @@ def _config(
         ("core-intercessor-like-infantry", "core-intercessor-like", 5)
         if enemy_datasheet is None
         else enemy_datasheet
+    )
+    beta_unit_specs = (
+        (("enemy", enemy_datasheet_id, enemy_model_profile_id, enemy_model_count),)
+        if enemy_unit_specs is None
+        else enemy_unit_specs
     )
     return GameConfig(
         game_id="phase13b-game",
@@ -4851,9 +5051,7 @@ def _config(
                 catalog=resolved_catalog,
                 player_id="player-b",
                 army_id="army-beta",
-                unit_specs=(
-                    ("enemy", enemy_datasheet_id, enemy_model_profile_id, enemy_model_count),
-                ),
+                unit_specs=beta_unit_specs,
             ),
         ),
         player_ids=("player-a", "player-b"),

@@ -61,6 +61,7 @@ from warhammer40k_core.engine.transports import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
+    FIRE_OVERWATCH_RULE_ID,
     blast_attack_bonus,
     blast_rule_id,
     has_weapon_keyword,
@@ -862,6 +863,7 @@ def _request_shooting_declaration(
     army_catalog: ArmyCatalog,
     phase: BattlePhase = BattlePhase.SHOOTING,
     request_context: JsonValue | None = None,
+    target_unit_ids: tuple[str, ...] | None = None,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
@@ -872,9 +874,13 @@ def _request_shooting_declaration(
         army_catalog=army_catalog,
         player_id=active_selection.player_id,
     )
-    target_unit_ids = _enemy_placed_unit_ids(
-        state=state,
-        player_id=active_selection.player_id,
+    candidate_target_unit_ids = (
+        _enemy_placed_unit_ids(
+            state=state,
+            player_id=active_selection.player_id,
+        )
+        if target_unit_ids is None
+        else _validate_identifier_tuple("shooting target_unit_ids", target_unit_ids)
     )
     target_candidates: list[JsonValue] = []
     for weapon in available_weapons:
@@ -884,7 +890,7 @@ def _request_shooting_declaration(
             ruleset_descriptor=ruleset_descriptor,
             attacker_unit=unit,
             weapon_profile=profile,
-            target_unit_ids=target_unit_ids,
+            target_unit_ids=candidate_target_unit_ids,
             terrain_features=terrain_features,
         )
         target_candidates.extend(
@@ -973,6 +979,7 @@ def request_out_of_phase_shooting_declaration(
     source_decision_request_id: str,
     source_decision_result_id: str,
     source_context: JsonValue,
+    target_unit_ids: tuple[str, ...] | None = None,
 ) -> LifecycleStatus:
     if state.out_of_phase_shooting_state is not None:
         raise GameLifecycleError("Out-of-phase shooting state is already active.")
@@ -1007,6 +1014,7 @@ def request_out_of_phase_shooting_declaration(
                 "source_context": source_context,
             }
         ),
+        target_unit_ids=target_unit_ids,
     )
 
 
@@ -1155,6 +1163,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
         decisions=decisions,
         result_id=result.result_id,
         shooting_player_id=out_of_phase_state.player_id,
+        out_of_phase_state=out_of_phase_state,
     )
     if ineligible_unit_ids:
         raise GameLifecycleError("Out-of-phase shooting cannot mark extra units as shot.")
@@ -1373,6 +1382,7 @@ def _validate_out_of_phase_declaration_submission(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         shooting_player_id=out_of_phase_state.player_id,
+        out_of_phase_state=out_of_phase_state,
     )
     if isinstance(attack_validation, ShootingProposalValidationResult):
         return attack_validation
@@ -1388,6 +1398,7 @@ def _attack_pools_for_proposal(
     decisions: DecisionController,
     result_id: str,
     shooting_player_id: str | None = None,
+    out_of_phase_state: OutOfPhaseShootingState | None = None,
 ) -> tuple[tuple[RangedAttackPool, ...], tuple[str, ...]]:
     result = _attack_pools_or_validation(
         state=state,
@@ -1397,6 +1408,7 @@ def _attack_pools_for_proposal(
         attack_count_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
         attack_count_scope_prefix=result_id,
         shooting_player_id=shooting_player_id,
+        out_of_phase_state=out_of_phase_state,
     )
     if isinstance(result, ShootingProposalValidationResult):
         raise GameLifecycleError("Accepted shooting declaration failed revalidation.")
@@ -1417,6 +1429,7 @@ def _attack_pools_or_validation(
     attack_count_manager: DiceRollManager | None = None,
     attack_count_scope_prefix: str | None = None,
     shooting_player_id: str | None = None,
+    out_of_phase_state: OutOfPhaseShootingState | None = None,
 ) -> _AttackPoolValidationResult:
     player_id = proposal.player_id if shooting_player_id is None else shooting_player_id
     unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
@@ -1436,6 +1449,7 @@ def _attack_pools_or_validation(
     if isinstance(firing_deck_validation, ShootingProposalValidationResult):
         return firing_deck_validation
     ineligible_unit_ids = firing_deck_validation
+    allowed_out_of_phase_target_ids = _out_of_phase_allowed_target_unit_ids(out_of_phase_state)
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
@@ -1458,6 +1472,16 @@ def _attack_pools_or_validation(
                 field="declarations",
             )
         weapon_profile = weapon["weapon_profile"]
+        if (
+            allowed_out_of_phase_target_ids is not None
+            and declaration.target_unit_instance_id not in allowed_out_of_phase_target_ids
+        ):
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="out_of_phase_target_unit_drift",
+                message="Out-of-phase shooting declaration target is not allowed by its source.",
+                field="declarations",
+            )
         pistol_validation = _validate_model_pistol_exclusivity(
             state=state,
             selected_unit=unit,
@@ -1523,6 +1547,8 @@ def _attack_pools_or_validation(
             target_within_half_range=target_within_half_range,
             player_id=player_id,
         )
+        if _out_of_phase_uses_fire_overwatch(out_of_phase_state):
+            targeting_rule_ids = (*targeting_rule_ids, FIRE_OVERWATCH_RULE_ID)
         attack_pools.append(
             RangedAttackPool.from_declaration(
                 declaration=declaration,
@@ -1535,6 +1561,31 @@ def _attack_pools_or_validation(
             )
         )
     return (tuple(attack_pools), ineligible_unit_ids)
+
+
+def _out_of_phase_allowed_target_unit_ids(
+    out_of_phase_state: OutOfPhaseShootingState | None,
+) -> tuple[str, ...] | None:
+    if not _out_of_phase_uses_fire_overwatch(out_of_phase_state):
+        return None
+    if out_of_phase_state is None:
+        raise GameLifecycleError("Fire Overwatch out-of-phase state is missing.")
+    source_context = out_of_phase_state.source_context
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Fire Overwatch source context must be an object.")
+    triggering_unit_id = source_context.get("triggering_enemy_unit_instance_id")
+    if type(triggering_unit_id) is not str:
+        raise GameLifecycleError("Fire Overwatch source context is missing triggering unit id.")
+    return (_validate_identifier("Fire Overwatch triggering unit id", triggering_unit_id),)
+
+
+def _out_of_phase_uses_fire_overwatch(
+    out_of_phase_state: OutOfPhaseShootingState | None,
+) -> bool:
+    return (
+        out_of_phase_state is not None
+        and out_of_phase_state.source_rule_id == FIRE_OVERWATCH_RULE_ID
+    )
 
 
 def _validate_model_pistol_exclusivity(

@@ -71,6 +71,7 @@ from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_c
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_DICE_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY,
     GRENADE_TARGET_CONTEXT_KEY,
     SELECTED_TARGET_UNIT_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
@@ -985,17 +986,24 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
     state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
         unit_instance_id="army-beta:enemy-unit",
         poses=tuple(
             Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
         ),
     )
+    _clear_terrain(state)
     _grant_cp(state, player_id="player-a", amount=1)
     record = _source_stratagem_record("fire-overwatch")
     context = _context(
         state=state,
         player_id="player-a",
         trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_payload=_fire_overwatch_trigger_payload(),
     )
     proposal_request = StratagemTargetProposal.for_request(
         context=context,
@@ -1086,17 +1094,24 @@ def test_phase13d_fire_overwatch_rejects_invalid_declaration_before_queue_pop() 
     state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
         unit_instance_id="army-beta:enemy-unit",
         poses=tuple(
             Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
         ),
     )
+    _clear_terrain(state)
     _grant_cp(state, player_id="player-a", amount=1)
     record = _source_stratagem_record("fire-overwatch")
     context = _context(
         state=state,
         player_id="player-a",
         trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_payload=_fire_overwatch_trigger_payload(),
     )
     proposal_request = StratagemTargetProposal.for_request(
         context=context,
@@ -1166,6 +1181,186 @@ def test_phase13d_fire_overwatch_rejects_invalid_declaration_before_queue_pop() 
     assert drift_status.status_kind is LifecycleStatusKind.INVALID
     assert lifecycle.decision_controller.queue.pending_requests == (shooting_request,)
     assert state.command_point_total("player-a") == 0
+    assert state.out_of_phase_shooting_state.attack_sequence is None
+
+
+def test_phase13d_fire_overwatch_rejects_unit_more_than_24_before_cp_spend() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=80.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    request = _request_fire_overwatch_target_proposal(lifecycle)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+
+    status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-fire-overwatch-too-far",
+            proposal=proposal,
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {
+        "invalid_reason": "fire_overwatch_unit_not_within_24",
+    }
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+
+
+def test_phase13d_fire_overwatch_rejects_titanic_trigger_before_cp_spend() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        keywords=("TITANIC", "VEHICLE"),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    request = _request_fire_overwatch_target_proposal(lifecycle)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+
+    status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-fire-overwatch-titanic",
+            proposal=proposal,
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {"invalid_reason": "fire_overwatch_target_titanic"}
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+
+
+def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> None:
+    lifecycle = _battle_lifecycle(
+        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+    )
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit-2",
+        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=12.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    target_request = _request_fire_overwatch_target_proposal(
+        lifecycle,
+        moved_unit_instance_id="army-beta:enemy-unit",
+    )
+    target_proposal = _proposal_request_from_decision(target_request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+    shooting_request = _decision_request(
+        lifecycle.submit_decision(
+            _target_proposal_result(
+                request=target_request,
+                result_id="phase13d-fire-overwatch-bound-target",
+                proposal=target_proposal,
+            )
+        )
+    )
+    request_payload = cast(dict[str, object], shooting_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+    assert {candidate["target_unit_instance_id"] for candidate in target_candidates} == {
+        "army-beta:enemy-unit"
+    }
+    available_weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    selected_weapon = available_weapons[0]
+    invalid_declaration = ShootingDeclarationProposal(
+        proposal_request_id=cast(str, proposal_request["request_id"]),
+        proposal_kind="shooting_declaration",
+        player_id=cast(str, proposal_request["active_player_id"]),
+        battle_round=cast(int, proposal_request["battle_round"]),
+        unit_instance_id=cast(str, proposal_request["unit_instance_id"]),
+        source_decision_request_id=cast(str, proposal_request["source_decision_request_id"]),
+        source_decision_result_id=cast(str, proposal_request["source_decision_result_id"]),
+        declarations=(
+            WeaponDeclaration(
+                attacker_model_instance_id=cast(str, selected_weapon["model_instance_id"]),
+                wargear_id=cast(str, selected_weapon["wargear_id"]),
+                weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
+                target_unit_instance_id="army-beta:enemy-unit-2",
+            ),
+        ),
+        visibility_cache_key=cast(str, proposal_request["visibility_cache_key"]),
+    )
+
+    status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase13d-fire-overwatch-wrong-target",
+            request_id=shooting_request.request_id,
+            decision_type=shooting_request.decision_type,
+            actor_id=shooting_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(invalid_declaration.to_payload()),
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    validation = cast(dict[str, object], status.payload)["proposal_validation"]
+    violations = cast(list[dict[str, object]], cast(dict[str, object], validation)["violations"])
+    assert violations[0]["violation_code"] == "out_of_phase_target_unit_drift"
+    assert lifecycle.decision_controller.queue.pending_requests == (shooting_request,)
+    assert state.command_point_total("player-a") == 0
+    assert len(state.stratagem_use_records) == 1
+    assert state.out_of_phase_shooting_state is not None
     assert state.out_of_phase_shooting_state.attack_sequence is None
 
 
@@ -1971,6 +2166,47 @@ def _context(
     )
 
 
+def _fire_overwatch_trigger_payload(
+    moved_unit_instance_id: str = "army-beta:enemy-unit",
+) -> JsonValue:
+    return validate_json_value(
+        {
+            FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY: moved_unit_instance_id,
+            "movement_phase_action": "normal_move",
+            "movement_payload": {
+                "unit_instance_id": moved_unit_instance_id,
+                "movement_phase_action": "normal_move",
+            },
+        }
+    )
+
+
+def _request_fire_overwatch_target_proposal(
+    lifecycle: GameLifecycle,
+    *,
+    moved_unit_instance_id: str = "army-beta:enemy-unit",
+) -> DecisionRequest:
+    state = _state(lifecycle)
+    record = _source_stratagem_record("fire-overwatch")
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_payload=_fire_overwatch_trigger_payload(moved_unit_instance_id),
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
+    )
+    return _decision_request(
+        request_stratagem_target_proposal(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            proposal_request=proposal_request,
+        )
+    )
+
+
 def _reaction_window(state: GameState, *, eligible_player_id: str) -> ReactionWindow:
     return _reaction_window_for_trigger(
         state=state,
@@ -2127,6 +2363,12 @@ def _replace_unit_poses(
             )
         )
     )
+
+
+def _clear_terrain(state: GameState) -> None:
+    mission_setup = state.mission_setup
+    assert mission_setup is not None
+    state.mission_setup = replace(mission_setup, terrain_features=())
 
 
 def _proposal_request_from_decision(request: DecisionRequest) -> StratagemTargetProposal:
@@ -2377,8 +2619,8 @@ def _set_command_step_ready_for_tactical_secondary(state: GameState) -> None:
     )
 
 
-def _battle_lifecycle() -> GameLifecycle:
-    config = _config()
+def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
+    config = _config() if config is None else config
     state = _battle_state(config=config)
     return GameLifecycle.from_payload(
         {
@@ -2408,7 +2650,10 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
     return state
 
 
-def _config() -> GameConfig:
+def _config(
+    *,
+    beta_unit_selection_ids: tuple[str, ...] = ("enemy-unit",),
+) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase12c-game",
@@ -2427,7 +2672,7 @@ def _config() -> GameConfig:
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
-                unit_selection_id="enemy-unit",
+                unit_selection_ids=beta_unit_selection_ids,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -2448,8 +2693,18 @@ def _army_muster_request(
     catalog: ArmyCatalog,
     player_id: str,
     army_id: str,
-    unit_selection_id: str,
+    unit_selection_id: str | None = None,
+    unit_selection_ids: tuple[str, ...] | None = None,
 ) -> ArmyMusterRequest:
+    if unit_selection_id is not None and unit_selection_ids is not None:
+        raise AssertionError("Use unit_selection_id or unit_selection_ids, not both.")
+    resolved_unit_selection_ids: tuple[str, ...]
+    if unit_selection_ids is None:
+        if unit_selection_id is None:
+            raise AssertionError("Expected at least one unit selection id.")
+        resolved_unit_selection_ids = (unit_selection_id,)
+    else:
+        resolved_unit_selection_ids = unit_selection_ids
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
@@ -2461,15 +2716,18 @@ def _army_muster_request(
             detachment_id="core-combined-arms",
         ),
         unit_selections=(
-            UnitMusterSelection(
-                unit_selection_id=unit_selection_id,
-                datasheet_id="core-intercessor-like-infantry",
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
+            *(
+                UnitMusterSelection(
+                    unit_selection_id=resolved_unit_selection_id,
+                    datasheet_id="core-intercessor-like-infantry",
+                    model_profile_selections=(
+                        ModelProfileSelection(
+                            model_profile_id="core-intercessor-like",
+                            model_count=5,
+                        ),
                     ),
-                ),
+                )
+                for resolved_unit_selection_id in resolved_unit_selection_ids
             ),
         ),
     )

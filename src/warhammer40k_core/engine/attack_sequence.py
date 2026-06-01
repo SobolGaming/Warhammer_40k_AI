@@ -106,6 +106,7 @@ from warhammer40k_core.engine.shooting_targets import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     DEVASTATING_WOUNDS_RULE_ID,
+    FIRE_OVERWATCH_RULE_ID,
     HAZARDOUS_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
@@ -856,6 +857,12 @@ class AttackSequence:
         )
 
     def without_deferred_mortal_wounds(self) -> Self:
+        return self.with_pending_deferred_mortal_wounds(())
+
+    def with_pending_deferred_mortal_wounds(
+        self,
+        deferred_mortal_wounds: tuple[DeferredMortalWounds, ...],
+    ) -> Self:
         return type(self)(
             sequence_id=self.sequence_id,
             attacker_player_id=self.attacker_player_id,
@@ -865,7 +872,7 @@ class AttackSequence:
             attack_index=self.attack_index,
             generated_hit_index=self.generated_hit_index,
             current_hit_roll=self.current_hit_roll,
-            deferred_mortal_wounds=(),
+            deferred_mortal_wounds=deferred_mortal_wounds,
         )
 
     def to_payload(self) -> AttackSequencePayload:
@@ -1399,16 +1406,27 @@ def _apply_deferred_mortal_wounds(
 ) -> tuple[AttackSequence, LifecycleStatus | None]:
     if not attack_sequence.deferred_mortal_wounds:
         return attack_sequence, None
+    target_order: list[str] = []
     mortal_wounds_by_target: dict[str, int] = {}
     attack_context_ids_by_target: dict[str, list[str]] = {}
     for deferred in attack_sequence.deferred_mortal_wounds:
+        if deferred.target_unit_instance_id not in mortal_wounds_by_target:
+            target_order.append(deferred.target_unit_instance_id)
         current = mortal_wounds_by_target.get(deferred.target_unit_instance_id, 0)
         mortal_wounds_by_target[deferred.target_unit_instance_id] = current + deferred.mortal_wounds
         attack_context_ids_by_target.setdefault(deferred.target_unit_instance_id, []).append(
             deferred.attack_context_id
         )
-    cleared_sequence = attack_sequence.without_deferred_mortal_wounds()
-    for target_unit_id, mortal_wounds in mortal_wounds_by_target.items():
+    for target_index, target_unit_id in enumerate(target_order):
+        mortal_wounds = mortal_wounds_by_target[target_unit_id]
+        remaining_target_ids = frozenset(target_order[target_index + 1 :])
+        sequence_after_current_target = attack_sequence.with_pending_deferred_mortal_wounds(
+            tuple(
+                deferred
+                for deferred in attack_sequence.deferred_mortal_wounds
+                if deferred.target_unit_instance_id in remaining_target_ids
+            )
+        )
         progress = MortalWoundApplicationProgress.start(
             application_id=(
                 f"{attack_sequence.sequence_id}:devastating-wounds:{target_unit_id}:mortal-wounds"
@@ -1440,7 +1458,7 @@ def _apply_deferred_mortal_wounds(
         if routed.request is not None:
             decisions.request_decision(routed.request)
             return (
-                cleared_sequence,
+                sequence_after_current_target,
                 LifecycleStatus.waiting_for_decision(
                     stage=GameLifecycleStage.BATTLE,
                     decision_request=routed.request,
@@ -1462,7 +1480,7 @@ def _apply_deferred_mortal_wounds(
             mortal_wounds=mortal_wounds,
             application=routed.application,
         )
-    return cleared_sequence, None
+    return attack_sequence.without_deferred_mortal_wounds(), None
 
 
 def _emit_deferred_mortal_wounds_applied(
@@ -1510,11 +1528,10 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
         next_request_id=state.next_decision_request_id(),
         dice_manager=manager,
     )
-    cleared_sequence = attack_sequence.without_deferred_mortal_wounds()
     if routed.request is not None:
         decisions.request_decision(routed.request)
         return (
-            cleared_sequence,
+            attack_sequence,
             already_allocated_model_ids,
             LifecycleStatus.waiting_for_decision(
                 stage=GameLifecycleStage.BATTLE,
@@ -1545,7 +1562,13 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
         mortal_wounds=routed.progress.mortal_wounds,
         application=routed.application,
     )
-    return cleared_sequence, already_allocated_model_ids, None
+    next_sequence, status = _apply_deferred_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=attack_sequence,
+    )
+    return next_sequence, already_allocated_model_ids, status
 
 
 def _precision_request_if_available(
@@ -2211,7 +2234,8 @@ def _roll_hit(
     attack_context_id: str,
 ) -> HitRoll:
     skill = _hit_skill(pool.weapon_profile)
-    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
+    is_fire_overwatch = FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT) and not is_fire_overwatch:
         return HitRoll.auto_hit(target_number=skill)
     modifier = pool.hit_roll_modifier + _persisting_hit_roll_modifier(
         state=state,
@@ -2228,7 +2252,12 @@ def _roll_hit(
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(modifier)
     final_roll = unmodified + capped_modifier
-    minimum_success = 4 if INDIRECT_FIRE_NO_VISIBLE_RULE_ID in pool.targeting_rule_ids else 2
+    if is_fire_overwatch:
+        minimum_success = 6
+    elif INDIRECT_FIRE_NO_VISIBLE_RULE_ID in pool.targeting_rule_ids:
+        minimum_success = 4
+    else:
+        minimum_success = 2
     generated_hits = sustained_hits_generated_hits(
         pool.weapon_profile,
         critical_hit=unmodified == 6,

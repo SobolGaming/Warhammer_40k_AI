@@ -14,6 +14,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 ASSAULT_RULE_ID = "weapon-ability:assault"
 BLAST_RULE_ID = "weapon-ability:blast"
 DEVASTATING_WOUNDS_RULE_ID = "weapon-ability:devastating-wounds"
+FIRE_OVERWATCH_RULE_ID = "core:fire-overwatch"
 HAZARDOUS_RULE_ID = "weapon-ability:hazardous"
 HEAVY_RULE_ID = "weapon-ability:heavy"
 IGNORES_COVER_RULE_ID = "weapon-ability:ignores-cover"

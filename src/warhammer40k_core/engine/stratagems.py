@@ -104,6 +104,7 @@ from warhammer40k_core.engine.timing_windows import (
     timing_trigger_kind_from_token,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
 
@@ -122,7 +123,7 @@ CORE_COMMAND_REROLL_HANDLER_ID = "core:command-reroll"
 CORE_INSANE_BRAVERY_HANDLER_ID = "core:insane-bravery"
 CORE_RAPID_INGRESS_HANDLER_ID = "core:rapid-ingress"
 CORE_NEW_ORDERS_HANDLER_ID = "core:new-orders"
-CORE_FIRE_OVERWATCH_HANDLER_ID = "core:fire-overwatch"
+CORE_FIRE_OVERWATCH_HANDLER_ID = FIRE_OVERWATCH_RULE_ID
 CORE_GO_TO_GROUND_HANDLER_ID = "core:go-to-ground"
 CORE_GRENADE_HANDLER_ID = "core:grenade"
 CORE_SMOKESCREEN_HANDLER_ID = "core:smokescreen"
@@ -136,6 +137,8 @@ GRENADE_TARGET_POLICY_ID = "grenades_unit_and_enemy_target"
 SMOKESCREEN_TARGET_POLICY_ID = "selected_target_smoke_unit"
 GRENADE_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
+FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY = "moved_unit_instance_id"
+FIRE_OVERWATCH_MAX_RANGE_INCHES = 24.0
 
 
 class StratagemAvailabilityKind(StrEnum):
@@ -1919,6 +1922,7 @@ def _stratagem_unavailable_reason(
             target_spec=record.definition.target_spec,
             policy=record.definition.restriction_policy,
             target_binding=target_binding,
+            context=context,
         )
         if target_error is not None:
             return target_error
@@ -1999,6 +2003,8 @@ def _handler_unavailable_reason(
             return "fire_overwatch_requires_enemy_move_trigger"
         if context.active_player_id == context.player_id:
             return "fire_overwatch_requires_opponent_turn"
+        if _fire_overwatch_triggering_enemy_unit_id_or_none(context) is None:
+            return "missing_fire_overwatch_trigger_unit"
         return None
     if definition.handler_id in {
         CORE_GO_TO_GROUND_HANDLER_ID,
@@ -2102,6 +2108,7 @@ def _enumerated_target_bindings(
                     target_spec=target_spec,
                     policy=definition.restriction_policy,
                     target_binding=binding,
+                    context=None,
                 )
                 is None
             ):
@@ -2127,6 +2134,7 @@ def _target_binding_error(
     target_spec: StratagemTargetSpec,
     policy: StratagemRestrictionPolicy,
     target_binding: StratagemTargetBinding,
+    context: StratagemEligibilityContext | None,
 ) -> str | None:
     if target_spec.target_kind is StratagemTargetKind.NONE:
         if target_binding.target_kind is not StratagemTargetKind.NONE:
@@ -2211,7 +2219,14 @@ def _target_binding_error(
             return "unit_not_grenades"
         return None
     if target_spec.target_policy_id == FIRE_OVERWATCH_TARGET_POLICY_ID:
-        return None
+        if context is None:
+            return None
+        return _fire_overwatch_target_binding_error(
+            state=state,
+            player_id=player_id,
+            context=context,
+            target_binding=target_binding,
+        )
     if target_spec.target_policy_id not in {"friendly_unit", "any_unit"}:
         return "unsupported_target_policy"
     return None
@@ -2246,6 +2261,13 @@ def _target_unit_has_keyword(
                 continue
             return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
     raise GameLifecycleError("Stratagem target unit is unknown.")
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Stratagem keyword lookup requires a UnitInstance.")
+    canonical = _canonical_keyword(keyword)
+    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
 
 
 def _canonical_keyword(keyword: str) -> str:
@@ -2380,6 +2402,82 @@ def _selected_target_unit_ids_or_none(
         seen.add(unit_id)
         unit_ids.append(unit_id)
     return tuple(sorted(unit_ids))
+
+
+def _fire_overwatch_target_binding_error(
+    *,
+    state: GameState,
+    player_id: str,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+) -> str | None:
+    triggering_unit_id = _fire_overwatch_triggering_enemy_unit_id_or_none(context)
+    if triggering_unit_id is None:
+        return "missing_fire_overwatch_trigger_unit"
+    triggering_owner = _unit_owner(state=state, unit_instance_id=triggering_unit_id)
+    if triggering_owner is None:
+        return "unknown_fire_overwatch_trigger_unit"
+    if triggering_owner == player_id:
+        return "fire_overwatch_trigger_unit_not_enemy"
+    triggering_unit = _unit_by_id(state=state, unit_instance_id=triggering_unit_id)
+    if _unit_has_keyword(triggering_unit, "TITANIC"):
+        return "fire_overwatch_target_titanic"
+    if state.battlefield_state is None:
+        return "fire_overwatch_requires_battlefield"
+    shooting_unit_id = _require_target_unit_id(target_binding)
+    if not _units_are_within_range_inches(
+        state=state,
+        first_unit_instance_id=shooting_unit_id,
+        second_unit_instance_id=triggering_unit_id,
+        distance_inches=FIRE_OVERWATCH_MAX_RANGE_INCHES,
+    ):
+        return "fire_overwatch_unit_not_within_24"
+    return None
+
+
+def _fire_overwatch_triggering_enemy_unit_id(
+    context: StratagemEligibilityContext,
+) -> str:
+    unit_id = _fire_overwatch_triggering_enemy_unit_id_or_none(context)
+    if unit_id is None:
+        raise GameLifecycleError("Fire Overwatch trigger payload requires moved unit id.")
+    return unit_id
+
+
+def _fire_overwatch_triggering_enemy_unit_id_or_none(
+    context: StratagemEligibilityContext,
+) -> str | None:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return None
+    unit_id = trigger_payload.get(FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY)
+    if type(unit_id) is not str:
+        return None
+    return _validate_identifier("Fire Overwatch moved unit id", unit_id)
+
+
+def _units_are_within_range_inches(
+    *,
+    state: GameState,
+    first_unit_instance_id: str,
+    second_unit_instance_id: str,
+    distance_inches: float,
+) -> bool:
+    first_models = _geometry_models_for_unit(
+        state=state,
+        unit_instance_id=first_unit_instance_id,
+    )
+    second_models = _geometry_models_for_unit(
+        state=state,
+        unit_instance_id=second_unit_instance_id,
+    )
+    if not first_models or not second_models:
+        return False
+    for first_model in first_models:
+        for second_model in second_models:
+            if first_model.range_to(second_model) <= distance_inches:
+                return True
+    return False
 
 
 def _grenade_context_error(
@@ -3253,6 +3351,7 @@ def _apply_fire_overwatch_handler(
     if context.trigger_kind is not TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE:
         raise GameLifecycleError("Fire Overwatch requires an enemy movement trigger.")
     shooting_unit_id = _require_target_unit_id(target_binding)
+    triggering_unit_id = _fire_overwatch_triggering_enemy_unit_id(context)
     request_out_of_phase_shooting_declaration(
         state=state,
         decisions=decisions,
@@ -3267,11 +3366,13 @@ def _apply_fire_overwatch_handler(
         source_context=validate_json_value(
             {
                 "source_kind": "fire_overwatch",
+                "triggering_enemy_unit_instance_id": triggering_unit_id,
                 "stratagem_use": use_record.to_payload(),
                 "trigger_kind": context.trigger_kind.value,
                 "trigger_payload": context.trigger_payload,
             }
         ),
+        target_unit_ids=(triggering_unit_id,),
     )
     decisions.event_log.append(
         "fire_overwatch_shooting_requested",
