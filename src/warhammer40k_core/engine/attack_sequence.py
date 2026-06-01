@@ -1,0 +1,1520 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import TYPE_CHECKING, Self, TypedDict, cast
+
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    DiceRollState,
+    DiceRollStatePayload,
+    RandomCharacteristicTiming,
+)
+from warhammer40k_core.core.modifiers import (
+    ModifierStack,
+    ModifierStackPayload,
+    RollModifier,
+    RollModifierPayload,
+)
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import DamageProfile, RangeProfileKind, WeaponProfile
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldScenario,
+    PlacementError,
+    geometry_model_for_placement,
+)
+from warhammer40k_core.engine.damage_allocation import (
+    SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+    AttackAllocation,
+    AttackAllocationDecision,
+    AttackAllocationPayload,
+    AttackAllocationRuleContext,
+    AttackAllocationRuleContextPayload,
+    DamageApplication,
+    DamageKind,
+    allocation_context_for_unit,
+    apply_damage_to_model,
+    build_attack_allocation_request,
+    model_by_id,
+    unit_by_id,
+    unit_owner_player_id,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
+from warhammer40k_core.engine.saves import (
+    SELECT_SAVING_THROW_KIND_DECISION_TYPE,
+    SaveOption,
+    SaveOptionPayload,
+    SavingThrow,
+    SavingThrowDecision,
+    build_saving_throw_kind_request,
+    resolve_saving_throw,
+    save_options_for_model,
+    saving_throw_roll_spec,
+    selected_save_option,
+)
+from warhammer40k_core.engine.shooting_targets import shooting_visibility_cache_key
+from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
+from warhammer40k_core.geometry.visibility import BenefitOfCoverResult, TerrainVisibilityContext
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
+
+
+ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
+    (
+        SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+        SELECT_SAVING_THROW_KIND_DECISION_TYPE,
+    )
+)
+
+
+class AttackSequenceStep(StrEnum):
+    HIT = "hit"
+    CRITICAL_HIT = "critical_hit"
+    WOUND = "wound"
+    CRITICAL_WOUND = "critical_wound"
+    ALLOCATE = "allocate"
+    SAVE = "save"
+    DAMAGE = "damage"
+
+
+class AttackSequenceEventPayload(TypedDict):
+    step: str
+    sequence_id: str
+    attack_context_id: str
+    pool_index: int
+    attack_index: int
+    payload: JsonValue
+
+
+class HitRollPayload(TypedDict):
+    target_number: int
+    roll_state: DiceRollStatePayload | None
+    unmodified_roll: int | None
+    modifier: int
+    capped_modifier: int
+    final_roll: int | None
+    successful: bool
+    critical: bool
+    skipped: bool
+    generated_hits: int
+
+
+class WoundRollPayload(TypedDict):
+    strength: int
+    toughness: int
+    target_number: int
+    roll_state: DiceRollStatePayload
+    unmodified_roll: int
+    modifier: int
+    capped_modifier: int
+    final_roll: int
+    successful: bool
+    critical: bool
+
+
+class AttackSequencePayload(TypedDict):
+    sequence_id: str
+    attacker_player_id: str
+    attacking_unit_instance_id: str
+    attack_pools: list[RangedAttackPoolPayload]
+    pool_index: int
+    attack_index: int
+
+
+class AttackResolutionContextPayload(TypedDict):
+    sequence_id: str
+    attack_context_id: str
+    pool_index: int
+    attack_index: int
+    attacker_player_id: str
+    defender_player_id: str
+    attacking_unit_instance_id: str
+    attacker_model_instance_id: str
+    target_unit_instance_id: str
+    weapon_profile_id: str
+    damage: int
+    hit_roll: HitRollPayload
+    wound_roll: WoundRollPayload
+    allocation: AttackAllocationPayload | None
+    save_options: list[SaveOptionPayload]
+
+
+class FastDiceGroupPayload(TypedDict):
+    group_id: str
+    attack_pool_ids: list[str]
+    allowed: bool
+    reason: str | None
+    attacks: int
+
+
+class AttackModifierStackSetPayload(TypedDict):
+    attacks: ModifierStackPayload | None
+    strength: ModifierStackPayload | None
+    armor_penetration: ModifierStackPayload | None
+    damage: ModifierStackPayload | None
+    hit_roll_modifiers: list[RollModifierPayload]
+    wound_roll_modifiers: list[RollModifierPayload]
+
+
+@dataclass(frozen=True, slots=True)
+class HitRoll:
+    target_number: int
+    roll_state: DiceRollState | None
+    unmodified_roll: int | None
+    modifier: int
+    capped_modifier: int
+    final_roll: int | None
+    successful: bool
+    critical: bool
+    skipped: bool = False
+    generated_hits: int = 1
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "target_number",
+            _validate_d6_target("HitRoll target_number", self.target_number),
+        )
+        if type(self.modifier) is not int:
+            raise GameLifecycleError("HitRoll modifier must be an integer.")
+        if type(self.capped_modifier) is not int:
+            raise GameLifecycleError("HitRoll capped_modifier must be an integer.")
+        if self.capped_modifier != _cap_roll_modifier(self.modifier):
+            raise GameLifecycleError("HitRoll capped_modifier does not match modifier cap.")
+        if type(self.successful) is not bool:
+            raise GameLifecycleError("HitRoll successful must be a bool.")
+        if type(self.critical) is not bool:
+            raise GameLifecycleError("HitRoll critical must be a bool.")
+        if type(self.skipped) is not bool:
+            raise GameLifecycleError("HitRoll skipped must be a bool.")
+        object.__setattr__(
+            self,
+            "generated_hits",
+            _validate_positive_int("HitRoll generated_hits", self.generated_hits),
+        )
+        if self.skipped:
+            if self.roll_state is not None or self.unmodified_roll is not None:
+                raise GameLifecycleError("Skipped HitRoll must not include a roll.")
+            if self.final_roll is not None:
+                raise GameLifecycleError("Skipped HitRoll must not include a final roll.")
+            if not self.successful:
+                raise GameLifecycleError("Skipped HitRoll must generate successful hits.")
+            if self.critical:
+                raise GameLifecycleError("Skipped HitRoll cannot be a Critical Hit.")
+            return
+        if self.roll_state is None:
+            raise GameLifecycleError("HitRoll requires a roll_state unless skipped.")
+        if type(self.roll_state) is not DiceRollState:
+            raise GameLifecycleError("HitRoll roll_state must be DiceRollState.")
+        if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
+            raise GameLifecycleError("HitRoll unmodified_roll must be a D6 value.")
+        if type(self.final_roll) is not int:
+            raise GameLifecycleError("HitRoll final_roll must be an integer.")
+        expected_success = self.unmodified_roll == 6 or (
+            self.unmodified_roll != 1 and self.final_roll >= self.target_number
+        )
+        if self.successful != expected_success:
+            raise GameLifecycleError("HitRoll success flag does not match roll semantics.")
+        if self.critical != (self.unmodified_roll == 6):
+            raise GameLifecycleError("HitRoll critical flag must track unmodified 6.")
+
+    @classmethod
+    def auto_hit(cls, *, target_number: int, generated_hits: int = 1) -> Self:
+        return cls(
+            target_number=target_number,
+            roll_state=None,
+            unmodified_roll=None,
+            modifier=0,
+            capped_modifier=0,
+            final_roll=None,
+            successful=True,
+            critical=False,
+            skipped=True,
+            generated_hits=generated_hits,
+        )
+
+    def to_payload(self) -> HitRollPayload:
+        return {
+            "target_number": self.target_number,
+            "roll_state": None if self.roll_state is None else self.roll_state.to_payload(),
+            "unmodified_roll": self.unmodified_roll,
+            "modifier": self.modifier,
+            "capped_modifier": self.capped_modifier,
+            "final_roll": self.final_roll,
+            "successful": self.successful,
+            "critical": self.critical,
+            "skipped": self.skipped,
+            "generated_hits": self.generated_hits,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class WoundRoll:
+    strength: int
+    toughness: int
+    target_number: int
+    roll_state: DiceRollState
+    unmodified_roll: int
+    modifier: int
+    capped_modifier: int
+    final_roll: int
+    successful: bool
+    critical: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "strength",
+            _validate_positive_int("WoundRoll strength", self.strength),
+        )
+        object.__setattr__(
+            self,
+            "toughness",
+            _validate_positive_int("WoundRoll toughness", self.toughness),
+        )
+        expected_target = wound_roll_target_number(strength=self.strength, toughness=self.toughness)
+        if self.target_number != expected_target:
+            raise GameLifecycleError("WoundRoll target_number does not match Strength/Toughness.")
+        if type(self.roll_state) is not DiceRollState:
+            raise GameLifecycleError("WoundRoll roll_state must be DiceRollState.")
+        if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
+            raise GameLifecycleError("WoundRoll unmodified_roll must be a D6 value.")
+        if type(self.modifier) is not int:
+            raise GameLifecycleError("WoundRoll modifier must be an integer.")
+        if self.capped_modifier != _cap_roll_modifier(self.modifier):
+            raise GameLifecycleError("WoundRoll capped_modifier does not match modifier cap.")
+        if type(self.final_roll) is not int:
+            raise GameLifecycleError("WoundRoll final_roll must be an integer.")
+        if type(self.successful) is not bool:
+            raise GameLifecycleError("WoundRoll successful must be a bool.")
+        if type(self.critical) is not bool:
+            raise GameLifecycleError("WoundRoll critical must be a bool.")
+        expected_success = self.unmodified_roll == 6 or (
+            self.unmodified_roll != 1 and self.final_roll >= self.target_number
+        )
+        if self.successful != expected_success:
+            raise GameLifecycleError("WoundRoll success flag does not match roll semantics.")
+        if self.critical != (self.unmodified_roll == 6):
+            raise GameLifecycleError("WoundRoll critical flag must track unmodified 6.")
+
+    def to_payload(self) -> WoundRollPayload:
+        return {
+            "strength": self.strength,
+            "toughness": self.toughness,
+            "target_number": self.target_number,
+            "roll_state": self.roll_state.to_payload(),
+            "unmodified_roll": self.unmodified_roll,
+            "modifier": self.modifier,
+            "capped_modifier": self.capped_modifier,
+            "final_roll": self.final_roll,
+            "successful": self.successful,
+            "critical": self.critical,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class AttackSequenceEvent:
+    step: AttackSequenceStep
+    sequence_id: str
+    attack_context_id: str
+    pool_index: int
+    attack_index: int
+    payload: JsonValue
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "step", attack_sequence_step_from_token(self.step))
+        object.__setattr__(
+            self,
+            "sequence_id",
+            _validate_identifier("AttackSequenceEvent sequence_id", self.sequence_id),
+        )
+        object.__setattr__(
+            self,
+            "attack_context_id",
+            _validate_identifier(
+                "AttackSequenceEvent attack_context_id",
+                self.attack_context_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "pool_index",
+            _validate_non_negative_int("AttackSequenceEvent pool_index", self.pool_index),
+        )
+        object.__setattr__(
+            self,
+            "attack_index",
+            _validate_non_negative_int("AttackSequenceEvent attack_index", self.attack_index),
+        )
+        object.__setattr__(self, "payload", validate_json_value(self.payload))
+
+    def to_payload(self) -> AttackSequenceEventPayload:
+        return {
+            "step": self.step.value,
+            "sequence_id": self.sequence_id,
+            "attack_context_id": self.attack_context_id,
+            "pool_index": self.pool_index,
+            "attack_index": self.attack_index,
+            "payload": self.payload,
+        }
+
+
+AttackSequenceEventHandler = Callable[[AttackSequenceEvent], AttackSequenceEvent]
+
+
+@dataclass(frozen=True, slots=True)
+class AttackSequenceHooks:
+    handlers: tuple[AttackSequenceEventHandler, ...] = ()
+
+    def __post_init__(self) -> None:
+        if type(self.handlers) is not tuple:
+            raise GameLifecycleError("AttackSequenceHooks handlers must be a tuple.")
+        for handler in self.handlers:
+            if not callable(handler):
+                raise GameLifecycleError("AttackSequenceHooks handlers must be callable.")
+
+    @classmethod
+    def empty(cls) -> Self:
+        return cls()
+
+    def emit(self, event: AttackSequenceEvent) -> AttackSequenceEvent:
+        if type(event) is not AttackSequenceEvent:
+            raise GameLifecycleError("AttackSequenceHooks emit requires an event.")
+        current = event
+        for handler in self.handlers:
+            updated = handler(current)
+            if type(updated) is not AttackSequenceEvent:
+                raise GameLifecycleError("Attack sequence hook must return a typed event.")
+            if updated.step is not current.step:
+                raise GameLifecycleError("Attack sequence hook cannot move timing windows.")
+            current = updated
+        return current
+
+
+@dataclass(frozen=True, slots=True)
+class AttackModifierStackSet:
+    attacks: ModifierStack | None = None
+    strength: ModifierStack | None = None
+    armor_penetration: ModifierStack | None = None
+    damage: ModifierStack | None = None
+    hit_roll_modifiers: tuple[RollModifier, ...] = ()
+    wound_roll_modifiers: tuple[RollModifier, ...] = ()
+
+    def __post_init__(self) -> None:
+        for stack in (self.attacks, self.strength, self.armor_penetration, self.damage):
+            if stack is not None and type(stack) is not ModifierStack:
+                raise GameLifecycleError("AttackModifierStackSet stacks must be ModifierStack.")
+        object.__setattr__(
+            self,
+            "hit_roll_modifiers",
+            _validate_roll_modifier_tuple(
+                "AttackModifierStackSet hit_roll_modifiers",
+                self.hit_roll_modifiers,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "wound_roll_modifiers",
+            _validate_roll_modifier_tuple(
+                "AttackModifierStackSet wound_roll_modifiers",
+                self.wound_roll_modifiers,
+            ),
+        )
+
+    def to_payload(self) -> AttackModifierStackSetPayload:
+        return {
+            "attacks": None if self.attacks is None else self.attacks.to_payload(),
+            "strength": None if self.strength is None else self.strength.to_payload(),
+            "armor_penetration": (
+                None if self.armor_penetration is None else self.armor_penetration.to_payload()
+            ),
+            "damage": None if self.damage is None else self.damage.to_payload(),
+            "hit_roll_modifiers": [modifier.to_payload() for modifier in self.hit_roll_modifiers],
+            "wound_roll_modifiers": [
+                modifier.to_payload() for modifier in self.wound_roll_modifiers
+            ],
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class AttackSequence:
+    sequence_id: str
+    attacker_player_id: str
+    attacking_unit_instance_id: str
+    attack_pools: tuple[RangedAttackPool, ...]
+    pool_index: int = 0
+    attack_index: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "sequence_id",
+            _validate_identifier("AttackSequence sequence_id", self.sequence_id),
+        )
+        object.__setattr__(
+            self,
+            "attacker_player_id",
+            _validate_identifier("AttackSequence attacker_player_id", self.attacker_player_id),
+        )
+        object.__setattr__(
+            self,
+            "attacking_unit_instance_id",
+            _validate_identifier(
+                "AttackSequence attacking_unit_instance_id",
+                self.attacking_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attack_pools",
+            _validate_attack_pools(self.attack_pools),
+        )
+        object.__setattr__(
+            self,
+            "pool_index",
+            _validate_non_negative_int("AttackSequence pool_index", self.pool_index),
+        )
+        object.__setattr__(
+            self,
+            "attack_index",
+            _validate_non_negative_int("AttackSequence attack_index", self.attack_index),
+        )
+        if self.pool_index > len(self.attack_pools):
+            raise GameLifecycleError("AttackSequence pool_index is outside attack_pools.")
+        if self.pool_index == len(self.attack_pools):
+            if self.attack_index != 0:
+                raise GameLifecycleError("Completed AttackSequence must have attack_index 0.")
+            return
+        if self.attack_index >= self.attack_pools[self.pool_index].attacks:
+            raise GameLifecycleError("AttackSequence attack_index is outside current pool.")
+
+    @classmethod
+    def start(
+        cls,
+        *,
+        sequence_id: str,
+        attacker_player_id: str,
+        attacking_unit_instance_id: str,
+        attack_pools: tuple[RangedAttackPool, ...],
+    ) -> Self:
+        return cls(
+            sequence_id=sequence_id,
+            attacker_player_id=attacker_player_id,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attack_pools=attack_pools,
+        )
+
+    @property
+    def is_complete(self) -> bool:
+        return self.pool_index == len(self.attack_pools)
+
+    def current_pool(self) -> RangedAttackPool:
+        if self.is_complete:
+            raise GameLifecycleError("Completed AttackSequence has no current pool.")
+        return self.attack_pools[self.pool_index]
+
+    def attack_context_id(self) -> str:
+        if self.is_complete:
+            raise GameLifecycleError("Completed AttackSequence has no attack context.")
+        return (
+            f"{self.sequence_id}:pool-{self.pool_index + 1:03d}:attack-{self.attack_index + 1:03d}"
+        )
+
+    def advanced_after_attack(self) -> Self:
+        if self.is_complete:
+            raise GameLifecycleError("Completed AttackSequence cannot advance.")
+        pool = self.current_pool()
+        next_attack_index = self.attack_index + 1
+        if next_attack_index < pool.attacks:
+            return type(self)(
+                sequence_id=self.sequence_id,
+                attacker_player_id=self.attacker_player_id,
+                attacking_unit_instance_id=self.attacking_unit_instance_id,
+                attack_pools=self.attack_pools,
+                pool_index=self.pool_index,
+                attack_index=next_attack_index,
+            )
+        next_pool_index = self.pool_index + 1
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            pool_index=next_pool_index,
+            attack_index=0,
+        )
+
+    def to_payload(self) -> AttackSequencePayload:
+        return {
+            "sequence_id": self.sequence_id,
+            "attacker_player_id": self.attacker_player_id,
+            "attacking_unit_instance_id": self.attacking_unit_instance_id,
+            "attack_pools": [pool.to_payload() for pool in self.attack_pools],
+            "pool_index": self.pool_index,
+            "attack_index": self.attack_index,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AttackSequencePayload) -> Self:
+        return cls(
+            sequence_id=payload["sequence_id"],
+            attacker_player_id=payload["attacker_player_id"],
+            attacking_unit_instance_id=payload["attacking_unit_instance_id"],
+            attack_pools=tuple(
+                RangedAttackPool.from_payload(pool) for pool in payload["attack_pools"]
+            ),
+            pool_index=payload["pool_index"],
+            attack_index=payload["attack_index"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class FastDiceGroup:
+    group_id: str
+    attack_pool_ids: tuple[str, ...]
+    allowed: bool
+    reason: str | None
+    attacks: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "group_id",
+            _validate_identifier("FastDiceGroup group_id", self.group_id),
+        )
+        object.__setattr__(
+            self,
+            "attack_pool_ids",
+            _validate_identifier_tuple("FastDiceGroup attack_pool_ids", self.attack_pool_ids),
+        )
+        if type(self.allowed) is not bool:
+            raise GameLifecycleError("FastDiceGroup allowed must be a bool.")
+        object.__setattr__(
+            self,
+            "reason",
+            _validate_optional_identifier("FastDiceGroup reason", self.reason),
+        )
+        object.__setattr__(
+            self,
+            "attacks",
+            _validate_non_negative_int("FastDiceGroup attacks", self.attacks),
+        )
+        if self.allowed and self.reason is not None:
+            raise GameLifecycleError("Allowed FastDiceGroup must not include reason.")
+        if not self.allowed and self.reason is None:
+            raise GameLifecycleError("Rejected FastDiceGroup requires reason.")
+
+    @classmethod
+    def evaluate(
+        cls,
+        *,
+        group_id: str,
+        pools: tuple[RangedAttackPool, ...],
+        allocation_order_can_affect_random_damage: bool,
+    ) -> Self:
+        pool_tuple = _validate_fast_dice_pools(pools)
+        if not pool_tuple:
+            return cls(
+                group_id=group_id,
+                attack_pool_ids=(),
+                allowed=False,
+                reason="empty_group",
+                attacks=0,
+            )
+        first = pool_tuple[0]
+        first_key = _fast_dice_pool_key(first)
+        for pool in pool_tuple[1:]:
+            if _fast_dice_pool_key(pool) != first_key:
+                return cls(
+                    group_id=group_id,
+                    attack_pool_ids=tuple(_pool_id(pool) for pool in pool_tuple),
+                    allowed=False,
+                    reason="attack_characteristics_or_target_differ",
+                    attacks=sum(pool.attacks for pool in pool_tuple),
+                )
+        if (
+            allocation_order_can_affect_random_damage
+            and first.weapon_profile.damage_profile.dice_expression is not None
+        ):
+            return cls(
+                group_id=group_id,
+                attack_pool_ids=tuple(_pool_id(pool) for pool in pool_tuple),
+                allowed=False,
+                reason="random_damage_order_can_affect_outcome",
+                attacks=sum(pool.attacks for pool in pool_tuple),
+            )
+        return cls(
+            group_id=group_id,
+            attack_pool_ids=tuple(_pool_id(pool) for pool in pool_tuple),
+            allowed=True,
+            reason=None,
+            attacks=sum(pool.attacks for pool in pool_tuple),
+        )
+
+    def to_payload(self) -> FastDiceGroupPayload:
+        return {
+            "group_id": self.group_id,
+            "attack_pool_ids": list(self.attack_pool_ids),
+            "allowed": self.allowed,
+            "reason": self.reason,
+            "attacks": self.attacks,
+        }
+
+
+def attack_sequence_step_from_token(token: object) -> AttackSequenceStep:
+    if type(token) is AttackSequenceStep:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("AttackSequenceStep token must be a string.")
+    try:
+        return AttackSequenceStep(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported AttackSequenceStep token: {token}.") from exc
+
+
+def wound_roll_target_number(*, strength: int, toughness: int) -> int:
+    valid_strength = _validate_positive_int("strength", strength)
+    valid_toughness = _validate_positive_int("toughness", toughness)
+    if valid_strength >= 2 * valid_toughness:
+        return 2
+    if valid_strength > valid_toughness:
+        return 3
+    if valid_strength == valid_toughness:
+        return 4
+    if 2 * valid_strength <= valid_toughness:
+        return 6
+    return 5
+
+
+def resolve_attack_sequence_until_blocked(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    attack_sequence: AttackSequence,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+    dice_manager: DiceRollManager | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    active_hooks = AttackSequenceHooks.empty() if hooks is None else hooks
+    allocated_model_ids = already_allocated_model_ids
+    current = attack_sequence
+    manager = (
+        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        if dice_manager is None
+        else dice_manager
+    )
+    while not current.is_complete:
+        attack_context = _roll_hit_and_wound(
+            state=state,
+            decisions=decisions,
+            manager=manager,
+            attack_sequence=current,
+            hooks=active_hooks,
+        )
+        if attack_context is None:
+            current = current.advanced_after_attack()
+            continue
+
+        allocation_context = allocation_context_for_unit(
+            state=state,
+            target_unit_instance_id=attack_context["target_unit_instance_id"],
+            already_allocated_model_ids=tuple(
+                model_id
+                for model_id in allocated_model_ids
+                if _model_is_alive(state=state, model_instance_id=model_id)
+            ),
+            attacker_constraint=None,
+        )
+        legal_model_ids = allocation_context.legal_model_ids()
+        if not legal_model_ids:
+            raise GameLifecycleError("Attack allocation has no legal target models.")
+        if len(legal_model_ids) > 1:
+            request = build_attack_allocation_request(
+                request_id=state.next_decision_request_id(),
+                defender_player_id=attack_context["defender_player_id"],
+                attack_context=validate_json_value(attack_context),
+                allocation_context=allocation_context,
+            )
+            decisions.request_decision(request)
+            _emit_event(
+                decisions=decisions,
+                hooks=active_hooks,
+                event=AttackSequenceEvent(
+                    step=AttackSequenceStep.ALLOCATE,
+                    sequence_id=current.sequence_id,
+                    attack_context_id=current.attack_context_id(),
+                    pool_index=current.pool_index,
+                    attack_index=current.attack_index,
+                    payload=validate_json_value(
+                        {
+                            "allocation_context": allocation_context.to_payload(),
+                            "forced": False,
+                        }
+                    ),
+                ),
+            )
+            return (
+                current,
+                allocated_model_ids,
+                LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=request,
+                    payload={
+                        "phase": BattlePhase.SHOOTING.value,
+                        "decision_type": SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+                        "attack_context_id": current.attack_context_id(),
+                    },
+                ),
+            )
+
+        if len(legal_model_ids) != 1:
+            raise GameLifecycleError("Forced allocation requires exactly one legal model.")
+        allocation = AttackAllocation.from_context(
+            allocation_context,
+            allocated_model_id=legal_model_ids[0],
+            forced=True,
+        )
+        next_sequence, allocated_model_ids, status = _continue_after_allocation(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            manager=manager,
+            attack_sequence=current,
+            attack_context=attack_context,
+            allocation=allocation,
+            allocated_model_ids=allocated_model_ids,
+            hooks=active_hooks,
+        )
+        if status is not None:
+            return next_sequence, allocated_model_ids, status
+        if next_sequence is None:
+            return None, allocated_model_ids, None
+        current = next_sequence
+    decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": current.sequence_id,
+            "attacker_player_id": current.attacker_player_id,
+            "attacking_unit_instance_id": current.attacking_unit_instance_id,
+        },
+    )
+    return None, allocated_model_ids, None
+
+
+def apply_attack_allocation_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    record = decisions.record_for_result(result)
+    request = record.request
+    decision = AttackAllocationDecision.from_result(request=request, result=result)
+    request_payload = _payload_object(request.payload)
+    allocation_context = AttackAllocationRuleContext.from_payload(
+        cast(AttackAllocationRuleContextPayload, request_payload["allocation_context"])
+    )
+    allocation = AttackAllocation.from_context(
+        allocation_context,
+        allocated_model_id=decision.selected_model_id,
+        forced=False,
+    )
+    return _continue_after_allocation(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        attack_sequence=attack_sequence,
+        attack_context=cast(AttackResolutionContextPayload, decision.attack_context),
+        allocation=allocation,
+        allocated_model_ids=already_allocated_model_ids,
+        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+    )
+
+
+def apply_saving_throw_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    record = decisions.record_for_result(result)
+    request = record.request
+    decision = SavingThrowDecision.from_result(request=request, result=result)
+    request_payload = _payload_object(request.payload)
+    raw_options = request_payload["save_options"]
+    if not isinstance(raw_options, list):
+        raise GameLifecycleError("Saving throw request save_options must be a list.")
+    options = tuple(
+        SaveOption.from_payload(cast(SaveOptionPayload, option)) for option in raw_options
+    )
+    option = selected_save_option(
+        options=options,
+        selected_save_kind=decision.selected_save_kind,
+    )
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    return _resolve_save_and_damage(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        attack_context=cast(AttackResolutionContextPayload, decision.attack_context),
+        save_option=option,
+        allocated_model_ids=already_allocated_model_ids,
+        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+    )
+
+
+def _continue_after_allocation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    allocation: AttackAllocation,
+    allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    _emit_event(
+        decisions=decisions,
+        hooks=hooks,
+        event=AttackSequenceEvent(
+            step=AttackSequenceStep.ALLOCATE,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_sequence.attack_context_id(),
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            payload=validate_json_value(allocation.to_payload()),
+        ),
+    )
+    updated_allocated_ids = tuple(sorted({*allocated_model_ids, allocation.allocated_model_id}))
+    allocated_model = model_by_id(state=state, model_instance_id=allocation.allocated_model_id)
+    pool = attack_sequence.current_pool()
+    cover_result = _cover_for_allocated_model(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        pool=pool,
+        allocated_model_id=allocation.allocated_model_id,
+    )
+    save_options = save_options_for_model(
+        model=allocated_model,
+        armor_penetration=pool.weapon_profile.armor_penetration.final,
+        cover_result=cover_result,
+    )
+    updated_attack_context: AttackResolutionContextPayload = {
+        **attack_context,
+        "allocation": allocation.to_payload(),
+        "save_options": [option.to_payload() for option in save_options],
+    }
+    if len(save_options) > 1:
+        defender_player_id = updated_attack_context["defender_player_id"]
+        request = build_saving_throw_kind_request(
+            request_id=state.next_decision_request_id(),
+            defender_player_id=defender_player_id,
+            attack_context=validate_json_value(updated_attack_context),
+            options=save_options,
+        )
+        decisions.request_decision(request)
+        return (
+            attack_sequence,
+            updated_allocated_ids,
+            LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=request,
+                payload={
+                    "phase": BattlePhase.SHOOTING.value,
+                    "decision_type": SELECT_SAVING_THROW_KIND_DECISION_TYPE,
+                    "attack_context_id": attack_sequence.attack_context_id(),
+                },
+            ),
+        )
+    if len(save_options) == 1:
+        return _resolve_save_and_damage(
+            state=state,
+            decisions=decisions,
+            manager=manager,
+            attack_sequence=attack_sequence,
+            attack_context=updated_attack_context,
+            save_option=save_options[0],
+            allocated_model_ids=updated_allocated_ids,
+            hooks=hooks,
+        )
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+        model_instance_id=allocation.allocated_model_id,
+        damage=updated_attack_context["damage"],
+        damage_kind=DamageKind.NORMAL,
+    )
+    _emit_damage_event(
+        decisions=decisions,
+        hooks=hooks,
+        attack_sequence=attack_sequence,
+        damage=damage,
+        saving_throw=None,
+    )
+    return attack_sequence.advanced_after_attack(), updated_allocated_ids, None
+
+
+def _resolve_save_and_damage(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    save_option: SaveOption,
+    allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    allocation = AttackAllocation.from_payload(
+        cast(AttackAllocationPayload, attack_context["allocation"])
+    )
+    roll_state = manager.roll(
+        saving_throw_roll_spec(
+            save_kind=save_option.save_kind,
+            player_id=attack_context["defender_player_id"],
+            allocated_model_id=allocation.allocated_model_id,
+            attack_context_id=attack_context["attack_context_id"],
+        )
+    )
+    saving_throw = resolve_saving_throw(option=save_option, roll_state=roll_state)
+    _emit_event(
+        decisions=decisions,
+        hooks=hooks,
+        event=AttackSequenceEvent(
+            step=AttackSequenceStep.SAVE,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_context["attack_context_id"],
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            payload=validate_json_value(saving_throw.to_payload()),
+        ),
+    )
+    damage: DamageApplication | None = None
+    if not saving_throw.successful:
+        damage = apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=attack_context["target_unit_instance_id"],
+            model_instance_id=allocation.allocated_model_id,
+            damage=attack_context["damage"],
+            damage_kind=DamageKind.NORMAL,
+        )
+    _emit_damage_event(
+        decisions=decisions,
+        hooks=hooks,
+        attack_sequence=attack_sequence,
+        damage=damage,
+        saving_throw=saving_throw,
+    )
+    return attack_sequence.advanced_after_attack(), allocated_model_ids, None
+
+
+def _roll_hit_and_wound(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    hooks: AttackSequenceHooks,
+) -> AttackResolutionContextPayload | None:
+    pool = attack_sequence.current_pool()
+    attack_context_id = attack_sequence.attack_context_id()
+    hit_roll = _roll_hit(
+        manager=manager,
+        pool=pool,
+        attacker_player_id=attack_sequence.attacker_player_id,
+        attack_context_id=attack_context_id,
+    )
+    _emit_event(
+        decisions=decisions,
+        hooks=hooks,
+        event=AttackSequenceEvent(
+            step=AttackSequenceStep.HIT,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_context_id,
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            payload=validate_json_value(hit_roll.to_payload()),
+        ),
+    )
+    if hit_roll.critical:
+        _emit_event(
+            decisions=decisions,
+            hooks=hooks,
+            event=AttackSequenceEvent(
+                step=AttackSequenceStep.CRITICAL_HIT,
+                sequence_id=attack_sequence.sequence_id,
+                attack_context_id=attack_context_id,
+                pool_index=attack_sequence.pool_index,
+                attack_index=attack_sequence.attack_index,
+                payload=validate_json_value(hit_roll.to_payload()),
+            ),
+        )
+    if not hit_roll.successful:
+        return None
+
+    target_unit = unit_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
+    toughness = _target_unit_toughness(target_unit)
+    wound_roll = _roll_wound(
+        manager=manager,
+        pool=pool,
+        toughness=toughness,
+        attacker_player_id=attack_sequence.attacker_player_id,
+        attack_context_id=attack_context_id,
+    )
+    _emit_event(
+        decisions=decisions,
+        hooks=hooks,
+        event=AttackSequenceEvent(
+            step=AttackSequenceStep.WOUND,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_context_id,
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            payload=validate_json_value(wound_roll.to_payload()),
+        ),
+    )
+    if wound_roll.critical:
+        _emit_event(
+            decisions=decisions,
+            hooks=hooks,
+            event=AttackSequenceEvent(
+                step=AttackSequenceStep.CRITICAL_WOUND,
+                sequence_id=attack_sequence.sequence_id,
+                attack_context_id=attack_context_id,
+                pool_index=attack_sequence.pool_index,
+                attack_index=attack_sequence.attack_index,
+                payload=validate_json_value(wound_roll.to_payload()),
+            ),
+        )
+    if not wound_roll.successful:
+        return None
+
+    return {
+        "sequence_id": attack_sequence.sequence_id,
+        "attack_context_id": attack_context_id,
+        "pool_index": attack_sequence.pool_index,
+        "attack_index": attack_sequence.attack_index,
+        "attacker_player_id": attack_sequence.attacker_player_id,
+        "defender_player_id": unit_owner_player_id(
+            state=state,
+            unit_instance_id=pool.target_unit_instance_id,
+        ),
+        "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+        "attacker_model_instance_id": pool.attacker_model_instance_id,
+        "target_unit_instance_id": pool.target_unit_instance_id,
+        "weapon_profile_id": pool.weapon_profile_id,
+        "damage": _damage_value(
+            manager=manager,
+            profile=pool.weapon_profile.damage_profile,
+            attack_context_id=attack_context_id,
+            attacker_player_id=attack_sequence.attacker_player_id,
+        ),
+        "hit_roll": hit_roll.to_payload(),
+        "wound_roll": wound_roll.to_payload(),
+        "allocation": None,
+        "save_options": [],
+    }
+
+
+def _roll_hit(
+    *,
+    manager: DiceRollManager,
+    pool: RangedAttackPool,
+    attacker_player_id: str,
+    attack_context_id: str,
+) -> HitRoll:
+    skill = _hit_skill(pool.weapon_profile)
+    roll_state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Hit roll for {pool.weapon_profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.hit",
+            actor_id=attacker_player_id,
+        )
+    )
+    unmodified = roll_state.current_total
+    capped_modifier = _cap_roll_modifier(pool.hit_roll_modifier)
+    final_roll = unmodified + capped_modifier
+    return HitRoll(
+        target_number=skill,
+        roll_state=roll_state,
+        unmodified_roll=unmodified,
+        modifier=pool.hit_roll_modifier,
+        capped_modifier=capped_modifier,
+        final_roll=final_roll,
+        successful=unmodified == 6 or (unmodified != 1 and final_roll >= skill),
+        critical=unmodified == 6,
+    )
+
+
+def _roll_wound(
+    *,
+    manager: DiceRollManager,
+    pool: RangedAttackPool,
+    toughness: int,
+    attacker_player_id: str,
+    attack_context_id: str,
+    wound_modifier: int = 0,
+) -> WoundRoll:
+    strength = pool.weapon_profile.strength.final
+    target_number = wound_roll_target_number(strength=strength, toughness=toughness)
+    roll_state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Wound roll for {pool.weapon_profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.wound",
+            actor_id=attacker_player_id,
+        )
+    )
+    unmodified = roll_state.current_total
+    capped_modifier = _cap_roll_modifier(wound_modifier)
+    final_roll = unmodified + capped_modifier
+    return WoundRoll(
+        strength=strength,
+        toughness=toughness,
+        target_number=target_number,
+        roll_state=roll_state,
+        unmodified_roll=unmodified,
+        modifier=wound_modifier,
+        capped_modifier=capped_modifier,
+        final_roll=final_roll,
+        successful=unmodified == 6 or (unmodified != 1 and final_roll >= target_number),
+        critical=unmodified == 6,
+    )
+
+
+def _emit_damage_event(
+    *,
+    decisions: DecisionController,
+    hooks: AttackSequenceHooks,
+    attack_sequence: AttackSequence,
+    damage: DamageApplication | None,
+    saving_throw: SavingThrow | None,
+) -> None:
+    payload = validate_json_value(
+        {
+            "saving_throw": None if saving_throw is None else saving_throw.to_payload(),
+            "damage_application": None if damage is None else damage.to_payload(),
+        }
+    )
+    _emit_event(
+        decisions=decisions,
+        hooks=hooks,
+        event=AttackSequenceEvent(
+            step=AttackSequenceStep.DAMAGE,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_sequence.attack_context_id(),
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            payload=payload,
+        ),
+    )
+    if damage is not None and damage.destroyed:
+        decisions.event_log.append(
+            "model_destroyed",
+            {
+                "sequence_id": attack_sequence.sequence_id,
+                "attack_context_id": attack_sequence.attack_context_id(),
+                "target_unit_instance_id": damage.target_unit_instance_id,
+                "model_instance_id": damage.model_instance_id,
+                "damage_kind": damage.damage_kind.value,
+            },
+        )
+
+
+def _emit_event(
+    *,
+    decisions: DecisionController,
+    hooks: AttackSequenceHooks,
+    event: AttackSequenceEvent,
+) -> None:
+    emitted = hooks.emit(event)
+    decisions.event_log.append("attack_sequence_step", emitted.to_payload())
+
+
+def _cover_for_allocated_model(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    pool: RangedAttackPool,
+    allocated_model_id: str,
+) -> BenefitOfCoverResult | None:
+    mission_setup = state.mission_setup
+    if mission_setup is None or not mission_setup.terrain_features:
+        return None
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Allocated-model cover requires battlefield_state.")
+    try:
+        scenario = BattlefieldScenario(
+            armies=tuple(state.army_definitions),
+            battlefield_state=battlefield,
+        )
+        attacker_model = model_by_id(
+            state=state,
+            model_instance_id=pool.attacker_model_instance_id,
+        )
+        allocated_model = model_by_id(state=state, model_instance_id=allocated_model_id)
+        observer_placement = battlefield.model_placement_by_id(pool.attacker_model_instance_id)
+        target_placement = battlefield.model_placement_by_id(allocated_model_id)
+        observer_geometry = geometry_model_for_placement(
+            model=attacker_model,
+            placement=observer_placement,
+        )
+        target_geometry = geometry_model_for_placement(
+            model=allocated_model,
+            placement=target_placement,
+        )
+    except PlacementError as exc:
+        raise GameLifecycleError("Allocated-model cover context is invalid.") from exc
+    terrain_features = mission_setup.terrain_features
+    terrain_volumes = tuple(
+        volume for feature in terrain_features for volume in feature.terrain_volumes()
+    )
+    excluded_model_ids = {pool.attacker_model_instance_id, allocated_model_id}
+    dynamic_blockers = tuple(
+        model
+        for model in scenario.placed_geometry_models()
+        if model.model_id not in excluded_model_ids
+    )
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset_descriptor,
+        los_cache_key=shooting_visibility_cache_key(
+            scenario=scenario,
+            terrain_features=terrain_features,
+        ),
+        observer_model=observer_geometry,
+        target_models=(target_geometry,),
+        terrain_features=terrain_features,
+        terrain_volumes=terrain_volumes,
+        dynamic_model_blockers=dynamic_blockers,
+        observer_keywords=unit_by_id(
+            state=state,
+            unit_instance_id=attack_pool_attacker_unit_id(state=state, pool=pool),
+        ).keywords,
+        target_keywords=unit_by_id(
+            state=state,
+            unit_instance_id=pool.target_unit_instance_id,
+        ).keywords,
+    )
+    return context.benefit_of_cover(context.resolve_line_of_sight())
+
+
+def attack_pool_attacker_unit_id(*, state: GameState, pool: RangedAttackPool) -> str:
+    for army in state.army_definitions:
+        for unit in army.units:
+            if any(
+                model.model_instance_id == pool.attacker_model_instance_id
+                for model in unit.own_models
+            ):
+                return unit.unit_instance_id
+    raise GameLifecycleError("Attack pool attacker model is unknown.")
+
+
+def _hit_skill(profile: WeaponProfile) -> int:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("Hit roll requires a WeaponProfile.")
+    expected = (
+        Characteristic.WEAPON_SKILL
+        if profile.range_profile.kind is RangeProfileKind.MELEE
+        else Characteristic.BALLISTIC_SKILL
+    )
+    if profile.skill.characteristic is not expected:
+        raise GameLifecycleError("Weapon skill characteristic does not match attack kind.")
+    return _validate_d6_target("Weapon skill target", profile.skill.final)
+
+
+def _target_unit_toughness(unit: UnitInstance) -> int:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Target unit must be a UnitInstance.")
+    alive_models = unit.alive_own_models()
+    if not alive_models:
+        raise GameLifecycleError("Target unit has no alive models.")
+    toughness_values: set[int] = set()
+    for model in alive_models:
+        for value in model.characteristics:
+            if value.characteristic is Characteristic.TOUGHNESS:
+                toughness_values.add(value.final)
+    if not toughness_values:
+        raise GameLifecycleError("Target unit models require Toughness.")
+    if len(toughness_values) != 1:
+        raise GameLifecycleError("Mixed Toughness target units are deferred to Phase 13E.")
+    return next(iter(toughness_values))
+
+
+def _damage_value(
+    *,
+    manager: DiceRollManager,
+    profile: DamageProfile,
+    attack_context_id: str,
+    attacker_player_id: str,
+) -> int:
+    if type(profile) is not DamageProfile:
+        raise GameLifecycleError("Damage resolution requires a DamageProfile.")
+    if profile.fixed_damage is not None:
+        return profile.fixed_damage
+    if profile.dice_expression is None:
+        raise GameLifecycleError("DamageProfile requires fixed damage or a dice expression.")
+    roll = manager.roll_random_characteristic(
+        characteristic=Characteristic.DAMAGE,
+        timing=RandomCharacteristicTiming.PER_ATTACK,
+        scope_id=f"{attack_context_id}:damage",
+        expression=profile.dice_expression,
+        reason="Phase 13C random Damage roll",
+        actor_id=attacker_player_id,
+    )
+    return roll.value
+
+
+def _model_is_alive(*, state: GameState, model_instance_id: str) -> bool:
+    return model_by_id(state=state, model_instance_id=model_instance_id).is_alive
+
+
+def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
+    profile = pool.weapon_profile
+    return (
+        pool.target_unit_instance_id,
+        profile.skill.final,
+        profile.strength.final,
+        profile.armor_penetration.final,
+        profile.damage_profile.to_payload(),
+        tuple(keyword.value for keyword in profile.keywords),
+        tuple(ability.to_payload() for ability in profile.abilities),
+    )
+
+
+def _pool_id(pool: RangedAttackPool) -> str:
+    return (
+        f"{pool.attacker_model_instance_id}:{pool.wargear_id}:"
+        f"{pool.weapon_profile_id}:{pool.target_unit_instance_id}"
+    )
+
+
+def _validate_attack_pools(values: object) -> tuple[RangedAttackPool, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("AttackSequence attack_pools must be a tuple.")
+    pools: list[RangedAttackPool] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not RangedAttackPool:
+            raise GameLifecycleError("AttackSequence attack_pools must contain attack pools.")
+        pools.append(value)
+    if not pools:
+        raise GameLifecycleError("AttackSequence requires at least one attack pool.")
+    return tuple(pools)
+
+
+def _validate_fast_dice_pools(values: object) -> tuple[RangedAttackPool, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("FastDiceGroup pools must be a tuple.")
+    pools: list[RangedAttackPool] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not RangedAttackPool:
+            raise GameLifecycleError("FastDiceGroup pools must contain attack pools.")
+        pools.append(value)
+    return tuple(pools)
+
+
+def _validate_roll_modifier_tuple(field_name: str, values: object) -> tuple[RollModifier, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    modifiers: list[RollModifier] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not RollModifier:
+            raise GameLifecycleError(f"{field_name} must contain RollModifier values.")
+        if value.modifier_id in seen:
+            raise GameLifecycleError(f"{field_name} must not duplicate modifier IDs.")
+        seen.add(value.modifier_id)
+        modifiers.append(value)
+    return tuple(sorted(modifiers, key=lambda modifier: (modifier.priority, modifier.modifier_id)))
+
+
+def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Attack sequence payload must be an object.")
+    return payload
+
+
+def _cap_roll_modifier(modifier: int) -> int:
+    if type(modifier) is not int:
+        raise GameLifecycleError("Roll modifier must be an integer.")
+    return max(-1, min(1, modifier))
+
+
+def _validate_d6_target(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value < 2 or value > 6:
+        raise GameLifecycleError(f"{field_name} must be between 2 and 6.")
+    return value
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value < 1:
+        raise GameLifecycleError(f"{field_name} must be at least 1.")
+    return value
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise GameLifecycleError(f"{field_name} must not be negative.")
+    return value
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    return tuple(sorted(identifiers))
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return stripped
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)

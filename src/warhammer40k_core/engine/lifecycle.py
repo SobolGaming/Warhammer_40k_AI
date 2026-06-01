@@ -7,6 +7,7 @@ from typing import Self, TypedDict
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.damage_allocation import SELECT_ATTACK_ALLOCATION_DECISION_TYPE
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
     DecisionControllerPayload,
@@ -68,6 +69,7 @@ from warhammer40k_core.engine.reaction_queue import (
     ReactionQueuePayload,
 )
 from warhammer40k_core.engine.reserves import ReserveStatus
+from warhammer40k_core.engine.saves import SELECT_SAVING_THROW_KIND_DECISION_TYPE
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     SequencingDecision,
@@ -131,6 +133,8 @@ _SHOOTING_DECISION_TYPES = frozenset(
     (
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+        SELECT_SAVING_THROW_KIND_DECISION_TYPE,
     )
 )
 _REACTION_FRAME_DECISION_TYPES = frozenset(
