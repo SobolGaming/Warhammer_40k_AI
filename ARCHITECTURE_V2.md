@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 13E** is treated as implemented at the time this file was updated. Phase 13F is the next build slice.
+Everything through **Phase 13F** is treated as implemented at the time this file was updated. Phase 14A is the next build slice.
 
 Completed / implemented foundation:
 
@@ -81,6 +81,7 @@ Completed / implemented foundation:
 | 13C | Complete | Attack sequence, allocation, saves, damage, and typed attack events |
 | 13D | Complete | Weapon abilities, shooting/fight modifiers, and shooting Stratagems |
 | 13E | Complete | Damage allocation, destroyed models, and destruction reactions |
+| 13F | Complete | Shooting phase completion gate |
 
 ## Cross-cutting architectural rules
 
@@ -1792,6 +1793,8 @@ Required tests:
 - non-triggering coherency cleanup removal.
 
 ## Phase 13F: Shooting phase completion gate
+
+Status: Complete.
 
 Required tests:
 

@@ -116,6 +116,7 @@ class ShootingPhaseStatePayload(TypedDict):
     phase_complete: bool
     selected_unit_ids: list[str]
     shot_unit_ids: list[str]
+    skipped_unit_ids: list[str]
     active_selection: ShootingUnitSelectionPayload | None
     attack_pools: list[RangedAttackPoolPayload]
     attack_sequence: AttackSequencePayload | None
@@ -232,6 +233,7 @@ class ShootingPhaseState:
     phase_complete: bool = False
     selected_unit_ids: tuple[str, ...] = ()
     shot_unit_ids: tuple[str, ...] = ()
+    skipped_unit_ids: tuple[str, ...] = ()
     active_selection: ShootingUnitSelection | None = None
     attack_pools: tuple[RangedAttackPool, ...] = ()
     attack_sequence: AttackSequence | None = None
@@ -263,6 +265,16 @@ class ShootingPhaseState:
             "shot_unit_ids",
             _validate_identifier_tuple("ShootingPhaseState shot_unit_ids", self.shot_unit_ids),
         )
+        object.__setattr__(
+            self,
+            "skipped_unit_ids",
+            _validate_identifier_tuple(
+                "ShootingPhaseState skipped_unit_ids",
+                self.skipped_unit_ids,
+            ),
+        )
+        if set(self.skipped_unit_ids) & set(self.shot_unit_ids):
+            raise GameLifecycleError("Shooting skipped units must not also count as shot.")
         if self.active_selection is not None:
             if type(self.active_selection) is not ShootingUnitSelection:
                 raise GameLifecycleError(
@@ -276,6 +288,8 @@ class ShootingPhaseState:
                 raise GameLifecycleError("Shooting active_selection must be selected.")
             if self.active_selection.unit_instance_id in self.shot_unit_ids:
                 raise GameLifecycleError("Shooting active_selection has already shot.")
+            if self.active_selection.unit_instance_id in self.skipped_unit_ids:
+                raise GameLifecycleError("Shooting active_selection has already been skipped.")
         object.__setattr__(
             self,
             "attack_pools",
@@ -322,6 +336,7 @@ class ShootingPhaseState:
             phase_complete=False,
             selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
             shot_unit_ids=self.shot_unit_ids,
+            skipped_unit_ids=self.skipped_unit_ids,
             active_selection=selection,
             attack_pools=self.attack_pools,
             attack_sequence=self.attack_sequence,
@@ -361,6 +376,7 @@ class ShootingPhaseState:
             phase_complete=False,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=shot_unit_ids,
+            skipped_unit_ids=self.skipped_unit_ids,
             active_selection=None,
             attack_pools=(*self.attack_pools, *attack_pools),
             attack_sequence=attack_sequence,
@@ -379,21 +395,26 @@ class ShootingPhaseState:
             phase_complete=self.phase_complete,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=self.shot_unit_ids,
+            skipped_unit_ids=self.skipped_unit_ids,
             active_selection=self.active_selection,
             attack_pools=self.attack_pools,
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=allocated_model_ids_this_phase,
         )
 
-    def with_phase_complete(self) -> Self:
+    def with_phase_complete(self, *, skipped_unit_ids: tuple[str, ...] = ()) -> Self:
         if self.active_selection is not None:
             raise GameLifecycleError("Shooting completion requires no active selection.")
+        if self.attack_sequence is not None:
+            raise GameLifecycleError("Shooting completion requires no active attack sequence.")
+        skipped_ids = _validate_identifier_tuple("skipped_unit_ids", skipped_unit_ids)
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             phase_complete=True,
             selected_unit_ids=self.selected_unit_ids,
             shot_unit_ids=self.shot_unit_ids,
+            skipped_unit_ids=tuple(sorted({*self.skipped_unit_ids, *skipped_ids})),
             active_selection=None,
             attack_pools=self.attack_pools,
             attack_sequence=None,
@@ -407,6 +428,7 @@ class ShootingPhaseState:
             "phase_complete": self.phase_complete,
             "selected_unit_ids": list(self.selected_unit_ids),
             "shot_unit_ids": list(self.shot_unit_ids),
+            "skipped_unit_ids": list(self.skipped_unit_ids),
             "active_selection": (
                 None if self.active_selection is None else self.active_selection.to_payload()
             ),
@@ -426,6 +448,7 @@ class ShootingPhaseState:
             phase_complete=payload["phase_complete"],
             selected_unit_ids=tuple(payload["selected_unit_ids"]),
             shot_unit_ids=tuple(payload["shot_unit_ids"]),
+            skipped_unit_ids=tuple(payload["skipped_unit_ids"]),
             active_selection=(
                 None
                 if active_selection is None
@@ -646,13 +669,18 @@ class ShootingPhaseHandler:
         if shooting_state.phase_complete:
             decisions.event_log.append(
                 "shooting_phase_completed",
-                _shooting_phase_status_payload(state=state, phase_body_status="complete"),
+                _shooting_phase_status_payload(
+                    state=state,
+                    phase_body_status="complete",
+                    skipped_unit_ids=shooting_state.skipped_unit_ids,
+                ),
             )
             return LifecycleStatus.advanced(
                 stage=GameLifecycleStage.BATTLE,
                 payload=_shooting_phase_status_payload(
                     state=state,
                     phase_body_status=_COMPLETE_SHOOTING_PHASE_STATUS,
+                    skipped_unit_ids=shooting_state.skipped_unit_ids,
                 ),
             )
         if shooting_state.active_selection is not None:
@@ -1036,12 +1064,21 @@ def _apply_shooting_unit_selection_decision(
     if shooting_state is None:
         raise GameLifecycleError("Shooting unit selection requires shooting_phase_state.")
     if result.selected_option_id == COMPLETE_SHOOTING_PHASE_OPTION_ID:
-        state.shooting_phase_state = shooting_state.with_phase_complete()
+        skipped_unit_ids = _legal_shooting_unit_ids(
+            state=state,
+            shooting_state=shooting_state,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+        )
+        state.shooting_phase_state = shooting_state.with_phase_complete(
+            skipped_unit_ids=skipped_unit_ids,
+        )
         decisions.event_log.append(
             "shooting_phase_completion_declared",
             _shooting_phase_status_payload(
                 state=state,
                 phase_body_status=_COMPLETE_SHOOTING_PHASE_STATUS,
+                skipped_unit_ids=skipped_unit_ids,
             ),
         )
         return
@@ -2122,7 +2159,11 @@ def _legal_shooting_unit_ids(
     placed_unit_ids = _active_player_placed_unit_ids(state=state, player_id=active_player_id)
     legal: list[str] = []
     for unit_id in placed_unit_ids:
-        if unit_id in shooting_state.selected_unit_ids or unit_id in shooting_state.shot_unit_ids:
+        if (
+            unit_id in shooting_state.selected_unit_ids
+            or unit_id in shooting_state.shot_unit_ids
+            or unit_id in shooting_state.skipped_unit_ids
+        ):
             continue
         unit = _unit_by_id(state=state, unit_instance_id=unit_id)
         if not _unit_can_select_to_shoot(state=state, unit=unit, army_catalog=army_catalog):
@@ -2455,7 +2496,15 @@ def _shooting_unit_options(
             DecisionOption(
                 option_id=COMPLETE_SHOOTING_PHASE_OPTION_ID,
                 label="Complete Shooting Phase",
-                payload={"phase_body_status": _COMPLETE_SHOOTING_PHASE_STATUS},
+                payload={
+                    "submission_kind": COMPLETE_SHOOTING_PHASE_OPTION_ID,
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "active_player_id": state.active_player_id,
+                    "phase_body_status": _COMPLETE_SHOOTING_PHASE_STATUS,
+                    "skipped_unit_ids": list(unit_ids),
+                },
             )
         )
     return tuple(options)
@@ -2465,13 +2514,16 @@ def _shooting_phase_status_payload(
     *,
     state: GameState,
     phase_body_status: str,
+    skipped_unit_ids: tuple[str, ...] = (),
 ) -> dict[str, JsonValue]:
+    skipped_ids = _validate_identifier_tuple("skipped_unit_ids", skipped_unit_ids)
     return {
         "game_id": state.game_id,
         "battle_round": state.battle_round,
         "active_player_id": state.active_player_id,
         "phase": BattlePhase.SHOOTING.value,
         "phase_body_status": phase_body_status,
+        "skipped_unit_ids": list(skipped_ids),
     }
 
 

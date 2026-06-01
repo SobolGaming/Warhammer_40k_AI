@@ -50,6 +50,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.core_stratagem_effects import GO_TO_GROUND_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
@@ -89,6 +90,7 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
@@ -123,6 +125,7 @@ from warhammer40k_core.engine.phases.shooting import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.saves import (
+    SELECT_SAVING_THROW_KIND_DECISION_TYPE,
     PlungingFireModifier,
     PlungingFireModifierResult,
     SaveKind,
@@ -5138,8 +5141,14 @@ def test_invalid_shooting_declaration_submissions_do_not_consume_pending_request
 
 
 def test_shooting_phase_completion_uses_finite_lifecycle_option() -> None:
-    lifecycle, _units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    complete_option = next(
+        option
+        for option in request.options
+        if option.option_id == COMPLETE_SHOOTING_PHASE_OPTION_ID
+    )
+    complete_payload = cast(dict[str, object], complete_option.payload)
 
     status = _submit_result(
         lifecycle,
@@ -5152,12 +5161,141 @@ def test_shooting_phase_completion_uses_finite_lifecycle_option() -> None:
     state = _state(lifecycle)
     assert state.current_battle_phase is BattlePhase.CHARGE
     assert state.shooting_phase_state is None
+    assert complete_payload["submission_kind"] == COMPLETE_SHOOTING_PHASE_OPTION_ID
+    assert complete_payload["skipped_unit_ids"] == [units["intercessor-1"].unit_instance_id]
     assert "shooting_phase_completion_declared" in {
         record.event_type for record in lifecycle.decision_controller.event_log.records
     }
     assert "shooting_phase_completed" in {
         record.event_type for record in lifecycle.decision_controller.event_log.records
     }
+    completion_declared = _last_event_payload(lifecycle, "shooting_phase_completion_declared")
+    phase_completed = _last_event_payload(lifecycle, "shooting_phase_completed")
+    assert completion_declared["skipped_unit_ids"] == [units["intercessor-1"].unit_instance_id]
+    assert phase_completed["skipped_unit_ids"] == [units["intercessor-1"].unit_instance_id]
+
+
+def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
+    profile = _phase13f_gate_weapon_profile()
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        enemy_unit_specs=(
+            ("enemy", "core-intercessor-like-infantry", "core-intercessor-like", 10),
+        ),
+        enemy_pose=Pose.at(25.0, 35.0),
+        catalog=_catalog_with_extra_bolt_profile(profile),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    skipped = units["intercessor-2"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    selected_option = next(
+        option
+        for option in selection_request.options
+        if option.option_id == attacker.unit_instance_id
+    )
+    assert cast(dict[str, object], selected_option.payload)["unit_instance_id"] == (
+        attacker.unit_instance_id
+    )
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=selection_request,
+            option_id=attacker.unit_instance_id,
+            result_id="phase13f-select-attacker",
+        )
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+        weapon_profile_id=profile.profile_id,
+    )
+
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13f-submit-declaration",
+    )
+    next_selection_status = _submit_phase13f_pending_attack_choices(
+        lifecycle,
+        status=status,
+        result_id_prefix="phase13f-attack",
+    )
+    next_selection_request = _decision_request(next_selection_status)
+    complete_option = next(
+        option
+        for option in next_selection_request.options
+        if option.option_id == COMPLETE_SHOOTING_PHASE_OPTION_ID
+    )
+    complete_payload = cast(dict[str, object], complete_option.payload)
+
+    final_status = _submit_result(
+        lifecycle,
+        request=next_selection_request,
+        option_id=COMPLETE_SHOOTING_PHASE_OPTION_ID,
+        result_id="phase13f-complete-after-attacks",
+    )
+    event_types = [event.event_type for event in lifecycle.decision_controller.event_log.records]
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    accepted_pool = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    model_destroyed_payload = _last_event_payload(lifecycle, "model_destroyed")
+    save_events = _attack_step_payloads(lifecycle, AttackSequenceStep.SAVE)
+
+    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert _state(lifecycle).current_battle_phase is BattlePhase.CHARGE
+    assert _state(lifecycle).shooting_phase_state is None
+    assert accepted_pool["target_visible_model_ids"]
+    assert accepted_pool["target_in_range_model_ids"]
+    assert model_destroyed_payload["transition_batch"] == {
+        "placements": [],
+        "removals": [model_destroyed_payload["removal_record"]],
+        "displacements": [],
+    }
+    assert any(_save_payload_has_cover(save_event) for save_event in save_events)
+    assert event_types.index("attack_sequence_completed") < event_types.index(
+        "shooting_phase_completion_declared"
+    )
+    assert complete_payload["skipped_unit_ids"] == [skipped.unit_instance_id]
+    assert _last_event_payload(lifecycle, "shooting_phase_completion_declared")[
+        "skipped_unit_ids"
+    ] == [skipped.unit_instance_id]
+
+
+def test_phase13f_shooting_completion_runs_for_both_players() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+
+    player_a_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    player_a_status = _submit_result(
+        lifecycle,
+        request=player_a_request,
+        option_id=COMPLETE_SHOOTING_PHASE_OPTION_ID,
+        result_id="phase13f-player-a-complete",
+    )
+    state = _state(lifecycle)
+    assert player_a_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.current_battle_phase is BattlePhase.CHARGE
+
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    state.active_player_id = "player-b"
+    player_b_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    player_b_option_ids = {option.option_id for option in player_b_request.options}
+    player_b_status = _submit_result(
+        lifecycle,
+        request=player_b_request,
+        option_id=COMPLETE_SHOOTING_PHASE_OPTION_ID,
+        result_id="phase13f-player-b-complete",
+    )
+    player_b_completed = _last_event_payload(lifecycle, "shooting_phase_completed")
+
+    assert player_b_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert player_b_request.actor_id == "player-b"
+    assert units["enemy"].unit_instance_id in player_b_option_ids
+    assert player_b_completed["active_player_id"] == "player-b"
+    assert player_b_completed["skipped_unit_ids"] == [units["enemy"].unit_instance_id]
 
 
 def test_shooting_phase_state_fails_fast_on_drift() -> None:
@@ -6184,6 +6322,98 @@ def test_shooting_declaration_request_drift_diagnostics_are_typed() -> None:
         "source_decision_result_drift",
         "visibility_cache_key_drift",
     }
+
+
+def _phase13f_gate_weapon_profile() -> WeaponProfile:
+    base = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    return replace(
+        base,
+        profile_id="phase13f-gate-rifle",
+        name="Phase 13F gate rifle",
+        attack_profile=AttackProfile.fixed(4),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -3),
+        damage_profile=DamageProfile.fixed(3),
+        keywords=(WeaponKeyword.TORRENT,),
+        abilities=(),
+    )
+
+
+def _phase13f_cover_effect(target_unit_instance_id: str) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id="phase13f-go-to-ground-cover",
+        source_rule_id="core-stratagem:go-to-ground",
+        owner_player_id="player-b",
+        target_unit_instance_ids=(target_unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhase.SHOOTING,
+            player_id="player-a",
+        ),
+        effect_payload={
+            "effect_kind": GO_TO_GROUND_EFFECT_KIND,
+            "benefit_of_cover": True,
+        },
+    )
+
+
+def _submit_phase13f_pending_attack_choices(
+    lifecycle: GameLifecycle,
+    *,
+    status: LifecycleStatus,
+    result_id_prefix: str,
+) -> LifecycleStatus:
+    attack_decision_types = {
+        SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        SELECT_SAVING_THROW_KIND_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    }
+    current = status
+    for index in range(128):
+        if current.status_kind is LifecycleStatusKind.UNSUPPORTED:
+            return current
+        request = _decision_request(current)
+        if request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
+            return current
+        if request.decision_type not in attack_decision_types:
+            raise AssertionError(f"Unexpected Phase 13F decision type {request.decision_type}.")
+        option = request.options[0]
+        current = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"{result_id_prefix}-{index:03d}",
+                request=request,
+                selected_option_id=option.option_id,
+            )
+        )
+    raise AssertionError("Phase 13F attack sequence did not drain.")
+
+
+def _attack_step_payloads(
+    lifecycle: GameLifecycle,
+    step: AttackSequenceStep,
+) -> tuple[dict[str, object], ...]:
+    return tuple(
+        event
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == step.value
+    )
+
+
+def _save_payload_has_cover(event: dict[str, object]) -> bool:
+    payload = cast(dict[str, object], event["payload"])
+    option = cast(dict[str, object], payload["option"])
+    cover_result = option.get("cover_result")
+    if option["cover_applied"] is not True or not isinstance(cover_result, dict):
+        return False
+    cover_payload = cast(dict[str, object], cover_result)
+    return cover_payload.get("has_benefit") is True
 
 
 def _shooting_lifecycle(
