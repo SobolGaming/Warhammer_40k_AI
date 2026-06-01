@@ -41,6 +41,7 @@ class WeaponKeyword(StrEnum):
 
 
 class AbilityKind(StrEnum):
+    DEVASTATING_WOUNDS = "devastating_wounds"
     SUSTAINED_HITS = "sustained_hits"
     MELTA = "melta"
     RAPID_FIRE = "rapid_fire"
@@ -55,6 +56,11 @@ class AbilityTiming(StrEnum):
 
 class AbilityCondition(StrEnum):
     STATIONARY_OR_POLICY_DEFINED = "stationary_or_policy_defined"
+
+
+class DevastatingWoundsEffect(StrEnum):
+    MORTAL_WOUNDS = "mortal_wounds"
+    NO_SAVES = "no_saves"
 
 
 class RangeProfileKind(StrEnum):
@@ -213,6 +219,20 @@ class AbilityDescriptor:
                 AbilityParameter(name="keyword", value=canonical_keyword),
                 AbilityParameter(name="threshold", value=threshold),
             ),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+
+    @classmethod
+    def devastating_wounds(
+        cls,
+        effect: DevastatingWoundsEffect = DevastatingWoundsEffect.MORTAL_WOUNDS,
+    ) -> Self:
+        resolved_effect = devastating_wounds_effect_from_token(effect)
+        return cls(
+            ability_id=f"devastating-wounds:{resolved_effect.value}",
+            name="Devastating Wounds",
+            ability_kind=AbilityKind.DEVASTATING_WOUNDS,
+            parameters=(AbilityParameter(name="effect", value=resolved_effect.value),),
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
@@ -522,6 +542,17 @@ def ability_condition_from_token(token: object | None) -> AbilityCondition | Non
         raise WeaponProfileError(f"Unsupported ability condition token: {token}.") from exc
 
 
+def devastating_wounds_effect_from_token(token: object) -> DevastatingWoundsEffect:
+    if type(token) is DevastatingWoundsEffect:
+        return token
+    if type(token) is not str:
+        raise WeaponProfileError("DevastatingWoundsEffect token must be a string.")
+    try:
+        return DevastatingWoundsEffect(token)
+    except ValueError as exc:
+        raise WeaponProfileError(f"Unsupported DevastatingWoundsEffect token: {token}.") from exc
+
+
 def range_profile_kind_from_token(token: object) -> RangeProfileKind:
     if type(token) is not str:
         raise WeaponProfileError("RangeProfile kind token must be a string.")
@@ -765,6 +796,14 @@ def _validate_supported_ability_shape(
             raise WeaponProfileError("Anti keyword ability must not include a condition.")
         return
 
+    if ability_kind is AbilityKind.DEVASTATING_WOUNDS:
+        _validate_devastating_wounds_parameters(parameters)
+        if timing is not AbilityTiming.ATTACK_SEQUENCE:
+            raise WeaponProfileError("Devastating Wounds ability must use attack timing.")
+        if condition is not None:
+            raise WeaponProfileError("Devastating Wounds ability must not include a condition.")
+        return
+
     if ability_kind is AbilityKind.HEAVY:
         if parameters:
             raise WeaponProfileError("Heavy ability must not include parameters.")
@@ -803,6 +842,12 @@ def _validate_anti_keyword_parameters(parameters: tuple[AbilityParameter, ...]) 
         "anti_keyword threshold parameter",
         by_name["threshold"].value,
     )
+
+
+def _validate_devastating_wounds_parameters(parameters: tuple[AbilityParameter, ...]) -> None:
+    if len(parameters) != 1 or parameters[0].name != "effect":
+        raise WeaponProfileError("devastating_wounds ability must include one effect parameter.")
+    devastating_wounds_effect_from_token(parameters[0].value)
 
 
 def _canonical_rule_keyword(keyword: object) -> str:

@@ -99,6 +99,7 @@ def test_range_attack_and_damage_profiles_consume_parsed_values() -> None:
 
 def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     abilities = (
+        AbilityDescriptor.devastating_wounds(),
         AbilityDescriptor.sustained_hits(1),
         AbilityDescriptor.melta(2),
         AbilityDescriptor.rapid_fire(1),
@@ -108,15 +109,17 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     payloads = [ability.to_payload() for ability in abilities]
     blob = json.dumps(payloads, sort_keys=True)
 
-    assert payloads[0]["ability_kind"] == AbilityKind.SUSTAINED_HITS.value
-    assert payloads[0]["parameters"] == [{"name": "value", "value": 1}]
-    assert payloads[3]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
-    assert payloads[3]["parameters"] == [
+    assert payloads[0]["ability_kind"] == AbilityKind.DEVASTATING_WOUNDS.value
+    assert payloads[0]["parameters"] == [{"name": "effect", "value": "mortal_wounds"}]
+    assert payloads[1]["ability_kind"] == AbilityKind.SUSTAINED_HITS.value
+    assert payloads[1]["parameters"] == [{"name": "value", "value": 1}]
+    assert payloads[4]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
+    assert payloads[4]["parameters"] == [
         {"name": "keyword", "value": "INFANTRY"},
         {"name": "threshold", "value": 4},
     ]
-    assert payloads[4]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
-    assert payloads[4]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
+    assert payloads[5]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
+    assert payloads[5]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities
@@ -136,6 +139,14 @@ def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
         AbilityDescriptor.sustained_hits(0)
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor.anti_keyword("Infantry", 1)
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="bad-devastating-wounds",
+            name="Bad Devastating Wounds",
+            ability_kind=AbilityKind.DEVASTATING_WOUNDS,
+            parameters=(AbilityParameter(name="effect", value="unsupported"),),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor(
             ability_id="bad-anti-keyword",

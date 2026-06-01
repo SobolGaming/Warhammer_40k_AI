@@ -36,9 +36,11 @@ from warhammer40k_core.engine.weapon_abilities import (
     HEAVY_RULE_ID,
     MELTA_RULE_ID,
     RAPID_FIRE_RULE_ID,
+    DevastatingWoundsResolution,
     anti_keyword_critical_threshold,
     blast_attack_bonus,
     blast_rule_id,
+    devastating_wounds_resolution,
     has_weapon_keyword,
     heavy_rule_id,
     melta_damage_bonus,
@@ -55,11 +57,13 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
         keywords=(
             WeaponKeyword.ASSAULT,
             WeaponKeyword.BLAST,
+            WeaponKeyword.DEVASTATING_WOUNDS,
             WeaponKeyword.MELTA,
             WeaponKeyword.RAPID_FIRE,
             WeaponKeyword.SUSTAINED_HITS,
         ),
         abilities=(
+            AbilityDescriptor.devastating_wounds(),
             AbilityDescriptor.rapid_fire(2),
             AbilityDescriptor.melta(3),
             AbilityDescriptor.sustained_hits(2),
@@ -68,6 +72,7 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
 
     assert has_weapon_keyword(profile, WeaponKeyword.ASSAULT)
     assert weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE) == 2
+    assert devastating_wounds_resolution(profile) is DevastatingWoundsResolution.MORTAL_WOUNDS
     assert rapid_fire_attack_bonus(profile, target_within_half_range=True) == 2
     assert rapid_fire_attack_bonus(profile, target_within_half_range=False) == 0
     assert melta_damage_bonus(profile, target_within_half_range=True) == 3
@@ -83,6 +88,11 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
 
 def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> None:
     profile = _profile(keywords=(WeaponKeyword.RAPID_FIRE,), abilities=())
+    devastating_profile = _profile(keywords=(WeaponKeyword.DEVASTATING_WOUNDS,), abilities=())
+    orphan_devastating_profile = _profile(
+        keywords=(),
+        abilities=(AbilityDescriptor.devastating_wounds(),),
+    )
     duplicate_profile = _profile(
         keywords=(),
         abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
@@ -91,6 +101,10 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
 
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
         weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE)
+    with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
+        devastating_wounds_resolution(devastating_profile)
+    with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
+        devastating_wounds_resolution(orphan_devastating_profile)
     with pytest.raises(GameLifecycleError, match="duplicate ability descriptors"):
         weapon_ability_int_value(duplicate_profile, AbilityKind.RAPID_FIRE)
     assert weapon_ability_int_value(no_descriptor_profile, AbilityKind.HEAVY) is None

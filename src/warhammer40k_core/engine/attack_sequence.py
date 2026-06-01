@@ -60,6 +60,7 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSourcePayload,
     allocation_context_for_unit,
     apply_damage_to_model,
+    apply_mortal_wounds_to_unit,
     build_attack_allocation_request,
     build_feel_no_pain_request,
     damage_kind_from_token,
@@ -97,12 +98,15 @@ from warhammer40k_core.engine.shooting_targets import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
+    DEVASTATING_WOUNDS_RULE_ID,
     HAZARDOUS_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
     MELTA_RULE_ID,
     TWIN_LINKED_RULE_ID,
+    DevastatingWoundsResolution,
     anti_keyword_critical_threshold,
+    devastating_wounds_resolution,
     has_weapon_keyword,
     melta_damage_bonus,
     sustained_hits_generated_hits,
@@ -185,6 +189,7 @@ class AttackSequencePayload(TypedDict):
     attack_index: int
     generated_hit_index: int
     current_hit_roll: HitRollPayload | None
+    deferred_mortal_wounds: list[DeferredMortalWoundsPayload]
 
 
 class AttackResolutionContextPayload(TypedDict):
@@ -212,6 +217,13 @@ class LostWoundContextPayload(TypedDict):
     damage_kind: str
     requested_wounds: int
     saving_throw: JsonValue
+
+
+class DeferredMortalWoundsPayload(TypedDict):
+    source_rule_id: str
+    target_unit_instance_id: str
+    attack_context_id: str
+    mortal_wounds: int
 
 
 class FastDiceGroupPayload(TypedDict):
@@ -589,6 +601,59 @@ class AttackModifierStackSet:
 
 
 @dataclass(frozen=True, slots=True)
+class DeferredMortalWounds:
+    source_rule_id: str
+    target_unit_instance_id: str
+    attack_context_id: str
+    mortal_wounds: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("DeferredMortalWounds source_rule_id", self.source_rule_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier(
+                "DeferredMortalWounds target_unit_instance_id",
+                self.target_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attack_context_id",
+            _validate_identifier(
+                "DeferredMortalWounds attack_context_id",
+                self.attack_context_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "mortal_wounds",
+            _validate_positive_int("DeferredMortalWounds mortal_wounds", self.mortal_wounds),
+        )
+
+    def to_payload(self) -> DeferredMortalWoundsPayload:
+        return {
+            "source_rule_id": self.source_rule_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "attack_context_id": self.attack_context_id,
+            "mortal_wounds": self.mortal_wounds,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DeferredMortalWoundsPayload) -> Self:
+        return cls(
+            source_rule_id=payload["source_rule_id"],
+            target_unit_instance_id=payload["target_unit_instance_id"],
+            attack_context_id=payload["attack_context_id"],
+            mortal_wounds=payload["mortal_wounds"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class AttackSequence:
     sequence_id: str
     attacker_player_id: str
@@ -598,6 +663,7 @@ class AttackSequence:
     attack_index: int = 0
     generated_hit_index: int = 0
     current_hit_roll: HitRoll | None = None
+    deferred_mortal_wounds: tuple[DeferredMortalWounds, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -643,6 +709,11 @@ class AttackSequence:
         )
         if self.current_hit_roll is not None and type(self.current_hit_roll) is not HitRoll:
             raise GameLifecycleError("AttackSequence current_hit_roll must be a HitRoll.")
+        object.__setattr__(
+            self,
+            "deferred_mortal_wounds",
+            _validate_deferred_mortal_wounds(self.deferred_mortal_wounds),
+        )
         if self.pool_index > len(self.attack_pools):
             raise GameLifecycleError("AttackSequence pool_index is outside attack_pools.")
         if self.pool_index == len(self.attack_pools):
@@ -717,6 +788,7 @@ class AttackSequence:
                 attack_pools=self.attack_pools,
                 pool_index=self.pool_index,
                 attack_index=next_attack_index,
+                deferred_mortal_wounds=self.deferred_mortal_wounds,
             )
         next_pool_index = self.pool_index + 1
         return type(self)(
@@ -726,6 +798,7 @@ class AttackSequence:
             attack_pools=self.attack_pools,
             pool_index=next_pool_index,
             attack_index=0,
+            deferred_mortal_wounds=self.deferred_mortal_wounds,
         )
 
     def advanced_after_generated_hit(self, hit_roll: HitRoll) -> Self:
@@ -744,6 +817,7 @@ class AttackSequence:
                 attack_pools=self.attack_pools,
                 pool_index=self.pool_index,
                 attack_index=self.attack_index,
+                deferred_mortal_wounds=self.deferred_mortal_wounds,
             ).advanced_after_attack()
         return type(self)(
             sequence_id=self.sequence_id,
@@ -754,6 +828,22 @@ class AttackSequence:
             attack_index=self.attack_index,
             generated_hit_index=next_generated_hit_index,
             current_hit_roll=hit_roll,
+            deferred_mortal_wounds=self.deferred_mortal_wounds,
+        )
+
+    def with_deferred_mortal_wounds(self, deferred: DeferredMortalWounds) -> Self:
+        if type(deferred) is not DeferredMortalWounds:
+            raise GameLifecycleError("AttackSequence deferred mortal wounds are invalid.")
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            pool_index=self.pool_index,
+            attack_index=self.attack_index,
+            generated_hit_index=self.generated_hit_index,
+            current_hit_roll=self.current_hit_roll,
+            deferred_mortal_wounds=(*self.deferred_mortal_wounds, deferred),
         )
 
     def to_payload(self) -> AttackSequencePayload:
@@ -768,6 +858,9 @@ class AttackSequence:
             "current_hit_roll": (
                 None if self.current_hit_roll is None else self.current_hit_roll.to_payload()
             ),
+            "deferred_mortal_wounds": [
+                deferred.to_payload() for deferred in self.deferred_mortal_wounds
+            ],
         }
 
     @classmethod
@@ -786,6 +879,10 @@ class AttackSequence:
                 None
                 if payload["current_hit_roll"] is None
                 else HitRoll.from_payload(payload["current_hit_roll"])
+            ),
+            deferred_mortal_wounds=tuple(
+                DeferredMortalWounds.from_payload(deferred)
+                for deferred in payload["deferred_mortal_wounds"]
             ),
         )
 
@@ -943,6 +1040,16 @@ def resolve_attack_sequence_until_blocked(
                 attack_context=attack_context,
             )
             continue
+        devastating_sequence = _defer_devastating_mortal_wounds_if_needed(
+            decisions=decisions,
+            manager=manager,
+            attack_sequence=current,
+            attack_context=attack_context,
+            hooks=active_hooks,
+        )
+        if devastating_sequence is not None:
+            current = devastating_sequence
+            continue
 
         allocation_context = allocation_context_for_unit(
             state=state,
@@ -1019,6 +1126,12 @@ def resolve_attack_sequence_until_blocked(
         if next_sequence is None:
             return None, allocated_model_ids, None
         current = next_sequence
+    _apply_deferred_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=current,
+    )
     decisions.event_log.append(
         "attack_sequence_completed",
         {
@@ -1174,6 +1287,111 @@ def apply_feel_no_pain_decision(
     )
 
 
+def _defer_devastating_mortal_wounds_if_needed(
+    *,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    hooks: AttackSequenceHooks,
+) -> AttackSequence | None:
+    pool = attack_sequence.current_pool()
+    resolution = _devastating_wounds_resolution_for_attack(
+        pool=pool,
+        attack_context=attack_context,
+    )
+    if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
+        return None
+    mortal_wounds = _damage_value(
+        manager=manager,
+        profile=pool.weapon_profile.damage_profile,
+        attack_context_id=attack_context["attack_context_id"],
+        attacker_player_id=attack_sequence.attacker_player_id,
+    ) + _melta_damage_modifier(pool)
+    deferred = DeferredMortalWounds(
+        source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
+        target_unit_instance_id=attack_context["target_unit_instance_id"],
+        attack_context_id=attack_context["attack_context_id"],
+        mortal_wounds=mortal_wounds,
+    )
+    _emit_event(
+        decisions=decisions,
+        hooks=hooks,
+        event=AttackSequenceEvent(
+            step=AttackSequenceStep.DAMAGE,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_sequence.attack_context_id(),
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_sequence.attack_index,
+            payload=validate_json_value(
+                {
+                    "saving_throw": None,
+                    "damage_application": None,
+                    "feel_no_pain": None,
+                    "deferred_mortal_wounds": deferred.to_payload(),
+                }
+            ),
+        ),
+    )
+    decisions.event_log.append(
+        "devastating_wounds_deferred",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attack_context_id": attack_context["attack_context_id"],
+            "target_unit_instance_id": attack_context["target_unit_instance_id"],
+            "mortal_wounds": mortal_wounds,
+            "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
+        },
+    )
+    return _advance_after_resolved_hit(
+        attack_sequence=attack_sequence.with_deferred_mortal_wounds(deferred),
+        attack_context=attack_context,
+    )
+
+
+def _apply_deferred_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+) -> None:
+    if not attack_sequence.deferred_mortal_wounds:
+        return
+    mortal_wounds_by_target: dict[str, int] = {}
+    attack_context_ids_by_target: dict[str, list[str]] = {}
+    for deferred in attack_sequence.deferred_mortal_wounds:
+        current = mortal_wounds_by_target.get(deferred.target_unit_instance_id, 0)
+        mortal_wounds_by_target[deferred.target_unit_instance_id] = current + deferred.mortal_wounds
+        attack_context_ids_by_target.setdefault(deferred.target_unit_instance_id, []).append(
+            deferred.attack_context_id
+        )
+    for target_unit_id, mortal_wounds in mortal_wounds_by_target.items():
+        application = apply_mortal_wounds_to_unit(
+            state=state,
+            target_unit_instance_id=target_unit_id,
+            mortal_wounds=mortal_wounds,
+            spill_over=True,
+            dice_manager=manager,
+            defender_player_id=unit_owner_player_id(
+                state=state,
+                unit_instance_id=target_unit_id,
+            ),
+        )
+        decisions.event_log.append(
+            "devastating_wounds_mortal_wounds_applied",
+            {
+                "sequence_id": attack_sequence.sequence_id,
+                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                "target_unit_instance_id": target_unit_id,
+                "attack_context_ids": attack_context_ids_by_target[target_unit_id],
+                "mortal_wounds": mortal_wounds,
+                "mortal_wound_application": application.to_payload(),
+                "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
+            },
+        )
+
+
 def _continue_after_allocation(
     *,
     state: GameState,
@@ -1226,9 +1444,13 @@ def _continue_after_allocation(
             source_rule_id=INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
             los_cache_key=f"{attack_context['attack_context_id']}:indirect-cover",
         )
-    no_saves_allowed = has_weapon_keyword(
-        pool.weapon_profile, WeaponKeyword.DEVASTATING_WOUNDS
-    ) and bool(attack_context["wound_roll"]["critical"])
+    no_saves_allowed = (
+        _devastating_wounds_resolution_for_attack(
+            pool=pool,
+            attack_context=attack_context,
+        )
+        is DevastatingWoundsResolution.NO_SAVES
+    )
     save_options = save_options_for_model(
         model=allocated_model,
         armor_penetration=pool.weapon_profile.armor_penetration.final,
@@ -1973,6 +2195,16 @@ def _melta_damage_modifier(pool: RangedAttackPool) -> int:
     return melta_damage_bonus(pool.weapon_profile, target_within_half_range=True)
 
 
+def _devastating_wounds_resolution_for_attack(
+    *,
+    pool: RangedAttackPool,
+    attack_context: AttackResolutionContextPayload,
+) -> DevastatingWoundsResolution | None:
+    if not bool(attack_context["wound_roll"]["critical"]):
+        return None
+    return devastating_wounds_resolution(pool.weapon_profile)
+
+
 def _resolve_hazardous_tests(
     *,
     state: GameState,
@@ -2248,6 +2480,19 @@ def _validate_attack_pools(values: object) -> tuple[RangedAttackPool, ...]:
     if not pools:
         raise GameLifecycleError("AttackSequence requires at least one attack pool.")
     return tuple(pools)
+
+
+def _validate_deferred_mortal_wounds(values: object) -> tuple[DeferredMortalWounds, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("AttackSequence deferred_mortal_wounds must be a tuple.")
+    deferred: list[DeferredMortalWounds] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DeferredMortalWounds:
+            raise GameLifecycleError(
+                "AttackSequence deferred_mortal_wounds must contain deferred mortal wounds."
+            )
+        deferred.append(value)
+    return tuple(deferred)
 
 
 def _validate_fast_dice_pools(values: object) -> tuple[RangedAttackPool, ...]:

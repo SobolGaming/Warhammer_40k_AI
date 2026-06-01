@@ -6,6 +6,7 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -20,6 +21,12 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.weapon_profiles import (
+    AttackProfile,
+    DamageProfile,
+    RangeProfile,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.battle_shock import (
     collect_battle_shock_test_requests,
     friendly_stratagem_target_permission,
@@ -27,6 +34,8 @@ from warhammer40k_core.engine.battle_shock import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
+    PlacementError,
+    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
@@ -36,7 +45,6 @@ from warhammer40k_core.engine.command_points import (
     CommandPointSpendStatus,
 )
 from warhammer40k_core.engine.core_stratagem_effects import (
-    FIRE_OVERWATCH_EFFECT_KIND,
     GO_TO_GROUND_EFFECT_KIND,
     GO_TO_GROUND_INVULNERABLE_SAVE,
     SMOKESCREEN_EFFECT_KIND,
@@ -79,11 +87,14 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
 )
+from warhammer40k_core.engine.shooting_targets import shooting_target_candidate_for_model
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     timing_trigger_kind_from_token,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
+from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -113,6 +124,7 @@ GO_TO_GROUND_TARGET_POLICY_ID = "selected_target_infantry_unit"
 GRENADE_TARGET_POLICY_ID = "grenades_unit_and_enemy_target"
 SMOKESCREEN_TARGET_POLICY_ID = "selected_target_smoke_unit"
 GRENADE_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
+SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
 
 
 class StratagemAvailabilityKind(StrEnum):
@@ -1960,15 +1972,19 @@ def _handler_unavailable_reason(
             )
         return None
     if definition.handler_id == CORE_FIRE_OVERWATCH_HANDLER_ID:
-        if context.active_player_id == context.player_id:
-            return "fire_overwatch_requires_opponent_turn"
-        return None
+        return "fire_overwatch_out_of_phase_shooting_unsupported"
     if definition.handler_id in {
         CORE_GO_TO_GROUND_HANDLER_ID,
         CORE_SMOKESCREEN_HANDLER_ID,
     }:
         if context.active_player_id == context.player_id:
             return "defensive_stratagem_requires_opponent_turn"
+        selected_context_error = _selected_target_context_error(
+            context=context,
+            target_binding=target_binding,
+        )
+        if selected_context_error is not None:
+            return selected_context_error
         return None
     if definition.handler_id == CORE_GRENADE_HANDLER_ID:
         if target_binding is None:
@@ -2296,6 +2312,49 @@ def _command_reroll_state(context: StratagemEligibilityContext) -> DiceRollState
     return DiceRollState.from_payload(cast(DiceRollStatePayload, roll_payload))
 
 
+def _selected_target_context_error(
+    *,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> str | None:
+    if context.trigger_kind is not TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET:
+        return "selected_target_requires_target_selection_trigger"
+    if context.phase is not BattlePhase.SHOOTING:
+        return "selected_target_requires_shooting_phase"
+    selected_unit_ids = _selected_target_unit_ids_or_none(context)
+    if selected_unit_ids is None:
+        return "missing_selected_target_context"
+    if not selected_unit_ids:
+        return "no_selected_target_units"
+    if target_binding is None:
+        return None
+    if _require_target_unit_id(target_binding) not in selected_unit_ids:
+        return "unit_not_selected_as_target"
+    return None
+
+
+def _selected_target_unit_ids_or_none(
+    context: StratagemEligibilityContext,
+) -> tuple[str, ...] | None:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return None
+    raw_unit_ids = trigger_payload.get(SELECTED_TARGET_UNIT_CONTEXT_KEY)
+    if not isinstance(raw_unit_ids, list):
+        return None
+    unit_ids: list[str] = []
+    seen: set[str] = set()
+    for raw_unit_id in raw_unit_ids:
+        if type(raw_unit_id) is not str:
+            return None
+        unit_id = _validate_identifier("Selected target unit id", raw_unit_id)
+        if unit_id in seen:
+            return None
+        seen.add(unit_id)
+        unit_ids.append(unit_id)
+    return tuple(sorted(unit_ids))
+
+
 def _grenade_context_error(
     *,
     state: GameState,
@@ -2304,6 +2363,28 @@ def _grenade_context_error(
 ) -> str | None:
     if not _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="GRENADES"):
         return "unit_not_grenades"
+    grenades_unit_id = _require_target_unit_id(target_binding)
+    if (
+        state.advanced_unit_state_for_unit(
+            player_id=context.player_id,
+            battle_round=context.battle_round,
+            unit_instance_id=grenades_unit_id,
+        )
+        is not None
+    ):
+        return "grenades_unit_advanced"
+    if (
+        state.fell_back_unit_state_for_unit(
+            player_id=context.player_id,
+            battle_round=context.battle_round,
+            unit_instance_id=grenades_unit_id,
+        )
+        is not None
+    ):
+        return "grenades_unit_fell_back"
+    shooting_state = state.shooting_phase_state
+    if shooting_state is not None and grenades_unit_id in shooting_state.shot_unit_ids:
+        return "grenades_unit_already_shot"
     target_unit_id = _grenade_target_unit_id_or_none(context)
     if target_unit_id is None:
         return "missing_grenade_target"
@@ -2314,6 +2395,26 @@ def _grenade_context_error(
         return "grenade_target_not_enemy"
     if state.battlefield_state is None:
         return "grenade_requires_battlefield"
+    if state.mission_setup is None:
+        return "grenade_requires_mission_setup"
+    if _unit_is_within_enemy_engagement_range(
+        state=state,
+        player_id=context.player_id,
+        unit_instance_id=grenades_unit_id,
+    ):
+        return "grenades_unit_in_engagement_range"
+    if _enemy_unit_is_within_friendly_engagement_range(
+        state=state,
+        player_id=context.player_id,
+        target_unit_instance_id=target_unit_id,
+    ):
+        return "grenade_target_engaged_with_friendly_unit"
+    if not _grenade_target_is_visible_and_in_range(
+        state=state,
+        grenades_unit_instance_id=grenades_unit_id,
+        target_unit_instance_id=target_unit_id,
+    ):
+        return "grenade_target_not_visible_and_within_range"
     return None
 
 
@@ -2334,6 +2435,157 @@ def _grenade_target_unit_id_or_none(context: StratagemEligibilityContext) -> str
     return _validate_identifier("Grenade target unit id", target_unit_id)
 
 
+def _grenade_target_is_visible_and_in_range(
+    *,
+    state: GameState,
+    grenades_unit_instance_id: str,
+    target_unit_instance_id: str,
+) -> bool:
+    scenario = _battlefield_scenario_for_stratagem(state)
+    unit = _unit_by_id(state=state, unit_instance_id=grenades_unit_instance_id)
+    terrain_features = _stratagem_terrain_features(state)
+    profile = _grenade_visibility_profile()
+    for model in unit.own_models:
+        if not model.is_alive:
+            continue
+        candidate = shooting_target_candidate_for_model(
+            scenario=scenario,
+            ruleset_descriptor=_stratagem_ruleset_descriptor(),
+            attacker_unit=unit,
+            attacker_model_instance_id=model.model_instance_id,
+            weapon_profile=profile,
+            target_unit_id=target_unit_instance_id,
+            terrain_features=terrain_features,
+        )
+        if candidate.is_legal:
+            return True
+    return False
+
+
+def _unit_is_within_enemy_engagement_range(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> bool:
+    unit_models = _geometry_models_for_unit(state=state, unit_instance_id=unit_instance_id)
+    for army in state.army_definitions:
+        if army.player_id == player_id:
+            continue
+        for unit in army.units:
+            if _any_models_within_engagement_range(
+                first_models=unit_models,
+                second_models=_geometry_models_for_unit(
+                    state=state,
+                    unit_instance_id=unit.unit_instance_id,
+                ),
+            ):
+                return True
+    return False
+
+
+def _enemy_unit_is_within_friendly_engagement_range(
+    *,
+    state: GameState,
+    player_id: str,
+    target_unit_instance_id: str,
+) -> bool:
+    target_models = _geometry_models_for_unit(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+    )
+    for army in state.army_definitions:
+        if army.player_id != player_id:
+            continue
+        for unit in army.units:
+            if _any_models_within_engagement_range(
+                first_models=_geometry_models_for_unit(
+                    state=state,
+                    unit_instance_id=unit.unit_instance_id,
+                ),
+                second_models=target_models,
+            ):
+                return True
+    return False
+
+
+def _any_models_within_engagement_range(
+    *,
+    first_models: tuple[Model, ...],
+    second_models: tuple[Model, ...],
+) -> bool:
+    policy = _stratagem_ruleset_descriptor().engagement_policy
+    for first_model in first_models:
+        for second_model in second_models:
+            if first_model.is_within_engagement_range(
+                second_model,
+                horizontal_inches=policy.horizontal_inches,
+                vertical_inches=policy.vertical_inches,
+            ):
+                return True
+    return False
+
+
+def _geometry_models_for_unit(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[Model, ...]:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Stratagem geometry requires battlefield_state.")
+    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
+    try:
+        models = tuple(
+            geometry_model_for_placement(
+                model=model,
+                placement=battlefield_state.model_placement_by_id(model.model_instance_id),
+            )
+            for model in unit.own_models
+            if model.is_alive
+        )
+    except PlacementError as exc:
+        raise GameLifecycleError("Stratagem geometry placement is invalid.") from exc
+    return models
+
+
+def _battlefield_scenario_for_stratagem(state: GameState) -> BattlefieldScenario:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Stratagem battlefield scenario requires battlefield_state.")
+    try:
+        return BattlefieldScenario(
+            armies=tuple(state.army_definitions),
+            battlefield_state=battlefield_state,
+        )
+    except PlacementError as exc:
+        raise GameLifecycleError("Stratagem battlefield scenario is invalid.") from exc
+
+
+def _stratagem_terrain_features(state: GameState) -> tuple[TerrainFeatureDefinition, ...]:
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise GameLifecycleError("Stratagem terrain requires mission_setup.")
+    return mission_setup.terrain_features
+
+
+def _stratagem_ruleset_descriptor() -> RulesetDescriptor:
+    return RulesetDescriptor.warhammer_40000_tenth()
+
+
+def _grenade_visibility_profile() -> WeaponProfile:
+    return WeaponProfile(
+        profile_id="core-stratagem:grenade:visibility-range",
+        name="Grenade Stratagem Visibility Range",
+        range_profile=RangeProfile.distance(8),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 1),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+    )
+
+
 def _unit_owner(*, state: GameState, unit_instance_id: str) -> str | None:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in state.army_definitions:
@@ -2341,6 +2593,15 @@ def _unit_owner(*, state: GameState, unit_instance_id: str) -> str | None:
             if unit.unit_instance_id == requested_unit_id:
                 return army.player_id
     return None
+
+
+def _unit_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit_id:
+                return unit
+    raise GameLifecycleError("unit_instance_id is unknown.")
 
 
 def _reserve_state_for_target(
@@ -2690,19 +2951,11 @@ def _apply_supported_stratagem_handler(
             use_record=use_record,
         )
         return
-    if definition.handler_id == CORE_FIRE_OVERWATCH_HANDLER_ID:
-        _apply_fire_overwatch_handler(
-            state=state,
-            decisions=decisions,
-            context=context,
-            target_binding=target_binding,
-            use_record=use_record,
-        )
-        return
     if definition.handler_id == CORE_GO_TO_GROUND_HANDLER_ID:
         _apply_go_to_ground_handler(
             state=state,
             decisions=decisions,
+            context=context,
             target_binding=target_binding,
             use_record=use_record,
         )
@@ -2720,6 +2973,7 @@ def _apply_supported_stratagem_handler(
         _apply_smokescreen_handler(
             state=state,
             decisions=decisions,
+            context=context,
             target_binding=target_binding,
             use_record=use_record,
         )
@@ -2946,51 +3200,11 @@ def _apply_new_orders_handler(
     )
 
 
-def _apply_fire_overwatch_handler(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    context: StratagemEligibilityContext,
-    target_binding: StratagemTargetBinding,
-    use_record: StratagemUseRecord,
-) -> None:
-    target_unit_id = _require_target_unit_id(target_binding)
-    effect = PersistingEffect(
-        effect_id=f"{use_record.use_id}:fire-overwatch-window",
-        source_rule_id=use_record.source_id,
-        owner_player_id=use_record.player_id,
-        target_unit_instance_ids=(target_unit_id,),
-        started_battle_round=use_record.battle_round,
-        started_phase=use_record.phase,
-        expiration=EffectExpiration.end_phase(
-            battle_round=use_record.battle_round,
-            phase=use_record.phase,
-            player_id=context.active_player_id or use_record.player_id,
-        ),
-        effect_payload={
-            "effect_kind": FIRE_OVERWATCH_EFFECT_KIND,
-            "stratagem_use_id": use_record.use_id,
-            "requires_out_of_phase_shooting_declaration": True,
-        },
-    )
-    state.record_persisting_effect(effect)
-    decisions.event_log.append(
-        "fire_overwatch_registered",
-        {
-            "game_id": state.game_id,
-            "player_id": use_record.player_id,
-            "battle_round": use_record.battle_round,
-            "phase": use_record.phase.value,
-            "stratagem_use": use_record.to_payload(),
-            "persisting_effect": effect.to_payload(),
-        },
-    )
-
-
 def _apply_go_to_ground_handler(
     *,
     state: GameState,
     decisions: DecisionController,
+    context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
     use_record: StratagemUseRecord,
 ) -> None:
@@ -3005,7 +3219,7 @@ def _apply_go_to_ground_handler(
         expiration=EffectExpiration.end_phase(
             battle_round=use_record.battle_round,
             phase=use_record.phase,
-            player_id=use_record.player_id,
+            player_id=context.active_player_id or use_record.player_id,
         ),
         effect_payload={
             "effect_kind": GO_TO_GROUND_EFFECT_KIND,
@@ -3032,6 +3246,7 @@ def _apply_smokescreen_handler(
     *,
     state: GameState,
     decisions: DecisionController,
+    context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
     use_record: StratagemUseRecord,
 ) -> None:
@@ -3046,7 +3261,7 @@ def _apply_smokescreen_handler(
         expiration=EffectExpiration.end_phase(
             battle_round=use_record.battle_round,
             phase=use_record.phase,
-            player_id=use_record.player_id,
+            player_id=context.active_player_id or use_record.player_id,
         ),
         effect_payload={
             "effect_kind": SMOKESCREEN_EFFECT_KIND,
@@ -3094,7 +3309,7 @@ def _apply_grenade_handler(
             actor_id=use_record.player_id,
         )
     )
-    mortal_wounds = min(3, sum(1 for value in roll_state.current_values if value >= 4))
+    mortal_wounds = sum(1 for value in roll_state.current_values if value >= 4)
     mortal_application = None
     if mortal_wounds > 0:
         mortal_application = apply_mortal_wounds_to_unit(

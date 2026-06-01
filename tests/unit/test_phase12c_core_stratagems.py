@@ -57,6 +57,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import MovementPhaseState, MovementPhaseStepKind
+from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserves import (
@@ -70,6 +71,7 @@ from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_DICE_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     GRENADE_TARGET_CONTEXT_KEY,
+    SELECTED_TARGET_UNIT_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogRecord,
@@ -921,6 +923,7 @@ def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None
     deferred_ids = {
         "counter-offensive",
         "epic-challenge",
+        "fire-overwatch",
         "heroic-intervention",
         "tank-shock",
     }
@@ -971,30 +974,40 @@ def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None
     assert len(lifecycle.decision_controller.queue.pending_requests) == 0
 
 
-def test_phase13d_fire_overwatch_uses_parameterized_target_and_records_effect() -> None:
+def test_phase13d_fire_overwatch_remains_explicitly_deferred_until_out_of_phase_shooting() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     state.active_player_id = "player-b"
     _grant_cp(state, player_id="player-a", amount=1)
-
-    status = _submit_source_stratagem_target(
-        lifecycle,
-        stratagem_id="fire-overwatch",
+    record = _source_stratagem_record("fire-overwatch")
+    context = _context(
+        state=state,
         player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
         trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
-        result_id="phase13d-fire-overwatch",
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
     )
 
-    event_payload = _last_event_payload(lifecycle.decision_controller, "fire_overwatch_registered")
-    effect_payload = cast(dict[str, JsonValue], event_payload["persisting_effect"])
-    effect_details = cast(dict[str, JsonValue], effect_payload["effect_payload"])
-    assert status.status_kind is not LifecycleStatusKind.INVALID
-    assert state.command_point_total("player-a") == 0
-    assert state.stratagem_use_records[0].handler_id == "core:fire-overwatch"
-    assert effect_details["effect_kind"] == "core_stratagem:fire_overwatch"
-    assert effect_details["requires_out_of_phase_shooting_declaration"] is True
+    unavailable = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+
+    assert record.definition.handler_id.startswith("unsupported:")
+    assert record.definition.target_spec.target_policy_id.startswith("unsupported:")
+    assert unavailable.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert unavailable.payload == {
+        "player_id": "player-a",
+        "stratagem_id": "fire-overwatch",
+        "unavailable_reason": "unsupported_handler",
+    }
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert len(lifecycle.decision_controller.queue.pending_requests) == 0
     assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
 
 
@@ -1012,6 +1025,9 @@ def test_phase13d_go_to_ground_and_smokescreen_register_defensive_effects() -> N
         target_unit_id="army-alpha:intercessor-unit-1",
         trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
         result_id="phase13d-go-to-ground",
+        trigger_payload={
+            SELECTED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
+        },
     )
 
     go_event = _last_event_payload(
@@ -1022,11 +1038,14 @@ def test_phase13d_go_to_ground_and_smokescreen_register_defensive_effects() -> N
         dict[str, JsonValue],
         cast(dict[str, JsonValue], go_event["persisting_effect"])["effect_payload"],
     )
+    go_persisting_effect = cast(dict[str, JsonValue], go_event["persisting_effect"])
+    go_expiration = cast(dict[str, JsonValue], go_persisting_effect["expiration"])
     assert go_status.status_kind is not LifecycleStatusKind.INVALID
     assert go_state.command_point_total("player-a") == 0
     assert go_effect["effect_kind"] == "core_stratagem:go_to_ground"
     assert go_effect["benefit_of_cover"] is True
     assert go_effect["invulnerable_save"] == 6
+    assert go_expiration["player_id"] == "player-b"
 
     smoke_lifecycle = _battle_lifecycle()
     smoke_state = _state(smoke_lifecycle)
@@ -1046,6 +1065,9 @@ def test_phase13d_go_to_ground_and_smokescreen_register_defensive_effects() -> N
         target_unit_id="army-alpha:intercessor-unit-1",
         trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
         result_id="phase13d-smokescreen",
+        trigger_payload={
+            SELECTED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
+        },
     )
 
     smoke_event = _last_event_payload(
@@ -1056,11 +1078,35 @@ def test_phase13d_go_to_ground_and_smokescreen_register_defensive_effects() -> N
         dict[str, JsonValue],
         cast(dict[str, JsonValue], smoke_event["persisting_effect"])["effect_payload"],
     )
+    smoke_persisting_effect = cast(dict[str, JsonValue], smoke_event["persisting_effect"])
+    smoke_expiration = cast(dict[str, JsonValue], smoke_persisting_effect["expiration"])
     assert smoke_status.status_kind is not LifecycleStatusKind.INVALID
     assert smoke_state.command_point_total("player-a") == 0
     assert smoke_effect["effect_kind"] == "core_stratagem:smokescreen"
     assert smoke_effect["benefit_of_cover"] is True
     assert smoke_effect["hit_roll_modifier"] == -1
+    assert smoke_expiration["player_id"] == "player-b"
+
+    invalid_lifecycle = _battle_lifecycle()
+    invalid_state = _state(invalid_lifecycle)
+    _set_current_battle_phase(invalid_state, BattlePhase.SHOOTING)
+    invalid_state.active_player_id = "player-b"
+    _grant_cp(invalid_state, player_id="player-a", amount=1)
+
+    invalid_status = _submit_source_stratagem_target(
+        invalid_lifecycle,
+        stratagem_id="go-to-ground",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        result_id="phase13d-go-to-ground-wrong-target",
+        trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: ["army-beta:enemy-unit"]},
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_status.payload == {"invalid_reason": "unit_not_selected_as_target"}
+    assert invalid_state.command_point_total("player-a") == 1
+    assert invalid_state.stratagem_use_records == []
 
 
 def test_phase13d_grenade_resolves_mortal_wounds_and_rejects_invalid_context() -> None:
@@ -1072,6 +1118,13 @@ def test_phase13d_grenade_resolves_mortal_wounds_and_rejects_invalid_context() -
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(
+            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+        ),
     )
     _grant_cp(state, player_id="player-a", amount=1)
 
@@ -1091,6 +1144,9 @@ def test_phase13d_grenade_resolves_mortal_wounds_and_rejects_invalid_context() -
     assert state.stratagem_use_records[0].handler_id == "core:grenade"
     assert grenade_payload["grenades_unit_instance_id"] == "army-alpha:intercessor-unit-1"
     assert grenade_payload["target_unit_instance_id"] == "army-beta:enemy-unit"
+    mortal_wounds = grenade_payload["mortal_wounds"]
+    assert isinstance(mortal_wounds, int)
+    assert 0 <= mortal_wounds <= 6
     assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
 
     invalid_lifecycle = _battle_lifecycle()
@@ -1137,6 +1193,44 @@ def test_phase13d_grenade_resolves_mortal_wounds_and_rejects_invalid_context() -
     assert invalid_state.command_point_total("player-a") == 1
     assert invalid_state.stratagem_use_records == []
     assert invalid_lifecycle.decision_controller.queue.pending_requests == (request,)
+
+    shot_lifecycle = _battle_lifecycle()
+    shot_state = _state(shot_lifecycle)
+    _set_current_battle_phase(shot_state, BattlePhase.SHOOTING)
+    shot_state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        shot_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _replace_unit_poses(
+        shot_state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(
+            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+        ),
+    )
+    shot_state.shooting_phase_state = ShootingPhaseState(
+        battle_round=shot_state.battle_round,
+        active_player_id="player-a",
+        shot_unit_ids=("army-alpha:intercessor-unit-1",),
+    )
+    _grant_cp(shot_state, player_id="player-a", amount=1)
+
+    shot_status = _submit_source_stratagem_target(
+        shot_lifecycle,
+        stratagem_id="grenade",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        result_id="phase13d-grenade-after-shooting",
+        trigger_payload={GRENADE_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
+    )
+
+    assert shot_status.status_kind is LifecycleStatusKind.INVALID
+    assert shot_status.payload == {"invalid_reason": "grenades_unit_already_shot"}
+    assert shot_state.command_point_total("player-a") == 1
+    assert shot_state.stratagem_use_records == []
 
 
 def test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle() -> None:
@@ -1779,6 +1873,28 @@ def _replace_unit_keywords(
             state.army_definitions[army_index] = replace(army, units=units)
             return
     raise AssertionError(f"Missing unit {unit_instance_id}.")
+
+
+def _replace_unit_poses(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    poses: tuple[Pose, ...],
+) -> None:
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    placement = battlefield_state.unit_placement_by_id(unit_instance_id)
+    assert len(placement.model_placements) == len(poses)
+    state.replace_battlefield_state(
+        battlefield_state.with_unit_placement(
+            placement.with_model_placements(
+                tuple(
+                    model_placement.with_pose(pose)
+                    for model_placement, pose in zip(placement.model_placements, poses, strict=True)
+                )
+            )
+        )
+    )
 
 
 def _proposal_request_from_decision(request: DecisionRequest) -> StratagemTargetProposal:

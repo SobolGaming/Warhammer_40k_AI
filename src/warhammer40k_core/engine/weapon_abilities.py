@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
+from enum import StrEnum
+
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityKind,
+    DevastatingWoundsEffect,
+    WeaponKeyword,
+    WeaponProfile,
+    devastating_wounds_effect_from_token,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 ASSAULT_RULE_ID = "weapon-ability:assault"
@@ -23,6 +31,11 @@ _PARAMETERIZED_KEYWORDS_BY_KIND = {
     AbilityKind.RAPID_FIRE: WeaponKeyword.RAPID_FIRE,
     AbilityKind.SUSTAINED_HITS: WeaponKeyword.SUSTAINED_HITS,
 }
+
+
+class DevastatingWoundsResolution(StrEnum):
+    MORTAL_WOUNDS = "mortal_wounds"
+    NO_SAVES = "no_saves"
 
 
 def has_weapon_keyword(profile: WeaponProfile, keyword: WeaponKeyword) -> bool:
@@ -86,6 +99,32 @@ def anti_keyword_critical_threshold(
     if not matching_thresholds:
         return None
     return min(matching_thresholds)
+
+
+def devastating_wounds_resolution(profile: WeaponProfile) -> DevastatingWoundsResolution | None:
+    _validate_weapon_profile(profile)
+    descriptors = tuple(
+        ability
+        for ability in profile.abilities
+        if ability.ability_kind is AbilityKind.DEVASTATING_WOUNDS
+    )
+    if len(descriptors) > 1:
+        raise GameLifecycleError("Weapon profile has duplicate Devastating Wounds descriptors.")
+    if WeaponKeyword.DEVASTATING_WOUNDS not in profile.keywords:
+        if descriptors:
+            raise GameLifecycleError("Devastating Wounds descriptor requires the weapon keyword.")
+        return None
+    if not descriptors:
+        raise GameLifecycleError("Devastating Wounds requires a structured ability descriptor.")
+    descriptor = descriptors[0]
+    if len(descriptor.parameters) != 1 or descriptor.parameters[0].name != "effect":
+        raise GameLifecycleError("Devastating Wounds descriptor requires one effect parameter.")
+    effect = devastating_wounds_effect_from_token(descriptor.parameters[0].value)
+    if effect is DevastatingWoundsEffect.MORTAL_WOUNDS:
+        return DevastatingWoundsResolution.MORTAL_WOUNDS
+    if effect is DevastatingWoundsEffect.NO_SAVES:
+        return DevastatingWoundsResolution.NO_SAVES
+    raise GameLifecycleError("Unsupported Devastating Wounds effect.")
 
 
 def rapid_fire_attack_bonus(profile: WeaponProfile, *, target_within_half_range: bool) -> int:

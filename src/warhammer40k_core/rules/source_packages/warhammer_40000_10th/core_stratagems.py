@@ -166,8 +166,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="movement",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="out_of_phase_shooting_unit",
-            handler_id="core:fire-overwatch",
+            target_policy_id="unsupported:phase-13d:fire-overwatch-out-of-phase-shooting-unit",
+            handler_id="unsupported:phase-13d:fire-overwatch-out-of-phase-shooting",
         ),
         SourceStratagemRow(
             stratagem_id="go-to-ground",

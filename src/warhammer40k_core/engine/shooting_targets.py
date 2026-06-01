@@ -495,6 +495,7 @@ def _target_candidate(
         evidence is not None
         and not evidence.visible_and_in_range_target_model_ids
         and WeaponKeyword.INDIRECT_FIRE in weapon_profile.keywords
+        and WeaponKeyword.TORRENT not in weapon_profile.keywords
     )
     if evidence is None or (
         not evidence.visible_and_in_range_target_model_ids and not indirect_no_visible

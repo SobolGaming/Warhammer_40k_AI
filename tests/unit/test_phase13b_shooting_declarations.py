@@ -31,8 +31,10 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackModifierStackSet,
     AttackSequence,
     AttackSequenceEvent,
+    AttackSequenceEventHandler,
     AttackSequenceHooks,
     AttackSequenceStep,
+    DeferredMortalWounds,
     FastDiceGroup,
     HitRoll,
     WoundRoll,
@@ -363,7 +365,10 @@ def test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effect
         _first_weapon_profile(lifecycle, attacker),
         profile_id="phase13d-torrent-anti-devastating",
         keywords=(WeaponKeyword.DEVASTATING_WOUNDS, WeaponKeyword.TORRENT),
-        abilities=(AbilityDescriptor.anti_keyword("Infantry", 4),),
+        abilities=(
+            AbilityDescriptor.anti_keyword("Infantry", 4),
+            AbilityDescriptor.devastating_wounds(),
+        ),
     )
     attack_context_id = "phase13d-torrent:pool-001:attack-001"
     wound_spec = DiceRollSpec(
@@ -412,12 +417,21 @@ def test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effect
     damage_payload = _attack_step_payload(events, AttackSequenceStep.DAMAGE)
     assert remaining_sequence is None
     assert status is None
-    assert allocated_ids == (defender_model.model_instance_id,)
+    assert allocated_ids == ()
     assert cast(dict[str, object], hit_payload["payload"])["skipped"] is True
     assert cast(dict[str, object], wound_payload["payload"])["critical_threshold"] == 4
     assert cast(dict[str, object], wound_payload["payload"])["critical"] is True
+    assert not any(event["step"] == AttackSequenceStep.ALLOCATE.value for event in events)
     assert not any(event["step"] == AttackSequenceStep.SAVE.value for event in events)
     assert cast(dict[str, object], damage_payload["payload"])["saving_throw"] is None
+    deferred_payload = cast(dict[str, object], damage_payload["payload"])["deferred_mortal_wounds"]
+    assert cast(dict[str, object], deferred_payload)["mortal_wounds"] == 1
+    applied_payload = _last_event_payload(lifecycle, "devastating_wounds_mortal_wounds_applied")
+    application = cast(dict[str, object], applied_payload["mortal_wound_application"])
+    applications = cast(list[dict[str, object]], application["applications"])
+    assert applied_payload["mortal_wounds"] == 1
+    assert applications[0]["model_instance_id"] == defender_model.model_instance_id
+    assert applications[0]["damage_kind"] == DamageKind.MORTAL.value
 
 
 def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
@@ -624,6 +638,21 @@ def test_phase13d_indirect_fire_targets_unseen_units_and_unmodified_one_to_three
     assert candidates[0].hit_roll_modifier == -1
     assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in candidates[0].targeting_rule_ids
     assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in candidates[0].targeting_rule_ids
+    torrent_profile = replace(
+        weapon_profile,
+        profile_id="phase13d-indirect-torrent",
+        keywords=(WeaponKeyword.INDIRECT_FIRE, WeaponKeyword.TORRENT),
+    )
+    torrent_candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=torrent_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+        terrain_features=(blocking_ruin,),
+    )
+    assert not torrent_candidates[0].is_legal
+    assert torrent_candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE
 
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
@@ -1116,6 +1145,35 @@ def test_phase13c_attack_payloads_hooks_and_fast_dice_groups() -> None:
     )
 
     assert AttackSequence.from_payload(sequence.to_payload()) == sequence
+    deferred = DeferredMortalWounds(
+        source_rule_id="devastating_wounds",
+        target_unit_instance_id=defender.unit_instance_id,
+        attack_context_id=sequence.attack_context_id(),
+        mortal_wounds=2,
+    )
+    assert DeferredMortalWounds.from_payload(deferred.to_payload()) == deferred
+    sequence_with_deferred = sequence.with_deferred_mortal_wounds(deferred)
+    assert (
+        AttackSequence.from_payload(sequence_with_deferred.to_payload()) == sequence_with_deferred
+    )
+    assert sequence_with_deferred.advanced_after_attack().deferred_mortal_wounds == (deferred,)
+    with pytest.raises(GameLifecycleError, match="deferred mortal wounds are invalid"):
+        sequence.with_deferred_mortal_wounds(cast(DeferredMortalWounds, object()))
+    with pytest.raises(GameLifecycleError, match="deferred_mortal_wounds must be a tuple"):
+        AttackSequence(
+            sequence_id=sequence.sequence_id,
+            attacker_player_id=sequence.attacker_player_id,
+            attacking_unit_instance_id=sequence.attacking_unit_instance_id,
+            attack_pools=sequence.attack_pools,
+            deferred_mortal_wounds=cast(tuple[DeferredMortalWounds, ...], [deferred]),
+        )
+    with pytest.raises(GameLifecycleError, match="mortal_wounds"):
+        DeferredMortalWounds(
+            source_rule_id="devastating_wounds",
+            target_unit_instance_id=defender.unit_instance_id,
+            attack_context_id=sequence.attack_context_id(),
+            mortal_wounds=0,
+        )
     assert HitRoll.auto_hit(target_number=3).to_payload()["skipped"] is True
 
     wound_spec = DiceRollSpec(
@@ -1170,6 +1228,54 @@ def test_phase13c_attack_payloads_hooks_and_fast_dice_groups() -> None:
     )
     with pytest.raises(GameLifecycleError, match="timing windows"):
         AttackSequenceHooks(handlers=(lambda _event: moved_event,)).emit(event)
+
+    def return_same_event(current: AttackSequenceEvent) -> AttackSequenceEvent:
+        return current
+
+    with pytest.raises(GameLifecycleError, match="handlers must be a tuple"):
+        AttackSequenceHooks(
+            handlers=cast(tuple[AttackSequenceEventHandler, ...], [return_same_event])
+        )
+    with pytest.raises(GameLifecycleError, match="handlers must be callable"):
+        AttackSequenceHooks(handlers=(cast(AttackSequenceEventHandler, object()),))
+    with pytest.raises(GameLifecycleError, match="emit requires an event"):
+        AttackSequenceHooks.empty().emit(cast(AttackSequenceEvent, object()))
+
+    def return_invalid_event(_event: AttackSequenceEvent) -> AttackSequenceEvent:
+        return cast(AttackSequenceEvent, object())
+
+    with pytest.raises(GameLifecycleError, match="hook must return"):
+        AttackSequenceHooks(handlers=(return_invalid_event,)).emit(event)
+    completed_sequence = AttackSequence(
+        sequence_id=sequence.sequence_id,
+        attacker_player_id=sequence.attacker_player_id,
+        attacking_unit_instance_id=sequence.attacking_unit_instance_id,
+        attack_pools=sequence.attack_pools,
+        pool_index=len(sequence.attack_pools),
+    )
+    with pytest.raises(GameLifecycleError, match="cannot advance generated hits"):
+        completed_sequence.advanced_after_generated_hit(HitRoll.auto_hit(target_number=3))
+    with pytest.raises(GameLifecycleError, match="requires a HitRoll"):
+        sequence.advanced_after_generated_hit(cast(HitRoll, object()))
+    failed_hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="phase13c failed hit payload fixture",
+        roll_type="attack_sequence.hit.fixture",
+        actor_id="player-a",
+    )
+    failed_hit_state = DiceRollManager("phase13c-hit-payload").roll_fixed(failed_hit_spec, [1])
+    failed_hit = HitRoll(
+        target_number=3,
+        roll_state=failed_hit_state,
+        unmodified_roll=1,
+        modifier=0,
+        capped_modifier=0,
+        final_roll=1,
+        successful=False,
+        critical=False,
+    )
+    with pytest.raises(GameLifecycleError, match="requires a successful hit"):
+        sequence.advanced_after_generated_hit(failed_hit)
 
     assert (
         FastDiceGroup.evaluate(
