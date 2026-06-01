@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 13D** is treated as implemented at the time this file was updated. Phase 13E is the next build slice.
+Everything through **Phase 13E** is treated as implemented at the time this file was updated. Phase 13F is the next build slice.
 
 Completed / implemented foundation:
 
@@ -80,6 +80,7 @@ Completed / implemented foundation:
 | 13B | Complete | Shooting phase target selection and weapon declaration |
 | 13C | Complete | Attack sequence, allocation, saves, damage, and typed attack events |
 | 13D | Complete | Weapon abilities, shooting/fight modifiers, and shooting Stratagems |
+| 13E | Complete | Damage allocation, destroyed models, and destruction reactions |
 
 ## Cross-cutting architectural rules
 
@@ -1762,10 +1763,15 @@ Required tests:
 
 ## Phase 13E: damage allocation, destroyed models, and destruction reactions
 
+Status: Complete.
+
 Invariants:
 
 - defender allocation choices are emitted as `DecisionRequest`s unless allocation is forced by the rules;
-- save selection, optional Feel No Pain source/use, and destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code;
+- save selection, optional Feel No Pain source/use, and optional destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code;
+- mandatory destruction reactions, including Deadly Demise-style rules, are engine-triggered and are not adapter decline choices;
+- Deadly Demise resolves before destroyed-model removal, including its trigger roll, eligible nearby-unit mortal-wound packets, and any routed Feel No Pain choices;
+- models destroyed by Deadly Demise mortal-wound packets use the same destroyed-model removal record, transition batch, and destruction-reaction host as attack damage;
 - defender allocation and destruction records are viewer-scoped where hidden information can differ;
 - defender allocates attacks according to rules;
 - wounded models must continue receiving damage where applicable;
@@ -1781,6 +1787,8 @@ Required tests:
 - wounded-model allocation priority;
 - destroyed-model removal event;
 - destroyed-model reaction timing;
+- Deadly Demise failed roll, successful mortal wounds, pre-removal measurement, and Feel No Pain pause/resume ordering;
+- Deadly Demise secondary casualties emit removal records, optional reaction requests, and chained mandatory Deadly Demise resolutions deterministically;
 - non-triggering coherency cleanup removal.
 
 ## Phase 13F: Shooting phase completion gate

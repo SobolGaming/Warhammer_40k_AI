@@ -5,10 +5,12 @@ from dataclasses import dataclass, field
 from typing import Self, TypedDict
 
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
+from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+    SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
     is_mortal_wound_feel_no_pain_request,
@@ -144,6 +146,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_SAVING_THROW_KIND_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     )
 )
 _REACTION_FRAME_DECISION_TYPES = frozenset(
@@ -157,6 +160,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_SAVING_THROW_KIND_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     )
 )
 
@@ -335,6 +339,18 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 invalid_reason="invalid_mortal_wound_feel_no_pain_result",
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+        ):
+            invalid_status = _invalid_destruction_reaction_status(
+                state=state,
+                request=pending_request,
+                result=result,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -762,6 +778,80 @@ def _invalid_finite_decision_status(
             message="Decision result selected option is not pending.",
             payload={"invalid_reason": invalid_reason, "field": "selected_option_id"},
         )
+    selected_payload = next(
+        option.payload
+        for option in request.options
+        if option.option_id == result.selected_option_id
+    )
+    if result.payload != selected_payload:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result payload does not match the selected option.",
+            payload={"invalid_reason": invalid_reason, "field": "payload"},
+        )
+    return None
+
+
+def _invalid_destruction_reaction_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    invalid_status = _invalid_finite_decision_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason="invalid_destruction_reaction_result",
+    )
+    if invalid_status is not None:
+        return invalid_status
+    request_payload = request.payload
+    if not isinstance(request_payload, Mapping):
+        raise GameLifecycleError("Destruction reaction request payload must be an object.")
+    destruction_context = request_payload.get("destruction_context")
+    if not isinstance(destruction_context, Mapping):
+        raise GameLifecycleError("Destruction reaction context must be an object.")
+    attack_context = destruction_context.get("attack_context")
+    if not isinstance(attack_context, Mapping):
+        raise GameLifecycleError("Destruction reaction attack context must be an object.")
+    attack_sequence = _active_attack_sequence_for_state(state)
+    if attack_sequence is None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Destruction reaction has no active attack sequence.",
+            payload={
+                "invalid_reason": "invalid_destruction_reaction_result",
+                "field": "attack_sequence",
+            },
+        )
+    expected_fields: tuple[tuple[str, object], ...] = (
+        ("sequence_id", attack_sequence.sequence_id),
+        ("attack_context_id", attack_sequence.attack_context_id()),
+        ("pool_index", attack_sequence.pool_index),
+        ("attack_index", attack_sequence.attack_index),
+        ("generated_hit_index", attack_sequence.generated_hit_index),
+    )
+    for field_name, expected_value in expected_fields:
+        if attack_context.get(field_name) != expected_value:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Destruction reaction attack context no longer matches state.",
+                payload={
+                    "invalid_reason": "invalid_destruction_reaction_result",
+                    "field": field_name,
+                },
+            )
+    return None
+
+
+def _active_attack_sequence_for_state(state: GameState) -> AttackSequence | None:
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
+        return out_of_phase_state.attack_sequence
+    shooting_state = state.shooting_phase_state
+    if shooting_state is not None and shooting_state.attack_sequence is not None:
+        return shooting_state.attack_sequence
     return None
 
 

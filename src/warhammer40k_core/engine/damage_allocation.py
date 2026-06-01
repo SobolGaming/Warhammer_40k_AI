@@ -26,12 +26,20 @@ if TYPE_CHECKING:
 SELECT_ATTACK_ALLOCATION_DECISION_TYPE = "select_attack_allocation"
 SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
+SELECT_DESTRUCTION_REACTION_DECISION_TYPE = "select_destruction_reaction"
 MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND = "mortal_wound"
+DECLINE_DESTRUCTION_REACTION_OPTION_ID = "decline_destruction_reaction"
 
 
 class DamageKind(StrEnum):
     NORMAL = "normal"
     MORTAL = "mortal"
+
+
+class DestructionReactionKind(StrEnum):
+    SHOOT_ON_DEATH = "shoot_on_death"
+    FIGHT_ON_DEATH = "fight_on_death"
+    DEADLY_DEMISE = "deadly_demise"
 
 
 class AttackAllocationConstraintPayload(TypedDict):
@@ -95,12 +103,29 @@ class FeelNoPainSourcePayload(TypedDict):
     threshold: int
 
 
+class DestructionReactionSourcePayload(TypedDict):
+    source_id: str
+    reaction_kind: str
+    source_rule_id: str
+    payload: JsonValue
+    optional: bool
+
+
 class FeelNoPainDecisionPayload(TypedDict):
     request_id: str
     result_id: str
     player_id: str
     selected_source_id: str | None
     lost_wound_context: JsonValue
+
+
+class DestructionReactionDecisionPayload(TypedDict):
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_source_id: str | None
+    selected_reaction_kind: str | None
+    destruction_context: JsonValue
 
 
 class FeelNoPainRollPayload(TypedDict):
@@ -872,6 +897,7 @@ class MortalWoundApplicationProgress:
         state: GameState,
         model_instance_id: str,
         resolution: FeelNoPainResolution,
+        remove_destroyed_model: bool = True,
     ) -> Self:
         if self.remaining_mortal_wounds < 1:
             raise GameLifecycleError("Mortal wound progress has no wound to resolve.")
@@ -879,6 +905,8 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError("Mortal wound progress requires Feel No Pain resolution.")
         if resolution.requested_wounds != 1:
             raise GameLifecycleError("Mortal wound Feel No Pain resolves one wound at a time.")
+        if type(remove_destroyed_model) is not bool:
+            raise GameLifecycleError("remove_destroyed_model must be a bool.")
         applications = list(self.applications)
         ignored = self.ignored_mortal_wounds
         remaining_lost = self.remaining_mortal_wounds_lost
@@ -889,6 +917,7 @@ class MortalWoundApplicationProgress:
                 model_instance_id=model_instance_id,
                 damage=1,
                 damage_kind=DamageKind.MORTAL,
+                remove_destroyed_model=remove_destroyed_model,
             )
             applications.append(application)
             if application.destroyed and not self.spill_over:
@@ -970,6 +999,59 @@ class FeelNoPainSource:
     @classmethod
     def from_payload(cls, payload: FeelNoPainSourcePayload) -> Self:
         return cls(source_id=payload["source_id"], threshold=payload["threshold"])
+
+
+@dataclass(frozen=True, slots=True)
+class DestructionReactionSource:
+    source_id: str
+    reaction_kind: DestructionReactionKind
+    source_rule_id: str
+    payload: JsonValue = None
+    optional: bool = True
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("DestructionReactionSource source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "reaction_kind",
+            destruction_reaction_kind_from_token(self.reaction_kind),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier(
+                "DestructionReactionSource source_rule_id",
+                self.source_rule_id,
+            ),
+        )
+        object.__setattr__(self, "payload", validate_json_value(self.payload))
+        if type(self.optional) is not bool:
+            raise GameLifecycleError("DestructionReactionSource optional must be a bool.")
+        if self.reaction_kind is DestructionReactionKind.DEADLY_DEMISE and self.optional:
+            raise GameLifecycleError("Deadly Demise destruction reactions must be mandatory.")
+
+    def to_payload(self) -> DestructionReactionSourcePayload:
+        return {
+            "source_id": self.source_id,
+            "reaction_kind": self.reaction_kind.value,
+            "source_rule_id": self.source_rule_id,
+            "payload": self.payload,
+            "optional": self.optional,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DestructionReactionSourcePayload) -> Self:
+        return cls(
+            source_id=payload["source_id"],
+            reaction_kind=destruction_reaction_kind_from_token(payload["reaction_kind"]),
+            source_rule_id=payload["source_rule_id"],
+            payload=payload["payload"],
+            optional=payload["optional"],
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -1128,6 +1210,90 @@ class FeelNoPainDecision:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class DestructionReactionDecision:
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_source_id: str | None
+    selected_reaction_kind: DestructionReactionKind | None
+    destruction_context: JsonValue
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("DestructionReactionDecision request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("DestructionReactionDecision result_id", self.result_id),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("DestructionReactionDecision player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "selected_source_id",
+            _validate_optional_identifier(
+                "DestructionReactionDecision selected_source_id",
+                self.selected_source_id,
+            ),
+        )
+        reaction_kind = self.selected_reaction_kind
+        object.__setattr__(
+            self,
+            "selected_reaction_kind",
+            None if reaction_kind is None else destruction_reaction_kind_from_token(reaction_kind),
+        )
+        if (self.selected_source_id is None) != (self.selected_reaction_kind is None):
+            raise GameLifecycleError(
+                "DestructionReactionDecision source and reaction kind must both be selected."
+            )
+        object.__setattr__(
+            self,
+            "destruction_context",
+            validate_json_value(self.destruction_context),
+        )
+
+    @classmethod
+    def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
+        result.validate_for_request(request)
+        payload = _payload_object(result.payload)
+        source_id = payload.get("source_id")
+        if source_id is not None and type(source_id) is not str:
+            raise GameLifecycleError("Destruction reaction source_id must be a string or null.")
+        raw_kind = payload.get("reaction_kind")
+        reaction_kind = None if raw_kind is None else destruction_reaction_kind_from_token(raw_kind)
+        actor_id = result.actor_id
+        if actor_id is None:
+            raise GameLifecycleError("DestructionReactionDecision requires an actor.")
+        request_payload = _payload_object(request.payload)
+        return cls(
+            request_id=request.request_id,
+            result_id=result.result_id,
+            player_id=actor_id,
+            selected_source_id=source_id,
+            selected_reaction_kind=reaction_kind,
+            destruction_context=validate_json_value(request_payload["destruction_context"]),
+        )
+
+    def to_payload(self) -> DestructionReactionDecisionPayload:
+        return {
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+            "player_id": self.player_id,
+            "selected_source_id": self.selected_source_id,
+            "selected_reaction_kind": (
+                None if self.selected_reaction_kind is None else self.selected_reaction_kind.value
+            ),
+            "destruction_context": self.destruction_context,
+        }
+
+
 def damage_kind_from_token(token: object) -> DamageKind:
     if type(token) is DamageKind:
         return token
@@ -1137,6 +1303,17 @@ def damage_kind_from_token(token: object) -> DamageKind:
         return DamageKind(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported DamageKind token: {token}.") from exc
+
+
+def destruction_reaction_kind_from_token(token: object) -> DestructionReactionKind:
+    if type(token) is DestructionReactionKind:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("DestructionReactionKind token must be a string.")
+    try:
+        return DestructionReactionKind(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported DestructionReactionKind token: {token}.") from exc
 
 
 def allocation_context_for_unit(
@@ -1242,6 +1419,57 @@ def build_feel_no_pain_request(
     )
 
 
+def build_destruction_reaction_request(
+    *,
+    request_id: str,
+    defender_player_id: str,
+    destruction_context: JsonValue,
+    sources: tuple[DestructionReactionSource, ...],
+) -> DecisionRequest:
+    source_tuple = _validate_destruction_reaction_sources(sources)
+    if not source_tuple:
+        raise GameLifecycleError(
+            "Destruction reaction request requires at least one optional source."
+        )
+    for source in source_tuple:
+        if not source.optional:
+            raise GameLifecycleError(
+                "Destruction reaction request sources must require a player choice."
+            )
+    options: list[DecisionOption] = [
+        DecisionOption(
+            option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+            label="Decline Destruction Reaction",
+            payload={"source_id": None, "reaction_kind": None},
+        )
+    ]
+    for source in source_tuple:
+        options.append(
+            DecisionOption(
+                option_id=source.source_id,
+                label=source.source_id,
+                payload={
+                    "source_id": source.source_id,
+                    "reaction_kind": source.reaction_kind.value,
+                    "optional": source.optional,
+                },
+            )
+        )
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        actor_id=defender_player_id,
+        payload=validate_json_value(
+            {
+                "destruction_context": validate_json_value(destruction_context),
+                "sources": [source.to_payload() for source in source_tuple],
+                "decline_option_id": DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+            }
+        ),
+        options=tuple(options),
+    )
+
+
 def is_mortal_wound_feel_no_pain_request(request: DecisionRequest) -> bool:
     if type(request) is not DecisionRequest:
         raise GameLifecycleError("Mortal wound Feel No Pain check requires a request.")
@@ -1267,7 +1495,10 @@ def continue_mortal_wound_application(
     request_id: str,
     progress: MortalWoundApplicationProgress,
     dice_manager: DiceRollManager | None = None,
+    remove_destroyed_models: bool = True,
 ) -> MortalWoundRoutingResult:
+    if type(remove_destroyed_models) is not bool:
+        raise GameLifecycleError("remove_destroyed_models must be a bool.")
     current = progress
     while current.remaining_mortal_wounds > 0:
         allocation_context = allocation_context_for_unit(
@@ -1317,6 +1548,7 @@ def continue_mortal_wound_application(
             state=state,
             model_instance_id=model_id,
             resolution=resolution,
+            remove_destroyed_model=remove_destroyed_models,
         )
     return MortalWoundRoutingResult(progress=current, application=current.to_application())
 
@@ -1328,7 +1560,10 @@ def resolve_mortal_wound_feel_no_pain_decision(
     result: DecisionResult,
     next_request_id: str,
     dice_manager: DiceRollManager | None = None,
+    remove_destroyed_models: bool = True,
 ) -> MortalWoundRoutingResult:
+    if type(remove_destroyed_models) is not bool:
+        raise GameLifecycleError("remove_destroyed_models must be a bool.")
     decision = FeelNoPainDecision.from_result(request=request, result=result)
     context = _mortal_wound_context_from_payload(decision.lost_wound_context)
     progress = MortalWoundApplicationProgress.from_feel_no_pain_context(decision.lost_wound_context)
@@ -1355,12 +1590,14 @@ def resolve_mortal_wound_feel_no_pain_decision(
         state=state,
         model_instance_id=model_id,
         resolution=resolution,
+        remove_destroyed_model=remove_destroyed_models,
     )
     return continue_mortal_wound_application(
         state=state,
         request_id=next_request_id,
         progress=updated,
         dice_manager=dice_manager,
+        remove_destroyed_models=remove_destroyed_models,
     )
 
 
@@ -1423,9 +1660,12 @@ def apply_damage_to_model(
     model_instance_id: str,
     damage: int,
     damage_kind: DamageKind,
+    remove_destroyed_model: bool = True,
 ) -> DamageApplication:
     requested_damage = _validate_positive_int("damage", damage)
     kind = damage_kind_from_token(damage_kind)
+    if type(remove_destroyed_model) is not bool:
+        raise GameLifecycleError("remove_destroyed_model must be a bool.")
     model = model_by_id(state=state, model_instance_id=model_instance_id)
     if not model.is_alive:
         raise GameLifecycleError("Damage cannot be applied to a destroyed model.")
@@ -1447,9 +1687,20 @@ def apply_damage_to_model(
         model_instance_id=model_instance_id,
         wounds_remaining=final_wounds,
     )
-    if application.destroyed:
-        _remove_destroyed_model(state=state, model_instance_id=model_instance_id)
+    if application.destroyed and remove_destroyed_model:
+        remove_destroyed_model_from_battlefield(state=state, model_instance_id=model_instance_id)
     return application
+
+
+def remove_destroyed_model_from_battlefield(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> None:
+    model = model_by_id(state=state, model_instance_id=model_instance_id)
+    if model.is_alive:
+        raise GameLifecycleError("Only destroyed models can be removed from battlefield.")
+    _remove_destroyed_model(state=state, model_instance_id=model_instance_id)
 
 
 def apply_mortal_wounds_to_unit(
@@ -1819,6 +2070,27 @@ def _validate_feel_no_pain_sources(values: object) -> tuple[FeelNoPainSource, ..
             raise GameLifecycleError("Feel No Pain sources must contain FeelNoPainSource values.")
         if value.source_id in seen:
             raise GameLifecycleError("Feel No Pain sources must not duplicate source IDs.")
+        seen.add(value.source_id)
+        sources.append(value)
+    return tuple(sorted(sources, key=lambda source: source.source_id))
+
+
+def _validate_destruction_reaction_sources(
+    values: object,
+) -> tuple[DestructionReactionSource, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Destruction reaction sources must be a tuple.")
+    sources: list[DestructionReactionSource] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DestructionReactionSource:
+            raise GameLifecycleError(
+                "Destruction reaction sources must contain DestructionReactionSource values."
+            )
+        if value.source_id in seen:
+            raise GameLifecycleError("Destruction reaction sources must not duplicate source IDs.")
+        if value.source_id == DECLINE_DESTRUCTION_REACTION_OPTION_ID:
+            raise GameLifecycleError("Destruction reaction source ID conflicts with decline.")
         seen.add(value.source_id)
         sources.append(value)
     return tuple(sorted(sources, key=lambda source: source.source_id))

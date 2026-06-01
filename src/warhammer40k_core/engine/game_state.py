@@ -46,6 +46,8 @@ from warhammer40k_core.engine.command_points import (
     initial_command_point_ledgers,
 )
 from warhammer40k_core.engine.damage_allocation import (
+    DestructionReactionSource,
+    DestructionReactionSourcePayload,
     FeelNoPainSource,
     FeelNoPainSourcePayload,
 )
@@ -198,6 +200,7 @@ class GameStatePayload(TypedDict):
     out_of_phase_shooting_state: OutOfPhaseShootingStatePayload | None
     feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
     feel_no_pain_decline_allowed_model_ids: list[str]
+    destruction_reaction_sources_by_model_id: dict[str, list[DestructionReactionSourcePayload]]
     reserve_states: list[ReserveStatePayload]
     hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
@@ -311,6 +314,13 @@ def _new_feel_no_pain_sources_by_model_id() -> dict[str, tuple[FeelNoPainSource,
 
 def _new_feel_no_pain_decline_allowed_model_ids() -> list[str]:
     return []
+
+
+def _new_destruction_reaction_sources_by_model_id() -> dict[
+    str,
+    tuple[DestructionReactionSource, ...],
+]:
+    return {}
 
 
 @dataclass(frozen=True, slots=True)
@@ -583,6 +593,10 @@ class GameState:
     feel_no_pain_decline_allowed_model_ids: list[str] = field(
         default_factory=_new_feel_no_pain_decline_allowed_model_ids
     )
+    destruction_reaction_sources_by_model_id: dict[
+        str,
+        tuple[DestructionReactionSource, ...],
+    ] = field(default_factory=_new_destruction_reaction_sources_by_model_id)
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
     transport_cargo_states: list[TransportCargoState] = field(
@@ -710,6 +724,12 @@ class GameState:
             _validate_feel_no_pain_decline_allowed_model_ids(
                 self.feel_no_pain_decline_allowed_model_ids,
                 source_model_ids=tuple(self.feel_no_pain_sources_by_model_id),
+            )
+        )
+        self.destruction_reaction_sources_by_model_id = (
+            _validate_destruction_reaction_sources_by_model_id(
+                self.destruction_reaction_sources_by_model_id,
+                army_definitions=self.army_definitions,
             )
         )
         self.reserve_states = _validate_reserve_states(
@@ -897,6 +917,53 @@ class GameState:
     ) -> bool:
         model_id = _validate_identifier("model_instance_id", model_instance_id)
         return model_id in self.feel_no_pain_decline_allowed_model_ids
+
+    def record_model_destruction_reaction_sources(
+        self,
+        *,
+        model_instance_id: str,
+        sources: tuple[DestructionReactionSource, ...],
+    ) -> None:
+        model_id = _validate_model_instance_id_for_state(
+            state=self,
+            model_instance_id=model_instance_id,
+        )
+        source_tuple = _validate_destruction_reaction_source_tuple(
+            "Destruction reaction sources",
+            sources,
+        )
+        if not source_tuple:
+            raise GameLifecycleError("Destruction reaction registration requires sources.")
+        updated_sources = dict(self.destruction_reaction_sources_by_model_id)
+        updated_sources[model_id] = source_tuple
+        self.destruction_reaction_sources_by_model_id = (
+            _validate_destruction_reaction_sources_by_model_id(
+                updated_sources,
+                army_definitions=self.army_definitions,
+            )
+        )
+
+    def clear_model_destruction_reaction_sources(self, *, model_instance_id: str) -> None:
+        model_id = _validate_model_instance_id_for_state(
+            state=self,
+            model_instance_id=model_instance_id,
+        )
+        updated_sources = dict(self.destruction_reaction_sources_by_model_id)
+        updated_sources.pop(model_id, None)
+        self.destruction_reaction_sources_by_model_id = (
+            _validate_destruction_reaction_sources_by_model_id(
+                updated_sources,
+                army_definitions=self.army_definitions,
+            )
+        )
+
+    def destruction_reaction_sources_for_model(
+        self,
+        *,
+        model_instance_id: str,
+    ) -> tuple[DestructionReactionSource, ...]:
+        model_id = _validate_identifier("model_instance_id", model_instance_id)
+        return self.destruction_reaction_sources_by_model_id.get(model_id, ())
 
     def complete_current_setup_step(self) -> SetupStep:
         if self.stage is not GameLifecycleStage.SETUP:
@@ -2083,6 +2150,10 @@ class GameState:
             "feel_no_pain_decline_allowed_model_ids": list(
                 self.feel_no_pain_decline_allowed_model_ids
             ),
+            "destruction_reaction_sources_by_model_id": {
+                model_id: [source.to_payload() for source in sources]
+                for model_id, sources in self.destruction_reaction_sources_by_model_id.items()
+            },
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
@@ -2284,6 +2355,12 @@ class GameState:
             feel_no_pain_decline_allowed_model_ids=list(
                 payload["feel_no_pain_decline_allowed_model_ids"]
             ),
+            destruction_reaction_sources_by_model_id={
+                model_id: tuple(
+                    DestructionReactionSource.from_payload(source) for source in sources
+                )
+                for model_id, sources in payload["destruction_reaction_sources_by_model_id"].items()
+            },
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]
             ],
@@ -2806,6 +2883,31 @@ def _validate_feel_no_pain_sources_by_model_id(
     return dict(sorted(validated.items()))
 
 
+def _validate_destruction_reaction_sources_by_model_id(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+) -> dict[str, tuple[DestructionReactionSource, ...]]:
+    if not isinstance(values, dict):
+        raise GameLifecycleError("GameState destruction reaction sources must be a dict.")
+    known_model_ids = _model_instance_ids(army_definitions)
+    validated: dict[str, tuple[DestructionReactionSource, ...]] = {}
+    for raw_model_id, raw_sources in cast(dict[object, object], values).items():
+        model_id = _validate_identifier("Destruction reaction model_instance_id", raw_model_id)
+        if known_model_ids and model_id not in known_model_ids:
+            raise GameLifecycleError("Destruction reaction source model is unknown.")
+        source_tuple = _validate_destruction_reaction_source_tuple(
+            "Destruction reaction sources",
+            raw_sources,
+        )
+        if not source_tuple:
+            raise GameLifecycleError(
+                "Destruction reaction source model requires at least one source."
+            )
+        validated[model_id] = source_tuple
+    return dict(sorted(validated.items()))
+
+
 def _validate_feel_no_pain_decline_allowed_model_ids(
     values: object,
     *,
@@ -2838,6 +2940,24 @@ def _validate_feel_no_pain_source_tuple(
     for value in cast(tuple[object, ...], values):
         if type(value) is not FeelNoPainSource:
             raise GameLifecycleError(f"{field_name} must contain FeelNoPainSource values.")
+        if value.source_id in seen:
+            raise GameLifecycleError(f"{field_name} must not duplicate source IDs.")
+        seen.add(value.source_id)
+        sources.append(value)
+    return tuple(sorted(sources, key=lambda source: source.source_id))
+
+
+def _validate_destruction_reaction_source_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DestructionReactionSource, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    sources: list[DestructionReactionSource] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DestructionReactionSource:
+            raise GameLifecycleError(f"{field_name} must contain DestructionReactionSource values.")
         if value.source_id in seen:
             raise GameLifecycleError(f"{field_name} must not duplicate source IDs.")
         seen.add(value.source_id)

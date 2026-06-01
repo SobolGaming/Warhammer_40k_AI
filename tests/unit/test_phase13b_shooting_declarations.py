@@ -40,6 +40,8 @@ from warhammer40k_core.engine.attack_sequence import (
     WoundRoll,
     attack_sequence_step_from_token,
     cover_for_allocated_model,
+    deadly_demise_mortal_wounds_roll_spec,
+    deadly_demise_trigger_roll_spec,
     resolve_attack_sequence_until_blocked,
     wound_roll_target_number,
 )
@@ -49,7 +51,9 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.damage_allocation import (
+    DECLINE_DESTRUCTION_REACTION_OPTION_ID,
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+    SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
     AttackAllocation,
@@ -58,6 +62,9 @@ from warhammer40k_core.engine.damage_allocation import (
     AttackAllocationRuleContext,
     DamageApplication,
     DamageKind,
+    DestructionReactionDecision,
+    DestructionReactionKind,
+    DestructionReactionSource,
     FeelNoPainDecision,
     FeelNoPainResolution,
     FeelNoPainRoll,
@@ -68,9 +75,11 @@ from warhammer40k_core.engine.damage_allocation import (
     apply_damage_to_model,
     apply_mortal_wounds_to_unit,
     build_attack_allocation_request,
+    build_destruction_reaction_request,
     build_feel_no_pain_request,
     continue_mortal_wound_application,
     damage_kind_from_token,
+    destruction_reaction_kind_from_token,
     feel_no_pain_roll_spec,
     is_mortal_wound_feel_no_pain_request,
     model_by_id,
@@ -81,7 +90,7 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -2610,6 +2619,1210 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle() -> Non
     assert updated_model.is_alive is False
 
 
+@pytest.mark.parametrize(
+    ("selected_source_kind", "expected_action_host"),
+    [
+        (DestructionReactionKind.SHOOT_ON_DEATH, BattlePhase.SHOOTING.value),
+        (DestructionReactionKind.FIGHT_ON_DEATH, BattlePhase.FIGHT.value),
+    ],
+)
+def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
+    selected_source_kind: DestructionReactionKind,
+    expected_action_host: str,
+) -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    shoot_source = DestructionReactionSource(
+        source_id="phase13e-shoot-on-death",
+        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+        source_rule_id="phase13e-shoot-on-death-rule",
+    )
+    fight_source = DestructionReactionSource(
+        source_id="phase13e-fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase13e-fight-on-death-rule",
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(shoot_source, fight_source),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-destruction-reaction",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-destruction-reaction:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-destruction-reaction",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-save", spec=save_spec, value=1),
+            ),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+
+    assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {
+        DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        shoot_source.source_id,
+        fight_source.source_id,
+    }
+    destroyed_payload = _last_event_payload(lifecycle, "model_destroyed")
+    removal_record = cast(dict[str, object], destroyed_payload["removal_record"])
+    transition_batch = cast(dict[str, object], destroyed_payload["transition_batch"])
+    updated_battlefield = state.battlefield_state
+    assert updated_battlefield is not None
+    assert removal_record["model_instance_id"] == defender_model.model_instance_id
+    assert removal_record["removal_kind"] == "destroyed"
+    assert cast(list[object], transition_batch["removals"]) == [removal_record]
+    assert defender_model.model_instance_id not in updated_battlefield.placed_model_ids()
+
+    selected_reaction_source = shoot_source
+    if selected_source_kind is DestructionReactionKind.FIGHT_ON_DEATH:
+        selected_reaction_source = fight_source
+
+    final_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=f"phase13e-select-{selected_source_kind.value}",
+            request=request,
+            selected_option_id=selected_reaction_source.source_id,
+        )
+    )
+    reaction_payload = _last_event_payload(lifecycle, "destruction_reaction_resolved")
+    selected_source = cast(dict[str, object], reaction_payload["selected_source"])
+
+    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert selected_source["source_id"] == selected_reaction_source.source_id
+    assert selected_source["reaction_kind"] == selected_source_kind.value
+    assert reaction_payload["selected_reaction_kind"] == selected_source_kind.value
+    assert reaction_payload["action_host"] == expected_action_host
+    assert reaction_payload["execution_status"] == "recorded_for_action_host"
+    assert any(
+        record.result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+        for record in lifecycle.decision_controller.records
+    )
+
+
+def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    deadly_demise_source = DestructionReactionSource(
+        source_id="phase13e-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase13e-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": 1},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(deadly_demise_source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-deadly-demise-reaction",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-deadly-demise-reaction:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    deadly_demise_spec = deadly_demise_trigger_roll_spec(
+        source=deadly_demise_source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-deadly-demise-reaction",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-deadly-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-deadly-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-deadly-save", spec=save_spec, value=1),
+                _fixed_roll_result(
+                    roll_id="phase13e-deadly-demise-failed",
+                    spec=deadly_demise_spec,
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    reaction_payload = _last_event_payload(lifecycle, "destruction_reaction_resolved")
+    selected_source = cast(dict[str, object], reaction_payload["selected_source"])
+    deadly_demise_payload = cast(dict[str, object], reaction_payload["deadly_demise"])
+    updated_battlefield = state.battlefield_state
+    assert updated_battlefield is not None
+
+    assert remaining_sequence is None
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert status is None
+    assert lifecycle.decision_controller.queue.pending_requests == ()
+    assert not any(
+        record.result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+        for record in lifecycle.decision_controller.records
+    )
+    assert reaction_payload["resolution_kind"] == "mandatory"
+    assert reaction_payload["decision"] is None
+    assert selected_source["source_id"] == deadly_demise_source.source_id
+    assert selected_source["reaction_kind"] == DestructionReactionKind.DEADLY_DEMISE.value
+    assert selected_source["optional"] is False
+    assert reaction_payload["action_host"] == "destruction_reaction"
+    assert reaction_payload["execution_status"] == "resolved_no_effect"
+    assert deadly_demise_payload["triggered"] is False
+    assert _event_payloads(lifecycle, "deadly_demise_mortal_wounds_applied") == ()
+    assert defender_model.model_instance_id not in updated_battlefield.placed_model_ids()
+    event_types = tuple(
+        event.event_type for event in lifecycle.decision_controller.event_log.records
+    )
+    assert event_types.index("destruction_reaction_resolved") < event_types.index("model_destroyed")
+
+
+def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(14.0, 35.0),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    attacker_model = attacker.own_models[0]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    deadly_demise_source = DestructionReactionSource(
+        source_id="phase13e-success-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase13e-success-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "d3"},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(deadly_demise_source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-success-deadly-demise",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-success-deadly-demise:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    deadly_demise_spec = deadly_demise_trigger_roll_spec(
+        source=deadly_demise_source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+    )
+    deadly_demise_mortal_wounds_spec = DiceRollManager.d3_source_spec(
+        reason=(
+            f"Deadly Demise mortal wounds for {deadly_demise_source.source_id} "
+            f"into {attacker.unit_instance_id}"
+        ),
+        roll_type="destruction_reaction.deadly_demise.mortal_wounds",
+        actor_id="player-b",
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-success-deadly-demise",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-success-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-success-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-success-save", spec=save_spec, value=1),
+                _fixed_roll_result(
+                    roll_id="phase13e-success-deadly-demise",
+                    spec=deadly_demise_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase13e-success-deadly-demise-d3",
+                    spec=deadly_demise_mortal_wounds_spec,
+                    value=3,
+                ),
+            ),
+        ),
+    )
+    applied = _last_event_payload(lifecycle, "deadly_demise_mortal_wounds_applied")
+    application = cast(dict[str, object], applied["mortal_wound_application"])
+    applications = cast(list[dict[str, object]], application["applications"])
+    updated_battlefield = state.battlefield_state
+    assert updated_battlefield is not None
+
+    assert remaining_sequence is None
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert status is None
+    assert applied["target_unit_instance_id"] == attacker.unit_instance_id
+    assert applications[0]["model_instance_id"] == attacker_model.model_instance_id
+    assert applied["mortal_wounds"] == 2
+    assert sum(cast(int, application["wounds_lost"]) for application in applications) == 2
+    assert applications[0]["wounds_lost"] == 1
+    assert (
+        model_by_id(
+            state=state, model_instance_id=attacker_model.model_instance_id
+        ).wounds_remaining
+        == 0
+    )
+    assert defender_model.model_instance_id not in updated_battlefield.placed_model_ids()
+    event_types = tuple(
+        event.event_type for event in lifecycle.decision_controller.event_log.records
+    )
+    assert event_types.index("deadly_demise_mortal_wounds_applied") < event_types.index(
+        "model_destroyed"
+    )
+
+
+def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(14.0, 35.0),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    attacker_model = attacker.own_models[0]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=attacker_model.model_instance_id,
+        sources=(FeelNoPainSource(source_id="phase13e-deadly-demise-fnp", threshold=5),),
+        decline_allowed=True,
+    )
+    deadly_demise_source = DestructionReactionSource(
+        source_id="phase13e-fnp-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase13e-fnp-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "d6"},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(deadly_demise_source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-fnp-deadly-demise",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-fnp-deadly-demise:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    deadly_demise_spec = deadly_demise_trigger_roll_spec(
+        source=deadly_demise_source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+    )
+    deadly_demise_mortal_wounds_spec = deadly_demise_mortal_wounds_roll_spec(
+        source=deadly_demise_source,
+        player_id="player-b",
+        target_unit_instance_id=attacker.unit_instance_id,
+        sides=6,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-fnp-deadly-demise",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-fnp-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-fnp-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-fnp-save", spec=save_spec, value=1),
+                _fixed_roll_result(
+                    roll_id="phase13e-fnp-deadly-demise",
+                    spec=deadly_demise_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase13e-fnp-deadly-demise-mortal-wounds",
+                    spec=deadly_demise_mortal_wounds_spec,
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    battlefield_before_fnp = state.battlefield_state
+    assert battlefield_before_fnp is not None
+    state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+
+    assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert defender_model.model_instance_id in battlefield_before_fnp.placed_model_ids()
+    assert (
+        model_by_id(
+            state=state, model_instance_id=defender_model.model_instance_id
+        ).wounds_remaining
+        == 0
+    )
+    assert _event_payloads(lifecycle, "model_destroyed") == ()
+
+    final_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13e-fnp-decline-deadly-demise",
+            request=request,
+            selected_option_id="decline",
+        )
+    )
+    updated_battlefield = state.battlefield_state
+    assert updated_battlefield is not None
+
+    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert defender_model.model_instance_id not in updated_battlefield.placed_model_ids()
+    assert _event_payloads(lifecycle, "deadly_demise_mortal_wounds_applied")
+    assert _event_payloads(lifecycle, "model_destroyed")
+
+
+def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_reaction() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(14.0, 35.0),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    attacker_model = attacker.own_models[0]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    secondary_reaction_source = DestructionReactionSource(
+        source_id="phase13e-secondary-shoot-on-death",
+        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+        source_rule_id="phase13e-secondary-shoot-on-death-rule",
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=attacker_model.model_instance_id,
+        sources=(secondary_reaction_source,),
+    )
+    deadly_demise_source = DestructionReactionSource(
+        source_id="phase13e-secondary-casualty-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase13e-secondary-casualty-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": attacker_model.wounds_remaining},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(deadly_demise_source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-secondary-casualty",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-secondary-casualty:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    deadly_demise_spec = deadly_demise_trigger_roll_spec(
+        source=deadly_demise_source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-secondary-casualty",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-secondary-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-secondary-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-secondary-save", spec=save_spec, value=1),
+                _fixed_roll_result(
+                    roll_id="phase13e-secondary-deadly-demise",
+                    spec=deadly_demise_spec,
+                    value=6,
+                ),
+            ),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    destroyed_payloads = _event_payloads(lifecycle, "model_destroyed")
+    secondary_destroyed_payloads = tuple(
+        payload
+        for payload in destroyed_payloads
+        if payload["model_instance_id"] == attacker_model.model_instance_id
+    )
+    updated_battlefield = state.battlefield_state
+    assert updated_battlefield is not None
+
+    assert remaining_sequence == sequence
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert {option.option_id for option in request.options} == {
+        DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        secondary_reaction_source.source_id,
+    }
+    assert len(secondary_destroyed_payloads) == 1
+    secondary_destroyed = secondary_destroyed_payloads[0]
+    removal_record = cast(dict[str, object], secondary_destroyed["removal_record"])
+    transition_batch = cast(dict[str, object], secondary_destroyed["transition_batch"])
+    assert removal_record["model_instance_id"] == attacker_model.model_instance_id
+    assert removal_record["removal_kind"] == "destroyed"
+    assert cast(list[object], transition_batch["removals"]) == [removal_record]
+    assert attacker_model.model_instance_id not in updated_battlefield.placed_model_ids()
+    assert defender_model.model_instance_id in updated_battlefield.placed_model_ids()
+
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    final_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13e-secondary-shoot-on-death-selected",
+            request=request,
+            selected_option_id=secondary_reaction_source.source_id,
+        )
+    )
+    final_battlefield = state.battlefield_state
+    assert final_battlefield is not None
+    final_destroyed_payloads = _event_payloads(lifecycle, "model_destroyed")
+    final_reaction_payloads = _event_payloads(lifecycle, "destruction_reaction_resolved")
+    secondary_reaction_payloads = tuple(
+        payload
+        for payload in final_reaction_payloads
+        if cast(dict[str, object], payload["selected_source"])["source_id"]
+        == secondary_reaction_source.source_id
+    )
+    primary_reaction_payloads = tuple(
+        payload
+        for payload in final_reaction_payloads
+        if cast(dict[str, object], payload["selected_source"])["source_id"]
+        == deadly_demise_source.source_id
+    )
+
+    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert defender_model.model_instance_id not in final_battlefield.placed_model_ids()
+    assert any(
+        payload["model_instance_id"] == defender_model.model_instance_id
+        for payload in final_destroyed_payloads
+    )
+    assert len(secondary_reaction_payloads) == 1
+    assert len(primary_reaction_payloads) == 1
+    assert secondary_reaction_payloads[0]["execution_status"] == "recorded_for_action_host"
+    assert primary_reaction_payloads[0]["execution_status"] == "resolved"
+
+
+def test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(14.0, 35.0),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    attacker_model = attacker.own_models[0]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    secondary_deadly_demise_source = DestructionReactionSource(
+        source_id="phase13e-secondary-chain-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase13e-secondary-chain-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": 1},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=attacker_model.model_instance_id,
+        sources=(secondary_deadly_demise_source,),
+    )
+    deadly_demise_source = DestructionReactionSource(
+        source_id="phase13e-primary-chain-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase13e-primary-chain-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": attacker_model.wounds_remaining},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(deadly_demise_source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-secondary-chain",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-secondary-chain:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    primary_deadly_demise_spec = deadly_demise_trigger_roll_spec(
+        source=deadly_demise_source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+    )
+    secondary_deadly_demise_spec = deadly_demise_trigger_roll_spec(
+        source=secondary_deadly_demise_source,
+        player_id="player-a",
+        model_instance_id=attacker_model.model_instance_id,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-secondary-chain",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-chain-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-chain-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-chain-save", spec=save_spec, value=1),
+                _fixed_roll_result(
+                    roll_id="phase13e-chain-primary-deadly-demise",
+                    spec=primary_deadly_demise_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase13e-chain-secondary-deadly-demise",
+                    spec=secondary_deadly_demise_spec,
+                    value=6,
+                ),
+            ),
+        ),
+    )
+    event_records = lifecycle.decision_controller.event_log.records
+    reaction_events = tuple(
+        event for event in event_records if event.event_type == "destruction_reaction_resolved"
+    )
+    deadly_demise_source_ids = tuple(
+        cast(dict[str, object], cast(dict[str, object], event.payload)["selected_source"])[
+            "source_id"
+        ]
+        for event in reaction_events
+        if cast(dict[str, object], cast(dict[str, object], event.payload)["selected_source"])[
+            "reaction_kind"
+        ]
+        == DestructionReactionKind.DEADLY_DEMISE.value
+    )
+    secondary_reaction_event = next(
+        event
+        for event in reaction_events
+        if cast(dict[str, object], cast(dict[str, object], event.payload)["selected_source"])[
+            "source_id"
+        ]
+        == secondary_deadly_demise_source.source_id
+    )
+    primary_reaction_event = next(
+        event
+        for event in reaction_events
+        if cast(dict[str, object], cast(dict[str, object], event.payload)["selected_source"])[
+            "source_id"
+        ]
+        == deadly_demise_source.source_id
+    )
+    secondary_destroyed_event = next(
+        event
+        for event in event_records
+        if event.event_type == "model_destroyed"
+        and cast(dict[str, object], event.payload)["model_instance_id"]
+        == attacker_model.model_instance_id
+    )
+    primary_destroyed_event = next(
+        event
+        for event in event_records
+        if event.event_type == "model_destroyed"
+        and cast(dict[str, object], event.payload)["model_instance_id"]
+        == defender_model.model_instance_id
+    )
+
+    assert remaining_sequence is None
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert status is None
+    assert deadly_demise_source_ids == (
+        secondary_deadly_demise_source.source_id,
+        deadly_demise_source.source_id,
+    )
+    assert event_records.index(secondary_reaction_event) < event_records.index(
+        secondary_destroyed_event
+    )
+    assert event_records.index(primary_reaction_event) < event_records.index(
+        primary_destroyed_event
+    )
+    assert event_records.index(secondary_destroyed_event) < event_records.index(
+        primary_destroyed_event
+    )
+    assert (
+        json.loads(json.dumps(primary_reaction_event.payload, sort_keys=True))
+        == primary_reaction_event.payload
+    )
+    assert (
+        json.loads(json.dumps(secondary_reaction_event.payload, sort_keys=True))
+        == secondary_reaction_event.payload
+    )
+
+
+def test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    source = DestructionReactionSource(
+        source_id="phase13e-invalid-shoot-on-death",
+        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+        source_rule_id="phase13e-invalid-rule",
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-invalid-reaction",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-invalid-reaction:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-invalid-reaction",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-invalid-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-invalid-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-invalid-save", spec=save_spec, value=1),
+            ),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    before_records = len(lifecycle.decision_controller.records)
+
+    stale_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase13e-stale-destruction-reaction",
+            request_id="wrong-request",
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=source.source_id,
+            payload={"source_id": source.source_id, "reaction_kind": source.reaction_kind.value},
+        )
+    )
+    malformed_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase13e-malformed-destruction-reaction",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=source.source_id,
+            payload={
+                "source_id": source.source_id,
+                "reaction_kind": DestructionReactionKind.FIGHT_ON_DEATH.value,
+            },
+        )
+    )
+
+    assert stale_status.status_kind is LifecycleStatusKind.INVALID
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+
+    decline_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13e-decline-destruction-reaction",
+            request=request,
+            selected_option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        )
+    )
+    reaction_payload = _last_event_payload(lifecycle, "destruction_reaction_resolved")
+
+    assert decline_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert reaction_payload["selected_source"] is None
+    assert reaction_payload["action_host"] is None
+    assert reaction_payload["execution_status"] == "declined"
+
+
+def test_phase13e_destruction_reaction_payloads_round_trip() -> None:
+    source = DestructionReactionSource(
+        source_id="phase13e-round-trip-fight",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase13e-round-trip-rule",
+        payload={"trigger_roll_threshold": 4},
+    )
+    request = build_destruction_reaction_request(
+        request_id="phase13e-round-trip-request",
+        defender_player_id="player-b",
+        destruction_context={"context_kind": "test-destruction"},
+        sources=(source,),
+    )
+    decoded_request = DecisionRequest.from_payload(
+        json.loads(json.dumps(request.to_payload(), sort_keys=True))
+    )
+    result = DecisionResult.for_request(
+        result_id="phase13e-round-trip-result",
+        request=decoded_request,
+        selected_option_id=source.source_id,
+    )
+    decision = DestructionReactionDecision.from_result(
+        request=decoded_request,
+        result=result,
+    )
+
+    assert DestructionReactionSource.from_payload(source.to_payload()) == source
+    assert destruction_reaction_kind_from_token("fight_on_death") is (
+        DestructionReactionKind.FIGHT_ON_DEATH
+    )
+    assert decision.selected_source_id == source.source_id
+    assert decision.selected_reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH
+    assert decision.destruction_context == {"context_kind": "test-destruction"}
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    model_id = units["enemy"].own_models[0].model_instance_id
+    state.record_model_destruction_reaction_sources(model_instance_id=model_id, sources=(source,))
+    decoded_state = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+    )
+
+    assert decoded_state.destruction_reaction_sources_for_model(model_instance_id=model_id) == (
+        source,
+    )
+    decoded_state.clear_model_destruction_reaction_sources(model_instance_id=model_id)
+    assert decoded_state.destruction_reaction_sources_for_model(model_instance_id=model_id) == ()
+
+
+def test_phase13e_destruction_reaction_validation_errors_are_typed() -> None:
+    with pytest.raises(GameLifecycleError, match="token must be a string"):
+        destruction_reaction_kind_from_token(1)
+    with pytest.raises(GameLifecycleError, match="Unsupported DestructionReactionKind"):
+        destruction_reaction_kind_from_token("not-a-destruction-reaction")
+    with pytest.raises(GameLifecycleError, match=r"Deadly Demise.*mandatory"):
+        DestructionReactionSource(
+            source_id="phase13e-optional-deadly-demise",
+            reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+            source_rule_id="phase13e-optional-deadly-demise-rule",
+        )
+    with pytest.raises(GameLifecycleError, match="requires a source"):
+        deadly_demise_trigger_roll_spec(
+            source=cast(DestructionReactionSource, object()),
+            player_id="player-b",
+            model_instance_id="phase13e-model",
+        )
+    with pytest.raises(GameLifecycleError, match="requires a Deadly Demise source"):
+        deadly_demise_trigger_roll_spec(
+            source=DestructionReactionSource(
+                source_id="phase13e-not-deadly-demise",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+                source_rule_id="phase13e-not-deadly-demise-rule",
+            ),
+            player_id="player-b",
+            model_instance_id="phase13e-model",
+        )
+    with pytest.raises(GameLifecycleError, match="mortal-wound roll requires a source"):
+        deadly_demise_mortal_wounds_roll_spec(
+            source=cast(DestructionReactionSource, object()),
+            player_id="player-b",
+            target_unit_instance_id="phase13e-target",
+            sides=6,
+        )
+    mandatory_source = DestructionReactionSource(
+        source_id="phase13e-mandatory-fight",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase13e-mandatory-fight-rule",
+        optional=False,
+    )
+    with pytest.raises(GameLifecycleError, match="player choice"):
+        build_destruction_reaction_request(
+            request_id="phase13e-mandatory-request",
+            defender_player_id="player-b",
+            destruction_context={"context_kind": "test"},
+            sources=(mandatory_source,),
+        )
+    with pytest.raises(GameLifecycleError, match="source and reaction kind"):
+        DestructionReactionDecision(
+            request_id="phase13e-invalid-decision-request",
+            result_id="phase13e-invalid-decision-result",
+            player_id="player-a",
+            selected_source_id="phase13e-invalid-source",
+            selected_reaction_kind=None,
+            destruction_context={"context_kind": "test"},
+        )
+
+    option = DecisionOption(
+        option_id="phase13e-no-actor-source",
+        label="No Actor Source",
+        payload={
+            "source_id": "phase13e-no-actor-source",
+            "reaction_kind": DestructionReactionKind.SHOOT_ON_DEATH.value,
+        },
+    )
+    request = DecisionRequest(
+        request_id="phase13e-no-actor-request",
+        decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        actor_id=None,
+        payload={"destruction_context": {"context_kind": "test"}},
+        options=(option,),
+    )
+    result = DecisionResult.for_request(
+        result_id="phase13e-no-actor-result",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    with pytest.raises(GameLifecycleError, match="requires an actor"):
+        DestructionReactionDecision.from_result(request=request, result=result)
+
+
 def test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -2992,6 +4205,13 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
             model_instance_id=target_model_id,
             resolution=FeelNoPainResolution.declined(requested_wounds=1),
         )
+    with pytest.raises(GameLifecycleError, match="remove_destroyed_model must be a bool"):
+        progress.after_wound_resolution(
+            state=state,
+            model_instance_id=target_model_id,
+            resolution=FeelNoPainResolution.declined(requested_wounds=1),
+            remove_destroyed_model=cast(bool, "yes"),
+        )
     with pytest.raises(GameLifecycleError, match="exactly one request or application"):
         MortalWoundRoutingResult(progress=progress)
     with pytest.raises(GameLifecycleError, match="request is invalid"):
@@ -3118,6 +4338,13 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
             request_id="phase13d-single-source-request",
             progress=single_source_progress,
         )
+    with pytest.raises(GameLifecycleError, match="remove_destroyed_models must be a bool"):
+        continue_mortal_wound_application(
+            state=routed_state,
+            request_id="phase13d-invalid-removal-flag",
+            progress=single_source_progress,
+            remove_destroyed_models=cast(bool, "yes"),
+        )
 
     routed_state.record_model_feel_no_pain_sources(
         model_instance_id=routed_model.model_instance_id,
@@ -3131,6 +4358,18 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     )
     request = choice_routing.request
     assert request is not None
+    with pytest.raises(GameLifecycleError, match="remove_destroyed_models must be a bool"):
+        resolve_mortal_wound_feel_no_pain_decision(
+            state=routed_state,
+            request=request,
+            result=DecisionResult.for_request(
+                result_id="phase13d-source-choice-invalid-removal-flag",
+                request=request,
+                selected_option_id=source.source_id,
+            ),
+            next_request_id="phase13d-source-choice-next",
+            remove_destroyed_models=cast(bool, "yes"),
+        )
     with pytest.raises(GameLifecycleError, match="decision requires dice manager"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
