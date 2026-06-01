@@ -1267,6 +1267,15 @@ def test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligi
         selection=selection,
         embarked_units=(passenger,),
     )
+    duplicate_model_result = resolve_firing_deck_selection(
+        cargo_state=cargo_state,
+        selection=replace(
+            selection,
+            firing_deck_value=2,
+            weapon_selections=(selection.weapon_selections[0], selection.weapon_selections[0]),
+        ),
+        embarked_units=(passenger,),
+    )
     one_shot_result = resolve_firing_deck_selection(
         cargo_state=cargo_state,
         selection=replace(
@@ -1287,6 +1296,9 @@ def test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligi
     assert result.is_valid
     assert result.temporary_weapon_profiles == (profile,)
     assert result.ineligible_unit_instance_ids == (passenger.unit_instance_id,)
+    assert TransportOperationViolationCode.FIRING_DECK_DUPLICATE_MODEL_SELECTION in {
+        violation.violation_code for violation in duplicate_model_result.violations
+    }
     assert TransportOperationViolationCode.FIRING_DECK_ONE_SHOT_WEAPON in {
         violation.violation_code for violation in one_shot_result.violations
     }

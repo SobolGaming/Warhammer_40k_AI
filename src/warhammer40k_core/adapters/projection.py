@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TypedDict, cast
+from typing import TypedDict
 
 from warhammer40k_core.engine.decision_request import (
     DecisionOptionPayload,
@@ -9,10 +9,6 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
-from warhammer40k_core.engine.movement_proposals import (
-    DecisionRequestProposalPayload,
-    MovementProposalRequestPayload,
-)
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 
@@ -42,7 +38,7 @@ class GameViewPayload(TypedDict):
     public_victory_point_ledgers: list[JsonValue]
     public_stratagem_use_records: list[JsonValue]
     pending_decision: DecisionRequestViewPayload | None
-    pending_proposal: MovementProposalRequestPayload | None
+    pending_proposal: JsonValue
     event_count: int
 
 
@@ -147,15 +143,17 @@ def _proposal_view(
     request: DecisionRequest,
     *,
     viewer_player_id: str,
-) -> MovementProposalRequestPayload | None:
+) -> JsonValue:
     if _secret_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
         return None
     if not request.is_parameterized_submission_request():
         return None
     if not isinstance(request.payload, dict):
         raise GameLifecycleError("Parameterized DecisionRequest payload must be an object.")
-    payload = cast(DecisionRequestProposalPayload, request.payload)
-    return payload["proposal_request"]
+    proposal_request = request.payload.get("proposal_request")
+    if not isinstance(proposal_request, dict):
+        raise GameLifecycleError("Parameterized DecisionRequest payload missing proposal_request.")
+    return validate_json_value(proposal_request)
 
 
 def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest | None:
