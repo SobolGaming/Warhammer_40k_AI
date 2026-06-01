@@ -1285,6 +1285,7 @@ def _apply_attack_sequence_decision_to_sequence(
         )
     elif result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_destruction_reaction_decision(
+            state=state,
             decisions=decisions,
             attack_sequence=attack_sequence,
             result=result,

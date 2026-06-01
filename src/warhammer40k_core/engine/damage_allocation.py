@@ -897,6 +897,7 @@ class MortalWoundApplicationProgress:
         state: GameState,
         model_instance_id: str,
         resolution: FeelNoPainResolution,
+        remove_destroyed_model: bool = True,
     ) -> Self:
         if self.remaining_mortal_wounds < 1:
             raise GameLifecycleError("Mortal wound progress has no wound to resolve.")
@@ -904,6 +905,8 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError("Mortal wound progress requires Feel No Pain resolution.")
         if resolution.requested_wounds != 1:
             raise GameLifecycleError("Mortal wound Feel No Pain resolves one wound at a time.")
+        if type(remove_destroyed_model) is not bool:
+            raise GameLifecycleError("remove_destroyed_model must be a bool.")
         applications = list(self.applications)
         ignored = self.ignored_mortal_wounds
         remaining_lost = self.remaining_mortal_wounds_lost
@@ -914,6 +917,7 @@ class MortalWoundApplicationProgress:
                 model_instance_id=model_instance_id,
                 damage=1,
                 damage_kind=DamageKind.MORTAL,
+                remove_destroyed_model=remove_destroyed_model,
             )
             applications.append(application)
             if application.destroyed and not self.spill_over:
@@ -1491,7 +1495,10 @@ def continue_mortal_wound_application(
     request_id: str,
     progress: MortalWoundApplicationProgress,
     dice_manager: DiceRollManager | None = None,
+    remove_destroyed_models: bool = True,
 ) -> MortalWoundRoutingResult:
+    if type(remove_destroyed_models) is not bool:
+        raise GameLifecycleError("remove_destroyed_models must be a bool.")
     current = progress
     while current.remaining_mortal_wounds > 0:
         allocation_context = allocation_context_for_unit(
@@ -1541,6 +1548,7 @@ def continue_mortal_wound_application(
             state=state,
             model_instance_id=model_id,
             resolution=resolution,
+            remove_destroyed_model=remove_destroyed_models,
         )
     return MortalWoundRoutingResult(progress=current, application=current.to_application())
 
@@ -1552,7 +1560,10 @@ def resolve_mortal_wound_feel_no_pain_decision(
     result: DecisionResult,
     next_request_id: str,
     dice_manager: DiceRollManager | None = None,
+    remove_destroyed_models: bool = True,
 ) -> MortalWoundRoutingResult:
+    if type(remove_destroyed_models) is not bool:
+        raise GameLifecycleError("remove_destroyed_models must be a bool.")
     decision = FeelNoPainDecision.from_result(request=request, result=result)
     context = _mortal_wound_context_from_payload(decision.lost_wound_context)
     progress = MortalWoundApplicationProgress.from_feel_no_pain_context(decision.lost_wound_context)
@@ -1579,12 +1590,14 @@ def resolve_mortal_wound_feel_no_pain_decision(
         state=state,
         model_instance_id=model_id,
         resolution=resolution,
+        remove_destroyed_model=remove_destroyed_models,
     )
     return continue_mortal_wound_application(
         state=state,
         request_id=next_request_id,
         progress=updated,
         dice_manager=dice_manager,
+        remove_destroyed_models=remove_destroyed_models,
     )
 
 
