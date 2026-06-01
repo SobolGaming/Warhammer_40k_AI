@@ -26,12 +26,20 @@ if TYPE_CHECKING:
 SELECT_ATTACK_ALLOCATION_DECISION_TYPE = "select_attack_allocation"
 SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
+SELECT_DESTRUCTION_REACTION_DECISION_TYPE = "select_destruction_reaction"
 MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND = "mortal_wound"
+DECLINE_DESTRUCTION_REACTION_OPTION_ID = "decline_destruction_reaction"
 
 
 class DamageKind(StrEnum):
     NORMAL = "normal"
     MORTAL = "mortal"
+
+
+class DestructionReactionKind(StrEnum):
+    SHOOT_ON_DEATH = "shoot_on_death"
+    FIGHT_ON_DEATH = "fight_on_death"
+    DEADLY_DEMISE = "deadly_demise"
 
 
 class AttackAllocationConstraintPayload(TypedDict):
@@ -95,12 +103,28 @@ class FeelNoPainSourcePayload(TypedDict):
     threshold: int
 
 
+class DestructionReactionSourcePayload(TypedDict):
+    source_id: str
+    reaction_kind: str
+    source_rule_id: str
+    payload: JsonValue
+
+
 class FeelNoPainDecisionPayload(TypedDict):
     request_id: str
     result_id: str
     player_id: str
     selected_source_id: str | None
     lost_wound_context: JsonValue
+
+
+class DestructionReactionDecisionPayload(TypedDict):
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_source_id: str | None
+    selected_reaction_kind: str | None
+    destruction_context: JsonValue
 
 
 class FeelNoPainRollPayload(TypedDict):
@@ -973,6 +997,52 @@ class FeelNoPainSource:
 
 
 @dataclass(frozen=True, slots=True)
+class DestructionReactionSource:
+    source_id: str
+    reaction_kind: DestructionReactionKind
+    source_rule_id: str
+    payload: JsonValue = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("DestructionReactionSource source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "reaction_kind",
+            destruction_reaction_kind_from_token(self.reaction_kind),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier(
+                "DestructionReactionSource source_rule_id",
+                self.source_rule_id,
+            ),
+        )
+        object.__setattr__(self, "payload", validate_json_value(self.payload))
+
+    def to_payload(self) -> DestructionReactionSourcePayload:
+        return {
+            "source_id": self.source_id,
+            "reaction_kind": self.reaction_kind.value,
+            "source_rule_id": self.source_rule_id,
+            "payload": self.payload,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DestructionReactionSourcePayload) -> Self:
+        return cls(
+            source_id=payload["source_id"],
+            reaction_kind=destruction_reaction_kind_from_token(payload["reaction_kind"]),
+            source_rule_id=payload["source_rule_id"],
+            payload=payload["payload"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class FeelNoPainRoll:
     source: FeelNoPainSource
     roll_state: DiceRollState
@@ -1128,6 +1198,90 @@ class FeelNoPainDecision:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class DestructionReactionDecision:
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_source_id: str | None
+    selected_reaction_kind: DestructionReactionKind | None
+    destruction_context: JsonValue
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("DestructionReactionDecision request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("DestructionReactionDecision result_id", self.result_id),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("DestructionReactionDecision player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "selected_source_id",
+            _validate_optional_identifier(
+                "DestructionReactionDecision selected_source_id",
+                self.selected_source_id,
+            ),
+        )
+        reaction_kind = self.selected_reaction_kind
+        object.__setattr__(
+            self,
+            "selected_reaction_kind",
+            None if reaction_kind is None else destruction_reaction_kind_from_token(reaction_kind),
+        )
+        if (self.selected_source_id is None) != (self.selected_reaction_kind is None):
+            raise GameLifecycleError(
+                "DestructionReactionDecision source and reaction kind must both be selected."
+            )
+        object.__setattr__(
+            self,
+            "destruction_context",
+            validate_json_value(self.destruction_context),
+        )
+
+    @classmethod
+    def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
+        result.validate_for_request(request)
+        payload = _payload_object(result.payload)
+        source_id = payload.get("source_id")
+        if source_id is not None and type(source_id) is not str:
+            raise GameLifecycleError("Destruction reaction source_id must be a string or null.")
+        raw_kind = payload.get("reaction_kind")
+        reaction_kind = None if raw_kind is None else destruction_reaction_kind_from_token(raw_kind)
+        actor_id = result.actor_id
+        if actor_id is None:
+            raise GameLifecycleError("DestructionReactionDecision requires an actor.")
+        request_payload = _payload_object(request.payload)
+        return cls(
+            request_id=request.request_id,
+            result_id=result.result_id,
+            player_id=actor_id,
+            selected_source_id=source_id,
+            selected_reaction_kind=reaction_kind,
+            destruction_context=validate_json_value(request_payload["destruction_context"]),
+        )
+
+    def to_payload(self) -> DestructionReactionDecisionPayload:
+        return {
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+            "player_id": self.player_id,
+            "selected_source_id": self.selected_source_id,
+            "selected_reaction_kind": (
+                None if self.selected_reaction_kind is None else self.selected_reaction_kind.value
+            ),
+            "destruction_context": self.destruction_context,
+        }
+
+
 def damage_kind_from_token(token: object) -> DamageKind:
     if type(token) is DamageKind:
         return token
@@ -1137,6 +1291,17 @@ def damage_kind_from_token(token: object) -> DamageKind:
         return DamageKind(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported DamageKind token: {token}.") from exc
+
+
+def destruction_reaction_kind_from_token(token: object) -> DestructionReactionKind:
+    if type(token) is DestructionReactionKind:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("DestructionReactionKind token must be a string.")
+    try:
+        return DestructionReactionKind(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported DestructionReactionKind token: {token}.") from exc
 
 
 def allocation_context_for_unit(
@@ -1236,6 +1401,49 @@ def build_feel_no_pain_request(
                 "lost_wound_context": validate_json_value(lost_wound_context),
                 "sources": [source.to_payload() for source in source_tuple],
                 "decline_allowed": decline_allowed,
+            }
+        ),
+        options=tuple(options),
+    )
+
+
+def build_destruction_reaction_request(
+    *,
+    request_id: str,
+    defender_player_id: str,
+    destruction_context: JsonValue,
+    sources: tuple[DestructionReactionSource, ...],
+) -> DecisionRequest:
+    source_tuple = _validate_destruction_reaction_sources(sources)
+    if not source_tuple:
+        raise GameLifecycleError("Destruction reaction request requires at least one source.")
+    options: list[DecisionOption] = [
+        DecisionOption(
+            option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+            label="Decline Destruction Reaction",
+            payload={"source_id": None, "reaction_kind": None},
+        )
+    ]
+    for source in source_tuple:
+        options.append(
+            DecisionOption(
+                option_id=source.source_id,
+                label=source.source_id,
+                payload={
+                    "source_id": source.source_id,
+                    "reaction_kind": source.reaction_kind.value,
+                },
+            )
+        )
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        actor_id=defender_player_id,
+        payload=validate_json_value(
+            {
+                "destruction_context": validate_json_value(destruction_context),
+                "sources": [source.to_payload() for source in source_tuple],
+                "decline_option_id": DECLINE_DESTRUCTION_REACTION_OPTION_ID,
             }
         ),
         options=tuple(options),
@@ -1819,6 +2027,27 @@ def _validate_feel_no_pain_sources(values: object) -> tuple[FeelNoPainSource, ..
             raise GameLifecycleError("Feel No Pain sources must contain FeelNoPainSource values.")
         if value.source_id in seen:
             raise GameLifecycleError("Feel No Pain sources must not duplicate source IDs.")
+        seen.add(value.source_id)
+        sources.append(value)
+    return tuple(sorted(sources, key=lambda source: source.source_id))
+
+
+def _validate_destruction_reaction_sources(
+    values: object,
+) -> tuple[DestructionReactionSource, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Destruction reaction sources must be a tuple.")
+    sources: list[DestructionReactionSource] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DestructionReactionSource:
+            raise GameLifecycleError(
+                "Destruction reaction sources must contain DestructionReactionSource values."
+            )
+        if value.source_id in seen:
+            raise GameLifecycleError("Destruction reaction sources must not duplicate source IDs.")
+        if value.source_id == DECLINE_DESTRUCTION_REACTION_OPTION_ID:
+            raise GameLifecycleError("Destruction reaction source ID conflicts with decline.")
         seen.add(value.source_id)
         sources.append(value)
     return tuple(sorted(sources, key=lambda source: source.source_id))

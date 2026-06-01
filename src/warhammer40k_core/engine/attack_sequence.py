@@ -34,7 +34,10 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRemovalKind,
     BattlefieldScenario,
+    BattlefieldTransitionBatch,
+    ModelRemovalRecord,
     PlacementError,
     geometry_model_for_placement,
 )
@@ -46,6 +49,7 @@ from warhammer40k_core.engine.core_stratagem_effects import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+    SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
     AttackAllocation,
@@ -56,6 +60,10 @@ from warhammer40k_core.engine.damage_allocation import (
     AttackAllocationRuleContextPayload,
     DamageApplication,
     DamageKind,
+    DestructionReactionDecision,
+    DestructionReactionKind,
+    DestructionReactionSource,
+    DestructionReactionSourcePayload,
     FeelNoPainDecision,
     FeelNoPainResolution,
     FeelNoPainSource,
@@ -65,6 +73,7 @@ from warhammer40k_core.engine.damage_allocation import (
     allocation_context_for_unit,
     apply_damage_to_model,
     build_attack_allocation_request,
+    build_destruction_reaction_request,
     build_feel_no_pain_request,
     continue_mortal_wound_application,
     damage_kind_from_token,
@@ -79,7 +88,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -138,8 +147,10 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_SAVING_THROW_KIND_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     )
 )
+DAMAGE_ALLOCATION_RULE_ID = "core_rules_damage_allocation"
 
 
 class AttackSequenceStep(StrEnum):
@@ -227,6 +238,21 @@ class LostWoundContextPayload(TypedDict):
     damage_kind: str
     requested_wounds: int
     saving_throw: JsonValue
+
+
+class DestructionReactionContextPayload(TypedDict):
+    context_kind: str
+    attack_context: AttackResolutionContextPayload
+    damage_application: JsonValue
+    model_destroyed_event_id: str
+    damage_event_id: str
+    target_unit_instance_id: str
+    model_instance_id: str
+    source_phase: str
+    source_step: str
+    removal_record: JsonValue
+    transition_batch: JsonValue
+    destroyed_model_rules_triggered: bool
 
 
 class DeferredMortalWoundsPayload(TypedDict):
@@ -563,6 +589,33 @@ class AttackSequenceHooks:
                 raise GameLifecycleError("Attack sequence hook cannot move timing windows.")
             current = updated
         return current
+
+
+@dataclass(frozen=True, slots=True)
+class DestroyedModelEmission:
+    damage_event_id: str
+    model_destroyed_event_id: str
+    removal_record: ModelRemovalRecord
+    transition_batch: BattlefieldTransitionBatch
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "damage_event_id",
+            _validate_identifier("DestroyedModelEmission damage_event_id", self.damage_event_id),
+        )
+        object.__setattr__(
+            self,
+            "model_destroyed_event_id",
+            _validate_identifier(
+                "DestroyedModelEmission model_destroyed_event_id",
+                self.model_destroyed_event_id,
+            ),
+        )
+        if type(self.removal_record) is not ModelRemovalRecord:
+            raise GameLifecycleError("DestroyedModelEmission requires a removal record.")
+        if type(self.transition_batch) is not BattlefieldTransitionBatch:
+            raise GameLifecycleError("DestroyedModelEmission requires a transition batch.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -1335,6 +1388,61 @@ def apply_feel_no_pain_decision(
     )
 
 
+def apply_destruction_reaction_decision(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    del hooks
+    record = decisions.record_for_result(result)
+    request = record.request
+    decision = DestructionReactionDecision.from_result(request=request, result=result)
+    selected_source = _selected_destruction_reaction_source_from_request(
+        request=request,
+        selected_source_id=decision.selected_source_id,
+    )
+    if selected_source is not None and selected_source.reaction_kind is not (
+        decision.selected_reaction_kind
+    ):
+        raise GameLifecycleError("Selected destruction reaction kind drift.")
+    context = _destruction_reaction_context_from_payload(decision.destruction_context)
+    attack_context = context["attack_context"]
+    _validate_attack_context_matches_sequence(
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        context_name="Destruction reaction",
+    )
+    if decision.player_id != attack_context["defender_player_id"]:
+        raise GameLifecycleError("Destruction reaction defender drift.")
+    decisions.event_log.append(
+        "destruction_reaction_resolved",
+        {
+            "decision": decision.to_payload(),
+            "selected_source": None if selected_source is None else selected_source.to_payload(),
+            "selected_reaction_kind": (
+                None
+                if decision.selected_reaction_kind is None
+                else decision.selected_reaction_kind.value
+            ),
+            "action_host": _destruction_reaction_action_host(selected_source),
+            "execution_status": (
+                "declined" if selected_source is None else "recorded_for_action_host"
+            ),
+        },
+    )
+    return (
+        _advance_after_resolved_hit(
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+        ),
+        already_allocated_model_ids,
+        None,
+    )
+
+
 def _defer_devastating_mortal_wounds_if_needed(
     *,
     decisions: DecisionController,
@@ -2063,7 +2171,7 @@ def _apply_damage_after_feel_no_pain(
             damage=resolution.remaining_wounds,
             damage_kind=damage_kind,
         )
-    _emit_damage_event(
+    destroyed_emission = _emit_damage_event(
         decisions=decisions,
         hooks=hooks,
         attack_sequence=attack_sequence,
@@ -2072,6 +2180,16 @@ def _apply_damage_after_feel_no_pain(
         saving_throw_payload=saving_throw_payload,
         feel_no_pain=resolution,
     )
+    reaction_status = _destruction_reaction_status_if_needed(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        damage=damage,
+        destroyed_emission=destroyed_emission,
+    )
+    if reaction_status is not None:
+        return attack_sequence, allocated_model_ids, reaction_status
     return (
         _advance_after_resolved_hit(
             attack_sequence=attack_sequence,
@@ -2091,6 +2209,88 @@ def _advance_after_resolved_hit(
     if hit_roll.generated_hits <= attack_sequence.generated_hit_index:
         raise GameLifecycleError("Resolved hit context has invalid generated hits.")
     return attack_sequence.advanced_after_generated_hit(hit_roll)
+
+
+def _destruction_reaction_status_if_needed(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    damage: DamageApplication | None,
+    destroyed_emission: DestroyedModelEmission | None,
+) -> LifecycleStatus | None:
+    if damage is None or not damage.destroyed:
+        return None
+    if destroyed_emission is None:
+        raise GameLifecycleError("Destroyed damage requires a destroyed model event.")
+    sources = _state_destruction_reaction_sources(
+        state=state,
+        model_instance_id=damage.model_instance_id,
+    )
+    if not sources:
+        return None
+    request = build_destruction_reaction_request(
+        request_id=state.next_decision_request_id(),
+        defender_player_id=attack_context["defender_player_id"],
+        destruction_context=validate_json_value(
+            _destruction_reaction_context_payload(
+                attack_context=attack_context,
+                damage=damage,
+                destroyed_emission=destroyed_emission,
+            )
+        ),
+        sources=sources,
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "destruction_reaction_window_opened",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attack_context_id": attack_sequence.attack_context_id(),
+            "model_instance_id": damage.model_instance_id,
+            "target_unit_instance_id": damage.target_unit_instance_id,
+            "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+            "sources": [source.to_payload() for source in sources],
+            "request_id": request.request_id,
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.SHOOTING.value,
+            "decision_type": SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+            "attack_context_id": attack_sequence.attack_context_id(),
+            "model_instance_id": damage.model_instance_id,
+        },
+    )
+
+
+def _destruction_reaction_context_payload(
+    *,
+    attack_context: AttackResolutionContextPayload,
+    damage: DamageApplication,
+    destroyed_emission: DestroyedModelEmission,
+) -> DestructionReactionContextPayload:
+    if type(damage) is not DamageApplication:
+        raise GameLifecycleError("Destruction reaction context requires damage.")
+    if not damage.destroyed:
+        raise GameLifecycleError("Destruction reaction context requires destroyed damage.")
+    return {
+        "context_kind": "attack_sequence_model_destroyed",
+        "attack_context": attack_context,
+        "damage_application": validate_json_value(damage.to_payload()),
+        "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+        "damage_event_id": destroyed_emission.damage_event_id,
+        "target_unit_instance_id": damage.target_unit_instance_id,
+        "model_instance_id": damage.model_instance_id,
+        "source_phase": BattlePhase.SHOOTING.value,
+        "source_step": AttackSequenceStep.DAMAGE.value,
+        "removal_record": validate_json_value(destroyed_emission.removal_record.to_payload()),
+        "transition_batch": validate_json_value(destroyed_emission.transition_batch.to_payload()),
+        "destroyed_model_rules_triggered": True,
+    }
 
 
 def _roll_hit_and_wound(
@@ -2418,7 +2618,7 @@ def _emit_damage_event(
     saving_throw: SavingThrow | None,
     saving_throw_payload: JsonValue | None = None,
     feel_no_pain: FeelNoPainResolution | None = None,
-) -> None:
+) -> DestroyedModelEmission | None:
     if saving_throw is not None and saving_throw_payload is not None:
         raise GameLifecycleError("Damage event saving throw payload is ambiguous.")
     resolved_saving_throw: JsonValue
@@ -2435,7 +2635,7 @@ def _emit_damage_event(
             "feel_no_pain": None if feel_no_pain is None else feel_no_pain.to_payload(),
         }
     )
-    _emit_event(
+    damage_event = _emit_event(
         decisions=decisions,
         hooks=hooks,
         event=AttackSequenceEvent(
@@ -2448,7 +2648,12 @@ def _emit_damage_event(
         ),
     )
     if damage is not None and damage.destroyed:
-        decisions.event_log.append(
+        removal_record = _destroyed_model_removal_record(
+            model_instance_id=damage.model_instance_id,
+            source_event_id=damage_event.event_id,
+        )
+        transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
+        destroyed_event = decisions.event_log.append(
             "model_destroyed",
             {
                 "sequence_id": attack_sequence.sequence_id,
@@ -2456,8 +2661,34 @@ def _emit_damage_event(
                 "target_unit_instance_id": damage.target_unit_instance_id,
                 "model_instance_id": damage.model_instance_id,
                 "damage_kind": damage.damage_kind.value,
+                "damage_event_id": damage_event.event_id,
+                "removal_record": removal_record.to_payload(),
+                "transition_batch": transition_batch.to_payload(),
+                "destroyed_model_rules_triggered": True,
             },
         )
+        return DestroyedModelEmission(
+            damage_event_id=damage_event.event_id,
+            model_destroyed_event_id=destroyed_event.event_id,
+            removal_record=removal_record,
+            transition_batch=transition_batch,
+        )
+    return None
+
+
+def _destroyed_model_removal_record(
+    *,
+    model_instance_id: str,
+    source_event_id: str,
+) -> ModelRemovalRecord:
+    return ModelRemovalRecord(
+        model_instance_id=model_instance_id,
+        removal_kind=BattlefieldRemovalKind.DESTROYED,
+        source_phase=BattlePhase.SHOOTING.value,
+        source_step=AttackSequenceStep.DAMAGE.value,
+        source_rule_id=DAMAGE_ALLOCATION_RULE_ID,
+        source_event_id=source_event_id,
+    )
 
 
 def _emit_event(
@@ -2465,9 +2696,9 @@ def _emit_event(
     decisions: DecisionController,
     hooks: AttackSequenceHooks,
     event: AttackSequenceEvent,
-) -> None:
+) -> EventRecord:
     emitted = hooks.emit(event)
-    decisions.event_log.append("attack_sequence_step", emitted.to_payload())
+    return decisions.event_log.append("attack_sequence_step", emitted.to_payload())
 
 
 def _target_has_effect_cover(*, state: GameState, target_unit_instance_id: str) -> bool:
@@ -2943,16 +3174,57 @@ def _validate_lost_wound_context_matches_sequence(
     attack_sequence: AttackSequence,
     attack_context: AttackResolutionContextPayload,
 ) -> None:
+    _validate_attack_context_matches_sequence(
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        context_name="Feel No Pain",
+    )
+
+
+def _validate_attack_context_matches_sequence(
+    *,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    context_name: str,
+) -> None:
     if attack_context["sequence_id"] != attack_sequence.sequence_id:
-        raise GameLifecycleError("Feel No Pain attack context sequence drift.")
+        raise GameLifecycleError(f"{context_name} attack context sequence drift.")
     if attack_context["attack_context_id"] != attack_sequence.attack_context_id():
-        raise GameLifecycleError("Feel No Pain attack context ID drift.")
+        raise GameLifecycleError(f"{context_name} attack context ID drift.")
     if attack_context["pool_index"] != attack_sequence.pool_index:
-        raise GameLifecycleError("Feel No Pain pool index drift.")
+        raise GameLifecycleError(f"{context_name} pool index drift.")
     if attack_context["attack_index"] != attack_sequence.attack_index:
-        raise GameLifecycleError("Feel No Pain attack index drift.")
+        raise GameLifecycleError(f"{context_name} attack index drift.")
     if attack_context["generated_hit_index"] != attack_sequence.generated_hit_index:
-        raise GameLifecycleError("Feel No Pain generated hit index drift.")
+        raise GameLifecycleError(f"{context_name} generated hit index drift.")
+
+
+def _destruction_reaction_context_from_payload(
+    payload: JsonValue,
+) -> DestructionReactionContextPayload:
+    raw = _payload_object(payload)
+    if raw.get("context_kind") != "attack_sequence_model_destroyed":
+        raise GameLifecycleError("Destruction reaction context kind is invalid.")
+    attack_context = raw["attack_context"]
+    if not isinstance(attack_context, dict):
+        raise GameLifecycleError("Destruction reaction context attack_context must be an object.")
+    return {
+        "context_kind": "attack_sequence_model_destroyed",
+        "attack_context": cast(AttackResolutionContextPayload, attack_context),
+        "damage_application": validate_json_value(raw["damage_application"]),
+        "model_destroyed_event_id": _payload_string(raw, key="model_destroyed_event_id"),
+        "damage_event_id": _payload_string(raw, key="damage_event_id"),
+        "target_unit_instance_id": _payload_string(raw, key="target_unit_instance_id"),
+        "model_instance_id": _payload_string(raw, key="model_instance_id"),
+        "source_phase": _payload_string(raw, key="source_phase"),
+        "source_step": _payload_string(raw, key="source_step"),
+        "removal_record": validate_json_value(raw["removal_record"]),
+        "transition_batch": validate_json_value(raw["transition_batch"]),
+        "destroyed_model_rules_triggered": _payload_bool(
+            raw,
+            key="destroyed_model_rules_triggered",
+        ),
+    }
 
 
 def _state_feel_no_pain_sources(
@@ -2968,6 +3240,58 @@ def _state_feel_no_pain_sources(
         if type(source) is not FeelNoPainSource:
             raise GameLifecycleError("Feel No Pain source lookup returned an invalid source.")
     return sources
+
+
+def _state_destruction_reaction_sources(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> tuple[DestructionReactionSource, ...]:
+    lookup = state.destruction_reaction_sources_for_model
+    sources = lookup(model_instance_id=model_instance_id)
+    if type(sources) is not tuple:
+        raise GameLifecycleError("Destruction reaction source lookup must return a tuple.")
+    for source in sources:
+        if type(source) is not DestructionReactionSource:
+            raise GameLifecycleError(
+                "Destruction reaction source lookup returned an invalid source."
+            )
+    return sources
+
+
+def _selected_destruction_reaction_source_from_request(
+    *,
+    request: DecisionRequest,
+    selected_source_id: str | None,
+) -> DestructionReactionSource | None:
+    request_payload = _payload_object(request.payload)
+    source_payloads = request_payload["sources"]
+    if not isinstance(source_payloads, list):
+        raise GameLifecycleError("Destruction reaction request sources must be a list.")
+    sources = tuple(
+        DestructionReactionSource.from_payload(
+            cast(DestructionReactionSourcePayload, source_payload)
+        )
+        for source_payload in source_payloads
+    )
+    if selected_source_id is None:
+        return None
+    for source in sources:
+        if source.source_id == selected_source_id:
+            return source
+    raise GameLifecycleError("Selected destruction reaction source is not in the request.")
+
+
+def _destruction_reaction_action_host(source: DestructionReactionSource | None) -> str | None:
+    if source is None:
+        return None
+    if source.reaction_kind is DestructionReactionKind.SHOOT_ON_DEATH:
+        return BattlePhase.SHOOTING.value
+    if source.reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH:
+        return BattlePhase.FIGHT.value
+    if source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE:
+        return "destruction_reaction"
+    raise GameLifecycleError("Unsupported destruction reaction kind.")
 
 
 def _state_feel_no_pain_decline_allowed(
@@ -2988,6 +3312,15 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     value = payload[key]
     if type(value) is not str:
         raise GameLifecycleError(f"Attack sequence payload {key} must be a string.")
+    return value
+
+
+def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    value = payload[key]
+    if type(value) is not bool:
+        raise GameLifecycleError(f"Attack sequence payload {key} must be a bool.")
     return value
 
 

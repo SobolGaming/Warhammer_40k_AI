@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 13D** is treated as implemented at the time this file was updated. Phase 13E is the next build slice.
+Everything through **Phase 13E** is treated as implemented at the time this file was updated. Phase 13F is the next build slice.
 
 Completed / implemented foundation:
 
@@ -80,6 +80,7 @@ Completed / implemented foundation:
 | 13B | Complete | Shooting phase target selection and weapon declaration |
 | 13C | Complete | Attack sequence, allocation, saves, damage, and typed attack events |
 | 13D | Complete | Weapon abilities, shooting/fight modifiers, and shooting Stratagems |
+| 13E | Complete | Damage allocation, destroyed models, and destruction reactions |
 
 ## Cross-cutting architectural rules
 
@@ -1761,6 +1762,8 @@ Required tests:
 - Grenade rejects invalid target bindings without mutation.
 
 ## Phase 13E: damage allocation, destroyed models, and destruction reactions
+
+Status: Complete.
 
 Invariants:
 
