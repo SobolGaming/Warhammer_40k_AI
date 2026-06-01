@@ -22,6 +22,7 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.mission_decisions import (
     MISSION_DECISION_TYPES,
+    START_MISSION_ACTION_DECISION_TYPE,
     apply_mission_decision,
     invalid_mission_decision_status,
 )
@@ -55,6 +56,11 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseHandler,
     MovementPhaseStepKind,
     assert_move_units_step_complete_for_reinforcements,
+)
+from warhammer40k_core.engine.phases.shooting import (
+    SELECT_SHOOTING_UNIT_DECISION_TYPE,
+    SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+    ShootingPhaseHandler,
 )
 from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
@@ -121,6 +127,12 @@ _MOVEMENT_DECISION_TYPES = frozenset(
     )
 )
 _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,))
+_SHOOTING_DECISION_TYPES = frozenset(
+    (
+        SELECT_SHOOTING_UNIT_DECISION_TYPE,
+        SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+    )
+)
 _REACTION_FRAME_DECISION_TYPES = frozenset(
     (
         REACTION_DECISION_TYPE,
@@ -145,6 +157,7 @@ class GameLifecycle:
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
     _movement_phase_handler: MovementPhaseHandler = field(default_factory=MovementPhaseHandler)
+    _shooting_phase_handler: ShootingPhaseHandler = field(default_factory=ShootingPhaseHandler)
     _triggered_movement_handler: TriggeredMovementHandler = field(
         default_factory=TriggeredMovementHandler
     )
@@ -159,6 +172,10 @@ class GameLifecycle:
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=config.ruleset_descriptor,
             parameterized_proposals=self.parameterized_movement_proposals,
+        )
+        self._shooting_phase_handler = ShootingPhaseHandler(
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
         )
         self._triggered_movement_handler = TriggeredMovementHandler(
             ruleset_descriptor=config.ruleset_descriptor
@@ -270,6 +287,20 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and pending_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            invalid_status = self._shooting_phase_handler.invalid_declaration_submission_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type in MISSION_DECISION_TYPES
         ):
             result.validate_for_request(pending_request)
@@ -368,6 +399,14 @@ class GameLifecycle:
                 result=result,
                 decisions=self.decision_controller,
             )
+            if record.request.decision_type == START_MISSION_ACTION_DECISION_TYPE:
+                return LifecycleStatus.advanced(
+                    stage=state.stage,
+                    payload={
+                        "decision_type": START_MISSION_ACTION_DECISION_TYPE,
+                        "result_id": result.result_id,
+                    },
+                )
             return self.advance_until_decision_or_terminal()
         if is_stratagem_placement_proposal_request(record.request):
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
@@ -404,6 +443,15 @@ class GameLifecycle:
             )
             if movement_status is not None:
                 return movement_status
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type in _SHOOTING_DECISION_TYPES:
+            shooting_status = self._shooting_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if shooting_status is not None:
+                return shooting_status
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
             triggered_status = self._triggered_movement_handler.apply_decision(
@@ -512,6 +560,10 @@ class GameLifecycle:
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor,
                 parameterized_proposals=parameterized_movement_proposals,
             ),
+            _shooting_phase_handler=ShootingPhaseHandler(
+                ruleset_descriptor=None if config is None else config.ruleset_descriptor,
+                army_catalog=None if config is None else config.army_catalog,
+            ),
             _triggered_movement_handler=TriggeredMovementHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
@@ -529,7 +581,7 @@ class GameLifecycle:
         return {
             BattlePhase.COMMAND: self._command_phase_handler,
             BattlePhase.MOVEMENT: self._movement_phase_handler,
-            BattlePhase.SHOOTING: UnsupportedPhaseHandler(BattlePhase.SHOOTING),
+            BattlePhase.SHOOTING: self._shooting_phase_handler,
             BattlePhase.CHARGE: UnsupportedPhaseHandler(BattlePhase.CHARGE),
             BattlePhase.FIGHT: UnsupportedPhaseHandler(BattlePhase.FIGHT),
         }
@@ -580,6 +632,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_transport_cargo_state_consistency(state=state)
     _validate_battlefield_state_consistency(state=state, config=config)
     _validate_movement_phase_state_consistency(state=state)
+    _validate_shooting_phase_state_consistency(state=state)
     _validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
@@ -887,6 +940,52 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
     if active_unit_id not in active_player_unit_ids:
         raise GameLifecycleError(
             "movement_phase_state active selection is not active player's unit."
+        )
+
+
+def _validate_shooting_phase_state_consistency(*, state: GameState) -> None:
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("shooting_phase_state requires battle stage.")
+    if state.current_battle_phase is not BattlePhase.SHOOTING:
+        raise GameLifecycleError("shooting_phase_state requires SHOOTING phase.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("shooting_phase_state requires active player.")
+    if shooting_state.active_player_id != state.active_player_id:
+        raise GameLifecycleError("shooting_phase_state active player drift.")
+    if shooting_state.battle_round != state.battle_round:
+        raise GameLifecycleError("shooting_phase_state battle round drift.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("shooting_phase_state requires battlefield_state.")
+    unit_owner_by_id = {
+        unit.unit_instance_id: army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+        state=state,
+        player_id=state.active_player_id,
+    )
+    active_player_unit_ids = {
+        unit_id
+        for unit_id, player_id in unit_owner_by_id.items()
+        if player_id == state.active_player_id
+    }
+    for unit_id in (*shooting_state.selected_unit_ids, *shooting_state.shot_unit_ids):
+        if unit_id not in active_player_unit_ids and unit_id not in active_player_embarked_unit_ids:
+            raise GameLifecycleError(
+                "shooting_phase_state selected unit is not active player's unit."
+            )
+    active_selection = shooting_state.active_selection
+    if active_selection is None:
+        return
+    if active_selection.unit_instance_id not in shooting_state.selected_unit_ids:
+        raise GameLifecycleError("shooting_phase_state active selection drift.")
+    if active_selection.unit_instance_id not in active_player_unit_ids:
+        raise GameLifecycleError(
+            "shooting_phase_state active selection is not active player's unit."
         )
 
 

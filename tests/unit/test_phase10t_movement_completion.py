@@ -73,7 +73,9 @@ def test_full_movement_phase_completion_exits_to_shooting_after_all_work_is_comp
         result_id="phase10t-result-000006",
     )
 
-    assert completion_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert completion_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert completion_status.decision_request is not None
+    assert completion_status.decision_request.decision_type == "select_shooting_unit"
     assert lifecycle.state is not None
     assert lifecycle.state.current_battle_phase is BattlePhase.SHOOTING
     assert lifecycle.state.movement_phase_state is None
@@ -100,13 +102,6 @@ def test_full_movement_phase_completion_exits_to_shooting_after_all_work_is_comp
         "active_player_id": "player-a",
         "next_phase": BattlePhase.SHOOTING.value,
         "phase_body_status": "reinforcements_complete",
-    }
-    assert _last_event_payload(lifecycle, "phase_body_unsupported") == {
-        "game_id": "phase10t-game",
-        "battle_round": 1,
-        "active_player_id": "player-a",
-        "phase": BattlePhase.SHOOTING.value,
-        "phase_body_status": "unsupported",
     }
     payload = cast(
         GameLifecyclePayload,

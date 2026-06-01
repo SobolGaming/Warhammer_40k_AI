@@ -82,6 +82,10 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseState,
     MovementPhaseStatePayload,
 )
+from warhammer40k_core.engine.phases.shooting import (
+    ShootingPhaseState,
+    ShootingPhaseStatePayload,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatePayload,
@@ -184,6 +188,7 @@ class GameStatePayload(TypedDict):
     battlefield_state: BattlefieldRuntimeStatePayload | None
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
+    shooting_phase_state: ShootingPhaseStatePayload | None
     reserve_states: list[ReserveStatePayload]
     hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
@@ -553,6 +558,7 @@ class GameState:
     battlefield_state: BattlefieldRuntimeState | None = None
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
+    shooting_phase_state: ShootingPhaseState | None = None
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
     transport_cargo_states: list[TransportCargoState] = field(
@@ -665,6 +671,9 @@ class GameState:
         )
         self.movement_phase_state = _validate_optional_movement_phase_state(
             self.movement_phase_state
+        )
+        self.shooting_phase_state = _validate_optional_shooting_phase_state(
+            self.shooting_phase_state
         )
         self.reserve_states = _validate_reserve_states(
             self.reserve_states,
@@ -829,6 +838,8 @@ class GameState:
                 self.command_step_state = None
             if completed_phase is BattlePhase.MOVEMENT:
                 self.movement_phase_state = None
+            if completed_phase is BattlePhase.SHOOTING:
+                self.shooting_phase_state = None
             self.battle_phase_index += 1
             self._expire_persisting_effects_at_current_phase_start()
             return completed_phase
@@ -852,6 +863,8 @@ class GameState:
             self.command_step_state = None
         if completed_phase is BattlePhase.MOVEMENT:
             self.movement_phase_state = None
+        if completed_phase is BattlePhase.SHOOTING:
+            self.shooting_phase_state = None
         completed_round = self.battle_round
         battle_round_ended = self._active_player_is_last_in_round(completed_player_id)
         if battle_round_ended:
@@ -869,6 +882,7 @@ class GameState:
             self.active_player_id = None
             self.command_step_state = None
             self.movement_phase_state = None
+            self.shooting_phase_state = None
             return completed_phase
         self.battle_phase_index = 0
         self._advance_active_player_after_completed_turn()
@@ -1939,6 +1953,11 @@ class GameState:
                 if self.movement_phase_state is None
                 else self.movement_phase_state.to_payload()
             ),
+            "shooting_phase_state": (
+                None
+                if self.shooting_phase_state is None
+                else self.shooting_phase_state.to_payload()
+            ),
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
@@ -2122,6 +2141,11 @@ class GameState:
                 None
                 if payload["movement_phase_state"] is None
                 else MovementPhaseState.from_payload(payload["movement_phase_state"])
+            ),
+            shooting_phase_state=(
+                None
+                if payload["shooting_phase_state"] is None
+                else ShootingPhaseState.from_payload(payload["shooting_phase_state"])
             ),
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]
@@ -2597,6 +2621,16 @@ def _validate_optional_movement_phase_state(
         return None
     if type(value) is not MovementPhaseState:
         raise GameLifecycleError("GameState movement_phase_state must be a MovementPhaseState.")
+    return value
+
+
+def _validate_optional_shooting_phase_state(
+    value: object | None,
+) -> ShootingPhaseState | None:
+    if value is None:
+        return None
+    if type(value) is not ShootingPhaseState:
+        raise GameLifecycleError("GameState shooting_phase_state must be a ShootingPhaseState.")
     return value
 
 

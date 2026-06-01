@@ -263,6 +263,21 @@ Attacker shooting decisions include:
 - finite or parameterized target and weapon declaration choices, depending on whether the full action space can be safely enumerated;
 - Firing Deck selections that bind each selected embarked model to at most one legal non-One-Shot ranged weapon, temporarily grant those attacks to the Transport, and mark the selected embarked units ineligible to shoot for the phase.
 
+Phase 13B implements attacker selection and declaration with these adapter-visible decisions:
+
+- `select_shooting_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_shooting_phase`. Unit option payloads use `submission_kind: "select_shooting_unit"` and include game ID, battle round, phase, player ID, and unit ID. The completion option uses `submission_kind: "complete_shooting_phase"`.
+- `submit_shooting_declaration`: parameterized active-player choice. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "shooting_declaration"`.
+- `submit_shooting_declaration.payload.proposal_request.available_weapons`: current JSON-safe weapon options, including model ID, wargear ID, full weapon-profile payload, and optional Firing Deck source unit/model IDs.
+- `submit_shooting_declaration.payload.proposal_request.target_candidates`: current JSON-safe target candidates with legality, violation diagnostics, in-range/visible target model IDs, line-of-sight witness, visibility cache key, hit modifier, and targeting rule IDs.
+
+Phase 13B shooting declaration submissions must use `selected_option_id: "submit_parameterized_payload"` and a `ShootingDeclarationProposal` payload containing:
+
+- `proposal_request_id`, `proposal_kind: "shooting_declaration"`, player ID, battle round, acting unit ID, source request/result IDs, and visibility cache key;
+- one or more `WeaponDeclaration` entries with attacker model ID, wargear ID, weapon profile ID, target unit ID, and optional Firing Deck source unit/model IDs;
+- optional `FiringDeckSelection` evidence with the Transport ID, Firing Deck value, selected embarked unit/model/wargear/profile bindings, and already-shot embarked unit IDs.
+
+Accepted Phase 13B declarations emit deterministic attack-pool payloads and `shooting_declaration_accepted` events. They do not resolve hit/wound/save/damage rolls; Phase 13C consumes the declared `RangedAttackPool` records. Rejected stale, malformed, drifted, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck Phase 13B submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
+
 Defender shooting decisions include:
 
 - finite `select_attack_allocation_model` choices when allocation is not forced;
@@ -278,11 +293,11 @@ If a shooting declaration is parameterized, the request must embed a typed propo
 - the ruleset descriptor hash and line-of-sight/cache evidence required by target validation;
 - visible viewer payloads that do not leak hidden opponent information.
 
-Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Accepted submissions validate target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Pistol, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
+Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Phase 13B does not allow recorded rule-invalid retry attempts for attacker declarations. Accepted submissions validate target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Pistol, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
 
 Defender allocation/save/defensive decisions may auto-resolve only when the rules leave exactly one legal outcome and no optional player choice. Otherwise the defending controlling player is the `DecisionRequest.actor_id`, even though they may not be the active player. Adapters must not infer that Shooting phase decisions always belong to the active player.
 
-Shooting decision records, attack-resolution events, line-of-sight witnesses, cover results, allocation records, save records, and damage/removal records must be deterministic and JSON-safe. Viewer-scoped projections and event deltas must not leak hidden information through option counts, target lists, payload metadata, rejected-proposal diagnostics, or derived fields.
+Shooting decision records, attack-resolution events, line-of-sight witnesses, cover results, allocation records, save records, and damage/removal records must be deterministic and JSON-safe. Phase 13B normal shooting unit/declaration requests are public because they concern table-visible units, weapons, targets, and Transport Firing Deck use. Viewer-scoped projections and event deltas must not leak hidden information through option counts, target lists, payload metadata, rejected-proposal diagnostics, or derived fields.
 
 Fire Overwatch is not emitted from the active player's normal Shooting phase. It is offered from legal opponent Movement or Charge reaction windows through the trigger-keyed Stratagem index, then resolves using an out-of-phase shooting context and resumes the parent phase through the Phase 12A reaction contract.
 

@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 13A** is treated as implemented at the time this file was updated. Phase 13B is the next build slice.
+Everything through **Phase 13B** is treated as implemented at the time this file was updated. Phase 13C is the next build slice.
 
 Completed / implemented foundation:
 
@@ -77,6 +77,7 @@ Completed / implemented foundation:
 | 12C | Complete | Phase-12-resolvable Core Stratagems |
 | 12D | Complete | Ability handler registry and keyword-gated rule execution |
 | 13A | Complete | Terrain visibility, line of sight, and cover foundation |
+| 13B | Complete | Shooting phase target selection and weapon declaration |
 
 ## Cross-cutting architectural rules
 
@@ -1545,6 +1546,8 @@ CORE V1 relevant areas:
 - `tests/rules/test_line_of_sight.py`
 
 ## Phase 13B: Shooting phase target selection and weapon declaration
+
+Status: Complete.
 
 Modules:
 
