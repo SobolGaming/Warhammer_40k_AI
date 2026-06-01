@@ -82,6 +82,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
+from warhammer40k_core.geometry.visibility import VisibilityBlockerKind
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -1033,6 +1034,87 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
     assert state.current_battle_phase is BattlePhase.CHARGE
 
 
+def test_shooting_los_uses_third_party_model_blockers() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1", "blocker"),
+        alpha_datasheets={"blocker": ("core-vehicle-monster", "core-vehicle-monster", 1)},
+        enemy_datasheet=("core-transport", "core-transport", 1),
+    )
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    blocker = units["blocker"]
+    target = units["enemy"]
+    attacker_poses = (
+        Pose.at(10.0, 35.0),
+        Pose.at(0.0, 5.0),
+        Pose.at(0.0, 7.0),
+        Pose.at(0.0, 9.0),
+        Pose.at(0.0, 11.0),
+    )
+    target_poses = (Pose.at(33.0, 35.0, facing_degrees=180.0),)
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=attacker_poses,
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=target_poses,
+    )
+    blocked_scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=blocker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=(Pose.at(21.5, 35.0),),
+    )
+    profile = _first_weapon_profile(lifecycle, attacker)
+
+    blocked_candidates = shooting_target_candidates_for_unit(
+        scenario=blocked_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )
+
+    assert blocked_candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE
+    witness = blocked_candidates[0].line_of_sight_witness
+    assert witness is not None
+    blocker_model_id = blocker.own_models[0].model_instance_id
+    assert any(
+        record.blocker_kind is VisibilityBlockerKind.MODEL and record.blocker_id == blocker_model_id
+        for record in witness.all_blocker_records()
+    )
+
+    clear_scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=blocker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=(Pose.at(21.5, 45.0),),
+    )
+    clear_candidates = shooting_target_candidates_for_unit(
+        scenario=clear_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )
+
+    assert clear_candidates[0].is_legal
+
+
 def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -1149,6 +1231,7 @@ def _shooting_lifecycle(
     *,
     alpha_unit_ids: tuple[str, ...],
     alpha_datasheets: dict[str, tuple[str, str, int]] | None = None,
+    enemy_datasheet: tuple[str, str, int] | None = None,
     embarked_unit_ids: tuple[str, ...] = (),
     enemy_pose: Pose | None = None,
     catalog: ArmyCatalog | None = None,
@@ -1157,6 +1240,7 @@ def _shooting_lifecycle(
     config = _config(
         alpha_unit_ids=alpha_unit_ids,
         alpha_datasheets=alpha_datasheets,
+        enemy_datasheet=enemy_datasheet,
         catalog=catalog,
     )
     armies = _mustered_armies(config)
@@ -1170,6 +1254,7 @@ def _shooting_lifecycle(
         for unit in army.units
     }
     battlefield = scenario.battlefield_state
+    friendly_unit_index = 0
     for unit_key, unit in units.items():
         if unit_key in embarked_unit_ids:
             battlefield = battlefield.without_unit_placement(unit.unit_instance_id)
@@ -1187,14 +1272,17 @@ def _shooting_lifecycle(
                 for index in range(len(unit.own_models))
             )
         elif unit.datasheet_id == "core-transport":
-            poses = (Pose.at(10.0, 35.0),)
+            poses = (Pose.at(10.0, 35.0 + (friendly_unit_index * 10.0)),)
         else:
+            friendly_y = 35.0 + (friendly_unit_index * 10.0)
             poses = tuple(
-                Pose.at(10.0 + index * 1.4, 35.0) for index in range(len(unit.own_models))
+                Pose.at(10.0 + index * 1.4, friendly_y) for index in range(len(unit.own_models))
             )
         battlefield = battlefield.with_unit_placement(
             _unit_placement_at(unit, army_id=army_id, player_id=player_id, poses=poses)
         )
+        if army_id == "army-alpha":
+            friendly_unit_index += 1
     state = GameState.from_config(config)
     for army in armies:
         state.record_army_definition(army)
@@ -1262,9 +1350,15 @@ def _config(
     *,
     alpha_unit_ids: tuple[str, ...],
     alpha_datasheets: dict[str, tuple[str, str, int]] | None,
+    enemy_datasheet: tuple[str, str, int] | None,
     catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
+    enemy_datasheet_id, enemy_model_profile_id, enemy_model_count = (
+        ("core-intercessor-like-infantry", "core-intercessor-like", 5)
+        if enemy_datasheet is None
+        else enemy_datasheet
+    )
     return GameConfig(
         game_id="phase13b-game",
         ruleset_descriptor=_ruleset(),
@@ -1287,7 +1381,7 @@ def _config(
                 player_id="player-b",
                 army_id="army-beta",
                 unit_specs=(
-                    ("enemy", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+                    ("enemy", enemy_datasheet_id, enemy_model_profile_id, enemy_model_count),
                 ),
             ),
         ),

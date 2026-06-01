@@ -487,7 +487,8 @@ def _target_candidate(
         range_inches=range_inches,
         terrain_features=terrain_features,
     )
-    if evidence is None:
+    if evidence is None or not evidence.visible_and_in_range_target_model_ids:
+        witness = None if evidence is None else evidence.witness
         return _invalid_candidate(
             attacker_unit=attacker_unit,
             weapon_profile=weapon_profile,
@@ -495,7 +496,10 @@ def _target_candidate(
             violation_code=ShootingTargetViolationCode.NOT_VISIBLE,
             message="No target model is both visible to and within range of the attacker.",
             visibility_cache_key=visibility_cache_key,
+            target_visible_model_ids=(),
             target_in_range_model_ids=target_in_range_model_ids,
+            line_of_sight_witness=witness,
+            observer_model_id=None if witness is None else witness.observer_model_id,
         )
     witness = evidence.witness
 
@@ -683,6 +687,29 @@ def _attacker_geometry_models(
     return selected
 
 
+def _shooting_dynamic_model_blockers(
+    *,
+    scenario: BattlefieldScenario,
+    observing_unit_id: str,
+    target_unit_id: str,
+) -> tuple[Model, ...]:
+    _validate_identifier("observing_unit_id", observing_unit_id)
+    _validate_identifier("target_unit_id", target_unit_id)
+    excluded_unit_ids = {observing_unit_id, target_unit_id}
+    blocker_models: list[Model] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        for unit_placement in placed_army.unit_placements:
+            if unit_placement.unit_instance_id in excluded_unit_ids:
+                continue
+            blocker_models.extend(
+                _geometry_models_for_unit_placement(
+                    scenario=scenario,
+                    unit_placement=unit_placement,
+                )
+            )
+    return tuple(sorted(blocker_models, key=lambda model: model.model_id))
+
+
 def _target_in_range_model_ids(
     *,
     attacker_models: tuple[Model, ...],
@@ -710,6 +737,12 @@ def _best_line_of_sight_range_evidence(
     terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> _LineOfSightRangeEvidence | None:
     best_evidence: _LineOfSightRangeEvidence | None = None
+    best_blocked_evidence: _LineOfSightRangeEvidence | None = None
+    blocker_models = _shooting_dynamic_model_blockers(
+        scenario=scenario,
+        observing_unit_id=attacker_unit.unit_instance_id,
+        target_unit_id=target_unit.unit_instance_id,
+    )
     for attacker_model in sorted(attacker_models, key=lambda model: model.model_id):
         in_range_model_ids = _target_in_range_model_ids(
             attacker_models=(attacker_model,),
@@ -724,7 +757,7 @@ def _best_line_of_sight_range_evidence(
             observer_model=attacker_model,
             target_models=target_models,
             terrain_features=terrain_features,
-            dynamic_model_blockers=(),
+            dynamic_model_blockers=blocker_models,
             observer_keywords=attacker_unit.keywords,
             target_keywords=target_unit.keywords,
         )
@@ -734,18 +767,20 @@ def _best_line_of_sight_range_evidence(
             for target_model_id in witness.visible_model_ids
             if target_model_id in in_range_model_ids
         )
-        if not visible_and_in_range_ids:
-            continue
         evidence = _LineOfSightRangeEvidence(
             witness=witness,
             visible_and_in_range_target_model_ids=visible_and_in_range_ids,
         )
+        if not visible_and_in_range_ids:
+            if best_blocked_evidence is None:
+                best_blocked_evidence = evidence
+            continue
         if best_evidence is None:
             best_evidence = evidence
             continue
         if len(visible_and_in_range_ids) > len(best_evidence.visible_and_in_range_target_model_ids):
             best_evidence = evidence
-    return best_evidence
+    return best_evidence if best_evidence is not None else best_blocked_evidence
 
 
 @dataclass(frozen=True, slots=True)
