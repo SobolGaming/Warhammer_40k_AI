@@ -265,7 +265,7 @@ Attacker shooting decisions include:
 
 Phase 13B implements attacker selection and declaration with these adapter-visible decisions:
 
-- `select_shooting_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_shooting_phase`. Unit option payloads use `submission_kind: "select_shooting_unit"` and include game ID, battle round, phase, player ID, and unit ID. The completion option uses `submission_kind: "complete_shooting_phase"`.
+- `select_shooting_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_shooting_phase`. Unit option payloads include the selected `unit_instance_id`. The completion option uses `submission_kind: "complete_shooting_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player units that completion will skip.
 - `submit_shooting_declaration`: parameterized active-player choice. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "shooting_declaration"`.
 - `submit_shooting_declaration.payload.proposal_request.available_weapons`: current JSON-safe weapon options, including model ID, wargear ID, full weapon-profile payload, and optional Firing Deck source unit/model IDs.
 - `submit_shooting_declaration.payload.proposal_request.firing_deck_value`: the selected Transport's descriptor-sourced Firing Deck value, or `null` when the unit has no Firing Deck descriptor.

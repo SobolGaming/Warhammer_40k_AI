@@ -1201,7 +1201,11 @@ def _validate_shooting_phase_state_consistency(*, state: GameState) -> None:
         for unit_id, player_id in unit_owner_by_id.items()
         if player_id == state.active_player_id
     }
-    for unit_id in (*shooting_state.selected_unit_ids, *shooting_state.shot_unit_ids):
+    for unit_id in (
+        *shooting_state.selected_unit_ids,
+        *shooting_state.shot_unit_ids,
+        *shooting_state.skipped_unit_ids,
+    ):
         if unit_id not in active_player_unit_ids and unit_id not in active_player_embarked_unit_ids:
             raise GameLifecycleError(
                 "shooting_phase_state selected unit is not active player's unit."
