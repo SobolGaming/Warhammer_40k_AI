@@ -3,7 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.dice import RandomCharacteristicTiming
 from warhammer40k_core.core.weapon_profiles import WeaponProfile, WeaponProfilePayload
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.transports import FiringDeckSelection, FiringDeckSelectionPayload
 
@@ -761,6 +764,45 @@ def fixed_attacks_for_profile(weapon_profile: WeaponProfile) -> int:
             "Phase 13B requires fixed attack counts; random attacks are resolved in Phase 13C."
         )
     return fixed_attacks
+
+
+def attacks_for_profile(
+    weapon_profile: WeaponProfile,
+    *,
+    manager: DiceRollManager,
+    scope_id: str,
+    actor_id: str,
+) -> int:
+    if type(weapon_profile) is not WeaponProfile:
+        raise GameLifecycleError("attacks_for_profile requires a WeaponProfile.")
+    if type(manager) is not DiceRollManager:
+        raise GameLifecycleError("attacks_for_profile requires a DiceRollManager.")
+    fixed_attacks = weapon_profile.attack_profile.fixed_attacks
+    if fixed_attacks is not None:
+        return fixed_attacks
+    expression = weapon_profile.attack_profile.dice_expression
+    if expression is None:
+        raise GameLifecycleError("AttackProfile requires fixed attacks or a dice expression.")
+    roll = manager.roll_random_characteristic(
+        characteristic=Characteristic.ATTACKS,
+        timing=RandomCharacteristicTiming.PER_WEAPON,
+        scope_id=scope_id,
+        expression=expression,
+        reason=f"Phase 13C random Attacks roll for {weapon_profile.profile_id}",
+        actor_id=actor_id,
+    )
+    return roll.value
+
+
+def unresolved_attacks_for_validation(weapon_profile: WeaponProfile) -> int:
+    if type(weapon_profile) is not WeaponProfile:
+        raise GameLifecycleError("unresolved_attacks_for_validation requires a WeaponProfile.")
+    fixed_attacks = weapon_profile.attack_profile.fixed_attacks
+    if fixed_attacks is not None:
+        return fixed_attacks
+    if weapon_profile.attack_profile.dice_expression is None:
+        raise GameLifecycleError("AttackProfile requires fixed attacks or a dice expression.")
+    return 1
 
 
 def _validate_weapon_declarations(values: object) -> tuple[WeaponDeclaration, ...]:
