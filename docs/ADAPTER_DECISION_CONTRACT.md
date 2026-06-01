@@ -277,14 +277,22 @@ Phase 13B shooting declaration submissions must use `selected_option_id: "submit
 - one or more `WeaponDeclaration` entries with attacker model ID, wargear ID, weapon profile ID, target unit ID, and optional Firing Deck source unit/model IDs;
 - optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, selected embarked unit/model/wargear/profile bindings, and already-shot embarked unit IDs. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
 
-Accepted Phase 13B declarations emit deterministic attack-pool payloads and `shooting_declaration_accepted` events. They do not resolve hit/wound/save/damage rolls; Phase 13C consumes the declared `RangedAttackPool` records. Rejected stale, malformed, drifted, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck Phase 13B submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
+Accepted Phase 13B declarations emit deterministic attack-pool payloads and `shooting_declaration_accepted` events. Phase 13C then consumes the declared `RangedAttackPool` records through the same Shooting phase lifecycle and may emit defender allocation or save decisions before returning to the next shooting-unit selection. Rejected stale, malformed, drifted, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck Phase 13B submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
 
 Defender shooting decisions include:
 
-- finite `select_attack_allocation_model` choices when allocation is not forced;
+- finite `select_attack_allocation` choices when allocation is not forced;
 - finite `select_saving_throw_kind` choices when armour and invulnerable saves are both legal;
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
 - shooting-coupled reactive Stratagem choices such as Go to Ground through the existing `use_stratagem` or Stratagem target-proposal contract.
+
+Phase 13C implements these defender-visible attack-resolution decisions:
+
+- `select_attack_allocation`: finite defending-player choice. Option IDs are legal `model_instance_id` values. `payload.attack_context` is the JSON-safe attack context for the single attack being allocated. `payload.allocation_context` includes alive model IDs, wounded model IDs, already-allocated model IDs for the phase, attached-unit Bodyguard/Character protection evidence, and any attacker-side allocation constraint. Adapters must select one pending option ID and must not infer legal models from table state.
+- `select_saving_throw_kind`: finite defending-player choice. Option IDs are `armour` or `invulnerable`. `payload.attack_context` is the JSON-safe attack context after allocation, including the allocated model and save options. `payload.save_options` contains deterministic save-kind, target-number, AP, cover, and source-rule evidence. Adapters must not apply AP, cover, or invulnerable-save rules locally.
+- `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path.
+
+Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Weapon abilities remain Phase 13D behavior, but adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
 
 If a shooting declaration is parameterized, the request must embed a typed proposal request with replay-safe source context:
 

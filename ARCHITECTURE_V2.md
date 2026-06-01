@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 13B** is treated as implemented at the time this file was updated. Phase 13C is the next build slice.
+Everything through **Phase 13C** is treated as implemented at the time this file was updated. Phase 13D is the next build slice.
 
 Completed / implemented foundation:
 
@@ -78,6 +78,7 @@ Completed / implemented foundation:
 | 12D | Complete | Ability handler registry and keyword-gated rule execution |
 | 13A | Complete | Terrain visibility, line of sight, and cover foundation |
 | 13B | Complete | Shooting phase target selection and weapon declaration |
+| 13C | Complete | Attack sequence, allocation, saves, damage, and typed attack events |
 
 ## Cross-cutting architectural rules
 
@@ -119,7 +120,7 @@ Rules audited against the 10e Core Rules page are assigned to explicit future ph
 | Persisting effects through Embark/Disembark and Attached-unit splits | Phase 12A, 12D, 15D |
 | Out-of-phase actions: perform only the specified action and do not trigger other rules normally used in that phase | Phase 12A, 12C, 12D |
 | Starting Strength, Below Half-strength, Battle-shock, CP gain cap, and Battle-shocked restrictions | Phase 11C |
-| Attached-unit Toughness, allocation protection for Characters, split timing, destroyed-unit triggers and keywords | Phase 13E, 15D |
+| Attached-unit Toughness, allocation protection for Characters, split timing, destroyed-unit triggers and keywords | Phase 13C, 13E, 15D |
 | Objective marker placement, movement over objective markers, no endpoint on objective markers, 3"/5" range, control timing | Phase 11A, 11B, 11C |
 | Fast dice rolling constraints, including no fast dice for random damage where order matters | Phase 13C, 18A |
 | Full common weapon ability list from Core Rules | Phase 13D |
@@ -1600,6 +1601,8 @@ Required tests:
 
 ## Phase 13C: attack sequence: hit, wound, allocate, save, damage
 
+Status: Complete.
+
 Modules:
 
 - `engine/attack_sequence.py`
@@ -1630,15 +1633,18 @@ Invariants:
 - unmodified Hit roll of 1 always fails;
 - Hit roll modifiers are capped at +1/-1;
 - Wound roll modifiers are capped at +1/-1;
-- Wound roll target number derives from Strength vs Toughness using the 2+/3+/4+/5+/6+ table;
+- Wound roll target number derives from Strength vs Toughness using integer-safe boundaries: 2+ when `S >= 2*T`, 3+ when `S > T`, 4+ when `S == T`, 6+ when `2*S <= T`, and otherwise 5+;
 - unmodified Wound roll of 6 always succeeds and unmodified Wound roll of 1 always fails;
 - unmodified saving throw roll of 1 always fails;
+- the attack sequence emits typed, ordered attack events/timing windows at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage; ability handlers may only mutate within their owning windows, so Phase 13D abilities can attach without reaching into attack-sequence internals;
+- hit resolution supports both rolled hits and explicit skipped-roll/generated-hit paths, so later ability handlers can produce auto-hits without coupling Phase 13C to named abilities;
 - Critical Wounds and wound-roll modification are explicit attack events;
 - all defender allocation, save-kind, optional Feel No Pain, and defensive reaction choices are player-facing decisions routed through `GameLifecycle.submit_decision(...)`; no defender choice may be made by direct engine helper calls, adapters, tests, or UI code;
 - defender-facing requests set the defending controlling player as `actor_id`, are viewer-scoped, and produce deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads;
 - forced allocation/save paths may resolve automatically only when there is exactly one legal rules outcome and no optional player choice;
 - the defender allocates attacks one at a time unless fast dice conditions are satisfied;
-- wounded models or models already allocated attacks this phase must continue receiving allocations until destroyed or all attacks are resolved/saved;
+- the allocation step accepts optional attacker-side allocation constraints so later rules can constrain or override allocation without bypassing `submit_decision(...)`;
+- wounded models or models already allocated attacks this phase must continue receiving allocations until destroyed or all attacks are resolved/saved, except where a higher-priority allocation rule forbids it; notably, Attached-unit Character protection prevents non-Precision attacks from being allocated to a Character while Bodyguard models remain, even if that Character lost wounds or had attacks allocated earlier in the phase;
 - armour saves apply AP modifiers and Benefit of Cover where eligible, including the Phase 13A non-stacking rule and AP 0 / Save 3+ or better exception flag;
 - attack allocation must call Phase 13A Benefit of Cover with only the allocated model in `target_models`; unit-scoped cover contexts are invalid for final save/AP modifiers because 10e cover is allocated-model specific;
 - Plunging Fire is a descriptor-driven AP modifier that consumes Phase 13A line-of-sight, height, and full-visibility evidence; rulesets that do not support it must return typed unsupported diagnostics instead of silently ignoring it;
@@ -1658,6 +1664,7 @@ Required tests:
 - armour-versus-invulnerable save choice is a finite defender `DecisionRequest` when both are legal;
 - optional or competing Feel No Pain choices are finite defender `DecisionRequest`s; forced single-source Feel No Pain paths remain engine-owned deterministic rolls;
 - stale/drift/malformed defender submissions are rejected without mutation;
+- full attack sequence resolves deterministically with no ability handlers installed, and a stub no-op handler proves each typed event hook fires in order;
 - hit/wound/save/damage deterministic dice flow;
 - Hit roll 6 critical/auto-success and 1 auto-fail;
 - Hit modifier cap of +1/-1;
@@ -1666,6 +1673,7 @@ Required tests:
 - Wound roll table boundaries;
 - armour save, invulnerable save, and cover interaction, including non-stacking and AP 0 / Save 3+ or better exception behavior;
 - allocated-model-scoped cover evaluation proves one target model's terrain occupancy cannot grant cover to a different allocated model;
+- a Character wounded by an earlier attacker-constrained allocation remains illegal for a later unconstrained attack while Attached-unit Bodyguard models remain;
 - Plunging Fire applies only with the required height/visibility evidence and fails explicitly when the selected ruleset does not support it;
 - mortal wound spillover and no-save path;
 - Devastating/Hazardous mortal-wound lost-remainder exceptions where applicable;
@@ -1719,7 +1727,7 @@ Invariants:
 - Torrent bypasses Hit rolls and interacts correctly with Indirect Fire restrictions;
 - Lethal Hits and Sustained Hits consume Critical Hit events;
 - Anti modifies Critical Wound thresholds based on target keywords;
-- Precision modifies allocation to visible Character models in Attached units;
+- Precision lets the attacking player optionally allocate a successful wound to a visible Character model in an Attached unit instead of following normal Bodyguard allocation; the choice belongs to the attacker and is surfaced through the decision contract;
 - Hazardous tests occur after the unit has resolved all its attacks and allocate mortal wounds to eligible Hazardous-equipped models;
 - Devastating Wounds behavior is ruleset-descriptor driven: launch 10th Edition may convert damage to mortal wounds, while later dataslate/source packages may instead mark the attack as allowing no saves of any kind; attack resolution must consume the descriptor and must not hard-code one edition's wording;
 - Extra Attacks weapons are additional melee weapons and their Attacks cannot be modified unless the modifying rule names that weapon;

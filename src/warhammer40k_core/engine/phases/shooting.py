@@ -11,7 +11,16 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine.attack_sequence import (
+    ATTACK_ALLOCATION_DECISION_TYPES,
+    AttackSequence,
+    AttackSequencePayload,
+    apply_attack_allocation_decision,
+    apply_saving_throw_decision,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.damage_allocation import SELECT_ATTACK_ALLOCATION_DECISION_TYPE
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     DecisionOption,
@@ -26,6 +35,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.saves import SELECT_SAVING_THROW_KIND_DECISION_TYPE
 from warhammer40k_core.engine.shooting_targets import (
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
@@ -79,6 +89,8 @@ class ShootingPhaseStatePayload(TypedDict):
     shot_unit_ids: list[str]
     active_selection: ShootingUnitSelectionPayload | None
     attack_pools: list[RangedAttackPoolPayload]
+    attack_sequence: AttackSequencePayload | None
+    allocated_model_ids_this_phase: list[str]
 
 
 class ShootingDeclarationProposalRequestPayload(TypedDict):
@@ -179,6 +191,8 @@ class ShootingPhaseState:
     shot_unit_ids: tuple[str, ...] = ()
     active_selection: ShootingUnitSelection | None = None
     attack_pools: tuple[RangedAttackPool, ...] = ()
+    attack_sequence: AttackSequence | None = None
+    allocated_model_ids_this_phase: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -224,8 +238,25 @@ class ShootingPhaseState:
             "attack_pools",
             _validate_attack_pools(self.attack_pools),
         )
+        if self.attack_sequence is not None:
+            if type(self.attack_sequence) is not AttackSequence:
+                raise GameLifecycleError(
+                    "ShootingPhaseState attack_sequence must be an AttackSequence."
+                )
+            if self.active_selection is not None:
+                raise GameLifecycleError("Shooting attack_sequence requires no active_selection.")
+        object.__setattr__(
+            self,
+            "allocated_model_ids_this_phase",
+            _validate_identifier_tuple(
+                "ShootingPhaseState allocated_model_ids_this_phase",
+                self.allocated_model_ids_this_phase,
+            ),
+        )
         if self.phase_complete and self.active_selection is not None:
             raise GameLifecycleError("Completed Shooting phase cannot have active_selection.")
+        if self.phase_complete and self.attack_sequence is not None:
+            raise GameLifecycleError("Completed Shooting phase cannot have attack_sequence.")
 
     def with_unit_selection(self, selection: ShootingUnitSelection) -> Self:
         if type(selection) is not ShootingUnitSelection:
@@ -250,6 +281,8 @@ class ShootingPhaseState:
             shot_unit_ids=self.shot_unit_ids,
             active_selection=selection,
             attack_pools=self.attack_pools,
+            attack_sequence=self.attack_sequence,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
         )
 
     def with_declaration(
@@ -257,6 +290,7 @@ class ShootingPhaseState:
         *,
         attack_pools: tuple[RangedAttackPool, ...],
         ineligible_unit_instance_ids: tuple[str, ...] = (),
+        attack_sequence: AttackSequence | None = None,
     ) -> Self:
         if self.phase_complete:
             raise GameLifecycleError("Cannot record shooting declaration after phase completion.")
@@ -265,6 +299,13 @@ class ShootingPhaseState:
         for pool in attack_pools:
             if type(pool) is not RangedAttackPool:
                 raise GameLifecycleError("Shooting declaration attack_pools must be attack pools.")
+        if attack_sequence is not None:
+            if type(attack_sequence) is not AttackSequence:
+                raise GameLifecycleError("Shooting declaration attack_sequence is invalid.")
+            if attack_sequence.attack_pools != attack_pools:
+                raise GameLifecycleError("Shooting declaration attack_sequence pool drift.")
+            if attack_sequence.attacking_unit_instance_id != self.active_selection.unit_instance_id:
+                raise GameLifecycleError("Shooting declaration attack_sequence unit drift.")
         ineligible_ids = _validate_identifier_tuple(
             "ineligible_unit_instance_ids",
             ineligible_unit_instance_ids,
@@ -279,6 +320,26 @@ class ShootingPhaseState:
             shot_unit_ids=shot_unit_ids,
             active_selection=None,
             attack_pools=(*self.attack_pools, *attack_pools),
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
+        )
+
+    def with_attack_sequence_update(
+        self,
+        *,
+        attack_sequence: AttackSequence | None,
+        allocated_model_ids_this_phase: tuple[str, ...],
+    ) -> Self:
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            phase_complete=self.phase_complete,
+            selected_unit_ids=self.selected_unit_ids,
+            shot_unit_ids=self.shot_unit_ids,
+            active_selection=self.active_selection,
+            attack_pools=self.attack_pools,
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=allocated_model_ids_this_phase,
         )
 
     def with_phase_complete(self) -> Self:
@@ -292,6 +353,8 @@ class ShootingPhaseState:
             shot_unit_ids=self.shot_unit_ids,
             active_selection=None,
             attack_pools=self.attack_pools,
+            attack_sequence=None,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
         )
 
     def to_payload(self) -> ShootingPhaseStatePayload:
@@ -305,6 +368,10 @@ class ShootingPhaseState:
                 None if self.active_selection is None else self.active_selection.to_payload()
             ),
             "attack_pools": [pool.to_payload() for pool in self.attack_pools],
+            "attack_sequence": (
+                None if self.attack_sequence is None else self.attack_sequence.to_payload()
+            ),
+            "allocated_model_ids_this_phase": list(self.allocated_model_ids_this_phase),
         }
 
     @classmethod
@@ -324,6 +391,12 @@ class ShootingPhaseState:
             attack_pools=tuple(
                 RangedAttackPool.from_payload(pool) for pool in payload["attack_pools"]
             ),
+            attack_sequence=(
+                None
+                if payload["attack_sequence"] is None
+                else AttackSequence.from_payload(payload["attack_sequence"])
+            ),
+            allocated_model_ids_this_phase=tuple(payload["allocated_model_ids_this_phase"]),
         )
 
 
@@ -357,6 +430,21 @@ class ShootingPhaseHandler:
         del reaction_queue
         _validate_shooting_phase_state(state)
         shooting_state = _ensure_shooting_phase_state(state=state)
+        if shooting_state.attack_sequence is not None:
+            attack_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+                state=state,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                attack_sequence=shooting_state.attack_sequence,
+                already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
+            )
+            shooting_state = shooting_state.with_attack_sequence_update(
+                attack_sequence=attack_sequence,
+                allocated_model_ids_this_phase=allocated_model_ids,
+            )
+            state.shooting_phase_state = shooting_state
+            if status is not None:
+                return status
         if shooting_state.phase_complete:
             decisions.event_log.append(
                 "shooting_phase_completed",
@@ -512,6 +600,13 @@ class ShootingPhaseHandler:
                 army_catalog=_army_catalog_for_handler(self),
             )
             return None
+        if result.decision_type in ATTACK_ALLOCATION_DECISION_TYPES:
+            return _apply_attack_sequence_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
 
 
@@ -692,9 +787,16 @@ def _apply_shooting_declaration_decision(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
+    attack_sequence = AttackSequence.start(
+        sequence_id=f"attack-sequence:{result.result_id}",
+        attacker_player_id=_active_player_id(state),
+        attacking_unit_instance_id=proposal.unit_instance_id,
+        attack_pools=attack_pools,
+    )
     state.shooting_phase_state = shooting_state.with_declaration(
         attack_pools=attack_pools,
         ineligible_unit_instance_ids=ineligible_unit_ids,
+        attack_sequence=attack_sequence,
     )
     decisions.event_log.append(
         "shooting_declaration_accepted",
@@ -715,6 +817,42 @@ def _apply_shooting_declaration_decision(
             }
         ),
     )
+
+
+def _apply_attack_sequence_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None or shooting_state.attack_sequence is None:
+        raise GameLifecycleError("Attack sequence decision requires active attack_sequence.")
+    if result.decision_type == SELECT_ATTACK_ALLOCATION_DECISION_TYPE:
+        attack_sequence, allocated_model_ids, status = apply_attack_allocation_decision(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            attack_sequence=shooting_state.attack_sequence,
+            result=result,
+            already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
+        )
+    elif result.decision_type == SELECT_SAVING_THROW_KIND_DECISION_TYPE:
+        attack_sequence, allocated_model_ids, status = apply_saving_throw_decision(
+            state=state,
+            decisions=decisions,
+            attack_sequence=shooting_state.attack_sequence,
+            result=result,
+            already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
+        )
+    else:
+        raise GameLifecycleError("Unsupported attack sequence decision type.")
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=attack_sequence,
+        allocated_model_ids_this_phase=allocated_model_ids,
+    )
+    return status
 
 
 def _validate_declaration_submission(
