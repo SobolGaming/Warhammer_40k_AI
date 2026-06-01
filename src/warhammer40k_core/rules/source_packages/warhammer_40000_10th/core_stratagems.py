@@ -166,8 +166,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="movement",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-13d:out-of-phase-shooting-unit",
-            handler_id="unsupported:phase-13d:fire-overwatch",
+            target_policy_id="out_of_phase_shooting_unit",
+            handler_id="core:fire-overwatch",
         ),
         SourceStratagemRow(
             stratagem_id="go-to-ground",
@@ -185,8 +185,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="shooting",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-13d:infantry-selected-target-unit",
-            handler_id="unsupported:phase-13d:go-to-ground",
+            target_policy_id="selected_target_infantry_unit",
+            handler_id="core:go-to-ground",
         ),
         SourceStratagemRow(
             stratagem_id="grenade",
@@ -206,8 +206,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="shooting",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-13d:grenades-unit-and-enemy-target",
-            handler_id="unsupported:phase-13d:grenade",
+            target_policy_id="grenades_unit_and_enemy_target",
+            handler_id="core:grenade",
         ),
         SourceStratagemRow(
             stratagem_id="heroic-intervention",
@@ -303,8 +303,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="shooting",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-13d:smoke-selected-target-unit",
-            handler_id="unsupported:phase-13d:smokescreen",
+            target_policy_id="selected_target_smoke_unit",
+            handler_id="core:smokescreen",
         ),
         SourceStratagemRow(
             stratagem_id="tank-shock",

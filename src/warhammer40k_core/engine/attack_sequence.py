@@ -12,6 +12,8 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
     RandomCharacteristicTiming,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
 )
 from warhammer40k_core.core.modifiers import (
     ModifierStack,
@@ -19,17 +21,28 @@ from warhammer40k_core.core.modifiers import (
     RollModifier,
     RollModifierPayload,
 )
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    LineOfSightPolicy,
+    RulesetDescriptor,
+    TerrainFeatureKind,
+)
 from warhammer40k_core.core.weapon_profiles import (
     DamageProfile,
     DamageProfilePayload,
     RangeProfileKind,
+    WeaponKeyword,
     WeaponProfile,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
     geometry_model_for_placement,
+)
+from warhammer40k_core.engine.core_stratagem_effects import (
+    GO_TO_GROUND_EFFECT_KIND,
+    unit_effect_hit_roll_modifier,
+    unit_effect_invulnerable_save,
+    unit_effects_grant_benefit_of_cover,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
@@ -67,6 +80,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.saves import (
     SELECT_SAVING_THROW_KIND_DECISION_TYPE,
+    SaveKind,
     SaveOption,
     SaveOptionPayload,
     SavingThrow,
@@ -82,8 +96,24 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import (
+    HAZARDOUS_RULE_ID,
+    INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+    INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+    MELTA_RULE_ID,
+    TWIN_LINKED_RULE_ID,
+    anti_keyword_critical_threshold,
+    has_weapon_keyword,
+    melta_damage_bonus,
+    sustained_hits_generated_hits,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
-from warhammer40k_core.geometry.visibility import BenefitOfCoverResult, TerrainVisibilityContext
+from warhammer40k_core.geometry.visibility import (
+    BenefitOfCoverResult,
+    CoverSourceReason,
+    CoverSourceRecord,
+    TerrainVisibilityContext,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -121,6 +151,7 @@ class HitRollPayload(TypedDict):
     target_number: int
     roll_state: DiceRollStatePayload | None
     unmodified_roll: int | None
+    minimum_unmodified_success: int
     modifier: int
     capped_modifier: int
     final_roll: int | None
@@ -134,13 +165,15 @@ class WoundRollPayload(TypedDict):
     strength: int
     toughness: int
     target_number: int
-    roll_state: DiceRollStatePayload
-    unmodified_roll: int
+    roll_state: DiceRollStatePayload | None
+    unmodified_roll: int | None
+    critical_threshold: int
     modifier: int
     capped_modifier: int
-    final_roll: int
+    final_roll: int | None
     successful: bool
     critical: bool
+    skipped: bool
 
 
 class AttackSequencePayload(TypedDict):
@@ -150,6 +183,8 @@ class AttackSequencePayload(TypedDict):
     attack_pools: list[RangedAttackPoolPayload]
     pool_index: int
     attack_index: int
+    generated_hit_index: int
+    current_hit_roll: HitRollPayload | None
 
 
 class AttackResolutionContextPayload(TypedDict):
@@ -157,6 +192,7 @@ class AttackResolutionContextPayload(TypedDict):
     attack_context_id: str
     pool_index: int
     attack_index: int
+    generated_hit_index: int
     attacker_player_id: str
     defender_player_id: str
     attacking_unit_instance_id: str
@@ -205,6 +241,7 @@ class HitRoll:
     final_roll: int | None
     successful: bool
     critical: bool
+    minimum_unmodified_success: int = 2
     skipped: bool = False
     generated_hits: int = 1
 
@@ -213,6 +250,14 @@ class HitRoll:
             self,
             "target_number",
             _validate_d6_target("HitRoll target_number", self.target_number),
+        )
+        object.__setattr__(
+            self,
+            "minimum_unmodified_success",
+            _validate_d6_minimum_success(
+                "HitRoll minimum_unmodified_success",
+                self.minimum_unmodified_success,
+            ),
         )
         if type(self.modifier) is not int:
             raise GameLifecycleError("HitRoll modifier must be an integer.")
@@ -250,7 +295,8 @@ class HitRoll:
         if type(self.final_roll) is not int:
             raise GameLifecycleError("HitRoll final_roll must be an integer.")
         expected_success = self.unmodified_roll == 6 or (
-            self.unmodified_roll != 1 and self.final_roll >= self.target_number
+            self.unmodified_roll >= self.minimum_unmodified_success
+            and self.final_roll >= self.target_number
         )
         if self.successful != expected_success:
             raise GameLifecycleError("HitRoll success flag does not match roll semantics.")
@@ -277,6 +323,7 @@ class HitRoll:
             "target_number": self.target_number,
             "roll_state": None if self.roll_state is None else self.roll_state.to_payload(),
             "unmodified_roll": self.unmodified_roll,
+            "minimum_unmodified_success": self.minimum_unmodified_success,
             "modifier": self.modifier,
             "capped_modifier": self.capped_modifier,
             "final_roll": self.final_roll,
@@ -286,19 +333,42 @@ class HitRoll:
             "generated_hits": self.generated_hits,
         }
 
+    @classmethod
+    def from_payload(cls, payload: HitRollPayload) -> Self:
+        roll_state_payload = payload["roll_state"]
+        return cls(
+            target_number=payload["target_number"],
+            roll_state=(
+                None
+                if roll_state_payload is None
+                else DiceRollState.from_payload(roll_state_payload)
+            ),
+            unmodified_roll=payload["unmodified_roll"],
+            modifier=payload["modifier"],
+            capped_modifier=payload["capped_modifier"],
+            final_roll=payload["final_roll"],
+            successful=payload["successful"],
+            critical=payload["critical"],
+            minimum_unmodified_success=payload["minimum_unmodified_success"],
+            skipped=payload["skipped"],
+            generated_hits=payload["generated_hits"],
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class WoundRoll:
     strength: int
     toughness: int
     target_number: int
-    roll_state: DiceRollState
-    unmodified_roll: int
+    roll_state: DiceRollState | None
+    unmodified_roll: int | None
     modifier: int
     capped_modifier: int
-    final_roll: int
+    final_roll: int | None
     successful: bool
     critical: bool
+    critical_threshold: int = 6
+    skipped: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -314,40 +384,83 @@ class WoundRoll:
         expected_target = wound_roll_target_number(strength=self.strength, toughness=self.toughness)
         if self.target_number != expected_target:
             raise GameLifecycleError("WoundRoll target_number does not match Strength/Toughness.")
-        if type(self.roll_state) is not DiceRollState:
-            raise GameLifecycleError("WoundRoll roll_state must be DiceRollState.")
-        if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
-            raise GameLifecycleError("WoundRoll unmodified_roll must be a D6 value.")
+        object.__setattr__(
+            self,
+            "critical_threshold",
+            _validate_d6_target("WoundRoll critical_threshold", self.critical_threshold),
+        )
         if type(self.modifier) is not int:
             raise GameLifecycleError("WoundRoll modifier must be an integer.")
         if self.capped_modifier != _cap_roll_modifier(self.modifier):
             raise GameLifecycleError("WoundRoll capped_modifier does not match modifier cap.")
-        if type(self.final_roll) is not int:
-            raise GameLifecycleError("WoundRoll final_roll must be an integer.")
         if type(self.successful) is not bool:
             raise GameLifecycleError("WoundRoll successful must be a bool.")
         if type(self.critical) is not bool:
             raise GameLifecycleError("WoundRoll critical must be a bool.")
-        expected_success = self.unmodified_roll == 6 or (
+        if type(self.skipped) is not bool:
+            raise GameLifecycleError("WoundRoll skipped must be a bool.")
+        if self.skipped:
+            if self.roll_state is not None or self.unmodified_roll is not None:
+                raise GameLifecycleError("Skipped WoundRoll must not include a roll.")
+            if self.final_roll is not None:
+                raise GameLifecycleError("Skipped WoundRoll must not include a final roll.")
+            if not self.successful:
+                raise GameLifecycleError("Skipped WoundRoll must be successful.")
+            if self.critical:
+                raise GameLifecycleError("Skipped WoundRoll cannot be a Critical Wound.")
+            return
+        if type(self.roll_state) is not DiceRollState:
+            raise GameLifecycleError("WoundRoll roll_state must be DiceRollState.")
+        if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
+            raise GameLifecycleError("WoundRoll unmodified_roll must be a D6 value.")
+        if type(self.final_roll) is not int:
+            raise GameLifecycleError("WoundRoll final_roll must be an integer.")
+        expected_critical = self.unmodified_roll >= self.critical_threshold
+        expected_success = expected_critical or (
             self.unmodified_roll != 1 and self.final_roll >= self.target_number
         )
         if self.successful != expected_success:
             raise GameLifecycleError("WoundRoll success flag does not match roll semantics.")
-        if self.critical != (self.unmodified_roll == 6):
-            raise GameLifecycleError("WoundRoll critical flag must track unmodified 6.")
+        if self.critical != expected_critical:
+            raise GameLifecycleError("WoundRoll critical flag must track critical threshold.")
+
+    @classmethod
+    def auto_wound(
+        cls,
+        *,
+        strength: int,
+        toughness: int,
+        target_number: int,
+    ) -> Self:
+        return cls(
+            strength=strength,
+            toughness=toughness,
+            target_number=target_number,
+            roll_state=None,
+            unmodified_roll=None,
+            critical_threshold=6,
+            modifier=0,
+            capped_modifier=0,
+            final_roll=None,
+            successful=True,
+            critical=False,
+            skipped=True,
+        )
 
     def to_payload(self) -> WoundRollPayload:
         return {
             "strength": self.strength,
             "toughness": self.toughness,
             "target_number": self.target_number,
-            "roll_state": self.roll_state.to_payload(),
+            "roll_state": None if self.roll_state is None else self.roll_state.to_payload(),
             "unmodified_roll": self.unmodified_roll,
+            "critical_threshold": self.critical_threshold,
             "modifier": self.modifier,
             "capped_modifier": self.capped_modifier,
             "final_roll": self.final_roll,
             "successful": self.successful,
             "critical": self.critical,
+            "skipped": self.skipped,
         }
 
 
@@ -483,6 +596,8 @@ class AttackSequence:
     attack_pools: tuple[RangedAttackPool, ...]
     pool_index: int = 0
     attack_index: int = 0
+    generated_hit_index: int = 0
+    current_hit_roll: HitRoll | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -518,14 +633,39 @@ class AttackSequence:
             "attack_index",
             _validate_non_negative_int("AttackSequence attack_index", self.attack_index),
         )
+        object.__setattr__(
+            self,
+            "generated_hit_index",
+            _validate_non_negative_int(
+                "AttackSequence generated_hit_index",
+                self.generated_hit_index,
+            ),
+        )
+        if self.current_hit_roll is not None and type(self.current_hit_roll) is not HitRoll:
+            raise GameLifecycleError("AttackSequence current_hit_roll must be a HitRoll.")
         if self.pool_index > len(self.attack_pools):
             raise GameLifecycleError("AttackSequence pool_index is outside attack_pools.")
         if self.pool_index == len(self.attack_pools):
             if self.attack_index != 0:
                 raise GameLifecycleError("Completed AttackSequence must have attack_index 0.")
+            if self.generated_hit_index != 0:
+                raise GameLifecycleError("Completed AttackSequence must not track generated hits.")
+            if self.current_hit_roll is not None:
+                raise GameLifecycleError(
+                    "Completed AttackSequence must not include a current hit roll."
+                )
             return
         if self.attack_index >= self.attack_pools[self.pool_index].attacks:
             raise GameLifecycleError("AttackSequence attack_index is outside current pool.")
+        if self.generated_hit_index > 0:
+            if self.current_hit_roll is None:
+                raise GameLifecycleError("Generated hit continuation requires a hit roll.")
+            if self.current_hit_roll.generated_hits <= self.generated_hit_index:
+                raise GameLifecycleError("Generated hit index is outside generated hits.")
+            if not self.current_hit_roll.successful:
+                raise GameLifecycleError("Generated hit continuation requires a successful hit.")
+        elif self.current_hit_roll is not None:
+            raise GameLifecycleError("Initial attack must not store a current hit roll.")
 
     @classmethod
     def start(
@@ -555,13 +695,18 @@ class AttackSequence:
     def attack_context_id(self) -> str:
         if self.is_complete:
             raise GameLifecycleError("Completed AttackSequence has no attack context.")
-        return (
+        context_id = (
             f"{self.sequence_id}:pool-{self.pool_index + 1:03d}:attack-{self.attack_index + 1:03d}"
         )
+        if self.generated_hit_index > 0:
+            return f"{context_id}:generated-hit-{self.generated_hit_index + 1:03d}"
+        return context_id
 
     def advanced_after_attack(self) -> Self:
         if self.is_complete:
             raise GameLifecycleError("Completed AttackSequence cannot advance.")
+        if self.generated_hit_index != 0 or self.current_hit_roll is not None:
+            raise GameLifecycleError("AttackSequence cannot skip unresolved generated hits.")
         pool = self.current_pool()
         next_attack_index = self.attack_index + 1
         if next_attack_index < pool.attacks:
@@ -583,6 +728,34 @@ class AttackSequence:
             attack_index=0,
         )
 
+    def advanced_after_generated_hit(self, hit_roll: HitRoll) -> Self:
+        if self.is_complete:
+            raise GameLifecycleError("Completed AttackSequence cannot advance generated hits.")
+        if type(hit_roll) is not HitRoll:
+            raise GameLifecycleError("Generated hit advancement requires a HitRoll.")
+        if not hit_roll.successful:
+            raise GameLifecycleError("Generated hit advancement requires a successful hit.")
+        next_generated_hit_index = self.generated_hit_index + 1
+        if next_generated_hit_index >= hit_roll.generated_hits:
+            return type(self)(
+                sequence_id=self.sequence_id,
+                attacker_player_id=self.attacker_player_id,
+                attacking_unit_instance_id=self.attacking_unit_instance_id,
+                attack_pools=self.attack_pools,
+                pool_index=self.pool_index,
+                attack_index=self.attack_index,
+            ).advanced_after_attack()
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            pool_index=self.pool_index,
+            attack_index=self.attack_index,
+            generated_hit_index=next_generated_hit_index,
+            current_hit_roll=hit_roll,
+        )
+
     def to_payload(self) -> AttackSequencePayload:
         return {
             "sequence_id": self.sequence_id,
@@ -591,6 +764,10 @@ class AttackSequence:
             "attack_pools": [pool.to_payload() for pool in self.attack_pools],
             "pool_index": self.pool_index,
             "attack_index": self.attack_index,
+            "generated_hit_index": self.generated_hit_index,
+            "current_hit_roll": (
+                None if self.current_hit_roll is None else self.current_hit_roll.to_payload()
+            ),
         }
 
     @classmethod
@@ -604,6 +781,12 @@ class AttackSequence:
             ),
             pool_index=payload["pool_index"],
             attack_index=payload["attack_index"],
+            generated_hit_index=payload["generated_hit_index"],
+            current_hit_roll=(
+                None
+                if payload["current_hit_roll"] is None
+                else HitRoll.from_payload(payload["current_hit_roll"])
+            ),
         )
 
 
@@ -754,6 +937,12 @@ def resolve_attack_sequence_until_blocked(
         if attack_context is None:
             current = current.advanced_after_attack()
             continue
+        if not attack_context["wound_roll"]["successful"]:
+            current = _advance_after_resolved_hit(
+                attack_sequence=current,
+                attack_context=attack_context,
+            )
+            continue
 
         allocation_context = allocation_context_for_unit(
             state=state,
@@ -837,6 +1026,12 @@ def resolve_attack_sequence_until_blocked(
             "attacker_player_id": current.attacker_player_id,
             "attacking_unit_instance_id": current.attacking_unit_instance_id,
         },
+    )
+    _resolve_hazardous_tests(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=current,
     )
     return None, allocated_model_ids, None
 
@@ -968,6 +1163,7 @@ def apply_feel_no_pain_decision(
         state=state,
         decisions=decisions,
         attack_sequence=attack_sequence,
+        attack_context=attack_context,
         target_unit_instance_id=attack_context["target_unit_instance_id"],
         model_instance_id=lost_wound_context["allocated_model_id"],
         damage_kind=damage_kind_from_token(lost_wound_context["damage_kind"]),
@@ -1011,10 +1207,39 @@ def _continue_after_allocation(
         pool=pool,
         allocated_model_id=allocation.allocated_model_id,
     )
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.IGNORES_COVER):
+        cover_result = None
+    elif _target_has_effect_cover(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    ):
+        cover_result = _cover_result_with_effect_source(
+            ruleset_descriptor=ruleset_descriptor,
+            current_cover_result=cover_result,
+            source_rule_id=GO_TO_GROUND_EFFECT_KIND,
+            los_cache_key=f"{attack_context['attack_context_id']}:effect-cover",
+        )
+    elif INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:
+        cover_result = _cover_result_with_effect_source(
+            ruleset_descriptor=ruleset_descriptor,
+            current_cover_result=cover_result,
+            source_rule_id=INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+            los_cache_key=f"{attack_context['attack_context_id']}:indirect-cover",
+        )
+    no_saves_allowed = has_weapon_keyword(
+        pool.weapon_profile, WeaponKeyword.DEVASTATING_WOUNDS
+    ) and bool(attack_context["wound_roll"]["critical"])
     save_options = save_options_for_model(
         model=allocated_model,
         armor_penetration=pool.weapon_profile.armor_penetration.final,
         cover_result=cover_result,
+        no_saves_allowed=no_saves_allowed,
+    )
+    save_options = _save_options_with_effect_invulnerable(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+        armor_penetration=pool.weapon_profile.armor_penetration.final,
+        save_options=save_options,
     )
     updated_attack_context: AttackResolutionContextPayload = {
         **attack_context,
@@ -1059,7 +1284,7 @@ def _continue_after_allocation(
         profile=pool.weapon_profile.damage_profile,
         attack_context_id=attack_context["attack_context_id"],
         attacker_player_id=attack_sequence.attacker_player_id,
-    )
+    ) + _melta_damage_modifier(pool)
     return _resolve_lost_wound_stage(
         state=state,
         decisions=decisions,
@@ -1113,12 +1338,13 @@ def _resolve_save_and_damage(
     )
     damage: DamageApplication | None = None
     if not saving_throw.successful:
+        pool = attack_sequence.current_pool()
         damage_amount = _damage_value(
             manager=manager,
-            profile=attack_sequence.current_pool().weapon_profile.damage_profile,
+            profile=pool.weapon_profile.damage_profile,
             attack_context_id=attack_context["attack_context_id"],
             attacker_player_id=attack_sequence.attacker_player_id,
-        )
+        ) + _melta_damage_modifier(pool)
         return _resolve_lost_wound_stage(
             state=state,
             decisions=decisions,
@@ -1140,7 +1366,14 @@ def _resolve_save_and_damage(
         damage=damage,
         saving_throw=saving_throw,
     )
-    return attack_sequence.advanced_after_attack(), allocated_model_ids, None
+    return (
+        _advance_after_resolved_hit(
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+        ),
+        allocated_model_ids,
+        None,
+    )
 
 
 def _resolve_lost_wound_stage(
@@ -1176,6 +1409,7 @@ def _resolve_lost_wound_stage(
             state=state,
             decisions=decisions,
             attack_sequence=attack_sequence,
+            attack_context=attack_context,
             target_unit_instance_id=target_unit_instance_id,
             model_instance_id=model_instance_id,
             damage_kind=damage_kind,
@@ -1196,6 +1430,7 @@ def _resolve_lost_wound_stage(
             state=state,
             decisions=decisions,
             attack_sequence=attack_sequence,
+            attack_context=attack_context,
             target_unit_instance_id=target_unit_instance_id,
             model_instance_id=model_instance_id,
             damage_kind=damage_kind,
@@ -1233,6 +1468,7 @@ def _apply_damage_after_feel_no_pain(
     state: GameState,
     decisions: DecisionController,
     attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
     target_unit_instance_id: str,
     model_instance_id: str,
     damage_kind: DamageKind,
@@ -1259,7 +1495,25 @@ def _apply_damage_after_feel_no_pain(
         saving_throw_payload=saving_throw_payload,
         feel_no_pain=resolution,
     )
-    return attack_sequence.advanced_after_attack(), allocated_model_ids, None
+    return (
+        _advance_after_resolved_hit(
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+        ),
+        allocated_model_ids,
+        None,
+    )
+
+
+def _advance_after_resolved_hit(
+    *,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+) -> AttackSequence:
+    hit_roll = HitRoll.from_payload(attack_context["hit_roll"])
+    if hit_roll.generated_hits <= attack_sequence.generated_hit_index:
+        raise GameLifecycleError("Resolved hit context has invalid generated hits.")
+    return attack_sequence.advanced_after_generated_hit(hit_roll)
 
 
 def _roll_hit_and_wound(
@@ -1272,30 +1526,19 @@ def _roll_hit_and_wound(
 ) -> AttackResolutionContextPayload | None:
     pool = attack_sequence.current_pool()
     attack_context_id = attack_sequence.attack_context_id()
-    hit_roll = _roll_hit(
-        manager=manager,
-        pool=pool,
-        attacker_player_id=attack_sequence.attacker_player_id,
-        attack_context_id=attack_context_id,
-    )
-    _emit_event(
-        decisions=decisions,
-        hooks=hooks,
-        event=AttackSequenceEvent(
-            step=AttackSequenceStep.HIT,
-            sequence_id=attack_sequence.sequence_id,
+    if attack_sequence.generated_hit_index == 0:
+        hit_roll = _roll_hit(
+            state=state,
+            manager=manager,
+            pool=pool,
+            attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
-            pool_index=attack_sequence.pool_index,
-            attack_index=attack_sequence.attack_index,
-            payload=validate_json_value(hit_roll.to_payload()),
-        ),
-    )
-    if hit_roll.critical:
+        )
         _emit_event(
             decisions=decisions,
             hooks=hooks,
             event=AttackSequenceEvent(
-                step=AttackSequenceStep.CRITICAL_HIT,
+                step=AttackSequenceStep.HIT,
                 sequence_id=attack_sequence.sequence_id,
                 attack_context_id=attack_context_id,
                 pool_index=attack_sequence.pool_index,
@@ -1303,18 +1546,60 @@ def _roll_hit_and_wound(
                 payload=validate_json_value(hit_roll.to_payload()),
             ),
         )
+        if hit_roll.critical:
+            _emit_event(
+                decisions=decisions,
+                hooks=hooks,
+                event=AttackSequenceEvent(
+                    step=AttackSequenceStep.CRITICAL_HIT,
+                    sequence_id=attack_sequence.sequence_id,
+                    attack_context_id=attack_context_id,
+                    pool_index=attack_sequence.pool_index,
+                    attack_index=attack_sequence.attack_index,
+                    payload=validate_json_value(hit_roll.to_payload()),
+                ),
+            )
+    else:
+        if attack_sequence.current_hit_roll is None:
+            raise GameLifecycleError("Generated hit resolution requires a hit roll.")
+        hit_roll = attack_sequence.current_hit_roll
     if not hit_roll.successful:
         return None
 
     target_unit = unit_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
     toughness = _target_unit_toughness(target_unit)
-    wound_roll = _roll_wound(
-        manager=manager,
-        pool=pool,
-        toughness=toughness,
-        attacker_player_id=attack_sequence.attacker_player_id,
-        attack_context_id=attack_context_id,
-    )
+    if (
+        attack_sequence.generated_hit_index == 0
+        and hit_roll.critical
+        and has_weapon_keyword(pool.weapon_profile, WeaponKeyword.LETHAL_HITS)
+    ):
+        wound_roll = WoundRoll.auto_wound(
+            strength=pool.weapon_profile.strength.final,
+            toughness=toughness,
+            target_number=wound_roll_target_number(
+                strength=pool.weapon_profile.strength.final,
+                toughness=toughness,
+            ),
+        )
+    else:
+        wound_roll = _roll_wound(
+            manager=manager,
+            pool=pool,
+            toughness=toughness,
+            target_keywords=target_unit.keywords,
+            attacker_player_id=attack_sequence.attacker_player_id,
+            attack_context_id=attack_context_id,
+        )
+        wound_roll = _reroll_wound_for_twin_linked_if_needed(
+            manager=manager,
+            decisions=decisions,
+            pool=pool,
+            initial_wound_roll=wound_roll,
+            toughness=toughness,
+            target_keywords=target_unit.keywords,
+            attacker_player_id=attack_sequence.attacker_player_id,
+            attack_context_id=attack_context_id,
+        )
     _emit_event(
         decisions=decisions,
         hooks=hooks,
@@ -1340,14 +1625,12 @@ def _roll_hit_and_wound(
                 payload=validate_json_value(wound_roll.to_payload()),
             ),
         )
-    if not wound_roll.successful:
-        return None
-
     return {
         "sequence_id": attack_sequence.sequence_id,
         "attack_context_id": attack_context_id,
         "pool_index": attack_sequence.pool_index,
         "attack_index": attack_sequence.attack_index,
+        "generated_hit_index": attack_sequence.generated_hit_index,
         "attacker_player_id": attack_sequence.attacker_player_id,
         "defender_player_id": unit_owner_player_id(
             state=state,
@@ -1367,12 +1650,19 @@ def _roll_hit_and_wound(
 
 def _roll_hit(
     *,
+    state: GameState,
     manager: DiceRollManager,
     pool: RangedAttackPool,
     attacker_player_id: str,
     attack_context_id: str,
 ) -> HitRoll:
     skill = _hit_skill(pool.weapon_profile)
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
+        return HitRoll.auto_hit(target_number=skill)
+    modifier = pool.hit_roll_modifier + _persisting_hit_roll_modifier(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    )
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
@@ -1382,17 +1672,24 @@ def _roll_hit(
         )
     )
     unmodified = roll_state.current_total
-    capped_modifier = _cap_roll_modifier(pool.hit_roll_modifier)
+    capped_modifier = _cap_roll_modifier(modifier)
     final_roll = unmodified + capped_modifier
+    minimum_success = 4 if INDIRECT_FIRE_NO_VISIBLE_RULE_ID in pool.targeting_rule_ids else 2
+    generated_hits = sustained_hits_generated_hits(
+        pool.weapon_profile,
+        critical_hit=unmodified == 6,
+    )
     return HitRoll(
         target_number=skill,
         roll_state=roll_state,
         unmodified_roll=unmodified,
-        modifier=pool.hit_roll_modifier,
+        modifier=modifier,
         capped_modifier=capped_modifier,
         final_roll=final_roll,
-        successful=unmodified == 6 or (unmodified != 1 and final_roll >= skill),
+        successful=unmodified == 6 or (unmodified >= minimum_success and final_roll >= skill),
         critical=unmodified == 6,
+        minimum_unmodified_success=minimum_success,
+        generated_hits=generated_hits,
     )
 
 
@@ -1401,6 +1698,7 @@ def _roll_wound(
     manager: DiceRollManager,
     pool: RangedAttackPool,
     toughness: int,
+    target_keywords: tuple[str, ...],
     attacker_player_id: str,
     attack_context_id: str,
     wound_modifier: int = 0,
@@ -1418,6 +1716,13 @@ def _roll_wound(
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(wound_modifier)
     final_roll = unmodified + capped_modifier
+    critical_threshold = anti_keyword_critical_threshold(
+        profile=pool.weapon_profile,
+        target_keywords=target_keywords,
+    )
+    if critical_threshold is None:
+        critical_threshold = 6
+    critical = unmodified >= critical_threshold
     return WoundRoll(
         strength=strength,
         toughness=toughness,
@@ -1427,9 +1732,98 @@ def _roll_wound(
         modifier=wound_modifier,
         capped_modifier=capped_modifier,
         final_roll=final_roll,
-        successful=unmodified == 6 or (unmodified != 1 and final_roll >= target_number),
-        critical=unmodified == 6,
+        successful=critical or (unmodified != 1 and final_roll >= target_number),
+        critical=critical,
+        critical_threshold=critical_threshold,
     )
+
+
+def _reroll_wound_for_twin_linked_if_needed(
+    *,
+    manager: DiceRollManager,
+    decisions: DecisionController,
+    pool: RangedAttackPool,
+    initial_wound_roll: WoundRoll,
+    toughness: int,
+    target_keywords: tuple[str, ...],
+    attacker_player_id: str,
+    attack_context_id: str,
+) -> WoundRoll:
+    if initial_wound_roll.successful:
+        return initial_wound_roll
+    if not has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TWIN_LINKED):
+        return initial_wound_roll
+    if initial_wound_roll.roll_state is None:
+        raise GameLifecycleError("Twin-linked reroll requires a wound roll state.")
+    permission = RerollPermission(
+        source_id=TWIN_LINKED_RULE_ID,
+        timing_window="attack_sequence.wound",
+        owning_player_id=attacker_player_id,
+        eligible_roll_type=initial_wound_roll.roll_state.original_result.spec.roll_type,
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    request = manager.build_reroll_request(
+        initial_wound_roll.roll_state,
+        request_id=f"{attack_context_id}:twin-linked-reroll-request",
+        actor_id=attacker_player_id,
+        permission=permission,
+        extra_payload={
+            "source_rule_id": TWIN_LINKED_RULE_ID,
+            "attack_context_id": attack_context_id,
+            "weapon_profile_id": pool.weapon_profile_id,
+        },
+    )
+    reroll_option_ids = tuple(
+        option.option_id for option in request.options if option.option_id != "decline"
+    )
+    if len(reroll_option_ids) != 1:
+        raise GameLifecycleError("Twin-linked reroll must resolve exactly one option.")
+    result = DecisionResult.for_request(
+        result_id=f"{attack_context_id}:twin-linked-reroll-result",
+        request=request,
+        selected_option_id=reroll_option_ids[0],
+    )
+    updated_state = manager.resolve_reroll(
+        initial_wound_roll.roll_state,
+        request=request,
+        result=result,
+        record_decision=False,
+    )
+    unmodified = updated_state.current_total
+    capped_modifier = _cap_roll_modifier(initial_wound_roll.modifier)
+    final_roll = unmodified + capped_modifier
+    critical_threshold = anti_keyword_critical_threshold(
+        profile=pool.weapon_profile,
+        target_keywords=target_keywords,
+    )
+    if critical_threshold is None:
+        critical_threshold = 6
+    critical = unmodified >= critical_threshold
+    wound_roll = WoundRoll(
+        strength=pool.weapon_profile.strength.final,
+        toughness=toughness,
+        target_number=initial_wound_roll.target_number,
+        roll_state=updated_state,
+        unmodified_roll=unmodified,
+        modifier=initial_wound_roll.modifier,
+        capped_modifier=capped_modifier,
+        final_roll=final_roll,
+        successful=critical or (unmodified != 1 and final_roll >= initial_wound_roll.target_number),
+        critical=critical,
+        critical_threshold=critical_threshold,
+    )
+    decisions.event_log.append(
+        "weapon_ability_reroll_resolved",
+        {
+            "source_rule_id": TWIN_LINKED_RULE_ID,
+            "attack_context_id": attack_context_id,
+            "weapon_profile_id": pool.weapon_profile_id,
+            "reroll_request": request.to_payload(),
+            "reroll_result": result.to_payload(),
+            "wound_roll": wound_roll.to_payload(),
+        },
+    )
+    return wound_roll
 
 
 def _emit_damage_event(
@@ -1491,6 +1885,167 @@ def _emit_event(
 ) -> None:
     emitted = hooks.emit(event)
     decisions.event_log.append("attack_sequence_step", emitted.to_payload())
+
+
+def _target_has_effect_cover(*, state: GameState, target_unit_instance_id: str) -> bool:
+    return unit_effects_grant_benefit_of_cover(
+        state.persisting_effects_for_unit(target_unit_instance_id)
+    )
+
+
+def _persisting_hit_roll_modifier(*, state: GameState, target_unit_instance_id: str) -> int:
+    return unit_effect_hit_roll_modifier(state.persisting_effects_for_unit(target_unit_instance_id))
+
+
+def _save_options_with_effect_invulnerable(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+    armor_penetration: int,
+    save_options: tuple[SaveOption, ...],
+) -> tuple[SaveOption, ...]:
+    effect_save = unit_effect_invulnerable_save(
+        state.persisting_effects_for_unit(target_unit_instance_id)
+    )
+    if effect_save is None:
+        return save_options
+    if any(
+        option.save_kind is SaveKind.INVULNERABLE and option.target_number <= effect_save
+        for option in save_options
+    ):
+        return save_options
+    return tuple(
+        sorted(
+            (
+                *(
+                    option
+                    for option in save_options
+                    if option.save_kind is not SaveKind.INVULNERABLE
+                ),
+                SaveOption(
+                    save_kind=SaveKind.INVULNERABLE,
+                    target_number=effect_save,
+                    characteristic_target_number=effect_save,
+                    armor_penetration=armor_penetration,
+                    source_rule_ids=(GO_TO_GROUND_EFFECT_KIND,),
+                ),
+            ),
+            key=lambda option: option.save_kind.value,
+        )
+    )
+
+
+def _cover_result_with_effect_source(
+    *,
+    ruleset_descriptor: RulesetDescriptor,
+    current_cover_result: BenefitOfCoverResult | None,
+    source_rule_id: str,
+    los_cache_key: str,
+) -> BenefitOfCoverResult:
+    if current_cover_result is not None and current_cover_result.has_benefit:
+        return current_cover_result
+    cover_policy = ruleset_descriptor.terrain_visibility_policy.cover_policy
+    source = CoverSourceRecord(
+        feature_id=source_rule_id,
+        feature_kind=TerrainFeatureKind.RUINS,
+        policy_kind=LineOfSightPolicy.TRUE_LINE_OF_SIGHT,
+        reason=CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE,
+    )
+    return BenefitOfCoverResult(
+        has_benefit=True,
+        cover_effect=cover_policy.cover_effect,
+        source_feature_ids=(source_rule_id,),
+        source_policy_kinds=(LineOfSightPolicy.TRUE_LINE_OF_SIGHT,),
+        source_records=(source,),
+        los_cache_key=los_cache_key,
+        target_unit_visible=False,
+        target_unit_fully_visible=False,
+        non_stacking=cover_policy.non_stacking,
+        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=(
+            cover_policy.ap_zero_save_bonus_excluded_for_save_3_plus_or_better
+        ),
+    )
+
+
+def _melta_damage_modifier(pool: RangedAttackPool) -> int:
+    if not any(rule_id.startswith(MELTA_RULE_ID) for rule_id in pool.targeting_rule_ids):
+        return 0
+    return melta_damage_bonus(pool.weapon_profile, target_within_half_range=True)
+
+
+def _resolve_hazardous_tests(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+) -> None:
+    hazardous_pools = tuple(
+        pool
+        for pool in attack_sequence.attack_pools
+        if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.HAZARDOUS)
+    )
+    seen: set[tuple[str, str, str]] = set()
+    for pool in hazardous_pools:
+        key = (pool.attacker_model_instance_id, pool.wargear_id, pool.weapon_profile_id)
+        if key in seen:
+            continue
+        seen.add(key)
+        roll_state = manager.roll(
+            DiceRollSpec(
+                expression=DiceExpression(quantity=1, sides=6),
+                reason=f"Hazardous test for {pool.weapon_profile_id} after shooting",
+                roll_type="hazardous_test",
+                actor_id=attack_sequence.attacker_player_id,
+            )
+        )
+        damage_application = None
+        if roll_state.current_total == 1:
+            model = model_by_id(state=state, model_instance_id=pool.attacker_model_instance_id)
+            if model.is_alive:
+                damage_application = apply_damage_to_model(
+                    state=state,
+                    target_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                    model_instance_id=pool.attacker_model_instance_id,
+                    damage=_hazardous_damage_for_attacker(
+                        state=state,
+                        attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                        model_wounds_remaining=model.wounds_remaining,
+                    ),
+                    damage_kind=DamageKind.MORTAL,
+                )
+        decisions.event_log.append(
+            "hazardous_test_resolved",
+            {
+                "source_rule_id": HAZARDOUS_RULE_ID,
+                "sequence_id": attack_sequence.sequence_id,
+                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                "attacker_model_instance_id": pool.attacker_model_instance_id,
+                "wargear_id": pool.wargear_id,
+                "weapon_profile_id": pool.weapon_profile_id,
+                "roll_state": roll_state.to_payload(),
+                "successful": roll_state.current_total != 1,
+                "damage_application": (
+                    None if damage_application is None else damage_application.to_payload()
+                ),
+            },
+        )
+
+
+def _hazardous_damage_for_attacker(
+    *,
+    state: GameState,
+    attacking_unit_instance_id: str,
+    model_wounds_remaining: int,
+) -> int:
+    unit = unit_by_id(state=state, unit_instance_id=attacking_unit_instance_id)
+    if (
+        _unit_has_keyword(unit, "CHARACTER")
+        or _unit_has_keyword(unit, "MONSTER")
+        or _unit_has_keyword(unit, "VEHICLE")
+    ):
+        return 3
+    return model_wounds_remaining
 
 
 def _cover_for_allocated_model(
@@ -1618,6 +2173,20 @@ def _target_unit_toughness(unit: UnitInstance) -> int:
     return next(iter(toughness_values))
 
 
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
+
+
+def _canonical_keyword(keyword: str) -> str:
+    if type(keyword) is not str:
+        raise GameLifecycleError("Unit keyword must be a string.")
+    stripped = keyword.strip()
+    if not stripped:
+        raise GameLifecycleError("Unit keyword must not be empty.")
+    return stripped.upper().replace(" ", "_").replace("-", "_")
+
+
 def _damage_value(
     *,
     manager: DiceRollManager,
@@ -1656,6 +2225,8 @@ def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
         profile.damage_profile.to_payload(),
         tuple(keyword.value for keyword in profile.keywords),
         tuple(ability.to_payload() for ability in profile.abilities),
+        pool.hit_roll_modifier,
+        pool.targeting_rule_ids,
     )
 
 
@@ -1757,6 +2328,8 @@ def _validate_lost_wound_context_matches_sequence(
         raise GameLifecycleError("Feel No Pain pool index drift.")
     if attack_context["attack_index"] != attack_sequence.attack_index:
         raise GameLifecycleError("Feel No Pain attack index drift.")
+    if attack_context["generated_hit_index"] != attack_sequence.generated_hit_index:
+        raise GameLifecycleError("Feel No Pain generated hit index drift.")
 
 
 def _state_feel_no_pain_sources(
@@ -1808,6 +2381,14 @@ def _cap_roll_modifier(modifier: int) -> int:
 
 
 def _validate_d6_target(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value < 2 or value > 6:
+        raise GameLifecycleError(f"{field_name} must be between 2 and 6.")
+    return value
+
+
+def _validate_d6_minimum_success(field_name: str, value: object) -> int:
     if type(value) is not int:
         raise GameLifecycleError(f"{field_name} must be an integer.")
     if value < 2 or value > 6:

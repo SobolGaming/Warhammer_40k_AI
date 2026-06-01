@@ -21,6 +21,10 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import (
+    INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+    INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+)
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.visibility import (
@@ -487,7 +491,14 @@ def _target_candidate(
         range_inches=range_inches,
         terrain_features=terrain_features,
     )
-    if evidence is None or not evidence.visible_and_in_range_target_model_ids:
+    indirect_no_visible = (
+        evidence is not None
+        and not evidence.visible_and_in_range_target_model_ids
+        and WeaponKeyword.INDIRECT_FIRE in weapon_profile.keywords
+    )
+    if evidence is None or (
+        not evidence.visible_and_in_range_target_model_ids and not indirect_no_visible
+    ):
         witness = None if evidence is None else evidence.witness
         return _invalid_candidate(
             attacker_unit=attacker_unit,
@@ -579,7 +590,15 @@ def _target_candidate(
         )
 
     hit_roll_modifier = 0
-    targeting_rule_ids: tuple[str, ...] = ()
+    targeting_rule_ids: list[str] = []
+    if indirect_no_visible:
+        hit_roll_modifier -= 1
+        targeting_rule_ids.extend(
+            (
+                INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+                INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+            )
+        )
     if (
         locked_context.is_locked
         and _unit_has_vehicle_or_monster_keyword(attacker_unit)
@@ -589,20 +608,26 @@ def _target_candidate(
         and _unit_has_vehicle_or_monster_keyword(target_unit)
         and WeaponKeyword.PISTOL not in weapon_profile.keywords
     ):
-        hit_roll_modifier = -1
-        targeting_rule_ids = (BIG_GUNS_NEVER_TIRE_RULE_ID,)
+        hit_roll_modifier -= 1
+        targeting_rule_ids.append(BIG_GUNS_NEVER_TIRE_RULE_ID)
 
     return ShootingTargetCandidate.legal(
         attacker_unit_instance_id=attacker_unit.unit_instance_id,
         weapon_profile_id=weapon_profile.profile_id,
         target_unit_instance_id=target_unit_id,
         observer_model_id=witness.observer_model_id,
-        target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
-        target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
+        target_visible_model_ids=(
+            () if indirect_no_visible else evidence.visible_and_in_range_target_model_ids
+        ),
+        target_in_range_model_ids=(
+            target_in_range_model_ids
+            if indirect_no_visible
+            else evidence.visible_and_in_range_target_model_ids
+        ),
         line_of_sight_witness=witness,
         visibility_cache_key=visibility_cache_key,
         hit_roll_modifier=hit_roll_modifier,
-        targeting_rule_ids=targeting_rule_ids,
+        targeting_rule_ids=tuple(targeting_rule_ids),
     )
 
 

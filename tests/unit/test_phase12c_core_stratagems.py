@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -68,6 +69,7 @@ from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_c
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_DICE_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    GRENADE_TARGET_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogRecord,
@@ -919,11 +921,7 @@ def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None
     deferred_ids = {
         "counter-offensive",
         "epic-challenge",
-        "fire-overwatch",
-        "go-to-ground",
-        "grenade",
         "heroic-intervention",
-        "smokescreen",
         "tank-shock",
     }
     deferred_records = tuple(
@@ -972,71 +970,160 @@ def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None
         }
     assert len(lifecycle.decision_controller.queue.pending_requests) == 0
 
-    finite_lifecycle = _battle_lifecycle()
-    finite_state = _state(finite_lifecycle)
-    _set_current_battle_phase(finite_state, BattlePhase.MOVEMENT)
-    _grant_cp(finite_state, player_id="player-a", amount=3)
-    finite_context = _context(
-        state=finite_state,
-        player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
-    )
-    handcraft_record = _source_stratagem_record("fire-overwatch")
-    handcraft_request = create_stratagem_use_decision_request(
-        state=finite_state,
-        context=finite_context,
-        options=(
-            _handcrafted_stratagem_option(
-                record=handcraft_record,
-                context=finite_context,
-                binding=StratagemTargetBinding(
-                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
-                    target_player_id="player-a",
-                    target_unit_instance_id="army-alpha:intercessor-unit-1",
-                ),
-            ),
-        ),
-    )
-    finite_lifecycle.decision_controller.request_decision(handcraft_request)
-    rejected_finite = finite_lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase12c-deferred-core-finite",
-            request=handcraft_request,
-            selected_option_id=handcraft_request.options[0].option_id,
-        )
-    )
-    assert rejected_finite.status_kind is LifecycleStatusKind.INVALID
-    assert rejected_finite.payload == {"invalid_reason": "unsupported_handler"}
-    assert finite_state.command_point_total("player-a") == 3
-    assert finite_state.stratagem_use_records == []
-    assert finite_lifecycle.decision_controller.queue.pending_requests == (handcraft_request,)
 
-    parameterized_lifecycle = _battle_lifecycle()
-    parameterized_state = _state(parameterized_lifecycle)
-    _set_current_battle_phase(parameterized_state, BattlePhase.MOVEMENT)
-    _grant_cp(parameterized_state, player_id="player-a", amount=1)
-    parameterized_context = _context(
-        state=parameterized_state,
+def test_phase13d_fire_overwatch_uses_parameterized_target_and_records_effect() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _grant_cp(state, player_id="player-a", amount=1)
+
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="fire-overwatch",
         player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
         trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        result_id="phase13d-fire-overwatch",
     )
-    parameterized_proposal = StratagemTargetProposal.for_request(
-        context=parameterized_context,
-        catalog_record=handcraft_record,
+
+    event_payload = _last_event_payload(lifecycle.decision_controller, "fire_overwatch_registered")
+    effect_payload = cast(dict[str, JsonValue], event_payload["persisting_effect"])
+    effect_details = cast(dict[str, JsonValue], effect_payload["effect_payload"])
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.command_point_total("player-a") == 0
+    assert state.stratagem_use_records[0].handler_id == "core:fire-overwatch"
+    assert effect_details["effect_kind"] == "core_stratagem:fire_overwatch"
+    assert effect_details["requires_out_of_phase_shooting_declaration"] is True
+    assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+
+
+def test_phase13d_go_to_ground_and_smokescreen_register_defensive_effects() -> None:
+    go_lifecycle = _battle_lifecycle()
+    go_state = _state(go_lifecycle)
+    _set_current_battle_phase(go_state, BattlePhase.SHOOTING)
+    go_state.active_player_id = "player-b"
+    _grant_cp(go_state, player_id="player-a", amount=1)
+
+    go_status = _submit_source_stratagem_target(
+        go_lifecycle,
+        stratagem_id="go-to-ground",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        result_id="phase13d-go-to-ground",
     )
-    pending_proposal_request = DecisionRequest(
-        request_id=parameterized_state.next_decision_request_id(),
-        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-        actor_id=parameterized_proposal.player_id,
-        payload=validate_json_value({"proposal_request": parameterized_proposal.to_payload()}),
-        options=(parameterized_decision_option(),),
+
+    go_event = _last_event_payload(
+        go_lifecycle.decision_controller,
+        "go_to_ground_effect_registered",
     )
-    parameterized_lifecycle.decision_controller.request_decision(pending_proposal_request)
-    rejected_parameterized = parameterized_lifecycle.submit_decision(
+    go_effect = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], go_event["persisting_effect"])["effect_payload"],
+    )
+    assert go_status.status_kind is not LifecycleStatusKind.INVALID
+    assert go_state.command_point_total("player-a") == 0
+    assert go_effect["effect_kind"] == "core_stratagem:go_to_ground"
+    assert go_effect["benefit_of_cover"] is True
+    assert go_effect["invulnerable_save"] == 6
+
+    smoke_lifecycle = _battle_lifecycle()
+    smoke_state = _state(smoke_lifecycle)
+    _set_current_battle_phase(smoke_state, BattlePhase.SHOOTING)
+    smoke_state.active_player_id = "player-b"
+    _replace_unit_keywords(
+        smoke_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Smoke"),
+    )
+    _grant_cp(smoke_state, player_id="player-a", amount=1)
+
+    smoke_status = _submit_source_stratagem_target(
+        smoke_lifecycle,
+        stratagem_id="smokescreen",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        result_id="phase13d-smokescreen",
+    )
+
+    smoke_event = _last_event_payload(
+        smoke_lifecycle.decision_controller,
+        "smokescreen_effect_registered",
+    )
+    smoke_effect = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], smoke_event["persisting_effect"])["effect_payload"],
+    )
+    assert smoke_status.status_kind is not LifecycleStatusKind.INVALID
+    assert smoke_state.command_point_total("player-a") == 0
+    assert smoke_effect["effect_kind"] == "core_stratagem:smokescreen"
+    assert smoke_effect["benefit_of_cover"] is True
+    assert smoke_effect["hit_roll_modifier"] == -1
+
+
+def test_phase13d_grenade_resolves_mortal_wounds_and_rejects_invalid_context() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="grenade",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        result_id="phase13d-grenade",
+        trigger_payload={GRENADE_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
+    )
+
+    grenade_payload = _last_event_payload(lifecycle.decision_controller, "grenade_resolved")
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.command_point_total("player-a") == 0
+    assert state.stratagem_use_records[0].handler_id == "core:grenade"
+    assert grenade_payload["grenades_unit_instance_id"] == "army-alpha:intercessor-unit-1"
+    assert grenade_payload["target_unit_instance_id"] == "army-beta:enemy-unit"
+    assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+
+    invalid_lifecycle = _battle_lifecycle()
+    invalid_state = _state(invalid_lifecycle)
+    _set_current_battle_phase(invalid_state, BattlePhase.SHOOTING)
+    invalid_state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        invalid_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _grant_cp(invalid_state, player_id="player-a", amount=1)
+    record = _source_stratagem_record("grenade")
+    context = _context(
+        state=invalid_state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
+    )
+    waiting = request_stratagem_target_proposal(
+        state=invalid_state,
+        decisions=invalid_lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+    request = _decision_request(waiting)
+    invalid_status = invalid_lifecycle.submit_decision(
         _target_proposal_result(
-            request=pending_proposal_request,
-            result_id="phase12c-deferred-core-parameterized",
-            proposal=parameterized_proposal.with_binding(
+            request=request,
+            result_id="phase13d-invalid-grenade",
+            proposal=_proposal_request_from_decision(request).with_binding(
                 StratagemTargetBinding(
                     target_kind=StratagemTargetKind.FRIENDLY_UNIT,
                     target_player_id="player-a",
@@ -1045,13 +1132,11 @@ def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None
             ),
         )
     )
-    assert rejected_parameterized.status_kind is LifecycleStatusKind.INVALID
-    assert rejected_parameterized.payload == {"invalid_reason": "unsupported_handler"}
-    assert parameterized_state.command_point_total("player-a") == 1
-    assert parameterized_state.stratagem_use_records == []
-    assert parameterized_lifecycle.decision_controller.queue.pending_requests == (
-        pending_proposal_request,
-    )
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_status.payload == {"invalid_reason": "missing_grenade_target"}
+    assert invalid_state.command_point_total("player-a") == 1
+    assert invalid_state.stratagem_use_records == []
+    assert invalid_lifecycle.decision_controller.queue.pending_requests == (request,)
 
 
 def test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle() -> None:
@@ -1615,6 +1700,50 @@ def _target_proposal_result(
     )
 
 
+def _submit_source_stratagem_target(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    player_id: str,
+    target_unit_id: str,
+    trigger_kind: TimingTriggerKind,
+    result_id: str,
+    trigger_payload: JsonValue = None,
+) -> LifecycleStatus:
+    state = _state(lifecycle)
+    record = _source_stratagem_record(stratagem_id)
+    context = _context(
+        state=state,
+        player_id=player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
+    )
+    waiting = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+    request = _decision_request(waiting)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id=player_id,
+            target_unit_instance_id=target_unit_id,
+        )
+    )
+    return lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id=result_id,
+            proposal=proposal,
+        )
+    )
+
+
 def _handcrafted_stratagem_option(
     *,
     record: StratagemCatalogRecord,
@@ -1633,6 +1762,23 @@ def _handcrafted_stratagem_option(
             }
         ),
     )
+
+
+def _replace_unit_keywords(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    keywords: tuple[str, ...],
+) -> None:
+    for army_index, army in enumerate(state.army_definitions):
+        units = tuple(
+            replace(unit, keywords=keywords) if unit.unit_instance_id == unit_instance_id else unit
+            for unit in army.units
+        )
+        if units != army.units:
+            state.army_definitions[army_index] = replace(army, units=units)
+            return
+    raise AssertionError(f"Missing unit {unit_instance_id}.")
 
 
 def _proposal_request_from_decision(request: DecisionRequest) -> StratagemTargetProposal:

@@ -20,7 +20,11 @@ from warhammer40k_core.engine.attack_sequence import (
     apply_saving_throw_decision,
     resolve_attack_sequence_until_blocked,
 )
-from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldScenario,
+    PlacementError,
+    geometry_model_for_placement,
+)
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
@@ -51,6 +55,16 @@ from warhammer40k_core.engine.transports import (
     resolve_firing_deck_selection,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.weapon_abilities import (
+    blast_attack_bonus,
+    blast_rule_id,
+    has_weapon_keyword,
+    heavy_rule_id,
+    melta_damage_bonus,
+    melta_rule_id,
+    rapid_fire_attack_bonus,
+    rapid_fire_rule_id,
+)
 from warhammer40k_core.engine.weapon_declaration import (
     SHOOTING_DECLARATION_PROPOSAL_KIND,
     AvailableWeaponPayload,
@@ -65,6 +79,7 @@ from warhammer40k_core.engine.weapon_declaration import (
     shooting_declaration_proposal_from_json,
     unresolved_attacks_for_validation,
 )
+from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
@@ -894,7 +909,8 @@ def _validate_declaration_submission(
             message="Shooting declaration unit does not match active selection.",
             field="unit_instance_id",
         )
-    if not _unit_can_select_to_shoot(state=state, unit_instance_id=proposal.unit_instance_id):
+    unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
+    if not _unit_can_select_to_shoot(state=state, unit=unit, army_catalog=army_catalog):
         return ShootingProposalValidationResult.invalid(
             proposal_request_id=proposal.proposal_request_id,
             violation_code="shooting_unit_ineligible",
@@ -1031,6 +1047,25 @@ def _attack_pools_or_validation(
                 ),
                 actor_id=proposal.player_id,
             )
+        target_within_half_range = _target_within_half_weapon_range(
+            scenario=scenario,
+            declaration=declaration,
+            weapon_profile=weapon_profile,
+            target_in_range_model_ids=candidate.target_in_range_model_ids,
+        )
+        attacks, targeting_rule_ids, hit_roll_modifier = _apply_phase13d_weapon_modifiers(
+            state=state,
+            unit=unit,
+            target_unit=_unit_by_id(
+                state=state,
+                unit_instance_id=declaration.target_unit_instance_id,
+            ),
+            weapon_profile=weapon_profile,
+            base_attacks=attacks,
+            base_targeting_rule_ids=candidate.targeting_rule_ids,
+            base_hit_roll_modifier=candidate.hit_roll_modifier,
+            target_within_half_range=target_within_half_range,
+        )
         attack_pools.append(
             RangedAttackPool.from_declaration(
                 declaration=declaration,
@@ -1038,8 +1073,8 @@ def _attack_pools_or_validation(
                 attacks=attacks,
                 target_visible_model_ids=candidate.target_visible_model_ids,
                 target_in_range_model_ids=candidate.target_in_range_model_ids,
-                hit_roll_modifier=candidate.hit_roll_modifier,
-                targeting_rule_ids=candidate.targeting_rule_ids,
+                hit_roll_modifier=hit_roll_modifier,
+                targeting_rule_ids=targeting_rule_ids,
             )
         )
     return (tuple(attack_pools), ineligible_unit_ids)
@@ -1076,6 +1111,102 @@ def _validate_model_pistol_exclusivity(
         )
     model_pistol_declaration_kind[model_key] = is_pistol
     return None
+
+
+def _apply_phase13d_weapon_modifiers(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    target_unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    base_attacks: int,
+    base_targeting_rule_ids: tuple[str, ...],
+    base_hit_roll_modifier: int,
+    target_within_half_range: bool,
+) -> tuple[int, tuple[str, ...], int]:
+    attacks = base_attacks
+    hit_roll_modifier = base_hit_roll_modifier
+    targeting_rule_ids: list[str] = list(base_targeting_rule_ids)
+
+    rapid_bonus = rapid_fire_attack_bonus(
+        weapon_profile,
+        target_within_half_range=target_within_half_range,
+    )
+    if rapid_bonus > 0:
+        attacks += rapid_bonus
+        targeting_rule_ids.append(rapid_fire_rule_id(rapid_bonus))
+
+    if has_weapon_keyword(weapon_profile, WeaponKeyword.BLAST):
+        blast_bonus = blast_attack_bonus(target_model_count=len(target_unit.alive_own_models()))
+        if blast_bonus > 0:
+            attacks += blast_bonus
+            targeting_rule_ids.append(blast_rule_id(blast_bonus))
+
+    melta_bonus = melta_damage_bonus(
+        weapon_profile,
+        target_within_half_range=target_within_half_range,
+    )
+    if melta_bonus > 0:
+        targeting_rule_ids.append(melta_rule_id(melta_bonus))
+
+    if has_weapon_keyword(weapon_profile, WeaponKeyword.HEAVY) and _unit_remained_stationary(
+        state=state,
+        unit=unit,
+    ):
+        hit_roll_modifier += 1
+        targeting_rule_ids.append(heavy_rule_id())
+
+    return attacks, tuple(targeting_rule_ids), hit_roll_modifier
+
+
+def _target_within_half_weapon_range(
+    *,
+    scenario: BattlefieldScenario,
+    declaration: WeaponDeclaration,
+    weapon_profile: WeaponProfile,
+    target_in_range_model_ids: tuple[str, ...],
+) -> bool:
+    range_inches = weapon_profile.range_profile.distance_inches
+    if range_inches is None:
+        raise GameLifecycleError("Half-range weapon modifier requires a ranged weapon.")
+    if not target_in_range_model_ids:
+        return False
+    battlefield = scenario.battlefield_state
+    attacker_placement = battlefield.model_placement_by_id(declaration.attacker_model_instance_id)
+    attacker_model = geometry_model_for_placement(
+        model=scenario.model_instance_for_placement(attacker_placement),
+        placement=attacker_placement,
+    )
+    half_range = float(range_inches) / 2.0
+    for target_model_id in target_in_range_model_ids:
+        target_placement = battlefield.model_placement_by_id(target_model_id)
+        target_model = geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(target_placement),
+            placement=target_placement,
+        )
+        distance = DistanceMeasurementContext.from_models(
+            attacker_model,
+            target_model,
+        ).closest_distance_inches()
+        if distance <= half_range:
+            return True
+    return False
+
+
+def _unit_remained_stationary(*, state: GameState, unit: UnitInstance) -> bool:
+    if _advanced_unit_is_restricted_to_assault_weapons(state=state, unit=unit):
+        return False
+    fell_back_state = state.fell_back_unit_state_for_unit(
+        player_id=_active_player_id(state),
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+    )
+    if fell_back_state is not None:
+        return False
+    movement_state = state.movement_phase_state
+    if movement_state is None:
+        return True
+    return unit.unit_instance_id not in movement_state.moved_unit_ids
 
 
 def _declaration_source_unit(
@@ -1332,6 +1463,12 @@ def _available_weapons_for_unit(
             army_catalog=army_catalog,
         )
     )
+    if _advanced_unit_is_restricted_to_assault_weapons(state=state, unit=unit):
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT)
+        ]
     return tuple(
         sorted(
             weapons,
@@ -1445,9 +1582,9 @@ def _legal_shooting_unit_ids(
     for unit_id in placed_unit_ids:
         if unit_id in shooting_state.selected_unit_ids or unit_id in shooting_state.shot_unit_ids:
             continue
-        if not _unit_can_select_to_shoot(state=state, unit_instance_id=unit_id):
-            continue
         unit = _unit_by_id(state=state, unit_instance_id=unit_id)
+        if not _unit_can_select_to_shoot(state=state, unit=unit, army_catalog=army_catalog):
+            continue
         if _unit_has_legal_shooting_declaration(
             state=state,
             scenario=scenario,
@@ -1485,21 +1622,55 @@ def _unit_has_legal_shooting_declaration(
     return False
 
 
-def _unit_can_select_to_shoot(*, state: GameState, unit_instance_id: str) -> bool:
+def _unit_can_select_to_shoot(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    army_catalog: ArmyCatalog,
+) -> bool:
     player_id = _active_player_id(state)
     advanced_state = state.advanced_unit_state_for_unit(
         player_id=player_id,
         battle_round=state.battle_round,
-        unit_instance_id=unit_instance_id,
+        unit_instance_id=unit.unit_instance_id,
     )
-    if advanced_state is not None and not advanced_state.can_shoot:
+    if (
+        advanced_state is not None
+        and not advanced_state.can_shoot
+        and not _unit_has_assault_ranged_weapon(unit=unit, army_catalog=army_catalog)
+    ):
         return False
     fell_back_state = state.fell_back_unit_state_for_unit(
         player_id=player_id,
         battle_round=state.battle_round,
-        unit_instance_id=unit_instance_id,
+        unit_instance_id=unit.unit_instance_id,
     )
     return not (fell_back_state is not None and not fell_back_state.can_shoot)
+
+
+def _advanced_unit_is_restricted_to_assault_weapons(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> bool:
+    advanced_state = state.advanced_unit_state_for_unit(
+        player_id=_active_player_id(state),
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+    )
+    return advanced_state is not None and not advanced_state.can_shoot
+
+
+def _unit_has_assault_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCatalog) -> bool:
+    for model in unit.own_models:
+        for weapon in _available_weapons_for_model(
+            model=model,
+            unit=unit,
+            army_catalog=army_catalog,
+        ):
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT):
+                return True
+    return False
 
 
 def _unit_has_already_shot(*, state: GameState, unit_instance_id: str) -> bool:

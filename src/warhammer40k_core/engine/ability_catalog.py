@@ -197,8 +197,10 @@ def _selected_weapon_keywords(
     for wargear_id in wargear_ids:
         wargear = _wargear_by_id(catalog=catalog, wargear_id=wargear_id)
         for profile in wargear.weapon_profiles:
-            selected.update(keyword.value for keyword in profile.keywords)
-            selected.update(ability.ability_kind.value for ability in profile.abilities)
+            selected.update(_canonical_keyword(keyword.value) for keyword in profile.keywords)
+            selected.update(
+                _canonical_keyword(ability.ability_kind.value) for ability in profile.abilities
+            )
     return frozenset(selected)
 
 
@@ -217,3 +219,7 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _canonical_keyword(value: str) -> str:
+    return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")

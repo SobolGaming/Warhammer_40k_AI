@@ -90,7 +90,7 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     assert deep_strike.definition.keyword_gate.required_keywords == ("DEEP_STRIKE",)
     assert deep_strike.definition.handler_id == "unsupported:phase-15b:deep-strike"
     assert hazardous.source_kind is AbilitySourceKind.WEAPON
-    assert hazardous.definition.handler_id == "unsupported:phase-13d:hazardous"
+    assert hazardous.definition.handler_id == "core:hazardous"
     assert tenth_edition_core_ability_index().all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
     )
@@ -448,8 +448,13 @@ def test_weapon_ability_execution_enforces_weapon_event_keywords() -> None:
 
     assert missing_keyword.status is AbilityResolutionStatus.INVALID
     assert missing_keyword.reason == "keyword_gate_closed"
-    assert matching_keyword.status is AbilityResolutionStatus.UNSUPPORTED
-    assert matching_keyword.reason == "unsupported_handler"
+    assert matching_keyword.status is AbilityResolutionStatus.APPLIED
+    replay_payload = cast(dict[str, object], matching_keyword.replay_payload)
+    assert replay_payload["effect_payload"] == {
+        "effect_kind": "hazardous_weapon_test",
+        "resolved_by": "attack_sequence",
+    }
+    assert replay_payload["source_keywords"] == ["HAZARDOUS"]
 
 
 def test_ability_records_context_and_results_round_trip_as_json_payloads() -> None:

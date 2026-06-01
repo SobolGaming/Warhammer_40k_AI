@@ -35,6 +35,7 @@ from warhammer40k_core.core.faction import (
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.core.wargear import Wargear, WargearError, WargearPayload
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
     AttackProfile,
     DamageProfile,
     RangeProfile,
@@ -155,6 +156,7 @@ class ArmyCatalog:
             armor_penetration=-1,
             damage=1,
             keywords=(WeaponKeyword.ASSAULT, WeaponKeyword.RAPID_FIRE),
+            abilities=(AbilityDescriptor.rapid_fire(1),),
         )
         mob_wargear = _ranged_wargear(
             wargear_id="core-mob-shoota",
@@ -205,6 +207,7 @@ class ArmyCatalog:
             armor_penetration=-2,
             damage=3,
             keywords=(WeaponKeyword.HEAVY,),
+            abilities=(AbilityDescriptor.heavy(),),
         )
         deep_strike_wargear = _ranged_wargear(
             wargear_id="core-drop-carbine",
@@ -564,6 +567,7 @@ def _ranged_wargear(
     armor_penetration: int,
     damage: int,
     keywords: tuple[WeaponKeyword, ...],
+    abilities: tuple[AbilityDescriptor, ...] = (),
 ) -> Wargear:
     return Wargear(
         wargear_id=wargear_id,
@@ -585,6 +589,7 @@ def _ranged_wargear(
                 ),
                 damage_profile=DamageProfile.fixed(damage),
                 keywords=keywords,
+                abilities=abilities,
             ),
         ),
     )

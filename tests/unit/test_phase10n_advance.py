@@ -473,11 +473,14 @@ def test_advanced_state_clears_at_end_of_active_player_turn() -> None:
         result_id="phase10n-result-000006",
     )
 
-    assert action_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert action_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    status_payload = cast(dict[str, object], action_status.payload)
+    assert status_payload["phase"] == "shooting"
     state = _state(lifecycle)
-    assert state.current_battle_phase is BattlePhase.CHARGE
+    assert state.current_battle_phase is BattlePhase.SHOOTING
     assert state.advanced_unit_states
 
+    state.advance_to_next_battle_phase()
     state.advance_to_next_battle_phase()
     state.advance_to_next_battle_phase()
 

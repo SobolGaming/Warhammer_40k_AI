@@ -7,7 +7,7 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.modifiers import ModifierStack, RollModifier
@@ -19,6 +19,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
     AttackProfile,
     DamageProfile,
     WeaponKeyword,
@@ -126,6 +127,14 @@ from warhammer40k_core.engine.transports import (
     TransportCargoState,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import (
+    BLAST_RULE_ID,
+    HEAVY_RULE_ID,
+    INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+    INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+    MELTA_RULE_ID,
+    RAPID_FIRE_RULE_ID,
+)
 from warhammer40k_core.engine.weapon_declaration import (
     RangedAttackPool,
     ShootingDeclarationProposal,
@@ -277,6 +286,473 @@ def test_phase13c_random_attacks_resolve_when_declaration_is_accepted() -> None:
     event_payload = cast(dict[str, object], random_events[0].payload)
     assert event_payload["characteristic"] == "attacks"
     assert event_payload["value"] == pool_payload["attacks"]
+
+
+def test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    modifier_profile = replace(
+        base_profile,
+        profile_id="phase13d-modifier-rifle",
+        name="Phase 13D modifier rifle",
+        keywords=(
+            WeaponKeyword.BLAST,
+            WeaponKeyword.HEAVY,
+            WeaponKeyword.MELTA,
+            WeaponKeyword.RAPID_FIRE,
+        ),
+        abilities=(
+            AbilityDescriptor.heavy(),
+            AbilityDescriptor.melta(2),
+            AbilityDescriptor.rapid_fire(1),
+        ),
+    )
+    catalog = _catalog_with_extra_bolt_profile(modifier_profile)
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(18.0, 35.0),
+        catalog=catalog,
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase13d-select-modifier-rifle",
+        )
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=modifier_profile.profile_id,
+    )
+
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13d-declare-modifier-rifle",
+    )
+
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+    assert pool_payload["attacks"] == 4
+    assert pool_payload["hit_roll_modifier"] == 1
+    assert f"{RAPID_FIRE_RULE_ID}:1" in targeting_rule_ids
+    assert f"{BLAST_RULE_ID}:1" in targeting_rule_ids
+    assert f"{MELTA_RULE_ID}:2" in targeting_rule_ids
+    assert HEAVY_RULE_ID in targeting_rule_ids
+
+
+def test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-torrent-anti-devastating",
+        keywords=(WeaponKeyword.DEVASTATING_WOUNDS, WeaponKeyword.TORRENT),
+        abilities=(AbilityDescriptor.anti_keyword("Infantry", 4),),
+    )
+    attack_context_id = "phase13d-torrent:pool-001:attack-001"
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        "phase13d-torrent",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(
+                roll_id="phase13d-torrent-wound",
+                spec=wound_spec,
+                value=4,
+            ),
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13d-torrent",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+
+    events = _event_payloads(lifecycle, "attack_sequence_step")
+    hit_payload = _attack_step_payload(events, AttackSequenceStep.HIT)
+    wound_payload = _attack_step_payload(events, AttackSequenceStep.WOUND)
+    damage_payload = _attack_step_payload(events, AttackSequenceStep.DAMAGE)
+    assert remaining_sequence is None
+    assert status is None
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert cast(dict[str, object], hit_payload["payload"])["skipped"] is True
+    assert cast(dict[str, object], wound_payload["payload"])["critical_threshold"] == 4
+    assert cast(dict[str, object], wound_payload["payload"])["critical"] is True
+    assert not any(event["step"] == AttackSequenceStep.SAVE.value for event in events)
+    assert cast(dict[str, object], damage_payload["payload"])["saving_throw"] is None
+
+
+def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-lethal-sustained",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        keywords=(WeaponKeyword.LETHAL_HITS, WeaponKeyword.SUSTAINED_HITS),
+        abilities=(AbilityDescriptor.sustained_hits(1),),
+    )
+    first_context_id = "phase13d-sustained:pool-001:attack-001"
+    generated_context_id = f"{first_context_id}:generated-hit-002"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {first_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {generated_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        "phase13d-sustained",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id="phase13d-sustained-hit", spec=hit_spec, value=6),
+            _fixed_roll_result(roll_id="phase13d-sustained-wound", spec=wound_spec, value=6),
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13d-sustained",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+
+    events = _event_payloads(lifecycle, "attack_sequence_step")
+    hit_payload = _attack_step_payload(events, AttackSequenceStep.HIT)
+    wound_events = [event for event in events if event["step"] == AttackSequenceStep.WOUND.value]
+    damage_events = [event for event in events if event["step"] == AttackSequenceStep.DAMAGE.value]
+    assert remaining_sequence is None
+    assert status is None
+    assert cast(dict[str, object], hit_payload["payload"])["generated_hits"] == 2
+    assert len(wound_events) == 2
+    assert wound_events[0]["attack_context_id"] == first_context_id
+    assert cast(dict[str, object], wound_events[0]["payload"])["skipped"] is True
+    assert wound_events[1]["attack_context_id"] == generated_context_id
+    assert cast(dict[str, object], wound_events[1]["payload"])["skipped"] is False
+    assert len(damage_events) == 2
+
+
+def test_phase13d_twin_linked_consumes_reroll_semantics_once() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-twin-linked",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        keywords=(WeaponKeyword.TWIN_LINKED,),
+    )
+    attack_context_id = "phase13d-twin-linked:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    reroll_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Reroll selected dice for {wound_spec.reason}",
+        roll_type="attack_sequence.wound.reroll",
+        actor_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        "phase13d-twin-linked",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id="phase13d-twin-hit", spec=hit_spec, value=3),
+            _fixed_roll_result(roll_id="phase13d-twin-wound", spec=wound_spec, value=1),
+            _fixed_roll_result(roll_id="phase13d-twin-reroll", spec=reroll_spec, value=6),
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13d-twin-linked",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+
+    reroll_payload = _last_event_payload(lifecycle, "weapon_ability_reroll_resolved")
+    assert remaining_sequence is None
+    assert status is None
+    assert cast(dict[str, object], reroll_payload["wound_roll"])["unmodified_roll"] == 6
+    assert cast(dict[str, object], reroll_payload["wound_roll"])["successful"] is True
+    assert len(_event_payloads(lifecycle, "weapon_ability_reroll_resolved")) == 1
+
+
+def test_phase13d_indirect_fire_targets_unseen_units_and_unmodified_one_to_three_fail() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=(
+            Pose.at(10.0, 35.0),
+            Pose.at(0.0, 5.0),
+            Pose.at(0.0, 7.0),
+            Pose.at(0.0, 9.0),
+            Pose.at(0.0, 11.0),
+        ),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=defender,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(33.0 + index * 1.4, 35.0) for index in range(5)),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-indirect",
+        keywords=(WeaponKeyword.INDIRECT_FIRE,),
+        abilities=(),
+    )
+    blocking_ruin = _blocking_ruin()
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+        terrain_features=(blocking_ruin,),
+    )
+
+    assert candidates[0].is_legal
+    assert candidates[0].target_visible_model_ids == ()
+    assert candidates[0].hit_roll_modifier == -1
+    assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in candidates[0].targeting_rule_ids
+    assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in candidates[0].targeting_rule_ids
+
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Hit roll for phase13d-indirect attack phase13d-indirect:pool-001:attack-001",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        "phase13d-indirect",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id="phase13d-indirect-hit", spec=hit_spec, value=3),
+        ),
+    )
+    pool = RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id=attacker.wargear_selections[0].wargear_ids[0],
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        attacks=1,
+        target_visible_model_ids=(),
+        target_in_range_model_ids=(defender.own_models[0].model_instance_id,),
+        targeting_rule_ids=(INDIRECT_FIRE_NO_VISIBLE_RULE_ID,),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13d-indirect",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(pool,),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    assert remaining_sequence is None
+    assert status is None
+    assert cast(dict[str, object], hit_payload["payload"])["minimum_unmodified_success"] == 4
+    assert cast(dict[str, object], hit_payload["payload"])["successful"] is False
+
+
+def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase13d-hazardous",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        keywords=(WeaponKeyword.HAZARDOUS,),
+    )
+    attack_context_id = "phase13d-hazardous:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    hazardous_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hazardous test for {weapon_profile.profile_id} after shooting",
+        roll_type="hazardous_test",
+        actor_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        "phase13d-hazardous",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id="phase13d-hazardous-hit", spec=hit_spec, value=6),
+            _fixed_roll_result(roll_id="phase13d-hazardous-wound", spec=wound_spec, value=6),
+            _fixed_roll_result(
+                roll_id="phase13d-hazardous-test",
+                spec=hazardous_spec,
+                value=1,
+            ),
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13d-hazardous",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+
+    hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
+    damage_application = cast(dict[str, object], hazardous_payload["damage_application"])
+    assert remaining_sequence is None
+    assert status is None
+    assert hazardous_payload["successful"] is False
+    assert damage_application["target_unit_instance_id"] == attacker.unit_instance_id
+    assert damage_application["model_instance_id"] == attacker.own_models[0].model_instance_id
 
 
 def test_phase13c_wound_roll_table_uses_integer_safe_boundaries() -> None:
@@ -2253,7 +2729,34 @@ def test_advanced_unit_is_eligible_to_shoot_only_when_state_permits() -> None:
     request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     assert {option.option_id for option in request.options} == {
         COMPLETE_SHOOTING_PHASE_OPTION_ID,
+        units["intercessor-1"].unit_instance_id,
         units["intercessor-2"].unit_instance_id,
+    }
+
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    non_assault_catalog = _catalog_with_replaced_bolt_profiles(
+        (replace(base_profile, keywords=(), abilities=()),)
+    )
+    restricted_lifecycle, restricted_units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        catalog=non_assault_catalog,
+    )
+    restricted_state = _state(restricted_lifecycle)
+    restricted_state.record_advanced_unit_state(
+        _advanced_unit_state(
+            restricted_units["intercessor-1"].unit_instance_id,
+            can_shoot=False,
+        )
+    )
+    restricted_request = _decision_request(
+        restricted_lifecycle.advance_until_decision_or_terminal()
+    )
+    assert {option.option_id for option in restricted_request.options} == {
+        COMPLETE_SHOOTING_PHASE_OPTION_ID,
+        restricted_units["intercessor-2"].unit_instance_id,
     }
 
     permitted_lifecycle, permitted_units = _shooting_lifecycle(
@@ -3241,6 +3744,19 @@ def _catalog_with_extra_bolt_profile(extra_profile: WeaponProfile) -> ArmyCatalo
     return replace(catalog, wargear=tuple(updated_wargear))
 
 
+def _catalog_with_replaced_bolt_profiles(
+    weapon_profiles: tuple[WeaponProfile, ...],
+) -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    updated_wargear: list[Wargear] = []
+    for wargear in catalog.wargear:
+        if wargear.wargear_id == "core-bolt-rifle":
+            updated_wargear.append(replace(wargear, weapon_profiles=weapon_profiles))
+            continue
+        updated_wargear.append(wargear)
+    return replace(catalog, wargear=tuple(updated_wargear))
+
+
 def _config(
     *,
     alpha_unit_ids: tuple[str, ...],
@@ -3733,3 +4249,21 @@ def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, 
         if event.event_type == event_type:
             return cast(dict[str, object], event.payload)
     raise AssertionError(f"Missing event type {event_type}.")
+
+
+def _event_payloads(lifecycle: GameLifecycle, event_type: str) -> tuple[dict[str, object], ...]:
+    return tuple(
+        cast(dict[str, object], event.payload)
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == event_type
+    )
+
+
+def _attack_step_payload(
+    events: tuple[dict[str, object], ...],
+    step: AttackSequenceStep,
+) -> dict[str, object]:
+    for event in events:
+        if event["step"] == step.value:
+            return event
+    raise AssertionError(f"Missing attack sequence step {step.value}.")

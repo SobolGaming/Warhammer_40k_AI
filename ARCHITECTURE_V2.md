@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 
 ## Roadmap status
 
-Everything through **Phase 13C** is treated as implemented at the time this file was updated. Phase 13D is the next build slice.
+Everything through **Phase 13D** is treated as implemented at the time this file was updated. Phase 13E is the next build slice.
 
 Completed / implemented foundation:
 
@@ -79,6 +79,7 @@ Completed / implemented foundation:
 | 13A | Complete | Terrain visibility, line of sight, and cover foundation |
 | 13B | Complete | Shooting phase target selection and weapon declaration |
 | 13C | Complete | Attack sequence, allocation, saves, damage, and typed attack events |
+| 13D | Complete | Weapon abilities, shooting/fight modifiers, and shooting Stratagems |
 
 ## Cross-cutting architectural rules
 
@@ -1685,6 +1686,8 @@ Required tests:
 - damage allocation payload round-trips.
 
 ## Phase 13D: weapon abilities, shooting/fight modifiers, and shooting Stratagems
+
+Status: Complete.
 
 Initial Core Rules weapon ability coverage:
 

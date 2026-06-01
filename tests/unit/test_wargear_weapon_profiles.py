@@ -102,6 +102,7 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
         AbilityDescriptor.sustained_hits(1),
         AbilityDescriptor.melta(2),
         AbilityDescriptor.rapid_fire(1),
+        AbilityDescriptor.anti_keyword("Infantry", 4),
         AbilityDescriptor.heavy(),
     )
     payloads = [ability.to_payload() for ability in abilities]
@@ -109,8 +110,13 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
 
     assert payloads[0]["ability_kind"] == AbilityKind.SUSTAINED_HITS.value
     assert payloads[0]["parameters"] == [{"name": "value", "value": 1}]
-    assert payloads[3]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
-    assert payloads[3]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
+    assert payloads[3]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
+    assert payloads[3]["parameters"] == [
+        {"name": "keyword", "value": "INFANTRY"},
+        {"name": "threshold", "value": 4},
+    ]
+    assert payloads[4]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
+    assert payloads[4]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities
@@ -128,6 +134,19 @@ def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
 
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor.sustained_hits(0)
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor.anti_keyword("Infantry", 1)
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="bad-anti-keyword",
+            name="Bad Anti",
+            ability_kind=AbilityKind.ANTI_KEYWORD,
+            parameters=(
+                AbilityParameter(name="keyword", value="Infantry"),
+                AbilityParameter(name="threshold", value=4),
+            ),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor(
             ability_id="bad-heavy",
@@ -291,6 +310,69 @@ def test_weapon_profile_abilities_are_deduplicated_and_sorted_deterministically(
             armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
             damage_profile=DamageProfile.fixed(1),
             abilities=(cast(AbilityDescriptor, "rapid-fire"),),
+        )
+
+
+def test_weapon_ability_descriptors_reject_invalid_phase13d_shapes() -> None:
+    with pytest.raises(WeaponProfileError, match="attack timing"):
+        AbilityDescriptor(
+            ability_id="rapid-fire:bad-timing",
+            name="Rapid Fire bad timing",
+            ability_kind=AbilityKind.RAPID_FIRE,
+            parameters=(AbilityParameter.integer(1),),
+        )
+    with pytest.raises(WeaponProfileError, match="must not include a condition"):
+        AbilityDescriptor(
+            ability_id="melta:bad-condition",
+            name="Melta bad condition",
+            ability_kind=AbilityKind.MELTA,
+            parameters=(AbilityParameter.integer(1),),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+            condition=AbilityCondition.STATIONARY_OR_POLICY_DEFINED,
+        )
+    with pytest.raises(WeaponProfileError, match="must include one value parameter"):
+        AbilityDescriptor(
+            ability_id="sustained-hits:bad-parameters",
+            name="Sustained Hits bad parameters",
+            ability_kind=AbilityKind.SUSTAINED_HITS,
+            parameters=(),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+    with pytest.raises(WeaponProfileError, match="must include keyword and threshold"):
+        AbilityDescriptor(
+            ability_id="anti-keyword:bad-parameters",
+            name="Anti bad parameters",
+            ability_kind=AbilityKind.ANTI_KEYWORD,
+            parameters=(AbilityParameter(name="keyword", value="INFANTRY"),),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+    with pytest.raises(WeaponProfileError, match="must be canonical"):
+        AbilityDescriptor(
+            ability_id="anti-keyword:bad-keyword",
+            name="Anti bad keyword",
+            ability_kind=AbilityKind.ANTI_KEYWORD,
+            parameters=(
+                AbilityParameter(name="keyword", value="infantry"),
+                AbilityParameter(name="threshold", value=4),
+            ),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+    with pytest.raises(WeaponProfileError, match="must be between 2 and 6"):
+        AbilityDescriptor.anti_keyword("INFANTRY", 7)
+    with pytest.raises(WeaponProfileError, match="must use movement-conditioned timing"):
+        AbilityDescriptor(
+            ability_id="heavy:bad-timing",
+            name="Heavy bad timing",
+            ability_kind=AbilityKind.HEAVY,
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+            condition=AbilityCondition.STATIONARY_OR_POLICY_DEFINED,
+        )
+    with pytest.raises(WeaponProfileError, match="stationary policy condition"):
+        AbilityDescriptor(
+            ability_id="heavy:bad-condition",
+            name="Heavy bad condition",
+            ability_kind=AbilityKind.HEAVY,
+            timing=AbilityTiming.MOVEMENT_CONDITIONED,
         )
 
 

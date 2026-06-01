@@ -204,7 +204,7 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     restrictions_descriptor="hazardous weapon test rules apply",
                     trigger_kind="after_dice_roll",
                     phase=None,
-                    handler_id="unsupported:phase-13d:hazardous",
+                    handler_id="core:hazardous",
                     required_keywords=("HAZARDOUS",),
                 ),
                 SourceAbilityRow(
