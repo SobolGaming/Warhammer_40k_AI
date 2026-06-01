@@ -45,6 +45,10 @@ from warhammer40k_core.engine.command_points import (
     CommandStepStatePayload,
     initial_command_point_ledgers,
 )
+from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainSource,
+    FeelNoPainSourcePayload,
+)
 from warhammer40k_core.engine.effects import (
     EffectExpirationBoundary,
     PersistingEffect,
@@ -189,6 +193,8 @@ class GameStatePayload(TypedDict):
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
     shooting_phase_state: ShootingPhaseStatePayload | None
+    feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
+    feel_no_pain_decline_allowed_model_ids: list[str]
     reserve_states: list[ReserveStatePayload]
     hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
@@ -293,6 +299,14 @@ def _new_secondary_mission_card_states() -> list[SecondaryMissionCardState]:
 
 
 def _new_persisting_effects() -> list[PersistingEffect]:
+    return []
+
+
+def _new_feel_no_pain_sources_by_model_id() -> dict[str, tuple[FeelNoPainSource, ...]]:
+    return {}
+
+
+def _new_feel_no_pain_decline_allowed_model_ids() -> list[str]:
     return []
 
 
@@ -559,6 +573,12 @@ class GameState:
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
     shooting_phase_state: ShootingPhaseState | None = None
+    feel_no_pain_sources_by_model_id: dict[str, tuple[FeelNoPainSource, ...]] = field(
+        default_factory=_new_feel_no_pain_sources_by_model_id
+    )
+    feel_no_pain_decline_allowed_model_ids: list[str] = field(
+        default_factory=_new_feel_no_pain_decline_allowed_model_ids
+    )
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
     transport_cargo_states: list[TransportCargoState] = field(
@@ -675,6 +695,16 @@ class GameState:
         self.shooting_phase_state = _validate_optional_shooting_phase_state(
             self.shooting_phase_state
         )
+        self.feel_no_pain_sources_by_model_id = _validate_feel_no_pain_sources_by_model_id(
+            self.feel_no_pain_sources_by_model_id,
+            army_definitions=self.army_definitions,
+        )
+        self.feel_no_pain_decline_allowed_model_ids = list(
+            _validate_feel_no_pain_decline_allowed_model_ids(
+                self.feel_no_pain_decline_allowed_model_ids,
+                source_model_ids=tuple(self.feel_no_pain_sources_by_model_id),
+            )
+        )
         self.reserve_states = _validate_reserve_states(
             self.reserve_states,
             player_ids=self.player_ids,
@@ -787,6 +817,79 @@ class GameState:
     def next_decision_request_id(self) -> str:
         self.decision_request_count += 1
         return f"decision-request-{self.decision_request_count:06d}"
+
+    def record_model_feel_no_pain_sources(
+        self,
+        *,
+        model_instance_id: str,
+        sources: tuple[FeelNoPainSource, ...],
+        decline_allowed: bool = False,
+    ) -> None:
+        model_id = _validate_model_instance_id_for_state(
+            state=self,
+            model_instance_id=model_instance_id,
+        )
+        source_tuple = _validate_feel_no_pain_source_tuple(
+            "Feel No Pain sources",
+            sources,
+        )
+        if type(decline_allowed) is not bool:
+            raise GameLifecycleError("Feel No Pain decline_allowed must be a bool.")
+        updated_sources = dict(self.feel_no_pain_sources_by_model_id)
+        updated_sources[model_id] = source_tuple
+        self.feel_no_pain_sources_by_model_id = _validate_feel_no_pain_sources_by_model_id(
+            updated_sources,
+            army_definitions=self.army_definitions,
+        )
+        decline_ids = set(self.feel_no_pain_decline_allowed_model_ids)
+        if decline_allowed:
+            decline_ids.add(model_id)
+        else:
+            decline_ids.discard(model_id)
+        self.feel_no_pain_decline_allowed_model_ids = list(
+            _validate_feel_no_pain_decline_allowed_model_ids(
+                tuple(decline_ids),
+                source_model_ids=tuple(self.feel_no_pain_sources_by_model_id),
+            )
+        )
+
+    def clear_model_feel_no_pain_sources(self, *, model_instance_id: str) -> None:
+        model_id = _validate_model_instance_id_for_state(
+            state=self,
+            model_instance_id=model_instance_id,
+        )
+        updated_sources = dict(self.feel_no_pain_sources_by_model_id)
+        updated_sources.pop(model_id, None)
+        self.feel_no_pain_sources_by_model_id = _validate_feel_no_pain_sources_by_model_id(
+            updated_sources,
+            army_definitions=self.army_definitions,
+        )
+        self.feel_no_pain_decline_allowed_model_ids = list(
+            _validate_feel_no_pain_decline_allowed_model_ids(
+                tuple(
+                    model_id_value
+                    for model_id_value in self.feel_no_pain_decline_allowed_model_ids
+                    if model_id_value != model_id
+                ),
+                source_model_ids=tuple(self.feel_no_pain_sources_by_model_id),
+            )
+        )
+
+    def feel_no_pain_sources_for_model(
+        self,
+        *,
+        model_instance_id: str,
+    ) -> tuple[FeelNoPainSource, ...]:
+        model_id = _validate_identifier("model_instance_id", model_instance_id)
+        return self.feel_no_pain_sources_by_model_id.get(model_id, ())
+
+    def feel_no_pain_decline_allowed_for_model(
+        self,
+        *,
+        model_instance_id: str,
+    ) -> bool:
+        model_id = _validate_identifier("model_instance_id", model_instance_id)
+        return model_id in self.feel_no_pain_decline_allowed_model_ids
 
     def complete_current_setup_step(self) -> SetupStep:
         if self.stage is not GameLifecycleStage.SETUP:
@@ -1958,6 +2061,13 @@ class GameState:
                 if self.shooting_phase_state is None
                 else self.shooting_phase_state.to_payload()
             ),
+            "feel_no_pain_sources_by_model_id": {
+                model_id: [source.to_payload() for source in sources]
+                for model_id, sources in self.feel_no_pain_sources_by_model_id.items()
+            },
+            "feel_no_pain_decline_allowed_model_ids": list(
+                self.feel_no_pain_decline_allowed_model_ids
+            ),
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
@@ -2146,6 +2256,13 @@ class GameState:
                 None
                 if payload["shooting_phase_state"] is None
                 else ShootingPhaseState.from_payload(payload["shooting_phase_state"])
+            ),
+            feel_no_pain_sources_by_model_id={
+                model_id: tuple(FeelNoPainSource.from_payload(source) for source in sources)
+                for model_id, sources in payload["feel_no_pain_sources_by_model_id"].items()
+            },
+            feel_no_pain_decline_allowed_model_ids=list(
+                payload["feel_no_pain_decline_allowed_model_ids"]
             ),
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]
@@ -2632,6 +2749,79 @@ def _validate_optional_shooting_phase_state(
     if type(value) is not ShootingPhaseState:
         raise GameLifecycleError("GameState shooting_phase_state must be a ShootingPhaseState.")
     return value
+
+
+def _validate_feel_no_pain_sources_by_model_id(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+) -> dict[str, tuple[FeelNoPainSource, ...]]:
+    if not isinstance(values, dict):
+        raise GameLifecycleError("GameState Feel No Pain sources must be a dict.")
+    known_model_ids = _model_instance_ids(army_definitions)
+    validated: dict[str, tuple[FeelNoPainSource, ...]] = {}
+    for raw_model_id, raw_sources in cast(dict[object, object], values).items():
+        model_id = _validate_identifier("Feel No Pain model_instance_id", raw_model_id)
+        if known_model_ids and model_id not in known_model_ids:
+            raise GameLifecycleError("Feel No Pain source model is unknown.")
+        source_tuple = _validate_feel_no_pain_source_tuple(
+            "Feel No Pain sources",
+            raw_sources,
+        )
+        if not source_tuple:
+            raise GameLifecycleError("Feel No Pain source model requires at least one source.")
+        validated[model_id] = source_tuple
+    return dict(sorted(validated.items()))
+
+
+def _validate_feel_no_pain_decline_allowed_model_ids(
+    values: object,
+    *,
+    source_model_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    if type(values) not in (list, tuple):
+        raise GameLifecycleError("GameState Feel No Pain decline model IDs must be a list.")
+    source_ids = set(source_model_ids)
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in cast(list[object] | tuple[object, ...], values):
+        model_id = _validate_identifier("Feel No Pain decline model_instance_id", value)
+        if model_id not in source_ids:
+            raise GameLifecycleError("Feel No Pain decline model requires sources.")
+        if model_id in seen:
+            raise GameLifecycleError("Feel No Pain decline model IDs must be unique.")
+        seen.add(model_id)
+        validated.append(model_id)
+    return tuple(sorted(validated))
+
+
+def _validate_feel_no_pain_source_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[FeelNoPainSource, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    sources: list[FeelNoPainSource] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not FeelNoPainSource:
+            raise GameLifecycleError(f"{field_name} must contain FeelNoPainSource values.")
+        if value.source_id in seen:
+            raise GameLifecycleError(f"{field_name} must not duplicate source IDs.")
+        seen.add(value.source_id)
+        sources.append(value)
+    return tuple(sorted(sources, key=lambda source: source.source_id))
+
+
+def _validate_model_instance_id_for_state(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> str:
+    model_id = _validate_identifier("model_instance_id", model_instance_id)
+    if model_id not in _model_instance_ids(state.army_definitions):
+        raise GameLifecycleError("model_instance_id is unknown.")
+    return model_id
 
 
 def _validate_optional_command_step_state(
@@ -3146,6 +3336,15 @@ def _validate_tactical_draws(
 def _unit_owner_by_id(army_definitions: list[ArmyDefinition]) -> dict[str, str]:
     return {
         unit.unit_instance_id: army.player_id for army in army_definitions for unit in army.units
+    }
+
+
+def _model_instance_ids(army_definitions: list[ArmyDefinition]) -> set[str]:
+    return {
+        model.model_instance_id
+        for army in army_definitions
+        for unit in army.units
+        for model in unit.own_models
     }
 
 

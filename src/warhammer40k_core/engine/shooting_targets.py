@@ -687,7 +687,7 @@ def _attacker_geometry_models(
     return selected
 
 
-def _shooting_dynamic_model_blockers(
+def shooting_dynamic_model_blockers(
     *,
     scenario: BattlefieldScenario,
     observing_unit_id: str,
@@ -708,6 +708,19 @@ def _shooting_dynamic_model_blockers(
                 )
             )
     return tuple(sorted(blocker_models, key=lambda model: model.model_id))
+
+
+def _shooting_dynamic_model_blockers(
+    *,
+    scenario: BattlefieldScenario,
+    observing_unit_id: str,
+    target_unit_id: str,
+) -> tuple[Model, ...]:
+    return shooting_dynamic_model_blockers(
+        scenario=scenario,
+        observing_unit_id=observing_unit_id,
+        target_unit_id=target_unit_id,
+    )
 
 
 def _target_in_range_model_ids(

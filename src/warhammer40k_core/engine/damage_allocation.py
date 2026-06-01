@@ -4,10 +4,16 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollStatePayload
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    DiceRollState,
+    DiceRollStatePayload,
+)
 from warhammer40k_core.engine.battlefield_state import PlacementError
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
@@ -77,6 +83,8 @@ class MortalWoundApplicationPayload(TypedDict):
     mortal_wounds: int
     spill_over: bool
     applications: list[DamageApplicationPayload]
+    feel_no_pain_resolutions: list[FeelNoPainResolutionPayload]
+    ignored_mortal_wounds: int
     remaining_mortal_wounds_lost: int
 
 
@@ -97,6 +105,14 @@ class FeelNoPainRollPayload(TypedDict):
     source: FeelNoPainSourcePayload
     roll_state: DiceRollStatePayload
     successful: bool
+
+
+class FeelNoPainResolutionPayload(TypedDict):
+    source: FeelNoPainSourcePayload | None
+    requested_wounds: int
+    ignored_wounds: int
+    remaining_wounds: int
+    rolls: list[FeelNoPainRollPayload]
 
 
 @dataclass(frozen=True, slots=True)
@@ -556,6 +572,8 @@ class MortalWoundApplication:
     mortal_wounds: int
     spill_over: bool
     applications: tuple[DamageApplication, ...]
+    feel_no_pain_resolutions: tuple[FeelNoPainResolution, ...] = ()
+    ignored_mortal_wounds: int = 0
     remaining_mortal_wounds_lost: int = 0
 
     def __post_init__(self) -> None:
@@ -576,6 +594,16 @@ class MortalWoundApplication:
             raise GameLifecycleError("MortalWoundApplication spill_over must be a bool.")
         applications = _validate_damage_applications(self.applications)
         object.__setattr__(self, "applications", applications)
+        resolutions = _validate_feel_no_pain_resolutions(self.feel_no_pain_resolutions)
+        object.__setattr__(self, "feel_no_pain_resolutions", resolutions)
+        object.__setattr__(
+            self,
+            "ignored_mortal_wounds",
+            _validate_non_negative_int(
+                "MortalWoundApplication ignored_mortal_wounds",
+                self.ignored_mortal_wounds,
+            ),
+        )
         object.__setattr__(
             self,
             "remaining_mortal_wounds_lost",
@@ -586,6 +614,7 @@ class MortalWoundApplication:
         )
         accounted = (
             sum(application.wounds_lost for application in applications)
+            + self.ignored_mortal_wounds
             + self.remaining_mortal_wounds_lost
         )
         if accounted != self.mortal_wounds:
@@ -597,6 +626,10 @@ class MortalWoundApplication:
             "mortal_wounds": self.mortal_wounds,
             "spill_over": self.spill_over,
             "applications": [application.to_payload() for application in self.applications],
+            "feel_no_pain_resolutions": [
+                resolution.to_payload() for resolution in self.feel_no_pain_resolutions
+            ],
+            "ignored_mortal_wounds": self.ignored_mortal_wounds,
             "remaining_mortal_wounds_lost": self.remaining_mortal_wounds_lost,
         }
 
@@ -624,6 +657,80 @@ class FeelNoPainSource:
     @classmethod
     def from_payload(cls, payload: FeelNoPainSourcePayload) -> Self:
         return cls(source_id=payload["source_id"], threshold=payload["threshold"])
+
+
+@dataclass(frozen=True, slots=True)
+class FeelNoPainRoll:
+    source: FeelNoPainSource
+    roll_state: DiceRollState
+    successful: bool
+
+    def __post_init__(self) -> None:
+        if type(self.source) is not FeelNoPainSource:
+            raise GameLifecycleError("FeelNoPainRoll source must be a FeelNoPainSource.")
+        if type(self.roll_state) is not DiceRollState:
+            raise GameLifecycleError("FeelNoPainRoll roll_state must be DiceRollState.")
+        if type(self.successful) is not bool:
+            raise GameLifecycleError("FeelNoPainRoll successful must be a bool.")
+        expected_success = self.roll_state.current_total >= self.source.threshold
+        if self.successful != expected_success:
+            raise GameLifecycleError("FeelNoPainRoll success flag drift.")
+
+    def to_payload(self) -> FeelNoPainRollPayload:
+        return {
+            "source": self.source.to_payload(),
+            "roll_state": self.roll_state.to_payload(),
+            "successful": self.successful,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class FeelNoPainResolution:
+    source: FeelNoPainSource | None
+    requested_wounds: int
+    rolls: tuple[FeelNoPainRoll, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.source is not None and type(self.source) is not FeelNoPainSource:
+            raise GameLifecycleError("FeelNoPainResolution source must be a FeelNoPainSource.")
+        object.__setattr__(
+            self,
+            "requested_wounds",
+            _validate_positive_int(
+                "FeelNoPainResolution requested_wounds",
+                self.requested_wounds,
+            ),
+        )
+        rolls = _validate_feel_no_pain_rolls(self.rolls)
+        object.__setattr__(self, "rolls", rolls)
+        if self.source is None and rolls:
+            raise GameLifecycleError("Declined Feel No Pain must not include rolls.")
+        if self.source is not None and len(rolls) != self.requested_wounds:
+            raise GameLifecycleError("Feel No Pain rolls must match requested wounds.")
+        for roll in rolls:
+            if roll.source != self.source:
+                raise GameLifecycleError("Feel No Pain roll source drift.")
+
+    @classmethod
+    def declined(cls, *, requested_wounds: int) -> Self:
+        return cls(source=None, requested_wounds=requested_wounds, rolls=())
+
+    @property
+    def ignored_wounds(self) -> int:
+        return sum(1 for roll in self.rolls if roll.successful)
+
+    @property
+    def remaining_wounds(self) -> int:
+        return self.requested_wounds - self.ignored_wounds
+
+    def to_payload(self) -> FeelNoPainResolutionPayload:
+        return {
+            "source": None if self.source is None else self.source.to_payload(),
+            "requested_wounds": self.requested_wounds,
+            "ignored_wounds": self.ignored_wounds,
+            "remaining_wounds": self.remaining_wounds,
+            "rolls": [roll.to_payload() for roll in self.rolls],
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -813,6 +920,41 @@ def feel_no_pain_roll_spec(
     )
 
 
+def resolve_feel_no_pain_rolls(
+    *,
+    manager: DiceRollManager,
+    source: FeelNoPainSource,
+    player_id: str,
+    model_instance_id: str,
+    requested_wounds: int,
+) -> FeelNoPainResolution:
+    if type(manager) is not DiceRollManager:
+        raise GameLifecycleError("Feel No Pain resolution requires a DiceRollManager.")
+    if type(source) is not FeelNoPainSource:
+        raise GameLifecycleError("Feel No Pain resolution requires a source.")
+    wounds = _validate_positive_int("requested_wounds", requested_wounds)
+    actor_id = _validate_identifier("player_id", player_id)
+    model_id = _validate_identifier("model_instance_id", model_instance_id)
+    rolls: list[FeelNoPainRoll] = []
+    for wound_index in range(1, wounds + 1):
+        roll_state = manager.roll(
+            feel_no_pain_roll_spec(
+                source=source,
+                player_id=actor_id,
+                model_instance_id=model_id,
+                wound_index=wound_index,
+            )
+        )
+        rolls.append(
+            FeelNoPainRoll(
+                source=source,
+                roll_state=roll_state,
+                successful=roll_state.current_total >= source.threshold,
+            )
+        )
+    return FeelNoPainResolution(source=source, requested_wounds=wounds, rolls=tuple(rolls))
+
+
 def apply_damage_to_model(
     *,
     state: GameState,
@@ -855,11 +997,15 @@ def apply_mortal_wounds_to_unit(
     target_unit_instance_id: str,
     mortal_wounds: int,
     spill_over: bool = True,
+    dice_manager: DiceRollManager | None = None,
+    defender_player_id: str | None = None,
 ) -> MortalWoundApplication:
     remaining = _validate_positive_int("mortal_wounds", mortal_wounds)
     if type(spill_over) is not bool:
         raise GameLifecycleError("spill_over must be a bool.")
     applications: list[DamageApplication] = []
+    feel_no_pain_resolutions: list[FeelNoPainResolution] = []
+    ignored_mortal_wounds = 0
     remaining_lost = 0
     while remaining > 0:
         context = allocation_context_for_unit(
@@ -872,6 +1018,33 @@ def apply_mortal_wounds_to_unit(
             remaining_lost = remaining
             break
         model_id = legal_model_ids[0]
+        sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_id)
+        decline_allowed = _state_feel_no_pain_decline_allowed(
+            state=state,
+            model_instance_id=model_id,
+        )
+        if len(sources) > 0:
+            if len(sources) > 1 or decline_allowed:
+                raise GameLifecycleError(
+                    "Mortal wound Feel No Pain choices require lifecycle routing."
+                )
+            source = sources[0]
+            if dice_manager is None or defender_player_id is None:
+                raise GameLifecycleError(
+                    "Mortal wound Feel No Pain resolution requires dice manager and defender."
+                )
+            resolution = resolve_feel_no_pain_rolls(
+                manager=dice_manager,
+                source=source,
+                player_id=defender_player_id,
+                model_instance_id=model_id,
+                requested_wounds=1,
+            )
+            feel_no_pain_resolutions.append(resolution)
+            if resolution.ignored_wounds == 1:
+                ignored_mortal_wounds += 1
+                remaining -= 1
+                continue
         application = apply_damage_to_model(
             state=state,
             target_unit_instance_id=target_unit_instance_id,
@@ -889,6 +1062,8 @@ def apply_mortal_wounds_to_unit(
         mortal_wounds=mortal_wounds,
         spill_over=spill_over,
         applications=tuple(applications),
+        feel_no_pain_resolutions=tuple(feel_no_pain_resolutions),
+        ignored_mortal_wounds=ignored_mortal_wounds,
         remaining_mortal_wounds_lost=remaining_lost,
     )
 
@@ -1005,6 +1180,30 @@ def _validate_damage_applications(values: object) -> tuple[DamageApplication, ..
     return tuple(applications)
 
 
+def _validate_feel_no_pain_rolls(values: object) -> tuple[FeelNoPainRoll, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Feel No Pain rolls must be a tuple.")
+    rolls: list[FeelNoPainRoll] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not FeelNoPainRoll:
+            raise GameLifecycleError("Feel No Pain rolls must contain FeelNoPainRoll values.")
+        rolls.append(value)
+    return tuple(rolls)
+
+
+def _validate_feel_no_pain_resolutions(values: object) -> tuple[FeelNoPainResolution, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Feel No Pain resolutions must be a tuple.")
+    resolutions: list[FeelNoPainResolution] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not FeelNoPainResolution:
+            raise GameLifecycleError(
+                "Feel No Pain resolutions must contain FeelNoPainResolution values."
+            )
+        resolutions.append(value)
+    return tuple(resolutions)
+
+
 def _validate_feel_no_pain_sources(values: object) -> tuple[FeelNoPainSource, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError("Feel No Pain sources must be a tuple.")
@@ -1018,6 +1217,28 @@ def _validate_feel_no_pain_sources(values: object) -> tuple[FeelNoPainSource, ..
         seen.add(value.source_id)
         sources.append(value)
     return tuple(sorted(sources, key=lambda source: source.source_id))
+
+
+def _state_feel_no_pain_sources(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> tuple[FeelNoPainSource, ...]:
+    lookup = state.feel_no_pain_sources_for_model
+    sources = lookup(model_instance_id=model_instance_id)
+    return _validate_feel_no_pain_sources(sources)
+
+
+def _state_feel_no_pain_decline_allowed(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> bool:
+    lookup = state.feel_no_pain_decline_allowed_for_model
+    value = lookup(model_instance_id=model_instance_id)
+    if type(value) is not bool:
+        raise GameLifecycleError("Feel No Pain decline state must be a bool.")
+    return value
 
 
 def _validate_subset(

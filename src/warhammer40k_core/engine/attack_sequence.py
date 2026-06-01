@@ -20,7 +20,12 @@ from warhammer40k_core.core.modifiers import (
     RollModifierPayload,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.core.weapon_profiles import DamageProfile, RangeProfileKind, WeaponProfile
+from warhammer40k_core.core.weapon_profiles import (
+    DamageProfile,
+    DamageProfilePayload,
+    RangeProfileKind,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
@@ -28,6 +33,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     AttackAllocation,
     AttackAllocationDecision,
     AttackAllocationPayload,
@@ -35,10 +41,17 @@ from warhammer40k_core.engine.damage_allocation import (
     AttackAllocationRuleContextPayload,
     DamageApplication,
     DamageKind,
+    FeelNoPainDecision,
+    FeelNoPainResolution,
+    FeelNoPainSource,
+    FeelNoPainSourcePayload,
     allocation_context_for_unit,
     apply_damage_to_model,
     build_attack_allocation_request,
+    build_feel_no_pain_request,
+    damage_kind_from_token,
     model_by_id,
+    resolve_feel_no_pain_rolls,
     unit_by_id,
     unit_owner_player_id,
 )
@@ -64,7 +77,10 @@ from warhammer40k_core.engine.saves import (
     saving_throw_roll_spec,
     selected_save_option,
 )
-from warhammer40k_core.engine.shooting_targets import shooting_visibility_cache_key
+from warhammer40k_core.engine.shooting_targets import (
+    shooting_dynamic_model_blockers,
+    shooting_visibility_cache_key,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
 from warhammer40k_core.geometry.visibility import BenefitOfCoverResult, TerrainVisibilityContext
@@ -77,6 +93,7 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
     (
         SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
         SELECT_SAVING_THROW_KIND_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     )
 )
 
@@ -146,11 +163,19 @@ class AttackResolutionContextPayload(TypedDict):
     attacker_model_instance_id: str
     target_unit_instance_id: str
     weapon_profile_id: str
-    damage: int
+    damage_profile: DamageProfilePayload
     hit_roll: HitRollPayload
     wound_roll: WoundRollPayload
     allocation: AttackAllocationPayload | None
     save_options: list[SaveOptionPayload]
+
+
+class LostWoundContextPayload(TypedDict):
+    attack_context: AttackResolutionContextPayload
+    allocated_model_id: str
+    damage_kind: str
+    requested_wounds: int
+    saving_throw: JsonValue
 
 
 class FastDiceGroupPayload(TypedDict):
@@ -887,6 +912,72 @@ def apply_saving_throw_decision(
     )
 
 
+def apply_feel_no_pain_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+    dice_manager: DiceRollManager | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    record = decisions.record_for_result(result)
+    request = record.request
+    decision = FeelNoPainDecision.from_result(request=request, result=result)
+    request_payload = _payload_object(request.payload)
+    source_payloads = request_payload["sources"]
+    if not isinstance(source_payloads, list):
+        raise GameLifecycleError("Feel No Pain request sources must be a list.")
+    sources = tuple(
+        FeelNoPainSource.from_payload(cast(FeelNoPainSourcePayload, source_payload))
+        for source_payload in source_payloads
+    )
+    selected_source: FeelNoPainSource | None = None
+    if decision.selected_source_id is not None:
+        for source in sources:
+            if source.source_id == decision.selected_source_id:
+                selected_source = source
+                break
+        if selected_source is None:
+            raise GameLifecycleError("Selected Feel No Pain source is not in the request.")
+    lost_wound_context = _lost_wound_context_from_payload(decision.lost_wound_context)
+    attack_context = lost_wound_context["attack_context"]
+    _validate_lost_wound_context_matches_sequence(
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+    )
+    manager = (
+        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        if dice_manager is None
+        else dice_manager
+    )
+    if selected_source is None:
+        resolution = FeelNoPainResolution.declined(
+            requested_wounds=lost_wound_context["requested_wounds"]
+        )
+    else:
+        resolution = resolve_feel_no_pain_rolls(
+            manager=manager,
+            source=selected_source,
+            player_id=attack_context["defender_player_id"],
+            model_instance_id=lost_wound_context["allocated_model_id"],
+            requested_wounds=lost_wound_context["requested_wounds"],
+        )
+    return _apply_damage_after_feel_no_pain(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        target_unit_instance_id=attack_context["target_unit_instance_id"],
+        model_instance_id=lost_wound_context["allocated_model_id"],
+        damage_kind=damage_kind_from_token(lost_wound_context["damage_kind"]),
+        resolution=resolution,
+        allocated_model_ids=already_allocated_model_ids,
+        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+        saving_throw_payload=lost_wound_context["saving_throw"],
+    )
+
+
 def _continue_after_allocation(
     *,
     state: GameState,
@@ -963,21 +1054,26 @@ def _continue_after_allocation(
             allocated_model_ids=updated_allocated_ids,
             hooks=hooks,
         )
-    damage = apply_damage_to_model(
+    damage_amount = _damage_value(
+        manager=manager,
+        profile=pool.weapon_profile.damage_profile,
+        attack_context_id=attack_context["attack_context_id"],
+        attacker_player_id=attack_sequence.attacker_player_id,
+    )
+    return _resolve_lost_wound_stage(
         state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
         target_unit_instance_id=pool.target_unit_instance_id,
         model_instance_id=allocation.allocated_model_id,
-        damage=updated_attack_context["damage"],
+        requested_wounds=damage_amount,
         damage_kind=DamageKind.NORMAL,
-    )
-    _emit_damage_event(
-        decisions=decisions,
-        hooks=hooks,
-        attack_sequence=attack_sequence,
-        damage=damage,
         saving_throw=None,
+        attack_context=updated_attack_context,
+        allocated_model_ids=updated_allocated_ids,
+        hooks=hooks,
+        manager=manager,
     )
-    return attack_sequence.advanced_after_attack(), updated_allocated_ids, None
 
 
 def _resolve_save_and_damage(
@@ -1017,12 +1113,25 @@ def _resolve_save_and_damage(
     )
     damage: DamageApplication | None = None
     if not saving_throw.successful:
-        damage = apply_damage_to_model(
+        damage_amount = _damage_value(
+            manager=manager,
+            profile=attack_sequence.current_pool().weapon_profile.damage_profile,
+            attack_context_id=attack_context["attack_context_id"],
+            attacker_player_id=attack_sequence.attacker_player_id,
+        )
+        return _resolve_lost_wound_stage(
             state=state,
+            decisions=decisions,
+            attack_sequence=attack_sequence,
             target_unit_instance_id=attack_context["target_unit_instance_id"],
             model_instance_id=allocation.allocated_model_id,
-            damage=attack_context["damage"],
+            requested_wounds=damage_amount,
             damage_kind=DamageKind.NORMAL,
+            saving_throw=saving_throw,
+            attack_context=attack_context,
+            allocated_model_ids=allocated_model_ids,
+            hooks=hooks,
+            manager=manager,
         )
     _emit_damage_event(
         decisions=decisions,
@@ -1030,6 +1139,125 @@ def _resolve_save_and_damage(
         attack_sequence=attack_sequence,
         damage=damage,
         saving_throw=saving_throw,
+    )
+    return attack_sequence.advanced_after_attack(), allocated_model_ids, None
+
+
+def _resolve_lost_wound_stage(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+    model_instance_id: str,
+    requested_wounds: int,
+    damage_kind: DamageKind,
+    saving_throw: SavingThrow | None,
+    attack_context: AttackResolutionContextPayload,
+    allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks,
+    manager: DiceRollManager,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    wounds = _validate_positive_int("requested_wounds", requested_wounds)
+    sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_instance_id)
+    decline_allowed = _state_feel_no_pain_decline_allowed(
+        state=state,
+        model_instance_id=model_instance_id,
+    )
+    lost_wound_context = _lost_wound_context_payload(
+        attack_context=attack_context,
+        allocated_model_id=model_instance_id,
+        damage_kind=damage_kind,
+        requested_wounds=wounds,
+        saving_throw=saving_throw,
+    )
+    if not sources:
+        return _apply_damage_after_feel_no_pain(
+            state=state,
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            target_unit_instance_id=target_unit_instance_id,
+            model_instance_id=model_instance_id,
+            damage_kind=damage_kind,
+            resolution=FeelNoPainResolution.declined(requested_wounds=wounds),
+            allocated_model_ids=allocated_model_ids,
+            hooks=hooks,
+            saving_throw_payload=lost_wound_context["saving_throw"],
+        )
+    if len(sources) == 1 and not decline_allowed:
+        resolution = resolve_feel_no_pain_rolls(
+            manager=manager,
+            source=sources[0],
+            player_id=attack_context["defender_player_id"],
+            model_instance_id=model_instance_id,
+            requested_wounds=wounds,
+        )
+        return _apply_damage_after_feel_no_pain(
+            state=state,
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            target_unit_instance_id=target_unit_instance_id,
+            model_instance_id=model_instance_id,
+            damage_kind=damage_kind,
+            resolution=resolution,
+            allocated_model_ids=allocated_model_ids,
+            hooks=hooks,
+            saving_throw_payload=lost_wound_context["saving_throw"],
+        )
+
+    request = build_feel_no_pain_request(
+        request_id=state.next_decision_request_id(),
+        defender_player_id=attack_context["defender_player_id"],
+        lost_wound_context=validate_json_value(lost_wound_context),
+        sources=sources,
+        decline_allowed=decline_allowed,
+    )
+    decisions.request_decision(request)
+    return (
+        attack_sequence,
+        allocated_model_ids,
+        LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.SHOOTING.value,
+                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "attack_context_id": attack_sequence.attack_context_id(),
+            },
+        ),
+    )
+
+
+def _apply_damage_after_feel_no_pain(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+    model_instance_id: str,
+    damage_kind: DamageKind,
+    resolution: FeelNoPainResolution,
+    allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks,
+    saving_throw_payload: JsonValue,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    damage: DamageApplication | None = None
+    if resolution.remaining_wounds > 0:
+        damage = apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+            model_instance_id=model_instance_id,
+            damage=resolution.remaining_wounds,
+            damage_kind=damage_kind,
+        )
+    _emit_damage_event(
+        decisions=decisions,
+        hooks=hooks,
+        attack_sequence=attack_sequence,
+        damage=damage,
+        saving_throw=None,
+        saving_throw_payload=saving_throw_payload,
+        feel_no_pain=resolution,
     )
     return attack_sequence.advanced_after_attack(), allocated_model_ids, None
 
@@ -1129,12 +1357,7 @@ def _roll_hit_and_wound(
         "attacker_model_instance_id": pool.attacker_model_instance_id,
         "target_unit_instance_id": pool.target_unit_instance_id,
         "weapon_profile_id": pool.weapon_profile_id,
-        "damage": _damage_value(
-            manager=manager,
-            profile=pool.weapon_profile.damage_profile,
-            attack_context_id=attack_context_id,
-            attacker_player_id=attack_sequence.attacker_player_id,
-        ),
+        "damage_profile": pool.weapon_profile.damage_profile.to_payload(),
         "hit_roll": hit_roll.to_payload(),
         "wound_roll": wound_roll.to_payload(),
         "allocation": None,
@@ -1216,11 +1439,23 @@ def _emit_damage_event(
     attack_sequence: AttackSequence,
     damage: DamageApplication | None,
     saving_throw: SavingThrow | None,
+    saving_throw_payload: JsonValue | None = None,
+    feel_no_pain: FeelNoPainResolution | None = None,
 ) -> None:
+    if saving_throw is not None and saving_throw_payload is not None:
+        raise GameLifecycleError("Damage event saving throw payload is ambiguous.")
+    resolved_saving_throw: JsonValue
+    if saving_throw_payload is not None:
+        resolved_saving_throw = saving_throw_payload
+    elif saving_throw is not None:
+        resolved_saving_throw = validate_json_value(saving_throw.to_payload())
+    else:
+        resolved_saving_throw = None
     payload = validate_json_value(
         {
-            "saving_throw": None if saving_throw is None else saving_throw.to_payload(),
+            "saving_throw": resolved_saving_throw,
             "damage_application": None if damage is None else damage.to_payload(),
+            "feel_no_pain": None if feel_no_pain is None else feel_no_pain.to_payload(),
         }
     )
     _emit_event(
@@ -1297,11 +1532,11 @@ def _cover_for_allocated_model(
     terrain_volumes = tuple(
         volume for feature in terrain_features for volume in feature.terrain_volumes()
     )
-    excluded_model_ids = {pool.attacker_model_instance_id, allocated_model_id}
-    dynamic_blockers = tuple(
-        model
-        for model in scenario.placed_geometry_models()
-        if model.model_id not in excluded_model_ids
+    attacking_unit_id = attack_pool_attacker_unit_id(state=state, pool=pool)
+    dynamic_blockers = shooting_dynamic_model_blockers(
+        scenario=scenario,
+        observing_unit_id=attacking_unit_id,
+        target_unit_id=pool.target_unit_instance_id,
     )
     context = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=ruleset_descriptor,
@@ -1316,7 +1551,7 @@ def _cover_for_allocated_model(
         dynamic_model_blockers=dynamic_blockers,
         observer_keywords=unit_by_id(
             state=state,
-            unit_instance_id=attack_pool_attacker_unit_id(state=state, pool=pool),
+            unit_instance_id=attacking_unit_id,
         ).keywords,
         target_keywords=unit_by_id(
             state=state,
@@ -1324,6 +1559,21 @@ def _cover_for_allocated_model(
         ).keywords,
     )
     return context.benefit_of_cover(context.resolve_line_of_sight())
+
+
+def cover_for_allocated_model(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    pool: RangedAttackPool,
+    allocated_model_id: str,
+) -> BenefitOfCoverResult | None:
+    return _cover_for_allocated_model(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        pool=pool,
+        allocated_model_id=allocated_model_id,
+    )
 
 
 def attack_pool_attacker_unit_id(*, state: GameState, pool: RangedAttackPool) -> str:
@@ -1459,6 +1709,96 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Attack sequence payload must be an object.")
     return payload
+
+
+def _lost_wound_context_payload(
+    *,
+    attack_context: AttackResolutionContextPayload,
+    allocated_model_id: str,
+    damage_kind: DamageKind,
+    requested_wounds: int,
+    saving_throw: SavingThrow | None,
+) -> LostWoundContextPayload:
+    return {
+        "attack_context": attack_context,
+        "allocated_model_id": _validate_identifier("allocated_model_id", allocated_model_id),
+        "damage_kind": damage_kind_from_token(damage_kind).value,
+        "requested_wounds": _validate_positive_int("requested_wounds", requested_wounds),
+        "saving_throw": (
+            None if saving_throw is None else validate_json_value(saving_throw.to_payload())
+        ),
+    }
+
+
+def _lost_wound_context_from_payload(payload: JsonValue) -> LostWoundContextPayload:
+    raw = _payload_object(payload)
+    attack_context = raw["attack_context"]
+    if not isinstance(attack_context, dict):
+        raise GameLifecycleError("Feel No Pain context attack_context must be an object.")
+    return {
+        "attack_context": cast(AttackResolutionContextPayload, attack_context),
+        "allocated_model_id": _payload_string(raw, key="allocated_model_id"),
+        "damage_kind": damage_kind_from_token(raw["damage_kind"]).value,
+        "requested_wounds": _payload_positive_int(raw, key="requested_wounds"),
+        "saving_throw": validate_json_value(raw["saving_throw"]),
+    }
+
+
+def _validate_lost_wound_context_matches_sequence(
+    *,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+) -> None:
+    if attack_context["sequence_id"] != attack_sequence.sequence_id:
+        raise GameLifecycleError("Feel No Pain attack context sequence drift.")
+    if attack_context["attack_context_id"] != attack_sequence.attack_context_id():
+        raise GameLifecycleError("Feel No Pain attack context ID drift.")
+    if attack_context["pool_index"] != attack_sequence.pool_index:
+        raise GameLifecycleError("Feel No Pain pool index drift.")
+    if attack_context["attack_index"] != attack_sequence.attack_index:
+        raise GameLifecycleError("Feel No Pain attack index drift.")
+
+
+def _state_feel_no_pain_sources(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> tuple[FeelNoPainSource, ...]:
+    lookup = state.feel_no_pain_sources_for_model
+    sources = lookup(model_instance_id=model_instance_id)
+    if type(sources) is not tuple:
+        raise GameLifecycleError("Feel No Pain source lookup must return a tuple.")
+    for source in sources:
+        if type(source) is not FeelNoPainSource:
+            raise GameLifecycleError("Feel No Pain source lookup returned an invalid source.")
+    return sources
+
+
+def _state_feel_no_pain_decline_allowed(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> bool:
+    lookup = state.feel_no_pain_decline_allowed_for_model
+    value = lookup(model_instance_id=model_instance_id)
+    if type(value) is not bool:
+        raise GameLifecycleError("Feel No Pain decline lookup must return a bool.")
+    return value
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    value = payload[key]
+    if type(value) is not str:
+        raise GameLifecycleError(f"Attack sequence payload {key} must be a string.")
+    return value
+
+
+def _payload_positive_int(payload: dict[str, JsonValue], *, key: str) -> int:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    return _validate_positive_int(key, payload[key])
 
 
 def _cap_roll_modifier(modifier: int) -> int:

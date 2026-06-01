@@ -16,11 +16,15 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequencePayload,
     apply_attack_allocation_decision,
+    apply_feel_no_pain_decision,
     apply_saving_throw_decision,
     resolve_attack_sequence_until_blocked,
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
-from warhammer40k_core.engine.damage_allocation import SELECT_ATTACK_ALLOCATION_DECISION_TYPE
+from warhammer40k_core.engine.damage_allocation import (
+    SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     DecisionOption,
@@ -28,6 +32,7 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -55,9 +60,10 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposalRequest,
     ShootingProposalValidationResult,
     WeaponDeclaration,
-    fixed_attacks_for_profile,
+    attacks_for_profile,
     shooting_declaration_missing_field,
     shooting_declaration_proposal_from_json,
+    unresolved_attacks_for_validation,
 )
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
@@ -786,6 +792,8 @@ def _apply_shooting_declaration_decision(
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        decisions=decisions,
+        result_id=result.result_id,
     )
     attack_sequence = AttackSequence.start(
         sequence_id=f"attack-sequence:{result.result_id}",
@@ -840,6 +848,14 @@ def _apply_attack_sequence_decision(
         )
     elif result.decision_type == SELECT_SAVING_THROW_KIND_DECISION_TYPE:
         attack_sequence, allocated_model_ids, status = apply_saving_throw_decision(
+            state=state,
+            decisions=decisions,
+            attack_sequence=shooting_state.attack_sequence,
+            result=result,
+            already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
+        )
+    elif result.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE:
+        attack_sequence, allocated_model_ids, status = apply_feel_no_pain_decision(
             state=state,
             decisions=decisions,
             attack_sequence=shooting_state.attack_sequence,
@@ -902,12 +918,16 @@ def _attack_pools_for_proposal(
     proposal: ShootingDeclarationProposal,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    decisions: DecisionController,
+    result_id: str,
 ) -> tuple[tuple[RangedAttackPool, ...], tuple[str, ...]]:
     result = _attack_pools_or_validation(
         state=state,
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        attack_count_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        attack_count_scope_prefix=result_id,
     )
     if isinstance(result, ShootingProposalValidationResult):
         raise GameLifecycleError("Accepted shooting declaration failed revalidation.")
@@ -925,6 +945,8 @@ def _attack_pools_or_validation(
     proposal: ShootingDeclarationProposal,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    attack_count_manager: DiceRollManager | None = None,
+    attack_count_scope_prefix: str | None = None,
 ) -> _AttackPoolValidationResult:
     unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
     scenario = _battlefield_scenario(state)
@@ -945,7 +967,7 @@ def _attack_pools_or_validation(
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
-    for declaration in proposal.declarations:
+    for declaration_index, declaration in enumerate(proposal.declarations, start=1):
         key = _declaration_available_weapon_key(declaration)
         if key in seen_declaration_keys:
             return ShootingProposalValidationResult.invalid(
@@ -993,11 +1015,27 @@ def _attack_pools_or_validation(
                 message=candidate.message or "Declared target is not legal.",
                 field="declarations",
             )
+        if attack_count_manager is None:
+            attacks = unresolved_attacks_for_validation(weapon_profile)
+        else:
+            if attack_count_scope_prefix is None:
+                raise GameLifecycleError("Random Attacks resolution requires a scope prefix.")
+            attacks = attacks_for_profile(
+                weapon_profile,
+                manager=attack_count_manager,
+                scope_id=(
+                    f"{attack_count_scope_prefix}:declaration-{declaration_index:03d}:"
+                    f"{declaration.attacker_model_instance_id}:{declaration.wargear_id}:"
+                    f"{declaration.weapon_profile_id}:{declaration.target_unit_instance_id}:"
+                    "attacks"
+                ),
+                actor_id=proposal.player_id,
+            )
         attack_pools.append(
             RangedAttackPool.from_declaration(
                 declaration=declaration,
                 weapon_profile=weapon_profile,
-                attacks=fixed_attacks_for_profile(weapon_profile),
+                attacks=attacks,
                 target_visible_model_ids=candidate.target_visible_model_ids,
                 target_in_range_model_ids=candidate.target_in_range_model_ids,
                 hit_roll_modifier=candidate.hit_roll_modifier,
