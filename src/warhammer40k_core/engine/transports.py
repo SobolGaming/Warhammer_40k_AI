@@ -92,6 +92,7 @@ class TransportOperationViolationCode(StrEnum):
     FIRING_DECK_UNIT_NOT_EMBARKED = "firing_deck_unit_not_embarked"
     FIRING_DECK_UNIT_ALREADY_SHOT = "firing_deck_unit_already_shot"
     FIRING_DECK_MODEL_DRIFT = "firing_deck_model_drift"
+    FIRING_DECK_DUPLICATE_MODEL_SELECTION = "firing_deck_duplicate_model_selection"
     FIRING_DECK_MELEE_WEAPON = "firing_deck_melee_weapon"
     FIRING_DECK_ONE_SHOT_WEAPON = "firing_deck_one_shot_weapon"
 
@@ -1817,7 +1818,24 @@ def resolve_firing_deck_selection(
                 unit_instance_id=selection.transport_unit_instance_id,
             )
         )
+    selected_model_keys: set[tuple[str, str]] = set()
     for weapon_selection in selection.weapon_selections:
+        selected_model_key = (
+            weapon_selection.embarked_unit_instance_id,
+            weapon_selection.model_instance_id,
+        )
+        if selected_model_key in selected_model_keys:
+            violations.append(
+                TransportOperationViolation(
+                    violation_code=(
+                        TransportOperationViolationCode.FIRING_DECK_DUPLICATE_MODEL_SELECTION
+                    ),
+                    message="Firing Deck can select at most one weapon per embarked model.",
+                    unit_instance_id=weapon_selection.embarked_unit_instance_id,
+                    model_instance_id=weapon_selection.model_instance_id,
+                )
+            )
+        selected_model_keys.add(selected_model_key)
         unit = units.get(weapon_selection.embarked_unit_instance_id)
         if unit is None or not cargo_state.contains_unit(
             weapon_selection.embarked_unit_instance_id
@@ -2542,15 +2560,21 @@ def _validate_firing_deck_weapon_selection_tuple(
     if type(values) is not tuple:
         raise GameLifecycleError(f"{field_name} must be a tuple.")
     selections: list[FiringDeckWeaponSelection] = []
-    seen_model_ids: set[str] = set()
     for value in cast(tuple[object, ...], values):
         if type(value) is not FiringDeckWeaponSelection:
             raise GameLifecycleError(f"{field_name} must contain FiringDeckWeaponSelection.")
-        if value.model_instance_id in seen_model_ids:
-            raise GameLifecycleError(f"{field_name} must not contain duplicate model IDs.")
-        seen_model_ids.add(value.model_instance_id)
         selections.append(value)
-    return tuple(sorted(selections, key=lambda selection: selection.model_instance_id))
+    return tuple(
+        sorted(
+            selections,
+            key=lambda selection: (
+                selection.embarked_unit_instance_id,
+                selection.model_instance_id,
+                selection.wargear_id,
+                selection.weapon_profile.profile_id,
+            ),
+        )
+    )
 
 
 def _validate_unit_tuple(field_name: str, values: object) -> tuple[UnitInstance, ...]:

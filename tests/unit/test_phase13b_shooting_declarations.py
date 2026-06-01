@@ -9,6 +9,7 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
+from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
@@ -72,6 +73,7 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
     ShootingDeclarationProposalRequest,
     WeaponDeclaration,
+    WeaponDeclarationPayload,
     fixed_attacks_for_profile,
 )
 from warhammer40k_core.geometry.pose import Pose
@@ -673,6 +675,153 @@ def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state
     assert pistol_candidates[0].hit_roll_modifier == 0
 
 
+def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        enemy_pose=Pose.at(35.0, 35.0),
+    )
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    friendly = units["intercessor-2"]
+    target = units["enemy"]
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(10.0 + index * 1.4, 20.0) for index in range(5)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=friendly,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(20.0 + index * 1.4, 35.0) for index in range(5)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(21.0 + index * 1.4, 35.0, facing_degrees=180.0) for index in range(5)),
+    )
+    profile = _first_weapon_profile(lifecycle, attacker)
+
+    engaged_infantry_candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )
+    assert (
+        engaged_infantry_candidates[0].violation_code
+        is ShootingTargetViolationCode.LOCKED_IN_COMBAT
+    )
+
+    monster_target = replace(target, keywords=(*target.keywords, "Monster"))
+    monster_scenario = _scenario_with_replaced_unit(
+        scenario=scenario,
+        replacement=monster_target,
+    )
+    monster_candidates = shooting_target_candidates_for_unit(
+        scenario=monster_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(monster_target.unit_instance_id,),
+    )
+    assert monster_candidates[0].is_legal
+    assert monster_candidates[0].hit_roll_modifier == -1
+    assert "big_guns_never_tire" in monster_candidates[0].targeting_rule_ids
+
+
+def test_mixed_pistol_and_non_pistol_declarations_are_rejected_without_queue_pop() -> None:
+    catalog = _catalog_with_extra_bolt_profile(
+        replace(
+            _weapon_profile_by_wargear(
+                wargear_id="core-bolt-rifle",
+                weapon_profile_id="core-bolt-rifle:standard",
+            ),
+            profile_id="phase13b-bolt-pistol:standard",
+            name="Phase 13B bolt pistol",
+            keywords=(WeaponKeyword.PISTOL,),
+        )
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=catalog,
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase13b-pistol-select",
+        )
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    first_model_id = units["intercessor-1"].own_models[0].model_instance_id
+    first_model_weapons = [
+        weapon for weapon in weapons if weapon["model_instance_id"] == first_model_id
+    ]
+    pistol_weapon = next(
+        weapon
+        for weapon in first_model_weapons
+        if WeaponKeyword.PISTOL.value
+        in cast(WeaponProfilePayload, weapon["weapon_profile"])["keywords"]
+    )
+    rifle_weapon = next(
+        weapon
+        for weapon in first_model_weapons
+        if WeaponKeyword.PISTOL.value
+        not in cast(WeaponProfilePayload, weapon["weapon_profile"])["keywords"]
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+    )
+    mixed_payload = proposal.to_payload()
+    mixed_payload["declarations"] = [
+        _weapon_payload_to_declaration_payload(
+            weapon=rifle_weapon,
+            target_unit_id=units["enemy"].unit_instance_id,
+        ),
+        _weapon_payload_to_declaration_payload(
+            weapon=pistol_weapon,
+            target_unit_id=units["enemy"].unit_instance_id,
+        ),
+    ]
+    before_records = len(lifecycle.decision_controller.records)
+
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=mixed_payload,
+        result_id="phase13b-mixed-pistol",
+    )
+    validation = cast(
+        dict[str, object],
+        cast(dict[str, object], status.payload)["proposal_validation"],
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(list[dict[str, object]], validation["violations"])[0]["violation_code"]
+        == "mixed_pistol_non_pistol_declaration"
+    )
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+
+
 def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligible() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("passenger-1", "transport-1"),
@@ -701,6 +850,11 @@ def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligi
         target_unit_id=units["enemy"].unit_instance_id,
         firing_deck_unit=units["passenger-1"],
     )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    assert proposal_request["firing_deck_value"] == 2
+    assert proposal.firing_deck_selection is not None
+    assert proposal.firing_deck_selection.firing_deck_value == 2
     status = _submit_payload(
         lifecycle,
         request=declaration_request,
@@ -727,6 +881,156 @@ def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligi
     )
     if state.shooting_phase_state is not None:
         assert units["passenger-1"].unit_instance_id in state.shooting_phase_state.shot_unit_ids
+
+
+def test_firing_deck_exposes_all_weapons_and_rejects_two_from_one_embarked_model() -> None:
+    catalog = _catalog_with_extra_bolt_profile(
+        replace(
+            _weapon_profile_by_wargear(
+                wargear_id="core-bolt-rifle",
+                weapon_profile_id="core-bolt-rifle:standard",
+            ),
+            profile_id="phase13b-extra-bolt:standard",
+            name="Phase 13B extra bolt weapon",
+        )
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("passenger-1", "transport-1"),
+        alpha_datasheets={
+            "passenger-1": ("core-intercessor-like-infantry", "core-intercessor-like", 5),
+            "transport-1": ("core-transport", "core-transport", 1),
+        },
+        embarked_unit_ids=("passenger-1",),
+        catalog=catalog,
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=selection_request,
+            option_id=units["transport-1"].unit_instance_id,
+            result_id="phase13b-select-firing-deck-two-weapons",
+        )
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    assert proposal_request["firing_deck_value"] == 2
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    passenger_model_id = units["passenger-1"].own_models[0].model_instance_id
+    firing_deck_weapons = [
+        weapon
+        for weapon in weapons
+        if weapon.get("firing_deck_source_model_instance_id") == passenger_model_id
+    ]
+    assert {weapon["weapon_profile_id"] for weapon in firing_deck_weapons} == {
+        "core-bolt-rifle:standard",
+        "phase13b-extra-bolt:standard",
+    }
+
+    target_unit_id = units["enemy"].unit_instance_id
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=target_unit_id,
+    )
+    duplicate_firing_deck_payload = proposal.to_payload()
+    duplicate_firing_deck_payload["declarations"] = [
+        _weapon_payload_to_declaration_payload(
+            weapon=weapon,
+            target_unit_id=target_unit_id,
+        )
+        for weapon in firing_deck_weapons
+    ]
+    duplicate_firing_deck_payload["firing_deck_selection"] = FiringDeckSelection(
+        player_id="player-a",
+        battle_round=1,
+        transport_unit_instance_id=units["transport-1"].unit_instance_id,
+        firing_deck_value=2,
+        weapon_selections=tuple(
+            FiringDeckWeaponSelection(
+                embarked_unit_instance_id=units["passenger-1"].unit_instance_id,
+                model_instance_id=passenger_model_id,
+                wargear_id=cast(str, weapon["wargear_id"]),
+                weapon_profile=WeaponProfile.from_payload(
+                    cast(WeaponProfilePayload, weapon["weapon_profile"])
+                ),
+            )
+            for weapon in firing_deck_weapons
+        ),
+        already_shot_unit_instance_ids=(),
+    ).to_payload()
+    before_records = len(lifecycle.decision_controller.records)
+
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=duplicate_firing_deck_payload,
+        result_id="phase13b-duplicate-firing-deck-model",
+    )
+    validation = cast(
+        dict[str, object],
+        cast(dict[str, object], status.payload)["proposal_validation"],
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(list[dict[str, object]], validation["violations"])[0]["violation_code"]
+        == "firing_deck_duplicate_model_selection"
+    )
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+
+
+def test_unit_level_target_legality_requires_one_model_with_range_and_visibility() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    assert state.mission_setup is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    attacker_poses = (
+        Pose.at(10.0, 35.0),
+        Pose.at(0.0, 5.0),
+        Pose.at(0.0, 7.0),
+        Pose.at(0.0, 9.0),
+        Pose.at(0.0, 11.0),
+    )
+    target_poses = tuple(Pose.at(33.0 + index * 1.4, 35.0) for index in range(5))
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=attacker_poses,
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=target_poses,
+    )
+    blocking_ruin = _blocking_ruin()
+    profile = _first_weapon_profile(lifecycle, attacker)
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+        terrain_features=(blocking_ruin,),
+    )
+    assert candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE
+
+    state.battlefield_state = scenario.battlefield_state
+    state.mission_setup = replace(state.mission_setup, terrain_features=(blocking_ruin,))
+    status = lifecycle.advance_until_decision_or_terminal()
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.current_battle_phase is BattlePhase.CHARGE
 
 
 def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence() -> None:
@@ -847,9 +1151,14 @@ def _shooting_lifecycle(
     alpha_datasheets: dict[str, tuple[str, str, int]] | None = None,
     embarked_unit_ids: tuple[str, ...] = (),
     enemy_pose: Pose | None = None,
+    catalog: ArmyCatalog | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_enemy_pose = Pose.at(35.0, 35.0) if enemy_pose is None else enemy_pose
-    config = _config(alpha_unit_ids=alpha_unit_ids, alpha_datasheets=alpha_datasheets)
+    config = _config(
+        alpha_unit_ids=alpha_unit_ids,
+        alpha_datasheets=alpha_datasheets,
+        catalog=catalog,
+    )
     armies = _mustered_armies(config)
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase13b-battlefield",
@@ -933,19 +1242,36 @@ def lifecycle_decisions_payload() -> dict[str, object]:
     return cast(dict[str, object], lifecycle.decision_controller.to_payload())
 
 
+def _catalog_with_extra_bolt_profile(extra_profile: WeaponProfile) -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    updated_wargear: list[Wargear] = []
+    for wargear in catalog.wargear:
+        if wargear.wargear_id == "core-bolt-rifle":
+            updated_wargear.append(
+                replace(
+                    wargear,
+                    weapon_profiles=(*wargear.weapon_profiles, extra_profile),
+                )
+            )
+            continue
+        updated_wargear.append(wargear)
+    return replace(catalog, wargear=tuple(updated_wargear))
+
+
 def _config(
     *,
     alpha_unit_ids: tuple[str, ...],
     alpha_datasheets: dict[str, tuple[str, str, int]] | None,
+    catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id="phase13b-game",
         ruleset_descriptor=_ruleset(),
-        army_catalog=catalog,
+        army_catalog=resolved_catalog,
         army_muster_requests=(
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_specs=tuple(
@@ -957,7 +1283,7 @@ def _config(
                 ),
             ),
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_specs=(
@@ -1099,7 +1425,7 @@ def _proposal_from_request(
             player_id="player-a",
             battle_round=1,
             transport_unit_instance_id=cast(str, proposal_request["unit_instance_id"]),
-            firing_deck_value=1,
+            firing_deck_value=cast(int, proposal_request["firing_deck_value"]),
             weapon_selections=(
                 FiringDeckWeaponSelection(
                     embarked_unit_instance_id=firing_deck_unit.unit_instance_id,
@@ -1124,6 +1450,31 @@ def _proposal_from_request(
         firing_deck_selection=firing_deck_selection,
         visibility_cache_key=cast(str, target_candidate["visibility_cache_key"]),
     )
+
+
+def _weapon_payload_to_declaration_payload(
+    *,
+    weapon: dict[str, object],
+    target_unit_id: str,
+) -> WeaponDeclarationPayload:
+    payload: WeaponDeclarationPayload = {
+        "attacker_model_instance_id": cast(str, weapon["model_instance_id"]),
+        "wargear_id": cast(str, weapon["wargear_id"]),
+        "weapon_profile_id": cast(str, weapon["weapon_profile_id"]),
+        "target_unit_instance_id": target_unit_id,
+        "firing_deck_source_unit_instance_id": None,
+        "firing_deck_source_model_instance_id": None,
+    }
+    if "firing_deck_source_unit_instance_id" in weapon:
+        payload["firing_deck_source_unit_instance_id"] = cast(
+            str,
+            weapon["firing_deck_source_unit_instance_id"],
+        )
+        payload["firing_deck_source_model_instance_id"] = cast(
+            str,
+            weapon["firing_deck_source_model_instance_id"],
+        )
+    return payload
 
 
 def _submit_result(
@@ -1174,6 +1525,39 @@ def _state(lifecycle: GameLifecycle) -> GameState:
 
 def _ruleset() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase13b-test")
+
+
+def _blocking_ruin() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="phase13b-blocking-ruin",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=20.0,
+        footprint_center_y_inches=35.0,
+        footprint_width_inches=4.0,
+        footprint_depth_inches=4.0,
+        walls=(
+            TerrainWallDefinition(
+                wall_id="wall",
+                center_x_inches=20.0,
+                center_y_inches=35.0,
+                bottom_z_inches=0.0,
+                width_inches=0.2,
+                depth_inches=4.0,
+                height_inches=4.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground-floor",
+                center_x_inches=20.0,
+                center_y_inches=35.0,
+                bottom_z_inches=0.0,
+                width_inches=4.0,
+                depth_inches=4.0,
+                thickness_inches=0.1,
+            ),
+        ),
+    )
 
 
 def _unit_placement_at(

@@ -187,6 +187,14 @@ class ArmyCatalog:
             damage=1,
             keywords=(),
         )
+        transport_firing_deck_ability = DatasheetAbilityDescriptor(
+            ability_id="core-firing-deck",
+            name="CORE Firing Deck",
+            source_id="datasheet:core-transport:ability:firing-deck",
+            support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            timing_tags=("shooting",),
+            parameter_tokens=("2",),
+        )
         vehicle_wargear = _ranged_wargear(
             wargear_id="core-heavy-cannon",
             name="Core heavy cannon",
@@ -307,6 +315,7 @@ class ArmyCatalog:
                     keywords=("Transport", "Vehicle"),
                     faction_keywords=("CORE Marines",),
                     wargear_id=transport_wargear.wargear_id,
+                    abilities=(transport_firing_deck_ability,),
                 ),
                 _datasheet(
                     datasheet_id="core-vehicle-monster",
@@ -419,6 +428,7 @@ def _datasheet(
     keywords: tuple[str, ...],
     faction_keywords: tuple[str, ...],
     wargear_id: str,
+    abilities: tuple[DatasheetAbilityDescriptor, ...] = (),
 ) -> DatasheetDefinition:
     return DatasheetDefinition(
         datasheet_id=datasheet_id,
@@ -459,6 +469,7 @@ def _datasheet(
                 max_selections=1,
             ),
         ),
+        abilities=abilities,
         source_ids=(f"datasheet:{datasheet_id}",),
     )
 

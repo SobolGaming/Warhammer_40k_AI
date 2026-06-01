@@ -476,7 +476,7 @@ def _target_candidate(
             visibility_cache_key=visibility_cache_key,
         )
 
-    witness = _best_line_of_sight_witness(
+    evidence = _best_line_of_sight_range_evidence(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         attacker_unit=attacker_unit,
@@ -484,24 +484,33 @@ def _target_candidate(
         target_unit=target_unit,
         target_models=target_models,
         visibility_cache_key=visibility_cache_key,
+        range_inches=range_inches,
         terrain_features=terrain_features,
     )
-    if witness is None:
+    if evidence is None:
         return _invalid_candidate(
             attacker_unit=attacker_unit,
             weapon_profile=weapon_profile,
             target_unit_id=target_unit_id,
             violation_code=ShootingTargetViolationCode.NOT_VISIBLE,
-            message="No target model is visible to the selected ranged attacker.",
+            message="No target model is both visible to and within range of the attacker.",
             visibility_cache_key=visibility_cache_key,
             target_in_range_model_ids=target_in_range_model_ids,
         )
+    witness = evidence.witness
 
     locked_context = _locked_in_combat_context(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         attacker_unit=attacker_unit,
         attacker_models=attacker_models,
+    )
+    target_engagement_context = _target_engagement_context(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        attacker_owner=attacker_owner,
+        target_unit_id=target_unit_id,
+        target_models=target_models,
     )
     if locked_context.is_locked:
         locked_validation = _locked_in_combat_validation(
@@ -523,6 +532,27 @@ def _target_candidate(
                 line_of_sight_witness=witness,
                 observer_model_id=witness.observer_model_id,
             )
+    target_engagement_validation = _target_engagement_validation(
+        attacker_unit=attacker_unit,
+        target_unit=target_unit,
+        target_unit_id=target_unit_id,
+        weapon_profile=weapon_profile,
+        locked_context=locked_context,
+        target_engagement_context=target_engagement_context,
+    )
+    if target_engagement_validation is not None:
+        return _invalid_candidate(
+            attacker_unit=attacker_unit,
+            weapon_profile=weapon_profile,
+            target_unit_id=target_unit_id,
+            violation_code=ShootingTargetViolationCode.LOCKED_IN_COMBAT,
+            message=target_engagement_validation,
+            visibility_cache_key=visibility_cache_key,
+            target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
+            target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
+            line_of_sight_witness=witness,
+            observer_model_id=witness.observer_model_id,
+        )
 
     if _unit_has_keyword(target_unit, "LONE_OPERATIVE") and not _lone_operative_target_allowed(
         scenario=scenario,
@@ -537,8 +567,8 @@ def _target_candidate(
             violation_code=ShootingTargetViolationCode.LONE_OPERATIVE,
             message="Lone Operative target is outside the allowed targeting distance.",
             visibility_cache_key=visibility_cache_key,
-            target_visible_model_ids=witness.visible_model_ids,
-            target_in_range_model_ids=target_in_range_model_ids,
+            target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
+            target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
             line_of_sight_witness=witness,
             observer_model_id=witness.observer_model_id,
             targeting_rule_ids=(LONE_OPERATIVE_RULE_ID,),
@@ -550,6 +580,10 @@ def _target_candidate(
         locked_context.is_locked
         and _unit_has_vehicle_or_monster_keyword(attacker_unit)
         and WeaponKeyword.PISTOL not in weapon_profile.keywords
+    ) or (
+        target_engagement_context.is_engaged_by_friendly
+        and _unit_has_vehicle_or_monster_keyword(target_unit)
+        and WeaponKeyword.PISTOL not in weapon_profile.keywords
     ):
         hit_roll_modifier = -1
         targeting_rule_ids = (BIG_GUNS_NEVER_TIRE_RULE_ID,)
@@ -559,8 +593,8 @@ def _target_candidate(
         weapon_profile_id=weapon_profile.profile_id,
         target_unit_instance_id=target_unit_id,
         observer_model_id=witness.observer_model_id,
-        target_visible_model_ids=witness.visible_model_ids,
-        target_in_range_model_ids=target_in_range_model_ids,
+        target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
+        target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
         line_of_sight_witness=witness,
         visibility_cache_key=visibility_cache_key,
         hit_roll_modifier=hit_roll_modifier,
@@ -663,7 +697,7 @@ def _target_in_range_model_ids(
     return tuple(sorted(ids))
 
 
-def _best_line_of_sight_witness(
+def _best_line_of_sight_range_evidence(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -672,10 +706,18 @@ def _best_line_of_sight_witness(
     target_unit: UnitInstance,
     target_models: tuple[Model, ...],
     visibility_cache_key: str,
+    range_inches: int,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
-) -> LineOfSightWitness | None:
-    best_witness: LineOfSightWitness | None = None
+) -> _LineOfSightRangeEvidence | None:
+    best_evidence: _LineOfSightRangeEvidence | None = None
     for attacker_model in sorted(attacker_models, key=lambda model: model.model_id):
+        in_range_model_ids = _target_in_range_model_ids(
+            attacker_models=(attacker_model,),
+            target_models=target_models,
+            range_inches=range_inches,
+        )
+        if not in_range_model_ids:
+            continue
         context = TerrainVisibilityContext.from_ruleset_descriptor(
             ruleset_descriptor=ruleset_descriptor,
             los_cache_key=visibility_cache_key,
@@ -687,19 +729,41 @@ def _best_line_of_sight_witness(
             target_keywords=target_unit.keywords,
         )
         witness = context.resolve_line_of_sight()
-        if witness.unit_visible:
-            if best_witness is None:
-                best_witness = witness
-                continue
-            if len(witness.visible_model_ids) > len(best_witness.visible_model_ids):
-                best_witness = witness
-    return best_witness
+        visible_and_in_range_ids = tuple(
+            target_model_id
+            for target_model_id in witness.visible_model_ids
+            if target_model_id in in_range_model_ids
+        )
+        if not visible_and_in_range_ids:
+            continue
+        evidence = _LineOfSightRangeEvidence(
+            witness=witness,
+            visible_and_in_range_target_model_ids=visible_and_in_range_ids,
+        )
+        if best_evidence is None:
+            best_evidence = evidence
+            continue
+        if len(visible_and_in_range_ids) > len(best_evidence.visible_and_in_range_target_model_ids):
+            best_evidence = evidence
+    return best_evidence
 
 
 @dataclass(frozen=True, slots=True)
 class _LockedInCombatContext:
     is_locked: bool
     engaged_target_unit_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class _TargetEngagementContext:
+    is_engaged_by_friendly: bool
+    engaged_friendly_unit_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class _LineOfSightRangeEvidence:
+    witness: LineOfSightWitness
+    visible_and_in_range_target_model_ids: tuple[str, ...]
 
 
 def _locked_in_combat_context(
@@ -731,6 +795,37 @@ def _locked_in_combat_context(
     )
 
 
+def _target_engagement_context(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    attacker_owner: str,
+    target_unit_id: str,
+    target_models: tuple[Model, ...],
+) -> _TargetEngagementContext:
+    engaged_friendly_unit_ids: set[str] = set()
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id != attacker_owner:
+            continue
+        for unit_placement in placed_army.unit_placements:
+            friendly_models = _geometry_models_for_unit_placement(
+                scenario=scenario,
+                unit_placement=unit_placement,
+            )
+            if _any_models_in_engagement(
+                attacker_models=friendly_models,
+                target_models=target_models,
+                ruleset_descriptor=ruleset_descriptor,
+            ):
+                engaged_friendly_unit_ids.add(unit_placement.unit_instance_id)
+    if target_unit_id in engaged_friendly_unit_ids:
+        raise GameLifecycleError("Target engagement context included the target unit.")
+    return _TargetEngagementContext(
+        is_engaged_by_friendly=bool(engaged_friendly_unit_ids),
+        engaged_friendly_unit_ids=tuple(sorted(engaged_friendly_unit_ids)),
+    )
+
+
 def _any_models_in_engagement(
     *,
     attacker_models: tuple[Model, ...],
@@ -747,6 +842,27 @@ def _any_models_in_engagement(
             ):
                 return True
     return False
+
+
+def _target_engagement_validation(
+    *,
+    attacker_unit: UnitInstance,
+    target_unit: UnitInstance,
+    target_unit_id: str,
+    weapon_profile: WeaponProfile,
+    locked_context: _LockedInCombatContext,
+    target_engagement_context: _TargetEngagementContext,
+) -> str | None:
+    if not target_engagement_context.is_engaged_by_friendly:
+        return None
+    if _unit_has_vehicle_or_monster_keyword(target_unit):
+        return None
+    target_is_engaged_with_attacker = target_unit_id in locked_context.engaged_target_unit_ids
+    if target_is_engaged_with_attacker and WeaponKeyword.PISTOL in weapon_profile.keywords:
+        return None
+    if target_is_engaged_with_attacker and _unit_has_vehicle_or_monster_keyword(attacker_unit):
+        return None
+    return "Enemy units within Engagement Range of friendly units cannot be selected as targets."
 
 
 def _locked_in_combat_validation(

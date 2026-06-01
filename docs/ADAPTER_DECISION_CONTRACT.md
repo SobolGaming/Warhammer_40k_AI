@@ -268,13 +268,14 @@ Phase 13B implements attacker selection and declaration with these adapter-visib
 - `select_shooting_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_shooting_phase`. Unit option payloads use `submission_kind: "select_shooting_unit"` and include game ID, battle round, phase, player ID, and unit ID. The completion option uses `submission_kind: "complete_shooting_phase"`.
 - `submit_shooting_declaration`: parameterized active-player choice. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "shooting_declaration"`.
 - `submit_shooting_declaration.payload.proposal_request.available_weapons`: current JSON-safe weapon options, including model ID, wargear ID, full weapon-profile payload, and optional Firing Deck source unit/model IDs.
-- `submit_shooting_declaration.payload.proposal_request.target_candidates`: current JSON-safe target candidates with legality, violation diagnostics, in-range/visible target model IDs, line-of-sight witness, visibility cache key, hit modifier, and targeting rule IDs.
+- `submit_shooting_declaration.payload.proposal_request.firing_deck_value`: the selected Transport's descriptor-sourced Firing Deck value, or `null` when the unit has no Firing Deck descriptor.
+- `submit_shooting_declaration.payload.proposal_request.target_candidates`: current JSON-safe target candidates with legality, violation diagnostics, visible-and-in-range target model IDs, line-of-sight witness, visibility cache key, hit modifier, and targeting rule IDs.
 
 Phase 13B shooting declaration submissions must use `selected_option_id: "submit_parameterized_payload"` and a `ShootingDeclarationProposal` payload containing:
 
 - `proposal_request_id`, `proposal_kind: "shooting_declaration"`, player ID, battle round, acting unit ID, source request/result IDs, and visibility cache key;
 - one or more `WeaponDeclaration` entries with attacker model ID, wargear ID, weapon profile ID, target unit ID, and optional Firing Deck source unit/model IDs;
-- optional `FiringDeckSelection` evidence with the Transport ID, Firing Deck value, selected embarked unit/model/wargear/profile bindings, and already-shot embarked unit IDs.
+- optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, selected embarked unit/model/wargear/profile bindings, and already-shot embarked unit IDs. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
 
 Accepted Phase 13B declarations emit deterministic attack-pool payloads and `shooting_declaration_accepted` events. They do not resolve hit/wound/save/damage rolls; Phase 13C consumes the declared `RangedAttackPool` records. Rejected stale, malformed, drifted, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck Phase 13B submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
 

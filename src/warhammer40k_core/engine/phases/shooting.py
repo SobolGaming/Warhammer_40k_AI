@@ -49,6 +49,7 @@ from warhammer40k_core.engine.weapon_declaration import (
     shooting_declaration_missing_field,
     shooting_declaration_proposal_from_json,
 )
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -59,7 +60,7 @@ SELECT_SHOOTING_UNIT_DECISION_TYPE = "select_shooting_unit"
 SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE = "submit_shooting_declaration"
 COMPLETE_SHOOTING_PHASE_OPTION_ID = "complete_shooting_phase"
 _COMPLETE_SHOOTING_PHASE_STATUS = "shooting_phase_complete"
-_DEFAULT_FIRING_DECK_VALUE = 1
+_FIRING_DECK_ABILITY_ID = "core-firing-deck"
 
 
 class ShootingUnitSelectionPayload(TypedDict):
@@ -94,6 +95,7 @@ class ShootingDeclarationProposalRequestPayload(TypedDict):
     source_decision_result_id: str
     ruleset_descriptor_hash: str
     visibility_cache_key: str
+    firing_deck_value: int | None
     available_weapons: list[AvailableWeaponPayload]
     target_candidates: list[JsonValue]
 
@@ -522,6 +524,7 @@ def _request_shooting_declaration(
     army_catalog: ArmyCatalog,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
+    terrain_features = _terrain_features_for_state(state)
     unit = _unit_by_id(state=state, unit_instance_id=active_selection.unit_instance_id)
     available_weapons = _available_weapons_for_unit(
         state=state,
@@ -541,11 +544,15 @@ def _request_shooting_declaration(
             attacker_unit=unit,
             weapon_profile=profile,
             target_unit_ids=target_unit_ids,
+            terrain_features=terrain_features,
         )
         target_candidates.extend(
             cast(JsonValue, candidate.to_payload()) for candidate in candidates
         )
-    visibility_cache_key = shooting_visibility_cache_key(scenario=scenario)
+    visibility_cache_key = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_features=terrain_features,
+    )
     request_id = state.next_decision_request_id()
     proposal_request: ShootingDeclarationProposalRequestPayload = {
         "request_id": request_id,
@@ -561,6 +568,10 @@ def _request_shooting_declaration(
         "source_decision_result_id": active_selection.result_id,
         "ruleset_descriptor_hash": state.ruleset_descriptor_hash,
         "visibility_cache_key": visibility_cache_key,
+        "firing_deck_value": _firing_deck_value_for_unit(
+            unit=unit,
+            army_catalog=army_catalog,
+        ),
         "available_weapons": [_available_weapon_to_payload(weapon) for weapon in available_weapons],
         "target_candidates": target_candidates,
     }
@@ -779,6 +790,7 @@ def _attack_pools_or_validation(
 ) -> _AttackPoolValidationResult:
     unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
     scenario = _battlefield_scenario(state)
+    terrain_features = _terrain_features_for_state(state)
     available_weapon_by_key = _available_weapon_by_declaration_key(
         state=state,
         unit=unit,
@@ -794,6 +806,7 @@ def _attack_pools_or_validation(
     ineligible_unit_ids = firing_deck_validation
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
+    model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
     for declaration in proposal.declarations:
         key = _declaration_available_weapon_key(declaration)
         if key in seen_declaration_keys:
@@ -813,6 +826,16 @@ def _attack_pools_or_validation(
                 field="declarations",
             )
         weapon_profile = weapon["weapon_profile"]
+        pistol_validation = _validate_model_pistol_exclusivity(
+            state=state,
+            selected_unit=unit,
+            declaration=declaration,
+            weapon_profile=weapon_profile,
+            model_pistol_declaration_kind=model_pistol_declaration_kind,
+            proposal_request_id=proposal.proposal_request_id,
+        )
+        if pistol_validation is not None:
+            return pistol_validation
         candidate = shooting_target_candidate_for_model(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -820,6 +843,7 @@ def _attack_pools_or_validation(
             attacker_model_instance_id=declaration.attacker_model_instance_id,
             weapon_profile=weapon_profile,
             target_unit_id=declaration.target_unit_instance_id,
+            terrain_features=terrain_features,
         )
         if not candidate.is_legal:
             violation = candidate.violation_code
@@ -843,6 +867,58 @@ def _attack_pools_or_validation(
             )
         )
     return (tuple(attack_pools), ineligible_unit_ids)
+
+
+def _validate_model_pistol_exclusivity(
+    *,
+    state: GameState,
+    selected_unit: UnitInstance,
+    declaration: WeaponDeclaration,
+    weapon_profile: WeaponProfile,
+    model_pistol_declaration_kind: dict[tuple[str, str], bool],
+    proposal_request_id: str,
+) -> ShootingProposalValidationResult | None:
+    source_unit = _declaration_source_unit(
+        state=state,
+        selected_unit=selected_unit,
+        declaration=declaration,
+    )
+    if _unit_has_vehicle_or_monster_keyword(source_unit):
+        return None
+    source_model_id = _declaration_source_model_id(declaration)
+    model_key = (source_unit.unit_instance_id, source_model_id)
+    is_pistol = WeaponKeyword.PISTOL in weapon_profile.keywords
+    existing = model_pistol_declaration_kind.get(model_key)
+    if existing is not None and existing != is_pistol:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal_request_id,
+            violation_code="mixed_pistol_non_pistol_declaration",
+            message=(
+                "A non-Monster/Vehicle model cannot shoot Pistol and non-Pistol weapons together."
+            ),
+            field="declarations",
+        )
+    model_pistol_declaration_kind[model_key] = is_pistol
+    return None
+
+
+def _declaration_source_unit(
+    *,
+    state: GameState,
+    selected_unit: UnitInstance,
+    declaration: WeaponDeclaration,
+) -> UnitInstance:
+    source_unit_id = declaration.firing_deck_source_unit_instance_id
+    if source_unit_id is None:
+        return selected_unit
+    return _unit_by_id(state=state, unit_instance_id=source_unit_id)
+
+
+def _declaration_source_model_id(declaration: WeaponDeclaration) -> str:
+    source_model_id = declaration.firing_deck_source_model_instance_id
+    if source_model_id is not None:
+        return source_model_id
+    return declaration.attacker_model_instance_id
 
 
 def _validate_firing_deck_selection(
@@ -895,7 +971,19 @@ def _validate_firing_deck_selection(
             message="Firing Deck selection transport does not match shooting unit.",
             field="firing_deck_selection",
         )
-    if selection.firing_deck_value != _DEFAULT_FIRING_DECK_VALUE:
+    transport_unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
+    firing_deck_value = _firing_deck_value_for_unit(
+        unit=transport_unit,
+        army_catalog=army_catalog,
+    )
+    if firing_deck_value is None:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="firing_deck_ability_missing",
+            message="Firing Deck declarations require a Firing Deck ability descriptor.",
+            field="firing_deck_selection",
+        )
+    if selection.firing_deck_value != firing_deck_value:
         return ShootingProposalValidationResult.invalid(
             proposal_request_id=proposal.proposal_request_id,
             violation_code="firing_deck_value_drift",
@@ -1118,6 +1206,8 @@ def _available_firing_deck_weapons(
         return ()
     if not _unit_has_keyword(transport_unit, "TRANSPORT"):
         return ()
+    if _firing_deck_value_for_unit(unit=transport_unit, army_catalog=army_catalog) is None:
+        return ()
     transport_model = _transport_firing_deck_model(transport_unit)
     weapons: list[_AvailableWeapon] = []
     for embarked_unit_id in cargo_state.embarked_unit_instance_ids:
@@ -1141,19 +1231,6 @@ def _available_firing_deck_weapons(
                         "firing_deck_source_model_instance_id": source_model.model_instance_id,
                     }
                 )
-                break
-            if (
-                len(
-                    {
-                        weapon_value.get("firing_deck_source_model_instance_id")
-                        for weapon_value in weapons
-                        if weapon_value.get("firing_deck_source_unit_instance_id")
-                        == embarked_unit.unit_instance_id
-                    }
-                )
-                >= _DEFAULT_FIRING_DECK_VALUE
-            ):
-                break
     return tuple(weapons)
 
 
@@ -1215,16 +1292,20 @@ def _unit_has_legal_shooting_declaration(
     army_catalog: ArmyCatalog,
 ) -> bool:
     target_unit_ids = _enemy_placed_unit_ids(state=state, player_id=_active_player_id(state))
+    terrain_features = _terrain_features_for_state(state)
     for weapon in _available_weapons_for_unit(state=state, unit=unit, army_catalog=army_catalog):
-        candidates = shooting_target_candidates_for_unit(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            attacker_unit=unit,
-            weapon_profile=weapon["weapon_profile"],
-            target_unit_ids=target_unit_ids,
-        )
-        if any(candidate.is_legal for candidate in candidates):
-            return True
+        for target_unit_id in target_unit_ids:
+            candidate = shooting_target_candidate_for_model(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                attacker_unit=unit,
+                attacker_model_instance_id=weapon["model_instance_id"],
+                weapon_profile=weapon["weapon_profile"],
+                target_unit_id=target_unit_id,
+                terrain_features=terrain_features,
+            )
+            if candidate.is_legal:
+                return True
     return False
 
 
@@ -1329,6 +1410,13 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     except PlacementError as exc:
         raise GameLifecycleError("Shooting battlefield scenario is invalid.") from exc
     return scenario
+
+
+def _terrain_features_for_state(state: GameState) -> tuple[TerrainFeatureDefinition, ...]:
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise GameLifecycleError("Shooting phase requires mission_setup.")
+    return mission_setup.terrain_features
 
 
 def _active_player_id(state: GameState) -> str:
@@ -1482,6 +1570,34 @@ def _ruleset_descriptor_for_handler(handler: ShootingPhaseHandler) -> RulesetDes
     if handler.ruleset_descriptor is None:
         raise GameLifecycleError("Shooting phase requires a RulesetDescriptor.")
     return handler.ruleset_descriptor
+
+
+def _firing_deck_value_for_unit(
+    *,
+    unit: UnitInstance,
+    army_catalog: ArmyCatalog,
+) -> int | None:
+    datasheet = army_catalog.datasheet_by_id(unit.datasheet_id)
+    descriptors = tuple(
+        ability for ability in datasheet.abilities if ability.ability_id == _FIRING_DECK_ABILITY_ID
+    )
+    if not descriptors:
+        return None
+    if len(descriptors) > 1:
+        raise GameLifecycleError("Datasheet must not contain duplicate Firing Deck descriptors.")
+    descriptor = next(iter(descriptors))
+    if len(descriptor.parameter_tokens) != 1:
+        raise GameLifecycleError("Firing Deck descriptor requires exactly one value token.")
+    token = descriptor.parameter_tokens[0]
+    try:
+        value = int(token)
+    except ValueError as exc:
+        raise GameLifecycleError("Firing Deck descriptor value token must be an int.") from exc
+    return _validate_positive_int("Firing Deck descriptor value", value)
+
+
+def _unit_has_vehicle_or_monster_keyword(unit: UnitInstance) -> bool:
+    return _unit_has_keyword(unit, "VEHICLE") or _unit_has_keyword(unit, "MONSTER")
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
