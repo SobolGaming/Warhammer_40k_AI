@@ -1647,9 +1647,12 @@ def apply_damage_to_model(
     model_instance_id: str,
     damage: int,
     damage_kind: DamageKind,
+    remove_destroyed_model: bool = True,
 ) -> DamageApplication:
     requested_damage = _validate_positive_int("damage", damage)
     kind = damage_kind_from_token(damage_kind)
+    if type(remove_destroyed_model) is not bool:
+        raise GameLifecycleError("remove_destroyed_model must be a bool.")
     model = model_by_id(state=state, model_instance_id=model_instance_id)
     if not model.is_alive:
         raise GameLifecycleError("Damage cannot be applied to a destroyed model.")
@@ -1671,9 +1674,20 @@ def apply_damage_to_model(
         model_instance_id=model_instance_id,
         wounds_remaining=final_wounds,
     )
-    if application.destroyed:
-        _remove_destroyed_model(state=state, model_instance_id=model_instance_id)
+    if application.destroyed and remove_destroyed_model:
+        remove_destroyed_model_from_battlefield(state=state, model_instance_id=model_instance_id)
     return application
+
+
+def remove_destroyed_model_from_battlefield(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> None:
+    model = model_by_id(state=state, model_instance_id=model_instance_id)
+    if model.is_alive:
+        raise GameLifecycleError("Only destroyed models can be removed from battlefield.")
+    _remove_destroyed_model(state=state, model_instance_id=model_instance_id)
 
 
 def apply_mortal_wounds_to_unit(
