@@ -95,6 +95,7 @@ from warhammer40k_core.engine.reserves import (
 )
 from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
+    CORE_FIRE_OVERWATCH_HANDLER_ID,
     CORE_RAPID_INGRESS_HANDLER_ID,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogIndex,
@@ -2127,6 +2128,7 @@ class MovementPhaseHandler:
         state: GameState,
         result: DecisionResult,
         decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus | None:
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
             return _apply_advance_roll_reroll_decision(
@@ -2135,6 +2137,8 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 parameterized_proposals=self.parameterized_proposals,
+                reaction_queue=reaction_queue,
+                stratagem_index=self.stratagem_index,
             )
         if result.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE:
             return _apply_desperate_escape_model_selection_decision(
@@ -2150,6 +2154,8 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 parameterized_proposals=self.parameterized_proposals,
+                reaction_queue=reaction_queue,
+                stratagem_index=self.stratagem_index,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_movement_proposal_decision(
@@ -2157,6 +2163,8 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                reaction_queue=reaction_queue,
+                stratagem_index=self.stratagem_index,
             )
         if result.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
             return _apply_reinforcement_unit_selection_decision(
@@ -2422,6 +2430,105 @@ def _request_rapid_ingress_reaction_if_available(
                 "battle_round": state.battle_round,
                 "active_player_id": active_player_id,
                 "reacting_player_id": player_id,
+            },
+        )
+    return None
+
+
+def _request_fire_overwatch_reaction_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+    moved_unit_instance_id: str,
+    movement_phase_action: MovementPhaseActionKind,
+    movement_payload: dict[str, JsonValue],
+) -> LifecycleStatus | None:
+    if reaction_queue is None or stratagem_index is None:
+        return None
+    if movement_phase_action not in {
+        MovementPhaseActionKind.NORMAL_MOVE,
+        MovementPhaseActionKind.ADVANCE,
+        MovementPhaseActionKind.FALL_BACK,
+    }:
+        return None
+    active_player_id = _active_player_id(state)
+    trigger_payload = validate_json_value(
+        {
+            "moved_unit_instance_id": moved_unit_instance_id,
+            "movement_phase_action": movement_phase_action.value,
+            "movement_payload": validate_json_value(movement_payload),
+        }
+    )
+    for player_id in state.player_ids:
+        if player_id == active_player_id:
+            continue
+        window_id = (
+            f"fire-overwatch-after-move-round-{state.battle_round:02d}-"
+            f"{moved_unit_instance_id}-player-{player_id}"
+        )
+        context = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=player_id,
+            trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+            timing_window_id=window_id,
+            trigger_payload=trigger_payload,
+        )
+        if stratagem_window_declined_for_context(decisions=decisions, context=context):
+            continue
+        proposal = stratagem_target_proposal_from_index(
+            state=state,
+            index=stratagem_index,
+            context=context,
+            handler_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+        )
+        if proposal is None:
+            continue
+        reaction_window = ReactionWindow(
+            timing_window=TimingWindow(
+                window_id=window_id,
+                descriptor=TimingWindowDescriptor(
+                    descriptor_id="core-fire-overwatch-after-enemy-move",
+                    trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+                    source_rule_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+                    phase=BattlePhase.MOVEMENT,
+                    source_step="move_units",
+                    metadata=trigger_payload,
+                ),
+                game_id=state.game_id,
+                battle_round=state.battle_round,
+                active_player_id=active_player_id,
+                phase=BattlePhase.MOVEMENT,
+            ),
+            eligible_player_ids=(player_id,),
+        )
+        triggered = reaction_queue.emit_decision_request(
+            state=state,
+            decisions=decisions,
+            reaction_window=reaction_window,
+            parent_phase=BattlePhase.MOVEMENT,
+            parent_step="after_enemy_unit_ends_move_reactions",
+            resume_token=f"{window_id}-resume",
+            actor_id=player_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            options=(parameterized_decision_option(),),
+            payload=stratagem_target_proposal_request_payload(
+                proposal,
+                allow_decline=True,
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=triggered.decision_request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "step": MovementPhaseStepKind.MOVE_UNITS.value,
+                "phase_body_status": "fire_overwatch_reaction_pending",
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "reacting_player_id": player_id,
+                "moved_unit_instance_id": moved_unit_instance_id,
             },
         )
     return None
@@ -3867,6 +3974,8 @@ def _apply_movement_action_decision(  # noqa: RET503
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     parameterized_proposals: bool,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -4046,6 +4155,8 @@ def _apply_movement_action_decision(  # noqa: RET503
             displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
             transition_batch=transition_batch,
             ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
         )
 
     if action is MovementPhaseActionKind.ADVANCE:
@@ -4092,6 +4203,8 @@ def _apply_movement_action_decision(  # noqa: RET503
             unit_placement=unit_placement,
             advance_roll=advance_roll,
             parameterized_proposals=parameterized_proposals,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
@@ -4210,6 +4323,8 @@ def _apply_movement_action_decision(  # noqa: RET503
             fall_back_result=fall_back_result,
             destroyed_model_ids=(),
             ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
         )
 
 
@@ -4324,6 +4439,8 @@ def _apply_movement_proposal_decision(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -4443,6 +4560,8 @@ def _apply_movement_proposal_decision(
             displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
             transition_batch=transition_batch,
             ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
         )
 
     if action is MovementPhaseActionKind.ADVANCE:
@@ -4520,6 +4639,8 @@ def _apply_movement_proposal_decision(
             displacement_kind=ModelDisplacementKind.ADVANCE,
             transition_batch=transition_batch,
             ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
@@ -4597,6 +4718,8 @@ def _apply_movement_proposal_decision(
             fall_back_result=fall_back_result,
             destroyed_model_ids=(),
             ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
         )
 
     raise GameLifecycleError("Unsupported movement proposal action.")
@@ -4713,6 +4836,8 @@ def _apply_advance_roll_reroll_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     parameterized_proposals: bool,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -4774,6 +4899,8 @@ def _apply_advance_roll_reroll_decision(
         unit_placement=unit_placement,
         advance_roll=advance_roll,
         parameterized_proposals=parameterized_proposals,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -4786,6 +4913,8 @@ def _resolve_and_apply_advance_move(
     unit_placement: UnitPlacement,
     advance_roll: AdvanceRollResult,
     parameterized_proposals: bool,
+    reaction_queue: ReactionQueue | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     _record_advance_roll_resolved_event(
@@ -4876,6 +5005,8 @@ def _resolve_and_apply_advance_move(
         displacement_kind=ModelDisplacementKind.ADVANCE,
         transition_batch=transition_batch,
         ruleset_descriptor=ruleset_descriptor,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -5049,6 +5180,8 @@ def _apply_fall_back_result(
     fall_back_result: FallBackActionResult,
     destroyed_model_ids: tuple[str, ...],
     ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     scenario = _battlefield_scenario(state)
@@ -5127,6 +5260,8 @@ def _apply_fall_back_result(
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         transition_batch=transition_batch,
         ruleset_descriptor=ruleset_descriptor,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -5141,6 +5276,8 @@ def _request_embark_after_move_or_complete_activation(
     displacement_kind: ModelDisplacementKind,
     transition_batch: BattlefieldTransitionBatch,
     ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
 ) -> LifecycleStatus | None:
     active_selection = _active_movement_selection(state)
     battlefield_state = state.battlefield_state
@@ -5161,7 +5298,15 @@ def _request_embark_after_move_or_complete_activation(
             displacement_kind=displacement_kind,
             transition_batch=transition_batch,
         )
-        return None
+        return _request_fire_overwatch_reaction_if_available(
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+            moved_unit_instance_id=active_selection.unit_instance_id,
+            movement_phase_action=action,
+            movement_payload=movement_payload,
+        )
     options = _post_move_embark_options(
         state=state,
         unit_instance_id=active_selection.unit_instance_id,
@@ -5178,6 +5323,8 @@ def _request_embark_after_move_or_complete_activation(
             displacement_kind=displacement_kind,
             transition_batch=transition_batch,
             ruleset_descriptor=ruleset_descriptor,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
         )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
@@ -5236,6 +5383,8 @@ def _complete_activation_then_request_post_normal_disembark_if_available(
     displacement_kind: ModelDisplacementKind,
     transition_batch: BattlefieldTransitionBatch,
     ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
 ) -> LifecycleStatus | None:
     active_selection = _active_movement_selection(state)
     transport_unit_instance_id = active_selection.unit_instance_id
@@ -5249,6 +5398,17 @@ def _complete_activation_then_request_post_normal_disembark_if_available(
         displacement_kind=displacement_kind,
         transition_batch=transition_batch,
     )
+    overwatch_status = _request_fire_overwatch_reaction_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
+        moved_unit_instance_id=active_selection.unit_instance_id,
+        movement_phase_action=action,
+        movement_payload=movement_payload,
+    )
+    if overwatch_status is not None:
+        return overwatch_status
     if action is not MovementPhaseActionKind.NORMAL_MOVE:
         return None
     movement_state = state.movement_phase_state

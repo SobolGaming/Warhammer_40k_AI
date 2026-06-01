@@ -9,7 +9,10 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameConfig
@@ -35,6 +38,10 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStepKind,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -55,6 +62,11 @@ def test_full_movement_phase_completion_exits_to_shooting_after_all_work_is_comp
         request=first_action,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         result_id="phase10t-result-000004",
+    )
+    second_selection_status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=second_selection_status,
+        result_id="phase10t-decline-fire-overwatch",
     )
     second_selection = _decision_request(second_selection_status)
     assert second_selection.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
@@ -227,6 +239,27 @@ def _submit_result(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
+        )
+    )
+
+
+def _decline_optional_stratagem_if_pending(
+    lifecycle: GameLifecycle,
+    *,
+    status: LifecycleStatus,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
         )
     )
 

@@ -192,8 +192,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "strategic_ploy",
             "gw-10e-core-stratagems:core:fire-overwatch",
-            "unsupported:phase-13d:out-of-phase-shooting-unit",
-            "unsupported:phase-13d:fire-overwatch",
+            "out_of_phase_shooting_unit",
+            "core:fire-overwatch",
             "core",
             None,
         ),
@@ -203,8 +203,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "battle_tactic",
             "gw-10e-core-stratagems:core:go-to-ground",
-            "unsupported:phase-13d:infantry-selected-target-unit",
-            "unsupported:phase-13d:go-to-ground",
+            "selected_target_infantry_unit",
+            "core:go-to-ground",
             "core",
             None,
         ),
@@ -214,8 +214,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "wargear",
             "gw-10e-core-stratagems:core:grenade",
-            "unsupported:phase-13d:grenades-unit-and-enemy-target",
-            "unsupported:phase-13d:grenade",
+            "grenades_unit_and_enemy_target",
+            "core:grenade",
             "core",
             None,
         ),
@@ -269,8 +269,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "wargear",
             "gw-10e-core-stratagems:core:smokescreen",
-            "unsupported:phase-13d:smoke-selected-target-unit",
-            "unsupported:phase-13d:smokescreen",
+            "selected_target_smoke_unit",
+            "core:smokescreen",
             "core",
             None,
         ),
@@ -542,14 +542,14 @@ def test_player_stratagem_index_filters_detachments_without_changing_options() -
 def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions() -> None:
     finite_lifecycle = _battle_lifecycle()
     finite_state = _state(finite_lifecycle)
-    _set_current_battle_phase(finite_state, BattlePhase.MOVEMENT)
+    _set_current_battle_phase(finite_state, BattlePhase.CHARGE)
     _grant_cp(finite_state, player_id="player-a", amount=1)
     finite_context = _context(
         state=finite_state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
     )
-    deferred_core_stratagem = _source_stratagem_record("fire-overwatch")
+    deferred_core_stratagem = _source_stratagem_record("tank-shock")
     finite_request = create_stratagem_use_decision_request(
         state=finite_state,
         context=finite_context,
@@ -578,13 +578,13 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
 
     parameterized_lifecycle = _battle_lifecycle()
     parameterized_state = _state(parameterized_lifecycle)
-    _set_current_battle_phase(parameterized_state, BattlePhase.MOVEMENT)
+    _set_current_battle_phase(parameterized_state, BattlePhase.CHARGE)
     _grant_cp(parameterized_state, player_id="player-a", amount=1)
-    deferred_core_stratagem = _source_stratagem_record("fire-overwatch")
+    deferred_core_stratagem = _source_stratagem_record("tank-shock")
     parameterized_context = _context(
         state=parameterized_state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.END_PHASE,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
     )
     proposal_request = StratagemTargetProposal.for_request(
         context=parameterized_context,
@@ -599,7 +599,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     assert unavailable_proposal.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert unavailable_proposal.payload == {
         "player_id": "player-a",
-        "stratagem_id": "fire-overwatch",
+        "stratagem_id": "tank-shock",
         "unavailable_reason": "unsupported_handler",
     }
     assert parameterized_state.command_point_total("player-a") == 1

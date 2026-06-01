@@ -10,6 +10,9 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, Plac
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+    is_mortal_wound_feel_no_pain_request,
+    mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
@@ -83,6 +86,7 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
+    apply_grenade_mortal_wound_feel_no_pain_decision,
     apply_stratagem_decision,
     apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
@@ -137,6 +141,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_SAVING_THROW_KIND_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     )
@@ -147,6 +152,11 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         STRATAGEM_DECISION_TYPE,
         STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
+        SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        SELECT_SAVING_THROW_KIND_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     )
 )
 
@@ -237,6 +247,12 @@ class GameLifecycle:
                     "pending_request_id": pending_request.request_id,
                 },
             )
+        out_of_phase_status = self._shooting_phase_handler.advance_out_of_phase_shooting_if_needed(
+            state=state,
+            decisions=self.decision_controller,
+        )
+        if out_of_phase_status is not None:
+            return out_of_phase_status
         if state.stage is GameLifecycleStage.COMPLETE:
             return LifecycleStatus.terminal(
                 stage=GameLifecycleStage.COMPLETE,
@@ -298,11 +314,27 @@ class GameLifecycle:
             and pending_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
         ):
             result.validate_for_request(pending_request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
             invalid_status = self._shooting_phase_handler.invalid_declaration_submission_status(
                 state=state,
                 request=pending_request,
                 result=result,
                 decisions=self.decision_controller,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+            and is_mortal_wound_feel_no_pain_request(pending_request)
+        ):
+            invalid_status = _invalid_finite_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                invalid_reason="invalid_mortal_wound_feel_no_pain_result",
             )
             if invalid_status is not None:
                 return invalid_status
@@ -373,6 +405,8 @@ class GameLifecycle:
                     state=state,
                     request=pending_request,
                     result=result,
+                    ruleset_descriptor=self._require_config().ruleset_descriptor,
+                    army_catalog=self._require_config().army_catalog,
                 )
                 if invalid_status is not None:
                     return invalid_status
@@ -448,16 +482,39 @@ class GameLifecycle:
                 state=state,
                 result=result,
                 decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
             )
             if movement_status is not None:
                 return movement_status
             return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+            and is_mortal_wound_feel_no_pain_request(record.request)
+        ):
+            source_context = mortal_wound_feel_no_pain_source_context(record.request)
+            if isinstance(source_context, dict) and source_context.get("source_kind") == "grenade":
+                grenade_status = apply_grenade_mortal_wound_feel_no_pain_decision(
+                    state=state,
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+                if grenade_status is not None:
+                    return grenade_status
+                return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _SHOOTING_DECISION_TYPES:
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             shooting_status = self._shooting_phase_handler.apply_decision(
                 state=state,
                 result=result,
                 decisions=self.decision_controller,
             )
+            if resolves_reaction_frame:
+                handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                    result=result,
+                    status=shooting_status,
+                )
+                if handled_status is not None:
+                    return handled_status
             if shooting_status is not None:
                 return shooting_status
             return self.advance_until_decision_or_terminal()
@@ -489,6 +546,8 @@ class GameLifecycle:
                 state=state,
                 result=result,
                 decisions=self.decision_controller,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
             )
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.resolve_reaction(
@@ -510,12 +569,12 @@ class GameLifecycle:
                 state=state,
                 result=result,
                 decisions=self.decision_controller,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
             )
             if resolves_reaction_frame:
                 follow_up_request = self._pending_decision_request()
-                if follow_up_request is not None and is_stratagem_placement_proposal_request(
-                    follow_up_request
-                ):
+                if follow_up_request is not None:
                     self.reaction_queue.continue_reaction(
                         result=result,
                         next_request_id=follow_up_request.request_id,
@@ -628,11 +687,82 @@ class GameLifecycle:
             stratagem_window_decline_event_payload(request=record.request, result=result),
         )
 
+    def _continue_or_resolve_out_of_phase_reaction(
+        self,
+        *,
+        result: DecisionResult,
+        status: LifecycleStatus | None,
+    ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if status is not None and status.decision_request is not None:
+            self.reaction_queue.continue_reaction(
+                result=result,
+                next_request_id=status.decision_request.request_id,
+                decisions=self.decision_controller,
+            )
+            return status
+        if status is None and state.out_of_phase_shooting_state is not None:
+            advanced_status = self._shooting_phase_handler.advance_out_of_phase_shooting_if_needed(
+                state=state,
+                decisions=self.decision_controller,
+            )
+            if advanced_status is not None and advanced_status.decision_request is not None:
+                self.reaction_queue.continue_reaction(
+                    result=result,
+                    next_request_id=advanced_status.decision_request.request_id,
+                    decisions=self.decision_controller,
+                )
+                return advanced_status
+            self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+            return advanced_status
+        self.reaction_queue.resolve_reaction(
+            result=result,
+            decisions=self.decision_controller,
+        )
+        return status
+
 
 def _payload_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+def _invalid_finite_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    invalid_reason: str,
+) -> LifecycleStatus | None:
+    if result.request_id != request.request_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result does not match the pending request.",
+            payload={"invalid_reason": invalid_reason, "field": "request_id"},
+        )
+    if result.decision_type != request.decision_type:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result type does not match the pending request.",
+            payload={"invalid_reason": invalid_reason, "field": "decision_type"},
+        )
+    if result.actor_id != request.actor_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result actor does not match the pending request.",
+            payload={"invalid_reason": invalid_reason, "field": "actor_id"},
+        )
+    if result.selected_option_id not in {option.option_id for option in request.options}:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result selected option is not pending.",
+            payload={"invalid_reason": invalid_reason, "field": "selected_option_id"},
+        )
+    return None
 
 
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:

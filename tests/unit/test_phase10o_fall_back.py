@@ -20,7 +20,10 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameConfig, GameState
@@ -52,6 +55,10 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
@@ -288,6 +295,11 @@ def test_fall_back_without_desperate_escape_completes_immediately() -> None:
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
         result_id="phase10o-result-000007",
+    )
+    status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=status,
+        result_id="phase10o-decline-fire-overwatch",
     )
     state = _state(lifecycle)
     fell_back_state = state.fell_back_unit_state_for_unit(
@@ -862,6 +874,27 @@ def _submit_result(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
+        )
+    )
+
+
+def _decline_optional_stratagem_if_pending(
+    lifecycle: GameLifecycle,
+    *,
+    status: LifecycleStatus,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
         )
     )
 

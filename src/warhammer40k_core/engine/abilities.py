@@ -19,6 +19,7 @@ from warhammer40k_core.engine.timing_windows import (
 )
 
 CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID = "core:movement-keyword-gate"
+CORE_HAZARDOUS_HANDLER_ID = "core:hazardous"
 MOVEMENT_CAPABILITY_FLAGS_PAYLOAD_KEY = "movement_capability_flags"
 
 
@@ -775,10 +776,18 @@ class AbilityHandlerRegistry:
 
 
 def default_ability_handler_registry() -> AbilityHandlerRegistry:
-    return AbilityHandlerRegistry.empty().with_handler(
-        handler_id=CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
-        timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
-        handler=_movement_keyword_gate_handler,
+    return (
+        AbilityHandlerRegistry.empty()
+        .with_handler(
+            handler_id=CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            handler=_movement_keyword_gate_handler,
+        )
+        .with_handler(
+            handler_id=CORE_HAZARDOUS_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
+            handler=_hazardous_keyword_handler,
+        )
     )
 
 
@@ -898,6 +907,24 @@ def _movement_keyword_gate_handler(
             "trigger_kind": context.trigger_kind.value,
             "source_keywords": list(context.source_keywords),
             "effect_payload": record.definition.replay_payload,
+        },
+    )
+
+
+def _hazardous_keyword_handler(
+    record: AbilityCatalogRecord,
+    context: AbilityExecutionContext,
+) -> AbilityResolutionResult:
+    return AbilityResolutionResult.applied(
+        record,
+        replay_payload={
+            "source_id": record.definition.source_id,
+            "trigger_kind": context.trigger_kind.value,
+            "source_keywords": list(context.source_keywords),
+            "effect_payload": {
+                "effect_kind": "hazardous_weapon_test",
+                "resolved_by": "attack_sequence",
+            },
         },
     )
 
