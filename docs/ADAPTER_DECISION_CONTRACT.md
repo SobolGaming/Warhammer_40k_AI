@@ -284,7 +284,8 @@ Defender shooting decisions include:
 - finite `select_attack_allocation` choices when allocation is not forced;
 - finite `select_saving_throw_kind` choices when armour and invulnerable saves are both legal;
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
-- finite optional destruction-reaction choices when a destroyed model has registered shoot-on-death, fight-on-death, Deadly Demise, or equivalent destruction sources;
+- finite optional destruction-reaction choices when a destroyed model has registered optional shoot-on-death, fight-on-death, or equivalent destruction sources;
+- mandatory destruction reactions such as Deadly Demise are engine-triggered records, not decline-capable adapter choices;
 - shooting-coupled reactive Stratagem choices such as Go to Ground through the existing `use_stratagem` or Stratagem target-proposal contract.
 
 Phase 13C implements these defender-visible attack-resolution decisions:
@@ -295,7 +296,7 @@ Phase 13C implements these defender-visible attack-resolution decisions:
 
 Phase 13E implements this destroyed-model attack-resolution decision:
 
-- `select_destruction_reaction`: finite controlling-player choice emitted after attack-sequence damage destroys a model with one or more structured destruction-reaction sources. Option IDs are source IDs plus `decline_destruction_reaction`. Source options carry `payload.source_id` and `payload.reaction_kind`, where supported `reaction_kind` values include `shoot_on_death`, `fight_on_death`, and `deadly_demise`; the decline option uses null source and kind values. `payload.destruction_context` contains the JSON-safe attack context, damage application, `model_destroyed` event ID, damage event ID, removal record, and transition batch. Adapters must submit one pending option ID through `GameLifecycle.submit_decision(...)` and must not start shooting, fighting, explosion, or removal mutations locally from the option payload. Accepted selections are recorded as destruction-reaction resolutions for the appropriate engine action host.
+- `select_destruction_reaction`: finite controlling-player choice emitted after attack-sequence damage destroys a model with one or more optional structured destruction-reaction sources. Option IDs are optional source IDs plus `decline_destruction_reaction`. Source options carry `payload.source_id`, `payload.reaction_kind`, and `payload.optional: true`, where supported optional `reaction_kind` values include `shoot_on_death` and `fight_on_death`; the decline option uses null source and kind values. `payload.destruction_context` contains the JSON-safe attack context, damage application, `model_destroyed` event ID, damage event ID, removal record, and transition batch. Adapters must submit one pending option ID through `GameLifecycle.submit_decision(...)` and must not start shooting, fighting, explosion, or removal mutations locally from the option payload. Accepted selections are recorded as destruction-reaction resolutions for the appropriate engine action host. Mandatory sources such as `deadly_demise` are recorded automatically as mandatory destruction-reaction resolutions and must not be presented as options.
 
 Phase 13D adds this attacker-visible attack-resolution decision:
 

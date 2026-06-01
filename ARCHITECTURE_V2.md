@@ -1768,7 +1768,8 @@ Status: Complete.
 Invariants:
 
 - defender allocation choices are emitted as `DecisionRequest`s unless allocation is forced by the rules;
-- save selection, optional Feel No Pain source/use, and destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code;
+- save selection, optional Feel No Pain source/use, and optional destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code;
+- mandatory destruction reactions, including Deadly Demise-style rules, are engine-triggered and are not adapter decline choices;
 - defender allocation and destruction records are viewer-scoped where hidden information can differ;
 - defender allocates attacks according to rules;
 - wounded models must continue receiving damage where applicable;

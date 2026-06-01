@@ -2761,6 +2761,107 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
     )
 
 
+def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    deadly_demise_source = DestructionReactionSource(
+        source_id="phase13e-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase13e-deadly-demise-rule",
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(deadly_demise_source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase13e-deadly-demise-reaction",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = "phase13e-deadly-demise-reaction:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase13e-deadly-demise-reaction",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="phase13e-deadly-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-deadly-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="phase13e-deadly-save", spec=save_spec, value=1),
+            ),
+        ),
+    )
+    reaction_payload = _last_event_payload(lifecycle, "destruction_reaction_resolved")
+    selected_source = cast(dict[str, object], reaction_payload["selected_source"])
+
+    assert remaining_sequence is None
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert status is None
+    assert lifecycle.decision_controller.queue.pending_requests == ()
+    assert not any(
+        record.result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+        for record in lifecycle.decision_controller.records
+    )
+    assert reaction_payload["resolution_kind"] == "mandatory"
+    assert reaction_payload["decision"] is None
+    assert selected_source["source_id"] == deadly_demise_source.source_id
+    assert selected_source["reaction_kind"] == DestructionReactionKind.DEADLY_DEMISE.value
+    assert selected_source["optional"] is False
+    assert reaction_payload["action_host"] == "destruction_reaction"
+
+
 def test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -2946,6 +3047,25 @@ def test_phase13e_destruction_reaction_validation_errors_are_typed() -> None:
         destruction_reaction_kind_from_token(1)
     with pytest.raises(GameLifecycleError, match="Unsupported DestructionReactionKind"):
         destruction_reaction_kind_from_token("not-a-destruction-reaction")
+    with pytest.raises(GameLifecycleError, match=r"Deadly Demise.*mandatory"):
+        DestructionReactionSource(
+            source_id="phase13e-optional-deadly-demise",
+            reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+            source_rule_id="phase13e-optional-deadly-demise-rule",
+        )
+    mandatory_source = DestructionReactionSource(
+        source_id="phase13e-mandatory-fight",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase13e-mandatory-fight-rule",
+        optional=False,
+    )
+    with pytest.raises(GameLifecycleError, match="player choice"):
+        build_destruction_reaction_request(
+            request_id="phase13e-mandatory-request",
+            defender_player_id="player-b",
+            destruction_context={"context_kind": "test"},
+            sources=(mandatory_source,),
+        )
     with pytest.raises(GameLifecycleError, match="source and reaction kind"):
         DestructionReactionDecision(
             request_id="phase13e-invalid-decision-request",

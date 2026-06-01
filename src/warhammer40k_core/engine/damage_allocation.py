@@ -108,6 +108,7 @@ class DestructionReactionSourcePayload(TypedDict):
     reaction_kind: str
     source_rule_id: str
     payload: JsonValue
+    optional: bool
 
 
 class FeelNoPainDecisionPayload(TypedDict):
@@ -1002,6 +1003,7 @@ class DestructionReactionSource:
     reaction_kind: DestructionReactionKind
     source_rule_id: str
     payload: JsonValue = None
+    optional: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1023,6 +1025,10 @@ class DestructionReactionSource:
             ),
         )
         object.__setattr__(self, "payload", validate_json_value(self.payload))
+        if type(self.optional) is not bool:
+            raise GameLifecycleError("DestructionReactionSource optional must be a bool.")
+        if self.reaction_kind is DestructionReactionKind.DEADLY_DEMISE and self.optional:
+            raise GameLifecycleError("Deadly Demise destruction reactions must be mandatory.")
 
     def to_payload(self) -> DestructionReactionSourcePayload:
         return {
@@ -1030,6 +1036,7 @@ class DestructionReactionSource:
             "reaction_kind": self.reaction_kind.value,
             "source_rule_id": self.source_rule_id,
             "payload": self.payload,
+            "optional": self.optional,
         }
 
     @classmethod
@@ -1039,6 +1046,7 @@ class DestructionReactionSource:
             reaction_kind=destruction_reaction_kind_from_token(payload["reaction_kind"]),
             source_rule_id=payload["source_rule_id"],
             payload=payload["payload"],
+            optional=payload["optional"],
         )
 
 
@@ -1416,7 +1424,14 @@ def build_destruction_reaction_request(
 ) -> DecisionRequest:
     source_tuple = _validate_destruction_reaction_sources(sources)
     if not source_tuple:
-        raise GameLifecycleError("Destruction reaction request requires at least one source.")
+        raise GameLifecycleError(
+            "Destruction reaction request requires at least one optional source."
+        )
+    for source in source_tuple:
+        if not source.optional:
+            raise GameLifecycleError(
+                "Destruction reaction request sources must require a player choice."
+            )
     options: list[DecisionOption] = [
         DecisionOption(
             option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
@@ -1432,6 +1447,7 @@ def build_destruction_reaction_request(
                 payload={
                     "source_id": source.source_id,
                     "reaction_kind": source.reaction_kind.value,
+                    "optional": source.optional,
                 },
             )
         )

@@ -2230,17 +2230,31 @@ def _destruction_reaction_status_if_needed(
     )
     if not sources:
         return None
+    destruction_context = validate_json_value(
+        _destruction_reaction_context_payload(
+            attack_context=attack_context,
+            damage=damage,
+            destroyed_emission=destroyed_emission,
+        )
+    )
+    mandatory_sources = tuple(source for source in sources if not source.optional)
+    optional_sources = tuple(source for source in sources if source.optional)
+    if mandatory_sources:
+        _emit_mandatory_destruction_reaction_resolutions(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            damage=damage,
+            destroyed_emission=destroyed_emission,
+            destruction_context=destruction_context,
+            sources=mandatory_sources,
+        )
+    if not optional_sources:
+        return None
     request = build_destruction_reaction_request(
         request_id=state.next_decision_request_id(),
         defender_player_id=attack_context["defender_player_id"],
-        destruction_context=validate_json_value(
-            _destruction_reaction_context_payload(
-                attack_context=attack_context,
-                damage=damage,
-                destroyed_emission=destroyed_emission,
-            )
-        ),
-        sources=sources,
+        destruction_context=destruction_context,
+        sources=optional_sources,
     )
     decisions.request_decision(request)
     decisions.event_log.append(
@@ -2251,7 +2265,8 @@ def _destruction_reaction_status_if_needed(
             "model_instance_id": damage.model_instance_id,
             "target_unit_instance_id": damage.target_unit_instance_id,
             "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
-            "sources": [source.to_payload() for source in sources],
+            "sources": [source.to_payload() for source in optional_sources],
+            "mandatory_sources": [source.to_payload() for source in mandatory_sources],
             "request_id": request.request_id,
         },
     )
@@ -2265,6 +2280,37 @@ def _destruction_reaction_status_if_needed(
             "model_instance_id": damage.model_instance_id,
         },
     )
+
+
+def _emit_mandatory_destruction_reaction_resolutions(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    damage: DamageApplication,
+    destroyed_emission: DestroyedModelEmission,
+    destruction_context: JsonValue,
+    sources: tuple[DestructionReactionSource, ...],
+) -> None:
+    for source in sources:
+        if source.optional:
+            raise GameLifecycleError("Mandatory destruction reaction source was optional.")
+        decisions.event_log.append(
+            "destruction_reaction_resolved",
+            {
+                "resolution_kind": "mandatory",
+                "decision": None,
+                "selected_source": source.to_payload(),
+                "selected_reaction_kind": source.reaction_kind.value,
+                "action_host": _destruction_reaction_action_host(source),
+                "execution_status": "recorded_for_action_host",
+                "destruction_context": validate_json_value(destruction_context),
+                "sequence_id": attack_sequence.sequence_id,
+                "attack_context_id": attack_sequence.attack_context_id(),
+                "model_instance_id": damage.model_instance_id,
+                "target_unit_instance_id": damage.target_unit_instance_id,
+                "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+            },
+        )
 
 
 def _destruction_reaction_context_payload(
