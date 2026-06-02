@@ -1013,7 +1013,7 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
     context = _context(
         state=state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_kind=TimingTriggerKind.END_PHASE,
         trigger_payload=_fire_overwatch_trigger_payload(),
     )
     proposal_request = StratagemTargetProposal.for_request(
@@ -1121,7 +1121,7 @@ def test_phase13d_fire_overwatch_rejects_invalid_declaration_before_queue_pop() 
     context = _context(
         state=state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_kind=TimingTriggerKind.END_PHASE,
         trigger_payload=_fire_overwatch_trigger_payload(),
     )
     proposal_request = StratagemTargetProposal.for_request(
@@ -2390,7 +2390,7 @@ def _request_fire_overwatch_target_proposal(
     context = _context(
         state=state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_kind=TimingTriggerKind.END_PHASE,
         trigger_payload=_fire_overwatch_trigger_payload(moved_unit_instance_id),
     )
     proposal_request = StratagemTargetProposal.for_request(

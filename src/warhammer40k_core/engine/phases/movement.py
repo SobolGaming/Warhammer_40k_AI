@@ -2323,14 +2323,14 @@ def _complete_reinforcements_step(
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
         raise GameLifecycleError("Completing Reinforcements requires Reinforcements step.")
-    rapid_ingress_status = _request_rapid_ingress_reaction_if_available(
+    end_movement_reaction_status = _request_end_opponent_movement_reaction_if_available(
         state=state,
         decisions=decisions,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
     )
-    if rapid_ingress_status is not None:
-        return rapid_ingress_status
+    if end_movement_reaction_status is not None:
+        return end_movement_reaction_status
     if not movement_state.reinforcements_completed:
         state.movement_phase_state = movement_state.with_reinforcements_completed()
     decisions.event_log.append(
@@ -2355,6 +2355,29 @@ def _complete_reinforcements_step(
             "active_player_id": active_player_id,
             "unarrived_reserve_count": unarrived_reserve_count,
         },
+    )
+
+
+def _request_end_opponent_movement_reaction_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+) -> LifecycleStatus | None:
+    fire_overwatch_status = _request_fire_overwatch_reaction_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
+    )
+    if fire_overwatch_status is not None:
+        return fire_overwatch_status
+    return _request_rapid_ingress_reaction_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -2441,97 +2464,151 @@ def _request_fire_overwatch_reaction_if_available(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
-    moved_unit_instance_id: str,
-    movement_phase_action: MovementPhaseActionKind,
-    movement_payload: dict[str, JsonValue],
 ) -> LifecycleStatus | None:
     if reaction_queue is None or stratagem_index is None:
         return None
-    if movement_phase_action not in {
-        MovementPhaseActionKind.NORMAL_MOVE,
-        MovementPhaseActionKind.ADVANCE,
-        MovementPhaseActionKind.FALL_BACK,
-    }:
+    movement_state = state.movement_phase_state
+    if movement_state is None:
         return None
     active_player_id = _active_player_id(state)
-    trigger_payload = validate_json_value(
-        {
-            "moved_unit_instance_id": moved_unit_instance_id,
-            "movement_phase_action": movement_phase_action.value,
-            "movement_payload": validate_json_value(movement_payload),
-        }
+    moved_unit_instance_ids = _active_player_end_movement_overwatch_trigger_unit_ids(
+        state=state,
+        decisions=decisions,
+        movement_state=movement_state,
     )
+    if not moved_unit_instance_ids:
+        return None
     for player_id in state.player_ids:
         if player_id == active_player_id:
             continue
-        window_id = (
-            f"fire-overwatch-after-move-round-{state.battle_round:02d}-"
-            f"{moved_unit_instance_id}-player-{player_id}"
-        )
-        context = StratagemEligibilityContext.from_state(
-            state=state,
-            player_id=player_id,
-            trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
-            timing_window_id=window_id,
-            trigger_payload=trigger_payload,
-        )
-        if stratagem_window_declined_for_context(decisions=decisions, context=context):
-            continue
-        proposal = stratagem_target_proposal_from_index(
-            state=state,
-            index=stratagem_index,
-            context=context,
-            handler_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
-        )
-        if proposal is None:
-            continue
-        reaction_window = ReactionWindow(
-            timing_window=TimingWindow(
-                window_id=window_id,
-                descriptor=TimingWindowDescriptor(
-                    descriptor_id="core-fire-overwatch-after-enemy-move",
-                    trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
-                    source_rule_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+        for moved_unit_instance_id in moved_unit_instance_ids:
+            window_id = (
+                f"fire-overwatch-end-movement-round-{state.battle_round:02d}-"
+                f"unit-{moved_unit_instance_id}-player-{player_id}"
+            )
+            trigger_payload = _fire_overwatch_end_movement_trigger_payload(
+                moved_unit_instance_id=moved_unit_instance_id,
+                timing_window_id=window_id,
+            )
+            context = StratagemEligibilityContext.from_state(
+                state=state,
+                player_id=player_id,
+                trigger_kind=TimingTriggerKind.END_PHASE,
+                timing_window_id=window_id,
+                trigger_payload=trigger_payload,
+            )
+            if stratagem_window_declined_for_context(decisions=decisions, context=context):
+                continue
+            proposal = stratagem_target_proposal_from_index(
+                state=state,
+                index=stratagem_index,
+                context=context,
+                handler_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+            )
+            if proposal is None:
+                continue
+            reaction_window = ReactionWindow(
+                timing_window=TimingWindow(
+                    window_id=window_id,
+                    descriptor=TimingWindowDescriptor(
+                        descriptor_id="core-fire-overwatch-end-opponent-movement",
+                        trigger_kind=TimingTriggerKind.END_PHASE,
+                        source_rule_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+                        phase=BattlePhase.MOVEMENT,
+                        source_step="end_movement_phase_reactions",
+                        metadata=trigger_payload,
+                    ),
+                    game_id=state.game_id,
+                    battle_round=state.battle_round,
+                    active_player_id=active_player_id,
                     phase=BattlePhase.MOVEMENT,
-                    source_step="move_units",
-                    metadata=trigger_payload,
                 ),
-                game_id=state.game_id,
-                battle_round=state.battle_round,
-                active_player_id=active_player_id,
-                phase=BattlePhase.MOVEMENT,
-            ),
-            eligible_player_ids=(player_id,),
-        )
-        triggered = reaction_queue.emit_decision_request(
-            state=state,
-            decisions=decisions,
-            reaction_window=reaction_window,
-            parent_phase=BattlePhase.MOVEMENT,
-            parent_step="after_enemy_unit_ends_move_reactions",
-            resume_token=f"{window_id}-resume",
-            actor_id=player_id,
-            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-            options=(parameterized_decision_option(),),
-            payload=stratagem_target_proposal_request_payload(
-                proposal,
-                allow_decline=True,
-            ),
-        )
-        return LifecycleStatus.waiting_for_decision(
-            stage=GameLifecycleStage.BATTLE,
-            decision_request=triggered.decision_request,
-            payload={
-                "phase": BattlePhase.MOVEMENT.value,
-                "step": MovementPhaseStepKind.MOVE_UNITS.value,
-                "phase_body_status": "fire_overwatch_reaction_pending",
-                "battle_round": state.battle_round,
-                "active_player_id": active_player_id,
-                "reacting_player_id": player_id,
-                "moved_unit_instance_id": moved_unit_instance_id,
-            },
-        )
+                eligible_player_ids=(player_id,),
+            )
+            triggered = reaction_queue.emit_decision_request(
+                state=state,
+                decisions=decisions,
+                reaction_window=reaction_window,
+                parent_phase=BattlePhase.MOVEMENT,
+                parent_step="end_movement_phase_reactions",
+                resume_token=f"{window_id}-resume",
+                actor_id=player_id,
+                decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+                options=(parameterized_decision_option(),),
+                payload=stratagem_target_proposal_request_payload(
+                    proposal,
+                    allow_decline=True,
+                ),
+            )
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=triggered.decision_request,
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                    "phase_body_status": "fire_overwatch_reaction_pending",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "reacting_player_id": player_id,
+                    "moved_unit_instance_id": moved_unit_instance_id,
+                },
+            )
     return None
+
+
+def _active_player_end_movement_overwatch_trigger_unit_ids(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    movement_state: MovementPhaseState,
+) -> tuple[str, ...]:
+    active_player_id = _active_player_id(state)
+    moved_ids = set(movement_state.moved_unit_ids)
+    eligible_action_ids: set[str] = set()
+    eligible_setup_ids: set[str] = set()
+    for record in decisions.event_log.records:
+        payload = record.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("game_id") != state.game_id:
+            continue
+        if payload.get("battle_round") != state.battle_round:
+            continue
+        if payload.get("phase") != BattlePhase.MOVEMENT.value:
+            continue
+        if payload.get("active_player_id") != active_player_id:
+            continue
+        unit_id = payload.get("unit_instance_id")
+        if type(unit_id) is not str or unit_id not in moved_ids:
+            continue
+        if record.event_type == "reinforcement_unit_arrived":
+            eligible_setup_ids.add(unit_id)
+            continue
+        if record.event_type != "movement_activation_completed":
+            continue
+        if payload.get("movement_phase_action") in {
+            MovementPhaseActionKind.NORMAL_MOVE.value,
+            MovementPhaseActionKind.ADVANCE.value,
+            MovementPhaseActionKind.FALL_BACK.value,
+        }:
+            eligible_action_ids.add(unit_id)
+    return tuple(sorted(eligible_action_ids | eligible_setup_ids))
+
+
+def _fire_overwatch_end_movement_trigger_payload(
+    *,
+    moved_unit_instance_id: str,
+    timing_window_id: str,
+) -> JsonValue:
+    moved_unit_id = _validate_identifier("moved_unit_instance_id", moved_unit_instance_id)
+    return validate_json_value(
+        {
+            "moved_unit_instance_id": moved_unit_id,
+            "timing_window_id": _validate_identifier("timing_window_id", timing_window_id),
+            "trigger_window": "end_opponent_movement_phase",
+            "eligible_trigger_kinds": ["set_up", "started_or_ended_move"],
+        }
+    )
 
 
 def _reinforcement_unit_options(
@@ -5298,15 +5375,7 @@ def _request_embark_after_move_or_complete_activation(
             displacement_kind=displacement_kind,
             transition_batch=transition_batch,
         )
-        return _request_fire_overwatch_reaction_if_available(
-            state=state,
-            decisions=decisions,
-            reaction_queue=reaction_queue,
-            stratagem_index=stratagem_index,
-            moved_unit_instance_id=active_selection.unit_instance_id,
-            movement_phase_action=action,
-            movement_payload=movement_payload,
-        )
+        return None
     options = _post_move_embark_options(
         state=state,
         unit_instance_id=active_selection.unit_instance_id,
@@ -5398,17 +5467,6 @@ def _complete_activation_then_request_post_normal_disembark_if_available(
         displacement_kind=displacement_kind,
         transition_batch=transition_batch,
     )
-    overwatch_status = _request_fire_overwatch_reaction_if_available(
-        state=state,
-        decisions=decisions,
-        reaction_queue=reaction_queue,
-        stratagem_index=stratagem_index,
-        moved_unit_instance_id=active_selection.unit_instance_id,
-        movement_phase_action=action,
-        movement_payload=movement_payload,
-    )
-    if overwatch_status is not None:
-        return overwatch_status
     if action is not MovementPhaseActionKind.NORMAL_MOVE:
         return None
     movement_state = state.movement_phase_state

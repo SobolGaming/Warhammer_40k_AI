@@ -2021,8 +2021,10 @@ def _handler_unavailable_reason(
             )
         return None
     if definition.handler_id == CORE_FIRE_OVERWATCH_HANDLER_ID:
-        if context.trigger_kind is not TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE:
-            return "fire_overwatch_requires_enemy_move_trigger"
+        if context.trigger_kind is not TimingTriggerKind.END_PHASE:
+            return "fire_overwatch_requires_end_opponent_movement_phase"
+        if context.phase is not BattlePhase.MOVEMENT:
+            return "fire_overwatch_requires_movement_phase"
         if context.active_player_id == context.player_id:
             return "fire_overwatch_requires_opponent_turn"
         if _fire_overwatch_triggering_enemy_unit_id_or_none(context) is None:
@@ -3397,8 +3399,10 @@ def _apply_fire_overwatch_handler(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
 ) -> None:
-    if context.trigger_kind is not TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE:
-        raise GameLifecycleError("Fire Overwatch requires an enemy movement trigger.")
+    if context.trigger_kind is not TimingTriggerKind.END_PHASE:
+        raise GameLifecycleError("Fire Overwatch requires the end of opponent Movement phase.")
+    if context.phase is not BattlePhase.MOVEMENT:
+        raise GameLifecycleError("Fire Overwatch requires the Movement phase.")
     shooting_unit_id = _require_target_unit_id(target_binding)
     triggering_unit_id = _fire_overwatch_triggering_enemy_unit_id(context)
     request_out_of_phase_shooting_declaration(

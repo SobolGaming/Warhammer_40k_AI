@@ -60,6 +60,8 @@ DICE_REROLL_DECISION_TYPE = "select_dice_reroll"
 _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
     {
         "secondary_missions_revealed",
+        "timing_window_opened",
+        "timing_window_resolved",
     }
 )
 

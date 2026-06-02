@@ -264,12 +264,6 @@ def test_advance_reroll_request_appears_only_with_legal_reroll_source() -> None:
         option_id="reroll:0",
         result_id="phase10n-result-000005",
     )
-    assert _decision_request(follow_up).decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
-    follow_up = _decline_optional_stratagem_if_pending(
-        reroll_lifecycle,
-        status=follow_up,
-        result_id="phase10n-decline-fire-overwatch-reroll",
-    )
     advanced = _state(reroll_lifecycle).advanced_unit_state_for_unit(
         player_id="player-a",
         battle_round=1,
@@ -494,6 +488,11 @@ def test_advanced_state_clears_at_end_of_active_player_turn() -> None:
         request=_decision_request(second_unit_status),
         option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
         result_id="phase10n-result-000006",
+    )
+    action_status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=action_status,
+        result_id="phase10n-decline-end-movement-fire-overwatch",
     )
 
     assert action_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION

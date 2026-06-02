@@ -84,6 +84,11 @@ def test_full_movement_phase_completion_exits_to_shooting_after_all_work_is_comp
         option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
         result_id="phase10t-result-000006",
     )
+    completion_status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=completion_status,
+        result_id="phase10t-decline-end-movement-fire-overwatch",
+    )
 
     assert completion_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert completion_status.decision_request is not None

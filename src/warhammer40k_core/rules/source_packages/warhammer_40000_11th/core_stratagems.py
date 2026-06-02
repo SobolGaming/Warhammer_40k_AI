@@ -155,14 +155,11 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:fire-overwatch",
-            when_descriptor=(
-                "opponent movement or charge phase after an enemy unit is set up "
-                "or starts or ends a move"
-            ),
+            when_descriptor="end of the opponent movement phase",
             target_descriptor="one eligible unit from the player's army that can shoot",
             effect_descriptor="the target unit shoots as if it were the shooting phase",
             restrictions_descriptor="matched play same stratagem per phase",
-            trigger_kind="after_enemy_unit_ends_move",
+            trigger_kind="end_phase",
             phase="movement",
             target_kind="friendly_unit",
             enumerable=False,
