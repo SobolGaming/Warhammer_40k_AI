@@ -1846,4 +1846,4 @@ def _model_path_witness(model: Model, end_pose: Pose) -> PathWitness:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase10r-test")
+    return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase10r-test")

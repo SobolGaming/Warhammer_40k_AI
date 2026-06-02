@@ -240,7 +240,7 @@ class ArmyCatalog:
         )
         return cls(
             catalog_id="phase9a-canonical",
-            ruleset_id=RulesetId.warhammer_40000_tenth(version="core-v2-phase9a"),
+            ruleset_id=RulesetId.warhammer_40000_eleventh(version="core-v2-phase9a"),
             source_package_id=source_package_id,
             datasheets=(
                 _datasheet(

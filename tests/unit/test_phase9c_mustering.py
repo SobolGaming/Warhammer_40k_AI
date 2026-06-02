@@ -337,7 +337,7 @@ def test_mustering_value_objects_fail_fast_on_invalid_shapes() -> None:
             catalog=catalog,
             request=replace(
                 request,
-                ruleset_id=RulesetId.warhammer_40000_tenth(version="other-ruleset"),
+                ruleset_id=RulesetId.warhammer_40000_eleventh(version="other-ruleset"),
             ),
         )
 

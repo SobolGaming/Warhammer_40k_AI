@@ -679,7 +679,7 @@ def test_placement_proposal_drift_rejections_keep_pending_request_and_records_cl
 def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> None:
     state, passenger, transport = _battle_state_with_embarked_passenger()
     handler = MovementPhaseHandler(
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         parameterized_proposals=True,
     )
     decisions = DecisionController()
@@ -727,7 +727,7 @@ def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> N
 def test_disembark_placement_missing_required_field_keeps_pending_request_clean() -> None:
     state, passenger, _transport = _battle_state_with_embarked_passenger()
     handler = MovementPhaseHandler(
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         parameterized_proposals=True,
     )
     decisions = DecisionController()
@@ -1180,7 +1180,7 @@ def _config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11d-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase11d-test"
         ),
         army_catalog=catalog,
@@ -1319,7 +1319,7 @@ def _enter_reinforcements_choice(
     state: GameState,
 ) -> tuple[MovementPhaseHandler, DecisionController, DecisionRequest]:
     handler = MovementPhaseHandler(
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase11d-test"
         ),
         parameterized_proposals=True,
@@ -1375,7 +1375,7 @@ def _battle_state_with_embarked_passenger() -> tuple[GameState, UnitInstance, Un
     passenger = armies[0].unit_by_id("army-alpha:passenger-unit")
     transport = armies[0].unit_by_id("army-alpha:transport-1")
     battlefield = scenario.battlefield_state.without_unit_placement(passenger.unit_instance_id)
-    ruleset = RulesetDescriptor.warhammer_40000_tenth()
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
     state = GameState(
         game_id="phase11d-disembark-game",
         ruleset_descriptor_hash=ruleset.descriptor_hash,

@@ -18,7 +18,7 @@ from warhammer40k_core.engine.abilities import (
     AbilityHandlerRegistry,
     movement_capability_flags_from_index,
 )
-from warhammer40k_core.engine.ability_catalog import tenth_edition_ability_index
+from warhammer40k_core.engine.ability_catalog import eleventh_edition_ability_index
 from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     model_displacement_kind_from_token,
@@ -167,7 +167,7 @@ class MovementCapabilitySet:
             keywords,
         )
         resolved_ability_index = (
-            tenth_edition_ability_index() if ability_index is None else ability_index
+            eleventh_edition_ability_index() if ability_index is None else ability_index
         )
         flags = set(
             movement_capability_flags_from_index(

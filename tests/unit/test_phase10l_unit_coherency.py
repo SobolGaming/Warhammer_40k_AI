@@ -7,7 +7,11 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import CoherencyPolicyDescriptor, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    CoherencyPolicyDescriptor,
+    CoherencyPolicyKind,
+    RulesetDescriptor,
+)
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -46,9 +50,9 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
-def test_tenth_five_model_unit_requires_one_neighbor_per_model() -> None:
+def test_eleventh_five_model_unit_requires_one_neighbor_per_model() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
-        RulesetDescriptor.warhammer_40000_tenth(),
+        RulesetDescriptor.warhammer_40000_eleventh(),
         unit_instance_id="army-alpha:intercessor-unit-1",
     )
 
@@ -66,9 +70,9 @@ def test_tenth_five_model_unit_requires_one_neighbor_per_model() -> None:
     assert result.offending_model_instance_ids == ()
 
 
-def test_tenth_two_disconnected_two_model_groups_are_not_coherent() -> None:
+def test_eleventh_two_disconnected_two_model_groups_are_not_coherent() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
-        RulesetDescriptor.warhammer_40000_tenth(),
+        RulesetDescriptor.warhammer_40000_eleventh(),
         unit_instance_id="army-alpha:split-unit",
     )
 
@@ -91,9 +95,9 @@ def test_tenth_two_disconnected_two_model_groups_are_not_coherent() -> None:
     )
 
 
-def test_tenth_large_unit_with_two_locally_coherent_clusters_is_not_coherent() -> None:
+def test_eleventh_large_unit_with_two_locally_coherent_clusters_is_not_coherent() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
-        RulesetDescriptor.warhammer_40000_tenth(),
+        RulesetDescriptor.warhammer_40000_eleventh(),
         unit_instance_id="army-alpha:split-large-unit",
     )
 
@@ -117,9 +121,9 @@ def test_tenth_large_unit_with_two_locally_coherent_clusters_is_not_coherent() -
     assert all(violation.neighbor_count is None for violation in result.violations)
 
 
-def test_tenth_seven_model_unit_requires_two_neighbors_per_model() -> None:
+def test_eleventh_seven_model_unit_requires_two_neighbors_per_model() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
-        RulesetDescriptor.warhammer_40000_tenth(),
+        RulesetDescriptor.warhammer_40000_eleventh(),
         unit_instance_id="army-alpha:boyz-unit-1",
     )
 
@@ -135,9 +139,9 @@ def test_tenth_seven_model_unit_requires_two_neighbors_per_model() -> None:
     } == {("model-1", 1, 2), ("model-7", 1, 2)}
 
 
-def test_tenth_broken_coherency_identifies_offending_model_ids() -> None:
+def test_eleventh_broken_coherency_identifies_offending_model_ids() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
-        RulesetDescriptor.warhammer_40000_tenth(),
+        RulesetDescriptor.warhammer_40000_eleventh(),
         unit_instance_id="army-alpha:intercessor-unit-1",
     )
 
@@ -157,10 +161,10 @@ def test_tenth_broken_coherency_identifies_offending_model_ids() -> None:
     assert result.violations[0].violation_code == "insufficient_coherency_neighbors"
 
 
-def test_preview_all_models_within_distance_policy_validates_pairwise_distance() -> None:
+def test_all_models_within_distance_policy_validates_pairwise_distance() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
-        RulesetDescriptor.warhammer_40000_eleventh_preview(),
-        unit_instance_id="army-alpha:preview-unit-1",
+        _descriptor_with_all_models_distance_coherency(),
+        unit_instance_id="army-alpha:all-models-distance-unit-1",
     )
 
     result = context.validate_models(
@@ -179,7 +183,7 @@ def test_preview_all_models_within_distance_policy_validates_pairwise_distance()
 
 
 def test_invalid_normal_move_endpoint_rolls_back_to_previous_placement() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     scenario = _scenario()
     before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
     attempted = _with_model_pose(
@@ -207,7 +211,7 @@ def test_invalid_normal_move_endpoint_rolls_back_to_previous_placement() -> None
 
 
 def test_movement_endpoint_coherency_rejects_attempted_missing_model_even_if_coherent() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     scenario = _scenario()
     before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
     attempted = replace(before, model_placements=before.model_placements[:-1])
@@ -223,7 +227,7 @@ def test_movement_endpoint_coherency_rejects_attempted_missing_model_even_if_coh
 
 
 def test_movement_endpoint_coherency_rejects_attempted_extra_or_swapped_model() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     scenario = _scenario()
     before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
     extra_placement = ModelPlacement(
@@ -249,7 +253,7 @@ def test_movement_endpoint_coherency_rejects_attempted_extra_or_swapped_model() 
 
 
 def test_movement_endpoint_coherency_rejects_army_or_player_drift() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     scenario = _scenario()
     before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
     player_drift_attempt = UnitPlacement(
@@ -283,7 +287,7 @@ def test_movement_endpoint_coherency_rejects_army_or_player_drift() -> None:
 
 
 def test_deployment_placement_outside_coherency_is_rejected() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     scenario = _scenario()
     placed_army = scenario.battlefield_state.placed_army_for_player("player-a")
     other_army = scenario.battlefield_state.placed_army_for_player("player-b")
@@ -311,7 +315,7 @@ def test_deployment_placement_outside_coherency_is_rejected() -> None:
 
 
 def test_coherency_result_and_rollback_payloads_round_trip() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     context = UnitCoherencyContext.from_ruleset_descriptor(
         descriptor,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -353,7 +357,7 @@ def test_coherency_result_and_rollback_payloads_round_trip() -> None:
 
 
 def test_single_model_context_payload_and_coherent_move_endpoint_round_trip() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     context = UnitCoherencyContext.from_ruleset_descriptor(
         descriptor,
         unit_instance_id="army-alpha:character-unit-1",
@@ -396,7 +400,7 @@ def test_single_model_context_payload_and_coherent_move_endpoint_round_trip() ->
 
 
 def test_coherency_value_objects_fail_fast_on_invalid_shapes() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     violation = UnitCoherencyViolation(
         model_instance_id="model-1",
         violation_code="insufficient_coherency_neighbors",
@@ -496,7 +500,7 @@ def test_coherency_value_objects_fail_fast_on_invalid_shapes() -> None:
 
 
 def test_movement_rollback_record_rejects_mismatched_shapes() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     scenario = _scenario()
     before = scenario.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
     attempted = _with_model_pose(
@@ -603,6 +607,18 @@ def _muster_request(
                 ),
             ),
         ),
+    )
+
+
+def _descriptor_with_all_models_distance_coherency() -> RulesetDescriptor:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    return replace(
+        descriptor,
+        coherency_policy=CoherencyPolicyDescriptor(
+            policy_kind=CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE,
+            max_all_models_distance_inches=9.0,
+        ),
+        descriptor_hash="",
     )
 
 

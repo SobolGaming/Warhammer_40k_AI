@@ -34,10 +34,10 @@ from warhammer40k_core.engine.abilities import (
 )
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
-    tenth_edition_ability_catalog_records,
-    tenth_edition_ability_index,
-    tenth_edition_core_ability_catalog_records,
-    tenth_edition_core_ability_index,
+    eleventh_edition_ability_catalog_records,
+    eleventh_edition_ability_index,
+    eleventh_edition_core_ability_catalog_records,
+    eleventh_edition_core_ability_index,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
@@ -54,14 +54,14 @@ from warhammer40k_core.engine.movement_legality import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities as source_data,
 )
 
 
 def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     rows = source_data.ability_rows()
-    records = tenth_edition_core_ability_catalog_records()
+    records = eleventh_edition_core_ability_catalog_records()
     payload = {
         "identity": source_data.source_package_identity_payload(),
         "rows": [row.to_payload() for row in rows],
@@ -91,7 +91,7 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     assert deep_strike.definition.handler_id == "unsupported:phase-15b:deep-strike"
     assert hazardous.source_kind is AbilitySourceKind.WEAPON
     assert hazardous.definition.handler_id == "core:hazardous"
-    assert tenth_edition_core_ability_index().all_records() == tuple(
+    assert eleventh_edition_core_ability_index().all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
     )
 
@@ -125,8 +125,8 @@ def test_ability_catalog_index_partitions_by_trigger_and_rejects_invalid_inputs(
 
 
 def test_ability_index_lookup_is_equivalent_to_full_tuple_scan_for_real_catalog() -> None:
-    catalog = tenth_edition_ability_catalog_records()
-    index = tenth_edition_ability_index()
+    catalog = eleventh_edition_ability_catalog_records()
+    index = eleventh_edition_ability_index()
     all_source_keywords = _all_source_keywords(catalog)
     phase_by_trigger = {
         TimingTriggerKind.START_PHASE: BattlePhaseKind.SHOOTING,
@@ -240,8 +240,8 @@ def test_registry_executes_only_opted_in_bucket_and_rejects_unsupported_handlers
 
 
 def test_keyword_gated_movement_capabilities_are_dispatched_from_ability_index() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
-    full_index = tenth_edition_ability_index()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    full_index = eleventh_edition_ability_index()
     empty_index = AbilityCatalogIndex.from_records(())
     capabilities = MovementCapabilitySet.from_keywords(
         ("Fly", "Infantry"),
@@ -387,7 +387,7 @@ def test_player_ability_index_filters_selected_sources() -> None:
 
 
 def test_player_index_retains_source_backed_weapon_keyword_records() -> None:
-    records = tenth_edition_ability_catalog_records()
+    records = eleventh_edition_ability_catalog_records()
     normal_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     normal_army = muster_army(
         catalog=normal_catalog,
@@ -432,7 +432,7 @@ def test_player_index_retains_source_backed_weapon_keyword_records() -> None:
 
 
 def test_weapon_ability_execution_enforces_weapon_event_keywords() -> None:
-    hazardous = _record_by_ability_id(tenth_edition_ability_catalog_records(), "core-hazardous")
+    hazardous = _record_by_ability_id(eleventh_edition_ability_catalog_records(), "core-hazardous")
     registry = default_ability_handler_registry()
     missing_keyword = registry.execute(
         record=hazardous,

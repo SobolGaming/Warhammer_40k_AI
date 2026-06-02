@@ -1499,7 +1499,7 @@ def _config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase10s-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase10s-test"
         ),
         army_catalog=catalog,
@@ -1567,7 +1567,7 @@ def _army_muster_request(
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase10s-test")
+    return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase10s-test")
 
 
 def _blood_surge_descriptor(

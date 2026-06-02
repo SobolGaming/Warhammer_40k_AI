@@ -2744,7 +2744,7 @@ def _stratagem_terrain_features(state: GameState) -> tuple[TerrainFeatureDefinit
 
 
 def _stratagem_ruleset_descriptor() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth()
+    return RulesetDescriptor.warhammer_40000_eleventh()
 
 
 def _grenade_visibility_profile() -> WeaponProfile:

@@ -16,31 +16,31 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTimingDescriptor,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_stratagems as source_data,
 )
 
-TENTH_EDITION_CORE_STRATAGEM_SOURCE_PACKAGE_ID = source_data.SOURCE_PACKAGE_ID
+ELEVENTH_EDITION_CORE_STRATAGEM_SOURCE_PACKAGE_ID = source_data.SOURCE_PACKAGE_ID
 
 
-def tenth_edition_core_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
+def eleventh_edition_core_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
     return tuple(_record_from_source_row(row) for row in source_data.core_stratagem_rows())
 
 
-def tenth_edition_core_stratagem_index() -> StratagemCatalogIndex:
-    return StratagemCatalogIndex.from_records(tenth_edition_core_stratagem_catalog_records())
+def eleventh_edition_core_stratagem_index() -> StratagemCatalogIndex:
+    return StratagemCatalogIndex.from_records(eleventh_edition_core_stratagem_catalog_records())
 
 
-def tenth_edition_detachment_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
+def eleventh_edition_detachment_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
     return tuple(_record_from_source_row(row) for row in source_data.detachment_stratagem_rows())
 
 
-def tenth_edition_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
+def eleventh_edition_stratagem_catalog_records() -> tuple[StratagemCatalogRecord, ...]:
     return tuple(_record_from_source_row(row) for row in source_data.stratagem_rows())
 
 
-def tenth_edition_stratagem_index() -> StratagemCatalogIndex:
-    return StratagemCatalogIndex.from_records(tenth_edition_stratagem_catalog_records())
+def eleventh_edition_stratagem_index() -> StratagemCatalogIndex:
+    return StratagemCatalogIndex.from_records(eleventh_edition_stratagem_catalog_records())
 
 
 def build_player_stratagem_index(

@@ -57,7 +57,7 @@ def _model(
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase13a-test")
+    return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase13a-test")
 
 
 def _visibility_ruin() -> TerrainFeatureDefinition:
@@ -94,7 +94,7 @@ def _visibility_ruin() -> TerrainFeatureDefinition:
     )
 
 
-def test_tenth_ruleset_has_explicit_ruins_and_woods_visibility_policies() -> None:
+def test_eleventh_ruleset_has_explicit_ruins_and_woods_visibility_policies() -> None:
     policy = _ruleset().terrain_visibility_policy
     ruins = policy.policy_for_feature_kind(TerrainFeatureKind.RUINS)
     woods = policy.policy_for_feature_kind(TerrainFeatureKind.WOODS)

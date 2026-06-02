@@ -49,11 +49,11 @@ from warhammer40k_core.engine.placement import create_deterministic_battlefield_
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.stratagem_catalog import (
     build_player_stratagem_index,
-    tenth_edition_core_stratagem_catalog_records,
-    tenth_edition_core_stratagem_index,
-    tenth_edition_detachment_stratagem_catalog_records,
-    tenth_edition_stratagem_catalog_records,
-    tenth_edition_stratagem_index,
+    eleventh_edition_core_stratagem_catalog_records,
+    eleventh_edition_core_stratagem_index,
+    eleventh_edition_detachment_stratagem_catalog_records,
+    eleventh_edition_stratagem_catalog_records,
+    eleventh_edition_stratagem_index,
 )
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
@@ -88,7 +88,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
-from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_stratagems as source_stratagems,
 )
 
@@ -133,9 +133,9 @@ def test_finite_stratagem_use_round_trips_through_lifecycle_and_spends_cp() -> N
 
 def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> None:
     source_identity = source_stratagems.source_package_identity_payload()
-    source_catalog = tenth_edition_stratagem_catalog_records()
-    core_catalog = tenth_edition_core_stratagem_catalog_records()
-    detachment_catalog = tenth_edition_detachment_stratagem_catalog_records()
+    source_catalog = eleventh_edition_stratagem_catalog_records()
+    core_catalog = eleventh_edition_core_stratagem_catalog_records()
+    detachment_catalog = eleventh_edition_detachment_stratagem_catalog_records()
     snapshot = tuple(
         (
             record.record_id,
@@ -150,147 +150,147 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
         )
         for record in source_catalog
     )
-    assert source_identity["edition_id"] == "warhammer_40000_10th"
-    assert source_identity["source_package_id"] == "gw-10e-core-stratagems"
+    assert source_identity["edition_id"] == "warhammer_40000_11th"
+    assert source_identity["source_package_id"] == "gw-11e-core-stratagems"
     assert snapshot == (
         (
-            "gw-10e-core-stratagems:core:command-reroll",
+            "gw-11e-core-stratagems:core:command-reroll",
             "command-reroll",
             1,
             "battle_tactic",
-            "gw-10e-core-stratagems:core:command-reroll",
+            "gw-11e-core-stratagems:core:command-reroll",
             "none",
             "core:command-reroll",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:counter-offensive",
+            "gw-11e-core-stratagems:core:counter-offensive",
             "counter-offensive",
             2,
             "strategic_ploy",
-            "gw-10e-core-stratagems:core:counter-offensive",
+            "gw-11e-core-stratagems:core:counter-offensive",
             "unsupported:phase-14e:fight-order-interrupt-unit",
             "unsupported:phase-14e:counter-offensive",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:epic-challenge",
+            "gw-11e-core-stratagems:core:epic-challenge",
             "epic-challenge",
             1,
             "epic_deed",
-            "gw-10e-core-stratagems:core:epic-challenge",
+            "gw-11e-core-stratagems:core:epic-challenge",
             "unsupported:phase-14e:character-model-fight-binding",
             "unsupported:phase-14e:epic-challenge",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:fire-overwatch",
+            "gw-11e-core-stratagems:core:fire-overwatch",
             "fire-overwatch",
             1,
             "strategic_ploy",
-            "gw-10e-core-stratagems:core:fire-overwatch",
+            "gw-11e-core-stratagems:core:fire-overwatch",
             "out_of_phase_shooting_unit",
             "core:fire-overwatch",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:go-to-ground",
+            "gw-11e-core-stratagems:core:go-to-ground",
             "go-to-ground",
             1,
             "battle_tactic",
-            "gw-10e-core-stratagems:core:go-to-ground",
+            "gw-11e-core-stratagems:core:go-to-ground",
             "selected_target_infantry_unit",
             "core:go-to-ground",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:grenade",
+            "gw-11e-core-stratagems:core:grenade",
             "grenade",
             1,
             "wargear",
-            "gw-10e-core-stratagems:core:grenade",
+            "gw-11e-core-stratagems:core:grenade",
             "grenades_unit_and_enemy_target",
             "core:grenade",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:heroic-intervention",
+            "gw-11e-core-stratagems:core:heroic-intervention",
             "heroic-intervention",
             1,
             "strategic_ploy",
-            "gw-10e-core-stratagems:core:heroic-intervention",
+            "gw-11e-core-stratagems:core:heroic-intervention",
             "unsupported:phase-14e:heroic-intervention-charge-unit",
             "unsupported:phase-14e:heroic-intervention",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:insane-bravery",
+            "gw-11e-core-stratagems:core:insane-bravery",
             "insane-bravery",
             1,
             "epic_deed",
-            "gw-10e-core-stratagems:core:insane-bravery",
+            "gw-11e-core-stratagems:core:insane-bravery",
             "battle_shock_test_unit",
             "core:insane-bravery",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:new-orders",
+            "gw-11e-core-stratagems:core:new-orders",
             "new-orders",
             1,
             "strategic_ploy",
-            "gw-10e-core-stratagems:core:new-orders",
+            "gw-11e-core-stratagems:core:new-orders",
             "active_tactical_secondary_card",
             "core:new-orders",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:rapid-ingress",
+            "gw-11e-core-stratagems:core:rapid-ingress",
             "rapid-ingress",
             1,
             "strategic_ploy",
-            "gw-10e-core-stratagems:core:rapid-ingress",
+            "gw-11e-core-stratagems:core:rapid-ingress",
             "reserves_unit",
             "core:rapid-ingress",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:smokescreen",
+            "gw-11e-core-stratagems:core:smokescreen",
             "smokescreen",
             1,
             "wargear",
-            "gw-10e-core-stratagems:core:smokescreen",
+            "gw-11e-core-stratagems:core:smokescreen",
             "selected_target_smoke_unit",
             "core:smokescreen",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:core:tank-shock",
+            "gw-11e-core-stratagems:core:tank-shock",
             "tank-shock",
             1,
             "strategic_ploy",
-            "gw-10e-core-stratagems:core:tank-shock",
+            "gw-11e-core-stratagems:core:tank-shock",
             "unsupported:phase-14e:vehicle-charge-target-binding",
             "unsupported:phase-14e:tank-shock",
             "core",
             None,
         ),
         (
-            "gw-10e-core-stratagems:detachment:armour-of-contempt",
+            "gw-11e-core-stratagems:detachment:armour-of-contempt",
             "armour-of-contempt",
             1,
             "battle_tactic",
-            "gw-10e-core-stratagems:detachment:gladius-task-force:armour-of-contempt",
+            "gw-11e-core-stratagems:detachment:gladius-task-force:armour-of-contempt",
             "unsupported:phase-13:selected-target-unit",
             "unsupported:phase-13:armour-of-contempt",
             "detachment",
@@ -327,8 +327,8 @@ def test_source_backed_stratagem_index_matches_tuple_options_for_trigger_windows
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _grant_cp(state, player_id="player-a", amount=10)
-    catalog = tenth_edition_stratagem_catalog_records()
-    index = tenth_edition_stratagem_index()
+    catalog = eleventh_edition_stratagem_catalog_records()
+    index = eleventh_edition_stratagem_index()
     phase_by_trigger = {
         TimingTriggerKind.START_PHASE: BattlePhase.COMMAND,
         TimingTriggerKind.END_PHASE: BattlePhase.MOVEMENT,
@@ -389,9 +389,9 @@ def test_stratagem_catalog_index_partitions_by_trigger_and_rejects_invalid_input
         )
         == ()
     )
-    assert tenth_edition_core_stratagem_index().all_records() == tuple(
+    assert eleventh_edition_core_stratagem_index().all_records() == tuple(
         sorted(
-            tenth_edition_core_stratagem_catalog_records(),
+            eleventh_edition_core_stratagem_catalog_records(),
             key=lambda record: record.record_id,
         )
     )
@@ -1616,7 +1616,7 @@ def _detachment_stratagem(
 
 
 def _source_stratagem_record(stratagem_id: str) -> StratagemCatalogRecord:
-    for record in tenth_edition_stratagem_catalog_records():
+    for record in eleventh_edition_stratagem_catalog_records():
         if record.definition.stratagem_id == stratagem_id:
             return record
     raise AssertionError(f"Missing source stratagem record: {stratagem_id}")
@@ -1752,7 +1752,7 @@ def _config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase12b-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
             descriptor_version="core-v2-phase12b-test"
         ),
         army_catalog=catalog,

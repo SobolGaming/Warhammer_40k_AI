@@ -6,10 +6,10 @@ from dataclasses import dataclass
 
 from warhammer40k_core.core.missions import MissionPackError, MissionSourcePackageDefinition
 
-EDITION_ID = "warhammer_40000_10th"
-MISSION_PACK_ID = "10e-chapter-approved-2025-26"
-SOURCE_PACKAGE_ID = "gw-10e-chapter-approved-2025-26"
-SOURCE_TITLE = "Warhammer 40,000 10th Edition Chapter Approved 2025-26"
+EDITION_ID = "warhammer_40000_11th"
+MISSION_PACK_ID = "11e-chapter-approved-2025-26"
+SOURCE_PACKAGE_ID = "gw-11e-chapter-approved-2025-26"
+SOURCE_TITLE = "Warhammer 40,000 11th Edition Chapter Approved 2025-26"
 SOURCE_VERSION = "2025-26"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-mission-source-v1"
 

@@ -66,7 +66,7 @@ def test_action_options_outside_engagement_are_remain_normal_and_advance() -> No
 
 
 def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
-    config = replace(_infantry_config(), game_id="phase10m-fallback-v2-0000")
+    config = replace(_infantry_config(), game_id="phase10m-fallback-v2-0001")
     lifecycle, movement_status = _advance_to_movement_unit_selection(config)
     _move_first_enemy_model_into_engagement(lifecycle)
 
@@ -136,7 +136,7 @@ def test_normal_move_rejects_path_through_enemy_model_base() -> None:
 
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=witness,
     )
@@ -155,7 +155,7 @@ def test_normal_move_rejects_forbidden_terrain_transit_in_terrain_layer() -> Non
 
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=witness,
         terrain_features=(ruins,),
@@ -179,7 +179,7 @@ def test_infantry_normal_move_can_traverse_ruins_wall() -> None:
 
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(12.0, 6.0)),
         terrain_features=(ruins,),
@@ -197,7 +197,7 @@ def test_vehicle_normal_move_cannot_traverse_ruins_wall() -> None:
 
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(14.0, 6.0)),
         terrain_features=(ruins,),
@@ -219,7 +219,7 @@ def test_infantry_normal_move_cannot_end_inside_ruins_wall() -> None:
 
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(9.0, 6.0)),
         terrain_features=(ruins,),
@@ -247,7 +247,7 @@ def test_infantry_normal_move_can_end_on_upper_ruins_floor_with_vertical_movemen
 
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_unit_vertical_witness_to_z(unit_placement, z_inches=3.0),
         terrain_features=(ruins,),
@@ -288,7 +288,7 @@ def test_non_round_vehicle_or_monster_normal_move_pays_two_inch_pivot_cost() -> 
         unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
         resolution = resolve_normal_move(
             scenario=scenario,
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             unit_placement=unit_placement,
             path_witness=_single_model_pivot_witness(unit_placement, movement_inches=8.0),
         )
@@ -309,7 +309,7 @@ def test_round_large_flying_stem_or_hover_vehicle_pays_two_inch_pivot_cost() -> 
         unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
         resolution = resolve_normal_move(
             scenario=scenario,
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             unit_placement=unit_placement,
             path_witness=_single_model_pivot_witness(unit_placement, movement_inches=8.0),
         )
@@ -329,7 +329,7 @@ def test_aircraft_normal_move_uses_aircraft_pivot_policy() -> None:
 
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_aircraft_pivot_witness(unit_placement, movement_inches=20.0),
     )
@@ -348,7 +348,7 @@ def test_normal_move_payload_rejects_pivot_policy_witness_drift() -> None:
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_pivot_witness(unit_placement, movement_inches=8.0),
     )
@@ -380,7 +380,7 @@ def test_normal_move_payload_rejects_path_witness_drift() -> None:
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
     resolution = resolve_normal_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_pivot_witness(unit_placement, movement_inches=8.0),
     )
@@ -414,7 +414,7 @@ def test_normal_move_rejects_witness_model_set_drift() -> None:
     with pytest.raises(GameLifecycleError, match="witness must match"):
         resolve_normal_move(
             scenario=scenario,
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             unit_placement=unit_placement,
             path_witness=witness,
         )
@@ -485,7 +485,7 @@ def _infantry_config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase10m-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase10m-test"
         ),
         army_catalog=catalog,

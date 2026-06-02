@@ -75,7 +75,7 @@ def test_source_catalog_round_trips_source_package_identity_without_object_reprs
     )
     bundle = RulesetBundle(
         bundle_id="phase9a-core-v2",
-        ruleset_id=RulesetId.warhammer_40000_tenth(version="core-v2-phase9a"),
+        ruleset_id=RulesetId.warhammer_40000_eleventh(version="core-v2-phase9a"),
         package_id=package_id,
         catalog_version=catalog_version,
         source_document_ids=(document_id,),
@@ -356,8 +356,8 @@ def test_army_catalog_validates_detachment_content_links() -> None:
 
 
 def test_phase_sequence_descriptors_are_explicit_policy_data() -> None:
-    setup_sequence = SetupSequenceDescriptor.warhammer_40000_tenth_default()
-    battle_sequence = BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default()
+    setup_sequence = SetupSequenceDescriptor.warhammer_40000_eleventh_default()
+    battle_sequence = BattlePhaseSequenceDescriptor.warhammer_40000_eleventh_default()
 
     assert setup_sequence.steps == (
         SetupStepKind.MUSTER_ARMIES,

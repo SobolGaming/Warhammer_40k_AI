@@ -310,7 +310,7 @@ def _config(*, mission_pool_entry_id: str = "mission-a") -> GameConfig:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
         descriptor_version="core-v2-phase11f-test"
     )
 

@@ -10,8 +10,7 @@ class RulesetError(ValueError):
 
 
 class RulesetEdition(StrEnum):
-    TENTH = "10e"
-    ELEVENTH_PREVIEW = "11e_preview"
+    ELEVENTH = "11e"
 
 
 class RulesetIdPayload(TypedDict):
@@ -36,16 +35,8 @@ class RulesetId:
         )
 
     @classmethod
-    def warhammer_40000_tenth(cls, version: str = "core-v2-phase8") -> Self:
-        return cls(game="warhammer_40000", edition=RulesetEdition.TENTH, version=version)
-
-    @classmethod
-    def warhammer_40000_eleventh_preview(cls, version: str = "preview") -> Self:
-        return cls(
-            game="warhammer_40000",
-            edition=RulesetEdition.ELEVENTH_PREVIEW,
-            version=version,
-        )
+    def warhammer_40000_eleventh(cls, version: str = "core-v2-phase14a") -> Self:
+        return cls(game="warhammer_40000", edition=RulesetEdition.ELEVENTH, version=version)
 
     def to_payload(self) -> RulesetIdPayload:
         return {

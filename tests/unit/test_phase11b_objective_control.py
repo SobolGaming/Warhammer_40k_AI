@@ -643,7 +643,7 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
         descriptor_version="core-v2-phase11b-test"
     )
 
