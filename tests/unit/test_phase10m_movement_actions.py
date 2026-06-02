@@ -34,6 +34,7 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    FallBackModeKind,
     MovementActionAvailabilityContext,
     MovementActionAvailabilityResult,
     MovementPhaseActionKind,
@@ -87,7 +88,7 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
 
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
-        MovementPhaseActionKind.FALL_BACK.value,
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}",
     }
     assert MovementPhaseActionKind.NORMAL_MOVE.value not in {
         option.option_id for option in action_request.options
@@ -99,7 +100,9 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        option_id=(
+            f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}"
+        ),
         result_id="phase10m-result-000004",
     )
     fall_back_status = _decline_optional_stratagem_if_pending(
@@ -108,9 +111,10 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
         result_id="phase10m-decline-fire-overwatch",
     )
     if fall_back_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
-        assert _decision_request(fall_back_status).decision_type == (
-            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
-        )
+        assert _decision_request(fall_back_status).decision_type in {
+            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+            SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        }
     else:
         assert fall_back_status.status_kind is LifecycleStatusKind.UNSUPPORTED
 

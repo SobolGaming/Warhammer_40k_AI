@@ -47,6 +47,7 @@ from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
+    FallBackModeKind,
     FellBackUnitState,
     MovementDiceRecord,
     MovementPhaseActionKind,
@@ -343,9 +344,10 @@ def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> N
         state=state,
         unit_instance_id=passenger.unit_instance_id,
     )
-    assert MovementPhaseActionKind.FALL_BACK.value in {
-        option.option_id for option in action_request.options
-    }
+    fall_back_option_id = (
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
+    )
+    assert fall_back_option_id in {option.option_id for option in action_request.options}
 
     embark_request = _decision_request(
         _submit_handler_decision(
@@ -353,7 +355,7 @@ def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> N
             state=state,
             decisions=decisions,
             request=action_request,
-            option_id=MovementPhaseActionKind.FALL_BACK.value,
+            option_id=fall_back_option_id,
             result_id="phase10q-fall-back",
         )
     )
@@ -1805,7 +1807,7 @@ def _advance_embark_ready_scenario() -> tuple[
             transport,
             army_id="army-alpha",
             player_id="player-a",
-            poses=(Pose.at(19.0, 10.0),),
+            poses=(Pose.at(14.0, 10.0),),
         )
     )
     return (

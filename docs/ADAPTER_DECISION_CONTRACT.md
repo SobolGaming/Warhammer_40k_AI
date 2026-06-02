@@ -40,7 +40,7 @@ The shared contract uses these objects and payloads:
 - `DecisionResult`: engine-facing result created from a submission and pending request.
 - `DecisionRecord`: replay-facing record of a request/result pair.
 - `ProposalRequestPayload`: neutral parameterized physical-action request embedded inside a `DecisionRequest.payload`.
-- `MovementProposalPayload`: parameterized movement answer, including `PathWitness`.
+- `MovementProposalPayload`: parameterized movement answer, including `PathWitness`, `movement_mode`, and the explicit `fall_back_mode` when Fall Back was selected.
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
 - `EventRecord`: deterministic event-log payload.
@@ -158,7 +158,7 @@ status = submit_option(
 
 Adapter helper APIs should take `request_id` explicitly even when a local wrapper can infer the current pending request. Explicit request IDs let network, replay, and UI adapters fail fast on stale-client drift before constructing a `DecisionRecord`.
 
-If the selected option is legal and the action requires exact movement input, the engine may emit a follow-up parameterized proposal request.
+Movement action option payloads include the selected `movement_mode`. Default Normal Move and Advance keep their existing option IDs, while Take to the Skies variants append the mode, for example `normal_move:fly_take_to_skies` or `advance:fly_take_to_skies`. Fall Back options are explicitly mode-scoped: `fall_back:ordered_retreat` or `fall_back:desperate_escape`, with `:fly_take_to_skies` appended when that movement mode is selected. If the selected option is legal and the action requires exact movement input, the engine may emit a follow-up parameterized proposal request carrying the same mode context.
 
 Phase 11E mission-scoring decisions that are player-facing are finite decisions:
 
@@ -348,7 +348,7 @@ The contract currently covers these proposal families:
 
 - Normal Move;
 - Advance after dice/reroll resolution;
-- Fall Back, including Desperate Escape follow-up behavior where applicable;
+- Fall Back, including explicit `ordered_retreat` or `desperate_escape` mode context and Desperate Escape follow-up behavior where applicable;
 - Reinforcement placement;
 - Deep Strike placement;
 - Strategic Reserves placement;
@@ -381,7 +381,10 @@ Example proposal request:
       "source_decision_result_id": "phase11d-golden-normal-action",
       "movement_phase_action": "normal_move",
       "placement_kinds": [],
-      "context": {}
+      "context": {
+        "source_selected_option_id": "normal_move",
+        "movement_mode": "normal"
+      }
     }
   },
   "options": [
@@ -407,6 +410,7 @@ Example Normal Move submission:
     "proposal_kind": "normal_move",
     "unit_instance_id": "army-alpha:intercessor-unit-1",
     "movement_phase_action": "normal_move",
+    "movement_mode": "normal",
     "witness": {
       "model_paths": [
         {
@@ -521,6 +525,7 @@ Before the queue is popped or a `DecisionRecord` is created, Phase 11D must vali
 - decision type drift;
 - proposal kind drift;
 - unit drift;
+- movement mode and Fall Back mode drift;
 - required proposal context drift;
 - JSON shape and required-field validity.
 
@@ -555,6 +560,7 @@ Important behavior:
 - stale request IDs are rejected;
 - proposal-kind drift is rejected;
 - unit drift is rejected;
+- movement-mode and Fall Back-mode drift are rejected;
 - malformed movement witnesses return typed invalid diagnostics;
 - malformed attempted placements return typed invalid diagnostics;
 - unsupported proposal kinds fail explicitly;

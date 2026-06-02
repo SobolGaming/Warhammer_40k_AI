@@ -11,5 +11,8 @@
   "source_decision_result_id": "phase11d-golden-normal-action",
   "movement_phase_action": "normal_move",
   "placement_kinds": [],
-  "context": {}
+  "context": {
+    "source_selected_option_id": "normal_move",
+    "movement_mode": "normal"
+  }
 }

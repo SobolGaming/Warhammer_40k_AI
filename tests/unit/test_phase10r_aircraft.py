@@ -65,6 +65,7 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     AdvanceRollRequest,
     AdvanceRollResult,
+    FallBackModeKind,
     MovementActionAvailabilityContext,
     MovementPhaseActionKind,
     MovementPhaseHandler,
@@ -1228,7 +1229,7 @@ def test_non_aircraft_engaged_by_aircraft_and_enemy_unit_must_remain_or_fall_bac
 
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
-        MovementPhaseActionKind.FALL_BACK.value,
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}",
     }
 
 

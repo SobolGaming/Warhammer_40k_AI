@@ -47,6 +47,7 @@ from warhammer40k_core.engine.phases.movement import (
     DesperateEscapeRequirementReason,
     DesperateEscapeRoll,
     FallBackActionResult,
+    FallBackModeKind,
     FellBackUnitState,
     MovementPhaseActionKind,
     MovementPhaseStepKind,
@@ -70,6 +71,12 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-0000"
 _TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0003"
 _ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0272"
+_ORDERED_FALL_BACK_OPTION_ID = (
+    f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
+)
+_DESPERATE_FALL_BACK_OPTION_ID = (
+    f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}"
+)
 
 
 def test_fall_back_domain_payloads_round_trip_without_object_reprs() -> None:
@@ -218,7 +225,7 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
         result_id="phase10o-result-000004",
     )
     removal_request = _decision_request(fall_back_status)
@@ -292,7 +299,7 @@ def test_fall_back_without_desperate_escape_completes_immediately() -> None:
     status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        option_id=_ORDERED_FALL_BACK_OPTION_ID,
         result_id="phase10o-result-000007",
     )
     status = _decline_optional_stratagem_if_pending(
@@ -384,7 +391,7 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
         result_id="phase10o-fall-back-failed-0001",
     )
     removal_request = _decision_request(fall_back_status)
@@ -653,7 +660,7 @@ def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
         result_id="phase10o-desperate-destroy-set-0001",
     )
     removal_request = _decision_request(fall_back_status)
@@ -817,7 +824,7 @@ def _advance_to_fall_back_action_request(
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
-        MovementPhaseActionKind.FALL_BACK.value,
+        _DESPERATE_FALL_BACK_OPTION_ID,
     }
     return lifecycle, action_request
 

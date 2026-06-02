@@ -66,7 +66,11 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
 )
-from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseActionKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
@@ -724,6 +728,56 @@ def test_mission_action_cancellation_maps_displacements_and_battlefield_departur
         interrupt_mission_action_for_battlefield_departure(
             _mission_action_state(action_id="phase14d-unconfigured-departure")
         )
+
+
+def test_started_mission_action_is_interrupted_by_runtime_normal_move() -> None:
+    lifecycle = _battle_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    action = replace(
+        _mission_action_state(action_id="phase14d-runtime-cancel-action"),
+        interruption_conditions=("unit_moved", "unit_left_battlefield"),
+    )
+    state.record_mission_action_state(action)
+    movement_status = lifecycle.advance_until_decision_or_terminal()
+    movement_request = movement_status.decision_request
+    assert movement_request is not None
+    assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14d-runtime-cancel-select-unit",
+            request=movement_request,
+            selected_option_id=action.unit_instance_id,
+        )
+    )
+    action_request = action_status.decision_request
+    assert action_request is not None
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14d-runtime-cancel-normal-move",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        )
+    )
+    _decline_stratagem_window_if_pending(
+        lifecycle,
+        status,
+        result_id="phase14d-runtime-cancel-decline-stratagem",
+    )
+    interrupted = state.mission_action_state_by_id(action.action_id)
+    interruption_event = next(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "mission_action_interrupted"
+    )
+    event_payload = cast(dict[str, JsonValue], interruption_event.payload)
+
+    assert interrupted.status is MissionActionStatus.INTERRUPTED
+    assert interrupted.interrupted_reason == "unit_moved"
+    assert event_payload["interrupted_reason"] == "unit_moved"
+    assert event_payload["unit_instance_id"] == action.unit_instance_id
 
 
 def test_mission_action_terminal_state_validation_is_fail_fast() -> None:

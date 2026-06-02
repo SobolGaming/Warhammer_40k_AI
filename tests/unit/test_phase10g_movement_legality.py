@@ -27,7 +27,9 @@ from warhammer40k_core.engine.movement_legality import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement import (
+    FallBackModeKind,
     MovementPhaseActionKind,
+    fall_back_mode_kind_from_token,
     movement_mode_for_phase_action,
     movement_phase_action_kind_from_token,
 )
@@ -59,6 +61,27 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
         MovementCapabilitySet.from_payload(cast(MovementCapabilitySetPayload, decoded)).to_payload()
         == payload
     )
+
+
+def test_movement_action_and_fall_back_mode_tokens_are_strict() -> None:
+    assert movement_mode_for_phase_action(MovementPhaseActionKind.REMAIN_STATIONARY) is None
+    assert movement_mode_for_phase_action(MovementPhaseActionKind.ADVANCE) is MovementMode.ADVANCE
+    assert (
+        movement_mode_for_phase_action(MovementPhaseActionKind.FALL_BACK) is MovementMode.FALL_BACK
+    )
+    assert (
+        fall_back_mode_kind_from_token(FallBackModeKind.ORDERED_RETREAT)
+        is FallBackModeKind.ORDERED_RETREAT
+    )
+    assert (
+        fall_back_mode_kind_from_token(FallBackModeKind.DESPERATE_ESCAPE.value)
+        is FallBackModeKind.DESPERATE_ESCAPE
+    )
+
+    with pytest.raises(GameLifecycleError, match="FallBackModeKind token must be a string"):
+        fall_back_mode_kind_from_token(7)
+    with pytest.raises(GameLifecycleError, match="Unsupported FallBackModeKind token"):
+        fall_back_mode_kind_from_token("drifted")
 
 
 def test_infantry_and_beast_receive_terrain_traversal_permissions() -> None:

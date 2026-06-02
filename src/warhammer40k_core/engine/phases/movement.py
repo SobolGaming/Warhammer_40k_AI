@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from itertools import combinations
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
@@ -23,6 +23,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
     RulesetDescriptorError,
+    movement_mode_from_token,
+)
+from warhammer40k_core.engine.actions import (
+    MissionActionState,
+    MissionActionStatus,
+    interrupt_mission_action_for_battlefield_departure,
+    interrupt_mission_action_for_displacement,
 )
 from warhammer40k_core.engine.aircraft import (
     AircraftMinimumMoveResult,
@@ -179,6 +186,11 @@ class MovementPhaseActionKind(StrEnum):
     NORMAL_MOVE = "normal_move"
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
+
+
+class FallBackModeKind(StrEnum):
+    ORDERED_RETREAT = "ordered_retreat"
+    DESPERATE_ESCAPE = "desperate_escape"
 
 
 class DesperateEscapeRequirementReason(StrEnum):
@@ -3734,6 +3746,10 @@ def _proposal_payload_parse_failure(
         field = "proposal_kind"
     elif "proposal_kind" in message:
         field = "proposal_kind"
+    elif "movement_mode" in message or "MovementMode" in message:
+        field = "movement_mode"
+    elif "fall_back_mode" in message or "FallBackModeKind" in message:
+        field = "fall_back_mode"
     elif "witness" in message or "PathWitness" in message:
         field = "witness"
     elif "attempted_placement" in message or "UnitPlacement" in message:
@@ -4074,6 +4090,7 @@ def _apply_movement_action_decision(  # noqa: RET503
         )
         return None
     if action is MovementPhaseActionKind.NORMAL_MOVE:
+        movement_mode = _movement_mode_from_payload(payload=payload, action=action)
         if parameterized_proposals:
             return _request_movement_proposal(
                 state=state,
@@ -4082,12 +4099,14 @@ def _apply_movement_action_decision(  # noqa: RET503
                 unit_instance_id=active_selection.unit_instance_id,
                 action=MovementPhaseActionKind.NORMAL_MOVE,
                 proposal_kind=ProposalKind.NORMAL_MOVE,
+                context={"movement_mode": movement_mode.value},
             )
         witness = _payload_path_witness(payload, key="witness")
         resolution = resolve_normal_move(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
+            movement_mode=movement_mode,
             path_witness=witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
@@ -4197,6 +4216,7 @@ def _apply_movement_action_decision(  # noqa: RET503
         )
 
     if action is MovementPhaseActionKind.ADVANCE:
+        movement_mode = _movement_mode_from_payload(payload=payload, action=action)
         advance_roll_request = _advance_roll_request_for_action(
             state=state,
             unit=unit,
@@ -4215,6 +4235,7 @@ def _apply_movement_action_decision(  # noqa: RET503
                 dice_roll_state=advance_roll_state,
                 advance_roll_request=advance_roll_request,
                 action_result=result,
+                movement_mode=movement_mode,
             )
             decisions.request_decision(reroll_request)
             return LifecycleStatus.waiting_for_decision(
@@ -4239,12 +4260,15 @@ def _apply_movement_action_decision(  # noqa: RET503
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
             advance_roll=advance_roll,
+            movement_mode=movement_mode,
             parameterized_proposals=parameterized_proposals,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
+        movement_mode = _movement_mode_from_payload(payload=payload, action=action)
+        fall_back_mode = _fall_back_mode_from_payload(payload)
         if parameterized_proposals:
             return _request_movement_proposal(
                 state=state,
@@ -4253,17 +4277,26 @@ def _apply_movement_action_decision(  # noqa: RET503
                 unit_instance_id=active_selection.unit_instance_id,
                 action=MovementPhaseActionKind.FALL_BACK,
                 proposal_kind=ProposalKind.FALL_BACK,
+                context={
+                    "movement_mode": movement_mode.value,
+                    "fall_back_mode": fall_back_mode.value,
+                },
             )
         witness = _payload_path_witness(payload, key="witness")
         fall_back_resolution = resolve_fall_back_move(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
+            movement_mode=movement_mode,
             path_witness=witness,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
+        )
+        fall_back_resolution = _fall_back_result_with_mode(
+            resolution=fall_back_resolution,
+            fall_back_mode=fall_back_mode,
         )
         drift_code = fall_back_resolution.selected_payload_drift_code(payload)
         if drift_code is not None:
@@ -4296,6 +4329,35 @@ def _apply_movement_action_decision(  # noqa: RET503
                     "violation_code": drift_code,
                 },
             )
+        mode_violation_code = _fall_back_mode_violation_code(
+            resolution=fall_back_resolution,
+            fall_back_mode=fall_back_mode,
+        )
+        if mode_violation_code is not None:
+            invalid_payload = _movement_action_invalid_payload(
+                state=state,
+                active_player_id=active_player_id,
+                unit_instance_id=active_selection.unit_instance_id,
+                action=action,
+                result=result,
+                violation_code=mode_violation_code,
+                movement_payload=fall_back_resolution.movement_payload,
+                rollback_record=fall_back_resolution.rollback_record,
+            )
+            decisions.event_log.append("movement_action_invalid", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Fall Back mode is not legal for the submitted movement path.",
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "phase_body_status": "movement_action_invalid",
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                    "movement_phase_action": action.value,
+                    "violation_code": mode_violation_code,
+                },
+            )
         if not fall_back_resolution.is_valid:
             violation_code = _normal_move_violation_code(fall_back_resolution)
             invalid_payload = _movement_action_invalid_payload(
@@ -4325,15 +4387,17 @@ def _apply_movement_action_decision(  # noqa: RET503
                     "violation_code": violation_code,
                 },
             )
-        desperate_escape_rolls = _roll_desperate_escape_dice(
-            state=state,
-            decisions=decisions,
-            resolution=fall_back_resolution,
-        )
-        fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
-            resolution=fall_back_resolution,
-            desperate_escape_rolls=desperate_escape_rolls,
-        )
+        fall_back_result = fall_back_resolution
+        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+            desperate_escape_rolls = _roll_desperate_escape_dice(
+                state=state,
+                decisions=decisions,
+                resolution=fall_back_resolution,
+            )
+            fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
+                resolution=fall_back_resolution,
+                desperate_escape_rolls=desperate_escape_rolls,
+            )
         if fall_back_result.failed_desperate_escape_rolls:
             request = _desperate_escape_model_selection_request(
                 state=state,
@@ -4376,6 +4440,11 @@ def _request_movement_proposal(
     context: dict[str, JsonValue] | None = None,
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
+    request_context: dict[str, JsonValue] = {
+        "source_selected_option_id": result.selected_option_id,
+    }
+    if context is not None:
+        request_context.update(context)
     proposal_request = MovementProposalRequest(
         request_id=state.next_decision_request_id(),
         decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -4388,7 +4457,7 @@ def _request_movement_proposal(
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
         movement_phase_action=action.value,
-        context=context,
+        context=request_context,
     )
     request = proposal_request.to_decision_request()
     decisions.request_decision(request)
@@ -4515,12 +4584,21 @@ def _apply_movement_proposal_decision(
         proposal_request.unit_instance_id
     )
     action = movement_phase_action_kind_from_token(submission.movement_phase_action)
+    source_selected_option_id = _payload_string(
+        proposal_request.context or {},
+        key="source_selected_option_id",
+    )
 
     if action is MovementPhaseActionKind.NORMAL_MOVE:
+        movement_mode = _movement_mode_from_proposal_submission(
+            submission=submission,
+            action=action,
+        )
         resolution = resolve_normal_move(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
+            movement_mode=movement_mode,
             path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
@@ -4539,7 +4617,7 @@ def _apply_movement_proposal_decision(
                 result=_action_result_from_proposal_request(
                     proposal_request=proposal_request,
                     actor_id=active_player_id,
-                    selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+                    selected_option_id=source_selected_option_id,
                     payload={
                         "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
                         "unit_instance_id": proposal_request.unit_instance_id,
@@ -4580,7 +4658,7 @@ def _apply_movement_proposal_decision(
             result=_action_result_from_proposal_request(
                 proposal_request=proposal_request,
                 actor_id=active_player_id,
-                selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+                selected_option_id=source_selected_option_id,
                 payload={
                     "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
                     "unit_instance_id": proposal_request.unit_instance_id,
@@ -4602,6 +4680,10 @@ def _apply_movement_proposal_decision(
         )
 
     if action is MovementPhaseActionKind.ADVANCE:
+        movement_mode = _movement_mode_from_proposal_submission(
+            submission=submission,
+            action=action,
+        )
         advance_roll_payload = _payload_object(proposal_request.context or {}, key="advance_roll")
         advance_roll = AdvanceRollResult.from_payload(
             cast(AdvanceRollResultPayload, advance_roll_payload)
@@ -4611,6 +4693,7 @@ def _apply_movement_proposal_decision(
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
             advance_roll=advance_roll,
+            movement_mode=movement_mode,
             path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
@@ -4659,7 +4742,7 @@ def _apply_movement_proposal_decision(
             result=_action_result_from_proposal_request(
                 proposal_request=proposal_request,
                 actor_id=active_player_id,
-                selected_option_id=MovementPhaseActionKind.ADVANCE.value,
+                selected_option_id=source_selected_option_id,
                 payload={
                     "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
                     "unit_instance_id": proposal_request.unit_instance_id,
@@ -4681,16 +4764,44 @@ def _apply_movement_proposal_decision(
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
+        movement_mode = _movement_mode_from_proposal_submission(
+            submission=submission,
+            action=action,
+        )
+        fall_back_mode = _fall_back_mode_from_proposal_submission(submission=submission)
         fall_back_resolution = resolve_fall_back_move(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
+            movement_mode=movement_mode,
             path_witness=submission.witness,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
         )
+        fall_back_resolution = _fall_back_result_with_mode(
+            resolution=fall_back_resolution,
+            fall_back_mode=fall_back_mode,
+        )
+        mode_violation_code = _fall_back_mode_violation_code(
+            resolution=fall_back_resolution,
+            fall_back_mode=fall_back_mode,
+        )
+        if mode_violation_code is not None:
+            return _reject_invalid_movement_resolution(
+                state=state,
+                decisions=decisions,
+                result=result,
+                unit_instance_id=proposal_request.unit_instance_id,
+                action=action,
+                movement_payload=fall_back_resolution.movement_payload,
+                rollback_record=fall_back_resolution.rollback_record,
+                violation_code=mode_violation_code,
+                message="Fall Back mode is not legal for the submitted movement path.",
+                proposal_request=proposal_request,
+                field="fall_back_mode",
+            )
         if not fall_back_resolution.is_valid:
             violation_code = _normal_move_violation_code(fall_back_resolution)
             return _reject_invalid_movement_resolution(
@@ -4708,19 +4819,21 @@ def _apply_movement_proposal_decision(
                 ),
                 proposal_request=proposal_request,
             )
-        desperate_escape_rolls = _roll_desperate_escape_dice(
-            state=state,
-            decisions=decisions,
-            resolution=fall_back_resolution,
-        )
-        fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
-            resolution=fall_back_resolution,
-            desperate_escape_rolls=desperate_escape_rolls,
-        )
+        fall_back_result = fall_back_resolution
+        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+            desperate_escape_rolls = _roll_desperate_escape_dice(
+                state=state,
+                decisions=decisions,
+                resolution=fall_back_resolution,
+            )
+            fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
+                resolution=fall_back_resolution,
+                desperate_escape_rolls=desperate_escape_rolls,
+            )
         action_result = _action_result_from_proposal_request(
             proposal_request=proposal_request,
             actor_id=active_player_id,
-            selected_option_id=MovementPhaseActionKind.FALL_BACK.value,
+            selected_option_id=source_selected_option_id,
             payload={
                 "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
                 "unit_instance_id": proposal_request.unit_instance_id,
@@ -4820,13 +4933,14 @@ def _reject_invalid_movement_resolution(
     violation_code: str,
     message: str,
     proposal_request: MovementProposalRequest,
+    field: str = "witness",
 ) -> LifecycleStatus:
     proposal_validation = ProposalValidationResult.invalid(
         proposal_request_id=proposal_request.request_id,
         proposal_kind=proposal_request.proposal_kind,
         violation_code=violation_code,
         message=message,
-        field="witness",
+        field=field,
     )
     invalid_payload = _movement_action_invalid_payload(
         state=state,
@@ -4917,15 +5031,20 @@ def _apply_advance_roll_reroll_decision(
     )
     scenario = _battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    movement_mode = _movement_mode_from_payload(
+        payload=context_payload,
+        action=MovementPhaseActionKind.ADVANCE,
+    )
     action_result = DecisionResult(
         result_id=action_result_id,
         request_id=action_request_id,
         decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
         actor_id=active_player_id,
-        selected_option_id=MovementPhaseActionKind.ADVANCE.value,
+        selected_option_id=_payload_string(context_payload, key="action_selected_option_id"),
         payload={
             "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
             "unit_instance_id": unit_instance_id,
+            "movement_mode": movement_mode.value,
         },
     )
     return _resolve_and_apply_advance_move(
@@ -4935,6 +5054,7 @@ def _apply_advance_roll_reroll_decision(
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
         advance_roll=advance_roll,
+        movement_mode=movement_mode,
         parameterized_proposals=parameterized_proposals,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
@@ -4949,6 +5069,7 @@ def _resolve_and_apply_advance_move(
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
     advance_roll: AdvanceRollResult,
+    movement_mode: MovementMode,
     parameterized_proposals: bool,
     reaction_queue: ReactionQueue | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
@@ -4967,13 +5088,17 @@ def _resolve_and_apply_advance_move(
             unit_instance_id=unit_placement.unit_instance_id,
             action=MovementPhaseActionKind.ADVANCE,
             proposal_kind=ProposalKind.ADVANCE,
-            context={"advance_roll": validate_json_value(advance_roll.to_payload())},
+            context={
+                "advance_roll": validate_json_value(advance_roll.to_payload()),
+                "movement_mode": movement_mode.value,
+            },
         )
     resolution = resolve_advance_move(
         scenario=_battlefield_scenario(state),
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
         advance_roll=advance_roll,
+        movement_mode=movement_mode,
         objective_markers=_objective_markers_for_state(state),
         hover_mode_states=tuple(state.hover_mode_states),
     )
@@ -5189,7 +5314,7 @@ def _apply_desperate_escape_model_selection_decision(
         request_id=_payload_string(context_payload, key="action_request_id"),
         decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
         actor_id=active_player_id,
-        selected_option_id=MovementPhaseActionKind.FALL_BACK.value,
+        selected_option_id=_payload_string(context_payload, key="action_selected_option_id"),
         payload={
             "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
             "unit_instance_id": unit_instance_id,
@@ -5712,6 +5837,15 @@ def _complete_movement_activation_with_record_ids(
     if movement_state is None or movement_state.active_selection is None:
         raise GameLifecycleError("Movement activation completion requires active selection.")
     active_selection = movement_state.active_selection
+    _interrupt_started_mission_actions_for_movement_activation(
+        state=state,
+        decisions=decisions,
+        active_selection=active_selection,
+        action=action,
+        request_id=request_id,
+        result_id=result_id,
+        displacement_kind=displacement_kind,
+    )
     state.movement_phase_state = movement_state.with_activation_complete(
         active_selection.unit_instance_id
     )
@@ -5733,6 +5867,75 @@ def _complete_movement_activation_with_record_ids(
         event_payload["transition_batch"] = validate_json_value(transition_batch.to_payload())
     event_payload.update(movement_payload)
     decisions.event_log.append("movement_activation_completed", event_payload)
+
+
+def _interrupt_started_mission_actions_for_movement_activation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    active_selection: MovementUnitSelection,
+    action: MovementPhaseActionKind,
+    request_id: str,
+    result_id: str,
+    displacement_kind: ModelDisplacementKind | None,
+) -> None:
+    if type(active_selection) is not MovementUnitSelection:
+        raise GameLifecycleError("Mission Action movement interruption requires active selection.")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        return
+    active_unit_on_battlefield = active_selection.unit_instance_id in {
+        placement.unit_instance_id
+        for army in battlefield_state.placed_armies
+        for placement in army.unit_placements
+    }
+    for action_state in tuple(state.mission_action_states):
+        if not _mission_action_state_is_active_for_unit(
+            action_state=action_state,
+            unit_instance_id=active_selection.unit_instance_id,
+        ):
+            continue
+        if active_unit_on_battlefield:
+            if displacement_kind is None:
+                continue
+            interrupted = interrupt_mission_action_for_displacement(
+                action_state,
+                displacement_kind=displacement_kind,
+            )
+        else:
+            interrupted = interrupt_mission_action_for_battlefield_departure(action_state)
+        if interrupted is None:
+            continue
+        state.replace_mission_action_state(interrupted)
+        decisions.event_log.append(
+            "mission_action_interrupted",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": active_selection.player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": active_selection.unit_instance_id,
+                "movement_phase_action": action.value,
+                "request_id": request_id,
+                "result_id": result_id,
+                "phase_body_status": "mission_action_interrupted",
+                "mission_action_state": validate_json_value(interrupted.to_payload()),
+                "interrupted_reason": interrupted.interrupted_reason,
+            },
+        )
+
+
+def _mission_action_state_is_active_for_unit(
+    *,
+    action_state: MissionActionState,
+    unit_instance_id: str,
+) -> bool:
+    if type(action_state) is not MissionActionState:
+        raise GameLifecycleError("Mission Action interruption requires MissionActionState.")
+    return (
+        action_state.status is MissionActionStatus.STARTED
+        and action_state.unit_instance_id == unit_instance_id
+    )
 
 
 def _movement_action_options(
@@ -5788,91 +5991,170 @@ def _movement_action_options(
             )
             continue
         if action is MovementPhaseActionKind.NORMAL_MOVE:
-            if parameterized_proposals:
+            movement_modes = _movement_modes_for_action_options(
+                scenario=scenario,
+                unit_placement=unit_placement,
+                ruleset_descriptor=ruleset_descriptor,
+                hover_mode_states=hover_mode_states,
+                action=action,
+            )
+            for movement_mode in movement_modes:
+                option_id = _movement_action_option_id(
+                    action=action,
+                    movement_mode=movement_mode,
+                )
+                if parameterized_proposals:
+                    options.append(
+                        DecisionOption(
+                            option_id=option_id,
+                            label=_movement_action_label(
+                                action=action,
+                                movement_mode=movement_mode,
+                            ),
+                            payload={
+                                "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                                "unit_instance_id": unit_placement.unit_instance_id,
+                                "movement_mode": movement_mode.value,
+                            },
+                        )
+                    )
+                    continue
+                resolution = resolve_normal_move(
+                    scenario=scenario,
+                    ruleset_descriptor=ruleset_descriptor,
+                    unit_placement=unit_placement,
+                    movement_mode=movement_mode,
+                    path_witness=None,
+                    objective_markers=objective_markers,
+                    hover_mode_states=hover_mode_states,
+                )
                 options.append(
                     DecisionOption(
-                        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-                        label="Normal Move",
+                        option_id=option_id,
+                        label=_movement_action_label(
+                            action=action,
+                            movement_mode=movement_mode,
+                        ),
+                        payload=validate_json_value(
+                            {
+                                "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                                "displacement_kind": ModelDisplacementKind.NORMAL_MOVE.value,
+                                "unit_instance_id": unit_placement.unit_instance_id,
+                                "movement_mode": movement_mode.value,
+                                "witness": resolution.witness.to_payload(),
+                                **resolution.movement_payload,
+                            }
+                        ),
+                    )
+                )
+            continue
+        if action is MovementPhaseActionKind.ADVANCE:
+            movement_modes = _movement_modes_for_action_options(
+                scenario=scenario,
+                unit_placement=unit_placement,
+                ruleset_descriptor=ruleset_descriptor,
+                hover_mode_states=hover_mode_states,
+                action=action,
+            )
+            for movement_mode in movement_modes:
+                options.append(
+                    DecisionOption(
+                        option_id=_movement_action_option_id(
+                            action=action,
+                            movement_mode=movement_mode,
+                        ),
+                        label=_movement_action_label(
+                            action=action,
+                            movement_mode=movement_mode,
+                        ),
                         payload={
-                            "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+                            "movement_phase_action": action.value,
                             "unit_instance_id": unit_placement.unit_instance_id,
+                            "movement_mode": movement_mode.value,
                         },
                     )
                 )
-                continue
-            resolution = resolve_normal_move(
-                scenario=scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                unit_placement=unit_placement,
-                path_witness=None,
-                objective_markers=objective_markers,
-                hover_mode_states=hover_mode_states,
-            )
-            options.append(
-                DecisionOption(
-                    option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-                    label="Normal Move",
-                    payload=validate_json_value(
-                        {
-                            "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
-                            "displacement_kind": ModelDisplacementKind.NORMAL_MOVE.value,
-                            "unit_instance_id": unit_placement.unit_instance_id,
-                            "witness": resolution.witness.to_payload(),
-                            **resolution.movement_payload,
-                        }
-                    ),
-                )
-            )
             continue
         if action is MovementPhaseActionKind.FALL_BACK:
+            movement_modes = _movement_modes_for_action_options(
+                scenario=scenario,
+                unit_placement=unit_placement,
+                ruleset_descriptor=ruleset_descriptor,
+                hover_mode_states=hover_mode_states,
+                action=action,
+            )
             if parameterized_proposals:
+                for movement_mode in movement_modes:
+                    for fall_back_mode in _fall_back_modes_for_parameterized_option(
+                        unit_instance_id=unit_placement.unit_instance_id,
+                        battle_shocked_unit_ids=battle_shocked_unit_ids,
+                    ):
+                        options.append(
+                            DecisionOption(
+                                option_id=_movement_action_option_id(
+                                    action=action,
+                                    movement_mode=movement_mode,
+                                    fall_back_mode=fall_back_mode,
+                                ),
+                                label=_movement_action_label(
+                                    action=action,
+                                    movement_mode=movement_mode,
+                                    fall_back_mode=fall_back_mode,
+                                ),
+                                payload={
+                                    "movement_phase_action": (
+                                        MovementPhaseActionKind.FALL_BACK.value
+                                    ),
+                                    "unit_instance_id": unit_placement.unit_instance_id,
+                                    "movement_mode": movement_mode.value,
+                                    "fall_back_mode": fall_back_mode.value,
+                                },
+                            )
+                        )
+                continue
+            for movement_mode in movement_modes:
+                fall_back_resolution = resolve_fall_back_move(
+                    scenario=scenario,
+                    ruleset_descriptor=ruleset_descriptor,
+                    unit_placement=unit_placement,
+                    movement_mode=movement_mode,
+                    path_witness=None,
+                    battle_round=battle_round,
+                    battle_shocked_unit_ids=battle_shocked_unit_ids,
+                    objective_markers=objective_markers,
+                    hover_mode_states=hover_mode_states,
+                )
+                fall_back_mode = _fall_back_mode_for_resolution(fall_back_resolution)
+                fall_back_resolution = _fall_back_result_with_mode(
+                    resolution=fall_back_resolution,
+                    fall_back_mode=fall_back_mode,
+                )
                 options.append(
                     DecisionOption(
-                        option_id=MovementPhaseActionKind.FALL_BACK.value,
-                        label="Fall Back",
-                        payload={
-                            "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
-                            "unit_instance_id": unit_placement.unit_instance_id,
-                        },
+                        option_id=_movement_action_option_id(
+                            action=action,
+                            movement_mode=movement_mode,
+                            fall_back_mode=fall_back_mode,
+                        ),
+                        label=_movement_action_label(
+                            action=action,
+                            movement_mode=movement_mode,
+                            fall_back_mode=fall_back_mode,
+                        ),
+                        payload=validate_json_value(
+                            {
+                                "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                                "displacement_kind": ModelDisplacementKind.FALL_BACK.value,
+                                "unit_instance_id": unit_placement.unit_instance_id,
+                                "movement_mode": movement_mode.value,
+                                "fall_back_mode": fall_back_mode.value,
+                                "witness": fall_back_resolution.witness.to_payload(),
+                                **fall_back_resolution.movement_payload,
+                            }
+                        ),
                     )
                 )
-                continue
-            fall_back_resolution = resolve_fall_back_move(
-                scenario=scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                unit_placement=unit_placement,
-                path_witness=None,
-                battle_round=battle_round,
-                battle_shocked_unit_ids=battle_shocked_unit_ids,
-                objective_markers=objective_markers,
-                hover_mode_states=hover_mode_states,
-            )
-            options.append(
-                DecisionOption(
-                    option_id=MovementPhaseActionKind.FALL_BACK.value,
-                    label="Fall Back",
-                    payload=validate_json_value(
-                        {
-                            "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
-                            "displacement_kind": ModelDisplacementKind.FALL_BACK.value,
-                            "unit_instance_id": unit_placement.unit_instance_id,
-                            "witness": fall_back_resolution.witness.to_payload(),
-                            **fall_back_resolution.movement_payload,
-                        }
-                    ),
-                )
-            )
             continue
-        options.append(
-            DecisionOption(
-                option_id=action.value,
-                label=action.value.replace("_", " ").title(),
-                payload={
-                    "movement_phase_action": action.value,
-                    "unit_instance_id": unit_placement.unit_instance_id,
-                },
-            )
-        )
     return tuple(options)
 
 
@@ -5948,6 +6230,7 @@ def _advance_roll_reroll_request(
     dice_roll_state: DiceRollState,
     advance_roll_request: AdvanceRollRequest,
     action_result: DecisionResult,
+    movement_mode: MovementMode,
 ) -> DecisionRequest:
     permission = advance_roll_request.reroll_permission
     if permission is None:
@@ -5964,9 +6247,11 @@ def _advance_roll_reroll_request(
                 "battle_round": state.battle_round,
                 "phase": BattlePhase.MOVEMENT.value,
                 "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
+                "movement_mode": movement_mode.value,
                 "unit_instance_id": advance_roll_request.unit_instance_id,
                 "action_request_id": action_result.request_id,
                 "action_result_id": action_result.result_id,
+                "action_selected_option_id": action_result.selected_option_id,
                 "advance_roll_request": validate_json_value(advance_roll_request.to_payload()),
                 "advance_roll_state": validate_json_value(dice_roll_state.to_payload()),
             }
@@ -6065,6 +6350,7 @@ def _desperate_escape_model_selection_request(
                 "unit_instance_id": fall_back_result.unit_instance_id,
                 "action_request_id": action_result.request_id,
                 "action_result_id": action_result.result_id,
+                "action_selected_option_id": action_result.selected_option_id,
                 "fall_back_result": validate_json_value(fall_back_result.to_payload()),
                 "failed_model_ids": list(failed_model_ids),
             }
@@ -6517,6 +6803,7 @@ def _resolve_unit_move(
         )
         rollback_record = None
     movement_payload: dict[str, JsonValue] = {
+        "movement_mode": movement_mode.value,
         "movement_inches": max_movement_inches,
         "model_movements": model_movements,
         "path_validation_results": validate_json_value(
@@ -7319,6 +7606,17 @@ def movement_phase_action_kind_from_token(token: object) -> MovementPhaseActionK
         raise GameLifecycleError(f"Unsupported MovementPhaseActionKind token: {token}.") from exc
 
 
+def fall_back_mode_kind_from_token(token: object) -> FallBackModeKind:
+    if type(token) is FallBackModeKind:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("FallBackModeKind token must be a string.")
+    try:
+        return FallBackModeKind(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported FallBackModeKind token: {token}.") from exc
+
+
 def movement_phase_step_kind_from_token(token: object) -> MovementPhaseStepKind:
     if type(token) is MovementPhaseStepKind:
         return token
@@ -7356,6 +7654,169 @@ def movement_mode_for_phase_action(action: object) -> MovementMode | None:
     if action_kind is MovementPhaseActionKind.FALL_BACK:
         return MovementMode.FALL_BACK
     raise GameLifecycleError(f"Unsupported MovementPhaseActionKind token: {action_kind.value}.")
+
+
+def _movement_mode_from_payload(
+    *,
+    payload: dict[str, JsonValue],
+    action: MovementPhaseActionKind,
+) -> MovementMode:
+    movement_mode = movement_mode_from_token(_payload_string(payload, key="movement_mode"))
+    return _movement_mode_for_action(action=action, movement_mode=movement_mode)
+
+
+def _movement_mode_from_proposal_submission(
+    *,
+    submission: MovementProposalPayload,
+    action: MovementPhaseActionKind,
+) -> MovementMode:
+    if submission.movement_mode is None:
+        raise GameLifecycleError("Movement proposal requires movement_mode.")
+    movement_mode = movement_mode_from_token(submission.movement_mode)
+    return _movement_mode_for_action(action=action, movement_mode=movement_mode)
+
+
+def _fall_back_mode_from_payload(payload: dict[str, JsonValue]) -> FallBackModeKind:
+    return fall_back_mode_kind_from_token(_payload_string(payload, key="fall_back_mode"))
+
+
+def _fall_back_mode_from_proposal_submission(
+    *,
+    submission: MovementProposalPayload,
+) -> FallBackModeKind:
+    if submission.fall_back_mode is None:
+        raise GameLifecycleError("Fall Back movement proposal requires fall_back_mode.")
+    return fall_back_mode_kind_from_token(submission.fall_back_mode)
+
+
+def _movement_action_option_id(
+    *,
+    action: MovementPhaseActionKind,
+    movement_mode: MovementMode,
+    fall_back_mode: FallBackModeKind | None = None,
+) -> str:
+    default_mode = movement_mode_for_phase_action(action)
+    if action is MovementPhaseActionKind.FALL_BACK:
+        if fall_back_mode is None:
+            raise GameLifecycleError("Fall Back option IDs require fall_back_mode.")
+        parts = [action.value, fall_back_mode.value]
+        if movement_mode is not default_mode:
+            parts.append(movement_mode.value)
+        return ":".join(parts)
+    if movement_mode is default_mode:
+        return action.value
+    return f"{action.value}:{movement_mode.value}"
+
+
+def _movement_action_label(
+    *,
+    action: MovementPhaseActionKind,
+    movement_mode: MovementMode,
+    fall_back_mode: FallBackModeKind | None = None,
+) -> str:
+    action_label = action.value.replace("_", " ").title()
+    labels: list[str] = [action_label]
+    if fall_back_mode is not None:
+        labels.append(fall_back_mode.value.replace("_", " ").title())
+    if movement_mode is MovementMode.FLY_TAKE_TO_SKIES:
+        labels.append("Take To Skies")
+    return " - ".join(labels)
+
+
+def _movement_modes_for_action_options(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+    hover_mode_states: tuple[HoverModeState, ...],
+    action: MovementPhaseActionKind,
+) -> tuple[MovementMode, ...]:
+    default_mode = movement_mode_for_phase_action(action)
+    if default_mode is None:
+        return ()
+    modes = [default_mode]
+    if _unit_can_take_to_the_skies(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        ruleset_descriptor=ruleset_descriptor,
+        hover_mode_states=hover_mode_states,
+    ):
+        modes.append(MovementMode.FLY_TAKE_TO_SKIES)
+    return tuple(modes)
+
+
+def _unit_can_take_to_the_skies(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+    hover_mode_states: tuple[HoverModeState, ...],
+) -> bool:
+    if not ruleset_descriptor.fly_policy.take_to_the_skies_supported:
+        return False
+    unit = scenario.unit_instance_for_placement(unit_placement)
+    hover_mode_state = _hover_mode_state_for_unit(
+        hover_mode_states=hover_mode_states,
+        unit_instance_id=unit_placement.unit_instance_id,
+    )
+    aircraft_policy = AircraftMovementPolicy.from_unit(
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+        hover_mode_state=hover_mode_state,
+    )
+    return "FLY" in aircraft_policy.effective_keywords and not aircraft_policy.hover_mode_active
+
+
+def _fall_back_modes_for_parameterized_option(
+    *,
+    unit_instance_id: str,
+    battle_shocked_unit_ids: tuple[str, ...],
+) -> tuple[FallBackModeKind, ...]:
+    if unit_instance_id in set(battle_shocked_unit_ids):
+        return (FallBackModeKind.DESPERATE_ESCAPE,)
+    return (FallBackModeKind.ORDERED_RETREAT, FallBackModeKind.DESPERATE_ESCAPE)
+
+
+def _fall_back_mode_for_resolution(resolution: FallBackActionResult) -> FallBackModeKind:
+    if type(resolution) is not FallBackActionResult:
+        raise GameLifecycleError("Fall Back mode resolution requires FallBackActionResult.")
+    if resolution.desperate_escape_requirements:
+        return FallBackModeKind.DESPERATE_ESCAPE
+    return FallBackModeKind.ORDERED_RETREAT
+
+
+def _fall_back_result_with_mode(
+    *,
+    resolution: FallBackActionResult,
+    fall_back_mode: FallBackModeKind,
+) -> FallBackActionResult:
+    if type(resolution) is not FallBackActionResult:
+        raise GameLifecycleError("Fall Back mode payload requires FallBackActionResult.")
+    if type(fall_back_mode) is not FallBackModeKind:
+        raise GameLifecycleError("Fall Back mode payload requires FallBackModeKind.")
+    return replace(
+        resolution,
+        movement_payload={
+            **resolution.movement_payload,
+            "fall_back_mode": fall_back_mode.value,
+        },
+    )
+
+
+def _fall_back_mode_violation_code(
+    *,
+    resolution: FallBackActionResult,
+    fall_back_mode: FallBackModeKind,
+) -> str | None:
+    if fall_back_mode is FallBackModeKind.ORDERED_RETREAT:
+        if resolution.desperate_escape_requirements:
+            return "ordered_retreat_requires_desperate_escape"
+        return None
+    if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+        if not resolution.desperate_escape_requirements:
+            return "desperate_escape_has_no_requirements"
+        return None
+    raise GameLifecycleError("Unsupported Fall Back mode.")
 
 
 def _model_movement_inches(model: ModelInstance) -> int:
