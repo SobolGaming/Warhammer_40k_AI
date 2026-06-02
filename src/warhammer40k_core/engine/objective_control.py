@@ -7,9 +7,11 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.objectives import (
+    DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES,
     Objective,
     ObjectiveAnchorKind,
     ObjectiveMarker,
+    TerrainObjectiveAnchor,
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
@@ -23,9 +25,11 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 
@@ -377,6 +381,7 @@ class ObjectiveControlContext:
     active_player_id: str
     ruleset_descriptor: RulesetDescriptor | None = None
     terrain_objectives: tuple[Objective, ...] = ()
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "game_id", _validate_identifier("game_id", self.game_id))
@@ -426,6 +431,14 @@ class ObjectiveControlContext:
                 self.terrain_objectives,
             ),
         )
+        object.__setattr__(
+            self,
+            "terrain_features",
+            _validate_terrain_feature_tuple(
+                "ObjectiveControlContext terrain_features",
+                self.terrain_features,
+            ),
+        )
         if self.terrain_objectives and self.ruleset_descriptor is None:
             raise GameLifecycleError("Terrain objective control requires a RulesetDescriptor.")
 
@@ -449,22 +462,31 @@ class ObjectiveControlContext:
             raise GameLifecycleError("Objective control requires MissionSetup objective markers.")
         if state.active_player_id is None:
             raise GameLifecycleError("Objective control requires an active player.")
+        objective_markers = tuple(
+            marker.to_objective_marker() for marker in state.mission_setup.objective_markers
+        )
+        terrain_features = tuple(state.mission_setup.terrain_features)
+        objective_markers, resolved_terrain_objectives = _objective_control_sources_for_ruleset(
+            objective_markers=objective_markers,
+            terrain_features=terrain_features,
+            ruleset_descriptor=ruleset_descriptor,
+            explicit_terrain_objectives=terrain_objectives,
+        )
         return cls(
             game_id=state.game_id,
             scenario=BattlefieldScenario(
                 armies=tuple(state.army_definitions),
                 battlefield_state=state.battlefield_state,
             ),
-            objective_markers=tuple(
-                marker.to_objective_marker() for marker in state.mission_setup.objective_markers
-            ),
+            objective_markers=objective_markers,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             timing=timing,
             phase=_battle_phase_value(phase),
             battle_round=state.battle_round,
             active_player_id=state.active_player_id,
             ruleset_descriptor=ruleset_descriptor,
-            terrain_objectives=terrain_objectives,
+            terrain_objectives=resolved_terrain_objectives,
+            terrain_features=terrain_features,
         )
 
 
@@ -601,6 +623,8 @@ def objective_marker_endpoint_violations(
     )
     violations: list[ObjectiveMarkerEndpointViolation] = []
     for marker in markers:
+        if not marker.blocks_placement:
+            continue
         for geometry_model in spatial_index.models_overlapping_objective_marker_endpoint(marker):
             placement = placement_by_model_id[geometry_model.model_id]
             violations.append(
@@ -704,10 +728,159 @@ def _terrain_objective_result(
             objective_id=objective.objective_id,
             unsupported_reason="terrain_objective_control_policy_unsupported",
         )
-    return ObjectiveControlResult.unsupported(
-        objective_id=objective.objective_id,
-        unsupported_reason="terrain_objective_control_policy_not_implemented",
+    if policy is not TerrainObjectiveControlPolicy.TERRAIN_AREA_OCCUPANCY:
+        raise GameLifecycleError("Unsupported terrain objective control policy.")
+    if type(objective.anchor) is not TerrainObjectiveAnchor:
+        raise GameLifecycleError("terrain_objectives must contain terrain-anchored objectives.")
+    feature = _terrain_feature_by_id(
+        context.terrain_features,
+        terrain_id=objective.anchor.terrain_id,
     )
+    scenario = context.scenario
+    placement_by_model_id = _model_placement_by_id(scenario)
+    model_instance_by_id = _model_instance_by_id(scenario)
+    contributors = tuple(
+        contribution
+        for geometry_model in scenario.placed_geometry_models()
+        if model_instance_by_id[geometry_model.model_id].is_alive
+        for contribution in (
+            _terrain_objective_contribution(
+                objective=objective,
+                feature=feature,
+                geometry_model=geometry_model,
+                placement=placement_by_model_id[geometry_model.model_id],
+                model_instance=model_instance_by_id[geometry_model.model_id],
+                battle_shocked_unit_ids=context.battle_shocked_unit_ids,
+            ),
+        )
+        if contribution is not None
+    )
+    return ObjectiveControlResult.from_contributors(
+        objective_id=objective.objective_id,
+        contributors=contributors,
+    )
+
+
+def _terrain_objective_contribution(
+    *,
+    objective: Objective,
+    feature: TerrainFeatureDefinition,
+    geometry_model: GeometryModel,
+    placement: ModelPlacement,
+    model_instance: ModelInstance,
+    battle_shocked_unit_ids: tuple[str, ...],
+) -> ObjectiveControlContribution | None:
+    horizontal_distance = shapely_backend.base_footprint_distance_to_bounds(
+        geometry_model.base,
+        geometry_model.pose,
+        feature.bounds(),
+    )
+    vertical_gap = _vertical_gap_to_terrain_area(geometry_model)
+    if horizontal_distance > objective.control_radius_inches:
+        return None
+    if vertical_gap > DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES:
+        return None
+    battle_shocked = placement.unit_instance_id in battle_shocked_unit_ids
+    objective_control_characteristic = _model_objective_control_characteristic(
+        model_instance,
+        battle_shocked=False,
+    )
+    effective_objective_control_characteristic = _model_objective_control_characteristic(
+        model_instance,
+        battle_shocked=battle_shocked,
+    )
+    return ObjectiveControlContribution(
+        player_id=placement.player_id,
+        unit_instance_id=placement.unit_instance_id,
+        model_instance_id=placement.model_instance_id,
+        objective_control=objective_control_characteristic.final,
+        effective_objective_control=effective_objective_control_characteristic.final,
+        battle_shocked=battle_shocked,
+        horizontal_distance_inches=horizontal_distance,
+        vertical_gap_inches=vertical_gap,
+    )
+
+
+def _vertical_gap_to_terrain_area(model: GeometryModel) -> float:
+    bottom, top = model.volume.vertical_interval(model.pose)
+    if top < 0.0:
+        return abs(top)
+    if bottom > 0.0:
+        return bottom
+    return 0.0
+
+
+def _terrain_feature_by_id(
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    *,
+    terrain_id: str,
+) -> TerrainFeatureDefinition:
+    requested_id = _validate_identifier("terrain_id", terrain_id)
+    for feature in terrain_features:
+        if feature.feature_id == requested_id:
+            return feature
+    raise GameLifecycleError("Terrain objective references an unknown terrain feature.")
+
+
+def _objective_control_sources_for_ruleset(
+    *,
+    objective_markers: tuple[ObjectiveMarker, ...],
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    ruleset_descriptor: RulesetDescriptor | None,
+    explicit_terrain_objectives: tuple[Objective, ...],
+) -> tuple[tuple[ObjectiveMarker, ...], tuple[Objective, ...]]:
+    markers = _validate_objective_marker_tuple("objective_markers", objective_markers)
+    features = _validate_terrain_feature_tuple("terrain_features", terrain_features)
+    terrain_objectives = _validate_objective_tuple(
+        "terrain_objectives",
+        explicit_terrain_objectives,
+    )
+    if terrain_objectives or ruleset_descriptor is None:
+        return markers, terrain_objectives
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("ruleset_descriptor must be a RulesetDescriptor.")
+    if not ruleset_descriptor.mission_policy.terrain_objective_missions_supported:
+        return markers, terrain_objectives
+    if (
+        ObjectiveAnchorKind.TERRAIN
+        not in ruleset_descriptor.objective_policy.supported_anchor_kinds
+    ):
+        return markers, terrain_objectives
+    if (
+        ruleset_descriptor.objective_policy.terrain_objective_control_policy
+        is TerrainObjectiveControlPolicy.UNSUPPORTED
+    ):
+        return markers, terrain_objectives
+    fallback_markers: list[ObjectiveMarker] = []
+    derived_objectives: list[Objective] = []
+    for marker in markers:
+        matching_features = tuple(
+            feature for feature in features if _terrain_feature_contains_marker(feature, marker)
+        )
+        if len(matching_features) > 1:
+            raise GameLifecycleError("Objective marker coincides with multiple terrain areas.")
+        if not matching_features:
+            fallback_markers.append(marker)
+            continue
+        derived_objectives.append(
+            Objective.terrain(
+                objective_id=marker.objective_marker_id,
+                name=marker.name,
+                terrain_id=matching_features[0].feature_id,
+                control_radius_inches=marker.control_horizontal_inches,
+            )
+        )
+    return tuple(fallback_markers), tuple(
+        sorted(derived_objectives, key=lambda objective: objective.objective_id)
+    )
+
+
+def _terrain_feature_contains_marker(
+    feature: TerrainFeatureDefinition,
+    marker: ObjectiveMarker,
+) -> bool:
+    min_x, min_y, max_x, max_y = feature.bounds()
+    return min_x <= marker.x_inches <= max_x and min_y <= marker.y_inches <= max_y
 
 
 def _record_id_for_context(context: ObjectiveControlContext) -> str:
@@ -915,6 +1088,24 @@ def _validate_objective_tuple(field_name: str, values: object) -> tuple[Objectiv
         seen.add(value.objective_id)
         objectives.append(value)
     return tuple(sorted(objectives, key=lambda objective: objective.objective_id))
+
+
+def _validate_terrain_feature_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[TerrainFeatureDefinition, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    features: list[TerrainFeatureDefinition] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TerrainFeatureDefinition:
+            raise GameLifecycleError(f"{field_name} must contain TerrainFeatureDefinition values.")
+        if value.feature_id in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(value.feature_id)
+        features.append(value)
+    return tuple(sorted(features, key=lambda feature: feature.feature_id))
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

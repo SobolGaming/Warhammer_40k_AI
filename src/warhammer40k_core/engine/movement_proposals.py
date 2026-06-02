@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.ruleset_descriptor import (
+    RulesetDescriptorError,
+    movement_mode_from_token,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     UnitPlacement,
@@ -87,6 +91,8 @@ class MovementProposalPayloadPayload(TypedDict):
     proposal_kind: str
     unit_instance_id: str
     movement_phase_action: str
+    movement_mode: NotRequired[str]
+    fall_back_mode: NotRequired[str]
     witness: PathWitnessPayload
     model_movements: NotRequired[list[ModelMovementProposalPayload]]
 
@@ -410,6 +416,8 @@ class MovementProposalPayload:
     unit_instance_id: str
     movement_phase_action: str
     witness: PathWitness
+    movement_mode: str | None = None
+    fall_back_mode: str | None = None
     model_movements: tuple[ModelMovementProposalPayload, ...] = ()
 
     def __post_init__(self) -> None:
@@ -441,6 +449,26 @@ class MovementProposalPayload:
         )
         if type(self.witness) is not PathWitness:
             raise GameLifecycleError("MovementProposalPayload witness must be a PathWitness.")
+        if self.movement_mode is not None:
+            try:
+                movement_mode = movement_mode_from_token(self.movement_mode)
+            except RulesetDescriptorError as exc:
+                raise GameLifecycleError(
+                    "MovementProposalPayload movement_mode is unsupported."
+                ) from exc
+            object.__setattr__(
+                self,
+                "movement_mode",
+                movement_mode.value,
+            )
+        object.__setattr__(
+            self,
+            "fall_back_mode",
+            _validate_optional_identifier(
+                "MovementProposalPayload fall_back_mode",
+                self.fall_back_mode,
+            ),
+        )
         object.__setattr__(
             self,
             "model_movements",
@@ -486,6 +514,24 @@ class MovementProposalPayload:
                 message="Movement proposal action does not match the pending request.",
                 field="movement_phase_action",
             )
+        movement_mode_result = _movement_proposal_context_match(
+            request=request,
+            submitted_value=self.movement_mode,
+            context_key="movement_mode",
+            violation_code="proposal_movement_mode_drift",
+            message="Movement proposal mode does not match the pending request.",
+        )
+        if movement_mode_result is not None:
+            return movement_mode_result
+        fall_back_mode_result = _movement_proposal_context_match(
+            request=request,
+            submitted_value=self.fall_back_mode,
+            context_key="fall_back_mode",
+            violation_code="proposal_fall_back_mode_drift",
+            message="Movement proposal Fall Back mode does not match the pending request.",
+        )
+        if fall_back_mode_result is not None:
+            return fall_back_mode_result
         return ProposalValidationResult.valid(
             proposal_request_id=request.request_id,
             proposal_kind=request.proposal_kind,
@@ -499,6 +545,10 @@ class MovementProposalPayload:
             "movement_phase_action": self.movement_phase_action,
             "witness": self.witness.to_payload(),
         }
+        if self.movement_mode is not None:
+            payload["movement_mode"] = self.movement_mode
+        if self.fall_back_mode is not None:
+            payload["fall_back_mode"] = self.fall_back_mode
         if self.model_movements:
             payload["model_movements"] = list(self.model_movements)
         return payload
@@ -512,6 +562,8 @@ class MovementProposalPayload:
             unit_instance_id=payload["unit_instance_id"],
             movement_phase_action=payload["movement_phase_action"],
             witness=PathWitness.from_payload(payload["witness"]),
+            movement_mode=payload.get("movement_mode"),
+            fall_back_mode=payload.get("fall_back_mode"),
             model_movements=() if model_movements is None else tuple(model_movements),
         )
 
@@ -704,6 +756,39 @@ def _validate_proposal_decision_type(value: object) -> str:
     if decision_type not in {MOVEMENT_PROPOSAL_DECISION_TYPE, PLACEMENT_PROPOSAL_DECISION_TYPE}:
         raise GameLifecycleError(f"Unsupported proposal decision_type: {decision_type}.")
     return decision_type
+
+
+def _movement_proposal_context_match(
+    *,
+    request: MovementProposalRequest,
+    submitted_value: str | None,
+    context_key: str,
+    violation_code: str,
+    message: str,
+) -> ProposalValidationResult | None:
+    context = request.context or {}
+    expected = context.get(context_key)
+    if expected is None:
+        if submitted_value is None:
+            return None
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code=violation_code,
+            message=message,
+            field=context_key,
+        )
+    if type(expected) is not str:
+        raise GameLifecycleError(f"Movement proposal context {context_key} must be a string.")
+    if submitted_value != expected:
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code=violation_code,
+            message=message,
+            field=context_key,
+        )
+    return None
 
 
 def _validate_proposal_violations(

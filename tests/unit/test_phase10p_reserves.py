@@ -94,7 +94,7 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, Terrain
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
-def test_movement_phase_enters_reinforcements_after_move_units() -> None:
+def test_movement_phase_requests_reserve_arrivals_inside_move_units() -> None:
     state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve()
     placed_unit_id = "army-alpha:intercessor-unit-2"
     state.movement_phase_state = MovementPhaseState(
@@ -112,16 +112,19 @@ def test_movement_phase_enters_reinforcements_after_move_units() -> None:
 
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     payload = cast(dict[str, object], status.payload)
-    assert payload["phase_body_status"] == "reinforcements_waiting_for_arrival_choice"
+    assert payload["step"] == MovementPhaseStepKind.MOVE_UNITS.value
+    assert payload["phase_body_status"] == "move_units_waiting_for_arrival_choice"
     assert payload["unarrived_reserve_count"] == 1
     assert status.decision_request is not None
     assert status.decision_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+    request_payload = cast(dict[str, object], status.decision_request.payload)
+    assert request_payload["step"] == MovementPhaseStepKind.MOVE_UNITS.value
     assert {option.option_id for option in status.decision_request.options} == {
         COMPLETE_REINFORCEMENTS_OPTION_ID,
         reserve_state.unit_instance_id,
     }
     assert state.movement_phase_state is not None
-    assert state.movement_phase_state.step is MovementPhaseStepKind.REINFORCEMENTS
+    assert state.movement_phase_state.step is MovementPhaseStepKind.MOVE_UNITS
     assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
 
 

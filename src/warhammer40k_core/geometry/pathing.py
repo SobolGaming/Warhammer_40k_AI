@@ -136,6 +136,7 @@ class PathValidationContextPayload(TypedDict):
     enemy_models: list[ModelPayload]
     terrain: list[TerrainVolumePayload]
     friendly_vehicle_monster_model_ids: list[str]
+    enemy_vehicle_monster_model_ids: list[str]
     aircraft_model_ids: list[str]
     may_transit_enemy_models: bool
     may_transit_enemy_engagement: bool
@@ -376,6 +377,7 @@ class PathValidationContext:
     enemy_models: tuple[Model, ...] = ()
     terrain: tuple[TerrainVolume, ...] = ()
     friendly_vehicle_monster_model_ids: tuple[str, ...] = ()
+    enemy_vehicle_monster_model_ids: tuple[str, ...] = ()
     aircraft_model_ids: tuple[str, ...] = ()
     may_transit_enemy_models: bool = False
     may_transit_enemy_engagement: bool = False
@@ -444,6 +446,20 @@ class PathValidationContext:
             self,
             "friendly_vehicle_monster_model_ids",
             friendly_vehicle_monster_model_ids,
+        )
+        enemy_vehicle_monster_model_ids = _validate_identifier_tuple(
+            "PathValidationContext enemy_vehicle_monster_model_ids",
+            self.enemy_vehicle_monster_model_ids,
+        )
+        enemy_model_ids = {model.model_id for model in enemy_models}
+        if any(model_id not in enemy_model_ids for model_id in enemy_vehicle_monster_model_ids):
+            raise GeometryError(
+                "PathValidationContext enemy_vehicle_monster_model_ids must reference enemy models."
+            )
+        object.__setattr__(
+            self,
+            "enemy_vehicle_monster_model_ids",
+            enemy_vehicle_monster_model_ids,
         )
         aircraft_model_ids = _validate_identifier_tuple(
             "PathValidationContext aircraft_model_ids",
@@ -552,8 +568,23 @@ class PathValidationContext:
                 if enemy_model.model_id in self.aircraft_model_ids:
                     continue
                 if _models_overlap_with_volume(sampled_model, enemy_model):
-                    if self.may_transit_enemy_models:
+                    if (
+                        self.may_transit_enemy_models
+                        and enemy_model.model_id not in self.enemy_vehicle_monster_model_ids
+                    ):
                         continue
+                    if (
+                        self.may_transit_enemy_models
+                        and enemy_model.model_id in self.enemy_vehicle_monster_model_ids
+                    ):
+                        return _invalid_path_validation(
+                            "enemy_vehicle_monster_transit_forbidden",
+                            "Path witness crosses an enemy VEHICLE/MONSTER blocker.",
+                            model_id=self.moving_model.model_id,
+                            blocker_id=enemy_model.model_id,
+                            metrics=metrics,
+                            movement_distance_witness=movement_distance_witness,
+                        )
                     return _invalid_path_validation(
                         "enemy_model_base_crossed",
                         "Path witness crosses an enemy model base.",
@@ -603,6 +634,11 @@ class PathValidationContext:
                     enemy_model,
                     horizontal_inches=self.enemy_engagement_horizontal_inches,
                     vertical_inches=self.enemy_engagement_vertical_inches,
+                ):
+                    continue
+                if (
+                    self.may_transit_enemy_models
+                    and enemy_model.model_id not in self.enemy_vehicle_monster_model_ids
                 ):
                     continue
                 if self.may_transit_enemy_engagement:
@@ -667,6 +703,7 @@ class PathValidationContext:
             "enemy_models": [model.to_payload() for model in self.enemy_models],
             "terrain": [terrain.to_payload() for terrain in self.terrain],
             "friendly_vehicle_monster_model_ids": list(self.friendly_vehicle_monster_model_ids),
+            "enemy_vehicle_monster_model_ids": list(self.enemy_vehicle_monster_model_ids),
             "aircraft_model_ids": list(self.aircraft_model_ids),
             "may_transit_enemy_models": self.may_transit_enemy_models,
             "may_transit_enemy_engagement": self.may_transit_enemy_engagement,
@@ -690,6 +727,7 @@ class PathValidationContext:
             enemy_models=tuple(Model.from_payload(model) for model in payload["enemy_models"]),
             terrain=tuple(terrain_volume_from_payload(terrain) for terrain in payload["terrain"]),
             friendly_vehicle_monster_model_ids=tuple(payload["friendly_vehicle_monster_model_ids"]),
+            enemy_vehicle_monster_model_ids=tuple(payload["enemy_vehicle_monster_model_ids"]),
             aircraft_model_ids=tuple(payload["aircraft_model_ids"]),
             may_transit_enemy_models=payload["may_transit_enemy_models"],
             may_transit_enemy_engagement=payload["may_transit_enemy_engagement"],

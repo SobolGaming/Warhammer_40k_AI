@@ -27,7 +27,9 @@ from warhammer40k_core.engine.movement_legality import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement import (
+    FallBackModeKind,
     MovementPhaseActionKind,
+    fall_back_mode_kind_from_token,
     movement_mode_for_phase_action,
     movement_phase_action_kind_from_token,
 )
@@ -59,6 +61,27 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
         MovementCapabilitySet.from_payload(cast(MovementCapabilitySetPayload, decoded)).to_payload()
         == payload
     )
+
+
+def test_movement_action_and_fall_back_mode_tokens_are_strict() -> None:
+    assert movement_mode_for_phase_action(MovementPhaseActionKind.REMAIN_STATIONARY) is None
+    assert movement_mode_for_phase_action(MovementPhaseActionKind.ADVANCE) is MovementMode.ADVANCE
+    assert (
+        movement_mode_for_phase_action(MovementPhaseActionKind.FALL_BACK) is MovementMode.FALL_BACK
+    )
+    assert (
+        fall_back_mode_kind_from_token(FallBackModeKind.ORDERED_RETREAT)
+        is FallBackModeKind.ORDERED_RETREAT
+    )
+    assert (
+        fall_back_mode_kind_from_token(FallBackModeKind.DESPERATE_ESCAPE.value)
+        is FallBackModeKind.DESPERATE_ESCAPE
+    )
+
+    with pytest.raises(GameLifecycleError, match="FallBackModeKind token must be a string"):
+        fall_back_mode_kind_from_token(7)
+    with pytest.raises(GameLifecycleError, match="Unsupported FallBackModeKind token"):
+        fall_back_mode_kind_from_token("drifted")
 
 
 def test_infantry_and_beast_receive_terrain_traversal_permissions() -> None:
@@ -289,25 +312,19 @@ def test_custom_normal_move_transit_allowed_but_endpoint_forbidden() -> None:
 
 def test_custom_and_unsupported_policy_require_explicit_descriptor() -> None:
     eleventh = RulesetDescriptor.warhammer_40000_eleventh()
-    custom = _descriptor_with_custom_movement_policy(include_take_to_skies=True)
 
     with pytest.raises(MovementLegalityError, match="explicit RulesetDescriptor"):
         EngagementMovementPolicy.from_ruleset_descriptor(
             None,
             movement_mode=MovementMode.NORMAL,
         )
-    with pytest.raises(MovementLegalityError, match="does not define movement legality"):
-        EngagementMovementPolicy.from_ruleset_descriptor(
-            eleventh,
-            movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
-        )
 
     policy = EngagementMovementPolicy.from_ruleset_descriptor(
-        custom,
+        eleventh,
         movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
     )
 
-    assert policy.horizontal_inches == custom.engagement_policy.horizontal_inches
+    assert policy.horizontal_inches == eleventh.engagement_policy.horizontal_inches
     assert policy.may_transit_enemy_engagement
     assert not policy.may_end_in_enemy_engagement
     assert policy.movement_mode is MovementMode.FLY_TAKE_TO_SKIES

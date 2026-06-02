@@ -11,7 +11,11 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceRollResult, DiceRollState
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
+from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
+    RulesetDescriptor,
+    TerrainFeatureKind,
+)
 from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
     AircraftMovementPolicyPayload,
@@ -61,11 +65,11 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     AdvanceRollRequest,
     AdvanceRollResult,
+    FallBackModeKind,
     MovementActionAvailabilityContext,
     MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
-    MovementPhaseStepKind,
     _aircraft_minimum_move_unavailable,  # pyright: ignore[reportPrivateUsage]
     _model_base_movement_inches,  # pyright: ignore[reportPrivateUsage]
     _model_movement_budget_inches,  # pyright: ignore[reportPrivateUsage]
@@ -457,7 +461,9 @@ def test_aircraft_movement_budget_helpers_fail_fast() -> None:
         _model_movement_budget_inches(
             model=model,
             aircraft_policy=policy,
+            ruleset_descriptor=_ruleset(),
             movement_bonus_inches=0,
+            movement_mode=MovementMode.NORMAL,
             movement_phase_action=cast(MovementPhaseActionKind, object()),
         )
     with pytest.raises(GameLifecycleError, match="geometry Model"):
@@ -1185,7 +1191,6 @@ def test_aircraft_transition_reserve_state_is_required_next_controller_turn_only
     state.movement_phase_state = MovementPhaseState(
         battle_round=2,
         active_player_id="player-a",
-        step=MovementPhaseStepKind.REINFORCEMENTS,
     )
     reinforcement_decisions = DecisionController()
     reinforcement_request = _decision_request(
@@ -1224,7 +1229,7 @@ def test_non_aircraft_engaged_by_aircraft_and_enemy_unit_must_remain_or_fall_bac
 
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
-        MovementPhaseActionKind.FALL_BACK.value,
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}",
     }
 
 

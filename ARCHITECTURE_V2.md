@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14C work and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14C** is treated as implemented at the time this file was updated. Phase 14C completed the shared primitives cutover for 2"/5" Engagement Range, one-neighbor plus 9"/5" coherency, free rotations, typed dash characteristics, Detection Range, Battle-shocked OC/action restrictions, and unit-level Hazardous mortal-wound allocation; **Phase 14D is the next build slice** before Phase 15 Charge/Fight work begins.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. Phase 14D completed the movement, terrain, objectives, and actions cutover: reserve arrivals stay inside Move Units, Take to the Skies has typed pathing, budget effects, finite movement options, and parameterized proposal context for Normal/Advance/Fall Back, Fall Back exposes Ordered Retreat and Desperate Escape mode IDs, Monster/Vehicle traversal gates enemy model blockers, objective control derives terrain objectives with marker fallback, non-blocking markers can be occupied, and Mission Actions cancel through engine-owned movement/departure hooks. **Phase 14E is the next build slice** before Phase 15 Charge/Fight work begins.
 
 Completed / implemented foundation:
 
@@ -88,12 +88,13 @@ Completed / implemented foundation:
 | 14A | Complete | Source identity and migration audit |
 | 14B | Complete | Timing windows, active player, and phase skeleton cutover |
 | 14C | Complete | Shared primitives cutover |
+| 14D | Complete | Movement, terrain, objectives, and actions cutover |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14D-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14E-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -159,7 +160,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Stratagem framework: same stratagem once per phase, same unit targeted by at most one stratagem per phase unless stated, optional additional CP sections, and source-backed 11th Edition Core Stratagem definitions | Phase 12B, 12C, 12D, 14I |
 | Core Stratagems: Command Re-roll partial-die semantics and no Leadership/Battle-shock coverage, Epic Challenge, Insane Bravery, New Orders, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch via Snap Shooting at end of opponent's Movement phase, Smokescreen, Heroic Intervention modes, and Counteroffensive | Phase 12B, 12C, 13D, 15E, 14I |
 | Monsters/Vehicles and `FRAME`: normal/advance-only movement through non-MONSTER/non-VEHICLE friendly/enemy models, frame measurement/rotation, shooting at engaged MONSTER/VEHICLE units, and close-quarters exceptions | Phase 10G, 10I, 13B, 14C, 14F |
-| Transports: capacity by models, multiple embarked units, battle-formation embark, embark after normal/advance/fall-back moves, Rapid/Tactical/Combat Disembark modes, emergency disembark, and destroyed-transport timing with Deadly Demise | Phase 10Q, 13E, 16C, 14H |
+| Transports: capacity by models, multiple embarked units, battle-formation embark, post-move Embark with setup-this-turn and datasheet-capacity gates, Rapid/Tactical/Combat Disembark modes including ingress restriction inheritance and Combat hazards/engagement permissions, Emergency Disembark closest-possible setup, and destroyed-transport timing with Deadly Demise | Phase 10Q, 13E, 16C, 14H |
 | Attached units: Leader and Support components, one Leader and one Support per bodyguard unless stated, bodyguard Toughness for attacks, destroyed-unit trigger identity, keyword union without model keyword inheritance, source-scoped ability persistence, and revive into attached unit | Phase 6, 13C, 13E, 16D, 17F, 14H |
 | Strategic Reserves and repositioned units: 50% points cap, no Fortifications, second-round ingress, 6" battlefield-edge setup, more-than-8" enemy distance, pre-third-round opponent-deployment-zone ban, third-round destruction exceptions, and move-history/effect persistence for repositioned units | Phase 10P, 11F, 16C, 14H |
 | Flying, Surge, and Aircraft: surge target selection and no-repeat-move restriction, optional `take to the skies` declaration with `-2"` budget unless Hover, FLY through all models/terrain and ignores vertical distance, Aircraft-only ingress, end-of-opponent-turn reserve transition, Aircraft engagement exceptions, and aircraft charge/fight restrictions | Phase 10R, 10S, 15B, 15D, 14D, 14H |
@@ -663,7 +664,7 @@ Invariants:
 - by default, a unit that Disembarked from a `TRANSPORT` in the current phase cannot Embark in that same phase; explicit rule overrides must be represented as typed permissions;
 - embarked units normally cannot do anything or be affected unless a rule says otherwise;
 - Disembark is battlefield placement from transport cargo;
-- Disembark is available only to units that started the Movement phase embarked;
+- Phase 10Q's initial Movement lifecycle exposes simple pre-move and post-Transport-Normal-Move Disembark gates; Phase 14H replaces this with the source-backed 11th Edition Rapid, Tactical, Combat, destroyed-Transport, and Emergency Disembark modes;
 - Disembark placement must be wholly within 3" of the Transport and not within enemy Engagement Range;
 - units disembarking before a stationary/not-yet-moved Transport moves can act normally but cannot choose Remain Stationary;
 - units disembarking after a Transport made a Normal move count as having made a Normal move, cannot move further this phase, and cannot declare a charge that turn;
@@ -1995,6 +1996,8 @@ Required tests:
 
 ## Phase 14D: movement, terrain, objectives, and actions cutover
 
+Status: Complete.
+
 Invariants:
 
 - Movement phase selection covers every friendly unit, including units in Strategic Reserves and embarked units;
@@ -2004,7 +2007,7 @@ Invariants:
 - Fall Back mode selection supports Ordered Retreat and Desperate Escape;
 - `MONSTER` and `VEHICLE` units can move through friendly and enemy models that
   are not `MONSTER` or `VEHICLE` only when making Normal or Advance moves;
-- Flying units can optionally take to the skies for Normal, Advance, Fall Back, and Charge moves, subtracting 2" unless Hover applies;
+- Flying units can optionally take to the skies for Normal, Advance, and Fall Back movement-phase actions through finite option IDs and parameterized proposal payload context, subtracting 2" unless Hover applies; Charge integration remains a Phase 15 charge-move task;
 - terrain areas and Exposed/Light/Dense categories replace retired terrain-feature policies;
 - Dense movement, vertical movement, stable non-ground endpoints, Solid, Hidden,
   Gone to Ground, Obscuring, and Benefit of Cover are represented from
@@ -2017,6 +2020,7 @@ Invariants:
 Required tests:
 
 - fall-back mode decisions validate battle-shocked and non-battle-shocked cases;
+- adapter proposal tests reject stale, drifted, and malformed `movement_mode` and `fall_back_mode` submissions before queue pop where required by the Phase 11D contract;
 - reserve-arrival Ingress choices occur during Move Units and use more-than-8"
   enemy-distance validation where applicable;
 - Monster/Vehicle model traversal is legal for Normal and Advance moves only and
@@ -2107,9 +2111,19 @@ Required Phase 15 tests:
 
 ## Phase 14H: advanced rules cutover
 
+Status: Not implemented. Phase 14D follow-up findings for movement-mode exposure, Fall Back mode payloads, and runtime Mission Action interruption are complete in Phase 14D; the transport, attached-unit, reserve, aircraft, revival, and destroyed-Transport items below remain Phase 14H scope.
+
 Invariants:
 
-- Transport capacity, multiple embarked units, Embark, Rapid/Tactical/Combat Disembark, Emergency Disembark, and destroyed-transport timing are source-backed and replay-facing;
+- Transport capacity, multiple embarked units, battle-formation Embark, post-move Embark, Rapid/Tactical/Combat Disembark, Emergency Disembark, and destroyed-transport timing are source-backed and replay-facing;
+- Embark after the first battle round has started is legal only after a Normal, Advance, or Fall Back move, only if every model is within 3" of a friendly `TRANSPORT`, the unit was not set up on the battlefield this turn, the unit is datasheet-eligible for that Transport, the Transport has sufficient remaining model capacity, and the engine removes the unit from the battlefield into that Transport's cargo state with deterministic removal records;
+- Disembark is legal only for a unit embarked within a `TRANSPORT` model that is on the battlefield, only if that unit did not Embark within that Transport this phase, and only if that Transport has not Advanced or Fell Back this phase;
+- Disembark uses an explicit source-backed mode enum and replay payload for `rapid_disembark`, `tactical_disembark`, `combat_disembark`, `destroyed_transport`, and `emergency_disembark`; any new adapter-visible mode, option family, proposal payload, or event shape must update `docs/ADAPTER_DECISION_CONTRACT.md` in the same implementation PR;
+- Rapid Disembark uses 3" wholly-within setup, is mandatory after the Transport makes a Normal or Ingress move, prevents charges until end of turn, and if the Transport made an Ingress move this turn the disembarking models must inherit the same setup restrictions that constrained the Transport's Ingress placement;
+- Tactical Disembark uses 3" wholly-within setup, is mandatory when the Transport remained stationary or has not yet been selected to move and a legal 3" setup exists, forbids Remain Stationary, and immediately routes the unit through the shared Movement phase decision path for a Normal or Advance move;
+- Combat Disembark uses 6" wholly-within setup when Rapid/Tactical conditions do not apply, makes one Hazard roll for each model through the shared Hazard/mortal-wound allocation service, can set up engaged only with enemy units that the Transport is engaged with, writes through Battle-shock, and prevents charges until end of turn;
+- Emergency Disembark uses 6" wholly-within setup for units embarked in a Transport that was just destroyed, makes one Hazard roll for each model before setup through the shared Hazard/mortal-wound allocation service, requires each model to be set up as close as possible to that Transport, destroys each model that cannot be placed that way, writes through Battle-shock, and prevents charges until end of turn;
+- destroyed-Transport Disembark/Emergency Disembark orchestration happens from the real destruction event before Transport removal and before/alongside Deadly Demise resolution according to the source timing, with embarked units not using stale battlefield placements or endpoint-only movement shortcuts;
 - Attached units support runtime-instantiated attached rules units from army-list
   Leader and Support declarations, one Leader and one Support per Bodyguard
   unless stated, Bodyguard Toughness for incoming attacks, keyword union without
@@ -2127,7 +2141,13 @@ Invariants:
 
 Required tests:
 
-- each transport mode has valid, invalid, replay, and drift coverage;
+- each transport mode has valid, invalid, replay, stale/drift/malformed submission, deterministic payload, and viewer-safe event/projection coverage;
+- Embark tests cover Normal, Advance, and Fall Back triggers; reject Remain Stationary, units set up this turn, wrong-player or non-Transport targets, datasheet-ineligible units, insufficient capacity, same-phase Disembark-then-Embark without an explicit typed override, and every-model-within-3" failures without mutation;
+- Rapid Disembark tests cover post-Normal and post-Ingress Transport movement, 3" wholly-within placement, no-charge state, and inheritance of Ingress restrictions such as enemy-distance and deployment-zone bans;
+- Tactical Disembark tests prove a legal 3" setup before a stationary/not-yet-selected Transport forces the Tactical mode, excludes Remain Stationary, routes to Normal/Advance movement through the shared Movement decision path, and rejects Fall Back unless an independent rule makes Fall Back legal;
+- Combat Disembark tests prove the 6" setup distance, fallback from impossible Tactical placement, one Hazard roll per model through the shared Hazard/mortal-wound service, Battle-shock/no-charge write-through, and the narrow permission to set up engaged only with enemies engaged with the Transport;
+- Emergency Disembark tests prove 6" closest-possible placement, destruction of unplaceable models, Hazard/mortal-wound allocation, Battle-shock/no-charge write-through, replay serialization, and no stale endpoint-only placement acceptance;
+- destroyed Transport orchestration tests prove Disembark/Emergency Disembark occurs from actual damage/destruction timing before Transport removal, does not leak through Deadly Demise ordering, and records deterministic placement/removal/damage/action-state effects;
 - attached-unit formation is instantiated at runtime from valid army-list
   declarations and emits replay-safe component role metadata;
 - attached-unit ability persistence ends when the relevant source model/unit is destroyed and resumes if revived;

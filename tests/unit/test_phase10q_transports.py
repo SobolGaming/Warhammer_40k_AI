@@ -47,6 +47,7 @@ from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
+    FallBackModeKind,
     FellBackUnitState,
     MovementDiceRecord,
     MovementPhaseActionKind,
@@ -286,7 +287,7 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
 
 def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None:
     scenario, passenger, transport, _enemy, _catalog = _advance_embark_ready_scenario()
-    state = _battle_state(scenario, game_id="phase10q-advance-embark-0001")
+    state = _battle_state(scenario, game_id="phase10q-advance-embark-0018")
     state.record_transport_cargo_state(_cargo_state(transport=transport))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
@@ -343,9 +344,10 @@ def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> N
         state=state,
         unit_instance_id=passenger.unit_instance_id,
     )
-    assert MovementPhaseActionKind.FALL_BACK.value in {
-        option.option_id for option in action_request.options
-    }
+    fall_back_option_id = (
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
+    )
+    assert fall_back_option_id in {option.option_id for option in action_request.options}
 
     embark_request = _decision_request(
         _submit_handler_decision(
@@ -353,7 +355,7 @@ def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> N
             state=state,
             decisions=decisions,
             request=action_request,
-            option_id=MovementPhaseActionKind.FALL_BACK.value,
+            option_id=fall_back_option_id,
             result_id="phase10q-fall-back",
         )
     )
@@ -1805,7 +1807,7 @@ def _advance_embark_ready_scenario() -> tuple[
             transport,
             army_id="army-alpha",
             player_id="player-a",
-            poses=(Pose.at(19.0, 10.0),),
+            poses=(Pose.at(14.0, 10.0),),
         )
     )
     return (
@@ -1884,6 +1886,18 @@ def _movement_action_request_for_unit(
     handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    if selection_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE:
+        decline_status = _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=COMPLETE_DISEMBARKS_OPTION_ID,
+            result_id=f"{unit_instance_id}:decline-pre-move-disembark",
+        )
+        assert decline_status is None
+        selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     selection_status = _submit_handler_decision(
         handler,
         state=state,

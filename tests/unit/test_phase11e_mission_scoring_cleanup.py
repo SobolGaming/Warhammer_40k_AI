@@ -15,6 +15,9 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatus,
+    interrupt_mission_action_for_battlefield_departure,
+    interrupt_mission_action_for_displacement,
+    mission_action_interruption_reason_for_displacement,
     mission_action_status_from_token,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -22,6 +25,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
+    ModelDisplacementKind,
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
@@ -62,7 +66,11 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
 )
-from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseActionKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
@@ -679,6 +687,144 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
         round_tripped_state.mission_action_state_by_id(completed.action_id).target_id
         == completed.target_id
     )
+
+
+def test_mission_action_cancellation_maps_displacements_and_battlefield_departure() -> None:
+    action = replace(
+        _mission_action_state(action_id="phase14d-cancel-action"),
+        interruption_conditions=("unit_moved", "unit_left_battlefield"),
+    )
+
+    interrupted_by_move = interrupt_mission_action_for_displacement(
+        action,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+    )
+    pile_in_result = interrupt_mission_action_for_displacement(
+        action,
+        displacement_kind=ModelDisplacementKind.PILE_IN,
+    )
+    consolidate_result = interrupt_mission_action_for_displacement(
+        action,
+        displacement_kind=ModelDisplacementKind.CONSOLIDATE,
+    )
+    interrupted_by_departure = interrupt_mission_action_for_battlefield_departure(action)
+
+    assert (
+        mission_action_interruption_reason_for_displacement(ModelDisplacementKind.ADVANCE)
+        == "unit_moved"
+    )
+    assert (
+        mission_action_interruption_reason_for_displacement(ModelDisplacementKind.PILE_IN) is None
+    )
+    assert interrupted_by_move is not None
+    assert interrupted_by_move.status is MissionActionStatus.INTERRUPTED
+    assert interrupted_by_move.interrupted_reason == "unit_moved"
+    assert pile_in_result is None
+    assert consolidate_result is None
+    assert interrupted_by_departure.status is MissionActionStatus.INTERRUPTED
+    assert interrupted_by_departure.interrupted_reason == "unit_left_battlefield"
+
+    with pytest.raises(GameLifecycleError, match="interruption reason is not configured"):
+        interrupt_mission_action_for_battlefield_departure(
+            _mission_action_state(action_id="phase14d-unconfigured-departure")
+        )
+
+
+def test_started_mission_action_is_interrupted_by_runtime_normal_move() -> None:
+    lifecycle = _battle_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    action = replace(
+        _mission_action_state(action_id="phase14d-runtime-cancel-action"),
+        interruption_conditions=("unit_moved", "unit_left_battlefield"),
+    )
+    state.record_mission_action_state(action)
+    movement_status = lifecycle.advance_until_decision_or_terminal()
+    movement_request = movement_status.decision_request
+    assert movement_request is not None
+    assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14d-runtime-cancel-select-unit",
+            request=movement_request,
+            selected_option_id=action.unit_instance_id,
+        )
+    )
+    action_request = action_status.decision_request
+    assert action_request is not None
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14d-runtime-cancel-normal-move",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        )
+    )
+    _decline_stratagem_window_if_pending(
+        lifecycle,
+        status,
+        result_id="phase14d-runtime-cancel-decline-stratagem",
+    )
+    interrupted = state.mission_action_state_by_id(action.action_id)
+    interruption_event = next(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "mission_action_interrupted"
+    )
+    event_payload = cast(dict[str, JsonValue], interruption_event.payload)
+
+    assert interrupted.status is MissionActionStatus.INTERRUPTED
+    assert interrupted.interrupted_reason == "unit_moved"
+    assert event_payload["interrupted_reason"] == "unit_moved"
+    assert event_payload["unit_instance_id"] == action.unit_instance_id
+
+
+def test_mission_action_terminal_state_validation_is_fail_fast() -> None:
+    action = _mission_action_state(action_id="phase14d-terminal-validation")
+
+    with pytest.raises(GameLifecycleError, match="Started mission Action must not have terminal"):
+        replace(action, score_transaction_id="victory-point:player-a:round-01:000001")
+    with pytest.raises(GameLifecycleError, match="Completed mission Action requires score"):
+        replace(
+            action,
+            status=MissionActionStatus.COMPLETED,
+            completed_battle_round=1,
+            completed_phase=BattlePhase.FIGHT.value,
+        )
+    with pytest.raises(GameLifecycleError, match="Completed mission Action cannot be interrupted"):
+        replace(
+            action,
+            status=MissionActionStatus.COMPLETED,
+            completed_battle_round=1,
+            completed_phase=BattlePhase.FIGHT.value,
+            interrupted_reason="unit_moved",
+            score_transaction_id="victory-point:player-a:round-01:000002",
+        )
+    with pytest.raises(GameLifecycleError, match="Interrupted mission Action requires a reason"):
+        replace(action, status=MissionActionStatus.INTERRUPTED)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Interrupted mission Action cannot have completion fields",
+    ):
+        replace(
+            action,
+            status=MissionActionStatus.INTERRUPTED,
+            completed_battle_round=1,
+            interrupted_reason="unit_moved",
+        )
+
+
+def test_mission_action_interruption_helpers_reject_malformed_state() -> None:
+    not_an_action = cast(MissionActionState, object())
+
+    with pytest.raises(GameLifecycleError, match="action_state must be a MissionActionState"):
+        interrupt_mission_action_for_displacement(
+            not_an_action,
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        )
+    with pytest.raises(GameLifecycleError, match="action_state must be a MissionActionState"):
+        interrupt_mission_action_for_battlefield_departure(not_an_action)
 
 
 def test_mission_action_start_rejects_drifted_lifecycle_option() -> None:

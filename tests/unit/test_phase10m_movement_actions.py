@@ -9,13 +9,16 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
 )
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameConfig
@@ -31,6 +34,7 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    FallBackModeKind,
     MovementActionAvailabilityContext,
     MovementActionAvailabilityResult,
     MovementPhaseActionKind,
@@ -38,6 +42,10 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pathing import PathWitness, TerrainEndpointViolationCode
@@ -80,7 +88,7 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
 
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
-        MovementPhaseActionKind.FALL_BACK.value,
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}",
     }
     assert MovementPhaseActionKind.NORMAL_MOVE.value not in {
         option.option_id for option in action_request.options
@@ -92,13 +100,23 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=MovementPhaseActionKind.FALL_BACK.value,
+        option_id=(
+            f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}"
+        ),
         result_id="phase10m-result-000004",
     )
-    assert fall_back_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert _decision_request(fall_back_status).decision_type == (
-        SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    fall_back_status = _decline_optional_stratagem_if_pending(
+        lifecycle,
+        status=fall_back_status,
+        result_id="phase10m-decline-fire-overwatch",
     )
+    if fall_back_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
+        assert _decision_request(fall_back_status).decision_type in {
+            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+            SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        }
+    else:
+        assert fall_back_status.status_kind is LifecycleStatusKind.UNSUPPORTED
 
 
 def test_movement_action_availability_payload_round_trips_without_object_reprs() -> None:
@@ -327,6 +345,86 @@ def test_round_large_flying_stem_or_hover_vehicle_records_cost_free_rotation() -
         ) == (45.0, 45.0)
 
 
+def test_fly_take_to_the_skies_applies_budget_modifier() -> None:
+    scenario = _vehicle_scenario_with_active_unit_keywords_and_base(
+        keywords=("FLY", "INFANTRY"),
+        base_size=BaseSizeDefinition.circular(32.0),
+    )
+    unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
+    start_pose = unit_placement.model_placements[0].pose
+    valid_resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+        path_witness=_single_model_witness_to_pose(
+            unit_placement,
+            end_pose=Pose.at(
+                start_pose.position.x + 10.0,
+                start_pose.position.y,
+                start_pose.position.z,
+                facing_degrees=start_pose.facing.degrees,
+            ),
+        ),
+    )
+    over_budget_resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+        path_witness=_single_model_witness_to_pose(
+            unit_placement,
+            end_pose=Pose.at(
+                start_pose.position.x + 12.0,
+                start_pose.position.y,
+                start_pose.position.z,
+                facing_degrees=start_pose.facing.degrees,
+            ),
+        ),
+    )
+
+    assert valid_resolution.is_valid
+    model_movements = cast(list[JsonValue], valid_resolution.movement_payload["model_movements"])
+    model_payload = cast(dict[str, object], model_movements[0])
+    assert model_payload["movement_mode"] == MovementMode.FLY_TAKE_TO_SKIES.value
+    assert model_payload["base_movement_inches"] == 12.0
+    assert model_payload["movement_distance_modifier_inches"] == -2.0
+    distance_witness = cast(dict[str, object], model_payload["movement_distance_witness"])
+    budget = cast(dict[str, object], distance_witness["budget"])
+    assert budget["max_distance_inches"] == 10.0
+    assert budget["remaining_distance_inches"] == 0.0
+    assert not over_budget_resolution.is_valid
+    assert over_budget_resolution.path_validation_results[0].violations[0].violation_code == (
+        "movement_distance_exceeded"
+    )
+
+
+def test_fly_take_to_the_skies_rejects_non_fly_and_wrong_action_mode() -> None:
+    scenario = _single_model_infantry_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
+    witness = _single_model_witness_to_pose(
+        unit_placement,
+        end_pose=Pose.at(7.0, 6.0),
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires the FLY keyword"):
+        resolve_normal_move(
+            scenario=scenario,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            unit_placement=unit_placement,
+            movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+            path_witness=witness,
+        )
+    with pytest.raises(GameLifecycleError, match="not legal for the selected movement action"):
+        resolve_normal_move(
+            scenario=scenario,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            unit_placement=unit_placement,
+            movement_mode=MovementMode.ADVANCE,
+            path_witness=witness,
+        )
+
+
 def test_aircraft_normal_move_records_cost_free_aircraft_rotation() -> None:
     scenario = _vehicle_scenario_with_active_unit_keywords_and_base(
         keywords=("Aircraft", "Vehicle"),
@@ -480,6 +578,27 @@ def _submit_result(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
+        )
+    )
+
+
+def _decline_optional_stratagem_if_pending(
+    lifecycle: GameLifecycle,
+    *,
+    status: LifecycleStatus,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
         )
     )
 

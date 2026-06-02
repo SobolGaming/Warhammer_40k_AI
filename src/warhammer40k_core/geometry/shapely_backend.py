@@ -137,6 +137,16 @@ def base_footprint_intersects_bounds(
     return surface.intersects(footprint_for_base(base, pose))
 
 
+def base_footprint_distance_to_bounds(
+    base: BaseShape,
+    pose: Pose,
+    bounds: tuple[float, float, float, float],
+) -> float:
+    min_x, min_y, max_x, max_y = bounds
+    surface = _geometry_module().box(min_x, min_y, max_x, max_y)
+    return surface.distance(footprint_for_base(base, pose))
+
+
 def base_footprint_distance(
     first: BaseShape,
     first_pose: Pose,

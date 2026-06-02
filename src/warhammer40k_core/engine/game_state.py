@@ -1351,6 +1351,9 @@ class GameState:
         self.replace_mission_action_state(interrupted)
         return interrupted
 
+    def runtime_ruleset_descriptor(self) -> RulesetDescriptor:
+        return self._ruleset_descriptor_for_runtime_policy()
+
     def record_persisting_effect(self, effect: PersistingEffect) -> None:
         if type(effect) is not PersistingEffect:
             raise GameLifecycleError("persisting_effect must be a PersistingEffect.")
@@ -2528,6 +2531,7 @@ class GameState:
                 self,
                 timing=timing,
                 phase=completed_phase,
+                ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
             )
         )
         self.record_objective_control_record(record)

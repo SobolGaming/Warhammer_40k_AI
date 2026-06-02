@@ -128,6 +128,7 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
     }
     assert cleanse_action.start_phase == "shooting"
     assert cleanse_action.target_policy == "objective_marker"
+    assert "unit_left_battlefield" in cleanse_action.interruption_conditions
     assert cleanse_action.victory_points == 5
     assert mission_pack.scoring.end_of_game_scoring_windows == (
         "turn_end_round_five_going_second",

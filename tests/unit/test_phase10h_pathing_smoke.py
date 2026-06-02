@@ -137,6 +137,37 @@ def test_fly_normal_move_can_transit_enemy_models_and_engagement_range() -> None
     assert enemy_engagement_result.is_valid
 
 
+def test_fly_take_to_the_skies_can_transit_enemy_models_and_engagement_range() -> None:
+    mover = _model("fly-mover", 1.0, 1.0)
+    enemy_base_blocker = _model("enemy-base-blocker", 3.0, 1.0)
+    enemy_engagement_blocker = _model("enemy-engagement-blocker", 3.0, 2.5)
+    context = _legality_context(
+        keywords=("FLY", "INFANTRY"),
+        movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+    )
+
+    enemy_base_context = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(enemy_base_blocker,),
+        end_pose=Pose.at(6.2, 1.0),
+    )
+    enemy_engagement_context = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(enemy_engagement_blocker,),
+        end_pose=Pose.at(6.2, 1.0),
+    )
+
+    assert context.capabilities.can_move_through_models
+    assert enemy_base_context.may_transit_enemy_models
+    assert enemy_engagement_context.may_transit_enemy_engagement
+    assert enemy_base_context.validate().is_valid
+    assert enemy_engagement_context.validate().is_valid
+
+
 def test_fly_normal_move_still_cannot_end_in_enemy_engagement_range_or_on_model() -> None:
     mover = _model("fly-mover", 1.0, 1.0)
     engagement_blocker = _model("enemy-engagement-blocker", 3.0, 2.5)
@@ -223,6 +254,58 @@ def test_non_fly_normal_and_advance_cannot_transit_enemy_model_base() -> None:
         assert not result.is_valid
         assert result.violations[0].violation_code == "enemy_model_base_crossed"
         assert result.violations[0].blocker_id == "enemy"
+
+
+def test_vehicle_or_monster_normal_and_advance_can_transit_enemy_non_vehicle_models() -> None:
+    mover = _model("vehicle-mover", 1.0, 1.0, radius=0.7)
+    enemy_infantry = _model("enemy-infantry", 3.0, 1.0)
+
+    for context in (
+        _normal_legality_context(keywords=("VEHICLE",)),
+        _legality_context(
+            keywords=("MONSTER",),
+            movement_mode=MovementMode.ADVANCE,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            displacement_kind=ModelDisplacementKind.ADVANCE,
+        ),
+    ):
+        path_context = _path_context(
+            context,
+            moving_model=mover,
+            enemy_models=(enemy_infantry,),
+            end_pose=Pose.at(7.0, 1.0),
+        )
+        result = path_context.validate()
+
+        assert path_context.may_transit_enemy_models
+        assert result.is_valid
+
+
+def test_vehicle_or_monster_normal_and_advance_cannot_transit_enemy_vehicle_or_monster() -> None:
+    mover = _model("vehicle-mover", 1.0, 1.0, radius=0.7)
+    enemy_vehicle = _model("enemy-vehicle", 3.0, 1.0, radius=0.9)
+
+    for context in (
+        _normal_legality_context(keywords=("VEHICLE",)),
+        _legality_context(
+            keywords=("MONSTER",),
+            movement_mode=MovementMode.ADVANCE,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            displacement_kind=ModelDisplacementKind.ADVANCE,
+        ),
+    ):
+        path_context = _path_context(
+            context,
+            moving_model=mover,
+            enemy_models=(enemy_vehicle,),
+            enemy_vehicle_monster_model_ids=(enemy_vehicle.model_id,),
+            end_pose=Pose.at(7.0, 1.0),
+        )
+        result = path_context.validate()
+
+        assert not result.is_valid
+        assert result.violations[0].violation_code == "enemy_vehicle_monster_transit_forbidden"
+        assert result.violations[0].blocker_id == enemy_vehicle.model_id
 
 
 def test_model_cannot_path_through_terrain_smoke_blocker() -> None:
@@ -396,6 +479,7 @@ def _path_context(
     enemy_models: tuple[Model, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
     friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
+    enemy_vehicle_monster_model_ids: tuple[str, ...] = (),
     middle_pose: Pose | None = None,
     end_pose: Pose,
     sample_interval_inches: float = 0.5,
@@ -421,5 +505,6 @@ def _path_context(
         enemy_models=enemy_models,
         terrain=terrain,
         friendly_vehicle_monster_model_ids=friendly_vehicle_monster_model_ids,
+        enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
         sample_interval_inches=sample_interval_inches,
     )

@@ -67,7 +67,6 @@ from warhammer40k_core.engine.phases.movement import (
     MovementDiceRecord,
     MovementPhaseActionKind,
     MovementPhaseState,
-    MovementPhaseStepKind,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -2126,7 +2125,6 @@ def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -
     state.movement_phase_state = MovementPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
-        step=MovementPhaseStepKind.REINFORCEMENTS,
         reinforcements_completed=True,
         selected_unit_ids=("army-alpha:intercessor-unit-1",),
         moved_unit_ids=("army-alpha:intercessor-unit-1",),
@@ -2215,7 +2213,6 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
     state.movement_phase_state = MovementPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
-        step=MovementPhaseStepKind.REINFORCEMENTS,
         reinforcements_completed=True,
         selected_unit_ids=("army-alpha:intercessor-unit-1",),
         moved_unit_ids=("army-alpha:intercessor-unit-1",),
