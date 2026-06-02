@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -14,12 +15,17 @@ from warhammer40k_core.core.attributes import (
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.objectives import Objective, ObjectiveMarker, ObjectiveMarkerPayload
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    RulesetDescriptor,
+    TerrainFeatureKind,
+    TerrainObjectiveControlPolicy,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
     UnitPlacement,
+    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.endpoint_placement import (
     ObjectiveMarkerEndpointPlacementViolation,
@@ -55,6 +61,7 @@ from warhammer40k_core.engine.phases.movement import resolve_normal_move
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
@@ -206,11 +213,20 @@ def test_objective_marker_payloads_round_trip_with_default_geometry() -> None:
 
 def test_terrain_objective_control_policy_is_explicitly_unsupported() -> None:
     state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
+    ruleset = _ruleset()
+    unsupported_ruleset = replace(
+        ruleset,
+        objective_policy=replace(
+            ruleset.objective_policy,
+            terrain_objective_control_policy=TerrainObjectiveControlPolicy.UNSUPPORTED,
+        ),
+        descriptor_hash="",
+    )
     context = ObjectiveControlContext.from_game_state(
         state,
         timing=ObjectiveControlTiming.PHASE_END,
         phase=BattlePhase.COMMAND,
-        ruleset_descriptor=_ruleset(),
+        ruleset_descriptor=unsupported_ruleset,
         terrain_objectives=(Objective.terrain("ruin-objective", "Ruin", "ruin-alpha"),),
     )
 
@@ -222,11 +238,97 @@ def test_terrain_objective_control_policy_is_explicitly_unsupported() -> None:
     assert result.controlled_by_player_id is None
 
 
-def test_model_endpoint_on_objective_marker_is_rejected() -> None:
+def test_terrain_objectives_derive_from_coincident_marker_and_control_area() -> None:
+    state = _battle_state_with_center_objective_positions(player_a_offsets=((0.0, 0.0),))
+    marker = _center_marker_definition(state)
+    terrain_feature = TerrainFeatureDefinition(
+        feature_id="center-terrain-objective",
+        feature_kind=TerrainFeatureKind.WOODS,
+        footprint_center_x_inches=marker.x_inches,
+        footprint_center_y_inches=marker.y_inches,
+        footprint_width_inches=6.0,
+        footprint_depth_inches=6.0,
+    )
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    state.mission_setup = replace(state.mission_setup, terrain_features=(terrain_feature,))
+
+    context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND,
+        ruleset_descriptor=_ruleset(),
+    )
+    record = resolve_objective_control(context)
+    result = record.result_by_objective_id(marker.objective_marker_id)
+
+    assert marker.objective_marker_id not in {
+        objective_marker.objective_marker_id for objective_marker in context.objective_markers
+    }
+    assert context.terrain_objectives == (
+        Objective.terrain(
+            marker.objective_marker_id,
+            marker.name,
+            terrain_feature.feature_id,
+        ),
+    )
+    assert result.status is ObjectiveControlStatus.CONTROLLED
+    assert result.controlled_by_player_id == "player-a"
+    assert result.contributors[0].horizontal_distance_inches == 0.0
+    assert (
+        ObjectiveControlRecord.from_payload(
+            cast(
+                ObjectiveControlRecordPayload,
+                json.loads(json.dumps(record.to_payload(), sort_keys=True)),
+            )
+        ).to_payload()
+        == record.to_payload()
+    )
+
+
+def test_nonblocking_objective_marker_can_be_occupied_at_endpoint() -> None:
     state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
     scenario = _scenario_from_state(state)
     marker_definition = _center_marker_definition(state)
     marker = marker_definition.to_objective_marker()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    overlapping = _with_model_offsets(
+        unit_placement,
+        marker_definition,
+        offsets=((0.0, 0.0),),
+    )
+    geometry_model = geometry_model_for_placement(
+        model=scenario.model_instance_for_placement(overlapping.model_placements[0]),
+        placement=overlapping.model_placements[0],
+    )
+
+    assert not marker.blocks_placement
+    assert (
+        objective_marker_endpoint_violations(
+            scenario=scenario,
+            objective_markers=(marker,),
+            unit_placement=overlapping,
+        )
+        == ()
+    )
+    assert (
+        objective_marker_endpoint_placement_violation(
+            model=geometry_model,
+            objective_markers=(marker,),
+            violation_code="objective_marker_endpoint_overlap",
+            placement_label="Normal Move",
+        )
+        is None
+    )
+
+
+def test_explicit_blocking_objective_marker_endpoint_is_rejected() -> None:
+    state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
+    scenario = _scenario_from_state(state)
+    marker_definition = _center_marker_definition(state)
+    marker = replace(marker_definition.to_objective_marker(), blocks_placement=True)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
         "army-alpha:intercessor-unit-1"
     )
@@ -258,12 +360,12 @@ def test_model_endpoint_on_objective_marker_is_rejected() -> None:
     assert ObjectiveMarkerEndpointViolation.from_payload(violation_payload) == violations[0]
 
 
-def test_normal_move_endpoint_on_objective_marker_is_rejected_by_shared_resolver() -> None:
+def test_normal_move_endpoint_on_blocking_objective_marker_is_rejected_by_shared_resolver() -> None:
     state = _battle_state_with_center_objective_positions(
         player_a_offsets=((4.0, 0.0), (4.0, 2.0), (4.0, 4.0), (4.0, 6.0), (4.0, 8.0)),
     )
     scenario = _scenario_from_state(state)
-    marker = _center_marker_definition(state).to_objective_marker()
+    marker = replace(_center_marker_definition(state).to_objective_marker(), blocks_placement=True)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
         "army-alpha:intercessor-unit-1"
     )
@@ -285,7 +387,7 @@ def test_normal_move_endpoint_on_objective_marker_is_rejected_by_shared_resolver
     )
 
 
-def test_setup_placement_endpoint_on_objective_marker_is_rejected_by_game_state() -> None:
+def test_setup_endpoint_on_nonblocking_objective_marker_is_allowed_by_game_state() -> None:
     mission_setup = _mission_setup()
     config = _config(mission_setup=mission_setup)
     armies = _mustered_armies(config)
@@ -302,8 +404,9 @@ def test_setup_placement_endpoint_on_objective_marker_is_rejected_by_game_state(
         _with_model_offsets(player_a, marker, offsets=((0.0, 0.0),))
     )
 
-    with pytest.raises(GameLifecycleError, match="objective marker"):
-        state.record_battlefield_state(battlefield_state)
+    state.record_battlefield_state(battlefield_state)
+
+    assert state.battlefield_state is battlefield_state
 
 
 def test_objective_marker_endpoint_placement_violation_payload_round_trips() -> None:

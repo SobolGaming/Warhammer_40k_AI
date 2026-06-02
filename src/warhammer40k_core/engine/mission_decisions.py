@@ -461,6 +461,7 @@ def _objective_marker_target_ids_by_unit(
             state,
             timing=ObjectiveControlTiming.PHASE_END,
             phase=_current_phase(state),
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
         )
     )
     targets_by_unit: dict[str, set[str]] = {}

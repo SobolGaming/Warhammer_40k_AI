@@ -1329,7 +1329,7 @@ def _enter_reinforcements_choice(
     request = _decision_request(status)
     assert request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
     assert state.movement_phase_state is not None
-    assert state.movement_phase_state.step is MovementPhaseStepKind.REINFORCEMENTS
+    assert state.movement_phase_state.step is MovementPhaseStepKind.MOVE_UNITS
     return handler, decisions, request
 
 

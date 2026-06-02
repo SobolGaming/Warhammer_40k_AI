@@ -93,6 +93,14 @@ _FLY_TRANSIT_MOVEMENT_MODES = frozenset(
         MovementMode.NORMAL,
         MovementMode.ADVANCE,
         MovementMode.FALL_BACK,
+        MovementMode.FLY_TAKE_TO_SKIES,
+    }
+)
+
+_VEHICLE_MONSTER_ENEMY_TRANSIT_MOVEMENT_MODES = frozenset(
+    {
+        MovementMode.NORMAL,
+        MovementMode.ADVANCE,
     }
 )
 
@@ -523,14 +531,20 @@ class MovementLegalityContext:
         enemy_models: tuple[Model, ...] = (),
         terrain: tuple[TerrainVolume, ...] = (),
         friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
+        enemy_vehicle_monster_model_ids: tuple[str, ...] = (),
         aircraft_model_ids: tuple[str, ...] = (),
         sample_interval_inches: float = 0.5,
         movement_distance_budget_inches: float | None = None,
     ) -> PathValidationContext:
         fly_transit_applies = self._fly_transit_applies()
+        vehicle_monster_enemy_transit_applies = (
+            self.capabilities.is_vehicle or self.capabilities.is_monster
+        ) and self.movement_mode in _VEHICLE_MONSTER_ENEMY_TRANSIT_MOVEMENT_MODES
         may_transit_enemy_models = (
-            self.capabilities.can_move_through_models and fly_transit_applies
-        ) or self.movement_mode is MovementMode.FALL_BACK
+            (self.capabilities.can_move_through_models and fly_transit_applies)
+            or self.movement_mode is MovementMode.FALL_BACK
+            or vehicle_monster_enemy_transit_applies
+        )
         may_transit_enemy_engagement = (
             self.engagement_policy.may_transit_enemy_engagement or fly_transit_applies
         )
@@ -539,6 +553,11 @@ class MovementLegalityContext:
             fly_transit_applies and self.capabilities.can_move_through_models
         ):
             friendly_vehicle_monster_blockers = ()
+        enemy_vehicle_monster_blockers: tuple[str, ...] = ()
+        if vehicle_monster_enemy_transit_applies and not (
+            fly_transit_applies and self.capabilities.can_move_through_models
+        ):
+            enemy_vehicle_monster_blockers = enemy_vehicle_monster_model_ids
         return PathValidationContext(
             moving_model=moving_model,
             witness=witness,
@@ -548,6 +567,7 @@ class MovementLegalityContext:
             enemy_models=enemy_models,
             terrain=terrain,
             friendly_vehicle_monster_model_ids=friendly_vehicle_monster_blockers,
+            enemy_vehicle_monster_model_ids=enemy_vehicle_monster_blockers,
             aircraft_model_ids=aircraft_model_ids,
             may_transit_enemy_models=may_transit_enemy_models,
             may_transit_enemy_engagement=may_transit_enemy_engagement,

@@ -22,6 +22,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MissionDeploymentZoneSource,
     MovementMode,
     RulesetDescriptor,
+    RulesetDescriptorError,
 )
 from warhammer40k_core.engine.aircraft import (
     AircraftMinimumMoveResult,
@@ -1160,12 +1161,8 @@ class MovementPhaseState:
                 raise GameLifecycleError(
                     "MovementPhaseState moved_unit_ids must be in selected_unit_ids."
                 )
-        if self.step is MovementPhaseStepKind.REINFORCEMENTS and self.active_selection is not None:
-            raise GameLifecycleError("Reinforcements step must not have active_selection.")
-        if self.reinforcements_completed and self.step is not MovementPhaseStepKind.REINFORCEMENTS:
-            raise GameLifecycleError(
-                "MovementPhaseState reinforcements_completed requires Reinforcements step."
-            )
+        if self.step is MovementPhaseStepKind.REINFORCEMENTS:
+            raise GameLifecycleError("Reinforcements is not a Movement phase step.")
         if self.active_selection is not None:
             if type(self.active_selection) is not MovementUnitSelection:
                 raise GameLifecycleError(
@@ -1332,30 +1329,14 @@ class MovementPhaseState:
         requested_step = movement_phase_step_kind_from_token(step)
         if requested_step is self.step:
             return self
-        if self.active_selection is not None:
-            raise GameLifecycleError("MovementPhaseState step change requires no active_selection.")
-        if requested_step is MovementPhaseStepKind.MOVE_UNITS:
-            raise GameLifecycleError("MovementPhaseState cannot return to Move Units.")
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step=requested_step,
-            reinforcements_completed=False,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
-            selected_unit_ids=self.selected_unit_ids,
-            moved_unit_ids=self.moved_unit_ids,
-            active_selection=None,
-        )
+        raise GameLifecycleError("MovementPhaseState has no secondary movement phase step.")
 
     def with_reinforcement_arrival(self, unit_instance_id: str) -> Self:
         arrived_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        if self.step is not MovementPhaseStepKind.REINFORCEMENTS:
-            raise GameLifecycleError("Reinforcement arrival requires Reinforcements step.")
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("Reinforcement arrival requires Move Units step.")
         if self.reinforcements_completed:
-            raise GameLifecycleError("Reinforcement arrival requires incomplete Reinforcements.")
+            raise GameLifecycleError("Reinforcement arrival requires incomplete Move Units.")
         selected = self.selected_unit_ids
         moved = self.moved_unit_ids
         if arrived_unit_id not in selected:
@@ -1377,10 +1358,10 @@ class MovementPhaseState:
         )
 
     def with_reinforcements_completed(self) -> Self:
-        if self.step is not MovementPhaseStepKind.REINFORCEMENTS:
-            raise GameLifecycleError("Completing Reinforcements requires Reinforcements step.")
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("Completing reserve arrivals requires Move Units step.")
         if self.active_selection is not None:
-            raise GameLifecycleError("Completing Reinforcements requires no active_selection.")
+            raise GameLifecycleError("Completing reserve arrivals requires no active_selection.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
@@ -1967,17 +1948,6 @@ class MovementPhaseHandler:
         _validate_movement_phase_state(state)
         movement_state = _ensure_movement_phase_state(state=state, decisions=decisions)
         _ensure_transport_cargo_phase_states(state)
-        if movement_state.step is MovementPhaseStepKind.REINFORCEMENTS:
-            assert_move_units_step_complete_for_reinforcements(
-                state=state,
-                movement_state=movement_state,
-            )
-            return _begin_reinforcements_step(
-                state=state,
-                decisions=decisions,
-                reaction_queue=reaction_queue,
-                stratagem_index=self.stratagem_index,
-            )
         active_selection = movement_state.active_selection
         if active_selection is not None:
             return _request_movement_action(
@@ -2004,20 +1974,6 @@ class MovementPhaseHandler:
             accounted_unplaced_model_ids=state.unavailable_model_ids(),
         )
         if not legal_unit_ids:
-            state.movement_phase_state = movement_state.with_step(
-                MovementPhaseStepKind.REINFORCEMENTS
-            )
-            decisions.event_log.append(
-                "movement_phase_step_entered",
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": _active_player_id(state),
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "step": MovementPhaseStepKind.REINFORCEMENTS.value,
-                    "phase_body_status": "reinforcements_step_entered",
-                },
-            )
             return _begin_reinforcements_step(
                 state=state,
                 decisions=decisions,
@@ -2262,11 +2218,15 @@ def _begin_reinforcements_step(
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     movement_state = state.movement_phase_state
-    if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
-        raise GameLifecycleError("Reinforcements step requires movement phase state.")
+    if movement_state is None or movement_state.step is not MovementPhaseStepKind.MOVE_UNITS:
+        raise GameLifecycleError("Reserve arrivals require Move Units state.")
+    assert_move_units_step_complete_for_reinforcements(
+        state=state,
+        movement_state=movement_state,
+    )
     unarrived_reserve_states = state.unarrived_reserve_states_for_player(active_player_id)
     if _overdue_required_reinforcement_reserve_states(state=state):
-        raise GameLifecycleError("Required Reinforcements arrival was missed.")
+        raise GameLifecycleError("Required reserve arrival was missed.")
     eligible_reserve_states = _eligible_reinforcement_reserve_states(state=state)
     required_reserve_states = _required_reinforcement_reserve_states(state=state)
     if movement_state.reinforcements_completed or not eligible_reserve_states:
@@ -2286,7 +2246,7 @@ def _begin_reinforcements_step(
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "active_player_id": active_player_id,
         },
         options=_reinforcement_unit_options(
@@ -2300,8 +2260,8 @@ def _begin_reinforcements_step(
         decision_request=request,
         payload={
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
-            "phase_body_status": "reinforcements_waiting_for_arrival_choice",
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
+            "phase_body_status": "move_units_waiting_for_arrival_choice",
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
             "unarrived_reserve_count": len(unarrived_reserve_states),
@@ -2321,8 +2281,8 @@ def _complete_reinforcements_step(
 ) -> LifecycleStatus:
     active_player_id = _active_player_id(state)
     movement_state = state.movement_phase_state
-    if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
-        raise GameLifecycleError("Completing Reinforcements requires Reinforcements step.")
+    if movement_state is None or movement_state.step is not MovementPhaseStepKind.MOVE_UNITS:
+        raise GameLifecycleError("Completing reserve arrivals requires Move Units step.")
     end_movement_reaction_status = _request_end_opponent_movement_reaction_if_available(
         state=state,
         decisions=decisions,
@@ -2334,23 +2294,23 @@ def _complete_reinforcements_step(
     if not movement_state.reinforcements_completed:
         state.movement_phase_state = movement_state.with_reinforcements_completed()
     decisions.event_log.append(
-        "reinforcements_step_completed",
+        "move_units_reserve_arrivals_completed",
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "unarrived_reserve_count": unarrived_reserve_count,
-            "phase_body_status": "reinforcements_complete",
+            "phase_body_status": "move_units_complete",
         },
     )
     return LifecycleStatus.advanced(
         stage=GameLifecycleStage.BATTLE,
         payload={
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
-            "phase_body_status": "reinforcements_complete",
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
+            "phase_body_status": "move_units_complete",
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
             "unarrived_reserve_count": unarrived_reserve_count,
@@ -2419,7 +2379,7 @@ def _request_rapid_ingress_reaction_if_available(
                     trigger_kind=TimingTriggerKind.END_PHASE,
                     source_rule_id=CORE_RAPID_INGRESS_HANDLER_ID,
                     phase=BattlePhase.MOVEMENT,
-                    source_step=MovementPhaseStepKind.REINFORCEMENTS.value,
+                    source_step=MovementPhaseStepKind.MOVE_UNITS.value,
                 ),
                 game_id=state.game_id,
                 battle_round=state.battle_round,
@@ -2448,7 +2408,7 @@ def _request_rapid_ingress_reaction_if_available(
             decision_request=triggered.decision_request,
             payload={
                 "phase": BattlePhase.MOVEMENT.value,
-                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "step": MovementPhaseStepKind.MOVE_UNITS.value,
                 "phase_body_status": "rapid_ingress_reaction_pending",
                 "battle_round": state.battle_round,
                 "active_player_id": active_player_id,
@@ -2545,7 +2505,7 @@ def _request_fire_overwatch_reaction_if_available(
                 decision_request=triggered.decision_request,
                 payload={
                     "phase": BattlePhase.MOVEMENT.value,
-                    "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                    "step": MovementPhaseStepKind.MOVE_UNITS.value,
                     "phase_body_status": "fire_overwatch_reaction_pending",
                     "battle_round": state.battle_round,
                     "active_player_id": active_player_id,
@@ -2621,7 +2581,7 @@ def _reinforcement_unit_options(
         options.append(
             DecisionOption(
                 option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
-                label="Complete Reinforcements",
+                label="Complete Reserve Arrivals",
                 payload={
                     "reinforcement_decision": COMPLETE_REINFORCEMENTS_OPTION_ID,
                 },
@@ -2692,33 +2652,33 @@ def _apply_reinforcement_unit_selection_decision(
     if result.actor_id != active_player_id:
         raise GameLifecycleError("Reinforcement selection actor must be the active player.")
     movement_state = state.movement_phase_state
-    if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
-        raise GameLifecycleError("Reinforcement selection requires Reinforcements step.")
+    if movement_state is None or movement_state.step is not MovementPhaseStepKind.MOVE_UNITS:
+        raise GameLifecycleError("Reinforcement selection requires Move Units step.")
     if movement_state.reinforcements_completed:
-        raise GameLifecycleError("Reinforcement selection requires incomplete Reinforcements.")
+        raise GameLifecycleError("Reinforcement selection requires incomplete Move Units.")
 
     payload = _decision_payload_object(result.payload)
     reinforcement_decision = _payload_string(payload, key="reinforcement_decision")
     if reinforcement_decision == COMPLETE_REINFORCEMENTS_OPTION_ID:
         if _required_reinforcement_reserve_states(state=state):
-            raise GameLifecycleError("Required Reinforcements arrival cannot be skipped.")
+            raise GameLifecycleError("Required reserve arrival cannot be skipped.")
         state.movement_phase_state = movement_state.with_reinforcements_completed()
         decisions.event_log.append(
-            "reinforcements_completion_selected",
+            "reserve_arrival_completion_selected",
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
                 "active_player_id": active_player_id,
                 "phase": BattlePhase.MOVEMENT.value,
-                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "step": MovementPhaseStepKind.MOVE_UNITS.value,
                 "request_id": result.request_id,
                 "result_id": result.result_id,
-                "phase_body_status": "reinforcements_completion_selected",
+                "phase_body_status": "reserve_arrival_completion_selected",
             },
         )
         return None
     if reinforcement_decision != "select_arrival":
-        raise GameLifecycleError("Unsupported Reinforcements selection payload.")
+        raise GameLifecycleError("Unsupported reserve arrival selection payload.")
 
     unit_instance_id = _payload_string(payload, key="unit_instance_id")
     reserve_state = state.reserve_state_for_unit(unit_instance_id)
@@ -2734,7 +2694,7 @@ def _apply_reinforcement_unit_selection_decision(
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "unit_instance_id": unit_instance_id,
             "request_id": result.request_id,
             "result_id": result.result_id,
@@ -2781,7 +2741,7 @@ def _request_reinforcement_placement(
             source_decision_result_id=result.result_id,
             placement_kinds=placement_kinds,
             context={
-                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "step": MovementPhaseStepKind.MOVE_UNITS.value,
                 "reserve_state": validate_json_value(reserve_state.to_payload()),
             },
         )
@@ -2794,7 +2754,7 @@ def _request_reinforcement_placement(
                 "battle_round": state.battle_round,
                 "active_player_id": active_player_id,
                 "phase": BattlePhase.MOVEMENT.value,
-                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "step": MovementPhaseStepKind.MOVE_UNITS.value,
                 "unit_instance_id": reserve_state.unit_instance_id,
                 "proposal_kind": proposal_kind.value,
                 "placement_kinds": [kind.value for kind in placement_kinds],
@@ -2809,7 +2769,7 @@ def _request_reinforcement_placement(
             decision_request=request,
             payload={
                 "phase": BattlePhase.MOVEMENT.value,
-                "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+                "step": MovementPhaseStepKind.MOVE_UNITS.value,
                 "phase_body_status": "placement_proposal_required",
                 "battle_round": state.battle_round,
                 "active_player_id": active_player_id,
@@ -2827,7 +2787,7 @@ def _request_reinforcement_placement(
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "active_player_id": active_player_id,
             "unit_instance_id": reserve_state.unit_instance_id,
         },
@@ -2842,7 +2802,7 @@ def _request_reinforcement_placement(
         decision_request=request,
         payload={
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "phase_body_status": "reinforcement_placement_required",
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
@@ -3045,14 +3005,14 @@ def _apply_reinforcement_placement_decision(
     if result.actor_id != active_player_id:
         raise GameLifecycleError("Reinforcement placement actor must be the active player.")
     movement_state = state.movement_phase_state
-    if movement_state is None or movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
-        raise GameLifecycleError("Reinforcement placement requires Reinforcements step.")
+    if movement_state is None or movement_state.step is not MovementPhaseStepKind.MOVE_UNITS:
+        raise GameLifecycleError("Reinforcement placement requires Move Units step.")
     if movement_state.reinforcements_completed:
-        raise GameLifecycleError("Reinforcement placement requires incomplete Reinforcements.")
+        raise GameLifecycleError("Reinforcement placement requires incomplete Move Units.")
 
     payload = _decision_payload_object(result.payload)
     if _payload_string(payload, key="reinforcement_decision") != "place_reinforcement_unit":
-        raise GameLifecycleError("Unsupported Reinforcements placement payload.")
+        raise GameLifecycleError("Unsupported reserve arrival placement payload.")
     unit_instance_id = _payload_string(payload, key="unit_instance_id")
     reserve_state = state.reserve_state_for_unit(unit_instance_id)
     if reserve_state is None:
@@ -3093,7 +3053,7 @@ def _apply_reinforcement_placement_decision(
             "battle_round": state.battle_round,
             "active_player_id": active_player_id,
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "unit_instance_id": unit_instance_id,
             "placement_kind": placement_kind.value,
             "request_id": result.request_id,
@@ -3153,7 +3113,7 @@ def _apply_valid_reinforcement_placement(
             "battle_round": state.battle_round,
             "active_player_id": arrived_state.player_id,
             "phase": BattlePhase.MOVEMENT.value,
-            "step": MovementPhaseStepKind.REINFORCEMENTS.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "unit_instance_id": arrived_state.unit_instance_id,
             "placement_kind": placement.candidate.placement_kind.value,
             "request_id": result.request_id,
@@ -6150,6 +6110,7 @@ def resolve_normal_move(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
+    movement_mode: MovementMode = MovementMode.NORMAL,
     path_witness: PathWitness | None = None,
     hover_mode_states: tuple[HoverModeState, ...] = (),
     battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
@@ -6169,7 +6130,10 @@ def resolve_normal_move(
         terrain_features=terrain_features,
         objective_markers=objective_markers,
         movement_bonus_inches=0,
-        movement_mode=MovementMode.NORMAL,
+        movement_mode=_movement_mode_for_action(
+            action=MovementPhaseActionKind.NORMAL_MOVE,
+            movement_mode=movement_mode,
+        ),
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
         action_label="Normal Move",
@@ -6194,6 +6158,7 @@ def resolve_advance_move(
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
     advance_roll: AdvanceRollResult,
+    movement_mode: MovementMode = MovementMode.ADVANCE,
     path_witness: PathWitness | None = None,
     hover_mode_states: tuple[HoverModeState, ...] = (),
     battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
@@ -6215,7 +6180,10 @@ def resolve_advance_move(
         terrain_features=terrain_features,
         objective_markers=objective_markers,
         movement_bonus_inches=advance_roll.value,
-        movement_mode=MovementMode.ADVANCE,
+        movement_mode=_movement_mode_for_action(
+            action=MovementPhaseActionKind.ADVANCE,
+            movement_mode=movement_mode,
+        ),
         movement_phase_action=MovementPhaseActionKind.ADVANCE,
         displacement_kind=ModelDisplacementKind.ADVANCE,
         action_label="Advance",
@@ -6244,6 +6212,7 @@ def resolve_fall_back_move(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
+    movement_mode: MovementMode = MovementMode.FALL_BACK,
     path_witness: PathWitness | None = None,
     battle_round: int = 1,
     battle_shocked_unit_ids: tuple[str, ...] = (),
@@ -6270,7 +6239,10 @@ def resolve_fall_back_move(
         terrain_features=terrain_features,
         objective_markers=objective_markers,
         movement_bonus_inches=0,
-        movement_mode=MovementMode.FALL_BACK,
+        movement_mode=_movement_mode_for_action(
+            action=MovementPhaseActionKind.FALL_BACK,
+            movement_mode=movement_mode,
+        ),
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         action_label="Fall Back",
@@ -6352,8 +6324,10 @@ def _resolve_unit_move(
         _default_move_witness(
             scenario=scenario,
             unit_placement=unit_placement,
+            ruleset_descriptor=ruleset_descriptor,
             aircraft_policy=aircraft_policy,
             movement_bonus_inches=movement_bonus_inches,
+            movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
         )
         if path_witness is None
@@ -6387,14 +6361,23 @@ def _resolve_unit_move(
         movement_inches = _model_default_movement_distance_inches(
             model=model,
             aircraft_policy=aircraft_policy,
+            ruleset_descriptor=ruleset_descriptor,
             movement_bonus_inches=movement_bonus_inches,
+            movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
         )
         movement_distance_budget_inches = _model_movement_budget_inches(
             model=model,
             aircraft_policy=aircraft_policy,
+            ruleset_descriptor=ruleset_descriptor,
             movement_bonus_inches=movement_bonus_inches,
+            movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
+        )
+        movement_distance_modifier_inches = _movement_distance_modifier_inches(
+            aircraft_policy=aircraft_policy,
+            ruleset_descriptor=ruleset_descriptor,
+            movement_mode=movement_mode,
         )
         max_movement_inches = max(max_movement_inches, movement_inches)
         moving_model = geometry_model_for_placement(model=model, placement=placement)
@@ -6428,6 +6411,10 @@ def _resolve_unit_move(
                 scenario=scenario,
                 player_id=unit_placement.player_id,
                 moving_model_instance_id=placement.model_instance_id,
+            ),
+            enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
+                scenario=scenario,
+                player_id=unit_placement.player_id,
             ),
             aircraft_model_ids=tuple(
                 model_id
@@ -6492,6 +6479,8 @@ def _resolve_unit_move(
             "movement_inches": movement_inches,
             "base_movement_inches": base_movement_inches,
             "movement_bonus_inches": movement_bonus_inches,
+            "movement_mode": movement_mode.value,
+            "movement_distance_modifier_inches": movement_distance_modifier_inches,
             "base_size": model.base_size.to_payload(),
             "start_pose": placement.pose.to_payload(),
             "end_pose": witness.final_pose_for_model(placement.model_instance_id).to_payload(),
@@ -6557,8 +6546,10 @@ def _default_move_witness(
     *,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
     aircraft_policy: AircraftMovementPolicy,
     movement_bonus_inches: int,
+    movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
 ) -> PathWitness:
     model_paths: list[tuple[str, Pose, Pose]] = []
@@ -6567,7 +6558,9 @@ def _default_move_witness(
         movement_inches = _model_default_movement_distance_inches(
             model=model,
             aircraft_policy=aircraft_policy,
+            ruleset_descriptor=ruleset_descriptor,
             movement_bonus_inches=movement_bonus_inches,
+            movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
         )
         model_paths.append(
@@ -7035,6 +7028,26 @@ def _friendly_vehicle_monster_model_ids(
     return tuple(sorted(model_ids))
 
 
+def _enemy_vehicle_monster_model_ids_for_player(
+    *,
+    scenario: BattlefieldScenario,
+    player_id: str,
+) -> tuple[str, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    model_ids: list[str] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id == requested_player_id:
+            continue
+        for unit_placement in placed_army.unit_placements:
+            unit = scenario.unit_instance_for_placement(unit_placement)
+            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
+                continue
+            model_ids.extend(
+                placement.model_instance_id for placement in unit_placement.model_placements
+            )
+    return tuple(sorted(model_ids))
+
+
 def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
     keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
     return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
@@ -7145,12 +7158,12 @@ def assert_move_units_step_complete_for_reinforcements(
     *,
     state: GameState,
     movement_state: MovementPhaseState,
-    message: str = "Move Units step must be complete before Reinforcements.",
+    message: str = "Move Units step must be complete before reserve arrivals.",
 ) -> None:
     if type(movement_state) is not MovementPhaseState:
         raise GameLifecycleError("Move Units completion check requires MovementPhaseState.")
-    if movement_state.step is not MovementPhaseStepKind.REINFORCEMENTS:
-        raise GameLifecycleError("Move Units completion check requires Reinforcements step.")
+    if movement_state.step is not MovementPhaseStepKind.MOVE_UNITS:
+        raise GameLifecycleError("Move Units completion check requires Move Units step.")
     if movement_state.active_selection is not None:
         raise GameLifecycleError(message)
     incomplete_selected_unit_ids = tuple(
@@ -7372,24 +7385,88 @@ def _model_movement_budget_inches(
     *,
     model: ModelInstance,
     aircraft_policy: AircraftMovementPolicy,
+    ruleset_descriptor: RulesetDescriptor,
     movement_bonus_inches: int,
+    movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
 ) -> float | None:
     if type(movement_phase_action) is not MovementPhaseActionKind:
         raise GameLifecycleError("movement_phase_action must be a MovementPhaseActionKind.")
     if aircraft_policy.uses_aircraft_rules:
         return None
-    return _model_base_movement_inches(
-        model=model,
-        aircraft_policy=aircraft_policy,
-    ) + float(movement_bonus_inches)
+    movement_budget = (
+        _model_base_movement_inches(
+            model=model,
+            aircraft_policy=aircraft_policy,
+        )
+        + float(movement_bonus_inches)
+        + _movement_distance_modifier_inches(
+            aircraft_policy=aircraft_policy,
+            ruleset_descriptor=ruleset_descriptor,
+            movement_mode=movement_mode,
+        )
+    )
+    if movement_budget < 0.0:
+        raise GameLifecycleError("Movement distance modifier cannot reduce budget below 0.")
+    return movement_budget
+
+
+def _movement_distance_modifier_inches(
+    *,
+    aircraft_policy: AircraftMovementPolicy,
+    ruleset_descriptor: RulesetDescriptor,
+    movement_mode: MovementMode,
+) -> float:
+    if type(aircraft_policy) is not AircraftMovementPolicy:
+        raise GameLifecycleError("Movement distance modifier requires AircraftMovementPolicy.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Movement distance modifier requires RulesetDescriptor.")
+    if type(movement_mode) is not MovementMode:
+        raise GameLifecycleError("Movement distance modifier requires MovementMode.")
+    try:
+        movement_mode_policy = ruleset_descriptor.movement_policy.policy_for_mode(movement_mode)
+    except RulesetDescriptorError as exc:
+        raise GameLifecycleError("Movement mode is not defined by the RulesetDescriptor.") from exc
+    if movement_mode is not MovementMode.FLY_TAKE_TO_SKIES:
+        return movement_mode_policy.movement_distance_modifier
+    if not ruleset_descriptor.fly_policy.take_to_the_skies_supported:
+        raise GameLifecycleError("RulesetDescriptor does not support Take to the Skies.")
+    if "FLY" not in aircraft_policy.effective_keywords:
+        raise GameLifecycleError("Take to the Skies requires the FLY keyword.")
+    if aircraft_policy.hover_mode_active:
+        return 0.0
+    return movement_mode_policy.movement_distance_modifier
+
+
+def _movement_mode_for_action(
+    *,
+    action: MovementPhaseActionKind,
+    movement_mode: MovementMode,
+) -> MovementMode:
+    if type(action) is not MovementPhaseActionKind:
+        raise GameLifecycleError("Movement mode selection requires MovementPhaseActionKind.")
+    if type(movement_mode) is not MovementMode:
+        raise GameLifecycleError("Movement mode selection requires MovementMode.")
+    if action is MovementPhaseActionKind.NORMAL_MOVE:
+        allowed_modes = (MovementMode.NORMAL, MovementMode.FLY_TAKE_TO_SKIES)
+    elif action is MovementPhaseActionKind.ADVANCE:
+        allowed_modes = (MovementMode.ADVANCE, MovementMode.FLY_TAKE_TO_SKIES)
+    elif action is MovementPhaseActionKind.FALL_BACK:
+        allowed_modes = (MovementMode.FALL_BACK, MovementMode.FLY_TAKE_TO_SKIES)
+    else:
+        raise GameLifecycleError("Movement mode selection received a non-move action.")
+    if movement_mode not in allowed_modes:
+        raise GameLifecycleError("Movement mode is not legal for the selected movement action.")
+    return movement_mode
 
 
 def _model_default_movement_distance_inches(
     *,
     model: ModelInstance,
     aircraft_policy: AircraftMovementPolicy,
+    ruleset_descriptor: RulesetDescriptor,
     movement_bonus_inches: int,
+    movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
 ) -> float:
     if aircraft_policy.uses_aircraft_rules:
@@ -7397,7 +7474,9 @@ def _model_default_movement_distance_inches(
     movement_budget = _model_movement_budget_inches(
         model=model,
         aircraft_policy=aircraft_policy,
+        ruleset_descriptor=ruleset_descriptor,
         movement_bonus_inches=movement_bonus_inches,
+        movement_mode=movement_mode,
         movement_phase_action=movement_phase_action,
     )
     if movement_budget is None:

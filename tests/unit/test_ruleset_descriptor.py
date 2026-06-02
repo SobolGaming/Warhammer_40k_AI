@@ -114,15 +114,31 @@ def test_descriptor_hash_includes_setup_and_battle_phase_sequences() -> None:
 def test_eleventh_migration_baseline_has_explicit_policy_data() -> None:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     normal_move = descriptor.movement_policy.policy_for_mode(MovementMode.NORMAL)
+    take_to_the_skies = descriptor.movement_policy.policy_for_mode(MovementMode.FLY_TAKE_TO_SKIES)
 
     assert descriptor.engagement_policy.horizontal_inches == 2.0
     assert descriptor.engagement_policy.vertical_inches == 5.0
     assert not normal_move.may_transit_enemy_engagement
-    assert descriptor.objective_policy.supported_anchor_kinds == (ObjectiveAnchorKind.POINT,)
+    assert descriptor.objective_policy.supported_anchor_kinds == (
+        ObjectiveAnchorKind.POINT,
+        ObjectiveAnchorKind.TERRAIN,
+    )
+    assert descriptor.objective_policy.terrain_objective_control_policy is (
+        TerrainObjectiveControlPolicy.TERRAIN_AREA_OCCUPANCY
+    )
     assert descriptor.coherency_policy.policy_kind is CoherencyPolicyKind.NEIGHBOR_COUNT
     assert descriptor.coherency_policy.required_neighbors_small_unit == 1
     assert descriptor.coherency_policy.large_unit_model_count_threshold is None
     assert descriptor.coherency_policy.max_unit_span_inches == 9.0
+    assert descriptor.fly_policy.take_to_the_skies_supported
+    assert descriptor.fly_policy.movement_penalty_inches == 2.0
+    assert descriptor.fly_policy.ignores_vertical_distance
+    assert descriptor.fly_policy.may_move_through_models
+    assert descriptor.fly_policy.may_move_through_terrain
+    assert take_to_the_skies.movement_distance_modifier == -2.0
+    assert take_to_the_skies.ignores_vertical_distance
+    assert take_to_the_skies.ignores_models
+    assert take_to_the_skies.ignores_terrain
 
 
 def test_eleventh_terrain_movement_policy_uses_two_inch_free_traversal_threshold() -> None:

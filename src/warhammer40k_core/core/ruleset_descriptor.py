@@ -1556,9 +1556,11 @@ class RulesetDescriptor:
                 feature_policies=_terrain_feature_visibility_policies_for_eleventh(),
             ),
             objective_policy=ObjectivePolicyDescriptor(
-                supported_anchor_kinds=(ObjectiveAnchorKind.POINT,),
+                supported_anchor_kinds=(ObjectiveAnchorKind.POINT, ObjectiveAnchorKind.TERRAIN),
                 default_point_control_radius_inches=3.0,
-                terrain_objective_control_policy=TerrainObjectiveControlPolicy.UNSUPPORTED,
+                terrain_objective_control_policy=(
+                    TerrainObjectiveControlPolicy.TERRAIN_AREA_OCCUPANCY
+                ),
             ),
             coherency_policy=CoherencyPolicyDescriptor(
                 policy_kind=CoherencyPolicyKind.NEIGHBOR_COUNT,
@@ -1571,11 +1573,11 @@ class RulesetDescriptor:
                 max_unit_span_inches=9.0,
             ),
             fly_policy=FlyPolicyDescriptor(
-                take_to_the_skies_supported=False,
-                movement_penalty_inches=0.0,
-                ignores_vertical_distance=False,
+                take_to_the_skies_supported=True,
+                movement_penalty_inches=2.0,
+                ignores_vertical_distance=True,
                 may_move_through_models=True,
-                may_move_through_terrain=False,
+                may_move_through_terrain=True,
             ),
             mission_policy=MissionPolicyDescriptor.core_rules_default(),
             setup_sequence=SetupSequenceDescriptor.warhammer_40000_eleventh_default(),
@@ -1877,6 +1879,16 @@ def _movement_policy_for_eleventh() -> MovementPolicyDescriptor:
                 ignores_vertical_distance=False,
                 ignores_models=False,
                 ignores_terrain=False,
+            ),
+            MovementModePolicy(
+                movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+                may_transit_enemy_engagement=True,
+                may_end_in_enemy_engagement=False,
+                requires_charge_target=False,
+                ignores_vertical_distance=True,
+                ignores_models=True,
+                ignores_terrain=True,
+                movement_distance_modifier=-2.0,
             ),
         )
     )

@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CORE = ROOT / "src" / "warhammer40k_core" / "core"
 MOVEMENT_LEGALITY = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_legality.py"
+MOVEMENT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement.py"
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
 UNIT_MODULES = (
     CORE / "unit.py",
@@ -72,6 +73,7 @@ def test_movement_legality_gates_friendly_vehicle_monster_blockers_by_mover() ->
         for node in ast.walk(context)
     )
     passes_filtered_blockers = False
+    passes_enemy_blockers = False
     for node in ast.walk(context):
         if not isinstance(node, ast.Call):
             continue
@@ -85,6 +87,29 @@ def test_movement_legality_gates_friendly_vehicle_monster_blockers_by_mover() ->
                 and keyword.value.id == "friendly_vehicle_monster_blockers"
             ):
                 passes_filtered_blockers = True
+        for keyword in node.keywords:
+            if keyword.arg != "enemy_vehicle_monster_model_ids":
+                continue
+            if (
+                isinstance(keyword.value, ast.Name)
+                and keyword.value.id == "enemy_vehicle_monster_blockers"
+            ):
+                passes_enemy_blockers = True
 
     assert gates_on_mover_keyword, "Friendly VEHICLE/MONSTER transit blockers must gate on mover."
     assert passes_filtered_blockers, "Pathing must receive the filtered blocker set."
+    assert passes_enemy_blockers, "Pathing must receive the filtered enemy blocker set."
+
+
+def test_movement_phase_has_no_public_reinforcements_step_tokens() -> None:
+    source = MOVEMENT_PHASE.read_text(encoding="utf-8")
+    forbidden_tokens = (
+        "reinforcements_step_completed",
+        "reinforcements_waiting_for_arrival_choice",
+        '"reinforcements_complete"',
+        "reinforcements_step_entered",
+        '"step": MovementPhaseStepKind.REINFORCEMENTS.value',
+    )
+    violations = [token for token in forbidden_tokens if token in source]
+
+    assert not violations, "Reserve arrivals must stay inside Move Units:\n" + "\n".join(violations)

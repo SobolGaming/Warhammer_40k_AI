@@ -269,6 +269,8 @@ def objective_marker_endpoint_placement_violation(
     code = _validate_identifier("violation_code", violation_code)
     label = _validate_identifier("placement_label", placement_label)
     for marker in markers:
+        if not marker.blocks_placement:
+            continue
         marker_pose = Pose.at(marker.x_inches, marker.y_inches, marker.z_inches)
         if objective_marker_endpoint_is_clear(
             marker_pose,

@@ -286,7 +286,7 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
 
 def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None:
     scenario, passenger, transport, _enemy, _catalog = _advance_embark_ready_scenario()
-    state = _battle_state(scenario, game_id="phase10q-advance-embark-0001")
+    state = _battle_state(scenario, game_id="phase10q-advance-embark-0018")
     state.record_transport_cargo_state(_cargo_state(transport=transport))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
@@ -1884,6 +1884,18 @@ def _movement_action_request_for_unit(
     handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    if selection_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE:
+        decline_status = _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=COMPLETE_DISEMBARKS_OPTION_ID,
+            result_id=f"{unit_instance_id}:decline-pre-move-disembark",
+        )
+        assert decline_status is None
+        selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     selection_status = _submit_handler_decision(
         handler,
         state=state,

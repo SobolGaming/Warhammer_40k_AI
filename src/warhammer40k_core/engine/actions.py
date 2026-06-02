@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.engine.battlefield_state import (
+    ModelDisplacementKind,
+    model_displacement_kind_from_token,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.scoring import VictoryPointAward
 
@@ -12,6 +16,17 @@ class MissionActionStatus(StrEnum):
     STARTED = "started"
     COMPLETED = "completed"
     INTERRUPTED = "interrupted"
+
+
+MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON = "unit_moved"
+MISSION_ACTION_UNIT_LEFT_BATTLEFIELD_INTERRUPTION_REASON = "unit_left_battlefield"
+
+_MISSION_ACTION_DISPLACEMENTS_ALLOWED_TO_CONTINUE = frozenset(
+    {
+        ModelDisplacementKind.PILE_IN,
+        ModelDisplacementKind.CONSOLIDATE,
+    }
+)
 
 
 class MissionActionStatePayload(TypedDict):
@@ -358,6 +373,36 @@ def mission_action_status_from_token(token: object) -> MissionActionStatus:
         return MissionActionStatus(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported MissionActionStatus token: {token}.") from exc
+
+
+def mission_action_interruption_reason_for_displacement(
+    displacement_kind: ModelDisplacementKind,
+) -> str | None:
+    resolved_kind = model_displacement_kind_from_token(displacement_kind)
+    if resolved_kind in _MISSION_ACTION_DISPLACEMENTS_ALLOWED_TO_CONTINUE:
+        return None
+    return MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON
+
+
+def interrupt_mission_action_for_displacement(
+    action_state: MissionActionState,
+    *,
+    displacement_kind: ModelDisplacementKind,
+) -> MissionActionState | None:
+    if type(action_state) is not MissionActionState:
+        raise GameLifecycleError("action_state must be a MissionActionState.")
+    reason = mission_action_interruption_reason_for_displacement(displacement_kind)
+    if reason is None:
+        return None
+    return action_state.interrupt(reason=reason)
+
+
+def interrupt_mission_action_for_battlefield_departure(
+    action_state: MissionActionState,
+) -> MissionActionState:
+    if type(action_state) is not MissionActionState:
+        raise GameLifecycleError("action_state must be a MissionActionState.")
+    return action_state.interrupt(reason=MISSION_ACTION_UNIT_LEFT_BATTLEFIELD_INTERRUPTION_REASON)
 
 
 def _reject_battle_shocked_action_unit(

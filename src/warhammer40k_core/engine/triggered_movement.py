@@ -900,6 +900,10 @@ def resolve_triggered_movement(
                 player_id=unit_placement.player_id,
                 moving_model_instance_id=placement.model_instance_id,
             ),
+            enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
+                scenario=scenario,
+                player_id=unit_placement.player_id,
+            ),
             aircraft_model_ids=tuple(
                 model_id
                 for model_id in aircraft_model_ids
@@ -1191,6 +1195,26 @@ def _friendly_vehicle_monster_model_ids(
                 placement.model_instance_id
                 for placement in unit_placement.model_placements
                 if placement.model_instance_id != moving_model_id
+            )
+    return tuple(sorted(model_ids))
+
+
+def _enemy_vehicle_monster_model_ids_for_player(
+    *,
+    scenario: BattlefieldScenario,
+    player_id: str,
+) -> tuple[str, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    model_ids: list[str] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id == requested_player_id:
+            continue
+        for unit_placement in placed_army.unit_placements:
+            unit = scenario.unit_instance_for_placement(unit_placement)
+            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
+                continue
+            model_ids.extend(
+                placement.model_instance_id for placement in unit_placement.model_placements
             )
     return tuple(sorted(model_ids))
 

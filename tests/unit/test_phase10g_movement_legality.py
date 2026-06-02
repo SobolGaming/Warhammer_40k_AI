@@ -289,25 +289,19 @@ def test_custom_normal_move_transit_allowed_but_endpoint_forbidden() -> None:
 
 def test_custom_and_unsupported_policy_require_explicit_descriptor() -> None:
     eleventh = RulesetDescriptor.warhammer_40000_eleventh()
-    custom = _descriptor_with_custom_movement_policy(include_take_to_skies=True)
 
     with pytest.raises(MovementLegalityError, match="explicit RulesetDescriptor"):
         EngagementMovementPolicy.from_ruleset_descriptor(
             None,
             movement_mode=MovementMode.NORMAL,
         )
-    with pytest.raises(MovementLegalityError, match="does not define movement legality"):
-        EngagementMovementPolicy.from_ruleset_descriptor(
-            eleventh,
-            movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
-        )
 
     policy = EngagementMovementPolicy.from_ruleset_descriptor(
-        custom,
+        eleventh,
         movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
     )
 
-    assert policy.horizontal_inches == custom.engagement_policy.horizontal_inches
+    assert policy.horizontal_inches == eleventh.engagement_policy.horizontal_inches
     assert policy.may_transit_enemy_engagement
     assert not policy.may_end_in_enemy_engagement
     assert policy.movement_mode is MovementMode.FLY_TAKE_TO_SKIES

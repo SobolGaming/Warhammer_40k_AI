@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14C work and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14C** is treated as implemented at the time this file was updated. Phase 14C completed the shared primitives cutover for 2"/5" Engagement Range, one-neighbor plus 9"/5" coherency, free rotations, typed dash characteristics, Detection Range, Battle-shocked OC/action restrictions, and unit-level Hazardous mortal-wound allocation; **Phase 14D is the next build slice** before Phase 15 Charge/Fight work begins.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. Phase 14D completed the movement, terrain, objectives, and actions cutover: reserve arrivals stay inside Move Units, Take to the Skies has typed pathing and budget effects, Monster/Vehicle traversal gates enemy model blockers, objective control derives terrain objectives with marker fallback, non-blocking markers can be occupied, and Mission Actions cancel through engine-owned displacement/departure rules. **Phase 14E is the next build slice** before Phase 15 Charge/Fight work begins.
 
 Completed / implemented foundation:
 
@@ -88,12 +88,13 @@ Completed / implemented foundation:
 | 14A | Complete | Source identity and migration audit |
 | 14B | Complete | Timing windows, active player, and phase skeleton cutover |
 | 14C | Complete | Shared primitives cutover |
+| 14D | Complete | Movement, terrain, objectives, and actions cutover |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14D-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14E-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -1994,6 +1995,8 @@ Required tests:
 - hazard rolls inflict 1 mortal wound, or 3 mortal wounds when every model is a `MONSTER`/`VEHICLE`.
 
 ## Phase 14D: movement, terrain, objectives, and actions cutover
+
+Status: Complete.
 
 Invariants:
 
