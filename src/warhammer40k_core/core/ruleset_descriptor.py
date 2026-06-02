@@ -1200,6 +1200,7 @@ class CoherencyPolicyDescriptor:
                 or self.large_unit_model_count_threshold is not None
                 or self.max_horizontal_inches is not None
                 or self.max_vertical_inches is not None
+                or self.max_unit_span_inches is not None
             ):
                 raise RulesetDescriptorError(
                     "ALL_MODELS_WITHIN_DISTANCE coherency must not set neighbor-count fields."
@@ -1535,7 +1536,7 @@ class RulesetDescriptor:
             source_date=source_date,
             descriptor_version=descriptor_version,
             engagement_policy=EngagementPolicyDescriptor(
-                horizontal_inches=1.0,
+                horizontal_inches=2.0,
                 vertical_inches=5.0,
             ),
             movement_policy=_movement_policy_for_eleventh(),
@@ -1562,12 +1563,12 @@ class RulesetDescriptor:
             coherency_policy=CoherencyPolicyDescriptor(
                 policy_kind=CoherencyPolicyKind.NEIGHBOR_COUNT,
                 required_neighbors_small_unit=1,
-                required_neighbors_large_unit=2,
-                large_unit_model_count_threshold=7,
+                required_neighbors_large_unit=None,
+                large_unit_model_count_threshold=None,
                 max_horizontal_inches=2.0,
                 max_vertical_inches=5.0,
                 max_all_models_distance_inches=None,
-                max_unit_span_inches=None,
+                max_unit_span_inches=9.0,
             ),
             fly_policy=FlyPolicyDescriptor(
                 take_to_the_skies_supported=False,

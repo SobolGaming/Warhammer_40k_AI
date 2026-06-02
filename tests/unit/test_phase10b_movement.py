@@ -488,8 +488,14 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
         budget = witness_payload["budget"]
         assert isinstance(budget, dict)
         budget_payload = cast(dict[str, object], budget)
+        assert set(budget_payload) == {
+            "max_distance_inches",
+            "straight_line_distance_inches",
+            "total_distance_inches",
+            "remaining_distance_inches",
+            "exceeded_by_inches",
+        }
         assert budget_payload["straight_line_distance_inches"] == 6.0
-        assert budget_payload["pivot_cost_inches"] == 0.0
         assert budget_payload["total_distance_inches"] == 6.0
         assert budget_payload["remaining_distance_inches"] == 0.0
 

@@ -186,9 +186,11 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26
 
 
 def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None:
+    allocation_profile = _phase13f_gate_weapon_profile()
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         game_id="phase13b-allocation-0005",
+        catalog=_catalog_with_extra_bolt_profile(allocation_profile),
     )
     first_status = lifecycle.advance_until_decision_or_terminal()
     first_request = _decision_request(first_status)
@@ -212,6 +214,7 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
     proposal = _proposal_from_request(
         request=declaration_request,
         target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=allocation_profile.profile_id,
     )
 
     next_status = lifecycle.submit_decision(
@@ -342,7 +345,7 @@ def test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers() ->
     catalog = _catalog_with_extra_bolt_profile(modifier_profile)
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
-        enemy_pose=Pose.at(18.0, 35.0),
+        enemy_pose=Pose.at(19.0, 35.0),
         catalog=catalog,
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -1349,10 +1352,20 @@ def test_phase13d_fire_overwatch_torrent_weapons_auto_hit() -> None:
     } == {"attack_sequence.wound"}
 
 
-def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
+@pytest.mark.parametrize(
+    ("extra_attacker_keywords", "expected_mortal_wounds"),
+    [((), 1), (("Vehicle",), 3)],
+)
+def test_phase13d_hazardous_tests_resolve_after_all_attacks(
+    extra_attacker_keywords: tuple[str, ...],
+    expected_mortal_wounds: int,
+) -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
+    if extra_attacker_keywords:
+        attacker = replace(attacker, keywords=(*attacker.keywords, *extra_attacker_keywords))
+        _replace_unit_instance_in_state(state=state, replacement=attacker)
     defender = units["enemy"]
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -1380,9 +1393,9 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
     )
     hazardous_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
-        reason=f"Hazardous test for {weapon_profile.profile_id} after shooting",
+        reason=f"Hazardous test for {attacker.unit_instance_id} after shooting",
         roll_type="hazardous_test",
-        actor_id="player-a",
+        actor_id=attacker.unit_instance_id,
     )
     dice_manager = DiceRollManager(
         "phase13d-hazardous",
@@ -1421,12 +1434,23 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
     )
 
     hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
-    damage_application = cast(dict[str, object], hazardous_payload["damage_application"])
+    mortal_wound_application = cast(
+        dict[str, object],
+        hazardous_payload["mortal_wound_application"],
+    )
+    applications = cast(list[dict[str, object]], mortal_wound_application["applications"])
     assert remaining_sequence is None
     assert status is None
     assert hazardous_payload["successful"] is False
-    assert damage_application["target_unit_instance_id"] == attacker.unit_instance_id
-    assert damage_application["model_instance_id"] == attacker.own_models[0].model_instance_id
+    assert hazardous_payload["mortal_wounds"] == expected_mortal_wounds
+    assert hazardous_payload["hazardous_weapon_profile_ids"] == ["phase13d-hazardous"]
+    assert mortal_wound_application["target_unit_instance_id"] == attacker.unit_instance_id
+    assert mortal_wound_application["mortal_wounds"] == expected_mortal_wounds
+    assert sum(cast(int, application["wounds_lost"]) for application in applications) == (
+        expected_mortal_wounds
+    )
+    assert applications[0]["target_unit_instance_id"] == attacker.unit_instance_id
+    assert applications[0]["model_instance_id"] == attacker.own_models[0].model_instance_id
 
 
 def test_phase13c_wound_roll_table_uses_integer_safe_boundaries() -> None:
@@ -6459,22 +6483,23 @@ def _shooting_lifecycle(
         army_id = unit.unit_instance_id.split(":", maxsplit=1)[0]
         player_id = "player-a" if army_id == "army-alpha" else "player-b"
         if army_id == "army-beta":
-            poses = tuple(
-                Pose.at(
-                    resolved_enemy_pose.position.x + (index * 1.4),
+            poses = _compact_test_unit_poses(
+                origin=Pose.at(
+                    resolved_enemy_pose.position.x,
                     resolved_enemy_pose.position.y + (enemy_unit_index * 10.0),
                     resolved_enemy_pose.position.z,
                     facing_degrees=180.0,
-                )
-                for index in range(len(unit.own_models))
+                ),
+                model_count=len(unit.own_models),
             )
             enemy_unit_index += 1
         elif unit.datasheet_id == "core-transport":
             poses = (Pose.at(10.0, 35.0 + (friendly_unit_index * 10.0)),)
         else:
             friendly_y = 35.0 + (friendly_unit_index * 10.0)
-            poses = tuple(
-                Pose.at(10.0 + index * 1.4, friendly_y) for index in range(len(unit.own_models))
+            poses = _compact_test_unit_poses(
+                origin=Pose.at(10.0, friendly_y),
+                model_count=len(unit.own_models),
             )
         battlefield = battlefield.with_unit_placement(
             _unit_placement_at(unit, army_id=army_id, player_id=player_id, poses=poses)
@@ -6521,6 +6546,20 @@ def _shooting_lifecycle(
         },
     )
     return GameLifecycle.from_payload(payload), units
+
+
+def _compact_test_unit_poses(*, origin: Pose, model_count: int) -> tuple[Pose, ...]:
+    if type(model_count) is not int or model_count < 1:
+        raise AssertionError("Test unit poses require at least one model.")
+    return tuple(
+        Pose.at(
+            origin.position.x + ((index % 5) * 1.4),
+            origin.position.y + ((index // 5) * 1.4),
+            origin.position.z,
+            facing_degrees=origin.facing.degrees,
+        )
+        for index in range(model_count)
+    )
 
 
 def lifecycle_decisions_payload() -> dict[str, object]:

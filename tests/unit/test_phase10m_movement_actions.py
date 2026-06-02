@@ -276,7 +276,7 @@ def test_infantry_normal_move_can_end_on_upper_ruins_floor_with_vertical_movemen
         assert upper_floor_segments[0].traversal_mode.value == "freely_traversable"
 
 
-def test_non_round_vehicle_or_monster_normal_move_pays_two_inch_pivot_cost() -> None:
+def test_non_round_vehicle_or_monster_normal_move_records_cost_free_rotation() -> None:
     for keywords, base_size in (
         (("Vehicle",), BaseSizeDefinition.rectangular(length_mm=100.0, width_mm=60.0)),
         (("Monster",), BaseSizeDefinition.oval(length_mm=100.0, width_mm=60.0)),
@@ -296,11 +296,14 @@ def test_non_round_vehicle_or_monster_normal_move_pays_two_inch_pivot_cost() -> 
         movement_distance_witness = resolution.path_validation_results[0].movement_distance_witness
         assert movement_distance_witness is not None
         assert resolution.is_valid
-        assert movement_distance_witness.pivot_cost_inches == 2.0
-        assert movement_distance_witness.total_distance_inches == 10.0
+        assert movement_distance_witness.total_distance_inches == 8.0
+        assert len(movement_distance_witness.rotation_events) == 2
+        assert tuple(
+            event.facing_delta_degrees for event in movement_distance_witness.rotation_events
+        ) == (45.0, 45.0)
 
 
-def test_round_large_flying_stem_or_hover_vehicle_pays_two_inch_pivot_cost() -> None:
+def test_round_large_flying_stem_or_hover_vehicle_records_cost_free_rotation() -> None:
     for keywords in (("Vehicle", "Fly"), ("Vehicle", "Hover")):
         scenario = _vehicle_scenario_with_active_unit_keywords_and_base(
             keywords=keywords,
@@ -317,10 +320,14 @@ def test_round_large_flying_stem_or_hover_vehicle_pays_two_inch_pivot_cost() -> 
         movement_distance_witness = resolution.path_validation_results[0].movement_distance_witness
         assert movement_distance_witness is not None
         assert resolution.is_valid
-        assert movement_distance_witness.pivot_cost_inches == 2.0
+        assert movement_distance_witness.total_distance_inches == 8.0
+        assert len(movement_distance_witness.rotation_events) == 2
+        assert tuple(
+            event.facing_delta_degrees for event in movement_distance_witness.rotation_events
+        ) == (45.0, 45.0)
 
 
-def test_aircraft_normal_move_uses_aircraft_pivot_policy() -> None:
+def test_aircraft_normal_move_records_cost_free_aircraft_rotation() -> None:
     scenario = _vehicle_scenario_with_active_unit_keywords_and_base(
         keywords=("Aircraft", "Vehicle"),
         base_size=BaseSizeDefinition.oval(length_mm=120.0, width_mm=80.0),
@@ -337,10 +344,12 @@ def test_aircraft_normal_move_uses_aircraft_pivot_policy() -> None:
     movement_distance_witness = resolution.path_validation_results[0].movement_distance_witness
     assert movement_distance_witness is not None
     assert resolution.is_valid
-    assert movement_distance_witness.pivot_cost_inches == 0.0
+    assert movement_distance_witness.total_distance_inches == 20.0
+    assert len(movement_distance_witness.rotation_events) == 1
+    assert movement_distance_witness.rotation_events[0].facing_delta_degrees == 90.0
 
 
-def test_normal_move_payload_rejects_pivot_policy_witness_drift() -> None:
+def test_normal_move_payload_rejects_distance_witness_drift() -> None:
     scenario = _vehicle_scenario_with_active_unit_keywords_and_base(
         keywords=("Vehicle",),
         base_size=BaseSizeDefinition.rectangular(length_mm=100.0, width_mm=60.0),
@@ -366,7 +375,7 @@ def test_normal_move_payload_rejects_pivot_policy_witness_drift() -> None:
     model_movements = cast(list[dict[str, object]], payload["model_movements"])
     distance_witness = cast(dict[str, object], model_movements[0]["movement_distance_witness"])
     budget = cast(dict[str, object], distance_witness["budget"])
-    budget["pivot_cost_inches"] = 1.0
+    budget["straight_line_distance_inches"] = 9.0
     budget["total_distance_inches"] = 9.0
     budget["remaining_distance_inches"] = 3.0
 

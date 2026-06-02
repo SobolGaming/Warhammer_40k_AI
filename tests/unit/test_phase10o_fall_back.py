@@ -16,7 +16,6 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
     ModelDisplacementKind,
-    PlacementError,
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
@@ -386,12 +385,12 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-two-result-v2-00001",
+        result_id="phase10o-fall-back-failed-0001",
     )
     removal_request = _decision_request(fall_back_status)
     destroyed_model_ids = (
-        "army-alpha:intercessor-unit-1:core-intercessor-like:002",
-        "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:003",
     )
     destroyed_option_id = "destroy:" + ",".join(destroyed_model_ids)
 
@@ -647,7 +646,7 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
     }
 
 
-def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift() -> None:
+def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_drift() -> None:
     lifecycle, action_request = _advance_to_fall_back_action_request(
         game_id=_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID,
     )
@@ -655,20 +654,22 @@ def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.FALL_BACK.value,
-        result_id="phase10o-five-result-v2-00113",
+        result_id="phase10o-desperate-destroy-set-0001",
     )
     removal_request = _decision_request(fall_back_status)
-    unit_model_ids = tuple(
+    all_unit_model_ids = tuple(
         f"army-alpha:intercessor-unit-1:core-intercessor-like:{index:03d}" for index in range(1, 6)
     )
-    destroyed_option_id = "destroy:" + ",".join(unit_model_ids)
+    selected_option = removal_request.options[-1]
+    selected_payload = cast(dict[str, object], selected_option.payload)
+    destroyed_model_ids = tuple(cast(list[str], selected_payload["destroyed_model_ids"]))
 
     assert removal_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
-    assert destroyed_option_id in {option.option_id for option in removal_request.options}
+    assert set(destroyed_model_ids) < set(all_unit_model_ids)
     status = _submit_result(
         lifecycle,
         request=removal_request,
-        option_id=destroyed_option_id,
+        option_id=selected_option.option_id,
         result_id="phase10o-result-000009",
     )
     state = _state(lifecycle)
@@ -677,17 +678,19 @@ def test_fall_back_desperate_escape_can_destroy_entire_unit_without_replay_drift
 
     assert status.decision_request is not None
     assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
-    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
-        battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
-    assert set(unit_model_ids) <= set(battlefield_state.removed_model_ids)
-    assert set(unit_model_ids).isdisjoint(battlefield_state.placed_model_ids())
+    surviving_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    assert set(destroyed_model_ids) <= set(battlefield_state.removed_model_ids)
+    assert set(destroyed_model_ids).isdisjoint(battlefield_state.placed_model_ids())
+    assert {placement.model_instance_id for placement in surviving_placement.model_placements} == (
+        set(all_unit_model_ids) - set(destroyed_model_ids)
+    )
     assert (
         state.fell_back_unit_state_for_unit(
             player_id="player-a",
             battle_round=1,
             unit_instance_id="army-alpha:intercessor-unit-1",
         )
-        is None
+        is not None
     )
 
     payload = cast(

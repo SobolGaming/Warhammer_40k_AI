@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.objectives import (
     Objective,
     ObjectiveAnchorKind,
@@ -666,14 +666,21 @@ def _objective_control_contribution(
         model=geometry_model,
         marker_diameter_inches=marker.marker_diameter_inches,
     )
-    objective_control = _model_objective_control(model_instance)
     battle_shocked = placement.unit_instance_id in battle_shocked_unit_ids
+    objective_control_characteristic = _model_objective_control_characteristic(
+        model_instance,
+        battle_shocked=False,
+    )
+    effective_objective_control_characteristic = _model_objective_control_characteristic(
+        model_instance,
+        battle_shocked=battle_shocked,
+    )
     return ObjectiveControlContribution(
         player_id=placement.player_id,
         unit_instance_id=placement.unit_instance_id,
         model_instance_id=placement.model_instance_id,
-        objective_control=objective_control,
-        effective_objective_control=0 if battle_shocked else objective_control,
+        objective_control=objective_control_characteristic.final,
+        effective_objective_control=effective_objective_control_characteristic.final,
         battle_shocked=battle_shocked,
         horizontal_distance_inches=context.horizontal_distance_inches(),
         vertical_gap_inches=context.vertical_gap_inches(),
@@ -758,12 +765,23 @@ def _spatial_index_for_endpoint_query(
     return SpatialIndex(models=models)
 
 
-def _model_objective_control(model: ModelInstance) -> int:
+def _model_objective_control_characteristic(
+    model: ModelInstance,
+    *,
+    battle_shocked: bool,
+) -> CharacteristicValue:
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Objective control requires a ModelInstance.")
+    if type(battle_shocked) is not bool:
+        raise GameLifecycleError("battle_shocked must be a bool.")
+    if battle_shocked:
+        return CharacteristicValue.replacement_dash(
+            Characteristic.OBJECTIVE_CONTROL,
+            applied_modifier_ids=("battle_shock",),
+        )
     for characteristic in model.characteristics:
         if characteristic.characteristic is Characteristic.OBJECTIVE_CONTROL:
-            return characteristic.final
+            return characteristic
     raise GameLifecycleError("ModelInstance is missing Objective Control.")
 
 

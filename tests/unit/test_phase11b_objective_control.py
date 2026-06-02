@@ -7,7 +7,11 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.attributes import (
+    Characteristic,
+    CharacteristicValue,
+    CharacteristicValueKind,
+)
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.objectives import Objective, ObjectiveMarker, ObjectiveMarkerPayload
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -40,6 +44,7 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
     ObjectiveMarkerEndpointViolation,
     ObjectiveMarkerEndpointViolationPayload,
+    _model_objective_control_characteristic,  # pyright: ignore[reportPrivateUsage]
     objective_control_status_from_token,
     objective_control_timing_from_token,
     objective_marker_endpoint_violations,
@@ -109,6 +114,14 @@ def test_battle_shocked_unit_contributes_oc_zero() -> None:
         for contribution in result.contributors
         if contribution.player_id == "player-a"
     )
+    player_a_army = state.army_definition_for_player("player-a")
+    assert player_a_army is not None
+    shocked_characteristic = _model_objective_control_characteristic(
+        player_a_army.units[0].own_models[0],
+        battle_shocked=True,
+    )
+    assert shocked_characteristic.value_kind is CharacteristicValueKind.REPLACEMENT_DASH
+    assert shocked_characteristic.applied_modifier_ids == ("battle_shock",)
 
 
 def test_contested_objective_has_deterministic_uncontrolled_result() -> None:

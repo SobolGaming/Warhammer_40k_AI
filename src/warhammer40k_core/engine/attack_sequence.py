@@ -75,6 +75,7 @@ from warhammer40k_core.engine.damage_allocation import (
     MortalWoundRoutingResult,
     allocation_context_for_unit,
     apply_damage_to_model,
+    apply_mortal_wounds_to_unit,
     build_attack_allocation_request,
     build_destruction_reaction_request,
     build_feel_no_pain_request,
@@ -3939,67 +3940,64 @@ def _resolve_hazardous_tests(
         for pool in attack_sequence.attack_pools
         if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.HAZARDOUS)
     )
-    seen: set[tuple[str, str, str]] = set()
-    for pool in hazardous_pools:
-        key = (pool.attacker_model_instance_id, pool.wargear_id, pool.weapon_profile_id)
-        if key in seen:
-            continue
-        seen.add(key)
-        roll_state = manager.roll(
-            DiceRollSpec(
-                expression=DiceExpression(quantity=1, sides=6),
-                reason=f"Hazardous test for {pool.weapon_profile_id} after shooting",
-                roll_type="hazardous_test",
-                actor_id=attack_sequence.attacker_player_id,
-            )
+    if not hazardous_pools:
+        return
+    hazardous_weapon_profile_ids = tuple(
+        sorted({pool.weapon_profile_id for pool in hazardous_pools})
+    )
+    roll_state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=(
+                f"Hazardous test for {attack_sequence.attacking_unit_instance_id} after shooting"
+            ),
+            roll_type="hazardous_test",
+            actor_id=attack_sequence.attacking_unit_instance_id,
         )
-        damage_application = None
-        if roll_state.current_total == 1:
-            model = model_by_id(state=state, model_instance_id=pool.attacker_model_instance_id)
-            if model.is_alive:
-                damage_application = apply_damage_to_model(
-                    state=state,
-                    target_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-                    model_instance_id=pool.attacker_model_instance_id,
-                    damage=_hazardous_damage_for_attacker(
-                        state=state,
-                        attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-                        model_wounds_remaining=model.wounds_remaining,
-                    ),
-                    damage_kind=DamageKind.MORTAL,
-                )
-        decisions.event_log.append(
-            "hazardous_test_resolved",
-            {
-                "source_rule_id": HAZARDOUS_RULE_ID,
-                "sequence_id": attack_sequence.sequence_id,
-                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                "attacker_model_instance_id": pool.attacker_model_instance_id,
-                "wargear_id": pool.wargear_id,
-                "weapon_profile_id": pool.weapon_profile_id,
-                "roll_state": roll_state.to_payload(),
-                "successful": roll_state.current_total != 1,
-                "damage_application": (
-                    None if damage_application is None else damage_application.to_payload()
-                ),
-            },
+    )
+    mortal_wound_application = None
+    mortal_wounds = 0
+    if roll_state.current_total == 1:
+        mortal_wounds = _hazardous_mortal_wounds_for_attacker(
+            state=state,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
         )
+        mortal_wound_application = apply_mortal_wounds_to_unit(
+            state=state,
+            target_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            mortal_wounds=mortal_wounds,
+            dice_manager=manager,
+            defender_player_id=unit_owner_player_id(
+                state=state,
+                unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            ),
+        )
+    decisions.event_log.append(
+        "hazardous_test_resolved",
+        {
+            "source_rule_id": HAZARDOUS_RULE_ID,
+            "sequence_id": attack_sequence.sequence_id,
+            "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+            "hazardous_weapon_profile_ids": list(hazardous_weapon_profile_ids),
+            "roll_state": roll_state.to_payload(),
+            "successful": roll_state.current_total != 1,
+            "mortal_wounds": mortal_wounds,
+            "mortal_wound_application": (
+                None if mortal_wound_application is None else mortal_wound_application.to_payload()
+            ),
+        },
+    )
 
 
-def _hazardous_damage_for_attacker(
+def _hazardous_mortal_wounds_for_attacker(
     *,
     state: GameState,
     attacking_unit_instance_id: str,
-    model_wounds_remaining: int,
 ) -> int:
     unit = unit_by_id(state=state, unit_instance_id=attacking_unit_instance_id)
-    if (
-        _unit_has_keyword(unit, "CHARACTER")
-        or _unit_has_keyword(unit, "MONSTER")
-        or _unit_has_keyword(unit, "VEHICLE")
-    ):
+    if _unit_has_keyword(unit, "MONSTER") or _unit_has_keyword(unit, "VEHICLE"):
         return 3
-    return model_wounds_remaining
+    return 1
 
 
 def _cover_for_allocated_model(

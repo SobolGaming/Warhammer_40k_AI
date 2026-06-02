@@ -115,12 +115,14 @@ def test_eleventh_migration_baseline_has_explicit_policy_data() -> None:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     normal_move = descriptor.movement_policy.policy_for_mode(MovementMode.NORMAL)
 
-    assert descriptor.engagement_policy.horizontal_inches == 1.0
+    assert descriptor.engagement_policy.horizontal_inches == 2.0
     assert descriptor.engagement_policy.vertical_inches == 5.0
     assert not normal_move.may_transit_enemy_engagement
     assert descriptor.objective_policy.supported_anchor_kinds == (ObjectiveAnchorKind.POINT,)
     assert descriptor.coherency_policy.policy_kind is CoherencyPolicyKind.NEIGHBOR_COUNT
-    assert descriptor.coherency_policy.large_unit_model_count_threshold == 7
+    assert descriptor.coherency_policy.required_neighbors_small_unit == 1
+    assert descriptor.coherency_policy.large_unit_model_count_threshold is None
+    assert descriptor.coherency_policy.max_unit_span_inches == 9.0
 
 
 def test_eleventh_terrain_movement_policy_uses_two_inch_free_traversal_threshold() -> None:
@@ -209,12 +211,19 @@ def test_objective_policy_rejects_duplicate_anchor_kinds() -> None:
         )
 
 
-def test_eleventh_coherency_descriptor_round_trips_with_threshold_seven() -> None:
+def test_eleventh_engagement_and_coherency_descriptors_match_phase14c_values() -> None:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     payload = descriptor.coherency_policy.to_payload()
 
+    assert descriptor.engagement_policy.horizontal_inches == 2.0
+    assert descriptor.engagement_policy.vertical_inches == 5.0
     assert payload["policy_kind"] == CoherencyPolicyKind.NEIGHBOR_COUNT.value
-    assert payload["large_unit_model_count_threshold"] == 7
+    assert payload["required_neighbors_small_unit"] == 1
+    assert payload["required_neighbors_large_unit"] is None
+    assert payload["large_unit_model_count_threshold"] is None
+    assert payload["max_horizontal_inches"] == 2.0
+    assert payload["max_vertical_inches"] == 5.0
+    assert payload["max_unit_span_inches"] == 9.0
     assert CoherencyPolicyDescriptor.from_payload(payload).to_payload() == payload
 
 
@@ -255,10 +264,9 @@ def test_descriptor_hash_changes_if_coherency_policy_changes() -> None:
         coherency_policy=CoherencyPolicyDescriptor(
             policy_kind=CoherencyPolicyKind.NEIGHBOR_COUNT,
             required_neighbors_small_unit=1,
-            required_neighbors_large_unit=2,
-            large_unit_model_count_threshold=8,
             max_horizontal_inches=2.0,
             max_vertical_inches=5.0,
+            max_unit_span_inches=10.0,
         ),
         descriptor_hash="",
     )

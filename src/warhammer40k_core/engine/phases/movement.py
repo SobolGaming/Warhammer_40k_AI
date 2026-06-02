@@ -6483,8 +6483,6 @@ def _resolve_unit_move(
                 model_collision_check_count=path_result.model_collision_check_count,
                 terrain_collision_check_count=path_result.terrain_collision_check_count,
                 engagement_check_count=path_result.engagement_check_count,
-                pivot_cost_inches=path_result.pivot_cost_inches,
-                pivot_cost_pending=path_result.pivot_cost_pending,
                 movement_distance_witness=path_result.movement_distance_witness,
             )
         path_validation_results.append(path_result)
@@ -7094,8 +7092,6 @@ def _path_result_with_aircraft_violations(
         model_collision_check_count=path_result.model_collision_check_count,
         terrain_collision_check_count=path_result.terrain_collision_check_count,
         engagement_check_count=path_result.engagement_check_count,
-        pivot_cost_inches=path_result.pivot_cost_inches,
-        pivot_cost_pending=path_result.pivot_cost_pending,
         movement_distance_witness=path_result.movement_distance_witness,
     )
 

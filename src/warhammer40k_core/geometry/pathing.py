@@ -22,8 +22,6 @@ from warhammer40k_core.geometry.movement_envelope import (
     MovementDistanceWitnessPayload,
     MovementEnvelope,
     MovementEnvelopePayload,
-    PivotCostPolicy,
-    PivotCostPolicyPayload,
 )
 from warhammer40k_core.geometry.pose import (
     Facing,
@@ -126,8 +124,6 @@ class PathValidationResultPayload(TypedDict):
     model_collision_check_count: int
     terrain_collision_check_count: int
     engagement_check_count: int
-    pivot_cost_inches: float
-    pivot_cost_pending: bool
     movement_distance_witness: MovementDistanceWitnessPayload | None
 
 
@@ -148,7 +144,6 @@ class PathValidationContextPayload(TypedDict):
     enemy_engagement_vertical_inches: float
     sample_interval_inches: float
     movement_distance_budget_inches: float | None
-    pivot_cost_policy: PivotCostPolicyPayload
 
 
 class TerrainPathSegmentPayload(TypedDict):
@@ -244,8 +239,6 @@ class PathValidationResult:
     model_collision_check_count: int = 0
     terrain_collision_check_count: int = 0
     engagement_check_count: int = 0
-    pivot_cost_inches: float = 0.0
-    pivot_cost_pending: bool = False
     movement_distance_witness: MovementDistanceWitness | None = None
 
     def __post_init__(self) -> None:
@@ -286,15 +279,6 @@ class PathValidationResult:
                 self.engagement_check_count,
             ),
         )
-        object.__setattr__(
-            self,
-            "pivot_cost_inches",
-            _validate_non_negative_number(
-                "PathValidationResult pivot_cost_inches",
-                self.pivot_cost_inches,
-            ),
-        )
-        _validate_bool("PathValidationResult pivot_cost_pending", self.pivot_cost_pending)
         if (
             self.movement_distance_witness is not None
             and type(self.movement_distance_witness) is not MovementDistanceWitness
@@ -311,8 +295,6 @@ class PathValidationResult:
         model_collision_check_count: int,
         terrain_collision_check_count: int,
         engagement_check_count: int,
-        pivot_cost_inches: float = 0.0,
-        pivot_cost_pending: bool = False,
         movement_distance_witness: MovementDistanceWitness | None = None,
     ) -> Self:
         return cls(
@@ -320,8 +302,6 @@ class PathValidationResult:
             model_collision_check_count=model_collision_check_count,
             terrain_collision_check_count=terrain_collision_check_count,
             engagement_check_count=engagement_check_count,
-            pivot_cost_inches=pivot_cost_inches,
-            pivot_cost_pending=pivot_cost_pending,
             movement_distance_witness=movement_distance_witness,
         )
 
@@ -334,8 +314,6 @@ class PathValidationResult:
         model_collision_check_count: int,
         terrain_collision_check_count: int,
         engagement_check_count: int,
-        pivot_cost_inches: float = 0.0,
-        pivot_cost_pending: bool = False,
         movement_distance_witness: MovementDistanceWitness | None = None,
     ) -> Self:
         return cls(
@@ -344,8 +322,6 @@ class PathValidationResult:
             model_collision_check_count=model_collision_check_count,
             terrain_collision_check_count=terrain_collision_check_count,
             engagement_check_count=engagement_check_count,
-            pivot_cost_inches=pivot_cost_inches,
-            pivot_cost_pending=pivot_cost_pending,
             movement_distance_witness=movement_distance_witness,
         )
 
@@ -361,8 +337,6 @@ class PathValidationResult:
             "model_collision_check_count": self.model_collision_check_count,
             "terrain_collision_check_count": self.terrain_collision_check_count,
             "engagement_check_count": self.engagement_check_count,
-            "pivot_cost_inches": self.pivot_cost_inches,
-            "pivot_cost_pending": self.pivot_cost_pending,
             "movement_distance_witness": (
                 None
                 if self.movement_distance_witness is None
@@ -381,8 +355,6 @@ class PathValidationResult:
             model_collision_check_count=payload["model_collision_check_count"],
             terrain_collision_check_count=payload["terrain_collision_check_count"],
             engagement_check_count=payload["engagement_check_count"],
-            pivot_cost_inches=payload["pivot_cost_inches"],
-            pivot_cost_pending=payload["pivot_cost_pending"],
             movement_distance_witness=(
                 None
                 if payload["movement_distance_witness"] is None
@@ -408,11 +380,10 @@ class PathValidationContext:
     may_transit_enemy_models: bool = False
     may_transit_enemy_engagement: bool = False
     may_end_in_enemy_engagement: bool = False
-    enemy_engagement_horizontal_inches: float = 1.0
+    enemy_engagement_horizontal_inches: float = 2.0
     enemy_engagement_vertical_inches: float = 5.0
     sample_interval_inches: float = 0.5
     movement_distance_budget_inches: float | None = None
-    pivot_cost_policy: PivotCostPolicy = field(default_factory=PivotCostPolicy)
 
     def __post_init__(self) -> None:
         if type(self.moving_model) is not Model:
@@ -528,17 +499,12 @@ class PathValidationContext:
                 self.movement_distance_budget_inches,
             ),
         )
-        if type(self.pivot_cost_policy) is not PivotCostPolicy:
-            raise GeometryError(
-                "PathValidationContext pivot_cost_policy must be a PivotCostPolicy."
-            )
 
     def validate(self) -> PathValidationResult:
         path = self.witness.poses_for_model(self.moving_model.model_id)
         movement_distance_witness = MovementDistanceWitness.for_model_path(
             model=self.moving_model,
             poses=path,
-            pivot_cost_policy=self.pivot_cost_policy,
             max_distance_inches=self.movement_distance_budget_inches,
         )
         if path[0] != self.moving_model.pose:
@@ -688,8 +654,6 @@ class PathValidationContext:
             model_collision_check_count=metrics.model_collision_check_count,
             terrain_collision_check_count=metrics.terrain_collision_check_count,
             engagement_check_count=metrics.engagement_check_count,
-            pivot_cost_inches=movement_distance_witness.pivot_cost_inches,
-            pivot_cost_pending=False,
             movement_distance_witness=movement_distance_witness,
         )
 
@@ -711,7 +675,6 @@ class PathValidationContext:
             "enemy_engagement_vertical_inches": self.enemy_engagement_vertical_inches,
             "sample_interval_inches": self.sample_interval_inches,
             "movement_distance_budget_inches": self.movement_distance_budget_inches,
-            "pivot_cost_policy": self.pivot_cost_policy.to_payload(),
         }
 
     @classmethod
@@ -735,7 +698,6 @@ class PathValidationContext:
             enemy_engagement_vertical_inches=payload["enemy_engagement_vertical_inches"],
             sample_interval_inches=payload["sample_interval_inches"],
             movement_distance_budget_inches=payload["movement_distance_budget_inches"],
-            pivot_cost_policy=PivotCostPolicy.from_payload(payload["pivot_cost_policy"]),
         )
 
 
@@ -2362,8 +2324,6 @@ def _invalid_path_validation(
         model_collision_check_count=metrics.model_collision_check_count,
         terrain_collision_check_count=metrics.terrain_collision_check_count,
         engagement_check_count=metrics.engagement_check_count,
-        pivot_cost_inches=movement_distance_witness.pivot_cost_inches,
-        pivot_cost_pending=False,
         movement_distance_witness=movement_distance_witness,
     )
 

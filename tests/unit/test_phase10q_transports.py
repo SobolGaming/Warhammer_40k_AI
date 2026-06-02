@@ -1805,7 +1805,7 @@ def _advance_embark_ready_scenario() -> tuple[
             transport,
             army_id="army-alpha",
             player_id="player-a",
-            poses=(Pose.at(12.0, 13.0),),
+            poses=(Pose.at(19.0, 10.0),),
         )
     )
     return (

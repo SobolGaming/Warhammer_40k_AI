@@ -252,7 +252,12 @@ def resolve_end_turn_cleanup(
             if result.is_coherent:
                 break
             coherency_results.append(result)
-            model_id = _next_cleanup_model_id(result)
+            model_id = _next_cleanup_model_id(
+                result,
+                scenario=current_scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_placement=unit_placement,
+            )
             model_placement = _model_placement_for_unit(unit_placement, model_id)
             removals.append(
                 CoherencyCleanupRemoval(
@@ -293,12 +298,41 @@ def resolve_end_turn_cleanup(
     return cleanup, battlefield_state
 
 
-def _next_cleanup_model_id(result: UnitCoherencyResult) -> str:
+def _next_cleanup_model_id(
+    result: UnitCoherencyResult,
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+) -> str:
     if type(result) is not UnitCoherencyResult:
         raise GameLifecycleError("Cleanup model selection requires UnitCoherencyResult.")
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("Cleanup model selection requires a BattlefieldScenario.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Cleanup model selection requires a RulesetDescriptor.")
+    if type(unit_placement) is not UnitPlacement:
+        raise GameLifecycleError("Cleanup model selection requires a UnitPlacement.")
+    if result.unit_instance_id != unit_placement.unit_instance_id:
+        raise GameLifecycleError("Cleanup coherency result unit drift.")
     offending_ids = result.offending_model_instance_ids
     if not offending_ids:
         raise GameLifecycleError("Broken coherency result must identify offending models.")
+    for candidate_id in offending_ids:
+        candidate_placement = unit_placement.with_model_placements(
+            tuple(
+                placement
+                for placement in unit_placement.model_placements
+                if placement.model_instance_id != candidate_id
+            )
+        )
+        candidate_result = unit_placement_coherency_result(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=candidate_placement,
+        )
+        if candidate_result.is_coherent:
+            return candidate_id
     return offending_ids[0]
 
 

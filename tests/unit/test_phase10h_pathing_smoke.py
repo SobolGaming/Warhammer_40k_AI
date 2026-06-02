@@ -119,13 +119,13 @@ def test_fly_normal_move_can_transit_enemy_models_and_engagement_range() -> None
         context,
         moving_model=mover,
         enemy_models=(enemy_base_blocker,),
-        end_pose=Pose.at(6.0, 1.0),
+        end_pose=Pose.at(6.2, 1.0),
     )
     enemy_engagement_context = _path_context(
         context,
         moving_model=mover,
         enemy_models=(enemy_engagement_blocker,),
-        end_pose=Pose.at(6.0, 1.0),
+        end_pose=Pose.at(6.2, 1.0),
     )
     enemy_base_result = enemy_base_context.validate()
     enemy_engagement_result = enemy_engagement_context.validate()
@@ -293,7 +293,7 @@ def test_fall_back_can_transit_enemy_engagement_range_but_cannot_end_there() -> 
 
 def test_normal_move_cannot_end_in_enemy_engagement_range() -> None:
     mover = _model("mover", 1.0, 1.0)
-    enemy = _model("enemy", 3.0, 2.5)
+    enemy = _model("enemy", 5.0, 1.0)
 
     result = _path_context(
         _normal_legality_context(),
@@ -328,7 +328,7 @@ def test_charge_policy_allows_transit_and_ending_in_enemy_engagement_range() -> 
     assert result.engagement_check_count > 0
 
 
-def test_non_circular_base_movement_records_real_pivot_cost() -> None:
+def test_non_circular_base_movement_records_cost_free_rotation() -> None:
     mover = _model("oval-mover", 2.0, 2.0, base=OvalBase(length=2.0, width=1.0))
     result = _path_context(
         _normal_legality_context(),
@@ -338,10 +338,10 @@ def test_non_circular_base_movement_records_real_pivot_cost() -> None:
     ).validate()
 
     assert result.is_valid
-    assert not result.pivot_cost_pending
-    assert result.pivot_cost_inches == 1.0
     assert result.movement_distance_witness is not None
-    assert result.movement_distance_witness.pivot_events[0].applied_cost_inches == 1.0
+    assert result.movement_distance_witness.total_distance_inches == 2.0
+    assert len(result.movement_distance_witness.rotation_events) == 1
+    assert result.movement_distance_witness.rotation_events[0].facing_delta_degrees == 90.0
 
 
 def _model(

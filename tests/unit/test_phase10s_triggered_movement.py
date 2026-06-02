@@ -948,7 +948,7 @@ def test_triggered_movement_can_transit_enemy_aircraft_but_not_end_in_engagement
             (
                 model_placement.model_instance_id,
                 model_placement.pose,
-                Pose.at(12.0, model_placement.pose.position.y),
+                Pose.at(14.0, model_placement.pose.position.y),
             ),
         )
     )

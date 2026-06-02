@@ -1350,6 +1350,48 @@ def _battle_state_with_unarrived_reserve_at_round_three_deadline() -> tuple[Game
     return state, reserve_unit.unit_instance_id
 
 
+def test_phase14c_battle_shocked_units_cannot_start_or_complete_mission_actions() -> None:
+    unit_id = "army-alpha:intercessor-unit-1"
+    action = _mission_action_state(action_id="cleanse:center:player-a")
+    award = VictoryPointAward(
+        player_id="player-a",
+        battle_round=1,
+        phase=BattlePhase.FIGHT.value,
+        amount=5,
+        source_kind=VictoryPointSourceKind.MISSION_ACTION,
+        source_id="cleanse",
+        scoring_timing="mission_action_complete",
+        metadata={"action_id": action.action_id},
+    )
+
+    with pytest.raises(GameLifecycleError, match="cannot start actions"):
+        MissionActionState.start(
+            action_id="cleanse:center:player-a",
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            target_id="tipping-point-center",
+            mission_id="cleanse",
+            battle_round=1,
+            phase=BattlePhase.MOVEMENT.value,
+            start_timing="movement_phase_unit_selected",
+            completion_timing="turn_end",
+            eligible_unit_instance_ids=(unit_id,),
+            interruption_conditions=("unit_moved",),
+            scoring_source_id="cleanse",
+            victory_points=5,
+            battle_shocked_unit_ids=(unit_id,),
+        )
+    with pytest.raises(GameLifecycleError, match="cannot complete actions"):
+        action.complete(
+            battle_round=1,
+            phase=BattlePhase.FIGHT.value,
+            completion_timing="turn_end",
+            award=award,
+            transaction_id="victory-point:player-a:round-01:000001",
+            battle_shocked_unit_ids=(unit_id,),
+        )
+
+
 def _mission_action_state(*, action_id: str) -> MissionActionState:
     return MissionActionState.start(
         action_id=action_id,
