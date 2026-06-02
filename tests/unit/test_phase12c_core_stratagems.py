@@ -1078,7 +1078,6 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
         request = _decision_request(status)
         assert request.decision_type in {
             "select_attack_allocation",
-            "select_saving_throw_kind",
             "select_feel_no_pain",
             "select_precision_allocation",
         }

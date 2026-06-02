@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the partial Phase 14E cutover, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. Phase 14D completed the movement, terrain, objectives, and actions cutover: reserve arrivals stay inside Move Units, Take to the Skies has typed pathing, budget effects, finite movement options, and parameterized proposal context for Normal/Advance/Fall Back, Fall Back exposes Ordered Retreat and Desperate Escape mode IDs, Monster/Vehicle traversal gates enemy model blockers, objective control derives terrain objectives with marker fallback, non-blocking markers can be occupied, and Mission Actions cancel through engine-owned movement/departure hooks. **Phase 14E is the next build slice** before Phase 15 Charge/Fight work begins.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E is partially implemented and remains the active build slice**: Benefit of Cover and Plunging Fire now modify BS rather than saves/AP, Invulnerable Saves are mandatory when present with no armour-versus-invulnerable adapter choice, Precision selection is pool-scoped as an interim visible Character model allocation constraint, and terrain objective control is locked to terrain-area containment instead of marker-radius contribution. The remaining Phase 14E work is the 11th Edition allocation-group host: save-before-allocation batching, defender allocation-order decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-mortal mixed-group ordering, and Precision selection by Character allocation group identity.
 
 Completed / implemented foundation:
 
@@ -146,11 +146,12 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Moving core: straight-line distance, free rotations, no pivot costs, per-model Move budgets when a unit has mixed Move characteristics, Set Up rollback, model overlap/surface checks, and end-of-turn coherency cleanup without destroyed-model triggers | Phase 10A-10T, 11E, 14C, 14D |
 | Unit coherency and engagement: 2"/5" engagement range, one-neighbor coherency plus 9"/5" max-spread coherency across every model | Phase 10G, 10L, 10M, 10N, 10O, 15A-15D, 14C |
 | Making attacks: ranged weapon selection, melee one-weapon selection plus `[EXTRA ATTACKS]`, target eligibility, identical-attack aggregation, and declared melee attack splitting across multiple engaged targets | Phase 13B, 13C, 13D, 15C, 14E |
-| Attack sequence: simultaneous hit/wound/save rolls per gathered attack group, allocation groups, defender allocation-order decision, save resolution from lowest to highest result, current allocation group transitions, and damage allocation to wounded models first | Phase 13C, 13E, 14E |
+| Attack sequence: current sequential hit/wound/model-allocation/save/damage host, mandatory Invulnerable Save precedence, model-level defender allocation choices, and pool-scoped Precision model constraint | Phase 13C, 13E, 14E partial |
+| Attack sequence 11th Edition allocation host: save-before-allocation batching, allocation groups, defender allocation-order decision, save resolution from lowest to highest result, current allocation group transitions, and damage allocation to wounded models first | Phase 14E remaining |
 | Mortal wounds, normal-damage-before-mortal ordering, hazard rolls as unit-level rolls that allocate through mortal-wound rules, and `[DEVASTATING WOUNDS]` mortal-wound cap of one destroyed model per critical wound | Phase 13C, 13D, 13E, 14C, 14E |
 | Visibility: 1 mm line of sight, visible vs fully visible model/unit states, same-unit model ignoring, and `FRAME` closest-point visibility/measurement | Phase 13A, 14C, 14D |
 | Terrain: terrain areas, exposed/light/dense categories, dense movement gates, vertical movement, stable non-ground-level endpoints, Solid 3" ground-level line-of-sight blocking, Hidden using model-level terrain-area occupancy and unit Detection Range, Gone to Ground detection modifier, Obscuring terrain areas, Benefit of Cover as `-1 BS`, and Plunging Fire as `+1 BS` | Phase 10F, 10I, 13A, 13C, 14D, 14E |
-| Objectives: terrain objectives as primary objective representation, marker fallback only when no terrain area coincides, objective markers can be moved through and ended on, terrain-area control range, secured-objective persistence and timing | Phase 11A, 11B, 11C, 14D |
+| Objectives: terrain objectives as primary objective representation, marker fallback only when no terrain area coincides, objective markers can be moved through and ended on, terrain-area containment for derived terrain objectives, secured-objective persistence and timing | Phase 11A, 11B, 11C, 14D, 14E |
 | Movement phase: every army unit is selected to move each Movement phase, including strategic reserves and embarked units; Ingress/reserve arrival is a move type inside Move Units, not a separate phase step; move type is a finite decision; Remain Stationary does not trigger start/end move rules | Phase 10B-10T, 14D |
 | Fall Back: Ordered Retreat vs Desperate Escape modes, hazard rolls for Desperate Escape, enemy-model traversal, post-move Battle-shock roll, and shooting/charge/action restrictions | Phase 10O, 11C, 14D |
 | Shooting phase: Normal, Assault, Close-quarters, Indirect, and Snap shooting types; close-quarters engaged targeting and weapon-selection restrictions; indirect cover/no-reroll/fail ranges; engaged MONSTER/VEHICLE targeting; `[BLAST]` engaged-target bans | Phase 13B-13F, 14F |
@@ -1701,7 +1702,6 @@ Objects:
 - `AttackAllocation`
 - `AttackAllocationDecision`
 - `SavingThrow`
-- `SavingThrowDecision`
 - `FeelNoPainDecision`
 - `PlungingFireModifier`
 - `MortalWoundApplication`
@@ -2033,32 +2033,73 @@ Required tests:
 
 ## Phase 14E: attack sequence and allocation cutover
 
-Invariants:
+Status: In progress.
+
+Implemented in the current cutover slice:
 
 - attacks are gathered by target and identical attack profile;
 - melee weapon target splitting is declared in the Select Targets step;
 - Benefit of Cover worsens BS by 1 before Hit rolls;
-- Plunging Fire improves BS by 1 when the terrain-height or `TOWERING` within-12" conditions are met and the target contains a model on ground level;
-- save rolls are made for all attacks that wounded before model allocation;
+- Plunging Fire improves BS by 1 when the 3"+ terrain-height or `TOWERING` within-12" conditions are met and the visible target unit contains a model on ground level;
 - unmodified save rolls of 1 fail before InSv/Sv evaluation;
-- if the current allocation group has an Invulnerable Save, that InSv is
-  mandatory and the defender cannot choose an armour Save instead;
-- armour Saves with AP modifiers are used only when the current allocation group
-  has no Invulnerable Save;
-- defender allocation groups and allocation order are explicit DecisionRequests unless only one legal order exists;
-- save results resolve from lowest to highest against the current allocation group;
-- normal damage resolves before mortal wounds for mixed attack groups;
+- if the allocated model has an Invulnerable Save, that InSv is mandatory and
+  the defender cannot choose an armour Save instead;
+- armour Saves with AP modifiers are used only when the allocated model has no
+  Invulnerable Save;
+- `[PRECISION]` selection is currently pool-scoped as an interim visible
+  Character model allocation constraint until those attacks resolve or that
+  model is destroyed;
 - `[DEVASTATING WOUNDS]` inflicts mortal wounds equal to Damage after normal damage and cannot spill one critical wound beyond one destroyed model.
+- derived terrain objectives use terrain-area containment for model
+  contribution; the objective marker radius is not used to count models outside
+  the terrain area.
 
-Required tests:
+Remaining Phase 14E invariants:
+
+- save rolls are made for all attacks that wounded before model allocation;
+- defender allocation groups are created before saves are resolved, with one
+  group for each `CHARACTER` model and one group for all other models sharing W,
+  Sv, and InSv characteristics;
+- defender allocation order is an explicit DecisionRequest unless only one
+  legal order exists;
+- allocation-order legality enforces wounded non-`CHARACTER` groups first, no
+  `CHARACTER` group before a non-`CHARACTER` group, and wounded `CHARACTER`
+  groups before unwounded `CHARACTER` groups;
+- save results resolve from lowest to highest against the current allocation
+  group;
+- current allocation group transitions only after all models in the prior group
+  are destroyed;
+- `[PRECISION]` selection happens at the start of the Allocation Order step for
+  attacks made with one or more Precision weapons, can select one allocation
+  group containing a Character model visible to one or more attacking models,
+  and makes that Character group the current allocation group until those
+  attacks are resolved or that Character group is destroyed;
+- normal damage resolves before mortal wounds for mixed attack groups.
+
+Implemented tests:
 
 - identical attack grouping and melee split declarations round-trip;
-- allocation-order decisions cover Bodyguard, Leader, Support, and wounded-model groups;
-- low-to-high save-result damage resolution destroys and transitions groups deterministically;
 - mandatory Invulnerable Save precedence is covered and emits no defender
   armour-versus-invulnerable choice;
 - cover and Plunging Fire modify BS, not AP or saves;
+- Precision Character-model selection persists for the current attack pool and
+  returns to ordinary model allocation after that selected Character model is
+  destroyed;
+- derived terrain objective tests prove models outside the terrain area do not
+  contribute through the marker control radius;
 - Devastating Wounds and hazard mortal wounds allocate through the shared mortal-wound service.
+
+Remaining required tests:
+
+- allocation-order decisions cover Bodyguard, Leader, Support, wounded-model,
+  and Character groups;
+- grouped save rolling occurs before model allocation;
+- low-to-high save-result damage resolution destroys and transitions groups
+  deterministically;
+- normal-damage-before-mortal ordering is covered for mixed attack groups;
+- Precision Character allocation-group selection persists for the current attack
+  pool and returns to ordinary allocation after that selected Character group is
+  destroyed.
 
 ## Phase 14F: shooting cutover
 

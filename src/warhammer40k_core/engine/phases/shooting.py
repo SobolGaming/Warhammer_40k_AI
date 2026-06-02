@@ -22,7 +22,6 @@ from warhammer40k_core.engine.attack_sequence import (
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
-    apply_saving_throw_decision,
     resolve_attack_sequence_until_blocked,
 )
 from warhammer40k_core.engine.battlefield_state import (
@@ -51,7 +50,6 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.saves import SELECT_SAVING_THROW_KIND_DECISION_TYPE
 from warhammer40k_core.engine.shooting_targets import (
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
@@ -1300,14 +1298,6 @@ def _apply_attack_sequence_decision_to_sequence(
             state=state,
             decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
-            attack_sequence=attack_sequence,
-            result=result,
-            already_allocated_model_ids=already_allocated_model_ids,
-        )
-    elif result.decision_type == SELECT_SAVING_THROW_KIND_DECISION_TYPE:
-        updated_sequence, allocated_model_ids, status = apply_saving_throw_decision(
-            state=state,
-            decisions=decisions,
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import CoverEffect, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
     WeaponKeyword,
@@ -28,14 +28,20 @@ from warhammer40k_core.engine.weapon_abilities import (
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.visibility import (
+    BenefitOfCoverResult,
     LineOfSightWitness,
     LineOfSightWitnessPayload,
     TerrainVisibilityContext,
 )
 from warhammer40k_core.geometry.volume import Model
 
+BENEFIT_OF_COVER_RULE_ID = "core-rules:benefit-of-cover"
 BIG_GUNS_NEVER_TIRE_RULE_ID = "big_guns_never_tire"
 LONE_OPERATIVE_RULE_ID = "lone_operative"
+PLUNGING_FIRE_RULE_ID = "core-rules:plunging-fire"
+PLUNGING_FIRE_TERRAIN_HEIGHT_INCHES = 3.0
+PLUNGING_FIRE_TOWERING_RANGE_INCHES = 12.0
+_GROUND_LEVEL_EPSILON = 1e-9
 
 
 class ShootingTargetViolationCode(StrEnum):
@@ -600,6 +606,20 @@ def _target_candidate(
                 INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
             )
         )
+    elif (
+        evidence.cover_result.has_benefit
+        and evidence.cover_result.cover_effect is CoverEffect.ATTACKER_BS_MODIFIER
+    ):
+        targeting_rule_ids.append(BENEFIT_OF_COVER_RULE_ID)
+    if _plunging_fire_applies(
+        attacker_unit=attacker_unit,
+        attacker_models=attacker_models,
+        target_unit=target_unit,
+        target_models=target_models,
+        evidence=evidence,
+        terrain_features=terrain_features,
+    ):
+        targeting_rule_ids.append(PLUNGING_FIRE_RULE_ID)
     if (
         locked_context.is_locked
         and _unit_has_vehicle_or_monster_keyword(attacker_unit)
@@ -763,6 +783,71 @@ def _target_in_range_model_ids(
     return tuple(sorted(ids))
 
 
+def _plunging_fire_applies(
+    *,
+    attacker_unit: UnitInstance,
+    attacker_models: tuple[Model, ...],
+    target_unit: UnitInstance,
+    target_models: tuple[Model, ...],
+    evidence: _LineOfSightRangeEvidence,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+) -> bool:
+    if _unit_has_keyword(attacker_unit, "AIRCRAFT") or _unit_has_keyword(target_unit, "AIRCRAFT"):
+        return False
+    if not evidence.visible_and_in_range_target_model_ids:
+        return False
+    if not _target_unit_contains_ground_level_model(target_models):
+        return False
+    observer_model = _geometry_model_by_id(attacker_models, evidence.witness.observer_model_id)
+    return _attacker_model_on_plunging_fire_terrain(
+        attacker_model=observer_model,
+        terrain_features=terrain_features,
+    ) or (
+        _unit_has_keyword(attacker_unit, "TOWERING")
+        and _target_unit_within_towering_plunging_fire_range(
+            attacker_model=observer_model,
+            target_models=target_models,
+        )
+    )
+
+
+def _target_unit_contains_ground_level_model(target_models: tuple[Model, ...]) -> bool:
+    return any(abs(model.pose.position.z) <= _GROUND_LEVEL_EPSILON for model in target_models)
+
+
+def _attacker_model_on_plunging_fire_terrain(
+    *,
+    attacker_model: Model,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+) -> bool:
+    for feature in terrain_features:
+        for floor in feature.floors:
+            if floor.bottom_z_inches < PLUNGING_FIRE_TERRAIN_HEIGHT_INCHES:
+                continue
+            floor_volume = floor.to_terrain_volume(feature_id=feature.feature_id)
+            if floor_volume.intersects_model(attacker_model):
+                return True
+    return False
+
+
+def _target_unit_within_towering_plunging_fire_range(
+    *,
+    attacker_model: Model,
+    target_models: tuple[Model, ...],
+) -> bool:
+    return any(
+        attacker_model.range_to(target_model) <= PLUNGING_FIRE_TOWERING_RANGE_INCHES
+        for target_model in target_models
+    )
+
+
+def _geometry_model_by_id(models: tuple[Model, ...], model_id: str) -> Model:
+    for model in models:
+        if model.model_id == model_id:
+            return model
+    raise GameLifecycleError("Plunging Fire observer model is not in attacker geometry.")
+
+
 def _best_line_of_sight_range_evidence(
     *,
     scenario: BattlefieldScenario,
@@ -801,6 +886,7 @@ def _best_line_of_sight_range_evidence(
             target_keywords=target_unit.keywords,
         )
         witness = context.resolve_line_of_sight()
+        cover_result = context.benefit_of_cover(witness)
         visible_and_in_range_ids = tuple(
             target_model_id
             for target_model_id in witness.visible_model_ids
@@ -808,6 +894,7 @@ def _best_line_of_sight_range_evidence(
         )
         evidence = _LineOfSightRangeEvidence(
             witness=witness,
+            cover_result=cover_result,
             visible_and_in_range_target_model_ids=visible_and_in_range_ids,
         )
         if not visible_and_in_range_ids:
@@ -837,6 +924,7 @@ class _TargetEngagementContext:
 @dataclass(frozen=True, slots=True)
 class _LineOfSightRangeEvidence:
     witness: LineOfSightWitness
+    cover_result: BenefitOfCoverResult
     visible_and_in_range_target_model_ids: tuple[str, ...]
 
 

@@ -69,7 +69,7 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-0000"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0003"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-new-0005"
 _ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0272"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"

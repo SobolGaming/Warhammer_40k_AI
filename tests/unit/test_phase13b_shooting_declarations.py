@@ -128,22 +128,20 @@ from warhammer40k_core.engine.phases.shooting import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.saves import (
-    SELECT_SAVING_THROW_KIND_DECISION_TYPE,
     PlungingFireModifier,
     PlungingFireModifierResult,
     SaveKind,
     SaveOption,
     SavingThrow,
-    SavingThrowDecision,
-    build_saving_throw_kind_request,
     cover_result_has_bonus,
+    mandatory_save_option,
     resolve_saving_throw,
     save_kind_from_token,
     save_options_for_model,
     saving_throw_roll_spec,
-    selected_save_option,
 )
 from warhammer40k_core.engine.shooting_targets import (
+    PLUNGING_FIRE_RULE_ID,
     ShootingTargetViolationCode,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
@@ -935,6 +933,127 @@ def test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_alloc
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE
     )
     assert hidden_allocation["allocated_model_id"] == hidden_bodyguard.model_instance_id
+
+
+def test_phase14e_precision_selection_persists_for_current_attack_pool() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    character_model = defender.own_models[1]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-precision-pool-rifle",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
+        keywords=(WeaponKeyword.PRECISION,),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14e-precision-pool",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=2,
+            ),
+        ),
+    )
+    precision_request = DecisionRequest(
+        request_id="phase14e-precision-pool-request",
+        decision_type=SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        actor_id="player-a",
+        payload={
+            "attack_context": {
+                "sequence_id": sequence.sequence_id,
+                "pool_index": 0,
+            },
+        },
+        options=(
+            DecisionOption(
+                option_id="decline_precision",
+                label="Decline Precision",
+                payload={"selected_model_id": None},
+            ),
+            DecisionOption(
+                option_id=character_model.model_instance_id,
+                label=character_model.model_instance_id,
+                payload={"selected_model_id": character_model.model_instance_id},
+            ),
+        ),
+    )
+    lifecycle.decision_controller.request_decision(precision_request)
+    lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            result_id="phase14e-precision-pool-result",
+            request=precision_request,
+            selected_option_id=character_model.model_instance_id,
+        )
+    )
+    second_attack = AttackSequence(
+        sequence_id=sequence.sequence_id,
+        attacker_player_id=sequence.attacker_player_id,
+        attacking_unit_instance_id=sequence.attacking_unit_instance_id,
+        attack_pools=sequence.attack_pools,
+        attack_index=1,
+    )
+    attack_context_id = "phase14e-precision-pool:pool-001:attack-002"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+
+    _remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=second_attack,
+        already_allocated_model_ids=(character_model.model_instance_id,),
+        dice_manager=DiceRollManager(
+            "phase14e-precision-pool",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14e-precision-pool-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-precision-pool-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+            ),
+        ),
+    )
+    allocation_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.ALLOCATE,
+    )
+    allocation = cast(dict[str, object], allocation_payload["payload"])
+    allocation_context = cast(dict[str, object], allocation["rule_context"])
+    attacker_constraint = cast(dict[str, object], allocation_context["attacker_constraint"])
+    precision_requests = [
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "decision_requested"
+        and cast(dict[str, object], event.payload)["decision_type"]
+        == SELECT_PRECISION_ALLOCATION_DECISION_TYPE
+    ]
+
+    assert status is None
+    assert allocation["allocated_model_id"] == character_model.model_instance_id
+    assert attacker_constraint["attacker_selected_model_id"] == character_model.model_instance_id
+    assert len(precision_requests) == 1
 
 
 def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
@@ -1736,7 +1855,7 @@ def test_phase13c_attached_unit_roles_require_runtime_keyword_not_identifier_pre
     assert context.attached_unit_character_model_ids == ()
 
 
-def test_phase13c_cover_save_bonus_is_allocated_model_scoped_and_ap_zero_limited() -> None:
+def test_phase14e_benefit_of_cover_does_not_modify_saves() -> None:
     _lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     model = units["enemy"].own_models[0]
     cover_result = _benefit_of_cover_result()
@@ -1763,9 +1882,348 @@ def test_phase13c_cover_save_bonus_is_allocated_model_scoped_and_ap_zero_limited
         option for option in ap_minus_one_options if option.save_kind is SaveKind.ARMOUR
     )
 
-    assert ap_minus_one_armour.cover_applied is True
-    assert ap_minus_one_armour.source_rule_ids == ("benefit_of_cover",)
-    assert ap_minus_one_armour.target_number == ap_minus_one_armour.characteristic_target_number
+    assert ap_minus_one_armour.cover_applied is False
+    assert ap_minus_one_armour.source_rule_ids == ()
+    assert ap_minus_one_armour.target_number == (
+        ap_minus_one_armour.characteristic_target_number + 1
+    )
+
+
+def test_phase14e_invulnerable_save_is_mandatory_without_save_kind_decision() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = replace(
+        defender.own_models[0],
+        characteristics=(
+            *defender.own_models[0].characteristics,
+            CharacteristicValue.from_raw(Characteristic.INVULNERABLE_SAVE, 4),
+        ),
+    )
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(defender, own_models=(defender_model, *defender.own_models[1:])),
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = _first_weapon_profile(lifecycle, attacker)
+    attack_context_id = "phase14e-mandatory-invulnerable:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.INVULNERABLE,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14e-mandatory-invulnerable",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-mandatory-invulnerable",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14e-invulnerable-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-invulnerable-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-invulnerable-save",
+                    spec=save_spec,
+                    value=3,
+                ),
+            ),
+        ),
+    )
+    save_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.SAVE,
+    )
+    payload = cast(dict[str, object], save_payload["payload"])
+
+    assert payload["save_kind"] == SaveKind.INVULNERABLE.value
+    assert payload["target_number"] == 4
+    assert payload["successful"] is False
+    retired_save_choice_type = "select_" + "saving_throw_kind"
+    assert not any(
+        event.event_type == "decision_requested"
+        and cast(dict[str, object], event.payload)["decision_type"] == retired_save_choice_type
+        for event in lifecycle.decision_controller.event_log.records
+    )
+
+
+def test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+    weapon_profile = _first_weapon_profile(lifecycle, attacker)
+    attack_context_id = "phase14e-cover-hit-skill:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14e-cover-hit-skill",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-cover-hit-skill",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14e-cover-hit",
+                    spec=hit_spec,
+                    value=3,
+                ),
+            ),
+        ),
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    payload = cast(dict[str, object], hit_payload["payload"])
+
+    assert payload["target_number"] == 4
+    assert payload["modifier"] == 0
+    assert payload["successful"] is False
+
+
+def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    base_scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    elevated_scenario = _scenario_with_unit_pose(
+        scenario=base_scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=_compact_test_unit_poses(origin=Pose.at(10.0, 35.0, 3.0), model_count=5),
+    )
+    plunging_ruin = TerrainFeatureDefinition(
+        feature_id="phase14e-plunging-ruin",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=12.0,
+        footprint_center_y_inches=35.0,
+        footprint_width_inches=12.0,
+        footprint_depth_inches=6.0,
+        walls=(
+            TerrainWallDefinition(
+                wall_id="south-wall",
+                center_x_inches=12.0,
+                center_y_inches=32.2,
+                bottom_z_inches=0.0,
+                width_inches=12.0,
+                depth_inches=0.2,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground-floor",
+                center_x_inches=12.0,
+                center_y_inches=35.0,
+                bottom_z_inches=0.0,
+                width_inches=12.0,
+                depth_inches=6.0,
+                thickness_inches=0.1,
+            ),
+            TerrainFloorDefinition(
+                floor_id="upper-floor",
+                center_x_inches=12.0,
+                center_y_inches=35.0,
+                bottom_z_inches=3.0,
+                width_inches=12.0,
+                depth_inches=6.0,
+                thickness_inches=0.1,
+            ),
+        ),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-plunging-fire-rifle",
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+    )
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=elevated_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+        terrain_features=(plunging_ruin,),
+    )
+    plain_candidates = shooting_target_candidates_for_unit(
+        scenario=base_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+    )
+
+    assert candidates[0].is_legal
+    assert PLUNGING_FIRE_RULE_ID in candidates[0].targeting_rule_ids
+    assert plain_candidates[0].is_legal
+    assert PLUNGING_FIRE_RULE_ID not in plain_candidates[0].targeting_rule_ids
+
+    towering_attacker = replace(attacker, keywords=(*attacker.keywords, "Towering"))
+    towering_scenario = _scenario_with_replaced_unit(
+        scenario=base_scenario,
+        replacement=towering_attacker,
+    )
+    towering_scenario = _scenario_with_unit_pose(
+        scenario=towering_scenario,
+        unit=defender,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=_compact_test_unit_poses(origin=Pose.at(20.0, 35.0), model_count=5),
+    )
+    towering_candidates = shooting_target_candidates_for_unit(
+        scenario=towering_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=towering_attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+    )
+
+    assert towering_candidates[0].is_legal
+    assert PLUNGING_FIRE_RULE_ID in towering_candidates[0].targeting_rule_ids
+
+    for label, targeting_rule_ids, expected_target_number, expected_successful in (
+        ("with-plunging-fire", (PLUNGING_FIRE_RULE_ID,), 3, True),
+        ("without-plunging-fire", (), 4, False),
+    ):
+        case_lifecycle, case_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+        case_state = _state(case_lifecycle)
+        case_attacker = case_units["intercessor-1"]
+        case_defender = case_units["enemy"]
+        case_profile = replace(
+            _first_weapon_profile(case_lifecycle, case_attacker),
+            profile_id=f"phase14e-plunging-fire-{label}",
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+        )
+        sequence_id = f"phase14e-plunging-fire-{label}"
+        attack_context_id = f"{sequence_id}:pool-001:attack-001"
+        hit_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Hit roll for {case_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.hit",
+            actor_id="player-a",
+        )
+        wound_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Wound roll for {case_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.wound",
+            actor_id="player-a",
+        )
+        resolve_attack_sequence_until_blocked(
+            state=case_state,
+            decisions=case_lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=AttackSequence.start(
+                sequence_id=sequence_id,
+                attacker_player_id="player-a",
+                attacking_unit_instance_id=case_attacker.unit_instance_id,
+                attack_pools=(
+                    replace(
+                        _attack_pool_for_test(
+                            attacker=case_attacker,
+                            defender=case_defender,
+                            weapon_profile=case_profile,
+                            attacks=1,
+                        ),
+                        targeting_rule_ids=targeting_rule_ids,
+                    ),
+                ),
+            ),
+            already_allocated_model_ids=(),
+            dice_manager=DiceRollManager(
+                sequence_id,
+                event_log=case_lifecycle.decision_controller.event_log,
+                injected_results=(
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:hit",
+                        spec=hit_spec,
+                        value=3,
+                    ),
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:wound",
+                        spec=wound_spec,
+                        value=1,
+                    ),
+                ),
+            ),
+        )
+        hit_payload = _attack_step_payload(
+            _event_payloads(case_lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.HIT,
+        )
+        payload = cast(dict[str, object], hit_payload["payload"])
+
+        assert payload["target_number"] == expected_target_number
+        assert payload["modifier"] == 0
+        assert payload["successful"] is expected_successful
 
 
 def test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks() -> None:
@@ -2388,88 +2846,15 @@ def test_phase13c_decision_payloads_validate_fail_fast() -> None:
         characteristic_target_number=4,
         armor_penetration=-2,
     )
-    save_request = build_saving_throw_kind_request(
-        request_id="phase13c-save-kind",
-        defender_player_id="player-b",
-        attack_context={"attack_context_id": "phase13c-save-kind"},
-        options=(armour_option, invulnerable_option),
-    )
+
     assert (
-        selected_save_option(
-            options=(armour_option, invulnerable_option),
-            selected_save_kind=SaveKind.ARMOUR,
-        )
-        == armour_option
+        mandatory_save_option(options=(armour_option, invulnerable_option)) == invulnerable_option
     )
-    with pytest.raises(GameLifecycleError, match="not legal"):
-        selected_save_option(options=(armour_option,), selected_save_kind=SaveKind.INVULNERABLE)
-
-    missing_save_request = DecisionRequest(
-        request_id="phase13c-save-missing",
-        decision_type=save_request.decision_type,
-        actor_id="player-b",
-        payload={"attack_context": {"attack_context_id": "missing-save"}},
-        options=(DecisionOption(option_id="bad", label="Bad", payload={}),),
-    )
-    with pytest.raises(GameLifecycleError, match="missing save_kind"):
-        SavingThrowDecision.from_result(
-            request=missing_save_request,
-            result=DecisionResult(
-                result_id="phase13c-save-missing-result",
-                request_id=missing_save_request.request_id,
-                decision_type=missing_save_request.decision_type,
-                actor_id=missing_save_request.actor_id,
-                selected_option_id="bad",
-                payload={},
-            ),
-        )
-    typed_save_request = DecisionRequest(
-        request_id="phase13c-save-typed",
-        decision_type=save_request.decision_type,
-        actor_id="player-b",
-        payload={"attack_context": {"attack_context_id": "typed-save"}},
-        options=(DecisionOption(option_id="bad", label="Bad", payload={"save_kind": 3}),),
-    )
-    with pytest.raises(GameLifecycleError, match="save_kind must be a string"):
-        SavingThrowDecision.from_result(
-            request=typed_save_request,
-            result=DecisionResult(
-                result_id="phase13c-save-typed-result",
-                request_id=typed_save_request.request_id,
-                decision_type=typed_save_request.decision_type,
-                actor_id=typed_save_request.actor_id,
-                selected_option_id="bad",
-                payload={"save_kind": 3},
-            ),
-        )
-    actorless_save_request = DecisionRequest(
-        request_id="phase13c-save-actorless",
-        decision_type=save_request.decision_type,
-        actor_id=None,
-        payload={"attack_context": {"attack_context_id": "actorless-save"}},
-        options=(
-            DecisionOption(
-                option_id=SaveKind.ARMOUR.value,
-                label="Armour",
-                payload={"save_kind": SaveKind.ARMOUR.value},
-            ),
-        ),
-    )
-    with pytest.raises(GameLifecycleError, match="requires a defender actor"):
-        SavingThrowDecision.from_result(
-            request=actorless_save_request,
-            result=DecisionResult(
-                result_id="phase13c-save-actorless-result",
-                request_id=actorless_save_request.request_id,
-                decision_type=actorless_save_request.decision_type,
-                actor_id=None,
-                selected_option_id=SaveKind.ARMOUR.value,
-                payload={"save_kind": SaveKind.ARMOUR.value},
-            ),
-        )
+    assert mandatory_save_option(options=(armour_option,)) == armour_option
+    assert mandatory_save_option(options=()) is None
 
 
-def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
+def test_phase13c_mandatory_saves_and_plunging_fire_are_typed() -> None:
     _lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     model = units["enemy"].own_models[0]
     cover_result = _benefit_of_cover_result()
@@ -2490,25 +2875,8 @@ def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
         cover_applied=False,
         cover_result=None,
     )
-    request = build_saving_throw_kind_request(
-        request_id="phase13c-save-request",
-        defender_player_id="player-b",
-        attack_context={"attack_context_id": "phase13c-save-context"},
-        options=(armour_option, invulnerable_option),
-    )
-    result = DecisionResult(
-        result_id="phase13c-save-result",
-        request_id=request.request_id,
-        decision_type=request.decision_type,
-        actor_id=request.actor_id,
-        selected_option_id=SaveKind.INVULNERABLE.value,
-        payload={"save_kind": SaveKind.INVULNERABLE.value},
-    )
-    decision = SavingThrowDecision.from_result(request=request, result=result)
-    selected = selected_save_option(
-        options=(armour_option, invulnerable_option),
-        selected_save_kind=decision.selected_save_kind,
-    )
+    selected = mandatory_save_option(options=(armour_option, invulnerable_option))
+    assert selected is not None
     save_roll = DiceRollManager("phase13c-save-roll").roll_fixed(
         saving_throw_roll_spec(
             save_kind=selected.save_kind,
@@ -2521,9 +2889,20 @@ def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
     saving_throw = resolve_saving_throw(option=selected, roll_state=save_roll)
 
     assert save_kind_from_token("armour") is SaveKind.ARMOUR
-    assert decision.to_payload()["selected_save_kind"] == "invulnerable"
     assert saving_throw.successful is True
     assert saving_throw.to_payload()["option"]["save_kind"] == "invulnerable"
+    assert SaveOption.from_payload(armour_option.to_payload()) == armour_option
+    stronger_invulnerable_option = SaveOption(
+        save_kind=SaveKind.INVULNERABLE,
+        target_number=3,
+        characteristic_target_number=3,
+        armor_penetration=-3,
+        source_rule_ids=("go-to-ground",),
+    )
+    assert (
+        mandatory_save_option(options=(armour_option, stronger_invulnerable_option))
+        == stronger_invulnerable_option
+    )
     with pytest.raises(GameLifecycleError, match="SaveKind token"):
         save_kind_from_token(3)
 
@@ -2531,7 +2910,7 @@ def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
         source_rule_id="plunging-fire",
         supported=False,
     ).apply(
-        armor_penetration=0,
+        ballistic_skill=4,
         attacker_z_inches=7.0,
         target_z_inches=0.0,
         target_fully_visible=True,
@@ -2540,8 +2919,8 @@ def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
         source_rule_id="plunging-fire",
         supported=True,
     ).apply(
-        armor_penetration=0,
-        attacker_z_inches=5.0,
+        ballistic_skill=4,
+        attacker_z_inches=2.0,
         target_z_inches=0.0,
         target_fully_visible=True,
     )
@@ -2549,7 +2928,7 @@ def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
         source_rule_id="plunging-fire",
         supported=True,
     ).apply(
-        armor_penetration=0,
+        ballistic_skill=4,
         attacker_z_inches=7.0,
         target_z_inches=0.0,
         target_fully_visible=False,
@@ -2558,7 +2937,7 @@ def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
         source_rule_id="plunging-fire",
         supported=True,
     ).apply(
-        armor_penetration=0,
+        ballistic_skill=4,
         attacker_z_inches=7.0,
         target_z_inches=0.0,
         target_fully_visible=True,
@@ -2567,16 +2946,234 @@ def test_phase13c_save_decisions_and_plunging_fire_are_typed() -> None:
     assert unsupported.status == "unsupported"
     assert too_low.reason == "height_advantage_not_met"
     assert not_visible.reason == "target_not_fully_visible"
-    assert applied.to_payload()["final_armor_penetration"] == -1
+    assert applied.to_payload()["final_ballistic_skill"] == 3
     with pytest.raises(GameLifecycleError, match="status"):
         PlungingFireModifierResult(
             source_rule_id="plunging-fire",
             status="wrong",
             reason=None,
-            input_armor_penetration=0,
-            final_armor_penetration=0,
-            required_height_advantage_inches=6.0,
+            input_ballistic_skill=4,
+            final_ballistic_skill=4,
+            required_height_advantage_inches=3.0,
             actual_height_advantage_inches=7.0,
+            target_fully_visible=True,
+        )
+
+
+def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
+    valid_option = SaveOption(
+        save_kind=SaveKind.ARMOUR,
+        target_number=3,
+        characteristic_target_number=3,
+        armor_penetration=0,
+    )
+    save_roll = DiceRollManager("phase14e-validation-save").roll_fixed(
+        saving_throw_roll_spec(
+            save_kind=SaveKind.ARMOUR,
+            player_id="player-b",
+            allocated_model_id="model-a",
+            attack_context_id="phase14e-validation-context",
+        ),
+        [3],
+    )
+
+    with pytest.raises(GameLifecycleError, match="cover_result"):
+        SaveOption(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            characteristic_target_number=3,
+            armor_penetration=0,
+            cover_result=cast(BenefitOfCoverResult, "bad-cover"),
+        )
+    with pytest.raises(GameLifecycleError, match="target_number"):
+        SaveOption(
+            save_kind=SaveKind.ARMOUR,
+            target_number=1,
+            characteristic_target_number=3,
+            armor_penetration=0,
+        )
+    with pytest.raises(GameLifecycleError, match="source_rule_ids"):
+        SaveOption(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            characteristic_target_number=3,
+            armor_penetration=0,
+            source_rule_ids=cast(tuple[str, ...], ["bad-list"]),
+        )
+    with pytest.raises(GameLifecycleError, match="duplicates"):
+        SaveOption(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            characteristic_target_number=3,
+            armor_penetration=0,
+            source_rule_ids=("same", "same"),
+        )
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        SaveOption(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            characteristic_target_number=3,
+            armor_penetration=0,
+            source_rule_ids=("",),
+        )
+
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        mandatory_save_option(options=cast(tuple[SaveOption, ...], [valid_option]))
+    with pytest.raises(GameLifecycleError, match="SaveOption values"):
+        mandatory_save_option(options=(cast(SaveOption, "not-an-option"),))
+
+    with pytest.raises(GameLifecycleError, match="target_number must match"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=4,
+            roll_state=save_roll,
+            unmodified_roll=4,
+            final_roll=4,
+            successful=True,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="D6 value"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=7,
+            final_roll=7,
+            successful=True,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="final_roll"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=cast(int, "bad-roll"),
+            successful=True,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="successful"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=3,
+            successful=cast(bool, "yes"),
+            option=valid_option,
+        )
+    invalid_roll_state_throw = SavingThrow(
+        save_kind=SaveKind.ARMOUR,
+        target_number=3,
+        roll_state=cast(DiceRollState, "bad-roll-state"),
+        unmodified_roll=3,
+        final_roll=3,
+        successful=True,
+        option=valid_option,
+    )
+    with pytest.raises(GameLifecycleError, match="roll_state"):
+        invalid_roll_state_throw.to_payload()
+
+    with pytest.raises(GameLifecycleError, match="supported"):
+        PlungingFireModifier(
+            source_rule_id="plunging-fire",
+            supported=cast(bool, "yes"),
+        )
+    with pytest.raises(GameLifecycleError, match="required height"):
+        PlungingFireModifier(
+            source_rule_id="plunging-fire",
+            supported=True,
+            required_height_advantage_inches=cast(float, "six"),
+        )
+    with pytest.raises(GameLifecycleError, match="positive"):
+        PlungingFireModifier(
+            source_rule_id="plunging-fire",
+            supported=True,
+            required_height_advantage_inches=0.0,
+        )
+    with pytest.raises(GameLifecycleError, match="BS modifier"):
+        PlungingFireModifier(
+            source_rule_id="plunging-fire",
+            supported=True,
+            ballistic_skill_modifier=cast(int, "minus-one"),
+        )
+
+    plunging_fire = PlungingFireModifier(source_rule_id="plunging-fire", supported=True)
+    with pytest.raises(GameLifecycleError, match="attacker height"):
+        plunging_fire.apply(
+            ballistic_skill=4,
+            attacker_z_inches=cast(float, 7),
+            target_z_inches=0.0,
+            target_fully_visible=True,
+        )
+    with pytest.raises(GameLifecycleError, match="target height"):
+        plunging_fire.apply(
+            ballistic_skill=4,
+            attacker_z_inches=7.0,
+            target_z_inches=cast(float, 0),
+            target_fully_visible=True,
+        )
+    with pytest.raises(GameLifecycleError, match="visibility"):
+        plunging_fire.apply(
+            ballistic_skill=4,
+            attacker_z_inches=7.0,
+            target_z_inches=0.0,
+            target_fully_visible=cast(bool, "yes"),
+        )
+
+    with pytest.raises(GameLifecycleError, match="required height"):
+        PlungingFireModifierResult(
+            source_rule_id="plunging-fire",
+            status="applied",
+            reason=None,
+            input_ballistic_skill=4,
+            final_ballistic_skill=3,
+            required_height_advantage_inches=cast(float, 6),
+            actual_height_advantage_inches=7.0,
+            target_fully_visible=True,
+        )
+    with pytest.raises(GameLifecycleError, match="actual height"):
+        PlungingFireModifierResult(
+            source_rule_id="plunging-fire",
+            status="applied",
+            reason=None,
+            input_ballistic_skill=4,
+            final_ballistic_skill=3,
+            required_height_advantage_inches=3.0,
+            actual_height_advantage_inches=cast(float, 7),
+            target_fully_visible=True,
+        )
+    with pytest.raises(GameLifecycleError, match="visibility"):
+        PlungingFireModifierResult(
+            source_rule_id="plunging-fire",
+            status="applied",
+            reason=None,
+            input_ballistic_skill=4,
+            final_ballistic_skill=3,
+            required_height_advantage_inches=3.0,
+            actual_height_advantage_inches=7.0,
+            target_fully_visible=cast(bool, "yes"),
+        )
+    with pytest.raises(GameLifecycleError, match="must not include a reason"):
+        PlungingFireModifierResult(
+            source_rule_id="plunging-fire",
+            status="applied",
+            reason="bad-reason",
+            input_ballistic_skill=4,
+            final_ballistic_skill=3,
+            required_height_advantage_inches=3.0,
+            actual_height_advantage_inches=7.0,
+            target_fully_visible=True,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a reason"):
+        PlungingFireModifierResult(
+            source_rule_id="plunging-fire",
+            status="not_applicable",
+            reason=None,
+            input_ballistic_skill=4,
+            final_ballistic_skill=4,
+            required_height_advantage_inches=3.0,
+            actual_height_advantage_inches=3.0,
             target_fully_visible=True,
         )
 
@@ -4827,15 +5424,15 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             allocated_model_id=model.model_instance_id,
             attack_context_id="phase13c-invalid-save-context",
         ),
-        [3],
+        [4],
     )
     with pytest.raises(GameLifecycleError, match="success flag"):
         resolve_saving_throw(option=armour_option, roll_state=save_roll).__class__(
             save_kind=SaveKind.ARMOUR,
             target_number=armour_option.target_number,
             roll_state=save_roll,
-            unmodified_roll=3,
-            final_roll=3,
+            unmodified_roll=4,
+            final_roll=4,
             successful=False,
             option=armour_option,
         )
@@ -4854,20 +5451,9 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             option=armour_option,
             roll_state="bad",  # type: ignore[arg-type]
         )
-    with pytest.raises(GameLifecycleError, match="Saving throw kind request"):
-        build_saving_throw_kind_request(
-            request_id="phase13c-one-save",
-            defender_player_id="player-b",
-            attack_context={"attack_context_id": "phase13c-one-save"},
-            options=(armour_option,),
-        )
+    assert mandatory_save_option(options=(armour_option,)) == armour_option
     with pytest.raises(GameLifecycleError, match="duplicate save kinds"):
-        build_saving_throw_kind_request(
-            request_id="phase13c-duplicate-save",
-            defender_player_id="player-b",
-            attack_context={"attack_context_id": "phase13c-duplicate-save"},
-            options=(armour_option, armour_option),
-        )
+        mandatory_save_option(options=(armour_option, armour_option))
 
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
@@ -5511,6 +6097,7 @@ def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
     accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
     accepted_pool = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
     model_destroyed_payload = _last_event_payload(lifecycle, "model_destroyed")
+    hit_events = _attack_step_payloads(lifecycle, AttackSequenceStep.HIT)
     save_events = _attack_step_payloads(lifecycle, AttackSequenceStep.SAVE)
 
     assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
@@ -5523,7 +6110,11 @@ def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
         "removals": [model_destroyed_payload["removal_record"]],
         "displacements": [],
     }
-    assert any(_save_payload_has_cover(save_event) for save_event in save_events)
+    assert any(
+        cast(dict[str, object], hit_event["payload"])["target_number"] == 4
+        for hit_event in hit_events
+    )
+    assert not any(_save_payload_has_cover(save_event) for save_event in save_events)
     assert event_types.index("attack_sequence_completed") < event_types.index(
         "shooting_phase_completion_declared"
     )
@@ -6639,7 +7230,6 @@ def _submit_phase13f_pending_attack_choices(
     attack_decision_types = {
         SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_SAVING_THROW_KIND_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     }
@@ -7131,7 +7721,7 @@ def _benefit_of_cover_result() -> BenefitOfCoverResult:
     )
     return BenefitOfCoverResult(
         has_benefit=True,
-        cover_effect=CoverEffect.SAVE_BONUS,
+        cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
         source_feature_ids=("phase13c-cover-ruin",),
         source_policy_kinds=(LineOfSightPolicy.TRUE_LINE_OF_SIGHT,),
         source_records=(source_record,),
