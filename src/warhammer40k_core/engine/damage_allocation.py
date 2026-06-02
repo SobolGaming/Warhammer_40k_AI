@@ -4,6 +4,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -24,6 +25,7 @@ if TYPE_CHECKING:
 
 
 SELECT_ATTACK_ALLOCATION_DECISION_TYPE = "select_attack_allocation"
+SELECT_ALLOCATION_ORDER_DECISION_TYPE = "select_allocation_order"
 SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
 SELECT_DESTRUCTION_REACTION_DECISION_TYPE = "select_destruction_reaction"
@@ -42,11 +44,20 @@ class DestructionReactionKind(StrEnum):
     DEADLY_DEMISE = "deadly_demise"
 
 
+class AllocationGroupRole(StrEnum):
+    BODYGUARD = "bodyguard"
+    CHARACTER = "character"
+    LEADER = "leader"
+    SUPPORT = "support"
+    NON_CHARACTER = "non_character"
+
+
 class AttackAllocationConstraintPayload(TypedDict):
     source_rule_ids: list[str]
     allowed_model_ids: list[str] | None
     can_allocate_protected_characters: bool
     attacker_selected_model_id: str | None
+    attacker_selected_group_id: str | None
 
 
 class AttackAllocationRuleContextPayload(TypedDict):
@@ -74,6 +85,33 @@ class AttackAllocationDecisionPayload(TypedDict):
     player_id: str
     selected_model_id: str
     attack_context: JsonValue
+
+
+class AllocationGroupPayload(TypedDict):
+    group_id: str
+    target_unit_instance_id: str
+    model_ids: list[str]
+    role: str
+    wounds: int
+    save: int | None
+    invulnerable_save: int | None
+    wounded_model_ids: list[str]
+    already_allocated_model_ids: list[str]
+    wounded: bool
+    bodyguard_model_ids: list[str]
+    character_model_ids: list[str]
+    role_evidence: list[str]
+    legality_reasons: list[str]
+
+
+class AllocationOrderDecisionPayload(TypedDict):
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_group_id: str
+    attack_context: JsonValue
+    allocation_context: AttackAllocationRuleContextPayload
+    allocation_groups: list[AllocationGroupPayload]
 
 
 class DamageApplicationPayload(TypedDict):
@@ -165,6 +203,7 @@ class AttackAllocationConstraint:
     allowed_model_ids: tuple[str, ...] | None = None
     can_allocate_protected_characters: bool = False
     attacker_selected_model_id: str | None = None
+    attacker_selected_group_id: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -196,6 +235,14 @@ class AttackAllocationConstraint:
                 self.attacker_selected_model_id,
             ),
         )
+        object.__setattr__(
+            self,
+            "attacker_selected_group_id",
+            _validate_optional_identifier(
+                "AttackAllocationConstraint attacker_selected_group_id",
+                self.attacker_selected_group_id,
+            ),
+        )
         if (
             self.attacker_selected_model_id is not None
             and self.allowed_model_ids is not None
@@ -213,6 +260,7 @@ class AttackAllocationConstraint:
             ),
             "can_allocate_protected_characters": self.can_allocate_protected_characters,
             "attacker_selected_model_id": self.attacker_selected_model_id,
+            "attacker_selected_group_id": self.attacker_selected_group_id,
         }
 
     @classmethod
@@ -223,6 +271,7 @@ class AttackAllocationConstraint:
             allowed_model_ids=None if allowed_model_ids is None else tuple(allowed_model_ids),
             can_allocate_protected_characters=payload["can_allocate_protected_characters"],
             attacker_selected_model_id=payload["attacker_selected_model_id"],
+            attacker_selected_group_id=payload["attacker_selected_group_id"],
         )
 
 
@@ -509,6 +558,257 @@ class AttackAllocationDecision:
             "player_id": self.player_id,
             "selected_model_id": self.selected_model_id,
             "attack_context": self.attack_context,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class AllocationGroup:
+    group_id: str
+    target_unit_instance_id: str
+    model_ids: tuple[str, ...]
+    role: AllocationGroupRole
+    wounds: int
+    save: int | None
+    invulnerable_save: int | None
+    wounded_model_ids: tuple[str, ...] = ()
+    already_allocated_model_ids: tuple[str, ...] = ()
+    bodyguard_model_ids: tuple[str, ...] = ()
+    character_model_ids: tuple[str, ...] = ()
+    role_evidence: tuple[str, ...] = ()
+    legality_reasons: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "group_id",
+            _validate_identifier("AllocationGroup group_id", self.group_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier(
+                "AllocationGroup target_unit_instance_id",
+                self.target_unit_instance_id,
+            ),
+        )
+        model_ids = _validate_identifier_tuple("AllocationGroup model_ids", self.model_ids)
+        if not model_ids:
+            raise GameLifecycleError("AllocationGroup requires models.")
+        object.__setattr__(self, "model_ids", model_ids)
+        object.__setattr__(self, "role", allocation_group_role_from_token(self.role))
+        object.__setattr__(
+            self,
+            "wounds",
+            _validate_positive_int("AllocationGroup wounds", self.wounds),
+        )
+        object.__setattr__(
+            self,
+            "save",
+            _validate_optional_save("AllocationGroup save", self.save),
+        )
+        object.__setattr__(
+            self,
+            "invulnerable_save",
+            _validate_optional_save(
+                "AllocationGroup invulnerable_save",
+                self.invulnerable_save,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "wounded_model_ids",
+            _validate_identifier_tuple(
+                "AllocationGroup wounded_model_ids",
+                self.wounded_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "already_allocated_model_ids",
+            _validate_identifier_tuple(
+                "AllocationGroup already_allocated_model_ids",
+                self.already_allocated_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "bodyguard_model_ids",
+            _validate_identifier_tuple(
+                "AllocationGroup bodyguard_model_ids",
+                self.bodyguard_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "character_model_ids",
+            _validate_identifier_tuple(
+                "AllocationGroup character_model_ids",
+                self.character_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "role_evidence",
+            _validate_identifier_tuple("AllocationGroup role_evidence", self.role_evidence),
+        )
+        object.__setattr__(
+            self,
+            "legality_reasons",
+            _validate_identifier_tuple(
+                "AllocationGroup legality_reasons",
+                self.legality_reasons,
+            ),
+        )
+        _validate_subset(
+            field_name="AllocationGroup wounded_model_ids",
+            values=self.wounded_model_ids,
+            universe=model_ids,
+        )
+        _validate_subset(
+            field_name="AllocationGroup already_allocated_model_ids",
+            values=self.already_allocated_model_ids,
+            universe=model_ids,
+        )
+
+    @property
+    def wounded(self) -> bool:
+        return bool(self.wounded_model_ids)
+
+    def ordered_model_ids_for_damage(self) -> tuple[str, ...]:
+        priority_ids = tuple(
+            model_id
+            for model_id in self.model_ids
+            if model_id in set(self.wounded_model_ids) | set(self.already_allocated_model_ids)
+        )
+        remaining_ids = tuple(
+            model_id for model_id in self.model_ids if model_id not in priority_ids
+        )
+        return (*priority_ids, *remaining_ids)
+
+    def to_payload(self) -> AllocationGroupPayload:
+        return {
+            "group_id": self.group_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "model_ids": list(self.model_ids),
+            "role": self.role.value,
+            "wounds": self.wounds,
+            "save": self.save,
+            "invulnerable_save": self.invulnerable_save,
+            "wounded_model_ids": list(self.wounded_model_ids),
+            "already_allocated_model_ids": list(self.already_allocated_model_ids),
+            "wounded": self.wounded,
+            "bodyguard_model_ids": list(self.bodyguard_model_ids),
+            "character_model_ids": list(self.character_model_ids),
+            "role_evidence": list(self.role_evidence),
+            "legality_reasons": list(self.legality_reasons),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AllocationGroupPayload) -> Self:
+        return cls(
+            group_id=payload["group_id"],
+            target_unit_instance_id=payload["target_unit_instance_id"],
+            model_ids=tuple(payload["model_ids"]),
+            role=allocation_group_role_from_token(payload["role"]),
+            wounds=payload["wounds"],
+            save=payload["save"],
+            invulnerable_save=payload["invulnerable_save"],
+            wounded_model_ids=tuple(payload["wounded_model_ids"]),
+            already_allocated_model_ids=tuple(payload["already_allocated_model_ids"]),
+            bodyguard_model_ids=tuple(payload["bodyguard_model_ids"]),
+            character_model_ids=tuple(payload["character_model_ids"]),
+            role_evidence=tuple(payload["role_evidence"]),
+            legality_reasons=tuple(payload["legality_reasons"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AllocationOrderDecision:
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_group_id: str
+    attack_context: JsonValue
+    allocation_context: AttackAllocationRuleContext
+    allocation_groups: tuple[AllocationGroup, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("AllocationOrderDecision request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("AllocationOrderDecision result_id", self.result_id),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("AllocationOrderDecision player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "selected_group_id",
+            _validate_identifier(
+                "AllocationOrderDecision selected_group_id",
+                self.selected_group_id,
+            ),
+        )
+        object.__setattr__(self, "attack_context", validate_json_value(self.attack_context))
+        if type(self.allocation_context) is not AttackAllocationRuleContext:
+            raise GameLifecycleError(
+                "AllocationOrderDecision allocation_context must be allocation context."
+            )
+        groups = _validate_allocation_groups(self.allocation_groups)
+        object.__setattr__(self, "allocation_groups", groups)
+        if self.selected_group_id not in {group.group_id for group in groups}:
+            raise GameLifecycleError("AllocationOrderDecision selected group is not legal.")
+
+    @classmethod
+    def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
+        result.validate_for_request(request)
+        payload = _payload_object(result.payload)
+        selected_group_id = _payload_string(payload, key="group_id")
+        actor_id = result.actor_id
+        if actor_id is None:
+            raise GameLifecycleError("AllocationOrderDecision requires a defender actor.")
+        request_payload = _payload_object(request.payload)
+        group_payloads = request_payload["allocation_groups"]
+        if not isinstance(group_payloads, list):
+            raise GameLifecycleError("Allocation order request groups must be a list.")
+        groups = tuple(
+            AllocationGroup.from_payload(cast(AllocationGroupPayload, group_payload))
+            for group_payload in group_payloads
+        )
+        return cls(
+            request_id=request.request_id,
+            result_id=result.result_id,
+            player_id=actor_id,
+            selected_group_id=selected_group_id,
+            attack_context=validate_json_value(request_payload["attack_context"]),
+            allocation_context=AttackAllocationRuleContext.from_payload(
+                cast(AttackAllocationRuleContextPayload, request_payload["allocation_context"])
+            ),
+            allocation_groups=groups,
+        )
+
+    def selected_group(self) -> AllocationGroup:
+        for group in self.allocation_groups:
+            if group.group_id == self.selected_group_id:
+                return group
+        raise GameLifecycleError("Selected allocation group is missing.")
+
+    def to_payload(self) -> AllocationOrderDecisionPayload:
+        return {
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+            "player_id": self.player_id,
+            "selected_group_id": self.selected_group_id,
+            "attack_context": self.attack_context,
+            "allocation_context": self.allocation_context.to_payload(),
+            "allocation_groups": [group.to_payload() for group in self.allocation_groups],
         }
 
 
@@ -1305,6 +1605,17 @@ def damage_kind_from_token(token: object) -> DamageKind:
         raise GameLifecycleError(f"Unsupported DamageKind token: {token}.") from exc
 
 
+def allocation_group_role_from_token(token: object) -> AllocationGroupRole:
+    if type(token) is AllocationGroupRole:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("AllocationGroupRole token must be a string.")
+    try:
+        return AllocationGroupRole(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported AllocationGroupRole token: {token}.") from exc
+
+
 def destruction_reaction_kind_from_token(token: object) -> DestructionReactionKind:
     if type(token) is DestructionReactionKind:
         return token
@@ -1342,6 +1653,188 @@ def allocation_context_for_unit(
         attached_unit_bodyguard_model_ids=bodyguard_model_ids,
         attached_unit_character_model_ids=character_model_ids,
         attacker_constraint=attacker_constraint,
+    )
+
+
+def allocation_groups_for_context(
+    *,
+    state: GameState,
+    allocation_context: AttackAllocationRuleContext,
+    visible_model_ids: tuple[str, ...] | None = None,
+) -> tuple[AllocationGroup, ...]:
+    if type(allocation_context) is not AttackAllocationRuleContext:
+        raise GameLifecycleError("Allocation groups require an allocation context.")
+    visible_id_set: set[str] | None = None
+    if visible_model_ids is not None:
+        visible_id_set = set(_validate_identifier_tuple("visible_model_ids", visible_model_ids))
+    legal_model_ids = allocation_context.legal_model_ids()
+    if visible_id_set is not None:
+        legal_model_ids = tuple(
+            model_id for model_id in legal_model_ids if model_id in visible_id_set
+        )
+    if not legal_model_ids:
+        return ()
+    bodyguard_ids = set(allocation_context.attached_unit_bodyguard_model_ids)
+    character_ids = set(allocation_context.attached_unit_character_model_ids)
+    wounded_ids = set(allocation_context.wounded_model_ids)
+    allocated_ids = set(allocation_context.already_allocated_model_ids)
+
+    groups: list[AllocationGroup] = []
+    non_character_models_by_profile: dict[
+        tuple[int, int | None, int | None, AllocationGroupRole],
+        list[ModelInstance],
+    ] = {}
+    for model_id in legal_model_ids:
+        model = model_by_id(state=state, model_instance_id=model_id)
+        wounds = model.starting_wounds
+        save = _model_characteristic(model, Characteristic.SAVE)
+        invulnerable = _model_characteristic(model, Characteristic.INVULNERABLE_SAVE)
+        if model_id in character_ids:
+            role = _character_allocation_role(model)
+            groups.append(
+                AllocationGroup(
+                    group_id=_character_allocation_group_id(model_id),
+                    target_unit_instance_id=allocation_context.target_unit_instance_id,
+                    model_ids=(model_id,),
+                    role=role,
+                    wounds=wounds,
+                    save=save,
+                    invulnerable_save=invulnerable,
+                    wounded_model_ids=(model_id,) if model_id in wounded_ids else (),
+                    already_allocated_model_ids=(model_id,) if model_id in allocated_ids else (),
+                    bodyguard_model_ids=tuple(sorted(bodyguard_ids & {model_id})),
+                    character_model_ids=(model_id,),
+                    role_evidence=_role_evidence_for_model(model=model, role=role),
+                    legality_reasons=_allocation_group_legality_reasons(
+                        model_ids=(model_id,),
+                        wounded_ids=wounded_ids,
+                        allocated_ids=allocated_ids,
+                        bodyguard_ids=bodyguard_ids,
+                        character_ids=character_ids,
+                        attacker_constraint=allocation_context.attacker_constraint,
+                    ),
+                )
+            )
+            continue
+        role = (
+            AllocationGroupRole.BODYGUARD
+            if model_id in bodyguard_ids
+            else (AllocationGroupRole.NON_CHARACTER)
+        )
+        non_character_models_by_profile.setdefault((wounds, save, invulnerable, role), []).append(
+            model
+        )
+
+    for (wounds, save, invulnerable, role), models in sorted(
+        non_character_models_by_profile.items(),
+        key=lambda item: (
+            item[0][3].value,
+            item[0][0],
+            99 if item[0][1] is None else item[0][1],
+            99 if item[0][2] is None else item[0][2],
+            tuple(model.model_instance_id for model in item[1]),
+        ),
+    ):
+        model_ids = tuple(model.model_instance_id for model in models)
+        groups.append(
+            AllocationGroup(
+                group_id=_profile_allocation_group_id(
+                    target_unit_instance_id=allocation_context.target_unit_instance_id,
+                    role=role,
+                    wounds=wounds,
+                    save=save,
+                    invulnerable_save=invulnerable,
+                    model_ids=model_ids,
+                ),
+                target_unit_instance_id=allocation_context.target_unit_instance_id,
+                model_ids=model_ids,
+                role=role,
+                wounds=wounds,
+                save=save,
+                invulnerable_save=invulnerable,
+                wounded_model_ids=tuple(
+                    model_id for model_id in model_ids if model_id in wounded_ids
+                ),
+                already_allocated_model_ids=tuple(
+                    model_id for model_id in model_ids if model_id in allocated_ids
+                ),
+                bodyguard_model_ids=tuple(
+                    model_id for model_id in model_ids if model_id in bodyguard_ids
+                ),
+                character_model_ids=tuple(
+                    model_id for model_id in model_ids if model_id in character_ids
+                ),
+                role_evidence=_role_evidence_for_models(models=models, role=role),
+                legality_reasons=_allocation_group_legality_reasons(
+                    model_ids=model_ids,
+                    wounded_ids=wounded_ids,
+                    allocated_ids=allocated_ids,
+                    bodyguard_ids=bodyguard_ids,
+                    character_ids=character_ids,
+                    attacker_constraint=allocation_context.attacker_constraint,
+                ),
+            )
+        )
+    return tuple(
+        sorted(
+            groups,
+            key=lambda group: (
+                0 if group.wounded else 1,
+                0 if group.already_allocated_model_ids else 1,
+                group.role.value,
+                group.group_id,
+            ),
+        )
+    )
+
+
+def build_allocation_order_request(
+    *,
+    request_id: str,
+    defender_player_id: str,
+    attack_context: JsonValue,
+    allocation_context: AttackAllocationRuleContext,
+    allocation_groups: tuple[AllocationGroup, ...],
+    attack_contexts: tuple[JsonValue, ...] = (),
+) -> DecisionRequest:
+    groups = _validate_allocation_groups(allocation_groups)
+    if len(groups) < 2:
+        raise GameLifecycleError("Allocation order request requires at least two legal groups.")
+    grouped_attack_contexts = tuple(validate_json_value(context) for context in attack_contexts)
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        actor_id=defender_player_id,
+        payload=validate_json_value(
+            {
+                "attack_context": validate_json_value(attack_context),
+                "attack_contexts": list(grouped_attack_contexts),
+                "allocation_context": allocation_context.to_payload(),
+                "allocation_groups": [group.to_payload() for group in groups],
+                "selection_kind": "current_allocation_group",
+            }
+        ),
+        options=tuple(
+            DecisionOption(
+                option_id=group.group_id,
+                label=group.group_id,
+                payload={
+                    "group_id": group.group_id,
+                    "model_ids": list(group.model_ids),
+                    "role": group.role.value,
+                    "wounds": group.wounds,
+                    "save": group.save,
+                    "invulnerable_save": group.invulnerable_save,
+                    "wounded": group.wounded,
+                    "wounded_model_ids": list(group.wounded_model_ids),
+                    "bodyguard_model_ids": list(group.bodyguard_model_ids),
+                    "character_model_ids": list(group.character_model_ids),
+                    "role_evidence": list(group.role_evidence),
+                    "legality_reasons": list(group.legality_reasons),
+                },
+            )
+            for group in groups
+        ),
     )
 
 
@@ -1907,6 +2400,100 @@ def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
 
 
+def _character_allocation_role(model: ModelInstance) -> AllocationGroupRole:
+    if "attached-role:leader" in model.source_ids:
+        return AllocationGroupRole.LEADER
+    if "attached-role:support" in model.source_ids:
+        return AllocationGroupRole.SUPPORT
+    return AllocationGroupRole.CHARACTER
+
+
+def _role_evidence_for_model(
+    *,
+    model: ModelInstance,
+    role: AllocationGroupRole,
+) -> tuple[str, ...]:
+    evidence = {
+        source_id
+        for source_id in model.source_ids
+        if source_id.startswith(("attached-role:", "datasheet:", "runtime-attached-unit:"))
+    }
+    evidence.add(f"allocation-role:{role.value}")
+    return tuple(sorted(evidence))
+
+
+def _role_evidence_for_models(
+    *,
+    models: list[ModelInstance],
+    role: AllocationGroupRole,
+) -> tuple[str, ...]:
+    evidence = {f"allocation-role:{role.value}"}
+    for model in models:
+        evidence.update(
+            source_id
+            for source_id in model.source_ids
+            if source_id.startswith(("attached-role:", "datasheet:", "runtime-attached-unit:"))
+        )
+    return tuple(sorted(evidence))
+
+
+def _allocation_group_legality_reasons(
+    *,
+    model_ids: tuple[str, ...],
+    wounded_ids: set[str],
+    allocated_ids: set[str],
+    bodyguard_ids: set[str],
+    character_ids: set[str],
+    attacker_constraint: AttackAllocationConstraint | None,
+) -> tuple[str, ...]:
+    reasons = {"legal_allocation_group"}
+    model_id_set = set(model_ids)
+    if model_id_set & wounded_ids:
+        reasons.add("wounded_group_priority")
+    if model_id_set & allocated_ids:
+        reasons.add("already_allocated_group_priority")
+    if bodyguard_ids and character_ids and model_id_set <= bodyguard_ids:
+        reasons.add("bodyguard_protects_character_groups")
+    if attacker_constraint is not None:
+        reasons.update(attacker_constraint.source_rule_ids)
+        if attacker_constraint.attacker_selected_group_id is not None:
+            reasons.add("attacker_selected_allocation_group")
+        if attacker_constraint.can_allocate_protected_characters:
+            reasons.add("protected_character_allocation_allowed")
+    return tuple(sorted(reasons))
+
+
+def _character_allocation_group_id(model_instance_id: str) -> str:
+    model_id = _validate_identifier("model_instance_id", model_instance_id)
+    return f"allocation-group:character:{model_id}"
+
+
+def _profile_allocation_group_id(
+    *,
+    target_unit_instance_id: str,
+    role: AllocationGroupRole,
+    wounds: int,
+    save: int | None,
+    invulnerable_save: int | None,
+    model_ids: tuple[str, ...],
+) -> str:
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    model_part = "-".join(_validate_identifier_tuple("model_ids", model_ids))
+    save_part = "none" if save is None else str(save)
+    invulnerable_part = "none" if invulnerable_save is None else str(invulnerable_save)
+    return (
+        f"allocation-group:{target_id}:{role.value}:w{wounds}:sv{save_part}:"
+        f"inv{invulnerable_part}:{model_part}"
+    )
+
+
+def _model_characteristic(model: ModelInstance, characteristic: Characteristic) -> int | None:
+    for value in model.characteristics:
+        if value.characteristic is characteristic:
+            return value.final
+    return None
+
+
 def _canonical_keyword(keyword: str) -> str:
     return keyword.upper().replace(" ", "_").replace("-", "_")
 
@@ -2033,6 +2620,21 @@ def _validate_damage_applications(values: object) -> tuple[DamageApplication, ..
     return tuple(applications)
 
 
+def _validate_allocation_groups(values: object) -> tuple[AllocationGroup, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Allocation groups must be a tuple.")
+    groups: list[AllocationGroup] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not AllocationGroup:
+            raise GameLifecycleError("Allocation groups must contain AllocationGroup values.")
+        if value.group_id in seen:
+            raise GameLifecycleError("Allocation groups must not duplicate group IDs.")
+        seen.add(value.group_id)
+        groups.append(value)
+    return tuple(sorted(groups, key=lambda group: group.group_id))
+
+
 def _validate_feel_no_pain_rolls(values: object) -> tuple[FeelNoPainRoll, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError("Feel No Pain rolls must be a tuple.")
@@ -2153,6 +2755,12 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     if value is None:
         return None
     return _validate_identifier(field_name, value)
+
+
+def _validate_optional_save(field_name: str, value: object | None) -> int | None:
+    if value is None:
+        return None
+    return _validate_d6_target(field_name, value)
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

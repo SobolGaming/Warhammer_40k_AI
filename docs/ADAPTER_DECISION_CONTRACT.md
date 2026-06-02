@@ -280,22 +280,34 @@ Accepted Phase 13B/14F declarations emit deterministic attack-pool payloads, inc
 
 Defender shooting decisions include:
 
-- finite `select_attack_allocation` choices when allocation is not forced;
+- finite `select_allocation_order` choices when more than one legal allocation
+  group can be selected as the current group;
+- legacy finite `select_attack_allocation` choices only for older single-attack
+  model-allocation paths that have not yet been retired;
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
 - finite optional destruction-reaction choices when a destroyed model has registered optional shoot-on-death, fight-on-death, or equivalent destruction sources;
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
 - shooting-coupled reactive Stratagem choices such as Go to Ground through the existing `use_stratagem` or Stratagem target-proposal contract.
 
-Saving throw kind is not an adapter choice in the 11th Edition contract. In the
-current partial Phase 14E implementation, if the allocated model has an
-Invulnerable Save, the engine must use that Invulnerable Save. Armour Saves with
-AP modifiers are used only when the allocated model has no Invulnerable Save.
-When the remaining allocation-group host lands, the same rule must apply to the
-current allocation group instead of a single allocated model. Adapters must not
-offer, submit, apply, or replay an armour-versus-invulnerable choice.
+Saving throw kind is not an adapter choice in the 11th Edition contract. If the
+current allocation group has an Invulnerable Save, the engine must use that
+Invulnerable Save. Armour Saves with AP modifiers are used only when the current
+allocation group has no Invulnerable Save. Adapters must not offer, submit,
+apply, or replay an armour-versus-invulnerable choice.
 
 Phase 13C implements these defender-visible attack-resolution decisions:
 
+- `select_allocation_order`: finite defending-player choice. Option IDs are legal
+  allocation `group_id` values, selecting the next current allocation group. The
+  request payload includes `attack_context` for the allocation-order window,
+  optional `attack_contexts` for grouped wound pools already rolled before the
+  decision, `allocation_context`, and `allocation_groups`. Each group payload
+  includes `group_id`, `model_ids`, `role`, W/Sv/InSv profile, wounded and
+  already-allocated model IDs, Bodyguard/Character evidence, role evidence, and
+  legality reasons. Adapters must select one pending option ID and must not infer
+  group legality, save profiles, or model membership from table state. Stale,
+  drifted, wrong-actor, wrong-option, or payload-mismatched submissions reject
+  before queue pop and before mutation.
 - `select_attack_allocation`: finite defending-player choice. Option IDs are legal `model_instance_id` values. `payload.attack_context` is the JSON-safe attack context for the single attack being allocated. `payload.allocation_context` includes alive model IDs, wounded model IDs, already-allocated model IDs for the phase, attached-unit Bodyguard/Character protection evidence, and any attacker-side allocation constraint. Adapters must select one pending option ID and must not infer legal models from table state.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Grenade mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves.
 
@@ -305,7 +317,7 @@ Phase 13E implements this destroyed-model attack-resolution decision:
 
 Phase 13D adds this attacker-visible attack-resolution decision:
 
-- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character models. The current partial Phase 14E payload uses visible Character `model_instance_id` option IDs plus `decline_precision`; Character options include `payload.selected_model_id`, and the decline option uses `selected_model_id: null`. Accepted Character selection is pool-scoped as an interim attacker-side constraint on that Character model until those attacks are resolved or that model is destroyed, whichever happens first. When the remaining allocation-group host lands, this decision must identify the selected Character allocation group rather than a single model, and the normal defender allocation path must be constrained to that group. Declining, having no visible Character, having no Precision source, or destruction of the selected Character model/group follows the normal defender allocation path.
+- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character allocation groups. Option IDs are visible eligible Character `group_id` values plus `decline_precision`; Character options include `payload.selected_group_id` and `payload.selected_model_ids`, and the decline option uses `selected_group_id: null` with an empty model list. Accepted Character-group selection is pool-scoped until those attacks resolve or that Character group is destroyed, whichever happens first. Declining, having no visible Character group, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
 
 Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Weapon abilities remain Phase 13D behavior, but adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
 

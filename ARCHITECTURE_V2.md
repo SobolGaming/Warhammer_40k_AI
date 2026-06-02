@@ -2035,79 +2035,64 @@ Required tests:
 
 ## Phase 14E: attack sequence and allocation cutover
 
-Status: In progress.
+Status: Complete.
 
 Implemented in the current cutover slice:
 
 - attacks are gathered by target and identical attack profile;
+- safe identical fixed-damage shooting pools use the grouped allocation host:
+  Hit and Wound rolls for the pool are resolved before allocation, save rolls
+  are made before damage, and failed saves resolve from lowest to highest;
 - melee weapon target splitting is declared in the Select Targets step;
 - Benefit of Cover worsens BS by 1 before Hit rolls;
 - Plunging Fire improves BS by 1 when the 3"+ terrain-height or `TOWERING` within-12" conditions are met and the visible target unit contains a model on ground level;
 - unmodified save rolls of 1 fail before InSv/Sv evaluation;
-- if the allocated model has an Invulnerable Save, that InSv is mandatory and
-  the defender cannot choose an armour Save instead;
-- armour Saves with AP modifiers are used only when the allocated model has no
-  Invulnerable Save;
-- `[PRECISION]` selection is currently pool-scoped as an interim visible
-  Character model allocation constraint until those attacks resolve or that
-  model is destroyed;
+- allocation groups are created from runtime attached-unit role metadata, with
+  one group for each eligible Character model and profile groups for
+  non-Character models sharing W, Sv, and InSv;
+- defender allocation order uses finite `select_allocation_order` requests when
+  more than one legal group exists, including group IDs, model IDs, group role,
+  W/Sv/InSv profile, wounded state, Bodyguard/Leader/Support evidence, and
+  legality reasons;
+- if the current allocation group has an Invulnerable Save, that InSv is
+  mandatory and the defender cannot choose an armour Save instead;
+- armour Saves with AP modifiers are used only when the current allocation
+  group has no Invulnerable Save;
+- current allocation group damage handles wounded models first and changes group
+  only after the selected group is exhausted/destroyed;
+- `[PRECISION]` selection is pool-scoped by visible eligible Character
+  allocation group until those attacks resolve or that Character group is
+  destroyed;
+- normal damage resolves before routed mortal wounds for mixed sequences;
 - `[DEVASTATING WOUNDS]` inflicts mortal wounds equal to Damage after normal damage and cannot spill one critical wound beyond one destroyed model.
 - derived terrain objectives use terrain-area containment for model
   contribution; the objective marker radius is not used to count models outside
   the terrain area.
-
-Remaining Phase 14E invariants:
-
-- save rolls are made for all attacks that wounded before model allocation;
-- defender allocation groups are created before saves are resolved, with one
-  group for each `CHARACTER` model and one group for all other models sharing W,
-  Sv, and InSv characteristics;
-- defender allocation order is an explicit DecisionRequest unless only one
-  legal order exists;
-- allocation-order legality enforces wounded non-`CHARACTER` groups first, no
-  `CHARACTER` group before a non-`CHARACTER` group, and wounded `CHARACTER`
-  groups before unwounded `CHARACTER` groups;
-- save results resolve from lowest to highest against the current allocation
-  group;
-- current allocation group transitions only after all models in the prior group
-  are destroyed;
-- `[PRECISION]` selection happens at the start of the Allocation Order step for
-  attacks made with one or more Precision weapons, can select one allocation
-  group containing a Character model visible to one or more attacking models,
-  and makes that Character group the current allocation group until those
-  attacks are resolved or that Character group is destroyed;
-- normal damage resolves before mortal wounds for mixed attack groups.
 
 Implemented tests:
 
 - identical attack grouping and melee split declarations round-trip;
 - mandatory Invulnerable Save precedence is covered and emits no defender
   armour-versus-invulnerable choice;
+- allocation-order decisions validate stale, wrong-actor, wrong-option, and
+  JSON-safe record payloads before mutation;
+- allocation-order requests emitted from grouped wound pools carry all wounded
+  attack contexts before any save is rolled;
+- grouped save rolling occurs before damage, and low-to-high save-result damage
+  resolution is deterministic;
 - cover and Plunging Fire modify BS, not AP or saves;
-- Precision Character-model selection persists for the current attack pool and
-  returns to ordinary model allocation after that selected Character model is
+- Precision Character allocation-group selection persists for the current attack
+  pool and returns to ordinary allocation after that selected Character group is
   destroyed;
 - derived terrain objective tests prove models outside the terrain area do not
   contribute through the marker control radius;
 - Devastating Wounds and hazard mortal wounds allocate through the shared mortal-wound service.
 
-Remaining required tests:
-
-- allocation-order decisions cover Bodyguard, Leader, Support, wounded-model,
-  and Character groups;
-- grouped save rolling occurs before model allocation;
-- low-to-high save-result damage resolution destroys and transitions groups
-  deterministically;
-- normal-damage-before-mortal ordering is covered for mixed attack groups;
-- Precision Character allocation-group selection persists for the current attack
-  pool and returns to ordinary allocation after that selected Character group is
-  destroyed.
-
 ## Phase 14F: shooting cutover
 
 Status: In progress.
 
-The current implementation is a partial shooting-type/declaration cutover: engine-enumerated shooting types are exposed through shooting target candidates, declarations, attack pools, replay payloads, and Fire Overwatch Snap Shooting, and the current sequential attack host consumes the resulting attack pools. Full Phase 14F completion remains blocked on the Phase 14E allocation-group host because the current attack sequence still resolves one attack at a time through model allocation, save, and damage before advancing to the next attack.
+The current implementation is a partial shooting-type/declaration cutover: engine-enumerated shooting types are exposed through shooting target candidates, declarations, attack pools, replay payloads, and Fire Overwatch Snap Shooting. Full Phase 14F completion remains blocked on rerunning the shooting-type rules through the grouped allocation host and enforcing Indirect/Snap Hit-roll reroll bans.
 
 Indirect and Snap Shooting currently emit deterministic no-Hit-reroll rule evidence on attack pools. Attack-sequence Hit-roll reroll windows are not yet wired for those rolls, so this evidence is inert until the remaining reroll-permission integration is implemented and tested.
 

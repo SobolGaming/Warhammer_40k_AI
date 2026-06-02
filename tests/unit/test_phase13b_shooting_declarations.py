@@ -55,10 +55,15 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.core_stratagem_effects import GO_TO_GROUND_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+    AllocationGroup,
+    AllocationGroupPayload,
+    AllocationGroupRole,
+    AllocationOrderDecision,
     AttackAllocation,
     AttackAllocationConstraint,
     AttackAllocationDecision,
@@ -76,8 +81,11 @@ from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplicationProgress,
     MortalWoundRoutingResult,
     allocation_context_for_unit,
+    allocation_group_role_from_token,
+    allocation_groups_for_context,
     apply_damage_to_model,
     apply_mortal_wounds_to_unit,
+    build_allocation_order_request,
     build_attack_allocation_request,
     build_destruction_reaction_request,
     build_feel_no_pain_request,
@@ -90,7 +98,7 @@ from warhammer40k_core.engine.damage_allocation import (
     mortal_wound_feel_no_pain_source_context,
     resolve_mortal_wound_feel_no_pain_decision,
 )
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -202,6 +210,24 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
         game_id="phase13b-allocation-0005",
         catalog=_catalog_with_extra_bolt_profile(allocation_profile),
     )
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    alternate_save_model = replace(
+        defender.own_models[1],
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.SAVE, 4)
+            if value.characteristic is Characteristic.SAVE
+            else value
+            for value in defender.own_models[1].characteristics
+        ),
+    )
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            defender,
+            own_models=(defender.own_models[0], alternate_save_model, *defender.own_models[2:]),
+        ),
+    )
     first_status = lifecycle.advance_until_decision_or_terminal()
     first_request = _decision_request(first_status)
 
@@ -238,14 +264,14 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
         )
     )
     next_request = _decision_request(next_status)
-    state = _state(lifecycle)
     assert state.shooting_phase_state is not None
     assert state.shooting_phase_state.shot_unit_ids == (units["intercessor-1"].unit_instance_id,)
     assert state.shooting_phase_state.attack_pools[0].target_unit_instance_id == (
         units["enemy"].unit_instance_id
     )
-    assert next_request.decision_type == SELECT_ATTACK_ALLOCATION_DECISION_TYPE
+    assert next_request.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE
     assert next_request.actor_id == "player-b"
+    assert len(next_request.options) == 2
     assert state.shooting_phase_state.attack_sequence is not None
     allocation_option = next_request.options[0]
     post_allocation_status = lifecycle.submit_decision(
@@ -260,7 +286,7 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
     )
     assert post_allocation_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert any(
-        record.request.decision_type == SELECT_ATTACK_ALLOCATION_DECISION_TYPE
+        record.request.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE
         for record in lifecycle.decision_controller.records
     )
     encoded = json.dumps(lifecycle.decision_controller.to_payload(), sort_keys=True)
@@ -774,11 +800,14 @@ def test_phase13d_precision_allocation_can_select_visible_attached_character() -
     assert remaining_sequence is not None
     assert request.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE
     assert request.actor_id == "player-a"
-    assert {
-        option.option_id
+    character_options = tuple(
+        option
         for option in request.options
-        if cast(dict[str, object], option.payload)["selected_model_id"] is not None
-    } == {character_model.model_instance_id}
+        if character_model.model_instance_id
+        in cast(list[str], cast(dict[str, object], option.payload)["selected_model_ids"])
+    )
+    assert len(character_options) == 1
+    character_group_id = character_options[0].option_id
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
@@ -792,14 +821,16 @@ def test_phase13d_precision_allocation_can_select_visible_attached_character() -
         DecisionResult.for_request(
             result_id="phase13d-precision-select-character",
             request=request,
-            selected_option_id=character_model.model_instance_id,
+            selected_option_id=character_group_id,
         )
     )
     allocation_payload = _attack_step_payload(
         _event_payloads(lifecycle, "attack_sequence_step"),
         AttackSequenceStep.ALLOCATE,
     )
-    allocation = cast(dict[str, object], allocation_payload["payload"])
+    allocation_step = cast(dict[str, object], allocation_payload["payload"])
+    allocation = cast(dict[str, object], allocation_step["allocation"])
+    allocation_group = cast(dict[str, object], allocation_step["allocation_group"])
     allocation_context = cast(dict[str, object], allocation["rule_context"])
     attacker_constraint = cast(dict[str, object], allocation_context["attacker_constraint"])
 
@@ -807,8 +838,10 @@ def test_phase13d_precision_allocation_can_select_visible_attached_character() -
         LifecycleStatusKind.WAITING_FOR_DECISION,
         LifecycleStatusKind.UNSUPPORTED,
     }
+    assert allocation_group["group_id"] == character_group_id
+    assert cast(list[str], allocation_group["model_ids"]) == [character_model.model_instance_id]
     assert allocation["allocated_model_id"] == character_model.model_instance_id
-    assert attacker_constraint["attacker_selected_model_id"] == character_model.model_instance_id
+    assert attacker_constraint["attacker_selected_group_id"] == character_group_id
     assert attacker_constraint["can_allocate_protected_characters"] is True
     assert PRECISION_RULE_ID in cast(list[str], attacker_constraint["source_rule_ids"])
     assert bodyguard_model.model_instance_id != allocation["allocated_model_id"]
@@ -852,13 +885,14 @@ def test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_alloc
             selected_option_id="decline_precision",
         )
     )
-    declined_allocation = cast(
+    declined_allocation_payload = cast(
         dict[str, object],
         _attack_step_payload(
             _event_payloads(declined_lifecycle, "attack_sequence_step"),
             AttackSequenceStep.ALLOCATE,
         )["payload"],
     )
+    declined_allocation = cast(dict[str, object], declined_allocation_payload["allocation"])
 
     assert declined_allocation["allocated_model_id"] == bodyguard_model.model_instance_id
 
@@ -930,13 +964,14 @@ def test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_alloc
             ),
         ),
     )
-    hidden_allocation = cast(
+    hidden_allocation_payload = cast(
         dict[str, object],
         _attack_step_payload(
             _event_payloads(hidden_lifecycle, "attack_sequence_step"),
             AttackSequenceStep.ALLOCATE,
         )["payload"],
     )
+    hidden_allocation = cast(dict[str, object], hidden_allocation_payload["allocation"])
 
     assert hidden_status is not None or hidden_remaining is None
     assert hidden_status is None or _decision_request(hidden_status).decision_type != (
@@ -970,6 +1005,24 @@ def test_phase14e_precision_selection_persists_for_current_attack_pool() -> None
             ),
         ),
     )
+    precision_allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=defender.unit_instance_id,
+        attacker_constraint=AttackAllocationConstraint(
+            source_rule_ids=(PRECISION_RULE_ID,),
+            can_allocate_protected_characters=True,
+        ),
+    )
+    precision_character_group = next(
+        group
+        for group in allocation_groups_for_context(
+            state=state,
+            allocation_context=precision_allocation_context,
+            visible_model_ids=tuple(model.model_instance_id for model in defender.own_models),
+        )
+        if character_model.model_instance_id in group.model_ids
+    )
+    precision_character_group_payload = validate_json_value(precision_character_group.to_payload())
     precision_request = DecisionRequest(
         request_id="phase14e-precision-pool-request",
         decision_type=SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -979,17 +1032,21 @@ def test_phase14e_precision_selection_persists_for_current_attack_pool() -> None
                 "sequence_id": sequence.sequence_id,
                 "pool_index": 0,
             },
+            "eligible_character_groups": [precision_character_group_payload],
         },
         options=(
             DecisionOption(
                 option_id="decline_precision",
                 label="Decline Precision",
-                payload={"selected_model_id": None},
+                payload={"selected_group_id": None, "selected_model_ids": []},
             ),
             DecisionOption(
-                option_id=character_model.model_instance_id,
-                label=character_model.model_instance_id,
-                payload={"selected_model_id": character_model.model_instance_id},
+                option_id=precision_character_group.group_id,
+                label=precision_character_group.group_id,
+                payload={
+                    "selected_group_id": precision_character_group.group_id,
+                    "selected_model_ids": list(precision_character_group.model_ids),
+                },
             ),
         ),
     )
@@ -998,7 +1055,7 @@ def test_phase14e_precision_selection_persists_for_current_attack_pool() -> None
         DecisionResult.for_request(
             result_id="phase14e-precision-pool-result",
             request=precision_request,
-            selected_option_id=character_model.model_instance_id,
+            selected_option_id=precision_character_group.group_id,
         )
     )
     second_attack = AttackSequence(
@@ -1049,7 +1106,8 @@ def test_phase14e_precision_selection_persists_for_current_attack_pool() -> None
         _event_payloads(lifecycle, "attack_sequence_step"),
         AttackSequenceStep.ALLOCATE,
     )
-    allocation = cast(dict[str, object], allocation_payload["payload"])
+    allocation_step = cast(dict[str, object], allocation_payload["payload"])
+    allocation = cast(dict[str, object], allocation_step["allocation"])
     allocation_context = cast(dict[str, object], allocation["rule_context"])
     attacker_constraint = cast(dict[str, object], allocation_context["attacker_constraint"])
     precision_requests = [
@@ -1062,8 +1120,260 @@ def test_phase14e_precision_selection_persists_for_current_attack_pool() -> None
 
     assert status is None
     assert allocation["allocated_model_id"] == character_model.model_instance_id
-    assert attacker_constraint["attacker_selected_model_id"] == character_model.model_instance_id
+    assert attacker_constraint["attacker_selected_group_id"] == precision_character_group.group_id
     assert len(precision_requests) == 1
+
+
+def test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-grouped-save-bolt-rifle",
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14e-grouped-saves",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=3,
+            ),
+        ),
+    )
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+    allocation_group = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+    )[0]
+    injected_results: list[DiceRollResult] = []
+    for attack_number in range(1, 4):
+        attack_context_id = f"phase14e-grouped-saves:pool-001:attack-{attack_number:03d}"
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-grouped-hit-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"),
+                    roll_type="attack_sequence.hit",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-grouped-wound-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(
+                        f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                    ),
+                    roll_type="attack_sequence.wound",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+    for attack_number, save_value in ((1, 2), (2, 1), (3, 6)):
+        attack_context_id = f"phase14e-grouped-saves:pool-001:attack-{attack_number:03d}"
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-grouped-save-{attack_number}",
+                spec=saving_throw_roll_spec(
+                    save_kind=SaveKind.ARMOUR,
+                    player_id="player-b",
+                    allocated_model_id=allocation_group.group_id,
+                    attack_context_id=attack_context_id,
+                ),
+                value=save_value,
+            )
+        )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-grouped-saves",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=tuple(injected_results),
+        ),
+    )
+    attack_events = _event_payloads(lifecycle, "attack_sequence_step")
+    save_event_indexes = [
+        index for index, event in enumerate(attack_events) if event["step"] == "save"
+    ]
+    damage_event_indexes = [
+        index
+        for index, event in enumerate(attack_events)
+        if event["step"] == "damage"
+        and cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+    damage_context_ids = [
+        event["attack_context_id"]
+        for event in attack_events
+        if event["step"] == "damage"
+        and cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+    grouped_allocation = next(
+        cast(dict[str, object], event["payload"])
+        for event in attack_events
+        if event["step"] == "allocate"
+        and cast(dict[str, object], event["payload"]).get("grouped_save_before_allocation") is True
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert max(save_event_indexes) < min(damage_event_indexes)
+    assert damage_context_ids == [
+        "phase14e-grouped-saves:pool-001:attack-002",
+        "phase14e-grouped-saves:pool-001:attack-001",
+    ]
+    assert grouped_allocation["attack_context_ids"] == [
+        "phase14e-grouped-saves:pool-001:attack-001",
+        "phase14e-grouped-saves:pool-001:attack-002",
+        "phase14e-grouped-saves:pool-001:attack-003",
+    ]
+
+
+def test_phase14e_allocation_order_request_after_grouped_wound_pool() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    alternate_save_model = replace(
+        defender.own_models[1],
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.SAVE, 4)
+            if value.characteristic is Characteristic.SAVE
+            else value
+            for value in defender.own_models[1].characteristics
+        ),
+    )
+    defender = replace(
+        defender,
+        own_models=(defender.own_models[0], alternate_save_model, *defender.own_models[2:]),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-allocation-order-grouped-pool",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14e-allocation-order-grouped-pool",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=2,
+            ),
+        ),
+    )
+    injected_results: list[DiceRollResult] = []
+    for attack_number in range(1, 3):
+        attack_context_id = (
+            f"phase14e-allocation-order-grouped-pool:pool-001:attack-{attack_number:03d}"
+        )
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-order-hit-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"),
+                    roll_type="attack_sequence.hit",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-order-wound-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(
+                        f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                    ),
+                    roll_type="attack_sequence.wound",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-allocation-order-grouped-pool",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=tuple(injected_results),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    request_payload = cast(dict[str, object], request.payload)
+    attack_contexts = cast(list[dict[str, object]], request_payload["attack_contexts"])
+    attack_events = _event_payloads(lifecycle, "attack_sequence_step")
+
+    assert remaining_sequence is not None
+    assert remaining_sequence == sequence
+    assert request.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE
+    assert len(request.options) == 2
+    assert [context["attack_context_id"] for context in attack_contexts] == [
+        "phase14e-allocation-order-grouped-pool:pool-001:attack-001",
+        "phase14e-allocation-order-grouped-pool:pool-001:attack-002",
+    ]
+    assert sum(1 for event in attack_events if event["step"] == "hit") == 2
+    assert sum(1 for event in attack_events if event["step"] == "wound") == 2
+    assert not any(event["step"] == "save" for event in attack_events)
+
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining_sequence.attack_pools,
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=(),
+    )
+    final_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14e-allocation-order-grouped-select",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+    )
+    final_attack_events = _event_payloads(lifecycle, "attack_sequence_step")
+
+    assert final_status.status_kind in {
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    assert sum(1 for event in final_attack_events if event["step"] == "damage") >= 2
 
 
 def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
@@ -3116,6 +3426,444 @@ def test_phase13c_decision_payloads_validate_fail_fast() -> None:
     )
     assert mandatory_save_option(options=(armour_option,)) == armour_option
     assert mandatory_save_option(options=()) is None
+
+
+def test_phase14e_allocation_order_decision_payloads_validate_before_mutation() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    alternate_save_model = replace(
+        defender.own_models[1],
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.SAVE, 4)
+            if value.characteristic is Characteristic.SAVE
+            else value
+            for value in defender.own_models[1].characteristics
+        ),
+    )
+    defender = replace(
+        defender,
+        own_models=(defender.own_models[0], alternate_save_model, *defender.own_models[2:]),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+    allocation_groups = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+    )
+    request = build_allocation_order_request(
+        request_id="phase14e-allocation-order-request",
+        defender_player_id="player-b",
+        attack_context={"attack_context_id": "phase14e-allocation-order"},
+        allocation_context=allocation_context,
+        allocation_groups=allocation_groups,
+    )
+    selected_option = request.options[0]
+    lifecycle.decision_controller.request_decision(request)
+
+    with pytest.raises(DecisionError, match="next queued request"):
+        lifecycle.decision_controller.submit_result(
+            DecisionResult(
+                result_id="phase14e-allocation-order-stale",
+                request_id="stale-request",
+                decision_type=request.decision_type,
+                actor_id=request.actor_id,
+                selected_option_id=selected_option.option_id,
+                payload=selected_option.payload,
+            )
+        )
+    assert lifecycle.decision_controller.queue.peek_next() == request
+
+    with pytest.raises(DecisionError, match="actor_id"):
+        lifecycle.decision_controller.submit_result(
+            DecisionResult(
+                result_id="phase14e-allocation-order-wrong-actor",
+                request_id=request.request_id,
+                decision_type=request.decision_type,
+                actor_id="player-a",
+                selected_option_id=selected_option.option_id,
+                payload=selected_option.payload,
+            )
+        )
+    assert lifecycle.decision_controller.queue.peek_next() == request
+
+    with pytest.raises(DecisionError, match="finite action space"):
+        lifecycle.decision_controller.submit_result(
+            DecisionResult(
+                result_id="phase14e-allocation-order-wrong-option",
+                request_id=request.request_id,
+                decision_type=request.decision_type,
+                actor_id=request.actor_id,
+                selected_option_id="not-a-group",
+                payload={"group_id": "not-a-group"},
+            )
+        )
+    assert lifecycle.decision_controller.queue.peek_next() == request
+
+    valid_result = DecisionResult.for_request(
+        result_id="phase14e-allocation-order-valid",
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+    record = lifecycle.decision_controller.submit_result(valid_result)
+    decision = AllocationOrderDecision.from_result(request=record.request, result=record.result)
+    encoded = json.dumps(record.to_payload(), sort_keys=True)
+
+    assert decision.selected_group_id == selected_option.option_id
+    assert len(decision.allocation_groups) == 2
+    assert decision.selected_group().group_id == selected_option.option_id
+    assert decision.to_payload()["selected_group_id"] == selected_option.option_id
+    assert "<" not in encoded
+    assert "object at 0x" not in encoded
+
+    malformed_request = DecisionRequest(
+        request_id="phase14e-allocation-order-malformed-groups",
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        payload={
+            **cast(dict[str, JsonValue], request.payload),
+            "allocation_groups": "not-a-list",
+        },
+        options=request.options,
+    )
+    with pytest.raises(GameLifecycleError, match="groups must be a list"):
+        AllocationOrderDecision.from_result(
+            request=malformed_request,
+            result=DecisionResult.for_request(
+                result_id="phase14e-allocation-order-malformed-result",
+                request=malformed_request,
+                selected_option_id=selected_option.option_id,
+            ),
+        )
+
+
+def test_phase14e_allocation_group_payloads_preserve_roles_and_priority() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = replace(
+        defender.own_models[0],
+        source_ids=tuple(
+            sorted(
+                {
+                    *defender.own_models[0].source_ids,
+                    "runtime-attached-unit:bodyguard",
+                }
+            )
+        ),
+    )
+    character_group_id = f"allocation-group:character:{defender.own_models[1].model_instance_id}"
+    character_model = replace(
+        defender.own_models[1],
+        source_ids=tuple(
+            sorted(
+                {
+                    *defender.own_models[1].source_ids,
+                    "attached-role:leader",
+                    "runtime-attached-unit:leader",
+                }
+            )
+        ),
+    )
+    attached_defender = replace(defender, own_models=(bodyguard_model, character_model))
+    _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=attached_defender.unit_instance_id,
+        attacker_constraint=AttackAllocationConstraint(
+            source_rule_ids=(PRECISION_RULE_ID,),
+            can_allocate_protected_characters=True,
+            attacker_selected_group_id=character_group_id,
+        ),
+    )
+    allocation_groups = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+    )
+    bodyguard_group = next(
+        group for group in allocation_groups if group.role is AllocationGroupRole.BODYGUARD
+    )
+    leader_group = next(
+        group for group in allocation_groups if group.role is AllocationGroupRole.LEADER
+    )
+    leader_payload = leader_group.to_payload()
+
+    assert (
+        allocation_group_role_from_token(AllocationGroupRole.LEADER) is AllocationGroupRole.LEADER
+    )
+    assert allocation_group_role_from_token("bodyguard") is AllocationGroupRole.BODYGUARD
+    assert bodyguard_group.model_ids == (bodyguard_model.model_instance_id,)
+    assert "allocation-role:bodyguard" in bodyguard_group.role_evidence
+    assert "runtime-attached-unit:bodyguard" in bodyguard_group.role_evidence
+    assert leader_group.group_id == character_group_id
+    assert leader_group.character_model_ids == (character_model.model_instance_id,)
+    assert "attached-role:leader" in leader_group.role_evidence
+    assert "runtime-attached-unit:leader" in leader_group.role_evidence
+    assert "attacker_selected_allocation_group" in leader_group.legality_reasons
+    assert AllocationGroup.from_payload(leader_payload) == leader_group
+    assert (
+        allocation_groups_for_context(
+            state=state,
+            allocation_context=allocation_context,
+            visible_model_ids=(),
+        )
+        == ()
+    )
+
+    with pytest.raises(GameLifecycleError, match="Unsupported AllocationGroupRole token"):
+        AllocationGroup.from_payload(
+            cast(AllocationGroupPayload, {**leader_payload, "role": "not-a-role"})
+        )
+    with pytest.raises(GameLifecycleError, match="token must be a string"):
+        allocation_group_role_from_token(7)
+    with pytest.raises(GameLifecycleError, match="requires models"):
+        AllocationGroup(
+            group_id="phase14e-empty-group",
+            target_unit_instance_id=attached_defender.unit_instance_id,
+            model_ids=(),
+            role=AllocationGroupRole.BODYGUARD,
+            wounds=2,
+            save=3,
+            invulnerable_save=None,
+        )
+    with pytest.raises(GameLifecycleError, match="at least two legal groups"):
+        build_allocation_order_request(
+            request_id="phase14e-one-group-request",
+            defender_player_id="player-b",
+            attack_context={"attack_context_id": "phase14e-one-group"},
+            allocation_context=allocation_context,
+            allocation_groups=(leader_group,),
+        )
+
+    support_model = replace(
+        character_model,
+        source_ids=tuple(
+            sorted(
+                (
+                    set(character_model.source_ids)
+                    - {"attached-role:leader", "runtime-attached-unit:leader"}
+                )
+                | {"attached-role:support", "runtime-attached-unit:support"}
+            )
+        ),
+    )
+    support_defender = replace(attached_defender, own_models=(bodyguard_model, support_model))
+    _replace_unit_instance_in_state(state=state, replacement=support_defender)
+    support_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=support_defender.unit_instance_id,
+        attacker_constraint=AttackAllocationConstraint(
+            source_rule_ids=(PRECISION_RULE_ID,),
+            can_allocate_protected_characters=True,
+        ),
+    )
+    support_group = next(
+        group
+        for group in allocation_groups_for_context(
+            state=state,
+            allocation_context=support_context,
+        )
+        if group.role is AllocationGroupRole.SUPPORT
+    )
+
+    assert support_group.character_model_ids == (support_model.model_instance_id,)
+    assert "attached-role:support" in support_group.role_evidence
+    assert "runtime-attached-unit:support" in support_group.role_evidence
+
+
+def test_phase14e_allocation_group_payloads_prioritize_wounded_then_allocated_models() -> None:
+    _lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(_lifecycle)
+    defender = units["enemy"]
+    wounded_model = replace(defender.own_models[1], wounds_remaining=1)
+    already_allocated_model = defender.own_models[2]
+    updated_defender = replace(
+        defender,
+        own_models=(
+            defender.own_models[0],
+            wounded_model,
+            *defender.own_models[2:],
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=updated_defender)
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=updated_defender.unit_instance_id,
+        already_allocated_model_ids=(already_allocated_model.model_instance_id,),
+    )
+    allocation_groups = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+    )
+    allocation_group = allocation_groups[0]
+
+    assert len(allocation_groups) == 1
+    assert allocation_group.wounded is True
+    assert allocation_group.model_ids == (
+        wounded_model.model_instance_id,
+        already_allocated_model.model_instance_id,
+    )
+    assert allocation_group.ordered_model_ids_for_damage() == (
+        wounded_model.model_instance_id,
+        already_allocated_model.model_instance_id,
+    )
+    assert AllocationGroup.from_payload(allocation_group.to_payload()) == allocation_group
+
+    with pytest.raises(GameLifecycleError, match="selected group is not legal"):
+        AllocationOrderDecision(
+            request_id="phase14e-illegal-selected-group-request",
+            result_id="phase14e-illegal-selected-group-result",
+            player_id="player-b",
+            selected_group_id="phase14e-missing-group",
+            attack_context={"attack_context_id": "phase14e-illegal-selected-group"},
+            allocation_context=allocation_context,
+            allocation_groups=allocation_groups,
+        )
+
+
+def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objects() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=defender.unit_instance_id,
+        attacker_constraint=AttackAllocationConstraint(
+            source_rule_ids=(PRECISION_RULE_ID,),
+            can_allocate_protected_characters=True,
+        ),
+    )
+    allocation_groups = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+    )
+    request = build_allocation_order_request(
+        request_id="phase14e-malformed-allocation-order-request",
+        defender_player_id="player-b",
+        attack_context={"attack_context_id": "phase14e-malformed-allocation-order"},
+        allocation_context=allocation_context,
+        allocation_groups=allocation_groups,
+    )
+    selected_option = request.options[0]
+    actorless_request = DecisionRequest(
+        request_id="phase14e-actorless-allocation-order-request",
+        decision_type=request.decision_type,
+        actor_id=None,
+        payload=request.payload,
+        options=request.options,
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires a defender actor"):
+        AllocationOrderDecision.from_result(
+            request=actorless_request,
+            result=DecisionResult.for_request(
+                result_id="phase14e-actorless-allocation-order-result",
+                request=actorless_request,
+                selected_option_id=selected_option.option_id,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="allocation_context must be allocation context"):
+        AllocationOrderDecision(
+            request_id="phase14e-bad-context-request",
+            result_id="phase14e-bad-context-result",
+            player_id="player-b",
+            selected_group_id=selected_option.option_id,
+            attack_context={"attack_context_id": "phase14e-bad-context"},
+            allocation_context=cast(AttackAllocationRuleContext, object()),
+            allocation_groups=allocation_groups,
+        )
+    with pytest.raises(GameLifecycleError, match="Allocation groups must be a tuple"):
+        AllocationOrderDecision(
+            request_id="phase14e-list-groups-request",
+            result_id="phase14e-list-groups-result",
+            player_id="player-b",
+            selected_group_id=selected_option.option_id,
+            attack_context={"attack_context_id": "phase14e-list-groups"},
+            allocation_context=allocation_context,
+            allocation_groups=cast(tuple[AllocationGroup, ...], list(allocation_groups)),
+        )
+    with pytest.raises(GameLifecycleError, match="must contain AllocationGroup values"):
+        AllocationOrderDecision(
+            request_id="phase14e-non-group-request",
+            result_id="phase14e-non-group-result",
+            player_id="player-b",
+            selected_group_id=selected_option.option_id,
+            attack_context={"attack_context_id": "phase14e-non-group"},
+            allocation_context=allocation_context,
+            allocation_groups=cast(tuple[AllocationGroup, ...], ("not-a-group",)),
+        )
+    with pytest.raises(GameLifecycleError, match="must not duplicate group IDs"):
+        AllocationOrderDecision(
+            request_id="phase14e-duplicate-group-request",
+            result_id="phase14e-duplicate-group-result",
+            player_id="player-b",
+            selected_group_id=allocation_groups[0].group_id,
+            attack_context={"attack_context_id": "phase14e-duplicate-group"},
+            allocation_context=allocation_context,
+            allocation_groups=(allocation_groups[0], allocation_groups[0]),
+        )
+    with pytest.raises(GameLifecycleError, match="attacker_constraint must be a constraint"):
+        AttackAllocationRuleContext(
+            target_unit_instance_id=defender.unit_instance_id,
+            alive_model_ids=tuple(model.model_instance_id for model in defender.own_models),
+            attacker_constraint=cast(AttackAllocationConstraint, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="require an allocation context"):
+        allocation_groups_for_context(
+            state=state,
+            allocation_context=cast(AttackAllocationRuleContext, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="unit_instance_id is unknown"):
+        allocation_context_for_unit(
+            state=state,
+            target_unit_instance_id="phase14e-missing-target-unit",
+        )
+    with pytest.raises(GameLifecycleError, match="model_instance_id is unknown"):
+        allocation_groups_for_context(
+            state=state,
+            allocation_context=AttackAllocationRuleContext(
+                target_unit_instance_id=defender.unit_instance_id,
+                alive_model_ids=("phase14e-missing-model",),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="forced must be a bool"):
+        AttackAllocation(
+            target_unit_instance_id=defender.unit_instance_id,
+            allocated_model_id=allocation_groups[0].model_ids[0],
+            legal_model_ids=allocation_groups[0].model_ids,
+            forced=cast(bool, "yes"),
+            rule_context=allocation_context,
+        )
+    with pytest.raises(GameLifecycleError, match="rule_context must be an allocation context"):
+        AttackAllocation(
+            target_unit_instance_id=defender.unit_instance_id,
+            allocated_model_id=allocation_groups[0].model_ids[0],
+            legal_model_ids=allocation_groups[0].model_ids,
+            forced=True,
+            rule_context=cast(AttackAllocationRuleContext, object()),
+        )
+
+    all_character_defender = replace(
+        defender,
+        own_models=tuple(
+            replace(
+                model,
+                source_ids=tuple(sorted({*model.source_ids, "attached-role:character"})),
+            )
+            for model in defender.own_models
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=all_character_defender)
+    all_character_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=all_character_defender.unit_instance_id,
+    )
+
+    assert all_character_context.attached_unit_bodyguard_model_ids == ()
+    assert all_character_context.attached_unit_character_model_ids == ()
 
 
 def test_phase13c_mandatory_saves_and_plunging_fire_are_typed() -> None:
