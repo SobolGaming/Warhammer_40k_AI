@@ -14,6 +14,7 @@ Primary references for roadmap coverage:
 
 - Warhammer 40,000 11th Edition Core Rules source PDF: [docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf](docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf)
 - 11th Edition app/codex/mission-pack source imports as they are added to CORE V2 source packages.
+- 11th Edition Digital App/community clarification supplement provided by project owner for this cutover plan.
 - CORE V1 reference implementation: <https://github.com/SobolGaming/Warhammer40k_AI>
 - CORE V1 generated Wahapedia data: <https://github.com/SobolGaming/Warhammer40k_AI/tree/dev/wahapedia_data>
 - CORE V2 repository: <https://github.com/SobolGaming/Warhammer_40k_AI>
@@ -61,7 +62,7 @@ Completed / implemented foundation:
 | 10M | Complete | Engagement-aware Movement action options and Normal Move finalization |
 | 10N | Complete | Advance action, dice, rerolls, and advanced-state restrictions |
 | 10O | Complete | Fall Back action and Desperate Escape resolution |
-| 10P | Complete | Reinforcements, Strategic Reserves, Deep Strike, and reserve placement |
+| 10P | Complete | Ingress Moves, Strategic Reserves, Deep Strike, and reserve placement |
 | 10Q | Complete | Transport Embark/Disembark, Firing Deck, and destroyed transport emergency disembark |
 | 10R | Complete | Aircraft and Hover movement/reserve behavior |
 | 10S | Complete | Triggered and surge movement foundation |
@@ -119,7 +120,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 |---|---|
 | D3 conversion, multi-dice expressions, roll-offs, reroll order, one-reroll-per-die, unmodified result semantics | Phase 10J |
 | Distance predicates including within, wholly within, more than, horizontal-only reserve distances, closest-points measurement, base-as-part-of-model visibility, `FRAME` measurement, and objective-marker range | Phase 10J.1, 13A, 15A, 20C |
-| Characteristic post-modifier caps/floors for Move, Toughness, Save, Invulnerable Save, Leadership, Objective Control, Range, Attacks, WS, BS, Strength, AP, and Damage, including `M "-"`, `OC "-"`, and Battle-shocked OC replacement | Phase 10J.1, 11C, 13C, 16B, 20C |
+| Characteristic post-modifier caps/floors for Move, Toughness, Save, Invulnerable Save, Leadership, Objective Control, Detection Range, Range, Attacks, WS, BS, Strength, AP, and Damage, including modifier-eligible `0`, modifier-immune `-`, Battle-shocked OC replacement, and half-damage applied after other Damage modifiers | Phase 10J.1, 11C, 13C, 16B, 20C |
 | Roll-offs for mission/setup/sequencing, including no rerolls or modifiers and repeat ties | Phase 10J, 12A, 15A |
 | Active/opposing player state, including start/end battle-round defaults and selected unit control during move/shoot/fight resolution | Phase 9B, 12A, 20B |
 | Start/end battle round, start/end turn, and start/end phase timing windows, including non-mission rules before mission rules at end-of-turn/end-of-phase/end-of-round windows | Phase 9B, 11E, 11F, 12A, 20B |
@@ -132,24 +133,25 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Attack sequence: simultaneous hit/wound/save rolls per gathered attack group, allocation groups, defender allocation-order decision, save resolution from lowest to highest result, current allocation group transitions, and damage allocation to wounded models first | Phase 13C, 13E, 20E |
 | Mortal wounds, normal-damage-before-mortal ordering, hazard rolls as unit-level rolls that allocate through mortal-wound rules, and `[DEVASTATING WOUNDS]` mortal-wound cap of one destroyed model per critical wound | Phase 13C, 13D, 13E, 20C, 20E |
 | Visibility: 1 mm line of sight, visible vs fully visible model/unit states, same-unit model ignoring, and `FRAME` closest-point visibility/measurement | Phase 13A, 20C, 20D |
-| Terrain: terrain areas, exposed/light/dense categories, dense movement gates, vertical movement, stable non-ground-level endpoints, Solid 3" ground-level line-of-sight blocking, Hidden 15" detection, Obscuring terrain areas, Benefit of Cover as `-1 BS`, and Plunging Fire as `+1 BS` | Phase 10F, 10I, 13A, 13C, 20D, 20E |
+| Terrain: terrain areas, exposed/light/dense categories, dense movement gates, vertical movement, stable non-ground-level endpoints, Solid 3" ground-level line-of-sight blocking, Hidden using model-level terrain-area occupancy and unit Detection Range, Gone to Ground detection modifier, Obscuring terrain areas, Benefit of Cover as `-1 BS`, and Plunging Fire as `+1 BS` | Phase 10F, 10I, 13A, 13C, 20D, 20E |
 | Objectives: terrain objectives as primary objective representation, marker fallback only when no terrain area coincides, objective markers can be moved through and ended on, terrain-area control range, secured-objective persistence and timing | Phase 11A, 11B, 11C, 20D |
-| Movement phase: every army unit is selected to move each Movement phase, including strategic reserves and embarked units; move type is a finite decision; Remain Stationary does not trigger start/end move rules | Phase 10B-10T, 20D |
+| Movement phase: every army unit is selected to move each Movement phase, including strategic reserves and embarked units; Ingress/reserve arrival is a move type inside Move Units, not a separate phase step; move type is a finite decision; Remain Stationary does not trigger start/end move rules | Phase 10B-10T, 20D |
 | Fall Back: Ordered Retreat vs Desperate Escape modes, hazard rolls for Desperate Escape, enemy-model traversal, post-move Battle-shock roll, and shooting/charge/action restrictions | Phase 10O, 11C, 20D |
 | Shooting phase: Normal, Assault, Close-quarters, Indirect, and Snap shooting types; close-quarters engaged targeting and weapon-selection restrictions; indirect cover/no-reroll/fail ranges; engaged MONSTER/VEHICLE targeting; `[BLAST]` engaged-target bans | Phase 13B-13F, 20F |
 | Charge phase: charge eligibility, charge-target declaration after the roll, target-within-roll-distance validation, within-1" and engaged-if-possible model movement clauses, all-target engagement requirement, non-target engagement ban, and Fights First grant | Phase 14A, 14B, 20G |
-| Fight phase: both-player pile-in step, Fights First alternating selection, eligible-to-fight pass rule when all eligible units are more than 5" from enemies, Normal Fight, Overrun Fight, both-player consolidation step, and Ongoing/Engaging/Objective consolidation modes | Phase 14C, 14D, 20G |
+| Fight phase: both-player pile-in step, Fights First alternating selection, eligible-to-fight if charged/engaged at Fight phase start/engaged at activation, eligible-to-fight pass rule when all eligible units are more than 5" from enemies, Normal Fight, Overrun Fight, both-player consolidation step, and Ongoing/Engaging/Objective consolidation modes | Phase 14C, 14D, 20G |
 | Actions: start eligibility exclusions, TITANIC exceptions, action-imposed shooting/charge restrictions, cancellation by moves except pile-in/consolidation, cancellation on leaving battlefield, and completion effects | Phase 11E, 16C-16D, 20D |
 | Stratagem framework: same stratagem once per phase, same unit targeted by at most one stratagem per phase unless stated, optional additional CP sections, and source-backed 11th Edition Core Stratagem definitions | Phase 12B, 12C, 12D, 20I |
 | Core Stratagems: Command Re-roll partial-die semantics and no Leadership/Battle-shock coverage, Epic Challenge, Insane Bravery, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch via Snap Shooting at end of opponent's Movement phase, Smokescreen, Heroic Intervention modes, and Counteroffensive | Phase 12B, 12C, 13D, 14E, 20I |
-| Monsters/Vehicles and `FRAME`: normal/advance movement through non-MONSTER/non-VEHICLE models, frame measurement/rotation, shooting at engaged MONSTER/VEHICLE units, and close-quarters exceptions | Phase 10G, 10I, 13B, 20C, 20F |
+| Monsters/Vehicles and `FRAME`: normal/advance-only movement through non-MONSTER/non-VEHICLE friendly/enemy models, frame measurement/rotation, shooting at engaged MONSTER/VEHICLE units, and close-quarters exceptions | Phase 10G, 10I, 13B, 20C, 20F |
 | Transports: capacity by models, multiple embarked units, battle-formation embark, embark after normal/advance/fall-back moves, Rapid/Tactical/Combat Disembark modes, emergency disembark, and destroyed-transport timing with Deadly Demise | Phase 10Q, 13E, 15C, 20H |
 | Attached units: Leader and Support components, one Leader and one Support per bodyguard unless stated, bodyguard Toughness for attacks, destroyed-unit trigger identity, keyword union without model keyword inheritance, source-scoped ability persistence, and revive into attached unit | Phase 6, 13C, 13E, 15D, 16F, 20H |
 | Strategic Reserves and repositioned units: 50% points cap, no Fortifications, second-round ingress, 6" battlefield-edge setup, more-than-8" enemy distance, pre-third-round opponent-deployment-zone ban, third-round destruction exceptions, and move-history/effect persistence for repositioned units | Phase 10P, 11F, 15C, 20H |
 | Flying, Surge, and Aircraft: surge target selection and no-repeat-move restriction, optional `take to the skies` declaration with `-2"` budget unless Hover, FLY through all models/terrain and ignores vertical distance, Aircraft-only ingress, end-of-opponent-turn reserve transition, Aircraft engagement exceptions, and aircraft charge/fight restrictions | Phase 10R, 10S, 14B, 14D, 20D, 20H |
-| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection, `[ANTI]`, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]`, Hover, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative X", `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 16C-16F, 20I |
-| Appendix rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, revived models, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 14C, 15B-15D, 16F, 20H |
-| Muster army restrictions: battle size, faction, detachment restrictions, rule of three/six, Enhancements, Epic Heroes, Warlord, Dedicated Transport occupancy | Phase 15D |
+| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection, `[ANTI]`, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]`, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative X", `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 16C-16F, 20I |
+| Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 14C, 15B-15D, 16F, 20H |
+| Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 15D, 20J |
+| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, no replacement on discard, once-per-round 1 CP discard reward, 15 VP per-round Secondary cap, and 45 VP Primary / 45 VP Secondary caps | Phase 11A, 11E, 11F, 20J |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 15A, 15C, 15E |
 
 # Build order details
@@ -258,12 +260,24 @@ Invariants:
 - `wholly within` requires the entire base/contact footprint to satisfy the predicate;
 - reserve and set-up rules that specify distance from enemy models use horizontal distance where the Core Rules say so;
 - objective marker range is 3" horizontal and 5" vertical unless mission policy overrides it;
-- objective markers are 40mm markers by default, can be moved over as if not there, and cannot be ended on top of;
+- objective markers are 40mm markers by default, can be moved over as if not
+  there, and can be ended on top of;
+- characteristics depicted as `-`, or replaced by `-` by a rule such as
+  Battle-shock replacing OC, are not numeric values and cannot be changed by
+  numeric modifiers;
+- characteristics with numeric value `0` remain numeric and can be changed by
+  modifiers such as auras unless that characteristic's own cap/floor forbids the
+  final value;
+- Detection Range is a unit characteristic, defaults to 15", and is better when
+  lower because it means the unit is detected from a shorter distance;
 - post-modifier Move and Toughness cannot be less than 1;
 - Save cannot become 1+ or better;
 - Leadership cannot become better than 4+ or worse than 9+;
 - Objective Control cannot be less than 0;
 - ranged weapon Range, Attacks, Strength, and Damage cannot be less than 1 unless a rule explicitly permits Damage 0;
+- halve-damage effects are applied after additive, subtractive, replacement, and
+  other Damage modifiers, so the halving consumes the already-modified Damage
+  value;
 - WS and BS cannot become 1+ or better;
 - AP cannot become worse than 0;
 - all caps/floors are applied after modifier stacking and before result consumption.
@@ -273,8 +287,14 @@ Required tests:
 - closest-base distance and baseless-model distance work;
 - within, wholly within, more-than, and horizontal-only predicates evaluate correctly;
 - objective marker range/control predicates use 3"/5";
-- objective marker endpoint overlap is rejected;
+- objective marker endpoint overlap is allowed and does not block otherwise legal
+  movement or placement;
 - each characteristic cap/floor is enforced after modifiers;
+- numeric `0` can be modified while `-` cannot be modified;
+- Battle-shocked OC becomes typed `-`, not numeric 0, and rejects OC modifier effects;
+- Detection Range defaults to 15", accepts modifier stacks, and treats lower
+  values as better for Hidden detection;
+- halve-damage effects apply after other Damage modifiers;
 - Damage can become 0 only when an explicit rule permits it;
 - distance predicate payloads round-trip without object reprs.
 
@@ -492,13 +512,13 @@ Invariants:
 - Fall Back models move up to M";
 - Fall Back can move within enemy Engagement Range but cannot end there;
 - if no legal endpoint exists, the unit cannot Fall Back;
-- moving over enemy models during Fall Back requires Desperate Escape tests unless the model is `TITANIC` or can `FLY`;
-- Battle-shocked units selected to Fall Back require Desperate Escape tests for every model;
-- Desperate Escape rolls of 1-2 destroy one model from the falling-back unit, selected by the controlling player;
-- post-destruction Fall Back endpoint coherency is validated against the surviving models before any battlefield mutation;
+- Desperate Escape is a Fall Back mode, and uses one hazard roll for each model in the falling-back unit;
+- Battle-shocked units selected to Fall Back must use Desperate Escape;
+- failed Desperate Escape hazard rolls allocate mortal wounds through the shared mortal-wound service;
+- post-hazard Fall Back endpoint coherency is validated before any battlefield mutation;
 - if Desperate Escape destroys every model in the falling-back unit, removal records remain authoritative and no stale `FellBackUnitState` is recorded;
 - unresolved Desperate Escape requirements cannot emit Fall Back transition records;
-- the same model can trigger only one Desperate Escape test per phase;
+- Desperate Escape allows moved models to move through enemy models;
 - units that Fall Back cannot shoot or declare a charge that turn unless a rule permits it;
 - destroyed models emit removal records with correct destruction context.
 
@@ -507,12 +527,11 @@ Required tests:
 - eligible unit can Fall Back;
 - ineligible unit cannot Fall Back;
 - endpoint in Engagement Range is rejected;
-- enemy-model overflight creates Desperate Escape requirements;
-- `FLY`/`TITANIC` exceptions avoid Desperate Escape for crossing enemy models;
-- Battle-shocked Fall Back requires tests for every model;
-- failed Desperate Escape destroys a selected model;
-- survivor coherency is revalidated after Desperate Escape destruction selection;
-- Desperate Escape destruction can make an otherwise incoherent attempted endpoint legal;
+- Desperate Escape mode creates one hazard roll per model;
+- Battle-shocked Fall Back requires Desperate Escape mode;
+- failed Desperate Escape hazard rolls allocate mortal wounds;
+- survivor coherency is revalidated after Desperate Escape mortal-wound resolution;
+- Desperate Escape casualties can make an otherwise incoherent attempted endpoint legal;
 - all-model Desperate Escape destruction round-trips through lifecycle replay without stale Fell Back state;
 - unresolved Desperate Escape requirements cannot emit transition batches;
 - Fall Back emits displacement and removal records where applicable.
@@ -523,7 +542,7 @@ CORE V1 relevant areas:
 - `src/warhammer40k_ai/pathing/rules_profile.py`
 - `src/warhammer40k_ai/pathing/validation.py`
 
-## Phase 10P: Reinforcements, Strategic Reserves, Deep Strike, and reserve placement
+## Phase 10P: Ingress Moves, Strategic Reserves, Deep Strike, and reserve placement
 
 Status: Complete.
 
@@ -545,20 +564,20 @@ Objects:
 
 Invariants:
 
-- Movement phase has Move Units then Reinforcements;
-- `REINFORCEMENTS` is a phase step, not a placement kind;
+- Movement phase has a Move Units step; reserve arrivals are resolved as move types such as Ingress Move selected inside that step;
+- `REINFORCEMENTS` is not a separate 11th Edition phase step and remains only a retired migration term;
 - reserve placement uses placement records, not displacement records;
 - all Reserves units not set up on the battlefield when the battle ends count as destroyed;
-- Reserves units set up in the Reinforcements step count as having made a Normal move that turn and cannot move further in that phase;
+- Reserves units set up by an Ingress Move follow the Ingress Move after-moving restrictions and cannot make another type of move until the start of the next Charge phase unless a rule permits it;
 - any specified enemy-distance requirement for setting up Reserves applies to horizontal distance unless the source rule says otherwise;
 - Strategic Reserves are a subset of Reserves, while Deep Strike and other reserve-like abilities keep their own setup rules;
 - Strategic Reserves declarations exclude `FORTIFICATIONS` and enforce the battle-size points limit, including embarked units inside transports placed into Strategic Reserves;
 - Strategic Reserves cannot arrive in battle round 1;
 - Strategic Reserves arriving in battle round 2 must be wholly within 6" of a battlefield edge and not within the enemy deployment zone;
 - Strategic Reserves arriving from battle round 3 onward must be wholly within 6" of a battlefield edge;
-- Strategic Reserves cannot be set up within 9" horizontally of enemy models;
+- Strategic Reserves cannot be set up within 8" horizontally of enemy units, i.e. they must be more than 8" away;
 - Deep Strike units may be placed in Reserves during Declare Battle Formations if every model has Deep Strike;
-- Deep Strike placement in the Reinforcements step is more than 9" horizontally from all enemy models;
+- Deep Strike placement uses its source setup policy and, under the 11th Edition Core Rules, is more than 8" horizontally from all enemy units;
 - a unit arriving from Strategic Reserves with Deep Strike may choose either Strategic Reserves setup rules or Deep Strike setup rules;
 - reserve placements validate battlefield edges, enemy distance restrictions, terrain endpoints, coherency, model overlap, and deployment restrictions;
 - mandatory arrivals are requeued or fail explicitly according to rules;
@@ -566,13 +585,13 @@ Invariants:
 
 Required tests:
 
-- Movement phase enters Reinforcements after Move Units;
+- Movement phase offers legal Ingress Move choices during Move Units;
 - Deep Strike placement uses `BattlefieldPlacementKind.DEEP_STRIKE`;
 - Strategic Reserves placement uses `BattlefieldPlacementKind.STRATEGIC_RESERVES`;
 - illegal reserve placement fails without mutating state;
 - reserve placement validates coherency and Engagement Range setup restriction;
 - reserve placement validates terrain endpoint support;
-- Strategic Reserves battle-round-2 edge/enemy-deployment-zone restrictions are enforced;
+- Strategic Reserves battle-round-2 edge/enemy-deployment-zone/more-than-8" restrictions are enforced;
 - Strategic Reserves battle-round-3 edge restrictions are enforced;
 - Deep Strike and Strategic Reserves choose the correct placement policy;
 - unarrived Reserves count as destroyed at game end.
@@ -785,8 +804,8 @@ Invariants:
 - failed movement rolls back state;
 - all successful movement emits transition records;
 - coherency is enforced at the end of every move;
-- Reinforcements step starts only after Move Units completion;
-- Movement phase advances only after Reinforcements and unresolved mandatory placements are complete;
+- reserve arrivals are legal Move Units selections rather than a separate Reinforcements step;
+- Movement phase advances only after all Move Units choices and unresolved mandatory placements are complete;
 - movement phase events and replay payloads are deterministic.
 
 Required tests:
@@ -794,7 +813,7 @@ Required tests:
 - full Move Units step completes;
 - Advance/Fall Back/Normal/Remain Stationary interact correctly;
 - failed movement does not mutate state;
-- Reinforcements occurs after Move Units;
+- reserve arrival choices occur during Move Units;
 - Movement phase exits to Shooting only when all movement-step work is complete.
 
 ## Phase 10U: movement/pathing/terrain profiling and hotspot budget gate
@@ -866,8 +885,8 @@ Implemented hardening:
 
 Deferred wiring contracts:
 
-- Phase 11A must provide mission deployment-zone geometry to live Reinforcements so battle-round-2 Strategic Reserves pass enemy deployment zones into `resolve_reserve_arrival`;
-- Phase 11A/11B must provide instantiated terrain features to live Reinforcements and deployment placement validation, not only resolver tests;
+- Phase 11A must provide mission deployment-zone geometry to live reserve-arrival validation so battle-round-2 Strategic Reserves pass enemy deployment zones into `resolve_reserve_arrival`;
+- Phase 11A/11B must provide instantiated terrain features to live reserve-arrival and deployment placement validation, not only resolver tests;
 - Phase 11E/11F must call unarrived-reserve destruction at the appropriate game-end or mission-pack deadline;
 - Phase 13B must consume Firing Deck selections during Shooting and validate selected weapons against the embarked model's wargear;
 - Phase 13E/14D must orchestrate destroyed Transport disembark from real destruction events before removing the Transport model;
@@ -924,7 +943,7 @@ Invariants:
 - objective marker positions are source-defined and use center-point measurement;
 - Chapter Approved objective markers are flat 40mm markers and do not impede movement/placement;
 - terrain layout templates are data and can instantiate pregenerated terrain pieces with conservative axis-aligned occupancy footprints;
-- live Reinforcements receives mission deployment-zone geometry for reserve placement validation;
+- live reserve-arrival validation receives mission deployment-zone geometry for reserve placement validation;
 - live placement validators receive instantiated terrain features instead of resolver-local test fixtures;
 - tournament mission pool is deterministic and replay-facing;
 - Fixed/Tactical/Challenger card behavior remains hidden/public-safe.
@@ -936,8 +955,8 @@ Required tests:
 - objective marker positions round-trip;
 - objective marker terrain/movement policy is flat/non-blocking for Chapter Approved;
 - terrain layout template instantiates deterministic terrain features;
-- live Reinforcements rejects battle-round-2 Strategic Reserves in enemy deployment zones using mission data;
-- live Reinforcements rejects illegal terrain endpoints using instantiated terrain layout data;
+- live reserve-arrival validation rejects battle-round-2 Strategic Reserves in enemy deployment zones using mission data;
+- live reserve-arrival validation rejects illegal terrain endpoints using instantiated terrain layout data;
 - mission pool selection is deterministic;
 - hidden Tactical/Fixed state does not leak to opponent public payload.
 
@@ -969,9 +988,9 @@ Objects:
 Invariants:
 
 - objective control derives from current placed models and OC values;
-- Battle-shocked units have OC 0;
+- Battle-shocked units have OC `-`, which contributes no Objective Control and cannot be modified by numeric OC modifiers;
 - objective markers use mission-defined center positions and default 40mm marker geometry unless a mission overrides it;
-- models can move over objective markers as if they were not there but cannot end a move on top of them;
+- models can move over objective markers and can end a move on top of them;
 - objective marker range is 3" horizontally and 5" vertically unless a mission overrides it;
 - objective control updates at the end of every phase and turn;
 - objective marker terrain interactions are descriptor-driven;
@@ -980,10 +999,10 @@ Invariants:
 Required tests:
 
 - objective control sums OC by player;
-- Battle-shocked unit contributes OC 0;
+- Battle-shocked unit contributes no OC because its OC characteristic is `-`;
 - contested objective has deterministic result;
 - terrain objective policy is explicit unsupported until implemented;
-- model cannot end on top of objective marker;
+- model can end on top of an objective marker;
 - objective control updates at phase and turn end;
 - objective control payloads round-trip.
 
@@ -1017,9 +1036,10 @@ Invariants:
 - a Battle-shock test rolls 2D6 and passes if the total is greater than or equal to the best Leadership in that unit;
 - non-reroll Battle-shock dice are deterministic engine-internal dice; future reroll or choice hooks must pause through `DecisionRequest` before mutation;
 - if a unit is forced to test for being below Starting Strength, it does not also test for being Below Half-strength unless a rule says otherwise;
-- failed Battle-shock marks the unit and all its models Battle-shocked until the start of the controlling player's next Command phase;
-- Battle-shocked units have OC 0;
-- Battle-shocked units require Desperate Escape tests for every model if selected to Fall Back;
+- failed Battle-shock marks the unit and all its models Battle-shocked until it passes a later recovery roll or another rule clears the state;
+- Battle-shocked units have OC `-`, not OC 0, and OC `-` cannot be increased by numeric modifiers;
+- Battle-shocked units must use Desperate Escape if selected to Fall Back;
+- Battle-shocked units cannot start actions and cannot complete actions already in progress;
 - a player cannot use Stratagems to affect their Battle-shocked units unless a rule permits it;
 - Starting Strength is recorded at army creation and updated correctly when Attached units split;
 - Below Half-strength for single-model units uses remaining wounds less than half the Wounds characteristic; other units use current model count less than half Starting Strength;
@@ -1031,7 +1051,7 @@ Required tests:
 - non-Command CP gain cap of 1CP per battle round is enforced;
 - below-half-strength unit emits Battle-shock test request;
 - below-Starting-Strength forced test suppresses duplicate Below Half-strength test unless overridden;
-- failed Battle-shock persists and changes OC to 0;
+- failed Battle-shock persists and changes OC to `-`;
 - passed Battle-shock avoids Battle-shocked state;
 - Battle-shocked unit cannot be targeted by friendly Stratagems by default;
 - Starting Strength and Below Half-strength logic works for single-model and multi-model units;
@@ -1103,12 +1123,15 @@ Initial parameterized request coverage:
 - Normal Move proposal;
 - Advance move proposal after Advance action and dice/reroll resolution;
 - Fall Back proposal, including Desperate Escape follow-up decisions where applicable;
-- Reinforcement placement proposal;
+- reserve-arrival placement proposal;
 - Deep Strike placement proposal;
 - Strategic Reserves placement proposal;
 - Disembark placement proposal.
 
-Reserve arrival proposal requests use distinct proposal kinds for general Reinforcement, Deep Strike, and Strategic Reserves flows. The request's `placement_kinds` field enumerates the legal physical placement methods available to that reserve state and unit.
+Reserve arrival proposal requests use distinct proposal kinds for general reserve
+arrival, Deep Strike, and Strategic Reserves flows. The request's
+`placement_kinds` field enumerates the legal physical placement methods
+available to that reserve state and unit.
 
 Later phases must reuse the same proposal contract for:
 
@@ -1186,9 +1209,14 @@ Invariants:
   finite `DecisionRequest` options through `GameLifecycle.submit_decision(...)`;
 - mission Actions have source-backed start timing, eligible units, target IDs,
   interruption conditions, completion timing, and scoring effects;
-- Select Secondary Missions uses a simultaneous-secret reveal gate; secondary
-  mode, Fixed IDs, Tactical draws/card states, and normal secondary scoring are
-  public after every player has selected;
+- the mission deck grants two Secondary Missions per player turn;
+- Secondary Missions are retained until achieved or discarded, and discarded
+  Secondary Missions are not replaced immediately;
+- retained Secondary Missions do not have a two-card hand-size cap;
+- Tactical discard can discard one or more retained Secondary Missions for the
+  source-backed once-per-battle-round CP reward and records no replacement draw;
+- secondary mode, Fixed IDs, Tactical draws/card states, and normal secondary
+  scoring visibility are source-backed and viewer-scoped;
 - objective control feeds scoring;
 - end-of-turn coherency cleanup removes models until each affected unit has one coherent group;
 - coherency-cleanup removals count as destroyed but do not trigger destroyed-model rules;
@@ -1199,9 +1227,8 @@ Required tests:
 
 - primary scoring at correct timing and source-backed battle-round gates;
 - secondary scoring uses source-backed Fixed/Tactical card VP values;
-- secondary choices stay hidden until every player has selected, then reveal to all viewers;
-- Tactical secondary draw/score/discard flow is public after the reveal gate;
-- Tactical secondary discard emits deterministic decision/event records through the lifecycle path;
+- Secondary Mission draw, score, retain, and discard flow is public or hidden according to source-backed viewer rules;
+- Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions for the once-per-battle-round CP reward, and does not replace discarded cards;
 - mission Action can start through the lifecycle decision path, persist its target,
   filter ineligible units, complete, be interrupted, and score;
 - source package payloads round-trip and preserve 11th Edition mission/scoring/action snapshots;
@@ -1218,7 +1245,7 @@ Implemented coverage:
 
 - game length is consumed from mission scoring policy;
 - end-of-round and end-of-game scoring windows are recorded once as replay-safe state;
-- Chapter Approved primary, secondary, Battle Ready, and total VP caps are enforced at award time;
+- 11th Edition primary, secondary, Battle Ready, per-round secondary, and total VP caps are enforced at award time;
 - final scoring result payloads include public capped scores, winner/draw determination, and scoring audit data;
 - final scoring payloads round-trip without Python object reprs.
 
@@ -1227,7 +1254,7 @@ Invariants:
 - game length is mission/ruleset data;
 - end-of-round and end-of-game scoring windows are explicit;
 - final VP ledger audit verifies winner/draw payloads;
-- Chapter Approved 100VP cap and per-source caps are represented in scoring policy;
+- 11th Edition 45 VP Primary cap, 45 VP Secondary cap, 15 VP per-round Secondary cap, Battle Ready cap, total VP cap, and per-source caps are represented in scoring policy;
 - game-end payload includes public final score and replay-safe scoring audit.
 
 Required tests:
@@ -1389,8 +1416,7 @@ Initial supported Core Stratagem groups at this build slice:
 
 - Command Re-roll;
 - Insane Bravery;
-- Rapid Ingress;
-- New Orders from Chapter Approved Tactical missions.
+- Rapid Ingress.
 
 Later phase-coupled Core Stratagems:
 
@@ -1406,9 +1432,12 @@ Invariants:
 - each supported Core Stratagem consumes CP and records use;
 - Command Re-roll uses source-backed edition-specific eligible roll classes, rejects roll actor drift, and applies Phase 10J reroll semantics while remaining valid as a nested reaction without breaking the parent timing window;
 - Insane Bravery integrates with Phase 11C Battle-shock results without bypassing `DecisionRequest`/`DecisionResult`;
-- Rapid Ingress reuses reserves/reinforcement placement validators and, where exact placement is required, emits the existing placement proposal request after the Stratagem decision is accepted; when offered from a reaction window, the parent remains blocked until the placement proposal resolves;
-- New Orders reuses Phase 11E source-backed Tactical secondary discard/draw/scoring state;
-- Command and Movement phase progression discover supported Core Stratagem windows through `StratagemCatalogIndex`: Command start for New Orders and Insane Bravery, and opponent Movement phase end for Rapid Ingress reaction/placement;
+- Rapid Ingress reuses reserve-arrival placement validators and, where exact placement is required, emits the existing placement proposal request after the Stratagem decision is accepted; when offered from a reaction window, the parent remains blocked until the placement proposal resolves;
+- retired New Orders replacement-draw behavior is not active 11th Edition
+  behavior; Tactical discard is a Phase 11E mission decision that grants the
+  source-backed CP reward and does not immediately replace discarded Secondary
+  Missions;
+- Command and Movement phase progression discover supported Core Stratagem windows through `StratagemCatalogIndex`: Command start for Insane Bravery and opponent Movement phase end for Rapid Ingress reaction/placement;
 - supported dice/mission/reserves Stratagems use deterministic dice/replay plumbing and source IDs;
 - Phase 12C reuses Phase 12A persisting-effect/reaction machinery and Phase 12B ledger/decision framework; it does not depend on the later Phase 12D ability registry or Phase 16D generic handlers;
 - unsupported Core Stratagems remain explicit unsupported descriptors.
@@ -1418,7 +1447,7 @@ Required tests:
 - one legal use per supported Phase-12 timing window;
 - one phase-progression regression per supported phase-owned Stratagem window, proving the window is emitted from the trigger-keyed index and resolves through `GameLifecycle.submit_decision(...)`;
 - combined-window regressions for phases with multiple optional Stratagem windows under the same phase/trigger, proving declining one timing window does not suppress a distinct later timing window;
-- per-Stratagem golden replay for Command Re-roll, Insane Bravery, Rapid Ingress, and New Orders;
+- per-Stratagem golden replay for Command Re-roll, Insane Bravery, and Rapid Ingress;
 - decision-contract round-trip for option enumeration, submission, recording, event emission, and replay;
 - CP consumption and repeat-use restriction;
 - target-binding validation;
@@ -1513,6 +1542,8 @@ Objects:
 - `CoverSourceRecord`
 - `CoverPolicyDescriptor`
 - `BenefitOfCoverResult`
+- `HiddenDetectionResult`
+- `GoneToGroundResult`
 
 Invariants:
 
@@ -1522,14 +1553,25 @@ Invariants:
 - Exposed, Light, and Dense terrain categories are explicit descriptors;
 - Obscuring terrain areas containing Light or Dense features block visibility when every line of sight crosses one or more such areas and neither model is within the crossed area;
 - Dense terrain features have Solid line-of-sight blocking for enclosed gaps 3" or less from ground level;
-- Hidden applies to `INFANTRY`/`BEASTS`/`SWARM` models within a terrain area containing Dense terrain when their unit did not make ranged attacks this turn or the previous turn;
-- Hidden models can only be visible to enemy models within detection range, defaulting to 15";
+- Hidden can apply only to `INFANTRY`, `BEASTS`, and `SWARM` models;
+- a model is Hidden when it is at least partially within a terrain area
+  containing a Dense or Light terrain element and its unit did not make ranged
+  attacks last turn;
+- Hidden units can only be visible to enemy models within the target unit's
+  Detection Range characteristic, defaulting to 15";
+- Gone to Ground applies to a model that is not fully visible to the attacking
+  model because a terrain piece is at least partially in the way;
+- Gone to Ground improves Detection Range by -3", making the default Hidden
+  detection distance 12";
+- rules, abilities, or Stratagems that let a Hidden unit shoot and remain Hidden
+  cancel Gone to Ground for that interaction;
 - Benefit of Cover is a policy result consumed by attacks, not a save-side effect;
 - Benefit of Cover applies to the target unit only when every model in that unit qualifies through terrain-area membership or terrain/obscuring not-fully-visible evidence;
 - Benefit of Cover worsens the attack's BS characteristic by 1 unless an ability such as `[IGNORES COVER]` removes it;
 - cover eligibility is visible in attack context before hit rolls are made;
 - LoS witnesses carry ruleset hash and spatial revision cache-key data;
-- Hidden distance gates, shot-state loss, and visibility output are first-class 11th Edition terrain behavior;
+- Hidden distance gates, last-turn shot-state loss, Gone to Ground cancellation,
+  and visibility output are first-class 11th Edition terrain behavior;
 - Phase 13A uses deterministic broad-phase candidate filtering and cache-key witnesses, but does not claim a persistent memoized shooting LoS cache; Phase 13B/13C must add or consume a real cache/index before high-volume shooting loops;
 - model silhouette sampling is an explicit deterministic approximation, not an exact hull; downstream cover and Plunging Fire behavior must carry accuracy tests for that sampling budget;
 - LoS witness/debug payloads are replay-safe.
@@ -1539,7 +1581,12 @@ Required tests:
 - terrain visibility fixture can block LoS deterministically;
 - terrain-area Obscuring blocks LoS only when all lines cross eligible areas and neither model is within the crossed area;
 - Dense terrain Solid blocks LoS through enclosed gaps 3" or less from ground level;
-- Hidden `INFANTRY`/`BEASTS`/`SWARM` models are visible only within detection range while their shot-state condition is satisfied;
+- Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Dense or Light terrain areas are
+  visible only within the target unit's Detection Range while their last-turn
+  shot-state condition is satisfied;
+- Gone to Ground applies only when the attacking model's full-visibility failure
+  is caused by intervening terrain, applies the -3" Detection Range modifier,
+  and is cancelled by Hidden-shooting rules that preserve Hidden;
 - target terrain-area membership and not-fully-visible terrain cover sources are represented independently of LoS blockers;
 - Benefit of Cover rejects a LoS witness from a different observer/target query even when terrain cache keys match;
 - Benefit of Cover worsens BS by 1 and does not modify the save roll;
@@ -1645,7 +1692,8 @@ Invariants:
 - Wound roll modifiers are capped at +1/-1;
 - Wound roll target number derives from Strength vs Toughness using integer-safe boundaries: 2+ when `S >= 2*T`, 3+ when `S > T`, 4+ when `S == T`, 6+ when `2*S <= T`, and otherwise 5+;
 - unmodified Wound roll of 6 always succeeds and unmodified Wound roll of 1 always fails;
-- unmodified saving throw roll of 1 always fails;
+- unmodified saving throw roll of 1 always fails before any save characteristic
+  is checked;
 - the attack sequence emits typed, ordered attack events/timing windows at hit, Critical Hit, wound, Critical Wound, allocation-order, save, and damage; ability handlers may only mutate within their owning windows, so Phase 13D abilities can attach without reaching into attack-sequence internals;
 - hit resolution supports both rolled hits and explicit skipped-roll/generated-hit paths, so later ability handlers can produce auto-hits without coupling Phase 13C to named abilities;
 - Critical Wounds and wound-roll modification are explicit attack events;
@@ -1658,8 +1706,14 @@ Invariants:
 - damage resolution walks save results from lowest result(s) to highest result(s), selecting models from the current allocation group and selecting a wounded model in that group where possible;
 - current allocation group transitions only after all models in the prior group are destroyed;
 - the allocation step accepts optional attacker-side allocation constraints, such as `[PRECISION]`, so later rules can constrain or override allocation without bypassing `submit_decision(...)`;
-- armour saves apply AP modifiers against the current allocation group's Sv characteristic;
-- invulnerable saves ignore AP and are checked against the current allocation group's InSv characteristic where present;
+- when the current allocation group has an Invulnerable Save, that InSv must be
+  used for the save roll and the defender cannot choose to use an armour Save
+  instead;
+- when the current allocation group has no Invulnerable Save but has a Save,
+  armour saves apply AP modifiers against the current allocation group's Sv
+  characteristic;
+- if neither Invulnerable Save nor Save applies, the save fails and the attack
+  inflicts damage;
 - Benefit of Cover worsens the attack's BS characteristic by 1 before hit rolls and no longer modifies save rolls;
 - the retired AP 0 / Save 3+ cover exception is not part of the 11th Edition ruleset and must be removed from runtime behavior;
 - Plunging Fire is a descriptor-driven BS improvement that consumes Phase 13A line-of-sight, height, ground-level target, and `TOWERING` within-12" evidence; unsupported Plunging Fire shapes return typed unsupported diagnostics instead of being silently ignored;
@@ -1675,7 +1729,9 @@ Invariants:
 Required tests:
 
 - defender allocation choice is emitted as a `DecisionRequest`, resolved through `GameLifecycle.submit_decision(...)`, replayed from `DecisionRecord`, and redacted or scoped correctly for viewers;
-- armour-versus-invulnerable save choice is a finite defender `DecisionRequest` when both are legal;
+- a save roll of 1 fails before InSv/Sv evaluation;
+- Invulnerable Save precedence is mandatory when the current allocation group has
+  InSv, with no armour-versus-invulnerable defender choice;
 - optional or competing Feel No Pain choices are finite defender `DecisionRequest`s; forced single-source Feel No Pain paths remain engine-owned deterministic rolls;
 - stale/drift/malformed defender submissions are rejected without mutation;
 - full attack sequence resolves deterministically with no ability handlers installed, and a stub no-op handler proves each typed event hook fires in order;
@@ -1685,7 +1741,8 @@ Required tests:
 - Wound modifier cap of +1/-1;
 - unmodified Wound roll 6/1 and unmodified Save roll 1 semantics;
 - Wound roll table boundaries;
-- armour save and invulnerable save interaction against current allocation groups;
+- armour save and mandatory invulnerable-save precedence against current
+  allocation groups;
 - Benefit of Cover worsens BS before hit rolls and never improves saves;
 - allocation groups and allocation-order decisions obey wounded-model and `CHARACTER` ordering constraints;
 - save rolls are resolved from lowest result(s) to highest result(s);
@@ -1724,6 +1781,7 @@ Initial Core Rules weapon ability coverage:
 - Devastating Wounds;
 - Sustained Hits X;
 - Extra Attacks;
+- Hunter X;
 - Anti-KEYWORD X+.
 
 Initial shooting-coupled Core Stratagem coverage:
@@ -1746,6 +1804,9 @@ Invariants:
 - Torrent bypasses Hit rolls and interacts correctly with Indirect Fire restrictions;
 - Lethal Hits and Sustained Hits consume Critical Hit events, and Lethal Hits remains an active-player choice because automatic wounds can prevent Critical Wound abilities;
 - Anti modifies Critical Wound thresholds based on target keywords;
+- `[HUNTER X]` weapons can only target units that match at least one listed
+  keyword in X, including composite keyword lists such as `MONSTER` or
+  `VEHICLE`;
 - Precision lets the attacking player select one visible `CHARACTER` allocation group at the start of the Allocation Order step; if selected, that group is the current allocation group until those attacks are resolved or that group is destroyed;
 - Hazardous tests occur after the unit has resolved all its attacks and make unit-level hazard rolls that allocate mortal wounds through the 11th Edition mortal-wound sequence;
 - Devastating Wounds ends the attack sequence for each critical wound and inflicts mortal wounds equal to Damage after normal damage; each critical wound can damage a maximum of one model and any excess mortal wounds from that critical wound are lost;
@@ -1765,6 +1826,8 @@ Required tests:
 - Fire Overwatch has end-of-opponent-Movement-phase reaction tests proving it creates an out-of-phase Snap Shooting state, rejects out-of-range, shooting-ineligible, no-legal-declaration, and TITANIC target bindings before CP spend, applies the unmodified-6 hit policy while preserving Torrent auto-hit behavior, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
 - Smokescreen and Explosives have decision-contract tests from their legal shooting-resolution windows;
 - unsupported weapon ability descriptor does not execute;
+- Hunter X rejects target declarations that lack every required keyword match and
+  accepts declarations with at least one listed target keyword;
 - modifier interactions are deterministic;
 - random Attacks and random Damage consume Phase 10J dice/reroll semantics;
 - Twin-linked cannot reroll a Wound roll twice;
@@ -1782,7 +1845,7 @@ Status: Complete.
 Invariants:
 
 - defender allocation choices are emitted as `DecisionRequest`s unless allocation is forced by the rules;
-- save selection, optional Feel No Pain source/use, and optional destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code;
+- optional Feel No Pain source/use and optional destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code; mandatory save routing, including Invulnerable Save precedence, is engine-owned;
 - mandatory destruction reactions, including Deadly Demise-style rules, are engine-triggered and are not adapter decline choices;
 - Deadly Demise resolves before destroyed-model removal, including its trigger roll, eligible nearby-unit mortal-wound packets, and any routed Feel No Pain choices;
 - models destroyed by Deadly Demise mortal-wound packets use the same destroyed-model removal record, transition batch, and destruction-reaction host as attack damage;
@@ -1790,6 +1853,9 @@ Invariants:
 - defender allocates attacks according to rules;
 - wounded models must continue receiving damage where applicable;
 - destroyed models are removed with removal records;
+- destroyed-model pools remain typed and source-addressable for later healing or
+  revival effects, including attached-unit component restoration while the
+  attached rules unit still exists;
 - destroyed-model reaction windows fire unless the removal cause suppresses them;
 - coherency-cleanup removals count as destroyed but do not trigger destroyed rules.
 
@@ -1800,6 +1866,8 @@ Required tests:
 - viewer-scoped projection/event tests cover any hidden defensive or destruction-reaction payloads;
 - wounded-model allocation priority;
 - destroyed-model removal event;
+- destroyed-model pool round-trip supports later healing/revival without object
+  reprs or component identity loss;
 - destroyed-model reaction timing;
 - Deadly Demise failed roll, successful mortal wounds, pre-removal measurement, and Feel No Pain pause/resume ordering;
 - Deadly Demise secondary casualties emit removal records, optional reaction requests, and chained mandatory Deadly Demise resolutions deterministically;
@@ -1847,6 +1915,9 @@ Invariants:
 Invariants:
 
 - Fight phase has Fights First then Remaining Combats;
+- a unit is eligible to fight if it made a Charge move this turn, was engaged in
+  melee at the start of the Fight phase, or is engaged in melee at activation
+  time;
 - eligible units are selected in correct order;
 - charging units and Fight First effects are represented in fight-order state;
 - fight interrupts use typed decision metadata.
@@ -1923,7 +1994,8 @@ Invariants:
 
 - redeployments occur after deployment and before first turn;
 - redeploy is removal + placement, not displacement;
-- Scout moves are pre-battle displacements;
+- Scout moves are pre-battle displacements and require the unit to start wholly
+  within its controlling player's deployment zone before the Scout move is made;
 - Infiltrators modify setup legality;
 - all pre-battle abilities use timing windows and source IDs.
 
@@ -1940,20 +2012,26 @@ Invariants:
 
 Invariants:
 
-- battle size defines points limit and mission-compatible battlefield expectations;
+- mustering order is Battle Size, Army Roster, Faction, Detachment Rules, Units, then Warlord promotion;
+- battle size defines points limit, detachment points, enhancement limit, unit limit, and mission-compatible battlefield expectations;
+- Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit Limit 2, doubled for `BATTLELINE` units;
+- Strike Force is 2000 points, 4 Detachment Points, Enhancement Limit 5, and Unit Limit 3, doubled for `BATTLELINE` units;
 - army faction is a selected Faction keyword and every included unit must be legal for that faction or an allowed exception;
-- detachment selection can impose required/prohibited units and grants detachment rules, Stratagems, and Enhancements;
+- detachment selection spends Detachment Points and grants access to detachment rules, units, Stratagems, and Enhancements; missing detachment point values are explicit awaiting-source data, not defaults;
 - the army must include at least one eligible `CHARACTER` model to be Warlord;
+- the Warlord must have the same Faction keyword as the rest of the army;
 - selected Warlord gains the `WARLORD` keyword;
-- Rule of Three is enforced for datasheets by name, except BATTLELINE and DEDICATED TRANSPORT allow up to six;
+- unit limits are enforced by Battle Size and doubled for `BATTLELINE` units;
 - `EPIC HERO` units are unique and cannot receive Enhancements;
 - only `CHARACTER` models can receive Enhancements;
-- the army can include at most three Enhancements;
+- Enhancement count is capped by Battle Size;
 - no unit can have more than one Enhancement;
 - each Enhancement must be unique;
+- Leader and Support attachments are declared on the army list, not in Declare Battle Formations;
+- Enhancements are selected after Attached Units are created, so the one-Enhancement-per-squad restriction applies across the attached rules unit;
 - every Dedicated Transport must start the battle with at least one unit embarked or it cannot be deployed and counts as destroyed during the first battle round;
 - Leader attachment restrictions are validated before battle;
-- each Bodyguard unit can have at most one Leader attached;
+- each Bodyguard unit can have at most one Leader and one Support attached unless a rule says otherwise;
 - while attached, the Attached unit is treated as one unit for rules purposes except destroyed-unit triggers;
 - coherency for an Attached unit is validated over the attached rules unit's alive models, not per component `UnitPlacement`;
 - attacks against Attached units use Bodyguard Toughness until the attacking unit resolves all attacks;
@@ -1963,11 +2041,12 @@ Invariants:
 
 Required tests:
 
-- Rule of Three and BATTLELINE/Dedicated Transport exceptions;
+- Incursion and Strike Force points, detachment points, enhancement limits, and unit limits;
 - Epic Hero uniqueness and Enhancement denial;
-- Enhancement count, uniqueness, Character-only, and one-per-unit restrictions;
+- Enhancement count, uniqueness, Character-only, and one-per-attached-squad restrictions;
 - Dedicated Transport empty-at-start consequence;
-- Leader/Bodyguard legal attachment and one-Leader-per-Bodyguard enforcement;
+- Leader/Support/Bodyguard legal attachment and army-list attachment timing;
+- Warlord faction-keyword requirement;
 - Attached-unit coherency uses `UnitGroup.alive_models()`/group-aware placement data across Leader and Bodyguard models;
 - Attached-unit Toughness and Character allocation protection;
 - Attached-unit split timing after attacks resolve;
@@ -2514,6 +2593,11 @@ Invariants:
 - retired pivot-cost policy, descriptors, and tests are removed or made audit failures;
 - `FRAME` measurement uses closest point on the model rather than base-only measurement;
 - `M "-"`, `OC "-"`, and InSv characteristics are represented as typed characteristic values;
+- numeric `0` characteristics can be changed by modifiers, but characteristics
+  depicted as `-` or replaced by `-` cannot be changed by numeric modifiers;
+- Detection Range is a unit characteristic, defaults to 15", is lower-is-better,
+  and is consumed by Hidden detection checks;
+- halve-damage effects apply after all other Damage modifiers;
 - Battle-shocked units use OC "-" semantics, cannot be targeted by controlling-player Stratagems, and cannot start or complete actions;
 - hazard rolls are unit-level rolls that allocate mortal wounds through the 11th Edition mortal-wound sequence.
 
@@ -2522,6 +2606,8 @@ Required tests:
 - static audit rejects pivot-cost policy usage;
 - Engagement Range and coherency descriptors match the 11th Edition values;
 - `FRAME` measurement and rotation witnesses round-trip;
+- `0` modifier, `-` modifier rejection, Detection Range modifier, and
+  halve-damage-after-modifiers cases are covered by shared characteristic tests;
 - Battle-shock persistence and recovery use the Command phase Battle-shock step;
 - hazard rolls inflict 1 mortal wound, or 3 mortal wounds when every model is a `MONSTER`/`VEHICLE`.
 
@@ -2530,11 +2616,17 @@ Required tests:
 Invariants:
 
 - Movement phase selection covers every friendly unit, including units in Strategic Reserves and embarked units;
+- Ingress Moves for reserve arrivals are selected inside Move Units, with no
+  separate Reinforcements step;
 - move-type selection is a finite decision and Remain Stationary triggers no start/end move rules;
 - Fall Back mode selection supports Ordered Retreat and Desperate Escape;
+- `MONSTER` and `VEHICLE` units can move through friendly and enemy models that
+  are not `MONSTER` or `VEHICLE` only when making Normal or Advance moves;
 - Flying units can optionally take to the skies for Normal, Advance, Fall Back, and Charge moves, subtracting 2" unless Hover applies;
 - terrain areas and Exposed/Light/Dense categories replace retired terrain-feature policies;
-- Dense movement, vertical movement, stable non-ground endpoints, Solid, Hidden, Obscuring, and Benefit of Cover are represented from structured terrain descriptors;
+- Dense movement, vertical movement, stable non-ground endpoints, Solid, Hidden,
+  Gone to Ground, Obscuring, and Benefit of Cover are represented from
+  structured terrain descriptors;
 - objectives are terrain objectives by default; 40 mm markers are only the fallback when an objective point does not coincide with a terrain area;
 - objective markers can be moved through and ended on;
 - Secured objectives persist until the opponent's level of control is greater at the end of a phase;
@@ -2543,8 +2635,13 @@ Invariants:
 Required tests:
 
 - fall-back mode decisions validate battle-shocked and non-battle-shocked cases;
+- reserve-arrival Ingress choices occur during Move Units and use more-than-8"
+  enemy-distance validation where applicable;
+- Monster/Vehicle model traversal is legal for Normal and Advance moves only and
+  remains illegal through other Monster/Vehicle models;
 - FLY take-to-the-skies changes pathing and movement budget deterministically;
-- terrain visibility and terrain movement consume terrain-area descriptors;
+- terrain visibility and terrain movement consume terrain-area descriptors,
+  including Light/Dense Hidden eligibility and Gone to Ground detection modifiers;
 - objective-control geometry supports terrain areas and marker fallback;
 - action cancellation rejects moves other than pile-in/consolidation and rejects leaving the battlefield.
 
@@ -2557,6 +2654,11 @@ Invariants:
 - Benefit of Cover worsens BS by 1 before Hit rolls;
 - Plunging Fire improves BS by 1 when the terrain-height or `TOWERING` within-12" conditions are met and the target contains a model on ground level;
 - save rolls are made for all attacks that wounded before model allocation;
+- unmodified save rolls of 1 fail before InSv/Sv evaluation;
+- if the current allocation group has an Invulnerable Save, that InSv is
+  mandatory and the defender cannot choose an armour Save instead;
+- armour Saves with AP modifiers are used only when the current allocation group
+  has no Invulnerable Save;
 - defender allocation groups and allocation order are explicit DecisionRequests unless only one legal order exists;
 - save results resolve from lowest to highest against the current allocation group;
 - normal damage resolves before mortal wounds for mixed attack groups;
@@ -2567,6 +2669,8 @@ Required tests:
 - identical attack grouping and melee split declarations round-trip;
 - allocation-order decisions cover Bodyguard, Leader, Support, and wounded-model groups;
 - low-to-high save-result damage resolution destroys and transitions groups deterministically;
+- mandatory Invulnerable Save precedence is covered and emits no defender
+  armour-versus-invulnerable choice;
 - cover and Plunging Fire modify BS, not AP or saves;
 - Devastating Wounds and hazard mortal wounds allocate through the shared mortal-wound service.
 
@@ -2598,6 +2702,9 @@ Invariants:
 - charge moves must end closer to targets, within 1" if possible, engaged if possible, engaged with every target, and not engaged with non-targets;
 - charging grants Fights First until end of turn;
 - Fight phase has Start, Pile In, Fight, Consolidate, and End steps;
+- a unit is eligible to fight if it made a Charge move this turn, was engaged in
+  melee at the start of the Fight phase, or is engaged in melee at activation
+  time;
 - both players make pile-in and consolidation moves, active player first;
 - Fights First and remaining combats alternate per the PDF sequence;
 - eligible-to-fight pass is available when all of a player's eligible units are more than 5" from enemy units;
@@ -2608,6 +2715,8 @@ Required tests:
 
 - charge-target and charge-move proposals validate path witnesses and target constraints;
 - Pile-in and consolidation use group-aware movement APIs;
+- fight eligibility covers charged units, units engaged at Fight phase start, and
+  units engaged at activation time;
 - Fight selection pass and Fights First fallback ordering are deterministic;
 - Overrun Fight cannot be selected unless the unit is otherwise eligible to fight;
 - Engaging Consolidation emits opponent fight decisions for newly engaged eligible units.
@@ -2617,12 +2726,16 @@ Required tests:
 Invariants:
 
 - Transport capacity, multiple embarked units, Embark, Rapid/Tactical/Combat Disembark, Emergency Disembark, and destroyed-transport timing are source-backed and replay-facing;
-- Attached units support Leader and Support components, one Leader and one Support per Bodyguard unless stated, Bodyguard Toughness for incoming attacks, keyword union without keyword inheritance, source-scoped ability persistence, and attached-unit revival;
+- Attached units support Leader and Support components, one Leader and one Support per Bodyguard unless stated, Bodyguard Toughness for incoming attacks, keyword union without keyword inheritance, source-scoped ability persistence, and attached-unit healing/revival;
 - Strategic Reserves use 50% points cap, 6" edge setup, more-than-8" enemy distance, pre-third-round opponent-deployment-zone restriction, and third-round destruction exceptions;
 - repositioned units preserve move history and persisting effects;
 - Surge moves require the source trigger, non-Battle-shocked/unengaged/not-moved state, closest enemy target, no non-target engagement, and no further movement that phase;
 - Aircraft start in Strategic Reserves, only make ingress moves, return to Strategic Reserves at the end of the opponent's turn, and follow the PDF charge/fight/Plunging Fire exclusions;
-- revived models keep starting wargear/enhancements, cannot exceed starting strength, must set up in coherency with phase-start battlefield models, and can be engaged only with enemies already engaged with the unit.
+- revived models keep starting wargear/enhancements, cannot exceed starting strength, must set up in coherency with phase-start battlefield models, and can be engaged only with enemies already engaged with the unit;
+- healing/revival effects can return destroyed models from a fully destroyed
+  Bodyguard component while a Leader/Support component remains in the Attached
+  unit, and this must not expand any component or attached rules unit above its
+  starting strength.
 
 Required tests:
 
@@ -2631,7 +2744,10 @@ Required tests:
 - Strategic Reserves and Deep Strike use the more-than-8" horizontal distance policy;
 - repositioned units preserve advance/fall-back/disembark history;
 - Surge and Aircraft restrictions are regression-tested;
-- revival placement honors attached-unit and engagement constraints.
+- revival placement honors attached-unit and engagement constraints;
+- fully destroyed Bodyguard models can be revived by an attached Leader/Support
+  source while the Attached unit still exists, without exceeding starting
+  strength.
 
 ## Phase 20I: Core Stratagems and core abilities cutover
 
@@ -2642,6 +2758,8 @@ Invariants:
 - Heroic Intervention supports Leap to Defend and Into the Fray modes, including the optional +1 CP section;
 - duplicate core/weapon ability instances require deterministic controlling-player selection at the timing stated by the PDF;
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
+- `[HUNTER X]` is target eligibility, not an attack modifier: the weapon can
+  only be declared into units matching at least one listed keyword;
 - core abilities listed in the 11th Edition Core Rules are either implemented with source-backed tests or explicitly unsupported with reason.
 
 Required tests:
@@ -2649,6 +2767,8 @@ Required tests:
 - Core Stratagem catalog source IDs and CP costs round-trip;
 - each Core Stratagem has target-binding, CP ledger, timing-window, and replay coverage;
 - duplicate ability selection is deterministic and adapter-visible when a player choice exists;
+- Hunter X target declaration accepts at least one listed keyword match and
+  rejects target units with none;
 - every supported core ability has focused tests and an unsupported-descriptor audit row where not yet implemented.
 
 ## Phase 20J: mission and catalog replacement
@@ -2656,6 +2776,24 @@ Required tests:
 Invariants:
 
 - mission packs, deployment maps, terrain layouts, actions, scoring, datasheets, keywords, detachments, enhancements, and faction rules are imported as 11th Edition source packages;
+- mustering source data follows the 11th Edition order: select Battle Size,
+  start Army Roster, choose Faction, select Detachment Rules, select Units, then
+  promote Warlord;
+- Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit
+  Limit 2 doubled for `BATTLELINE`; Strike Force is 2000 points, 4 Detachment
+  Points, Enhancement Limit 5, and Unit Limit 3 doubled for `BATTLELINE`;
+- detachment point costs are source data, and missing values remain
+  awaiting-source rows rather than defaults;
+- Leader and Support Attached Units are declared on the army list, Enhancements
+  are selected after Attached Units are created, no attached squad can have more
+  than one Enhancement, and the Warlord must share the army Faction keyword;
+- mission deck source data grants two Secondary Missions per player turn, keeps
+  Secondary Missions until scored or discarded, and does not replace discarded
+  Secondary Missions immediately;
+- retained Secondary Missions have no two-card hand-size cap, and discard rewards
+  are once-per-battle-round CP rewards;
+- scoring source data caps Primary at 45 VP, Secondary at 45 VP, and Secondary
+  scoring at 15 VP per battle round;
 - source imports reuse the existing normalization/ETL boundary but produce 11th Edition package IDs and hashes;
 - old source snapshots are not selectable as active game content;
 - catalog/reporting distinguishes implemented, unsupported, and awaiting-source rows without silently substituting retired data.
@@ -2665,13 +2803,18 @@ Required tests:
 - package hashes are deterministic;
 - retired source packages cannot be selected for a new game;
 - representative mission/action/scoring rows load from 11th Edition source identity;
+- battle-size mustering rows enforce point, Detachment Point, Enhancement Limit,
+  Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
+  faction-keyword rules;
+- Secondary Mission draw/retain/no-hand-size-cap/discard and 45/45/15 VP caps
+  load from source data and round-trip through mission scoring fixtures;
 - coverage report groups awaiting-source rows separately from unsupported rule shapes.
 
 ## Phase 20K: cutover hardening and static audits
 
 Invariants:
 
-- CI fails on active retired edition IDs, pivot-cost policies, old terrain kinds, old cover save/AP exceptions, 1" engagement, old coherency thresholds, Battle-shock auto-expiry, retired Core Stratagem names, and old Aircraft minimum-move policy;
+- CI fails on active retired edition IDs, pivot-cost policies, old terrain kinds, old cover save/AP exceptions, optional armour-versus-invulnerable save choice, 1" engagement, old coherency thresholds, Battle-shock auto-expiry, separate Reinforcements phase steps, 9" reserve-arrival enemy-distance policies, New Orders replacement-draw behavior, retired Core Stratagem names, and old Aircraft minimum-move policy;
 - replay fixtures and canonical JSON payloads are regenerated for 11th Edition-only identifiers;
 - no adapter, headless, UI, network, AI, or test path can choose a retired ruleset;
 - `ARCHITECTURE_V2.md`, `README.md`, and source-package docs agree on 11th Edition-only scope.
@@ -2700,7 +2843,7 @@ Required tests:
 | Terrain movement | 10F, 10H, 10I, 20D |
 | Terrain visibility/cover, including Hidden, Obscuring, Solid, Benefit of Cover, and Plunging Fire | 13A, 13C, 20D, 20E |
 | Movement phase Move Units | 10B-10T, 20D |
-| Movement phase Reinforcements | 10P, 20H |
+| Movement phase reserve arrivals and Ingress Moves | 10P, 20D, 20H |
 | Transports | 10Q, 20H |
 | Aircraft | 10R, 20H |
 | Command phase | 11C, 20B, 20C |
