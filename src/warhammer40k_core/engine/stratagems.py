@@ -2451,9 +2451,6 @@ def _fire_overwatch_target_binding_error(
         return "unknown_fire_overwatch_trigger_unit"
     if triggering_owner == player_id:
         return "fire_overwatch_trigger_unit_not_enemy"
-    triggering_unit = _unit_by_id(state=state, unit_instance_id=triggering_unit_id)
-    if _unit_has_keyword(triggering_unit, "TITANIC"):
-        return "fire_overwatch_target_titanic"
     if state.battlefield_state is None:
         return "fire_overwatch_requires_battlefield"
     shooting_unit_id = _require_target_unit_id(target_binding)
@@ -2467,6 +2464,14 @@ def _fire_overwatch_target_binding_error(
     if ruleset_descriptor is None or army_catalog is None:
         return "fire_overwatch_requires_shooting_rules_context"
     shooting_unit = _unit_by_id(state=state, unit_instance_id=shooting_unit_id)
+    if _unit_has_keyword(shooting_unit, "TITANIC"):
+        return "fire_overwatch_unit_titanic"
+    if _unit_is_within_enemy_engagement_range(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=shooting_unit_id,
+    ):
+        return "fire_overwatch_unit_engaged"
     if not shooting_unit_can_select_to_shoot(
         state=state,
         unit=shooting_unit,
