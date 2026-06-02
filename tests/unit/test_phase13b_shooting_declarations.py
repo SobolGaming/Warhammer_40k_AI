@@ -46,8 +46,10 @@ from warhammer40k_core.engine.attack_sequence import (
     wound_roll_target_number,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRuntimeState,
     BattlefieldScenario,
     ModelPlacement,
+    PlacedArmy,
     UnitPlacement,
 )
 from warhammer40k_core.engine.core_stratagem_effects import GO_TO_GROUND_EFFECT_KIND
@@ -73,6 +75,7 @@ from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
     MortalWoundApplicationProgress,
     MortalWoundRoutingResult,
+    allocation_context_for_unit,
     apply_damage_to_model,
     apply_mortal_wounds_to_unit,
     build_attack_allocation_request,
@@ -1646,6 +1649,91 @@ def test_phase13c_attached_character_wounded_by_attacker_constraint_is_not_force
     )
 
     assert constrained_context.legal_model_ids() == ("character-1",)
+
+
+def test_phase13c_attached_unit_roles_require_runtime_keyword_not_identifier_prefix() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    prefixed_unit_id = "attached-unit:enemy"
+    bodyguard_model = replace(
+        defender.own_models[0],
+        model_instance_id=f"{prefixed_unit_id}:bodyguard",
+    )
+    character_model = replace(
+        defender.own_models[1],
+        model_instance_id=f"{prefixed_unit_id}:character",
+        source_ids=tuple(
+            sorted(
+                {
+                    *defender.own_models[1].source_ids,
+                    "attached-role:character",
+                    "datasheet:core-character-leader",
+                }
+            )
+        ),
+    )
+    prefixed_defender = replace(
+        defender,
+        unit_instance_id=prefixed_unit_id,
+        own_models=(bodyguard_model, character_model),
+    )
+    state.army_definitions = [
+        (
+            replace(army, army_id="attached-unit", units=(prefixed_defender,))
+            if army.player_id == "player-b"
+            else army
+        )
+        for army in state.army_definitions
+    ]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    old_placement = battlefield.unit_placement_by_id(defender.unit_instance_id)
+    model_placements = tuple(
+        ModelPlacement(
+            army_id="attached-unit",
+            player_id="player-b",
+            unit_instance_id=prefixed_unit_id,
+            model_instance_id=model.model_instance_id,
+            pose=old_model_placement.pose,
+        )
+        for model, old_model_placement in zip(
+            prefixed_defender.own_models,
+            old_placement.model_placements[: len(prefixed_defender.own_models)],
+            strict=True,
+        )
+    )
+    state.battlefield_state = BattlefieldRuntimeState(
+        battlefield_id=battlefield.battlefield_id,
+        placed_armies=tuple(
+            (
+                PlacedArmy(
+                    army_id="attached-unit",
+                    player_id="player-b",
+                    unit_placements=(
+                        UnitPlacement(
+                            army_id="attached-unit",
+                            player_id="player-b",
+                            unit_instance_id=prefixed_unit_id,
+                            model_placements=model_placements,
+                        ),
+                    ),
+                )
+                if placed_army.player_id == "player-b"
+                else placed_army
+            )
+            for placed_army in battlefield.placed_armies
+        ),
+        removed_model_ids=battlefield.removed_model_ids,
+    )
+
+    context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=prefixed_unit_id,
+    )
+
+    assert context.attached_unit_bodyguard_model_ids == ()
+    assert context.attached_unit_character_model_ids == ()
 
 
 def test_phase13c_cover_save_bonus_is_allocated_model_scoped_and_ap_zero_limited() -> None:

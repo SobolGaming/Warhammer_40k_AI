@@ -2110,7 +2110,11 @@ Required Phase 15 tests:
 Invariants:
 
 - Transport capacity, multiple embarked units, Embark, Rapid/Tactical/Combat Disembark, Emergency Disembark, and destroyed-transport timing are source-backed and replay-facing;
-- Attached units support Leader and Support components, one Leader and one Support per Bodyguard unless stated, Bodyguard Toughness for incoming attacks, keyword union without keyword inheritance, source-scoped ability persistence, and attached-unit healing/revival;
+- Attached units support runtime-instantiated attached rules units from army-list
+  Leader and Support declarations, one Leader and one Support per Bodyguard
+  unless stated, Bodyguard Toughness for incoming attacks, keyword union without
+  model keyword inheritance, source-scoped ability persistence, and
+  attached-unit healing/revival;
 - Strategic Reserves use 50% points cap, 6" edge setup, more-than-8" enemy distance, pre-third-round opponent-deployment-zone restriction, and third-round destruction exceptions;
 - repositioned units preserve move history and persisting effects;
 - Surge moves require the source trigger, non-Battle-shocked/unengaged/not-moved state, closest enemy target, no non-target engagement, and no further movement that phase;
@@ -2124,6 +2128,8 @@ Invariants:
 Required tests:
 
 - each transport mode has valid, invalid, replay, and drift coverage;
+- attached-unit formation is instantiated at runtime from valid army-list
+  declarations and emits replay-safe component role metadata;
 - attached-unit ability persistence ends when the relevant source model/unit is destroyed and resumes if revived;
 - Strategic Reserves and Deep Strike use the more-than-8" horizontal distance policy;
 - repositioned units preserve advance/fall-back/disembark history;
@@ -2361,12 +2367,15 @@ Invariants:
 - Enhancement count is capped by Battle Size;
 - no unit can have more than one Enhancement;
 - each Enhancement must be unique;
-- Leader and Support attachments are declared on the army list, not in Declare Battle Formations;
+- Leader and Support attachments are declared on the army list, not in Declare
+  Battle Formations, and mustering turns those declarations into runtime
+  attached rules-unit instances rather than only retaining component units;
 - Enhancements are selected after Attached Units are created, so the one-Enhancement-per-squad restriction applies across the attached rules unit;
 - every Dedicated Transport must start the battle with at least one unit embarked or it cannot be deployed and counts as destroyed during the first battle round;
 - Leader attachment restrictions are validated before battle;
 - each Bodyguard unit can have at most one Leader and one Support attached unless a rule says otherwise;
-- while attached, the Attached unit is treated as one unit for rules purposes except destroyed-unit triggers;
+- while attached, the runtime-instantiated Attached unit is treated as one unit
+  for rules purposes except destroyed-unit triggers;
 - coherency for an Attached unit is validated over the attached rules unit's alive models, not per component `UnitPlacement`;
 - attacks against Attached units use Bodyguard Toughness until the attacking unit resolves all attacks;
 - attacks cannot be allocated to Character models in Attached units until the Bodyguard is destroyed unless a rule such as Precision permits it;
@@ -2379,7 +2388,9 @@ Required tests:
 - Epic Hero uniqueness and Enhancement denial;
 - Enhancement count, uniqueness, Character-only, and one-per-attached-squad restrictions;
 - Dedicated Transport empty-at-start consequence;
-- Leader/Support/Bodyguard legal attachment and army-list attachment timing;
+- Leader/Support/Bodyguard legal attachment, army-list attachment timing, and
+  runtime instantiation of the attached rules unit with deterministic component
+  role metadata;
 - Warlord faction-keyword requirement;
 - Attached-unit coherency uses `UnitGroup.alive_models()`/group-aware placement data across Leader and Bodyguard models;
 - Attached-unit Toughness and Character allocation protection;

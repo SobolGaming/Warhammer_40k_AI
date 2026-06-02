@@ -1836,10 +1836,7 @@ def _attached_unit_model_roles(
     unit: UnitInstance,
     alive_models: tuple[ModelInstance, ...],
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
-    if not (
-        unit.unit_instance_id.startswith("attached-unit:")
-        or _unit_has_keyword(unit, "ATTACHED_UNIT")
-    ):
+    if not _unit_has_keyword(unit, "ATTACHED_UNIT"):
         return (), ()
     character_datasheet_ids = {
         candidate.datasheet_id
