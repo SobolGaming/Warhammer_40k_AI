@@ -1511,6 +1511,169 @@ def test_phase14e_allocation_order_request_after_grouped_wound_pool() -> None:
     assert sum(1 for event in final_attack_events if event["step"] == "damage") >= 2
 
 
+def test_phase14e_grouped_failed_saves_transition_to_next_ordered_group() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    first_group_model = replace(
+        defender.own_models[0],
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.SAVE, 2)
+            if value.characteristic is Characteristic.SAVE
+            else value
+            for value in defender.own_models[0].characteristics
+        ),
+    )
+    later_group_models = tuple(
+        replace(
+            model,
+            characteristics=tuple(
+                CharacteristicValue.from_raw(Characteristic.SAVE, 4)
+                if value.characteristic is Characteristic.SAVE
+                else value
+                for value in model.characteristics
+            ),
+        )
+        for model in defender.own_models[1:]
+    )
+    defender = replace(defender, own_models=(first_group_model, *later_group_models))
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-ordered-group-transition",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
+        damage_profile=DamageProfile.fixed(first_group_model.starting_wounds),
+        keywords=(),
+        abilities=(),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14e-ordered-group-transition",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=2,
+            ),
+        ),
+    )
+    injected_results: list[DiceRollResult] = []
+    for attack_number in range(1, 3):
+        attack_context_id = f"phase14e-ordered-group-transition:pool-001:attack-{attack_number:03d}"
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-ordered-transition-hit-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"),
+                    roll_type="attack_sequence.hit",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-ordered-transition-wound-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=(
+                        f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                    ),
+                    roll_type="attack_sequence.wound",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-ordered-group-transition",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=tuple(injected_results),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    request_payload = cast(dict[str, object], request.payload)
+    allocation_groups = cast(list[dict[str, object]], request_payload["allocation_groups"])
+    one_model_group = next(
+        group
+        for group in allocation_groups
+        if cast(list[str], group["model_ids"]) == [first_group_model.model_instance_id]
+    )
+    later_group = next(
+        group
+        for group in allocation_groups
+        if first_group_model.model_instance_id not in cast(list[str], group["model_ids"])
+    )
+    selected_option = next(
+        option
+        for option in request.options
+        if cast(dict[str, object], option.payload)["ordered_group_ids"]
+        == [one_model_group["group_id"], later_group["group_id"]]
+    )
+
+    assert remaining_sequence is not None
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining_sequence.attack_pools,
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=(),
+    )
+    final_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14e-ordered-group-transition-select",
+            request=request,
+            selected_option_id=selected_option.option_id,
+        )
+    )
+    damage_model_ids = [
+        cast(
+            dict[str, object],
+            cast(dict[str, object], event["payload"])["damage_application"],
+        )["model_instance_id"]
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == "damage"
+        and cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+    grouped_allocation = next(
+        cast(dict[str, object], event["payload"])
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == "allocate"
+        and cast(dict[str, object], event["payload"]).get("grouped_save_before_allocation") is True
+        and "allocation_order_group_ids" in cast(dict[str, object], event["payload"])
+    )
+
+    assert final_status.status_kind in {
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    assert grouped_allocation["allocation_order_group_ids"] == [
+        one_model_group["group_id"],
+        later_group["group_id"],
+    ]
+    assert damage_model_ids[:2] == [
+        first_group_model.model_instance_id,
+        cast(list[str], later_group["model_ids"])[0],
+    ]
+    assert not model_by_id(
+        state=state,
+        model_instance_id=first_group_model.model_instance_id,
+    ).is_alive
+
+
 def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -3637,11 +3800,13 @@ def test_phase14e_allocation_order_decision_payloads_validate_before_mutation() 
                 decision_type=request.decision_type,
                 actor_id=request.actor_id,
                 selected_option_id="not-a-group",
-                payload={"group_id": "not-a-group"},
+                payload={"ordered_group_ids": ["not-a-group"]},
             )
         )
     assert lifecycle.decision_controller.queue.peek_next() == request
 
+    selected_option_payload = cast(dict[str, object], selected_option.payload)
+    selected_order = tuple(cast(list[str], selected_option_payload["ordered_group_ids"]))
     valid_result = DecisionResult.for_request(
         result_id="phase14e-allocation-order-valid",
         request=request,
@@ -3651,10 +3816,13 @@ def test_phase14e_allocation_order_decision_payloads_validate_before_mutation() 
     decision = AllocationOrderDecision.from_result(request=record.request, result=record.result)
     encoded = json.dumps(record.to_payload(), sort_keys=True)
 
-    assert decision.selected_group_id == selected_option.option_id
+    assert cast(dict[str, object], request.payload)["selection_kind"] == "allocation_group_order"
+    assert decision.ordered_group_ids == selected_order
+    assert decision.selected_group_id == selected_order[0]
     assert len(decision.allocation_groups) == 2
-    assert decision.selected_group().group_id == selected_option.option_id
-    assert decision.to_payload()["selected_group_id"] == selected_option.option_id
+    assert decision.selected_group().group_id == selected_order[0]
+    assert tuple(group.group_id for group in decision.ordered_groups()) == selected_order
+    assert decision.to_payload()["ordered_group_ids"] == list(selected_order)
     assert "<" not in encoded
     assert "object at 0x" not in encoded
 
@@ -3675,6 +3843,28 @@ def test_phase14e_allocation_order_decision_payloads_validate_before_mutation() 
                 result_id="phase14e-allocation-order-malformed-result",
                 request=malformed_request,
                 selected_option_id=selected_option.option_id,
+            ),
+        )
+    malformed_order_request = DecisionRequest(
+        request_id="phase14e-allocation-order-malformed-order",
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        payload=request.payload,
+        options=(
+            DecisionOption(
+                option_id="phase14e-malformed-order-option",
+                label="phase14e-malformed-order-option",
+                payload={"submission_kind": SELECT_ALLOCATION_ORDER_DECISION_TYPE},
+            ),
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="missing ordered_group_ids"):
+        AllocationOrderDecision.from_result(
+            request=malformed_order_request,
+            result=DecisionResult.for_request(
+                result_id="phase14e-allocation-order-missing-order-result",
+                request=malformed_order_request,
+                selected_option_id="phase14e-malformed-order-option",
             ),
         )
 
@@ -3851,12 +4041,12 @@ def test_phase14e_allocation_group_payloads_prioritize_wounded_then_allocated_mo
     )
     assert AllocationGroup.from_payload(allocation_group.to_payload()) == allocation_group
 
-    with pytest.raises(GameLifecycleError, match="selected group is not legal"):
+    with pytest.raises(GameLifecycleError, match="ordered groups must match legal groups"):
         AllocationOrderDecision(
             request_id="phase14e-illegal-selected-group-request",
             result_id="phase14e-illegal-selected-group-result",
             player_id="player-b",
-            selected_group_id="phase14e-missing-group",
+            ordered_group_ids=("phase14e-missing-group",),
             attack_context={"attack_context_id": "phase14e-illegal-selected-group"},
             allocation_context=allocation_context,
             allocation_groups=allocation_groups,
@@ -3879,6 +4069,7 @@ def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objec
         state=state,
         allocation_context=allocation_context,
     )
+    ordered_group_ids = tuple(group.group_id for group in allocation_groups)
     request = build_allocation_order_request(
         request_id="phase14e-malformed-allocation-order-request",
         defender_player_id="player-b",
@@ -3909,7 +4100,7 @@ def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objec
             request_id="phase14e-bad-context-request",
             result_id="phase14e-bad-context-result",
             player_id="player-b",
-            selected_group_id=selected_option.option_id,
+            ordered_group_ids=ordered_group_ids,
             attack_context={"attack_context_id": "phase14e-bad-context"},
             allocation_context=cast(AttackAllocationRuleContext, object()),
             allocation_groups=allocation_groups,
@@ -3919,7 +4110,7 @@ def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objec
             request_id="phase14e-list-groups-request",
             result_id="phase14e-list-groups-result",
             player_id="player-b",
-            selected_group_id=selected_option.option_id,
+            ordered_group_ids=ordered_group_ids,
             attack_context={"attack_context_id": "phase14e-list-groups"},
             allocation_context=allocation_context,
             allocation_groups=cast(tuple[AllocationGroup, ...], list(allocation_groups)),
@@ -3929,7 +4120,7 @@ def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objec
             request_id="phase14e-non-group-request",
             result_id="phase14e-non-group-result",
             player_id="player-b",
-            selected_group_id=selected_option.option_id,
+            ordered_group_ids=ordered_group_ids,
             attack_context={"attack_context_id": "phase14e-non-group"},
             allocation_context=allocation_context,
             allocation_groups=cast(tuple[AllocationGroup, ...], ("not-a-group",)),
@@ -3939,10 +4130,30 @@ def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objec
             request_id="phase14e-duplicate-group-request",
             result_id="phase14e-duplicate-group-result",
             player_id="player-b",
-            selected_group_id=allocation_groups[0].group_id,
+            ordered_group_ids=(allocation_groups[0].group_id,),
             attack_context={"attack_context_id": "phase14e-duplicate-group"},
             allocation_context=allocation_context,
             allocation_groups=(allocation_groups[0], allocation_groups[0]),
+        )
+    with pytest.raises(GameLifecycleError, match="ordered_group_ids must not be empty"):
+        AllocationOrderDecision(
+            request_id="phase14e-empty-order-request",
+            result_id="phase14e-empty-order-result",
+            player_id="player-b",
+            ordered_group_ids=(),
+            attack_context={"attack_context_id": "phase14e-empty-order"},
+            allocation_context=allocation_context,
+            allocation_groups=allocation_groups,
+        )
+    with pytest.raises(GameLifecycleError, match="ordered_group_ids must not contain duplicates"):
+        AllocationOrderDecision(
+            request_id="phase14e-duplicate-order-request",
+            result_id="phase14e-duplicate-order-result",
+            player_id="player-b",
+            ordered_group_ids=(allocation_groups[0].group_id, allocation_groups[0].group_id),
+            attack_context={"attack_context_id": "phase14e-duplicate-order"},
+            allocation_context=allocation_context,
+            allocation_groups=allocation_groups,
         )
     with pytest.raises(GameLifecycleError, match="attacker_constraint must be a constraint"):
         AttackAllocationRuleContext(

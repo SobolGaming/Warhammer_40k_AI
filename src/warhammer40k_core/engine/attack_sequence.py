@@ -1419,7 +1419,7 @@ def apply_allocation_order_decision(
             attack_sequence=attack_sequence,
             attack_contexts=attack_contexts,
             allocation_context=decision.allocation_context,
-            allocation_group=decision.selected_group(),
+            allocation_groups=decision.ordered_groups(),
             allocated_model_ids=already_allocated_model_ids,
             hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         )
@@ -2479,7 +2479,7 @@ def _resolve_grouped_current_pool_if_available(
         attack_sequence=attack_sequence,
         attack_contexts=tuple(context for _, context in wounded_contexts),
         allocation_context=allocation_context,
-        allocation_group=allocation_group,
+        allocation_groups=(allocation_group,),
     )
     save_results = _roll_grouped_saves(
         state=state,
@@ -2497,7 +2497,7 @@ def _resolve_grouped_current_pool_if_available(
         manager=manager,
         attack_sequence=attack_sequence,
         allocation_context=allocation_context,
-        allocation_group=allocation_group,
+        allocation_groups=(allocation_group,),
         save_results=save_results,
         allocated_model_ids=allocated_model_ids,
         hooks=hooks,
@@ -2518,12 +2518,16 @@ def _continue_after_grouped_allocation_order(
     attack_sequence: AttackSequence,
     attack_contexts: tuple[AttackResolutionContextPayload, ...],
     allocation_context: AttackAllocationRuleContext,
-    allocation_group: AllocationGroup,
+    allocation_groups: tuple[AllocationGroup, ...],
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if not attack_contexts:
         raise GameLifecycleError("Grouped allocation order requires attack contexts.")
+    ordered_groups = _validate_ordered_allocation_group_tuple(
+        "Grouped allocation order allocation_groups",
+        allocation_groups,
+    )
     wounded_contexts = tuple(
         (
             _attack_sequence_for_context(
@@ -2540,7 +2544,7 @@ def _continue_after_grouped_allocation_order(
         attack_sequence=attack_sequence,
         attack_contexts=attack_contexts,
         allocation_context=allocation_context,
-        allocation_group=allocation_group,
+        allocation_groups=ordered_groups,
     )
     save_results = _roll_grouped_saves(
         state=state,
@@ -2549,7 +2553,7 @@ def _continue_after_grouped_allocation_order(
         manager=manager,
         wounded_contexts=wounded_contexts,
         allocation_context=allocation_context,
-        allocation_group=allocation_group,
+        allocation_group=ordered_groups[0],
         hooks=hooks,
     )
     updated_allocated_ids = _resolve_grouped_save_results_to_damage(
@@ -2558,7 +2562,7 @@ def _continue_after_grouped_allocation_order(
         manager=manager,
         attack_sequence=attack_sequence,
         allocation_context=allocation_context,
-        allocation_group=allocation_group,
+        allocation_groups=ordered_groups,
         save_results=save_results,
         allocated_model_ids=allocated_model_ids,
         hooks=hooks,
@@ -2573,13 +2577,17 @@ def _resolve_grouped_save_results_to_damage(
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
     allocation_context: AttackAllocationRuleContext,
-    allocation_group: AllocationGroup,
+    allocation_groups: tuple[AllocationGroup, ...],
     save_results: tuple[GroupedSaveResult, ...],
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
 ) -> tuple[str, ...]:
     pool = attack_sequence.current_pool()
-    updated_allocated_ids = tuple(sorted({*allocated_model_ids, *allocation_group.model_ids}))
+    ordered_groups = _validate_ordered_allocation_group_tuple(
+        "Grouped save damage allocation_groups",
+        allocation_groups,
+    )
+    updated_allocated_ids = tuple(sorted({*allocated_model_ids, *ordered_groups[0].model_ids}))
     for save_result in save_results:
         if save_result.saving_throw is not None and save_result.saving_throw.successful:
             _emit_damage_event(
@@ -2597,9 +2605,16 @@ def _resolve_grouped_save_results_to_damage(
         ),
         key=lambda result: result.failed_save_sort_key,
     ):
+        current_group = _current_allocation_group_for_order(
+            state=state,
+            allocation_groups=ordered_groups,
+        )
+        if current_group is None:
+            break
+        updated_allocated_ids = tuple(sorted({*updated_allocated_ids, *current_group.model_ids}))
         current_model_id = _current_model_id_for_allocation_group(
             state=state,
-            allocation_group=save_result.allocation_group,
+            allocation_group=current_group,
         )
         allocation = AttackAllocation.from_context(
             allocation_context,
@@ -2760,8 +2775,12 @@ def _emit_grouped_allocation_event(
     attack_sequence: AttackSequence,
     attack_contexts: tuple[AttackResolutionContextPayload, ...],
     allocation_context: AttackAllocationRuleContext,
-    allocation_group: AllocationGroup,
+    allocation_groups: tuple[AllocationGroup, ...],
 ) -> None:
+    ordered_groups = _validate_ordered_allocation_group_tuple(
+        "Grouped allocation event allocation_groups",
+        allocation_groups,
+    )
     _emit_event(
         decisions=decisions,
         hooks=hooks,
@@ -2775,7 +2794,9 @@ def _emit_grouped_allocation_event(
             attack_index=0,
             payload=validate_json_value(
                 {
-                    "allocation_group": allocation_group.to_payload(),
+                    "allocation_group": ordered_groups[0].to_payload(),
+                    "allocation_order_group_ids": [group.group_id for group in ordered_groups],
+                    "allocation_groups": [group.to_payload() for group in ordered_groups],
                     "allocation_context": allocation_context.to_payload(),
                     "attack_context_ids": [
                         context["attack_context_id"] for context in attack_contexts
@@ -5318,6 +5339,23 @@ def _current_model_id_for_allocation_group(
     raise GameLifecycleError("Allocation group has no alive models.")
 
 
+def _current_allocation_group_for_order(
+    *,
+    state: GameState,
+    allocation_groups: tuple[AllocationGroup, ...],
+) -> AllocationGroup | None:
+    ordered_groups = _validate_ordered_allocation_group_tuple(
+        "Current allocation order allocation_groups",
+        allocation_groups,
+    )
+    for group in ordered_groups:
+        if any(
+            _model_is_alive(state=state, model_instance_id=model_id) for model_id in group.model_ids
+        ):
+            return group
+    return None
+
+
 def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
     profile = pool.weapon_profile
     return (
@@ -5383,6 +5421,26 @@ def _validate_allocation_group_tuple(
         seen.add(value.group_id)
         groups.append(value)
     return tuple(sorted(groups, key=lambda group: group.group_id))
+
+
+def _validate_ordered_allocation_group_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[AllocationGroup, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    groups: list[AllocationGroup] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not AllocationGroup:
+            raise GameLifecycleError(f"{field_name} must contain AllocationGroup values.")
+        if value.group_id in seen:
+            raise GameLifecycleError(f"{field_name} must not duplicate group IDs.")
+        seen.add(value.group_id)
+        groups.append(value)
+    if not groups:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return tuple(groups)
 
 
 def _validate_fast_dice_pools(values: object) -> tuple[RangedAttackPool, ...]:

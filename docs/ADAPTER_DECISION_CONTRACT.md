@@ -283,7 +283,7 @@ Accepted Phase 13B/14F declarations emit deterministic attack-pool payloads, inc
 Defender shooting decisions include:
 
 - finite `select_allocation_order` choices when more than one legal allocation
-  group can be selected as the current group;
+  group order exists for the current grouped save/damage window;
 - legacy finite `select_attack_allocation` choices only for older single-attack
   model-allocation paths that have not yet been retired;
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
@@ -299,17 +299,21 @@ apply, or replay an armour-versus-invulnerable choice.
 
 Phase 13C implements these defender-visible attack-resolution decisions:
 
-- `select_allocation_order`: finite defending-player choice. Option IDs are legal
-  allocation `group_id` values, selecting the next current allocation group. The
-  request payload includes `attack_context` for the allocation-order window,
+- `select_allocation_order`: finite defending-player choice. Option IDs are
+  deterministic order IDs such as `allocation-order-001`; adapters must not
+  invent group-order payloads. The selected option payload includes
+  `submission_kind: "select_allocation_order"`, `ordered_group_ids`, and
+  `ordered_groups`. The request payload includes `selection_kind:
+  "allocation_group_order"`, `attack_context` for the allocation-order window,
   optional `attack_contexts` for grouped wound pools already rolled before the
   decision, `allocation_context`, and `allocation_groups`. Each group payload
   includes `group_id`, `model_ids`, `role`, W/Sv/InSv profile, wounded and
   already-allocated model IDs, Bodyguard/Character evidence, role evidence, and
-  legality reasons. Adapters must select one pending option ID and must not infer
-  group legality, save profiles, or model membership from table state. Stale,
-  drifted, wrong-actor, wrong-option, or payload-mismatched submissions reject
-  before queue pop and before mutation.
+  legality reasons. Failed saves resolve from lowest to highest against the
+  current ordered group; when that group is destroyed or exhausted, remaining
+  failed saves advance to the next group in `ordered_group_ids`. Stale, drifted,
+  wrong-actor, wrong-option, or payload-mismatched submissions reject before
+  queue pop and before mutation.
 - `select_attack_allocation`: finite defending-player choice. Option IDs are legal `model_instance_id` values. `payload.attack_context` is the JSON-safe attack context for the single attack being allocated. `payload.allocation_context` includes alive model IDs, wounded model IDs, already-allocated model IDs for the phase, attached-unit Bodyguard/Character protection evidence, and any attacker-side allocation constraint. Adapters must select one pending option ID and must not infer legal models from table state.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Grenade mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves.
 

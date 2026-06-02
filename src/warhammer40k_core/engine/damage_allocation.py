@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from enum import StrEnum
+from itertools import permutations
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -108,7 +109,7 @@ class AllocationOrderDecisionPayload(TypedDict):
     request_id: str
     result_id: str
     player_id: str
-    selected_group_id: str
+    ordered_group_ids: list[str]
     attack_context: JsonValue
     allocation_context: AttackAllocationRuleContextPayload
     allocation_groups: list[AllocationGroupPayload]
@@ -727,7 +728,7 @@ class AllocationOrderDecision:
     request_id: str
     result_id: str
     player_id: str
-    selected_group_id: str
+    ordered_group_ids: tuple[str, ...]
     attack_context: JsonValue
     allocation_context: AttackAllocationRuleContext
     allocation_groups: tuple[AllocationGroup, ...]
@@ -750,10 +751,10 @@ class AllocationOrderDecision:
         )
         object.__setattr__(
             self,
-            "selected_group_id",
-            _validate_identifier(
-                "AllocationOrderDecision selected_group_id",
-                self.selected_group_id,
+            "ordered_group_ids",
+            _validate_ordered_identifier_tuple(
+                "AllocationOrderDecision ordered_group_ids",
+                self.ordered_group_ids,
             ),
         )
         object.__setattr__(self, "attack_context", validate_json_value(self.attack_context))
@@ -763,14 +764,17 @@ class AllocationOrderDecision:
             )
         groups = _validate_allocation_groups(self.allocation_groups)
         object.__setattr__(self, "allocation_groups", groups)
-        if self.selected_group_id not in {group.group_id for group in groups}:
-            raise GameLifecycleError("AllocationOrderDecision selected group is not legal.")
+        group_ids = tuple(group.group_id for group in groups)
+        if set(self.ordered_group_ids) != set(group_ids):
+            raise GameLifecycleError(
+                "AllocationOrderDecision ordered groups must match legal groups."
+            )
 
     @classmethod
     def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
         result.validate_for_request(request)
         payload = _payload_object(result.payload)
-        selected_group_id = _payload_string(payload, key="group_id")
+        ordered_group_ids = _payload_string_tuple(payload, key="ordered_group_ids")
         actor_id = result.actor_id
         if actor_id is None:
             raise GameLifecycleError("AllocationOrderDecision requires a defender actor.")
@@ -786,7 +790,7 @@ class AllocationOrderDecision:
             request_id=request.request_id,
             result_id=result.result_id,
             player_id=actor_id,
-            selected_group_id=selected_group_id,
+            ordered_group_ids=ordered_group_ids,
             attack_context=validate_json_value(request_payload["attack_context"]),
             allocation_context=AttackAllocationRuleContext.from_payload(
                 cast(AttackAllocationRuleContextPayload, request_payload["allocation_context"])
@@ -794,18 +798,31 @@ class AllocationOrderDecision:
             allocation_groups=groups,
         )
 
+    @property
+    def selected_group_id(self) -> str:
+        if not self.ordered_group_ids:
+            raise GameLifecycleError("AllocationOrderDecision requires an ordered group.")
+        return self.ordered_group_ids[0]
+
     def selected_group(self) -> AllocationGroup:
-        for group in self.allocation_groups:
-            if group.group_id == self.selected_group_id:
-                return group
-        raise GameLifecycleError("Selected allocation group is missing.")
+        return self.ordered_groups()[0]
+
+    def ordered_groups(self) -> tuple[AllocationGroup, ...]:
+        groups_by_id = {group.group_id: group for group in self.allocation_groups}
+        ordered_groups: list[AllocationGroup] = []
+        for group_id in self.ordered_group_ids:
+            group = groups_by_id.get(group_id)
+            if group is None:
+                raise GameLifecycleError("Ordered allocation group is missing.")
+            ordered_groups.append(group)
+        return tuple(ordered_groups)
 
     def to_payload(self) -> AllocationOrderDecisionPayload:
         return {
             "request_id": self.request_id,
             "result_id": self.result_id,
             "player_id": self.player_id,
-            "selected_group_id": self.selected_group_id,
+            "ordered_group_ids": list(self.ordered_group_ids),
             "attack_context": self.attack_context,
             "allocation_context": self.allocation_context.to_payload(),
             "allocation_groups": [group.to_payload() for group in self.allocation_groups],
@@ -1801,6 +1818,7 @@ def build_allocation_order_request(
     if len(groups) < 2:
         raise GameLifecycleError("Allocation order request requires at least two legal groups.")
     grouped_attack_contexts = tuple(validate_json_value(context) for context in attack_contexts)
+    ordered_group_options = tuple(permutations(groups))
     return DecisionRequest(
         request_id=request_id,
         decision_type=SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -1811,29 +1829,22 @@ def build_allocation_order_request(
                 "attack_contexts": list(grouped_attack_contexts),
                 "allocation_context": allocation_context.to_payload(),
                 "allocation_groups": [group.to_payload() for group in groups],
-                "selection_kind": "current_allocation_group",
+                "selection_kind": "allocation_group_order",
             }
         ),
         options=tuple(
             DecisionOption(
-                option_id=group.group_id,
-                label=group.group_id,
-                payload={
-                    "group_id": group.group_id,
-                    "model_ids": list(group.model_ids),
-                    "role": group.role.value,
-                    "wounds": group.wounds,
-                    "save": group.save,
-                    "invulnerable_save": group.invulnerable_save,
-                    "wounded": group.wounded,
-                    "wounded_model_ids": list(group.wounded_model_ids),
-                    "bodyguard_model_ids": list(group.bodyguard_model_ids),
-                    "character_model_ids": list(group.character_model_ids),
-                    "role_evidence": list(group.role_evidence),
-                    "legality_reasons": list(group.legality_reasons),
-                },
+                option_id=f"allocation-order-{option_index:03d}",
+                label=f"allocation-order-{option_index:03d}",
+                payload=validate_json_value(
+                    {
+                        "submission_kind": SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+                        "ordered_group_ids": [group.group_id for group in ordered_groups],
+                        "ordered_groups": [group.to_payload() for group in ordered_groups],
+                    }
+                ),
             )
-            for group in groups
+            for option_index, ordered_groups in enumerate(ordered_group_options, start=1)
         ),
     )
 
@@ -2513,6 +2524,15 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return value
 
 
+def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing {key}.")
+    value = payload[key]
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Decision payload {key} must be a list.")
+    return _validate_ordered_identifier_tuple(key, tuple(value))
+
+
 def _mortal_wound_context_from_request(
     request: DecisionRequest,
 ) -> MortalWoundFeelNoPainContextPayload:
@@ -2740,6 +2760,22 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
         seen.add(identifier)
         identifiers.append(identifier)
     return tuple(sorted(identifiers))
+
+
+def _validate_ordered_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    if not identifiers:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return tuple(identifiers)
 
 
 def _validate_identifier(field_name: str, value: object) -> str:
