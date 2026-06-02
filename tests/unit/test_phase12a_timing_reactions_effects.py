@@ -1041,7 +1041,7 @@ def _transport_state_with_embarked_passenger() -> tuple[GameState, str, str]:
     state = GameState.from_config(
         GameConfig(
             game_id="phase12a-transport-game",
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
                 descriptor_version="core-v2-phase12a-test"
             ),
             army_catalog=catalog,
@@ -1083,7 +1083,7 @@ def _config(*, unit_selection_ids: tuple[str, ...]) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase12a-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
             descriptor_version="core-v2-phase12a-test"
         ),
         army_catalog=catalog,

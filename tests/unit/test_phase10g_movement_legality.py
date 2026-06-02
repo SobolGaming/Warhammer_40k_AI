@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
 
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
+    MovementModePolicy,
+    MovementPolicyDescriptor,
+    RulesetDescriptor,
+)
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.movement_legality import (
     EngagementMovementPolicy,
@@ -28,7 +34,7 @@ from warhammer40k_core.engine.phases.movement import (
 
 
 def test_fly_resolves_as_capability_not_movement_action() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     capabilities = MovementCapabilitySet.from_keywords(
         ("Fly", "Infantry"),
         ruleset_descriptor=descriptor,
@@ -56,7 +62,7 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
 
 
 def test_infantry_and_beast_receive_terrain_traversal_permissions() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
 
     infantry = MovementCapabilitySet.from_keywords(
         ("INFANTRY",),
@@ -77,7 +83,7 @@ def test_infantry_and_beast_receive_terrain_traversal_permissions() -> None:
 
 
 def test_vehicle_monster_restrictions_are_capability_constraints() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
 
     vehicle = MovementCapabilitySet.from_keywords(
         ("Vehicle", "Walker"),
@@ -97,8 +103,8 @@ def test_vehicle_monster_restrictions_are_capability_constraints() -> None:
     assert "monster" not in {action.value for action in MovementPhaseActionKind}
 
 
-def test_tenth_normal_move_cannot_end_in_enemy_engagement_range() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+def test_eleventh_normal_move_cannot_end_in_enemy_engagement_range() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     context = _legality_context(
         descriptor=descriptor,
         movement_mode=MovementMode.NORMAL,
@@ -145,8 +151,8 @@ def test_tenth_normal_move_cannot_end_in_enemy_engagement_range() -> None:
     )
 
 
-def test_tenth_normal_and_advance_cannot_transit_enemy_engagement_range() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+def test_eleventh_normal_and_advance_cannot_transit_enemy_engagement_range() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     normal = _legality_context(
         descriptor=descriptor,
         movement_mode=MovementMode.NORMAL,
@@ -176,8 +182,8 @@ def test_tenth_normal_and_advance_cannot_transit_enemy_engagement_range() -> Non
         assert outside_result.is_legal
 
 
-def test_tenth_fly_normal_advance_and_fall_back_can_transit_enemy_engagement_range() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+def test_eleventh_fly_normal_advance_and_fall_back_can_transit_enemy_engagement_range() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
 
     for context in (
         _legality_context(
@@ -216,9 +222,9 @@ def test_tenth_fly_normal_advance_and_fall_back_can_transit_enemy_engagement_ran
         assert endpoint.violation_code == "enemy_engagement_range_end_forbidden"
 
 
-def test_tenth_fall_back_transit_allowed_but_endpoint_forbidden() -> None:
+def test_eleventh_fall_back_transit_allowed_but_endpoint_forbidden() -> None:
     context = _legality_context(
-        descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         movement_mode=MovementMode.FALL_BACK,
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         displacement_kind=ModelDisplacementKind.FALL_BACK,
@@ -238,9 +244,9 @@ def test_tenth_fall_back_transit_allowed_but_endpoint_forbidden() -> None:
     assert endpoint.violation_code == "enemy_engagement_range_end_forbidden"
 
 
-def test_tenth_charge_transit_and_endpoint_are_allowed_by_charge_policy() -> None:
+def test_eleventh_charge_transit_and_endpoint_are_allowed_by_charge_policy() -> None:
     context = _legality_context(
-        descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         movement_mode=MovementMode.CHARGE,
         movement_phase_action=None,
         displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
@@ -259,20 +265,20 @@ def test_tenth_charge_transit_and_endpoint_are_allowed_by_charge_policy() -> Non
     assert endpoint.is_legal
 
 
-def test_preview_normal_move_transit_allowed_but_endpoint_forbidden() -> None:
+def test_custom_normal_move_transit_allowed_but_endpoint_forbidden() -> None:
     context = _legality_context(
-        descriptor=RulesetDescriptor.warhammer_40000_eleventh_preview(),
+        descriptor=_descriptor_with_custom_movement_policy(normal_transit=True),
         movement_mode=MovementMode.NORMAL,
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
     )
 
     transit = context.validate_path_transits_enemy_engagement(
-        enemy_horizontal_distance_inches=2.0,
+        enemy_horizontal_distance_inches=1.0,
         enemy_vertical_distance_inches=0.0,
     )
     endpoint = context.validate_end_position_enemy_engagement(
-        enemy_horizontal_distance_inches=2.0,
+        enemy_horizontal_distance_inches=1.0,
         enemy_vertical_distance_inches=0.0,
     )
 
@@ -281,9 +287,9 @@ def test_preview_normal_move_transit_allowed_but_endpoint_forbidden() -> None:
     assert endpoint.violation_code == "enemy_engagement_range_end_forbidden"
 
 
-def test_preview_and_unsupported_policy_require_explicit_descriptor() -> None:
-    tenth = RulesetDescriptor.warhammer_40000_tenth()
-    preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
+def test_custom_and_unsupported_policy_require_explicit_descriptor() -> None:
+    eleventh = RulesetDescriptor.warhammer_40000_eleventh()
+    custom = _descriptor_with_custom_movement_policy(include_take_to_skies=True)
 
     with pytest.raises(MovementLegalityError, match="explicit RulesetDescriptor"):
         EngagementMovementPolicy.from_ruleset_descriptor(
@@ -292,16 +298,16 @@ def test_preview_and_unsupported_policy_require_explicit_descriptor() -> None:
         )
     with pytest.raises(MovementLegalityError, match="does not define movement legality"):
         EngagementMovementPolicy.from_ruleset_descriptor(
-            tenth,
+            eleventh,
             movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
         )
 
     policy = EngagementMovementPolicy.from_ruleset_descriptor(
-        preview,
+        custom,
         movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
     )
 
-    assert policy.horizontal_inches == 2.0
+    assert policy.horizontal_inches == custom.engagement_policy.horizontal_inches
     assert policy.may_transit_enemy_engagement
     assert not policy.may_end_in_enemy_engagement
     assert policy.movement_mode is MovementMode.FLY_TAKE_TO_SKIES
@@ -332,4 +338,36 @@ def _legality_context(
         movement_mode=movement_mode,
         movement_phase_action=movement_phase_action,
         displacement_kind=displacement_kind,
+    )
+
+
+def _descriptor_with_custom_movement_policy(
+    *,
+    normal_transit: bool = False,
+    include_take_to_skies: bool = False,
+) -> RulesetDescriptor:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    movement_modes: list[MovementModePolicy] = []
+    for policy in descriptor.movement_policy.movement_modes:
+        if policy.movement_mode is MovementMode.NORMAL and normal_transit:
+            movement_modes.append(replace(policy, may_transit_enemy_engagement=True))
+            continue
+        movement_modes.append(policy)
+    if include_take_to_skies:
+        movement_modes.append(
+            MovementModePolicy(
+                movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+                may_transit_enemy_engagement=True,
+                may_end_in_enemy_engagement=False,
+                requires_charge_target=False,
+                ignores_vertical_distance=True,
+                ignores_models=True,
+                ignores_terrain=True,
+                movement_distance_modifier=-2.0,
+            )
+        )
+    return replace(
+        descriptor,
+        movement_policy=MovementPolicyDescriptor(movement_modes=tuple(movement_modes)),
+        descriptor_hash="",
     )

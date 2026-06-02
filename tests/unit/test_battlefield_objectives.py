@@ -243,7 +243,7 @@ def test_deployment_zone_contains_points_and_validates_bounds() -> None:
 def test_phase_8_payloads_round_trip_without_object_reprs() -> None:
     battlefield = Battlefield(
         battlefield_id="table",
-        ruleset_id=RulesetId.warhammer_40000_eleventh_preview(version="mission-draft"),
+        ruleset_id=RulesetId.warhammer_40000_eleventh(version="mission-draft"),
         width=44.0,
         depth=60.0,
         terrain_layout=TerrainLayout(terrain_ids=("ruin",), generation=1),
@@ -299,13 +299,13 @@ def test_stable_identity_prefixes_are_rejected_for_phase_8_ids() -> None:
 
 
 def test_ruleset_id_payload_round_trips() -> None:
-    ruleset_id = RulesetId.warhammer_40000_eleventh_preview(version="terrain-objectives")
+    ruleset_id = RulesetId.warhammer_40000_eleventh(version="terrain-objectives")
 
     payload = ruleset_id.to_payload()
 
     assert payload == {
         "game": "warhammer_40000",
-        "edition": RulesetEdition.ELEVENTH_PREVIEW.value,
+        "edition": RulesetEdition.ELEVENTH.value,
         "version": "terrain-objectives",
     }
     assert RulesetId.from_payload(payload).to_payload() == payload

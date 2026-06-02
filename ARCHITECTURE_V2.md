@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-13F work and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14A work and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 13F** is treated as implemented at the time this file was updated, but those slices were built from retired-edition assumptions and are not release-complete for the new target ruleset. **Phase 14A is the next build slice** and starts the mandatory 11th Edition-only migration before Phase 15 Charge/Fight work begins.
+Everything through **Phase 14A** is treated as implemented at the time this file was updated. Phase 14A completed the mandatory 11th Edition-only source identity cutover and retired-identity audit; **Phase 14B is the next build slice** before Phase 15 Charge/Fight work begins.
 
 Completed / implemented foundation:
 
@@ -85,12 +85,13 @@ Completed / implemented foundation:
 | 13D | Complete | Weapon abilities, shooting/fight modifiers, and shooting Stratagems |
 | 13E | Complete | Damage allocation, destroyed models, and destruction reactions |
 | 13F | Complete | Shooting phase completion gate |
+| 14A | Complete | Source identity and migration audit |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14A-14K | Next | Mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14B-14K | Next | Mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -1914,6 +1915,8 @@ Required tests:
 Phase 14 is the mandatory 11th Edition revalidation pass for completed Phases 1-13F. These phases are not optional compatibility slices. They must remove or quarantine retired identifiers, assumptions, fixtures, and source-package facts before Phase 15 Charge/Fight work begins.
 
 ## Phase 14A: source identity and migration audit
+
+Status: Complete.
 
 Modules:
 

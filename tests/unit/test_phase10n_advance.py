@@ -118,7 +118,7 @@ def test_advance_move_consumes_movement_plus_d6() -> None:
 
     resolution = resolve_advance_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         advance_roll=advance_roll,
     )
@@ -462,7 +462,7 @@ def test_invalid_advance_does_not_mutate_battlefield_state() -> None:
     )
     resolution = resolve_advance_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=near_edge,
         advance_roll=_fixed_advance_roll(value=1),
     )
@@ -863,7 +863,7 @@ def _config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase10n-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase10n-test"
         ),
         army_catalog=catalog,

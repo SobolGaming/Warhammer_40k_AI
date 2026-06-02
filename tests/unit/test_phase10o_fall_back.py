@@ -70,7 +70,7 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-0000"
 _TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0000"
-_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0266"
+_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0272"
 
 
 def test_fall_back_domain_payloads_round_trip_without_object_reprs() -> None:
@@ -127,13 +127,13 @@ def test_fall_back_allows_engagement_transit_but_rejects_endpoint_in_engagement(
     )
     valid_resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
     invalid_resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(5.8, 6.0)),
     )
@@ -153,7 +153,7 @@ def test_fall_back_enemy_model_overflight_creates_one_desperate_escape_requireme
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -179,7 +179,7 @@ def test_fly_and_titanic_fall_back_overflight_avoid_desperate_escape_requirement
         )
         resolution = resolve_fall_back_move(
             scenario=scenario,
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             unit_placement=unit_placement,
             path_witness=_fall_back_witness(
                 unit_placement,
@@ -198,7 +198,7 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
         battle_shocked_unit_ids=("army-alpha:intercessor-unit-1",),
@@ -332,7 +332,7 @@ def test_fall_back_payload_round_trip_and_drift_codes() -> None:
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -436,7 +436,7 @@ def test_fall_back_destruction_selection_can_make_otherwise_incoherent_endpoint_
     }
     resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness_with_end_poses(unit_placement, attempted_end_poses),
         battle_shocked_unit_ids=("army-alpha:intercessor-unit-1",),
@@ -462,7 +462,7 @@ def test_fall_back_destruction_selection_can_make_otherwise_incoherent_endpoint_
 
     survivor_coherency = unit_placement_coherency_result(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=surviving_placement,
     )
     batch = result.transition_batch(
@@ -487,7 +487,7 @@ def test_fall_back_result_rejects_destruction_selection_drift() -> None:
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -521,7 +521,7 @@ def test_fall_back_transition_batch_rejects_unresolved_desperate_escape_requirem
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -537,13 +537,13 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
     )
     invalid_resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(5.8, 6.0)),
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -604,7 +604,7 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
         )
     partial_resolution = resolve_fall_back_move(
         scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(
             unit_placement,
@@ -963,7 +963,7 @@ def _config(*, game_id: str = "phase10o-desperate") -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id=game_id,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase10o-test"
         ),
         army_catalog=catalog,

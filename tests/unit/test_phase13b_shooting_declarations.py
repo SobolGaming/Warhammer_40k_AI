@@ -186,7 +186,10 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26
 
 
 def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1", "intercessor-2"))
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        game_id="phase13b-allocation-0005",
+    )
     first_status = lifecycle.advance_until_decision_or_terminal()
     first_request = _decision_request(first_status)
 
@@ -6419,6 +6422,7 @@ def _save_payload_has_cover(event: dict[str, object]) -> bool:
 def _shooting_lifecycle(
     *,
     alpha_unit_ids: tuple[str, ...],
+    game_id: str = "phase13b-game",
     alpha_datasheets: dict[str, tuple[str, str, int]] | None = None,
     enemy_datasheet: tuple[str, str, int] | None = None,
     enemy_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
@@ -6428,6 +6432,7 @@ def _shooting_lifecycle(
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_enemy_pose = Pose.at(35.0, 35.0) if enemy_pose is None else enemy_pose
     config = _config(
+        game_id=game_id,
         alpha_unit_ids=alpha_unit_ids,
         alpha_datasheets=alpha_datasheets,
         enemy_datasheet=enemy_datasheet,
@@ -6554,6 +6559,7 @@ def _catalog_with_replaced_bolt_profiles(
 
 def _config(
     *,
+    game_id: str = "phase13b-game",
     alpha_unit_ids: tuple[str, ...],
     alpha_datasheets: dict[str, tuple[str, str, int]] | None,
     enemy_datasheet: tuple[str, str, int] | None,
@@ -6572,7 +6578,7 @@ def _config(
         else enemy_unit_specs
     )
     return GameConfig(
-        game_id="phase13b-game",
+        game_id=game_id,
         ruleset_descriptor=_ruleset(),
         army_catalog=resolved_catalog,
         army_muster_requests=(
@@ -6833,7 +6839,7 @@ def _state(lifecycle: GameLifecycle) -> GameState:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase13b-test")
+    return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase13b-test")
 
 
 def _benefit_of_cover_result() -> BenefitOfCoverResult:

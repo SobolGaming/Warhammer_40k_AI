@@ -1060,7 +1060,7 @@ def _ruins_terrain_contexts(
     )
     legality = MovementLegalityContext.from_keywords(
         keywords=("FLY", "INFANTRY") if has_fly else ("INFANTRY",),
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         movement_mode=MovementMode.NORMAL,
         movement_phase_action=_NORMAL_MOVE_TOKEN,
         displacement_kind=_NORMAL_MOVE_TOKEN,

@@ -27,7 +27,7 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainLayoutTemplate,
     TerrainWallTemplate,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2025_26 as source_data,
 )
 

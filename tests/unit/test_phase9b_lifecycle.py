@@ -67,7 +67,7 @@ def _config(
 ) -> GameConfig:
     descriptor = ruleset_descriptor
     if descriptor is None:
-        descriptor = RulesetDescriptor.warhammer_40000_tenth(
+        descriptor = RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase9b-test"
         )
     catalog = ArmyCatalog.phase9a_canonical_content_pack() if army_catalog is None else army_catalog
@@ -155,7 +155,7 @@ def _descriptor_with_sequences(
     setup_steps: tuple[SetupStepKind, ...] | None = None,
     battle_phases: tuple[BattlePhaseKind, ...] | None = None,
 ) -> RulesetDescriptor:
-    base = RulesetDescriptor.warhammer_40000_tenth(
+    base = RulesetDescriptor.warhammer_40000_eleventh(
         descriptor_version="core-v2-phase9b-sequence-test"
     )
     return RulesetDescriptor(
@@ -174,12 +174,12 @@ def _descriptor_with_sequences(
         setup_sequence=SetupSequenceDescriptor(
             steps=setup_steps
             if setup_steps is not None
-            else SetupSequenceDescriptor.warhammer_40000_tenth_default().steps
+            else SetupSequenceDescriptor.warhammer_40000_eleventh_default().steps
         ),
         battle_phase_sequence=BattlePhaseSequenceDescriptor(
             phases=battle_phases
             if battle_phases is not None
-            else BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default().phases
+            else BattlePhaseSequenceDescriptor.warhammer_40000_eleventh_default().phases
         ),
     )
 
@@ -343,7 +343,7 @@ def test_setup_steps_advance_in_ruleset_descriptor_order() -> None:
     ]
 
     assert observed_steps == [
-        step.value for step in RulesetDescriptor.warhammer_40000_tenth().setup_sequence.steps
+        step.value for step in RulesetDescriptor.warhammer_40000_eleventh().setup_sequence.steps
     ]
 
 

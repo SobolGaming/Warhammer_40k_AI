@@ -351,7 +351,7 @@ def _mission_setup() -> MissionSetup:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase10t-test")
+    return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase10t-test")
 
 
 def _army_muster_request(

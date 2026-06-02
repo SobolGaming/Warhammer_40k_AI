@@ -286,7 +286,7 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
 
 def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None:
     scenario, passenger, transport, _enemy, _catalog = _advance_embark_ready_scenario()
-    state = _battle_state(scenario)
+    state = _battle_state(scenario, game_id="phase10q-advance-embark-0001")
     state.record_transport_cargo_state(_cargo_state(transport=transport))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
@@ -2103,13 +2103,17 @@ def _transport_scenario(
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth()
+    return RulesetDescriptor.warhammer_40000_eleventh()
 
 
-def _battle_state(scenario: BattlefieldScenario) -> GameState:
+def _battle_state(
+    scenario: BattlefieldScenario,
+    *,
+    game_id: str = "phase10q-game",
+) -> GameState:
     ruleset = _ruleset()
     return GameState(
-        game_id="phase10q-game",
+        game_id=game_id,
         ruleset_descriptor_hash=ruleset.descriptor_hash,
         stage=GameLifecycleStage.BATTLE,
         setup_sequence=tuple(ruleset.setup_sequence.steps),

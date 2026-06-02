@@ -1331,7 +1331,7 @@ def _mission_setup() -> MissionSetup:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
         descriptor_version="core-v2-phase11c-test"
     )
 

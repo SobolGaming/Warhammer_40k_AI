@@ -278,7 +278,7 @@ class SetupSequenceDescriptor:
         object.__setattr__(self, "steps", steps)
 
     @classmethod
-    def warhammer_40000_tenth_default(cls) -> Self:
+    def warhammer_40000_eleventh_default(cls) -> Self:
         return cls(
             steps=(
                 SetupStepKind.MUSTER_ARMIES,
@@ -316,7 +316,7 @@ class BattlePhaseSequenceDescriptor:
         object.__setattr__(self, "phases", phases)
 
     @classmethod
-    def warhammer_40000_tenth_default(cls) -> Self:
+    def warhammer_40000_eleventh_default(cls) -> Self:
         return cls(
             phases=(
                 BattlePhaseKind.COMMAND,
@@ -689,7 +689,7 @@ class TerrainMovementPolicy:
         )
 
     @classmethod
-    def warhammer_40000_tenth_default(cls) -> Self:
+    def warhammer_40000_eleventh_default(cls) -> Self:
         return cls(
             freely_traversable_height_threshold_inches=2.0,
             climb_vertical_distance_counts=True,
@@ -698,7 +698,7 @@ class TerrainMovementPolicy:
             infantry_beast_ruins_wall_traversal_mode=TerrainTraversalMode.THROUGH_FEATURE,
             fly_traversal_mode=TerrainTraversalMode.AIR_PATH,
             fly_uses_air_path_measurement=True,
-            feature_policies=_terrain_feature_movement_policies_for_tenth(),
+            feature_policies=_terrain_feature_movement_policies_for_eleventh(),
         )
 
     def policy_for_feature_kind(
@@ -788,7 +788,7 @@ class CoverPolicyDescriptor:
             )
 
     @classmethod
-    def warhammer_40000_tenth_default(cls) -> Self:
+    def warhammer_40000_eleventh_default(cls) -> Self:
         return cls(cover_effect=CoverEffect.SAVE_BONUS)
 
     def to_payload(self) -> CoverPolicyDescriptorPayload:
@@ -829,7 +829,7 @@ class TerrainFeatureVisibilityPolicy:
     towering_uses_true_los_through_feature: bool
     towering_uses_true_los_when_wholly_within_feature: bool
     cover_policy: CoverPolicyDescriptor = field(
-        default_factory=CoverPolicyDescriptor.warhammer_40000_tenth_default
+        default_factory=CoverPolicyDescriptor.warhammer_40000_eleventh_default
     )
 
     def __post_init__(self) -> None:
@@ -947,7 +947,7 @@ class TerrainVisibilityPolicyDescriptor:
     hidden_lost_after_shooting: bool = False
     cover_effect: CoverEffect = CoverEffect.SAVE_BONUS
     cover_policy: CoverPolicyDescriptor = field(
-        default_factory=CoverPolicyDescriptor.warhammer_40000_tenth_default
+        default_factory=CoverPolicyDescriptor.warhammer_40000_eleventh_default
     )
     feature_policies: tuple[TerrainFeatureVisibilityPolicy, ...] = ()
 
@@ -1525,25 +1525,25 @@ class RulesetDescriptor:
         object.__setattr__(self, "descriptor_hash", expected_hash)
 
     @classmethod
-    def warhammer_40000_tenth(
+    def warhammer_40000_eleventh(
         cls,
-        source_date: str | date = "2023-06-24",
-        descriptor_version: str = "core-v2-phase9a",
+        source_date: str | date = "2026-06-01",
+        descriptor_version: str = "core-v2-phase14a",
     ) -> Self:
         return cls(
-            ruleset_id=RulesetId.warhammer_40000_tenth(version=descriptor_version),
+            ruleset_id=RulesetId.warhammer_40000_eleventh(version=descriptor_version),
             source_date=source_date,
             descriptor_version=descriptor_version,
             engagement_policy=EngagementPolicyDescriptor(
                 horizontal_inches=1.0,
                 vertical_inches=5.0,
             ),
-            movement_policy=_movement_policy_for_tenth(),
+            movement_policy=_movement_policy_for_eleventh(),
             charge_policy=ChargePolicyDescriptor(
                 target_selection_timing=ChargeTargetSelectionTiming.BEFORE_ROLL,
                 endpoint_requirement=ChargeEndpointRequirement.DECLARED_TARGET_ENGAGEMENT,
             ),
-            terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_tenth_default(),
+            terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_eleventh_default(),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=False,
                 hidden_detection_range_inches=None,
@@ -1551,8 +1551,8 @@ class RulesetDescriptor:
                 hidden_requires_terrain_area_occupancy=False,
                 hidden_lost_after_shooting=False,
                 cover_effect=CoverEffect.SAVE_BONUS,
-                cover_policy=CoverPolicyDescriptor.warhammer_40000_tenth_default(),
-                feature_policies=_terrain_feature_visibility_policies_for_tenth(),
+                cover_policy=CoverPolicyDescriptor.warhammer_40000_eleventh_default(),
+                feature_policies=_terrain_feature_visibility_policies_for_eleventh(),
             ),
             objective_policy=ObjectivePolicyDescriptor(
                 supported_anchor_kinds=(ObjectiveAnchorKind.POINT,),
@@ -1577,17 +1577,17 @@ class RulesetDescriptor:
                 may_move_through_terrain=False,
             ),
             mission_policy=MissionPolicyDescriptor.core_rules_default(),
-            setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
-            battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
+            setup_sequence=SetupSequenceDescriptor.warhammer_40000_eleventh_default(),
+            battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_eleventh_default(),
         )
 
     @classmethod
-    def warhammer_40000_tenth_chapter_approved_2025_26(
+    def warhammer_40000_eleventh_chapter_approved_2025_26(
         cls,
         source_date: str | date = "2025-06-01",
-        descriptor_version: str = "core-v2-phase10p-ca2025-26",
+        descriptor_version: str = "core-v2-phase14a-ca2025-26",
     ) -> Self:
-        core = cls.warhammer_40000_tenth(
+        core = cls.warhammer_40000_eleventh(
             source_date=source_date,
             descriptor_version=descriptor_version,
         )
@@ -1606,84 +1606,6 @@ class RulesetDescriptor:
             mission_policy=MissionPolicyDescriptor.chapter_approved_2025_26(),
             setup_sequence=core.setup_sequence,
             battle_phase_sequence=core.battle_phase_sequence,
-        )
-
-    @classmethod
-    def warhammer_40000_eleventh_preview(
-        cls,
-        source_date: str | date = "2026-05-26",
-        descriptor_version: str = "core-v2-phase9a-preview",
-    ) -> Self:
-        return cls(
-            ruleset_id=RulesetId.warhammer_40000_eleventh_preview(version=descriptor_version),
-            source_date=source_date,
-            descriptor_version=descriptor_version,
-            engagement_policy=EngagementPolicyDescriptor(
-                horizontal_inches=2.0,
-                vertical_inches=5.0,
-            ),
-            movement_policy=_movement_policy_for_eleventh_preview(),
-            charge_policy=ChargePolicyDescriptor(
-                target_selection_timing=ChargeTargetSelectionTiming.AFTER_ROLL,
-                endpoint_requirement=ChargeEndpointRequirement.SELECTED_TARGET_BASE_CONTACT,
-            ),
-            terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_tenth_default(),
-            terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
-                hidden_supported=True,
-                hidden_detection_range_inches=15.0,
-                hidden_requires_keywords=("Hidden",),
-                hidden_requires_terrain_area_occupancy=True,
-                hidden_lost_after_shooting=True,
-                cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
-                cover_policy=CoverPolicyDescriptor(
-                    cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
-                    ap_zero_save_bonus_excluded_for_save_3_plus_or_better=False,
-                ),
-                feature_policies=_terrain_feature_visibility_policies_for_tenth(
-                    CoverPolicyDescriptor(
-                        cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
-                        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=False,
-                    )
-                ),
-            ),
-            objective_policy=ObjectivePolicyDescriptor(
-                supported_anchor_kinds=(
-                    ObjectiveAnchorKind.POINT,
-                    ObjectiveAnchorKind.TERRAIN,
-                ),
-                default_point_control_radius_inches=3.0,
-                terrain_objective_control_policy=TerrainObjectiveControlPolicy.UNSUPPORTED,
-            ),
-            coherency_policy=CoherencyPolicyDescriptor(
-                policy_kind=CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE,
-                required_neighbors_small_unit=None,
-                required_neighbors_large_unit=None,
-                large_unit_model_count_threshold=None,
-                max_horizontal_inches=None,
-                max_vertical_inches=None,
-                max_all_models_distance_inches=9.0,
-                max_unit_span_inches=None,
-            ),
-            fly_policy=FlyPolicyDescriptor(
-                take_to_the_skies_supported=True,
-                movement_penalty_inches=2.0,
-                ignores_vertical_distance=True,
-                may_move_through_models=True,
-                may_move_through_terrain=True,
-            ),
-            mission_policy=MissionPolicyDescriptor(
-                fixed_objective_missions_supported=True,
-                terrain_objective_missions_supported=True,
-                deployment_zone_source=MissionDeploymentZoneSource.MISSION,
-                reserves_arrival_blocked_battle_rounds=(),
-                reserves_arrival_excludes_during_battle_strategic_reserves=False,
-                reserve_destruction_timing=ReserveDestructionTimingKind.END_OF_BATTLE,
-                reserve_destruction_battle_round=None,
-                reserve_destruction_excludes_during_battle_strategic_reserves=False,
-                reserve_destruction_only_declare_battle_formations=False,
-            ),
-            setup_sequence=SetupSequenceDescriptor.warhammer_40000_tenth_default(),
-            battle_phase_sequence=BattlePhaseSequenceDescriptor.warhammer_40000_tenth_default(),
         )
 
     def to_payload(self) -> RulesetDescriptorPayload:
@@ -1916,7 +1838,7 @@ def battle_phase_kind_from_token(token: object) -> BattlePhaseKind:
         raise RulesetDescriptorError(f"Unsupported BattlePhaseKind token: {token}.") from exc
 
 
-def _movement_policy_for_tenth() -> MovementPolicyDescriptor:
+def _movement_policy_for_eleventh() -> MovementPolicyDescriptor:
     return MovementPolicyDescriptor(
         movement_modes=(
             MovementModePolicy(
@@ -1959,60 +1881,7 @@ def _movement_policy_for_tenth() -> MovementPolicyDescriptor:
     )
 
 
-def _movement_policy_for_eleventh_preview() -> MovementPolicyDescriptor:
-    return MovementPolicyDescriptor(
-        movement_modes=(
-            MovementModePolicy(
-                movement_mode=MovementMode.NORMAL,
-                may_transit_enemy_engagement=True,
-                may_end_in_enemy_engagement=False,
-                requires_charge_target=False,
-                ignores_vertical_distance=False,
-                ignores_models=False,
-                ignores_terrain=False,
-            ),
-            MovementModePolicy(
-                movement_mode=MovementMode.ADVANCE,
-                may_transit_enemy_engagement=True,
-                may_end_in_enemy_engagement=False,
-                requires_charge_target=False,
-                ignores_vertical_distance=False,
-                ignores_models=False,
-                ignores_terrain=False,
-            ),
-            MovementModePolicy(
-                movement_mode=MovementMode.FALL_BACK,
-                may_transit_enemy_engagement=True,
-                may_end_in_enemy_engagement=False,
-                requires_charge_target=False,
-                ignores_vertical_distance=False,
-                ignores_models=False,
-                ignores_terrain=False,
-            ),
-            MovementModePolicy(
-                movement_mode=MovementMode.CHARGE,
-                may_transit_enemy_engagement=True,
-                may_end_in_enemy_engagement=True,
-                requires_charge_target=True,
-                ignores_vertical_distance=False,
-                ignores_models=False,
-                ignores_terrain=False,
-            ),
-            MovementModePolicy(
-                movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
-                may_transit_enemy_engagement=True,
-                may_end_in_enemy_engagement=False,
-                requires_charge_target=False,
-                ignores_vertical_distance=True,
-                ignores_models=True,
-                ignores_terrain=True,
-                movement_distance_modifier=-2.0,
-            ),
-        )
-    )
-
-
-def _terrain_feature_movement_policies_for_tenth() -> tuple[TerrainFeatureMovementPolicy, ...]:
+def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMovementPolicy, ...]:
     unrestricted_keywords: tuple[str, ...] = ()
     ruins_through_keywords = (
         "BEAST",
@@ -2155,11 +2024,11 @@ def _terrain_feature_movement_policies_for_tenth() -> tuple[TerrainFeatureMoveme
     )
 
 
-def _terrain_feature_visibility_policies_for_tenth(
+def _terrain_feature_visibility_policies_for_eleventh(
     cover_policy: CoverPolicyDescriptor | None = None,
 ) -> tuple[TerrainFeatureVisibilityPolicy, ...]:
     resolved_cover_policy = (
-        CoverPolicyDescriptor.warhammer_40000_tenth_default()
+        CoverPolicyDescriptor.warhammer_40000_eleventh_default()
         if cover_policy is None
         else cover_policy
     )

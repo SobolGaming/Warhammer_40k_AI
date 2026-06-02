@@ -78,7 +78,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatus,
 )
-from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_catalog_records
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_catalog_records
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_DICE_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
@@ -282,7 +282,7 @@ def test_command_reroll_rejects_opponent_roll_actor_drift_before_queue_pop() -> 
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
 
 
-def test_command_reroll_allows_tenth_edition_desperate_escape_roll_for_actor() -> None:
+def test_command_reroll_allows_eleventh_edition_desperate_escape_roll_for_actor() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
@@ -324,7 +324,7 @@ def test_command_reroll_allows_tenth_edition_desperate_escape_roll_for_actor() -
     assert _has_event(lifecycle.decision_controller, "command_reroll_resolved")
 
 
-def test_command_reroll_allows_tenth_edition_number_of_attacks_roll_for_actor() -> None:
+def test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
@@ -2323,7 +2323,7 @@ def test_rapid_ingress_malformed_placement_payload_rejects_before_queue_pop() ->
 
 
 def _source_stratagem_record(stratagem_id: str) -> StratagemCatalogRecord:
-    for record in tenth_edition_stratagem_catalog_records():
+    for record in eleventh_edition_stratagem_catalog_records():
         if record.definition.stratagem_id == stratagem_id:
             return record
     raise AssertionError(f"Missing source stratagem record: {stratagem_id}")
@@ -2890,7 +2890,7 @@ def _config(
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id="phase12c-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
             descriptor_version="core-v2-phase12c-test"
         ),
         army_catalog=resolved_catalog,

@@ -4,10 +4,10 @@ import hashlib
 import json
 from dataclasses import dataclass
 
-EDITION_ID = "warhammer_40000_10th"
-SOURCE_PACKAGE_ID = "gw-10e-core-stratagems"
-SOURCE_TITLE = "Warhammer 40,000 10th Edition Core Stratagems"
-SOURCE_VERSION = "10e-core-rules"
+EDITION_ID = "warhammer_40000_11th"
+SOURCE_PACKAGE_ID = "gw-11e-core-stratagems"
+SOURCE_TITLE = "Warhammer 40,000 11th Edition Core Stratagems"
+SOURCE_VERSION = "11e-core-rules"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-stratagem-source-v1"
 
 

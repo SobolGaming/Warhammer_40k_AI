@@ -15,27 +15,27 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities as source_data,
 )
 
-TENTH_EDITION_CORE_ABILITY_SOURCE_PACKAGE_ID = source_data.SOURCE_PACKAGE_ID
+ELEVENTH_EDITION_CORE_ABILITY_SOURCE_PACKAGE_ID = source_data.SOURCE_PACKAGE_ID
 
 
-def tenth_edition_core_ability_catalog_records() -> tuple[AbilityCatalogRecord, ...]:
+def eleventh_edition_core_ability_catalog_records() -> tuple[AbilityCatalogRecord, ...]:
     return tuple(_record_from_source_row(row) for row in source_data.core_ability_rows())
 
 
-def tenth_edition_core_ability_index() -> AbilityCatalogIndex:
-    return AbilityCatalogIndex.from_records(tenth_edition_core_ability_catalog_records())
+def eleventh_edition_core_ability_index() -> AbilityCatalogIndex:
+    return AbilityCatalogIndex.from_records(eleventh_edition_core_ability_catalog_records())
 
 
-def tenth_edition_ability_catalog_records() -> tuple[AbilityCatalogRecord, ...]:
+def eleventh_edition_ability_catalog_records() -> tuple[AbilityCatalogRecord, ...]:
     return tuple(_record_from_source_row(row) for row in source_data.ability_rows())
 
 
-def tenth_edition_ability_index() -> AbilityCatalogIndex:
-    return AbilityCatalogIndex.from_records(tenth_edition_ability_catalog_records())
+def eleventh_edition_ability_index() -> AbilityCatalogIndex:
+    return AbilityCatalogIndex.from_records(eleventh_edition_ability_catalog_records())
 
 
 def build_player_ability_index(

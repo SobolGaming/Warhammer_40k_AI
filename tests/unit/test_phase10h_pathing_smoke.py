@@ -381,7 +381,7 @@ def _legality_context(
 ) -> MovementLegalityContext:
     return MovementLegalityContext.from_keywords(
         keywords=keywords,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         movement_mode=movement_mode,
         movement_phase_action=movement_phase_action,
         displacement_kind=displacement_kind,

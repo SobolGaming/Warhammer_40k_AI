@@ -29,7 +29,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
-from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_index
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
     CORE_INSANE_BRAVERY_HANDLER_ID,
     CORE_NEW_ORDERS_HANDLER_ID,
@@ -49,7 +49,7 @@ TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
 
 @dataclass(frozen=True, slots=True)
 class CommandPhaseHandler:
-    stratagem_index: StratagemCatalogIndex = field(default_factory=tenth_edition_stratagem_index)
+    stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
 
     def __post_init__(self) -> None:
         if type(self.stratagem_index) is not StratagemCatalogIndex:

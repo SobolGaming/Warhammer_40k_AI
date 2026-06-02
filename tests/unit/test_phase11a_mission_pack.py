@@ -53,7 +53,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
-from warhammer40k_core.rules.source_packages.warhammer_40000_10th import (
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2025_26 as source_data,
 )
 
@@ -85,19 +85,19 @@ def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None
     assert "object at 0x" not in encoded
     assert MissionSourcePackageDefinition.from_payload(payload).to_payload() == payload
     assert payload == {
-        "edition_id": "warhammer_40000_10th",
-        "mission_pack_id": "10e-chapter-approved-2025-26",
-        "source_package_id": "gw-10e-chapter-approved-2025-26",
-        "source_title": "Warhammer 40,000 10th Edition Chapter Approved 2025-26",
+        "edition_id": "warhammer_40000_11th",
+        "mission_pack_id": "11e-chapter-approved-2025-26",
+        "source_package_id": "gw-11e-chapter-approved-2025-26",
+        "source_title": "Warhammer 40,000 11th Edition Chapter Approved 2025-26",
         "source_version": "2025-26",
         "source_commit_or_import_hash": source_package.source_commit_or_import_hash,
         "imported_at_schema_version": "core-v2-mission-source-v1",
     }
     assert len(source_package.source_commit_or_import_hash) == 64
-    assert mission_pack.mission_pack_id == "10e-chapter-approved-2025-26"
+    assert mission_pack.mission_pack_id == "11e-chapter-approved-2025-26"
 
 
-def test_chapter_approved_10th_edition_scoring_action_source_snapshot() -> None:
+def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
     mission_pack = chapter_approved_2025_26_mission_pack()
     take_and_hold = next(
         mission
@@ -118,7 +118,7 @@ def test_chapter_approved_10th_edition_scoring_action_source_snapshot() -> None:
         "cap": 15,
         "condition": "each_controlled_objective_from_battle_round_two",
         "source_id": (
-            "gw-10e-chapter-approved-2025-26:primary:take-and-hold:"
+            "gw-11e-chapter-approved-2025-26:primary:take-and-hold:"
             "scoring-rule:take-and-hold-control"
         ),
     }
@@ -135,20 +135,20 @@ def test_chapter_approved_10th_edition_scoring_action_source_snapshot() -> None:
     )
 
 
-def test_future_edition_source_identity_cannot_collide_with_tenth_edition() -> None:
-    tenth = source_data.source_package_definition()
+def test_future_edition_source_identity_cannot_collide_with_eleventh_edition() -> None:
+    eleventh = source_data.source_package_definition()
     future = MissionSourcePackageDefinition(
-        edition_id="warhammer_40000_11th",
-        mission_pack_id=tenth.mission_pack_id,
-        source_package_id=tenth.source_package_id,
-        source_title="Warhammer 40,000 11th Edition Preview",
-        source_version=tenth.source_version,
-        source_commit_or_import_hash=tenth.source_commit_or_import_hash,
-        imported_at_schema_version=tenth.imported_at_schema_version,
+        edition_id="warhammer_40000_future",
+        mission_pack_id=eleventh.mission_pack_id,
+        source_package_id=eleventh.source_package_id,
+        source_title="Warhammer 40,000 Future Edition",
+        source_version=eleventh.source_version,
+        source_commit_or_import_hash=eleventh.source_commit_or_import_hash,
+        imported_at_schema_version=eleventh.imported_at_schema_version,
     )
 
-    assert tenth.source_namespace_key() != future.source_namespace_key()
-    source_data.assert_distinct_source_package_identity(tenth, future)
+    assert eleventh.source_namespace_key() != future.source_namespace_key()
+    source_data.assert_distinct_source_package_identity(eleventh, future)
 
 
 def test_deployment_map_and_objective_marker_policy_round_trip() -> None:
@@ -853,7 +853,7 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
         descriptor_version="core-v2-phase11a-test"
     )
 

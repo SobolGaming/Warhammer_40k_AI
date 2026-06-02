@@ -93,7 +93,7 @@ from warhammer40k_core.engine.reserves import (
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
-from warhammer40k_core.engine.stratagem_catalog import tenth_edition_stratagem_index
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
     CORE_FIRE_OVERWATCH_HANDLER_ID,
     CORE_RAPID_INGRESS_HANDLER_ID,
@@ -1938,7 +1938,7 @@ class _ResolvedUnitMove:
 class MovementPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     parameterized_proposals: bool = False
-    stratagem_index: StratagemCatalogIndex = field(default_factory=tenth_edition_stratagem_index)
+    stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
 
     def __post_init__(self) -> None:
         if (

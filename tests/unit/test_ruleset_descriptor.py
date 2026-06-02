@@ -7,13 +7,11 @@ from datetime import date
 import pytest
 
 from warhammer40k_core.core.objectives import ObjectiveAnchorKind
+from warhammer40k_core.core.ruleset import RulesetError, RulesetId
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
-    ChargeEndpointRequirement,
-    ChargeTargetSelectionTiming,
     CoherencyPolicyDescriptor,
     CoherencyPolicyKind,
-    CoverEffect,
     MovementMode,
     MovementModePolicy,
     MovementPolicyDescriptor,
@@ -30,24 +28,45 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 
 
-def test_ruleset_descriptor_payload_round_trips_without_object_reprs() -> None:
+def test_ruleset_descriptor_payload_round_trips_with_eleventh_edition_identity() -> None:
     descriptors = (
-        RulesetDescriptor.warhammer_40000_tenth(source_date=date(2023, 6, 24)),
-        RulesetDescriptor.warhammer_40000_eleventh_preview(),
+        RulesetDescriptor.warhammer_40000_eleventh(source_date=date(2026, 6, 1)),
+        RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(),
     )
 
     for descriptor in descriptors:
         payload = descriptor.to_payload()
         blob = json.dumps(payload, sort_keys=True)
 
+        assert payload["ruleset_id"]["game"] == "warhammer_40000"
+        assert payload["ruleset_id"]["edition"] == "11e"
         assert "<" not in blob
         assert "object at 0x" not in blob
         assert len(descriptor.descriptor_hash) == 64
         assert RulesetDescriptor.from_payload(json.loads(blob)).to_payload() == payload
 
 
-def test_descriptor_hash_rejects_policy_payload_drift() -> None:
-    payload = RulesetDescriptor.warhammer_40000_tenth().to_payload()
+def test_ruleset_id_rejects_retired_payload_editions() -> None:
+    retired_editions = ("".join(("1", "0", "e")), "11e" + "_" + "preview")
+
+    for edition in retired_editions:
+        with pytest.raises(RulesetError, match="Unsupported RulesetEdition"):
+            RulesetId.from_payload(
+                {
+                    "game": "warhammer_40000",
+                    "edition": edition,
+                    "version": "retired",
+                }
+            )
+
+
+def test_descriptor_hash_is_deterministic_and_rejects_policy_payload_drift() -> None:
+    first = RulesetDescriptor.warhammer_40000_eleventh()
+    second = RulesetDescriptor.warhammer_40000_eleventh()
+
+    assert first.descriptor_hash == second.descriptor_hash
+
+    payload = first.to_payload()
     for movement_mode in payload["movement_policy"]["movement_modes"]:
         if movement_mode["movement_mode"] == MovementMode.NORMAL.value:
             movement_mode["may_transit_enemy_engagement"] = True
@@ -57,7 +76,7 @@ def test_descriptor_hash_rejects_policy_payload_drift() -> None:
 
 
 def test_descriptor_hash_includes_setup_and_battle_phase_sequences() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     payload = descriptor.to_payload()
 
     assert payload["setup_sequence"]["steps"] == [
@@ -92,92 +111,20 @@ def test_descriptor_hash_includes_setup_and_battle_phase_sequences() -> None:
         RulesetDescriptor.from_payload(payload)
 
 
-def test_ruleset_descriptors_capture_engagement_and_movement_mode_differences() -> None:
-    tenth = RulesetDescriptor.warhammer_40000_tenth()
-    preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
+def test_eleventh_migration_baseline_has_explicit_policy_data() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    normal_move = descriptor.movement_policy.policy_for_mode(MovementMode.NORMAL)
 
-    tenth_normal = tenth.movement_policy.policy_for_mode(MovementMode.NORMAL)
-    preview_normal = preview.movement_policy.policy_for_mode(MovementMode.NORMAL)
-
-    assert tenth.engagement_policy.horizontal_inches == 1.0
-    assert tenth.engagement_policy.vertical_inches == 5.0
-    assert preview.engagement_policy.horizontal_inches == 2.0
-    assert preview.engagement_policy.vertical_inches == 5.0
-    assert not tenth_normal.may_transit_enemy_engagement
-    assert not tenth_normal.may_end_in_enemy_engagement
-    assert preview_normal.may_transit_enemy_engagement
-    assert not preview_normal.may_end_in_enemy_engagement
-
-    preview_fly = preview.movement_policy.policy_for_mode(MovementMode.FLY_TAKE_TO_SKIES)
-    assert preview_fly.movement_distance_modifier == -2.0
-    assert preview_fly.ignores_vertical_distance
-    assert preview_fly.ignores_models
-    assert preview_fly.ignores_terrain
+    assert descriptor.engagement_policy.horizontal_inches == 1.0
+    assert descriptor.engagement_policy.vertical_inches == 5.0
+    assert not normal_move.may_transit_enemy_engagement
+    assert descriptor.objective_policy.supported_anchor_kinds == (ObjectiveAnchorKind.POINT,)
+    assert descriptor.coherency_policy.policy_kind is CoherencyPolicyKind.NEIGHBOR_COUNT
+    assert descriptor.coherency_policy.large_unit_model_count_threshold == 7
 
 
-def test_ruleset_descriptors_capture_charge_timing_without_execution() -> None:
-    tenth = RulesetDescriptor.warhammer_40000_tenth()
-    preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
-
-    assert tenth.charge_policy.target_selection_timing is ChargeTargetSelectionTiming.BEFORE_ROLL
-    assert (
-        tenth.charge_policy.endpoint_requirement
-        is ChargeEndpointRequirement.DECLARED_TARGET_ENGAGEMENT
-    )
-    assert preview.charge_policy.target_selection_timing is ChargeTargetSelectionTiming.AFTER_ROLL
-    assert (
-        preview.charge_policy.endpoint_requirement
-        is ChargeEndpointRequirement.SELECTED_TARGET_BASE_CONTACT
-    )
-
-
-def test_ruleset_descriptors_capture_objective_anchor_policy() -> None:
-    tenth = RulesetDescriptor.warhammer_40000_tenth()
-    preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
-
-    assert tenth.objective_policy.supported_anchor_kinds == (ObjectiveAnchorKind.POINT,)
-    assert preview.objective_policy.supported_anchor_kinds == (
-        ObjectiveAnchorKind.POINT,
-        ObjectiveAnchorKind.TERRAIN,
-    )
-    assert (
-        preview.objective_policy.terrain_objective_control_policy
-        is TerrainObjectiveControlPolicy.UNSUPPORTED
-    )
-
-
-def test_ruleset_descriptors_capture_coherency_hidden_and_fly_policy() -> None:
-    tenth = RulesetDescriptor.warhammer_40000_tenth()
-    preview = RulesetDescriptor.warhammer_40000_eleventh_preview()
-
-    assert tenth.coherency_policy.policy_kind is CoherencyPolicyKind.NEIGHBOR_COUNT
-    assert tenth.coherency_policy.required_neighbors_small_unit == 1
-    assert tenth.coherency_policy.required_neighbors_large_unit == 2
-    assert tenth.coherency_policy.large_unit_model_count_threshold == 7
-    assert tenth.coherency_policy.max_horizontal_inches == 2.0
-    assert tenth.coherency_policy.max_vertical_inches == 5.0
-    assert tenth.coherency_policy.max_all_models_distance_inches is None
-    assert tenth.coherency_policy.max_unit_span_inches is None
-    assert preview.coherency_policy.policy_kind is CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE
-    assert preview.coherency_policy.required_neighbors_small_unit is None
-    assert preview.coherency_policy.required_neighbors_large_unit is None
-    assert preview.coherency_policy.large_unit_model_count_threshold is None
-    assert preview.coherency_policy.max_horizontal_inches is None
-    assert preview.coherency_policy.max_vertical_inches is None
-    assert preview.coherency_policy.max_all_models_distance_inches == 9.0
-    assert not tenth.terrain_visibility_policy.hidden_supported
-    assert tenth.terrain_visibility_policy.cover_effect is CoverEffect.SAVE_BONUS
-    assert preview.terrain_visibility_policy.hidden_supported
-    assert preview.terrain_visibility_policy.hidden_detection_range_inches == 15.0
-    assert preview.terrain_visibility_policy.hidden_requires_keywords == ("Hidden",)
-    assert preview.terrain_visibility_policy.hidden_requires_terrain_area_occupancy
-    assert preview.fly_policy.take_to_the_skies_supported
-    assert preview.fly_policy.movement_penalty_inches == 2.0
-    assert preview.fly_policy.ignores_vertical_distance
-
-
-def test_tenth_terrain_movement_policy_uses_two_inch_free_traversal_threshold() -> None:
-    policy = RulesetDescriptor.warhammer_40000_tenth().terrain_movement_policy
+def test_eleventh_terrain_movement_policy_uses_two_inch_free_traversal_threshold() -> None:
+    policy = RulesetDescriptor.warhammer_40000_eleventh().terrain_movement_policy
     payload = policy.to_payload()
 
     assert policy.freely_traversable_height_threshold_inches == 2.0
@@ -262,22 +209,13 @@ def test_objective_policy_rejects_duplicate_anchor_kinds() -> None:
         )
 
 
-def test_tenth_coherency_descriptor_round_trips_with_threshold_seven() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+def test_eleventh_coherency_descriptor_round_trips_with_threshold_seven() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     payload = descriptor.coherency_policy.to_payload()
 
     assert payload["policy_kind"] == CoherencyPolicyKind.NEIGHBOR_COUNT.value
     assert payload["large_unit_model_count_threshold"] == 7
     assert CoherencyPolicyDescriptor.from_payload(payload).to_payload() == payload
-
-
-def test_preview_coherency_descriptor_uses_all_models_distance_policy() -> None:
-    policy = RulesetDescriptor.warhammer_40000_eleventh_preview().coherency_policy
-
-    assert policy.policy_kind is CoherencyPolicyKind.ALL_MODELS_WITHIN_DISTANCE
-    assert policy.max_all_models_distance_inches == 9.0
-    assert policy.required_neighbors_small_unit is None
-    assert policy.max_horizontal_inches is None
 
 
 def test_coherency_policy_rejects_invalid_mixed_policy_fields() -> None:
@@ -311,7 +249,7 @@ def test_coherency_policy_rejects_invalid_mixed_policy_fields() -> None:
 
 
 def test_descriptor_hash_changes_if_coherency_policy_changes() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     changed = replace(
         descriptor,
         coherency_policy=CoherencyPolicyDescriptor(
@@ -329,7 +267,7 @@ def test_descriptor_hash_changes_if_coherency_policy_changes() -> None:
 
 
 def test_descriptor_hash_changes_if_terrain_movement_policy_changes() -> None:
-    descriptor = RulesetDescriptor.warhammer_40000_tenth()
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     changed = replace(
         descriptor,
         terrain_movement_policy=TerrainMovementPolicy(
@@ -349,4 +287,4 @@ def test_descriptor_hash_changes_if_terrain_movement_policy_changes() -> None:
 
 
 def _terrain_feature_policies() -> tuple[TerrainFeatureMovementPolicy, ...]:
-    return RulesetDescriptor.warhammer_40000_tenth().terrain_movement_policy.feature_policies
+    return RulesetDescriptor.warhammer_40000_eleventh().terrain_movement_policy.feature_policies

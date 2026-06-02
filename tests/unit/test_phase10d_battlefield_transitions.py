@@ -449,7 +449,7 @@ def _config() -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase10d-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_tenth(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase10d-test"
         ),
         army_catalog=catalog,

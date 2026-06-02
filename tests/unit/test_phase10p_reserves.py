@@ -2018,11 +2018,11 @@ def _violation_codes(
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth(descriptor_version="core-v2-phase10p-test")
+    return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase10p-test")
 
 
 def _chapter_approved_ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_tenth_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
         descriptor_version="core-v2-phase10p-ca-test"
     )
 

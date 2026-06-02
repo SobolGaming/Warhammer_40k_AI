@@ -287,7 +287,7 @@ class Battlefield:
     battlefield_id: str
     width: float
     depth: float
-    ruleset_id: RulesetId = field(default_factory=RulesetId.warhammer_40000_tenth)
+    ruleset_id: RulesetId = field(default_factory=RulesetId.warhammer_40000_eleventh)
     terrain_layout: TerrainLayout = field(default_factory=TerrainLayout)
     objectives: tuple[Objective, ...] = ()
     deployment_zones: tuple[DeploymentZone, ...] = ()
