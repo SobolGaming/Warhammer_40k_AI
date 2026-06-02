@@ -13,6 +13,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 ASSAULT_RULE_ID = "weapon-ability:assault"
 BLAST_RULE_ID = "weapon-ability:blast"
+CLOSE_QUARTERS_RULE_ID = "weapon-ability:close-quarters"
 DEVASTATING_WOUNDS_RULE_ID = "weapon-ability:devastating-wounds"
 FIRE_OVERWATCH_RULE_ID = "core:fire-overwatch"
 HAZARDOUS_RULE_ID = "weapon-ability:hazardous"
@@ -20,10 +21,15 @@ HEAVY_RULE_ID = "weapon-ability:heavy"
 IGNORES_COVER_RULE_ID = "weapon-ability:ignores-cover"
 INDIRECT_FIRE_NO_VISIBLE_RULE_ID = "weapon-ability:indirect-fire:no-visible-target"
 INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID = "weapon-ability:indirect-fire:benefit-of-cover"
+INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID = "weapon-ability:indirect-fire:no-hit-rerolls"
+INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID = (
+    "weapon-ability:indirect-fire:stationary-friendly-visible"
+)
 LETHAL_HITS_RULE_ID = "weapon-ability:lethal-hits"
 MELTA_RULE_ID = "weapon-ability:melta"
 PRECISION_RULE_ID = "weapon-ability:precision"
 RAPID_FIRE_RULE_ID = "weapon-ability:rapid-fire"
+SNAP_SHOOTING_RULE_ID = "core:snap-shooting"
 SUSTAINED_HITS_RULE_ID = "weapon-ability:sustained-hits"
 TORRENT_RULE_ID = "weapon-ability:torrent"
 TWIN_LINKED_RULE_ID = "weapon-ability:twin-linked"
@@ -44,6 +50,13 @@ def has_weapon_keyword(profile: WeaponProfile, keyword: WeaponKeyword) -> bool:
     _validate_weapon_profile(profile)
     _validate_weapon_keyword(keyword)
     return keyword in profile.keywords
+
+
+def has_close_quarters_weapon_keyword(profile: WeaponProfile) -> bool:
+    _validate_weapon_profile(profile)
+    return (
+        WeaponKeyword.PISTOL in profile.keywords or WeaponKeyword.CLOSE_QUARTERS in profile.keywords
+    )
 
 
 def weapon_ability_int_value(profile: WeaponProfile, ability_kind: AbilityKind) -> int | None:

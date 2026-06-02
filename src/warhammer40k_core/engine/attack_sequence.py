@@ -122,8 +122,10 @@ from warhammer40k_core.engine.weapon_abilities import (
     HAZARDOUS_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+    INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID,
     MELTA_RULE_ID,
     PRECISION_RULE_ID,
+    SNAP_SHOOTING_RULE_ID,
     TWIN_LINKED_RULE_ID,
     DevastatingWoundsResolution,
     anti_keyword_critical_threshold,
@@ -3645,7 +3647,10 @@ def _roll_hit(
         - _plunging_fire_ballistic_skill_improvement(pool=pool)
     )
     skill = max(2, min(skill, 6))
-    is_fire_overwatch = FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
+    is_snap_shooting = (
+        FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
+        or SNAP_SHOOTING_RULE_ID in pool.targeting_rule_ids
+    )
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
         return HitRoll.auto_hit(target_number=skill)
     modifier = pool.hit_roll_modifier + _persisting_hit_roll_modifier(
@@ -3663,10 +3668,12 @@ def _roll_hit(
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(modifier)
     final_roll = unmodified + capped_modifier
-    if is_fire_overwatch:
+    if is_snap_shooting:
         minimum_success = 6
     elif INDIRECT_FIRE_NO_VISIBLE_RULE_ID in pool.targeting_rule_ids:
-        minimum_success = 4
+        minimum_success = (
+            4 if INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids else 6
+        )
     else:
         minimum_success = 2
     generated_hits = sustained_hits_generated_hits(
@@ -4448,6 +4455,7 @@ def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
         profile.damage_profile.to_payload(),
         tuple(keyword.value for keyword in profile.keywords),
         tuple(ability.to_payload() for ability in profile.abilities),
+        pool.shooting_type.value,
         pool.hit_roll_modifier,
         pool.targeting_rule_ids,
     )

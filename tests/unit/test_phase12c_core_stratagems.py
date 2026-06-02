@@ -77,6 +77,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatus,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_catalog_records
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_DICE_CONTEXT_KEY,
@@ -109,6 +110,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import SNAP_SHOOTING_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
     WeaponDeclaration,
@@ -1057,6 +1059,12 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
     assert state.out_of_phase_shooting_state.parent_phase is BattlePhase.MOVEMENT
     assert _has_event(lifecycle.decision_controller, "fire_overwatch_shooting_requested")
     assert not _has_event(lifecycle.decision_controller, "persisting_effect_recorded")
+    request_payload = cast(dict[str, object], shooting_request.payload)
+    proposal_payload = cast(dict[str, object], request_payload["proposal_request"])
+    target_candidates = cast(list[dict[str, object]], proposal_payload["target_candidates"])
+    assert {
+        tuple(cast(list[str], candidate["shooting_types"])) for candidate in target_candidates
+    } == {(ShootingType.SNAP.value,)}
 
     declaration = _shooting_declaration_from_request(
         request=shooting_request,
@@ -1093,6 +1101,12 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
     assert _state(lifecycle).out_of_phase_shooting_state is None
     assert _has_event(lifecycle.decision_controller, "out_of_phase_shooting_declaration_accepted")
     assert _has_event(lifecycle.decision_controller, "out_of_phase_shooting_completed")
+    accepted = _last_event_payload(
+        lifecycle.decision_controller,
+        "out_of_phase_shooting_declaration_accepted",
+    )
+    attack_pools = cast(list[dict[str, object]], accepted["attack_pools"])
+    assert SNAP_SHOOTING_RULE_ID in cast(list[str], attack_pools[0]["targeting_rule_ids"])
     assert "<" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
 
 
@@ -1436,6 +1450,7 @@ def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> N
                 wargear_id=cast(str, selected_weapon["wargear_id"]),
                 weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
                 target_unit_instance_id="army-beta:enemy-unit-2",
+                shooting_type=_first_shooting_type(target_candidates[0]),
             ),
         ),
         visibility_cache_key=cast(str, proposal_request["visibility_cache_key"]),
@@ -2728,10 +2743,18 @@ def _shooting_declaration_from_request(
                 wargear_id=cast(str, selected_weapon["wargear_id"]),
                 weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
                 target_unit_instance_id=target_unit_id,
+                shooting_type=_first_shooting_type(target_candidate),
             ),
         ),
         visibility_cache_key=cast(str, target_candidate["visibility_cache_key"]),
     )
+
+
+def _first_shooting_type(target_candidate: dict[str, object]) -> ShootingType:
+    shooting_types = cast(list[str], target_candidate["shooting_types"])
+    if not shooting_types:
+        raise AssertionError("Target candidate has no shooting types.")
+    return ShootingType(shooting_types[0])
 
 
 def _move_unit_to_reserves(

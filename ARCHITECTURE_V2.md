@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the partial Phase 14E cutover, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D and Phase 14F work, the partial Phase 14E cutover, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E is partially implemented and remains the active build slice**: Benefit of Cover and Plunging Fire now modify BS rather than saves/AP, Invulnerable Saves are mandatory when present with no armour-versus-invulnerable adapter choice, Precision selection is pool-scoped as an interim visible Character model allocation constraint, and terrain objective control is locked to terrain-area containment instead of marker-radius contribution. The remaining Phase 14E work is the 11th Edition allocation-group host: save-before-allocation batching, defender allocation-order decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-mortal mixed-group ordering, and Precision selection by Character allocation group identity.
+Everything through **Phase 14D** and **Phase 14F** is treated as implemented at the time this file was updated. **Phase 14E is partially implemented and remains the active build slice**: Benefit of Cover and Plunging Fire now modify BS rather than saves/AP, Invulnerable Saves are mandatory when present with no armour-versus-invulnerable adapter choice, Precision selection is pool-scoped as an interim visible Character model allocation constraint, and terrain objective control is locked to terrain-area containment instead of marker-radius contribution. The remaining Phase 14E work is the 11th Edition allocation-group host: save-before-allocation batching, defender allocation-order decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-mortal mixed-group ordering, and Precision selection by Character allocation group identity.
 
 Completed / implemented foundation:
 
@@ -89,12 +89,13 @@ Completed / implemented foundation:
 | 14B | Complete | Timing windows, active player, and phase skeleton cutover |
 | 14C | Complete | Shared primitives cutover |
 | 14D | Complete | Movement, terrain, objectives, and actions cutover |
+| 14F | Complete | Shooting cutover |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14E-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14E, 14G-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -2102,6 +2103,8 @@ Remaining required tests:
   destroyed.
 
 ## Phase 14F: shooting cutover
+
+Status: Complete.
 
 Invariants:
 

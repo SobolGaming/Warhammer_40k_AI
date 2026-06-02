@@ -55,6 +55,7 @@ def test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization() -
     assert "Feel No Pain" in canonical_rule_keyword_tokens()
     assert "Feel No Pain" not in canonical_weapon_keyword_tokens()
     assert weapon_keyword_from_token("Rapid Fire") is WeaponKeyword.RAPID_FIRE
+    assert weapon_keyword_from_token("Close-quarters") is WeaponKeyword.CLOSE_QUARTERS
 
     with pytest.raises(WeaponProfileError):
         weapon_keyword_from_token("rapid fire")

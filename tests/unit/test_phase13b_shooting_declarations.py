@@ -145,6 +145,12 @@ from warhammer40k_core.engine.shooting_targets import (
     ShootingTargetViolationCode,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
+    unit_has_line_of_sight_to_target,
+)
+from warhammer40k_core.engine.shooting_types import (
+    ShootingType,
+    shooting_type_from_token,
+    validate_shooting_type_tuple,
 )
 from warhammer40k_core.engine.transports import (
     FiringDeckSelection,
@@ -158,10 +164,13 @@ from warhammer40k_core.engine.weapon_abilities import (
     FIRE_OVERWATCH_RULE_ID,
     HEAVY_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+    INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+    INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID,
     MELTA_RULE_ID,
     PRECISION_RULE_ID,
     RAPID_FIRE_RULE_ID,
+    SNAP_SHOOTING_RULE_ID,
 )
 from warhammer40k_core.engine.weapon_declaration import (
     RangedAttackPool,
@@ -873,6 +882,7 @@ def test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_alloc
                 weapon_profile_id=precision_profile.profile_id,
                 weapon_profile=precision_profile,
                 target_unit_instance_id=hidden_defender.unit_instance_id,
+                shooting_type=ShootingType.NORMAL,
                 attacks=1,
                 target_visible_model_ids=(hidden_bodyguard.model_instance_id,),
                 target_in_range_model_ids=(
@@ -1208,7 +1218,7 @@ def test_phase13d_twin_linked_consumes_reroll_semantics_once() -> None:
     assert len(_event_payloads(lifecycle, "weapon_ability_reroll_resolved")) == 1
 
 
-def test_phase13d_indirect_fire_targets_unseen_units_and_unmodified_one_to_three_fail() -> None:
+def test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_fail() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     assert state.battlefield_state is not None
@@ -1295,10 +1305,11 @@ def test_phase13d_indirect_fire_targets_unseen_units_and_unmodified_one_to_three
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,
         target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.INDIRECT,
         attacks=1,
         target_visible_model_ids=(),
         target_in_range_model_ids=(defender.own_models[0].model_instance_id,),
-        targeting_rule_ids=(INDIRECT_FIRE_NO_VISIBLE_RULE_ID,),
+        targeting_rule_ids=(INDIRECT_FIRE_NO_VISIBLE_RULE_ID, INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID),
     )
     sequence = AttackSequence.start(
         sequence_id="phase13d-indirect",
@@ -1314,6 +1325,179 @@ def test_phase13d_indirect_fire_targets_unseen_units_and_unmodified_one_to_three
         attack_sequence=sequence,
         already_allocated_model_ids=(),
         dice_manager=dice_manager,
+    )
+
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    assert remaining_sequence is None
+    assert status is None
+    assert cast(dict[str, object], hit_payload["payload"])["minimum_unmodified_success"] == 6
+    assert cast(dict[str, object], hit_payload["payload"])["successful"] is False
+
+
+def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    observer = units["intercessor-1"]
+    defender = units["enemy"]
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=observer,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(10.0, 34.0 + index * 0.5) for index in range(5)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=defender,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(
+            Pose.at(33.0 + index * 1.4, 34.0 + index * 0.5, facing_degrees=180.0)
+            for index in range(5)
+        ),
+    )
+
+    assert unit_has_line_of_sight_to_target(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        observing_unit=observer,
+        target_unit_id=defender.unit_instance_id,
+    )
+    assert not unit_has_line_of_sight_to_target(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        observing_unit=observer,
+        target_unit_id=defender.unit_instance_id,
+        terrain_features=(_blocking_ruin(),),
+    )
+
+    unplaced_scenario = BattlefieldScenario(
+        armies=scenario.armies,
+        battlefield_state=scenario.battlefield_state.without_unit_placement(
+            defender.unit_instance_id
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="requires placed units"):
+        unit_has_line_of_sight_to_target(
+            scenario=unplaced_scenario,
+            ruleset_descriptor=_ruleset(),
+            observing_unit=observer,
+            target_unit_id=defender.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a BattlefieldScenario"):
+        unit_has_line_of_sight_to_target(
+            scenario=cast(BattlefieldScenario, object()),
+            ruleset_descriptor=_ruleset(),
+            observing_unit=observer,
+            target_unit_id=defender.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
+        unit_has_line_of_sight_to_target(
+            scenario=scenario,
+            ruleset_descriptor=cast(RulesetDescriptor, object()),
+            observing_unit=observer,
+            target_unit_id=defender.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a UnitInstance"):
+        unit_has_line_of_sight_to_target(
+            scenario=scenario,
+            ruleset_descriptor=_ruleset(),
+            observing_unit=cast(UnitInstance, object()),
+            target_unit_id=defender.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="terrain_features must contain"):
+        unit_has_line_of_sight_to_target(
+            scenario=scenario,
+            ruleset_descriptor=_ruleset(),
+            observing_unit=observer,
+            target_unit_id=defender.unit_instance_id,
+            terrain_features=cast(tuple[TerrainFeatureDefinition, ...], ("bad-terrain",)),
+        )
+
+
+def test_phase14f_shooting_type_tokens_are_fail_fast() -> None:
+    assert shooting_type_from_token(ShootingType.SNAP) is ShootingType.SNAP
+    assert validate_shooting_type_tuple(
+        "test shooting_types",
+        (ShootingType.SNAP, "normal"),
+    ) == (ShootingType.NORMAL, ShootingType.SNAP)
+
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        shooting_type_from_token(1)
+    with pytest.raises(GameLifecycleError, match="Unsupported shooting type token"):
+        shooting_type_from_token("unsupported")
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        validate_shooting_type_tuple("test shooting_types", ["normal"])
+    with pytest.raises(GameLifecycleError, match="must not contain duplicates"):
+        validate_shooting_type_tuple("test shooting_types", ("normal", ShootingType.NORMAL))
+
+
+def test_phase14f_indirect_stationary_friendly_visibility_uses_one_to_three_fail() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14f-indirect-stationary-visible",
+        keywords=(WeaponKeyword.INDIRECT_FIRE,),
+        abilities=(),
+    )
+    sequence_id = "phase14f-indirect-stationary-visible"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    pool = RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id=attacker.wargear_selections[0].wargear_ids[0],
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.INDIRECT,
+        attacks=1,
+        target_visible_model_ids=(),
+        target_in_range_model_ids=(defender.own_models[0].model_instance_id,),
+        targeting_rule_ids=(
+            INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+            INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
+            INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID,
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(pool,),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=hit_spec,
+                    value=3,
+                ),
+            ),
+        ),
     )
 
     hit_payload = _attack_step_payload(
@@ -1358,6 +1542,7 @@ def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
                 weapon_profile=weapon_profile,
                 attacks=1,
             ),
+            shooting_type=ShootingType.SNAP,
             hit_roll_modifier=1,
             targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
         )
@@ -1402,6 +1587,83 @@ def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
         assert hit["successful"] is (roll_value == 6)
 
 
+def test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes() -> None:
+    for roll_value in (5, 6):
+        lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+        state = _state(lifecycle)
+        attacker = units["intercessor-1"]
+        defender = units["enemy"]
+        weapon_profile = replace(
+            _first_weapon_profile(lifecycle, attacker),
+            profile_id=f"phase14f-snap-hit-{roll_value}",
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 2),
+        )
+        sequence_id = f"phase14f-snap-hit-{roll_value}"
+        attack_context_id = f"{sequence_id}:pool-001:attack-001"
+        hit_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.hit",
+            actor_id="player-a",
+        )
+        wound_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.wound",
+            actor_id="player-a",
+        )
+        pool = replace(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+            shooting_type=ShootingType.SNAP,
+            hit_roll_modifier=1,
+            targeting_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+        )
+
+        resolve_attack_sequence_until_blocked(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=AttackSequence.start(
+                sequence_id=sequence_id,
+                attacker_player_id="player-a",
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attack_pools=(pool,),
+            ),
+            already_allocated_model_ids=(),
+            dice_manager=DiceRollManager(
+                sequence_id,
+                event_log=lifecycle.decision_controller.event_log,
+                injected_results=(
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:hit",
+                        spec=hit_spec,
+                        value=roll_value,
+                    ),
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:wound",
+                        spec=wound_spec,
+                        value=1,
+                    ),
+                ),
+            ),
+        )
+
+        hit_payload = _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.HIT,
+        )
+        hit = cast(dict[str, object], hit_payload["payload"])
+        assert hit["minimum_unmodified_success"] == 6
+        assert hit["target_number"] == 2
+        assert hit["modifier"] == 1
+        assert hit["successful"] is (roll_value == 6)
+
+
 def test_phase13d_fire_overwatch_torrent_weapons_auto_hit() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -1428,6 +1690,7 @@ def test_phase13d_fire_overwatch_torrent_weapons_auto_hit() -> None:
             weapon_profile=weapon_profile,
             attacks=1,
         ),
+        shooting_type=ShootingType.SNAP,
         targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
     )
 
@@ -2274,6 +2537,7 @@ def test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks() -> None
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,
         target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
         attacks=1,
         target_visible_model_ids=(defender_model.model_instance_id,),
         target_in_range_model_ids=(defender_model.model_instance_id,),
@@ -5928,6 +6192,48 @@ def test_invalid_shooting_declaration_submissions_do_not_consume_pending_request
     assert len(lifecycle.decision_controller.records) == before_records
     assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
 
+    missing_type_payload = proposal.to_payload()
+    missing_type_declaration = cast(dict[str, object], missing_type_payload["declarations"][0])
+    del missing_type_declaration["shooting_type"]
+    missing_type_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=missing_type_payload,
+        result_id="phase14f-missing-shooting-type",
+    )
+    missing_type_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], missing_type_status.payload)["proposal_validation"],
+    )
+    assert missing_type_status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(list[dict[str, object]], missing_type_validation["violations"])[0]["violation_code"]
+        == "proposal_schema_invalid"
+    )
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+
+    invented_type_payload = proposal.to_payload()
+    invented_type_declaration = cast(dict[str, object], invented_type_payload["declarations"][0])
+    invented_type_declaration["shooting_type"] = ShootingType.SNAP.value
+    invented_type_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=invented_type_payload,
+        result_id="phase14f-invented-shooting-type",
+    )
+    invented_type_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], invented_type_status.payload)["proposal_validation"],
+    )
+    assert invented_type_status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(list[dict[str, object]], invented_type_validation["violations"])[0]["violation_code"]
+        == "shooting_type_unavailable"
+    )
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+
     duplicate_payload = proposal.to_payload()
     duplicate_payload["declarations"] = [
         proposal.declarations[0].to_payload(),
@@ -6267,6 +6573,7 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
             wargear_id="wargear-1",
             weapon_profile_id="profile-1",
             target_unit_instance_id="target-1",
+            shooting_type=ShootingType.NORMAL,
             firing_deck_source_unit_instance_id="source-unit",
         )
     with pytest.raises(GameLifecycleError, match="token must be a string"):
@@ -6481,6 +6788,7 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
         target_unit_ids=(lone_target.unit_instance_id,),
     )
     assert close_candidates[0].is_legal
+    assert close_candidates[0].shooting_types == (ShootingType.NORMAL,)
 
 
 def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state() -> None:
@@ -6508,6 +6816,7 @@ def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state
     assert vehicle_candidates[0].is_legal
     assert vehicle_candidates[0].hit_roll_modifier == -1
     assert "big_guns_never_tire" in vehicle_candidates[0].targeting_rule_ids
+    assert vehicle_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)
 
     infantry_lifecycle, infantry_units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -6540,6 +6849,35 @@ def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state
     )
     assert pistol_candidates[0].is_legal
     assert pistol_candidates[0].hit_roll_modifier == 0
+    assert pistol_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)
+
+    close_quarters_profile = replace(
+        infantry_profile,
+        keywords=(WeaponKeyword.CLOSE_QUARTERS,),
+    )
+    close_quarters_candidates = shooting_target_candidates_for_unit(
+        scenario=infantry_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=infantry,
+        weapon_profile=close_quarters_profile,
+        target_unit_ids=(infantry_units["enemy"].unit_instance_id,),
+    )
+    assert close_quarters_candidates[0].is_legal
+    assert close_quarters_candidates[0].hit_roll_modifier == 0
+    assert close_quarters_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)
+
+    blast_profile = replace(
+        infantry_profile,
+        keywords=(WeaponKeyword.CLOSE_QUARTERS, WeaponKeyword.BLAST),
+    )
+    blast_candidates = shooting_target_candidates_for_unit(
+        scenario=infantry_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=infantry,
+        weapon_profile=blast_profile,
+        target_unit_ids=(infantry_units["enemy"].unit_instance_id,),
+    )
+    assert blast_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
 
 
 def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() -> None:
@@ -6606,9 +6944,31 @@ def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() 
     assert monster_candidates[0].is_legal
     assert monster_candidates[0].hit_roll_modifier == -1
     assert "big_guns_never_tire" in monster_candidates[0].targeting_rule_ids
+    assert monster_candidates[0].shooting_types == (ShootingType.CLOSE_QUARTERS,)
+
+    close_quarters_profile = replace(profile, keywords=(WeaponKeyword.CLOSE_QUARTERS,))
+    close_quarters_candidates = shooting_target_candidates_for_unit(
+        scenario=monster_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=close_quarters_profile,
+        target_unit_ids=(monster_target.unit_instance_id,),
+    )
+    assert close_quarters_candidates[0].is_legal
+    assert close_quarters_candidates[0].hit_roll_modifier == 0
+
+    blast_profile = replace(profile, keywords=(WeaponKeyword.BLAST,))
+    blast_candidates = shooting_target_candidates_for_unit(
+        scenario=monster_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=blast_profile,
+        target_unit_ids=(monster_target.unit_instance_id,),
+    )
+    assert blast_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
 
 
-def test_mixed_pistol_and_non_pistol_declarations_are_rejected_without_queue_pop() -> None:
+def test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_pop() -> None:
     catalog = _catalog_with_extra_bolt_profile(
         replace(
             _weapon_profile_by_wargear(
@@ -6683,7 +7043,7 @@ def test_mixed_pistol_and_non_pistol_declarations_are_rejected_without_queue_pop
     assert status.status_kind is LifecycleStatusKind.INVALID
     assert (
         cast(list[dict[str, object]], validation["violations"])[0]["violation_code"]
-        == "mixed_pistol_non_pistol_declaration"
+        == "mixed_close_quarters_non_close_quarters_declaration"
     )
     assert len(lifecycle.decision_controller.records) == before_records
     assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
@@ -7584,6 +7944,7 @@ def _proposal_from_request(
             wargear_id=cast(str, selected_weapon["wargear_id"]),
             weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
             target_unit_instance_id=target_unit_id,
+            shooting_type=_first_shooting_type(target_candidate),
         )
     ]
     firing_deck_selection = None
@@ -7602,6 +7963,7 @@ def _proposal_from_request(
                 wargear_id=passenger_wargear_id,
                 weapon_profile_id=cast(str, passenger_profile["weapon_profile_id"]),
                 target_unit_instance_id=target_unit_id,
+                shooting_type=_first_shooting_type(target_candidate),
                 firing_deck_source_unit_instance_id=firing_deck_unit.unit_instance_id,
                 firing_deck_source_model_instance_id=passenger_model.model_instance_id,
             )
@@ -7641,12 +8003,14 @@ def _weapon_payload_to_declaration_payload(
     *,
     weapon: dict[str, object],
     target_unit_id: str,
+    shooting_type: ShootingType = ShootingType.NORMAL,
 ) -> WeaponDeclarationPayload:
     payload: WeaponDeclarationPayload = {
         "attacker_model_instance_id": cast(str, weapon["model_instance_id"]),
         "wargear_id": cast(str, weapon["wargear_id"]),
         "weapon_profile_id": cast(str, weapon["weapon_profile_id"]),
         "target_unit_instance_id": target_unit_id,
+        "shooting_type": shooting_type.value,
         "firing_deck_source_unit_instance_id": None,
         "firing_deck_source_model_instance_id": None,
     }
@@ -7660,6 +8024,13 @@ def _weapon_payload_to_declaration_payload(
             weapon["firing_deck_source_model_instance_id"],
         )
     return payload
+
+
+def _first_shooting_type(target_candidate: dict[str, object]) -> ShootingType:
+    shooting_types = cast(list[str], target_candidate["shooting_types"])
+    if not shooting_types:
+        raise AssertionError("Target candidate has no shooting types.")
+    return ShootingType(shooting_types[0])
 
 
 def _submit_result(
@@ -7766,6 +8137,7 @@ def _attack_pool_for_test(
             if target_unit_instance_id is None
             else target_unit_instance_id
         ),
+        shooting_type=ShootingType.NORMAL,
         attacks=attacks,
         target_visible_model_ids=defender_model_ids,
         target_in_range_model_ids=defender_model_ids,

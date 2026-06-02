@@ -51,19 +51,29 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.shooting_targets import (
+    ShootingTargetCandidate,
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
     shooting_visibility_cache_key,
+    unit_has_line_of_sight_to_target,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
 from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
     resolve_firing_deck_selection,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
+    ASSAULT_RULE_ID,
+    CLOSE_QUARTERS_RULE_ID,
     FIRE_OVERWATCH_RULE_ID,
+    INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
+    INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+    INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID,
+    SNAP_SHOOTING_RULE_ID,
     blast_attack_bonus,
     blast_rule_id,
+    has_close_quarters_weapon_keyword,
     has_weapon_keyword,
     heavy_rule_id,
     melta_damage_bonus,
@@ -892,6 +902,7 @@ def _request_shooting_declaration(
     phase: BattlePhase = BattlePhase.SHOOTING,
     request_context: JsonValue | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
+    forced_shooting_type: ShootingType | None = None,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
@@ -922,7 +933,16 @@ def _request_shooting_declaration(
             terrain_features=terrain_features,
         )
         target_candidates.extend(
-            cast(JsonValue, candidate.to_payload()) for candidate in candidates
+            _target_candidate_payload_for_request(
+                state=state,
+                scenario=scenario,
+                candidate=cast(dict[str, JsonValue], candidate.to_payload()),
+                unit=unit,
+                weapon_profile=profile,
+                player_id=active_selection.player_id,
+                forced_shooting_type=forced_shooting_type,
+            )
+            for candidate in candidates
         )
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
@@ -1043,7 +1063,81 @@ def request_out_of_phase_shooting_declaration(
             }
         ),
         target_unit_ids=target_unit_ids,
+        forced_shooting_type=(
+            ShootingType.SNAP if source_rule_id == FIRE_OVERWATCH_RULE_ID else None
+        ),
     )
+
+
+def _target_candidate_payload_for_request(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    candidate: dict[str, JsonValue],
+    unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    player_id: str,
+    forced_shooting_type: ShootingType | None,
+) -> JsonValue:
+    payload = dict(candidate)
+    payload["shooting_types"] = [
+        shooting_type.value
+        for shooting_type in _shooting_types_for_candidate_payload(
+            state=state,
+            scenario=scenario,
+            candidate=candidate,
+            unit=unit,
+            weapon_profile=weapon_profile,
+            player_id=player_id,
+            forced_shooting_type=forced_shooting_type,
+        )
+    ]
+    return validate_json_value(payload)
+
+
+def _shooting_types_for_candidate_payload(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    candidate: dict[str, JsonValue],
+    unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    player_id: str,
+    forced_shooting_type: ShootingType | None,
+) -> tuple[ShootingType, ...]:
+    if candidate.get("is_legal") is not True:
+        return ()
+    raw_types = candidate.get("shooting_types")
+    if not isinstance(raw_types, list):
+        raise GameLifecycleError("Shooting target candidate payload missing shooting_types.")
+    base_types = tuple(shooting_type_from_token(value) for value in raw_types)
+    target_unit_id = _payload_string(
+        cast(dict[str, object], candidate),
+        key="target_unit_instance_id",
+    )
+    if forced_shooting_type is not None:
+        if forced_shooting_type is not ShootingType.SNAP:
+            raise GameLifecycleError("Unsupported forced shooting type.")
+        if _snap_shooting_type_allowed_for_unit_target(
+            scenario=scenario,
+            candidate=candidate,
+            unit=unit,
+            target_unit_id=target_unit_id,
+        ):
+            return (ShootingType.SNAP,)
+        return ()
+    if _advanced_unit_is_restricted_to_assault_weapons(
+        state=state,
+        unit=unit,
+        player_id=player_id,
+    ):
+        if ShootingType.NORMAL in base_types and has_weapon_keyword(
+            weapon_profile,
+            WeaponKeyword.ASSAULT,
+        ):
+            return (ShootingType.ASSAULT,)
+        return ()
+    return base_types
 
 
 def _apply_shooting_unit_selection_decision(
@@ -1490,6 +1584,7 @@ def _attack_pools_or_validation(
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
+    snap_target_unit_ids: set[str] = set()
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
         key = _declaration_available_weapon_key(declaration)
         if key in seen_declaration_keys:
@@ -1548,6 +1643,25 @@ def _attack_pools_or_validation(
                 message=candidate.message or "Declared target is not legal.",
                 field="declarations",
             )
+        allowed_shooting_types = _shooting_types_for_declaration_candidate(
+            state=state,
+            scenario=scenario,
+            candidate=candidate,
+            declaration=declaration,
+            unit=unit,
+            weapon_profile=weapon_profile,
+            player_id=player_id,
+            out_of_phase_state=out_of_phase_state,
+        )
+        if declaration.shooting_type not in allowed_shooting_types:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="shooting_type_unavailable",
+                message="Declared shooting type is not available for this weapon and target.",
+                field="declarations",
+            )
+        if declaration.shooting_type is ShootingType.SNAP:
+            snap_target_unit_ids.add(declaration.target_unit_instance_id)
         if attack_count_manager is None:
             attacks = unresolved_attacks_for_validation(weapon_profile)
         else:
@@ -1572,6 +1686,8 @@ def _attack_pools_or_validation(
         )
         attacks, targeting_rule_ids, hit_roll_modifier = _apply_phase13d_weapon_modifiers(
             state=state,
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
             unit=unit,
             target_unit=_unit_by_id(
                 state=state,
@@ -1582,10 +1698,15 @@ def _attack_pools_or_validation(
             base_targeting_rule_ids=candidate.targeting_rule_ids,
             base_hit_roll_modifier=candidate.hit_roll_modifier,
             target_within_half_range=target_within_half_range,
+            terrain_features=terrain_features,
             player_id=player_id,
         )
         if _out_of_phase_uses_fire_overwatch(out_of_phase_state):
             targeting_rule_ids = (*targeting_rule_ids, FIRE_OVERWATCH_RULE_ID)
+        targeting_rule_ids = _targeting_rule_ids_with_shooting_type(
+            shooting_type=declaration.shooting_type,
+            targeting_rule_ids=targeting_rule_ids,
+        )
         attack_pools.append(
             RangedAttackPool.from_declaration(
                 declaration=declaration,
@@ -1596,6 +1717,13 @@ def _attack_pools_or_validation(
                 hit_roll_modifier=hit_roll_modifier,
                 targeting_rule_ids=targeting_rule_ids,
             )
+        )
+    if len(snap_target_unit_ids) > 1:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="snap_shooting_multiple_targets",
+            message="Snap Shooting declarations must target one enemy unit.",
+            field="declarations",
         )
     return (tuple(attack_pools), ineligible_unit_ids)
 
@@ -1625,6 +1753,70 @@ def _out_of_phase_uses_fire_overwatch(
     )
 
 
+def _forced_shooting_type_for_out_of_phase(
+    out_of_phase_state: OutOfPhaseShootingState | None,
+) -> ShootingType | None:
+    if _out_of_phase_uses_fire_overwatch(out_of_phase_state):
+        return ShootingType.SNAP
+    return None
+
+
+def _shooting_types_for_declaration_candidate(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    candidate: ShootingTargetCandidate,
+    declaration: WeaponDeclaration,
+    unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    player_id: str,
+    out_of_phase_state: OutOfPhaseShootingState | None,
+) -> tuple[ShootingType, ...]:
+    forced_shooting_type = _forced_shooting_type_for_out_of_phase(out_of_phase_state)
+    if forced_shooting_type is not None:
+        if forced_shooting_type is not ShootingType.SNAP:
+            raise GameLifecycleError("Unsupported forced shooting type.")
+        if candidate.target_visible_model_ids and _declaration_target_within_max_range(
+            scenario=scenario,
+            declaration=declaration,
+            target_in_range_model_ids=candidate.target_visible_model_ids,
+            range_inches=24,
+        ):
+            return (ShootingType.SNAP,)
+        return ()
+    if _advanced_unit_is_restricted_to_assault_weapons(
+        state=state,
+        unit=unit,
+        player_id=player_id,
+    ):
+        if ShootingType.NORMAL in candidate.shooting_types and has_weapon_keyword(
+            weapon_profile,
+            WeaponKeyword.ASSAULT,
+        ):
+            return (ShootingType.ASSAULT,)
+        return ()
+    return candidate.shooting_types
+
+
+def _targeting_rule_ids_with_shooting_type(
+    *,
+    shooting_type: ShootingType,
+    targeting_rule_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    rule_ids = list(targeting_rule_ids)
+    if shooting_type is ShootingType.ASSAULT:
+        rule_ids.append(ASSAULT_RULE_ID)
+    elif shooting_type is ShootingType.CLOSE_QUARTERS:
+        rule_ids.append(CLOSE_QUARTERS_RULE_ID)
+    elif shooting_type is ShootingType.SNAP:
+        rule_ids.append(SNAP_SHOOTING_RULE_ID)
+    elif shooting_type in {ShootingType.NORMAL, ShootingType.INDIRECT}:
+        pass
+    else:
+        raise GameLifecycleError("Unsupported shooting type for targeting rule IDs.")
+    return tuple(dict.fromkeys(rule_ids))
+
+
 def _validate_model_pistol_exclusivity(
     *,
     state: GameState,
@@ -1643,24 +1835,27 @@ def _validate_model_pistol_exclusivity(
         return None
     source_model_id = _declaration_source_model_id(declaration)
     model_key = (source_unit.unit_instance_id, source_model_id)
-    is_pistol = WeaponKeyword.PISTOL in weapon_profile.keywords
+    is_close_quarters = has_close_quarters_weapon_keyword(weapon_profile)
     existing = model_pistol_declaration_kind.get(model_key)
-    if existing is not None and existing != is_pistol:
+    if existing is not None and existing != is_close_quarters:
         return ShootingProposalValidationResult.invalid(
             proposal_request_id=proposal_request_id,
-            violation_code="mixed_pistol_non_pistol_declaration",
+            violation_code="mixed_close_quarters_non_close_quarters_declaration",
             message=(
-                "A non-Monster/Vehicle model cannot shoot Pistol and non-Pistol weapons together."
+                "A non-Monster/Vehicle model cannot shoot close-quarters and "
+                "non-close-quarters weapons together."
             ),
             field="declarations",
         )
-    model_pistol_declaration_kind[model_key] = is_pistol
+    model_pistol_declaration_kind[model_key] = is_close_quarters
     return None
 
 
 def _apply_phase13d_weapon_modifiers(
     *,
     state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
     unit: UnitInstance,
     target_unit: UnitInstance,
     weapon_profile: WeaponProfile,
@@ -1668,6 +1863,7 @@ def _apply_phase13d_weapon_modifiers(
     base_targeting_rule_ids: tuple[str, ...],
     base_hit_roll_modifier: int,
     target_within_half_range: bool,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
     player_id: str | None = None,
 ) -> tuple[int, tuple[str, ...], int]:
     attacks = base_attacks
@@ -1702,6 +1898,20 @@ def _apply_phase13d_weapon_modifiers(
     ):
         hit_roll_modifier += 1
         targeting_rule_ids.append(heavy_rule_id())
+
+    if INDIRECT_FIRE_NO_VISIBLE_RULE_ID in targeting_rule_ids:
+        targeting_rule_ids.append(INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID)
+        if _unit_remained_stationary(state=state, unit=unit, player_id=player_id) and (
+            _target_visible_to_friendly_unit(
+                state=state,
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                target_unit_instance_id=target_unit.unit_instance_id,
+                terrain_features=terrain_features,
+                player_id=player_id,
+            )
+        ):
+            targeting_rule_ids.append(INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID)
 
     return attacks, tuple(targeting_rule_ids), hit_roll_modifier
 
@@ -1740,6 +1950,81 @@ def _target_within_half_weapon_range(
     return False
 
 
+def _snap_shooting_type_allowed_for_unit_target(
+    *,
+    scenario: BattlefieldScenario,
+    candidate: dict[str, JsonValue],
+    unit: UnitInstance,
+    target_unit_id: str,
+) -> bool:
+    target_visible_model_ids = candidate.get("target_visible_model_ids")
+    if not isinstance(target_visible_model_ids, list) or not target_visible_model_ids:
+        return False
+    return _unit_target_within_max_range(
+        scenario=scenario,
+        unit=unit,
+        target_unit_id=target_unit_id,
+        range_inches=24,
+    )
+
+
+def _declaration_target_within_max_range(
+    *,
+    scenario: BattlefieldScenario,
+    declaration: WeaponDeclaration,
+    target_in_range_model_ids: tuple[str, ...],
+    range_inches: int,
+) -> bool:
+    if not target_in_range_model_ids:
+        return False
+    battlefield = scenario.battlefield_state
+    attacker_placement = battlefield.model_placement_by_id(declaration.attacker_model_instance_id)
+    attacker_model = geometry_model_for_placement(
+        model=scenario.model_instance_for_placement(attacker_placement),
+        placement=attacker_placement,
+    )
+    for target_model_id in target_in_range_model_ids:
+        target_placement = battlefield.model_placement_by_id(target_model_id)
+        target_model = geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(target_placement),
+            placement=target_placement,
+        )
+        if DistanceMeasurementContext.from_models(
+            attacker_model,
+            target_model,
+        ).closest_distance_inches() <= float(range_inches):
+            return True
+    return False
+
+
+def _unit_target_within_max_range(
+    *,
+    scenario: BattlefieldScenario,
+    unit: UnitInstance,
+    target_unit_id: str,
+    range_inches: int,
+) -> bool:
+    battlefield = scenario.battlefield_state
+    unit_placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+    target_placement = battlefield.unit_placement_by_id(target_unit_id)
+    for attacker_model_placement in unit_placement.model_placements:
+        attacker_model = geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(attacker_model_placement),
+            placement=attacker_model_placement,
+        )
+        for target_model_placement in target_placement.model_placements:
+            target_model = geometry_model_for_placement(
+                model=scenario.model_instance_for_placement(target_model_placement),
+                placement=target_model_placement,
+            )
+            if DistanceMeasurementContext.from_models(
+                attacker_model,
+                target_model,
+            ).closest_distance_inches() <= float(range_inches):
+                return True
+    return False
+
+
 def _unit_remained_stationary(
     *,
     state: GameState,
@@ -1765,6 +2050,40 @@ def _unit_remained_stationary(
     if movement_state is None:
         return True
     return unit.unit_instance_id not in movement_state.moved_unit_ids
+
+
+def _target_visible_to_friendly_unit(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    target_unit_instance_id: str,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    player_id: str | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Friendly visibility query requires battlefield_state.")
+    try:
+        placed_army = battlefield.placed_army_for_player(actor_id)
+    except PlacementError as exc:
+        raise GameLifecycleError(
+            "Friendly visibility query requires placed friendly units."
+        ) from exc
+    for unit_placement in placed_army.unit_placements:
+        if unit_placement.unit_instance_id == target_unit_instance_id:
+            raise GameLifecycleError("Friendly visibility query included the target unit.")
+        friendly_unit = _unit_by_id(state=state, unit_instance_id=unit_placement.unit_instance_id)
+        if unit_has_line_of_sight_to_target(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            observing_unit=friendly_unit,
+            target_unit_id=target_unit_instance_id,
+            terrain_features=terrain_features,
+        ):
+            return True
+    return False
 
 
 def _declaration_source_unit(

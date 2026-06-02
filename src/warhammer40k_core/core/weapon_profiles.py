@@ -34,6 +34,7 @@ class WeaponKeyword(StrEnum):
     TORRENT = "Torrent"
     PSYCHIC = "Psychic"
     PISTOL = "Pistol"
+    CLOSE_QUARTERS = "Close-quarters"
     HEAVY = "Heavy"
     BLAST = "Blast"
     MELTA = "Melta"
