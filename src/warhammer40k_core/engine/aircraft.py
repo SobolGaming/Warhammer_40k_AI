@@ -30,7 +30,6 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.movement_envelope import (
     AircraftBaseMovementWitness,
     AircraftBaseMovementWitnessPayload,
-    PivotCostPolicy,
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -39,9 +38,6 @@ from warhammer40k_core.geometry.volume import Model
 
 _AIRCRAFT_KEYWORD = "AIRCRAFT"
 _FLY_KEYWORD = "FLY"
-_HOVER_KEYWORD = "HOVER"
-_MONSTER_KEYWORD = "MONSTER"
-_VEHICLE_KEYWORD = "VEHICLE"
 _AIRCRAFT_MINIMUM_MOVE_INCHES = 20.0
 _AIRCRAFT_MAXIMUM_PIVOT_DEGREES = 90.0
 _AIRCRAFT_RESERVE_DESTINATION_ID = "strategic_reserves"
@@ -85,7 +81,6 @@ class AircraftMovementPolicyPayload(TypedDict):
     uses_aircraft_rules: bool
     minimum_move_inches: float | None
     maximum_pivot_degrees: float | None
-    pivot_cost_inches: float
     can_move_over_other_models: bool
     other_models_can_move_over_this_aircraft: bool
     can_declare_charge: bool
@@ -297,7 +292,6 @@ class AircraftMovementPolicy:
     uses_aircraft_rules: bool
     minimum_move_inches: float | None
     maximum_pivot_degrees: float | None
-    pivot_cost_inches: float
     can_move_over_other_models: bool
     other_models_can_move_over_this_aircraft: bool
     can_declare_charge: bool
@@ -370,14 +364,6 @@ class AircraftMovementPolicy:
                 self.maximum_pivot_degrees,
             ),
         )
-        object.__setattr__(
-            self,
-            "pivot_cost_inches",
-            _validate_non_negative_number(
-                "AircraftMovementPolicy pivot_cost_inches",
-                self.pivot_cost_inches,
-            ),
-        )
         if self.uses_aircraft_rules and not self.has_aircraft_keyword:
             raise GameLifecycleError("AircraftMovementPolicy cannot use rules without AIRCRAFT.")
         if self.hover_mode_active and self.uses_aircraft_rules:
@@ -433,7 +419,6 @@ class AircraftMovementPolicy:
             uses_aircraft_rules=uses_aircraft_rules,
             minimum_move_inches=_AIRCRAFT_MINIMUM_MOVE_INCHES if uses_aircraft_rules else None,
             maximum_pivot_degrees=_AIRCRAFT_MAXIMUM_PIVOT_DEGREES if uses_aircraft_rules else None,
-            pivot_cost_inches=0.0 if uses_aircraft_rules else _generic_pivot_cost_placeholder(),
             can_move_over_other_models=uses_aircraft_rules or _FLY_KEYWORD in effective_keywords,
             other_models_can_move_over_this_aircraft=uses_aircraft_rules,
             can_declare_charge=not uses_aircraft_rules,
@@ -442,34 +427,6 @@ class AircraftMovementPolicy:
 
     def aircraft_model_ids(self) -> tuple[str, ...]:
         return self.model_instance_ids if self.uses_aircraft_rules else ()
-
-    def to_pivot_cost_policy(self, model_instance_id: str) -> PivotCostPolicy:
-        requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
-        if requested_model_id not in set(self.model_instance_ids):
-            raise GameLifecycleError("model_instance_id is not governed by this aircraft policy.")
-        effective_keyword_set = set(self.effective_keywords)
-        aircraft_model_ids = (requested_model_id,) if self.uses_aircraft_rules else ()
-        vehicle_or_monster_model_ids = (
-            (requested_model_id,)
-            if (
-                _VEHICLE_KEYWORD in effective_keyword_set
-                or _MONSTER_KEYWORD in effective_keyword_set
-            )
-            else ()
-        )
-        round_base_flying_stem_or_hover_model_ids = (
-            (requested_model_id,)
-            if _VEHICLE_KEYWORD in effective_keyword_set
-            and (_FLY_KEYWORD in effective_keyword_set or _HOVER_KEYWORD in effective_keyword_set)
-            else ()
-        )
-        return PivotCostPolicy(
-            vehicle_or_monster_model_ids=vehicle_or_monster_model_ids,
-            aircraft_model_ids=aircraft_model_ids,
-            round_base_flying_stem_or_hover_stand_vehicle_model_ids=(
-                round_base_flying_stem_or_hover_model_ids
-            ),
-        )
 
     def validate_normal_move_witness(
         self,
@@ -543,7 +500,6 @@ class AircraftMovementPolicy:
             "uses_aircraft_rules": self.uses_aircraft_rules,
             "minimum_move_inches": self.minimum_move_inches,
             "maximum_pivot_degrees": self.maximum_pivot_degrees,
-            "pivot_cost_inches": self.pivot_cost_inches,
             "can_move_over_other_models": self.can_move_over_other_models,
             "other_models_can_move_over_this_aircraft": (
                 self.other_models_can_move_over_this_aircraft
@@ -565,7 +521,6 @@ class AircraftMovementPolicy:
             uses_aircraft_rules=payload["uses_aircraft_rules"],
             minimum_move_inches=payload["minimum_move_inches"],
             maximum_pivot_degrees=payload["maximum_pivot_degrees"],
-            pivot_cost_inches=payload["pivot_cost_inches"],
             can_move_over_other_models=payload["can_move_over_other_models"],
             other_models_can_move_over_this_aircraft=payload[
                 "other_models_can_move_over_this_aircraft"
@@ -1036,10 +991,6 @@ def _angle_delta_degrees(first: float, second: float) -> float:
     return abs((first - second + 180.0) % 360.0 - 180.0)
 
 
-def _generic_pivot_cost_placeholder() -> float:
-    return 0.0
-
-
 def _required_number(field_name: str, value: float | None) -> float:
     if value is None:
         raise GameLifecycleError(f"{field_name} is required.")
@@ -1128,13 +1079,6 @@ def _validate_positive_number(field_name: str, value: object) -> float:
     number = _validate_finite_number(field_name, value)
     if number <= 0.0:
         raise GameLifecycleError(f"{field_name} must be greater than 0.")
-    return number
-
-
-def _validate_non_negative_number(field_name: str, value: object) -> float:
-    number = _validate_finite_number(field_name, value)
-    if number < 0.0:
-        raise GameLifecycleError(f"{field_name} must not be negative.")
     return number
 
 

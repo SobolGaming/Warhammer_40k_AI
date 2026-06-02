@@ -354,6 +354,7 @@ def _apply_start_mission_action(
         interruption_conditions=mission_action.interruption_conditions,
         scoring_source_id=mission_action.scoring_source_id,
         victory_points=mission_action.victory_points,
+        battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
     )
     state.record_mission_action_state(action_state)
     decisions.event_log.append(
@@ -404,6 +405,7 @@ def _mission_action_start_options(
         (unit_id, target_id)
         for unit_id in eligible_unit_ids
         for target_id in target_ids_by_unit.get(unit_id, ())
+        if unit_id not in state.battle_shocked_unit_ids
     )
     if not eligible_target_pairs:
         return ()

@@ -59,10 +59,10 @@ def test_eleventh_five_model_unit_requires_one_neighbor_per_model() -> None:
     result = context.validate_models(
         (
             _model("model-1", x=0.0),
-            _model("model-2", x=3.0),
-            _model("model-3", x=6.0),
-            _model("model-4", x=9.0),
-            _model("model-5", x=12.0),
+            _model("model-2", x=2.5),
+            _model("model-3", x=5.0),
+            _model("model-4", x=7.5),
+            _model("model-5", x=10.0),
         )
     )
 
@@ -86,8 +86,8 @@ def test_eleventh_two_disconnected_two_model_groups_are_not_coherent() -> None:
     )
 
     assert not result.is_coherent
-    assert {violation.violation_code for violation in result.violations} == {
-        "unit_coherency_not_single_group"
+    assert "unit_coherency_not_single_group" in {
+        violation.violation_code for violation in result.violations
     }
     assert any(
         violation.violation_code == "unit_coherency_not_single_group"
@@ -115,28 +115,39 @@ def test_eleventh_large_unit_with_two_locally_coherent_clusters_is_not_coherent(
     )
 
     assert not result.is_coherent
-    assert {violation.violation_code for violation in result.violations} == {
-        "unit_coherency_not_single_group"
+    assert "unit_coherency_not_single_group" in {
+        violation.violation_code for violation in result.violations
     }
     assert all(violation.neighbor_count is None for violation in result.violations)
 
 
-def test_eleventh_seven_model_unit_requires_two_neighbors_per_model() -> None:
+def test_eleventh_seven_model_unit_requires_one_neighbor_per_model_and_span_limit() -> None:
     context = UnitCoherencyContext.from_ruleset_descriptor(
         RulesetDescriptor.warhammer_40000_eleventh(),
         unit_instance_id="army-alpha:boyz-unit-1",
     )
 
     result = context.validate_models(
-        tuple(_model(f"model-{index}", x=(index - 1) * 3.0) for index in range(1, 8))
+        tuple(_model(f"model-{index}", x=(index - 1) * 1.5) for index in range(1, 8))
+    )
+
+    assert result.is_coherent
+    assert result.offending_model_instance_ids == ()
+
+
+def test_eleventh_unit_span_limit_is_enforced_after_neighbor_coherency() -> None:
+    context = UnitCoherencyContext.from_ruleset_descriptor(
+        RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_instance_id="army-alpha:span-unit-1",
+    )
+
+    result = context.validate_models(
+        tuple(_model(f"model-{index}", x=(index - 1) * 3.0) for index in range(1, 6))
     )
 
     assert not result.is_coherent
-    assert result.offending_model_instance_ids == ("model-1", "model-7")
-    assert {
-        (violation.model_instance_id, violation.neighbor_count, violation.required_neighbor_count)
-        for violation in result.violations
-    } == {("model-1", 1, 2), ("model-7", 1, 2)}
+    assert {violation.violation_code for violation in result.violations} == {"unit_span_exceeded"}
+    assert result.violations[0].max_unit_span_inches == 9.0
 
 
 def test_eleventh_broken_coherency_identifies_offending_model_ids() -> None:
@@ -148,10 +159,10 @@ def test_eleventh_broken_coherency_identifies_offending_model_ids() -> None:
     result = context.validate_models(
         (
             _model("model-1", x=0.0),
-            _model("model-2", x=3.0),
-            _model("model-3", x=6.0),
-            _model("model-4", x=9.0),
-            _model("model-5", x=30.0),
+            _model("model-2", x=2.5),
+            _model("model-3", x=5.0),
+            _model("model-4", x=7.5),
+            _model("model-5", x=4.0, y=4.0),
         )
     )
 

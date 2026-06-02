@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict
+from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import (
     BoundedCharacteristicValue,
@@ -67,6 +67,16 @@ class ModifierStackPayload(TypedDict):
     raw_value: int
     target_id: str | None
     modifiers: list[ModifierPayload]
+
+
+class DamageCharacteristicResolutionPayload(TypedDict):
+    characteristic: str
+    raw: int
+    base: int
+    modifier_final: int
+    final: int
+    applied_modifier_ids: list[str]
+    halve_damage_after_modifiers: bool
 
 
 class RollModifierPayload(TypedDict):
@@ -434,6 +444,144 @@ class ModifierStack:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class DamageCharacteristicResolution:
+    raw: int
+    base: int
+    modifier_final: int
+    final: int
+    applied_modifier_ids: tuple[str, ...]
+    halve_damage_after_modifiers: bool
+    characteristic: Characteristic = Characteristic.DAMAGE
+
+    def __post_init__(self) -> None:
+        if self.characteristic is not Characteristic.DAMAGE:
+            raise ModifierError("DamageCharacteristicResolution characteristic must be Damage.")
+        for field_name, value in (
+            ("raw", self.raw),
+            ("base", self.base),
+            ("modifier_final", self.modifier_final),
+            ("final", self.final),
+        ):
+            validate_characteristic_value(
+                Characteristic.DAMAGE,
+                f"DamageCharacteristicResolution {field_name}",
+                value,
+            )
+        if type(self.halve_damage_after_modifiers) is not bool:
+            raise ModifierError("halve_damage_after_modifiers must be a bool.")
+        ids = _validate_identifier_tuple(
+            "DamageCharacteristicResolution applied_modifier_ids",
+            self.applied_modifier_ids,
+        )
+        if ids != self.applied_modifier_ids:
+            object.__setattr__(self, "applied_modifier_ids", ids)
+        expected_final = self.modifier_final
+        if self.halve_damage_after_modifiers:
+            expected_final = _halve_damage_rounding_up(expected_final)
+        if self.final != expected_final:
+            raise ModifierError("DamageCharacteristicResolution final drift.")
+
+    def to_characteristic_value(self) -> CharacteristicValue:
+        return CharacteristicValue(
+            characteristic=Characteristic.DAMAGE,
+            raw=self.raw,
+            base=self.base,
+            final=self.final,
+            applied_modifier_ids=self.applied_modifier_ids,
+        )
+
+    def to_payload(self) -> DamageCharacteristicResolutionPayload:
+        return {
+            "characteristic": self.characteristic.value,
+            "raw": self.raw,
+            "base": self.base,
+            "modifier_final": self.modifier_final,
+            "final": self.final,
+            "applied_modifier_ids": list(self.applied_modifier_ids),
+            "halve_damage_after_modifiers": self.halve_damage_after_modifiers,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DamageCharacteristicResolutionPayload) -> Self:
+        return cls(
+            characteristic=characteristic_from_token(payload["characteristic"]),
+            raw=payload["raw"],
+            base=payload["base"],
+            modifier_final=payload["modifier_final"],
+            final=payload["final"],
+            applied_modifier_ids=tuple(payload["applied_modifier_ids"]),
+            halve_damage_after_modifiers=payload["halve_damage_after_modifiers"],
+        )
+
+
+def resolve_characteristic_value(
+    value: CharacteristicValue,
+    modifiers: Iterable[Modifier],
+    *,
+    target_id: str | None = None,
+    bound_policy: CharacteristicBoundPolicy | None = None,
+) -> CharacteristicValue:
+    if type(value) is not CharacteristicValue:
+        raise ModifierError("resolve_characteristic_value requires a CharacteristicValue.")
+    modifier_tuple = tuple(modifiers)
+    for modifier in modifier_tuple:
+        _validate_modifier(modifier)
+    if value.is_dash:
+        if any(
+            modifier.applies_to(value.characteristic, target_id=target_id)
+            for modifier in modifier_tuple
+        ):
+            raise ModifierError("Numeric modifiers cannot change dash characteristic values.")
+        return value
+    return ModifierStack(
+        characteristic=value.characteristic,
+        raw_value=value.raw,
+        modifiers=modifier_tuple,
+        target_id=target_id,
+    ).resolve(bound_policy=bound_policy)
+
+
+def resolve_damage_characteristic(
+    value: CharacteristicValue,
+    modifiers: Iterable[Modifier],
+    *,
+    target_id: str | None = None,
+    halve_damage_after_modifiers: bool = False,
+    damage_zero_permitted: bool = False,
+) -> DamageCharacteristicResolution:
+    if type(value) is not CharacteristicValue:
+        raise ModifierError("resolve_damage_characteristic requires a CharacteristicValue.")
+    if value.characteristic is not Characteristic.DAMAGE:
+        raise ModifierError("resolve_damage_characteristic requires a Damage value.")
+    if value.is_dash:
+        raise ModifierError("Damage cannot be resolved from a dash characteristic value.")
+    if type(halve_damage_after_modifiers) is not bool:
+        raise ModifierError("halve_damage_after_modifiers must be a bool.")
+    bounded = ModifierStack(
+        characteristic=Characteristic.DAMAGE,
+        raw_value=value.raw,
+        modifiers=tuple(modifiers),
+        target_id=target_id,
+    ).resolve_bounded(
+        bound_policy=CharacteristicBoundPolicy.for_characteristic(
+            Characteristic.DAMAGE,
+            damage_zero_permitted=damage_zero_permitted,
+        )
+    )
+    final = bounded.final
+    if halve_damage_after_modifiers:
+        final = _halve_damage_rounding_up(final)
+    return DamageCharacteristicResolution(
+        raw=bounded.raw,
+        base=bounded.base,
+        modifier_final=bounded.final,
+        final=final,
+        applied_modifier_ids=bounded.applied_modifier_ids,
+        halve_damage_after_modifiers=halve_damage_after_modifiers,
+    )
+
+
 def modifier_timing_from_token(token: object) -> ModifierTiming:
     if type(token) is not str:
         raise ModifierError("ModifierTiming token must be a string.")
@@ -504,6 +652,20 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     return _validate_identifier(field_name, value)
 
 
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise ModifierError(f"{field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise ModifierError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    return tuple(identifiers)
+
+
 def _validate_modifier_scope(scope: object) -> ModifierScope:
     if type(scope) is not ModifierScope:
         raise ModifierError("Modifier scope must be a ModifierScope.")
@@ -570,3 +732,12 @@ def _modifier_order_key(modifier: Modifier) -> tuple[int, int, str]:
 
 def _roll_modifier_order_key(modifier: RollModifier) -> tuple[int, str]:
     return (modifier.priority, modifier.modifier_id)
+
+
+def _halve_damage_rounding_up(value: int) -> int:
+    validate_characteristic_value(
+        Characteristic.DAMAGE,
+        "halve_damage_after_modifiers value",
+        value,
+    )
+    return (value + 1) // 2

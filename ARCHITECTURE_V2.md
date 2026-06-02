@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14B work and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14C work and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14B** is treated as implemented at the time this file was updated. Phase 14B completed the timing-window, active-player, and End of Opponent's Movement phase reaction cutover; **Phase 14C is the next build slice** before Phase 15 Charge/Fight work begins.
+Everything through **Phase 14C** is treated as implemented at the time this file was updated. Phase 14C completed the shared primitives cutover for 2"/5" Engagement Range, one-neighbor plus 9"/5" coherency, free rotations, typed dash characteristics, Detection Range, Battle-shocked OC/action restrictions, and unit-level Hazardous mortal-wound allocation; **Phase 14D is the next build slice** before Phase 15 Charge/Fight work begins.
 
 Completed / implemented foundation:
 
@@ -87,12 +87,13 @@ Completed / implemented foundation:
 | 13F | Complete | Shooting phase completion gate |
 | 14A | Complete | Source identity and migration audit |
 | 14B | Complete | Timing windows, active player, and phase skeleton cutover |
+| 14C | Complete | Shared primitives cutover |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14C-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14D-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -1963,6 +1964,8 @@ Required tests:
 - end-of-opponent-Movement reactions are emitted in the correct order.
 
 ## Phase 14C: shared primitives cutover
+
+Status: Complete.
 
 Invariants:
 

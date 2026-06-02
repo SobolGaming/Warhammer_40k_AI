@@ -186,9 +186,11 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26
 
 
 def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None:
+    allocation_profile = _phase13f_gate_weapon_profile()
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         game_id="phase13b-allocation-0005",
+        catalog=_catalog_with_extra_bolt_profile(allocation_profile),
     )
     first_status = lifecycle.advance_until_decision_or_terminal()
     first_request = _decision_request(first_status)
@@ -212,6 +214,7 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
     proposal = _proposal_from_request(
         request=declaration_request,
         target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=allocation_profile.profile_id,
     )
 
     next_status = lifecycle.submit_decision(
@@ -342,7 +345,7 @@ def test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers() ->
     catalog = _catalog_with_extra_bolt_profile(modifier_profile)
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
-        enemy_pose=Pose.at(18.0, 35.0),
+        enemy_pose=Pose.at(19.0, 35.0),
         catalog=catalog,
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -1349,10 +1352,36 @@ def test_phase13d_fire_overwatch_torrent_weapons_auto_hit() -> None:
     } == {"attack_sequence.wound"}
 
 
-def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
+@pytest.mark.parametrize(
+    (
+        "hazardous_roll_value",
+        "extra_attacker_keywords",
+        "expected_successful",
+        "expected_mortal_wounds",
+    ),
+    [
+        (1, (), False, 1),
+        (2, (), False, 1),
+        (3, (), True, 0),
+        (1, ("Vehicle",), False, 3),
+        (2, ("Vehicle",), False, 3),
+        (1, ("Monster",), False, 3),
+        (2, ("Monster",), False, 3),
+        (3, ("Monster",), True, 0),
+    ],
+)
+def test_phase13d_hazardous_tests_resolve_after_all_attacks(
+    hazardous_roll_value: int,
+    extra_attacker_keywords: tuple[str, ...],
+    expected_successful: bool,
+    expected_mortal_wounds: int,
+) -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
+    if extra_attacker_keywords:
+        attacker = replace(attacker, keywords=(*attacker.keywords, *extra_attacker_keywords))
+        _replace_unit_instance_in_state(state=state, replacement=attacker)
     defender = units["enemy"]
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -1380,9 +1409,9 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
     )
     hazardous_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
-        reason=f"Hazardous test for {weapon_profile.profile_id} after shooting",
+        reason=f"Hazardous test for {attacker.unit_instance_id} after shooting",
         roll_type="hazardous_test",
-        actor_id="player-a",
+        actor_id=attacker.unit_instance_id,
     )
     dice_manager = DiceRollManager(
         "phase13d-hazardous",
@@ -1393,7 +1422,7 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
             _fixed_roll_result(
                 roll_id="phase13d-hazardous-test",
                 spec=hazardous_spec,
-                value=1,
+                value=hazardous_roll_value,
             ),
         ),
     )
@@ -1421,12 +1450,160 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks() -> None:
     )
 
     hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
-    damage_application = cast(dict[str, object], hazardous_payload["damage_application"])
     assert remaining_sequence is None
     assert status is None
+    assert hazardous_payload["successful"] is expected_successful
+    assert hazardous_payload["mortal_wounds"] == expected_mortal_wounds
+    assert hazardous_payload["hazardous_weapon_profile_ids"] == ["phase13d-hazardous"]
+    if expected_successful:
+        assert hazardous_payload["mortal_wound_application"] is None
+        assert hazardous_payload["pending_mortal_wound_request_id"] is None
+        assert not _event_payloads(lifecycle, "hazardous_mortal_wounds_applied")
+        return
+
+    mortal_wound_application = cast(
+        dict[str, object],
+        hazardous_payload["mortal_wound_application"],
+    )
+    applications = cast(list[dict[str, object]], mortal_wound_application["applications"])
+    applied_payload = _last_event_payload(lifecycle, "hazardous_mortal_wounds_applied")
+    applied_application = cast(dict[str, object], applied_payload["mortal_wound_application"])
+    assert hazardous_payload["pending_mortal_wound_request_id"] is None
+    assert mortal_wound_application["target_unit_instance_id"] == attacker.unit_instance_id
+    assert mortal_wound_application["mortal_wounds"] == expected_mortal_wounds
+    assert applied_payload["mortal_wounds"] == expected_mortal_wounds
+    assert applied_application == mortal_wound_application
+    assert sum(cast(int, application["wounds_lost"]) for application in applications) == (
+        expected_mortal_wounds
+    )
+    assert applications[0]["target_unit_instance_id"] == attacker.unit_instance_id
+    assert applications[0]["model_instance_id"] == attacker.own_models[0].model_instance_id
+
+
+def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    attacker_model = attacker.own_models[0]
+    source = FeelNoPainSource(source_id="phase14c-hazardous-fnp", threshold=5)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=attacker_model.model_instance_id,
+        sources=(source,),
+        decline_allowed=True,
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14c-hazardous-fnp",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        keywords=(WeaponKeyword.HAZARDOUS,),
+    )
+    attack_context_id = "phase14c-hazardous-fnp:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    hazardous_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hazardous test for {attacker.unit_instance_id} after shooting",
+        roll_type="hazardous_test",
+        actor_id=attacker.unit_instance_id,
+    )
+    dice_manager = DiceRollManager(
+        "phase14c-hazardous-fnp",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id="phase14c-hazardous-fnp-hit", spec=hit_spec, value=6),
+            _fixed_roll_result(roll_id="phase14c-hazardous-fnp-wound", spec=wound_spec, value=6),
+            _fixed_roll_result(
+                roll_id="phase14c-hazardous-fnp-test",
+                spec=hazardous_spec,
+                value=2,
+            ),
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14c-hazardous-fnp",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
+
+    assert remaining_sequence is not None
+    assert allocated_ids == (defender.own_models[0].model_instance_id,)
+    assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {"decline", source.source_id}
     assert hazardous_payload["successful"] is False
-    assert damage_application["target_unit_instance_id"] == attacker.unit_instance_id
-    assert damage_application["model_instance_id"] == attacker.own_models[0].model_instance_id
+    assert hazardous_payload["mortal_wounds"] == 1
+    assert hazardous_payload["mortal_wound_application"] is None
+    assert hazardous_payload["pending_mortal_wound_request_id"] == request.request_id
+    assert not _event_payloads(lifecycle, "hazardous_mortal_wounds_applied")
+    assert model_by_id(state=state, model_instance_id=attacker_model.model_instance_id) == (
+        attacker_model
+    )
+
+    current_shooting_state = state.shooting_phase_state
+    assert current_shooting_state is not None
+    state.shooting_phase_state = current_shooting_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14c-hazardous-fnp-decline",
+            request=request,
+            selected_option_id="decline",
+        )
+    )
+    applied_payload = _last_event_payload(lifecycle, "hazardous_mortal_wounds_applied")
+    applied_application = cast(dict[str, object], applied_payload["mortal_wound_application"])
+    applications = cast(list[dict[str, object]], applied_application["applications"])
+    updated_model = model_by_id(state=state, model_instance_id=attacker_model.model_instance_id)
+
+    assert applied_payload["mortal_wounds"] == 1
+    assert applications[0]["target_unit_instance_id"] == attacker.unit_instance_id
+    assert applications[0]["model_instance_id"] == attacker_model.model_instance_id
+    assert updated_model.wounds_remaining == attacker_model.wounds_remaining - 1
+    assert state.shooting_phase_state is None
 
 
 def test_phase13c_wound_roll_table_uses_integer_safe_boundaries() -> None:
@@ -6459,22 +6636,23 @@ def _shooting_lifecycle(
         army_id = unit.unit_instance_id.split(":", maxsplit=1)[0]
         player_id = "player-a" if army_id == "army-alpha" else "player-b"
         if army_id == "army-beta":
-            poses = tuple(
-                Pose.at(
-                    resolved_enemy_pose.position.x + (index * 1.4),
+            poses = _compact_test_unit_poses(
+                origin=Pose.at(
+                    resolved_enemy_pose.position.x,
                     resolved_enemy_pose.position.y + (enemy_unit_index * 10.0),
                     resolved_enemy_pose.position.z,
                     facing_degrees=180.0,
-                )
-                for index in range(len(unit.own_models))
+                ),
+                model_count=len(unit.own_models),
             )
             enemy_unit_index += 1
         elif unit.datasheet_id == "core-transport":
             poses = (Pose.at(10.0, 35.0 + (friendly_unit_index * 10.0)),)
         else:
             friendly_y = 35.0 + (friendly_unit_index * 10.0)
-            poses = tuple(
-                Pose.at(10.0 + index * 1.4, friendly_y) for index in range(len(unit.own_models))
+            poses = _compact_test_unit_poses(
+                origin=Pose.at(10.0, friendly_y),
+                model_count=len(unit.own_models),
             )
         battlefield = battlefield.with_unit_placement(
             _unit_placement_at(unit, army_id=army_id, player_id=player_id, poses=poses)
@@ -6521,6 +6699,20 @@ def _shooting_lifecycle(
         },
     )
     return GameLifecycle.from_payload(payload), units
+
+
+def _compact_test_unit_poses(*, origin: Pose, model_count: int) -> tuple[Pose, ...]:
+    if type(model_count) is not int or model_count < 1:
+        raise AssertionError("Test unit poses require at least one model.")
+    return tuple(
+        Pose.at(
+            origin.position.x + ((index % 5) * 1.4),
+            origin.position.y + ((index // 5) * 1.4),
+            origin.position.z,
+            facing_degrees=origin.facing.degrees,
+        )
+        for index in range(model_count)
+    )
 
 
 def lifecycle_decisions_payload() -> dict[str, object]:

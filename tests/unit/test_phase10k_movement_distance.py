@@ -10,11 +10,11 @@ from warhammer40k_core.core.unit_group import UnitGroup
 from warhammer40k_core.geometry.base import CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.collision import CollisionSet
 from warhammer40k_core.geometry.movement_envelope import (
+    MovementDistanceBudget,
     MovementDistanceWitness,
     MovementDistanceWitnessPayload,
     MovementEnvelope,
     MovementSegment,
-    PivotCostPolicy,
 )
 from warhammer40k_core.geometry.pathing import (
     PathFailureReason,
@@ -27,23 +27,18 @@ from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
-def test_circular_base_without_facing_change_has_zero_pivot_cost() -> None:
-    model = _model("round-infantry", base=CircularBase(radius=0.5))
-    witness = MovementDistanceWitness.for_model_path(
-        model=model,
-        poses=(model.pose, Pose.at(2.0, 0.0), Pose.at(4.0, 0.0)),
-        pivot_cost_policy=PivotCostPolicy(),
-        max_distance_inches=4.0,
-    )
-
-    assert witness.pivot_cost_inches == 0.0
-    assert witness.total_distance_inches == 4.0
-    assert witness.budget is not None
-    assert witness.budget.remaining_distance_inches == 0.0
-
-
-def test_non_round_infantry_base_pays_one_inch_once_for_multiple_pivots() -> None:
-    model = _model("oval-infantry", base=OvalBase(length=2.0, width=1.0))
+@pytest.mark.parametrize(
+    "base",
+    [
+        CircularBase(radius=0.5),
+        OvalBase(length=2.0, width=1.0),
+        RectangularBase(length=3.0, width=2.0),
+    ],
+)
+def test_rotations_cost_zero_for_every_base_shape(
+    base: CircularBase | OvalBase | RectangularBase,
+) -> None:
+    model = _model("rotating-model", base=base)
 
     witness = MovementDistanceWitness.for_model_path(
         model=model,
@@ -52,81 +47,30 @@ def test_non_round_infantry_base_pays_one_inch_once_for_multiple_pivots() -> Non
             Pose.at(2.0, 0.0, facing_degrees=90.0),
             Pose.at(4.0, 0.0, facing_degrees=180.0),
         ),
-        pivot_cost_policy=PivotCostPolicy(),
-        max_distance_inches=5.0,
+        max_distance_inches=4.0,
     )
 
     assert witness.straight_line_distance_inches == 4.0
-    assert witness.pivot_cost_inches == 1.0
-    assert witness.total_distance_inches == 5.0
-    assert len(witness.pivot_events) == 2
-    assert witness.pivot_events[0].pivot_value_inches == 1.0
-    assert witness.pivot_events[0].applied_cost_inches == 1.0
-    assert witness.pivot_events[0].first_pivot_for_model
-    assert witness.pivot_events[1].pivot_value_inches == 1.0
-    assert witness.pivot_events[1].applied_cost_inches == 0.0
-    assert not witness.pivot_events[1].first_pivot_for_model
+    assert witness.total_distance_inches == 4.0
+    assert len(witness.rotation_events) == 2
+    assert witness.rotation_events[0].facing_delta_degrees == 90.0
+    assert witness.rotation_events[1].facing_delta_degrees == 90.0
+    assert witness.budget is not None
+    assert witness.budget.remaining_distance_inches == 0.0
 
 
-def test_non_round_vehicle_or_monster_pays_two_inches() -> None:
-    vehicle = _model("vehicle", base=RectangularBase(length=3.0, width=2.0))
-    monster = _model("monster", base=OvalBase(length=3.0, width=2.0))
-    policy = PivotCostPolicy(vehicle_or_monster_model_ids=("vehicle", "monster"))
-
-    for model in (vehicle, monster):
-        witness = MovementDistanceWitness.for_model_path(
-            model=model,
-            poses=(model.pose, Pose.at(1.0, 0.0, facing_degrees=90.0)),
-            pivot_cost_policy=policy,
-        )
-
-        assert witness.pivot_cost_inches == 2.0
-        assert witness.pivot_events[0].pivot_value_inches == 2.0
-
-
-def test_round_base_large_flying_stem_or_hover_vehicle_pays_two_inches() -> None:
-    large_round_vehicle = _model("large-round-vehicle", base=_circular_mm(40.0))
-    normal_round_vehicle = _model("normal-round-vehicle", base=_circular_mm(32.0))
-    policy = PivotCostPolicy(
-        round_base_flying_stem_or_hover_stand_vehicle_model_ids=(
-            "large-round-vehicle",
-            "normal-round-vehicle",
-        )
+def test_distance_budget_tolerates_floating_point_boundary_noise() -> None:
+    budget = MovementDistanceBudget.from_totals(
+        max_distance_inches=7.0,
+        straight_line_distance_inches=7.000000000000001,
     )
 
-    large_witness = MovementDistanceWitness.for_model_path(
-        model=large_round_vehicle,
-        poses=(large_round_vehicle.pose, Pose.at(1.0, 0.0, facing_degrees=90.0)),
-        pivot_cost_policy=policy,
-    )
-    normal_witness = MovementDistanceWitness.for_model_path(
-        model=normal_round_vehicle,
-        poses=(normal_round_vehicle.pose, Pose.at(1.0, 0.0, facing_degrees=90.0)),
-        pivot_cost_policy=policy,
-    )
-
-    assert large_witness.pivot_cost_inches == 2.0
-    assert normal_witness.pivot_cost_inches == 0.0
+    assert budget.is_within_budget
+    assert budget.remaining_distance_inches == 0.0
+    assert budget.exceeded_by_inches == 0.0
 
 
-def test_aircraft_pays_zero_in_generic_pivot_policy() -> None:
-    model = _model("aircraft", base=OvalBase(length=4.0, width=2.0))
-    policy = PivotCostPolicy(
-        aircraft_model_ids=("aircraft",),
-        vehicle_or_monster_model_ids=("aircraft",),
-    )
-
-    witness = MovementDistanceWitness.for_model_path(
-        model=model,
-        poses=(model.pose, Pose.at(1.0, 0.0, facing_degrees=90.0)),
-        pivot_cost_policy=policy,
-    )
-
-    assert witness.pivot_cost_inches == 0.0
-    assert witness.pivot_events[0].pivot_value_inches == 0.0
-
-
-def test_insufficient_budget_after_pivot_cost_rejects_path_query() -> None:
+def test_straight_distance_budget_rejects_path_query_when_exceeded() -> None:
     model = _model("oval-infantry", base=OvalBase(length=2.0, width=1.0))
     witness = PathWitness.for_paths(
         (
@@ -135,7 +79,7 @@ def test_insufficient_budget_after_pivot_cost_rejects_path_query() -> None:
                 (
                     model.pose,
                     Pose.at(2.0, 0.0, facing_degrees=90.0),
-                    Pose.at(4.0, 0.0, facing_degrees=90.0),
+                    Pose.at(5.0, 0.0, facing_degrees=90.0),
                 ),
             ),
         )
@@ -155,7 +99,7 @@ def test_insufficient_budget_after_pivot_cost_rejects_path_query() -> None:
     assert result.failure.model_id == model.model_id
 
 
-def test_path_validation_context_rejects_distance_budget_exceeded_by_pivot_cost() -> None:
+def test_path_validation_context_rejects_straight_distance_budget_exceeded() -> None:
     model = _model_at("oval-infantry", x=2.0, y=2.0, base=OvalBase(length=2.0, width=1.0))
     witness = PathWitness.for_paths(
         (
@@ -164,7 +108,7 @@ def test_path_validation_context_rejects_distance_budget_exceeded_by_pivot_cost(
                 (
                     model.pose,
                     Pose.at(4.0, 2.0, facing_degrees=90.0),
-                    Pose.at(6.0, 2.0, facing_degrees=90.0),
+                    Pose.at(7.0, 2.0, facing_degrees=90.0),
                 ),
             ),
         )
@@ -201,8 +145,7 @@ def test_movement_distance_witness_round_trips_without_object_reprs() -> None:
     witness = MovementDistanceWitness.for_model_path(
         model=model,
         poses=(model.pose, Pose.at(2.0, 0.0, facing_degrees=90.0)),
-        pivot_cost_policy=PivotCostPolicy(),
-        max_distance_inches=3.0,
+        max_distance_inches=2.0,
     )
 
     payload = cast(
@@ -216,33 +159,31 @@ def test_movement_distance_witness_round_trips_without_object_reprs() -> None:
     assert MovementDistanceWitness.from_payload(payload).to_payload() == payload
 
 
-def test_movement_distance_witness_rejects_missing_pivot_event_for_facing_change() -> None:
-    payload = _oval_pivot_witness_payload()
-    payload["pivot_events"] = []
-    _rewrite_budget(payload, straight_line_distance_inches=2.0, pivot_cost_inches=0.0)
+def test_movement_distance_witness_rejects_missing_rotation_event_for_facing_change() -> None:
+    payload = _oval_rotation_witness_payload()
+    payload["rotation_events"] = []
 
-    with pytest.raises(GeometryError, match="pivot events must match facing-change segments"):
+    with pytest.raises(GeometryError, match="rotation events must match facing-change segments"):
         MovementDistanceWitness.from_payload(payload)
 
 
-def test_movement_distance_witness_rejects_first_pivot_underpayment() -> None:
-    payload = _oval_pivot_witness_payload()
-    payload["pivot_events"][0]["applied_cost_inches"] = 0.0
-    _rewrite_budget(payload, straight_line_distance_inches=2.0, pivot_cost_inches=0.0)
+def test_movement_distance_witness_rejects_rotation_delta_drift() -> None:
+    payload = _oval_rotation_witness_payload()
+    payload["rotation_events"][0]["facing_delta_degrees"] = 45.0
 
-    with pytest.raises(GeometryError, match="First pivot event must apply the full pivot value"):
+    with pytest.raises(GeometryError, match="facing_delta_degrees drift"):
         MovementDistanceWitness.from_payload(payload)
 
 
-def test_movement_distance_witness_rejects_pivot_event_pose_drift() -> None:
-    payload = _oval_pivot_witness_payload()
-    payload["pivot_events"][0]["end_pose"] = Pose.at(
+def test_movement_distance_witness_rejects_rotation_event_pose_drift() -> None:
+    payload = _oval_rotation_witness_payload()
+    payload["rotation_events"][0]["end_pose"] = Pose.at(
         2.0,
         1.0,
         facing_degrees=90.0,
     ).to_payload()
 
-    with pytest.raises(GeometryError, match="pivot event poses must match segment poses"):
+    with pytest.raises(GeometryError, match="rotation event poses must match segment poses"):
         MovementDistanceWitness.from_payload(payload)
 
 
@@ -255,8 +196,7 @@ def test_movement_distance_witness_rejects_non_contiguous_segments() -> None:
             Pose.at(2.0, 0.0, facing_degrees=90.0),
             Pose.at(4.0, 0.0, facing_degrees=90.0),
         ),
-        pivot_cost_policy=PivotCostPolicy(),
-        max_distance_inches=5.0,
+        max_distance_inches=4.0,
     )
     payload = cast(
         MovementDistanceWitnessPayload,
@@ -268,7 +208,7 @@ def test_movement_distance_witness_rejects_non_contiguous_segments() -> None:
         facing_degrees=90.0,
     ).to_payload()
     payload["segments"][1]["distance_inches"] = 1.0
-    _rewrite_budget(payload, straight_line_distance_inches=3.0, pivot_cost_inches=1.0)
+    _rewrite_budget(payload, straight_line_distance_inches=3.0)
 
     with pytest.raises(GeometryError, match="segments must form a contiguous path"):
         MovementDistanceWitness.from_payload(payload)
@@ -303,17 +243,12 @@ def _unit(unit_id: str, *model_ids: str) -> Unit:
     )
 
 
-def _circular_mm(diameter_mm: float) -> CircularBase:
-    return CircularBase(radius=(diameter_mm / 25.4) / 2.0)
-
-
-def _oval_pivot_witness_payload() -> MovementDistanceWitnessPayload:
+def _oval_rotation_witness_payload() -> MovementDistanceWitnessPayload:
     model = _model("oval-infantry", base=OvalBase(length=2.0, width=1.0))
     witness = MovementDistanceWitness.for_model_path(
         model=model,
         poses=(model.pose, Pose.at(2.0, 0.0, facing_degrees=90.0)),
-        pivot_cost_policy=PivotCostPolicy(),
-        max_distance_inches=3.0,
+        max_distance_inches=2.0,
     )
     return cast(
         MovementDistanceWitnessPayload,
@@ -325,14 +260,17 @@ def _rewrite_budget(
     payload: MovementDistanceWitnessPayload,
     *,
     straight_line_distance_inches: float,
-    pivot_cost_inches: float,
 ) -> None:
     budget = payload["budget"]
     assert budget is not None
     max_distance_inches = budget["max_distance_inches"]
-    total_distance_inches = straight_line_distance_inches + pivot_cost_inches
     budget["straight_line_distance_inches"] = straight_line_distance_inches
-    budget["pivot_cost_inches"] = pivot_cost_inches
-    budget["total_distance_inches"] = total_distance_inches
-    budget["remaining_distance_inches"] = max(max_distance_inches - total_distance_inches, 0.0)
-    budget["exceeded_by_inches"] = max(total_distance_inches - max_distance_inches, 0.0)
+    budget["total_distance_inches"] = straight_line_distance_inches
+    budget["remaining_distance_inches"] = max(
+        max_distance_inches - straight_line_distance_inches,
+        0.0,
+    )
+    budget["exceeded_by_inches"] = max(
+        straight_line_distance_inches - max_distance_inches,
+        0.0,
+    )

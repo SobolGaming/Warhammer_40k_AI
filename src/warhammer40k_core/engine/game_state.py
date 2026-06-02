@@ -1322,6 +1322,8 @@ class GameState:
         if type(completion_phase) is not BattlePhase:
             raise GameLifecycleError("completion_phase must be a BattlePhase.")
         action_state = self.mission_action_state_by_id(action_id)
+        if action_state.unit_instance_id in self.battle_shocked_unit_ids:
+            raise GameLifecycleError("Battle-shocked units cannot complete actions.")
         policy = mission_scoring_policy_from_setup(self.mission_setup)
         award = policy.mission_action_award(
             player_id=action_state.player_id,
@@ -1338,6 +1340,7 @@ class GameState:
             completion_timing=action_state.completion_timing,
             award=award,
             transaction_id=transaction.transaction_id,
+            battle_shocked_unit_ids=tuple(self.battle_shocked_unit_ids),
         )
         self.replace_mission_action_state(completed)
         return completed

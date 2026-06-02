@@ -9,10 +9,12 @@ from warhammer40k_core.core.attributes import (
     Characteristic,
     CharacteristicError,
     CharacteristicValue,
+    CharacteristicValueKind,
     CharacteristicValuePayload,
     characteristic_from_token,
 )
 from warhammer40k_core.core.modifiers import (
+    DamageCharacteristicResolution,
     Modifier,
     ModifierError,
     ModifierOperation,
@@ -23,6 +25,8 @@ from warhammer40k_core.core.modifiers import (
     ModifierTiming,
     modifier_operation_from_token,
     modifier_timing_from_token,
+    resolve_characteristic_value,
+    resolve_damage_characteristic,
 )
 from warhammer40k_core.rules.timing import ordered_modifier_timings
 
@@ -43,6 +47,7 @@ def test_initial_phase_two_characteristics_are_supported() -> None:
         "armor_penetration",
         "damage",
         "range",
+        "detection_range",
     )
 
 
@@ -93,6 +98,106 @@ def test_characteristic_values_reject_raw_strings_and_invalid_numbers() -> None:
         )
     with pytest.raises(CharacteristicError):
         characteristic_from_token("not-a-characteristic")
+
+
+def test_phase14c_dash_characteristics_are_typed_and_replay_safe() -> None:
+    source_dash = CharacteristicValue.source_dash(Characteristic.INVULNERABLE_SAVE)
+    battle_shock_dash = CharacteristicValue.replacement_dash(
+        Characteristic.OBJECTIVE_CONTROL,
+        applied_modifier_ids=("battle_shock",),
+    )
+
+    assert source_dash.value_kind is CharacteristicValueKind.SOURCE_DASH
+    assert source_dash.is_dash
+    assert source_dash.to_payload()["value_kind"] == "source_dash"
+    assert CharacteristicValue.from_payload(source_dash.to_payload()) == source_dash
+    assert battle_shock_dash.value_kind is CharacteristicValueKind.REPLACEMENT_DASH
+    assert battle_shock_dash.applied_modifier_ids == ("battle_shock",)
+    assert battle_shock_dash.final == 0
+
+
+def test_phase14c_dash_characteristics_reject_numeric_fields_and_modifiers() -> None:
+    with pytest.raises(CharacteristicError):
+        CharacteristicValue(
+            characteristic=Characteristic.MOVEMENT,
+            raw=0,
+            base=0,
+            final=1,
+            value_kind=CharacteristicValueKind.SOURCE_DASH,
+        )
+
+    movement_bonus = Modifier(
+        modifier_id="advance-bonus",
+        scope=ModifierScope.for_characteristics((Characteristic.MOVEMENT,)),
+        timing=ModifierTiming.ADDITIVE,
+        operation=ModifierOperation.ADD,
+        operand=1,
+    )
+
+    with pytest.raises(ModifierError):
+        resolve_characteristic_value(
+            CharacteristicValue.source_dash(Characteristic.MOVEMENT),
+            (movement_bonus,),
+        )
+
+
+def test_phase14c_numeric_zero_characteristics_can_be_modified() -> None:
+    objective_control_bonus = Modifier(
+        modifier_id="banner-control",
+        scope=ModifierScope.for_characteristics((Characteristic.OBJECTIVE_CONTROL,)),
+        timing=ModifierTiming.ADDITIVE,
+        operation=ModifierOperation.ADD,
+        operand=1,
+    )
+
+    resolved = resolve_characteristic_value(
+        CharacteristicValue.from_raw(Characteristic.OBJECTIVE_CONTROL, 0),
+        (objective_control_bonus,),
+    )
+
+    assert resolved.value_kind is CharacteristicValueKind.NUMERIC
+    assert resolved.raw == 0
+    assert resolved.final == 1
+    assert resolved.applied_modifier_ids == ("banner-control",)
+
+
+def test_phase14c_detection_range_defaults_to_fifteen_and_can_be_lowered() -> None:
+    detection_range = CharacteristicValue.detection_range_default()
+    stealth_modifier = Modifier(
+        modifier_id="stealth-field",
+        scope=ModifierScope.for_characteristics((Characteristic.DETECTION_RANGE,)),
+        timing=ModifierTiming.ADDITIVE,
+        operation=ModifierOperation.ADD,
+        operand=-3,
+    )
+
+    resolved = resolve_characteristic_value(detection_range, (stealth_modifier,))
+
+    assert detection_range.raw == 15
+    assert resolved.final == 12
+    assert resolved.applied_modifier_ids == ("stealth-field",)
+
+
+def test_phase14c_damage_is_halved_after_other_modifiers() -> None:
+    damage_bonus = Modifier(
+        modifier_id="focused-strike",
+        scope=ModifierScope.for_characteristics((Characteristic.DAMAGE,)),
+        timing=ModifierTiming.ADDITIVE,
+        operation=ModifierOperation.ADD,
+        operand=2,
+    )
+
+    resolved = resolve_damage_characteristic(
+        CharacteristicValue.from_raw(Characteristic.DAMAGE, 5),
+        (damage_bonus,),
+        halve_damage_after_modifiers=True,
+    )
+    payload = resolved.to_payload()
+
+    assert resolved.modifier_final == 7
+    assert resolved.final == 4
+    assert resolved.to_characteristic_value().final == 4
+    assert DamageCharacteristicResolution.from_payload(payload).to_payload() == payload
 
 
 def test_modifier_scope_matches_characteristic_and_target_explicitly() -> None:

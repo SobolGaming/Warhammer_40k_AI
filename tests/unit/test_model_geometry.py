@@ -140,11 +140,11 @@ def test_model_has_stable_identity_and_requires_geometry() -> None:
 
 def test_model_range_and_engagement_use_2_5d_volume_distance() -> None:
     first = _model("first", 0.0, 0.0)
-    second = _model("second", 2.0, 0.0)
+    second = _model("second", 3.0, 0.0)
     elevated = _model("elevated", 0.0, 0.0, z=8.0)
 
-    assert math.isclose(first.base_distance_to(second), 1.0)
-    assert math.isclose(first.range_to(second), 1.0)
+    assert math.isclose(first.base_distance_to(second), 2.0)
+    assert math.isclose(first.range_to(second), 2.0)
     assert first.is_within_engagement_range(second)
     assert math.isclose(first.range_to(elevated), 6.0)
     assert not first.is_within_engagement_range(elevated)

@@ -40,6 +40,7 @@ class UnitCoherencyViolationPayload(TypedDict):
     max_horizontal_inches: float | None
     max_vertical_inches: float | None
     max_all_models_distance_inches: float | None
+    max_unit_span_inches: float | None
     related_model_instance_ids: list[str]
 
 
@@ -76,6 +77,7 @@ class UnitCoherencyViolation:
     max_horizontal_inches: float | None = None
     max_vertical_inches: float | None = None
     max_all_models_distance_inches: float | None = None
+    max_unit_span_inches: float | None = None
     related_model_instance_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -134,6 +136,14 @@ class UnitCoherencyViolation:
         )
         object.__setattr__(
             self,
+            "max_unit_span_inches",
+            _validate_optional_positive_number(
+                "UnitCoherencyViolation max_unit_span_inches",
+                self.max_unit_span_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
             "related_model_instance_ids",
             _validate_identifier_tuple(
                 "UnitCoherencyViolation related_model_instance_ids",
@@ -150,6 +160,7 @@ class UnitCoherencyViolation:
             "max_horizontal_inches": self.max_horizontal_inches,
             "max_vertical_inches": self.max_vertical_inches,
             "max_all_models_distance_inches": self.max_all_models_distance_inches,
+            "max_unit_span_inches": self.max_unit_span_inches,
             "related_model_instance_ids": list(self.related_model_instance_ids),
         }
 
@@ -163,6 +174,7 @@ class UnitCoherencyViolation:
             max_horizontal_inches=payload["max_horizontal_inches"],
             max_vertical_inches=payload["max_vertical_inches"],
             max_all_models_distance_inches=payload["max_all_models_distance_inches"],
+            max_unit_span_inches=payload["max_unit_span_inches"],
             related_model_instance_ids=tuple(payload["related_model_instance_ids"]),
         )
 
@@ -353,6 +365,15 @@ class UnitCoherencyContext:
                 max_vertical_inches=max_vertical,
             )
         )
+        max_unit_span = self.coherency_policy.max_unit_span_inches
+        if max_unit_span is not None:
+            violations.extend(
+                _unit_span_violations(
+                    models,
+                    max_unit_span_inches=max_unit_span,
+                    max_vertical_inches=max_vertical,
+                )
+            )
         return self._result(models=models, violations=tuple(violations))
 
     def _validate_all_models_within_distance_policy(
@@ -654,6 +675,38 @@ def _single_group_violations(
         if component != retained_component
         for model_id in component
     )
+
+
+def _unit_span_violations(
+    models: tuple[Model, ...],
+    *,
+    max_unit_span_inches: float,
+    max_vertical_inches: float,
+) -> tuple[UnitCoherencyViolation, ...]:
+    violations: list[UnitCoherencyViolation] = []
+    for model in models:
+        distant_model_ids = tuple(
+            other.model_id
+            for other in models
+            if other.model_id != model.model_id
+            and (
+                model.base_distance_to(other) > max_unit_span_inches
+                or model.volume.vertical_gap_to(model.pose, other.volume, other.pose)
+                > max_vertical_inches
+            )
+        )
+        if not distant_model_ids:
+            continue
+        violations.append(
+            UnitCoherencyViolation(
+                model_instance_id=model.model_id,
+                violation_code="unit_span_exceeded",
+                max_vertical_inches=max_vertical_inches,
+                max_unit_span_inches=max_unit_span_inches,
+                related_model_instance_ids=distant_model_ids,
+            )
+        )
+    return tuple(violations)
 
 
 def _connected_components(adjacency: dict[str, set[str]]) -> tuple[tuple[str, ...], ...]:

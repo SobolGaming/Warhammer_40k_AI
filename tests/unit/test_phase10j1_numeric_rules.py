@@ -65,7 +65,7 @@ def _add_modifier(characteristic: Characteristic, operand: int) -> Modifier:
     )
 
 
-def test_closest_base_distance_and_baseless_model_distance_work() -> None:
+def test_closest_base_distance_and_baseless_frame_measurement_work() -> None:
     source = _model("source", 0.0, 0.0)
     target = _model("target", 2.0, 0.0)
     based = DistanceMeasurementContext.from_models(source, target)
@@ -76,10 +76,19 @@ def test_closest_base_distance_and_baseless_model_distance_work() -> None:
         source_height_inches=2.0,
         target=target,
     )
+    frame = DistanceMeasurementContext.from_baseless_source_to_model(
+        source_id="frame-source",
+        source_pose=Pose.at(0.0, 0.0),
+        source_contact_radius_inches=1.0,
+        source_height_inches=2.0,
+        target=_model("frame-target", 3.0, 0.0),
+    )
 
     assert math.isclose(based.horizontal_distance_inches(), 1.0)
     assert math.isclose(based.closest_distance_inches(), 1.0)
     assert math.isclose(baseless.horizontal_distance_inches(), 1.25)
+    assert math.isclose(frame.horizontal_distance_inches(), 1.5)
+    assert math.isclose(frame.closest_distance_inches(), 1.5)
 
 
 def test_distance_predicates_evaluate_within_wholly_more_than_and_horizontal_only() -> None:

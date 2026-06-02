@@ -24,10 +24,18 @@ class Characteristic(StrEnum):
     ARMOR_PENETRATION = "armor_penetration"
     DAMAGE = "damage"
     RANGE = "range"
+    DETECTION_RANGE = "detection_range"
+
+
+class CharacteristicValueKind(StrEnum):
+    NUMERIC = "numeric"
+    SOURCE_DASH = "source_dash"
+    REPLACEMENT_DASH = "replacement_dash"
 
 
 class CharacteristicValuePayload(TypedDict):
     characteristic: str
+    value_kind: str
     raw: int
     base: int
     final: int
@@ -65,12 +73,20 @@ class CharacteristicValue:
     base: int
     final: int
     applied_modifier_ids: tuple[str, ...] = ()
+    value_kind: CharacteristicValueKind = CharacteristicValueKind.NUMERIC
 
     def __post_init__(self) -> None:
         characteristic = _ensure_characteristic(self.characteristic)
+        object.__setattr__(self, "characteristic", characteristic)
+        value_kind = characteristic_value_kind_from_token(self.value_kind)
+        object.__setattr__(self, "value_kind", value_kind)
         _validate_characteristic_number(characteristic, "raw", self.raw)
         _validate_characteristic_number(characteristic, "base", self.base)
         _validate_characteristic_number(characteristic, "final", self.final)
+        if value_kind is not CharacteristicValueKind.NUMERIC and (
+            self.raw != 0 or self.base != 0 or self.final != 0
+        ):
+            raise CharacteristicError("Dash characteristic values must use zero numeric fields.")
 
         ids = _validate_identifier_tuple(
             "CharacteristicValue applied_modifier_ids",
@@ -88,9 +104,48 @@ class CharacteristicValue:
             final=raw,
         )
 
+    @classmethod
+    def source_dash(cls, characteristic: Characteristic) -> Self:
+        return cls(
+            characteristic=characteristic,
+            raw=0,
+            base=0,
+            final=0,
+            value_kind=CharacteristicValueKind.SOURCE_DASH,
+        )
+
+    @classmethod
+    def replacement_dash(
+        cls,
+        characteristic: Characteristic,
+        *,
+        applied_modifier_ids: tuple[str, ...] = (),
+    ) -> Self:
+        return cls(
+            characteristic=characteristic,
+            raw=0,
+            base=0,
+            final=0,
+            applied_modifier_ids=applied_modifier_ids,
+            value_kind=CharacteristicValueKind.REPLACEMENT_DASH,
+        )
+
+    @classmethod
+    def detection_range_default(cls) -> Self:
+        return cls.from_raw(Characteristic.DETECTION_RANGE, 15)
+
+    @property
+    def is_dash(self) -> bool:
+        return self.value_kind is not CharacteristicValueKind.NUMERIC
+
+    @property
+    def is_numeric(self) -> bool:
+        return self.value_kind is CharacteristicValueKind.NUMERIC
+
     def to_payload(self) -> CharacteristicValuePayload:
         return {
             "characteristic": self.characteristic.value,
+            "value_kind": self.value_kind.value,
             "raw": self.raw,
             "base": self.base,
             "final": self.final,
@@ -101,6 +156,7 @@ class CharacteristicValue:
     def from_payload(cls, payload: CharacteristicValuePayload) -> Self:
         return cls(
             characteristic=characteristic_from_token(payload["characteristic"]),
+            value_kind=characteristic_value_kind_from_token(payload["value_kind"]),
             raw=payload["raw"],
             base=payload["base"],
             final=payload["final"],
@@ -257,6 +313,7 @@ class BoundedCharacteristicValue:
             base=self.base,
             final=self.final,
             applied_modifier_ids=self.applied_modifier_ids,
+            value_kind=CharacteristicValueKind.NUMERIC,
         )
 
     def to_payload(self) -> BoundedCharacteristicValuePayload:
@@ -290,6 +347,17 @@ def characteristic_from_token(token: object) -> Characteristic:
         return Characteristic(token)
     except ValueError as exc:
         raise CharacteristicError(f"Unsupported characteristic token: {token}.") from exc
+
+
+def characteristic_value_kind_from_token(token: object) -> CharacteristicValueKind:
+    if type(token) is CharacteristicValueKind:
+        return token
+    if type(token) is not str:
+        raise CharacteristicError("CharacteristicValueKind token must be a string.")
+    try:
+        return CharacteristicValueKind(token)
+    except ValueError as exc:
+        raise CharacteristicError(f"Unsupported CharacteristicValueKind token: {token}.") from exc
 
 
 def validate_characteristic_value(
@@ -374,6 +442,7 @@ _DEFAULT_MINIMUMS = {
     Characteristic.ATTACKS: 1,
     Characteristic.DAMAGE: 1,
     Characteristic.RANGE: 1,
+    Characteristic.DETECTION_RANGE: 0,
 }
 
 _DEFAULT_MAXIMUMS = {

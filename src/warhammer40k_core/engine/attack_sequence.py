@@ -158,6 +158,7 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
 )
 DAMAGE_ALLOCATION_RULE_ID = "core_rules_damage_allocation"
 DEADLY_DEMISE_SOURCE_KIND = "deadly_demise"
+HAZARDOUS_SOURCE_KIND = "hazardous"
 
 
 def deadly_demise_trigger_roll_spec(
@@ -307,6 +308,15 @@ class DeferredMortalWoundsPayload(TypedDict):
     source_rule_id: str
     target_unit_instance_id: str
     attack_context_id: str
+    mortal_wounds: int
+
+
+class HazardousMortalWoundSourceContextPayload(TypedDict):
+    source_kind: str
+    sequence_id: str
+    attacking_unit_instance_id: str
+    hazardous_weapon_profile_ids: list[str]
+    hazardous_roll_state: DiceRollStatePayload
     mortal_wounds: int
 
 
@@ -1235,12 +1245,14 @@ def resolve_attack_sequence_until_blocked(
             "attacking_unit_instance_id": current.attacking_unit_instance_id,
         },
     )
-    _resolve_hazardous_tests(
+    hazardous_status = _resolve_hazardous_tests(
         state=state,
         decisions=decisions,
         manager=manager,
         attack_sequence=current,
     )
+    if hazardous_status is not None:
+        return current, allocated_model_ids, hazardous_status
     return None, allocated_model_ids, None
 
 
@@ -1723,6 +1735,13 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
             routed=routed,
             hooks=hooks,
         )
+    if source_context.get("source_kind") == HAZARDOUS_SOURCE_KIND:
+        return _continue_hazardous_after_mortal_wound_feel_no_pain(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            already_allocated_model_ids=already_allocated_model_ids,
+            routed=routed,
+        )
     if routed.request is not None:
         decisions.request_decision(routed.request)
         return (
@@ -1763,6 +1782,41 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
         attack_sequence=attack_sequence,
     )
     return next_sequence, already_allocated_model_ids, status
+
+
+def _continue_hazardous_after_mortal_wound_feel_no_pain(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    already_allocated_model_ids: tuple[str, ...],
+    routed: MortalWoundRoutingResult,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    source_context = _hazardous_source_context_from_payload(routed.progress.source_context)
+    if source_context["sequence_id"] != attack_sequence.sequence_id:
+        raise GameLifecycleError("Hazardous mortal wound source context sequence drift.")
+    if source_context["attacking_unit_instance_id"] != attack_sequence.attacking_unit_instance_id:
+        raise GameLifecycleError("Hazardous mortal wound source context attacker drift.")
+    if source_context["mortal_wounds"] != routed.progress.mortal_wounds:
+        raise GameLifecycleError("Hazardous mortal wound source context wound drift.")
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        return (
+            attack_sequence,
+            already_allocated_model_ids,
+            _hazardous_feel_no_pain_status(
+                attack_sequence=attack_sequence,
+                request=routed.request,
+            ),
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Hazardous mortal wound Feel No Pain did not finish routing.")
+    _emit_hazardous_mortal_wounds_applied(
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        source_context=source_context,
+        application=routed.application,
+    )
+    return None, already_allocated_model_ids, None
 
 
 def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
@@ -3933,73 +3987,236 @@ def _resolve_hazardous_tests(
     decisions: DecisionController,
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
-) -> None:
+) -> LifecycleStatus | None:
     hazardous_pools = tuple(
         pool
         for pool in attack_sequence.attack_pools
         if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.HAZARDOUS)
     )
-    seen: set[tuple[str, str, str]] = set()
-    for pool in hazardous_pools:
-        key = (pool.attacker_model_instance_id, pool.wargear_id, pool.weapon_profile_id)
-        if key in seen:
-            continue
-        seen.add(key)
-        roll_state = manager.roll(
-            DiceRollSpec(
-                expression=DiceExpression(quantity=1, sides=6),
-                reason=f"Hazardous test for {pool.weapon_profile_id} after shooting",
-                roll_type="hazardous_test",
-                actor_id=attack_sequence.attacker_player_id,
+    if not hazardous_pools:
+        return None
+    hazardous_weapon_profile_ids = tuple(
+        sorted({pool.weapon_profile_id for pool in hazardous_pools})
+    )
+    roll_state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=(
+                f"Hazardous test for {attack_sequence.attacking_unit_instance_id} after shooting"
+            ),
+            roll_type="hazardous_test",
+            actor_id=attack_sequence.attacking_unit_instance_id,
+        )
+    )
+    hazardous_failed = roll_state.current_total <= 2
+    mortal_wounds = 0
+    if not hazardous_failed:
+        _emit_hazardous_test_resolved(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            hazardous_weapon_profile_ids=hazardous_weapon_profile_ids,
+            roll_state=roll_state,
+            successful=True,
+            mortal_wounds=mortal_wounds,
+            mortal_wound_application=None,
+            pending_mortal_wound_request_id=None,
+        )
+        return None
+
+    mortal_wounds = _hazardous_mortal_wounds_for_attacker(
+        state=state,
+        attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+    )
+    progress = MortalWoundApplicationProgress.start(
+        application_id=f"{attack_sequence.sequence_id}:hazardous:mortal-wounds",
+        source_rule_id=HAZARDOUS_RULE_ID,
+        source_context=_hazardous_source_context_payload(
+            attack_sequence=attack_sequence,
+            hazardous_weapon_profile_ids=hazardous_weapon_profile_ids,
+            roll_state=roll_state,
+            mortal_wounds=mortal_wounds,
+        ),
+        target_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+        defender_player_id=unit_owner_player_id(
+            state=state,
+            unit_instance_id=attack_sequence.attacking_unit_instance_id,
+        ),
+        mortal_wounds=mortal_wounds,
+        spill_over=True,
+    )
+    routed = continue_mortal_wound_application(
+        state=state,
+        request_id=state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=manager,
+    )
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        _emit_hazardous_test_resolved(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            hazardous_weapon_profile_ids=hazardous_weapon_profile_ids,
+            roll_state=roll_state,
+            successful=False,
+            mortal_wounds=mortal_wounds,
+            mortal_wound_application=None,
+            pending_mortal_wound_request_id=routed.request.request_id,
+        )
+        return _hazardous_feel_no_pain_status(
+            attack_sequence=attack_sequence,
+            request=routed.request,
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Hazardous mortal wounds did not produce application.")
+    _emit_hazardous_test_resolved(
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        hazardous_weapon_profile_ids=hazardous_weapon_profile_ids,
+        roll_state=roll_state,
+        successful=False,
+        mortal_wounds=mortal_wounds,
+        mortal_wound_application=routed.application,
+        pending_mortal_wound_request_id=None,
+    )
+    _emit_hazardous_mortal_wounds_applied(
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        source_context=_hazardous_source_context_from_payload(progress.source_context),
+        application=routed.application,
+    )
+    return None
+
+
+def _emit_hazardous_test_resolved(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    hazardous_weapon_profile_ids: tuple[str, ...],
+    roll_state: DiceRollState,
+    successful: bool,
+    mortal_wounds: int,
+    mortal_wound_application: MortalWoundApplication | None,
+    pending_mortal_wound_request_id: str | None,
+) -> None:
+    decisions.event_log.append(
+        "hazardous_test_resolved",
+        {
+            "source_rule_id": HAZARDOUS_RULE_ID,
+            "sequence_id": attack_sequence.sequence_id,
+            "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+            "hazardous_weapon_profile_ids": list(hazardous_weapon_profile_ids),
+            "roll_state": roll_state.to_payload(),
+            "successful": successful,
+            "mortal_wounds": mortal_wounds,
+            "mortal_wound_application": (
+                None if mortal_wound_application is None else mortal_wound_application.to_payload()
+            ),
+            "pending_mortal_wound_request_id": pending_mortal_wound_request_id,
+        },
+    )
+
+
+def _emit_hazardous_mortal_wounds_applied(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    source_context: HazardousMortalWoundSourceContextPayload,
+    application: MortalWoundApplication,
+) -> None:
+    decisions.event_log.append(
+        "hazardous_mortal_wounds_applied",
+        {
+            "source_rule_id": HAZARDOUS_RULE_ID,
+            "sequence_id": attack_sequence.sequence_id,
+            "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+            "hazardous_weapon_profile_ids": source_context["hazardous_weapon_profile_ids"],
+            "hazardous_roll_state": source_context["hazardous_roll_state"],
+            "mortal_wounds": source_context["mortal_wounds"],
+            "mortal_wound_application": application.to_payload(),
+        },
+    )
+
+
+def _hazardous_feel_no_pain_status(
+    *,
+    attack_sequence: AttackSequence,
+    request: DecisionRequest,
+) -> LifecycleStatus:
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.SHOOTING.value,
+            "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+            "sequence_id": attack_sequence.sequence_id,
+            "source_rule_id": HAZARDOUS_RULE_ID,
+            "source_kind": HAZARDOUS_SOURCE_KIND,
+        },
+    )
+
+
+def _hazardous_source_context_payload(
+    *,
+    attack_sequence: AttackSequence,
+    hazardous_weapon_profile_ids: tuple[str, ...],
+    roll_state: DiceRollState,
+    mortal_wounds: int,
+) -> JsonValue:
+    return validate_json_value(
+        {
+            "source_kind": HAZARDOUS_SOURCE_KIND,
+            "sequence_id": attack_sequence.sequence_id,
+            "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+            "hazardous_weapon_profile_ids": list(hazardous_weapon_profile_ids),
+            "hazardous_roll_state": roll_state.to_payload(),
+            "mortal_wounds": mortal_wounds,
+        }
+    )
+
+
+def _hazardous_source_context_from_payload(
+    payload: JsonValue,
+) -> HazardousMortalWoundSourceContextPayload:
+    raw = _payload_object(payload)
+    if raw.get("source_kind") != HAZARDOUS_SOURCE_KIND:
+        raise GameLifecycleError("Hazardous mortal wound source context kind is invalid.")
+    weapon_profile_ids = raw.get("hazardous_weapon_profile_ids")
+    if not isinstance(weapon_profile_ids, list):
+        raise GameLifecycleError(
+            "Hazardous mortal wound source context weapon profile IDs must be a list."
+        )
+    hazardous_roll_state = raw.get("hazardous_roll_state")
+    if not isinstance(hazardous_roll_state, dict):
+        raise GameLifecycleError(
+            "Hazardous mortal wound source context roll state must be an object."
+        )
+    return {
+        "source_kind": HAZARDOUS_SOURCE_KIND,
+        "sequence_id": _payload_string(raw, key="sequence_id"),
+        "attacking_unit_instance_id": _payload_string(raw, key="attacking_unit_instance_id"),
+        "hazardous_weapon_profile_ids": list(
+            _validate_identifier_tuple(
+                "Hazardous mortal wound weapon_profile_ids",
+                tuple(weapon_profile_ids),
             )
-        )
-        damage_application = None
-        if roll_state.current_total == 1:
-            model = model_by_id(state=state, model_instance_id=pool.attacker_model_instance_id)
-            if model.is_alive:
-                damage_application = apply_damage_to_model(
-                    state=state,
-                    target_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-                    model_instance_id=pool.attacker_model_instance_id,
-                    damage=_hazardous_damage_for_attacker(
-                        state=state,
-                        attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-                        model_wounds_remaining=model.wounds_remaining,
-                    ),
-                    damage_kind=DamageKind.MORTAL,
-                )
-        decisions.event_log.append(
-            "hazardous_test_resolved",
-            {
-                "source_rule_id": HAZARDOUS_RULE_ID,
-                "sequence_id": attack_sequence.sequence_id,
-                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                "attacker_model_instance_id": pool.attacker_model_instance_id,
-                "wargear_id": pool.wargear_id,
-                "weapon_profile_id": pool.weapon_profile_id,
-                "roll_state": roll_state.to_payload(),
-                "successful": roll_state.current_total != 1,
-                "damage_application": (
-                    None if damage_application is None else damage_application.to_payload()
-                ),
-            },
-        )
+        ),
+        "hazardous_roll_state": cast(
+            DiceRollStatePayload,
+            validate_json_value(hazardous_roll_state),
+        ),
+        "mortal_wounds": _payload_positive_int(raw, key="mortal_wounds"),
+    }
 
 
-def _hazardous_damage_for_attacker(
+def _hazardous_mortal_wounds_for_attacker(
     *,
     state: GameState,
     attacking_unit_instance_id: str,
-    model_wounds_remaining: int,
 ) -> int:
     unit = unit_by_id(state=state, unit_instance_id=attacking_unit_instance_id)
-    if (
-        _unit_has_keyword(unit, "CHARACTER")
-        or _unit_has_keyword(unit, "MONSTER")
-        or _unit_has_keyword(unit, "VEHICLE")
-    ):
+    if _unit_has_keyword(unit, "MONSTER") or _unit_has_keyword(unit, "VEHICLE"):
         return 3
-    return model_wounds_remaining
+    return 1
 
 
 def _cover_for_allocated_model(

@@ -184,7 +184,13 @@ class MissionActionState:
         interruption_conditions: tuple[str, ...],
         scoring_source_id: str,
         victory_points: int,
+        battle_shocked_unit_ids: tuple[str, ...] = (),
     ) -> Self:
+        _reject_battle_shocked_action_unit(
+            unit_instance_id=unit_instance_id,
+            battle_shocked_unit_ids=battle_shocked_unit_ids,
+            action_state="start",
+        )
         return cls(
             action_id=action_id,
             player_id=player_id,
@@ -209,9 +215,15 @@ class MissionActionState:
         completion_timing: str,
         award: VictoryPointAward,
         transaction_id: str,
+        battle_shocked_unit_ids: tuple[str, ...] = (),
     ) -> Self:
         if self.status is not MissionActionStatus.STARTED:
             raise GameLifecycleError("Only started mission Actions can complete.")
+        _reject_battle_shocked_action_unit(
+            unit_instance_id=self.unit_instance_id,
+            battle_shocked_unit_ids=battle_shocked_unit_ids,
+            action_state="complete",
+        )
         requested_timing = _validate_identifier("completion_timing", completion_timing)
         if requested_timing != self.completion_timing:
             raise GameLifecycleError("Mission Action completion timing drift.")
@@ -346,6 +358,25 @@ def mission_action_status_from_token(token: object) -> MissionActionStatus:
         return MissionActionStatus(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported MissionActionStatus token: {token}.") from exc
+
+
+def _reject_battle_shocked_action_unit(
+    *,
+    unit_instance_id: str,
+    battle_shocked_unit_ids: tuple[str, ...],
+    action_state: str,
+) -> None:
+    unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    shocked_ids = set(
+        _validate_identifier_tuple(
+            "battle_shocked_unit_ids",
+            battle_shocked_unit_ids,
+            min_length=0,
+        )
+    )
+    if unit_id in shocked_ids:
+        requested_state = _validate_identifier("action_state", action_state)
+        raise GameLifecycleError(f"Battle-shocked units cannot {requested_state} actions.")
 
 
 def _validate_identifier_tuple(

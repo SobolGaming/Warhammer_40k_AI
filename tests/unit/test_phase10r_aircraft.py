@@ -95,7 +95,7 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, Terrain
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
-def test_aircraft_policy_uses_zero_pivot_cost_and_validates_forward_move() -> None:
+def test_aircraft_policy_records_cost_free_rotation_and_validates_forward_move() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()
     ruleset = _ruleset()
     unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
@@ -129,13 +129,14 @@ def test_aircraft_policy_uses_zero_pivot_cost_and_validates_forward_move() -> No
     distance = MovementDistanceWitness.for_model_path(
         model=moving_model,
         poses=witness.poses_for_model(moving_model.model_id),
-        pivot_cost_policy=policy.to_pivot_cost_policy(moving_model.model_id),
     )
 
     assert policy.uses_aircraft_rules
     assert policy.minimum_move_inches == 20.0
     assert policy.maximum_pivot_degrees == 90.0
-    assert distance.pivot_cost_inches == 0.0
+    assert distance.total_distance_inches == 20.0
+    assert len(distance.rotation_events) == 1
+    assert distance.rotation_events[0].facing_delta_degrees == 90.0
     assert policy.validate_normal_move_witness(moving_model=moving_model, witness=witness) == ()
 
 
@@ -559,7 +560,7 @@ def test_normal_move_rejects_stale_aircraft_policy_after_hover_state_changes() -
 def test_other_models_can_transit_aircraft_but_not_end_on_them() -> None:
     mover = _geometry_model("mover", x=1.0, y=1.0)
     enemy_aircraft = _geometry_model("enemy-aircraft", x=3.0, y=1.0)
-    transit_witness = PathWitness.for_paths(((mover.model_id, (mover.pose, Pose.at(6.0, 1.0))),))
+    transit_witness = PathWitness.for_paths(((mover.model_id, (mover.pose, Pose.at(6.2, 1.0))),))
     blocked = PathValidationContext(
         moving_model=mover,
         witness=transit_witness,
@@ -1245,7 +1246,7 @@ def test_normal_and_advance_can_transit_enemy_aircraft_but_not_end_in_engagement
             (
                 model_placement.model_instance_id,
                 model_placement.pose,
-                Pose.at(12.0, model_placement.pose.position.y),
+                Pose.at(14.0, model_placement.pose.position.y),
             ),
         )
     )

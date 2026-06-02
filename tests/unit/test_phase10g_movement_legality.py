@@ -113,17 +113,17 @@ def test_eleventh_normal_move_cannot_end_in_enemy_engagement_range() -> None:
     )
 
     result = context.validate_end_position_enemy_engagement(
-        enemy_horizontal_distance_inches=1.0,
+        enemy_horizontal_distance_inches=2.0,
         enemy_vertical_distance_inches=0.0,
     )
     legal_result = context.validate_end_position_enemy_engagement(
-        enemy_horizontal_distance_inches=1.01,
+        enemy_horizontal_distance_inches=2.01,
         enemy_vertical_distance_inches=0.0,
     )
 
     assert context.movement_phase_action == MovementPhaseActionKind.NORMAL_MOVE.value
     assert context.displacement_kind is ModelDisplacementKind.NORMAL_MOVE
-    assert context.engagement_policy.horizontal_inches == 1.0
+    assert context.engagement_policy.horizontal_inches == 2.0
     assert context.engagement_policy.vertical_inches == 5.0
     assert result.status is MovementLegalityStatus.INVALID
     assert not result.is_legal
@@ -168,11 +168,11 @@ def test_eleventh_normal_and_advance_cannot_transit_enemy_engagement_range() -> 
 
     for context in (normal, advance):
         result = context.validate_path_transits_enemy_engagement(
-            enemy_horizontal_distance_inches=1.0,
+            enemy_horizontal_distance_inches=2.0,
             enemy_vertical_distance_inches=0.0,
         )
         outside_result = context.validate_path_transits_enemy_engagement(
-            enemy_horizontal_distance_inches=1.01,
+            enemy_horizontal_distance_inches=2.01,
             enemy_vertical_distance_inches=0.0,
         )
 
