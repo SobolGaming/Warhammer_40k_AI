@@ -2132,7 +2132,7 @@ Invariants:
 - non-`MONSTER`/non-`VEHICLE` close-quarters shooting can only select `[CLOSE-QUARTERS]` weapons and engaged targets;
 - `MONSTER`/`VEHICLE` close-quarters and engaged-target shooting apply the correct -1 Hit modifier except for qualifying `[CLOSE-QUARTERS]` attacks;
 - `[BLAST]` weapons cannot target engaged units through close-quarters or engaged `MONSTER`/`VEHICLE` shooting;
-- Indirect shooting grants cover, forbids hit rerolls, and has the 1-5/1-3 unmodified fail policy;
+- Indirect shooting can only declare `[INDIRECT FIRE]` weapon profiles, grants cover, forbids hit rerolls, and has the 1-5/1-3 unmodified fail policy;
 - Snap Shooting targets one visible enemy unit within 24", hits only on unmodified 6, and forbids Hit-roll rerolls;
 - after a unit shoots in the Shooting phase, it cannot start a Mission Action until the phase ends.
 

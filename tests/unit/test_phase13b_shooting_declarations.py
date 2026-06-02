@@ -339,6 +339,115 @@ def test_phase14f_select_shooting_type_is_finite_before_declaration() -> None:
     )
 
 
+def test_phase14f_indirect_shooting_type_requires_indirect_fire_weapon_profiles() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    indirect_profile = replace(
+        base_profile,
+        profile_id="phase14f-mixed-indirect-fire",
+        name="Phase 14F mixed Indirect Fire rifle",
+        keywords=(WeaponKeyword.INDIRECT_FIRE,),
+        abilities=(),
+    )
+    catalog = _catalog_with_extra_bolt_profile(indirect_profile)
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=catalog,
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    type_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase14f-mixed-indirect-select-unit",
+        )
+    )
+
+    assert {option.option_id for option in type_request.options} == {
+        ShootingType.NORMAL.value,
+        ShootingType.INDIRECT.value,
+    }
+
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=type_request,
+            option_id=ShootingType.INDIRECT.value,
+            result_id="phase14f-mixed-indirect-select-type",
+        )
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+
+    assert {weapon["weapon_profile_id"] for weapon in weapons} == {indirect_profile.profile_id}
+    assert all(
+        WeaponKeyword.INDIRECT_FIRE.value
+        in cast(WeaponProfilePayload, weapon["weapon_profile"])["keywords"]
+        for weapon in weapons
+    )
+    assert {
+        tuple(cast(list[str], candidate["shooting_types"]))
+        for candidate in target_candidates
+        if candidate["is_legal"] is True
+    } == {(ShootingType.INDIRECT.value,)}
+
+    invalid_proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=indirect_profile.profile_id,
+    )
+    invalid_payload = invalid_proposal.to_payload()
+    invalid_declaration = invalid_payload["declarations"][0]
+    invalid_declaration["weapon_profile_id"] = base_profile.profile_id
+    before_records = len(lifecycle.decision_controller.records)
+
+    invalid_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=invalid_payload,
+        result_id="phase14f-mixed-indirect-invalid-normal-profile",
+    )
+    invalid_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], invalid_status.payload)["proposal_validation"],
+    )
+    invalid_violation = cast(list[dict[str, object]], invalid_validation["violations"])[0]
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_violation["violation_code"] in {
+        "weapon_declaration_unavailable",
+        "shooting_type_unavailable",
+    }
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+
+    valid_proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=indirect_profile.profile_id,
+    )
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=valid_proposal.to_payload(),
+        result_id="phase14f-mixed-indirect-valid",
+    )
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+
+    assert pool_payload["weapon_profile_id"] == indirect_profile.profile_id
+    assert pool_payload["shooting_type"] == ShootingType.INDIRECT.value
+    assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in targeting_rule_ids
+    assert INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in targeting_rule_ids
+    assert INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in targeting_rule_ids
+
+
 def test_phase14f_select_shooting_type_rejects_drift_before_mutation() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)

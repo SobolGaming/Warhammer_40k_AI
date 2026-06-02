@@ -1499,12 +1499,9 @@ def _shooting_types_for_selected_type(
             army_catalog=army_catalog,
         ):
             return ()
-        if ShootingType.INDIRECT in base_types and has_weapon_keyword(
-            weapon_profile,
-            WeaponKeyword.INDIRECT_FIRE,
-        ):
-            return (ShootingType.INDIRECT,)
-        if ShootingType.NORMAL in base_types:
+        if not has_weapon_keyword(weapon_profile, WeaponKeyword.INDIRECT_FIRE):
+            return ()
+        if ShootingType.INDIRECT in base_types or ShootingType.NORMAL in base_types:
             return (ShootingType.INDIRECT,)
         return ()
     if shooting_type is ShootingType.SNAP:
@@ -2055,6 +2052,16 @@ def _attack_pools_or_validation(
                 field="declarations",
             )
         weapon_profile = weapon["weapon_profile"]
+        if declaration.shooting_type is ShootingType.INDIRECT and not has_weapon_keyword(
+            weapon_profile,
+            WeaponKeyword.INDIRECT_FIRE,
+        ):
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="shooting_type_unavailable",
+                message="Indirect shooting requires an Indirect Fire weapon profile.",
+                field="declarations",
+            )
         if (
             allowed_out_of_phase_target_ids is not None
             and declaration.target_unit_instance_id not in allowed_out_of_phase_target_ids
@@ -2858,6 +2865,12 @@ def _available_weapons_for_unit(
             weapon
             for weapon in weapons
             if has_close_quarters_weapon_keyword(weapon["weapon_profile"])
+        ]
+    if selected_shooting_type is ShootingType.INDIRECT:
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE)
         ]
     if selected_shooting_type is ShootingType.NORMAL and _unit_advanced_this_turn(
         state=state,
