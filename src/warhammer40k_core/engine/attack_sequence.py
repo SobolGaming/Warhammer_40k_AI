@@ -4340,7 +4340,7 @@ def _target_unit_toughness(unit: UnitInstance) -> int:
     if not toughness_values:
         raise GameLifecycleError("Target unit models require Toughness.")
     if len(toughness_values) != 1:
-        raise GameLifecycleError("Mixed Toughness target units are deferred to Phase 13E.")
+        raise GameLifecycleError("Mixed Toughness target units are deferred to Phase 14H/16D.")
     return next(iter(toughness_values))
 
 
