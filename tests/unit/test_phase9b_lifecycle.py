@@ -533,13 +533,25 @@ def test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary() -
         "current_phase": BattlePhase.SHOOTING.value,
     }
     assert tuple(event.event_type for event in decisions.event_log.records) == (
+        "timing_window_opened",
+        "timing_window_resolved",
+        "timing_window_opened",
+        "timing_window_resolved",
+        "timing_window_opened",
+        "timing_window_resolved",
         "command_points_gained",
         "command_points_gained",
         "command_step_started",
         "command_phase_scoring_hooks_resolved",
         "battle_shock_step_completed",
+        "timing_window_opened",
+        "timing_window_resolved",
         "battle_phase_completed",
+        "timing_window_opened",
+        "timing_window_resolved",
         "phase_body_placeholder_noop",
+        "timing_window_opened",
+        "timing_window_resolved",
         "battle_phase_completed",
     )
 

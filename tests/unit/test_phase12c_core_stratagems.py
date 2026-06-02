@@ -1013,7 +1013,7 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
     context = _context(
         state=state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_kind=TimingTriggerKind.END_PHASE,
         trigger_payload=_fire_overwatch_trigger_payload(),
     )
     proposal_request = StratagemTargetProposal.for_request(
@@ -1121,7 +1121,7 @@ def test_phase13d_fire_overwatch_rejects_invalid_declaration_before_queue_pop() 
     context = _context(
         state=state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_kind=TimingTriggerKind.END_PHASE,
         trigger_payload=_fire_overwatch_trigger_payload(),
     )
     proposal_request = StratagemTargetProposal.for_request(
@@ -1237,7 +1237,7 @@ def test_phase13d_fire_overwatch_rejects_unit_more_than_24_before_cp_spend() -> 
     assert state.stratagem_use_records == []
 
 
-def test_phase13d_fire_overwatch_rejects_titanic_trigger_before_cp_spend() -> None:
+def test_phase13d_fire_overwatch_rejects_titanic_selected_unit_before_cp_spend() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
@@ -1254,7 +1254,7 @@ def test_phase13d_fire_overwatch_rejects_titanic_trigger_before_cp_spend() -> No
     )
     _replace_unit_keywords(
         state,
-        unit_instance_id="army-beta:enemy-unit",
+        unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("TITANIC", "VEHICLE"),
     )
     _grant_cp(state, player_id="player-a", amount=1)
@@ -1276,10 +1276,100 @@ def test_phase13d_fire_overwatch_rejects_titanic_trigger_before_cp_spend() -> No
     )
 
     assert status.status_kind is LifecycleStatusKind.INVALID
-    assert status.payload == {"invalid_reason": "fire_overwatch_target_titanic"}
+    assert status.payload == {"invalid_reason": "fire_overwatch_unit_titanic"}
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
     assert state.command_point_total("player-a") == 1
     assert state.stratagem_use_records == []
+    assert state.out_of_phase_shooting_state is None
+
+
+def test_phase13d_fire_overwatch_allows_titanic_triggering_enemy_unit() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        keywords=("TITANIC", "VEHICLE"),
+    )
+    _clear_terrain(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    request = _request_fire_overwatch_target_proposal(lifecycle)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+
+    shooting_status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-fire-overwatch-titanic-trigger",
+            proposal=proposal,
+        )
+    )
+    shooting_request = _decision_request(shooting_status)
+
+    assert shooting_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert shooting_request.decision_type == "submit_shooting_declaration"
+    assert state.command_point_total("player-a") == 0
+    assert len(state.stratagem_use_records) == 1
+    assert state.out_of_phase_shooting_state is not None
+
+
+def test_phase13d_fire_overwatch_rejects_engaged_selected_unit_before_cp_spend() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=1.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    _grant_cp(state, player_id="player-a", amount=1)
+    request = _request_fire_overwatch_target_proposal(lifecycle)
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+    )
+
+    status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-fire-overwatch-engaged",
+            proposal=proposal,
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {"invalid_reason": "fire_overwatch_unit_engaged"}
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert state.out_of_phase_shooting_state is None
 
 
 def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> None:
@@ -2390,7 +2480,7 @@ def _request_fire_overwatch_target_proposal(
     context = _context(
         state=state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_kind=TimingTriggerKind.END_PHASE,
         trigger_payload=_fire_overwatch_trigger_payload(moved_unit_instance_id),
     )
     proposal_request = StratagemTargetProposal.for_request(

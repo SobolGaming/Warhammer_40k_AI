@@ -841,6 +841,26 @@ class GameState:
             return None
         return self.battle_phase_sequence[self.battle_phase_index]
 
+    def effective_active_player_id(self) -> str | None:
+        out_of_phase_shooting = self.out_of_phase_shooting_state
+        if out_of_phase_shooting is not None:
+            return out_of_phase_shooting.player_id
+        shooting_state = self.shooting_phase_state
+        if shooting_state is not None and shooting_state.active_selection is not None:
+            return shooting_state.active_selection.player_id
+        movement_state = self.movement_phase_state
+        if movement_state is not None and movement_state.active_selection is not None:
+            return movement_state.active_selection.player_id
+        return self.active_player_id
+
+    def effective_opposing_player_ids(self) -> tuple[str, ...]:
+        effective_active_player_id = self.effective_active_player_id()
+        if effective_active_player_id is None:
+            return ()
+        return tuple(
+            player_id for player_id in self.player_ids if player_id != effective_active_player_id
+        )
+
     def next_decision_request_id(self) -> str:
         self.decision_request_count += 1
         return f"decision-request-{self.decision_request_count:06d}"
@@ -998,11 +1018,6 @@ class GameState:
         completed_player_id = self.active_player_id
         if completed_player_id is None:
             raise GameLifecycleError("GameState active player is required during battle.")
-        phase_end_record = self._record_objective_control_boundary(
-            completed_phase=completed_phase,
-            timing=ObjectiveControlTiming.PHASE_END,
-        )
-        self._score_objective_control_boundary(phase_end_record)
         self.expire_persisting_effects_at_boundary(
             EffectExpirationBoundary.phase_end(
                 battle_round=self.battle_round,
@@ -1010,6 +1025,11 @@ class GameState:
                 player_id=completed_player_id,
             )
         )
+        phase_end_record = self._record_objective_control_boundary(
+            completed_phase=completed_phase,
+            timing=ObjectiveControlTiming.PHASE_END,
+        )
+        self._score_objective_control_boundary(phase_end_record)
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
             if completed_phase is BattlePhase.COMMAND:
                 self.command_step_state = None
@@ -1025,11 +1045,6 @@ class GameState:
             player_id=completed_player_id,
             battle_round=self.battle_round,
         )
-        turn_end_record = self._record_objective_control_boundary(
-            completed_phase=completed_phase,
-            timing=ObjectiveControlTiming.TURN_END,
-        )
-        self._score_objective_control_boundary(turn_end_record)
         self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
         self.expire_persisting_effects_at_boundary(
             EffectExpirationBoundary.turn_end(
@@ -1037,6 +1052,11 @@ class GameState:
                 player_id=completed_player_id,
             )
         )
+        turn_end_record = self._record_objective_control_boundary(
+            completed_phase=completed_phase,
+            timing=ObjectiveControlTiming.TURN_END,
+        )
+        self._score_objective_control_boundary(turn_end_record)
         if completed_phase is BattlePhase.COMMAND:
             self.command_step_state = None
         if completed_phase is BattlePhase.MOVEMENT:
@@ -1047,11 +1067,11 @@ class GameState:
         completed_round = self.battle_round
         battle_round_ended = self._active_player_is_last_in_round(completed_player_id)
         if battle_round_ended:
-            self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_ROUND)
-            self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=False)
             self.expire_persisting_effects_at_boundary(
                 EffectExpirationBoundary.battle_round_end(battle_round=completed_round)
             )
+            self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=False)
+            self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_ROUND)
         if battle_round_ended and self._game_ends_after_completed_round(completed_round):
             self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=True)
             self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_GAME)

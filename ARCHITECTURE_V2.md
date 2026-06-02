@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14A work and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14B work and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14A** is treated as implemented at the time this file was updated. Phase 14A completed the mandatory 11th Edition-only source identity cutover and retired-identity audit; **Phase 14B is the next build slice** before Phase 15 Charge/Fight work begins.
+Everything through **Phase 14B** is treated as implemented at the time this file was updated. Phase 14B completed the timing-window, active-player, and End of Opponent's Movement phase reaction cutover; **Phase 14C is the next build slice** before Phase 15 Charge/Fight work begins.
 
 Completed / implemented foundation:
 
@@ -86,12 +86,13 @@ Completed / implemented foundation:
 | 13E | Complete | Damage allocation, destroyed models, and destruction reactions |
 | 13F | Complete | Shooting phase completion gate |
 | 14A | Complete | Source identity and migration audit |
+| 14B | Complete | Timing windows, active player, and phase skeleton cutover |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14B-14K | Next | Mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14C-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -1846,7 +1847,7 @@ Required tests:
 
 - each supported weapon ability has at least one focused attack-sequence test;
 - each supported shooting-coupled Core Stratagem has decision-contract, CP, target-binding, and replay coverage;
-- Fire Overwatch has end-of-opponent-Movement-phase reaction tests proving it creates an out-of-phase Snap Shooting state, rejects out-of-range, shooting-ineligible, no-legal-declaration, and TITANIC target bindings before CP spend, applies the unmodified-6 hit policy while preserving Torrent auto-hit behavior, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
+- Fire Overwatch has end-of-opponent-Movement-phase reaction tests proving it creates an out-of-phase Snap Shooting state, rejects out-of-range, engaged, TITANIC, shooting-ineligible, and no-legal-declaration selected friendly unit bindings before CP spend, applies the unmodified-6 hit policy while preserving Torrent auto-hit behavior, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
 - Smokescreen and Explosives have decision-contract tests from their legal shooting-resolution windows;
 - unsupported weapon ability descriptor does not execute;
 - Hunter X rejects target declarations that lack every required keyword match and
@@ -1942,6 +1943,8 @@ Required tests:
 - no compatibility shim can instantiate a retired ruleset.
 
 ## Phase 14B: timing windows, active player, and phase skeleton cutover
+
+Status: Complete.
 
 Invariants:
 
