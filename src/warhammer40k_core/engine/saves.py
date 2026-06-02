@@ -241,7 +241,7 @@ class PlungingFireModifierResult:
 class PlungingFireModifier:
     source_rule_id: str
     supported: bool
-    required_height_advantage_inches: float = 6.0
+    required_height_advantage_inches: float = 3.0
     ballistic_skill_modifier: int = -1
 
     def __post_init__(self) -> None:

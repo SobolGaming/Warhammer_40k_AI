@@ -141,6 +141,7 @@ from warhammer40k_core.engine.saves import (
     saving_throw_roll_spec,
 )
 from warhammer40k_core.engine.shooting_targets import (
+    PLUNGING_FIRE_RULE_ID,
     ShootingTargetViolationCode,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
@@ -2043,6 +2044,188 @@ def test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll() -> 
     assert payload["successful"] is False
 
 
+def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    base_scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    elevated_scenario = _scenario_with_unit_pose(
+        scenario=base_scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=_compact_test_unit_poses(origin=Pose.at(10.0, 35.0, 3.0), model_count=5),
+    )
+    plunging_ruin = TerrainFeatureDefinition(
+        feature_id="phase14e-plunging-ruin",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=12.0,
+        footprint_center_y_inches=35.0,
+        footprint_width_inches=12.0,
+        footprint_depth_inches=6.0,
+        walls=(
+            TerrainWallDefinition(
+                wall_id="south-wall",
+                center_x_inches=12.0,
+                center_y_inches=32.2,
+                bottom_z_inches=0.0,
+                width_inches=12.0,
+                depth_inches=0.2,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground-floor",
+                center_x_inches=12.0,
+                center_y_inches=35.0,
+                bottom_z_inches=0.0,
+                width_inches=12.0,
+                depth_inches=6.0,
+                thickness_inches=0.1,
+            ),
+            TerrainFloorDefinition(
+                floor_id="upper-floor",
+                center_x_inches=12.0,
+                center_y_inches=35.0,
+                bottom_z_inches=3.0,
+                width_inches=12.0,
+                depth_inches=6.0,
+                thickness_inches=0.1,
+            ),
+        ),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-plunging-fire-rifle",
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+    )
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=elevated_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+        terrain_features=(plunging_ruin,),
+    )
+    plain_candidates = shooting_target_candidates_for_unit(
+        scenario=base_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+    )
+
+    assert candidates[0].is_legal
+    assert PLUNGING_FIRE_RULE_ID in candidates[0].targeting_rule_ids
+    assert plain_candidates[0].is_legal
+    assert PLUNGING_FIRE_RULE_ID not in plain_candidates[0].targeting_rule_ids
+
+    towering_attacker = replace(attacker, keywords=(*attacker.keywords, "Towering"))
+    towering_scenario = _scenario_with_replaced_unit(
+        scenario=base_scenario,
+        replacement=towering_attacker,
+    )
+    towering_scenario = _scenario_with_unit_pose(
+        scenario=towering_scenario,
+        unit=defender,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=_compact_test_unit_poses(origin=Pose.at(20.0, 35.0), model_count=5),
+    )
+    towering_candidates = shooting_target_candidates_for_unit(
+        scenario=towering_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=towering_attacker,
+        weapon_profile=weapon_profile,
+        target_unit_ids=(defender.unit_instance_id,),
+    )
+
+    assert towering_candidates[0].is_legal
+    assert PLUNGING_FIRE_RULE_ID in towering_candidates[0].targeting_rule_ids
+
+    for label, targeting_rule_ids, expected_target_number, expected_successful in (
+        ("with-plunging-fire", (PLUNGING_FIRE_RULE_ID,), 3, True),
+        ("without-plunging-fire", (), 4, False),
+    ):
+        case_lifecycle, case_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+        case_state = _state(case_lifecycle)
+        case_attacker = case_units["intercessor-1"]
+        case_defender = case_units["enemy"]
+        case_profile = replace(
+            _first_weapon_profile(case_lifecycle, case_attacker),
+            profile_id=f"phase14e-plunging-fire-{label}",
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+        )
+        sequence_id = f"phase14e-plunging-fire-{label}"
+        attack_context_id = f"{sequence_id}:pool-001:attack-001"
+        hit_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Hit roll for {case_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.hit",
+            actor_id="player-a",
+        )
+        wound_spec = DiceRollSpec(
+            expression=DiceExpression(quantity=1, sides=6),
+            reason=f"Wound roll for {case_profile.profile_id} attack {attack_context_id}",
+            roll_type="attack_sequence.wound",
+            actor_id="player-a",
+        )
+        resolve_attack_sequence_until_blocked(
+            state=case_state,
+            decisions=case_lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=AttackSequence.start(
+                sequence_id=sequence_id,
+                attacker_player_id="player-a",
+                attacking_unit_instance_id=case_attacker.unit_instance_id,
+                attack_pools=(
+                    replace(
+                        _attack_pool_for_test(
+                            attacker=case_attacker,
+                            defender=case_defender,
+                            weapon_profile=case_profile,
+                            attacks=1,
+                        ),
+                        targeting_rule_ids=targeting_rule_ids,
+                    ),
+                ),
+            ),
+            already_allocated_model_ids=(),
+            dice_manager=DiceRollManager(
+                sequence_id,
+                event_log=case_lifecycle.decision_controller.event_log,
+                injected_results=(
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:hit",
+                        spec=hit_spec,
+                        value=3,
+                    ),
+                    _fixed_roll_result(
+                        roll_id=f"{sequence_id}:wound",
+                        spec=wound_spec,
+                        value=1,
+                    ),
+                ),
+            ),
+        )
+        hit_payload = _attack_step_payload(
+            _event_payloads(case_lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.HIT,
+        )
+        payload = cast(dict[str, object], hit_payload["payload"])
+
+        assert payload["target_number"] == expected_target_number
+        assert payload["modifier"] == 0
+        assert payload["successful"] is expected_successful
+
+
 def test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -2737,7 +2920,7 @@ def test_phase13c_mandatory_saves_and_plunging_fire_are_typed() -> None:
         supported=True,
     ).apply(
         ballistic_skill=4,
-        attacker_z_inches=5.0,
+        attacker_z_inches=2.0,
         target_z_inches=0.0,
         target_fully_visible=True,
     )
@@ -2771,7 +2954,7 @@ def test_phase13c_mandatory_saves_and_plunging_fire_are_typed() -> None:
             reason=None,
             input_ballistic_skill=4,
             final_ballistic_skill=4,
-            required_height_advantage_inches=6.0,
+            required_height_advantage_inches=3.0,
             actual_height_advantage_inches=7.0,
             target_fully_visible=True,
         )
@@ -2956,7 +3139,7 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             reason=None,
             input_ballistic_skill=4,
             final_ballistic_skill=3,
-            required_height_advantage_inches=6.0,
+            required_height_advantage_inches=3.0,
             actual_height_advantage_inches=cast(float, 7),
             target_fully_visible=True,
         )
@@ -2967,7 +3150,7 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             reason=None,
             input_ballistic_skill=4,
             final_ballistic_skill=3,
-            required_height_advantage_inches=6.0,
+            required_height_advantage_inches=3.0,
             actual_height_advantage_inches=7.0,
             target_fully_visible=cast(bool, "yes"),
         )
@@ -2978,7 +3161,7 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             reason="bad-reason",
             input_ballistic_skill=4,
             final_ballistic_skill=3,
-            required_height_advantage_inches=6.0,
+            required_height_advantage_inches=3.0,
             actual_height_advantage_inches=7.0,
             target_fully_visible=True,
         )
@@ -2989,7 +3172,7 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             reason=None,
             input_ballistic_skill=4,
             final_ballistic_skill=4,
-            required_height_advantage_inches=6.0,
+            required_height_advantage_inches=3.0,
             actual_height_advantage_inches=3.0,
             target_fully_visible=True,
         )

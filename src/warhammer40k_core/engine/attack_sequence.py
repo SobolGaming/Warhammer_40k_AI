@@ -111,6 +111,7 @@ from warhammer40k_core.engine.saves import (
 )
 from warhammer40k_core.engine.shooting_targets import (
     BENEFIT_OF_COVER_RULE_ID,
+    PLUNGING_FIRE_RULE_ID,
     shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
 )
@@ -3638,11 +3639,12 @@ def _roll_hit(
     attacker_player_id: str,
     attack_context_id: str,
 ) -> HitRoll:
-    skill = _hit_skill(pool.weapon_profile) + _benefit_of_cover_ballistic_skill_penalty(
-        state=state,
-        pool=pool,
+    skill = (
+        _hit_skill(pool.weapon_profile)
+        + _benefit_of_cover_ballistic_skill_penalty(state=state, pool=pool)
+        - _plunging_fire_ballistic_skill_improvement(pool=pool)
     )
-    skill = min(skill, 6)
+    skill = max(2, min(skill, 6))
     is_fire_overwatch = FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
         return HitRoll.auto_hit(target_number=skill)
@@ -3931,6 +3933,12 @@ def _benefit_of_cover_ballistic_skill_penalty(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
     ):
+        return 1
+    return 0
+
+
+def _plunging_fire_ballistic_skill_improvement(*, pool: RangedAttackPool) -> int:
+    if PLUNGING_FIRE_RULE_ID in pool.targeting_rule_ids:
         return 1
     return 0
 

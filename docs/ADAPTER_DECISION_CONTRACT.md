@@ -286,11 +286,13 @@ Defender shooting decisions include:
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
 - shooting-coupled reactive Stratagem choices such as Go to Ground through the existing `use_stratagem` or Stratagem target-proposal contract.
 
-Saving throw kind is not an adapter choice in the 11th Edition contract. If the
-current allocation group has an Invulnerable Save, the engine must use that
-Invulnerable Save. Armour Saves with AP modifiers are used only when the current
-allocation group has no Invulnerable Save. Adapters must not offer, submit,
-apply, or replay an armour-versus-invulnerable choice.
+Saving throw kind is not an adapter choice in the 11th Edition contract. In the
+current partial Phase 14E implementation, if the allocated model has an
+Invulnerable Save, the engine must use that Invulnerable Save. Armour Saves with
+AP modifiers are used only when the allocated model has no Invulnerable Save.
+When the remaining allocation-group host lands, the same rule must apply to the
+current allocation group instead of a single allocated model. Adapters must not
+offer, submit, apply, or replay an armour-versus-invulnerable choice.
 
 Phase 13C implements these defender-visible attack-resolution decisions:
 
@@ -303,7 +305,7 @@ Phase 13E implements this destroyed-model attack-resolution decision:
 
 Phase 13D adds this attacker-visible attack-resolution decision:
 
-- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character models. Option IDs are visible Character `model_instance_id` values plus `decline_precision`. Character options include `payload.selected_model_id`; the decline option uses `selected_model_id: null`. Accepted Character selection identifies the Character allocation group that becomes the current allocation group for the current attack pool until those attacks are resolved or that Character group is destroyed, whichever happens first. While that selection remains live, the normal defender allocation path is constrained to the selected Character group. Declining, having no visible Character, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
+- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character models. The current partial Phase 14E payload uses visible Character `model_instance_id` option IDs plus `decline_precision`; Character options include `payload.selected_model_id`, and the decline option uses `selected_model_id: null`. Accepted Character selection is pool-scoped as an interim attacker-side constraint on that Character model until those attacks are resolved or that model is destroyed, whichever happens first. When the remaining allocation-group host lands, this decision must identify the selected Character allocation group rather than a single model, and the normal defender allocation path must be constrained to that group. Declining, having no visible Character, having no Precision source, or destruction of the selected Character model/group follows the normal defender allocation path.
 
 Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Weapon abilities remain Phase 13D behavior, but adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
 
