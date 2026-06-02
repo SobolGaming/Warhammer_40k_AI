@@ -142,7 +142,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Fight phase: both-player pile-in step, Fights First alternating selection, eligible-to-fight if charged/engaged at Fight phase start/engaged at activation, eligible-to-fight pass rule when all eligible units are more than 5" from enemies, Normal Fight, Overrun Fight, both-player consolidation step, and Ongoing/Engaging/Objective consolidation modes | Phase 14C, 14D, 20G |
 | Actions: start eligibility exclusions, TITANIC exceptions, action-imposed shooting/charge restrictions, cancellation by moves except pile-in/consolidation, cancellation on leaving battlefield, and completion effects | Phase 11E, 16C-16D, 20D |
 | Stratagem framework: same stratagem once per phase, same unit targeted by at most one stratagem per phase unless stated, optional additional CP sections, and source-backed 11th Edition Core Stratagem definitions | Phase 12B, 12C, 12D, 20I |
-| Core Stratagems: Command Re-roll partial-die semantics and no Leadership/Battle-shock coverage, Epic Challenge, Insane Bravery, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch via Snap Shooting at end of opponent's Movement phase, Smokescreen, Heroic Intervention modes, and Counteroffensive | Phase 12B, 12C, 13D, 14E, 20I |
+| Core Stratagems: Command Re-roll partial-die semantics and no Leadership/Battle-shock coverage, Epic Challenge, Insane Bravery, New Orders, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch via Snap Shooting at end of opponent's Movement phase, Smokescreen, Heroic Intervention modes, and Counteroffensive | Phase 12B, 12C, 13D, 14E, 20I |
 | Monsters/Vehicles and `FRAME`: normal/advance-only movement through non-MONSTER/non-VEHICLE friendly/enemy models, frame measurement/rotation, shooting at engaged MONSTER/VEHICLE units, and close-quarters exceptions | Phase 10G, 10I, 13B, 20C, 20F |
 | Transports: capacity by models, multiple embarked units, battle-formation embark, embark after normal/advance/fall-back moves, Rapid/Tactical/Combat Disembark modes, emergency disembark, and destroyed-transport timing with Deadly Demise | Phase 10Q, 13E, 15C, 20H |
 | Attached units: Leader and Support components, one Leader and one Support per bodyguard unless stated, bodyguard Toughness for attacks, destroyed-unit trigger identity, keyword union without model keyword inheritance, source-scoped ability persistence, and revive into attached unit | Phase 6, 13C, 13E, 15D, 16F, 20H |
@@ -151,7 +151,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection, `[ANTI]`, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]`, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative X", `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 16C-16F, 20I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 14C, 15B-15D, 16F, 20H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 15D, 20J |
-| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, no replacement on discard, once-per-round 1 CP discard reward, 15 VP per-round Secondary cap, and 45 VP Primary / 45 VP Secondary caps | Phase 11A, 11E, 11F, 20J |
+| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with once-per-round 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Secondary cap, and 45 VP Primary / 45 VP Secondary caps | Phase 11A, 11E, 11F, 12C, 20J |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 15A, 15C, 15E |
 
 # Build order details
@@ -1210,11 +1210,15 @@ Invariants:
 - mission Actions have source-backed start timing, eligible units, target IDs,
   interruption conditions, completion timing, and scoring effects;
 - the mission deck grants two Secondary Missions per player turn;
-- Secondary Missions are retained until achieved or discarded, and discarded
-  Secondary Missions are not replaced immediately;
+- Secondary Missions are retained until achieved or discarded, and Secondary
+  Missions discarded by the ordinary Tactical discard flow are not replaced
+  immediately;
 - retained Secondary Missions do not have a two-card hand-size cap;
 - Tactical discard can discard one or more retained Secondary Missions for the
   source-backed once-per-battle-round CP reward and records no replacement draw;
+- New Orders is a separate 1 CP Stratagem path that discards one retained
+  Secondary Mission, immediately draws a replacement Secondary Mission, and is
+  usable only once per game;
 - secondary mode, Fixed IDs, Tactical draws/card states, and normal secondary
   scoring visibility are source-backed and viewer-scoped;
 - objective control feeds scoring;
@@ -1229,6 +1233,9 @@ Required tests:
 - secondary scoring uses source-backed Fixed/Tactical card VP values;
 - Secondary Mission draw, score, retain, and discard flow is public or hidden according to source-backed viewer rules;
 - Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions for the once-per-battle-round CP reward, and does not replace discarded cards;
+- New Orders emits deterministic Stratagem, CP, discard, and replacement-draw
+  records, rejects second use in the same game, and cannot be confused with
+  ordinary Tactical discard;
 - mission Action can start through the lifecycle decision path, persist its target,
   filter ineligible units, complete, be interrupted, and score;
 - source package payloads round-trip and preserve 11th Edition mission/scoring/action snapshots;
@@ -1416,6 +1423,7 @@ Initial supported Core Stratagem groups at this build slice:
 
 - Command Re-roll;
 - Insane Bravery;
+- New Orders;
 - Rapid Ingress.
 
 Later phase-coupled Core Stratagems:
@@ -1432,12 +1440,11 @@ Invariants:
 - each supported Core Stratagem consumes CP and records use;
 - Command Re-roll uses source-backed edition-specific eligible roll classes, rejects roll actor drift, and applies Phase 10J reroll semantics while remaining valid as a nested reaction without breaking the parent timing window;
 - Insane Bravery integrates with Phase 11C Battle-shock results without bypassing `DecisionRequest`/`DecisionResult`;
+- New Orders costs 1 CP, can be used only once per game, discards one retained
+  Secondary Mission card, and immediately draws one replacement Secondary Mission
+  card through source-backed mission deck state;
 - Rapid Ingress reuses reserve-arrival placement validators and, where exact placement is required, emits the existing placement proposal request after the Stratagem decision is accepted; when offered from a reaction window, the parent remains blocked until the placement proposal resolves;
-- retired New Orders replacement-draw behavior is not active 11th Edition
-  behavior; Tactical discard is a Phase 11E mission decision that grants the
-  source-backed CP reward and does not immediately replace discarded Secondary
-  Missions;
-- Command and Movement phase progression discover supported Core Stratagem windows through `StratagemCatalogIndex`: Command start for Insane Bravery and opponent Movement phase end for Rapid Ingress reaction/placement;
+- Command and Movement phase progression discover supported Core Stratagem windows through `StratagemCatalogIndex`: Command start for Insane Bravery and New Orders, and opponent Movement phase end for Rapid Ingress reaction/placement;
 - supported dice/mission/reserves Stratagems use deterministic dice/replay plumbing and source IDs;
 - Phase 12C reuses Phase 12A persisting-effect/reaction machinery and Phase 12B ledger/decision framework; it does not depend on the later Phase 12D ability registry or Phase 16D generic handlers;
 - unsupported Core Stratagems remain explicit unsupported descriptors.
@@ -1447,7 +1454,10 @@ Required tests:
 - one legal use per supported Phase-12 timing window;
 - one phase-progression regression per supported phase-owned Stratagem window, proving the window is emitted from the trigger-keyed index and resolves through `GameLifecycle.submit_decision(...)`;
 - combined-window regressions for phases with multiple optional Stratagem windows under the same phase/trigger, proving declining one timing window does not suppress a distinct later timing window;
-- per-Stratagem golden replay for Command Re-roll, Insane Bravery, and Rapid Ingress;
+- per-Stratagem golden replay for Command Re-roll, Insane Bravery, New Orders, and Rapid Ingress;
+- New Orders consumes 1 CP, rejects second use in the same game, discards exactly
+  one retained Secondary Mission, and immediately draws exactly one replacement
+  card;
 - decision-contract round-trip for option enumeration, submission, recording, event emission, and replay;
 - CP consumption and repeat-use restriction;
 - target-binding validation;
@@ -2753,8 +2763,11 @@ Required tests:
 
 Invariants:
 
-- Core Stratagem package contains Command Re-roll, Epic Challenge, Insane Bravery, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch, Smokescreen, Heroic Intervention, and Counteroffensive;
+- Core Stratagem package contains Command Re-roll, Epic Challenge, Insane Bravery, New Orders, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch, Smokescreen, Heroic Intervention, and Counteroffensive;
 - Command Re-roll excludes Leadership and Battle-shock rolls, permits one die of a multi-dice roll except Charge rolls, and consumes Phase 10J reroll semantics;
+- New Orders costs 1 CP, can be used only once per game, discards one retained
+  Secondary Mission card, and immediately draws one replacement Secondary Mission
+  card;
 - Heroic Intervention supports Leap to Defend and Into the Fray modes, including the optional +1 CP section;
 - duplicate core/weapon ability instances require deterministic controlling-player selection at the timing stated by the PDF;
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
@@ -2766,6 +2779,8 @@ Required tests:
 
 - Core Stratagem catalog source IDs and CP costs round-trip;
 - each Core Stratagem has target-binding, CP ledger, timing-window, and replay coverage;
+- New Orders rejects second use in the same game and emits deterministic
+  discard-and-replacement-draw mission deck records;
 - duplicate ability selection is deterministic and adapter-visible when a player choice exists;
 - Hunter X target declaration accepts at least one listed keyword match and
   rejects target units with none;
@@ -2788,10 +2803,11 @@ Invariants:
   are selected after Attached Units are created, no attached squad can have more
   than one Enhancement, and the Warlord must share the army Faction keyword;
 - mission deck source data grants two Secondary Missions per player turn, keeps
-  Secondary Missions until scored or discarded, and does not replace discarded
-  Secondary Missions immediately;
-- retained Secondary Missions have no two-card hand-size cap, and discard rewards
-  are once-per-battle-round CP rewards;
+  Secondary Missions until scored or discarded, and does not replace ordinary
+  Tactical-discarded Secondary Missions immediately;
+- retained Secondary Missions have no two-card hand-size cap, ordinary discard
+  rewards are once-per-battle-round CP rewards, and New Orders is the explicit
+  once-per-game 1 CP replacement-draw exception;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, and Secondary
   scoring at 15 VP per battle round;
 - source imports reuse the existing normalization/ETL boundary but produce 11th Edition package IDs and hashes;
@@ -2806,15 +2822,16 @@ Required tests:
 - battle-size mustering rows enforce point, Detachment Point, Enhancement Limit,
   Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
   faction-keyword rules;
-- Secondary Mission draw/retain/no-hand-size-cap/discard and 45/45/15 VP caps
-  load from source data and round-trip through mission scoring fixtures;
+- Secondary Mission draw/retain/no-hand-size-cap/discard, New Orders
+  replacement draw, and 45/45/15 VP caps load from source data and round-trip
+  through mission scoring fixtures;
 - coverage report groups awaiting-source rows separately from unsupported rule shapes.
 
 ## Phase 20K: cutover hardening and static audits
 
 Invariants:
 
-- CI fails on active retired edition IDs, pivot-cost policies, old terrain kinds, old cover save/AP exceptions, optional armour-versus-invulnerable save choice, 1" engagement, old coherency thresholds, Battle-shock auto-expiry, separate Reinforcements phase steps, 9" reserve-arrival enemy-distance policies, New Orders replacement-draw behavior, retired Core Stratagem names, and old Aircraft minimum-move policy;
+- CI fails on active retired edition IDs, pivot-cost policies, old terrain kinds, old cover save/AP exceptions, optional armour-versus-invulnerable save choice, 1" engagement, old coherency thresholds, Battle-shock auto-expiry, separate Reinforcements phase steps, 9" reserve-arrival enemy-distance policies, replacement draws outside New Orders, retired Core Stratagem names, and old Aircraft minimum-move policy;
 - replay fixtures and canonical JSON payloads are regenerated for 11th Edition-only identifiers;
 - no adapter, headless, UI, network, AI, or test path can choose a retired ruleset;
 - `ARCHITECTURE_V2.md`, `README.md`, and source-package docs agree on 11th Edition-only scope.
