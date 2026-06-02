@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D and Phase 14F work, the partial Phase 14E cutover, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the partial Phase 14E cutover, the partial Phase 14F shooting-type cutover, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** and **Phase 14F** is treated as implemented at the time this file was updated. **Phase 14E is partially implemented and remains the active build slice**: Benefit of Cover and Plunging Fire now modify BS rather than saves/AP, Invulnerable Saves are mandatory when present with no armour-versus-invulnerable adapter choice, Precision selection is pool-scoped as an interim visible Character model allocation constraint, and terrain objective control is locked to terrain-area containment instead of marker-radius contribution. The remaining Phase 14E work is the 11th Edition allocation-group host: save-before-allocation batching, defender allocation-order decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-mortal mixed-group ordering, and Precision selection by Character allocation group identity.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E is partially implemented and remains the active build slice**: Benefit of Cover and Plunging Fire now modify BS rather than saves/AP, Invulnerable Saves are mandatory when present with no armour-versus-invulnerable adapter choice, Precision selection is pool-scoped as an interim visible Character model allocation constraint, and terrain objective control is locked to terrain-area containment instead of marker-radius contribution. **Phase 14F has a partial shooting-type/declaration cutover** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, but full Phase 14F completion is blocked on the remaining Phase 14E allocation-group host and attack Hit-roll reroll-permission enforcement. The remaining Phase 14E work is the 11th Edition allocation-group host: save-before-allocation batching, defender allocation-order decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-mortal mixed-group ordering, and Precision selection by Character allocation group identity.
 
 Completed / implemented foundation:
 
@@ -89,13 +89,14 @@ Completed / implemented foundation:
 | 14B | Complete | Timing windows, active player, and phase skeleton cutover |
 | 14C | Complete | Shared primitives cutover |
 | 14D | Complete | Movement, terrain, objectives, and actions cutover |
-| 14F | Complete | Shooting cutover |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14E, 14G-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14E | In progress | Attack sequence allocation-group host and allocation-order cutover |
+| 14F | In progress | Shooting cutover; shooting-type/declaration slice is implemented, completion remains blocked on Phase 14E allocation host and Hit-reroll enforcement |
+| 14G-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -155,7 +156,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Objectives: terrain objectives as primary objective representation, marker fallback only when no terrain area coincides, objective markers can be moved through and ended on, terrain-area containment for derived terrain objectives, secured-objective persistence and timing | Phase 11A, 11B, 11C, 14D, 14E |
 | Movement phase: every army unit is selected to move each Movement phase, including strategic reserves and embarked units; Ingress/reserve arrival is a move type inside Move Units, not a separate phase step; move type is a finite decision; Remain Stationary does not trigger start/end move rules | Phase 10B-10T, 14D |
 | Fall Back: Ordered Retreat vs Desperate Escape modes, hazard rolls for Desperate Escape, enemy-model traversal, post-move Battle-shock roll, and shooting/charge/action restrictions | Phase 10O, 11C, 14D |
-| Shooting phase: Normal, Assault, Close-quarters, Indirect, and Snap shooting types; close-quarters engaged targeting and weapon-selection restrictions; indirect cover/no-reroll/fail ranges; engaged MONSTER/VEHICLE targeting; `[BLAST]` engaged-target bans | Phase 13B-13F, 14F |
+| Shooting phase: partial Normal, Assault, Close-quarters, Indirect, and Snap shooting-type/declaration cutover; close-quarters engaged targeting and weapon-selection restrictions; indirect cover/no-reroll evidence and fail ranges; engaged MONSTER/VEHICLE targeting; `[BLAST]` engaged-target bans | Phase 13B-13F, 14F partial |
 | Charge phase: charge eligibility, charge-target declaration after the roll, target-within-roll-distance validation, within-1" and engaged-if-possible model movement clauses, all-target engagement requirement, non-target engagement ban, and Fights First grant | Phase 15A, 15B, 14G |
 | Fight phase: both-player pile-in step, Fights First alternating selection, eligible-to-fight if charged/engaged at Fight phase start/engaged at activation, eligible-to-fight pass rule when all eligible units are more than 5" from enemies, Normal Fight, Overrun Fight, both-player consolidation step, and Ongoing/Engaging/Objective consolidation modes | Phase 15C, 15D, 14G |
 | Actions: start eligibility exclusions, TITANIC exceptions, action-imposed shooting/charge restrictions, cancellation by moves except pile-in/consolidation, cancellation on leaving battlefield, and completion effects | Phase 11E, 17C-17D, 14D |
@@ -2104,7 +2105,11 @@ Remaining required tests:
 
 ## Phase 14F: shooting cutover
 
-Status: Complete.
+Status: In progress.
+
+The current implementation is a partial shooting-type/declaration cutover: engine-enumerated shooting types are exposed through shooting target candidates, declarations, attack pools, replay payloads, and Fire Overwatch Snap Shooting, and the current sequential attack host consumes the resulting attack pools. Full Phase 14F completion remains blocked on the Phase 14E allocation-group host because the current attack sequence still resolves one attack at a time through model allocation, save, and damage before advancing to the next attack.
+
+Indirect and Snap Shooting currently emit deterministic no-Hit-reroll rule evidence on attack pools. Attack-sequence Hit-roll reroll windows are not yet wired for those rolls, so this evidence is inert until the remaining reroll-permission integration is implemented and tested.
 
 Invariants:
 
@@ -2121,7 +2126,7 @@ Required tests:
 - shooting-type decisions reject stale/malformed submissions;
 - close-quarters weapon-selection and target restrictions are enforced per model keyword;
 - engaged `MONSTER`/`VEHICLE` shooting and `[BLAST]` FAQs are regression-tested;
-- indirect and snap policies interact correctly with Torrent, Heavy, cover, and reroll permissions.
+- indirect and snap policies interact correctly with Torrent, Heavy, cover, and reroll permissions after attack Hit-roll reroll windows are wired.
 
 ## Phase 14G: charge and fight source contract
 
