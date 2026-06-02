@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the partial Phase 14E cutover, the partial Phase 14F shooting-type cutover, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14F work and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E is partially implemented and remains the active build slice**: Benefit of Cover and Plunging Fire now modify BS rather than saves/AP, Invulnerable Saves are mandatory when present with no armour-versus-invulnerable adapter choice, Precision selection is pool-scoped as an interim visible Character model allocation constraint, and terrain objective control is locked to terrain-area containment instead of marker-radius contribution. **Phase 14F has a partial shooting-type/declaration cutover** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, but full Phase 14F completion is blocked on the remaining Phase 14E allocation-group host and attack Hit-roll reroll-permission enforcement. The remaining Phase 14E work is the 11th Edition allocation-group host: save-before-allocation batching, defender allocation-order decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-mortal mixed-group ordering, and Precision selection by Character allocation group identity.
+Everything through **Phase 14F** is treated as implemented at the time this file was updated. Phase 14E completed the 11th Edition allocation-group host, including save-before-allocation batching, defender allocation-order decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-mortal mixed-group ordering, and Precision selection by Character allocation group identity. Phase 14F completed the Shooting phase cutover for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock.
 
 Completed / implemented foundation:
 
@@ -89,13 +89,13 @@ Completed / implemented foundation:
 | 14B | Complete | Timing windows, active player, and phase skeleton cutover |
 | 14C | Complete | Shared primitives cutover |
 | 14D | Complete | Movement, terrain, objectives, and actions cutover |
+| 14E | Complete | Attack sequence allocation-group host and allocation-order cutover |
+| 14F | Complete | Shooting cutover with finite shooting-type selection and grouped attack resolution |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14E | In progress | Attack sequence allocation-group host and allocation-order cutover |
-| 14F | In progress | Shooting cutover; shooting-type/declaration slice is implemented, completion remains blocked on Phase 14E allocation host and Hit-reroll enforcement |
 | 14G-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
@@ -148,18 +148,18 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Moving core: straight-line distance, free rotations, no pivot costs, per-model Move budgets when a unit has mixed Move characteristics, Set Up rollback, model overlap/surface checks, and end-of-turn coherency cleanup without destroyed-model triggers | Phase 10A-10T, 11E, 14C, 14D |
 | Unit coherency and engagement: 2"/5" engagement range, one-neighbor coherency plus 9"/5" max-spread coherency across every model | Phase 10G, 10L, 10M, 10N, 10O, 15A-15D, 14C |
 | Making attacks: ranged weapon selection, melee one-weapon selection plus `[EXTRA ATTACKS]`, target eligibility, identical-attack aggregation, and declared melee attack splitting across multiple engaged targets | Phase 13B, 13C, 13D, 15C, 14E |
-| Attack sequence: current sequential hit/wound/model-allocation/save/damage host, mandatory Invulnerable Save precedence, model-level defender allocation choices, and pool-scoped Precision model constraint | Phase 13C, 13E, 14E partial |
-| Attack sequence 11th Edition allocation host: save-before-allocation batching, allocation groups, defender allocation-order decision, save resolution from lowest to highest result, current allocation group transitions, and damage allocation to wounded models first | Phase 14E remaining |
+| Attack sequence: grouped hit/wound/save-before-allocation/damage host, mandatory Invulnerable Save precedence, defender allocation-order decisions, low-to-high failed-save resolution, and group-scoped Precision Character selection | Phase 13C, 13E, 14E |
+| Attack sequence 11th Edition allocation host: save-before-allocation batching, allocation groups, defender allocation-order decision, save resolution from lowest to highest result, current allocation group transitions, and damage allocation to wounded models first | Phase 14E |
 | Mortal wounds, normal-damage-before-mortal ordering, hazard rolls as unit-level rolls that allocate through mortal-wound rules, and `[DEVASTATING WOUNDS]` mortal-wound cap of one destroyed model per critical wound | Phase 13C, 13D, 13E, 14C, 14E |
 | Visibility: 1 mm line of sight, visible vs fully visible model/unit states, same-unit model ignoring, and `FRAME` closest-point visibility/measurement | Phase 13A, 14C, 14D |
 | Terrain: terrain areas, exposed/light/dense categories, dense movement gates, vertical movement, stable non-ground-level endpoints, Solid 3" ground-level line-of-sight blocking, Hidden using model-level terrain-area occupancy and unit Detection Range, Gone to Ground detection modifier, Obscuring terrain areas, Benefit of Cover as `-1 BS`, and Plunging Fire as `+1 BS` | Phase 10F, 10I, 13A, 13C, 14D, 14E |
 | Objectives: terrain objectives as primary objective representation, marker fallback only when no terrain area coincides, objective markers can be moved through and ended on, terrain-area containment for derived terrain objectives, secured-objective persistence and timing | Phase 11A, 11B, 11C, 14D, 14E |
 | Movement phase: every army unit is selected to move each Movement phase, including strategic reserves and embarked units; Ingress/reserve arrival is a move type inside Move Units, not a separate phase step; move type is a finite decision; Remain Stationary does not trigger start/end move rules | Phase 10B-10T, 14D |
 | Fall Back: Ordered Retreat vs Desperate Escape modes, hazard rolls for Desperate Escape, enemy-model traversal, post-move Battle-shock roll, and shooting/charge/action restrictions | Phase 10O, 11C, 14D |
-| Shooting phase: partial Normal, Assault, Close-quarters, Indirect, and Snap shooting-type/declaration cutover; close-quarters engaged targeting and weapon-selection restrictions; indirect cover/no-reroll evidence and fail ranges; engaged MONSTER/VEHICLE targeting; `[BLAST]` engaged-target bans | Phase 13B-13F, 14F partial |
+| Shooting phase: Normal, Assault, Close-quarters, Indirect, and Snap shooting-type cutover through finite shooting-type selection, declaration, grouped attacks, saves, and damage; close-quarters engaged targeting and weapon-selection restrictions; Indirect cover/no-reroll enforcement and fail ranges; engaged MONSTER/VEHICLE targeting; `[BLAST]` engaged-target bans; Assault/Advanced weapon gating; Fire Overwatch/Snap routing | Phase 13B-13F, 14F |
 | Charge phase: charge eligibility, charge-target declaration after the roll, target-within-roll-distance validation, within-1" and engaged-if-possible model movement clauses, all-target engagement requirement, non-target engagement ban, and Fights First grant | Phase 15A, 15B, 14G |
 | Fight phase: both-player pile-in step, Fights First alternating selection, eligible-to-fight if charged/engaged at Fight phase start/engaged at activation, eligible-to-fight pass rule when all eligible units are more than 5" from enemies, Normal Fight, Overrun Fight, both-player consolidation step, and Ongoing/Engaging/Objective consolidation modes | Phase 15C, 15D, 14G |
-| Actions: start eligibility exclusions, TITANIC exceptions, action-imposed shooting/charge restrictions, cancellation by moves except pile-in/consolidation, cancellation on leaving battlefield, and completion effects | Phase 11E, 17C-17D, 14D |
+| Actions: start eligibility exclusions, including Battle-shocked units and units that shot earlier in the current Shooting phase; TITANIC exceptions, action-imposed shooting/charge restrictions, cancellation by moves except pile-in/consolidation, cancellation on leaving battlefield, and completion effects | Phase 11E, 17C-17D, 14D, 14F |
 | Stratagem framework: same stratagem once per phase, same unit targeted by at most one stratagem per phase unless stated, optional additional CP sections, and source-backed 11th Edition Core Stratagem definitions | Phase 12B, 12C, 12D, 14I |
 | Core Stratagems: Command Re-roll partial-die semantics and no Leadership/Battle-shock coverage, Epic Challenge, Insane Bravery, New Orders, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch via Snap Shooting at end of opponent's Movement phase, Smokescreen, Heroic Intervention modes, and Counteroffensive | Phase 12B, 12C, 13D, 15E, 14I |
 | Monsters/Vehicles and `FRAME`: normal/advance-only movement through non-MONSTER/non-VEHICLE friendly/enemy models, frame measurement/rotation, shooting at engaged MONSTER/VEHICLE units, and close-quarters exceptions | Phase 10G, 10I, 13B, 14C, 14F |
@@ -2090,28 +2090,31 @@ Implemented tests:
 
 ## Phase 14F: shooting cutover
 
-Status: In progress.
+Status: Complete.
 
-The current implementation is a partial shooting-type/declaration cutover: engine-enumerated shooting types are exposed through shooting target candidates, declarations, attack pools, replay payloads, and Fire Overwatch Snap Shooting. Full Phase 14F completion remains blocked on rerunning the shooting-type rules through the grouped allocation host and enforcing Indirect/Snap Hit-roll reroll bans.
+Phase 14F completes the Shooting phase cutover. The active player selects an eligible unit, then answers the finite `select_shooting_type` decision before the engine emits the parameterized shooting declaration request. The selected shooting type is preserved through declarations, attack pools, replay payloads, grouped attack resolution, allocation-order decisions, saves, damage, and Fire Overwatch Snap Shooting.
 
-Indirect and Snap Shooting currently emit deterministic no-Hit-reroll rule evidence on attack pools. Attack-sequence Hit-roll reroll windows are not yet wired for those rolls, so this evidence is inert until the remaining reroll-permission integration is implemented and tested.
+Indirect and Snap Shooting now attach deterministic no-Hit-reroll rule IDs to Hit-roll specs, and the dice/Command Re-roll paths reject reroll windows for those rolls before mutation. Units that shoot in the Shooting phase are excluded from Mission Action start options until the phase ends through the shared action decision path.
 
 Invariants:
 
 - Shooting type is an engine-enumerated decision: Normal, Assault, Close-quarters, Indirect, or source-provided types such as Snap Shooting;
+- in-phase Shooting uses `select_shooting_type` as a finite active-player decision between unit selection and shooting declaration;
 - `[CLOSE-QUARTERS]` and `[PISTOL]` are identical for all rules purposes;
 - non-`MONSTER`/non-`VEHICLE` close-quarters shooting can only select `[CLOSE-QUARTERS]` weapons and engaged targets;
 - `MONSTER`/`VEHICLE` close-quarters and engaged-target shooting apply the correct -1 Hit modifier except for qualifying `[CLOSE-QUARTERS]` attacks;
 - `[BLAST]` weapons cannot target engaged units through close-quarters or engaged `MONSTER`/`VEHICLE` shooting;
 - Indirect shooting grants cover, forbids hit rerolls, and has the 1-5/1-3 unmodified fail policy;
-- Snap Shooting targets one visible enemy unit within 24", hits only on unmodified 6, and forbids Hit-roll rerolls.
+- Snap Shooting targets one visible enemy unit within 24", hits only on unmodified 6, and forbids Hit-roll rerolls;
+- after a unit shoots in the Shooting phase, it cannot start a Mission Action until the phase ends.
 
 Required tests:
 
-- shooting-type decisions reject stale/malformed submissions;
+- shooting-type finite decisions reject stale, drifted, wrong-actor, and wrong-option submissions before mutation;
 - close-quarters weapon-selection and target restrictions are enforced per model keyword;
 - engaged `MONSTER`/`VEHICLE` shooting and `[BLAST]` FAQs are regression-tested;
-- indirect and snap policies interact correctly with Torrent, Heavy, cover, and reroll permissions after attack Hit-roll reroll windows are wired.
+- indirect and snap policies interact correctly with Torrent, Heavy, cover, grouped attacks, and reroll permissions;
+- Assault/Advanced, Close-quarters/Blast, Monster/Vehicle, Indirect, Fire Overwatch/Snap, and action-start lock tests exercise the full lifecycle decision path.
 
 ## Phase 14G: charge and fight source contract
 

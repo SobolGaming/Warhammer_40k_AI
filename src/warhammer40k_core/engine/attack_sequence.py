@@ -127,7 +127,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     FIRE_OVERWATCH_RULE_ID,
     HAZARDOUS_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
-    INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+    INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
     INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID,
     MELTA_RULE_ID,
     PRECISION_RULE_ID,
@@ -4506,6 +4506,10 @@ def _roll_hit(
             reason=f"Hit roll for {pool.weapon_profile_id} attack {attack_context_id}",
             roll_type="attack_sequence.hit",
             actor_id=attacker_player_id,
+            reroll_forbidden_rule_ids=_hit_reroll_forbidden_rule_ids(
+                is_snap_shooting=is_snap_shooting,
+                targeting_rule_ids=pool.targeting_rule_ids,
+            ),
         )
     )
     unmodified = roll_state.current_total
@@ -4513,7 +4517,7 @@ def _roll_hit(
     final_roll = unmodified + capped_modifier
     if is_snap_shooting:
         minimum_success = 6
-    elif INDIRECT_FIRE_NO_VISIBLE_RULE_ID in pool.targeting_rule_ids:
+    elif INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in pool.targeting_rule_ids:
         minimum_success = (
             4 if INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids else 6
         )
@@ -4535,6 +4539,19 @@ def _roll_hit(
         minimum_unmodified_success=minimum_success,
         generated_hits=generated_hits,
     )
+
+
+def _hit_reroll_forbidden_rule_ids(
+    *,
+    is_snap_shooting: bool,
+    targeting_rule_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    rule_ids: list[str] = []
+    if is_snap_shooting:
+        rule_ids.append(SNAP_SHOOTING_RULE_ID)
+    if INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in targeting_rule_ids:
+        rule_ids.append(INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID)
+    return tuple(dict.fromkeys(rule_ids))
 
 
 def _roll_wound(

@@ -71,6 +71,7 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseActionKind,
 )
+from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
@@ -898,6 +899,37 @@ def test_cleanse_mission_action_filters_ineligible_vehicle_units() -> None:
         not in cast(list[JsonValue], option_payload["eligible_unit_instance_ids"])
         for option_payload in option_payloads
     )
+
+
+def test_mission_action_start_excludes_units_that_shot_this_shooting_phase() -> None:
+    lifecycle = _battle_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    unit_id = "army-alpha:intercessor-unit-1"
+    _place_unit_near_objective(
+        state,
+        unit_instance_id=unit_id,
+        target_suffix="center",
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(unit_id,),
+        shot_unit_ids=(unit_id,),
+    )
+
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="cleanse-objective",
+    )
+
+    assert waiting.status_kind.value == "unsupported"
+    assert waiting.decision_request is None
+    waiting_payload = cast(dict[str, JsonValue], waiting.payload)
+    assert waiting_payload["mission_action_id"] == "cleanse-objective"
 
 
 def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() -> None:

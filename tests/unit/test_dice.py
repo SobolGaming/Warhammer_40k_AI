@@ -352,6 +352,25 @@ def test_reroll_selection_is_an_explicit_decision() -> None:
     assert updated.current_values[1] == 4
 
 
+def test_reroll_forbidden_roll_spec_rejects_reroll_request() -> None:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Indirect Fire hit roll with forbidden rerolls",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+        reroll_forbidden_rule_ids=("weapon-ability:indirect-fire:no-hit-rerolls",),
+    )
+    manager = DiceRollManager("seed")
+    state = manager.roll_fixed(spec, [4])
+
+    with pytest.raises(DecisionError, match="forbid rerolls"):
+        manager.request_reroll(state, allowed_selections=((0,),))
+
+    assert state.original_result.spec.to_payload()["reroll_forbidden_rule_ids"] == [
+        "weapon-ability:indirect-fire:no-hit-rerolls"
+    ]
+
+
 def test_reroll_request_uses_explicit_allowed_selections_not_power_set() -> None:
     manager = DiceRollManager("seed")
     spec = DiceRollSpec(

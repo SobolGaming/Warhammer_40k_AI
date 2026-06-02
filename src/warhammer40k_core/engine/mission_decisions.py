@@ -406,6 +406,7 @@ def _mission_action_start_options(
         for unit_id in eligible_unit_ids
         for target_id in target_ids_by_unit.get(unit_id, ())
         if unit_id not in state.battle_shocked_unit_ids
+        and not _unit_has_shot_this_shooting_phase(state=state, unit_instance_id=unit_id)
     )
     if not eligible_target_pairs:
         return ()
@@ -476,6 +477,15 @@ def _objective_marker_target_ids_by_unit(
         unit_id: tuple(sorted(target_ids))
         for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
     }
+
+
+def _unit_has_shot_this_shooting_phase(*, state: GameState, unit_instance_id: str) -> bool:
+    if _current_phase(state) is not BattlePhase.SHOOTING:
+        return False
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        return False
+    return unit_instance_id in shooting_state.shot_unit_ids
 
 
 def _canonical_keyword(keyword: str) -> str:

@@ -36,6 +36,7 @@ class DiceRollSpecPayload(TypedDict):
     reason: str
     roll_type: str
     actor_id: str | None
+    reroll_forbidden_rule_ids: list[str]
 
 
 class DiceRollResultPayload(TypedDict):
@@ -238,6 +239,7 @@ class DiceRollSpec:
     reason: str
     roll_type: str
     actor_id: str | None = None
+    reroll_forbidden_rule_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -252,6 +254,16 @@ class DiceRollSpec:
         )
         if self.actor_id is not None and not self.actor_id.strip():
             raise DiceRollSpecError("DiceRollSpec actor_id must not be empty when supplied.")
+        object.__setattr__(
+            self,
+            "reroll_forbidden_rule_ids",
+            _validate_identifier_tuple(
+                "DiceRollSpec reroll_forbidden_rule_ids",
+                self.reroll_forbidden_rule_ids,
+                min_length=0,
+                sort_values=True,
+            ),
+        )
 
     def to_payload(self) -> DiceRollSpecPayload:
         return {
@@ -259,6 +271,7 @@ class DiceRollSpec:
             "reason": self.reason,
             "roll_type": self.roll_type,
             "actor_id": self.actor_id,
+            "reroll_forbidden_rule_ids": list(self.reroll_forbidden_rule_ids),
         }
 
     @classmethod
@@ -268,6 +281,7 @@ class DiceRollSpec:
             reason=payload["reason"],
             roll_type=payload["roll_type"],
             actor_id=payload["actor_id"],
+            reroll_forbidden_rule_ids=tuple(payload["reroll_forbidden_rule_ids"]),
         )
 
 

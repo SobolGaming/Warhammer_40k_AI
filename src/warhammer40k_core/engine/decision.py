@@ -368,6 +368,8 @@ class DiceRollManager:
     ) -> DecisionRequest:
         if state.original_result.spec.roll_type == "roll_off":
             raise DecisionError("Roll-off dice cannot be rerolled.")
+        if state.original_result.spec.reroll_forbidden_rule_ids:
+            raise DecisionError("Dice roll has source rules that forbid rerolls.")
         if permission is not None:
             if allowed_selections is not None:
                 raise DecisionError("Reroll request must use permission or selections, not both.")
@@ -803,6 +805,9 @@ def _dice_roll_spec_payload(payload: JsonValue) -> DiceRollSpecPayload:
         "reason": _extract_string(payload, key="reason"),
         "roll_type": _extract_string(payload, key="roll_type"),
         "actor_id": _extract_optional_string(payload, key="actor_id"),
+        "reroll_forbidden_rule_ids": list(
+            _extract_string_list(payload, key="reroll_forbidden_rule_ids")
+        ),
     }
 
 
@@ -827,6 +832,23 @@ def _dice_roll_source(payload: JsonValue) -> DiceRollSource:
     if source == "injected":
         return "injected"
     raise DecisionError("dice_rolled event source must be rng, fixed, or injected.")
+
+
+def _extract_string_list(payload: JsonValue, *, key: str) -> tuple[str, ...]:
+    if not isinstance(payload, dict):
+        raise DecisionError("Decision payload must be an object.")
+    if key not in payload:
+        raise DecisionError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, list):
+        raise DecisionError(f"Decision payload key must be a string list: {key}.")
+
+    validated: list[str] = []
+    for item in value:
+        if not isinstance(item, str):
+            raise DecisionError(f"Decision payload key must contain strings: {key}.")
+        validated.append(item)
+    return tuple(validated)
 
 
 def _extract_optional_string(payload: JsonValue, *, key: str) -> str | None:

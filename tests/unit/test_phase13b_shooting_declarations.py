@@ -127,11 +127,13 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
+    SELECT_SHOOTING_TYPE_DECISION_TYPE,
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     OutOfPhaseShootingState,
     ShootingPhaseHandler,
     ShootingPhaseState,
+    ShootingTypeSelection,
     ShootingUnitSelection,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -239,13 +241,12 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
         units["intercessor-2"].unit_instance_id,
     }
 
-    declaration_status = _submit_result(
+    declaration_request = _select_shooting_unit_and_type(
         lifecycle,
-        request=first_request,
-        option_id=units["intercessor-1"].unit_instance_id,
-        result_id="phase13b-select-shooter",
+        selection_request=first_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13b-select-shooter",
     )
-    declaration_request = _decision_request(declaration_status)
     assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -297,6 +298,145 @@ def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None
     }
 
 
+def test_phase14f_select_shooting_type_is_finite_before_declaration() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    unit_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    type_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=unit_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase14f-select-unit-for-type",
+        )
+    )
+
+    assert type_request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE
+    assert type_request.actor_id == "player-a"
+    assert {option.option_id for option in type_request.options} == {ShootingType.NORMAL.value}
+    request_payload = cast(dict[str, object], type_request.payload)
+    assert request_payload["unit_instance_id"] == units["intercessor-1"].unit_instance_id
+    assert request_payload["legal_shooting_types"] == [ShootingType.NORMAL.value]
+    option_payload = cast(dict[str, object], type_request.options[0].payload)
+    assert option_payload["submission_kind"] == SELECT_SHOOTING_TYPE_DECISION_TYPE
+    assert option_payload["shooting_type"] == ShootingType.NORMAL.value
+    assert DecisionRequest.from_payload(type_request.to_payload()) == type_request
+
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=type_request,
+            option_id=ShootingType.NORMAL.value,
+            result_id="phase14f-select-normal-type",
+        )
+    )
+    declaration_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], declaration_payload["proposal_request"])
+    assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+    assert proposal_request["selected_shooting_type"] == ShootingType.NORMAL.value
+    assert _last_event_payload(lifecycle, "shooting_type_selected")["shooting_type"] == (
+        ShootingType.NORMAL.value
+    )
+
+
+def test_phase14f_select_shooting_type_rejects_drift_before_mutation() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    type_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=unit_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase14f-drift-select-unit",
+        )
+    )
+    before_records = len(lifecycle.decision_controller.records)
+    state.record_advanced_unit_state(
+        _advanced_unit_state(units["intercessor-1"].unit_instance_id, can_shoot=False)
+    )
+
+    status = _submit_result(
+        lifecycle,
+        request=type_request,
+        option_id=ShootingType.NORMAL.value,
+        result_id="phase14f-drift-select-normal",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], status.payload)["invalid_reason"] == (
+        "shooting_type_option_drift"
+    )
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (type_request,)
+
+
+def test_phase14f_select_shooting_type_rejects_wrong_actor_and_option_before_mutation() -> None:
+    wrong_actor_lifecycle, wrong_actor_units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",)
+    )
+    wrong_actor_unit_request = _decision_request(
+        wrong_actor_lifecycle.advance_until_decision_or_terminal()
+    )
+    wrong_actor_type_request = _decision_request(
+        _submit_result(
+            wrong_actor_lifecycle,
+            request=wrong_actor_unit_request,
+            option_id=wrong_actor_units["intercessor-1"].unit_instance_id,
+            result_id="phase14f-wrong-actor-select-unit",
+        )
+    )
+    wrong_actor_option = wrong_actor_type_request.options[0]
+    wrong_actor_records = len(wrong_actor_lifecycle.decision_controller.records)
+
+    with pytest.raises(DecisionError, match="actor_id"):
+        wrong_actor_lifecycle.submit_decision(
+            DecisionResult(
+                result_id="phase14f-wrong-actor-select-type",
+                request_id=wrong_actor_type_request.request_id,
+                decision_type=wrong_actor_type_request.decision_type,
+                actor_id="player-b",
+                selected_option_id=wrong_actor_option.option_id,
+                payload=wrong_actor_option.payload,
+            )
+        )
+    assert len(wrong_actor_lifecycle.decision_controller.records) == wrong_actor_records
+    assert wrong_actor_lifecycle.decision_controller.queue.pending_requests == (
+        wrong_actor_type_request,
+    )
+
+    wrong_option_lifecycle, wrong_option_units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",)
+    )
+    wrong_option_unit_request = _decision_request(
+        wrong_option_lifecycle.advance_until_decision_or_terminal()
+    )
+    wrong_option_type_request = _decision_request(
+        _submit_result(
+            wrong_option_lifecycle,
+            request=wrong_option_unit_request,
+            option_id=wrong_option_units["intercessor-1"].unit_instance_id,
+            result_id="phase14f-wrong-option-select-unit",
+        )
+    )
+    wrong_option_records = len(wrong_option_lifecycle.decision_controller.records)
+
+    with pytest.raises(DecisionError):
+        wrong_option_lifecycle.submit_decision(
+            DecisionResult(
+                result_id="phase14f-wrong-option-select-type",
+                request_id=wrong_option_type_request.request_id,
+                decision_type=wrong_option_type_request.decision_type,
+                actor_id=wrong_option_type_request.actor_id,
+                selected_option_id=ShootingType.INDIRECT.value,
+                payload={"submission_kind": SELECT_SHOOTING_TYPE_DECISION_TYPE},
+            )
+        )
+    assert len(wrong_option_lifecycle.decision_controller.records) == wrong_option_records
+    assert wrong_option_lifecycle.decision_controller.queue.pending_requests == (
+        wrong_option_type_request,
+    )
+
+
 def test_phase13c_random_attacks_resolve_when_declaration_is_accepted() -> None:
     base_profile = _weapon_profile_by_wargear(
         wargear_id="core-bolt-rifle",
@@ -313,13 +453,11 @@ def test_phase13c_random_attacks_resolve_when_declaration_is_accepted() -> None:
         catalog=catalog,
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase13c-random-attacks-select",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13c-random-attacks-select",
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -385,13 +523,11 @@ def test_phase13d_declaration_applies_rapid_blast_melta_and_heavy_modifiers() ->
         catalog=catalog,
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase13d-select-modifier-rifle",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13d-select-modifier-rifle",
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -440,13 +576,12 @@ def test_phase13d_advanced_unit_allowed_to_shoot_does_not_gain_heavy_modifier() 
         _advanced_unit_state(attacker.unit_instance_id, can_shoot=True)
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=attacker.unit_instance_id,
-            result_id="phase13d-select-advanced-assault-heavy",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase13d-select-advanced-assault-heavy",
+        shooting_type=ShootingType.ASSAULT,
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -1601,6 +1736,7 @@ def test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_
         reason="Hit roll for phase13d-indirect attack phase13d-indirect:pool-001:attack-001",
         roll_type="attack_sequence.hit",
         actor_id="player-a",
+        reroll_forbidden_rule_ids=(INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,),
     )
     dice_manager = DiceRollManager(
         "phase13d-indirect",
@@ -1768,6 +1904,7 @@ def test_phase14f_indirect_stationary_friendly_visibility_uses_one_to_three_fail
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
         roll_type="attack_sequence.hit",
         actor_id="player-a",
+        reroll_forbidden_rule_ids=(INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,),
     )
     pool = RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
@@ -1838,6 +1975,7 @@ def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
             reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
             roll_type="attack_sequence.hit",
             actor_id="player-a",
+            reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
         )
         wound_spec = DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
@@ -1915,6 +2053,7 @@ def test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes() -> None:
             reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
             roll_type="attack_sequence.hit",
             actor_id="player-a",
+            reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
         )
         wound_spec = DiceRollSpec(
             expression=DiceExpression(quantity=1, sides=6),
@@ -6856,13 +6995,11 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
 def test_invalid_shooting_declaration_submissions_do_not_consume_pending_request() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase13b-invalid-select",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13b-invalid-select",
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -7108,13 +7245,11 @@ def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
     assert cast(dict[str, object], selected_option.payload)["unit_instance_id"] == (
         attacker.unit_instance_id
     )
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=attacker.unit_instance_id,
-            result_id="phase13f-select-attacker",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase13f-select-attacker",
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -7221,12 +7356,34 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
     )
     state = ShootingPhaseState(battle_round=1, active_player_id="player-a")
     selected = state.with_unit_selection(selection)
+    shooting_type_selection = ShootingTypeSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id="army-alpha:intercessor-1",
+        shooting_type=ShootingType.NORMAL,
+        request_id="phase13b-state-type-request",
+        result_id="phase13b-state-type-result",
+    )
+    selected_with_type = selected.with_shooting_type_selection(shooting_type_selection)
+
+    assert ShootingUnitSelection.from_payload(selection.to_payload()) == selection
+    assert ShootingTypeSelection.from_payload(shooting_type_selection.to_payload()) == (
+        shooting_type_selection
+    )
+    assert ShootingPhaseState.from_payload(selected_with_type.to_payload()) == selected_with_type
 
     with pytest.raises(GameLifecycleError, match="phase_complete"):
         ShootingPhaseState(
             battle_round=1,
             active_player_id="player-a",
             phase_complete=cast(bool, "yes"),
+        )
+    with pytest.raises(GameLifecycleError, match="must not also count as shot"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            shot_unit_ids=("army-alpha:intercessor-1",),
+            skipped_unit_ids=("army-alpha:intercessor-1",),
         )
     with pytest.raises(GameLifecycleError, match="active_selection must be"):
         ShootingPhaseState(
@@ -7263,6 +7420,61 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
             shot_unit_ids=("army-alpha:intercessor-1",),
             active_selection=selection,
         )
+    with pytest.raises(GameLifecycleError, match="already been skipped"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-1",),
+            skipped_unit_ids=("army-alpha:intercessor-1",),
+            active_selection=selection,
+        )
+    with pytest.raises(GameLifecycleError, match="selected_shooting_type must be"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-1",),
+            active_selection=selection,
+            selected_shooting_type=cast(ShootingTypeSelection, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires active_selection"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_shooting_type=shooting_type_selection,
+        )
+    with pytest.raises(GameLifecycleError, match="active player drift"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-1",),
+            active_selection=selection,
+            selected_shooting_type=replace(shooting_type_selection, player_id="player-b"),
+        )
+    with pytest.raises(GameLifecycleError, match="battle round drift"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-1",),
+            active_selection=selection,
+            selected_shooting_type=replace(shooting_type_selection, battle_round=2),
+        )
+    with pytest.raises(GameLifecycleError, match="unit drift"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-1",),
+            active_selection=selection,
+            selected_shooting_type=replace(
+                shooting_type_selection,
+                unit_instance_id="army-alpha:intercessor-2",
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="attack_sequence must be"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            attack_sequence=cast(AttackSequence, object()),
+        )
     with pytest.raises(GameLifecycleError, match="Completed Shooting phase"):
         ShootingPhaseState(
             battle_round=1,
@@ -7284,19 +7496,41 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
     with pytest.raises(GameLifecycleError, match="battle round drift"):
         state.with_unit_selection(replace(selection, battle_round=2))
     with pytest.raises(GameLifecycleError, match="already selected"):
-        selected.with_declaration(attack_pools=()).with_unit_selection(selection)
+        selected_with_type.with_declaration(attack_pools=()).with_unit_selection(selection)
     with pytest.raises(GameLifecycleError, match="already shot"):
         ShootingPhaseState(
             battle_round=1,
             active_player_id="player-a",
             shot_unit_ids=("army-alpha:intercessor-1",),
         ).with_unit_selection(selection)
+    with pytest.raises(GameLifecycleError, match="Shooting type selection must be"):
+        selected.with_shooting_type_selection(cast(ShootingTypeSelection, object()))
+    with pytest.raises(GameLifecycleError, match="after phase completion"):
+        state.with_phase_complete().with_shooting_type_selection(shooting_type_selection)
+    with pytest.raises(GameLifecycleError, match="requires active_selection"):
+        state.with_shooting_type_selection(shooting_type_selection)
+    with pytest.raises(GameLifecycleError, match="already been selected"):
+        selected_with_type.with_shooting_type_selection(shooting_type_selection)
+    with pytest.raises(GameLifecycleError, match="player drift"):
+        selected.with_shooting_type_selection(
+            replace(shooting_type_selection, player_id="player-b")
+        )
+    with pytest.raises(GameLifecycleError, match="battle round drift"):
+        selected.with_shooting_type_selection(replace(shooting_type_selection, battle_round=2))
+    with pytest.raises(GameLifecycleError, match="unit drift"):
+        selected.with_shooting_type_selection(
+            replace(shooting_type_selection, unit_instance_id="army-alpha:intercessor-2")
+        )
     with pytest.raises(GameLifecycleError, match="after phase completion"):
         state.with_phase_complete().with_declaration(attack_pools=())
     with pytest.raises(GameLifecycleError, match="requires active_selection"):
         state.with_declaration(attack_pools=())
+    with pytest.raises(GameLifecycleError, match="requires selected_shooting_type"):
+        selected.with_declaration(attack_pools=())
     with pytest.raises(GameLifecycleError, match="attack_pools must be attack pools"):
-        selected.with_declaration(attack_pools=cast(tuple[RangedAttackPool, ...], (object(),)))
+        selected_with_type.with_declaration(
+            attack_pools=cast(tuple[RangedAttackPool, ...], (object(),))
+        )
     with pytest.raises(GameLifecycleError, match="requires no active selection"):
         selected.with_phase_complete()
     with pytest.raises(GameLifecycleError, match="attack_pools must be a tuple"):
@@ -7330,6 +7564,97 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
         shooting_target_violation_code_from_token("not-a-violation")
     with pytest.raises(GameLifecycleError, match="requires a WeaponProfile"):
         fixed_attacks_for_profile(cast(WeaponProfile, object()))
+
+
+def test_shooting_phase_state_rejects_declaration_type_and_sequence_drift() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = _first_weapon_profile(lifecycle, attacker)
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=attacker.unit_instance_id,
+        request_id="phase14f-state-declaration-request",
+        result_id="phase14f-state-declaration-result",
+    )
+    type_selection = ShootingTypeSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=attacker.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        request_id="phase14f-state-type-request",
+        result_id="phase14f-state-type-result",
+    )
+    selected_with_type = (
+        ShootingPhaseState(battle_round=1, active_player_id="player-a")
+        .with_unit_selection(selection)
+        .with_shooting_type_selection(type_selection)
+    )
+    normal_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    valid_sequence = AttackSequence.start(
+        sequence_id="phase14f-valid-state-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(normal_pool,),
+    )
+    type_drift_pool = replace(normal_pool, shooting_type=ShootingType.ASSAULT)
+    pool_drift_sequence = AttackSequence.start(
+        sequence_id="phase14f-pool-drift-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(replace(normal_pool, attacks=2),),
+    )
+    unit_drift_sequence = AttackSequence.start(
+        sequence_id="phase14f-unit-drift-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=defender.unit_instance_id,
+        attack_pools=(normal_pool,),
+    )
+
+    with pytest.raises(GameLifecycleError, match="attack_sequence requires no active_selection"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            active_selection=selection,
+            attack_sequence=valid_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="Completed Shooting phase"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            phase_complete=True,
+            attack_sequence=valid_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="active attack sequence"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            attack_sequence=valid_sequence,
+        ).with_phase_complete()
+    with pytest.raises(GameLifecycleError, match="attack pool type drift"):
+        selected_with_type.with_declaration(attack_pools=(type_drift_pool,))
+    with pytest.raises(GameLifecycleError, match="attack_sequence is invalid"):
+        selected_with_type.with_declaration(
+            attack_pools=(normal_pool,),
+            attack_sequence=cast(AttackSequence, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="attack_sequence pool drift"):
+        selected_with_type.with_declaration(
+            attack_pools=(normal_pool,),
+            attack_sequence=pool_drift_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="attack_sequence unit drift"):
+        selected_with_type.with_declaration(
+            attack_pools=(normal_pool,),
+            attack_sequence=unit_drift_sequence,
+        )
 
 
 def test_advanced_unit_is_eligible_to_shoot_only_when_state_permits() -> None:
@@ -7733,13 +8058,11 @@ def test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_
         catalog=catalog,
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase13b-pistol-select",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13b-pistol-select",
     )
     request_payload = cast(dict[str, object], declaration_request.payload)
     proposal_request = cast(dict[str, object], request_payload["proposal_request"])
@@ -7812,13 +8135,11 @@ def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligi
         COMPLETE_SHOOTING_PHASE_OPTION_ID,
         units["transport-1"].unit_instance_id,
     }
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=first_request,
-            option_id=units["transport-1"].unit_instance_id,
-            result_id="phase13b-select-transport",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=first_request,
+        unit_instance_id=units["transport-1"].unit_instance_id,
+        selection_result_id="phase13b-select-transport",
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -7879,13 +8200,11 @@ def test_firing_deck_exposes_all_weapons_and_rejects_two_from_one_embarked_model
         catalog=catalog,
     )
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["transport-1"].unit_instance_id,
-            result_id="phase13b-select-firing-deck-two-weapons",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["transport-1"].unit_instance_id,
+        selection_result_id="phase13b-select-firing-deck-two-weapons",
     )
     request_payload = cast(dict[str, object], declaration_request.payload)
     proposal_request = cast(dict[str, object], request_payload["proposal_request"])
@@ -8182,13 +8501,11 @@ def test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers
 def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase13b-select-round-trip",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13b-select-round-trip",
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -8215,13 +8532,11 @@ def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence
 def test_shooting_declaration_request_drift_diagnostics_are_typed() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase13b-select-drift-diagnostics",
-        )
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase13b-select-drift-diagnostics",
     )
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -8795,6 +9110,40 @@ def _submit_result(
             selected_option_id=option_id,
         )
     )
+
+
+def _select_shooting_unit_and_type(
+    lifecycle: GameLifecycle,
+    *,
+    selection_request: DecisionRequest,
+    unit_instance_id: str,
+    selection_result_id: str,
+    shooting_type: ShootingType = ShootingType.NORMAL,
+    type_result_id: str | None = None,
+) -> DecisionRequest:
+    type_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=selection_request,
+            option_id=unit_instance_id,
+            result_id=selection_result_id,
+        )
+    )
+    assert type_request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE
+    type_payload = cast(dict[str, object], type_request.payload)
+    assert type_payload["unit_instance_id"] == unit_instance_id
+    assert shooting_type.value in {option.option_id for option in type_request.options}
+
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=type_request,
+            option_id=shooting_type.value,
+            result_id=type_result_id or f"{selection_result_id}-type",
+        )
+    )
+    assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+    return declaration_request
 
 
 def _submit_payload(
