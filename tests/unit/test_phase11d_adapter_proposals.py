@@ -455,7 +455,7 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
 
 def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
     session, movement_status = _local_session_at_movement_unit_selection(
-        game_id="phase10o-one-v2-0000"
+        game_id="phase10o-one-v2-new-0000"
     )
     state = _session_state(session)
     _mark_first_unit_battle_shocked(state)

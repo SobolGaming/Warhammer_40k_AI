@@ -12,14 +12,9 @@ from warhammer40k_core.core.dice import (
     DiceRollStatePayload,
 )
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
-from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.visibility import BenefitOfCoverResult, BenefitOfCoverResultPayload
-
-SELECT_SAVING_THROW_KIND_DECISION_TYPE = "select_saving_throw_kind"
 
 
 class SaveKind(StrEnum):
@@ -47,20 +42,12 @@ class SavingThrowPayload(TypedDict):
     option: SaveOptionPayload
 
 
-class SavingThrowDecisionPayload(TypedDict):
-    request_id: str
-    result_id: str
-    player_id: str
-    selected_save_kind: str
-    attack_context: JsonValue
-
-
 class PlungingFireModifierResultPayload(TypedDict):
     source_rule_id: str
     status: str
     reason: str | None
-    input_armor_penetration: int
-    final_armor_penetration: int
+    input_ballistic_skill: int
+    final_ballistic_skill: int
     required_height_advantage_inches: float
     actual_height_advantage_inches: float
     target_fully_visible: bool
@@ -182,70 +169,12 @@ class SavingThrow:
 
 
 @dataclass(frozen=True, slots=True)
-class SavingThrowDecision:
-    request_id: str
-    result_id: str
-    player_id: str
-    selected_save_kind: SaveKind
-    attack_context: JsonValue
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "request_id",
-            _validate_identifier("SavingThrowDecision request_id", self.request_id),
-        )
-        object.__setattr__(
-            self,
-            "result_id",
-            _validate_identifier("SavingThrowDecision result_id", self.result_id),
-        )
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("SavingThrowDecision player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "selected_save_kind",
-            save_kind_from_token(self.selected_save_kind),
-        )
-        object.__setattr__(self, "attack_context", validate_json_value(self.attack_context))
-
-    @classmethod
-    def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
-        result.validate_for_request(request)
-        payload = _payload_object(result.payload)
-        selected_save_kind = save_kind_from_token(_payload_string(payload, key="save_kind"))
-        actor_id = result.actor_id
-        if actor_id is None:
-            raise GameLifecycleError("SavingThrowDecision requires a defender actor.")
-        request_payload = _payload_object(request.payload)
-        return cls(
-            request_id=request.request_id,
-            result_id=result.result_id,
-            player_id=actor_id,
-            selected_save_kind=selected_save_kind,
-            attack_context=validate_json_value(request_payload["attack_context"]),
-        )
-
-    def to_payload(self) -> SavingThrowDecisionPayload:
-        return {
-            "request_id": self.request_id,
-            "result_id": self.result_id,
-            "player_id": self.player_id,
-            "selected_save_kind": self.selected_save_kind.value,
-            "attack_context": self.attack_context,
-        }
-
-
-@dataclass(frozen=True, slots=True)
 class PlungingFireModifierResult:
     source_rule_id: str
     status: str
     reason: str | None
-    input_armor_penetration: int
-    final_armor_penetration: int
+    input_ballistic_skill: int
+    final_ballistic_skill: int
     required_height_advantage_inches: float
     actual_height_advantage_inches: float
     target_fully_visible: bool
@@ -268,10 +197,22 @@ class PlungingFireModifierResult:
             "reason",
             _validate_optional_identifier("PlungingFireModifierResult reason", self.reason),
         )
-        if type(self.input_armor_penetration) is not int:
-            raise GameLifecycleError("PlungingFireModifierResult input AP must be an int.")
-        if type(self.final_armor_penetration) is not int:
-            raise GameLifecycleError("PlungingFireModifierResult final AP must be an int.")
+        object.__setattr__(
+            self,
+            "input_ballistic_skill",
+            _validate_save_target(
+                "PlungingFireModifierResult input Ballistic Skill",
+                self.input_ballistic_skill,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "final_ballistic_skill",
+            _validate_save_target(
+                "PlungingFireModifierResult final Ballistic Skill",
+                self.final_ballistic_skill,
+            ),
+        )
         if type(self.required_height_advantage_inches) is not float:
             raise GameLifecycleError("PlungingFireModifierResult required height must be float.")
         if type(self.actual_height_advantage_inches) is not float:
@@ -288,8 +229,8 @@ class PlungingFireModifierResult:
             "source_rule_id": self.source_rule_id,
             "status": self.status,
             "reason": self.reason,
-            "input_armor_penetration": self.input_armor_penetration,
-            "final_armor_penetration": self.final_armor_penetration,
+            "input_ballistic_skill": self.input_ballistic_skill,
+            "final_ballistic_skill": self.final_ballistic_skill,
             "required_height_advantage_inches": self.required_height_advantage_inches,
             "actual_height_advantage_inches": self.actual_height_advantage_inches,
             "target_fully_visible": self.target_fully_visible,
@@ -301,7 +242,7 @@ class PlungingFireModifier:
     source_rule_id: str
     supported: bool
     required_height_advantage_inches: float = 6.0
-    armor_penetration_modifier: int = -1
+    ballistic_skill_modifier: int = -1
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -315,19 +256,18 @@ class PlungingFireModifier:
             raise GameLifecycleError("PlungingFireModifier required height must be a float.")
         if self.required_height_advantage_inches <= 0.0:
             raise GameLifecycleError("PlungingFireModifier required height must be positive.")
-        if type(self.armor_penetration_modifier) is not int:
-            raise GameLifecycleError("PlungingFireModifier AP modifier must be an int.")
+        if type(self.ballistic_skill_modifier) is not int:
+            raise GameLifecycleError("PlungingFireModifier BS modifier must be an int.")
 
     def apply(
         self,
         *,
-        armor_penetration: int,
+        ballistic_skill: int,
         attacker_z_inches: float,
         target_z_inches: float,
         target_fully_visible: bool,
     ) -> PlungingFireModifierResult:
-        if type(armor_penetration) is not int:
-            raise GameLifecycleError("Plunging Fire armor_penetration must be an int.")
+        skill = _validate_save_target("Plunging Fire ballistic_skill", ballistic_skill)
         if type(attacker_z_inches) is not float:
             raise GameLifecycleError("Plunging Fire attacker height must be a float.")
         if type(target_z_inches) is not float:
@@ -340,8 +280,8 @@ class PlungingFireModifier:
                 source_rule_id=self.source_rule_id,
                 status="unsupported",
                 reason="ruleset_does_not_support_plunging_fire",
-                input_armor_penetration=armor_penetration,
-                final_armor_penetration=armor_penetration,
+                input_ballistic_skill=skill,
+                final_ballistic_skill=skill,
                 required_height_advantage_inches=self.required_height_advantage_inches,
                 actual_height_advantage_inches=height_advantage,
                 target_fully_visible=target_fully_visible,
@@ -351,8 +291,8 @@ class PlungingFireModifier:
                 source_rule_id=self.source_rule_id,
                 status="not_applicable",
                 reason="height_advantage_not_met",
-                input_armor_penetration=armor_penetration,
-                final_armor_penetration=armor_penetration,
+                input_ballistic_skill=skill,
+                final_ballistic_skill=skill,
                 required_height_advantage_inches=self.required_height_advantage_inches,
                 actual_height_advantage_inches=height_advantage,
                 target_fully_visible=target_fully_visible,
@@ -362,8 +302,8 @@ class PlungingFireModifier:
                 source_rule_id=self.source_rule_id,
                 status="not_applicable",
                 reason="target_not_fully_visible",
-                input_armor_penetration=armor_penetration,
-                final_armor_penetration=armor_penetration,
+                input_ballistic_skill=skill,
+                final_ballistic_skill=skill,
                 required_height_advantage_inches=self.required_height_advantage_inches,
                 actual_height_advantage_inches=height_advantage,
                 target_fully_visible=target_fully_visible,
@@ -372,8 +312,8 @@ class PlungingFireModifier:
             source_rule_id=self.source_rule_id,
             status="applied",
             reason=None,
-            input_armor_penetration=armor_penetration,
-            final_armor_penetration=armor_penetration + self.armor_penetration_modifier,
+            input_ballistic_skill=skill,
+            final_ballistic_skill=max(2, skill + self.ballistic_skill_modifier),
             required_height_advantage_inches=self.required_height_advantage_inches,
             actual_height_advantage_inches=height_advantage,
             target_fully_visible=target_fully_visible,
@@ -453,48 +393,26 @@ def save_options_for_model(
     return tuple(option for option in options if option.can_succeed_on_d6)
 
 
-def build_saving_throw_kind_request(
-    *,
-    request_id: str,
-    defender_player_id: str,
-    attack_context: JsonValue,
-    options: tuple[SaveOption, ...],
-) -> DecisionRequest:
+def mandatory_save_option(options: tuple[SaveOption, ...]) -> SaveOption | None:
     selectable = _selectable_save_options(options)
-    if len(selectable) < 2:
-        raise GameLifecycleError("Saving throw kind request requires at least two options.")
-    return DecisionRequest(
-        request_id=request_id,
-        decision_type=SELECT_SAVING_THROW_KIND_DECISION_TYPE,
-        actor_id=defender_player_id,
-        payload=validate_json_value(
-            {
-                "attack_context": validate_json_value(attack_context),
-                "save_options": [option.to_payload() for option in selectable],
-            }
-        ),
-        options=tuple(
-            DecisionOption(
-                option_id=option.save_kind.value,
-                label=f"{option.save_kind.value} save",
-                payload={"save_kind": option.save_kind.value},
-            )
-            for option in selectable
-        ),
+    invulnerable_options = tuple(
+        option for option in selectable if option.save_kind is SaveKind.INVULNERABLE
     )
-
-
-def selected_save_option(
-    *,
-    options: tuple[SaveOption, ...],
-    selected_save_kind: SaveKind,
-) -> SaveOption:
-    kind = save_kind_from_token(selected_save_kind)
-    selectable = _selectable_save_options(options)
-    for option in selectable:
-        if option.save_kind is kind:
-            return option
-    raise GameLifecycleError("Selected saving throw kind is not legal for this attack.")
+    if invulnerable_options:
+        return min(
+            invulnerable_options,
+            key=lambda option: (
+                option.target_number,
+                option.characteristic_target_number,
+                option.source_rule_ids,
+            ),
+        )
+    armour_options = tuple(option for option in selectable if option.save_kind is SaveKind.ARMOUR)
+    if not armour_options:
+        return None
+    if len(armour_options) != 1:
+        raise GameLifecycleError("Saving throw options must contain at most one armour save.")
+    return armour_options[0]
 
 
 def saving_throw_roll_spec(
@@ -593,21 +511,6 @@ def _model_characteristic(model: ModelInstance, characteristic: Characteristic) 
         if value.characteristic is characteristic:
             return value.final
     return None
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Decision payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    if key not in payload:
-        raise GameLifecycleError(f"Decision payload missing {key}.")
-    value = payload[key]
-    if type(value) is not str:
-        raise GameLifecycleError(f"Decision payload {key} must be a string.")
-    return value
 
 
 def _validate_save_target(field_name: str, value: object) -> int:

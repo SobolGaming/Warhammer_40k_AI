@@ -789,7 +789,7 @@ class CoverPolicyDescriptor:
 
     @classmethod
     def warhammer_40000_eleventh_default(cls) -> Self:
-        return cls(cover_effect=CoverEffect.SAVE_BONUS)
+        return cls(cover_effect=CoverEffect.ATTACKER_BS_MODIFIER)
 
     def to_payload(self) -> CoverPolicyDescriptorPayload:
         return {
@@ -945,7 +945,7 @@ class TerrainVisibilityPolicyDescriptor:
     hidden_requires_keywords: tuple[str, ...] = ()
     hidden_requires_terrain_area_occupancy: bool = False
     hidden_lost_after_shooting: bool = False
-    cover_effect: CoverEffect = CoverEffect.SAVE_BONUS
+    cover_effect: CoverEffect = CoverEffect.ATTACKER_BS_MODIFIER
     cover_policy: CoverPolicyDescriptor = field(
         default_factory=CoverPolicyDescriptor.warhammer_40000_eleventh_default
     )
@@ -1551,7 +1551,7 @@ class RulesetDescriptor:
                 hidden_requires_keywords=(),
                 hidden_requires_terrain_area_occupancy=False,
                 hidden_lost_after_shooting=False,
-                cover_effect=CoverEffect.SAVE_BONUS,
+                cover_effect=CoverEffect.ATTACKER_BS_MODIFIER,
                 cover_policy=CoverPolicyDescriptor.warhammer_40000_eleventh_default(),
                 feature_policies=_terrain_feature_visibility_policies_for_eleventh(),
             ),

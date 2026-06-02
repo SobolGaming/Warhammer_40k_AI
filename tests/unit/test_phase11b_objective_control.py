@@ -286,6 +286,43 @@ def test_terrain_objectives_derive_from_coincident_marker_and_control_area() -> 
     )
 
 
+def test_terrain_objective_control_requires_terrain_area_containment_not_marker_radius() -> None:
+    state = _battle_state_with_center_objective_positions(player_a_offsets=((5.0, 0.0),))
+    marker = _center_marker_definition(state)
+    terrain_feature = TerrainFeatureDefinition(
+        feature_id="center-terrain-objective",
+        feature_kind=TerrainFeatureKind.WOODS,
+        footprint_center_x_inches=marker.x_inches,
+        footprint_center_y_inches=marker.y_inches,
+        footprint_width_inches=6.0,
+        footprint_depth_inches=6.0,
+    )
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    state.mission_setup = replace(state.mission_setup, terrain_features=(terrain_feature,))
+
+    context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND,
+        ruleset_descriptor=_ruleset(),
+    )
+    result = resolve_objective_control(context).result_by_objective_id(marker.objective_marker_id)
+
+    assert marker.objective_marker_id not in {
+        objective_marker.objective_marker_id for objective_marker in context.objective_markers
+    }
+    assert context.terrain_objectives == (
+        Objective.terrain(
+            marker.objective_marker_id,
+            marker.name,
+            terrain_feature.feature_id,
+        ),
+    )
+    assert result.status is ObjectiveControlStatus.UNCONTROLLED
+    assert result.contributors == ()
+
+
 def test_nonblocking_objective_marker_can_be_occupied_at_endpoint() -> None:
     state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
     scenario = _scenario_from_state(state)

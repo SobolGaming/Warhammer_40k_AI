@@ -100,19 +100,17 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.saves import (
-    SELECT_SAVING_THROW_KIND_DECISION_TYPE,
     SaveKind,
     SaveOption,
     SaveOptionPayload,
     SavingThrow,
-    SavingThrowDecision,
-    build_saving_throw_kind_request,
+    mandatory_save_option,
     resolve_saving_throw,
     save_options_for_model,
     saving_throw_roll_spec,
-    selected_save_option,
 )
 from warhammer40k_core.engine.shooting_targets import (
+    BENEFIT_OF_COVER_RULE_ID,
     shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
 )
@@ -151,7 +149,6 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
     (
         SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_SAVING_THROW_KIND_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     )
@@ -677,6 +674,26 @@ class DestroyedModelEmission:
 
 
 @dataclass(frozen=True, slots=True)
+class PrecisionPoolSelection:
+    selected_model_id: str | None
+    selection_recorded: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "selected_model_id",
+            _validate_optional_identifier(
+                "PrecisionPoolSelection selected_model_id",
+                self.selected_model_id,
+            ),
+        )
+        if type(self.selection_recorded) is not bool:
+            raise GameLifecycleError("PrecisionPoolSelection selection_recorded must be a bool.")
+        if self.selected_model_id is not None and not self.selection_recorded:
+            raise GameLifecycleError("Precision selected model requires a recorded selection.")
+
+
+@dataclass(frozen=True, slots=True)
 class AttackModifierStackSet:
     attacks: ModifierStack | None = None
     strength: ModifierStack | None = None
@@ -1191,27 +1208,36 @@ def resolve_attack_sequence_until_blocked(
             current = devastating_sequence
             continue
 
-        precision_request = _precision_request_if_available(
-            state=state,
+        precision_selection = _precision_pool_selection(
+            decisions=decisions,
             attack_sequence=current,
-            attack_context=attack_context,
-            allocated_model_ids=allocated_model_ids,
         )
-        if precision_request is not None:
-            decisions.request_decision(precision_request)
-            return (
-                current,
-                allocated_model_ids,
-                LifecycleStatus.waiting_for_decision(
-                    stage=GameLifecycleStage.BATTLE,
-                    decision_request=precision_request,
-                    payload={
-                        "phase": BattlePhase.SHOOTING.value,
-                        "decision_type": SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-                        "attack_context_id": current.attack_context_id(),
-                    },
-                ),
+        attacker_constraint = _precision_constraint_from_selection(
+            state=state,
+            selection=precision_selection,
+        )
+        if not precision_selection.selection_recorded:
+            precision_request = _precision_request_if_available(
+                state=state,
+                attack_sequence=current,
+                attack_context=attack_context,
+                allocated_model_ids=allocated_model_ids,
             )
+            if precision_request is not None:
+                decisions.request_decision(precision_request)
+                return (
+                    current,
+                    allocated_model_ids,
+                    LifecycleStatus.waiting_for_decision(
+                        stage=GameLifecycleStage.BATTLE,
+                        decision_request=precision_request,
+                        payload={
+                            "phase": BattlePhase.SHOOTING.value,
+                            "decision_type": SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+                            "attack_context_id": current.attack_context_id(),
+                        },
+                    ),
+                )
 
         next_sequence, allocated_model_ids, status = _resolve_allocation_stage(
             state=state,
@@ -1222,7 +1248,7 @@ def resolve_attack_sequence_until_blocked(
             attack_context=attack_context,
             allocated_model_ids=allocated_model_ids,
             hooks=active_hooks,
-            attacker_constraint=None,
+            attacker_constraint=attacker_constraint,
         )
         if status is not None:
             return next_sequence, allocated_model_ids, status
@@ -1332,42 +1358,6 @@ def apply_precision_allocation_decision(
         allocated_model_ids=already_allocated_model_ids,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         attacker_constraint=attacker_constraint,
-    )
-
-
-def apply_saving_throw_decision(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    attack_sequence: AttackSequence,
-    result: DecisionResult,
-    already_allocated_model_ids: tuple[str, ...],
-    hooks: AttackSequenceHooks | None = None,
-) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
-    record = decisions.record_for_result(result)
-    request = record.request
-    decision = SavingThrowDecision.from_result(request=request, result=result)
-    request_payload = _payload_object(request.payload)
-    raw_options = request_payload["save_options"]
-    if not isinstance(raw_options, list):
-        raise GameLifecycleError("Saving throw request save_options must be a list.")
-    options = tuple(
-        SaveOption.from_payload(cast(SaveOptionPayload, option)) for option in raw_options
-    )
-    option = selected_save_option(
-        options=options,
-        selected_save_kind=decision.selected_save_kind,
-    )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    return _resolve_save_and_damage(
-        state=state,
-        decisions=decisions,
-        manager=manager,
-        attack_sequence=attack_sequence,
-        attack_context=cast(AttackResolutionContextPayload, decision.attack_context),
-        save_option=option,
-        allocated_model_ids=already_allocated_model_ids,
-        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
     )
 
 
@@ -2077,6 +2067,57 @@ def _build_precision_allocation_request(
     )
 
 
+def _precision_pool_selection(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+) -> PrecisionPoolSelection:
+    selected_model_id: str | None = None
+    selection_recorded = False
+    for record in decisions.records:
+        if record.request.decision_type != SELECT_PRECISION_ALLOCATION_DECISION_TYPE:
+            continue
+        request_payload = _payload_object(record.request.payload)
+        attack_context = cast(
+            AttackResolutionContextPayload,
+            request_payload["attack_context"],
+        )
+        if attack_context["sequence_id"] != attack_sequence.sequence_id:
+            continue
+        if attack_context["pool_index"] != attack_sequence.pool_index:
+            continue
+        current_selected_model_id = _precision_selected_model_id(record.result.payload)
+        if selection_recorded:
+            if selected_model_id != current_selected_model_id:
+                raise GameLifecycleError("Precision selection must be unique for an attack pool.")
+            continue
+        selected_model_id = current_selected_model_id
+        selection_recorded = True
+    return PrecisionPoolSelection(
+        selected_model_id=selected_model_id,
+        selection_recorded=selection_recorded,
+    )
+
+
+def _precision_constraint_from_selection(
+    *,
+    state: GameState,
+    selection: PrecisionPoolSelection,
+) -> AttackAllocationConstraint | None:
+    if type(selection) is not PrecisionPoolSelection:
+        raise GameLifecycleError("Precision pool selection is invalid.")
+    if selection.selected_model_id is None:
+        return None
+    if not _model_is_alive(state=state, model_instance_id=selection.selected_model_id):
+        return None
+    return AttackAllocationConstraint(
+        source_rule_ids=(PRECISION_RULE_ID,),
+        allowed_model_ids=(selection.selected_model_id,),
+        can_allocate_protected_characters=True,
+        attacker_selected_model_id=selection.selected_model_id,
+    )
+
+
 def _resolve_allocation_stage(
     *,
     state: GameState,
@@ -2243,41 +2284,21 @@ def _continue_after_allocation(
         armor_penetration=pool.weapon_profile.armor_penetration.final,
         save_options=save_options,
     )
+    save_option = mandatory_save_option(save_options)
+    resolved_save_options = () if save_option is None else (save_option,)
     updated_attack_context: AttackResolutionContextPayload = {
         **attack_context,
         "allocation": allocation.to_payload(),
-        "save_options": [option.to_payload() for option in save_options],
+        "save_options": [option.to_payload() for option in resolved_save_options],
     }
-    if len(save_options) > 1:
-        defender_player_id = updated_attack_context["defender_player_id"]
-        request = build_saving_throw_kind_request(
-            request_id=state.next_decision_request_id(),
-            defender_player_id=defender_player_id,
-            attack_context=validate_json_value(updated_attack_context),
-            options=save_options,
-        )
-        decisions.request_decision(request)
-        return (
-            attack_sequence,
-            updated_allocated_ids,
-            LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=request,
-                payload={
-                    "phase": BattlePhase.SHOOTING.value,
-                    "decision_type": SELECT_SAVING_THROW_KIND_DECISION_TYPE,
-                    "attack_context_id": attack_sequence.attack_context_id(),
-                },
-            ),
-        )
-    if len(save_options) == 1:
+    if save_option is not None:
         return _resolve_save_and_damage(
             state=state,
             decisions=decisions,
             manager=manager,
             attack_sequence=attack_sequence,
             attack_context=updated_attack_context,
-            save_option=save_options[0],
+            save_option=save_option,
             allocated_model_ids=updated_allocated_ids,
             hooks=hooks,
         )
@@ -3617,7 +3638,11 @@ def _roll_hit(
     attacker_player_id: str,
     attack_context_id: str,
 ) -> HitRoll:
-    skill = _hit_skill(pool.weapon_profile)
+    skill = _hit_skill(pool.weapon_profile) + _benefit_of_cover_ballistic_skill_penalty(
+        state=state,
+        pool=pool,
+    )
+    skill = min(skill, 6)
     is_fire_overwatch = FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
         return HitRoll.auto_hit(target_number=skill)
@@ -3889,6 +3914,25 @@ def _target_has_effect_cover(*, state: GameState, target_unit_instance_id: str) 
     return unit_effects_grant_benefit_of_cover(
         state.persisting_effects_for_unit(target_unit_instance_id)
     )
+
+
+def _benefit_of_cover_ballistic_skill_penalty(
+    *,
+    state: GameState,
+    pool: RangedAttackPool,
+) -> int:
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.IGNORES_COVER):
+        return 0
+    if BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:
+        return 1
+    if INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:
+        return 1
+    if _target_has_effect_cover(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    ):
+        return 1
+    return 0
 
 
 def _persisting_hit_roll_modifier(*, state: GameState, target_unit_instance_id: str) -> int:

@@ -104,7 +104,6 @@ Finite decisions are bounded option choices already enumerated by the engine. Ex
 - movement action selection;
 - shooting unit selection;
 - defender attack-allocation model selection;
-- armour-versus-invulnerable save choices;
 - optional defensive ability choices;
 - reroll choices;
 - Stratagem use choices;
@@ -282,16 +281,20 @@ Accepted Phase 13B declarations emit deterministic attack-pool payloads and `sho
 Defender shooting decisions include:
 
 - finite `select_attack_allocation` choices when allocation is not forced;
-- finite `select_saving_throw_kind` choices when armour and invulnerable saves are both legal;
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
 - finite optional destruction-reaction choices when a destroyed model has registered optional shoot-on-death, fight-on-death, or equivalent destruction sources;
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
 - shooting-coupled reactive Stratagem choices such as Go to Ground through the existing `use_stratagem` or Stratagem target-proposal contract.
 
+Saving throw kind is not an adapter choice in the 11th Edition contract. If the
+current allocation group has an Invulnerable Save, the engine must use that
+Invulnerable Save. Armour Saves with AP modifiers are used only when the current
+allocation group has no Invulnerable Save. Adapters must not offer, submit,
+apply, or replay an armour-versus-invulnerable choice.
+
 Phase 13C implements these defender-visible attack-resolution decisions:
 
 - `select_attack_allocation`: finite defending-player choice. Option IDs are legal `model_instance_id` values. `payload.attack_context` is the JSON-safe attack context for the single attack being allocated. `payload.allocation_context` includes alive model IDs, wounded model IDs, already-allocated model IDs for the phase, attached-unit Bodyguard/Character protection evidence, and any attacker-side allocation constraint. Adapters must select one pending option ID and must not infer legal models from table state.
-- `select_saving_throw_kind`: finite defending-player choice. Option IDs are `armour` or `invulnerable`. `payload.attack_context` is the JSON-safe attack context after allocation, including the allocated model and save options. `payload.save_options` contains deterministic save-kind, target-number, AP, cover, and source-rule evidence. Adapters must not apply AP, cover, or invulnerable-save rules locally.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Grenade mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves.
 
 Phase 13E implements this destroyed-model attack-resolution decision:
@@ -300,7 +303,7 @@ Phase 13E implements this destroyed-model attack-resolution decision:
 
 Phase 13D adds this attacker-visible attack-resolution decision:
 
-- `select_precision_allocation`: finite attacking-player choice for Precision after a successful wound against an Attached unit with visible eligible Character models. Option IDs are visible Character `model_instance_id` values plus `decline_precision`. Character options include `payload.selected_model_id`; the decline option uses `selected_model_id: null`. Accepted Character selection becomes the attacker's allocation constraint and allows protected Character allocation for that attack only. Declining, having no visible Character, or having no Precision source follows the normal defender allocation path.
+- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character models. Option IDs are visible Character `model_instance_id` values plus `decline_precision`. Character options include `payload.selected_model_id`; the decline option uses `selected_model_id: null`. Accepted Character selection identifies the Character allocation group that becomes the current allocation group for the current attack pool until those attacks are resolved or that Character group is destroyed, whichever happens first. While that selection remains live, the normal defender allocation path is constrained to the selected Character group. Declining, having no visible Character, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
 
 Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Weapon abilities remain Phase 13D behavior, but adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
 
@@ -333,8 +336,8 @@ Required Phase 13 adapter-contract tests:
 - valid shooting target/weapon declaration through the chosen finite or parameterized submission path;
 - stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, and invalid-visibility submission rejection without mutation where required;
 - Firing Deck declaration validation, replay, and end-of-phase ineligible-unit state;
-- defender attack-allocation and armour-versus-invulnerable save choice round-trip through finite decisions;
-- Precision allocation choice round-trip through finite attacker decisions, including decline and normal Bodyguard-protected fallback;
+- defender attack-allocation round-trip through finite decisions, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
+- Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, selected-group destruction, and normal Bodyguard-protected fallback;
 - optional or competing Feel No Pain decisions through finite decisions;
 - Go to Ground, Fire Overwatch, and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
 - replay/payload round-trip with no Python object reprs or memory addresses;

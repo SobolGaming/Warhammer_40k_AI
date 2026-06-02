@@ -776,7 +776,7 @@ def _terrain_objective_contribution(
         feature.bounds(),
     )
     vertical_gap = _vertical_gap_to_terrain_area(geometry_model)
-    if horizontal_distance > objective.control_radius_inches:
+    if horizontal_distance > 0.0:
         return None
     if vertical_gap > DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES:
         return None
@@ -867,7 +867,6 @@ def _objective_control_sources_for_ruleset(
                 objective_id=marker.objective_marker_id,
                 name=marker.name,
                 terrain_id=matching_features[0].feature_id,
-                control_radius_inches=marker.control_horizontal_inches,
             )
         )
     return tuple(fallback_markers), tuple(

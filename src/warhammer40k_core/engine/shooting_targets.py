@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import CoverEffect, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
     WeaponKeyword,
@@ -28,12 +28,14 @@ from warhammer40k_core.engine.weapon_abilities import (
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.visibility import (
+    BenefitOfCoverResult,
     LineOfSightWitness,
     LineOfSightWitnessPayload,
     TerrainVisibilityContext,
 )
 from warhammer40k_core.geometry.volume import Model
 
+BENEFIT_OF_COVER_RULE_ID = "core-rules:benefit-of-cover"
 BIG_GUNS_NEVER_TIRE_RULE_ID = "big_guns_never_tire"
 LONE_OPERATIVE_RULE_ID = "lone_operative"
 
@@ -600,6 +602,11 @@ def _target_candidate(
                 INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
             )
         )
+    elif (
+        evidence.cover_result.has_benefit
+        and evidence.cover_result.cover_effect is CoverEffect.ATTACKER_BS_MODIFIER
+    ):
+        targeting_rule_ids.append(BENEFIT_OF_COVER_RULE_ID)
     if (
         locked_context.is_locked
         and _unit_has_vehicle_or_monster_keyword(attacker_unit)
@@ -801,6 +808,7 @@ def _best_line_of_sight_range_evidence(
             target_keywords=target_unit.keywords,
         )
         witness = context.resolve_line_of_sight()
+        cover_result = context.benefit_of_cover(witness)
         visible_and_in_range_ids = tuple(
             target_model_id
             for target_model_id in witness.visible_model_ids
@@ -808,6 +816,7 @@ def _best_line_of_sight_range_evidence(
         )
         evidence = _LineOfSightRangeEvidence(
             witness=witness,
+            cover_result=cover_result,
             visible_and_in_range_target_model_ids=visible_and_in_range_ids,
         )
         if not visible_and_in_range_ids:
@@ -837,6 +846,7 @@ class _TargetEngagementContext:
 @dataclass(frozen=True, slots=True)
 class _LineOfSightRangeEvidence:
     witness: LineOfSightWitness
+    cover_result: BenefitOfCoverResult
     visible_and_in_range_target_model_ids: tuple[str, ...]
 
 
