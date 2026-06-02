@@ -94,6 +94,7 @@ from warhammer40k_core.engine.damage_allocation import (
     destruction_reaction_kind_from_token,
     feel_no_pain_roll_spec,
     is_mortal_wound_feel_no_pain_request,
+    legal_allocation_group_orders,
     model_by_id,
     mortal_wound_feel_no_pain_source_context,
     resolve_mortal_wound_feel_no_pain_decision,
@@ -1671,6 +1672,508 @@ def test_phase14e_grouped_failed_saves_transition_to_next_ordered_group() -> Non
     assert not model_by_id(
         state=state,
         model_instance_id=first_group_model.model_instance_id,
+    ).is_alive
+
+
+def test_phase14e_allocation_order_only_exposes_same_tier_choices() -> None:
+    allocation_context = AttackAllocationRuleContext(
+        target_unit_instance_id="phase14e-tier-target",
+        alive_model_ids=(
+            "phase14e-bodyguard-a",
+            "phase14e-character-a",
+            "phase14e-character-b",
+        ),
+    )
+    bodyguard_group = AllocationGroup(
+        group_id="phase14e-bodyguard-group",
+        target_unit_instance_id="phase14e-tier-target",
+        model_ids=("phase14e-bodyguard-a",),
+        role=AllocationGroupRole.BODYGUARD,
+        wounds=2,
+        save=3,
+        invulnerable_save=None,
+    )
+    wounded_character_group = AllocationGroup(
+        group_id="phase14e-wounded-character-group",
+        target_unit_instance_id="phase14e-tier-target",
+        model_ids=("phase14e-character-a",),
+        role=AllocationGroupRole.CHARACTER,
+        wounds=4,
+        save=3,
+        invulnerable_save=4,
+        wounded_model_ids=("phase14e-character-a",),
+        character_model_ids=("phase14e-character-a",),
+    )
+    unwounded_character_group = AllocationGroup(
+        group_id="phase14e-unwounded-character-group",
+        target_unit_instance_id="phase14e-tier-target",
+        model_ids=("phase14e-character-b",),
+        role=AllocationGroupRole.SUPPORT,
+        wounds=4,
+        save=3,
+        invulnerable_save=4,
+        character_model_ids=("phase14e-character-b",),
+    )
+
+    forced_order = legal_allocation_group_orders(
+        (wounded_character_group, bodyguard_group, unwounded_character_group)
+    )
+
+    assert forced_order == ((bodyguard_group, wounded_character_group, unwounded_character_group),)
+    with pytest.raises(GameLifecycleError, match="at least two legal orders"):
+        build_allocation_order_request(
+            request_id="phase14e-tier-forced-request",
+            defender_player_id="player-b",
+            attack_context={"attack_context_id": "phase14e-tier-forced"},
+            allocation_context=allocation_context,
+            allocation_groups=(
+                bodyguard_group,
+                wounded_character_group,
+                unwounded_character_group,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="legal allocation order"):
+        AllocationOrderDecision(
+            request_id="phase14e-tier-illegal-request",
+            result_id="phase14e-tier-illegal-result",
+            player_id="player-b",
+            ordered_group_ids=(
+                wounded_character_group.group_id,
+                bodyguard_group.group_id,
+                unwounded_character_group.group_id,
+            ),
+            attack_context={"attack_context_id": "phase14e-tier-illegal"},
+            allocation_context=allocation_context,
+            allocation_groups=(
+                bodyguard_group,
+                wounded_character_group,
+                unwounded_character_group,
+            ),
+        )
+
+    peer_bodyguard_group = AllocationGroup(
+        group_id="phase14e-peer-bodyguard-group",
+        target_unit_instance_id="phase14e-tier-target",
+        model_ids=("phase14e-bodyguard-b",),
+        role=AllocationGroupRole.BODYGUARD,
+        wounds=2,
+        save=4,
+        invulnerable_save=None,
+    )
+    peer_context = AttackAllocationRuleContext(
+        target_unit_instance_id="phase14e-tier-target",
+        alive_model_ids=(
+            "phase14e-bodyguard-a",
+            "phase14e-bodyguard-b",
+            "phase14e-character-b",
+        ),
+    )
+    peer_request = build_allocation_order_request(
+        request_id="phase14e-tier-peer-request",
+        defender_player_id="player-b",
+        attack_context={"attack_context_id": "phase14e-tier-peer"},
+        allocation_context=peer_context,
+        allocation_groups=(
+            bodyguard_group,
+            peer_bodyguard_group,
+            unwounded_character_group,
+        ),
+    )
+    option_orders = tuple(
+        tuple(cast(list[str], cast(dict[str, object], option.payload)["ordered_group_ids"]))
+        for option in peer_request.options
+    )
+    selected_option = peer_request.options[0]
+    decision = AllocationOrderDecision.from_result(
+        request=peer_request,
+        result=DecisionResult.for_request(
+            result_id="phase14e-tier-peer-result",
+            request=peer_request,
+            selected_option_id=selected_option.option_id,
+        ),
+    )
+
+    assert option_orders == (
+        (
+            bodyguard_group.group_id,
+            peer_bodyguard_group.group_id,
+            unwounded_character_group.group_id,
+        ),
+        (
+            peer_bodyguard_group.group_id,
+            bodyguard_group.group_id,
+            unwounded_character_group.group_id,
+        ),
+    )
+    assert cast(dict[str, object], peer_request.payload)["priority_group_ids"] == []
+    assert decision.to_payload()["priority_group_ids"] == []
+
+    priority_order = legal_allocation_group_orders(
+        (
+            bodyguard_group,
+            wounded_character_group,
+            unwounded_character_group,
+        ),
+        priority_group_ids=(unwounded_character_group.group_id,),
+    )
+    assert priority_order == (
+        (unwounded_character_group, bodyguard_group, wounded_character_group),
+    )
+
+
+def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-grouped-lethal-sustained",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
+        keywords=(WeaponKeyword.LETHAL_HITS, WeaponKeyword.SUSTAINED_HITS),
+        abilities=(AbilityDescriptor.sustained_hits(1),),
+    )
+    first_context_id = "phase14e-grouped-lethal-sustained:pool-001:attack-001"
+    generated_context_id = f"{first_context_id}:generated-hit-002"
+    second_context_id = "phase14e-grouped-lethal-sustained:pool-001:attack-002"
+    sequence = AttackSequence.start(
+        sequence_id="phase14e-grouped-lethal-sustained",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=2,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-grouped-lethal-sustained",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14e-grouped-lethal-sustained-hit-1",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Hit roll for {weapon_profile.profile_id} attack {first_context_id}"
+                        ),
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-grouped-lethal-sustained-wound-generated",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            "Wound roll for "
+                            f"{weapon_profile.profile_id} attack {generated_context_id}"
+                        ),
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-grouped-lethal-sustained-hit-2",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Hit roll for {weapon_profile.profile_id} attack {second_context_id}"
+                        ),
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    events = _event_payloads(lifecycle, "attack_sequence_step")
+    grouped_allocation = next(
+        cast(dict[str, object], event["payload"])
+        for event in events
+        if event["step"] == "allocate"
+        and cast(dict[str, object], event["payload"]).get("grouped_save_before_allocation") is True
+    )
+    wound_events = [event for event in events if event["step"] == "wound"]
+    critical_hit_events = [event for event in events if event["step"] == "critical_hit"]
+    damage_context_ids = [
+        event["attack_context_id"]
+        for event in events
+        if event["step"] == "damage"
+        and cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+
+    assert remaining_sequence is None
+    assert status is None
+    assert (
+        cast(dict[str, object], _attack_step_payload(events, AttackSequenceStep.HIT)["payload"])[
+            "generated_hits"
+        ]
+        == 2
+    )
+    assert critical_hit_events[0]["attack_context_id"] == first_context_id
+    assert [event["attack_context_id"] for event in wound_events] == [
+        first_context_id,
+        generated_context_id,
+    ]
+    assert cast(dict[str, object], wound_events[0]["payload"])["skipped"] is True
+    assert grouped_allocation["attack_context_ids"] == [
+        first_context_id,
+        generated_context_id,
+    ]
+    assert damage_context_ids == [first_context_id, generated_context_id]
+
+
+def test_phase14e_grouped_devastating_wounds_cap_each_critical_wound() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-grouped-devastating-wounds",
+        damage_profile=DamageProfile.fixed(3),
+        keywords=(WeaponKeyword.DEVASTATING_WOUNDS, WeaponKeyword.TORRENT),
+        abilities=(AbilityDescriptor.devastating_wounds(),),
+    )
+    first_context_id = "phase14e-grouped-devastating:pool-001:attack-001"
+    second_context_id = "phase14e-grouped-devastating:pool-001:attack-002"
+    sequence = AttackSequence.start(
+        sequence_id="phase14e-grouped-devastating",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=2,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-grouped-devastating",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14e-grouped-devastating-wound-1",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Wound roll for {weapon_profile.profile_id} attack {first_context_id}"
+                        ),
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-grouped-devastating-wound-2",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Wound roll for {weapon_profile.profile_id} attack {second_context_id}"
+                        ),
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+            ),
+        ),
+    )
+    deferred_events = _event_payloads(lifecycle, "devastating_wounds_deferred")
+    applied_events = _event_payloads(lifecycle, "devastating_wounds_mortal_wounds_applied")
+    attack_events = _event_payloads(lifecycle, "attack_sequence_step")
+    applied_payloads = [
+        cast(dict[str, object], event["mortal_wound_application"]) for event in applied_events
+    ]
+    application_lists = [
+        cast(list[dict[str, object]], payload["applications"]) for payload in applied_payloads
+    ]
+
+    assert remaining_sequence is None
+    assert status is None
+    assert [event["attack_context_id"] for event in deferred_events] == [
+        first_context_id,
+        second_context_id,
+    ]
+    assert [event["attack_context_ids"] for event in applied_events] == [
+        [first_context_id],
+        [second_context_id],
+    ]
+    assert all(payload["mortal_wounds"] == 3 for payload in applied_payloads)
+    assert all(payload["spill_over"] is False for payload in applied_payloads)
+    assert all(payload["remaining_mortal_wounds_lost"] == 1 for payload in applied_payloads)
+    assert all(
+        len({application["model_instance_id"] for application in applications}) == 1
+        for applications in application_lists
+    )
+    assert not any(event["step"] == "save" for event in attack_events)
+    assert not any(
+        event["step"] == "allocate"
+        and cast(dict[str, object], event["payload"]).get("grouped_save_before_allocation") is True
+        for event in attack_events
+    )
+
+
+def test_phase14e_grouped_precision_promotes_character_then_returns_to_bodyguard() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = defender.own_models[0]
+    character_model = defender.own_models[1]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-grouped-precision",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
+        damage_profile=DamageProfile.fixed(character_model.starting_wounds),
+        keywords=(WeaponKeyword.PRECISION,),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14e-grouped-precision",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=2,
+            ),
+        ),
+    )
+    injected_results: list[DiceRollResult] = []
+    for attack_number in range(1, 3):
+        attack_context_id = f"phase14e-grouped-precision:pool-001:attack-{attack_number:03d}"
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-grouped-precision-hit-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+                    roll_type="attack_sequence.hit",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+        injected_results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14e-grouped-precision-wound-{attack_number}",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=1, sides=6),
+                    reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+                    roll_type="attack_sequence.wound",
+                    actor_id="player-a",
+                ),
+                value=6,
+            )
+        )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-grouped-precision",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=tuple(injected_results),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    request_payload = cast(dict[str, object], request.payload)
+    character_option = next(
+        option
+        for option in request.options
+        if character_model.model_instance_id
+        in cast(list[str], cast(dict[str, object], option.payload)["selected_model_ids"])
+    )
+
+    assert remaining_sequence is not None
+    assert request.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert [
+        context["attack_context_id"]
+        for context in cast(list[dict[str, object]], request_payload["attack_contexts"])
+    ] == [
+        "phase14e-grouped-precision:pool-001:attack-001",
+        "phase14e-grouped-precision:pool-001:attack-002",
+    ]
+
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining_sequence.attack_pools,
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    final_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14e-grouped-precision-select",
+            request=request,
+            selected_option_id=character_option.option_id,
+        )
+    )
+    attack_events = _event_payloads(lifecycle, "attack_sequence_step")
+    grouped_allocation = next(
+        cast(dict[str, object], event["payload"])
+        for event in attack_events
+        if event["step"] == "allocate"
+        and cast(dict[str, object], event["payload"]).get("grouped_save_before_allocation") is True
+    )
+    damage_model_ids = [
+        cast(
+            dict[str, object],
+            cast(dict[str, object], event["payload"])["damage_application"],
+        )["model_instance_id"]
+        for event in attack_events
+        if event["step"] == "damage"
+        and cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+
+    assert final_status.status_kind in {
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    assert cast(list[str], grouped_allocation["allocation_order_group_ids"])[0] == (
+        character_option.option_id
+    )
+    assert character_model.model_instance_id in cast(
+        list[str],
+        cast(dict[str, object], grouped_allocation["allocation_group"])["model_ids"],
+    )
+    assert damage_model_ids[:2] == [
+        character_model.model_instance_id,
+        bodyguard_model.model_instance_id,
+    ]
+    assert not model_by_id(
+        state=state, model_instance_id=character_model.model_instance_id
     ).is_alive
 
 
@@ -3958,7 +4461,7 @@ def test_phase14e_allocation_group_payloads_preserve_roles_and_priority() -> Non
             save=3,
             invulnerable_save=None,
         )
-    with pytest.raises(GameLifecycleError, match="at least two legal groups"):
+    with pytest.raises(GameLifecycleError, match="at least two legal orders"):
         build_allocation_order_request(
             request_id="phase14e-one-group-request",
             defender_player_id="player-b",
@@ -4057,19 +4560,33 @@ def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objec
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
-    allocation_context = allocation_context_for_unit(
-        state=state,
+    allocation_context = AttackAllocationRuleContext(
         target_unit_instance_id=defender.unit_instance_id,
-        attacker_constraint=AttackAllocationConstraint(
-            source_rule_ids=(PRECISION_RULE_ID,),
-            can_allocate_protected_characters=True,
+        alive_model_ids=("phase14e-malformed-model-a", "phase14e-malformed-model-b"),
+    )
+    allocation_groups = (
+        AllocationGroup(
+            group_id="phase14e-malformed-group-a",
+            target_unit_instance_id=defender.unit_instance_id,
+            model_ids=("phase14e-malformed-model-a",),
+            role=AllocationGroupRole.NON_CHARACTER,
+            wounds=2,
+            save=3,
+            invulnerable_save=None,
+        ),
+        AllocationGroup(
+            group_id="phase14e-malformed-group-b",
+            target_unit_instance_id=defender.unit_instance_id,
+            model_ids=("phase14e-malformed-model-b",),
+            role=AllocationGroupRole.NON_CHARACTER,
+            wounds=2,
+            save=4,
+            invulnerable_save=None,
         ),
     )
-    allocation_groups = allocation_groups_for_context(
-        state=state,
-        allocation_context=allocation_context,
+    ordered_group_ids = tuple(
+        group.group_id for group in legal_allocation_group_orders(allocation_groups)[0]
     )
-    ordered_group_ids = tuple(group.group_id for group in allocation_groups)
     request = build_allocation_order_request(
         request_id="phase14e-malformed-allocation-order-request",
         defender_player_id="player-b",

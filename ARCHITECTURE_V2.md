@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation is implemented for safe grouped fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, and normal-damage-before-routed-mortal ordering. The remaining Phase 14E Track 2.5 work is weapon abilities inside the grouped host: Precision group behavior, Devastating Wounds cap/order, Cleave, Lance, Close-quarters/Pistol aliasing, critical timing, and no illegal spillover. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock.
 
 Completed / implemented foundation:
 
@@ -95,7 +95,7 @@ Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14E | In progress | Allocation-group host foundation is implemented; Track 2.5 weapon abilities into the grouped host remain |
+| 14E | In progress | Allocation-group host and grouped-host weapon abilities are implemented for supported fixed-damage pools; melee-only Cleave/Lance execution waits on Phase 15 Charge/Fight |
 | 14G-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
@@ -2040,8 +2040,8 @@ Status: In progress.
 Implemented in the current cutover slice:
 
 - attacks are gathered by target and identical attack profile;
-- safe identical fixed-damage shooting pools without timing-sensitive weapon
-  abilities use the grouped allocation host:
+- supported identical fixed-damage shooting pools, including timing-sensitive
+  shooting-compatible weapon abilities, use the grouped allocation host:
   Hit and Wound rolls for the pool are resolved before allocation, save rolls
   are made before damage, and failed saves resolve from lowest to highest;
 - melee weapon target splitting is declared in the Select Targets step;
@@ -2051,10 +2051,12 @@ Implemented in the current cutover slice:
 - allocation groups are created from runtime attached-unit role metadata, with
   one group for each eligible Character model and profile groups for
   non-Character models sharing W, Sv, and InSv;
-- defender allocation order uses finite `select_allocation_order` requests with
-  ordered group options when more than one legal group exists, including group
-  IDs, model IDs, group role, W/Sv/InSv profile, wounded state,
-  Bodyguard/Leader/Support evidence, and legality reasons;
+- defender allocation order is automatic when the 11th Edition priority tiers
+  force a single order, and uses finite `select_allocation_order` requests only
+  when more than one legal same-tier group ordering exists. Request payloads
+  include group IDs, model IDs, group role, W/Sv/InSv profile, wounded state,
+  Bodyguard/Leader/Support evidence, legality reasons, and Precision priority
+  group IDs when applicable;
 - if the current allocation group has an Invulnerable Save, that InSv is
   mandatory and the defender cannot choose an armour Save instead;
 - armour Saves with AP modifiers are used only when the current allocation
@@ -2063,21 +2065,28 @@ Implemented in the current cutover slice:
   the next selected ordered group only after the current group is exhausted or
   destroyed;
 - `[PRECISION]` selection is pool-scoped by visible eligible Character
-  allocation group on the existing per-attack host;
+  allocation group. In the grouped host, the attacker-selected Character group
+  is promoted to the front of the legal allocation order until those attacks
+  resolve or that Character group is destroyed, then remaining failed saves
+  return to the normal ordered groups;
+- grouped Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, and
+  Devastating Wounds preserve critical Hit/Wound timing through the grouped
+  host;
 - normal damage resolves before routed mortal wounds for mixed sequences;
-- `[DEVASTATING WOUNDS]` inflicts mortal wounds equal to Damage after normal damage and cannot spill one critical wound beyond one destroyed model.
+- `[DEVASTATING WOUNDS]` inflicts mortal wounds equal to Damage after normal damage and cannot spill one critical wound beyond one destroyed model;
+- `[CLEAVE X]` is a structured weapon ability descriptor and helper that adds
+  X attacks per five target-unit models when one target was selected for all of
+  that weapon's attacks. Fight-phase dice gathering will be implemented with
+  the Phase 15 melee declaration host;
 - derived terrain objectives use terrain-area containment for model
   contribution; the objective marker radius is not used to count models outside
   the terrain area.
 
-Remaining Track 2.5 work before Phase 14E can be marked complete:
+Remaining work before Phase 14E can be marked complete:
 
-- route timing-sensitive weapon abilities through the grouped host, including
-  Precision group selection, Devastating Wounds cap/order, Cleave, Lance,
-  Close-quarters/Pistol aliasing, critical Hit/Wound timing, and no illegal
-  spillover from a single critical Devastating Wound;
-- remove the grouped-host exclusions for those abilities only after strict
-  grouped-sequence regressions cover each ability.
+- integrate melee-only Cleave dice gathering and Lance charge-gated Wound-roll
+  modifiers into the Phase 15 Charge/Fight host once melee attack declarations
+  and charged-unit state exist.
 
 Implemented tests:
 
@@ -2087,15 +2096,22 @@ Implemented tests:
 - allocation-order decisions validate stale, wrong-actor, wrong-option, and
   JSON-safe record payloads before mutation;
 - allocation-order requests emitted from grouped wound pools carry all wounded
-  attack contexts before any save is rolled;
+  attack contexts before any save is rolled, and only expose defender choices
+  between legal same-tier group orders;
 - grouped save rolling occurs before damage, and low-to-high save-result damage
   resolution is deterministic;
 - grouped failed-save damage transitions to the next ordered allocation group
   when the current group is destroyed or exhausted;
+- grouped Precision promotes the attacker-selected Character allocation group
+  before ordinary defender group ordering, then returns remaining failed saves
+  to Bodyguard/non-Character groups after that Character group is destroyed;
+- grouped Lethal Hits, Sustained Hits, and Devastating Wounds regressions prove
+  critical timing, generated-hit wound resolution, post-normal deferred mortal
+  wound routing, and one-destroyed-model-per-critical Devastating Wounds caps;
 - cover and Plunging Fire modify BS, not AP or saves;
-- Precision Character allocation-group selection persists for the current
-  per-attack pool and returns to ordinary allocation after that selected
-  Character group is destroyed;
+- Precision Character allocation-group selection persists for the current pool
+  and returns to ordinary allocation after that selected Character group is
+  destroyed;
 - derived terrain objective tests prove models outside the terrain area do not
   contribute through the marker control radius;
 - Devastating Wounds and hazard mortal wounds allocate through the shared mortal-wound service.
@@ -2104,7 +2120,7 @@ Implemented tests:
 
 Status: Complete.
 
-Phase 14F completes the shooting-type cutover. The active player selects an eligible unit, then answers the finite `select_shooting_type` decision before the engine emits the parameterized shooting declaration request. The selected shooting type is preserved through declarations, attack pools, replay payloads, supported grouped attack resolution, allocation-order decisions, saves, damage, and Fire Overwatch Snap Shooting. Phase 14E Track 2.5 remains responsible for routing timing-sensitive weapon abilities through the grouped host.
+Phase 14F completes the shooting-type cutover. The active player selects an eligible unit, then answers the finite `select_shooting_type` decision before the engine emits the parameterized shooting declaration request. The selected shooting type is preserved through declarations, attack pools, replay payloads, supported grouped attack resolution, allocation-order decisions, saves, damage, and Fire Overwatch Snap Shooting. Phase 14E supplies the grouped attack/allocation host used by this shooting cutover.
 
 Indirect and Snap Shooting now attach deterministic no-Hit-reroll rule IDs to Hit-roll specs, and the dice/Command Re-roll paths reject reroll windows for those rolls before mutation. Units that shoot in the Shooting phase are excluded from Mission Action start options until the phase ends through the shared action decision path.
 

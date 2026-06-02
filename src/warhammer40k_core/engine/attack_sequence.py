@@ -87,6 +87,7 @@ from warhammer40k_core.engine.damage_allocation import (
     continue_mortal_wound_application,
     damage_kind_from_token,
     is_mortal_wound_feel_no_pain_request,
+    legal_allocation_group_orders,
     model_by_id,
     remove_destroyed_model_from_battlefield,
     resolve_feel_no_pain_rolls,
@@ -1252,9 +1253,12 @@ def resolve_attack_sequence_until_blocked(
             hooks=active_hooks,
         )
         if grouped_resolution is not None:
-            current, allocated_model_ids, status = grouped_resolution
+            next_current, allocated_model_ids, status = grouped_resolution
             if status is not None:
-                return current, allocated_model_ids, status
+                return next_current, allocated_model_ids, status
+            if next_current is None:
+                return None, allocated_model_ids, None
+            current = next_current
             continue
         attack_context = _roll_hit_and_wound(
             state=state,
@@ -1459,6 +1463,55 @@ def apply_precision_allocation_decision(
     result.validate_for_request(request)
     request_payload = _payload_object(request.payload)
     attack_context = cast(AttackResolutionContextPayload, request_payload["attack_context"])
+    raw_attack_contexts = request_payload.get("attack_contexts")
+    if isinstance(raw_attack_contexts, list) and raw_attack_contexts:
+        precision_selection = _precision_pool_selection(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+        )
+        allocation_context, allocation_groups, priority_group_ids = (
+            _precision_grouped_allocation_context_and_groups(
+                state=state,
+                target_unit_instance_id=attack_context["target_unit_instance_id"],
+                allocated_model_ids=already_allocated_model_ids,
+                precision_selection=precision_selection,
+            )
+        )
+        if not priority_group_ids:
+            allocation_context = allocation_context_for_unit(
+                state=state,
+                target_unit_instance_id=attack_context["target_unit_instance_id"],
+                already_allocated_model_ids=_alive_allocated_model_ids(
+                    state=state,
+                    allocated_model_ids=already_allocated_model_ids,
+                ),
+            )
+            allocation_groups = allocation_groups_for_context(
+                state=state,
+                allocation_context=allocation_context,
+            )
+        return _continue_grouped_allocation_for_wound_contexts(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            attack_sequence=attack_sequence,
+            allocation_context=allocation_context,
+            allocation_groups=allocation_groups,
+            wounded_contexts=tuple(
+                (
+                    _attack_sequence_for_context(
+                        attack_sequence=attack_sequence,
+                        attack_context=cast(AttackResolutionContextPayload, raw_context),
+                    ),
+                    cast(AttackResolutionContextPayload, raw_context),
+                )
+                for raw_context in raw_attack_contexts
+            ),
+            allocated_model_ids=already_allocated_model_ids,
+            hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+            priority_group_ids=priority_group_ids,
+        )
     _validate_lost_wound_context_matches_sequence(
         attack_sequence=attack_sequence,
         attack_context=attack_context,
@@ -1713,30 +1766,14 @@ def _apply_deferred_mortal_wounds(
 ) -> tuple[AttackSequence, LifecycleStatus | None]:
     if not attack_sequence.deferred_mortal_wounds:
         return attack_sequence, None
-    target_order: list[str] = []
-    mortal_wounds_by_target: dict[str, int] = {}
-    attack_context_ids_by_target: dict[str, list[str]] = {}
-    for deferred in attack_sequence.deferred_mortal_wounds:
-        if deferred.target_unit_instance_id not in mortal_wounds_by_target:
-            target_order.append(deferred.target_unit_instance_id)
-        current = mortal_wounds_by_target.get(deferred.target_unit_instance_id, 0)
-        mortal_wounds_by_target[deferred.target_unit_instance_id] = current + deferred.mortal_wounds
-        attack_context_ids_by_target.setdefault(deferred.target_unit_instance_id, []).append(
-            deferred.attack_context_id
-        )
-    for target_index, target_unit_id in enumerate(target_order):
-        mortal_wounds = mortal_wounds_by_target[target_unit_id]
-        remaining_target_ids = frozenset(target_order[target_index + 1 :])
+    for deferred_index, deferred in enumerate(attack_sequence.deferred_mortal_wounds):
         sequence_after_current_target = attack_sequence.with_pending_deferred_mortal_wounds(
-            tuple(
-                deferred
-                for deferred in attack_sequence.deferred_mortal_wounds
-                if deferred.target_unit_instance_id in remaining_target_ids
-            )
+            attack_sequence.deferred_mortal_wounds[deferred_index + 1 :]
         )
         progress = MortalWoundApplicationProgress.start(
             application_id=(
-                f"{attack_sequence.sequence_id}:devastating-wounds:{target_unit_id}:mortal-wounds"
+                f"{attack_sequence.sequence_id}:devastating-wounds:"
+                f"{deferred.attack_context_id}:mortal-wounds"
             ),
             source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
             source_context=validate_json_value(
@@ -1744,17 +1781,17 @@ def _apply_deferred_mortal_wounds(
                     "source_kind": "devastating_wounds",
                     "sequence_id": attack_sequence.sequence_id,
                     "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                    "target_unit_instance_id": target_unit_id,
-                    "attack_context_ids": attack_context_ids_by_target[target_unit_id],
+                    "target_unit_instance_id": deferred.target_unit_instance_id,
+                    "attack_context_ids": [deferred.attack_context_id],
                 }
             ),
-            target_unit_instance_id=target_unit_id,
+            target_unit_instance_id=deferred.target_unit_instance_id,
             defender_player_id=unit_owner_player_id(
                 state=state,
-                unit_instance_id=target_unit_id,
+                unit_instance_id=deferred.target_unit_instance_id,
             ),
-            mortal_wounds=mortal_wounds,
-            spill_over=True,
+            mortal_wounds=deferred.mortal_wounds,
+            spill_over=False,
         )
         routed = continue_mortal_wound_application(
             state=state,
@@ -1782,9 +1819,9 @@ def _apply_deferred_mortal_wounds(
         _emit_deferred_mortal_wounds_applied(
             decisions=decisions,
             attack_sequence=attack_sequence,
-            target_unit_id=target_unit_id,
-            attack_context_ids=tuple(attack_context_ids_by_target[target_unit_id]),
-            mortal_wounds=mortal_wounds,
+            target_unit_id=deferred.target_unit_instance_id,
+            attack_context_ids=(deferred.attack_context_id,),
+            mortal_wounds=deferred.mortal_wounds,
             application=routed.application,
         )
     return attack_sequence.without_deferred_mortal_wounds(), None
@@ -2156,6 +2193,112 @@ def _precision_request_if_available(
     )
 
 
+def _grouped_precision_request_if_available(
+    *,
+    state: GameState,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    attack_contexts: tuple[AttackResolutionContextPayload, ...],
+    allocated_model_ids: tuple[str, ...],
+) -> DecisionRequest | None:
+    pool = attack_sequence.current_pool()
+    if not has_weapon_keyword(pool.weapon_profile, WeaponKeyword.PRECISION):
+        return None
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=attack_context["target_unit_instance_id"],
+        already_allocated_model_ids=_alive_allocated_model_ids(
+            state=state,
+            allocated_model_ids=allocated_model_ids,
+        ),
+        attacker_constraint=AttackAllocationConstraint(
+            source_rule_ids=(PRECISION_RULE_ID,),
+            can_allocate_protected_characters=True,
+        ),
+    )
+    allocation_groups = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+        visible_model_ids=pool.target_visible_model_ids,
+    )
+    eligible_character_groups = tuple(
+        group for group in allocation_groups if group.role in _PRECISION_CHARACTER_GROUP_ROLES
+    )
+    if not eligible_character_groups:
+        return None
+    request = _build_precision_allocation_request(
+        request_id=state.next_decision_request_id(),
+        attacker_player_id=attack_context["attacker_player_id"],
+        attack_context=validate_json_value(attack_context),
+        allocation_context=allocation_context,
+        eligible_character_groups=eligible_character_groups,
+    )
+    return DecisionRequest(
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        payload=validate_json_value(
+            {
+                **cast(dict[str, JsonValue], request.payload),
+                "attack_contexts": [validate_json_value(context) for context in attack_contexts],
+            }
+        ),
+        options=request.options,
+    )
+
+
+def _precision_grouped_allocation_context_and_groups(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+    allocated_model_ids: tuple[str, ...],
+    precision_selection: PrecisionPoolSelection,
+) -> tuple[AttackAllocationRuleContext, tuple[AllocationGroup, ...], tuple[str, ...]]:
+    if type(precision_selection) is not PrecisionPoolSelection:
+        raise GameLifecycleError("Precision grouped allocation selection is invalid.")
+    alive_selected_model_ids = tuple(
+        model_id
+        for model_id in precision_selection.selected_model_ids
+        if _model_is_alive(state=state, model_instance_id=model_id)
+    )
+    attacker_constraint = None
+    priority_group_ids: tuple[str, ...] = ()
+    if precision_selection.selected_group_id is not None and alive_selected_model_ids:
+        attacker_constraint = AttackAllocationConstraint(
+            source_rule_ids=(PRECISION_RULE_ID,),
+            can_allocate_protected_characters=True,
+            attacker_selected_group_id=precision_selection.selected_group_id,
+        )
+        priority_group_ids = (precision_selection.selected_group_id,)
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=target_unit_instance_id,
+        already_allocated_model_ids=_alive_allocated_model_ids(
+            state=state,
+            allocated_model_ids=allocated_model_ids,
+        ),
+        attacker_constraint=attacker_constraint,
+    )
+    allocation_groups = allocation_groups_for_context(
+        state=state,
+        allocation_context=allocation_context,
+    )
+    if priority_group_ids and not any(
+        group.group_id == priority_group_ids[0] for group in allocation_groups
+    ):
+        return _precision_grouped_allocation_context_and_groups(
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+            allocated_model_ids=allocated_model_ids,
+            precision_selection=PrecisionPoolSelection(
+                selected_group_id=None,
+                selected_model_ids=(),
+                selection_recorded=precision_selection.selection_recorded,
+            ),
+        )
+    return allocation_context, allocation_groups, priority_group_ids
+
+
 def _build_precision_allocation_request(
     *,
     request_id: str,
@@ -2292,7 +2435,10 @@ def _resolve_allocation_stage(
     )
     if not allocation_groups:
         raise GameLifecycleError("Attack allocation has no legal target groups.")
-    if len(allocation_groups) > 1:
+    allocation_orders = legal_allocation_group_orders(allocation_groups)
+    if not allocation_orders:
+        raise GameLifecycleError("Attack allocation has no legal group order.")
+    if len(allocation_orders) > 1:
         request = build_allocation_order_request(
             request_id=state.next_decision_request_id(),
             defender_player_id=attack_context["defender_player_id"],
@@ -2333,8 +2479,14 @@ def _resolve_allocation_stage(
             ),
         )
 
-    if len(allocation_groups) != 1:
-        raise GameLifecycleError("Forced allocation requires exactly one legal group.")
+    allocation_order = _first_allocation_group_order(
+        "Forced allocation orders",
+        allocation_orders,
+    )
+    allocation_group = _first_allocation_group(
+        "Forced allocation order",
+        allocation_order,
+    )
     return _continue_after_allocation_group(
         state=state,
         decisions=decisions,
@@ -2343,7 +2495,7 @@ def _resolve_allocation_stage(
         attack_sequence=attack_sequence,
         attack_context=attack_context,
         allocation_context=allocation_context,
-        allocation_group=allocation_groups[0],
+        allocation_group=allocation_group,
         forced=True,
         allocated_model_ids=allocated_model_ids,
         hooks=hooks,
@@ -2359,7 +2511,7 @@ def _resolve_grouped_current_pool_if_available(
     attack_sequence: AttackSequence,
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
-) -> tuple[AttackSequence, tuple[str, ...], LifecycleStatus | None] | None:
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None] | None:
     if not _attack_pool_can_use_grouped_allocation_host(attack_sequence=attack_sequence):
         return None
     pool = attack_sequence.current_pool()
@@ -2387,9 +2539,58 @@ def _resolve_grouped_current_pool_if_available(
     ):
         return None
 
+    wounded_contexts = _grouped_wounded_contexts_for_pool(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        hooks=hooks,
+    )
+    if not wounded_contexts:
+        return (
+            _advance_after_current_pool(attack_sequence=attack_sequence),
+            allocated_model_ids,
+            None,
+        )
+    attack_sequence, normal_wounded_contexts = _defer_grouped_devastating_wounds(
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        wounded_contexts=wounded_contexts,
+        hooks=hooks,
+    )
+    if not normal_wounded_contexts:
+        return (
+            _advance_after_current_pool(attack_sequence=attack_sequence),
+            allocated_model_ids,
+            None,
+        )
+    return _continue_grouped_allocation_for_wound_contexts(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        allocation_context=allocation_context,
+        allocation_groups=allocation_groups,
+        wounded_contexts=normal_wounded_contexts,
+        allocated_model_ids=allocated_model_ids,
+        hooks=hooks,
+    )
+
+
+def _grouped_wounded_contexts_for_pool(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    hooks: AttackSequenceHooks,
+) -> tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...]:
+    pool = attack_sequence.current_pool()
     wounded_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
     for attack_index in range(pool.attacks):
-        attack_for_rolls = AttackSequence(
+        current = AttackSequence(
             sequence_id=attack_sequence.sequence_id,
             attacker_player_id=attack_sequence.attacker_player_id,
             attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
@@ -2398,33 +2599,163 @@ def _resolve_grouped_current_pool_if_available(
             attack_index=attack_index,
             deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
         )
-        attack_context = _roll_hit_and_wound(
-            state=state,
-            decisions=decisions,
-            manager=manager,
-            attack_sequence=attack_for_rolls,
-            hooks=hooks,
-        )
-        if attack_context is None:
-            continue
-        if attack_context["wound_roll"]["successful"]:
-            wounded_contexts.append((attack_for_rolls, attack_context))
-    if not wounded_contexts:
-        return (
-            _advance_after_current_pool(attack_sequence=attack_sequence),
-            allocated_model_ids,
-            None,
-        )
-    if len(allocation_groups) > 1:
-        grouped_attack_context = _grouped_attack_context_payload(
-            attack_sequence=attack_sequence,
-            attack_contexts=tuple(context for _, context in wounded_contexts),
-            pool=pool,
-            defender_player_id=unit_owner_player_id(
+        while True:
+            attack_context = _roll_hit_and_wound(
                 state=state,
-                unit_instance_id=pool.target_unit_instance_id,
+                decisions=decisions,
+                manager=manager,
+                attack_sequence=current,
+                hooks=hooks,
+            )
+            if attack_context is None:
+                break
+            if attack_context["wound_roll"]["successful"]:
+                wounded_contexts.append((current, attack_context))
+            hit_roll = HitRoll.from_payload(attack_context["hit_roll"])
+            next_sequence = current.advanced_after_generated_hit(hit_roll)
+            if (
+                next_sequence.pool_index != current.pool_index
+                or next_sequence.attack_index != current.attack_index
+            ):
+                break
+            current = next_sequence
+    return tuple(wounded_contexts)
+
+
+def _defer_grouped_devastating_wounds(
+    *,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
+    hooks: AttackSequenceHooks,
+) -> tuple[AttackSequence, tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...]]:
+    current = attack_sequence
+    normal_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
+    pool = attack_sequence.current_pool()
+    for wounded_sequence, attack_context in wounded_contexts:
+        resolution = _devastating_wounds_resolution_for_attack(
+            pool=pool,
+            attack_context=attack_context,
+        )
+        if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
+            normal_contexts.append((wounded_sequence, attack_context))
+            continue
+        mortal_wounds = _damage_value(
+            manager=manager,
+            profile=pool.weapon_profile.damage_profile,
+            attack_context_id=attack_context["attack_context_id"],
+            attacker_player_id=attack_sequence.attacker_player_id,
+        ) + _melta_damage_modifier(pool)
+        deferred = DeferredMortalWounds(
+            source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
+            target_unit_instance_id=attack_context["target_unit_instance_id"],
+            attack_context_id=attack_context["attack_context_id"],
+            mortal_wounds=mortal_wounds,
+        )
+        _emit_event(
+            decisions=decisions,
+            hooks=hooks,
+            event=AttackSequenceEvent(
+                step=AttackSequenceStep.DAMAGE,
+                sequence_id=wounded_sequence.sequence_id,
+                attack_context_id=attack_context["attack_context_id"],
+                pool_index=wounded_sequence.pool_index,
+                attack_index=wounded_sequence.attack_index,
+                payload=validate_json_value(
+                    {
+                        "saving_throw": None,
+                        "damage_application": None,
+                        "feel_no_pain": None,
+                        "deferred_mortal_wounds": deferred.to_payload(),
+                    }
+                ),
             ),
         )
+        decisions.event_log.append(
+            "devastating_wounds_deferred",
+            {
+                "sequence_id": attack_sequence.sequence_id,
+                "attack_context_id": attack_context["attack_context_id"],
+                "target_unit_instance_id": attack_context["target_unit_instance_id"],
+                "mortal_wounds": mortal_wounds,
+                "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
+            },
+        )
+        current = current.with_deferred_mortal_wounds(deferred)
+    return current, tuple(normal_contexts)
+
+
+def _continue_grouped_allocation_for_wound_contexts(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    allocation_context: AttackAllocationRuleContext,
+    allocation_groups: tuple[AllocationGroup, ...],
+    wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
+    allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks,
+    priority_group_ids: tuple[str, ...] = (),
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    if not wounded_contexts:
+        raise GameLifecycleError("Grouped allocation requires wounded contexts.")
+    pool = attack_sequence.current_pool()
+    grouped_attack_context = _grouped_attack_context_payload(
+        attack_sequence=attack_sequence,
+        attack_contexts=tuple(context for _, context in wounded_contexts),
+        pool=pool,
+        defender_player_id=unit_owner_player_id(
+            state=state,
+            unit_instance_id=pool.target_unit_instance_id,
+        ),
+    )
+    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.PRECISION):
+        precision_selection = _precision_pool_selection(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+        )
+        if not precision_selection.selection_recorded:
+            precision_request = _grouped_precision_request_if_available(
+                state=state,
+                attack_sequence=attack_sequence,
+                attack_context=grouped_attack_context,
+                attack_contexts=tuple(context for _, context in wounded_contexts),
+                allocated_model_ids=allocated_model_ids,
+            )
+            if precision_request is not None:
+                decisions.request_decision(precision_request)
+                return (
+                    attack_sequence,
+                    allocated_model_ids,
+                    LifecycleStatus.waiting_for_decision(
+                        stage=GameLifecycleStage.BATTLE,
+                        decision_request=precision_request,
+                        payload={
+                            "phase": BattlePhase.SHOOTING.value,
+                            "decision_type": SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+                            "attack_context_id": grouped_attack_context["attack_context_id"],
+                        },
+                    ),
+                )
+        if precision_selection.selected_group_id is not None:
+            allocation_context, allocation_groups, priority_group_ids = (
+                _precision_grouped_allocation_context_and_groups(
+                    state=state,
+                    target_unit_instance_id=pool.target_unit_instance_id,
+                    allocated_model_ids=allocated_model_ids,
+                    precision_selection=precision_selection,
+                )
+            )
+    allocation_orders = legal_allocation_group_orders(
+        allocation_groups,
+        priority_group_ids=priority_group_ids,
+    )
+    if not allocation_orders:
+        raise GameLifecycleError("Grouped allocation has no legal group order.")
+    if len(allocation_orders) > 1:
         request = build_allocation_order_request(
             request_id=state.next_decision_request_id(),
             defender_player_id=grouped_attack_context["defender_player_id"],
@@ -2432,6 +2763,7 @@ def _resolve_grouped_current_pool_if_available(
             attack_contexts=tuple(validate_json_value(context) for _, context in wounded_contexts),
             allocation_context=allocation_context,
             allocation_groups=allocation_groups,
+            priority_group_ids=priority_group_ids,
         )
         decisions.request_decision(request)
         _emit_event(
@@ -2447,6 +2779,7 @@ def _resolve_grouped_current_pool_if_available(
                     {
                         "allocation_context": allocation_context.to_payload(),
                         "allocation_groups": [group.to_payload() for group in allocation_groups],
+                        "priority_group_ids": list(priority_group_ids),
                         "attack_context_ids": [
                             context["attack_context_id"] for _, context in wounded_contexts
                         ],
@@ -2469,26 +2802,26 @@ def _resolve_grouped_current_pool_if_available(
                 },
             ),
         )
-
-    if len(allocation_groups) != 1:
-        raise GameLifecycleError("Grouped allocation host expected one allocation group.")
-    allocation_group = allocation_groups[0]
+    ordered_groups = _first_allocation_group_order(
+        "Grouped allocation orders",
+        allocation_orders,
+    )
     _emit_grouped_allocation_event(
         decisions=decisions,
         hooks=hooks,
         attack_sequence=attack_sequence,
         attack_contexts=tuple(context for _, context in wounded_contexts),
         allocation_context=allocation_context,
-        allocation_groups=(allocation_group,),
+        allocation_groups=ordered_groups,
     )
     save_results = _roll_grouped_saves(
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
         manager=manager,
-        wounded_contexts=tuple(wounded_contexts),
+        wounded_contexts=wounded_contexts,
         allocation_context=allocation_context,
-        allocation_group=allocation_group,
+        allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
         hooks=hooks,
     )
     updated_allocated_ids = _resolve_grouped_save_results_to_damage(
@@ -2497,16 +2830,12 @@ def _resolve_grouped_current_pool_if_available(
         manager=manager,
         attack_sequence=attack_sequence,
         allocation_context=allocation_context,
-        allocation_groups=(allocation_group,),
+        allocation_groups=ordered_groups,
         save_results=save_results,
         allocated_model_ids=allocated_model_ids,
         hooks=hooks,
     )
-    return (
-        _advance_after_current_pool(attack_sequence=attack_sequence),
-        updated_allocated_ids,
-        None,
-    )
+    return _advance_after_current_pool(attack_sequence=attack_sequence), updated_allocated_ids, None
 
 
 def _continue_after_grouped_allocation_order(
@@ -2553,7 +2882,7 @@ def _continue_after_grouped_allocation_order(
         manager=manager,
         wounded_contexts=wounded_contexts,
         allocation_context=allocation_context,
-        allocation_group=ordered_groups[0],
+        allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
         hooks=hooks,
     )
     updated_allocated_ids = _resolve_grouped_save_results_to_damage(
@@ -2587,7 +2916,8 @@ def _resolve_grouped_save_results_to_damage(
         "Grouped save damage allocation_groups",
         allocation_groups,
     )
-    updated_allocated_ids = tuple(sorted({*allocated_model_ids, *ordered_groups[0].model_ids}))
+    first_group = _first_allocation_group("Grouped save damage allocation_groups", ordered_groups)
+    updated_allocated_ids = tuple(sorted({*allocated_model_ids, *first_group.model_ids}))
     for save_result in save_results:
         if save_result.saving_throw is not None and save_result.saving_throw.successful:
             _emit_damage_event(
@@ -2675,19 +3005,7 @@ def _attack_pool_can_use_grouped_allocation_host(*, attack_sequence: AttackSeque
     if pool.attacks < 2:
         return False
     profile = pool.weapon_profile
-    if profile.damage_profile.dice_expression is not None:
-        return False
-    timing_sensitive_keywords = frozenset(
-        (
-            WeaponKeyword.DEVASTATING_WOUNDS,
-            WeaponKeyword.LETHAL_HITS,
-            WeaponKeyword.PRECISION,
-            WeaponKeyword.SUSTAINED_HITS,
-        )
-    )
-    if any(keyword in timing_sensitive_keywords for keyword in profile.keywords):
-        return False
-    return not profile.abilities
+    return profile.damage_profile.dice_expression is None
 
 
 def _allocation_group_has_interrupting_damage_choices(
@@ -2781,6 +3099,9 @@ def _emit_grouped_allocation_event(
         "Grouped allocation event allocation_groups",
         allocation_groups,
     )
+    first_group = _first_allocation_group(
+        "Grouped allocation event allocation_groups", ordered_groups
+    )
     _emit_event(
         decisions=decisions,
         hooks=hooks,
@@ -2794,7 +3115,7 @@ def _emit_grouped_allocation_event(
             attack_index=0,
             payload=validate_json_value(
                 {
-                    "allocation_group": ordered_groups[0].to_payload(),
+                    "allocation_group": first_group.to_payload(),
                     "allocation_order_group_ids": [group.group_id for group in ordered_groups],
                     "allocation_groups": [group.to_payload() for group in ordered_groups],
                     "allocation_context": allocation_context.to_payload(),
@@ -5441,6 +5762,24 @@ def _validate_ordered_allocation_group_tuple(
     if not groups:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return tuple(groups)
+
+
+def _first_allocation_group(field_name: str, values: object) -> AllocationGroup:
+    groups = _validate_ordered_allocation_group_tuple(field_name, values)
+    for group in groups:
+        return group
+    raise GameLifecycleError(f"{field_name} must not be empty.")
+
+
+def _first_allocation_group_order(
+    field_name: str,
+    values: tuple[tuple[AllocationGroup, ...], ...],
+) -> tuple[AllocationGroup, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    for order in values:
+        return _validate_ordered_allocation_group_tuple(field_name, order)
+    raise GameLifecycleError(f"{field_name} must not be empty.")
 
 
 def _validate_fast_dice_pools(values: object) -> tuple[RangedAttackPool, ...]:

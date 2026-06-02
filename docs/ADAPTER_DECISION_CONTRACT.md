@@ -278,7 +278,7 @@ Phase 13B shooting declaration submissions must use `selected_option_id: "submit
 - one or more `WeaponDeclaration` entries with attacker model ID, wargear ID, weapon profile ID, target unit ID, engine-enumerated `shooting_type`, and optional Firing Deck source unit/model IDs;
 - optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, selected embarked unit/model/wargear/profile bindings, and already-shot embarked unit IDs. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
 
-Accepted Phase 13B/14F declarations emit deterministic attack-pool payloads, including the selected `shooting_type`, and `shooting_declaration_accepted` events. Legal shooting types are engine-enumerated values: `normal`, `assault`, `close_quarters`, `indirect`, or source-provided values such as `snap`. Adapters must submit the pending `select_shooting_type` option before an in-phase declaration, then select one of the declaration request target candidate's current `shooting_types`; they must not invent a shooting type or infer one from weapon keywords. Phase 13C/14E then consumes the declared `RangedAttackPool` records through the grouped Shooting phase lifecycle and may emit defender Precision, allocation-order, save, Feel No Pain, or destruction-reaction decisions before returning to the next shooting-unit selection. Rejected stale, malformed, drifted, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
+Accepted Phase 13B/14F declarations emit deterministic attack-pool payloads, including the selected `shooting_type`, and `shooting_declaration_accepted` events. Legal shooting types are engine-enumerated values: `normal`, `assault`, `close_quarters`, `indirect`, or source-provided values such as `snap`. Adapters must submit the pending `select_shooting_type` option before an in-phase declaration, then select one of the declaration request target candidate's current `shooting_types`; they must not invent a shooting type or infer one from weapon keywords. Phase 13C/14E then consumes the declared `RangedAttackPool` records through the grouped Shooting phase lifecycle and may emit attacker Precision plus defender allocation-order, save, Feel No Pain, or destruction-reaction decisions before returning to the next shooting-unit selection. Rejected stale, malformed, drifted, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
 
 Defender shooting decisions include:
 
@@ -306,14 +306,23 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   `ordered_groups`. The request payload includes `selection_kind:
   "allocation_group_order"`, `attack_context` for the allocation-order window,
   optional `attack_contexts` for grouped wound pools already rolled before the
-  decision, `allocation_context`, and `allocation_groups`. Each group payload
-  includes `group_id`, `model_ids`, `role`, W/Sv/InSv profile, wounded and
-  already-allocated model IDs, Bodyguard/Character evidence, role evidence, and
-  legality reasons. Failed saves resolve from lowest to highest against the
-  current ordered group; when that group is destroyed or exhausted, remaining
-  failed saves advance to the next group in `ordered_group_ids`. Stale, drifted,
-  wrong-actor, wrong-option, or payload-mismatched submissions reject before
-  queue pop and before mutation.
+  decision, `allocation_context`, `allocation_groups`, and
+  `priority_group_ids`. Each group payload includes `group_id`, `model_ids`,
+  `role`, W/Sv/InSv profile, wounded and already-allocated model IDs,
+  Bodyguard/Character evidence, role evidence, and legality reasons. The engine
+  creates allocation groups automatically: one per eligible Character model and
+  one per non-Character W/Sv/InSv profile. It emits this finite decision only
+  when more than one legal group order exists inside the same allocation tier;
+  forced tier order is automatic. Wounded non-Character groups precede
+  unwounded non-Character groups, non-Character groups precede Character
+  groups, and wounded Character groups precede unwounded Character groups.
+  `priority_group_ids` is normally empty; Precision may populate it with the
+  attacker-selected visible Character group, which is promoted to the front of
+  the legal order for the current attack pool. Failed saves resolve from lowest
+  to highest against the current ordered group; when that group is destroyed or
+  exhausted, remaining failed saves advance to the next group in
+  `ordered_group_ids`. Stale, drifted, wrong-actor, wrong-option, or
+  payload-mismatched submissions reject before queue pop and before mutation.
 - `select_attack_allocation`: finite defending-player choice. Option IDs are legal `model_instance_id` values. `payload.attack_context` is the JSON-safe attack context for the single attack being allocated. `payload.allocation_context` includes alive model IDs, wounded model IDs, already-allocated model IDs for the phase, attached-unit Bodyguard/Character protection evidence, and any attacker-side allocation constraint. Adapters must select one pending option ID and must not infer legal models from table state.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Grenade mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves.
 
@@ -323,9 +332,9 @@ Phase 13E implements this destroyed-model attack-resolution decision:
 
 Phase 13D adds this attacker-visible attack-resolution decision:
 
-- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character allocation groups. Option IDs are visible eligible Character `group_id` values plus `decline_precision`; Character options include `payload.selected_group_id` and `payload.selected_model_ids`, and the decline option uses `selected_group_id: null` with an empty model list. Accepted Character-group selection is pool-scoped until those attacks resolve or that Character group is destroyed, whichever happens first. Declining, having no visible Character group, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
+- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character allocation groups. Option IDs are visible eligible Character `group_id` values plus `decline_precision`; Character options include `payload.selected_group_id` and `payload.selected_model_ids`, and the decline option uses `selected_group_id: null` with an empty model list. Grouped-host requests include the wounded pool's `attack_contexts` in the request payload. Accepted Character-group selection is pool-scoped until those attacks resolve or that Character group is destroyed, whichever happens first. In the grouped host, the selected Character group is carried as allocation-order `priority_group_ids` and promoted ahead of ordinary defender group order; remaining failed saves return to normal ordered groups after that Character group is destroyed. Declining, having no visible Character group, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
 
-Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Weapon abilities remain Phase 13D behavior, but adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
+Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Supported grouped-host weapon abilities preserve those event boundaries, including Lethal Hits skipped wound payloads, Sustained Hits generated-hit wound contexts, Precision priority-group allocation, and Devastating Wounds deferred mortal-wound packets. Adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
 
 If a shooting declaration is parameterized, the request must embed a typed proposal request with replay-safe source context:
 
@@ -357,8 +366,8 @@ Required Phase 13 adapter-contract tests:
 - valid shooting target/weapon declaration through the chosen finite or parameterized submission path;
 - stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, and invalid-visibility submission rejection without mutation where required;
 - Firing Deck declaration validation, replay, and end-of-phase ineligible-unit state;
-- defender attack-allocation round-trip through finite decisions, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
-- Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, selected-group destruction, and normal Bodyguard-protected fallback;
+- defender attack-allocation/allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, grouped failed-save transition to the next ordered group, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
+- Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, grouped priority-group promotion, selected-group destruction, and normal Bodyguard-protected fallback;
 - optional or competing Feel No Pain decisions through finite decisions;
 - Go to Ground, Fire Overwatch, and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
 - replay/payload round-trip with no Python object reprs or memory addresses;

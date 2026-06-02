@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from itertools import permutations
+from itertools import permutations, product
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -51,6 +51,15 @@ class AllocationGroupRole(StrEnum):
     LEADER = "leader"
     SUPPORT = "support"
     NON_CHARACTER = "non_character"
+
+
+_CHARACTER_ALLOCATION_GROUP_ROLES = frozenset(
+    (
+        AllocationGroupRole.CHARACTER,
+        AllocationGroupRole.LEADER,
+        AllocationGroupRole.SUPPORT,
+    )
+)
 
 
 class AttackAllocationConstraintPayload(TypedDict):
@@ -110,6 +119,7 @@ class AllocationOrderDecisionPayload(TypedDict):
     result_id: str
     player_id: str
     ordered_group_ids: list[str]
+    priority_group_ids: list[str]
     attack_context: JsonValue
     allocation_context: AttackAllocationRuleContextPayload
     allocation_groups: list[AllocationGroupPayload]
@@ -732,6 +742,7 @@ class AllocationOrderDecision:
     attack_context: JsonValue
     allocation_context: AttackAllocationRuleContext
     allocation_groups: tuple[AllocationGroup, ...]
+    priority_group_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -769,6 +780,22 @@ class AllocationOrderDecision:
             raise GameLifecycleError(
                 "AllocationOrderDecision ordered groups must match legal groups."
             )
+        priority_ids = _validate_identifier_tuple(
+            "AllocationOrderDecision priority_group_ids",
+            self.priority_group_ids,
+        )
+        object.__setattr__(self, "priority_group_ids", priority_ids)
+        legal_orders = tuple(
+            tuple(group.group_id for group in order)
+            for order in legal_allocation_group_orders(
+                groups,
+                priority_group_ids=priority_ids,
+            )
+        )
+        if self.ordered_group_ids not in legal_orders:
+            raise GameLifecycleError(
+                "AllocationOrderDecision ordered groups must match a legal allocation order."
+            )
 
     @classmethod
     def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
@@ -782,6 +809,13 @@ class AllocationOrderDecision:
         group_payloads = request_payload["allocation_groups"]
         if not isinstance(group_payloads, list):
             raise GameLifecycleError("Allocation order request groups must be a list.")
+        raw_priority_group_ids = request_payload["priority_group_ids"]
+        if not isinstance(raw_priority_group_ids, list):
+            raise GameLifecycleError("Allocation order priority_group_ids must be a list.")
+        priority_group_ids = _validate_identifier_tuple(
+            "Allocation order priority_group_ids",
+            tuple(raw_priority_group_ids),
+        )
         groups = tuple(
             AllocationGroup.from_payload(cast(AllocationGroupPayload, group_payload))
             for group_payload in group_payloads
@@ -796,6 +830,7 @@ class AllocationOrderDecision:
                 cast(AttackAllocationRuleContextPayload, request_payload["allocation_context"])
             ),
             allocation_groups=groups,
+            priority_group_ids=priority_group_ids,
         )
 
     @property
@@ -823,6 +858,7 @@ class AllocationOrderDecision:
             "result_id": self.result_id,
             "player_id": self.player_id,
             "ordered_group_ids": list(self.ordered_group_ids),
+            "priority_group_ids": list(self.priority_group_ids),
             "attack_context": self.attack_context,
             "allocation_context": self.allocation_context.to_payload(),
             "allocation_groups": [group.to_payload() for group in self.allocation_groups],
@@ -1805,6 +1841,34 @@ def allocation_groups_for_context(
     )
 
 
+def legal_allocation_group_orders(
+    allocation_groups: tuple[AllocationGroup, ...],
+    *,
+    priority_group_ids: tuple[str, ...] = (),
+) -> tuple[tuple[AllocationGroup, ...], ...]:
+    groups = _validate_allocation_groups(allocation_groups)
+    priority_ids = _validate_identifier_tuple("priority_group_ids", priority_group_ids)
+    if not groups:
+        return ()
+    group_by_id = {group.group_id: group for group in groups}
+    missing_priority_ids = tuple(
+        group_id for group_id in priority_ids if group_id not in group_by_id
+    )
+    if missing_priority_ids:
+        raise GameLifecycleError("Priority allocation group is not legal.")
+    priority_groups = tuple(group_by_id[group_id] for group_id in priority_ids)
+    remaining_groups = tuple(group for group in groups if group.group_id not in set(priority_ids))
+    tier_options = tuple(
+        tuple(permutations(tier)) for tier in _allocation_order_tiers(remaining_groups) if tier
+    )
+    if not tier_options:
+        return (priority_groups,)
+    return tuple(
+        (*priority_groups, *(group for tier in tier_order for group in tier))
+        for tier_order in product(*tier_options)
+    )
+
+
 def build_allocation_order_request(
     *,
     request_id: str,
@@ -1813,12 +1877,17 @@ def build_allocation_order_request(
     allocation_context: AttackAllocationRuleContext,
     allocation_groups: tuple[AllocationGroup, ...],
     attack_contexts: tuple[JsonValue, ...] = (),
+    priority_group_ids: tuple[str, ...] = (),
 ) -> DecisionRequest:
     groups = _validate_allocation_groups(allocation_groups)
-    if len(groups) < 2:
-        raise GameLifecycleError("Allocation order request requires at least two legal groups.")
+    ordered_group_options = legal_allocation_group_orders(
+        groups,
+        priority_group_ids=priority_group_ids,
+    )
+    if len(ordered_group_options) < 2:
+        raise GameLifecycleError("Allocation order request requires at least two legal orders.")
     grouped_attack_contexts = tuple(validate_json_value(context) for context in attack_contexts)
-    ordered_group_options = tuple(permutations(groups))
+    priority_ids = _validate_identifier_tuple("priority_group_ids", priority_group_ids)
     return DecisionRequest(
         request_id=request_id,
         decision_type=SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -1829,6 +1898,7 @@ def build_allocation_order_request(
                 "attack_contexts": list(grouped_attack_contexts),
                 "allocation_context": allocation_context.to_payload(),
                 "allocation_groups": [group.to_payload() for group in groups],
+                "priority_group_ids": list(priority_ids),
                 "selection_kind": "allocation_group_order",
             }
         ),
@@ -2472,6 +2542,36 @@ def _allocation_group_legality_reasons(
         if attacker_constraint.can_allocate_protected_characters:
             reasons.add("protected_character_allocation_allowed")
     return tuple(sorted(reasons))
+
+
+def _allocation_order_tiers(
+    allocation_groups: tuple[AllocationGroup, ...],
+) -> tuple[tuple[AllocationGroup, ...], ...]:
+    groups = _validate_allocation_groups(allocation_groups)
+    wounded_non_character: list[AllocationGroup] = []
+    unwounded_non_character: list[AllocationGroup] = []
+    wounded_character: list[AllocationGroup] = []
+    unwounded_character: list[AllocationGroup] = []
+    for group in groups:
+        is_character_group = group.role in _CHARACTER_ALLOCATION_GROUP_ROLES
+        if is_character_group and group.wounded:
+            wounded_character.append(group)
+        elif is_character_group:
+            unwounded_character.append(group)
+        elif group.wounded:
+            wounded_non_character.append(group)
+        else:
+            unwounded_non_character.append(group)
+    return tuple(
+        tuple(tier)
+        for tier in (
+            wounded_non_character,
+            unwounded_non_character,
+            wounded_character,
+            unwounded_character,
+        )
+        if tier
+    )
 
 
 def _character_allocation_group_id(model_instance_id: str) -> str:
