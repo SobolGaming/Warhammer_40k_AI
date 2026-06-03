@@ -20,18 +20,21 @@ flowchart TD
     save_walk["Save: walk dice low to high"]
     save_result{Save successful?}
     normal_damage["Damage Allocation: current ordered group and model"]
-    resolve_normal["Resolve Damage for Model: normal damage"]
+    normal_fnp["Resolve Feel No Pain (if applicable)"]
+    resolve_normal["Apply remaining normal damage to model"]
     model_destroyed{Current model destroyed?}
+    normal_destruction["Resolve destruction window: mandatory Deadly Demise chains, then optional reactions"]
     group_exhausted{Current group exhausted?}
     next_model["Damage Allocation: shift to next model in current group"]
     next_group["Damage Allocation: advance to next ordered group"]
     next_die{More failed save dice?}
     mortal_packet["Damage Allocation: mortal wound packet"]
     mortal_model["Damage Allocation: current mortal wound model"]
-    resolve_mortal["Resolve Damage for Model: mortal wounds"]
+    mortal_fnp["Resolve Feel No Pain (if applicable)"]
+    resolve_mortal["Apply remaining mortal wound to model"]
+    mortal_destroyed{Current mortal-wound model destroyed?}
+    mortal_destruction["Resolve destruction window: mandatory Deadly Demise chains, then optional reactions"]
     mortal_remaining{More mortal wounds?}
-    fnp{Feel No Pain choice or roll?}
-    reaction{Destruction reaction or Deadly Demise?}
     done([Attack pool resolved])
 
     start --> hit
@@ -48,12 +51,12 @@ flowchart TD
     save_walk --> save_result
     save_result -- "Saved" --> next_die
     save_result -- "Failed" --> normal_damage
-    normal_damage --> resolve_normal
-    resolve_normal --> fnp
-    fnp --> reaction
-    reaction --> model_destroyed
-    model_destroyed -- "Yes" --> group_exhausted
+    normal_damage --> normal_fnp
+    normal_fnp --> resolve_normal
+    resolve_normal --> model_destroyed
+    model_destroyed -- "Yes" --> normal_destruction
     model_destroyed -- "No" --> next_die
+    normal_destruction --> group_exhausted
     group_exhausted -- "No" --> next_model
     group_exhausted -- "Yes" --> next_group
     next_model --> next_die
@@ -63,11 +66,14 @@ flowchart TD
 
     devastating -- "Mortal wounds" --> mortal_packet
     mortal_packet --> mortal_model
-    mortal_model --> resolve_mortal
-    resolve_mortal --> fnp
-    fnp --> mortal_remaining
+    mortal_model --> mortal_fnp
+    mortal_fnp --> resolve_mortal
+    resolve_mortal --> mortal_destroyed
+    mortal_destroyed -- "Yes" --> mortal_destruction
+    mortal_destroyed -- "No" --> mortal_remaining
+    mortal_destruction --> mortal_remaining
     mortal_remaining -- "Yes" --> mortal_model
-    mortal_remaining -- "No" --> reaction
+    mortal_remaining -- "No" --> done
 ```
 
 Key constraints:
@@ -84,5 +90,13 @@ Key constraints:
   the current ordered group still has eligible models, allocation shifts to the
   next model in that group; it advances to the next ordered group only after
   the current group is exhausted.
+- Feel No Pain is resolved, declined, or auto-applied at the lost-wound stage
+  before any remaining damage is applied to the model.
+- Destruction windows are opened only after damage leaves a model destroyed.
+  Mandatory destruction reactions such as Deadly Demise resolve before removal
+  and can recursively route mortal wounds that destroy additional models with
+  their own mandatory destruction reactions. Optional destruction reactions are
+  then emitted through the lifecycle decision path when the rules provide a
+  choice.
 - Mortal wounds do not create save choices; optional Feel No Pain and
   destruction reactions still use the same lifecycle decision path.
