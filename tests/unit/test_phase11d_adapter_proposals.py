@@ -76,6 +76,7 @@ from warhammer40k_core.engine.reserves import (
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.transports import (
+    DisembarkModeKind,
     TransportCapacityProfile,
     TransportCargoState,
     TransportMovementStatus,
@@ -796,6 +797,8 @@ def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> N
         )
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    assert proposal.context is not None
+    assert proposal.context["disembark_mode"] == DisembarkModeKind.TACTICAL_DISEMBARK.value
 
     status = _submit_parameterized_handler_payload(
         handler=handler,
@@ -810,6 +813,7 @@ def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> N
                 placement_kind=BattlefieldPlacementKind.DISEMBARK,
                 attempted_placement=_disembark_placement(passenger),
                 transport_unit_instance_id=transport.unit_instance_id,
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
                 transport_movement_status=TransportMovementStatus.NOT_MOVED,
             ).to_payload()
         ),
@@ -822,6 +826,58 @@ def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> N
     cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
     assert cargo is not None
     assert cargo.embarked_unit_instance_ids == ()
+
+
+def test_disembark_placement_wrong_mode_keeps_pending_request_clean() -> None:
+    state, passenger, transport = _battle_state_with_embarked_passenger()
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        parameterized_proposals=True,
+    )
+    decisions = DecisionController()
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase14h-select-disembark-mode-drift",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    before_record_count = len(decisions.records)
+
+    status = _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        payload=_json(
+            PlacementProposalPayload(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=ProposalKind.DISEMBARK,
+                unit_instance_id=passenger.unit_instance_id,
+                placement_kind=BattlefieldPlacementKind.DISEMBARK,
+                attempted_placement=_disembark_placement(passenger),
+                transport_unit_instance_id=transport.unit_instance_id,
+                disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+                transport_movement_status=TransportMovementStatus.NOT_MOVED,
+            ).to_payload()
+        ),
+        result_id="phase14h-place-disembark-mode-drift",
+    )
+    assert status is not None
+    violation = cast(
+        list[dict[str, object]],
+        _proposal_validation(status)["violations"],
+    )[0]
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert violation["violation_code"] == "proposal_disembark_mode_drift"
+    assert len(decisions.records) == before_record_count
+    assert decisions.queue.pending_requests == (placement_request,)
 
 
 def test_disembark_placement_missing_required_field_keeps_pending_request_clean() -> None:
@@ -857,6 +913,7 @@ def test_disembark_placement_missing_required_field_keeps_pending_request_clean(
                 unit_instance_id=passenger.unit_instance_id,
                 placement_kind=BattlefieldPlacementKind.DISEMBARK,
                 attempted_placement=_disembark_placement(passenger),
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
                 transport_movement_status=TransportMovementStatus.NOT_MOVED,
             ).to_payload()
         ),

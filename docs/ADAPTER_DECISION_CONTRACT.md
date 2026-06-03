@@ -236,6 +236,8 @@ Deferred Core Stratagem descriptors for Heroic Intervention, Counter-offensive, 
 
 Phase 14G freezes the Charge/Fight ruleset contract but does not emit new player-facing decisions. `RulesetDescriptor.charge_policy` defines after-roll charge-target selection, 12" declaration/target-selection gates, rolled-distance target eligibility, charge-move endpoint constraints, and the Fights First grant. `RulesetDescriptor.fight_policy` defines the Start/Pile In/Fight/Consolidate/End step order, eligibility reasons, Fights First and remaining-combat ordering bands, both-player pile-in/consolidation sequencing, the more-than-5" eligible-pass rule, explicit Normal/Overrun fight types, and Ongoing/Engaging/Objective consolidation modes. Phase 15 Charge/Fight implementations must consume these source-contract payloads and then add or update this document for every finite option family, proposal kind, pending request payload, decision record, or event shape they expose.
 
+Phase 14H updates Transport Disembark decisions to expose the source-backed `disembark_mode` on every pending `select_disembark_unit`, `place_disembark_unit`, `submit_placement_proposal`, Disembark selection payload, Disembarked unit state, destroyed-Transport disembark payload, and `unit_disembarked` event. Valid mode tokens are `rapid_disembark`, `tactical_disembark`, `combat_disembark`, `destroyed_transport`, and `emergency_disembark`. Adapters must submit the pending mode token unchanged; stale, malformed, omitted, or wrong-mode finite and parameterized submissions reject before authoritative mutation. `rapid_disembark` is used for post-Normal/Ingress Transport movement and records no further movement or charge permission. `tactical_disembark` is used for pre-move stationary/not-yet-selected Transports, forbids choosing Remain Stationary afterward, and routes the unit back through the shared Movement action decision path. `destroyed_transport` and `emergency_disembark` are replay modes for the corresponding source-backed destroyed-Transport rule paths and must not be inferred locally from placement distance. `combat_disembark` is a reserved source-backed 6" mode; CORE V2 rejects it at the Disembark selection and standard resolver layer until a dedicated source path carries enough evidence to distinguish it from locally inferred placement distance.
+
 CP totals, CP ledger transactions, and normal Stratagem-use events are public in matched play. Viewer-scoped projections expose public CP ledger data under `public_command_point_ledgers` and public Stratagem-use records under `public_stratagem_use_records`. Adapter event deltas may expose normal CP and Stratagem events to every player unless a future source-backed hidden rule explicitly marks a pending decision, record, or event hidden. Any hidden Stratagem rule must update this document before implementation and must not leak hidden information through option counts, payload fields, event metadata, or derived projection data.
 
 Required Phase 12 adapter-contract tests:
@@ -538,6 +540,38 @@ Example Strategic Reserves submission shape:
     ]
   },
   "large_model_exceptions": []
+}
+```
+
+Example Disembark submission shape:
+
+```json
+{
+  "proposal_request_id": "decision-request-000052",
+  "proposal_kind": "disembark_placement",
+  "unit_instance_id": "army-alpha:passenger-unit",
+  "placement_kind": "disembark",
+  "attempted_placement": {
+    "army_id": "army-alpha",
+    "player_id": "player-a",
+    "unit_instance_id": "army-alpha:passenger-unit",
+    "model_placements": [
+      {
+        "army_id": "army-alpha",
+        "player_id": "player-a",
+        "unit_instance_id": "army-alpha:passenger-unit",
+        "model_instance_id": "army-alpha:passenger-unit:model-1",
+        "pose": {
+          "position": {"x": 13.0, "y": 10.0, "z": 0.0},
+          "facing": {"degrees": 0.0}
+        }
+      }
+    ]
+  },
+  "transport_unit_instance_id": "army-alpha:transport-1",
+  "disembark_mode": "tactical_disembark",
+  "transport_movement_status": "not_moved",
+  "restriction_overrides": []
 }
 ```
 

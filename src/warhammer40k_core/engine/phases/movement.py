@@ -120,6 +120,7 @@ from warhammer40k_core.engine.timing_windows import (
 )
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
+    DisembarkModeKind,
     DisembarkResolution,
     DisembarkSelection,
     EmbarkResolution,
@@ -131,6 +132,7 @@ from warhammer40k_core.engine.transports import (
     TransportRestrictionOverridePayload,
     apply_disembark_to_battlefield,
     apply_embark_to_battlefield,
+    disembark_mode_kind_from_token,
     resolve_disembark,
     resolve_embark,
     transport_movement_status_from_token,
@@ -3165,6 +3167,7 @@ def _request_pre_move_disembark_if_available(
             "battle_round": state.battle_round,
             "phase": BattlePhase.MOVEMENT.value,
             "active_player_id": _active_player_id(state),
+            "disembark_mode": DisembarkModeKind.TACTICAL_DISEMBARK.value,
             "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
         },
         options=_disembark_unit_selection_options(entries),
@@ -3209,6 +3212,7 @@ def _request_post_normal_move_disembark_if_available(
             "phase": BattlePhase.MOVEMENT.value,
             "active_player_id": _active_player_id(state),
             "transport_unit_instance_id": transport_unit_instance_id,
+            "disembark_mode": DisembarkModeKind.RAPID_DISEMBARK.value,
             "transport_movement_status": TransportMovementStatus.NORMAL_MOVE.value,
         },
         options=_disembark_unit_selection_options(entries),
@@ -3268,6 +3272,7 @@ def _pre_move_disembark_entries(
                     unit=unit,
                     transport_placement=transport_placement,
                 ),
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
                 transport_movement_status=TransportMovementStatus.NOT_MOVED,
             )
             resolution = resolve_disembark(
@@ -3329,6 +3334,7 @@ def _post_normal_move_disembark_entries(
                 unit=unit,
                 transport_placement=transport_placement,
             ),
+            disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
         )
         resolution = resolve_disembark(
@@ -3367,6 +3373,7 @@ def _disembark_unit_selection_options(
                 "transport_decision": "select_disembark_unit",
                 "unit_instance_id": selection.unit_instance_id,
                 "transport_unit_instance_id": selection.transport_unit_instance_id,
+                "disembark_mode": selection.disembark_mode.value,
             },
         )
         for selection in selections
@@ -3395,16 +3402,19 @@ def _apply_disembark_unit_selection_decision(
         raise GameLifecycleError("Disembark selection requires inactive Move Units step.")
 
     request_payload = _request_payload_for_result(decisions=decisions, result=result)
+    disembark_mode = disembark_mode_kind_from_token(
+        _payload_string(request_payload, key="disembark_mode")
+    )
     transport_movement_status = transport_movement_status_from_token(
         _payload_string(request_payload, key="transport_movement_status")
     )
-    if transport_movement_status is TransportMovementStatus.NOT_MOVED:
+    if disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK:
         entries = _pre_move_disembark_entries(
             state=state,
             movement_state=movement_state,
             ruleset_descriptor=ruleset_descriptor,
         )
-    elif transport_movement_status is TransportMovementStatus.NORMAL_MOVE:
+    elif disembark_mode is DisembarkModeKind.RAPID_DISEMBARK:
         entries = _post_normal_move_disembark_entries(
             state=state,
             movement_state=movement_state,
@@ -3415,7 +3425,7 @@ def _apply_disembark_unit_selection_decision(
             ),
         )
     else:
-        raise GameLifecycleError("Disembark selection request has unsupported timing.")
+        raise GameLifecycleError("Disembark selection request has unsupported mode.")
 
     payload = _decision_payload_object(result.payload)
     transport_decision = _payload_string(payload, key="transport_decision")
@@ -3444,6 +3454,7 @@ def _apply_disembark_unit_selection_decision(
                 "request_id": result.request_id,
                 "result_id": result.result_id,
                 "declined_unit_instance_ids": list(declined_unit_ids),
+                "disembark_mode": disembark_mode.value,
                 "transport_movement_status": transport_movement_status.value,
                 "phase_body_status": phase_body_status,
             },
@@ -3453,11 +3464,17 @@ def _apply_disembark_unit_selection_decision(
         raise GameLifecycleError("Unsupported Disembark selection payload.")
     unit_instance_id = _payload_string(payload, key="unit_instance_id")
     transport_unit_instance_id = _payload_string(payload, key="transport_unit_instance_id")
+    payload_disembark_mode = disembark_mode_kind_from_token(
+        _payload_string(payload, key="disembark_mode")
+    )
+    if payload_disembark_mode is not disembark_mode:
+        raise GameLifecycleError("Disembark selection mode payload drift.")
     matching = tuple(
         selection
         for selection in entries
         if selection.unit_instance_id == unit_instance_id
         and selection.transport_unit_instance_id == transport_unit_instance_id
+        and selection.disembark_mode is payload_disembark_mode
     )
     if len(matching) != 1:
         raise GameLifecycleError("Disembark selection is not currently legal.")
@@ -3470,6 +3487,7 @@ def _apply_disembark_unit_selection_decision(
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": unit_instance_id,
             "transport_unit_instance_id": transport_unit_instance_id,
+            "disembark_mode": matching[0].disembark_mode.value,
             "transport_movement_status": matching[0].transport_movement_status.value,
             "request_id": result.request_id,
             "result_id": result.result_id,
@@ -3510,6 +3528,7 @@ def _request_disembark_placement(
             placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
             context={
                 "transport_unit_instance_id": selection.transport_unit_instance_id,
+                "disembark_mode": selection.disembark_mode.value,
                 "transport_movement_status": selection.transport_movement_status.value,
                 "restriction_overrides": [
                     validate_json_value(override.to_payload())
@@ -3528,6 +3547,7 @@ def _request_disembark_placement(
                 "phase": BattlePhase.MOVEMENT.value,
                 "unit_instance_id": selection.unit_instance_id,
                 "transport_unit_instance_id": selection.transport_unit_instance_id,
+                "disembark_mode": selection.disembark_mode.value,
                 "proposal_kind": ProposalKind.DISEMBARK.value,
                 "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
                 "request_id": request.request_id,
@@ -3546,6 +3566,7 @@ def _request_disembark_placement(
                 "active_player_id": _active_player_id(state),
                 "unit_instance_id": selection.unit_instance_id,
                 "transport_unit_instance_id": selection.transport_unit_instance_id,
+                "disembark_mode": selection.disembark_mode.value,
                 "proposal_kind": ProposalKind.DISEMBARK.value,
                 "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
                 "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
@@ -3562,6 +3583,7 @@ def _request_disembark_placement(
             "active_player_id": _active_player_id(state),
             "unit_instance_id": selection.unit_instance_id,
             "transport_unit_instance_id": selection.transport_unit_instance_id,
+            "disembark_mode": selection.disembark_mode.value,
             "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
         },
         options=(
@@ -3574,6 +3596,7 @@ def _request_disembark_placement(
                         "unit_instance_id": selection.unit_instance_id,
                         "transport_unit_instance_id": selection.transport_unit_instance_id,
                         "attempted_placement": selection.attempted_placement.to_payload(),
+                        "disembark_mode": selection.disembark_mode.value,
                         "transport_movement_status": selection.transport_movement_status.value,
                         "restriction_overrides": [
                             override.to_payload() for override in selection.restriction_overrides
@@ -3594,6 +3617,7 @@ def _request_disembark_placement(
             "active_player_id": _active_player_id(state),
             "unit_instance_id": selection.unit_instance_id,
             "transport_unit_instance_id": selection.transport_unit_instance_id,
+            "disembark_mode": selection.disembark_mode.value,
         },
     )
 
@@ -3621,6 +3645,9 @@ def _apply_disembark_placement_decision(
         unit_instance_id=unit_instance_id,
         transport_unit_instance_id=transport_unit_instance_id,
         attempted_placement=attempted_placement,
+        disembark_mode=disembark_mode_kind_from_token(
+            _payload_string(payload, key="disembark_mode")
+        ),
         transport_movement_status=transport_movement_status_from_token(
             _payload_string(payload, key="transport_movement_status")
         ),
@@ -3868,6 +3895,9 @@ def _apply_placement_proposal_decision(
             "unit_instance_id": submission.unit_instance_id,
             "transport_unit_instance_id": submission.transport_unit_instance_id,
             "attempted_placement": validate_json_value(submission.attempted_placement.to_payload()),
+            "disembark_mode": submission.disembark_mode.value
+            if submission.disembark_mode is not None
+            else None,
             "transport_movement_status": submission.transport_movement_status.value
             if submission.transport_movement_status is not None
             else None,
@@ -3909,6 +3939,8 @@ def _apply_placement_proposal_decision(
 def _missing_disembark_proposal_field(submission: PlacementProposalPayload) -> str | None:
     if submission.transport_unit_instance_id is None:
         return "transport_unit_instance_id"
+    if submission.disembark_mode is None:
+        return "disembark_mode"
     if submission.transport_movement_status is None:
         return "transport_movement_status"
     return None
@@ -3934,7 +3966,7 @@ def _apply_valid_disembark(
     )
     state.replace_transport_cargo_state(disembark.updated_cargo_state)
     state.record_disembarked_unit_state(disembark.disembarked_unit_state)
-    if disembark.selection.transport_movement_status is TransportMovementStatus.NORMAL_MOVE:
+    if disembark.selection.disembark_mode is DisembarkModeKind.RAPID_DISEMBARK:
         movement_state = state.movement_phase_state
         if movement_state is None:
             raise GameLifecycleError("Post-move Disembark requires movement_phase_state.")
@@ -3952,6 +3984,7 @@ def _apply_valid_disembark(
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": disembark.selection.unit_instance_id,
             "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
+            "disembark_mode": disembark.selection.disembark_mode.value,
             "transport_movement_status": disembark.selection.transport_movement_status.value,
             "request_id": result.request_id,
             "result_id": result.result_id,

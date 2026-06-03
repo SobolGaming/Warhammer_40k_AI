@@ -2264,7 +2264,7 @@ Invariants:
   promote Warlord;
 - Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit
   Limit 2 doubled for `BATTLELINE`; Strike Force is 2000 points, 4 Detachment
-  Points, Enhancement Limit 5, and Unit Limit 3 doubled for `BATTLELINE`;
+  Points, Enhancement Limit 4, and Unit Limit 3 doubled for `BATTLELINE`;
 - detachment point costs are source data, and missing values remain
   awaiting-source rows rather than defaults;
 - Leader and Support Attached Units are declared on the army list, Enhancements
@@ -2274,7 +2274,7 @@ Invariants:
   Secondary Missions until scored or discarded, and does not replace ordinary
   Tactical-discarded Secondary Missions immediately;
 - retained Secondary Missions have no two-card hand-size cap, ordinary discard
-  rewards are once-per-battle-round CP rewards, and New Orders is the explicit
+  rewards are once-per-player-turn CP rewards, and New Orders is the explicit
   once-per-game 1 CP replacement-draw exception;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, and Secondary
   scoring at 15 VP per battle round;

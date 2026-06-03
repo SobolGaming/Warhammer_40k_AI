@@ -59,9 +59,10 @@ from warhammer40k_core.engine.placement import create_deterministic_battlefield_
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.transports import (
     DestroyedTransportDisembark,
+    DisembarkedUnitState,
+    DisembarkModeKind,
     DisembarkResolution,
     DisembarkSelection,
-    DisembarkTimingKind,
     EmbarkResolution,
     EmbarkSelection,
     FiringDeckResolution,
@@ -77,7 +78,7 @@ from warhammer40k_core.engine.transports import (
     apply_destroyed_transport_disembark_to_battlefield,
     apply_disembark_to_battlefield,
     apply_embark_to_battlefield,
-    disembark_timing_kind_from_token,
+    disembark_mode_kind_from_token,
     resolve_destroyed_transport_disembark,
     resolve_disembark,
     resolve_embark,
@@ -500,6 +501,13 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
 
     disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
+    disembark_payload = cast(dict[str, object], disembark_request.payload)
+    assert disembark_payload["disembark_mode"] == DisembarkModeKind.TACTICAL_DISEMBARK.value
+    selected_payload = cast(
+        dict[str, object],
+        disembark_request.option_by_id(passenger.unit_instance_id).payload,
+    )
+    assert selected_payload["disembark_mode"] == DisembarkModeKind.TACTICAL_DISEMBARK.value
     placement_request = _decision_request(
         _submit_handler_decision(
             handler,
@@ -533,7 +541,7 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
         unit_instance_id=passenger.unit_instance_id,
     )
     assert disembarked_state is not None
-    assert disembarked_state.timing_kind is DisembarkTimingKind.BEFORE_TRANSPORT_MOVED
+    assert disembarked_state.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK
 
     movement_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     selection_status = _submit_handler_decision(
@@ -579,7 +587,7 @@ def test_transport_normal_move_emits_post_move_disembark_decision_after_pre_move
     )
 
     handler, decisions, post_move_disembark_request = (
-        _post_normal_move_disembark_request_after_transport_normal_move(
+        _rapid_disembark_request_after_transport_normal_move(
             state=state,
             passenger=passenger,
             transport=transport,
@@ -593,6 +601,7 @@ def test_transport_normal_move_emits_post_move_disembark_decision_after_pre_move
     assert post_move_payload["transport_movement_status"] == (
         TransportMovementStatus.NORMAL_MOVE.value
     )
+    assert post_move_payload["disembark_mode"] == DisembarkModeKind.RAPID_DISEMBARK.value
     assert post_move_payload["transport_unit_instance_id"] == transport.unit_instance_id
     assert {option.option_id for option in post_move_disembark_request.options} == {
         COMPLETE_DISEMBARKS_OPTION_ID,
@@ -620,7 +629,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
         )
     )
     handler, decisions, post_move_disembark_request = (
-        _post_normal_move_disembark_request_after_transport_normal_move(
+        _rapid_disembark_request_after_transport_normal_move(
             state=state,
             passenger=passenger,
             transport=transport,
@@ -659,7 +668,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
         unit_instance_id=passenger.unit_instance_id,
     )
     assert disembarked_state is not None
-    assert disembarked_state.timing_kind is DisembarkTimingKind.AFTER_TRANSPORT_NORMAL_MOVE
+    assert disembarked_state.disembark_mode is DisembarkModeKind.RAPID_DISEMBARK
     assert not disembarked_state.can_move_further
     assert not disembarked_state.can_declare_charge
     assert state.movement_phase_state is not None
@@ -833,6 +842,7 @@ def test_disembark_places_unit_and_applies_after_normal_move_restrictions() -> N
             unit_instance_id=passenger.unit_instance_id,
             transport_unit_instance_id=transport.unit_instance_id,
             attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
         ),
         unit=passenger,
@@ -843,9 +853,7 @@ def test_disembark_places_unit_and_applies_after_normal_move_restrictions() -> N
 
     assert resolution.is_valid
     assert resolution.disembarked_unit_state is not None
-    assert resolution.disembarked_unit_state.timing_kind is (
-        DisembarkTimingKind.AFTER_TRANSPORT_NORMAL_MOVE
-    )
+    assert resolution.disembarked_unit_state.disembark_mode is (DisembarkModeKind.RAPID_DISEMBARK)
     assert not resolution.disembarked_unit_state.can_move_further
     assert not resolution.disembarked_unit_state.can_declare_charge
     assert resolution.transition_batch is not None
@@ -885,6 +893,7 @@ def test_disembark_endpoint_honors_terrain_top_restrictions() -> None:
             unit_instance_id=passenger.unit_instance_id,
             transport_unit_instance_id=transport.unit_instance_id,
             attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NOT_MOVED,
         ),
         unit=passenger,
@@ -945,6 +954,7 @@ def test_disembark_ruins_upper_floor_requires_full_base_support() -> None:
             unit_instance_id=passenger.unit_instance_id,
             transport_unit_instance_id=transport.unit_instance_id,
             attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NOT_MOVED,
         ),
         unit=passenger,
@@ -968,7 +978,7 @@ def test_disembark_ruins_upper_floor_requires_full_base_support() -> None:
     }
 
 
-def test_disembark_after_advance_and_embark_after_disembark_need_explicit_overrides() -> None:
+def test_disembark_mode_status_pairs_are_fail_fast_and_round_trip() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     disembark_scenario = _without_unit(scenario, passenger.unit_instance_id)
     cargo_state = _cargo_state(
@@ -984,54 +994,96 @@ def test_disembark_after_advance_and_embark_after_disembark_need_explicit_overri
         poses=_disembark_poses(),
     )
 
-    blocked_disembark = resolve_disembark(
-        scenario=disembark_scenario,
-        ruleset_descriptor=_ruleset(),
-        cargo_state=cargo_state,
-        selection=DisembarkSelection(
-            player_id="player-a",
-            battle_round=1,
-            unit_instance_id=passenger.unit_instance_id,
-            transport_unit_instance_id=transport.unit_instance_id,
-            attempted_placement=attempted_placement,
-            transport_movement_status=TransportMovementStatus.ADVANCE,
-        ),
-        unit=passenger,
-        transport_placement=disembark_scenario.battlefield_state.unit_placement_by_id(
-            transport.unit_instance_id
-        ),
+    tactical_selection = DisembarkSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        attempted_placement=attempted_placement,
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
     )
-    allowed_disembark = resolve_disembark(
-        scenario=disembark_scenario,
-        ruleset_descriptor=_ruleset(),
-        cargo_state=cargo_state,
-        selection=DisembarkSelection(
-            player_id="player-a",
-            battle_round=1,
-            unit_instance_id=passenger.unit_instance_id,
-            transport_unit_instance_id=transport.unit_instance_id,
-            attempted_placement=attempted_placement,
-            transport_movement_status=TransportMovementStatus.ADVANCE,
-            restriction_overrides=(
-                TransportRestrictionOverride(
-                    override_kind=(
-                        TransportRestrictionOverrideKind.ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK
-                    ),
-                    source_rule_id="phase10q_override",
-                ),
+    rapid_normal_selection = DisembarkSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        attempted_placement=attempted_placement,
+        disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+    )
+    rapid_ingress_selection = DisembarkSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        attempted_placement=attempted_placement,
+        disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.INGRESS_MOVE,
+    )
+
+    assert DisembarkSelection.from_payload(tactical_selection.to_payload()) == tactical_selection
+    assert (
+        DisembarkSelection.from_payload(rapid_normal_selection.to_payload())
+        == rapid_normal_selection
+    )
+    assert (
+        DisembarkSelection.from_payload(rapid_ingress_selection.to_payload())
+        == rapid_ingress_selection
+    )
+
+    with pytest.raises(GameLifecycleError, match="Tactical Disembark requires an unmoved"):
+        resolve_disembark(
+            scenario=disembark_scenario,
+            ruleset_descriptor=_ruleset(),
+            cargo_state=cargo_state,
+            selection=DisembarkSelection(
+                player_id="player-a",
+                battle_round=1,
+                unit_instance_id=passenger.unit_instance_id,
+                transport_unit_instance_id=transport.unit_instance_id,
+                attempted_placement=attempted_placement,
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+                transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
             ),
-        ),
-        unit=passenger,
-        transport_placement=disembark_scenario.battlefield_state.unit_placement_by_id(
-            transport.unit_instance_id
-        ),
-    )
+            unit=passenger,
+            transport_placement=disembark_scenario.battlefield_state.unit_placement_by_id(
+                transport.unit_instance_id
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="Rapid Disembark requires Normal or Ingress"):
+        DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        )
+    with pytest.raises(GameLifecycleError, match="Combat Disembark requires a dedicated"):
+        DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        )
+    with pytest.raises(GameLifecycleError, match="Combat Disembark requires a dedicated"):
+        DisembarkedUnitState.for_mode(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        )
 
-    assert TransportOperationViolationCode.TRANSPORT_ADVANCED_OR_FELL_BACK in {
-        violation.violation_code for violation in blocked_disembark.violations
-    }
-    assert allowed_disembark.is_valid
 
+def test_embark_after_disembark_needs_explicit_override() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     disembarked_cargo = _cargo_state(
         transport=transport,
         embarked_unit_ids=(),
@@ -1169,6 +1221,7 @@ def test_disembark_reports_enemy_range_edge_overlap_and_membership_failures() ->
             unit_instance_id=passenger.unit_instance_id,
             transport_unit_instance_id=transport.unit_instance_id,
             attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NOT_MOVED,
         ),
         unit=enemy,
@@ -1214,6 +1267,7 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
             unit_instance_id=passenger.unit_instance_id,
             transport_unit_instance_id=transport.unit_instance_id,
             attempted_placement=partial_placement,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NOT_MOVED,
         ),
         unit=passenger,
@@ -1221,7 +1275,6 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
             transport.unit_instance_id
         ),
         dice_manager=DiceRollManager(10),
-        emergency=True,
     )
 
     assert result.placement.is_valid
@@ -1232,7 +1285,7 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
     assert result.disembarked_unit_state.battle_shocked_until == (
         "controller_next_command_phase_start"
     )
-    assert result.disembarked_unit_state.timing_kind is DisembarkTimingKind.EMERGENCY_DISEMBARKATION
+    assert result.disembarked_unit_state.disembark_mode is (DisembarkModeKind.EMERGENCY_DISEMBARK)
     updated_battlefield = apply_destroyed_transport_disembark_to_battlefield(
         battlefield_state=disembark_scenario.battlefield_state,
         disembark=result,
@@ -1417,6 +1470,7 @@ def test_transport_payloads_round_trip_without_python_reprs() -> None:
                 player_id="player-a",
                 poses=_disembark_poses(),
             ),
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NOT_MOVED,
         ),
         unit=passenger,
@@ -1428,7 +1482,10 @@ def test_transport_payloads_round_trip_without_python_reprs() -> None:
         scenario=_without_unit(scenario, passenger.unit_instance_id),
         ruleset_descriptor=_ruleset(),
         cargo_state=cargo_state,
-        selection=disembark_resolution.selection,
+        selection=replace(
+            disembark_resolution.selection,
+            disembark_mode=DisembarkModeKind.DESTROYED_TRANSPORT,
+        ),
         unit=passenger,
         transport_placement=scenario.battlefield_state.unit_placement_by_id(
             transport.unit_instance_id
@@ -1490,6 +1547,7 @@ def test_transport_payloads_round_trip_without_python_reprs() -> None:
                     player_id="player-a",
                     poses=_disembark_poses(),
                 ),
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
                 transport_movement_status=TransportMovementStatus.NOT_MOVED,
             ).to_payload()
         ).transport_movement_status
@@ -1516,6 +1574,7 @@ def test_resolution_payloads_reject_destroyed_transport_and_firing_deck_drift() 
             player_id="player-a",
             poses=_disembark_poses(),
         ),
+        disembark_mode=DisembarkModeKind.DESTROYED_TRANSPORT,
         transport_movement_status=TransportMovementStatus.NOT_MOVED,
     )
     destroyed_resolution = resolve_destroyed_transport_disembark(
@@ -1539,7 +1598,7 @@ def test_resolution_payloads_reject_destroyed_transport_and_firing_deck_drift() 
             battle_round=destroyed_resolution.battle_round,
             unit_instance_id=destroyed_resolution.unit_instance_id,
             transport_unit_instance_id=destroyed_resolution.transport_unit_instance_id,
-            emergency=destroyed_resolution.emergency,
+            disembark_mode=destroyed_resolution.disembark_mode,
             placement=destroyed_resolution.placement,
             roll_threshold=destroyed_resolution.roll_threshold,
             model_rolls=(bad_mortal_wound_roll, *destroyed_resolution.model_rolls[1:]),
@@ -1555,7 +1614,7 @@ def test_resolution_payloads_reject_destroyed_transport_and_firing_deck_drift() 
             battle_round=destroyed_resolution.battle_round,
             unit_instance_id=destroyed_resolution.unit_instance_id,
             transport_unit_instance_id=destroyed_resolution.transport_unit_instance_id,
-            emergency=destroyed_resolution.emergency,
+            disembark_mode=destroyed_resolution.disembark_mode,
             placement=destroyed_resolution.placement,
             roll_threshold=destroyed_resolution.roll_threshold,
             model_rolls=(bad_model_roll, *destroyed_resolution.model_rolls[1:]),
@@ -1603,10 +1662,10 @@ def test_transport_token_parsers_reject_invalid_values() -> None:
         transport_restriction_override_kind_from_token(None)
     with pytest.raises(GameLifecycleError, match="Unsupported TransportRestrictionOverrideKind"):
         transport_restriction_override_kind_from_token("bad-override")
-    with pytest.raises(GameLifecycleError, match="DisembarkTimingKind token"):
-        disembark_timing_kind_from_token(False)
-    with pytest.raises(GameLifecycleError, match="Unsupported DisembarkTimingKind"):
-        disembark_timing_kind_from_token("bad-disembark")
+    with pytest.raises(GameLifecycleError, match="DisembarkModeKind token"):
+        disembark_mode_kind_from_token(False)
+    with pytest.raises(GameLifecycleError, match="Unsupported DisembarkModeKind"):
+        disembark_mode_kind_from_token("bad-disembark")
     with pytest.raises(GameLifecycleError, match="TransportOperationViolationCode token"):
         transport_operation_violation_code_from_token(3.14)
     with pytest.raises(GameLifecycleError, match="Unsupported TransportOperationViolationCode"):
@@ -1707,6 +1766,7 @@ def test_disembarked_units_use_shared_movement_decision_path_restrictions() -> N
             attempted_placement=scenario.battlefield_state.unit_placement_by_id(
                 passenger.unit_instance_id
             ),
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NOT_MOVED,
         ),
         unit=passenger,
@@ -1912,7 +1972,7 @@ def _movement_action_request_for_unit(
     return handler, decisions, action_request
 
 
-def _post_normal_move_disembark_request_after_transport_normal_move(
+def _rapid_disembark_request_after_transport_normal_move(
     *,
     state: GameState,
     passenger: UnitInstance,
