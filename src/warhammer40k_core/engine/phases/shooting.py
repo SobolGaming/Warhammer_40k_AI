@@ -19,7 +19,6 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequencePayload,
     apply_allocation_order_decision,
-    apply_attack_allocation_decision,
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
@@ -32,7 +31,6 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-    SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -1805,16 +1803,7 @@ def _apply_attack_sequence_decision_to_sequence(
     attack_sequence: AttackSequence,
     already_allocated_model_ids: tuple[str, ...],
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
-    if result.decision_type == SELECT_ATTACK_ALLOCATION_DECISION_TYPE:
-        updated_sequence, allocated_model_ids, status = apply_attack_allocation_decision(
-            state=state,
-            decisions=decisions,
-            ruleset_descriptor=ruleset_descriptor,
-            attack_sequence=attack_sequence,
-            result=result,
-            already_allocated_model_ids=already_allocated_model_ids,
-        )
-    elif result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
+    if result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_allocation_order_decision(
             state=state,
             decisions=decisions,
@@ -1836,6 +1825,7 @@ def _apply_attack_sequence_decision_to_sequence(
         updated_sequence, allocated_model_ids, status = apply_feel_no_pain_decision(
             state=state,
             decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
@@ -1844,6 +1834,7 @@ def _apply_attack_sequence_decision_to_sequence(
         updated_sequence, allocated_model_ids, status = apply_destruction_reaction_decision(
             state=state,
             decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,

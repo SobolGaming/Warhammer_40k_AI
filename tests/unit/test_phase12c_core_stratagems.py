@@ -393,7 +393,13 @@ def test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor
 
 
 @pytest.mark.parametrize(
-    "roll_type", ["battle_shock_roll", "leadership_roll", "desperate_escape_roll"]
+    "roll_type",
+    [
+        "attack_sequence.allocation_order.no_save",
+        "battle_shock_roll",
+        "leadership_roll",
+        "desperate_escape_roll",
+    ],
 )
 def test_phase14i_command_reroll_excludes_unlisted_roll_classes(
     roll_type: str,
@@ -1364,7 +1370,6 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
             break
         request = _decision_request(status)
         assert request.decision_type in {
-            "select_attack_allocation",
             "select_feel_no_pain",
             "select_precision_allocation",
         }

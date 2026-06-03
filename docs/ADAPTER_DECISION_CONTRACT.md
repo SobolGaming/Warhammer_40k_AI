@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14F shooting decision requirements, and Phase 14B End of Opponent's Movement phase reaction timing. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, and Phase 14B End of Opponent's Movement phase reaction timing. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14F shooting decision rules, and Phase 14B End of Opponent's Movement phase reaction timing, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, and Phase 14B End of Opponent's Movement phase reaction timing, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -227,7 +227,7 @@ Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule
 
 Phase 12C source-backed Core Stratagems are adapter-visible through these handler bindings:
 
-- `core:command-reroll`: finite `use_stratagem` option at `after_dice_roll`; the option payload context includes `trigger_payload.dice_roll_state`, and the source-backed catalog definition includes `eligible_roll_types` for the edition-specific roll classes that may be re-rolled. The 11th Edition source list covers Hit, Wound, Damage, saving throw, Advance, Charge, Hazardous, and number-of-attacks rolls; the normalized number-of-attacks roll type is `number_of_attacks_roll`. It does not include Leadership, Battle-shock, or Desperate Escape roll classes. Desperate Escape uses hazard rolls in 11th Edition. Runtime attack/save roll specs can remain precise (`attack_sequence.hit`, `attack_sequence.wound`, `attack_sequence.save.*`, and random Damage roll types); Command Re-roll normalizes those to source-backed roll classes before eligibility comparison. The engine rejects unlisted non-roll-off roll types and roll actor drift before option emission and before queue pop. Single-die rolls and Charge rolls resolve through Phase 10J whole-roll reroll semantics. Non-Charge multi-dice rolls emit a nested `select_dice_reroll` finite request with one legal reroll option per die, and lifecycle submission must select one engine-emitted option ID. This can be offered in a Phase 12A reaction window, and the parent resumes only after `command_reroll_resolved` and `reaction_parent_resumed` are emitted.
+- `core:command-reroll`: finite `use_stratagem` option at `after_dice_roll`; the option payload context includes `trigger_payload.dice_roll_state`, and the source-backed catalog definition includes `eligible_roll_types` for the edition-specific roll classes that may be re-rolled. The 11th Edition source list covers Hit, Wound, Damage, saving throw, Advance, Charge, Hazardous, and number-of-attacks rolls; the normalized number-of-attacks roll type is `number_of_attacks_roll`. It does not include Leadership, Battle-shock, Desperate Escape, or no-save allocation-order roll classes. Desperate Escape uses hazard rolls in 11th Edition. Runtime attack/save roll specs can remain precise (`attack_sequence.hit`, `attack_sequence.wound`, `attack_sequence.save.*`, and random Damage roll types); Command Re-roll normalizes those to source-backed roll classes before eligibility comparison. A real armour or invulnerable saving throw remains an `attack_sequence.save.*` roll even when its target number is above 6 and cannot succeed on a D6. Synthetic ordered-allocation dice for effects that permit no saving throw use `attack_sequence.allocation_order.no_save` and are not saving throws. The engine rejects unlisted non-roll-off roll types and roll actor drift before option emission and before queue pop. Single-die rolls and Charge rolls resolve through Phase 10J whole-roll reroll semantics. Non-Charge multi-dice rolls emit a nested `select_dice_reroll` finite request with one legal reroll option per die, and lifecycle submission must select one engine-emitted option ID. This can be offered in a Phase 12A reaction window, and the parent resumes only after `command_reroll_resolved` and `reaction_parent_resumed` are emitted.
 - `core:insane-bravery`: parameterized `submit_stratagem_target_proposal` for a unit pending a Battle-shock test. Accepted use records a persisting auto-pass effect and the Command phase resolves the Battle-shock test as passed without adapter-owned mutation.
 - `core:rapid-ingress`: parameterized target proposal for an unarrived reserves unit during the opponent Movement phase end. Accepted use spends CP and records the Stratagem use, then emits a `submit_placement_proposal` request using the existing placement proposal contract. The placement answer must also go through `GameLifecycle.submit_decision(...)`. When Rapid Ingress is offered from a Phase 12A reaction window, the reaction frame continues from the target proposal to the placement proposal and the parent resumes only after a valid placement resolves. Rule-invalid but well-formed placement proposals are recorded as rejected attempts and emit a fresh pending placement request for retry; stale, malformed, or wrong-context placement proposals are rejected before queue pop.
 - `core:new-orders`: finite `use_stratagem` options for active Tactical secondary cards. The target binding uses `target_kind: "tactical_secondary_card"` and `target_secondary_mission_id`; accepted use costs 1 CP, is once per game, discards that card, and draws one replacement through engine-owned Tactical secondary state.
@@ -290,8 +290,6 @@ Defender shooting decisions include:
 
 - finite `select_allocation_order` choices when more than one legal allocation
   group order exists for the current grouped save/damage window;
-- legacy finite `select_attack_allocation` choices only for older single-attack
-  model-allocation paths that have not yet been retired;
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
 - finite optional destruction-reaction choices when a destroyed model has registered optional shoot-on-death, fight-on-death, or equivalent destruction sources;
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
@@ -324,12 +322,21 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   groups, and wounded Character groups precede unwounded Character groups.
   `priority_group_ids` is normally empty; Precision may populate it with the
   attacker-selected visible Character group, which is promoted to the front of
-  the legal order for the current attack pool. Failed saves resolve from lowest
-  to highest against the current ordered group; when that group is destroyed or
-  exhausted, remaining failed saves advance to the next group in
+  the legal order for the current attack pool. Phase 14H resolves every
+  successful wound in the pool through this grouped path, including pool-of-one
+  attacks, random Damage rolls, Feel No Pain interruptions, Deadly Demise, and
+  Devastating Wounds. The engine rolls all non-Devastating saving throw dice for
+  the grouped pool before applying normal damage, sorts those dice from lowest
+  to highest, then walks them against the current ordered group. Real armour or
+  invulnerable saving throw options are retained even when the target is above 6
+  and cannot succeed on a D6. Effects that permit no saving throw may roll an
+  internal `attack_sequence.allocation_order.no_save` die for deterministic ordering;
+  that die is not a saving throw and is not Command Re-roll eligible. The save
+  event for each die is emitted when that die is walked, so the payload reflects
+  the model and save profile that are current at damage time. When a group is
+  destroyed or exhausted, remaining failed saves advance to the next group in
   `ordered_group_ids`. Stale, drifted, wrong-actor, wrong-option, or
   payload-mismatched submissions reject before queue pop and before mutation.
-- `select_attack_allocation`: finite defending-player choice. Option IDs are legal `model_instance_id` values. `payload.attack_context` is the JSON-safe attack context for the single attack being allocated. `payload.allocation_context` includes alive model IDs, wounded model IDs, already-allocated model IDs for the phase, attached-unit Bodyguard/Character protection evidence, and any attacker-side allocation constraint. Adapters must select one pending option ID and must not infer legal models from table state.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Explosives mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves.
 
 Phase 13E implements this destroyed-model attack-resolution decision:
@@ -340,7 +347,7 @@ Phase 13D adds this attacker-visible attack-resolution decision:
 
 - `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character allocation groups. Option IDs are visible eligible Character `group_id` values plus `decline_precision`; Character options include `payload.selected_group_id` and `payload.selected_model_ids`, and the decline option uses `selected_group_id: null` with an empty model list. Grouped-host requests include the wounded pool's `attack_contexts` in the request payload. Accepted Character-group selection is pool-scoped until those attacks resolve or that Character group is destroyed, whichever happens first. In the grouped host, the selected Character group is carried as allocation-order `priority_group_ids` and promoted ahead of ordinary defender group order; remaining failed saves return to normal ordered groups after that Character group is destroyed. Declining, having no visible Character group, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
 
-Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Supported grouped-host weapon abilities preserve those event boundaries, including Lethal Hits skipped wound payloads, Sustained Hits generated-hit wound contexts, Precision priority-group allocation, and Devastating Wounds deferred mortal-wound packets. Adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
+Phase 13C/14H attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Supported grouped-host weapon abilities preserve those event boundaries, including Lethal Hits skipped wound payloads, Sustained Hits generated-hit wound contexts, Precision priority-group allocation, and Devastating Wounds deferred mortal-wound packets. Phase 14H has one pooled save/damage resolver: adapters must not expect or submit single-attack allocation decisions during shooting attack resolution. Normal damage is resolved before deferred Devastating Wounds mortal-wound packets for the same attack pool. Internal grouped-damage continuation payloads are replay-safe engine state, not adapter-submitted payloads, and must not leak hidden information through viewer-scoped projections or event deltas.
 
 If a shooting declaration is parameterized, the request must embed a typed proposal request with replay-safe source context:
 
@@ -371,7 +378,7 @@ Required Phase 13 adapter-contract tests:
 - valid shooting target/weapon declaration through the chosen finite or parameterized submission path;
 - stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, and invalid-visibility submission rejection without mutation where required;
 - Firing Deck declaration validation, replay, and end-of-phase ineligible-unit state;
-- defender attack-allocation/allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, grouped failed-save transition to the next ordered group, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
+- defender allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, pooled save sorting, grouped failed-save transition to the next ordered group, pool-of-one convergence through the grouped resolver, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
 - Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, grouped priority-group promotion, selected-group destruction, and normal Bodyguard-protected fallback;
 - optional or competing Feel No Pain decisions through finite decisions;
 - Smokescreen, Fire Overwatch, and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
