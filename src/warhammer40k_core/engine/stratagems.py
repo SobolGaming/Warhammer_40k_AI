@@ -1949,15 +1949,6 @@ def _stratagem_unavailable_reason(
     )
     if handler_reason is not None:
         return handler_reason
-    restriction = _restriction_violation(
-        state=state,
-        player_id=context.player_id,
-        definition=record.definition,
-        context=context,
-        target_binding=target_binding,
-    )
-    if restriction is not None:
-        return restriction
     if target_binding is not None:
         target_error = _target_binding_error(
             state=state,
@@ -1971,6 +1962,15 @@ def _stratagem_unavailable_reason(
         )
         if target_error is not None:
             return target_error
+    restriction = _restriction_violation(
+        state=state,
+        player_id=context.player_id,
+        definition=record.definition,
+        context=context,
+        target_binding=target_binding,
+    )
+    if restriction is not None:
+        return restriction
     return None
 
 

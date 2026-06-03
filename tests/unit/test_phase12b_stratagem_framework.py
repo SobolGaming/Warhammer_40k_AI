@@ -1096,6 +1096,31 @@ def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() ->
     assert schema.status_kind is LifecycleStatusKind.INVALID
     assert schema.payload == {"invalid_reason": "schema"}
 
+    unknown_target_lifecycle = _battle_lifecycle()
+    unknown_target_state = _state(unknown_target_lifecycle)
+    unknown_target_request = _parameterized_request(unknown_target_lifecycle)
+    unknown_target_proposal = _proposal_request_from_decision(unknown_target_request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id="army-alpha:missing-unit",
+        )
+    )
+    unknown_target = unknown_target_lifecycle.submit_decision(
+        _proposal_result(
+            request=unknown_target_request,
+            result_id="phase12b-unknown-target-proposal",
+            proposal=unknown_target_proposal,
+        )
+    )
+    assert unknown_target.status_kind is LifecycleStatusKind.INVALID
+    assert unknown_target.payload == {"invalid_reason": "unknown_target_unit"}
+    assert unknown_target_state.command_point_total("player-a") == 1
+    assert unknown_target_state.stratagem_use_records == []
+    assert unknown_target_lifecycle.decision_controller.queue.pending_requests == (
+        unknown_target_request,
+    )
+
     wrong_context_lifecycle = _battle_lifecycle()
     wrong_context_request = _parameterized_request(wrong_context_lifecycle)
     wrong_context_base = _proposal_request_from_decision(wrong_context_request).with_binding(
