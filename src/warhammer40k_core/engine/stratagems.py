@@ -2152,6 +2152,10 @@ def _stratagem_affected_unit_ids(
         raw_unit_ids.append(target_binding.target_unit_instance_id)
     if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
         raw_unit_ids.append(_command_reroll_affected_unit_id(context))
+    if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID and target_binding is not None:
+        explosives_target_id = _explosives_target_unit_id_or_none(context)
+        if explosives_target_id is not None:
+            raw_unit_ids.append(explosives_target_id)
     if not raw_unit_ids:
         return ()
     return _validate_stratagem_affected_unit_ids(

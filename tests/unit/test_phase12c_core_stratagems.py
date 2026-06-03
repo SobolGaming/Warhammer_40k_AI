@@ -117,6 +117,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.engine.weapon_abilities import SNAP_SHOOTING_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
@@ -2183,7 +2184,12 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
     explosives_payload = _last_event_payload(lifecycle.decision_controller, "explosives_resolved")
     assert status.status_kind is not LifecycleStatusKind.INVALID
     assert state.command_point_total("player-a") == 0
-    assert state.stratagem_use_records[0].handler_id == "core:explosives"
+    use_record = state.stratagem_use_records[0]
+    assert use_record.handler_id == "core:explosives"
+    assert use_record.affected_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+        "army-beta:enemy-unit",
+    )
     assert explosives_payload["explosives_unit_instance_id"] == ("army-alpha:intercessor-unit-1")
     assert explosives_payload["target_unit_instance_id"] == "army-beta:enemy-unit"
     mortal_wounds = explosives_payload["mortal_wounds"]
@@ -2273,6 +2279,153 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
     assert shot_status.payload == {"invalid_reason": "explosives_unit_already_shot"}
     assert shot_state.command_point_total("player-a") == 1
     assert shot_state.stratagem_use_records == []
+
+
+def test_phase13d_explosives_blocks_enemy_unit_from_later_same_phase_stratagem() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(
+            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+        ),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    _grant_cp(state, player_id="player-b", amount=1)
+
+    explosives_status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="explosives",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        result_id="phase13d-explosives-blocks-enemy",
+        trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
+    )
+    command_reroll = _source_stratagem_record("command-reroll")
+    roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-b")
+    context = _context(
+        state=state,
+        player_id="player-b",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=_command_reroll_trigger_payload(
+            roll_state,
+            unit_instance_id="army-beta:enemy-unit",
+        ),
+    )
+    command_reroll_status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=(command_reroll,),
+        context=context,
+    )
+
+    assert explosives_status.status_kind is not LifecycleStatusKind.INVALID
+    assert command_reroll_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert len(state.stratagem_use_records) == 1
+    assert state.command_point_total("player-b") == 1
+
+
+def test_phase13d_explosives_canonicalizes_attached_enemy_component_target() -> None:
+    attached_id = "attached-unit:army-beta:enemy-command-unit"
+    lifecycle = _battle_lifecycle(
+        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+    )
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(
+            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+        ),
+    )
+    _mark_attached_unit_join(
+        state,
+        player_id="player-b",
+        attached_unit_instance_id=attached_id,
+        component_unit_instance_ids=("army-beta:enemy-unit", "army-beta:enemy-unit-2"),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="explosives",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        result_id="phase13d-explosives-attached-enemy-target",
+        trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.stratagem_use_records[0].affected_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+        attached_id,
+    )
+
+
+def test_phase13d_explosives_unknown_enemy_target_rejects_before_queue_pop() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    record = _source_stratagem_record("explosives")
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:missing-unit"},
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
+    )
+    waiting = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+    request = _decision_request(waiting)
+    invalid_status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-explosives-unknown-enemy-target",
+            proposal=_proposal_request_from_decision(request).with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-a",
+                    target_unit_instance_id="army-alpha:intercessor-unit-1",
+                )
+            ),
+        )
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_status.payload == {"invalid_reason": "unknown_explosives_target"}
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
 
 
 def test_phase13d_explosives_mortal_wounds_route_decline_allowed_feel_no_pain() -> None:
@@ -3111,6 +3264,40 @@ def _replace_unit_poses(
                 )
             )
         )
+    )
+
+
+def _mark_attached_unit_join(
+    state: GameState,
+    *,
+    player_id: str,
+    attached_unit_instance_id: str,
+    component_unit_instance_ids: tuple[str, ...],
+) -> None:
+    source_id = f"attached-unit-join:{attached_unit_instance_id}"
+    component_id_set = set(component_unit_instance_ids)
+    component_starting_model_count = 0
+    updated_records: list[StartingStrengthRecord] = []
+    for record in state.starting_strength_records:
+        if record.unit_instance_id not in component_id_set:
+            updated_records.append(record)
+            continue
+        component_starting_model_count += record.starting_model_count
+        updated_records.append(replace(record, source_id=source_id))
+    if component_starting_model_count == 0:
+        raise AssertionError("Attached-unit test fixture did not find component records.")
+    updated_records.append(
+        StartingStrengthRecord(
+            player_id=player_id,
+            unit_instance_id=attached_unit_instance_id,
+            starting_model_count=component_starting_model_count,
+            single_model_starting_wounds=None,
+            source_id=source_id,
+        )
+    )
+    state.starting_strength_records = sorted(
+        updated_records,
+        key=lambda record: record.unit_instance_id,
     )
 
 
