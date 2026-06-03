@@ -55,6 +55,7 @@ class TransportMovementStatus(StrEnum):
     NORMAL_MOVE = "normal_move"
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
+    INGRESS_MOVE = "ingress_move"
 
 
 class TransportRestrictionOverrideKind(StrEnum):
@@ -62,11 +63,12 @@ class TransportRestrictionOverrideKind(StrEnum):
     ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK = "allow_disembark_after_advance_or_fall_back"
 
 
-class DisembarkTimingKind(StrEnum):
-    BEFORE_TRANSPORT_MOVED = "before_transport_moved"
-    AFTER_TRANSPORT_NORMAL_MOVE = "after_transport_normal_move"
+class DisembarkModeKind(StrEnum):
+    RAPID_DISEMBARK = "rapid_disembark"
+    TACTICAL_DISEMBARK = "tactical_disembark"
+    COMBAT_DISEMBARK = "combat_disembark"
     DESTROYED_TRANSPORT = "destroyed_transport"
-    EMERGENCY_DISEMBARKATION = "emergency_disembarkation"
+    EMERGENCY_DISEMBARK = "emergency_disembark"
 
 
 class TransportOperationViolationCode(StrEnum):
@@ -152,6 +154,7 @@ class DisembarkSelectionPayload(TypedDict):
     unit_instance_id: str
     transport_unit_instance_id: str
     attempted_placement: UnitPlacementPayload
+    disembark_mode: str
     transport_movement_status: str
     restriction_overrides: list[TransportRestrictionOverridePayload]
 
@@ -161,7 +164,7 @@ class DisembarkedUnitStatePayload(TypedDict):
     battle_round: int
     unit_instance_id: str
     transport_unit_instance_id: str
-    timing_kind: str
+    disembark_mode: str
     can_move_further: bool
     can_choose_remain_stationary: bool
     can_declare_charge: bool
@@ -190,7 +193,7 @@ class DestroyedTransportDisembarkPayload(TypedDict):
     battle_round: int
     unit_instance_id: str
     transport_unit_instance_id: str
-    emergency: bool
+    disembark_mode: str
     placement: DisembarkResolutionPayload
     roll_threshold: int
     model_rolls: list[DestroyedTransportModelRollPayload]
@@ -231,8 +234,11 @@ _EMBARK_DISTANCE_INCHES = 3.0
 _DISEMBARK_DISTANCE_INCHES = 3.0
 _EMERGENCY_DISEMBARK_DISTANCE_INCHES = 6.0
 _CORE_TRANSPORT_RULE_ID = "core_rules_transports"
+_RAPID_DISEMBARK_RULE_ID = "core_rules_rapid_disembark"
+_TACTICAL_DISEMBARK_RULE_ID = "core_rules_tactical_disembark"
+_COMBAT_DISEMBARK_RULE_ID = "core_rules_combat_disembark"
 _DESTROYED_TRANSPORT_RULE_ID = "core_rules_destroyed_transport"
-_EMERGENCY_DISEMBARKATION_RULE_ID = "core_rules_emergency_disembarkation"
+_EMERGENCY_DISEMBARK_RULE_ID = "core_rules_emergency_disembark"
 
 
 @dataclass(frozen=True, slots=True)
@@ -739,6 +745,7 @@ class DisembarkSelection:
     unit_instance_id: str
     transport_unit_instance_id: str
     attempted_placement: UnitPlacement
+    disembark_mode: DisembarkModeKind
     transport_movement_status: TransportMovementStatus
     restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
 
@@ -776,8 +783,17 @@ class DisembarkSelection:
             raise GameLifecycleError("DisembarkSelection attempted_placement player drift.")
         object.__setattr__(
             self,
+            "disembark_mode",
+            disembark_mode_kind_from_token(self.disembark_mode),
+        )
+        object.__setattr__(
+            self,
             "transport_movement_status",
             transport_movement_status_from_token(self.transport_movement_status),
+        )
+        _validate_disembark_mode_status(
+            disembark_mode=self.disembark_mode,
+            transport_movement_status=self.transport_movement_status,
         )
         object.__setattr__(
             self,
@@ -799,6 +815,7 @@ class DisembarkSelection:
             "unit_instance_id": self.unit_instance_id,
             "transport_unit_instance_id": self.transport_unit_instance_id,
             "attempted_placement": self.attempted_placement.to_payload(),
+            "disembark_mode": self.disembark_mode.value,
             "transport_movement_status": self.transport_movement_status.value,
             "restriction_overrides": [
                 override.to_payload() for override in self.restriction_overrides
@@ -813,6 +830,7 @@ class DisembarkSelection:
             unit_instance_id=payload["unit_instance_id"],
             transport_unit_instance_id=payload["transport_unit_instance_id"],
             attempted_placement=UnitPlacement.from_payload(payload["attempted_placement"]),
+            disembark_mode=disembark_mode_kind_from_token(payload["disembark_mode"]),
             transport_movement_status=transport_movement_status_from_token(
                 payload["transport_movement_status"]
             ),
@@ -829,7 +847,7 @@ class DisembarkedUnitState:
     battle_round: int
     unit_instance_id: str
     transport_unit_instance_id: str
-    timing_kind: DisembarkTimingKind
+    disembark_mode: DisembarkModeKind
     can_move_further: bool
     can_choose_remain_stationary: bool
     can_declare_charge: bool
@@ -862,8 +880,8 @@ class DisembarkedUnitState:
         )
         object.__setattr__(
             self,
-            "timing_kind",
-            disembark_timing_kind_from_token(self.timing_kind),
+            "disembark_mode",
+            disembark_mode_kind_from_token(self.disembark_mode),
         )
         object.__setattr__(
             self,
@@ -898,40 +916,61 @@ class DisembarkedUnitState:
         )
 
     @classmethod
-    def for_normal_disembark(
+    def for_mode(
         cls,
         *,
         player_id: str,
         battle_round: int,
         unit_instance_id: str,
         transport_unit_instance_id: str,
+        disembark_mode: DisembarkModeKind,
         transport_movement_status: TransportMovementStatus,
     ) -> Self:
+        mode = disembark_mode_kind_from_token(disembark_mode)
         status = transport_movement_status_from_token(transport_movement_status)
-        if status is TransportMovementStatus.NORMAL_MOVE:
+        _validate_disembark_mode_status(
+            disembark_mode=mode,
+            transport_movement_status=status,
+        )
+        if mode is DisembarkModeKind.RAPID_DISEMBARK:
             return cls(
                 player_id=player_id,
                 battle_round=battle_round,
                 unit_instance_id=unit_instance_id,
                 transport_unit_instance_id=transport_unit_instance_id,
-                timing_kind=DisembarkTimingKind.AFTER_TRANSPORT_NORMAL_MOVE,
+                disembark_mode=mode,
                 can_move_further=False,
                 can_choose_remain_stationary=False,
                 can_declare_charge=False,
                 battle_shocked_until=None,
-                source_rule_id=_CORE_TRANSPORT_RULE_ID,
+                source_rule_id=_RAPID_DISEMBARK_RULE_ID,
             )
+        if mode is DisembarkModeKind.COMBAT_DISEMBARK:
+            return cls(
+                player_id=player_id,
+                battle_round=battle_round,
+                unit_instance_id=unit_instance_id,
+                transport_unit_instance_id=transport_unit_instance_id,
+                disembark_mode=mode,
+                can_move_further=False,
+                can_choose_remain_stationary=False,
+                can_declare_charge=False,
+                battle_shocked_until="controller_next_command_phase_start",
+                source_rule_id=_COMBAT_DISEMBARK_RULE_ID,
+            )
+        if mode is not DisembarkModeKind.TACTICAL_DISEMBARK:
+            raise GameLifecycleError("Normal Disembark requires Tactical, Rapid, or Combat mode.")
         return cls(
             player_id=player_id,
             battle_round=battle_round,
             unit_instance_id=unit_instance_id,
             transport_unit_instance_id=transport_unit_instance_id,
-            timing_kind=DisembarkTimingKind.BEFORE_TRANSPORT_MOVED,
+            disembark_mode=mode,
             can_move_further=True,
             can_choose_remain_stationary=False,
             can_declare_charge=True,
             battle_shocked_until=None,
-            source_rule_id=_CORE_TRANSPORT_RULE_ID,
+            source_rule_id=_TACTICAL_DISEMBARK_RULE_ID,
         )
 
     @classmethod
@@ -942,24 +981,30 @@ class DisembarkedUnitState:
         battle_round: int,
         unit_instance_id: str,
         transport_unit_instance_id: str,
-        emergency: bool,
+        disembark_mode: DisembarkModeKind,
     ) -> Self:
+        mode = disembark_mode_kind_from_token(disembark_mode)
+        if mode not in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }:
+            raise GameLifecycleError(
+                "Destroyed Transport Disembark requires destroyed or emergency mode."
+            )
         return cls(
             player_id=player_id,
             battle_round=battle_round,
             unit_instance_id=unit_instance_id,
             transport_unit_instance_id=transport_unit_instance_id,
-            timing_kind=(
-                DisembarkTimingKind.EMERGENCY_DISEMBARKATION
-                if emergency
-                else DisembarkTimingKind.DESTROYED_TRANSPORT
-            ),
+            disembark_mode=mode,
             can_move_further=False,
             can_choose_remain_stationary=False,
             can_declare_charge=False,
             battle_shocked_until="controller_next_command_phase_start",
             source_rule_id=(
-                _EMERGENCY_DISEMBARKATION_RULE_ID if emergency else _DESTROYED_TRANSPORT_RULE_ID
+                _EMERGENCY_DISEMBARK_RULE_ID
+                if mode is DisembarkModeKind.EMERGENCY_DISEMBARK
+                else _DESTROYED_TRANSPORT_RULE_ID
             ),
         )
 
@@ -969,7 +1014,7 @@ class DisembarkedUnitState:
             "battle_round": self.battle_round,
             "unit_instance_id": self.unit_instance_id,
             "transport_unit_instance_id": self.transport_unit_instance_id,
-            "timing_kind": self.timing_kind.value,
+            "disembark_mode": self.disembark_mode.value,
             "can_move_further": self.can_move_further,
             "can_choose_remain_stationary": self.can_choose_remain_stationary,
             "can_declare_charge": self.can_declare_charge,
@@ -984,7 +1029,7 @@ class DisembarkedUnitState:
             battle_round=payload["battle_round"],
             unit_instance_id=payload["unit_instance_id"],
             transport_unit_instance_id=payload["transport_unit_instance_id"],
-            timing_kind=disembark_timing_kind_from_token(payload["timing_kind"]),
+            disembark_mode=disembark_mode_kind_from_token(payload["disembark_mode"]),
             can_move_further=payload["can_move_further"],
             can_choose_remain_stationary=payload["can_choose_remain_stationary"],
             can_declare_charge=payload["can_declare_charge"],
@@ -1149,7 +1194,7 @@ class DestroyedTransportDisembark:
     battle_round: int
     unit_instance_id: str
     transport_unit_instance_id: str
-    emergency: bool
+    disembark_mode: DisembarkModeKind
     placement: DisembarkResolution
     roll_threshold: int
     model_rolls: tuple[DestroyedTransportModelRoll, ...]
@@ -1183,9 +1228,16 @@ class DestroyedTransportDisembark:
         )
         object.__setattr__(
             self,
-            "emergency",
-            _validate_bool("DestroyedTransportDisembark emergency", self.emergency),
+            "disembark_mode",
+            disembark_mode_kind_from_token(self.disembark_mode),
         )
+        if self.disembark_mode not in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }:
+            raise GameLifecycleError(
+                "DestroyedTransportDisembark requires destroyed or emergency mode."
+            )
         if type(self.placement) is not DisembarkResolution:
             raise GameLifecycleError(
                 "DestroyedTransportDisembark placement must be a DisembarkResolution."
@@ -1213,7 +1265,9 @@ class DestroyedTransportDisembark:
                 self.destroyed_model_instance_ids,
             ),
         )
-        if self.roll_threshold != (3 if self.emergency else 1):
+        if self.roll_threshold != (
+            3 if self.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK else 1
+        ):
             raise GameLifecycleError("DestroyedTransportDisembark roll threshold drift.")
         for roll in self.model_rolls:
             expected_mortal_wound = roll.roll_state.current_total <= self.roll_threshold
@@ -1242,7 +1296,7 @@ class DestroyedTransportDisembark:
             "battle_round": self.battle_round,
             "unit_instance_id": self.unit_instance_id,
             "transport_unit_instance_id": self.transport_unit_instance_id,
-            "emergency": self.emergency,
+            "disembark_mode": self.disembark_mode.value,
             "placement": self.placement.to_payload(),
             "roll_threshold": self.roll_threshold,
             "model_rolls": [roll.to_payload() for roll in self.model_rolls],
@@ -1260,7 +1314,7 @@ class DestroyedTransportDisembark:
             battle_round=payload["battle_round"],
             unit_instance_id=payload["unit_instance_id"],
             transport_unit_instance_id=payload["transport_unit_instance_id"],
-            emergency=payload["emergency"],
+            disembark_mode=disembark_mode_kind_from_token(payload["disembark_mode"]),
             placement=DisembarkResolution.from_payload(payload["placement"]),
             roll_threshold=payload["roll_threshold"],
             model_rolls=tuple(
@@ -1658,6 +1712,12 @@ def resolve_disembark(
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> DisembarkResolution:
+    if selection.disembark_mode not in {
+        DisembarkModeKind.RAPID_DISEMBARK,
+        DisembarkModeKind.TACTICAL_DISEMBARK,
+        DisembarkModeKind.COMBAT_DISEMBARK,
+    }:
+        raise GameLifecycleError("resolve_disembark requires a standard Disembark mode.")
     return _resolve_disembark(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -1665,8 +1725,6 @@ def resolve_disembark(
         selection=selection,
         unit=unit,
         transport_placement=transport_placement,
-        distance_inches=_DISEMBARK_DISTANCE_INCHES,
-        emergency=False,
         require_started_phase_embarked=True,
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
@@ -1698,7 +1756,6 @@ def resolve_destroyed_transport_disembark(
     unit: UnitInstance,
     transport_placement: UnitPlacement,
     dice_manager: DiceRollManager,
-    emergency: bool = False,
     battlefield_width_inches: float = _DEFAULT_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
@@ -1706,10 +1763,14 @@ def resolve_destroyed_transport_disembark(
 ) -> DestroyedTransportDisembark:
     if type(dice_manager) is not DiceRollManager:
         raise GameLifecycleError("Destroyed Transport disembark requires a DiceRollManager.")
-    emergency_value = _validate_bool("emergency", emergency)
-    distance = (
-        _EMERGENCY_DISEMBARK_DISTANCE_INCHES if emergency_value else _DISEMBARK_DISTANCE_INCHES
-    )
+    if selection.disembark_mode not in {
+        DisembarkModeKind.DESTROYED_TRANSPORT,
+        DisembarkModeKind.EMERGENCY_DISEMBARK,
+    }:
+        raise GameLifecycleError(
+            "Destroyed Transport disembark requires destroyed or emergency mode."
+        )
+    emergency = selection.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
     destroyed_selection = replace(
         selection,
         transport_movement_status=TransportMovementStatus.NOT_MOVED,
@@ -1721,15 +1782,13 @@ def resolve_destroyed_transport_disembark(
         selection=destroyed_selection,
         unit=unit,
         transport_placement=transport_placement,
-        distance_inches=distance,
-        emergency=emergency_value,
         require_started_phase_embarked=False,
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
     )
-    roll_threshold = 3 if emergency_value else 1
+    roll_threshold = 3 if emergency else 1
     model_rolls: list[DestroyedTransportModelRoll] = []
     if placement.is_valid:
         for model_placement in selection.attempted_placement.model_placements:
@@ -1761,7 +1820,7 @@ def resolve_destroyed_transport_disembark(
         battle_round=selection.battle_round,
         unit_instance_id=selection.unit_instance_id,
         transport_unit_instance_id=selection.transport_unit_instance_id,
-        emergency=emergency_value,
+        disembark_mode=selection.disembark_mode,
         placement=placement,
         roll_threshold=roll_threshold,
         model_rolls=tuple(model_rolls),
@@ -1935,15 +1994,15 @@ def transport_restriction_override_kind_from_token(
         ) from exc
 
 
-def disembark_timing_kind_from_token(token: object) -> DisembarkTimingKind:
-    if type(token) is DisembarkTimingKind:
+def disembark_mode_kind_from_token(token: object) -> DisembarkModeKind:
+    if type(token) is DisembarkModeKind:
         return token
     if type(token) is not str:
-        raise GameLifecycleError("DisembarkTimingKind token must be a string.")
+        raise GameLifecycleError("DisembarkModeKind token must be a string.")
     try:
-        return DisembarkTimingKind(token)
+        return DisembarkModeKind(token)
     except ValueError as exc:
-        raise GameLifecycleError(f"Unsupported DisembarkTimingKind token: {token}.") from exc
+        raise GameLifecycleError(f"Unsupported DisembarkModeKind token: {token}.") from exc
 
 
 def transport_operation_violation_code_from_token(
@@ -1969,8 +2028,6 @@ def _resolve_disembark(
     selection: DisembarkSelection,
     unit: UnitInstance,
     transport_placement: UnitPlacement,
-    distance_inches: float,
-    emergency: bool,
     require_started_phase_embarked: bool,
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
@@ -1993,6 +2050,9 @@ def _resolve_disembark(
     depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
     features = _validate_terrain_feature_tuple("terrain_features", terrain_features)
     markers = _validate_objective_marker_tuple("objective_markers", objective_markers)
+    disembark_mode = selection.disembark_mode
+    distance_inches = _disembark_distance_inches(disembark_mode)
+    allow_partial = disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
     active_cargo = cargo_state.for_movement_phase(battle_round=selection.battle_round)
     transport = scenario.unit_instance_for_placement(transport_placement)
     violations: list[TransportOperationViolation] = []
@@ -2050,7 +2110,7 @@ def _resolve_disembark(
         violations=violations,
         unit=unit,
         attempted_placement=selection.attempted_placement,
-        allow_partial=emergency,
+        allow_partial=allow_partial,
     )
     models = _geometry_models_for_unit_placement(
         scenario=scenario,
@@ -2096,20 +2156,25 @@ def _resolve_disembark(
             disembarked_unit_state=None,
             transition_batch=None,
         )
+    is_destroyed_transport_disembark_mode = selection.disembark_mode in (
+        DisembarkModeKind.DESTROYED_TRANSPORT,
+        DisembarkModeKind.EMERGENCY_DISEMBARK,
+    )
     disembarked_state = (
         DisembarkedUnitState.for_destroyed_transport(
             player_id=selection.player_id,
             battle_round=selection.battle_round,
             unit_instance_id=selection.unit_instance_id,
             transport_unit_instance_id=selection.transport_unit_instance_id,
-            emergency=emergency,
+            disembark_mode=selection.disembark_mode,
         )
-        if emergency or not require_started_phase_embarked
-        else DisembarkedUnitState.for_normal_disembark(
+        if is_destroyed_transport_disembark_mode
+        else DisembarkedUnitState.for_mode(
             player_id=selection.player_id,
             battle_round=selection.battle_round,
             unit_instance_id=selection.unit_instance_id,
             transport_unit_instance_id=selection.transport_unit_instance_id,
+            disembark_mode=selection.disembark_mode,
             transport_movement_status=selection.transport_movement_status,
         )
     )
@@ -2124,6 +2189,40 @@ def _resolve_disembark(
             source_rule_id=disembarked_state.source_rule_id,
         ),
     )
+
+
+def _disembark_distance_inches(disembark_mode: DisembarkModeKind) -> float:
+    mode = disembark_mode_kind_from_token(disembark_mode)
+    if mode in {
+        DisembarkModeKind.COMBAT_DISEMBARK,
+        DisembarkModeKind.EMERGENCY_DISEMBARK,
+    }:
+        return _EMERGENCY_DISEMBARK_DISTANCE_INCHES
+    if mode in {
+        DisembarkModeKind.RAPID_DISEMBARK,
+        DisembarkModeKind.TACTICAL_DISEMBARK,
+        DisembarkModeKind.DESTROYED_TRANSPORT,
+    }:
+        return _DISEMBARK_DISTANCE_INCHES
+    raise GameLifecycleError("Unsupported DisembarkModeKind.")
+
+
+def _validate_disembark_mode_status(
+    *,
+    disembark_mode: DisembarkModeKind,
+    transport_movement_status: TransportMovementStatus,
+) -> None:
+    mode = disembark_mode_kind_from_token(disembark_mode)
+    status = transport_movement_status_from_token(transport_movement_status)
+    if (
+        mode
+        in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }
+        and status is not TransportMovementStatus.NOT_MOVED
+    ):
+        raise GameLifecycleError("Destroyed Transport Disembark requires destroyed timing.")
 
 
 def _append_transport_common_violations(

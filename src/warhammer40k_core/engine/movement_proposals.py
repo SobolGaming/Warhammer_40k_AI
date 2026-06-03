@@ -25,9 +25,11 @@ from warhammer40k_core.engine.reserves import (
     LargeModelReservePlacementExceptionPayload,
 )
 from warhammer40k_core.engine.transports import (
+    DisembarkModeKind,
     TransportMovementStatus,
     TransportRestrictionOverride,
     TransportRestrictionOverridePayload,
+    disembark_mode_kind_from_token,
     transport_movement_status_from_token,
 )
 from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
@@ -105,6 +107,7 @@ class PlacementProposalPayloadPayload(TypedDict):
     attempted_placement: UnitPlacementPayload
     large_model_exceptions: NotRequired[list[LargeModelReservePlacementExceptionPayload]]
     transport_unit_instance_id: NotRequired[str]
+    disembark_mode: NotRequired[str]
     transport_movement_status: NotRequired[str]
     restriction_overrides: NotRequired[list[TransportRestrictionOverridePayload]]
 
@@ -577,6 +580,7 @@ class PlacementProposalPayload:
     attempted_placement: UnitPlacement
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...] = ()
     transport_unit_instance_id: str | None = None
+    disembark_mode: DisembarkModeKind | None = None
     transport_movement_status: TransportMovementStatus | None = None
     restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
 
@@ -629,6 +633,12 @@ class PlacementProposalPayload:
                 self.transport_unit_instance_id,
             ),
         )
+        if self.disembark_mode is not None:
+            object.__setattr__(
+                self,
+                "disembark_mode",
+                disembark_mode_kind_from_token(self.disembark_mode),
+            )
         if self.transport_movement_status is not None:
             object.__setattr__(
                 self,
@@ -683,6 +693,28 @@ class PlacementProposalPayload:
                 message="Placement kind is not allowed by the pending request.",
                 field="placement_kind",
             )
+        disembark_mode_result = _placement_proposal_context_match(
+            request=request,
+            submitted_value=None if self.disembark_mode is None else self.disembark_mode.value,
+            context_key="disembark_mode",
+            violation_code="proposal_disembark_mode_drift",
+            message="Disembark proposal mode does not match the pending request.",
+        )
+        if disembark_mode_result is not None:
+            return disembark_mode_result
+        transport_status_result = _placement_proposal_context_match(
+            request=request,
+            submitted_value=None
+            if self.transport_movement_status is None
+            else self.transport_movement_status.value,
+            context_key="transport_movement_status",
+            violation_code="proposal_transport_movement_status_drift",
+            message=(
+                "Disembark proposal transport movement status does not match the pending request."
+            ),
+        )
+        if transport_status_result is not None:
+            return transport_status_result
         return ProposalValidationResult.valid(
             proposal_request_id=request.request_id,
             proposal_kind=request.proposal_kind,
@@ -702,6 +734,8 @@ class PlacementProposalPayload:
             ]
         if self.transport_unit_instance_id is not None:
             payload["transport_unit_instance_id"] = self.transport_unit_instance_id
+        if self.disembark_mode is not None:
+            payload["disembark_mode"] = self.disembark_mode.value
         if self.transport_movement_status is not None:
             payload["transport_movement_status"] = self.transport_movement_status.value
         if self.restriction_overrides:
@@ -713,6 +747,7 @@ class PlacementProposalPayload:
     @classmethod
     def from_payload(cls, payload: PlacementProposalPayloadPayload) -> Self:
         large_exceptions_payload = payload.get("large_model_exceptions")
+        disembark_mode_payload = payload.get("disembark_mode")
         movement_status_payload = payload.get("transport_movement_status")
         overrides_payload = payload.get("restriction_overrides")
         return cls(
@@ -728,6 +763,9 @@ class PlacementProposalPayload:
                 for exception in large_exceptions_payload
             ),
             transport_unit_instance_id=payload.get("transport_unit_instance_id"),
+            disembark_mode=None
+            if disembark_mode_payload is None
+            else disembark_mode_kind_from_token(disembark_mode_payload),
             transport_movement_status=None
             if movement_status_payload is None
             else transport_movement_status_from_token(movement_status_payload),
@@ -780,6 +818,39 @@ def _movement_proposal_context_match(
         )
     if type(expected) is not str:
         raise GameLifecycleError(f"Movement proposal context {context_key} must be a string.")
+    if submitted_value != expected:
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code=violation_code,
+            message=message,
+            field=context_key,
+        )
+    return None
+
+
+def _placement_proposal_context_match(
+    *,
+    request: MovementProposalRequest,
+    submitted_value: str | None,
+    context_key: str,
+    violation_code: str,
+    message: str,
+) -> ProposalValidationResult | None:
+    context = request.context or {}
+    expected = context.get(context_key)
+    if expected is None:
+        if submitted_value is None:
+            return None
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code=violation_code,
+            message=message,
+            field=context_key,
+        )
+    if type(expected) is not str:
+        raise GameLifecycleError(f"Placement proposal context {context_key} must be a string.")
     if submitted_value != expected:
         return ProposalValidationResult.invalid(
             proposal_request_id=request.request_id,
