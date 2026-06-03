@@ -174,6 +174,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     BLAST_RULE_ID,
     FIRE_OVERWATCH_RULE_ID,
     HEAVY_RULE_ID,
+    HUNTER_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
@@ -1940,7 +1941,7 @@ def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
         profile_id="phase14e-grouped-lethal-sustained",
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -10),
         keywords=(WeaponKeyword.LETHAL_HITS, WeaponKeyword.SUSTAINED_HITS),
-        abilities=(AbilityDescriptor.sustained_hits(1),),
+        abilities=(AbilityDescriptor.lethal_hits(), AbilityDescriptor.sustained_hits(1)),
     )
     first_context_id = "phase14e-grouped-lethal-sustained:pool-001:attack-001"
     generated_context_id = f"{first_context_id}:generated-hit-002"
@@ -2301,7 +2302,7 @@ def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
         profile_id="phase13d-lethal-sustained",
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
         keywords=(WeaponKeyword.LETHAL_HITS, WeaponKeyword.SUSTAINED_HITS),
-        abilities=(AbilityDescriptor.sustained_hits(1),),
+        abilities=(AbilityDescriptor.lethal_hits(), AbilityDescriptor.sustained_hits(1)),
     )
     first_context_id = "phase13d-sustained:pool-001:attack-001"
     generated_context_id = f"{first_context_id}:generated-hit-002"
@@ -2361,6 +2362,168 @@ def test_phase13d_lethal_and_sustained_hits_resolve_generated_hits() -> None:
     assert wound_events[1]["attack_context_id"] == generated_context_id
     assert cast(dict[str, object], wound_events[1]["payload"])["skipped"] is False
     assert len(damage_events) == 2
+
+
+def test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = replace(units["enemy"], keywords=("VEHICLE",))
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14i-lethal-hits-vehicle-gate",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        keywords=(WeaponKeyword.LETHAL_HITS,),
+        abilities=(AbilityDescriptor.lethal_hits(target_keywords=("VEHICLE",)),),
+    )
+    attack_context_id = "phase14i-lethal-hits-vehicle-gate:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14i-lethal-hits-vehicle-gate",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14i-lethal-hits-vehicle-gate",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14i-lethal-hits-vehicle-gate-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+            ),
+        ),
+    )
+    wound_events = [
+        event
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == AttackSequenceStep.WOUND.value
+    ]
+
+    assert remaining_sequence is None
+    assert status is None
+    assert len(wound_events) == 1
+    assert cast(dict[str, object], wound_events[0]["payload"])["skipped"] is True
+
+
+def test_phase14i_sustained_hits_slash_keyword_gate_controls_generated_hits() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = replace(units["enemy"], keywords=("INFANTRY",))
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14i-sustained-hits-infantry-beasts-gate",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        keywords=(WeaponKeyword.SUSTAINED_HITS,),
+        abilities=(AbilityDescriptor.sustained_hits(1, target_keywords=("INFANTRY/BEASTS",)),),
+    )
+    first_context_id = "phase14i-sustained-hits:pool-001:attack-001"
+    generated_context_id = f"{first_context_id}:generated-hit-002"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {first_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    first_wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {first_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    generated_wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {generated_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14i-sustained-hits",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14i-sustained-hits",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14i-sustained-hits-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14i-sustained-hits-wound",
+                    spec=first_wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14i-sustained-hits-generated-wound",
+                    spec=generated_wound_spec,
+                    value=6,
+                ),
+            ),
+        ),
+    )
+    events = _event_payloads(lifecycle, "attack_sequence_step")
+    hit_payload = _attack_step_payload(events, AttackSequenceStep.HIT)
+    wound_events = [event for event in events if event["step"] == AttackSequenceStep.WOUND.value]
+
+    assert remaining_sequence is None
+    assert status is None
+    assert cast(dict[str, object], hit_payload["payload"])["generated_hits"] == 2
+    assert [event["attack_context_id"] for event in wound_events] == [
+        first_context_id,
+        generated_context_id,
+    ]
 
 
 def test_phase13d_twin_linked_consumes_reroll_semantics_once() -> None:
@@ -8699,6 +8862,54 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
     )
     assert close_candidates[0].is_legal
     assert close_candidates[0].shooting_types == (ShootingType.NORMAL,)
+
+
+def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    infantry_target = replace(units["enemy"], keywords=("INFANTRY",))
+    _replace_unit_instance_in_state(state=state, replacement=infantry_target)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    hunter_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14i-hunter-vehicle-monster-gate",
+        keywords=(WeaponKeyword.HUNTER,),
+        abilities=(AbilityDescriptor.hunter(target_keywords=("VEHICLE/MONSTER",)),),
+    )
+
+    invalid_candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=hunter_profile,
+        target_unit_ids=(infantry_target.unit_instance_id,),
+    )
+    assert invalid_candidates[0].violation_code is (
+        ShootingTargetViolationCode.HUNTER_TARGET_KEYWORD_MISMATCH
+    )
+    assert invalid_candidates[0].targeting_rule_ids == (HUNTER_RULE_ID,)
+
+    vehicle_target = replace(infantry_target, keywords=("Vehicle",))
+    _replace_unit_instance_in_state(state=state, replacement=vehicle_target)
+    legal_scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    legal_candidates = shooting_target_candidates_for_unit(
+        scenario=legal_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=hunter_profile,
+        target_unit_ids=(vehicle_target.unit_instance_id,),
+    )
+
+    assert legal_candidates[0].is_legal
+    assert HUNTER_RULE_ID in legal_candidates[0].targeting_rule_ids
 
 
 def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state() -> None:

@@ -87,13 +87,16 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
-    apply_grenade_mortal_wound_feel_no_pain_decision,
+    apply_command_reroll_decision,
+    apply_explosives_mortal_wound_feel_no_pain_decision,
     apply_stratagem_decision,
     apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
+    invalid_command_reroll_decision_status,
     invalid_stratagem_placement_proposal_status,
     invalid_stratagem_target_proposal_status,
     invalid_stratagem_use_status,
+    is_command_reroll_decision_request,
     is_stratagem_placement_proposal_request,
     is_stratagem_window_decline_result,
     stratagem_window_decline_allowed,
@@ -147,6 +150,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        DICE_REROLL_DECISION_TYPE,
     )
 )
 _REACTION_FRAME_DECISION_TYPES = frozenset(
@@ -358,6 +362,18 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and is_command_reroll_decision_request(pending_request)
+        ):
+            invalid_status = invalid_command_reroll_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
         ):
             invalid_status = _invalid_destruction_reaction_status(
@@ -506,6 +522,20 @@ class GameLifecycle:
                     decisions=self.decision_controller,
                 )
             return self.advance_until_decision_or_terminal()
+        if is_command_reroll_decision_request(record.request):
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            apply_command_reroll_decision(
+                state=state,
+                request=record.request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if resolves_reaction_frame:
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
             movement_status = self._movement_phase_handler.apply_decision(
                 state=state,
@@ -521,14 +551,17 @@ class GameLifecycle:
             and is_mortal_wound_feel_no_pain_request(record.request)
         ):
             source_context = mortal_wound_feel_no_pain_source_context(record.request)
-            if isinstance(source_context, dict) and source_context.get("source_kind") == "grenade":
-                grenade_status = apply_grenade_mortal_wound_feel_no_pain_decision(
+            if (
+                isinstance(source_context, dict)
+                and source_context.get("source_kind") == "explosives"
+            ):
+                explosives_status = apply_explosives_mortal_wound_feel_no_pain_decision(
                     state=state,
                     result=result,
                     decisions=self.decision_controller,
                 )
-                if grenade_status is not None:
-                    return grenade_status
+                if explosives_status is not None:
+                    return explosives_status
                 return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _SHOOTING_DECISION_TYPES:
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
@@ -579,10 +612,20 @@ class GameLifecycle:
                 army_catalog=self._require_config().army_catalog,
             )
             if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.resolve_reaction(
-                    result=result,
-                    decisions=self.decision_controller,
-                )
+                follow_up_request = self._pending_decision_request()
+                if follow_up_request is not None and is_command_reroll_decision_request(
+                    follow_up_request
+                ):
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=follow_up_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+                else:
+                    self.reaction_queue.resolve_reaction(
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)

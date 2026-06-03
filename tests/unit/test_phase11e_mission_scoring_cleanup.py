@@ -630,6 +630,119 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
     assert decisions.queue.peek_next().request_id == discard_request.request_id
 
 
+def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> None:
+    lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    active_card = next(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a"
+        and card.mode is SecondaryMissionCardMode.TACTICAL
+        and card.status is SecondaryMissionCardStatus.ACTIVE
+    )
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    result_id = "phase11e-own-turn-discard"
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=f"discard:{active_card.secondary_mission_id}",
+        result_id=result_id,
+    ).to_result(discard_request)
+
+    lifecycle.submit_decision(discard_result)
+
+    expected_source_id = (
+        f"chapter-approved-2025-26:tactical-secondary-discard:{result_id}:cp-reward"
+    )
+    ledger = state.command_point_ledger_for_player("player-a")
+    reward_transactions = [
+        transaction
+        for transaction in ledger.transactions
+        if transaction.source_id == expected_source_id
+    ]
+    assert state.command_point_total("player-a") == 1
+    assert len(reward_transactions) == 1
+    assert reward_transactions[0].amount == 1
+    assert reward_transactions[0].source_kind.value == "other"
+    discard_payload = cast(
+        dict[str, JsonValue],
+        next(
+            record.payload
+            for record in lifecycle.decision_controller.event_log.records
+            if record.event_type == "tactical_secondary_mission_discarded"
+        ),
+    )
+    command_point_gain = cast(dict[str, JsonValue], discard_payload["command_point_gain"])
+    assert discard_payload["active_player_id"] == "player-a"
+    assert discard_payload["command_point_reward_eligible"] is True
+    assert discard_payload["command_point_reward_reason"] == "discarding_players_turn"
+    assert command_point_gain["source_id"] == expected_source_id
+    assert command_point_gain["status"] == "applied"
+
+
+def test_tactical_secondary_discard_in_opponents_turn_has_no_chapter_approved_cp_reward() -> None:
+    lifecycle = _battle_lifecycle(player_b_secondary=SecondaryMissionMode.TACTICAL)
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.record_tactical_secondary_draw(
+        TacticalSecondaryDraw(
+            player_id="player-b",
+            battle_round=state.battle_round,
+            request_id="phase11e-opponent-turn-tactical-draw-request",
+            result_id="phase11e-opponent-turn-tactical-draw",
+            draw_count=state.tactical_secondary_draw_count,
+        )
+    )
+    active_cards = state.draw_tactical_secondary_cards(
+        player_id="player-b",
+        source_result_id="phase11e-opponent-turn-tactical-draw",
+    )
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-b",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    assert discard_request.actor_id == "player-b"
+    request_payload = cast(dict[str, JsonValue], discard_request.payload)
+    assert request_payload["active_player_id"] == "player-a"
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=f"discard:{active_cards[0].secondary_mission_id}",
+        result_id="phase11e-opponent-turn-discard",
+    ).to_result(discard_request)
+
+    lifecycle.submit_decision(discard_result)
+
+    assert state.command_point_total("player-b") == 0
+    assert all(
+        not transaction.source_id.startswith("chapter-approved-2025-26:tactical-secondary-discard:")
+        for transaction in state.command_point_ledger_for_player("player-b").transactions
+    )
+    discard_payload = cast(
+        dict[str, JsonValue],
+        next(
+            record.payload
+            for record in lifecycle.decision_controller.event_log.records
+            if record.event_type == "tactical_secondary_mission_discarded"
+        ),
+    )
+    assert discard_payload["player_id"] == "player-b"
+    assert discard_payload["active_player_id"] == "player-a"
+    assert discard_payload["command_point_reward_eligible"] is False
+    assert discard_payload["command_point_reward_reason"] == "not_discarding_players_turn"
+    assert discard_payload["command_point_gain"] is None
+
+
 def test_mission_action_can_complete_interrupt_and_score() -> None:
     lifecycle = _battle_lifecycle()
     state = lifecycle.state

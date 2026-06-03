@@ -103,10 +103,13 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     abilities = (
         AbilityDescriptor.devastating_wounds(),
         AbilityDescriptor.sustained_hits(1),
+        AbilityDescriptor.lethal_hits(target_keywords=("Vehicle",)),
+        AbilityDescriptor.hunter(target_keywords=("Vehicle/Monster",)),
         AbilityDescriptor.cleave(2),
         AbilityDescriptor.melta(2),
         AbilityDescriptor.rapid_fire(1),
         AbilityDescriptor.anti_keyword("Infantry", 4),
+        AbilityDescriptor.sustained_hits(2, target_keywords=("INFANTRY/BEASTS",)),
         AbilityDescriptor.heavy(),
     )
     payloads = [ability.to_payload() for ability in abilities]
@@ -116,15 +119,21 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     assert payloads[0]["parameters"] == [{"name": "effect", "value": "mortal_wounds"}]
     assert payloads[1]["ability_kind"] == AbilityKind.SUSTAINED_HITS.value
     assert payloads[1]["parameters"] == [{"name": "value", "value": 1}]
-    assert payloads[2]["ability_kind"] == AbilityKind.CLEAVE.value
-    assert payloads[2]["parameters"] == [{"name": "value", "value": 2}]
-    assert payloads[5]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
-    assert payloads[5]["parameters"] == [
+    assert payloads[2]["ability_kind"] == AbilityKind.LETHAL_HITS.value
+    assert payloads[2]["target_keywords"] == ["VEHICLE"]
+    assert payloads[3]["ability_kind"] == AbilityKind.HUNTER.value
+    assert payloads[3]["target_keywords"] == ["VEHICLE", "MONSTER"]
+    assert payloads[3]["timing"] == AbilityTiming.TARGET_DECLARATION.value
+    assert payloads[4]["ability_kind"] == AbilityKind.CLEAVE.value
+    assert payloads[4]["parameters"] == [{"name": "value", "value": 2}]
+    assert payloads[7]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
+    assert payloads[7]["parameters"] == [
         {"name": "keyword", "value": "INFANTRY"},
         {"name": "threshold", "value": 4},
     ]
-    assert payloads[6]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
-    assert payloads[6]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
+    assert payloads[8]["target_keywords"] == ["INFANTRY", "BEASTS"]
+    assert payloads[9]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
+    assert payloads[9]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities
@@ -142,6 +151,12 @@ def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
 
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor.sustained_hits(0)
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor.lethal_hits(target_keywords=("Vehicle/",))
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor.lethal_hits(target_keywords=("Vehicle/Vehicle",))
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor.hunter(target_keywords=())
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor.anti_keyword("Infantry", 1)
     with pytest.raises(WeaponProfileError):
@@ -168,6 +183,14 @@ def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
             ability_id="bad-heavy",
             name="Bad Heavy",
             ability_kind=AbilityKind.HEAVY,
+        )
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor(
+            ability_id="bad-hunter-timing",
+            name="Bad Hunter",
+            ability_kind=AbilityKind.HUNTER,
+            target_keywords=("VEHICLE",),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
         )
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor(

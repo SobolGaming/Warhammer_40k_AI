@@ -23,10 +23,12 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
+    HUNTER_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
     has_close_quarters_weapon_keyword,
     has_weapon_keyword,
+    hunter_target_allowed,
 )
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -55,6 +57,7 @@ class ShootingTargetViolationCode(StrEnum):
     NOT_VISIBLE = "not_visible"
     LONE_OPERATIVE = "lone_operative"
     LOCKED_IN_COMBAT = "locked_in_combat"
+    HUNTER_TARGET_KEYWORD_MISMATCH = "hunter_target_keyword_mismatch"
 
 
 class ShootingTargetCandidatePayload(TypedDict):
@@ -542,6 +545,19 @@ def _target_candidate(
             visibility_cache_key=visibility_cache_key,
         )
     target_unit = scenario.army_by_id(target_placement.army_id).unit_by_id(target_unit_id)
+    hunter_rule_ids: tuple[str, ...] = ()
+    if WeaponKeyword.HUNTER in weapon_profile.keywords:
+        hunter_rule_ids = (HUNTER_RULE_ID,)
+        if not hunter_target_allowed(weapon_profile, target_keywords=target_unit.keywords):
+            return _invalid_candidate(
+                attacker_unit=attacker_unit,
+                weapon_profile=weapon_profile,
+                target_unit_id=target_unit_id,
+                violation_code=ShootingTargetViolationCode.HUNTER_TARGET_KEYWORD_MISMATCH,
+                message="Hunter weapons can only target units with at least one listed keyword.",
+                visibility_cache_key=visibility_cache_key,
+                targeting_rule_ids=hunter_rule_ids,
+            )
     attacker_models = _attacker_geometry_models(
         scenario=scenario,
         attacker_placement=attacker_placement,
@@ -699,7 +715,7 @@ def _target_candidate(
         )
 
     hit_roll_modifier = 0
-    targeting_rule_ids: list[str] = []
+    targeting_rule_ids: list[str] = list(hunter_rule_ids)
     if indirect_no_visible:
         hit_roll_modifier -= 1
         targeting_rule_ids.extend(

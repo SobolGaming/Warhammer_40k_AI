@@ -165,13 +165,24 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             None,
         ),
         (
-            "gw-11e-core-stratagems:core:counter-offensive",
-            "counter-offensive",
+            "gw-11e-core-stratagems:core:counteroffensive",
+            "counteroffensive",
             2,
             "strategic_ploy",
-            "gw-11e-core-stratagems:core:counter-offensive",
+            "gw-11e-core-stratagems:core:counteroffensive",
             "unsupported:phase-14g:fight-order-interrupt-unit",
-            "unsupported:phase-14g:counter-offensive",
+            "unsupported:phase-14g:counteroffensive",
+            "core",
+            None,
+        ),
+        (
+            "gw-11e-core-stratagems:core:crushing-impact",
+            "crushing-impact",
+            1,
+            "strategic_ploy",
+            "gw-11e-core-stratagems:core:crushing-impact",
+            "unsupported:phase-14g:vehicle-charge-target-binding",
+            "unsupported:phase-14g:crushing-impact",
             "core",
             None,
         ),
@@ -187,6 +198,17 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             None,
         ),
         (
+            "gw-11e-core-stratagems:core:explosives",
+            "explosives",
+            1,
+            "wargear",
+            "gw-11e-core-stratagems:core:explosives",
+            "explosives_unit_and_enemy_target",
+            "core:explosives",
+            "core",
+            None,
+        ),
+        (
             "gw-11e-core-stratagems:core:fire-overwatch",
             "fire-overwatch",
             1,
@@ -194,28 +216,6 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             "gw-11e-core-stratagems:core:fire-overwatch",
             "out_of_phase_shooting_unit",
             "core:fire-overwatch",
-            "core",
-            None,
-        ),
-        (
-            "gw-11e-core-stratagems:core:go-to-ground",
-            "go-to-ground",
-            1,
-            "battle_tactic",
-            "gw-11e-core-stratagems:core:go-to-ground",
-            "selected_target_infantry_unit",
-            "core:go-to-ground",
-            "core",
-            None,
-        ),
-        (
-            "gw-11e-core-stratagems:core:grenade",
-            "grenade",
-            1,
-            "wargear",
-            "gw-11e-core-stratagems:core:grenade",
-            "grenades_unit_and_enemy_target",
-            "core:grenade",
             "core",
             None,
         ),
@@ -275,17 +275,6 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             None,
         ),
         (
-            "gw-11e-core-stratagems:core:tank-shock",
-            "tank-shock",
-            1,
-            "strategic_ploy",
-            "gw-11e-core-stratagems:core:tank-shock",
-            "unsupported:phase-14g:vehicle-charge-target-binding",
-            "unsupported:phase-14g:tank-shock",
-            "core",
-            None,
-        ),
-        (
             "gw-11e-core-stratagems:detachment:armour-of-contempt",
             "armour-of-contempt",
             1,
@@ -297,7 +286,7 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             "gladius-task-force",
         ),
     )
-    assert len(core_catalog) == 12
+    assert len(core_catalog) == 11
     assert len(detachment_catalog) == 1
 
     lifecycle = _battle_lifecycle()
@@ -549,7 +538,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
         player_id="player-a",
         trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
     )
-    deferred_core_stratagem = _source_stratagem_record("tank-shock")
+    deferred_core_stratagem = _source_stratagem_record("crushing-impact")
     finite_request = create_stratagem_use_decision_request(
         state=finite_state,
         context=finite_context,
@@ -580,7 +569,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     parameterized_state = _state(parameterized_lifecycle)
     _set_current_battle_phase(parameterized_state, BattlePhase.CHARGE)
     _grant_cp(parameterized_state, player_id="player-a", amount=1)
-    deferred_core_stratagem = _source_stratagem_record("tank-shock")
+    deferred_core_stratagem = _source_stratagem_record("crushing-impact")
     parameterized_context = _context(
         state=parameterized_state,
         player_id="player-a",
@@ -599,7 +588,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     assert unavailable_proposal.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert unavailable_proposal.payload == {
         "player_id": "player-a",
-        "stratagem_id": "tank-shock",
+        "stratagem_id": "crushing-impact",
         "unavailable_reason": "unsupported_handler",
     }
     assert parameterized_state.command_point_total("player-a") == 1

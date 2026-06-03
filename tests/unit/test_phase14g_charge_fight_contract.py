@@ -153,13 +153,17 @@ def test_phase14g_charge_fight_core_stratagem_hooks_remain_deferred() -> None:
         row.stratagem_id: (row.target_policy_id, row.handler_id)
         for row in core_stratagems.core_stratagem_rows()
         if row.stratagem_id
-        in {"counter-offensive", "epic-challenge", "heroic-intervention", "tank-shock"}
+        in {"counteroffensive", "crushing-impact", "epic-challenge", "heroic-intervention"}
     }
 
     assert deferred == {
-        "counter-offensive": (
+        "counteroffensive": (
             "unsupported:phase-14g:fight-order-interrupt-unit",
-            "unsupported:phase-14g:counter-offensive",
+            "unsupported:phase-14g:counteroffensive",
+        ),
+        "crushing-impact": (
+            "unsupported:phase-14g:vehicle-charge-target-binding",
+            "unsupported:phase-14g:crushing-impact",
         ),
         "epic-challenge": (
             "unsupported:phase-14g:character-model-fight-binding",
@@ -168,9 +172,5 @@ def test_phase14g_charge_fight_core_stratagem_hooks_remain_deferred() -> None:
         "heroic-intervention": (
             "unsupported:phase-14g:heroic-intervention-charge-unit",
             "unsupported:phase-14g:heroic-intervention",
-        ),
-        "tank-shock": (
-            "unsupported:phase-14g:vehicle-charge-target-binding",
-            "unsupported:phase-14g:tank-shock",
         ),
     }

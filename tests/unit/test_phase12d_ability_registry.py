@@ -15,6 +15,8 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.abilities import (
+    CORE_HAZARDOUS_HANDLER_ID,
+    CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilityDefinition,
@@ -93,6 +95,36 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     assert hazardous.definition.handler_id == "core:hazardous"
     assert eleventh_edition_core_ability_index().all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
+    )
+
+
+def test_phase14i_core_ability_rows_are_supported_or_explicitly_unsupported() -> None:
+    rows = source_data.ability_rows()
+    supported_handler_ids = {
+        CORE_HAZARDOUS_HANDLER_ID,
+        CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
+    }
+
+    assert [
+        row.ability_id
+        for row in rows
+        if row.handler_id not in supported_handler_ids
+        and not row.handler_id.startswith("unsupported:")
+    ] == []
+    assert tuple(
+        (row.ability_id, row.handler_id)
+        for row in rows
+        if row.handler_id.startswith("unsupported:")
+    ) == (
+        ("core-deadly-demise", "unsupported:phase-13c:deadly-demise"),
+        ("core-deep-strike", "unsupported:phase-15b:deep-strike"),
+        ("core-feel-no-pain", "unsupported:phase-13c:feel-no-pain"),
+        ("core-firing-deck", "unsupported:phase-13d:firing-deck"),
+        ("core-infiltrators", "unsupported:phase-15b:infiltrators"),
+        ("core-leader", "unsupported:phase-15c:leader"),
+        ("core-lone-operative", "unsupported:phase-13b:lone-operative"),
+        ("core-scouts", "unsupported:phase-15b:scouts"),
+        ("core-stealth", "unsupported:phase-13d:stealth"),
     )
 
 

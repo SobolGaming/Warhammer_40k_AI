@@ -40,20 +40,24 @@ class WeaponKeyword(StrEnum):
     BLAST = "Blast"
     MELTA = "Melta"
     ONE_SHOT = "One Shot"
+    HUNTER = "Hunter"
 
 
 class AbilityKind(StrEnum):
     DEVASTATING_WOUNDS = "devastating_wounds"
     SUSTAINED_HITS = "sustained_hits"
+    LETHAL_HITS = "lethal_hits"
     CLEAVE = "cleave"
     MELTA = "melta"
     RAPID_FIRE = "rapid_fire"
     ANTI_KEYWORD = "anti_keyword"
     HEAVY = "heavy"
+    HUNTER = "hunter"
 
 
 class AbilityTiming(StrEnum):
     ATTACK_SEQUENCE = "attack_sequence"
+    TARGET_DECLARATION = "target_declaration"
     MOVEMENT_CONDITIONED = "movement_conditioned"
 
 
@@ -99,6 +103,7 @@ class AbilityDescriptorPayload(TypedDict):
     name: str
     ability_kind: str
     parameters: list[AbilityParameterPayload]
+    target_keywords: list[str]
     timing: str | None
     condition: str | None
 
@@ -146,6 +151,7 @@ class AbilityDescriptor:
     name: str
     ability_kind: AbilityKind
     parameters: tuple[AbilityParameter, ...] = ()
+    target_keywords: tuple[str, ...] = ()
     timing: AbilityTiming | None = None
     condition: AbilityCondition | None = None
 
@@ -165,6 +171,10 @@ class AbilityDescriptor:
         if parameters != self.parameters:
             object.__setattr__(self, "parameters", parameters)
 
+        target_keywords = _canonical_target_keyword_tuple(self.target_keywords)
+        if target_keywords != self.target_keywords:
+            object.__setattr__(self, "target_keywords", target_keywords)
+
         timing = _validate_optional_ability_timing(self.timing)
         if timing != self.timing:
             object.__setattr__(self, "timing", timing)
@@ -176,18 +186,50 @@ class AbilityDescriptor:
         _validate_supported_ability_shape(
             ability_kind=ability_kind,
             parameters=parameters,
+            target_keywords=target_keywords,
             timing=timing,
             condition=condition,
         )
 
     @classmethod
-    def sustained_hits(cls, value: int) -> Self:
+    def sustained_hits(cls, value: int, *, target_keywords: tuple[str, ...] = ()) -> Self:
+        canonical_target_keywords = _canonical_target_keyword_tuple(target_keywords)
         return cls(
-            ability_id=f"sustained-hits:{value}",
-            name=f"Sustained Hits {value}",
+            ability_id=(
+                f"sustained-hits:{value}"
+                f"{_target_keyword_ability_id_suffix(canonical_target_keywords)}"
+            ),
+            name=(
+                f"Sustained Hits {value}{_target_keyword_name_suffix(canonical_target_keywords)}"
+            ),
             ability_kind=AbilityKind.SUSTAINED_HITS,
             parameters=(AbilityParameter.integer(value),),
+            target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+
+    @classmethod
+    def lethal_hits(cls, *, target_keywords: tuple[str, ...] = ()) -> Self:
+        canonical_target_keywords = _canonical_target_keyword_tuple(target_keywords)
+        return cls(
+            ability_id=(
+                f"lethal-hits{_target_keyword_ability_id_suffix(canonical_target_keywords)}"
+            ),
+            name=f"Lethal Hits{_target_keyword_name_suffix(canonical_target_keywords)}",
+            ability_kind=AbilityKind.LETHAL_HITS,
+            target_keywords=canonical_target_keywords,
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+
+    @classmethod
+    def hunter(cls, *, target_keywords: tuple[str, ...]) -> Self:
+        canonical_target_keywords = _canonical_target_keyword_tuple(target_keywords)
+        return cls(
+            ability_id=f"hunter{_target_keyword_ability_id_suffix(canonical_target_keywords)}",
+            name=f"Hunter{_target_keyword_name_suffix(canonical_target_keywords)}",
+            ability_kind=AbilityKind.HUNTER,
+            target_keywords=canonical_target_keywords,
+            timing=AbilityTiming.TARGET_DECLARATION,
         )
 
     @classmethod
@@ -265,6 +307,7 @@ class AbilityDescriptor:
             "name": self.name,
             "ability_kind": self.ability_kind.value,
             "parameters": [parameter.to_payload() for parameter in self.parameters],
+            "target_keywords": list(self.target_keywords),
             "timing": None if self.timing is None else self.timing.value,
             "condition": None if self.condition is None else self.condition.value,
         }
@@ -278,6 +321,7 @@ class AbilityDescriptor:
             parameters=tuple(
                 AbilityParameter.from_payload(parameter) for parameter in payload["parameters"]
             ),
+            target_keywords=tuple(payload["target_keywords"]),
             timing=ability_timing_from_token(payload["timing"]),
             condition=ability_condition_from_token(payload["condition"]),
         )
@@ -782,10 +826,42 @@ def _validate_ability_parameter(parameter: object) -> AbilityParameter:
     return parameter
 
 
+def _canonical_target_keyword_tuple(values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise WeaponProfileError("AbilityDescriptor target_keywords must be a tuple.")
+    keywords: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        if type(value) is not str:
+            raise WeaponProfileError("AbilityDescriptor target keyword must be a string.")
+        for part in value.split("/"):
+            keyword = _canonical_rule_keyword(part)
+            if keyword in seen:
+                raise WeaponProfileError(
+                    "AbilityDescriptor target_keywords must not contain duplicates."
+                )
+            seen.add(keyword)
+            keywords.append(keyword)
+    return tuple(keywords)
+
+
+def _target_keyword_ability_id_suffix(target_keywords: tuple[str, ...]) -> str:
+    if not target_keywords:
+        return ""
+    return ":" + "/".join(keyword.lower() for keyword in target_keywords)
+
+
+def _target_keyword_name_suffix(target_keywords: tuple[str, ...]) -> str:
+    if not target_keywords:
+        return ""
+    return ": " + "/".join(keyword.replace("_", " ").title() for keyword in target_keywords)
+
+
 def _validate_supported_ability_shape(
     *,
     ability_kind: AbilityKind,
     parameters: tuple[AbilityParameter, ...],
+    target_keywords: tuple[str, ...],
     timing: AbilityTiming | None,
     condition: AbilityCondition | None,
 ) -> None:
@@ -800,6 +876,26 @@ def _validate_supported_ability_shape(
             raise WeaponProfileError("Parameterized weapon abilities must use attack timing.")
         if condition is not None:
             raise WeaponProfileError("Parameterized weapon abilities must not include a condition.")
+        return
+
+    if ability_kind is AbilityKind.LETHAL_HITS:
+        if parameters:
+            raise WeaponProfileError("Lethal Hits ability must not include parameters.")
+        if timing is not AbilityTiming.ATTACK_SEQUENCE:
+            raise WeaponProfileError("Lethal Hits ability must use attack timing.")
+        if condition is not None:
+            raise WeaponProfileError("Lethal Hits ability must not include a condition.")
+        return
+
+    if ability_kind is AbilityKind.HUNTER:
+        if parameters:
+            raise WeaponProfileError("Hunter ability must not include parameters.")
+        if not target_keywords:
+            raise WeaponProfileError("Hunter ability requires target keywords.")
+        if timing is not AbilityTiming.TARGET_DECLARATION:
+            raise WeaponProfileError("Hunter ability must use target declaration timing.")
+        if condition is not None:
+            raise WeaponProfileError("Hunter ability must not include a condition.")
         return
 
     if ability_kind is AbilityKind.ANTI_KEYWORD:
@@ -821,6 +917,8 @@ def _validate_supported_ability_shape(
     if ability_kind is AbilityKind.HEAVY:
         if parameters:
             raise WeaponProfileError("Heavy ability must not include parameters.")
+        if target_keywords:
+            raise WeaponProfileError("Heavy ability must not include target keywords.")
         if timing is not AbilityTiming.MOVEMENT_CONDITIONED:
             raise WeaponProfileError("Heavy ability must use movement-conditioned timing.")
         if condition is not AbilityCondition.STATIONARY_OR_POLICY_DEFINED:

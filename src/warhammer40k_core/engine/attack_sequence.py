@@ -138,6 +138,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     anti_keyword_critical_threshold,
     devastating_wounds_resolution,
     has_weapon_keyword,
+    lethal_hits_applies,
     melta_damage_bonus,
     sustained_hits_generated_hits,
 )
@@ -174,6 +175,36 @@ _PRECISION_CHARACTER_GROUP_ROLES = frozenset(
         AllocationGroupRole.SUPPORT,
     )
 )
+
+
+def attack_sequence_hit_roll_spec(
+    *,
+    weapon_profile_id: str,
+    attack_context_id: str,
+    attacker_player_id: str,
+    reroll_forbidden_rule_ids: tuple[str, ...] = (),
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id=attacker_player_id,
+        reroll_forbidden_rule_ids=reroll_forbidden_rule_ids,
+    )
+
+
+def attack_sequence_wound_roll_spec(
+    *,
+    weapon_profile_id: str,
+    attack_context_id: str,
+    attacker_player_id: str,
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id=attacker_player_id,
+    )
 
 
 def deadly_demise_trigger_roll_spec(
@@ -4741,7 +4772,7 @@ def _roll_hit_and_wound(
     if (
         attack_sequence.generated_hit_index == 0
         and hit_roll.critical
-        and has_weapon_keyword(pool.weapon_profile, WeaponKeyword.LETHAL_HITS)
+        and lethal_hits_applies(pool.weapon_profile, target_keywords=target_unit.keywords)
     ):
         wound_roll = WoundRoll.auto_wound(
             strength=pool.weapon_profile.strength.final,
@@ -4843,11 +4874,10 @@ def _roll_hit(
         target_unit_instance_id=pool.target_unit_instance_id,
     )
     roll_state = manager.roll(
-        DiceRollSpec(
-            expression=DiceExpression(quantity=1, sides=6),
-            reason=f"Hit roll for {pool.weapon_profile_id} attack {attack_context_id}",
-            roll_type="attack_sequence.hit",
-            actor_id=attacker_player_id,
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=pool.weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id=attacker_player_id,
             reroll_forbidden_rule_ids=_hit_reroll_forbidden_rule_ids(
                 is_snap_shooting=is_snap_shooting,
                 targeting_rule_ids=pool.targeting_rule_ids,
@@ -4865,9 +4895,11 @@ def _roll_hit(
         )
     else:
         minimum_success = 2
+    target_unit = unit_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
     generated_hits = sustained_hits_generated_hits(
         pool.weapon_profile,
         critical_hit=unmodified == 6,
+        target_keywords=target_unit.keywords,
     )
     return HitRoll(
         target_number=skill,
@@ -4909,11 +4941,10 @@ def _roll_wound(
     strength = pool.weapon_profile.strength.final
     target_number = wound_roll_target_number(strength=strength, toughness=toughness)
     roll_state = manager.roll(
-        DiceRollSpec(
-            expression=DiceExpression(quantity=1, sides=6),
-            reason=f"Wound roll for {pool.weapon_profile_id} attack {attack_context_id}",
-            roll_type="attack_sequence.wound",
-            actor_id=attacker_player_id,
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=pool.weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id=attacker_player_id,
         )
     )
     unmodified = roll_state.current_total

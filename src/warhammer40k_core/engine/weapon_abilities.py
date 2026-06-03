@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import cast
 
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
     AbilityKind,
     DevastatingWoundsEffect,
     WeaponKeyword,
     WeaponProfile,
     devastating_wounds_effect_from_token,
 )
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 ASSAULT_RULE_ID = "weapon-ability:assault"
@@ -19,6 +23,7 @@ DEVASTATING_WOUNDS_RULE_ID = "weapon-ability:devastating-wounds"
 FIRE_OVERWATCH_RULE_ID = "core:fire-overwatch"
 HAZARDOUS_RULE_ID = "weapon-ability:hazardous"
 HEAVY_RULE_ID = "weapon-ability:heavy"
+HUNTER_RULE_ID = "weapon-ability:hunter"
 IGNORES_COVER_RULE_ID = "weapon-ability:ignores-cover"
 INDIRECT_FIRE_NO_VISIBLE_RULE_ID = "weapon-ability:indirect-fire:no-visible-target"
 INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID = "weapon-ability:indirect-fire:benefit-of-cover"
@@ -34,12 +39,18 @@ SNAP_SHOOTING_RULE_ID = "core:snap-shooting"
 SUSTAINED_HITS_RULE_ID = "weapon-ability:sustained-hits"
 TORRENT_RULE_ID = "weapon-ability:torrent"
 TWIN_LINKED_RULE_ID = "weapon-ability:twin-linked"
+WEAPON_ABILITY_SELECTION_DECISION_TYPE = "select_weapon_ability_instance"
 
 _PARAMETERIZED_KEYWORDS_BY_KIND = {
     AbilityKind.CLEAVE: WeaponKeyword.CLEAVE,
     AbilityKind.MELTA: WeaponKeyword.MELTA,
     AbilityKind.RAPID_FIRE: WeaponKeyword.RAPID_FIRE,
     AbilityKind.SUSTAINED_HITS: WeaponKeyword.SUSTAINED_HITS,
+}
+_ABILITY_KEYWORDS_BY_KIND = {
+    **_PARAMETERIZED_KEYWORDS_BY_KIND,
+    AbilityKind.LETHAL_HITS: WeaponKeyword.LETHAL_HITS,
+    AbilityKind.HUNTER: WeaponKeyword.HUNTER,
 }
 
 
@@ -61,27 +72,184 @@ def has_close_quarters_weapon_keyword(profile: WeaponProfile) -> bool:
     )
 
 
-def weapon_ability_int_value(profile: WeaponProfile, ability_kind: AbilityKind) -> int | None:
+def weapon_ability_int_value(
+    profile: WeaponProfile,
+    ability_kind: AbilityKind,
+    *,
+    target_keywords: tuple[str, ...] = (),
+    selected_ability_id: str | None = None,
+) -> int | None:
     _validate_weapon_profile(profile)
     _validate_ability_kind(ability_kind)
-    descriptors = tuple(
-        ability for ability in profile.abilities if ability.ability_kind is ability_kind
+    _target_keyword_set(target_keywords)
+    descriptors = _ability_descriptors(profile, ability_kind)
+    expected_keyword = _ABILITY_KEYWORDS_BY_KIND.get(ability_kind)
+    if descriptors and expected_keyword is not None and expected_keyword not in profile.keywords:
+        raise GameLifecycleError(
+            f"{expected_keyword.value} descriptor requires the weapon keyword."
+        )
+    matching_descriptors = _matching_ability_descriptors(
+        profile,
+        ability_kind,
+        target_keywords=target_keywords,
     )
-    if len(descriptors) > 1:
-        raise GameLifecycleError("Weapon profile has duplicate ability descriptors.")
-    if descriptors:
-        value = _ability_parameter_value(profile=profile, ability_kind=ability_kind)
+    descriptor: AbilityDescriptor | None
+    if len(matching_descriptors) > 1 or selected_ability_id is not None:
+        descriptor = _selected_duplicate_ability_descriptor(
+            matching_descriptors,
+            selected_ability_id=selected_ability_id,
+        )
+    else:
+        descriptor = matching_descriptors[0] if matching_descriptors else None
+    if descriptor is not None:
+        value = _ability_parameter_value(descriptor)
         if type(value) is not int:
             raise GameLifecycleError("Weapon ability value parameter must be an integer.")
         if value < 1:
             raise GameLifecycleError("Weapon ability value parameter must be positive.")
         return value
-    expected_keyword = _PARAMETERIZED_KEYWORDS_BY_KIND.get(ability_kind)
+    if descriptors:
+        return None
     if expected_keyword is not None and expected_keyword in profile.keywords:
         raise GameLifecycleError(
             f"{expected_keyword.value} requires a structured ability descriptor."
         )
     return None
+
+
+def weapon_ability_applies(
+    profile: WeaponProfile,
+    ability_kind: AbilityKind,
+    *,
+    target_keywords: tuple[str, ...],
+) -> bool:
+    _validate_weapon_profile(profile)
+    _validate_ability_kind(ability_kind)
+    _target_keyword_set(target_keywords)
+    descriptors = tuple(
+        ability for ability in profile.abilities if ability.ability_kind is ability_kind
+    )
+    expected_keyword = _ABILITY_KEYWORDS_BY_KIND.get(ability_kind)
+    if descriptors and expected_keyword is not None and expected_keyword not in profile.keywords:
+        raise GameLifecycleError(
+            f"{expected_keyword.value} descriptor requires the weapon keyword."
+        )
+    if descriptors:
+        return any(
+            _target_keyword_gate_matches(
+                descriptor.target_keywords,
+                target_keywords=target_keywords,
+            )
+            for descriptor in descriptors
+        )
+    if expected_keyword is not None and expected_keyword in profile.keywords:
+        raise GameLifecycleError(
+            f"{expected_keyword.value} requires a structured ability descriptor."
+        )
+    return False
+
+
+def weapon_ability_selection_request(
+    profile: WeaponProfile,
+    ability_kind: AbilityKind,
+    *,
+    target_keywords: tuple[str, ...],
+    actor_id: str,
+    request_id: str,
+    source_context: JsonValue = None,
+) -> DecisionRequest | None:
+    _validate_weapon_profile(profile)
+    _validate_ability_kind(ability_kind)
+    target_keyword_tuple = _validate_target_keyword_tuple(
+        "Weapon ability target keywords",
+        target_keywords,
+    )
+    actor = _validate_identifier("Weapon ability selection actor_id", actor_id)
+    request = _validate_identifier("Weapon ability selection request_id", request_id)
+    descriptors = _ability_descriptors(profile, ability_kind)
+    expected_keyword = _ABILITY_KEYWORDS_BY_KIND.get(ability_kind)
+    if descriptors and expected_keyword is not None and expected_keyword not in profile.keywords:
+        raise GameLifecycleError(
+            f"{expected_keyword.value} descriptor requires the weapon keyword."
+        )
+    matching_descriptors = _matching_ability_descriptors(
+        profile,
+        ability_kind,
+        target_keywords=target_keyword_tuple,
+    )
+    if len(matching_descriptors) <= 1:
+        return None
+    return DecisionRequest(
+        request_id=request,
+        decision_type=WEAPON_ABILITY_SELECTION_DECISION_TYPE,
+        actor_id=actor,
+        payload=validate_json_value(
+            {
+                "submission_kind": WEAPON_ABILITY_SELECTION_DECISION_TYPE,
+                "weapon_profile_id": profile.profile_id,
+                "ability_kind": ability_kind.value,
+                "target_keywords": list(target_keyword_tuple),
+                "source_context": source_context,
+            }
+        ),
+        options=tuple(
+            DecisionOption(
+                option_id=descriptor.ability_id,
+                label=descriptor.name,
+                payload=validate_json_value(
+                    {
+                        "submission_kind": WEAPON_ABILITY_SELECTION_DECISION_TYPE,
+                        "weapon_profile_id": profile.profile_id,
+                        "ability_kind": ability_kind.value,
+                        "selected_ability_id": descriptor.ability_id,
+                        "ability_descriptor": descriptor.to_payload(),
+                    }
+                ),
+            )
+            for descriptor in matching_descriptors
+        ),
+    )
+
+
+def lethal_hits_applies(profile: WeaponProfile, *, target_keywords: tuple[str, ...]) -> bool:
+    return weapon_ability_applies(
+        profile,
+        AbilityKind.LETHAL_HITS,
+        target_keywords=target_keywords,
+    )
+
+
+def hunter_target_allowed(profile: WeaponProfile, *, target_keywords: tuple[str, ...]) -> bool:
+    _validate_weapon_profile(profile)
+    _target_keyword_set(target_keywords)
+    descriptors = tuple(
+        ability for ability in profile.abilities if ability.ability_kind is AbilityKind.HUNTER
+    )
+    if descriptors and WeaponKeyword.HUNTER not in profile.keywords:
+        raise GameLifecycleError("Hunter descriptor requires the weapon keyword.")
+    if not descriptors:
+        if WeaponKeyword.HUNTER in profile.keywords:
+            raise GameLifecycleError("Hunter requires a structured ability descriptor.")
+        return True
+    return any(
+        _target_keyword_gate_matches(
+            descriptor.target_keywords,
+            target_keywords=target_keywords,
+        )
+        for descriptor in descriptors
+    )
+
+
+def hunter_targeting_rule_ids(
+    profile: WeaponProfile,
+    *,
+    target_keywords: tuple[str, ...],
+) -> tuple[str, ...]:
+    if hunter_target_allowed(profile, target_keywords=target_keywords):
+        if any(ability.ability_kind is AbilityKind.HUNTER for ability in profile.abilities):
+            return (HUNTER_RULE_ID,)
+        return ()
+    return ()
 
 
 def anti_keyword_critical_threshold(
@@ -90,10 +258,15 @@ def anti_keyword_critical_threshold(
     target_keywords: tuple[str, ...],
 ) -> int | None:
     _validate_weapon_profile(profile)
-    target_keyword_set = {_canonical_keyword(keyword) for keyword in target_keywords}
+    target_keyword_set = _target_keyword_set(target_keywords)
     matching_thresholds: list[int] = []
     for ability in profile.abilities:
         if ability.ability_kind is not AbilityKind.ANTI_KEYWORD:
+            continue
+        if not _target_keyword_gate_matches(
+            ability.target_keywords,
+            target_keywords=target_keywords,
+        ):
             continue
         keyword = _ability_parameter_by_name(
             profile=profile,
@@ -179,8 +352,17 @@ def melta_damage_bonus(profile: WeaponProfile, *, target_within_half_range: bool
     return value
 
 
-def sustained_hits_generated_hits(profile: WeaponProfile, *, critical_hit: bool) -> int:
-    value = weapon_ability_int_value(profile, AbilityKind.SUSTAINED_HITS)
+def sustained_hits_generated_hits(
+    profile: WeaponProfile,
+    *,
+    critical_hit: bool,
+    target_keywords: tuple[str, ...] = (),
+) -> int:
+    value = weapon_ability_int_value(
+        profile,
+        AbilityKind.SUSTAINED_HITS,
+        target_keywords=target_keywords,
+    )
     if value is None or not critical_hit:
         return 1
     return 1 + value
@@ -206,20 +388,52 @@ def heavy_rule_id() -> str:
     return HEAVY_RULE_ID
 
 
-def _ability_parameter_value(
-    *,
+def _ability_parameter_value(descriptor: AbilityDescriptor) -> object:
+    if type(descriptor) is not AbilityDescriptor:
+        raise GameLifecycleError("Weapon ability lookup requires an ability descriptor.")
+    parameters = descriptor.parameters
+    if len(parameters) != 1 or parameters[0].name != "value":
+        raise GameLifecycleError("Parameterized weapon ability requires one value parameter.")
+    return parameters[0].value
+
+
+def _ability_descriptors(
     profile: WeaponProfile,
     ability_kind: AbilityKind,
-) -> object:
-    descriptors = tuple(
-        ability for ability in profile.abilities if ability.ability_kind is ability_kind
+) -> tuple[AbilityDescriptor, ...]:
+    return tuple(ability for ability in profile.abilities if ability.ability_kind is ability_kind)
+
+
+def _matching_ability_descriptors(
+    profile: WeaponProfile,
+    ability_kind: AbilityKind,
+    *,
+    target_keywords: tuple[str, ...],
+) -> tuple[AbilityDescriptor, ...]:
+    return tuple(
+        descriptor
+        for descriptor in _ability_descriptors(profile, ability_kind)
+        if _target_keyword_gate_matches(
+            descriptor.target_keywords,
+            target_keywords=target_keywords,
+        )
     )
-    if len(descriptors) != 1:
-        raise GameLifecycleError("Weapon ability lookup requires exactly one descriptor.")
-    descriptor = descriptors[0]
-    if len(descriptor.parameters) != 1 or descriptor.parameters[0].name != "value":
-        raise GameLifecycleError("Parameterized weapon ability requires one value parameter.")
-    return descriptor.parameters[0].value
+
+
+def _selected_duplicate_ability_descriptor(
+    descriptors: tuple[AbilityDescriptor, ...],
+    *,
+    selected_ability_id: str | None,
+) -> AbilityDescriptor:
+    if not descriptors:
+        raise GameLifecycleError("Selected weapon ability descriptor does not match this target.")
+    if selected_ability_id is None:
+        raise GameLifecycleError("Weapon ability requires controlling-player selection.")
+    selected_id = _validate_identifier("selected_ability_id", selected_ability_id)
+    for descriptor in descriptors:
+        if descriptor.ability_id == selected_id:
+            return descriptor
+    raise GameLifecycleError("Selected weapon ability descriptor does not match this target.")
 
 
 def _ability_parameter_by_name(
@@ -242,7 +456,33 @@ def _ability_parameter_by_name(
     raise GameLifecycleError("Weapon ability descriptor is missing a required parameter.")
 
 
-def _canonical_keyword(keyword: str) -> str:
+def _target_keyword_gate_matches(
+    gate_keywords: tuple[str, ...],
+    *,
+    target_keywords: tuple[str, ...],
+) -> bool:
+    validated_gate_keywords = _validate_target_keyword_tuple(
+        "Weapon ability target keyword gate",
+        gate_keywords,
+    )
+    if not validated_gate_keywords:
+        return True
+    return bool(set(validated_gate_keywords) & _target_keyword_set(target_keywords))
+
+
+def _target_keyword_set(target_keywords: tuple[str, ...]) -> frozenset[str]:
+    return frozenset(
+        _validate_target_keyword_tuple("Weapon ability target keywords", target_keywords)
+    )
+
+
+def _validate_target_keyword_tuple(field_name: str, keywords: object) -> tuple[str, ...]:
+    if type(keywords) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    return tuple(_canonical_keyword(keyword) for keyword in cast(tuple[object, ...], keywords))
+
+
+def _canonical_keyword(keyword: object) -> str:
     if type(keyword) is not str:
         raise GameLifecycleError("Weapon ability keyword must be a string.")
     stripped = keyword.strip()
@@ -267,6 +507,15 @@ def _validate_ability_kind(kind: object) -> AbilityKind:
     if type(kind) is not AbilityKind:
         raise GameLifecycleError("Weapon ability helpers require AbilityKind values.")
     return kind
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return stripped
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

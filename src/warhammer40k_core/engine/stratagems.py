@@ -61,7 +61,11 @@ from warhammer40k_core.engine.damage_allocation import (
     resolve_mortal_wound_feel_no_pain_decision,
     unit_owner_player_id,
 )
-from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.decision import (
+    DICE_REROLL_DECISION_TYPE,
+    DecisionError,
+    DiceRollManager,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -129,7 +133,7 @@ CORE_RAPID_INGRESS_HANDLER_ID = "core:rapid-ingress"
 CORE_NEW_ORDERS_HANDLER_ID = "core:new-orders"
 CORE_FIRE_OVERWATCH_HANDLER_ID = FIRE_OVERWATCH_RULE_ID
 CORE_GO_TO_GROUND_HANDLER_ID = "core:go-to-ground"
-CORE_GRENADE_HANDLER_ID = "core:grenade"
+CORE_EXPLOSIVES_HANDLER_ID = "core:explosives"
 CORE_SMOKESCREEN_HANDLER_ID = "core:smokescreen"
 COMMAND_REROLL_DICE_CONTEXT_KEY = "dice_roll_state"
 INSANE_BRAVERY_TARGET_POLICY_ID = "battle_shock_test_unit"
@@ -137,9 +141,9 @@ RAPID_INGRESS_TARGET_POLICY_ID = "reserves_unit"
 NEW_ORDERS_TARGET_POLICY_ID = "active_tactical_secondary_card"
 FIRE_OVERWATCH_TARGET_POLICY_ID = "out_of_phase_shooting_unit"
 GO_TO_GROUND_TARGET_POLICY_ID = "selected_target_infantry_unit"
-GRENADE_TARGET_POLICY_ID = "grenades_unit_and_enemy_target"
+EXPLOSIVES_TARGET_POLICY_ID = "explosives_unit_and_enemy_target"
 SMOKESCREEN_TARGET_POLICY_ID = "selected_target_smoke_unit"
-GRENADE_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
+EXPLOSIVES_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
 FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY = "moved_unit_instance_id"
 FIRE_OVERWATCH_MAX_RANGE_INCHES = 24.0
@@ -2043,10 +2047,14 @@ def _handler_unavailable_reason(
         if selected_context_error is not None:
             return selected_context_error
         return None
-    if definition.handler_id == CORE_GRENADE_HANDLER_ID:
+    if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID:
         if target_binding is None:
             return None
-        return _grenade_context_error(state=state, context=context, target_binding=target_binding)
+        return _explosives_context_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+        )
     return None
 
 
@@ -2238,7 +2246,7 @@ def _target_binding_error(
         ):
             return "unit_not_smoke"
         return None
-    if target_spec.target_policy_id == GRENADE_TARGET_POLICY_ID:
+    if target_spec.target_policy_id == EXPLOSIVES_TARGET_POLICY_ID:
         if not _target_unit_has_keyword(
             state=state,
             target_binding=target_binding,
@@ -2366,21 +2374,33 @@ def _command_reroll_context_error(
         if roll_state.original_result.spec.actor_id != context.player_id:
             return "dice_roll_actor_drift"
         roll_type = roll_state.original_result.spec.roll_type
-        if roll_type not in definition.eligible_roll_types:
+        if _command_reroll_roll_class(roll_type) not in definition.eligible_roll_types:
             return "ineligible_dice_roll_type"
         if roll_state.original_result.spec.reroll_forbidden_rule_ids:
             return "dice_roll_reroll_forbidden"
-        permission = RerollPermission(
+        permission = _command_reroll_permission(
             source_id=CORE_COMMAND_REROLL_HANDLER_ID,
-            timing_window=context.timing_window_id or context.trigger_kind.value,
-            owning_player_id=context.player_id,
-            eligible_roll_type=roll_type,
-            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+            context=context,
+            roll_state=roll_state,
         )
         permission.legal_selections_for_state(roll_state)
     except (DiceRollSpecError, GameLifecycleError):  # fmt: skip
         return "invalid_dice_roll_context"
     return None
+
+
+def _command_reroll_roll_class(roll_type: str) -> str:
+    if roll_type == "attack_sequence.hit":
+        return "hit_roll"
+    if roll_type == "attack_sequence.wound":
+        return "wound_roll"
+    if roll_type.startswith("attack_sequence.save."):
+        return "save_roll"
+    if roll_type.startswith("attack_sequence.damage"):
+        return "damage_roll"
+    if roll_type.startswith("random_characteristic.damage."):
+        return "damage_roll"
+    return roll_type
 
 
 def _command_reroll_state(context: StratagemEligibilityContext) -> DiceRollState:
@@ -2391,6 +2411,36 @@ def _command_reroll_state(context: StratagemEligibilityContext) -> DiceRollState
     if not isinstance(roll_payload, dict):
         raise GameLifecycleError("Command Re-roll requires dice_roll_state payload.")
     return DiceRollState.from_payload(cast(DiceRollStatePayload, roll_payload))
+
+
+def _command_reroll_permission(
+    *,
+    source_id: str,
+    context: StratagemEligibilityContext,
+    roll_state: DiceRollState,
+) -> RerollPermission:
+    roll_type = roll_state.original_result.spec.roll_type
+    if roll_type == "charge_roll" or len(roll_state.current_values) == 1:
+        return RerollPermission(
+            source_id=source_id,
+            timing_window=context.timing_window_id or context.trigger_kind.value,
+            owning_player_id=context.player_id,
+            eligible_roll_type=roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+    already_rerolled = set(roll_state.rerolled_indices())
+    return RerollPermission(
+        source_id=source_id,
+        timing_window=context.timing_window_id or context.trigger_kind.value,
+        owning_player_id=context.player_id,
+        eligible_roll_type=roll_type,
+        component_selection_policy=RerollComponentSelectionPolicy.COMPONENT_SELECTION,
+        allowed_component_selections=tuple(
+            (index,)
+            for index, _value in enumerate(roll_state.current_values)
+            if index not in already_rerolled
+        ),
+    )
 
 
 def _selected_target_context_error(
@@ -2538,7 +2588,7 @@ def _units_are_within_range_inches(
     return False
 
 
-def _grenade_context_error(
+def _explosives_context_error(
     *,
     state: GameState,
     context: StratagemEligibilityContext,
@@ -2546,88 +2596,88 @@ def _grenade_context_error(
 ) -> str | None:
     if not _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="GRENADES"):
         return "unit_not_grenades"
-    grenades_unit_id = _require_target_unit_id(target_binding)
+    explosives_unit_id = _require_target_unit_id(target_binding)
     if (
         state.advanced_unit_state_for_unit(
             player_id=context.player_id,
             battle_round=context.battle_round,
-            unit_instance_id=grenades_unit_id,
+            unit_instance_id=explosives_unit_id,
         )
         is not None
     ):
-        return "grenades_unit_advanced"
+        return "explosives_unit_advanced"
     if (
         state.fell_back_unit_state_for_unit(
             player_id=context.player_id,
             battle_round=context.battle_round,
-            unit_instance_id=grenades_unit_id,
+            unit_instance_id=explosives_unit_id,
         )
         is not None
     ):
-        return "grenades_unit_fell_back"
+        return "explosives_unit_fell_back"
     shooting_state = state.shooting_phase_state
-    if shooting_state is not None and grenades_unit_id in shooting_state.shot_unit_ids:
-        return "grenades_unit_already_shot"
-    target_unit_id = _grenade_target_unit_id_or_none(context)
+    if shooting_state is not None and explosives_unit_id in shooting_state.shot_unit_ids:
+        return "explosives_unit_already_shot"
+    target_unit_id = _explosives_target_unit_id_or_none(context)
     if target_unit_id is None:
-        return "missing_grenade_target"
+        return "missing_explosives_target"
     target_owner = _unit_owner(state=state, unit_instance_id=target_unit_id)
     if target_owner is None:
-        return "unknown_grenade_target"
+        return "unknown_explosives_target"
     if target_owner == context.player_id:
-        return "grenade_target_not_enemy"
+        return "explosives_target_not_enemy"
     if state.battlefield_state is None:
-        return "grenade_requires_battlefield"
+        return "explosives_requires_battlefield"
     if state.mission_setup is None:
-        return "grenade_requires_mission_setup"
+        return "explosives_requires_mission_setup"
     if _unit_is_within_enemy_engagement_range(
         state=state,
         player_id=context.player_id,
-        unit_instance_id=grenades_unit_id,
+        unit_instance_id=explosives_unit_id,
     ):
-        return "grenades_unit_in_engagement_range"
+        return "explosives_unit_in_engagement_range"
     if _enemy_unit_is_within_friendly_engagement_range(
         state=state,
         player_id=context.player_id,
         target_unit_instance_id=target_unit_id,
     ):
-        return "grenade_target_engaged_with_friendly_unit"
-    if not _grenade_target_is_visible_and_in_range(
+        return "explosives_target_engaged_with_friendly_unit"
+    if not _explosives_target_is_visible_and_in_range(
         state=state,
-        grenades_unit_instance_id=grenades_unit_id,
+        explosives_unit_instance_id=explosives_unit_id,
         target_unit_instance_id=target_unit_id,
     ):
-        return "grenade_target_not_visible_and_within_range"
+        return "explosives_target_not_visible_and_within_range"
     return None
 
 
-def _grenade_target_unit_id(context: StratagemEligibilityContext) -> str:
-    target_unit_id = _grenade_target_unit_id_or_none(context)
+def _explosives_target_unit_id(context: StratagemEligibilityContext) -> str:
+    target_unit_id = _explosives_target_unit_id_or_none(context)
     if target_unit_id is None:
-        raise GameLifecycleError("Grenade trigger payload requires enemy target unit id.")
+        raise GameLifecycleError("Explosives trigger payload requires enemy target unit id.")
     return target_unit_id
 
 
-def _grenade_target_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
+def _explosives_target_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
     trigger_payload = context.trigger_payload
     if not isinstance(trigger_payload, dict):
         return None
-    target_unit_id = trigger_payload.get(GRENADE_TARGET_CONTEXT_KEY)
+    target_unit_id = trigger_payload.get(EXPLOSIVES_TARGET_CONTEXT_KEY)
     if type(target_unit_id) is not str:
         return None
-    return _validate_identifier("Grenade target unit id", target_unit_id)
+    return _validate_identifier("Explosives target unit id", target_unit_id)
 
 
-def _grenade_target_is_visible_and_in_range(
+def _explosives_target_is_visible_and_in_range(
     *,
     state: GameState,
-    grenades_unit_instance_id: str,
+    explosives_unit_instance_id: str,
     target_unit_instance_id: str,
 ) -> bool:
     scenario = _battlefield_scenario_for_stratagem(state)
-    unit = _unit_by_id(state=state, unit_instance_id=grenades_unit_instance_id)
+    unit = _unit_by_id(state=state, unit_instance_id=explosives_unit_instance_id)
     terrain_features = _stratagem_terrain_features(state)
-    profile = _grenade_visibility_profile()
+    profile = _explosives_visibility_profile()
     for model in unit.own_models:
         if not model.is_alive:
             continue
@@ -2756,10 +2806,10 @@ def _stratagem_ruleset_descriptor() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_eleventh()
 
 
-def _grenade_visibility_profile() -> WeaponProfile:
+def _explosives_visibility_profile() -> WeaponProfile:
     return WeaponProfile(
-        profile_id="core-stratagem:grenade:visibility-range",
-        name="Grenade Stratagem Visibility Range",
+        profile_id="core-stratagem:explosives:visibility-range",
+        name="Explosives Stratagem Visibility Range",
         range_profile=RangeProfile.distance(8),
         attack_profile=AttackProfile.fixed(1),
         skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
@@ -3156,8 +3206,8 @@ def _apply_supported_stratagem_handler(
             use_record=use_record,
         )
         return
-    if definition.handler_id == CORE_GRENADE_HANDLER_ID:
-        _apply_grenade_handler(
+    if definition.handler_id == CORE_EXPLOSIVES_HANDLER_ID:
+        _apply_explosives_handler(
             state=state,
             decisions=decisions,
             context=context,
@@ -3189,16 +3239,14 @@ def _apply_command_reroll_handler(
     if roll_state.original_result.spec.actor_id != context.player_id:
         raise GameLifecycleError("Command Re-roll roll actor was not prevalidated.")
     roll_type = roll_state.original_result.spec.roll_type
-    if roll_type not in definition.eligible_roll_types:
+    if _command_reroll_roll_class(roll_type) not in definition.eligible_roll_types:
         raise GameLifecycleError("Command Re-roll roll type was not prevalidated.")
     if roll_state.original_result.spec.reroll_forbidden_rule_ids:
         raise GameLifecycleError("Command Re-roll forbidden roll was not prevalidated.")
-    permission = RerollPermission(
+    permission = _command_reroll_permission(
         source_id=use_record.source_id,
-        timing_window=context.timing_window_id or context.trigger_kind.value,
-        owning_player_id=context.player_id,
-        eligible_roll_type=roll_type,
-        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        context=context,
+        roll_state=roll_state,
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     request = manager.build_reroll_request(
@@ -3207,13 +3255,32 @@ def _apply_command_reroll_handler(
         actor_id=context.player_id,
         permission=permission,
         extra_payload={
-            "stratagem_use_id": use_record.use_id,
-            "stratagem_source_id": use_record.source_id,
+            "command_reroll_context": validate_json_value(
+                {
+                    "stratagem_use": use_record.to_payload(),
+                    "stratagem_context": context.to_payload(),
+                    "roll_state": roll_state.to_payload(),
+                }
+            ),
         },
     )
     reroll_option_ids = tuple(
         option.option_id for option in request.options if option.option_id != "decline"
     )
+    if len(reroll_option_ids) > 1:
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "command_reroll_selection_requested",
+            {
+                "game_id": state.game_id,
+                "player_id": context.player_id,
+                "battle_round": context.battle_round,
+                "phase": context.phase.value,
+                "stratagem_use": use_record.to_payload(),
+                "reroll_request": request.to_payload(),
+            },
+        )
+        return
     if len(reroll_option_ids) != 1:
         raise GameLifecycleError("Command Re-roll must resolve exactly one reroll option.")
     reroll_result = DecisionResult.for_request(
@@ -3239,6 +3306,91 @@ def _apply_command_reroll_handler(
             "reroll_result": reroll_result.to_payload(),
             "updated_roll_state": updated_state.to_payload(),
         },
+    )
+
+
+def is_command_reroll_decision_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Command Re-roll request check requires a DecisionRequest.")
+    if request.decision_type != DICE_REROLL_DECISION_TYPE:
+        return False
+    payload = request.payload
+    return isinstance(payload, dict) and isinstance(payload.get("command_reroll_context"), dict)
+
+
+def invalid_command_reroll_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if not is_command_reroll_decision_request(request):
+        return _invalid(state, "Command Re-roll decision is malformed.", "malformed_request")
+    try:
+        result.validate_for_request(request)
+        context, _use_record, _roll_state = _command_reroll_request_context(request)
+    except (DecisionError, GameLifecycleError, KeyError):  # fmt: skip
+        return _invalid(state, "Command Re-roll decision context is invalid.", "malformed")
+    drift = _context_state_drift(state=state, context=context)
+    if drift is not None:
+        return _invalid(state, "Command Re-roll decision context drifted.", drift)
+    return None
+
+
+def apply_command_reroll_decision(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> None:
+    context, use_record, roll_state = _command_reroll_request_context(request)
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    updated_state = manager.resolve_reroll(
+        roll_state,
+        request=request,
+        result=result,
+        record_decision=False,
+    )
+    decisions.event_log.append(
+        "command_reroll_resolved",
+        {
+            "game_id": state.game_id,
+            "player_id": context.player_id,
+            "battle_round": context.battle_round,
+            "phase": context.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "reroll_request": request.to_payload(),
+            "reroll_result": result.to_payload(),
+            "updated_roll_state": updated_state.to_payload(),
+        },
+    )
+
+
+def _command_reroll_request_context(
+    request: DecisionRequest,
+) -> tuple[StratagemEligibilityContext, StratagemUseRecord, DiceRollState]:
+    payload = request.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Command Re-roll decision payload must be an object.")
+    context_payload = payload.get("command_reroll_context")
+    if not isinstance(context_payload, dict):
+        raise GameLifecycleError("Command Re-roll decision payload missing context.")
+    stratagem_context_payload = context_payload.get("stratagem_context")
+    use_record_payload = context_payload.get("stratagem_use")
+    roll_state_payload = context_payload.get("roll_state")
+    if not isinstance(stratagem_context_payload, dict):
+        raise GameLifecycleError("Command Re-roll stratagem context is invalid.")
+    if not isinstance(use_record_payload, dict):
+        raise GameLifecycleError("Command Re-roll stratagem use is invalid.")
+    if not isinstance(roll_state_payload, dict):
+        raise GameLifecycleError("Command Re-roll roll state is invalid.")
+    return (
+        StratagemEligibilityContext.from_payload(
+            cast(StratagemEligibilityContextPayload, stratagem_context_payload)
+        ),
+        StratagemUseRecord.from_payload(cast(StratagemUseRecordPayload, use_record_payload)),
+        DiceRollState.from_payload(cast(DiceRollStatePayload, roll_state_payload)),
     )
 
 
@@ -3533,7 +3685,7 @@ def _apply_smokescreen_handler(
     )
 
 
-def _apply_grenade_handler(
+def _apply_explosives_handler(
     *,
     state: GameState,
     decisions: DecisionController,
@@ -3541,20 +3693,20 @@ def _apply_grenade_handler(
     target_binding: StratagemTargetBinding,
     use_record: StratagemUseRecord,
 ) -> None:
-    target_unit_id = _grenade_target_unit_id(context)
-    context_error = _grenade_context_error(
+    target_unit_id = _explosives_target_unit_id(context)
+    context_error = _explosives_context_error(
         state=state,
         context=context,
         target_binding=target_binding,
     )
     if context_error is not None:
-        raise GameLifecycleError("Prevalidated Grenade context failed.")
+        raise GameLifecycleError("Prevalidated Explosives context failed.")
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
             expression=DiceExpression(quantity=6, sides=6),
-            reason=f"Grenade mortal wounds for {use_record.use_id}",
-            roll_type="stratagem.grenade",
+            reason=f"Explosives mortal wounds for {use_record.use_id}",
+            roll_type="stratagem.explosives",
             actor_id=use_record.player_id,
         )
     )
@@ -3562,13 +3714,13 @@ def _apply_grenade_handler(
     mortal_application = None
     if mortal_wounds > 0:
         progress = MortalWoundApplicationProgress.start(
-            application_id=f"{use_record.use_id}:grenade:mortal-wounds",
-            source_rule_id=CORE_GRENADE_HANDLER_ID,
+            application_id=f"{use_record.use_id}:explosives:mortal-wounds",
+            source_rule_id=CORE_EXPLOSIVES_HANDLER_ID,
             source_context=validate_json_value(
                 {
-                    "source_kind": "grenade",
+                    "source_kind": "explosives",
                     "stratagem_use": use_record.to_payload(),
-                    "grenades_unit_instance_id": _require_target_unit_id(target_binding),
+                    "explosives_unit_instance_id": _require_target_unit_id(target_binding),
                     "target_unit_instance_id": target_unit_id,
                     "roll_state": roll_state.to_payload(),
                 }
@@ -3591,13 +3743,13 @@ def _apply_grenade_handler(
             decisions.request_decision(routed.request)
             return
         if routed.application is None:
-            raise GameLifecycleError("Grenade mortal wounds did not produce application.")
+            raise GameLifecycleError("Explosives mortal wounds did not produce application.")
         mortal_application = routed.application
-    _emit_grenade_resolved(
+    _emit_explosives_resolved(
         decisions=decisions,
         state=state,
         use_record=use_record,
-        grenades_unit_instance_id=_require_target_unit_id(target_binding),
+        explosives_unit_instance_id=_require_target_unit_id(target_binding),
         target_unit_instance_id=target_unit_id,
         roll_state=validate_json_value(roll_state.to_payload()),
         mortal_wounds=mortal_wounds,
@@ -3605,7 +3757,7 @@ def _apply_grenade_handler(
     )
 
 
-def apply_grenade_mortal_wound_feel_no_pain_decision(
+def apply_explosives_mortal_wound_feel_no_pain_decision(
     *,
     state: GameState,
     result: DecisionResult,
@@ -3614,10 +3766,10 @@ def apply_grenade_mortal_wound_feel_no_pain_decision(
     record = decisions.record_for_result(result)
     request = record.request
     if not is_mortal_wound_feel_no_pain_request(request):
-        raise GameLifecycleError("Grenade Feel No Pain requires mortal wound context.")
+        raise GameLifecycleError("Explosives Feel No Pain requires mortal wound context.")
     source_context = mortal_wound_feel_no_pain_source_context(request)
-    if not isinstance(source_context, dict) or source_context.get("source_kind") != "grenade":
-        raise GameLifecycleError("Grenade Feel No Pain source context is invalid.")
+    if not isinstance(source_context, dict) or source_context.get("source_kind") != "explosives":
+        raise GameLifecycleError("Explosives Feel No Pain source context is invalid.")
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
@@ -3636,24 +3788,24 @@ def apply_grenade_mortal_wound_feel_no_pain_decision(
                 if state.current_battle_phase is not None
                 else None,
                 "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-                "source_rule_id": CORE_GRENADE_HANDLER_ID,
+                "source_rule_id": CORE_EXPLOSIVES_HANDLER_ID,
             },
         )
     if routed.application is None:
-        raise GameLifecycleError("Grenade Feel No Pain did not finish routing.")
+        raise GameLifecycleError("Explosives Feel No Pain did not finish routing.")
     use_record = StratagemUseRecord.from_payload(
         cast(StratagemUseRecordPayload, source_context["stratagem_use"])
     )
     roll_state_payload = source_context["roll_state"]
     if not isinstance(roll_state_payload, dict):
-        raise GameLifecycleError("Grenade source context roll_state is invalid.")
-    _emit_grenade_resolved(
+        raise GameLifecycleError("Explosives source context roll_state is invalid.")
+    _emit_explosives_resolved(
         decisions=decisions,
         state=state,
         use_record=use_record,
-        grenades_unit_instance_id=_validate_identifier(
-            "grenades_unit_instance_id",
-            source_context["grenades_unit_instance_id"],
+        explosives_unit_instance_id=_validate_identifier(
+            "explosives_unit_instance_id",
+            source_context["explosives_unit_instance_id"],
         ),
         target_unit_instance_id=routed.progress.target_unit_instance_id,
         roll_state=validate_json_value(roll_state_payload),
@@ -3663,26 +3815,26 @@ def apply_grenade_mortal_wound_feel_no_pain_decision(
     return None
 
 
-def _emit_grenade_resolved(
+def _emit_explosives_resolved(
     *,
     decisions: DecisionController,
     state: GameState,
     use_record: StratagemUseRecord,
-    grenades_unit_instance_id: str,
+    explosives_unit_instance_id: str,
     target_unit_instance_id: str,
     roll_state: JsonValue,
     mortal_wounds: int,
     mortal_application: MortalWoundApplication | None,
 ) -> None:
     decisions.event_log.append(
-        "grenade_resolved",
+        "explosives_resolved",
         {
             "game_id": state.game_id,
             "player_id": use_record.player_id,
             "battle_round": use_record.battle_round,
             "phase": use_record.phase.value,
             "stratagem_use": use_record.to_payload(),
-            "grenades_unit_instance_id": grenades_unit_instance_id,
+            "explosives_unit_instance_id": explosives_unit_instance_id,
             "target_unit_instance_id": target_unit_instance_id,
             "roll_state": roll_state,
             "mortal_wounds": mortal_wounds,
