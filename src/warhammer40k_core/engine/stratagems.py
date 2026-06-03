@@ -2368,6 +2368,8 @@ def _command_reroll_context_error(
         roll_type = roll_state.original_result.spec.roll_type
         if roll_type not in definition.eligible_roll_types:
             return "ineligible_dice_roll_type"
+        if roll_state.original_result.spec.reroll_forbidden_rule_ids:
+            return "dice_roll_reroll_forbidden"
         permission = RerollPermission(
             source_id=CORE_COMMAND_REROLL_HANDLER_ID,
             timing_window=context.timing_window_id or context.trigger_kind.value,
@@ -3189,6 +3191,8 @@ def _apply_command_reroll_handler(
     roll_type = roll_state.original_result.spec.roll_type
     if roll_type not in definition.eligible_roll_types:
         raise GameLifecycleError("Command Re-roll roll type was not prevalidated.")
+    if roll_state.original_result.spec.reroll_forbidden_rule_ids:
+        raise GameLifecycleError("Command Re-roll forbidden roll was not prevalidated.")
     permission = RerollPermission(
         source_id=use_record.source_id,
         timing_window=context.timing_window_id or context.trigger_kind.value,

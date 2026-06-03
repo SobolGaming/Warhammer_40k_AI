@@ -22,6 +22,7 @@ class WeaponKeyword(StrEnum):
     DEVASTATING_WOUNDS = "Devastating Wounds"
     SUSTAINED_HITS = "Sustained Hits"
     LETHAL_HITS = "Lethal Hits"
+    CLEAVE = "Cleave"
     TWIN_LINKED = "Twin-linked"
     IGNORES_COVER = "Ignores Cover"
     INDIRECT_FIRE = "Indirect Fire"
@@ -34,6 +35,7 @@ class WeaponKeyword(StrEnum):
     TORRENT = "Torrent"
     PSYCHIC = "Psychic"
     PISTOL = "Pistol"
+    CLOSE_QUARTERS = "Close-quarters"
     HEAVY = "Heavy"
     BLAST = "Blast"
     MELTA = "Melta"
@@ -43,6 +45,7 @@ class WeaponKeyword(StrEnum):
 class AbilityKind(StrEnum):
     DEVASTATING_WOUNDS = "devastating_wounds"
     SUSTAINED_HITS = "sustained_hits"
+    CLEAVE = "cleave"
     MELTA = "melta"
     RAPID_FIRE = "rapid_fire"
     ANTI_KEYWORD = "anti_keyword"
@@ -183,6 +186,16 @@ class AbilityDescriptor:
             ability_id=f"sustained-hits:{value}",
             name=f"Sustained Hits {value}",
             ability_kind=AbilityKind.SUSTAINED_HITS,
+            parameters=(AbilityParameter.integer(value),),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+
+    @classmethod
+    def cleave(cls, value: int) -> Self:
+        return cls(
+            ability_id=f"cleave:{value}",
+            name=f"Cleave {value}",
+            ability_kind=AbilityKind.CLEAVE,
             parameters=(AbilityParameter.integer(value),),
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
@@ -778,6 +791,7 @@ def _validate_supported_ability_shape(
 ) -> None:
     if ability_kind in {
         AbilityKind.SUSTAINED_HITS,
+        AbilityKind.CLEAVE,
         AbilityKind.MELTA,
         AbilityKind.RAPID_FIRE,
     }:

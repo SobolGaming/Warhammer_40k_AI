@@ -33,6 +33,7 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.weapon_abilities import (
     BLAST_RULE_ID,
+    CLEAVE_RULE_ID,
     HEAVY_RULE_ID,
     MELTA_RULE_ID,
     RAPID_FIRE_RULE_ID,
@@ -40,6 +41,8 @@ from warhammer40k_core.engine.weapon_abilities import (
     anti_keyword_critical_threshold,
     blast_attack_bonus,
     blast_rule_id,
+    cleave_attack_bonus,
+    cleave_rule_id,
     devastating_wounds_resolution,
     has_weapon_keyword,
     heavy_rule_id,
@@ -57,6 +60,7 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
         keywords=(
             WeaponKeyword.ASSAULT,
             WeaponKeyword.BLAST,
+            WeaponKeyword.CLEAVE,
             WeaponKeyword.DEVASTATING_WOUNDS,
             WeaponKeyword.MELTA,
             WeaponKeyword.RAPID_FIRE,
@@ -64,6 +68,7 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
         ),
         abilities=(
             AbilityDescriptor.devastating_wounds(),
+            AbilityDescriptor.cleave(2),
             AbilityDescriptor.rapid_fire(2),
             AbilityDescriptor.melta(3),
             AbilityDescriptor.sustained_hits(2),
@@ -71,8 +76,11 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
     )
 
     assert has_weapon_keyword(profile, WeaponKeyword.ASSAULT)
+    assert weapon_ability_int_value(profile, AbilityKind.CLEAVE) == 2
     assert weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE) == 2
     assert devastating_wounds_resolution(profile) is DevastatingWoundsResolution.MORTAL_WOUNDS
+    assert cleave_attack_bonus(profile, single_target=True, target_model_count=11) == 4
+    assert cleave_attack_bonus(profile, single_target=False, target_model_count=11) == 0
     assert rapid_fire_attack_bonus(profile, target_within_half_range=True) == 2
     assert rapid_fire_attack_bonus(profile, target_within_half_range=False) == 0
     assert melta_damage_bonus(profile, target_within_half_range=True) == 3
@@ -82,12 +90,18 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
     assert blast_attack_bonus(target_model_count=11) == 2
     assert rapid_fire_rule_id(2) == f"{RAPID_FIRE_RULE_ID}:2"
     assert blast_rule_id(2) == f"{BLAST_RULE_ID}:2"
+    assert cleave_rule_id(2) == f"{CLEAVE_RULE_ID}:2"
     assert melta_rule_id(3) == f"{MELTA_RULE_ID}:3"
     assert heavy_rule_id() == HEAVY_RULE_ID
 
 
 def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> None:
     profile = _profile(keywords=(WeaponKeyword.RAPID_FIRE,), abilities=())
+    cleave_profile = _profile(keywords=(WeaponKeyword.CLEAVE,), abilities=())
+    valid_cleave_profile = _profile(
+        keywords=(WeaponKeyword.CLEAVE,),
+        abilities=(AbilityDescriptor.cleave(1),),
+    )
     devastating_profile = _profile(keywords=(WeaponKeyword.DEVASTATING_WOUNDS,), abilities=())
     orphan_devastating_profile = _profile(
         keywords=(),
@@ -101,6 +115,8 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
 
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
         weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE)
+    with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
+        cleave_attack_bonus(cleave_profile, single_target=True, target_model_count=5)
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
         devastating_wounds_resolution(devastating_profile)
     with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
@@ -120,8 +136,18 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
         blast_attack_bonus(target_model_count=cast(int, 1.5))
     with pytest.raises(GameLifecycleError, match="Blast target_model_count must not be negative"):
         blast_attack_bonus(target_model_count=-1)
+    with pytest.raises(GameLifecycleError, match="Cleave target_model_count must be an integer"):
+        cleave_attack_bonus(
+            valid_cleave_profile,
+            single_target=True,
+            target_model_count=cast(int, 1.5),
+        )
+    with pytest.raises(GameLifecycleError, match="Cleave target_model_count must not be negative"):
+        cleave_attack_bonus(valid_cleave_profile, single_target=True, target_model_count=-1)
     with pytest.raises(GameLifecycleError, match="Rapid Fire value must be an integer"):
         rapid_fire_rule_id(cast(int, "2"))
+    with pytest.raises(GameLifecycleError, match="Cleave value must be at least 1"):
+        cleave_rule_id(0)
     with pytest.raises(GameLifecycleError, match="Melta value must be at least 1"):
         melta_rule_id(0)
     with pytest.raises(GameLifecycleError, match="Weapon ability keyword must be a string"):

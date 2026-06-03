@@ -55,6 +55,8 @@ def test_weapon_keywords_are_canonical_tokens_shared_with_rule_normalization() -
     assert "Feel No Pain" in canonical_rule_keyword_tokens()
     assert "Feel No Pain" not in canonical_weapon_keyword_tokens()
     assert weapon_keyword_from_token("Rapid Fire") is WeaponKeyword.RAPID_FIRE
+    assert weapon_keyword_from_token("Close-quarters") is WeaponKeyword.CLOSE_QUARTERS
+    assert weapon_keyword_from_token("Cleave") is WeaponKeyword.CLEAVE
 
     with pytest.raises(WeaponProfileError):
         weapon_keyword_from_token("rapid fire")
@@ -101,6 +103,7 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     abilities = (
         AbilityDescriptor.devastating_wounds(),
         AbilityDescriptor.sustained_hits(1),
+        AbilityDescriptor.cleave(2),
         AbilityDescriptor.melta(2),
         AbilityDescriptor.rapid_fire(1),
         AbilityDescriptor.anti_keyword("Infantry", 4),
@@ -113,13 +116,15 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     assert payloads[0]["parameters"] == [{"name": "effect", "value": "mortal_wounds"}]
     assert payloads[1]["ability_kind"] == AbilityKind.SUSTAINED_HITS.value
     assert payloads[1]["parameters"] == [{"name": "value", "value": 1}]
-    assert payloads[4]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
-    assert payloads[4]["parameters"] == [
+    assert payloads[2]["ability_kind"] == AbilityKind.CLEAVE.value
+    assert payloads[2]["parameters"] == [{"name": "value", "value": 2}]
+    assert payloads[5]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
+    assert payloads[5]["parameters"] == [
         {"name": "keyword", "value": "INFANTRY"},
         {"name": "threshold", "value": 4},
     ]
-    assert payloads[5]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
-    assert payloads[5]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
+    assert payloads[6]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
+    assert payloads[6]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities

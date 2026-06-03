@@ -9,6 +9,7 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.damage_allocation import (
+    SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
@@ -65,6 +66,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseHandler,
 )
 from warhammer40k_core.engine.phases.shooting import (
+    SELECT_SHOOTING_TYPE_DECISION_TYPE,
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
@@ -138,7 +140,9 @@ _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISI
 _SHOOTING_DECISION_TYPES = frozenset(
     (
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
+        SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
@@ -152,6 +156,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
@@ -307,6 +312,19 @@ class GameLifecycle:
             )
             if malformed_status is not None:
                 return malformed_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            invalid_status = self._shooting_phase_handler.invalid_shooting_type_selection_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
         if (
             type(result) is DecisionResult
             and pending_request is not None

@@ -20,10 +20,13 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
+    has_close_quarters_weapon_keyword,
+    has_weapon_keyword,
 )
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -66,6 +69,7 @@ class ShootingTargetCandidatePayload(TypedDict):
     target_in_range_model_ids: list[str]
     line_of_sight_witness: LineOfSightWitnessPayload | None
     visibility_cache_key: str
+    shooting_types: list[str]
     hit_roll_modifier: int
     targeting_rule_ids: list[str]
 
@@ -83,6 +87,7 @@ class ShootingTargetCandidate:
     target_in_range_model_ids: tuple[str, ...]
     line_of_sight_witness: LineOfSightWitness | None
     visibility_cache_key: str
+    shooting_types: tuple[ShootingType, ...] = ()
     hit_roll_modifier: int = 0
     targeting_rule_ids: tuple[str, ...] = ()
 
@@ -161,6 +166,14 @@ class ShootingTargetCandidate:
                 self.visibility_cache_key,
             ),
         )
+        object.__setattr__(
+            self,
+            "shooting_types",
+            validate_shooting_type_tuple(
+                "ShootingTargetCandidate shooting_types",
+                self.shooting_types,
+            ),
+        )
         if type(self.hit_roll_modifier) is not int:
             raise GameLifecycleError("ShootingTargetCandidate hit_roll_modifier must be an int.")
         object.__setattr__(
@@ -177,6 +190,12 @@ class ShootingTargetCandidate:
             raise GameLifecycleError("Illegal ShootingTargetCandidate requires violation_code.")
         if self.is_legal and self.line_of_sight_witness is None:
             raise GameLifecycleError("Legal ShootingTargetCandidate requires LoS evidence.")
+        if self.is_legal and not self.shooting_types:
+            raise GameLifecycleError("Legal ShootingTargetCandidate requires shooting_types.")
+        if not self.is_legal and self.shooting_types:
+            raise GameLifecycleError(
+                "Illegal ShootingTargetCandidate must not have shooting_types."
+            )
 
     @classmethod
     def legal(
@@ -190,6 +209,7 @@ class ShootingTargetCandidate:
         target_in_range_model_ids: tuple[str, ...],
         line_of_sight_witness: LineOfSightWitness,
         visibility_cache_key: str,
+        shooting_types: tuple[ShootingType, ...],
         hit_roll_modifier: int = 0,
         targeting_rule_ids: tuple[str, ...] = (),
     ) -> Self:
@@ -205,6 +225,7 @@ class ShootingTargetCandidate:
             target_in_range_model_ids=target_in_range_model_ids,
             line_of_sight_witness=line_of_sight_witness,
             visibility_cache_key=visibility_cache_key,
+            shooting_types=shooting_types,
             hit_roll_modifier=hit_roll_modifier,
             targeting_rule_ids=targeting_rule_ids,
         )
@@ -259,6 +280,7 @@ class ShootingTargetCandidate:
                 else self.line_of_sight_witness.to_payload()
             ),
             "visibility_cache_key": self.visibility_cache_key,
+            "shooting_types": [shooting_type.value for shooting_type in self.shooting_types],
             "hit_roll_modifier": self.hit_roll_modifier,
             "targeting_rule_ids": list(self.targeting_rule_ids),
         }
@@ -282,6 +304,10 @@ class ShootingTargetCandidate:
                 else LineOfSightWitness.from_payload(witness_payload)
             ),
             visibility_cache_key=payload["visibility_cache_key"],
+            shooting_types=validate_shooting_type_tuple(
+                "ShootingTargetCandidate payload shooting_types",
+                tuple(payload["shooting_types"]),
+            ),
             hit_roll_modifier=payload["hit_roll_modifier"],
             targeting_rule_ids=tuple(payload["targeting_rule_ids"]),
         )
@@ -382,6 +408,63 @@ def shooting_visibility_cache_key(
         model_blocker_revision=_model_blocker_revision(scenario.placed_geometry_models()),
     )
     return spatial_state.los_cache_key()
+
+
+def unit_has_line_of_sight_to_target(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    observing_unit: UnitInstance,
+    target_unit_id: str,
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+) -> bool:
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("Line of sight target query requires a BattlefieldScenario.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Line of sight target query requires a RulesetDescriptor.")
+    if type(observing_unit) is not UnitInstance:
+        raise GameLifecycleError("Line of sight target query requires a UnitInstance.")
+    _validate_identifier("target_unit_id", target_unit_id)
+    if type(terrain_features) is not tuple:
+        raise GameLifecycleError("terrain_features must be a tuple.")
+    for feature in terrain_features:
+        if type(feature) is not TerrainFeatureDefinition:
+            raise GameLifecycleError("terrain_features must contain TerrainFeatureDefinition.")
+    observing_placement = _unit_placement_or_none(scenario, observing_unit.unit_instance_id)
+    target_placement = _unit_placement_or_none(scenario, target_unit_id)
+    if observing_placement is None or target_placement is None:
+        raise GameLifecycleError("Line of sight target query requires placed units.")
+    target_unit = scenario.army_by_id(target_placement.army_id).unit_by_id(target_unit_id)
+    visibility_cache_key = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_features=terrain_features,
+    )
+    target_models = _geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=target_placement,
+    )
+    blocker_models = _shooting_dynamic_model_blockers(
+        scenario=scenario,
+        observing_unit_id=observing_unit.unit_instance_id,
+        target_unit_id=target_unit_id,
+    )
+    for observer_model in _geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=observing_placement,
+    ):
+        context = TerrainVisibilityContext.from_ruleset_descriptor(
+            ruleset_descriptor=ruleset_descriptor,
+            los_cache_key=visibility_cache_key,
+            observer_model=observer_model,
+            target_models=target_models,
+            terrain_features=terrain_features,
+            dynamic_model_blockers=blocker_models,
+            observer_keywords=observing_unit.keywords,
+            target_keywords=target_unit.keywords,
+        )
+        if context.resolve_line_of_sight().visible_model_ids:
+            return True
+    return False
 
 
 def _validate_target_query_inputs(
@@ -576,6 +659,25 @@ def _target_candidate(
             observer_model_id=witness.observer_model_id,
         )
 
+    if _blast_engaged_target_validation(
+        weapon_profile=weapon_profile,
+        target_unit_id=target_unit_id,
+        locked_context=locked_context,
+        target_engagement_context=target_engagement_context,
+    ):
+        return _invalid_candidate(
+            attacker_unit=attacker_unit,
+            weapon_profile=weapon_profile,
+            target_unit_id=target_unit_id,
+            violation_code=ShootingTargetViolationCode.LOCKED_IN_COMBAT,
+            message="Blast weapons cannot target units that are within Engagement Range.",
+            visibility_cache_key=visibility_cache_key,
+            target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
+            target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
+            line_of_sight_witness=witness,
+            observer_model_id=witness.observer_model_id,
+        )
+
     if _unit_has_keyword(target_unit, "LONE_OPERATIVE") and not _lone_operative_target_allowed(
         scenario=scenario,
         attacker_unit=attacker_unit,
@@ -623,11 +725,11 @@ def _target_candidate(
     if (
         locked_context.is_locked
         and _unit_has_vehicle_or_monster_keyword(attacker_unit)
-        and WeaponKeyword.PISTOL not in weapon_profile.keywords
+        and not has_close_quarters_weapon_keyword(weapon_profile)
     ) or (
         target_engagement_context.is_engaged_by_friendly
         and _unit_has_vehicle_or_monster_keyword(target_unit)
-        and WeaponKeyword.PISTOL not in weapon_profile.keywords
+        and not has_close_quarters_weapon_keyword(weapon_profile)
     ):
         hit_roll_modifier -= 1
         targeting_rule_ids.append(BIG_GUNS_NEVER_TIRE_RULE_ID)
@@ -647,6 +749,11 @@ def _target_candidate(
         ),
         line_of_sight_witness=witness,
         visibility_cache_key=visibility_cache_key,
+        shooting_types=_shooting_types_for_target_candidate(
+            indirect_no_visible=indirect_no_visible,
+            locked_context=locked_context,
+            target_engagement_context=target_engagement_context,
+        ),
         hit_roll_modifier=hit_roll_modifier,
         targeting_rule_ids=tuple(targeting_rule_ids),
     )
@@ -1020,7 +1127,7 @@ def _target_engagement_validation(
     if _unit_has_vehicle_or_monster_keyword(target_unit):
         return None
     target_is_engaged_with_attacker = target_unit_id in locked_context.engaged_target_unit_ids
-    if target_is_engaged_with_attacker and WeaponKeyword.PISTOL in weapon_profile.keywords:
+    if target_is_engaged_with_attacker and has_close_quarters_weapon_keyword(weapon_profile):
         return None
     if target_is_engaged_with_attacker and _unit_has_vehicle_or_monster_keyword(attacker_unit):
         return None
@@ -1034,14 +1141,42 @@ def _locked_in_combat_validation(
     target_unit_id: str,
     engaged_target_unit_ids: tuple[str, ...],
 ) -> str | None:
-    is_pistol = WeaponKeyword.PISTOL in weapon_profile.keywords
-    if is_pistol:
+    is_close_quarters = has_close_quarters_weapon_keyword(weapon_profile)
+    if is_close_quarters:
         if target_unit_id not in engaged_target_unit_ids:
-            return "Pistol attacks from locked units must target engaged enemy units."
+            return "Close-quarters attacks from locked units must target engaged enemy units."
         return None
     if _unit_has_vehicle_or_monster_keyword(attacker_unit):
         return None
-    return "Units locked in combat cannot shoot non-Pistol ranged weapons."
+    return "Units locked in combat cannot shoot non-close-quarters ranged weapons."
+
+
+def _blast_engaged_target_validation(
+    *,
+    weapon_profile: WeaponProfile,
+    target_unit_id: str,
+    locked_context: _LockedInCombatContext,
+    target_engagement_context: _TargetEngagementContext,
+) -> bool:
+    if not has_weapon_keyword(weapon_profile, WeaponKeyword.BLAST):
+        return False
+    return (
+        target_unit_id in locked_context.engaged_target_unit_ids
+        or target_engagement_context.is_engaged_by_friendly
+    )
+
+
+def _shooting_types_for_target_candidate(
+    *,
+    indirect_no_visible: bool,
+    locked_context: _LockedInCombatContext,
+    target_engagement_context: _TargetEngagementContext,
+) -> tuple[ShootingType, ...]:
+    if indirect_no_visible:
+        return (ShootingType.INDIRECT,)
+    if locked_context.is_locked or target_engagement_context.is_engaged_by_friendly:
+        return (ShootingType.CLOSE_QUARTERS,)
+    return (ShootingType.NORMAL,)
 
 
 def _lone_operative_target_allowed(

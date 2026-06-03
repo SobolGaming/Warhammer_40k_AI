@@ -18,6 +18,7 @@ from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     AttackSequence,
     AttackSequencePayload,
+    apply_allocation_order_decision,
     apply_attack_allocation_decision,
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
@@ -30,6 +31,7 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.damage_allocation import (
+    SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
@@ -51,19 +53,29 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.shooting_targets import (
+    ShootingTargetCandidate,
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
     shooting_visibility_cache_key,
+    unit_has_line_of_sight_to_target,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
 from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
     resolve_firing_deck_selection,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
+    ASSAULT_RULE_ID,
+    CLOSE_QUARTERS_RULE_ID,
     FIRE_OVERWATCH_RULE_ID,
+    INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+    INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
+    INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID,
+    SNAP_SHOOTING_RULE_ID,
     blast_attack_bonus,
     blast_rule_id,
+    has_close_quarters_weapon_keyword,
     has_weapon_keyword,
     heavy_rule_id,
     melta_damage_bonus,
@@ -94,6 +106,7 @@ if TYPE_CHECKING:
 
 
 SELECT_SHOOTING_UNIT_DECISION_TYPE = "select_shooting_unit"
+SELECT_SHOOTING_TYPE_DECISION_TYPE = "select_shooting_type"
 SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE = "submit_shooting_declaration"
 COMPLETE_SHOOTING_PHASE_OPTION_ID = "complete_shooting_phase"
 _COMPLETE_SHOOTING_PHASE_STATUS = "shooting_phase_complete"
@@ -108,6 +121,15 @@ class ShootingUnitSelectionPayload(TypedDict):
     result_id: str
 
 
+class ShootingTypeSelectionPayload(TypedDict):
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    shooting_type: str
+    request_id: str
+    result_id: str
+
+
 class ShootingPhaseStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
@@ -116,6 +138,7 @@ class ShootingPhaseStatePayload(TypedDict):
     shot_unit_ids: list[str]
     skipped_unit_ids: list[str]
     active_selection: ShootingUnitSelectionPayload | None
+    selected_shooting_type: ShootingTypeSelectionPayload | None
     attack_pools: list[RangedAttackPoolPayload]
     attack_sequence: AttackSequencePayload | None
     allocated_model_ids_this_phase: list[str]
@@ -147,6 +170,7 @@ class ShootingDeclarationProposalRequestPayload(TypedDict):
     proposal_kind: str
     source_decision_request_id: str
     source_decision_result_id: str
+    selected_shooting_type: str | None
     ruleset_descriptor_hash: str
     visibility_cache_key: str
     firing_deck_value: int | None
@@ -225,6 +249,72 @@ class ShootingUnitSelection:
 
 
 @dataclass(frozen=True, slots=True)
+class ShootingTypeSelection:
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    shooting_type: ShootingType
+    request_id: str
+    result_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("ShootingTypeSelection player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("ShootingTypeSelection battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "ShootingTypeSelection unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "shooting_type",
+            shooting_type_from_token(self.shooting_type),
+        )
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("ShootingTypeSelection request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("ShootingTypeSelection result_id", self.result_id),
+        )
+
+    def to_payload(self) -> ShootingTypeSelectionPayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "unit_instance_id": self.unit_instance_id,
+            "shooting_type": self.shooting_type.value,
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ShootingTypeSelectionPayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            unit_instance_id=payload["unit_instance_id"],
+            shooting_type=shooting_type_from_token(payload["shooting_type"]),
+            request_id=payload["request_id"],
+            result_id=payload["result_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class ShootingPhaseState:
     battle_round: int
     active_player_id: str
@@ -233,6 +323,7 @@ class ShootingPhaseState:
     shot_unit_ids: tuple[str, ...] = ()
     skipped_unit_ids: tuple[str, ...] = ()
     active_selection: ShootingUnitSelection | None = None
+    selected_shooting_type: ShootingTypeSelection | None = None
     attack_pools: tuple[RangedAttackPool, ...] = ()
     attack_sequence: AttackSequence | None = None
     allocated_model_ids_this_phase: tuple[str, ...] = ()
@@ -288,6 +379,24 @@ class ShootingPhaseState:
                 raise GameLifecycleError("Shooting active_selection has already shot.")
             if self.active_selection.unit_instance_id in self.skipped_unit_ids:
                 raise GameLifecycleError("Shooting active_selection has already been skipped.")
+        if self.selected_shooting_type is not None:
+            if type(self.selected_shooting_type) is not ShootingTypeSelection:
+                raise GameLifecycleError(
+                    "ShootingPhaseState selected_shooting_type must be ShootingTypeSelection."
+                )
+            if self.active_selection is None:
+                raise GameLifecycleError(
+                    "Shooting selected_shooting_type requires active_selection."
+                )
+            if self.selected_shooting_type.player_id != self.active_player_id:
+                raise GameLifecycleError("Shooting selected_shooting_type active player drift.")
+            if self.selected_shooting_type.battle_round != self.battle_round:
+                raise GameLifecycleError("Shooting selected_shooting_type battle round drift.")
+            if (
+                self.selected_shooting_type.unit_instance_id
+                != self.active_selection.unit_instance_id
+            ):
+                raise GameLifecycleError("Shooting selected_shooting_type unit drift.")
         object.__setattr__(
             self,
             "attack_pools",
@@ -336,6 +445,36 @@ class ShootingPhaseState:
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=selection,
+            selected_shooting_type=None,
+            attack_pools=self.attack_pools,
+            attack_sequence=self.attack_sequence,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
+        )
+
+    def with_shooting_type_selection(self, selection: ShootingTypeSelection) -> Self:
+        if type(selection) is not ShootingTypeSelection:
+            raise GameLifecycleError("Shooting type selection must be ShootingTypeSelection.")
+        if self.phase_complete:
+            raise GameLifecycleError("Cannot select a shooting type after phase completion.")
+        if self.active_selection is None:
+            raise GameLifecycleError("Shooting type selection requires active_selection.")
+        if self.selected_shooting_type is not None:
+            raise GameLifecycleError("Shooting type has already been selected.")
+        if selection.player_id != self.active_player_id:
+            raise GameLifecycleError("Shooting type selection player drift.")
+        if selection.battle_round != self.battle_round:
+            raise GameLifecycleError("Shooting type selection battle round drift.")
+        if selection.unit_instance_id != self.active_selection.unit_instance_id:
+            raise GameLifecycleError("Shooting type selection unit drift.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            phase_complete=False,
+            selected_unit_ids=self.selected_unit_ids,
+            shot_unit_ids=self.shot_unit_ids,
+            skipped_unit_ids=self.skipped_unit_ids,
+            active_selection=self.active_selection,
+            selected_shooting_type=selection,
             attack_pools=self.attack_pools,
             attack_sequence=self.attack_sequence,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
@@ -352,9 +491,13 @@ class ShootingPhaseState:
             raise GameLifecycleError("Cannot record shooting declaration after phase completion.")
         if self.active_selection is None:
             raise GameLifecycleError("Shooting declaration requires active_selection.")
+        if self.selected_shooting_type is None:
+            raise GameLifecycleError("Shooting declaration requires selected_shooting_type.")
         for pool in attack_pools:
             if type(pool) is not RangedAttackPool:
                 raise GameLifecycleError("Shooting declaration attack_pools must be attack pools.")
+            if pool.shooting_type is not self.selected_shooting_type.shooting_type:
+                raise GameLifecycleError("Shooting declaration attack pool type drift.")
         if attack_sequence is not None:
             if type(attack_sequence) is not AttackSequence:
                 raise GameLifecycleError("Shooting declaration attack_sequence is invalid.")
@@ -376,6 +519,7 @@ class ShootingPhaseState:
             shot_unit_ids=shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=None,
+            selected_shooting_type=None,
             attack_pools=(*self.attack_pools, *attack_pools),
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
@@ -395,6 +539,7 @@ class ShootingPhaseState:
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=self.active_selection,
+            selected_shooting_type=self.selected_shooting_type,
             attack_pools=self.attack_pools,
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=allocated_model_ids_this_phase,
@@ -403,6 +548,8 @@ class ShootingPhaseState:
     def with_phase_complete(self, *, skipped_unit_ids: tuple[str, ...] = ()) -> Self:
         if self.active_selection is not None:
             raise GameLifecycleError("Shooting completion requires no active selection.")
+        if self.selected_shooting_type is not None:
+            raise GameLifecycleError("Shooting completion requires no selected shooting type.")
         if self.attack_sequence is not None:
             raise GameLifecycleError("Shooting completion requires no active attack sequence.")
         skipped_ids = _validate_identifier_tuple("skipped_unit_ids", skipped_unit_ids)
@@ -414,6 +561,7 @@ class ShootingPhaseState:
             shot_unit_ids=self.shot_unit_ids,
             skipped_unit_ids=tuple(sorted({*self.skipped_unit_ids, *skipped_ids})),
             active_selection=None,
+            selected_shooting_type=None,
             attack_pools=self.attack_pools,
             attack_sequence=None,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
@@ -430,6 +578,11 @@ class ShootingPhaseState:
             "active_selection": (
                 None if self.active_selection is None else self.active_selection.to_payload()
             ),
+            "selected_shooting_type": (
+                None
+                if self.selected_shooting_type is None
+                else self.selected_shooting_type.to_payload()
+            ),
             "attack_pools": [pool.to_payload() for pool in self.attack_pools],
             "attack_sequence": (
                 None if self.attack_sequence is None else self.attack_sequence.to_payload()
@@ -440,6 +593,7 @@ class ShootingPhaseState:
     @classmethod
     def from_payload(cls, payload: ShootingPhaseStatePayload) -> Self:
         active_selection = payload["active_selection"]
+        selected_shooting_type = payload["selected_shooting_type"]
         return cls(
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
@@ -451,6 +605,11 @@ class ShootingPhaseState:
                 None
                 if active_selection is None
                 else ShootingUnitSelection.from_payload(active_selection)
+            ),
+            selected_shooting_type=(
+                None
+                if selected_shooting_type is None
+                else ShootingTypeSelection.from_payload(selected_shooting_type)
             ),
             attack_pools=tuple(
                 RangedAttackPool.from_payload(pool) for pool in payload["attack_pools"]
@@ -681,11 +840,26 @@ class ShootingPhaseHandler:
                     skipped_unit_ids=shooting_state.skipped_unit_ids,
                 ),
             )
-        if shooting_state.active_selection is not None:
+        if (
+            shooting_state.active_selection is not None
+            and shooting_state.selected_shooting_type is None
+        ):
+            return _request_shooting_type_selection(
+                state=state,
+                decisions=decisions,
+                shooting_state=shooting_state,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                army_catalog=_army_catalog_for_handler(self),
+            )
+        if (
+            shooting_state.active_selection is not None
+            and shooting_state.selected_shooting_type is not None
+        ):
             return _request_shooting_declaration(
                 state=state,
                 decisions=decisions,
                 active_selection=shooting_state.active_selection,
+                selected_shooting_type=shooting_state.selected_shooting_type.shooting_type,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
             )
@@ -847,6 +1021,53 @@ class ShootingPhaseHandler:
             )
         return None
 
+    def invalid_shooting_type_selection_status(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        if request.decision_type != SELECT_SHOOTING_TYPE_DECISION_TYPE:
+            raise GameLifecycleError(
+                "Shooting type prevalidation received unsupported decision_type."
+            )
+        shooting_state = state.shooting_phase_state
+        if shooting_state is None or shooting_state.active_selection is None:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Shooting type selection requires an active shooting unit.",
+                payload={"invalid_reason": "shooting_type_wrong_context"},
+            )
+        payload = _decision_payload_object(result.payload)
+        unit_instance_id = _payload_string(payload, key="unit_instance_id")
+        if unit_instance_id != shooting_state.active_selection.unit_instance_id:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Shooting type selection unit drifted.",
+                payload={"invalid_reason": "shooting_type_unit_drift"},
+            )
+        shooting_type = shooting_type_from_token(_payload_string(payload, key="shooting_type"))
+        unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
+        legal_types = _legal_shooting_types_for_unit(
+            state=state,
+            unit=unit,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            army_catalog=_army_catalog_for_handler(self),
+        )
+        if shooting_type not in legal_types:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Shooting type selection is no longer legal.",
+                payload={
+                    "invalid_reason": "shooting_type_option_drift",
+                    "unit_instance_id": unit_instance_id,
+                    "shooting_type": shooting_type.value,
+                    "legal_shooting_types": [legal.value for legal in legal_types],
+                },
+            )
+        return None
+
     def apply_decision(
         self,
         *,
@@ -856,6 +1077,15 @@ class ShootingPhaseHandler:
     ) -> LifecycleStatus | None:
         if result.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
             _apply_shooting_unit_selection_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                army_catalog=_army_catalog_for_handler(self),
+            )
+            return None
+        if result.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
+            _apply_shooting_type_selection_decision(
                 state=state,
                 result=result,
                 decisions=decisions,
@@ -882,6 +1112,78 @@ class ShootingPhaseHandler:
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
 
 
+def _request_shooting_type_selection(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    shooting_state: ShootingPhaseState,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+) -> LifecycleStatus:
+    active_selection = shooting_state.active_selection
+    if active_selection is None:
+        raise GameLifecycleError("Shooting type request requires active_selection.")
+    unit = _unit_by_id(state=state, unit_instance_id=active_selection.unit_instance_id)
+    legal_types = _legal_shooting_types_for_unit(
+        state=state,
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+    )
+    if not legal_types:
+        raise GameLifecycleError("Selected shooting unit has no legal shooting types.")
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_SHOOTING_TYPE_DECISION_TYPE,
+        actor_id=active_selection.player_id,
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.SHOOTING.value,
+                "active_player_id": active_selection.player_id,
+                "unit_instance_id": active_selection.unit_instance_id,
+                "source_decision_request_id": active_selection.request_id,
+                "source_decision_result_id": active_selection.result_id,
+                "legal_shooting_types": [shooting_type.value for shooting_type in legal_types],
+            }
+        ),
+        options=_shooting_type_options(
+            state=state,
+            active_selection=active_selection,
+            legal_types=legal_types,
+        ),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "shooting_type_selection_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": active_selection.player_id,
+                "phase": BattlePhase.SHOOTING.value,
+                "unit_instance_id": active_selection.unit_instance_id,
+                "request_id": request.request_id,
+                "source_decision_request_id": active_selection.request_id,
+                "source_decision_result_id": active_selection.result_id,
+                "legal_shooting_types": [shooting_type.value for shooting_type in legal_types],
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.SHOOTING.value,
+            "battle_round": state.battle_round,
+            "active_player_id": active_selection.player_id,
+            "unit_instance_id": active_selection.unit_instance_id,
+            "legal_shooting_type_count": len(legal_types),
+        },
+    )
+
+
 def _request_shooting_declaration(
     *,
     state: GameState,
@@ -889,9 +1191,11 @@ def _request_shooting_declaration(
     active_selection: ShootingUnitSelection,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    selected_shooting_type: ShootingType | None = None,
     phase: BattlePhase = BattlePhase.SHOOTING,
     request_context: JsonValue | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
+    forced_shooting_type: ShootingType | None = None,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
@@ -901,6 +1205,7 @@ def _request_shooting_declaration(
         unit=unit,
         army_catalog=army_catalog,
         player_id=active_selection.player_id,
+        selected_shooting_type=selected_shooting_type,
     )
     candidate_target_unit_ids = (
         _enemy_placed_unit_ids(
@@ -922,7 +1227,18 @@ def _request_shooting_declaration(
             terrain_features=terrain_features,
         )
         target_candidates.extend(
-            cast(JsonValue, candidate.to_payload()) for candidate in candidates
+            _target_candidate_payload_for_request(
+                state=state,
+                scenario=scenario,
+                candidate=cast(dict[str, JsonValue], candidate.to_payload()),
+                unit=unit,
+                weapon_profile=profile,
+                player_id=active_selection.player_id,
+                army_catalog=army_catalog,
+                selected_shooting_type=selected_shooting_type,
+                forced_shooting_type=forced_shooting_type,
+            )
+            for candidate in candidates
         )
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
@@ -941,6 +1257,9 @@ def _request_shooting_declaration(
         "proposal_kind": SHOOTING_DECLARATION_PROPOSAL_KIND,
         "source_decision_request_id": active_selection.request_id,
         "source_decision_result_id": active_selection.result_id,
+        "selected_shooting_type": (
+            None if selected_shooting_type is None else selected_shooting_type.value
+        ),
         "ruleset_descriptor_hash": state.ruleset_descriptor_hash,
         "visibility_cache_key": visibility_cache_key,
         "firing_deck_value": _firing_deck_value_for_unit(
@@ -975,6 +1294,9 @@ def _request_shooting_declaration(
                 "request_id": request.request_id,
                 "source_decision_request_id": active_selection.request_id,
                 "source_decision_result_id": active_selection.result_id,
+                "selected_shooting_type": (
+                    None if selected_shooting_type is None else selected_shooting_type.value
+                ),
                 "available_weapon_count": len(available_weapons),
                 "target_candidate_count": len(target_candidates),
                 "visibility_cache_key": visibility_cache_key,
@@ -1043,7 +1365,148 @@ def request_out_of_phase_shooting_declaration(
             }
         ),
         target_unit_ids=target_unit_ids,
+        forced_shooting_type=(
+            ShootingType.SNAP if source_rule_id == FIRE_OVERWATCH_RULE_ID else None
+        ),
     )
+
+
+def _target_candidate_payload_for_request(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    candidate: dict[str, JsonValue],
+    unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    player_id: str,
+    army_catalog: ArmyCatalog,
+    selected_shooting_type: ShootingType | None,
+    forced_shooting_type: ShootingType | None,
+) -> JsonValue:
+    payload = dict(candidate)
+    payload["shooting_types"] = [
+        shooting_type.value
+        for shooting_type in _shooting_types_for_candidate_payload(
+            state=state,
+            scenario=scenario,
+            candidate=candidate,
+            unit=unit,
+            weapon_profile=weapon_profile,
+            player_id=player_id,
+            army_catalog=army_catalog,
+            selected_shooting_type=selected_shooting_type,
+            forced_shooting_type=forced_shooting_type,
+        )
+    ]
+    return validate_json_value(payload)
+
+
+def _shooting_types_for_candidate_payload(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    candidate: dict[str, JsonValue],
+    unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    player_id: str,
+    army_catalog: ArmyCatalog,
+    selected_shooting_type: ShootingType | None,
+    forced_shooting_type: ShootingType | None,
+) -> tuple[ShootingType, ...]:
+    if candidate.get("is_legal") is not True:
+        return ()
+    raw_types = candidate.get("shooting_types")
+    if not isinstance(raw_types, list):
+        raise GameLifecycleError("Shooting target candidate payload missing shooting_types.")
+    base_types = tuple(shooting_type_from_token(value) for value in raw_types)
+    target_unit_id = _payload_string(
+        cast(dict[str, object], candidate),
+        key="target_unit_instance_id",
+    )
+    if forced_shooting_type is not None:
+        if forced_shooting_type is not ShootingType.SNAP:
+            raise GameLifecycleError("Unsupported forced shooting type.")
+        if _snap_shooting_type_allowed_for_unit_target(
+            scenario=scenario,
+            candidate=candidate,
+            unit=unit,
+            target_unit_id=target_unit_id,
+        ):
+            return (ShootingType.SNAP,)
+        return ()
+    if selected_shooting_type is not None:
+        return _shooting_types_for_selected_type(
+            state=state,
+            base_types=base_types,
+            unit=unit,
+            weapon_profile=weapon_profile,
+            selected_shooting_type=selected_shooting_type,
+            player_id=player_id,
+            army_catalog=army_catalog,
+        )
+    if _advanced_unit_is_restricted_to_assault_weapons(
+        state=state,
+        unit=unit,
+        player_id=player_id,
+    ):
+        if ShootingType.NORMAL in base_types and has_weapon_keyword(
+            weapon_profile,
+            WeaponKeyword.ASSAULT,
+        ):
+            return (ShootingType.ASSAULT,)
+        return ()
+    return base_types
+
+
+def _shooting_types_for_selected_type(
+    *,
+    state: GameState,
+    base_types: tuple[ShootingType, ...],
+    unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    selected_shooting_type: ShootingType,
+    player_id: str,
+    army_catalog: ArmyCatalog,
+) -> tuple[ShootingType, ...]:
+    shooting_type = shooting_type_from_token(selected_shooting_type)
+    advanced = _unit_advanced_this_turn(state=state, unit=unit, player_id=player_id)
+    if shooting_type is ShootingType.NORMAL:
+        if advanced:
+            return ()
+        if ShootingType.NORMAL in base_types:
+            return (ShootingType.NORMAL,)
+        return ()
+    if shooting_type is ShootingType.ASSAULT:
+        if not advanced:
+            return ()
+        if ShootingType.NORMAL in base_types and has_weapon_keyword(
+            weapon_profile,
+            WeaponKeyword.ASSAULT,
+        ):
+            return (ShootingType.ASSAULT,)
+        return ()
+    if shooting_type is ShootingType.CLOSE_QUARTERS:
+        if advanced or ShootingType.CLOSE_QUARTERS not in base_types:
+            return ()
+        if _unit_has_vehicle_or_monster_keyword(unit) or has_close_quarters_weapon_keyword(
+            weapon_profile
+        ):
+            return (ShootingType.CLOSE_QUARTERS,)
+        return ()
+    if shooting_type is ShootingType.INDIRECT:
+        if advanced or not _unit_has_indirect_ranged_weapon(
+            unit=unit,
+            army_catalog=army_catalog,
+        ):
+            return ()
+        if not has_weapon_keyword(weapon_profile, WeaponKeyword.INDIRECT_FIRE):
+            return ()
+        if ShootingType.INDIRECT in base_types or ShootingType.NORMAL in base_types:
+            return (ShootingType.INDIRECT,)
+        return ()
+    if shooting_type is ShootingType.SNAP:
+        return ()
+    raise GameLifecycleError("Unsupported selected shooting type.")
 
 
 def _apply_shooting_unit_selection_decision(
@@ -1111,6 +1574,64 @@ def _apply_shooting_unit_selection_decision(
             "result_id": result.result_id,
             "phase_body_status": "unit_selected",
         },
+    )
+
+
+def _apply_shooting_type_selection_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+) -> None:
+    _validate_shooting_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Shooting type selection actor must be the active player.")
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None or shooting_state.active_selection is None:
+        raise GameLifecycleError("Shooting type selection requires active_selection.")
+    if shooting_state.selected_shooting_type is not None:
+        raise GameLifecycleError("Shooting type has already been selected.")
+    payload = _decision_payload_object(result.payload)
+    unit_instance_id = _payload_string(payload, key="unit_instance_id")
+    if unit_instance_id != shooting_state.active_selection.unit_instance_id:
+        raise GameLifecycleError("Shooting type selection unit drift.")
+    shooting_type = shooting_type_from_token(_payload_string(payload, key="shooting_type"))
+    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
+    legal_types = _legal_shooting_types_for_unit(
+        state=state,
+        unit=unit,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+    )
+    if shooting_type not in legal_types:
+        raise GameLifecycleError("Shooting type selection is not currently legal.")
+    selection = ShootingTypeSelection(
+        player_id=active_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=unit_instance_id,
+        shooting_type=shooting_type,
+        request_id=result.request_id,
+        result_id=result.result_id,
+    )
+    state.shooting_phase_state = shooting_state.with_shooting_type_selection(selection)
+    decisions.event_log.append(
+        "shooting_type_selected",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "phase": BattlePhase.SHOOTING.value,
+                "unit_instance_id": unit_instance_id,
+                "shooting_type": shooting_type.value,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "phase_body_status": "shooting_type_selected",
+            }
+        ),
     )
 
 
@@ -1293,6 +1814,15 @@ def _apply_attack_sequence_decision_to_sequence(
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
         )
+    elif result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
+        updated_sequence, allocated_model_ids, status = apply_allocation_order_decision(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            attack_sequence=attack_sequence,
+            result=result,
+            already_allocated_model_ids=already_allocated_model_ids,
+        )
     elif result.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_precision_allocation_decision(
             state=state,
@@ -1358,6 +1888,13 @@ def _validate_declaration_submission(
             violation_code="proposal_unit_drift",
             message="Shooting declaration unit does not match active selection.",
             field="unit_instance_id",
+        )
+    if shooting_state.selected_shooting_type is None:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="shooting_type_not_selected",
+            message="Shooting declaration requires a selected shooting type.",
+            field="declarations",
         )
     unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
     if not _unit_can_select_to_shoot(state=state, unit=unit, army_catalog=army_catalog):
@@ -1472,11 +2009,16 @@ def _attack_pools_or_validation(
     unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
+    selected_shooting_type = _selected_shooting_type_for_declaration(
+        state=state,
+        out_of_phase_state=out_of_phase_state,
+    )
     available_weapon_by_key = _available_weapon_by_declaration_key(
         state=state,
         unit=unit,
         army_catalog=army_catalog,
         player_id=player_id,
+        selected_shooting_type=selected_shooting_type,
     )
     firing_deck_validation = _validate_firing_deck_selection(
         state=state,
@@ -1490,6 +2032,7 @@ def _attack_pools_or_validation(
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
+    snap_target_unit_ids: set[str] = set()
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
         key = _declaration_available_weapon_key(declaration)
         if key in seen_declaration_keys:
@@ -1509,6 +2052,16 @@ def _attack_pools_or_validation(
                 field="declarations",
             )
         weapon_profile = weapon["weapon_profile"]
+        if declaration.shooting_type is ShootingType.INDIRECT and not has_weapon_keyword(
+            weapon_profile,
+            WeaponKeyword.INDIRECT_FIRE,
+        ):
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="shooting_type_unavailable",
+                message="Indirect shooting requires an Indirect Fire weapon profile.",
+                field="declarations",
+            )
         if (
             allowed_out_of_phase_target_ids is not None
             and declaration.target_unit_instance_id not in allowed_out_of_phase_target_ids
@@ -1548,6 +2101,27 @@ def _attack_pools_or_validation(
                 message=candidate.message or "Declared target is not legal.",
                 field="declarations",
             )
+        allowed_shooting_types = _shooting_types_for_declaration_candidate(
+            state=state,
+            scenario=scenario,
+            candidate=candidate,
+            declaration=declaration,
+            unit=unit,
+            weapon_profile=weapon_profile,
+            player_id=player_id,
+            out_of_phase_state=out_of_phase_state,
+            selected_shooting_type=selected_shooting_type,
+            army_catalog=army_catalog,
+        )
+        if declaration.shooting_type not in allowed_shooting_types:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="shooting_type_unavailable",
+                message="Declared shooting type is not available for this weapon and target.",
+                field="declarations",
+            )
+        if declaration.shooting_type is ShootingType.SNAP:
+            snap_target_unit_ids.add(declaration.target_unit_instance_id)
         if attack_count_manager is None:
             attacks = unresolved_attacks_for_validation(weapon_profile)
         else:
@@ -1572,20 +2146,28 @@ def _attack_pools_or_validation(
         )
         attacks, targeting_rule_ids, hit_roll_modifier = _apply_phase13d_weapon_modifiers(
             state=state,
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
             unit=unit,
             target_unit=_unit_by_id(
                 state=state,
                 unit_instance_id=declaration.target_unit_instance_id,
             ),
             weapon_profile=weapon_profile,
+            shooting_type=declaration.shooting_type,
             base_attacks=attacks,
             base_targeting_rule_ids=candidate.targeting_rule_ids,
             base_hit_roll_modifier=candidate.hit_roll_modifier,
             target_within_half_range=target_within_half_range,
+            terrain_features=terrain_features,
             player_id=player_id,
         )
         if _out_of_phase_uses_fire_overwatch(out_of_phase_state):
             targeting_rule_ids = (*targeting_rule_ids, FIRE_OVERWATCH_RULE_ID)
+        targeting_rule_ids = _targeting_rule_ids_with_shooting_type(
+            shooting_type=declaration.shooting_type,
+            targeting_rule_ids=targeting_rule_ids,
+        )
         attack_pools.append(
             RangedAttackPool.from_declaration(
                 declaration=declaration,
@@ -1596,6 +2178,13 @@ def _attack_pools_or_validation(
                 hit_roll_modifier=hit_roll_modifier,
                 targeting_rule_ids=targeting_rule_ids,
             )
+        )
+    if len(snap_target_unit_ids) > 1:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="snap_shooting_multiple_targets",
+            message="Snap Shooting declarations must target one enemy unit.",
+            field="declarations",
         )
     return (tuple(attack_pools), ineligible_unit_ids)
 
@@ -1625,6 +2214,98 @@ def _out_of_phase_uses_fire_overwatch(
     )
 
 
+def _forced_shooting_type_for_out_of_phase(
+    out_of_phase_state: OutOfPhaseShootingState | None,
+) -> ShootingType | None:
+    if _out_of_phase_uses_fire_overwatch(out_of_phase_state):
+        return ShootingType.SNAP
+    return None
+
+
+def _selected_shooting_type_for_declaration(
+    *,
+    state: GameState,
+    out_of_phase_state: OutOfPhaseShootingState | None,
+) -> ShootingType | None:
+    forced = _forced_shooting_type_for_out_of_phase(out_of_phase_state)
+    if forced is not None:
+        return forced
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None or shooting_state.active_selection is None:
+        return None
+    if shooting_state.selected_shooting_type is None:
+        return None
+    return shooting_state.selected_shooting_type.shooting_type
+
+
+def _shooting_types_for_declaration_candidate(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    candidate: ShootingTargetCandidate,
+    declaration: WeaponDeclaration,
+    unit: UnitInstance,
+    weapon_profile: WeaponProfile,
+    player_id: str,
+    out_of_phase_state: OutOfPhaseShootingState | None,
+    selected_shooting_type: ShootingType | None,
+    army_catalog: ArmyCatalog,
+) -> tuple[ShootingType, ...]:
+    forced_shooting_type = _forced_shooting_type_for_out_of_phase(out_of_phase_state)
+    if forced_shooting_type is not None:
+        if forced_shooting_type is not ShootingType.SNAP:
+            raise GameLifecycleError("Unsupported forced shooting type.")
+        if candidate.target_visible_model_ids and _declaration_target_within_max_range(
+            scenario=scenario,
+            declaration=declaration,
+            target_in_range_model_ids=candidate.target_visible_model_ids,
+            range_inches=24,
+        ):
+            return (ShootingType.SNAP,)
+        return ()
+    if selected_shooting_type is not None:
+        return _shooting_types_for_selected_type(
+            state=state,
+            base_types=candidate.shooting_types,
+            unit=unit,
+            weapon_profile=weapon_profile,
+            selected_shooting_type=selected_shooting_type,
+            player_id=player_id,
+            army_catalog=army_catalog,
+        )
+    if _advanced_unit_is_restricted_to_assault_weapons(
+        state=state,
+        unit=unit,
+        player_id=player_id,
+    ):
+        if ShootingType.NORMAL in candidate.shooting_types and has_weapon_keyword(
+            weapon_profile,
+            WeaponKeyword.ASSAULT,
+        ):
+            return (ShootingType.ASSAULT,)
+        return ()
+    return candidate.shooting_types
+
+
+def _targeting_rule_ids_with_shooting_type(
+    *,
+    shooting_type: ShootingType,
+    targeting_rule_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    rule_ids = list(targeting_rule_ids)
+    if shooting_type is ShootingType.ASSAULT:
+        rule_ids.append(ASSAULT_RULE_ID)
+    elif shooting_type is ShootingType.CLOSE_QUARTERS:
+        rule_ids.append(CLOSE_QUARTERS_RULE_ID)
+    elif shooting_type is ShootingType.SNAP:
+        rule_ids.append(SNAP_SHOOTING_RULE_ID)
+    elif shooting_type in {ShootingType.NORMAL, ShootingType.INDIRECT}:
+        pass
+    else:
+        raise GameLifecycleError("Unsupported shooting type for targeting rule IDs.")
+    return tuple(dict.fromkeys(rule_ids))
+
+
 def _validate_model_pistol_exclusivity(
     *,
     state: GameState,
@@ -1643,31 +2324,36 @@ def _validate_model_pistol_exclusivity(
         return None
     source_model_id = _declaration_source_model_id(declaration)
     model_key = (source_unit.unit_instance_id, source_model_id)
-    is_pistol = WeaponKeyword.PISTOL in weapon_profile.keywords
+    is_close_quarters = has_close_quarters_weapon_keyword(weapon_profile)
     existing = model_pistol_declaration_kind.get(model_key)
-    if existing is not None and existing != is_pistol:
+    if existing is not None and existing != is_close_quarters:
         return ShootingProposalValidationResult.invalid(
             proposal_request_id=proposal_request_id,
-            violation_code="mixed_pistol_non_pistol_declaration",
+            violation_code="mixed_close_quarters_non_close_quarters_declaration",
             message=(
-                "A non-Monster/Vehicle model cannot shoot Pistol and non-Pistol weapons together."
+                "A non-Monster/Vehicle model cannot shoot close-quarters and "
+                "non-close-quarters weapons together."
             ),
             field="declarations",
         )
-    model_pistol_declaration_kind[model_key] = is_pistol
+    model_pistol_declaration_kind[model_key] = is_close_quarters
     return None
 
 
 def _apply_phase13d_weapon_modifiers(
     *,
     state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
     unit: UnitInstance,
     target_unit: UnitInstance,
     weapon_profile: WeaponProfile,
+    shooting_type: ShootingType,
     base_attacks: int,
     base_targeting_rule_ids: tuple[str, ...],
     base_hit_roll_modifier: int,
     target_within_half_range: bool,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
     player_id: str | None = None,
 ) -> tuple[int, tuple[str, ...], int]:
     attacks = base_attacks
@@ -1703,7 +2389,25 @@ def _apply_phase13d_weapon_modifiers(
         hit_roll_modifier += 1
         targeting_rule_ids.append(heavy_rule_id())
 
-    return attacks, tuple(targeting_rule_ids), hit_roll_modifier
+    if shooting_type is ShootingType.INDIRECT and has_weapon_keyword(
+        weapon_profile, WeaponKeyword.INDIRECT_FIRE
+    ):
+        if INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID not in targeting_rule_ids:
+            targeting_rule_ids.append(INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID)
+        targeting_rule_ids.append(INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID)
+        if _unit_remained_stationary(state=state, unit=unit, player_id=player_id) and (
+            _target_visible_to_friendly_unit(
+                state=state,
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                target_unit_instance_id=target_unit.unit_instance_id,
+                terrain_features=terrain_features,
+                player_id=player_id,
+            )
+        ):
+            targeting_rule_ids.append(INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID)
+
+    return attacks, tuple(dict.fromkeys(targeting_rule_ids)), hit_roll_modifier
 
 
 def _target_within_half_weapon_range(
@@ -1740,6 +2444,81 @@ def _target_within_half_weapon_range(
     return False
 
 
+def _snap_shooting_type_allowed_for_unit_target(
+    *,
+    scenario: BattlefieldScenario,
+    candidate: dict[str, JsonValue],
+    unit: UnitInstance,
+    target_unit_id: str,
+) -> bool:
+    target_visible_model_ids = candidate.get("target_visible_model_ids")
+    if not isinstance(target_visible_model_ids, list) or not target_visible_model_ids:
+        return False
+    return _unit_target_within_max_range(
+        scenario=scenario,
+        unit=unit,
+        target_unit_id=target_unit_id,
+        range_inches=24,
+    )
+
+
+def _declaration_target_within_max_range(
+    *,
+    scenario: BattlefieldScenario,
+    declaration: WeaponDeclaration,
+    target_in_range_model_ids: tuple[str, ...],
+    range_inches: int,
+) -> bool:
+    if not target_in_range_model_ids:
+        return False
+    battlefield = scenario.battlefield_state
+    attacker_placement = battlefield.model_placement_by_id(declaration.attacker_model_instance_id)
+    attacker_model = geometry_model_for_placement(
+        model=scenario.model_instance_for_placement(attacker_placement),
+        placement=attacker_placement,
+    )
+    for target_model_id in target_in_range_model_ids:
+        target_placement = battlefield.model_placement_by_id(target_model_id)
+        target_model = geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(target_placement),
+            placement=target_placement,
+        )
+        if DistanceMeasurementContext.from_models(
+            attacker_model,
+            target_model,
+        ).closest_distance_inches() <= float(range_inches):
+            return True
+    return False
+
+
+def _unit_target_within_max_range(
+    *,
+    scenario: BattlefieldScenario,
+    unit: UnitInstance,
+    target_unit_id: str,
+    range_inches: int,
+) -> bool:
+    battlefield = scenario.battlefield_state
+    unit_placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+    target_placement = battlefield.unit_placement_by_id(target_unit_id)
+    for attacker_model_placement in unit_placement.model_placements:
+        attacker_model = geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(attacker_model_placement),
+            placement=attacker_model_placement,
+        )
+        for target_model_placement in target_placement.model_placements:
+            target_model = geometry_model_for_placement(
+                model=scenario.model_instance_for_placement(target_model_placement),
+                placement=target_model_placement,
+            )
+            if DistanceMeasurementContext.from_models(
+                attacker_model,
+                target_model,
+            ).closest_distance_inches() <= float(range_inches):
+                return True
+    return False
+
+
 def _unit_remained_stationary(
     *,
     state: GameState,
@@ -1765,6 +2544,40 @@ def _unit_remained_stationary(
     if movement_state is None:
         return True
     return unit.unit_instance_id not in movement_state.moved_unit_ids
+
+
+def _target_visible_to_friendly_unit(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    target_unit_instance_id: str,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    player_id: str | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Friendly visibility query requires battlefield_state.")
+    try:
+        placed_army = battlefield.placed_army_for_player(actor_id)
+    except PlacementError as exc:
+        raise GameLifecycleError(
+            "Friendly visibility query requires placed friendly units."
+        ) from exc
+    for unit_placement in placed_army.unit_placements:
+        if unit_placement.unit_instance_id == target_unit_instance_id:
+            raise GameLifecycleError("Friendly visibility query included the target unit.")
+        friendly_unit = _unit_by_id(state=state, unit_instance_id=unit_placement.unit_instance_id)
+        if unit_has_line_of_sight_to_target(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            observing_unit=friendly_unit,
+            target_unit_id=target_unit_instance_id,
+            terrain_features=terrain_features,
+        ):
+            return True
+    return False
 
 
 def _declaration_source_unit(
@@ -1969,6 +2782,7 @@ def _available_weapon_by_declaration_key(
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
+    selected_shooting_type: ShootingType | None = None,
 ) -> dict[tuple[str, str, str, str | None, str | None], _AvailableWeapon]:
     return {
         _available_weapon_key(weapon): weapon
@@ -1977,6 +2791,7 @@ def _available_weapon_by_declaration_key(
             unit=unit,
             army_catalog=army_catalog,
             player_id=player_id,
+            selected_shooting_type=selected_shooting_type,
         )
     }
 
@@ -2011,6 +2826,7 @@ def _available_weapons_for_unit(
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
+    selected_shooting_type: ShootingType | None = None,
 ) -> tuple[_AvailableWeapon, ...]:
     weapons: list[_AvailableWeapon] = []
     for model in unit.own_models:
@@ -2028,7 +2844,47 @@ def _available_weapons_for_unit(
             army_catalog=army_catalog,
         )
     )
-    if _advanced_unit_is_restricted_to_assault_weapons(
+    if (
+        selected_shooting_type is ShootingType.ASSAULT
+        or _advanced_unit_is_restricted_to_assault_weapons(
+            state=state,
+            unit=unit,
+            player_id=player_id,
+        )
+    ):
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT)
+        ]
+    if (
+        selected_shooting_type is ShootingType.CLOSE_QUARTERS
+        and not _unit_has_vehicle_or_monster_keyword(unit)
+    ):
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_close_quarters_weapon_keyword(weapon["weapon_profile"])
+        ]
+    if selected_shooting_type is ShootingType.INDIRECT:
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE)
+        ]
+    if selected_shooting_type is ShootingType.NORMAL and _unit_advanced_this_turn(
+        state=state,
+        unit=unit,
+        player_id=player_id,
+    ):
+        weapons = []
+    if selected_shooting_type is ShootingType.INDIRECT and _unit_advanced_this_turn(
+        state=state,
+        unit=unit,
+        player_id=player_id,
+    ):
+        weapons = []
+    if selected_shooting_type is None and _advanced_unit_is_restricted_to_assault_weapons(
         state=state,
         unit=unit,
         player_id=player_id,
@@ -2178,6 +3034,7 @@ def _unit_has_legal_shooting_declaration(
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
+    selected_shooting_type: ShootingType | None = None,
 ) -> bool:
     actor_id = _active_player_id(state) if player_id is None else player_id
     resolved_target_unit_ids = (
@@ -2191,6 +3048,7 @@ def _unit_has_legal_shooting_declaration(
         unit=unit,
         army_catalog=army_catalog,
         player_id=actor_id,
+        selected_shooting_type=selected_shooting_type,
     ):
         for target_unit_id in resolved_target_unit_ids:
             candidate = shooting_target_candidate_for_model(
@@ -2202,9 +3060,51 @@ def _unit_has_legal_shooting_declaration(
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
             )
-            if candidate.is_legal:
+            if not candidate.is_legal:
+                continue
+            if selected_shooting_type is None:
+                return True
+            if _shooting_types_for_selected_type(
+                state=state,
+                base_types=candidate.shooting_types,
+                unit=unit,
+                weapon_profile=weapon["weapon_profile"],
+                selected_shooting_type=selected_shooting_type,
+                player_id=actor_id,
+                army_catalog=army_catalog,
+            ):
                 return True
     return False
+
+
+def _legal_shooting_types_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    player_id: str | None = None,
+    target_unit_ids: tuple[str, ...] | None = None,
+) -> tuple[ShootingType, ...]:
+    legal_types: list[ShootingType] = []
+    for shooting_type in (
+        ShootingType.NORMAL,
+        ShootingType.ASSAULT,
+        ShootingType.CLOSE_QUARTERS,
+        ShootingType.INDIRECT,
+    ):
+        if _unit_has_legal_shooting_declaration(
+            state=state,
+            scenario=_battlefield_scenario(state),
+            unit=unit,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            player_id=player_id,
+            target_unit_ids=target_unit_ids,
+            selected_shooting_type=shooting_type,
+        ):
+            legal_types.append(shooting_type)
+    return tuple(legal_types)
 
 
 def shooting_unit_can_select_to_shoot(
@@ -2284,6 +3184,23 @@ def _advanced_unit_is_restricted_to_assault_weapons(
     return advanced_state is not None and not advanced_state.can_shoot
 
 
+def _unit_advanced_this_turn(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    player_id: str | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    return (
+        state.advanced_unit_state_for_unit(
+            player_id=actor_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+        )
+        is not None
+    )
+
+
 def _unit_has_assault_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCatalog) -> bool:
     for model in unit.own_models:
         for weapon in _available_weapons_for_model(
@@ -2292,6 +3209,18 @@ def _unit_has_assault_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCat
             army_catalog=army_catalog,
         ):
             if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT):
+                return True
+    return False
+
+
+def _unit_has_indirect_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCatalog) -> bool:
+    for model in unit.own_models:
+        for weapon in _available_weapons_for_model(
+            model=model,
+            unit=unit,
+            army_catalog=army_catalog,
+        ):
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE):
                 return True
     return False
 
@@ -2494,6 +3423,34 @@ def _shooting_unit_options(
                     "active_player_id": state.active_player_id,
                     "phase_body_status": _COMPLETE_SHOOTING_PHASE_STATUS,
                     "skipped_unit_ids": list(unit_ids),
+                },
+            )
+        )
+    return tuple(options)
+
+
+def _shooting_type_options(
+    *,
+    state: GameState,
+    active_selection: ShootingUnitSelection,
+    legal_types: tuple[ShootingType, ...],
+) -> tuple[DecisionOption, ...]:
+    options: list[DecisionOption] = []
+    for shooting_type in legal_types:
+        options.append(
+            DecisionOption(
+                option_id=shooting_type.value,
+                label=f"{shooting_type.value.replace('_', ' ').title()} Shooting",
+                payload={
+                    "submission_kind": SELECT_SHOOTING_TYPE_DECISION_TYPE,
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "active_player_id": active_selection.player_id,
+                    "unit_instance_id": active_selection.unit_instance_id,
+                    "shooting_type": shooting_type.value,
+                    "source_decision_request_id": active_selection.request_id,
+                    "source_decision_result_id": active_selection.result_id,
                 },
             )
         )

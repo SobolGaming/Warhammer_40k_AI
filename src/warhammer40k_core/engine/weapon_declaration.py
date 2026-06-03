@@ -8,6 +8,7 @@ from warhammer40k_core.core.dice import RandomCharacteristicTiming
 from warhammer40k_core.core.weapon_profiles import WeaponProfile, WeaponProfilePayload
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
 from warhammer40k_core.engine.transports import FiringDeckSelection, FiringDeckSelectionPayload
 
 SHOOTING_DECLARATION_PROPOSAL_KIND = "shooting_declaration"
@@ -18,6 +19,7 @@ class WeaponDeclarationPayload(TypedDict):
     wargear_id: str
     weapon_profile_id: str
     target_unit_instance_id: str
+    shooting_type: str
     firing_deck_source_unit_instance_id: str | None
     firing_deck_source_model_instance_id: str | None
 
@@ -41,6 +43,7 @@ class RangedAttackPoolPayload(TypedDict):
     weapon_profile_id: str
     weapon_profile: WeaponProfilePayload
     target_unit_instance_id: str
+    shooting_type: str
     attacks: int
     target_visible_model_ids: list[str]
     target_in_range_model_ids: list[str]
@@ -79,6 +82,7 @@ class WeaponDeclaration:
     wargear_id: str
     weapon_profile_id: str
     target_unit_instance_id: str
+    shooting_type: ShootingType
     firing_deck_source_unit_instance_id: str | None = None
     firing_deck_source_model_instance_id: str | None = None
 
@@ -112,6 +116,7 @@ class WeaponDeclaration:
                 self.target_unit_instance_id,
             ),
         )
+        object.__setattr__(self, "shooting_type", shooting_type_from_token(self.shooting_type))
         object.__setattr__(
             self,
             "firing_deck_source_unit_instance_id",
@@ -145,17 +150,22 @@ class WeaponDeclaration:
             "wargear_id": self.wargear_id,
             "weapon_profile_id": self.weapon_profile_id,
             "target_unit_instance_id": self.target_unit_instance_id,
+            "shooting_type": self.shooting_type.value,
             "firing_deck_source_unit_instance_id": self.firing_deck_source_unit_instance_id,
             "firing_deck_source_model_instance_id": self.firing_deck_source_model_instance_id,
         }
 
     @classmethod
     def from_payload(cls, payload: WeaponDeclarationPayload) -> Self:
+        missing = _weapon_declaration_missing_field(payload)
+        if missing is not None:
+            raise GameLifecycleError(f"WeaponDeclaration payload missing {missing}.")
         return cls(
             attacker_model_instance_id=payload["attacker_model_instance_id"],
             wargear_id=payload["wargear_id"],
             weapon_profile_id=payload["weapon_profile_id"],
             target_unit_instance_id=payload["target_unit_instance_id"],
+            shooting_type=shooting_type_from_token(payload["shooting_type"]),
             firing_deck_source_unit_instance_id=payload["firing_deck_source_unit_instance_id"],
             firing_deck_source_model_instance_id=payload["firing_deck_source_model_instance_id"],
         )
@@ -364,6 +374,7 @@ class RangedAttackPool:
     weapon_profile_id: str
     weapon_profile: WeaponProfile
     target_unit_instance_id: str
+    shooting_type: ShootingType
     attacks: int
     target_visible_model_ids: tuple[str, ...]
     target_in_range_model_ids: tuple[str, ...]
@@ -406,6 +417,7 @@ class RangedAttackPool:
                 self.target_unit_instance_id,
             ),
         )
+        object.__setattr__(self, "shooting_type", shooting_type_from_token(self.shooting_type))
         object.__setattr__(
             self,
             "attacks",
@@ -480,6 +492,7 @@ class RangedAttackPool:
             weapon_profile_id=declaration.weapon_profile_id,
             weapon_profile=weapon_profile,
             target_unit_instance_id=declaration.target_unit_instance_id,
+            shooting_type=declaration.shooting_type,
             attacks=attacks,
             target_visible_model_ids=target_visible_model_ids,
             target_in_range_model_ids=target_in_range_model_ids,
@@ -496,6 +509,7 @@ class RangedAttackPool:
             "weapon_profile_id": self.weapon_profile_id,
             "weapon_profile": self.weapon_profile.to_payload(),
             "target_unit_instance_id": self.target_unit_instance_id,
+            "shooting_type": self.shooting_type.value,
             "attacks": self.attacks,
             "target_visible_model_ids": list(self.target_visible_model_ids),
             "target_in_range_model_ids": list(self.target_in_range_model_ids),
@@ -513,6 +527,7 @@ class RangedAttackPool:
             weapon_profile_id=payload["weapon_profile_id"],
             weapon_profile=WeaponProfile.from_payload(payload["weapon_profile"]),
             target_unit_instance_id=payload["target_unit_instance_id"],
+            shooting_type=shooting_type_from_token(payload["shooting_type"]),
             attacks=payload["attacks"],
             target_visible_model_ids=tuple(payload["target_visible_model_ids"]),
             target_in_range_model_ids=tuple(payload["target_in_range_model_ids"]),
@@ -737,6 +752,25 @@ def shooting_declaration_missing_field(payload: object) -> str | None:
         "declarations",
         "firing_deck_selection",
         "visibility_cache_key",
+    )
+    for field in required_fields:
+        if field not in raw_payload:
+            return field
+    return None
+
+
+def _weapon_declaration_missing_field(payload: object) -> str | None:
+    if not isinstance(payload, dict):
+        return "declaration"
+    raw_payload = cast(dict[str, object], payload)
+    required_fields = (
+        "attacker_model_instance_id",
+        "wargear_id",
+        "weapon_profile_id",
+        "target_unit_instance_id",
+        "shooting_type",
+        "firing_deck_source_unit_instance_id",
+        "firing_deck_source_model_instance_id",
     )
     for field in required_fields:
         if field not in raw_payload:

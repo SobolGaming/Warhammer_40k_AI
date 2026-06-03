@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13 shooting decision requirements, and Phase 14B End of Opponent's Movement phase reaction timing. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14F shooting decision requirements, and Phase 14B End of Opponent's Movement phase reaction timing. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13 shooting decision rules, and Phase 14B End of Opponent's Movement phase reaction timing, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14F shooting decision rules, and Phase 14B End of Opponent's Movement phase reaction timing, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -259,43 +259,70 @@ Phase 13B and later shooting slices add player-facing attacker and defender choi
 Attacker shooting decisions include:
 
 - finite `select_shooting_unit` choices for the active player when more than one unit can be selected or skipped;
+- finite `select_shooting_type` choices for the selected unit before any in-phase shooting declaration is submitted;
 - finite or parameterized target and weapon declaration choices, depending on whether the full action space can be safely enumerated;
 - Firing Deck selections that bind each selected embarked model to at most one legal non-One-Shot ranged weapon, temporarily grant those attacks to the Transport, and mark the selected embarked units ineligible to shoot for the phase.
 
 Phase 13B implements attacker selection and declaration with these adapter-visible decisions:
 
 - `select_shooting_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_shooting_phase`. Unit option payloads include the selected `unit_instance_id`. The completion option uses `submission_kind: "complete_shooting_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player units that completion will skip.
-- `submit_shooting_declaration`: parameterized active-player choice. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "shooting_declaration"`.
+- `select_shooting_type`: finite active-player choice emitted after `select_shooting_unit` and before in-phase `submit_shooting_declaration`. Option IDs are engine-enumerated shooting type IDs such as `normal`, `assault`, `close_quarters`, or `indirect`. The request payload includes `game_id`, `battle_round`, `phase`, `active_player_id`, `unit_instance_id`, source unit-selection request/result IDs, and `legal_shooting_types`. Option payloads include `submission_kind: "select_shooting_type"`, the same source context, and the selected `shooting_type`. Stale, drifted, wrong-actor, or wrong-option submissions reject before queue pop and before mutation.
+- `submit_shooting_declaration`: parameterized active-player choice. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "shooting_declaration"`. In-phase requests include `payload.proposal_request.selected_shooting_type`; target candidate `shooting_types` are constrained to that selected type. Out-of-phase Fire Overwatch bypasses the in-phase type decision and emits a constrained `submit_shooting_declaration` request with source-forced `snap` shooting.
 - `submit_shooting_declaration.payload.proposal_request.available_weapons`: current JSON-safe weapon options, including model ID, wargear ID, full weapon-profile payload, and optional Firing Deck source unit/model IDs.
 - `submit_shooting_declaration.payload.proposal_request.firing_deck_value`: the selected Transport's descriptor-sourced Firing Deck value, or `null` when the unit has no Firing Deck descriptor.
-- `submit_shooting_declaration.payload.proposal_request.target_candidates`: current JSON-safe target candidates with legality, violation diagnostics, visible-and-in-range target model IDs, line-of-sight witness, visibility cache key, hit modifier, and targeting rule IDs.
+- `submit_shooting_declaration.payload.proposal_request.target_candidates`: current JSON-safe target candidates with legality, violation diagnostics, visible-and-in-range target model IDs, line-of-sight witness, visibility cache key, engine-enumerated `shooting_types`, hit modifier, and targeting rule IDs.
 
 Phase 13B shooting declaration submissions must use `selected_option_id: "submit_parameterized_payload"` and a `ShootingDeclarationProposal` payload containing:
 
 - `proposal_request_id`, `proposal_kind: "shooting_declaration"`, player ID, battle round, acting unit ID, source request/result IDs, and visibility cache key;
-- one or more `WeaponDeclaration` entries with attacker model ID, wargear ID, weapon profile ID, target unit ID, and optional Firing Deck source unit/model IDs;
+- one or more `WeaponDeclaration` entries with attacker model ID, wargear ID, weapon profile ID, target unit ID, engine-enumerated `shooting_type`, and optional Firing Deck source unit/model IDs;
 - optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, selected embarked unit/model/wargear/profile bindings, and already-shot embarked unit IDs. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
 
-Accepted Phase 13B declarations emit deterministic attack-pool payloads and `shooting_declaration_accepted` events. Phase 13C then consumes the declared `RangedAttackPool` records through the same Shooting phase lifecycle and may emit defender allocation or save decisions before returning to the next shooting-unit selection. Rejected stale, malformed, drifted, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck Phase 13B submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
+Accepted Phase 13B/14F declarations emit deterministic attack-pool payloads, including the selected `shooting_type`, and `shooting_declaration_accepted` events. Legal shooting types are engine-enumerated values: `normal`, `assault`, `close_quarters`, `indirect`, or source-provided values such as `snap`. Adapters must submit the pending `select_shooting_type` option before an in-phase declaration, then select one of the declaration request target candidate's current `shooting_types`; they must not invent a shooting type or infer one from weapon keywords. Phase 13C/14E then consumes the declared `RangedAttackPool` records through the grouped Shooting phase lifecycle and may emit attacker Precision plus defender allocation-order, save, Feel No Pain, or destruction-reaction decisions before returning to the next shooting-unit selection. Rejected stale, malformed, drifted, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, or invalid-Firing-Deck submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
 
 Defender shooting decisions include:
 
-- finite `select_attack_allocation` choices when allocation is not forced;
+- finite `select_allocation_order` choices when more than one legal allocation
+  group order exists for the current grouped save/damage window;
+- legacy finite `select_attack_allocation` choices only for older single-attack
+  model-allocation paths that have not yet been retired;
 - finite optional or competing defensive ability choices, including any optional Feel No Pain source/use choice;
 - finite optional destruction-reaction choices when a destroyed model has registered optional shoot-on-death, fight-on-death, or equivalent destruction sources;
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
 - shooting-coupled reactive Stratagem choices such as Go to Ground through the existing `use_stratagem` or Stratagem target-proposal contract.
 
-Saving throw kind is not an adapter choice in the 11th Edition contract. In the
-current partial Phase 14E implementation, if the allocated model has an
-Invulnerable Save, the engine must use that Invulnerable Save. Armour Saves with
-AP modifiers are used only when the allocated model has no Invulnerable Save.
-When the remaining allocation-group host lands, the same rule must apply to the
-current allocation group instead of a single allocated model. Adapters must not
-offer, submit, apply, or replay an armour-versus-invulnerable choice.
+Saving throw kind is not an adapter choice in the 11th Edition contract. If the
+current allocation group has an Invulnerable Save, the engine must use that
+Invulnerable Save. Armour Saves with AP modifiers are used only when the current
+allocation group has no Invulnerable Save. Adapters must not offer, submit,
+apply, or replay an armour-versus-invulnerable choice.
 
 Phase 13C implements these defender-visible attack-resolution decisions:
 
+- `select_allocation_order`: finite defending-player choice. Option IDs are
+  deterministic order IDs such as `allocation-order-001`; adapters must not
+  invent group-order payloads. The selected option payload includes
+  `submission_kind: "select_allocation_order"`, `ordered_group_ids`, and
+  `ordered_groups`. The request payload includes `selection_kind:
+  "allocation_group_order"`, `attack_context` for the allocation-order window,
+  optional `attack_contexts` for grouped wound pools already rolled before the
+  decision, `allocation_context`, `allocation_groups`, and
+  `priority_group_ids`. Each group payload includes `group_id`, `model_ids`,
+  `role`, W/Sv/InSv profile, wounded and already-allocated model IDs,
+  Bodyguard/Character evidence, role evidence, and legality reasons. The engine
+  creates allocation groups automatically: one per eligible Character model and
+  one per non-Character W/Sv/InSv profile. It emits this finite decision only
+  when more than one legal group order exists inside the same allocation tier;
+  forced tier order is automatic. Wounded non-Character groups precede
+  unwounded non-Character groups, non-Character groups precede Character
+  groups, and wounded Character groups precede unwounded Character groups.
+  `priority_group_ids` is normally empty; Precision may populate it with the
+  attacker-selected visible Character group, which is promoted to the front of
+  the legal order for the current attack pool. Failed saves resolve from lowest
+  to highest against the current ordered group; when that group is destroyed or
+  exhausted, remaining failed saves advance to the next group in
+  `ordered_group_ids`. Stale, drifted, wrong-actor, wrong-option, or
+  payload-mismatched submissions reject before queue pop and before mutation.
 - `select_attack_allocation`: finite defending-player choice. Option IDs are legal `model_instance_id` values. `payload.attack_context` is the JSON-safe attack context for the single attack being allocated. `payload.allocation_context` includes alive model IDs, wounded model IDs, already-allocated model IDs for the phase, attached-unit Bodyguard/Character protection evidence, and any attacker-side allocation constraint. Adapters must select one pending option ID and must not infer legal models from table state.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Grenade mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves.
 
@@ -305,9 +332,9 @@ Phase 13E implements this destroyed-model attack-resolution decision:
 
 Phase 13D adds this attacker-visible attack-resolution decision:
 
-- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character models. The current partial Phase 14E payload uses visible Character `model_instance_id` option IDs plus `decline_precision`; Character options include `payload.selected_model_id`, and the decline option uses `selected_model_id: null`. Accepted Character selection is pool-scoped as an interim attacker-side constraint on that Character model until those attacks are resolved or that model is destroyed, whichever happens first. When the remaining allocation-group host lands, this decision must identify the selected Character allocation group rather than a single model, and the normal defender allocation path must be constrained to that group. Declining, having no visible Character, having no Precision source, or destruction of the selected Character model/group follows the normal defender allocation path.
+- `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character allocation groups. Option IDs are visible eligible Character `group_id` values plus `decline_precision`; Character options include `payload.selected_group_id` and `payload.selected_model_ids`, and the decline option uses `selected_group_id: null` with an empty model list. Grouped-host requests include the wounded pool's `attack_contexts` in the request payload. Accepted Character-group selection is pool-scoped until those attacks resolve or that Character group is destroyed, whichever happens first. In the grouped host, the selected Character group is carried as allocation-order `priority_group_ids` and promoted ahead of ordinary defender group order; remaining failed saves return to normal ordered groups after that Character group is destroyed. Declining, having no visible Character group, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
 
-Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Weapon abilities remain Phase 13D behavior, but adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
+Phase 13C attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Supported grouped-host weapon abilities preserve those event boundaries, including Lethal Hits skipped wound payloads, Sustained Hits generated-hit wound contexts, Precision priority-group allocation, and Devastating Wounds deferred mortal-wound packets. Adapters may rely on these event names and payload boundaries as the public attack-sequence timing surface.
 
 If a shooting declaration is parameterized, the request must embed a typed proposal request with replay-safe source context:
 
@@ -317,7 +344,7 @@ If a shooting declaration is parameterized, the request must embed a typed propo
 - the ruleset descriptor hash and line-of-sight/cache evidence required by target validation;
 - visible viewer payloads that do not leak hidden opponent information.
 
-Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Phase 13B does not allow recorded rule-invalid retry attempts for attacker declarations. Accepted submissions validate target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Pistol, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
+Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Phase 13B/14F does not allow recorded rule-invalid retry attempts for attacker declarations. Accepted submissions validate the previously selected shooting type, target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Close-quarters/Pistol, Blast engagement bans, Assault/Advanced weapon gating, Indirect per-weapon `[INDIRECT FIRE]` eligibility, Indirect visibility and no-Hit-reroll policy, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
 
 Defender allocation/save/defensive/destruction-reaction decisions may auto-resolve only when the rules leave exactly one legal outcome and no optional player choice. Otherwise the defending or destroyed-model controlling player is the `DecisionRequest.actor_id`, even though they may not be the active player. Adapters must not infer that Shooting phase decisions always belong to the active player. Stale, drifted, wrong-actor, wrong-option, or payload-mismatched destruction-reaction submissions return typed invalid diagnostics before queue pop and before a `DecisionRecord` is created.
 
@@ -335,11 +362,12 @@ Fire Overwatch is not emitted from the active player's normal Shooting phase and
 Required Phase 13 adapter-contract tests:
 
 - valid attacker unit selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid shooting-type selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`, including stale/drift/wrong-actor/wrong-option rejection before mutation;
 - valid shooting target/weapon declaration through the chosen finite or parameterized submission path;
 - stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, and invalid-visibility submission rejection without mutation where required;
 - Firing Deck declaration validation, replay, and end-of-phase ineligible-unit state;
-- defender attack-allocation round-trip through finite decisions, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
-- Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, selected-group destruction, and normal Bodyguard-protected fallback;
+- defender attack-allocation/allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, grouped failed-save transition to the next ordered group, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
+- Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, grouped priority-group promotion, selected-group destruction, and normal Bodyguard-protected fallback;
 - optional or competing Feel No Pain decisions through finite decisions;
 - Go to Ground, Fire Overwatch, and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
 - replay/payload round-trip with no Python object reprs or memory addresses;

@@ -13,6 +13,8 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 ASSAULT_RULE_ID = "weapon-ability:assault"
 BLAST_RULE_ID = "weapon-ability:blast"
+CLEAVE_RULE_ID = "weapon-ability:cleave"
+CLOSE_QUARTERS_RULE_ID = "weapon-ability:close-quarters"
 DEVASTATING_WOUNDS_RULE_ID = "weapon-ability:devastating-wounds"
 FIRE_OVERWATCH_RULE_ID = "core:fire-overwatch"
 HAZARDOUS_RULE_ID = "weapon-ability:hazardous"
@@ -20,15 +22,21 @@ HEAVY_RULE_ID = "weapon-ability:heavy"
 IGNORES_COVER_RULE_ID = "weapon-ability:ignores-cover"
 INDIRECT_FIRE_NO_VISIBLE_RULE_ID = "weapon-ability:indirect-fire:no-visible-target"
 INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID = "weapon-ability:indirect-fire:benefit-of-cover"
+INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID = "weapon-ability:indirect-fire:no-hit-rerolls"
+INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID = (
+    "weapon-ability:indirect-fire:stationary-friendly-visible"
+)
 LETHAL_HITS_RULE_ID = "weapon-ability:lethal-hits"
 MELTA_RULE_ID = "weapon-ability:melta"
 PRECISION_RULE_ID = "weapon-ability:precision"
 RAPID_FIRE_RULE_ID = "weapon-ability:rapid-fire"
+SNAP_SHOOTING_RULE_ID = "core:snap-shooting"
 SUSTAINED_HITS_RULE_ID = "weapon-ability:sustained-hits"
 TORRENT_RULE_ID = "weapon-ability:torrent"
 TWIN_LINKED_RULE_ID = "weapon-ability:twin-linked"
 
 _PARAMETERIZED_KEYWORDS_BY_KIND = {
+    AbilityKind.CLEAVE: WeaponKeyword.CLEAVE,
     AbilityKind.MELTA: WeaponKeyword.MELTA,
     AbilityKind.RAPID_FIRE: WeaponKeyword.RAPID_FIRE,
     AbilityKind.SUSTAINED_HITS: WeaponKeyword.SUSTAINED_HITS,
@@ -44,6 +52,13 @@ def has_weapon_keyword(profile: WeaponProfile, keyword: WeaponKeyword) -> bool:
     _validate_weapon_profile(profile)
     _validate_weapon_keyword(keyword)
     return keyword in profile.keywords
+
+
+def has_close_quarters_weapon_keyword(profile: WeaponProfile) -> bool:
+    _validate_weapon_profile(profile)
+    return (
+        WeaponKeyword.PISTOL in profile.keywords or WeaponKeyword.CLOSE_QUARTERS in profile.keywords
+    )
 
 
 def weapon_ability_int_value(profile: WeaponProfile, ability_kind: AbilityKind) -> int | None:
@@ -144,6 +159,19 @@ def blast_attack_bonus(*, target_model_count: int) -> int:
     return target_model_count // 5
 
 
+def cleave_attack_bonus(
+    profile: WeaponProfile, *, single_target: bool, target_model_count: int
+) -> int:
+    value = weapon_ability_int_value(profile, AbilityKind.CLEAVE)
+    if value is None or not single_target:
+        return 0
+    if type(target_model_count) is not int:
+        raise GameLifecycleError("Cleave target_model_count must be an integer.")
+    if target_model_count < 0:
+        raise GameLifecycleError("Cleave target_model_count must not be negative.")
+    return value * (target_model_count // 5)
+
+
 def melta_damage_bonus(profile: WeaponProfile, *, target_within_half_range: bool) -> int:
     value = weapon_ability_int_value(profile, AbilityKind.MELTA)
     if value is None or not target_within_half_range:
@@ -164,6 +192,10 @@ def rapid_fire_rule_id(value: int) -> str:
 
 def blast_rule_id(value: int) -> str:
     return f"{BLAST_RULE_ID}:{_validate_positive_int('Blast value', value)}"
+
+
+def cleave_rule_id(value: int) -> str:
+    return f"{CLEAVE_RULE_ID}:{_validate_positive_int('Cleave value', value)}"
 
 
 def melta_rule_id(value: int) -> str:

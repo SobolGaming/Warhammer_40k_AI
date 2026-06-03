@@ -287,7 +287,7 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
 
 def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None:
     scenario, passenger, transport, _enemy, _catalog = _advance_embark_ready_scenario()
-    state = _battle_state(scenario, game_id="phase10q-advance-embark-new-0001")
+    state = _battle_state(scenario, game_id="phase10q-advance-embark-newer-0002")
     state.record_transport_cargo_state(_cargo_state(transport=transport))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
