@@ -103,10 +103,12 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     abilities = (
         AbilityDescriptor.devastating_wounds(),
         AbilityDescriptor.sustained_hits(1),
+        AbilityDescriptor.lethal_hits(target_keywords=("Vehicle",)),
         AbilityDescriptor.cleave(2),
         AbilityDescriptor.melta(2),
         AbilityDescriptor.rapid_fire(1),
         AbilityDescriptor.anti_keyword("Infantry", 4),
+        AbilityDescriptor.sustained_hits(2, target_keywords=("INFANTRY/BEASTS",)),
         AbilityDescriptor.heavy(),
     )
     payloads = [ability.to_payload() for ability in abilities]
@@ -116,15 +118,18 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     assert payloads[0]["parameters"] == [{"name": "effect", "value": "mortal_wounds"}]
     assert payloads[1]["ability_kind"] == AbilityKind.SUSTAINED_HITS.value
     assert payloads[1]["parameters"] == [{"name": "value", "value": 1}]
-    assert payloads[2]["ability_kind"] == AbilityKind.CLEAVE.value
-    assert payloads[2]["parameters"] == [{"name": "value", "value": 2}]
-    assert payloads[5]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
-    assert payloads[5]["parameters"] == [
+    assert payloads[2]["ability_kind"] == AbilityKind.LETHAL_HITS.value
+    assert payloads[2]["target_keywords"] == ["VEHICLE"]
+    assert payloads[3]["ability_kind"] == AbilityKind.CLEAVE.value
+    assert payloads[3]["parameters"] == [{"name": "value", "value": 2}]
+    assert payloads[6]["ability_kind"] == AbilityKind.ANTI_KEYWORD.value
+    assert payloads[6]["parameters"] == [
         {"name": "keyword", "value": "INFANTRY"},
         {"name": "threshold", "value": 4},
     ]
-    assert payloads[6]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
-    assert payloads[6]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
+    assert payloads[7]["target_keywords"] == ["INFANTRY", "BEASTS"]
+    assert payloads[8]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
+    assert payloads[8]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities
@@ -142,6 +147,10 @@ def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
 
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor.sustained_hits(0)
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor.lethal_hits(target_keywords=("Vehicle/",))
+    with pytest.raises(WeaponProfileError):
+        AbilityDescriptor.lethal_hits(target_keywords=("Vehicle/Vehicle",))
     with pytest.raises(WeaponProfileError):
         AbilityDescriptor.anti_keyword("Infantry", 1)
     with pytest.raises(WeaponProfileError):

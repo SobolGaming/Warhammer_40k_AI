@@ -138,6 +138,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     anti_keyword_critical_threshold,
     devastating_wounds_resolution,
     has_weapon_keyword,
+    lethal_hits_applies,
     melta_damage_bonus,
     sustained_hits_generated_hits,
 )
@@ -4741,7 +4742,7 @@ def _roll_hit_and_wound(
     if (
         attack_sequence.generated_hit_index == 0
         and hit_roll.critical
-        and has_weapon_keyword(pool.weapon_profile, WeaponKeyword.LETHAL_HITS)
+        and lethal_hits_applies(pool.weapon_profile, target_keywords=target_unit.keywords)
     ):
         wound_roll = WoundRoll.auto_wound(
             strength=pool.weapon_profile.strength.final,
@@ -4865,9 +4866,11 @@ def _roll_hit(
         )
     else:
         minimum_success = 2
+    target_unit = unit_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
     generated_hits = sustained_hits_generated_hits(
         pool.weapon_profile,
         critical_hit=unmodified == 6,
+        target_keywords=target_unit.keywords,
     )
     return HitRoll(
         target_number=skill,

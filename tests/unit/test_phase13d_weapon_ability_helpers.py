@@ -46,6 +46,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     devastating_wounds_resolution,
     has_weapon_keyword,
     heavy_rule_id,
+    lethal_hits_applies,
     melta_damage_bonus,
     melta_rule_id,
     rapid_fire_attack_bonus,
@@ -98,6 +99,7 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
 def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> None:
     profile = _profile(keywords=(WeaponKeyword.RAPID_FIRE,), abilities=())
     cleave_profile = _profile(keywords=(WeaponKeyword.CLEAVE,), abilities=())
+    lethal_profile = _profile(keywords=(WeaponKeyword.LETHAL_HITS,), abilities=())
     valid_cleave_profile = _profile(
         keywords=(WeaponKeyword.CLEAVE,),
         abilities=(AbilityDescriptor.cleave(1),),
@@ -108,13 +110,15 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
         abilities=(AbilityDescriptor.devastating_wounds(),),
     )
     duplicate_profile = _profile(
-        keywords=(),
+        keywords=(WeaponKeyword.RAPID_FIRE,),
         abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
     )
     no_descriptor_profile = _profile(keywords=(), abilities=())
 
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
         weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE)
+    with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
+        lethal_hits_applies(lethal_profile, target_keywords=("VEHICLE",))
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
         cleave_attack_bonus(cleave_profile, single_target=True, target_model_count=5)
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
@@ -177,6 +181,45 @@ def test_phase13d_anti_keyword_threshold_matches_canonical_target_keywords() -> 
     )
     assert anti_keyword_critical_threshold(profile=profile, target_keywords=("MONSTER",)) == 5
     assert anti_keyword_critical_threshold(profile=profile, target_keywords=("vehicle",)) is None
+
+
+def test_phase14i_keyword_gated_weapon_abilities_match_target_keywords() -> None:
+    profile = _profile(
+        keywords=(WeaponKeyword.LETHAL_HITS, WeaponKeyword.SUSTAINED_HITS),
+        abilities=(
+            AbilityDescriptor.lethal_hits(target_keywords=("VEHICLE",)),
+            AbilityDescriptor.sustained_hits(1, target_keywords=("INFANTRY/BEASTS",)),
+        ),
+    )
+
+    assert profile.abilities[0].target_keywords == ("VEHICLE",)
+    assert profile.abilities[1].target_keywords == ("INFANTRY", "BEASTS")
+    assert lethal_hits_applies(profile, target_keywords=("VEHICLE",))
+    assert not lethal_hits_applies(profile, target_keywords=("INFANTRY",))
+    assert (
+        sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=("INFANTRY",),
+        )
+        == 2
+    )
+    assert (
+        sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=("BEASTS",),
+        )
+        == 2
+    )
+    assert (
+        sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=("VEHICLE",),
+        )
+        == 1
+    )
 
 
 def test_phase13d_core_stratagem_effect_helpers_read_typed_payloads() -> None:
