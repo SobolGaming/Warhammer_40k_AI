@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-SELECT_ATTACK_ALLOCATION_DECISION_TYPE = "select_attack_allocation"
 SELECT_ALLOCATION_ORDER_DECISION_TYPE = "select_allocation_order"
 SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
@@ -87,14 +86,6 @@ class AttackAllocationPayload(TypedDict):
     forced: bool
     source_rule_ids: list[str]
     rule_context: AttackAllocationRuleContextPayload
-
-
-class AttackAllocationDecisionPayload(TypedDict):
-    request_id: str
-    result_id: str
-    player_id: str
-    selected_model_id: str
-    attack_context: JsonValue
 
 
 class AllocationGroupPayload(TypedDict):
@@ -372,7 +363,7 @@ class AttackAllocationRuleContext:
             universe=alive_model_ids,
         )
 
-    def legal_model_ids(self) -> tuple[str, ...]:
+    def candidate_model_ids(self) -> tuple[str, ...]:
         legal = set(self.alive_model_ids)
         bodyguard_ids = set(self.attached_unit_bodyguard_model_ids)
         character_ids = set(self.attached_unit_character_model_ids)
@@ -390,11 +381,16 @@ class AttackAllocationRuleContext:
             if selected not in legal:
                 raise GameLifecycleError("Attacker-side allocation selection is not legal.")
             return (selected,)
+        return tuple(sorted(legal))
 
-        priority_ids = legal & (set(self.wounded_model_ids) | set(self.already_allocated_model_ids))
+    def legal_model_ids(self) -> tuple[str, ...]:
+        legal = self.candidate_model_ids()
+        priority_ids = set(legal) & (
+            set(self.wounded_model_ids) | set(self.already_allocated_model_ids)
+        )
         if priority_ids:
             return tuple(sorted(priority_ids))
-        return tuple(sorted(legal))
+        return legal
 
     def to_payload(self) -> AttackAllocationRuleContextPayload:
         return {
@@ -509,67 +505,6 @@ class AttackAllocation:
             source_rule_ids=tuple(payload["source_rule_ids"]),
             rule_context=AttackAllocationRuleContext.from_payload(payload["rule_context"]),
         )
-
-
-@dataclass(frozen=True, slots=True)
-class AttackAllocationDecision:
-    request_id: str
-    result_id: str
-    player_id: str
-    selected_model_id: str
-    attack_context: JsonValue
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "request_id",
-            _validate_identifier("AttackAllocationDecision request_id", self.request_id),
-        )
-        object.__setattr__(
-            self,
-            "result_id",
-            _validate_identifier("AttackAllocationDecision result_id", self.result_id),
-        )
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("AttackAllocationDecision player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "selected_model_id",
-            _validate_identifier(
-                "AttackAllocationDecision selected_model_id",
-                self.selected_model_id,
-            ),
-        )
-        object.__setattr__(self, "attack_context", validate_json_value(self.attack_context))
-
-    @classmethod
-    def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
-        result.validate_for_request(request)
-        payload = _payload_object(result.payload)
-        selected_model_id = _payload_string(payload, key="model_instance_id")
-        actor_id = result.actor_id
-        if actor_id is None:
-            raise GameLifecycleError("AttackAllocationDecision requires a defender actor.")
-        request_payload = _payload_object(request.payload)
-        return cls(
-            request_id=request.request_id,
-            result_id=result.result_id,
-            player_id=actor_id,
-            selected_model_id=selected_model_id,
-            attack_context=validate_json_value(request_payload["attack_context"]),
-        )
-
-    def to_payload(self) -> AttackAllocationDecisionPayload:
-        return {
-            "request_id": self.request_id,
-            "result_id": self.result_id,
-            "player_id": self.player_id,
-            "selected_model_id": self.selected_model_id,
-            "attack_context": self.attack_context,
-        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -1714,13 +1649,20 @@ def allocation_groups_for_context(
     state: GameState,
     allocation_context: AttackAllocationRuleContext,
     visible_model_ids: tuple[str, ...] | None = None,
+    include_priority_tiers: bool = False,
 ) -> tuple[AllocationGroup, ...]:
     if type(allocation_context) is not AttackAllocationRuleContext:
         raise GameLifecycleError("Allocation groups require an allocation context.")
+    if type(include_priority_tiers) is not bool:
+        raise GameLifecycleError("include_priority_tiers must be a bool.")
     visible_id_set: set[str] | None = None
     if visible_model_ids is not None:
         visible_id_set = set(_validate_identifier_tuple("visible_model_ids", visible_model_ids))
-    legal_model_ids = allocation_context.legal_model_ids()
+    legal_model_ids = (
+        allocation_context.candidate_model_ids()
+        if include_priority_tiers
+        else allocation_context.legal_model_ids()
+    )
     if visible_id_set is not None:
         legal_model_ids = tuple(
             model_id for model_id in legal_model_ids if model_id in visible_id_set
@@ -1915,37 +1857,6 @@ def build_allocation_order_request(
                 ),
             )
             for option_index, ordered_groups in enumerate(ordered_group_options, start=1)
-        ),
-    )
-
-
-def build_attack_allocation_request(
-    *,
-    request_id: str,
-    defender_player_id: str,
-    attack_context: JsonValue,
-    allocation_context: AttackAllocationRuleContext,
-) -> DecisionRequest:
-    legal_model_ids = allocation_context.legal_model_ids()
-    if len(legal_model_ids) < 2:
-        raise GameLifecycleError("Attack allocation request requires at least two legal models.")
-    return DecisionRequest(
-        request_id=request_id,
-        decision_type=SELECT_ATTACK_ALLOCATION_DECISION_TYPE,
-        actor_id=defender_player_id,
-        payload=validate_json_value(
-            {
-                "attack_context": validate_json_value(attack_context),
-                "allocation_context": allocation_context.to_payload(),
-            }
-        ),
-        options=tuple(
-            DecisionOption(
-                option_id=model_id,
-                label=model_id,
-                payload={"model_instance_id": model_id},
-            )
-            for model_id in legal_model_ids
         ),
     )
 

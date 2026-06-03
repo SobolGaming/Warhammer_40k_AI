@@ -390,7 +390,7 @@ def save_options_for_model(
                 armor_penetration=armor_penetration,
             )
         )
-    return tuple(option for option in options if option.can_succeed_on_d6)
+    return tuple(options)
 
 
 def mandatory_save_option(options: tuple[SaveOption, ...]) -> SaveOption | None:
@@ -501,8 +501,7 @@ def _selectable_save_options(options: tuple[SaveOption, ...]) -> tuple[SaveOptio
         if option.save_kind in seen:
             raise GameLifecycleError("Saving throw options must not duplicate save kinds.")
         seen.add(option.save_kind)
-        if option.can_succeed_on_d6:
-            validated.append(option)
+        validated.append(option)
     return tuple(sorted(validated, key=lambda option: option.save_kind.value))
 
 
