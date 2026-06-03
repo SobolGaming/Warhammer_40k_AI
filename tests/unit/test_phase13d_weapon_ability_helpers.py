@@ -35,8 +35,10 @@ from warhammer40k_core.engine.weapon_abilities import (
     BLAST_RULE_ID,
     CLEAVE_RULE_ID,
     HEAVY_RULE_ID,
+    HUNTER_RULE_ID,
     MELTA_RULE_ID,
     RAPID_FIRE_RULE_ID,
+    WEAPON_ABILITY_SELECTION_DECISION_TYPE,
     DevastatingWoundsResolution,
     anti_keyword_critical_threshold,
     blast_attack_bonus,
@@ -46,6 +48,8 @@ from warhammer40k_core.engine.weapon_abilities import (
     devastating_wounds_resolution,
     has_weapon_keyword,
     heavy_rule_id,
+    hunter_target_allowed,
+    hunter_targeting_rule_ids,
     lethal_hits_applies,
     melta_damage_bonus,
     melta_rule_id,
@@ -53,6 +57,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     rapid_fire_rule_id,
     sustained_hits_generated_hits,
     weapon_ability_int_value,
+    weapon_ability_selection_request,
 )
 
 
@@ -109,6 +114,14 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
         keywords=(),
         abilities=(AbilityDescriptor.devastating_wounds(),),
     )
+    orphan_rapid_fire_profile = _profile(
+        keywords=(),
+        abilities=(AbilityDescriptor.rapid_fire(1),),
+    )
+    orphan_lethal_profile = _profile(
+        keywords=(),
+        abilities=(AbilityDescriptor.lethal_hits(),),
+    )
     duplicate_profile = _profile(
         keywords=(WeaponKeyword.RAPID_FIRE,),
         abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
@@ -125,8 +138,20 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
         devastating_wounds_resolution(devastating_profile)
     with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
         devastating_wounds_resolution(orphan_devastating_profile)
-    with pytest.raises(GameLifecycleError, match="duplicate ability descriptors"):
+    with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
+        weapon_ability_int_value(orphan_rapid_fire_profile, AbilityKind.RAPID_FIRE)
+    with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
+        lethal_hits_applies(orphan_lethal_profile, target_keywords=("VEHICLE",))
+    with pytest.raises(GameLifecycleError, match="requires controlling-player selection"):
         weapon_ability_int_value(duplicate_profile, AbilityKind.RAPID_FIRE)
+    assert (
+        weapon_ability_int_value(
+            duplicate_profile,
+            AbilityKind.RAPID_FIRE,
+            selected_ability_id="rapid-fire:2",
+        )
+        == 2
+    )
     assert weapon_ability_int_value(no_descriptor_profile, AbilityKind.HEAVY) is None
     assert melta_damage_bonus(no_descriptor_profile, target_within_half_range=True) == 0
     assert sustained_hits_generated_hits(no_descriptor_profile, critical_hit=True) == 1
@@ -220,6 +245,89 @@ def test_phase14i_keyword_gated_weapon_abilities_match_target_keywords() -> None
         )
         == 1
     )
+
+
+def test_phase14i_hunter_target_gate_is_target_eligibility() -> None:
+    profile = _profile(
+        keywords=(WeaponKeyword.HUNTER,),
+        abilities=(AbilityDescriptor.hunter(target_keywords=("VEHICLE/MONSTER",)),),
+    )
+    missing_descriptor = _profile(keywords=(WeaponKeyword.HUNTER,), abilities=())
+    orphan_descriptor = _profile(
+        keywords=(),
+        abilities=(AbilityDescriptor.hunter(target_keywords=("VEHICLE",)),),
+    )
+
+    assert hunter_target_allowed(profile, target_keywords=("Vehicle",))
+    assert hunter_target_allowed(profile, target_keywords=("Monster",))
+    assert not hunter_target_allowed(profile, target_keywords=("Infantry",))
+    assert hunter_targeting_rule_ids(profile, target_keywords=("Vehicle",)) == (HUNTER_RULE_ID,)
+    assert hunter_targeting_rule_ids(_profile(keywords=(), abilities=()), target_keywords=()) == ()
+    with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
+        hunter_target_allowed(missing_descriptor, target_keywords=("Vehicle",))
+    with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
+        hunter_target_allowed(orphan_descriptor, target_keywords=("Vehicle",))
+
+
+def test_phase14i_duplicate_weapon_ability_selection_is_adapter_visible() -> None:
+    profile = _profile(
+        keywords=(WeaponKeyword.RAPID_FIRE,),
+        abilities=(AbilityDescriptor.rapid_fire(2), AbilityDescriptor.rapid_fire(1)),
+    )
+    single_descriptor_profile = _profile(
+        keywords=(WeaponKeyword.RAPID_FIRE,),
+        abilities=(AbilityDescriptor.rapid_fire(1),),
+    )
+    orphan_descriptor_profile = _profile(
+        keywords=(),
+        abilities=(AbilityDescriptor.rapid_fire(1),),
+    )
+
+    request = weapon_ability_selection_request(
+        profile,
+        AbilityKind.RAPID_FIRE,
+        target_keywords=(),
+        actor_id="player-a",
+        request_id="phase14i-duplicate-rapid-fire-selection",
+        source_context={"timing": "weapon-profile-import"},
+    )
+
+    assert request is not None
+    assert (
+        weapon_ability_selection_request(
+            single_descriptor_profile,
+            AbilityKind.RAPID_FIRE,
+            target_keywords=(),
+            actor_id="player-a",
+            request_id="phase14i-single-rapid-fire-selection",
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
+        weapon_ability_selection_request(
+            orphan_descriptor_profile,
+            AbilityKind.RAPID_FIRE,
+            target_keywords=(),
+            actor_id="player-a",
+            request_id="phase14i-orphan-rapid-fire-selection",
+        )
+    assert request.decision_type == WEAPON_ABILITY_SELECTION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert tuple(option.option_id for option in request.options) == (
+        "rapid-fire:1",
+        "rapid-fire:2",
+    )
+    first_option_payload = cast(dict[str, JsonValue], request.options[0].payload)
+    assert first_option_payload["selected_ability_id"] == "rapid-fire:1"
+    assert (
+        weapon_ability_int_value(
+            profile,
+            AbilityKind.RAPID_FIRE,
+            selected_ability_id=request.options[1].option_id,
+        )
+        == 2
+    )
+    assert "<" not in str(request.to_payload())
 
 
 def test_phase13d_core_stratagem_effect_helpers_read_typed_payloads() -> None:

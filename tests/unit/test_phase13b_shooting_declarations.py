@@ -174,6 +174,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     BLAST_RULE_ID,
     FIRE_OVERWATCH_RULE_ID,
     HEAVY_RULE_ID,
+    HUNTER_RULE_ID,
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
     INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
@@ -8861,6 +8862,54 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
     )
     assert close_candidates[0].is_legal
     assert close_candidates[0].shooting_types == (ShootingType.NORMAL,)
+
+
+def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    infantry_target = replace(units["enemy"], keywords=("INFANTRY",))
+    _replace_unit_instance_in_state(state=state, replacement=infantry_target)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    hunter_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14i-hunter-vehicle-monster-gate",
+        keywords=(WeaponKeyword.HUNTER,),
+        abilities=(AbilityDescriptor.hunter(target_keywords=("VEHICLE/MONSTER",)),),
+    )
+
+    invalid_candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=hunter_profile,
+        target_unit_ids=(infantry_target.unit_instance_id,),
+    )
+    assert invalid_candidates[0].violation_code is (
+        ShootingTargetViolationCode.HUNTER_TARGET_KEYWORD_MISMATCH
+    )
+    assert invalid_candidates[0].targeting_rule_ids == (HUNTER_RULE_ID,)
+
+    vehicle_target = replace(infantry_target, keywords=("Vehicle",))
+    _replace_unit_instance_in_state(state=state, replacement=vehicle_target)
+    legal_scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    legal_candidates = shooting_target_candidates_for_unit(
+        scenario=legal_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=hunter_profile,
+        target_unit_ids=(vehicle_target.unit_instance_id,),
+    )
+
+    assert legal_candidates[0].is_legal
+    assert HUNTER_RULE_ID in legal_candidates[0].targeting_rule_ids
 
 
 def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state() -> None:

@@ -40,6 +40,7 @@ class WeaponKeyword(StrEnum):
     BLAST = "Blast"
     MELTA = "Melta"
     ONE_SHOT = "One Shot"
+    HUNTER = "Hunter"
 
 
 class AbilityKind(StrEnum):
@@ -51,10 +52,12 @@ class AbilityKind(StrEnum):
     RAPID_FIRE = "rapid_fire"
     ANTI_KEYWORD = "anti_keyword"
     HEAVY = "heavy"
+    HUNTER = "hunter"
 
 
 class AbilityTiming(StrEnum):
     ATTACK_SEQUENCE = "attack_sequence"
+    TARGET_DECLARATION = "target_declaration"
     MOVEMENT_CONDITIONED = "movement_conditioned"
 
 
@@ -216,6 +219,17 @@ class AbilityDescriptor:
             ability_kind=AbilityKind.LETHAL_HITS,
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+
+    @classmethod
+    def hunter(cls, *, target_keywords: tuple[str, ...]) -> Self:
+        canonical_target_keywords = _canonical_target_keyword_tuple(target_keywords)
+        return cls(
+            ability_id=f"hunter{_target_keyword_ability_id_suffix(canonical_target_keywords)}",
+            name=f"Hunter{_target_keyword_name_suffix(canonical_target_keywords)}",
+            ability_kind=AbilityKind.HUNTER,
+            target_keywords=canonical_target_keywords,
+            timing=AbilityTiming.TARGET_DECLARATION,
         )
 
     @classmethod
@@ -871,6 +885,17 @@ def _validate_supported_ability_shape(
             raise WeaponProfileError("Lethal Hits ability must use attack timing.")
         if condition is not None:
             raise WeaponProfileError("Lethal Hits ability must not include a condition.")
+        return
+
+    if ability_kind is AbilityKind.HUNTER:
+        if parameters:
+            raise WeaponProfileError("Hunter ability must not include parameters.")
+        if not target_keywords:
+            raise WeaponProfileError("Hunter ability requires target keywords.")
+        if timing is not AbilityTiming.TARGET_DECLARATION:
+            raise WeaponProfileError("Hunter ability must use target declaration timing.")
+        if condition is not None:
+            raise WeaponProfileError("Hunter ability must not include a condition.")
         return
 
     if ability_kind is AbilityKind.ANTI_KEYWORD:

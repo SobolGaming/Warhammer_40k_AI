@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.stratagems import (
     StratagemAvailabilityKind,
@@ -101,6 +102,7 @@ def _record_from_source_row(row: source_data.SourceStratagemRow) -> StratagemCat
             ),
             handler_id=row.handler_id,
             eligible_roll_types=row.eligible_roll_types,
+            effect_payload=validate_json_value(row.effect_payload),
         ),
         availability_kind=StratagemAvailabilityKind(row.availability_kind),
         detachment_id=row.detachment_id,

@@ -35,9 +35,10 @@ class SourceStratagemRow:
     once_per_battle: bool = False
     once_per_target_per_phase: bool = False
     allow_battle_shocked_targets: bool = False
+    effect_payload: dict[str, object] | None = None
     disabled: bool = False
 
-    def to_payload(self) -> dict[str, bool | int | str | None | list[str]]:
+    def to_payload(self) -> dict[str, object]:
         return {
             "stratagem_id": self.stratagem_id,
             "name": self.name,
@@ -61,6 +62,7 @@ class SourceStratagemRow:
             "once_per_battle": self.once_per_battle,
             "once_per_target_per_phase": self.once_per_target_per_phase,
             "allow_battle_shocked_targets": self.allow_battle_shocked_targets,
+            "effect_payload": self.effect_payload,
             "disabled": self.disabled,
         }
 
@@ -110,13 +112,13 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             ),
         ),
         SourceStratagemRow(
-            stratagem_id="counter-offensive",
-            name="Counter-offensive",
+            stratagem_id="counteroffensive",
+            name="Counteroffensive",
             command_point_cost=2,
             category="strategic_ploy",
             availability_kind="core",
             detachment_id=None,
-            source_id=f"{source_prefix}:counter-offensive",
+            source_id=f"{source_prefix}:counteroffensive",
             when_descriptor="after an enemy unit has fought",
             target_descriptor="one eligible unit from the player's army that can fight",
             effect_descriptor="the target unit fights next",
@@ -126,7 +128,7 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             target_kind="friendly_unit",
             enumerable=False,
             target_policy_id="unsupported:phase-14g:fight-order-interrupt-unit",
-            handler_id="unsupported:phase-14g:counter-offensive",
+            handler_id="unsupported:phase-14g:counteroffensive",
         ),
         SourceStratagemRow(
             stratagem_id="epic-challenge",
@@ -167,35 +169,16 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             handler_id="core:fire-overwatch",
         ),
         SourceStratagemRow(
-            stratagem_id="go-to-ground",
-            name="Go to Ground",
-            command_point_cost=1,
-            category="battle_tactic",
-            availability_kind="core",
-            detachment_id=None,
-            source_id=f"{source_prefix}:go-to-ground",
-            when_descriptor="opponent shooting phase after an enemy unit selects targets",
-            target_descriptor="one infantry unit from the player's army selected as a target",
-            effect_descriptor="the target unit gains benefit of cover and a defensive save effect",
-            restrictions_descriptor="matched play same stratagem per phase",
-            trigger_kind="after_unit_selected_as_target",
-            phase="shooting",
-            target_kind="friendly_unit",
-            enumerable=False,
-            target_policy_id="selected_target_infantry_unit",
-            handler_id="core:go-to-ground",
-        ),
-        SourceStratagemRow(
-            stratagem_id="grenade",
-            name="Grenade",
+            stratagem_id="explosives",
+            name="Explosives",
             command_point_cost=1,
             category="wargear",
             availability_kind="core",
             detachment_id=None,
-            source_id=f"{source_prefix}:grenade",
+            source_id=f"{source_prefix}:explosives",
             when_descriptor="shooting phase before selecting targets",
             target_descriptor=(
-                "one grenades unit from the player's army and one enemy unit in range"
+                "one GRENADES unit from the player's army and one enemy unit in range"
             ),
             effect_descriptor="roll six dice and inflict mortal wounds for each high result",
             restrictions_descriptor="matched play same stratagem per phase",
@@ -203,8 +186,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="shooting",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="grenades_unit_and_enemy_target",
-            handler_id="core:grenade",
+            target_policy_id="explosives_unit_and_enemy_target",
+            handler_id="core:explosives",
         ),
         SourceStratagemRow(
             stratagem_id="heroic-intervention",
@@ -224,6 +207,10 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             enumerable=False,
             target_policy_id="unsupported:phase-14g:heroic-intervention-charge-unit",
             handler_id="unsupported:phase-14g:heroic-intervention",
+            effect_payload={
+                "modes": ["leap_to_defend", "into_the_fray"],
+                "optional_additional_command_point_cost": 1,
+            },
         ),
         SourceStratagemRow(
             stratagem_id="insane-bravery",
@@ -283,6 +270,7 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             enumerable=True,
             target_policy_id="active_tactical_secondary_card",
             handler_id="core:new-orders",
+            once_per_battle=True,
         ),
         SourceStratagemRow(
             stratagem_id="smokescreen",
@@ -304,13 +292,13 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             handler_id="core:smokescreen",
         ),
         SourceStratagemRow(
-            stratagem_id="tank-shock",
-            name="Tank Shock",
+            stratagem_id="crushing-impact",
+            name="Crushing Impact",
             command_point_cost=1,
             category="strategic_ploy",
             availability_kind="core",
             detachment_id=None,
-            source_id=f"{source_prefix}:tank-shock",
+            source_id=f"{source_prefix}:crushing-impact",
             when_descriptor="charge phase after a vehicle unit ends a charge move",
             target_descriptor=(
                 "one vehicle unit from the player's army and one enemy unit within engagement range"
@@ -322,7 +310,7 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             target_kind="friendly_unit",
             enumerable=False,
             target_policy_id="unsupported:phase-14g:vehicle-charge-target-binding",
-            handler_id="unsupported:phase-14g:tank-shock",
+            handler_id="unsupported:phase-14g:crushing-impact",
         ),
     )
 
