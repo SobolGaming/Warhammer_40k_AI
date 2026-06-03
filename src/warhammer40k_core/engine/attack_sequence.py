@@ -177,6 +177,36 @@ _PRECISION_CHARACTER_GROUP_ROLES = frozenset(
 )
 
 
+def attack_sequence_hit_roll_spec(
+    *,
+    weapon_profile_id: str,
+    attack_context_id: str,
+    attacker_player_id: str,
+    reroll_forbidden_rule_ids: tuple[str, ...] = (),
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id=attacker_player_id,
+        reroll_forbidden_rule_ids=reroll_forbidden_rule_ids,
+    )
+
+
+def attack_sequence_wound_roll_spec(
+    *,
+    weapon_profile_id: str,
+    attack_context_id: str,
+    attacker_player_id: str,
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id=attacker_player_id,
+    )
+
+
 def deadly_demise_trigger_roll_spec(
     *,
     source: DestructionReactionSource,
@@ -4844,11 +4874,10 @@ def _roll_hit(
         target_unit_instance_id=pool.target_unit_instance_id,
     )
     roll_state = manager.roll(
-        DiceRollSpec(
-            expression=DiceExpression(quantity=1, sides=6),
-            reason=f"Hit roll for {pool.weapon_profile_id} attack {attack_context_id}",
-            roll_type="attack_sequence.hit",
-            actor_id=attacker_player_id,
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=pool.weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id=attacker_player_id,
             reroll_forbidden_rule_ids=_hit_reroll_forbidden_rule_ids(
                 is_snap_shooting=is_snap_shooting,
                 targeting_rule_ids=pool.targeting_rule_ids,
@@ -4912,11 +4941,10 @@ def _roll_wound(
     strength = pool.weapon_profile.strength.final
     target_number = wound_roll_target_number(strength=strength, toughness=toughness)
     roll_state = manager.roll(
-        DiceRollSpec(
-            expression=DiceExpression(quantity=1, sides=6),
-            reason=f"Wound roll for {pool.weapon_profile_id} attack {attack_context_id}",
-            roll_type="attack_sequence.wound",
-            actor_id=attacker_player_id,
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=pool.weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id=attacker_player_id,
         )
     )
     unmodified = roll_state.current_total

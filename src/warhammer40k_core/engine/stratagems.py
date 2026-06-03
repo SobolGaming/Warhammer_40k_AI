@@ -2374,7 +2374,7 @@ def _command_reroll_context_error(
         if roll_state.original_result.spec.actor_id != context.player_id:
             return "dice_roll_actor_drift"
         roll_type = roll_state.original_result.spec.roll_type
-        if roll_type not in definition.eligible_roll_types:
+        if _command_reroll_roll_class(roll_type) not in definition.eligible_roll_types:
             return "ineligible_dice_roll_type"
         if roll_state.original_result.spec.reroll_forbidden_rule_ids:
             return "dice_roll_reroll_forbidden"
@@ -2387,6 +2387,20 @@ def _command_reroll_context_error(
     except (DiceRollSpecError, GameLifecycleError):  # fmt: skip
         return "invalid_dice_roll_context"
     return None
+
+
+def _command_reroll_roll_class(roll_type: str) -> str:
+    if roll_type == "attack_sequence.hit":
+        return "hit_roll"
+    if roll_type == "attack_sequence.wound":
+        return "wound_roll"
+    if roll_type.startswith("attack_sequence.save."):
+        return "save_roll"
+    if roll_type.startswith("attack_sequence.damage"):
+        return "damage_roll"
+    if roll_type.startswith("random_characteristic.damage."):
+        return "damage_roll"
+    return roll_type
 
 
 def _command_reroll_state(context: StratagemEligibilityContext) -> DiceRollState:
@@ -3225,7 +3239,7 @@ def _apply_command_reroll_handler(
     if roll_state.original_result.spec.actor_id != context.player_id:
         raise GameLifecycleError("Command Re-roll roll actor was not prevalidated.")
     roll_type = roll_state.original_result.spec.roll_type
-    if roll_type not in definition.eligible_roll_types:
+    if _command_reroll_roll_class(roll_type) not in definition.eligible_roll_types:
         raise GameLifecycleError("Command Re-roll roll type was not prevalidated.")
     if roll_state.original_result.spec.reroll_forbidden_rule_ids:
         raise GameLifecycleError("Command Re-roll forbidden roll was not prevalidated.")

@@ -12,6 +12,10 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attack_sequence import (
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     ModelPlacement,
@@ -77,6 +81,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatus,
 )
+from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_catalog_records
 from warhammer40k_core.engine.stratagems import (
@@ -127,7 +132,7 @@ def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None
     _grant_cp(state, player_id="player-a", amount=1)
     command_reroll = _source_stratagem_record("command-reroll")
     assert "advance_roll" in command_reroll.definition.eligible_roll_types
-    assert "desperate_escape_roll" in command_reroll.definition.eligible_roll_types
+    assert "desperate_escape_roll" not in command_reroll.definition.eligible_roll_types
     assert "number_of_attacks_roll" in command_reroll.definition.eligible_roll_types
     assert "random_damage" not in command_reroll.definition.eligible_roll_types
     assert "battle_shock_roll" not in command_reroll.definition.eligible_roll_types
@@ -284,17 +289,36 @@ def test_command_reroll_rejects_opponent_roll_actor_drift_before_queue_pop() -> 
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
 
 
-def test_command_reroll_allows_eleventh_edition_desperate_escape_roll_for_actor() -> None:
+@pytest.mark.parametrize(
+    "roll_spec",
+    [
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id="phase14i-bolt-rifle",
+            attack_context_id="phase14i-hit:pool-001:attack-001",
+            attacker_player_id="player-a",
+        ),
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id="phase14i-bolt-rifle",
+            attack_context_id="phase14i-wound:pool-001:attack-001",
+            attacker_player_id="player-a",
+        ),
+        saving_throw_roll_spec(
+            save_kind=SaveKind.ARMOUR,
+            player_id="player-a",
+            allocated_model_id="phase14i-intercessor-1",
+            attack_context_id="phase14i-save:pool-001:attack-001",
+        ),
+    ],
+)
+def test_phase14i_command_reroll_accepts_real_attack_and_save_roll_specs(
+    roll_spec: DiceRollSpec,
+) -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _grant_cp(state, player_id="player-a", amount=1)
     command_reroll = _source_stratagem_record("command-reroll")
-    roll_state = _roll_command_reroll_candidate(
-        lifecycle,
-        actor_id="player-a",
-        roll_type="desperate_escape_roll",
-    )
+    roll_state = _roll_command_reroll_candidate_from_spec(lifecycle, spec=roll_spec)
     trigger_payload = validate_json_value(
         {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
     )
@@ -315,7 +339,7 @@ def test_command_reroll_allows_eleventh_edition_desperate_escape_roll_for_actor(
 
     lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase12c-command-reroll-desperate-escape",
+            result_id=f"phase14i-command-reroll-{roll_spec.roll_type.replace('.', '-')}",
             request=request,
             selected_option_id=request.options[0].option_id,
         )
@@ -368,8 +392,10 @@ def test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor
     assert _has_event(lifecycle.decision_controller, "command_reroll_resolved")
 
 
-@pytest.mark.parametrize("roll_type", ["battle_shock_roll", "leadership_roll"])
-def test_phase14i_command_reroll_excludes_leadership_and_battle_shock_rolls(
+@pytest.mark.parametrize(
+    "roll_type", ["battle_shock_roll", "leadership_roll", "desperate_escape_roll"]
+)
+def test_phase14i_command_reroll_excludes_unlisted_roll_classes(
     roll_type: str,
 ) -> None:
     lifecycle = _battle_lifecycle()
@@ -2656,18 +2682,31 @@ def _roll_command_reroll_candidate(
     quantity: int = 1,
     values: tuple[int, ...] | None = None,
 ) -> DiceRollState:
-    state = _state(lifecycle)
-    roll_values = (1,) if values is None else values
-    return DiceRollManager(
-        state.game_id,
-        event_log=lifecycle.decision_controller.event_log,
-    ).roll_fixed(
+    return _roll_command_reroll_candidate_from_spec(
+        lifecycle,
         DiceRollSpec(
             expression=DiceExpression(quantity=quantity, sides=6),
             reason="Phase 12C Command Re-roll candidate",
             roll_type=roll_type,
             actor_id=actor_id,
         ),
+        values=values,
+    )
+
+
+def _roll_command_reroll_candidate_from_spec(
+    lifecycle: GameLifecycle,
+    spec: DiceRollSpec,
+    *,
+    values: tuple[int, ...] | None = None,
+) -> DiceRollState:
+    state = _state(lifecycle)
+    roll_values = (1,) if values is None else values
+    return DiceRollManager(
+        state.game_id,
+        event_log=lifecycle.decision_controller.event_log,
+    ).roll_fixed(
+        spec,
         roll_values,
     )
 

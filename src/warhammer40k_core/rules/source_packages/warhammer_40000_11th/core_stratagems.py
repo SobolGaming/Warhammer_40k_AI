@@ -103,7 +103,6 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
                 "advance_roll",
                 "charge_roll",
                 "damage_roll",
-                "desperate_escape_roll",
                 "hazardous_test",
                 "hit_roll",
                 "number_of_attacks_roll",
