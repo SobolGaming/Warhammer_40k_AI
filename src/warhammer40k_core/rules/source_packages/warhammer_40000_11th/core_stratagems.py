@@ -125,8 +125,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="fight",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14e:fight-order-interrupt-unit",
-            handler_id="unsupported:phase-14e:counter-offensive",
+            target_policy_id="unsupported:phase-14g:fight-order-interrupt-unit",
+            handler_id="unsupported:phase-14g:counter-offensive",
         ),
         SourceStratagemRow(
             stratagem_id="epic-challenge",
@@ -144,8 +144,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="fight",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14e:character-model-fight-binding",
-            handler_id="unsupported:phase-14e:epic-challenge",
+            target_policy_id="unsupported:phase-14g:character-model-fight-binding",
+            handler_id="unsupported:phase-14g:epic-challenge",
         ),
         SourceStratagemRow(
             stratagem_id="fire-overwatch",
@@ -222,8 +222,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="charge",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14e:heroic-intervention-charge-unit",
-            handler_id="unsupported:phase-14e:heroic-intervention",
+            target_policy_id="unsupported:phase-14g:heroic-intervention-charge-unit",
+            handler_id="unsupported:phase-14g:heroic-intervention",
         ),
         SourceStratagemRow(
             stratagem_id="insane-bravery",
@@ -321,8 +321,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="charge",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14e:vehicle-charge-target-binding",
-            handler_id="unsupported:phase-14e:tank-shock",
+            target_policy_id="unsupported:phase-14g:vehicle-charge-target-binding",
+            handler_id="unsupported:phase-14g:tank-shock",
         ),
     )
 
