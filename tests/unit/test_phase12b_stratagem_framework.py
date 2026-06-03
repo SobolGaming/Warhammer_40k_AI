@@ -71,6 +71,7 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetProposalPayload,
     StratagemTargetSpec,
     StratagemTimingDescriptor,
+    StratagemUseRecord,
     StratagemUseRequest,
     create_stratagem_use_decision_request,
     invalid_stratagem_use_status,
@@ -87,6 +88,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindow,
     TimingWindowDescriptor,
 )
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_stratagems as source_stratagems,
@@ -757,6 +759,11 @@ def test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options() ->
     )
     assert duplicate.status_kind is LifecycleStatusKind.UNSUPPORTED
 
+    shocked_lifecycle = _battle_lifecycle()
+    shocked_state = _state(shocked_lifecycle)
+    _set_current_battle_phase(shocked_state, BattlePhase.MOVEMENT)
+    _grant_cp(shocked_state, player_id="player-a", amount=2)
+    shocked_context = _context(state=shocked_state, player_id="player-a")
     fresh_catalog = (
         _core_stratagem(
             stratagem_id="rapid-ingress",
@@ -764,14 +771,14 @@ def test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options() ->
             target_spec=target_spec,
         ),
     )
-    state.battle_shocked_unit_ids = [unit_id]
+    shocked_state.battle_shocked_unit_ids = [unit_id]
     shocked_options = stratagem_use_options(
-        state=state,
+        state=shocked_state,
         catalog_records=fresh_catalog,
-        context=context,
+        context=shocked_context,
     )
     allowed_shocked_options = stratagem_use_options(
-        state=state,
+        state=shocked_state,
         catalog_records=(
             _core_stratagem(
                 stratagem_id="inspiring-command",
@@ -780,7 +787,7 @@ def test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options() ->
                 restriction_policy=StratagemRestrictionPolicy(allow_battle_shocked_targets=True),
             ),
         ),
-        context=context,
+        context=shocked_context,
     )
 
     assert shocked_options == ()
@@ -790,6 +797,237 @@ def test_same_phase_duplicate_and_battle_shocked_targeting_suppress_options() ->
         "target_player_id": "player-a",
         "target_unit_instance_id": unit_id,
     }
+
+
+def test_different_stratagem_same_unit_same_phase_suppresses_options() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=3)
+    context = _context(state=state, player_id="player-a")
+    unit_id = "army-alpha:intercessor-unit-1"
+    target_spec = StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT)
+    first_catalog = (
+        _core_stratagem(
+            stratagem_id="first-targeted-buff",
+            command_point_cost=1,
+            target_spec=target_spec,
+        ),
+    )
+
+    request = _decision_request(
+        request_stratagem_use(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            catalog_records=first_catalog,
+            context=context,
+        )
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12b-first-affected-unit-use",
+            request=request,
+            selected_option_id=_option_id_for_target(request, unit_id),
+        )
+    )
+    first_use = state.stratagem_use_records[0]
+
+    assert first_use.affected_unit_instance_ids == (unit_id,)
+    assert StratagemUseRecord.from_payload(first_use.to_payload()) == first_use
+    assert first_use.to_payload()["affected_unit_instance_ids"] == [unit_id]
+    second_catalog = (
+        _core_stratagem(
+            stratagem_id="second-targeted-buff",
+            command_point_cost=1,
+            target_spec=target_spec,
+        ),
+    )
+    duplicate = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=second_catalog,
+        context=context,
+    )
+
+    assert duplicate.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert (
+        stratagem_use_options(
+            state=state,
+            catalog_records=second_catalog,
+            context=context,
+        )
+        == ()
+    )
+
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    shooting_context = _context(state=state, player_id="player-a")
+    shooting_catalog = (
+        _core_stratagem(
+            stratagem_id="second-targeted-buff",
+            command_point_cost=1,
+            timing=StratagemTimingDescriptor(
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                phase=BattlePhase.SHOOTING,
+            ),
+            target_spec=target_spec,
+        ),
+    )
+
+    assert (
+        len(
+            stratagem_use_options(
+                state=state,
+                catalog_records=shooting_catalog,
+                context=shooting_context,
+            )
+        )
+        == 1
+    )
+
+
+def test_opponent_stratagem_affecting_unit_blocks_same_phase_stratagem() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=1)
+    _grant_cp(state, player_id="player-b", amount=1)
+    unit_id = "army-alpha:intercessor-unit-1"
+    player_b_context = _context(state=state, player_id="player-b")
+    player_b_catalog = (
+        _core_stratagem(
+            stratagem_id="opponent-any-unit-effect",
+            command_point_cost=1,
+            target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.ANY_UNIT),
+        ),
+    )
+
+    opponent_request = _decision_request(
+        request_stratagem_use(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            catalog_records=player_b_catalog,
+            context=player_b_context,
+        )
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12b-opponent-affects-unit",
+            request=opponent_request,
+            selected_option_id=_option_id_for_target(opponent_request, unit_id),
+        )
+    )
+
+    assert state.stratagem_use_records[0].player_id == "player-b"
+    assert state.stratagem_use_records[0].affected_unit_instance_ids == (unit_id,)
+    player_a_context = _context(state=state, player_id="player-a")
+    player_a_catalog = (
+        _core_stratagem(
+            stratagem_id="player-friendly-unit-effect",
+            command_point_cost=1,
+            target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT),
+        ),
+    )
+
+    blocked = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=player_a_catalog,
+        context=player_a_context,
+    )
+
+    assert blocked.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert (
+        stratagem_use_options(
+            state=state,
+            catalog_records=player_a_catalog,
+            context=player_a_context,
+        )
+        == ()
+    )
+
+
+def test_stratagem_use_record_rejects_duplicate_affected_unit_ids() -> None:
+    unit_id = "army-alpha:intercessor-unit-1"
+
+    with pytest.raises(GameLifecycleError, match="affected_unit_instance_ids must be unique"):
+        StratagemUseRecord(
+            use_id="phase12b-duplicate-affected-unit",
+            player_id="player-a",
+            stratagem_id="duplicate-affected-unit-test",
+            source_id="source:duplicate-affected-unit-test",
+            battle_round=1,
+            phase=BattlePhase.MOVEMENT,
+            timing_window_id=None,
+            request_id="phase12b-duplicate-affected-unit-request",
+            result_id="phase12b-duplicate-affected-unit-result",
+            selected_option_id="phase12b-duplicate-affected-unit-option",
+            target_binding=StratagemTargetBinding(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                target_player_id="player-a",
+                target_unit_instance_id=unit_id,
+            ),
+            affected_unit_instance_ids=(unit_id, unit_id),
+            command_point_cost=0,
+            command_point_transaction_id=None,
+            handler_id="record_only",
+        )
+
+
+def test_attached_unit_components_share_one_stratagem_affected_key() -> None:
+    bodyguard_id = "army-alpha:intercessor-unit-1"
+    leader_id = "army-alpha:captain-unit"
+    attached_id = "attached-unit:army-alpha:captain-intercessors"
+    lifecycle = _battle_lifecycle(config=_attached_unit_config())
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=3)
+    _mark_attached_unit_join(
+        state,
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        component_unit_instance_ids=(bodyguard_id, leader_id),
+    )
+    context = _context(state=state, player_id="player-a")
+    target_spec = StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT)
+    first_catalog = (
+        _core_stratagem(
+            stratagem_id="bodyguard-stratagem",
+            command_point_cost=1,
+            target_spec=target_spec,
+        ),
+    )
+
+    request = _decision_request(
+        request_stratagem_use(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            catalog_records=first_catalog,
+            context=context,
+        )
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12b-attached-bodyguard-use",
+            request=request,
+            selected_option_id=_option_id_for_target(request, bodyguard_id),
+        )
+    )
+
+    assert state.stratagem_use_records[0].affected_unit_instance_ids == (attached_id,)
+    second_catalog = (
+        _core_stratagem(
+            stratagem_id="leader-stratagem",
+            command_point_cost=1,
+            target_spec=target_spec,
+        ),
+    )
+    options = stratagem_use_options(
+        state=state,
+        catalog_records=second_catalog,
+        context=context,
+    )
+
+    assert options == ()
 
 
 def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() -> None:
@@ -1706,8 +1944,8 @@ def _context(
     )
 
 
-def _battle_lifecycle() -> GameLifecycle:
-    config = _config()
+def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
+    config = _config() if config is None else config
     state = _battle_state(config=config)
     return GameLifecycle.from_payload(
         {
@@ -1751,6 +1989,68 @@ def _config() -> GameConfig:
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_id="intercessor-unit-1",
+            ),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="enemy-unit",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
+        mission_setup=MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2025_26_mission_pack(),
+            mission_pool_entry_id="mission-a",
+            terrain_layout_id="layout-1",
+            attacker_player_id="player-a",
+            defender_player_id="player-b",
+        ),
+    )
+
+
+def _attached_unit_config() -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase12b-attached-game",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+            descriptor_version="core-v2-phase12b-attached-test"
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            ArmyMusterRequest(
+                army_id="army-alpha",
+                player_id="player-a",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_id="core-combined-arms",
+                ),
+                unit_selections=(
+                    UnitMusterSelection(
+                        unit_selection_id="intercessor-unit-1",
+                        datasheet_id="core-intercessor-like-infantry",
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id="core-intercessor-like",
+                                model_count=5,
+                            ),
+                        ),
+                    ),
+                    UnitMusterSelection(
+                        unit_selection_id="captain-unit",
+                        datasheet_id="core-character-leader",
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id="core-character-leader",
+                                model_count=1,
+                            ),
+                        ),
+                    ),
+                ),
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -1849,6 +2149,49 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _option_id_for_target(request: DecisionRequest, target_unit_instance_id: str) -> str:
+    for option in request.options:
+        payload = cast(dict[str, JsonValue], option.payload)
+        binding = cast(dict[str, JsonValue], payload["target_binding"])
+        if binding["target_unit_instance_id"] == target_unit_instance_id:
+            return option.option_id
+    raise AssertionError(f"Missing Stratagem option for target {target_unit_instance_id}.")
+
+
+def _mark_attached_unit_join(
+    state: GameState,
+    *,
+    player_id: str,
+    attached_unit_instance_id: str,
+    component_unit_instance_ids: tuple[str, ...],
+) -> None:
+    source_id = f"attached-unit-join:{attached_unit_instance_id}"
+    component_id_set = set(component_unit_instance_ids)
+    component_starting_model_count = 0
+    updated_records: list[StartingStrengthRecord] = []
+    for record in state.starting_strength_records:
+        if record.unit_instance_id not in component_id_set:
+            updated_records.append(record)
+            continue
+        component_starting_model_count += record.starting_model_count
+        updated_records.append(replace(record, source_id=source_id))
+    if component_starting_model_count == 0:
+        raise AssertionError("Attached-unit test fixture did not find component records.")
+    updated_records.append(
+        StartingStrengthRecord(
+            player_id=player_id,
+            unit_instance_id=attached_unit_instance_id,
+            starting_model_count=component_starting_model_count,
+            single_model_starting_wounds=None,
+            source_id=source_id,
+        )
+    )
+    state.starting_strength_records = sorted(
+        updated_records,
+        key=lambda record: record.unit_instance_id,
+    )
 
 
 def _state(lifecycle: GameLifecycle) -> GameState:

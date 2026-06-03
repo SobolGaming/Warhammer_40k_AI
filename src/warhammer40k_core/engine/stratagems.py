@@ -136,6 +136,7 @@ CORE_GO_TO_GROUND_HANDLER_ID = "core:go-to-ground"
 CORE_EXPLOSIVES_HANDLER_ID = "core:explosives"
 CORE_SMOKESCREEN_HANDLER_ID = "core:smokescreen"
 COMMAND_REROLL_DICE_CONTEXT_KEY = "dice_roll_state"
+COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY = "affected_unit_instance_id"
 INSANE_BRAVERY_TARGET_POLICY_ID = "battle_shock_test_unit"
 RAPID_INGRESS_TARGET_POLICY_ID = "reserves_unit"
 NEW_ORDERS_TARGET_POLICY_ID = "active_tactical_secondary_card"
@@ -180,6 +181,7 @@ class StratagemUseRecordPayload(TypedDict):
     result_id: str
     selected_option_id: str
     target_binding: StratagemTargetBindingPayload
+    affected_unit_instance_ids: list[str]
     command_point_cost: int
     command_point_transaction_id: str | None
     handler_id: str
@@ -986,6 +988,7 @@ class StratagemUseRecord:
     result_id: str
     selected_option_id: str
     target_binding: StratagemTargetBinding
+    affected_unit_instance_ids: tuple[str, ...]
     command_point_cost: int
     command_point_transaction_id: str | None
     handler_id: str
@@ -1046,6 +1049,8 @@ class StratagemUseRecord:
         )
         if type(self.target_binding) is not StratagemTargetBinding:
             raise GameLifecycleError("StratagemUseRecord target_binding must be a binding.")
+        affected_unit_ids = _validate_stratagem_affected_unit_ids(self.affected_unit_instance_ids)
+        object.__setattr__(self, "affected_unit_instance_ids", affected_unit_ids)
         object.__setattr__(
             self,
             "command_point_cost",
@@ -1082,6 +1087,7 @@ class StratagemUseRecord:
             "result_id": self.result_id,
             "selected_option_id": self.selected_option_id,
             "target_binding": self.target_binding.to_payload(),
+            "affected_unit_instance_ids": list(self.affected_unit_instance_ids),
             "command_point_cost": self.command_point_cost,
             "command_point_transaction_id": self.command_point_transaction_id,
             "handler_id": self.handler_id,
@@ -1102,6 +1108,7 @@ class StratagemUseRecord:
             result_id=payload["result_id"],
             selected_option_id=payload["selected_option_id"],
             target_binding=StratagemTargetBinding.from_payload(payload["target_binding"]),
+            affected_unit_instance_ids=tuple(payload["affected_unit_instance_ids"]),
             command_point_cost=payload["command_point_cost"],
             command_point_transaction_id=payload["command_point_transaction_id"],
             handler_id=payload["handler_id"],
@@ -1612,6 +1619,17 @@ def _apply_stratagem_use(
             raise GameLifecycleError("Applied stratagem spend is missing transaction.")
         transaction_id = spend_result.transaction.transaction_id
         decisions.event_log.append("command_points_spent", spend_result.to_payload())
+    try:
+        affected_unit_ids = _stratagem_affected_unit_ids(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+        )
+    except GameLifecycleError as exc:
+        raise GameLifecycleError(
+            "Prevalidated stratagem affected-unit context is invalid."
+        ) from exc
     use_record = StratagemUseRecord(
         use_id=use_id,
         player_id=context.player_id,
@@ -1624,6 +1642,7 @@ def _apply_stratagem_use(
         result_id=result.result_id,
         selected_option_id=result.selected_option_id,
         target_binding=target_binding,
+        affected_unit_instance_ids=affected_unit_ids,
         command_point_cost=definition.command_point_cost,
         command_point_transaction_id=transaction_id,
         handler_id=definition.handler_id,
@@ -1996,7 +2015,11 @@ def _handler_unavailable_reason(
     target_binding: StratagemTargetBinding | None,
 ) -> str | None:
     if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
-        return _command_reroll_context_error(definition=definition, context=context)
+        return _command_reroll_context_error(
+            state=state,
+            definition=definition,
+            context=context,
+        )
     if definition.handler_id == CORE_INSANE_BRAVERY_HANDLER_ID:
         if target_binding is None:
             if _battle_shock_test_unit_ids(state=state, player_id=context.player_id):
@@ -2099,6 +2122,119 @@ def _restriction_violation(
         )
     ):
         return "once_per_target_per_phase"
+    affected_unit_ids = _stratagem_affected_unit_ids(
+        state=state,
+        definition=definition,
+        context=context,
+        target_binding=target_binding,
+    )
+    if affected_unit_ids:
+        affected_unit_id_set = set(affected_unit_ids)
+        if any(
+            use.battle_round == context.battle_round
+            and use.phase is context.phase
+            and affected_unit_id_set.intersection(use.affected_unit_instance_ids)
+            for use in state.stratagem_use_records
+        ):
+            return "affected_unit_already_stratagem_target"
+    return None
+
+
+def _stratagem_affected_unit_ids(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> tuple[str, ...]:
+    raw_unit_ids: list[str] = []
+    if target_binding is not None and target_binding.target_unit_instance_id is not None:
+        raw_unit_ids.append(target_binding.target_unit_instance_id)
+    if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
+        raw_unit_ids.append(_command_reroll_affected_unit_id(context))
+    if not raw_unit_ids:
+        return ()
+    return _validate_stratagem_affected_unit_ids(
+        tuple(
+            _canonical_stratagem_affected_unit_id(
+                state=state,
+                unit_instance_id=unit_instance_id,
+            )
+            for unit_instance_id in raw_unit_ids
+        )
+    )
+
+
+def _canonical_stratagem_affected_unit_id(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> str:
+    requested_unit_id = _validate_identifier("affected_unit_instance_id", unit_instance_id)
+    owner = _rules_unit_owner(state=state, unit_instance_id=requested_unit_id)
+    if owner is None:
+        raise GameLifecycleError("Stratagem affected unit is unknown.")
+    if requested_unit_id.startswith("attached-unit:"):
+        return requested_unit_id
+    attached_unit_id = _attached_unit_id_for_component(
+        state=state,
+        unit_instance_id=requested_unit_id,
+    )
+    if attached_unit_id is not None:
+        return attached_unit_id
+    unit = _unit_by_id_or_none(state=state, unit_instance_id=requested_unit_id)
+    if unit is not None and _unit_has_keyword(unit, "ATTACHED_UNIT"):
+        return requested_unit_id
+    if unit is not None and _unit_has_runtime_attached_role(unit):
+        raise GameLifecycleError("Runtime attached unit requires attached-unit identity.")
+    return requested_unit_id
+
+
+def _attached_unit_id_for_component(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> str | None:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    component_record = None
+    for record in state.starting_strength_records:
+        if record.unit_instance_id == requested_unit_id:
+            component_record = record
+            break
+    if component_record is None:
+        return None
+    attached_unit_ids = tuple(
+        record.unit_instance_id
+        for record in state.starting_strength_records
+        if record.player_id == component_record.player_id
+        and record.source_id == component_record.source_id
+        and record.unit_instance_id.startswith("attached-unit:")
+    )
+    if len(attached_unit_ids) > 1:
+        raise GameLifecycleError("Attached-unit source has multiple attached identities.")
+    if attached_unit_ids:
+        return attached_unit_ids[0]
+    return None
+
+
+def _unit_has_runtime_attached_role(unit: UnitInstance) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Attached-role lookup requires a UnitInstance.")
+    return any(
+        source_id.startswith(("runtime-attached-unit:", "attached-role:"))
+        for model in unit.own_models
+        for source_id in model.source_ids
+    )
+
+
+def _rules_unit_owner(*, state: GameState, unit_instance_id: str) -> str | None:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    owner = _unit_owner(state=state, unit_instance_id=requested_unit_id)
+    if owner is not None:
+        return owner
+    for record in state.starting_strength_records:
+        if record.unit_instance_id == requested_unit_id:
+            return record.player_id
     return None
 
 
@@ -2366,6 +2502,7 @@ def _rapid_ingress_unit_ids(*, state: GameState, player_id: str) -> tuple[str, .
 
 def _command_reroll_context_error(
     *,
+    state: GameState,
     definition: StratagemDefinition,
     context: StratagemEligibilityContext,
 ) -> str | None:
@@ -2378,6 +2515,13 @@ def _command_reroll_context_error(
             return "ineligible_dice_roll_type"
         if roll_state.original_result.spec.reroll_forbidden_rule_ids:
             return "dice_roll_reroll_forbidden"
+        affected_unit_id = _command_reroll_affected_unit_id(context)
+        if _rules_unit_owner(state=state, unit_instance_id=affected_unit_id) != context.player_id:
+            return "affected_unit_owner_drift"
+        _canonical_stratagem_affected_unit_id(
+            state=state,
+            unit_instance_id=affected_unit_id,
+        )
         permission = _command_reroll_permission(
             source_id=CORE_COMMAND_REROLL_HANDLER_ID,
             context=context,
@@ -2411,6 +2555,16 @@ def _command_reroll_state(context: StratagemEligibilityContext) -> DiceRollState
     if not isinstance(roll_payload, dict):
         raise GameLifecycleError("Command Re-roll requires dice_roll_state payload.")
     return DiceRollState.from_payload(cast(DiceRollStatePayload, roll_payload))
+
+
+def _command_reroll_affected_unit_id(context: StratagemEligibilityContext) -> str:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        raise GameLifecycleError("Command Re-roll requires dice roll trigger payload.")
+    unit_id = trigger_payload.get(COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY)
+    if type(unit_id) is not str:
+        raise GameLifecycleError("Command Re-roll requires affected unit context.")
+    return _validate_identifier("Command Re-roll affected unit id", unit_id)
 
 
 def _command_reroll_permission(
@@ -2835,6 +2989,15 @@ def _unit_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
             if unit.unit_instance_id == requested_unit_id:
                 return unit
     raise GameLifecycleError("unit_instance_id is unknown.")
+
+
+def _unit_by_id_or_none(*, state: GameState, unit_instance_id: str) -> UnitInstance | None:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit_id:
+                return unit
+    return None
 
 
 def _reserve_state_for_target(
@@ -3996,6 +4159,16 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     return tuple(
         _validate_identifier(field_name, value) for value in cast(tuple[object, ...], values)
     )
+
+
+def _validate_stratagem_affected_unit_ids(values: object) -> tuple[str, ...]:
+    affected_unit_ids = _validate_identifier_tuple(
+        "StratagemUseRecord affected_unit_instance_ids",
+        values,
+    )
+    if len(set(affected_unit_ids)) != len(affected_unit_ids):
+        raise GameLifecycleError("StratagemUseRecord affected_unit_instance_ids must be unique.")
+    return tuple(sorted(affected_unit_ids))
 
 
 def _validate_optional_phase(field_name: str, value: object | None) -> BattlePhaseKind | None:
