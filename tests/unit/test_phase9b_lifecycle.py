@@ -165,6 +165,7 @@ def _descriptor_with_sequences(
         engagement_policy=base.engagement_policy,
         movement_policy=base.movement_policy,
         charge_policy=base.charge_policy,
+        fight_policy=base.fight_policy,
         terrain_movement_policy=base.terrain_movement_policy,
         terrain_visibility_policy=base.terrain_visibility_policy,
         objective_policy=base.objective_policy,

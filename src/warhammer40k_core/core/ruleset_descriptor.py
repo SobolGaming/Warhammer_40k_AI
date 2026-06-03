@@ -37,6 +37,36 @@ class ChargeEndpointRequirement(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
+class FightPhaseStepKind(StrEnum):
+    START = "start"
+    PILE_IN = "pile_in"
+    FIGHT = "fight"
+    CONSOLIDATE = "consolidate"
+    END = "end"
+
+
+class FightEligibilityKind(StrEnum):
+    CHARGED_THIS_TURN = "charged_this_turn"
+    ENGAGED_AT_FIGHT_PHASE_START = "engaged_at_fight_phase_start"
+    ENGAGED_AT_ACTIVATION = "engaged_at_activation"
+
+
+class FightOrderingBandKind(StrEnum):
+    FIGHTS_FIRST = "fights_first"
+    REMAINING_COMBATS = "remaining_combats"
+
+
+class FightTypeKind(StrEnum):
+    NORMAL = "normal"
+    OVERRUN = "overrun"
+
+
+class ConsolidationModeKind(StrEnum):
+    ONGOING = "ongoing"
+    ENGAGING = "engaging"
+    OBJECTIVE = "objective"
+
+
 class TerrainObjectiveControlPolicy(StrEnum):
     UNSUPPORTED = "unsupported"
     TERRAIN_AREA_OCCUPANCY = "terrain_area_occupancy"
@@ -143,6 +173,36 @@ class MovementPolicyDescriptorPayload(TypedDict):
 class ChargePolicyDescriptorPayload(TypedDict):
     target_selection_timing: str
     endpoint_requirement: str
+    max_declaration_range_inches: float
+    max_target_selection_range_inches: float
+    target_selection_requires_rolled_distance: bool
+    requires_unengaged_unit: bool
+    forbids_advance: bool
+    forbids_fall_back: bool
+    requires_battlefield_presence: bool
+    must_end_closer_to_selected_targets: bool
+    preferred_target_distance_inches: float
+    must_reach_preferred_target_distance_if_possible: bool
+    must_end_engaged_if_possible: bool
+    must_end_engaged_with_every_selected_target: bool
+    forbids_non_target_engagement: bool
+    grants_fights_first_until_end_turn: bool
+
+
+class FightPolicyDescriptorPayload(TypedDict):
+    steps: list[str]
+    eligibility_kinds: list[str]
+    ordering_bands: list[str]
+    pile_in_available_to_both_players: bool
+    consolidation_available_to_both_players: bool
+    active_player_pile_in_first: bool
+    active_player_consolidates_first: bool
+    fights_first_alternates: bool
+    remaining_combats_alternates: bool
+    eligible_pass_distance_inches: float
+    fight_types: list[str]
+    consolidation_modes: list[str]
+    engaging_consolidation_emits_opponent_fight_decision: bool
 
 
 class TerrainFeatureMovementPolicyPayload(TypedDict):
@@ -254,6 +314,7 @@ class RulesetDescriptorPayload(TypedDict):
     engagement_policy: EngagementPolicyDescriptorPayload
     movement_policy: MovementPolicyDescriptorPayload
     charge_policy: ChargePolicyDescriptorPayload
+    fight_policy: FightPolicyDescriptorPayload
     terrain_movement_policy: TerrainMovementPolicyPayload
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptorPayload
     objective_policy: ObjectivePolicyDescriptorPayload
@@ -501,6 +562,20 @@ class MovementPolicyDescriptor:
 class ChargePolicyDescriptor:
     target_selection_timing: ChargeTargetSelectionTiming
     endpoint_requirement: ChargeEndpointRequirement
+    max_declaration_range_inches: float = 12.0
+    max_target_selection_range_inches: float = 12.0
+    target_selection_requires_rolled_distance: bool = True
+    requires_unengaged_unit: bool = True
+    forbids_advance: bool = True
+    forbids_fall_back: bool = True
+    requires_battlefield_presence: bool = True
+    must_end_closer_to_selected_targets: bool = True
+    preferred_target_distance_inches: float = 1.0
+    must_reach_preferred_target_distance_if_possible: bool = True
+    must_end_engaged_if_possible: bool = True
+    must_end_engaged_with_every_selected_target: bool = True
+    forbids_non_target_engagement: bool = True
+    grants_fights_first_until_end_turn: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -513,11 +588,97 @@ class ChargePolicyDescriptor:
             "endpoint_requirement",
             charge_endpoint_requirement_from_token(self.endpoint_requirement),
         )
+        object.__setattr__(
+            self,
+            "max_declaration_range_inches",
+            _validate_positive_number(
+                "ChargePolicyDescriptor max_declaration_range_inches",
+                self.max_declaration_range_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "max_target_selection_range_inches",
+            _validate_positive_number(
+                "ChargePolicyDescriptor max_target_selection_range_inches",
+                self.max_target_selection_range_inches,
+            ),
+        )
+        if self.max_target_selection_range_inches > self.max_declaration_range_inches:
+            raise RulesetDescriptorError(
+                "ChargePolicyDescriptor target range must not exceed declaration range."
+            )
+        object.__setattr__(
+            self,
+            "preferred_target_distance_inches",
+            _validate_positive_number(
+                "ChargePolicyDescriptor preferred_target_distance_inches",
+                self.preferred_target_distance_inches,
+            ),
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor target_selection_requires_rolled_distance",
+            self.target_selection_requires_rolled_distance,
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor requires_unengaged_unit",
+            self.requires_unengaged_unit,
+        )
+        _validate_bool("ChargePolicyDescriptor forbids_advance", self.forbids_advance)
+        _validate_bool("ChargePolicyDescriptor forbids_fall_back", self.forbids_fall_back)
+        _validate_bool(
+            "ChargePolicyDescriptor requires_battlefield_presence",
+            self.requires_battlefield_presence,
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor must_end_closer_to_selected_targets",
+            self.must_end_closer_to_selected_targets,
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor must_reach_preferred_target_distance_if_possible",
+            self.must_reach_preferred_target_distance_if_possible,
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor must_end_engaged_if_possible",
+            self.must_end_engaged_if_possible,
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor must_end_engaged_with_every_selected_target",
+            self.must_end_engaged_with_every_selected_target,
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor forbids_non_target_engagement",
+            self.forbids_non_target_engagement,
+        )
+        _validate_bool(
+            "ChargePolicyDescriptor grants_fights_first_until_end_turn",
+            self.grants_fights_first_until_end_turn,
+        )
 
     def to_payload(self) -> ChargePolicyDescriptorPayload:
         return {
             "target_selection_timing": self.target_selection_timing.value,
             "endpoint_requirement": self.endpoint_requirement.value,
+            "max_declaration_range_inches": self.max_declaration_range_inches,
+            "max_target_selection_range_inches": self.max_target_selection_range_inches,
+            "target_selection_requires_rolled_distance": (
+                self.target_selection_requires_rolled_distance
+            ),
+            "requires_unengaged_unit": self.requires_unengaged_unit,
+            "forbids_advance": self.forbids_advance,
+            "forbids_fall_back": self.forbids_fall_back,
+            "requires_battlefield_presence": self.requires_battlefield_presence,
+            "must_end_closer_to_selected_targets": self.must_end_closer_to_selected_targets,
+            "preferred_target_distance_inches": self.preferred_target_distance_inches,
+            "must_reach_preferred_target_distance_if_possible": (
+                self.must_reach_preferred_target_distance_if_possible
+            ),
+            "must_end_engaged_if_possible": self.must_end_engaged_if_possible,
+            "must_end_engaged_with_every_selected_target": (
+                self.must_end_engaged_with_every_selected_target
+            ),
+            "forbids_non_target_engagement": self.forbids_non_target_engagement,
+            "grants_fights_first_until_end_turn": self.grants_fights_first_until_end_turn,
         }
 
     @classmethod
@@ -529,6 +690,201 @@ class ChargePolicyDescriptor:
             endpoint_requirement=charge_endpoint_requirement_from_token(
                 payload["endpoint_requirement"]
             ),
+            max_declaration_range_inches=payload["max_declaration_range_inches"],
+            max_target_selection_range_inches=payload["max_target_selection_range_inches"],
+            target_selection_requires_rolled_distance=payload[
+                "target_selection_requires_rolled_distance"
+            ],
+            requires_unengaged_unit=payload["requires_unengaged_unit"],
+            forbids_advance=payload["forbids_advance"],
+            forbids_fall_back=payload["forbids_fall_back"],
+            requires_battlefield_presence=payload["requires_battlefield_presence"],
+            must_end_closer_to_selected_targets=payload["must_end_closer_to_selected_targets"],
+            preferred_target_distance_inches=payload["preferred_target_distance_inches"],
+            must_reach_preferred_target_distance_if_possible=payload[
+                "must_reach_preferred_target_distance_if_possible"
+            ],
+            must_end_engaged_if_possible=payload["must_end_engaged_if_possible"],
+            must_end_engaged_with_every_selected_target=payload[
+                "must_end_engaged_with_every_selected_target"
+            ],
+            forbids_non_target_engagement=payload["forbids_non_target_engagement"],
+            grants_fights_first_until_end_turn=payload["grants_fights_first_until_end_turn"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class FightPolicyDescriptor:
+    steps: tuple[FightPhaseStepKind, ...]
+    eligibility_kinds: tuple[FightEligibilityKind, ...]
+    ordering_bands: tuple[FightOrderingBandKind, ...]
+    pile_in_available_to_both_players: bool
+    consolidation_available_to_both_players: bool
+    active_player_pile_in_first: bool
+    active_player_consolidates_first: bool
+    fights_first_alternates: bool
+    remaining_combats_alternates: bool
+    eligible_pass_distance_inches: float
+    fight_types: tuple[FightTypeKind, ...]
+    consolidation_modes: tuple[ConsolidationModeKind, ...]
+    engaging_consolidation_emits_opponent_fight_decision: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "steps",
+            _validate_fight_phase_step_tuple("FightPolicyDescriptor steps", self.steps),
+        )
+        object.__setattr__(
+            self,
+            "eligibility_kinds",
+            _validate_fight_eligibility_tuple(
+                "FightPolicyDescriptor eligibility_kinds",
+                self.eligibility_kinds,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "ordering_bands",
+            _validate_fight_ordering_band_tuple(
+                "FightPolicyDescriptor ordering_bands",
+                self.ordering_bands,
+            ),
+        )
+        _validate_bool(
+            "FightPolicyDescriptor pile_in_available_to_both_players",
+            self.pile_in_available_to_both_players,
+        )
+        _validate_bool(
+            "FightPolicyDescriptor consolidation_available_to_both_players",
+            self.consolidation_available_to_both_players,
+        )
+        _validate_bool(
+            "FightPolicyDescriptor active_player_pile_in_first",
+            self.active_player_pile_in_first,
+        )
+        _validate_bool(
+            "FightPolicyDescriptor active_player_consolidates_first",
+            self.active_player_consolidates_first,
+        )
+        _validate_bool(
+            "FightPolicyDescriptor fights_first_alternates",
+            self.fights_first_alternates,
+        )
+        _validate_bool(
+            "FightPolicyDescriptor remaining_combats_alternates",
+            self.remaining_combats_alternates,
+        )
+        object.__setattr__(
+            self,
+            "eligible_pass_distance_inches",
+            _validate_positive_number(
+                "FightPolicyDescriptor eligible_pass_distance_inches",
+                self.eligible_pass_distance_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "fight_types",
+            _validate_fight_type_tuple("FightPolicyDescriptor fight_types", self.fight_types),
+        )
+        object.__setattr__(
+            self,
+            "consolidation_modes",
+            _validate_consolidation_mode_tuple(
+                "FightPolicyDescriptor consolidation_modes",
+                self.consolidation_modes,
+            ),
+        )
+        _validate_bool(
+            "FightPolicyDescriptor engaging_consolidation_emits_opponent_fight_decision",
+            self.engaging_consolidation_emits_opponent_fight_decision,
+        )
+
+    @classmethod
+    def warhammer_40000_eleventh_default(cls) -> Self:
+        return cls(
+            steps=(
+                FightPhaseStepKind.START,
+                FightPhaseStepKind.PILE_IN,
+                FightPhaseStepKind.FIGHT,
+                FightPhaseStepKind.CONSOLIDATE,
+                FightPhaseStepKind.END,
+            ),
+            eligibility_kinds=(
+                FightEligibilityKind.CHARGED_THIS_TURN,
+                FightEligibilityKind.ENGAGED_AT_FIGHT_PHASE_START,
+                FightEligibilityKind.ENGAGED_AT_ACTIVATION,
+            ),
+            ordering_bands=(
+                FightOrderingBandKind.FIGHTS_FIRST,
+                FightOrderingBandKind.REMAINING_COMBATS,
+            ),
+            pile_in_available_to_both_players=True,
+            consolidation_available_to_both_players=True,
+            active_player_pile_in_first=True,
+            active_player_consolidates_first=True,
+            fights_first_alternates=True,
+            remaining_combats_alternates=True,
+            eligible_pass_distance_inches=5.0,
+            fight_types=(FightTypeKind.NORMAL, FightTypeKind.OVERRUN),
+            consolidation_modes=(
+                ConsolidationModeKind.ONGOING,
+                ConsolidationModeKind.ENGAGING,
+                ConsolidationModeKind.OBJECTIVE,
+            ),
+            engaging_consolidation_emits_opponent_fight_decision=True,
+        )
+
+    def to_payload(self) -> FightPolicyDescriptorPayload:
+        return {
+            "steps": [step.value for step in self.steps],
+            "eligibility_kinds": [kind.value for kind in self.eligibility_kinds],
+            "ordering_bands": [band.value for band in self.ordering_bands],
+            "pile_in_available_to_both_players": self.pile_in_available_to_both_players,
+            "consolidation_available_to_both_players": (
+                self.consolidation_available_to_both_players
+            ),
+            "active_player_pile_in_first": self.active_player_pile_in_first,
+            "active_player_consolidates_first": self.active_player_consolidates_first,
+            "fights_first_alternates": self.fights_first_alternates,
+            "remaining_combats_alternates": self.remaining_combats_alternates,
+            "eligible_pass_distance_inches": self.eligible_pass_distance_inches,
+            "fight_types": [fight_type.value for fight_type in self.fight_types],
+            "consolidation_modes": [mode.value for mode in self.consolidation_modes],
+            "engaging_consolidation_emits_opponent_fight_decision": (
+                self.engaging_consolidation_emits_opponent_fight_decision
+            ),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: FightPolicyDescriptorPayload) -> Self:
+        return cls(
+            steps=tuple(fight_phase_step_kind_from_token(step) for step in payload["steps"]),
+            eligibility_kinds=tuple(
+                fight_eligibility_kind_from_token(kind) for kind in payload["eligibility_kinds"]
+            ),
+            ordering_bands=tuple(
+                fight_ordering_band_kind_from_token(band) for band in payload["ordering_bands"]
+            ),
+            pile_in_available_to_both_players=payload["pile_in_available_to_both_players"],
+            consolidation_available_to_both_players=payload[
+                "consolidation_available_to_both_players"
+            ],
+            active_player_pile_in_first=payload["active_player_pile_in_first"],
+            active_player_consolidates_first=payload["active_player_consolidates_first"],
+            fights_first_alternates=payload["fights_first_alternates"],
+            remaining_combats_alternates=payload["remaining_combats_alternates"],
+            eligible_pass_distance_inches=payload["eligible_pass_distance_inches"],
+            fight_types=tuple(
+                fight_type_kind_from_token(fight_type) for fight_type in payload["fight_types"]
+            ),
+            consolidation_modes=tuple(
+                consolidation_mode_kind_from_token(mode) for mode in payload["consolidation_modes"]
+            ),
+            engaging_consolidation_emits_opponent_fight_decision=payload[
+                "engaging_consolidation_emits_opponent_fight_decision"
+            ],
         )
 
 
@@ -1443,6 +1799,7 @@ class RulesetDescriptor:
     engagement_policy: EngagementPolicyDescriptor
     movement_policy: MovementPolicyDescriptor
     charge_policy: ChargePolicyDescriptor
+    fight_policy: FightPolicyDescriptor
     terrain_movement_policy: TerrainMovementPolicy
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptor
     objective_policy: ObjectivePolicyDescriptor
@@ -1476,6 +1833,11 @@ class RulesetDescriptor:
             "RulesetDescriptor charge_policy",
             self.charge_policy,
             ChargePolicyDescriptor,
+        )
+        _validate_descriptor_part(
+            "RulesetDescriptor fight_policy",
+            self.fight_policy,
+            FightPolicyDescriptor,
         )
         _validate_descriptor_part(
             "RulesetDescriptor terrain_movement_policy",
@@ -1541,9 +1903,10 @@ class RulesetDescriptor:
             ),
             movement_policy=_movement_policy_for_eleventh(),
             charge_policy=ChargePolicyDescriptor(
-                target_selection_timing=ChargeTargetSelectionTiming.BEFORE_ROLL,
-                endpoint_requirement=ChargeEndpointRequirement.DECLARED_TARGET_ENGAGEMENT,
+                target_selection_timing=ChargeTargetSelectionTiming.AFTER_ROLL,
+                endpoint_requirement=ChargeEndpointRequirement.SELECTED_TARGET_ENGAGEMENT,
             ),
+            fight_policy=FightPolicyDescriptor.warhammer_40000_eleventh_default(),
             terrain_movement_policy=TerrainMovementPolicy.warhammer_40000_eleventh_default(),
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=False,
@@ -1601,6 +1964,7 @@ class RulesetDescriptor:
             engagement_policy=core.engagement_policy,
             movement_policy=core.movement_policy,
             charge_policy=core.charge_policy,
+            fight_policy=core.fight_policy,
             terrain_movement_policy=core.terrain_movement_policy,
             terrain_visibility_policy=core.terrain_visibility_policy,
             objective_policy=core.objective_policy,
@@ -1626,6 +1990,7 @@ class RulesetDescriptor:
             engagement_policy=EngagementPolicyDescriptor.from_payload(payload["engagement_policy"]),
             movement_policy=MovementPolicyDescriptor.from_payload(payload["movement_policy"]),
             charge_policy=ChargePolicyDescriptor.from_payload(payload["charge_policy"]),
+            fight_policy=FightPolicyDescriptor.from_payload(payload["fight_policy"]),
             terrain_movement_policy=TerrainMovementPolicy.from_payload(
                 payload["terrain_movement_policy"]
             ),
@@ -1651,6 +2016,7 @@ class RulesetDescriptor:
             "engagement_policy": self.engagement_policy.to_payload(),
             "movement_policy": self.movement_policy.to_payload(),
             "charge_policy": self.charge_policy.to_payload(),
+            "fight_policy": self.fight_policy.to_payload(),
             "terrain_movement_policy": self.terrain_movement_policy.to_payload(),
             "terrain_visibility_policy": self.terrain_visibility_policy.to_payload(),
             "objective_policy": self.objective_policy.to_payload(),
@@ -1697,6 +2063,61 @@ def charge_endpoint_requirement_from_token(token: object) -> ChargeEndpointRequi
         raise RulesetDescriptorError(
             f"Unsupported ChargeEndpointRequirement token: {token}."
         ) from exc
+
+
+def fight_phase_step_kind_from_token(token: object) -> FightPhaseStepKind:
+    if type(token) is FightPhaseStepKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("FightPhaseStepKind token must be a string.")
+    try:
+        return FightPhaseStepKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported FightPhaseStepKind token: {token}.") from exc
+
+
+def fight_eligibility_kind_from_token(token: object) -> FightEligibilityKind:
+    if type(token) is FightEligibilityKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("FightEligibilityKind token must be a string.")
+    try:
+        return FightEligibilityKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported FightEligibilityKind token: {token}.") from exc
+
+
+def fight_ordering_band_kind_from_token(token: object) -> FightOrderingBandKind:
+    if type(token) is FightOrderingBandKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("FightOrderingBandKind token must be a string.")
+    try:
+        return FightOrderingBandKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported FightOrderingBandKind token: {token}.") from exc
+
+
+def fight_type_kind_from_token(token: object) -> FightTypeKind:
+    if type(token) is FightTypeKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("FightTypeKind token must be a string.")
+    try:
+        return FightTypeKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported FightTypeKind token: {token}.") from exc
+
+
+def consolidation_mode_kind_from_token(token: object) -> ConsolidationModeKind:
+    if type(token) is ConsolidationModeKind:
+        return token
+    if type(token) is not str:
+        raise RulesetDescriptorError("ConsolidationModeKind token must be a string.")
+    try:
+        return ConsolidationModeKind(token)
+    except ValueError as exc:
+        raise RulesetDescriptorError(f"Unsupported ConsolidationModeKind token: {token}.") from exc
 
 
 def terrain_objective_control_policy_from_token(
@@ -2162,6 +2583,92 @@ def _validate_unique_battle_phases(phases: tuple[BattlePhaseKind, ...]) -> None:
         if phase in seen:
             raise RulesetDescriptorError("BattlePhaseSequenceDescriptor phases must be unique.")
         seen.add(phase)
+
+
+def _validate_fight_phase_step_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[FightPhaseStepKind, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(f"{field_name} must be a tuple.")
+    steps = tuple(
+        fight_phase_step_kind_from_token(value) for value in cast(tuple[object, ...], values)
+    )
+    if not steps:
+        raise RulesetDescriptorError(f"{field_name} must not be empty.")
+    _validate_unique_values(field_name, steps)
+    return steps
+
+
+def _validate_fight_eligibility_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[FightEligibilityKind, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(f"{field_name} must be a tuple.")
+    kinds = tuple(
+        fight_eligibility_kind_from_token(value) for value in cast(tuple[object, ...], values)
+    )
+    if not kinds:
+        raise RulesetDescriptorError(f"{field_name} must not be empty.")
+    _validate_unique_values(field_name, kinds)
+    return kinds
+
+
+def _validate_fight_ordering_band_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[FightOrderingBandKind, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(f"{field_name} must be a tuple.")
+    bands = tuple(
+        fight_ordering_band_kind_from_token(value) for value in cast(tuple[object, ...], values)
+    )
+    if not bands:
+        raise RulesetDescriptorError(f"{field_name} must not be empty.")
+    _validate_unique_values(field_name, bands)
+    return bands
+
+
+def _validate_fight_type_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[FightTypeKind, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(f"{field_name} must be a tuple.")
+    fight_types = tuple(
+        fight_type_kind_from_token(value) for value in cast(tuple[object, ...], values)
+    )
+    if not fight_types:
+        raise RulesetDescriptorError(f"{field_name} must not be empty.")
+    _validate_unique_values(field_name, fight_types)
+    return fight_types
+
+
+def _validate_consolidation_mode_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[ConsolidationModeKind, ...]:
+    if type(values) is not tuple:
+        raise RulesetDescriptorError(f"{field_name} must be a tuple.")
+    modes = tuple(
+        consolidation_mode_kind_from_token(value) for value in cast(tuple[object, ...], values)
+    )
+    if not modes:
+        raise RulesetDescriptorError(f"{field_name} must not be empty.")
+    _validate_unique_values(field_name, modes)
+    return modes
+
+
+def _validate_unique_values(
+    field_name: str,
+    values: tuple[StrEnum, ...],
+) -> None:
+    seen: set[StrEnum] = set()
+    for value in values:
+        if value in seen:
+            raise RulesetDescriptorError(f"{field_name} must not contain duplicates.")
+        seen.add(value)
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
