@@ -171,7 +171,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection, `[ANTI]`, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]`, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative X", `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17F, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
-| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with once-per-round 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Secondary cap, and 45 VP Primary / 45 VP Secondary caps | Phase 11A, 11E, 11F, 12C, 14J |
+| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2025-26 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Secondary cap, and 45 VP Primary / 45 VP Secondary caps | Phase 11A, 11E, 11F, 12C, 14J |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 16A, 16C, 16E |
 
 # Build order details
@@ -1234,8 +1234,9 @@ Invariants:
   Missions discarded by the ordinary Tactical discard flow are not replaced
   immediately;
 - retained Secondary Missions do not have a two-card hand-size cap;
-- Tactical discard can discard one or more retained Secondary Missions for the
-  source-backed once-per-battle-round CP reward and records no replacement draw;
+- Tactical discard can discard one or more retained Secondary Missions, records
+  no replacement draw, and grants the Chapter Approved 2025-26 1 CP ordinary
+  discard reward only when the discarding player is the active player;
 - New Orders is a separate 1 CP Stratagem path that discards one retained
   Secondary Mission, immediately draws a replacement Secondary Mission, and is
   usable only once per game;
@@ -1252,7 +1253,7 @@ Required tests:
 - primary scoring at correct timing and source-backed battle-round gates;
 - secondary scoring uses source-backed Fixed/Tactical card VP values;
 - Secondary Mission draw, score, retain, and discard flow is public or hidden according to source-backed viewer rules;
-- Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions for the once-per-battle-round CP reward, and does not replace discarded cards;
+- Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions, grants the Chapter Approved 2025-26 1 CP ordinary discard reward only on the discarding player's own turn, and does not replace discarded cards;
 - New Orders emits deterministic Stratagem, CP, discard, and replacement-draw
   records, rejects second use in the same game, and cannot be confused with
   ordinary Tactical discard;
@@ -2273,9 +2274,14 @@ Invariants:
 - mission deck source data grants two Secondary Missions per player turn, keeps
   Secondary Missions until scored or discarded, and does not replace ordinary
   Tactical-discarded Secondary Missions immediately;
-- retained Secondary Missions have no two-card hand-size cap, ordinary discard
-  rewards are once-per-player-turn CP rewards, and New Orders is the explicit
-  once-per-game 1 CP replacement-draw exception;
+- retained Secondary Missions have no two-card hand-size cap, ordinary Tactical
+  discard can happen in either player's turn but grants the Chapter Approved
+  2025-26 1 CP reward only when the discarding player is the active player, and
+  New Orders is the explicit once-per-game 1 CP replacement-draw exception;
+- Future PR note: when the 11th Edition mission-card source is available,
+  re-check the ordinary Tactical discard CP reward timing against that source
+  instead of assuming the Chapter Approved 2025-26 own-turn-only rule carries
+  forward;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, and Secondary
   scoring at 15 VP per battle round;
 - source imports reuse the existing normalization/ETL boundary but produce 11th Edition package IDs and hashes;

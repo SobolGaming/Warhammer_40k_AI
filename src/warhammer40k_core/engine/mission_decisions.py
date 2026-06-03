@@ -6,6 +6,10 @@ from typing import cast
 from warhammer40k_core.core.missions import MissionActionDefinition
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.command_points import (
+    CommandPointGainStatus,
+    CommandPointSourceKind,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -81,6 +85,7 @@ def request_tactical_secondary_discard(
     _assert_battle_state(state)
     requested_player = _validate_player_id(state=state, player_id=player_id)
     phase = _current_phase(state)
+    active_player_id = _active_player_id(state)
     active_cards = _active_tactical_secondary_cards(state=state, player_id=requested_player)
     if not active_cards:
         return LifecycleStatus.unsupported(
@@ -99,6 +104,7 @@ def request_tactical_secondary_discard(
         payload={
             "game_id": state.game_id,
             "player_id": requested_player,
+            "active_player_id": active_player_id,
             "battle_round": state.battle_round,
             "phase": phase.value,
             "legal_secondary_mission_ids": [card.secondary_mission_id for card in active_cards],
@@ -110,6 +116,7 @@ def request_tactical_secondary_discard(
                 payload={
                     "game_id": state.game_id,
                     "player_id": requested_player,
+                    "active_player_id": active_player_id,
                     "battle_round": state.battle_round,
                     "phase": phase.value,
                     "secondary_mission_id": card.secondary_mission_id,
@@ -138,7 +145,7 @@ def request_mission_action_start(
     mission_action_id: str,
 ) -> LifecycleStatus:
     _assert_battle_state(state)
-    requested_player = _validate_player_id(state=state, player_id=player_id)
+    requested_player = _validate_active_player_id(state=state, player_id=player_id)
     phase = _current_phase(state)
     mission_action = _mission_action_for_state(state=state, mission_action_id=mission_action_id)
     if mission_action.target_policy != "objective_marker":
@@ -226,6 +233,23 @@ def invalid_mission_decision_status(
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
         secondary_mission_id = _payload_string(payload, key="secondary_mission_id")
+        drift_reason = _decision_context_drift_reason(
+            state=state,
+            payload=payload,
+            player_id=player_id,
+            result=result,
+        )
+        if drift_reason is not None:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Tactical secondary discard option drifted.",
+                payload={
+                    "game_id": state.game_id,
+                    "player_id": player_id,
+                    "secondary_mission_id": secondary_mission_id,
+                    "invalid_reason": drift_reason,
+                },
+            )
         if (
             state.secondary_mission_card_state(
                 player_id=player_id,
@@ -250,6 +274,25 @@ def invalid_mission_decision_status(
         mission_action_id = _payload_string(payload, key="mission_action_id")
         unit_instance_id = _payload_string(payload, key="unit_instance_id")
         target_id = _payload_string(payload, key="target_id")
+        drift_reason = _decision_context_drift_reason(
+            state=state,
+            payload=payload,
+            player_id=player_id,
+            result=result,
+        )
+        if drift_reason is not None:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Mission Action start option drifted.",
+                payload={
+                    "game_id": state.game_id,
+                    "player_id": player_id,
+                    "mission_action_id": mission_action_id,
+                    "unit_instance_id": unit_instance_id,
+                    "target_id": target_id,
+                    "invalid_reason": drift_reason,
+                },
+            )
         try:
             action = _mission_action_for_state(
                 state=state,
@@ -312,14 +355,27 @@ def _apply_tactical_secondary_discard(
         secondary_mission_id=secondary_mission_id,
         result_id=result.result_id,
     )
+    command_point_gain = _apply_tactical_secondary_discard_cp_reward(
+        state=state,
+        decisions=decisions,
+        result=result,
+        player_id=player_id,
+    )
+    reward_eligible = player_id == _active_player_id(state)
     decisions.event_log.append(
         "tactical_secondary_mission_discarded",
         {
             "game_id": state.game_id,
             "player_id": player_id,
+            "active_player_id": _active_player_id(state),
             "battle_round": state.battle_round,
             "phase": _current_phase(state).value,
             "secondary_mission_card_state": validate_json_value(discarded.to_payload()),
+            "command_point_reward_eligible": reward_eligible,
+            "command_point_reward_reason": (
+                "discarding_players_turn" if reward_eligible else "not_discarding_players_turn"
+            ),
+            "command_point_gain": command_point_gain,
         },
     )
 
@@ -531,14 +587,64 @@ def _validate_decision_context(
     player_id: str,
     result: DecisionResult,
 ) -> None:
+    drift_reason = _decision_context_drift_reason(
+        state=state,
+        payload=payload,
+        player_id=player_id,
+        result=result,
+    )
+    if drift_reason is not None:
+        raise GameLifecycleError(f"Mission decision context drift: {drift_reason}.")
+
+
+def _decision_context_drift_reason(
+    *,
+    state: GameState,
+    payload: dict[str, JsonValue],
+    player_id: str,
+    result: DecisionResult,
+) -> str | None:
     if result.actor_id != player_id:
-        raise GameLifecycleError("Mission decision actor/player drift.")
+        return "actor_player_drift"
     if _payload_string(payload, key="game_id") != state.game_id:
-        raise GameLifecycleError("Mission decision game_id drift.")
+        return "game_id_drift"
     if _payload_int(payload, key="battle_round") != state.battle_round:
-        raise GameLifecycleError("Mission decision battle_round drift.")
+        return "battle_round_drift"
     if _payload_string(payload, key="phase") != _current_phase(state).value:
-        raise GameLifecycleError("Mission decision phase drift.")
+        return "phase_drift"
+    active_player_payload = payload.get("active_player_id")
+    if active_player_payload is not None and (
+        _validate_identifier("active_player_id", active_player_payload) != _active_player_id(state)
+    ):
+        return "active_player_id_drift"
+    return None
+
+
+def _apply_tactical_secondary_discard_cp_reward(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    player_id: str,
+) -> JsonValue | None:
+    if player_id != _active_player_id(state):
+        return None
+    gain = state.gain_command_points(
+        player_id=player_id,
+        amount=1,
+        source_id=(
+            f"chapter-approved-2025-26:tactical-secondary-discard:{result.result_id}:cp-reward"
+        ),
+        source_kind=CommandPointSourceKind.OTHER,
+    )
+    gain_payload = validate_json_value(gain.to_payload())
+    decisions.event_log.append(
+        "command_points_gained"
+        if gain.status is CommandPointGainStatus.APPLIED
+        else "command_points_gain_capped",
+        gain_payload,
+    )
+    return gain_payload
 
 
 def _assert_battle_state(state: GameState) -> None:
@@ -555,10 +661,22 @@ def _current_phase(state: GameState) -> BattlePhase:
     return phase
 
 
+def _active_player_id(state: GameState) -> str:
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise GameLifecycleError("Mission decision requires an active player.")
+    return active_player_id
+
+
 def _validate_player_id(*, state: GameState, player_id: str) -> str:
     requested_player = _validate_identifier("player_id", player_id)
     if requested_player not in state.player_ids:
         raise GameLifecycleError("Mission decision player_id is not in this game.")
+    return requested_player
+
+
+def _validate_active_player_id(*, state: GameState, player_id: str) -> str:
+    requested_player = _validate_player_id(state=state, player_id=player_id)
     if state.active_player_id != requested_player:
         raise GameLifecycleError("Mission decision player_id must be the active player.")
     return requested_player
