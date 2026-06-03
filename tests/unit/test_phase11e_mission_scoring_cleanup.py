@@ -85,6 +85,7 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
+    TacticalSecondaryAchievementContext,
     VictoryPointAward,
     VictoryPointLedger,
     VictoryPointSourceKind,
@@ -184,6 +185,10 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
             "secondary_mission_id": "assassination",
             "scoring_rule_id": "assassination-fixed",
             "scoring_rule_condition": "fixed_secondary_condition",
+            "scoring_rule_source_id": (
+                "gw-11e-chapter-approved-2025-26:secondary:assassination:"
+                "scoring-rule:assassination-fixed"
+            ),
         },
     }
     assert any(
@@ -231,11 +236,19 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-fixed",
         "scoring_rule_condition": "fixed_secondary_condition",
+        "scoring_rule_source_id": (
+            "gw-11e-chapter-approved-2025-26:secondary:bring-it-down:"
+            "scoring-rule:bring-it-down-fixed"
+        ),
     }
     assert tactical_transaction.metadata == {
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-tactical",
         "scoring_rule_condition": "tactical_secondary_condition",
+        "scoring_rule_source_id": (
+            "gw-11e-chapter-approved-2025-26:secondary:bring-it-down:"
+            "scoring-rule:bring-it-down-tactical"
+        ),
     }
 
 
@@ -565,6 +578,11 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         "secondary_mission_id": active_cards[0].secondary_mission_id,
         "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
         "scoring_rule_condition": "tactical_secondary_condition",
+        "scoring_rule_source_id": (
+            f"gw-11e-chapter-approved-2025-26:secondary:"
+            f"{active_cards[0].secondary_mission_id}:scoring-rule:"
+            f"{active_cards[0].secondary_mission_id}-tactical"
+        ),
     }
     round_tripped = GameLifecycle.from_payload(discard_lifecycle.to_payload())
     encoded = json.dumps(round_tripped.to_payload(), sort_keys=True)
@@ -632,16 +650,42 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
     assert decisions.queue.peek_next().request_id == discard_request.request_id
 
 
+def test_phase14j_tactical_secondary_score_requires_engine_achievement_context() -> None:
+    lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    card = _active_tactical_card(state)
+    unrecorded_context = _tactical_secondary_achievement_context_for_card(
+        state=state,
+        card=card,
+        achievement_id="phase14j-unrecorded-achievement",
+    )
+
+    unsupported = request_tactical_secondary_score(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        achievement_context=unrecorded_context,
+    )
+
+    assert unsupported.status_kind.value == "unsupported"
+    assert unsupported.decision_request is None
+    assert lifecycle.decision_controller.queue.pending_requests == ()
+
+
 def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -> None:
     retain_lifecycle = _battle_lifecycle_with_active_tactical_cards()
     retain_state = retain_lifecycle.state
     assert retain_state is not None
     retain_card = _active_tactical_card(retain_state)
+    retain_context = _record_tactical_secondary_achievement_context(
+        state=retain_state,
+        card=retain_card,
+        achievement_id="phase14j-retain-achievement",
+    )
     retain_waiting = request_tactical_secondary_score(
         state=retain_state,
         decisions=retain_lifecycle.decision_controller,
-        player_id="player-a",
-        secondary_mission_id=retain_card.secondary_mission_id,
+        achievement_context=retain_context,
     )
     retain_request = retain_waiting.decision_request
     assert retain_request is not None
@@ -652,8 +696,13 @@ def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -
         f"score:{retain_card.secondary_mission_id}",
     ]
     retain_payload = cast(dict[str, JsonValue], retain_request.payload)
+    assert retain_payload["achievement_id"] == retain_context.achievement_id
     assert retain_payload["victory_points"] == 5
     assert retain_payload["scoring_rule_id"] == f"{retain_card.secondary_mission_id}-tactical"
+    assert retain_payload["scoring_rule_source_id"] == (
+        f"gw-11e-chapter-approved-2025-26:secondary:{retain_card.secondary_mission_id}:"
+        f"scoring-rule:{retain_card.secondary_mission_id}-tactical"
+    )
 
     retain_lifecycle.submit_decision(
         FiniteOptionSubmission(
@@ -675,6 +724,9 @@ def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -
     )
     assert retained is not None
     assert retained.status is SecondaryMissionCardStatus.ACTIVE
+    assert (
+        retain_state.tactical_secondary_achievement_context(retain_context.achievement_id) is None
+    )
     assert retain_state.victory_point_total("player-a") == 0
     assert cast(dict[str, JsonValue], retain_event.payload)["retained"] is True
 
@@ -682,11 +734,15 @@ def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -
     score_state = score_lifecycle.state
     assert score_state is not None
     score_card = _active_tactical_card(score_state)
+    score_context = _record_tactical_secondary_achievement_context(
+        state=score_state,
+        card=score_card,
+        achievement_id="phase14j-score-achievement",
+    )
     score_waiting = request_tactical_secondary_score(
         state=score_state,
         decisions=score_lifecycle.decision_controller,
-        player_id="player-a",
-        secondary_mission_id=score_card.secondary_mission_id,
+        achievement_context=score_context,
     )
     score_request = score_waiting.decision_request
     assert score_request is not None
@@ -721,11 +777,16 @@ def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -
     )
     score_payload = cast(dict[str, JsonValue], score_event.payload)
     assert scored_record.status is SecondaryMissionCardStatus.SCORED
+    assert score_state.tactical_secondary_achievement_context(score_context.achievement_id) is None
     assert score_state.victory_point_total("player-a") == 5
     assert score_payload["discarded_after_score"] is True
+    event_context = cast(dict[str, JsonValue], score_payload["achievement_context"])
+    assert event_context["achievement_id"] == score_context.achievement_id
     transaction = cast(dict[str, JsonValue], score_payload["victory_point_transaction"])
     assert transaction["source_kind"] == "tactical_secondary"
     assert transaction["source_id"] == score_card.secondary_mission_id
+    transaction_metadata = cast(dict[str, JsonValue], transaction["metadata"])
+    assert transaction_metadata["scoring_rule_source_id"] == score_context.scoring_rule_source_id
 
 
 def test_phase14j_tactical_secondary_score_rejects_drifted_lifecycle_option() -> None:
@@ -733,11 +794,15 @@ def test_phase14j_tactical_secondary_score_rejects_drifted_lifecycle_option() ->
     state = lifecycle.state
     assert state is not None
     card = _active_tactical_card(state)
+    context = _record_tactical_secondary_achievement_context(
+        state=state,
+        card=card,
+        achievement_id="phase14j-card-drift-achievement",
+    )
     waiting = request_tactical_secondary_score(
         state=state,
         decisions=lifecycle.decision_controller,
-        player_id="player-a",
-        secondary_mission_id=card.secondary_mission_id,
+        achievement_context=context,
     )
     request = waiting.decision_request
     assert request is not None
@@ -758,6 +823,231 @@ def test_phase14j_tactical_secondary_score_rejects_drifted_lifecycle_option() ->
     assert status.status_kind.value == "invalid"
     assert not lifecycle.decision_controller.records
     assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+
+
+def test_phase14j_tactical_secondary_score_rejects_stale_achievement_context() -> None:
+    lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    card = _active_tactical_card(state)
+    context = _record_tactical_secondary_achievement_context(
+        state=state,
+        card=card,
+        achievement_id="phase14j-missing-achievement",
+    )
+    waiting = request_tactical_secondary_score(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        achievement_context=context,
+    )
+    request = waiting.decision_request
+    assert request is not None
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=f"score:{card.secondary_mission_id}",
+        result_id="phase14j-score-missing-achievement",
+    ).to_result(request)
+    state.consume_tactical_secondary_achievement_context(context.achievement_id)
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind.value == "invalid"
+    invalid_payload = cast(dict[str, JsonValue], status.payload)
+    assert invalid_payload["invalid_reason"] == "achievement_context_missing"
+    assert not lifecycle.decision_controller.records
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+
+
+def test_phase14j_tactical_secondary_score_rejects_round_phase_and_rule_drift() -> None:
+    round_lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    round_state = round_lifecycle.state
+    assert round_state is not None
+    round_card = _active_tactical_card(round_state)
+    round_context = _record_tactical_secondary_achievement_context(
+        state=round_state,
+        card=round_card,
+        achievement_id="phase14j-round-drift-achievement",
+    )
+    round_waiting = request_tactical_secondary_score(
+        state=round_state,
+        decisions=round_lifecycle.decision_controller,
+        achievement_context=round_context,
+    )
+    round_request = round_waiting.decision_request
+    assert round_request is not None
+    round_result = FiniteOptionSubmission(
+        request_id=round_request.request_id,
+        selected_option_id=f"score:{round_card.secondary_mission_id}",
+        result_id="phase14j-round-drift",
+    ).to_result(round_request)
+    round_state.battle_round += 1
+
+    round_status = round_lifecycle.submit_decision(round_result)
+
+    assert round_status.status_kind.value == "invalid"
+    round_payload = cast(dict[str, JsonValue], round_status.payload)
+    assert round_payload["invalid_reason"] == "battle_round_drift"
+
+    phase_lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    phase_state = phase_lifecycle.state
+    assert phase_state is not None
+    phase_card = _active_tactical_card(phase_state)
+    phase_context = _record_tactical_secondary_achievement_context(
+        state=phase_state,
+        card=phase_card,
+        achievement_id="phase14j-phase-drift-achievement",
+    )
+    phase_waiting = request_tactical_secondary_score(
+        state=phase_state,
+        decisions=phase_lifecycle.decision_controller,
+        achievement_context=phase_context,
+    )
+    phase_request = phase_waiting.decision_request
+    assert phase_request is not None
+    phase_result = FiniteOptionSubmission(
+        request_id=phase_request.request_id,
+        selected_option_id=f"score:{phase_card.secondary_mission_id}",
+        result_id="phase14j-phase-drift",
+    ).to_result(phase_request)
+    phase_state.battle_phase_index = phase_state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+
+    phase_status = phase_lifecycle.submit_decision(phase_result)
+
+    assert phase_status.status_kind.value == "invalid"
+    phase_payload = cast(dict[str, JsonValue], phase_status.payload)
+    assert phase_payload["invalid_reason"] == "phase_drift"
+
+    rule_lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    rule_state = rule_lifecycle.state
+    assert rule_state is not None
+    rule_card = _active_tactical_card(rule_state)
+    rule_context = _record_tactical_secondary_achievement_context(
+        state=rule_state,
+        card=rule_card,
+        achievement_id="phase14j-rule-drift-achievement",
+    )
+    rule_waiting = request_tactical_secondary_score(
+        state=rule_state,
+        decisions=rule_lifecycle.decision_controller,
+        achievement_context=rule_context,
+    )
+    rule_request = rule_waiting.decision_request
+    assert rule_request is not None
+    rule_result = FiniteOptionSubmission(
+        request_id=rule_request.request_id,
+        selected_option_id=f"score:{rule_card.secondary_mission_id}",
+        result_id="phase14j-rule-drift",
+    ).to_result(rule_request)
+    rule_state.tactical_secondary_achievement_contexts[0] = replace(
+        rule_context,
+        victory_points=rule_context.victory_points + 1,
+    )
+
+    rule_status = rule_lifecycle.submit_decision(rule_result)
+
+    assert rule_status.status_kind.value == "invalid"
+    rule_payload = cast(dict[str, JsonValue], rule_status.payload)
+    assert rule_payload["invalid_reason"] == "victory_points_drift"
+
+
+def test_phase14j_tactical_secondary_achievement_context_is_source_validated() -> None:
+    state = _battle_lifecycle_with_active_tactical_cards().state
+    assert state is not None
+    card = _active_tactical_card(state)
+    context = _tactical_secondary_achievement_context_for_card(
+        state=state,
+        card=card,
+        achievement_id="phase14j-invalid-achievement",
+    )
+
+    with pytest.raises(GameLifecycleError, match="VP drift"):
+        state.record_tactical_secondary_achievement_context(
+            replace(context, victory_points=context.victory_points + 1)
+        )
+
+
+def test_phase14j_tactical_secondary_achievement_context_round_trips_and_is_redacted() -> None:
+    state = _battle_lifecycle_with_active_tactical_cards().state
+    assert state is not None
+    card = _active_tactical_card(state)
+    context = _record_tactical_secondary_achievement_context(
+        state=state,
+        card=card,
+        achievement_id="phase14j-round-trip-achievement",
+    )
+
+    with pytest.raises(GameLifecycleError, match="already exists"):
+        state.record_tactical_secondary_achievement_context(context)
+    with pytest.raises(GameLifecycleError, match="already exists for this card"):
+        state.record_tactical_secondary_achievement_context(
+            replace(context, achievement_id="phase14j-duplicate-card-achievement")
+        )
+
+    payload = state.to_payload()
+    assert payload["tactical_secondary_achievement_contexts"] == [context.to_payload()]
+    restored = GameState.from_payload(payload)
+    assert restored.tactical_secondary_achievement_context(context.achievement_id) == context
+    public_payload = restored.to_public_payload(viewer_player_id="player-a")
+    assert public_payload["tactical_secondary_achievement_contexts"] == []
+
+
+def test_phase14j_tactical_secondary_achievement_context_state_validation_rejects_drift() -> None:
+    state = _battle_lifecycle_with_active_tactical_cards().state
+    assert state is not None
+    card = _active_tactical_card(state)
+    context = _tactical_secondary_achievement_context_for_card(
+        state=state,
+        card=card,
+        achievement_id="phase14j-state-validation-achievement",
+    )
+
+    with pytest.raises(GameLifecycleError, match="game_id drift"):
+        replace(
+            state,
+            tactical_secondary_achievement_contexts=[
+                replace(context, game_id="phase14j-other-game")
+            ],
+        )
+    with pytest.raises(GameLifecycleError, match="player_id is not in this game"):
+        replace(
+            state,
+            tactical_secondary_achievement_contexts=[
+                replace(context, player_id="phase14j-missing-player")
+            ],
+        )
+    with pytest.raises(GameLifecycleError, match="active_player_id is not in this game"):
+        replace(
+            state,
+            tactical_secondary_achievement_contexts=[
+                replace(context, active_player_id="phase14j-missing-active-player")
+            ],
+        )
+    with pytest.raises(GameLifecycleError, match="must not duplicate IDs"):
+        replace(state, tactical_secondary_achievement_contexts=[context, context])
+    with pytest.raises(GameLifecycleError, match="must not duplicate cards"):
+        replace(
+            state,
+            tactical_secondary_achievement_contexts=[
+                context,
+                replace(context, achievement_id="phase14j-state-duplicate-card"),
+            ],
+        )
+    with pytest.raises(GameLifecycleError, match="does not exist"):
+        state.consume_tactical_secondary_achievement_context("phase14j-missing-achievement")
+
+
+def test_phase14j_tactical_secondary_achievement_context_rejects_non_tactical_mode() -> None:
+    state = _battle_lifecycle_with_active_tactical_cards().state
+    assert state is not None
+    card = _active_tactical_card(state)
+    context = _tactical_secondary_achievement_context_for_card(
+        state=state,
+        card=card,
+        achievement_id="phase14j-invalid-mode-achievement",
+    )
+
+    with pytest.raises(GameLifecycleError, match="Tactical mode"):
+        replace(context, mode=SecondaryMissionCardMode.FIXED)
 
 
 def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> None:
@@ -2003,6 +2293,64 @@ def _active_tactical_card(state: GameState) -> SecondaryMissionCardState:
         if card.player_id == "player-a"
         and card.mode is SecondaryMissionCardMode.TACTICAL
         and card.status is SecondaryMissionCardStatus.ACTIVE
+    )
+
+
+def _record_tactical_secondary_achievement_context(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    achievement_id: str,
+) -> TacticalSecondaryAchievementContext:
+    context = _tactical_secondary_achievement_context_for_card(
+        state=state,
+        card=card,
+        achievement_id=achievement_id,
+    )
+    state.record_tactical_secondary_achievement_context(context)
+    return context
+
+
+def _tactical_secondary_achievement_context_for_card(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    achievement_id: str,
+) -> TacticalSecondaryAchievementContext:
+    assert state.mission_setup is not None
+    assert state.active_player_id is not None
+    phase = state.current_battle_phase
+    assert phase is not None
+    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    award = policy.secondary_award(
+        player_id=card.player_id,
+        battle_round=state.battle_round,
+        phase=phase.value,
+        secondary_mission_id=card.secondary_mission_id,
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        hidden=False,
+    )
+    metadata = cast(dict[str, JsonValue], award.metadata)
+    return TacticalSecondaryAchievementContext(
+        achievement_id=achievement_id,
+        game_id=state.game_id,
+        player_id=card.player_id,
+        active_player_id=state.active_player_id,
+        secondary_mission_id=card.secondary_mission_id,
+        battle_round=state.battle_round,
+        phase=phase.value,
+        card_battle_round=card.battle_round,
+        victory_points=award.amount,
+        scoring_rule_id=cast(str, metadata["scoring_rule_id"]),
+        scoring_rule_condition=cast(str, metadata["scoring_rule_condition"]),
+        scoring_rule_source_id=cast(str, metadata["scoring_rule_source_id"]),
+        scoring_timing=award.scoring_timing,
+        source_id=f"phase14j:{card.secondary_mission_id}:requirements-achieved",
+        evidence={
+            "evidence_kind": "source_backed_requirement_result",
+            "requirements_met": True,
+            "secondary_mission_id": card.secondary_mission_id,
+        },
     )
 
 

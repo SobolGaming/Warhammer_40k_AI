@@ -110,6 +110,8 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardState,
     SecondaryMissionCardStatePayload,
     SecondaryMissionCardStatus,
+    TacticalSecondaryAchievementContext,
+    TacticalSecondaryAchievementContextPayload,
     VictoryPointAward,
     VictoryPointLedger,
     VictoryPointLedgerPayload,
@@ -218,6 +220,7 @@ class GameStatePayload(TypedDict):
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
     secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
+    tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContextPayload]
 
 
 def _new_secondary_mission_choices() -> list[SecondaryMissionChoice]:
@@ -301,6 +304,10 @@ def _new_army_definitions() -> list[ArmyDefinition]:
 
 
 def _new_secondary_mission_card_states() -> list[SecondaryMissionCardState]:
+    return []
+
+
+def _new_tactical_secondary_achievement_contexts() -> list[TacticalSecondaryAchievementContext]:
     return []
 
 
@@ -636,6 +643,9 @@ class GameState:
     secondary_mission_card_states: list[SecondaryMissionCardState] = field(
         default_factory=_new_secondary_mission_card_states
     )
+    tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContext] = field(
+        default_factory=_new_tactical_secondary_achievement_contexts
+    )
 
     def __post_init__(self) -> None:
         self.game_id = _validate_identifier("GameState game_id", self.game_id)
@@ -809,6 +819,13 @@ class GameState:
         self.secondary_mission_card_states = _validate_secondary_mission_card_states(
             self.secondary_mission_card_states,
             player_ids=self.player_ids,
+        )
+        self.tactical_secondary_achievement_contexts = (
+            _validate_tactical_secondary_achievement_contexts(
+                self.tactical_secondary_achievement_contexts,
+                game_id=self.game_id,
+                player_ids=self.player_ids,
+            )
         )
         _validate_hover_mode_state_references(self)
         _validate_state_stage_indexes(self)
@@ -1758,6 +1775,121 @@ class GameState:
         self._replace_secondary_mission_card_state(scored)
         return scored
 
+    def record_tactical_secondary_achievement_context(
+        self,
+        context: TacticalSecondaryAchievementContext,
+    ) -> None:
+        if type(context) is not TacticalSecondaryAchievementContext:
+            raise GameLifecycleError("context must be a TacticalSecondaryAchievementContext.")
+        self._validate_current_tactical_secondary_achievement_context(context)
+        if any(
+            stored.achievement_id == context.achievement_id
+            for stored in self.tactical_secondary_achievement_contexts
+        ):
+            raise GameLifecycleError("Tactical secondary achievement context already exists.")
+        if any(
+            stored.player_id == context.player_id
+            and stored.secondary_mission_id == context.secondary_mission_id
+            and stored.card_battle_round == context.card_battle_round
+            for stored in self.tactical_secondary_achievement_contexts
+        ):
+            raise GameLifecycleError(
+                "Tactical secondary achievement context already exists for this card."
+            )
+        self.tactical_secondary_achievement_contexts.append(context)
+        self.tactical_secondary_achievement_contexts.sort(
+            key=lambda stored: (
+                stored.player_id,
+                stored.card_battle_round,
+                stored.secondary_mission_id,
+            )
+        )
+
+    def tactical_secondary_achievement_context(
+        self,
+        achievement_id: str,
+    ) -> TacticalSecondaryAchievementContext | None:
+        requested_achievement_id = _validate_identifier("achievement_id", achievement_id)
+        matches = [
+            context
+            for context in self.tactical_secondary_achievement_contexts
+            if context.achievement_id == requested_achievement_id
+        ]
+        if not matches:
+            return None
+        if len(matches) > 1:
+            raise GameLifecycleError("Multiple Tactical secondary achievement contexts found.")
+        return matches[0]
+
+    def consume_tactical_secondary_achievement_context(
+        self,
+        achievement_id: str,
+    ) -> TacticalSecondaryAchievementContext:
+        requested_achievement_id = _validate_identifier("achievement_id", achievement_id)
+        for index, context in enumerate(self.tactical_secondary_achievement_contexts):
+            if context.achievement_id == requested_achievement_id:
+                return self.tactical_secondary_achievement_contexts.pop(index)
+        raise GameLifecycleError("Tactical secondary achievement context does not exist.")
+
+    def _validate_current_tactical_secondary_achievement_context(
+        self,
+        context: TacticalSecondaryAchievementContext,
+    ) -> None:
+        if context.game_id != self.game_id:
+            raise GameLifecycleError("Tactical secondary achievement context game_id drift.")
+        if context.player_id not in self.player_ids:
+            raise GameLifecycleError(
+                "Tactical secondary achievement context player_id is not in this game."
+            )
+        if context.active_player_id != self.active_player_id:
+            raise GameLifecycleError(
+                "Tactical secondary achievement context active_player_id drift."
+            )
+        if context.battle_round != self.battle_round:
+            raise GameLifecycleError("Tactical secondary achievement context battle_round drift.")
+        current_phase = self.current_battle_phase
+        if current_phase is None:
+            raise GameLifecycleError("Tactical secondary achievement context requires a phase.")
+        if context.phase != current_phase.value:
+            raise GameLifecycleError("Tactical secondary achievement context phase drift.")
+        card_state = self.secondary_mission_card_state(
+            player_id=context.player_id,
+            secondary_mission_id=context.secondary_mission_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+        )
+        if card_state is None:
+            raise GameLifecycleError(
+                "Tactical secondary achievement context requires an active card."
+            )
+        if context.card_battle_round != card_state.battle_round:
+            raise GameLifecycleError(
+                "Tactical secondary achievement context card battle_round drift."
+            )
+        if self.mission_setup is None:
+            raise GameLifecycleError(
+                "Tactical secondary achievement context requires MissionSetup."
+            )
+        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        award = policy.secondary_award(
+            player_id=context.player_id,
+            battle_round=self.battle_round,
+            phase=current_phase.value,
+            secondary_mission_id=context.secondary_mission_id,
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+        )
+        metadata = cast(dict[str, JsonValue], award.metadata)
+        if context.victory_points != award.amount:
+            raise GameLifecycleError("Tactical secondary achievement context VP drift.")
+        if context.scoring_rule_id != metadata["scoring_rule_id"]:
+            raise GameLifecycleError("Tactical secondary achievement context rule ID drift.")
+        if context.scoring_rule_condition != metadata["scoring_rule_condition"]:
+            raise GameLifecycleError("Tactical secondary achievement context condition drift.")
+        if context.scoring_rule_source_id != metadata["scoring_rule_source_id"]:
+            raise GameLifecycleError("Tactical secondary achievement context source ID drift.")
+        if context.scoring_timing != award.scoring_timing:
+            raise GameLifecycleError("Tactical secondary achievement context timing drift.")
+
     def discard_tactical_secondary(
         self,
         *,
@@ -2211,6 +2343,9 @@ class GameState:
             "secondary_mission_card_states": [
                 state.to_payload() for state in self.secondary_mission_card_states
             ],
+            "tactical_secondary_achievement_contexts": [
+                context.to_payload() for context in self.tactical_secondary_achievement_contexts
+            ],
         }
 
     def to_public_payload(self, *, viewer_player_id: str) -> dict[str, JsonValue]:
@@ -2262,6 +2397,7 @@ class GameState:
             JsonValue,
             self.public_mission_action_states(viewer_player_id=viewer),
         )
+        payload["tactical_secondary_achievement_contexts"] = []
         validate_json_value(payload)
         return payload
 
@@ -2443,6 +2579,10 @@ class GameState:
             secondary_mission_card_states=[
                 SecondaryMissionCardState.from_payload(state)
                 for state in payload["secondary_mission_card_states"]
+            ],
+            tactical_secondary_achievement_contexts=[
+                TacticalSecondaryAchievementContext.from_payload(context)
+                for context in payload["tactical_secondary_achievement_contexts"]
             ],
         )
 
@@ -3702,6 +3842,61 @@ def _validate_secondary_mission_card_states(
             state.battle_round,
             state.mode.value,
             state.secondary_mission_id,
+        ),
+    )
+
+
+def _validate_tactical_secondary_achievement_contexts(
+    contexts: object,
+    *,
+    game_id: str,
+    player_ids: tuple[str, ...],
+) -> list[TacticalSecondaryAchievementContext]:
+    if not isinstance(contexts, list):
+        raise GameLifecycleError(
+            "GameState tactical_secondary_achievement_contexts must be a list."
+        )
+    requested_game_id = _validate_identifier("game_id", game_id)
+    validated: list[TacticalSecondaryAchievementContext] = []
+    seen_ids: set[str] = set()
+    seen_cards: set[tuple[str, str, int]] = set()
+    for context in cast(list[object], contexts):
+        if type(context) is not TacticalSecondaryAchievementContext:
+            raise GameLifecycleError(
+                "GameState tactical_secondary_achievement_contexts must contain contexts."
+            )
+        if context.game_id != requested_game_id:
+            raise GameLifecycleError("TacticalSecondaryAchievementContext game_id drift.")
+        if context.player_id not in player_ids:
+            raise GameLifecycleError(
+                "TacticalSecondaryAchievementContext player_id is not in this game."
+            )
+        if context.active_player_id not in player_ids:
+            raise GameLifecycleError(
+                "TacticalSecondaryAchievementContext active_player_id is not in this game."
+            )
+        if context.achievement_id in seen_ids:
+            raise GameLifecycleError(
+                "GameState tactical_secondary_achievement_contexts must not duplicate IDs."
+            )
+        card_key = (
+            context.player_id,
+            context.secondary_mission_id,
+            context.card_battle_round,
+        )
+        if card_key in seen_cards:
+            raise GameLifecycleError(
+                "GameState tactical_secondary_achievement_contexts must not duplicate cards."
+            )
+        seen_ids.add(context.achievement_id)
+        seen_cards.add(card_key)
+        validated.append(context)
+    return sorted(
+        validated,
+        key=lambda context: (
+            context.player_id,
+            context.card_battle_round,
+            context.secondary_mission_id,
         ),
     )
 

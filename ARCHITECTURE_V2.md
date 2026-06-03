@@ -172,7 +172,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection, `[ANTI]`, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]`, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative X", `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17F, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
-| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2025-26 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Secondary cap, and 45 VP Primary / 45 VP Secondary caps | Phase 11A, 11E, 11F, 12C, 14J |
+| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2025-26 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 16A, 16C, 16E |
 
 # Build order details
@@ -1274,7 +1274,7 @@ Implemented coverage:
 
 - game length is consumed from mission scoring policy;
 - end-of-round and end-of-game scoring windows are recorded once as replay-safe state;
-- 11th Edition primary, secondary, Battle Ready, per-round secondary, and total VP caps are enforced at award time;
+- 11th Edition primary, secondary, Battle Ready, per-round Primary, per-round Secondary, and total VP caps are enforced at award time;
 - final scoring result payloads include public capped scores, winner/draw determination, and scoring audit data;
 - final scoring payloads round-trip without Python object reprs.
 
@@ -1283,7 +1283,7 @@ Invariants:
 - game length is mission/ruleset data;
 - end-of-round and end-of-game scoring windows are explicit;
 - final VP ledger audit verifies winner/draw payloads;
-- 11th Edition 45 VP Primary cap, 45 VP Secondary cap, 15 VP per-round Secondary cap, Battle Ready cap, total VP cap, and per-source caps are represented in scoring policy;
+- 11th Edition 45 VP Primary cap, 45 VP Secondary cap, 10 VP Battle Ready cap, 15 VP per-round Primary and Secondary caps, 100 VP total cap, and per-source caps are represented in scoring policy;
 - game-end payload includes public final score and replay-safe scoring audit.
 
 Required tests:
@@ -2260,10 +2260,10 @@ Required tests:
 
 Status: Complete for the current source-backed slice. The engine now records the
 five 11th Edition Force Dispositions, the 25-cell player-vs-opponent Primary
-Mission matrix, three layout identifiers per cell, and Tactical Secondary
-score/retain as an adapter-visible finite decision. Exact Primary Mission
-scoring rules, layout geometry, and confirmed 18-card Secondary Mission
-identities remain pending source work rather than guessed content.
+Mission matrix, three layout identifiers per cell, and engine-achievement-gated
+Tactical Secondary score/retain as an adapter-visible finite decision. Exact
+Primary Mission scoring rules, layout geometry, and confirmed 18-card Secondary
+Mission identities remain pending source work rather than guessed content.
 
 Invariants:
 
@@ -2293,16 +2293,19 @@ Invariants:
   discard can happen in either player's turn but grants the Chapter Approved
   2025-26 1 CP reward only when the discarding player is the active player, and
   New Orders is the explicit once-per-game 1 CP replacement-draw exception;
-- when a Tactical Secondary Mission Card's requirements are achieved, scoring is
-  a finite player decision: scoring awards the source-backed VP and discards the
-  card, while declining to score awards no VP and keeps the card retained;
+- when a Tactical Secondary Mission Card's requirements are achieved, the engine
+  records a source-backed achievement context before emitting the finite scoring
+  decision: scoring awards the source-backed VP, consumes the context, and
+  discards the card, while declining to score consumes that finite context,
+  awards no VP, and keeps the card retained;
 - Future PR note: when the 11th Edition mission-card source is available,
   replace the provisional Secondary Mission card source rows with the confirmed
   18-card list and re-check ordinary Tactical discard CP reward timing against
   that source instead of assuming the Chapter Approved 2025-26 own-turn-only
   rule carries forward;
-- scoring source data caps Primary at 45 VP, Secondary at 45 VP, and Secondary
-  scoring at 15 VP per battle round;
+- scoring source data caps Primary at 45 VP, Secondary at 45 VP, Battle Ready at
+  10 VP, total score at 100 VP, and Primary and Secondary scoring at 15 VP per
+  battle round;
 - source imports reuse the existing normalization/ETL boundary but produce 11th Edition package IDs and hashes;
 - old source snapshots are not selectable as active game content;
 - catalog/reporting distinguishes implemented, unsupported, and awaiting-source rows without silently substituting retired data.
@@ -2319,11 +2322,12 @@ Required tests:
   Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
   faction-keyword rules;
 - Secondary Mission draw/retain/no-hand-size-cap/discard, New Orders
-  replacement draw, and 45/45/15 VP caps load from source data and round-trip
-  through mission scoring fixtures;
-- Tactical Secondary score/retain decisions use deterministic option IDs,
-  reject drift before queue pop, award/discard only when the player chooses to
-  score, and keep the card active when the player declines to score;
+  replacement draw, and 45/45/10/100 plus 15-per-round VP caps load from source
+  data and round-trip through mission scoring fixtures;
+- Tactical Secondary score/retain decisions require a recorded engine-owned
+  achievement context, use deterministic option IDs, reject drift before queue
+  pop, award/discard only when the player chooses to score, and keep the card
+  active when the player declines to score;
 - coverage report groups awaiting-source rows separately from unsupported rule shapes.
 
 ## Phase 14K: cutover hardening and static audits
