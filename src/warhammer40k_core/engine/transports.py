@@ -236,7 +236,6 @@ _EMERGENCY_DISEMBARK_DISTANCE_INCHES = 6.0
 _CORE_TRANSPORT_RULE_ID = "core_rules_transports"
 _RAPID_DISEMBARK_RULE_ID = "core_rules_rapid_disembark"
 _TACTICAL_DISEMBARK_RULE_ID = "core_rules_tactical_disembark"
-_COMBAT_DISEMBARK_RULE_ID = "core_rules_combat_disembark"
 _DESTROYED_TRANSPORT_RULE_ID = "core_rules_destroyed_transport"
 _EMERGENCY_DISEMBARK_RULE_ID = "core_rules_emergency_disembark"
 
@@ -945,21 +944,8 @@ class DisembarkedUnitState:
                 battle_shocked_until=None,
                 source_rule_id=_RAPID_DISEMBARK_RULE_ID,
             )
-        if mode is DisembarkModeKind.COMBAT_DISEMBARK:
-            return cls(
-                player_id=player_id,
-                battle_round=battle_round,
-                unit_instance_id=unit_instance_id,
-                transport_unit_instance_id=transport_unit_instance_id,
-                disembark_mode=mode,
-                can_move_further=False,
-                can_choose_remain_stationary=False,
-                can_declare_charge=False,
-                battle_shocked_until="controller_next_command_phase_start",
-                source_rule_id=_COMBAT_DISEMBARK_RULE_ID,
-            )
         if mode is not DisembarkModeKind.TACTICAL_DISEMBARK:
-            raise GameLifecycleError("Normal Disembark requires Tactical, Rapid, or Combat mode.")
+            raise GameLifecycleError("Normal Disembark requires Tactical or Rapid mode.")
         return cls(
             player_id=player_id,
             battle_round=battle_round,
@@ -1712,10 +1698,13 @@ def resolve_disembark(
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> DisembarkResolution:
+    if selection.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
+        raise GameLifecycleError(
+            "Combat Disembark requires a dedicated source-backed transport path."
+        )
     if selection.disembark_mode not in {
         DisembarkModeKind.RAPID_DISEMBARK,
         DisembarkModeKind.TACTICAL_DISEMBARK,
-        DisembarkModeKind.COMBAT_DISEMBARK,
     }:
         raise GameLifecycleError("resolve_disembark requires a standard Disembark mode.")
     return _resolve_disembark(
@@ -2193,8 +2182,11 @@ def _resolve_disembark(
 
 def _disembark_distance_inches(disembark_mode: DisembarkModeKind) -> float:
     mode = disembark_mode_kind_from_token(disembark_mode)
+    if mode is DisembarkModeKind.COMBAT_DISEMBARK:
+        raise GameLifecycleError(
+            "Combat Disembark requires a dedicated source-backed transport path."
+        )
     if mode in {
-        DisembarkModeKind.COMBAT_DISEMBARK,
         DisembarkModeKind.EMERGENCY_DISEMBARK,
     }:
         return _EMERGENCY_DISEMBARK_DISTANCE_INCHES
@@ -2214,15 +2206,31 @@ def _validate_disembark_mode_status(
 ) -> None:
     mode = disembark_mode_kind_from_token(disembark_mode)
     status = transport_movement_status_from_token(transport_movement_status)
-    if (
-        mode
-        in {
-            DisembarkModeKind.DESTROYED_TRANSPORT,
-            DisembarkModeKind.EMERGENCY_DISEMBARK,
-        }
-        and status is not TransportMovementStatus.NOT_MOVED
-    ):
-        raise GameLifecycleError("Destroyed Transport Disembark requires destroyed timing.")
+    if mode is DisembarkModeKind.TACTICAL_DISEMBARK:
+        if status is not TransportMovementStatus.NOT_MOVED:
+            raise GameLifecycleError("Tactical Disembark requires an unmoved Transport.")
+        return
+    if mode is DisembarkModeKind.RAPID_DISEMBARK:
+        if status not in {
+            TransportMovementStatus.NORMAL_MOVE,
+            TransportMovementStatus.INGRESS_MOVE,
+        }:
+            raise GameLifecycleError(
+                "Rapid Disembark requires Normal or Ingress Transport movement."
+            )
+        return
+    if mode in {
+        DisembarkModeKind.DESTROYED_TRANSPORT,
+        DisembarkModeKind.EMERGENCY_DISEMBARK,
+    }:
+        if status is not TransportMovementStatus.NOT_MOVED:
+            raise GameLifecycleError("Destroyed Transport Disembark requires destroyed timing.")
+        return
+    if mode is DisembarkModeKind.COMBAT_DISEMBARK:
+        raise GameLifecycleError(
+            "Combat Disembark requires a dedicated source-backed transport path."
+        )
+    raise GameLifecycleError("Unsupported DisembarkModeKind.")
 
 
 def _append_transport_common_violations(
