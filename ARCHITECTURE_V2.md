@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks; it does not implement Charge/Fight execution.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks; it does not implement Charge/Fight execution. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
 
 Completed / implemented foundation:
 
@@ -91,13 +91,14 @@ Completed / implemented foundation:
 | 14D | Complete | Movement, terrain, objectives, and actions cutover |
 | 14F | Complete | Shooting-type cutover with finite shooting-type selection and supported grouped attack resolution |
 | 14G | Complete | Charge/Fight source contract for Phase 15 implementation |
+| 14J | Complete | Mission/catalog replacement slice with Force Dispositions, Primary Mission matrix source tracking, and Tactical Secondary score/retain decisions |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
 | 14E | In progress | Allocation-group host and grouped-host weapon abilities are implemented for supported fixed-damage pools; melee-only Cleave/Lance execution waits on Phase 15 Charge/Fight |
-| 14H-14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
+| 14H, 14I, 14K | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -2257,9 +2258,23 @@ Required tests:
 
 ## Phase 14J: mission and catalog replacement
 
+Status: Complete for the current source-backed slice. The engine now records the
+five 11th Edition Force Dispositions, the 25-cell player-vs-opponent Primary
+Mission matrix, three layout identifiers per cell, and Tactical Secondary
+score/retain as an adapter-visible finite decision. Exact Primary Mission
+scoring rules, layout geometry, and confirmed 18-card Secondary Mission
+identities remain pending source work rather than guessed content.
+
 Invariants:
 
 - mission packs, deployment maps, terrain layouts, actions, scoring, datasheets, keywords, detachments, enhancements, and faction rules are imported as 11th Edition source packages;
+- 11th Edition Primary Mission source data records the five Force Dispositions
+  (`Purge The Foe`, `Take And Hold`, `Disruption`, `Reconnaissance`, and
+  `Priority Assets`), the deterministic 5x5 player-vs-opponent matrix, and
+  three source-tracked battlefield layout identifiers per matrix cell;
+- matrix cells whose Primary Mission rules or layout geometry are not yet known
+  remain `awaiting_source`, never substituted with retired-edition missions or
+  invented scoring text;
 - mustering source data follows the 11th Edition order: select Battle Size,
   start Army Roster, choose Faction, select Detachment Rules, select Units, then
   promote Warlord;
@@ -2278,10 +2293,14 @@ Invariants:
   discard can happen in either player's turn but grants the Chapter Approved
   2025-26 1 CP reward only when the discarding player is the active player, and
   New Orders is the explicit once-per-game 1 CP replacement-draw exception;
+- when a Tactical Secondary Mission Card's requirements are achieved, scoring is
+  a finite player decision: scoring awards the source-backed VP and discards the
+  card, while declining to score awards no VP and keeps the card retained;
 - Future PR note: when the 11th Edition mission-card source is available,
-  re-check the ordinary Tactical discard CP reward timing against that source
-  instead of assuming the Chapter Approved 2025-26 own-turn-only rule carries
-  forward;
+  replace the provisional Secondary Mission card source rows with the confirmed
+  18-card list and re-check ordinary Tactical discard CP reward timing against
+  that source instead of assuming the Chapter Approved 2025-26 own-turn-only
+  rule carries forward;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, and Secondary
   scoring at 15 VP per battle round;
 - source imports reuse the existing normalization/ETL boundary but produce 11th Edition package IDs and hashes;
@@ -2293,12 +2312,18 @@ Required tests:
 - package hashes are deterministic;
 - retired source packages cannot be selected for a new game;
 - representative mission/action/scoring rows load from 11th Edition source identity;
+- Force Disposition rows and all 25 Primary Mission matrix cells load,
+  round-trip, preserve `awaiting_source` status, and expose exactly three layout
+  identifiers per cell;
 - battle-size mustering rows enforce point, Detachment Point, Enhancement Limit,
   Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
   faction-keyword rules;
 - Secondary Mission draw/retain/no-hand-size-cap/discard, New Orders
   replacement draw, and 45/45/15 VP caps load from source data and round-trip
   through mission scoring fixtures;
+- Tactical Secondary score/retain decisions use deterministic option IDs,
+  reject drift before queue pop, award/discard only when the player chooses to
+  score, and keep the card active when the player declines to score;
 - coverage report groups awaiting-source rows separately from unsupported rule shapes.
 
 ## Phase 14K: cutover hardening and static audits

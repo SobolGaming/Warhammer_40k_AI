@@ -48,8 +48,10 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_decisions import (
     START_MISSION_ACTION_DECISION_TYPE,
     TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
+    TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
     request_mission_action_start,
     request_tactical_secondary_discard,
+    request_tactical_secondary_score,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import (
@@ -628,6 +630,134 @@ def test_tactical_secondary_discard_rejects_drifted_lifecycle_option() -> None:
     assert status.status_kind.value == "invalid"
     assert not decisions.records
     assert decisions.queue.peek_next().request_id == discard_request.request_id
+
+
+def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -> None:
+    retain_lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    retain_state = retain_lifecycle.state
+    assert retain_state is not None
+    retain_card = _active_tactical_card(retain_state)
+    retain_waiting = request_tactical_secondary_score(
+        state=retain_state,
+        decisions=retain_lifecycle.decision_controller,
+        player_id="player-a",
+        secondary_mission_id=retain_card.secondary_mission_id,
+    )
+    retain_request = retain_waiting.decision_request
+    assert retain_request is not None
+    assert retain_request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE
+    assert retain_request.actor_id == "player-a"
+    assert [option.option_id for option in retain_request.options] == [
+        f"retain:{retain_card.secondary_mission_id}",
+        f"score:{retain_card.secondary_mission_id}",
+    ]
+    retain_payload = cast(dict[str, JsonValue], retain_request.payload)
+    assert retain_payload["victory_points"] == 5
+    assert retain_payload["scoring_rule_id"] == f"{retain_card.secondary_mission_id}-tactical"
+
+    retain_lifecycle.submit_decision(
+        FiniteOptionSubmission(
+            request_id=retain_request.request_id,
+            selected_option_id=f"retain:{retain_card.secondary_mission_id}",
+            result_id="phase14j-retain-tactical-score",
+        ).to_result(retain_request)
+    )
+
+    retained = retain_state.secondary_mission_card_state(
+        player_id="player-a",
+        secondary_mission_id=retain_card.secondary_mission_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    retain_event = next(
+        event
+        for event in retain_lifecycle.decision_controller.event_log.records
+        if event.event_type == "tactical_secondary_mission_score_declined"
+    )
+    assert retained is not None
+    assert retained.status is SecondaryMissionCardStatus.ACTIVE
+    assert retain_state.victory_point_total("player-a") == 0
+    assert cast(dict[str, JsonValue], retain_event.payload)["retained"] is True
+
+    score_lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    score_state = score_lifecycle.state
+    assert score_state is not None
+    score_card = _active_tactical_card(score_state)
+    score_waiting = request_tactical_secondary_score(
+        state=score_state,
+        decisions=score_lifecycle.decision_controller,
+        player_id="player-a",
+        secondary_mission_id=score_card.secondary_mission_id,
+    )
+    score_request = score_waiting.decision_request
+    assert score_request is not None
+
+    score_lifecycle.submit_decision(
+        FiniteOptionSubmission(
+            request_id=score_request.request_id,
+            selected_option_id=f"score:{score_card.secondary_mission_id}",
+            result_id="phase14j-score-tactical",
+        ).to_result(score_request)
+    )
+
+    assert (
+        score_state.secondary_mission_card_state(
+            player_id="player-a",
+            secondary_mission_id=score_card.secondary_mission_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+        )
+        is None
+    )
+    scored_record = next(
+        card
+        for card in score_state.secondary_mission_card_states
+        if card.player_id == "player-a"
+        and card.secondary_mission_id == score_card.secondary_mission_id
+        and card.mode is SecondaryMissionCardMode.TACTICAL
+    )
+    score_event = next(
+        event
+        for event in score_lifecycle.decision_controller.event_log.records
+        if event.event_type == "tactical_secondary_mission_scored"
+    )
+    score_payload = cast(dict[str, JsonValue], score_event.payload)
+    assert scored_record.status is SecondaryMissionCardStatus.SCORED
+    assert score_state.victory_point_total("player-a") == 5
+    assert score_payload["discarded_after_score"] is True
+    transaction = cast(dict[str, JsonValue], score_payload["victory_point_transaction"])
+    assert transaction["source_kind"] == "tactical_secondary"
+    assert transaction["source_id"] == score_card.secondary_mission_id
+
+
+def test_phase14j_tactical_secondary_score_rejects_drifted_lifecycle_option() -> None:
+    lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    card = _active_tactical_card(state)
+    waiting = request_tactical_secondary_score(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        secondary_mission_id=card.secondary_mission_id,
+    )
+    request = waiting.decision_request
+    assert request is not None
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=f"score:{card.secondary_mission_id}",
+        result_id="phase14j-score-drift",
+    ).to_result(request)
+    state.score_secondary_mission(
+        player_id="player-a",
+        secondary_mission_id=card.secondary_mission_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.COMMAND,
+    )
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind.value == "invalid"
+    assert not lifecycle.decision_controller.records
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
 
 
 def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> None:
@@ -1864,6 +1994,16 @@ def _battle_lifecycle_with_active_tactical_cards() -> GameLifecycle:
         source_result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
     )
     return lifecycle
+
+
+def _active_tactical_card(state: GameState) -> SecondaryMissionCardState:
+    return next(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a"
+        and card.mode is SecondaryMissionCardMode.TACTICAL
+        and card.status is SecondaryMissionCardStatus.ACTIVE
+    )
 
 
 def _battle_lifecycle_with_player_a_vehicle() -> GameLifecycle:
