@@ -26,6 +26,12 @@ class SecondaryMissionAvailability(StrEnum):
     BOTH = "both"
 
 
+class MissionSourceStatus(StrEnum):
+    IMPLEMENTED = "implemented"
+    UNSUPPORTED = "unsupported"
+    AWAITING_SOURCE = "awaiting_source"
+
+
 class MissionSourcePackageDefinitionPayload(TypedDict):
     edition_id: str
     mission_pack_id: str
@@ -126,6 +132,21 @@ class MissionDeckDefinitionPayload(TypedDict):
     source_id: str
 
 
+class ForceDispositionDefinitionPayload(TypedDict):
+    force_disposition_id: str
+    name: str
+    source_id: str
+
+
+class PrimaryMissionMatrixCellPayload(TypedDict):
+    player_force_disposition_id: str
+    opponent_force_disposition_id: str
+    primary_mission_id: str
+    battlefield_layout_ids: list[str]
+    source_status: str
+    source_id: str
+
+
 class MissionPoolEntryPayload(TypedDict):
     mission_pool_entry_id: str
     primary_mission_id: str
@@ -174,6 +195,8 @@ class MissionPackDefinitionPayload(TypedDict):
     secondary_missions: list[SecondaryMissionDefinitionPayload]
     mission_actions: list[MissionActionDefinitionPayload]
     challenger_cards: list[ChallengerCardDefinitionPayload]
+    force_dispositions: list[ForceDispositionDefinitionPayload]
+    primary_mission_matrix_cells: list[PrimaryMissionMatrixCellPayload]
     mission_pool_entries: list[MissionPoolEntryPayload]
     scoring_caps: TournamentScoringCapsPayload
     scoring: MissionPackScoringDefinitionPayload
@@ -1128,6 +1151,127 @@ class MissionDeckDefinition:
 
 
 @dataclass(frozen=True, slots=True)
+class ForceDispositionDefinition:
+    force_disposition_id: str
+    name: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "force_disposition_id",
+            _validate_unprefixed_identifier(
+                "ForceDispositionDefinition force_disposition_id",
+                self.force_disposition_id,
+                reserved_prefix="force-disposition:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "name",
+            _validate_identifier("ForceDispositionDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("ForceDispositionDefinition source_id", self.source_id),
+        )
+
+    def to_payload(self) -> ForceDispositionDefinitionPayload:
+        return {
+            "force_disposition_id": self.force_disposition_id,
+            "name": self.name,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ForceDispositionDefinitionPayload) -> Self:
+        return cls(
+            force_disposition_id=payload["force_disposition_id"],
+            name=payload["name"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PrimaryMissionMatrixCell:
+    player_force_disposition_id: str
+    opponent_force_disposition_id: str
+    primary_mission_id: str
+    battlefield_layout_ids: tuple[str, ...]
+    source_status: MissionSourceStatus
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_force_disposition_id",
+            _validate_identifier(
+                "PrimaryMissionMatrixCell player_force_disposition_id",
+                self.player_force_disposition_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "opponent_force_disposition_id",
+            _validate_identifier(
+                "PrimaryMissionMatrixCell opponent_force_disposition_id",
+                self.opponent_force_disposition_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_mission_id",
+            _validate_identifier(
+                "PrimaryMissionMatrixCell primary_mission_id", self.primary_mission_id
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battlefield_layout_ids",
+            _validate_identifier_tuple(
+                "PrimaryMissionMatrixCell battlefield_layout_ids",
+                self.battlefield_layout_ids,
+                min_length=3,
+                sort_values=False,
+            ),
+        )
+        if len(self.battlefield_layout_ids) != 3:
+            raise MissionPackError("PrimaryMissionMatrixCell requires exactly three layouts.")
+        object.__setattr__(
+            self,
+            "source_status",
+            mission_source_status_from_token(self.source_status),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("PrimaryMissionMatrixCell source_id", self.source_id),
+        )
+
+    def to_payload(self) -> PrimaryMissionMatrixCellPayload:
+        return {
+            "player_force_disposition_id": self.player_force_disposition_id,
+            "opponent_force_disposition_id": self.opponent_force_disposition_id,
+            "primary_mission_id": self.primary_mission_id,
+            "battlefield_layout_ids": list(self.battlefield_layout_ids),
+            "source_status": self.source_status.value,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PrimaryMissionMatrixCellPayload) -> Self:
+        return cls(
+            player_force_disposition_id=payload["player_force_disposition_id"],
+            opponent_force_disposition_id=payload["opponent_force_disposition_id"],
+            primary_mission_id=payload["primary_mission_id"],
+            battlefield_layout_ids=tuple(payload["battlefield_layout_ids"]),
+            source_status=mission_source_status_from_token(payload["source_status"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MissionPoolEntry:
     mission_pool_entry_id: str
     primary_mission_id: str
@@ -1459,6 +1603,8 @@ class MissionPackDefinition:
     secondary_missions: tuple[SecondaryMissionDefinition, ...]
     mission_actions: tuple[MissionActionDefinition, ...]
     challenger_cards: tuple[ChallengerCardDefinition, ...]
+    force_dispositions: tuple[ForceDispositionDefinition, ...]
+    primary_mission_matrix_cells: tuple[PrimaryMissionMatrixCell, ...]
     mission_pool_entries: tuple[MissionPoolEntry, ...]
     scoring_caps: TournamentScoringCaps
     scoring: MissionPackScoringDefinition
@@ -1504,6 +1650,10 @@ class MissionPackDefinition:
         secondary_missions = _validate_secondary_missions(self.secondary_missions)
         mission_actions = _validate_mission_actions(self.mission_actions)
         challenger_cards = _validate_challenger_cards(self.challenger_cards)
+        force_dispositions = _validate_force_dispositions(self.force_dispositions)
+        primary_mission_matrix_cells = _validate_primary_mission_matrix_cells(
+            self.primary_mission_matrix_cells
+        )
         mission_pool_entries = _validate_mission_pool_entries(self.mission_pool_entries)
         if type(self.scoring_caps) is not TournamentScoringCaps:
             raise MissionPackError("MissionPackDefinition scoring_caps must be scoring caps.")
@@ -1515,6 +1665,11 @@ class MissionPackDefinition:
             primary_missions=primary_missions,
             secondary_missions=secondary_missions,
             challenger_cards=challenger_cards,
+        )
+        _validate_primary_mission_matrix_references(
+            force_dispositions=force_dispositions,
+            primary_mission_matrix_cells=primary_mission_matrix_cells,
+            primary_missions=primary_missions,
         )
         _validate_mission_pool_references(
             mission_pool_entries=mission_pool_entries,
@@ -1528,6 +1683,8 @@ class MissionPackDefinition:
         object.__setattr__(self, "secondary_missions", secondary_missions)
         object.__setattr__(self, "mission_actions", mission_actions)
         object.__setattr__(self, "challenger_cards", challenger_cards)
+        object.__setattr__(self, "force_dispositions", force_dispositions)
+        object.__setattr__(self, "primary_mission_matrix_cells", primary_mission_matrix_cells)
         object.__setattr__(self, "mission_pool_entries", mission_pool_entries)
 
     def deployment_map(self, deployment_map_id: str) -> DeploymentMapDefinition:
@@ -1564,6 +1721,35 @@ class MissionPackDefinition:
             if card.challenger_card_id == requested_id:
                 return card
         raise MissionPackError("MissionPackDefinition does not contain challenger_card_id.")
+
+    def force_disposition(self, force_disposition_id: str) -> ForceDispositionDefinition:
+        requested_id = _validate_identifier("force_disposition_id", force_disposition_id)
+        for disposition in self.force_dispositions:
+            if disposition.force_disposition_id == requested_id:
+                return disposition
+        raise MissionPackError("MissionPackDefinition does not contain force_disposition_id.")
+
+    def primary_mission_matrix_cell(
+        self,
+        *,
+        player_force_disposition_id: str,
+        opponent_force_disposition_id: str,
+    ) -> PrimaryMissionMatrixCell:
+        player_disposition_id = _validate_identifier(
+            "player_force_disposition_id",
+            player_force_disposition_id,
+        )
+        opponent_disposition_id = _validate_identifier(
+            "opponent_force_disposition_id",
+            opponent_force_disposition_id,
+        )
+        for cell in self.primary_mission_matrix_cells:
+            if (
+                cell.player_force_disposition_id == player_disposition_id
+                and cell.opponent_force_disposition_id == opponent_disposition_id
+            ):
+                return cell
+        raise MissionPackError("MissionPackDefinition does not contain matrix cell.")
 
     def deterministic_mission_pool_order(self, *, seed: str) -> tuple[MissionPoolEntry, ...]:
         seed_value = _validate_identifier("seed", seed)
@@ -1602,6 +1788,12 @@ class MissionPackDefinition:
             "secondary_missions": [mission.to_payload() for mission in self.secondary_missions],
             "mission_actions": [action.to_payload() for action in self.mission_actions],
             "challenger_cards": [card.to_payload() for card in self.challenger_cards],
+            "force_dispositions": [
+                disposition.to_payload() for disposition in self.force_dispositions
+            ],
+            "primary_mission_matrix_cells": [
+                cell.to_payload() for cell in self.primary_mission_matrix_cells
+            ],
             "mission_pool_entries": [entry.to_payload() for entry in self.mission_pool_entries],
             "scoring_caps": self.scoring_caps.to_payload(),
             "scoring": self.scoring.to_payload(),
@@ -1640,6 +1832,14 @@ class MissionPackDefinition:
             challenger_cards=tuple(
                 ChallengerCardDefinition.from_payload(card) for card in payload["challenger_cards"]
             ),
+            force_dispositions=tuple(
+                ForceDispositionDefinition.from_payload(disposition)
+                for disposition in payload["force_dispositions"]
+            ),
+            primary_mission_matrix_cells=tuple(
+                PrimaryMissionMatrixCell.from_payload(cell)
+                for cell in payload["primary_mission_matrix_cells"]
+            ),
             mission_pool_entries=tuple(
                 MissionPoolEntry.from_payload(entry) for entry in payload["mission_pool_entries"]
             ),
@@ -1657,6 +1857,17 @@ def secondary_mission_availability_from_token(token: object) -> SecondaryMission
         return SecondaryMissionAvailability(token)
     except ValueError as exc:
         raise MissionPackError(f"Unsupported SecondaryMissionAvailability token: {token}.") from exc
+
+
+def mission_source_status_from_token(token: object) -> MissionSourceStatus:
+    if type(token) is MissionSourceStatus:
+        return token
+    if type(token) is not str:
+        raise MissionPackError("MissionSourceStatus token must be a string.")
+    try:
+        return MissionSourceStatus(token)
+    except ValueError as exc:
+        raise MissionPackError(f"Unsupported MissionSourceStatus token: {token}.") from exc
 
 
 def _stable_order_key(*, seed: str, entry_id: str) -> str:
@@ -1785,6 +1996,51 @@ def _validate_challenger_cards(values: object) -> tuple[ChallengerCardDefinition
     )
 
 
+def _validate_force_dispositions(values: object) -> tuple[ForceDispositionDefinition, ...]:
+    return _validate_unique_values(
+        field_name="MissionPackDefinition force_dispositions",
+        values=values,
+        expected_type=ForceDispositionDefinition,
+        identity=lambda item: item.force_disposition_id,
+    )
+
+
+def _validate_primary_mission_matrix_cells(
+    values: object,
+) -> tuple[PrimaryMissionMatrixCell, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError(
+            "MissionPackDefinition primary_mission_matrix_cells must be a tuple."
+        )
+    entries: list[PrimaryMissionMatrixCell] = []
+    seen: set[tuple[str, str]] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PrimaryMissionMatrixCell:
+            raise MissionPackError(
+                "MissionPackDefinition primary_mission_matrix_cells must contain cells."
+            )
+        key = (value.player_force_disposition_id, value.opponent_force_disposition_id)
+        if key in seen:
+            raise MissionPackError(
+                "MissionPackDefinition primary_mission_matrix_cells must not duplicate cells."
+            )
+        seen.add(key)
+        entries.append(value)
+    if not entries:
+        raise MissionPackError(
+            "MissionPackDefinition primary_mission_matrix_cells must not be empty."
+        )
+    return tuple(
+        sorted(
+            entries,
+            key=lambda cell: (
+                cell.player_force_disposition_id,
+                cell.opponent_force_disposition_id,
+            ),
+        )
+    )
+
+
 def _validate_mission_pool_entries(values: object) -> tuple[MissionPoolEntry, ...]:
     return _validate_unique_values(
         field_name="MissionPackDefinition mission_pool_entries",
@@ -1847,6 +2103,57 @@ def _validate_deck_references(
         mission_deck.deployment_map_ids,
         {deployment_map.deployment_map_id for deployment_map in deployment_maps},
     )
+
+
+def _validate_primary_mission_matrix_references(
+    *,
+    force_dispositions: tuple[ForceDispositionDefinition, ...],
+    primary_mission_matrix_cells: tuple[PrimaryMissionMatrixCell, ...],
+    primary_missions: tuple[PrimaryMissionDefinition, ...],
+) -> None:
+    disposition_ids = {disposition.force_disposition_id for disposition in force_dispositions}
+    primary_mission_ids = {mission.primary_mission_id for mission in primary_missions}
+    expected_cells = {
+        (player_disposition_id, opponent_disposition_id)
+        for player_disposition_id in disposition_ids
+        for opponent_disposition_id in disposition_ids
+    }
+    actual_cells = {
+        (cell.player_force_disposition_id, cell.opponent_force_disposition_id)
+        for cell in primary_mission_matrix_cells
+    }
+    unknown_disposition_ids = {
+        disposition_id
+        for cell in primary_mission_matrix_cells
+        for disposition_id in (
+            cell.player_force_disposition_id,
+            cell.opponent_force_disposition_id,
+        )
+        if disposition_id not in disposition_ids
+    }
+    if unknown_disposition_ids:
+        raise MissionPackError(
+            "PrimaryMissionMatrixCell references unknown force dispositions: "
+            f"{', '.join(sorted(unknown_disposition_ids))}."
+        )
+    missing_cells = expected_cells - actual_cells
+    if missing_cells:
+        missing_text = ", ".join(
+            f"{player_id}/{opponent_id}" for player_id, opponent_id in sorted(missing_cells)
+        )
+        raise MissionPackError(f"Primary mission matrix is missing cells: {missing_text}.")
+    extra_cells = actual_cells - expected_cells
+    if extra_cells:
+        extra_text = ", ".join(
+            f"{player_id}/{opponent_id}" for player_id, opponent_id in sorted(extra_cells)
+        )
+        raise MissionPackError(f"Primary mission matrix has unexpected cells: {extra_text}.")
+    for cell in primary_mission_matrix_cells:
+        if (
+            cell.source_status is MissionSourceStatus.IMPLEMENTED
+            and cell.primary_mission_id not in primary_mission_ids
+        ):
+            raise MissionPackError("Implemented matrix cell must reference a primary mission.")
 
 
 def _validate_mission_pool_references(

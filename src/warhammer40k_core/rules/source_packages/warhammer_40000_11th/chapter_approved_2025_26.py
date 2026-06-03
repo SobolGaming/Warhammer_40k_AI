@@ -73,6 +73,36 @@ class SourceSecondaryMissionRow:
 
 
 @dataclass(frozen=True, slots=True)
+class SourceForceDispositionRow:
+    force_disposition_id: str
+    name: str
+
+    def to_payload(self) -> dict[str, str]:
+        return {
+            "force_disposition_id": self.force_disposition_id,
+            "name": self.name,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class SourcePrimaryMissionMatrixCellRow:
+    player_force_disposition_id: str
+    opponent_force_disposition_id: str
+    primary_mission_id: str
+    battlefield_layout_ids: tuple[str, str, str]
+    source_status: str
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "player_force_disposition_id": self.player_force_disposition_id,
+            "opponent_force_disposition_id": self.opponent_force_disposition_id,
+            "primary_mission_id": self.primary_mission_id,
+            "battlefield_layout_ids": list(self.battlefield_layout_ids),
+            "source_status": self.source_status,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class SourceMissionActionRow:
     mission_action_id: str
     mission_id: str
@@ -508,6 +538,41 @@ def secondary_mission_rows() -> tuple[SourceSecondaryMissionRow, ...]:
     )
 
 
+def force_disposition_rows() -> tuple[SourceForceDispositionRow, ...]:
+    return (
+        SourceForceDispositionRow("purge-the-foe", "Purge The Foe"),
+        SourceForceDispositionRow("take-and-hold", "Take And Hold"),
+        SourceForceDispositionRow("disruption", "Disruption"),
+        SourceForceDispositionRow("reconnaissance", "Reconnaissance"),
+        SourceForceDispositionRow("priority-assets", "Priority Assets"),
+    )
+
+
+def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ...]:
+    rows: list[SourcePrimaryMissionMatrixCellRow] = []
+    for player_disposition in force_disposition_rows():
+        for opponent_disposition in force_disposition_rows():
+            primary_mission_id = (
+                "primary-"
+                f"{player_disposition.force_disposition_id}-vs-"
+                f"{opponent_disposition.force_disposition_id}"
+            )
+            rows.append(
+                SourcePrimaryMissionMatrixCellRow(
+                    player_force_disposition_id=player_disposition.force_disposition_id,
+                    opponent_force_disposition_id=opponent_disposition.force_disposition_id,
+                    primary_mission_id=primary_mission_id,
+                    battlefield_layout_ids=(
+                        f"{primary_mission_id}-layout-1",
+                        f"{primary_mission_id}-layout-2",
+                        f"{primary_mission_id}-layout-3",
+                    ),
+                    source_status="awaiting_source",
+                )
+            )
+    return tuple(rows)
+
+
 def mission_action_rows() -> tuple[SourceMissionActionRow, ...]:
     return (
         SourceMissionActionRow(
@@ -590,8 +655,8 @@ def mission_pack_scoring_row() -> SourceMissionPackScoringRow:
         primary_scoring_timing="phase_end",
         secondary_vp_per_score=5,
         mission_action_vp=5,
-        primary_vp_cap=50,
-        secondary_vp_cap=40,
+        primary_vp_cap=45,
+        secondary_vp_cap=45,
         total_vp_cap=100,
         end_of_round_scoring_windows=("battle_round_end",),
         end_of_game_scoring_windows=("turn_end_round_five_going_second", "end_of_battle"),
@@ -692,6 +757,8 @@ def _source_payload_for_hash() -> dict[str, object]:
         "imported_at_schema_version": IMPORTED_AT_SCHEMA_VERSION,
         "primary_missions": [row.to_payload() for row in primary_mission_rows()],
         "secondary_missions": [row.to_payload() for row in secondary_mission_rows()],
+        "force_dispositions": [row.to_payload() for row in force_disposition_rows()],
+        "primary_mission_matrix": [row.to_payload() for row in primary_mission_matrix_rows()],
         "mission_actions": [row.to_payload() for row in mission_action_rows()],
         "scoring": mission_pack_scoring_row().to_payload(),
     }

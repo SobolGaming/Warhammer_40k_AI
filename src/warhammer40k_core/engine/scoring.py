@@ -132,6 +132,25 @@ class SecondaryMissionCardStatePayload(TypedDict):
     discarded_result_id: str | None
 
 
+class TacticalSecondaryAchievementContextPayload(TypedDict):
+    achievement_id: str
+    game_id: str
+    player_id: str
+    active_player_id: str
+    secondary_mission_id: str
+    mode: str
+    battle_round: int
+    phase: str
+    card_battle_round: int
+    victory_points: int
+    scoring_rule_id: str
+    scoring_rule_condition: str
+    scoring_rule_source_id: str
+    scoring_timing: str
+    source_id: str
+    evidence: JsonValue
+
+
 class ScoringWindowStatePayload(TypedDict):
     window_id: str
     game_id: str
@@ -1406,6 +1425,7 @@ class MissionScoringPolicy:
                 "secondary_mission_id": requested_secondary_id,
                 "scoring_rule_id": rule.rule_id,
                 "scoring_rule_condition": rule.condition,
+                "scoring_rule_source_id": rule.source_id,
             },
         )
 
@@ -1833,6 +1853,173 @@ class SecondaryMissionCardState:
             source_result_id=payload["source_result_id"],
             scored_transaction_id=payload["scored_transaction_id"],
             discarded_result_id=payload["discarded_result_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TacticalSecondaryAchievementContext:
+    achievement_id: str
+    game_id: str
+    player_id: str
+    active_player_id: str
+    secondary_mission_id: str
+    battle_round: int
+    phase: str
+    card_battle_round: int
+    victory_points: int
+    scoring_rule_id: str
+    scoring_rule_condition: str
+    scoring_rule_source_id: str
+    scoring_timing: str
+    source_id: str
+    evidence: JsonValue
+    mode: SecondaryMissionCardMode = SecondaryMissionCardMode.TACTICAL
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "achievement_id",
+            _validate_identifier(
+                "TacticalSecondaryAchievementContext achievement_id",
+                self.achievement_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "game_id",
+            _validate_identifier("TacticalSecondaryAchievementContext game_id", self.game_id),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("TacticalSecondaryAchievementContext player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier(
+                "TacticalSecondaryAchievementContext active_player_id",
+                self.active_player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "secondary_mission_id",
+            _validate_identifier(
+                "TacticalSecondaryAchievementContext secondary_mission_id",
+                self.secondary_mission_id,
+            ),
+        )
+        object.__setattr__(self, "mode", secondary_mission_card_mode_from_token(self.mode))
+        if self.mode is not SecondaryMissionCardMode.TACTICAL:
+            raise GameLifecycleError("Tactical achievement context requires Tactical mode.")
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int(
+                "TacticalSecondaryAchievementContext battle_round",
+                self.battle_round,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "phase",
+            _validate_identifier("TacticalSecondaryAchievementContext phase", self.phase),
+        )
+        object.__setattr__(
+            self,
+            "card_battle_round",
+            _validate_positive_int(
+                "TacticalSecondaryAchievementContext card_battle_round",
+                self.card_battle_round,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "victory_points",
+            _validate_positive_int(
+                "TacticalSecondaryAchievementContext victory_points",
+                self.victory_points,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "scoring_rule_id",
+            _validate_identifier(
+                "TacticalSecondaryAchievementContext scoring_rule_id",
+                self.scoring_rule_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "scoring_rule_condition",
+            _validate_identifier(
+                "TacticalSecondaryAchievementContext scoring_rule_condition",
+                self.scoring_rule_condition,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "scoring_rule_source_id",
+            _validate_identifier(
+                "TacticalSecondaryAchievementContext scoring_rule_source_id",
+                self.scoring_rule_source_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "scoring_timing",
+            _validate_identifier(
+                "TacticalSecondaryAchievementContext scoring_timing",
+                self.scoring_timing,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("TacticalSecondaryAchievementContext source_id", self.source_id),
+        )
+        object.__setattr__(self, "evidence", validate_json_value(self.evidence))
+
+    def to_payload(self) -> TacticalSecondaryAchievementContextPayload:
+        return {
+            "achievement_id": self.achievement_id,
+            "game_id": self.game_id,
+            "player_id": self.player_id,
+            "active_player_id": self.active_player_id,
+            "secondary_mission_id": self.secondary_mission_id,
+            "mode": self.mode.value,
+            "battle_round": self.battle_round,
+            "phase": self.phase,
+            "card_battle_round": self.card_battle_round,
+            "victory_points": self.victory_points,
+            "scoring_rule_id": self.scoring_rule_id,
+            "scoring_rule_condition": self.scoring_rule_condition,
+            "scoring_rule_source_id": self.scoring_rule_source_id,
+            "scoring_timing": self.scoring_timing,
+            "source_id": self.source_id,
+            "evidence": self.evidence,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TacticalSecondaryAchievementContextPayload) -> Self:
+        return cls(
+            achievement_id=payload["achievement_id"],
+            game_id=payload["game_id"],
+            player_id=payload["player_id"],
+            active_player_id=payload["active_player_id"],
+            secondary_mission_id=payload["secondary_mission_id"],
+            mode=secondary_mission_card_mode_from_token(payload["mode"]),
+            battle_round=payload["battle_round"],
+            phase=payload["phase"],
+            card_battle_round=payload["card_battle_round"],
+            victory_points=payload["victory_points"],
+            scoring_rule_id=payload["scoring_rule_id"],
+            scoring_rule_condition=payload["scoring_rule_condition"],
+            scoring_rule_source_id=payload["scoring_rule_source_id"],
+            scoring_timing=payload["scoring_timing"],
+            source_id=payload["source_id"],
+            evidence=payload["evidence"],
         )
 
 

@@ -11,7 +11,10 @@ from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.missions import (
     MissionPackDefinition,
     MissionPackDefinitionPayload,
+    MissionPackError,
     MissionSourcePackageDefinition,
+    MissionSourceStatus,
+    mission_source_status_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -97,6 +100,93 @@ def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None
     assert mission_pack.mission_pack_id == "11e-chapter-approved-2025-26"
 
 
+def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
+    mission_pack = chapter_approved_2025_26_mission_pack()
+
+    assert [
+        disposition.force_disposition_id for disposition in mission_pack.force_dispositions
+    ] == [
+        "disruption",
+        "priority-assets",
+        "purge-the-foe",
+        "reconnaissance",
+        "take-and-hold",
+    ]
+    assert len(mission_pack.primary_mission_matrix_cells) == 25
+
+    purge_into_hold = mission_pack.primary_mission_matrix_cell(
+        player_force_disposition_id="purge-the-foe",
+        opponent_force_disposition_id="take-and-hold",
+    )
+    hold_into_purge = mission_pack.primary_mission_matrix_cell(
+        player_force_disposition_id="take-and-hold",
+        opponent_force_disposition_id="purge-the-foe",
+    )
+    mirror = mission_pack.primary_mission_matrix_cell(
+        player_force_disposition_id="reconnaissance",
+        opponent_force_disposition_id="reconnaissance",
+    )
+
+    assert purge_into_hold.primary_mission_id == "primary-purge-the-foe-vs-take-and-hold"
+    assert hold_into_purge.primary_mission_id == "primary-take-and-hold-vs-purge-the-foe"
+    assert purge_into_hold.primary_mission_id != hold_into_purge.primary_mission_id
+    assert mirror.primary_mission_id == "primary-reconnaissance-vs-reconnaissance"
+    assert purge_into_hold.source_status is MissionSourceStatus.AWAITING_SOURCE
+    assert len(purge_into_hold.battlefield_layout_ids) == 3
+    assert all(
+        layout_id.startswith(purge_into_hold.primary_mission_id)
+        for layout_id in purge_into_hold.battlefield_layout_ids
+    )
+    assert MissionPackDefinition.from_payload(mission_pack.to_payload()).to_payload() == (
+        mission_pack.to_payload()
+    )
+
+
+def test_phase14j_mission_source_status_tokens_are_strict() -> None:
+    assert mission_source_status_from_token("awaiting_source") is (
+        MissionSourceStatus.AWAITING_SOURCE
+    )
+    assert mission_source_status_from_token(MissionSourceStatus.IMPLEMENTED) is (
+        MissionSourceStatus.IMPLEMENTED
+    )
+
+    with pytest.raises(MissionPackError, match="MissionSourceStatus token"):
+        mission_source_status_from_token(1)
+    with pytest.raises(MissionPackError, match="Unsupported MissionSourceStatus"):
+        mission_source_status_from_token("legacy")
+
+
+def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
+    mission_pack = chapter_approved_2025_26_mission_pack()
+
+    with pytest.raises(MissionPackError, match="force_disposition_id"):
+        mission_pack.force_disposition("unknown-disposition")
+    with pytest.raises(MissionPackError, match="matrix cell"):
+        mission_pack.primary_mission_matrix_cell(
+            player_force_disposition_id="purge-the-foe",
+            opponent_force_disposition_id="unknown-disposition",
+        )
+
+    with pytest.raises(MissionPackError, match="missing cells"):
+        replace(
+            mission_pack,
+            primary_mission_matrix_cells=mission_pack.primary_mission_matrix_cells[:-1],
+        )
+
+    implemented_without_primary = replace(
+        mission_pack.primary_mission_matrix_cells[0],
+        source_status=MissionSourceStatus.IMPLEMENTED,
+    )
+    with pytest.raises(MissionPackError, match="must reference a primary mission"):
+        replace(
+            mission_pack,
+            primary_mission_matrix_cells=(
+                implemented_without_primary,
+                *mission_pack.primary_mission_matrix_cells[1:],
+            ),
+        )
+
+
 def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
     mission_pack = chapter_approved_2025_26_mission_pack()
     take_and_hold = next(
@@ -150,6 +240,8 @@ def test_future_edition_source_identity_cannot_collide_with_eleventh_edition() -
 
     assert eleventh.source_namespace_key() != future.source_namespace_key()
     source_data.assert_distinct_source_package_identity(eleventh, future)
+    with pytest.raises(MissionPackError, match="Source package identities"):
+        source_data.assert_distinct_source_package_identity(eleventh, eleventh)
 
 
 def test_deployment_map_and_objective_marker_policy_round_trip() -> None:

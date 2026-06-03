@@ -7,6 +7,7 @@ from warhammer40k_core.core.missions import (
     ChallengerCardDefinition,
     ChapterApprovedMissionSequence,
     DeploymentMapDefinition,
+    ForceDispositionDefinition,
     MissionActionDefinition,
     MissionDeckDefinition,
     MissionPackDefinition,
@@ -14,8 +15,10 @@ from warhammer40k_core.core.missions import (
     MissionPackScoringDefinition,
     MissionPoolEntry,
     MissionScoringRuleDefinition,
+    MissionSourceStatus,
     ObjectiveMarkerDefinition,
     PrimaryMissionDefinition,
+    PrimaryMissionMatrixCell,
     SecondaryMissionAvailability,
     SecondaryMissionDefinition,
     TournamentScoringCaps,
@@ -46,6 +49,7 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
     secondary_missions = _secondary_missions()
     mission_actions = _mission_actions()
     challenger_cards = _challenger_cards()
+    force_dispositions = _force_dispositions()
     scoring = source_data.mission_pack_scoring_row()
     return MissionPackDefinition(
         mission_pack_id=source_data.MISSION_PACK_ID,
@@ -89,6 +93,8 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
         secondary_missions=secondary_missions,
         mission_actions=mission_actions,
         challenger_cards=challenger_cards,
+        force_dispositions=force_dispositions,
+        primary_mission_matrix_cells=_primary_mission_matrix_cells(),
         mission_pool_entries=_mission_pool_entries(),
         scoring_caps=TournamentScoringCaps(
             primary_vp_cap=scoring.primary_vp_cap,
@@ -715,6 +721,37 @@ def _secondary_missions() -> tuple[SecondaryMissionDefinition, ...]:
             source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:secondary:{row.secondary_mission_id}",
         )
         for row in source_data.secondary_mission_rows()
+    )
+
+
+def _force_dispositions() -> tuple[ForceDispositionDefinition, ...]:
+    return tuple(
+        ForceDispositionDefinition(
+            force_disposition_id=row.force_disposition_id,
+            name=row.name,
+            source_id=(
+                f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:force-disposition:{row.force_disposition_id}"
+            ),
+        )
+        for row in source_data.force_disposition_rows()
+    )
+
+
+def _primary_mission_matrix_cells() -> tuple[PrimaryMissionMatrixCell, ...]:
+    return tuple(
+        PrimaryMissionMatrixCell(
+            player_force_disposition_id=row.player_force_disposition_id,
+            opponent_force_disposition_id=row.opponent_force_disposition_id,
+            primary_mission_id=row.primary_mission_id,
+            battlefield_layout_ids=row.battlefield_layout_ids,
+            source_status=MissionSourceStatus(row.source_status),
+            source_id=(
+                f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary-mission-matrix:"
+                f"{row.player_force_disposition_id}:"
+                f"{row.opponent_force_disposition_id}"
+            ),
+        )
+        for row in source_data.primary_mission_matrix_rows()
     )
 
 

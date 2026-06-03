@@ -85,7 +85,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
             player_id="player-a",
             battle_round=1,
             phase=BattlePhase.COMMAND.value,
-            amount=45,
+            amount=46,
             source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
             source_id="assassination",
             scoring_timing="secondary_mission_score",
@@ -127,20 +127,20 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     player_a_score = next(score for score in player_scores if score["player_id"] == "player-a")
     player_b_score = next(score for score in player_scores if score["player_id"] == "player-b")
 
-    assert primary_transaction.amount == 50
-    assert secondary_transaction.amount == 40
+    assert primary_transaction.amount == 45
+    assert secondary_transaction.amount == 45
     assert battle_ready_transaction.amount == 10
     assert state.victory_point_total("player-a") == 100
-    assert state.victory_point_total("player-b") == 50
+    assert state.victory_point_total("player-b") == 45
     assert result["final_scores"] == [
         {"player_id": "player-a", "victory_points": 100},
-        {"player_id": "player-b", "victory_points": 50},
+        {"player_id": "player-b", "victory_points": 45},
     ]
     assert result["winner_player_ids"] == ["player-a"]
     assert result["is_draw"] is False
     assert player_a_score["raw_victory_points"] == 100
     assert player_a_score["cap_adjustment"] == 0
-    assert player_b_score["raw_primary_vp"] == 50
+    assert player_b_score["raw_primary_vp"] == 45
     assert _cap_reasons(primary_transaction) == ["primary_vp_cap"]
     assert _cap_reasons(secondary_transaction) == ["secondary_vp_cap"]
     assert _cap_reasons(battle_ready_transaction) == ["battle_ready_vp_cap", "total_vp_cap"]
@@ -155,7 +155,7 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
             player_id="player-a",
             battle_round=1,
             phase=BattlePhase.COMMAND.value,
-            amount=49,
+            amount=44,
             source_kind=VictoryPointSourceKind.PRIMARY,
             source_id="terraform",
             scoring_timing="phase_end",
@@ -167,7 +167,7 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
             player_id="player-a",
             battle_round=1,
             phase=BattlePhase.COMMAND.value,
-            amount=39,
+            amount=44,
             source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
             source_id="cleanse",
             scoring_timing="secondary_mission_score",
@@ -209,10 +209,10 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     assert cleanse_transaction.amount == 1
     assert _cap_reasons(terraform_transaction) == ["primary_vp_cap"]
     assert _cap_reasons(cleanse_transaction) == ["secondary_vp_cap"]
-    assert player_a_score["raw_primary_vp"] == 50
-    assert player_a_score["raw_secondary_vp"] == 40
-    assert player_a_score["capped_primary_vp"] == 50
-    assert player_a_score["capped_secondary_vp"] == 40
+    assert player_a_score["raw_primary_vp"] == 45
+    assert player_a_score["raw_secondary_vp"] == 45
+    assert player_a_score["capped_primary_vp"] == 45
+    assert player_a_score["capped_secondary_vp"] == 45
     assert (
         state.victory_point_ledger_for_player("player-a").points_from_source_kind(
             VictoryPointSourceKind.MISSION_ACTION
