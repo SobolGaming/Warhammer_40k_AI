@@ -304,14 +304,20 @@ attacker-visible attack-resolution decisions:
 - `select_attack_weapon_group`: finite attacking-player choice emitted after a
   target unit is selected when that target has two or more unresolved
   identical-attack groups. Option IDs use deterministic `attack-group:<hash>`
-  values derived from the selected target, identical-attack signature, and
-  contributing pool indices. The selected option payload includes
+  values derived from the selected target, the full synthetic-pool-safe
+  identical-attack signature, and contributing pool indices. The selected option
+  payload includes
   `submission_kind: "select_attack_weapon_group"`, `target_unit_instance_id`,
   `sequence_id`, and a JSON-safe `gathered_group` payload with the
   identical-attack signature, contributing pool indices, per-pool attack counts,
-  and total gathered attacks. If exactly one group remains for the selected
-  target, the engine records an automatic finite choice instead of emitting a
-  pending request.
+  and total gathered attacks. The signature includes every pool field the
+  current single synthetic-pool resolver copies for downstream hit/wound,
+  Precision visibility, cover/LOS, event attribution, and Firing Deck/source
+  attribution, including attacker model ID, wargear/profile IDs, visible and
+  in-range target model IDs, targeting rule IDs, shooting type, and optional
+  Firing Deck source unit/model IDs. If exactly one group remains for the
+  selected target, the engine records an automatic finite choice instead of
+  emitting a pending request.
 
 Adapters must answer both decisions by selecting one pending option ID through
 `GameLifecycle.submit_decision(...)`; they must not invent target IDs, group IDs,

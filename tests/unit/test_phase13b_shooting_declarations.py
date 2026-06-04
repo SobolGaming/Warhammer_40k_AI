@@ -5502,7 +5502,6 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     )
     second_pool = replace(
         first_pool,
-        attacker_model_instance_id=attacker.own_models[1].model_instance_id,
         attacks=4,
     )
     sequence = AttackSequence.start(
@@ -5519,11 +5518,29 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     assert len(groups) == 1
     assert groups[0].total_attacks == 6
     assert groups[0].pool_indices == (0, 1)
+    assert groups[0].group_id.startswith("attack-group:")
+    assert groups[0].group_id.count(":") == 1
     assert "attacks" not in identical_attack_signature(first_pool).to_payload()
+    assert groups[0].signature.attacker_model_instance_id == first_pool.attacker_model_instance_id
+    assert groups[0].signature.wargear_id == first_pool.wargear_id
+    assert groups[0].signature.weapon_profile_id == first_pool.weapon_profile_id
+    assert groups[0].signature.target_visible_model_ids == first_pool.target_visible_model_ids
+    assert groups[0].signature.target_in_range_model_ids == first_pool.target_in_range_model_ids
     assert IdenticalAttackSignature.from_payload(groups[0].signature.to_payload()) == (
         groups[0].signature
     )
     assert GatheredAttackGroup.from_payload(groups[0].to_payload()) == groups[0]
+    synthetic_pool = (
+        sequence.with_selected_target_unit(defender.unit_instance_id)
+        .with_current_gathered_group(groups[0])
+        .current_pool()
+    )
+    assert synthetic_pool.attacks == 6
+    assert synthetic_pool.attacker_model_instance_id == first_pool.attacker_model_instance_id
+    assert synthetic_pool.target_visible_model_ids == first_pool.target_visible_model_ids
+    assert synthetic_pool.target_in_range_model_ids == first_pool.target_in_range_model_ids
+    assert synthetic_pool.firing_deck_source_unit_instance_id is None
+    assert synthetic_pool.firing_deck_source_model_instance_id is None
 
     strength_profile = replace(
         base_profile,
@@ -5548,8 +5565,25 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
         first_pool,
         replace(
             first_pool,
+            attacker_model_instance_id=attacker.own_models[1].model_instance_id,
+        ),
+        replace(first_pool, target_visible_model_ids=(defender.own_models[0].model_instance_id,)),
+        replace(first_pool, target_in_range_model_ids=(defender.own_models[0].model_instance_id,)),
+        replace(
+            first_pool,
+            firing_deck_source_unit_instance_id="army-alpha:transport-1",
+            firing_deck_source_model_instance_id="army-alpha:transport-1:model-001",
+        ),
+        replace(first_pool, wargear_id="phase14l-other-wargear"),
+        replace(
+            first_pool,
             weapon_profile_id=strength_profile.profile_id,
             weapon_profile=strength_profile,
+        ),
+        replace(
+            first_pool,
+            weapon_profile_id="phase14l-equal-profile-id",
+            weapon_profile=replace(base_profile, profile_id="phase14l-equal-profile-id"),
         ),
         replace(first_pool, hit_roll_modifier=1),
         replace(
@@ -5565,6 +5599,146 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     )
     signatures = {identical_attack_signature(pool) for pool in different_pools}
     assert len(signatures) == len(different_pools)
+
+
+def test_phase14l_precision_visibility_provenance_prevents_unsafe_gathering() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = defender.own_models[0]
+    character_model = defender.own_models[1]
+    precision_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14l-precision-visible-provenance",
+        keywords=(WeaponKeyword.PRECISION,),
+        abilities=(),
+    )
+    bodyguard_only_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=precision_profile,
+        attacks=1,
+    )
+    bodyguard_only_pool = replace(
+        bodyguard_only_pool,
+        target_visible_model_ids=(bodyguard_model.model_instance_id,),
+        target_in_range_model_ids=(
+            bodyguard_model.model_instance_id,
+            character_model.model_instance_id,
+        ),
+    )
+    character_visible_pool = replace(
+        bodyguard_only_pool,
+        target_visible_model_ids=(
+            bodyguard_model.model_instance_id,
+            character_model.model_instance_id,
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14l-precision-visible-provenance",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(bodyguard_only_pool, character_visible_pool),
+    )
+
+    groups = gathered_attack_groups_for_target(
+        attack_sequence=sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+
+    assert len(groups) == 2
+    assert {group.pool_indices for group in groups} == {(0,), (1,)}
+    assert {group.signature.target_visible_model_ids for group in groups} == {
+        (bodyguard_model.model_instance_id,),
+        (bodyguard_model.model_instance_id, character_model.model_instance_id),
+    }
+
+
+def test_phase14l_attacker_observer_provenance_prevents_unsafe_cover_gathering() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14l-cover-observer-provenance",
+        keywords=(),
+        abilities=(),
+    )
+    first_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    second_pool = replace(
+        first_pool,
+        attacker_model_instance_id=attacker.own_models[1].model_instance_id,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14l-cover-observer-provenance",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(first_pool, second_pool),
+    )
+
+    groups = gathered_attack_groups_for_target(
+        attack_sequence=sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+
+    assert len(groups) == 2
+    assert {group.pool_indices for group in groups} == {(0,), (1,)}
+    assert {group.signature.attacker_model_instance_id for group in groups} == {
+        first_pool.attacker_model_instance_id,
+        second_pool.attacker_model_instance_id,
+    }
+
+
+def test_phase14l_range_and_firing_deck_provenance_prevent_unsafe_gathering() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14l-range-firing-deck-provenance",
+        keywords=(),
+        abilities=(),
+    )
+    first_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    range_limited_pool = replace(
+        first_pool,
+        target_in_range_model_ids=(defender.own_models[0].model_instance_id,),
+    )
+    firing_deck_pool = replace(
+        first_pool,
+        firing_deck_source_unit_instance_id="army-alpha:transport-1",
+        firing_deck_source_model_instance_id="army-alpha:transport-1:model-001",
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14l-range-firing-deck-provenance",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(first_pool, range_limited_pool, firing_deck_pool),
+    )
+
+    groups = gathered_attack_groups_for_target(
+        attack_sequence=sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+
+    assert len(groups) == 3
+    assert {group.pool_indices for group in groups} == {(0,), (1,), (2,)}
+    assert {group.signature.target_in_range_model_ids for group in groups} == {
+        first_pool.target_in_range_model_ids,
+        range_limited_pool.target_in_range_model_ids,
+    }
+    assert any(group.signature.firing_deck_source_unit_instance_id is not None for group in groups)
 
 
 def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None:
@@ -5596,6 +5770,11 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
 
     with pytest.raises(GameLifecycleError, match="hit_roll_modifier"):
         IdenticalAttackSignature(
+            attacker_model_instance_id=group.signature.attacker_model_instance_id,
+            wargear_id=group.signature.wargear_id,
+            weapon_profile_id=group.signature.weapon_profile_id,
+            target_visible_model_ids=group.signature.target_visible_model_ids,
+            target_in_range_model_ids=group.signature.target_in_range_model_ids,
             hit_basis=group.signature.hit_basis,
             hit_roll_modifier=cast(Any, "0"),
             wound_roll_modifiers=group.signature.wound_roll_modifiers,
@@ -5605,6 +5784,31 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
             weapon_rule_tokens=group.signature.weapon_rule_tokens,
             targeting_rule_ids=group.signature.targeting_rule_ids,
             shooting_type=group.signature.shooting_type,
+            firing_deck_source_unit_instance_id=(
+                group.signature.firing_deck_source_unit_instance_id
+            ),
+            firing_deck_source_model_instance_id=(
+                group.signature.firing_deck_source_model_instance_id
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="Firing Deck source unit and model"):
+        IdenticalAttackSignature(
+            attacker_model_instance_id=group.signature.attacker_model_instance_id,
+            wargear_id=group.signature.wargear_id,
+            weapon_profile_id=group.signature.weapon_profile_id,
+            target_visible_model_ids=group.signature.target_visible_model_ids,
+            target_in_range_model_ids=group.signature.target_in_range_model_ids,
+            hit_basis=group.signature.hit_basis,
+            hit_roll_modifier=group.signature.hit_roll_modifier,
+            wound_roll_modifiers=group.signature.wound_roll_modifiers,
+            strength=group.signature.strength,
+            armor_penetration=group.signature.armor_penetration,
+            damage=group.signature.damage,
+            weapon_rule_tokens=group.signature.weapon_rule_tokens,
+            targeting_rule_ids=group.signature.targeting_rule_ids,
+            shooting_type=group.signature.shooting_type,
+            firing_deck_source_unit_instance_id="transport",
+            firing_deck_source_model_instance_id=None,
         )
     with pytest.raises(GameLifecycleError, match="Firing Deck source unit and model"):
         type(contribution)(

@@ -418,6 +418,11 @@ class AttackModifierStackSetPayload(TypedDict):
 
 
 class IdenticalAttackSignaturePayload(TypedDict):
+    attacker_model_instance_id: str
+    wargear_id: str
+    weapon_profile_id: str
+    target_visible_model_ids: list[str]
+    target_in_range_model_ids: list[str]
     hit_basis: str
     hit_roll_modifier: int
     wound_roll_modifiers: list[str]
@@ -427,6 +432,8 @@ class IdenticalAttackSignaturePayload(TypedDict):
     weapon_rule_tokens: list[str]
     targeting_rule_ids: list[str]
     shooting_type: str
+    firing_deck_source_unit_instance_id: str | None
+    firing_deck_source_model_instance_id: str | None
 
 
 class GatheredAttackContributionPayload(TypedDict):
@@ -1010,6 +1017,11 @@ class DeferredMortalWounds:
 
 @dataclass(frozen=True, slots=True)
 class IdenticalAttackSignature:
+    attacker_model_instance_id: str
+    wargear_id: str
+    weapon_profile_id: str
+    target_visible_model_ids: tuple[str, ...]
+    target_in_range_model_ids: tuple[str, ...]
     hit_basis: str
     hit_roll_modifier: int
     wound_roll_modifiers: tuple[str, ...]
@@ -1019,8 +1031,47 @@ class IdenticalAttackSignature:
     weapon_rule_tokens: tuple[str, ...]
     targeting_rule_ids: tuple[str, ...]
     shooting_type: str
+    firing_deck_source_unit_instance_id: str | None = None
+    firing_deck_source_model_instance_id: str | None = None
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_identifier(
+                "IdenticalAttackSignature attacker_model_instance_id",
+                self.attacker_model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "wargear_id",
+            _validate_identifier("IdenticalAttackSignature wargear_id", self.wargear_id),
+        )
+        object.__setattr__(
+            self,
+            "weapon_profile_id",
+            _validate_identifier(
+                "IdenticalAttackSignature weapon_profile_id",
+                self.weapon_profile_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_visible_model_ids",
+            _validate_ordered_identifier_tuple(
+                "IdenticalAttackSignature target_visible_model_ids",
+                self.target_visible_model_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_in_range_model_ids",
+            _validate_ordered_identifier_tuple(
+                "IdenticalAttackSignature target_in_range_model_ids",
+                self.target_in_range_model_ids,
+            ),
+        )
         object.__setattr__(
             self,
             "hit_basis",
@@ -1075,6 +1126,29 @@ class IdenticalAttackSignature:
             "shooting_type",
             _validate_identifier("IdenticalAttackSignature shooting_type", self.shooting_type),
         )
+        object.__setattr__(
+            self,
+            "firing_deck_source_unit_instance_id",
+            _validate_optional_identifier(
+                "IdenticalAttackSignature firing_deck_source_unit_instance_id",
+                self.firing_deck_source_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "firing_deck_source_model_instance_id",
+            _validate_optional_identifier(
+                "IdenticalAttackSignature firing_deck_source_model_instance_id",
+                self.firing_deck_source_model_instance_id,
+            ),
+        )
+        if (self.firing_deck_source_unit_instance_id is None) != (
+            self.firing_deck_source_model_instance_id is None
+        ):
+            raise GameLifecycleError(
+                "IdenticalAttackSignature Firing Deck source unit and model must be supplied "
+                "together."
+            )
 
     def stable_hash(self) -> str:
         encoded = canonical_json(self.to_payload()).encode("utf-8")
@@ -1082,6 +1156,11 @@ class IdenticalAttackSignature:
 
     def to_payload(self) -> IdenticalAttackSignaturePayload:
         return {
+            "attacker_model_instance_id": self.attacker_model_instance_id,
+            "wargear_id": self.wargear_id,
+            "weapon_profile_id": self.weapon_profile_id,
+            "target_visible_model_ids": list(self.target_visible_model_ids),
+            "target_in_range_model_ids": list(self.target_in_range_model_ids),
             "hit_basis": self.hit_basis,
             "hit_roll_modifier": self.hit_roll_modifier,
             "wound_roll_modifiers": list(self.wound_roll_modifiers),
@@ -1091,11 +1170,18 @@ class IdenticalAttackSignature:
             "weapon_rule_tokens": list(self.weapon_rule_tokens),
             "targeting_rule_ids": list(self.targeting_rule_ids),
             "shooting_type": self.shooting_type,
+            "firing_deck_source_unit_instance_id": self.firing_deck_source_unit_instance_id,
+            "firing_deck_source_model_instance_id": self.firing_deck_source_model_instance_id,
         }
 
     @classmethod
     def from_payload(cls, payload: IdenticalAttackSignaturePayload) -> Self:
         return cls(
+            attacker_model_instance_id=payload["attacker_model_instance_id"],
+            wargear_id=payload["wargear_id"],
+            weapon_profile_id=payload["weapon_profile_id"],
+            target_visible_model_ids=tuple(payload["target_visible_model_ids"]),
+            target_in_range_model_ids=tuple(payload["target_in_range_model_ids"]),
             hit_basis=payload["hit_basis"],
             hit_roll_modifier=payload["hit_roll_modifier"],
             wound_roll_modifiers=tuple(payload["wound_roll_modifiers"]),
@@ -1105,6 +1191,8 @@ class IdenticalAttackSignature:
             weapon_rule_tokens=tuple(payload["weapon_rule_tokens"]),
             targeting_rule_ids=tuple(payload["targeting_rule_ids"]),
             shooting_type=payload["shooting_type"],
+            firing_deck_source_unit_instance_id=payload["firing_deck_source_unit_instance_id"],
+            firing_deck_source_model_instance_id=payload["firing_deck_source_model_instance_id"],
         )
 
 
@@ -2950,8 +3038,9 @@ def _grouped_precision_request_if_available(
     allocation_context = allocation_context_for_unit(
         state=state,
         target_unit_instance_id=attack_context["target_unit_instance_id"],
-        already_allocated_model_ids=_alive_allocated_model_ids(
+        already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
             state=state,
+            target_unit_instance_id=attack_context["target_unit_instance_id"],
             allocated_model_ids=allocated_model_ids,
         ),
         attacker_constraint=AttackAllocationConstraint(
@@ -3017,8 +3106,9 @@ def _precision_grouped_allocation_context_and_groups(
     allocation_context = allocation_context_for_unit(
         state=state,
         target_unit_instance_id=target_unit_instance_id,
-        already_allocated_model_ids=_alive_allocated_model_ids(
+        already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
             state=state,
+            target_unit_instance_id=target_unit_instance_id,
             allocated_model_ids=allocated_model_ids,
         ),
         attacker_constraint=attacker_constraint,
@@ -3147,8 +3237,9 @@ def _resolve_grouped_current_pool(
     allocation_context = allocation_context_for_unit(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
-        already_allocated_model_ids=_alive_allocated_model_ids(
+        already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
             state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
             allocated_model_ids=allocated_model_ids,
         ),
         attacker_constraint=None,
@@ -3549,8 +3640,9 @@ def _resolve_grouped_damage_from(
         allocation_context = allocation_context_for_unit(
             state=state,
             target_unit_instance_id=pool.target_unit_instance_id,
-            already_allocated_model_ids=_alive_allocated_model_ids(
+            already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
                 state=state,
+                target_unit_instance_id=pool.target_unit_instance_id,
                 allocated_model_ids=current_pending.allocated_model_ids,
             ),
             attacker_constraint=base_allocation_context.attacker_constraint,
@@ -3716,6 +3808,21 @@ def _alive_allocated_model_ids(
         model_id
         for model_id in allocated_model_ids
         if _model_is_alive(state=state, model_instance_id=model_id)
+    )
+
+
+def _alive_allocated_model_ids_for_target_unit(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+    allocated_model_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    target_unit = unit_by_id(state=state, unit_instance_id=target_unit_instance_id)
+    target_model_ids = {model.model_instance_id for model in target_unit.own_models}
+    return tuple(
+        model_id
+        for model_id in allocated_model_ids
+        if model_id in target_model_ids and _model_is_alive(state=state, model_instance_id=model_id)
     )
 
 
@@ -6089,7 +6196,13 @@ def _damage_value(
 
 
 def _model_is_alive(*, state: GameState, model_instance_id: str) -> bool:
-    return model_by_id(state=state, model_instance_id=model_instance_id).is_alive
+    model = model_by_id(state=state, model_instance_id=model_instance_id)
+    if not model.is_alive:
+        return False
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Alive model lookup requires battlefield_state.")
+    return model_instance_id in set(battlefield.placed_model_ids())
 
 
 def _current_model_id_for_allocation_group(
@@ -6155,6 +6268,11 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
         else f"hit_target:{_hit_skill(profile)}"
     )
     return IdenticalAttackSignature(
+        attacker_model_instance_id=pool.attacker_model_instance_id,
+        wargear_id=pool.wargear_id,
+        weapon_profile_id=pool.weapon_profile_id,
+        target_visible_model_ids=pool.target_visible_model_ids,
+        target_in_range_model_ids=pool.target_in_range_model_ids,
         hit_basis=hit_basis,
         hit_roll_modifier=pool.hit_roll_modifier,
         wound_roll_modifiers=(),
@@ -6164,6 +6282,8 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
         weapon_rule_tokens=_weapon_rule_tokens_for_signature(profile),
         targeting_rule_ids=tuple(sorted(pool.targeting_rule_ids)),
         shooting_type=pool.shooting_type.value,
+        firing_deck_source_unit_instance_id=pool.firing_deck_source_unit_instance_id,
+        firing_deck_source_model_instance_id=pool.firing_deck_source_model_instance_id,
     )
 
 
@@ -6368,7 +6488,11 @@ def _gathered_attack_group_from_indices(
     total_attacks = sum(contribution.attacks for contribution in contributions)
     target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
     return GatheredAttackGroup(
-        group_id=f"attack-group:{target_id}:{signature.stable_hash()}",
+        group_id=_gathered_attack_group_id(
+            target_unit_instance_id=target_id,
+            signature=signature,
+            pool_indices=pool_indices,
+        ),
         target_unit_instance_id=target_id,
         signature=signature,
         pool_indices=pool_indices,
@@ -6392,6 +6516,24 @@ def _gathered_attack_contribution(
         firing_deck_source_unit_instance_id=pool.firing_deck_source_unit_instance_id,
         firing_deck_source_model_instance_id=pool.firing_deck_source_model_instance_id,
     )
+
+
+def _gathered_attack_group_id(
+    *,
+    target_unit_instance_id: str,
+    signature: IdenticalAttackSignature,
+    pool_indices: tuple[int, ...],
+) -> str:
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    indices = _validate_pool_index_tuple("GatheredAttackGroup pool_indices", pool_indices)
+    encoded = canonical_json(
+        {
+            "target_unit_instance_id": target_id,
+            "signature": signature.to_payload(),
+            "pool_indices": list(indices),
+        }
+    ).encode("utf-8")
+    return f"attack-group:{sha256(encoded).hexdigest()[:16]}"
 
 
 def _synthetic_pool_for_gathered_group(
@@ -7110,6 +7252,20 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
         seen.add(identifier)
         identifiers.append(identifier)
     return tuple(sorted(identifiers))
+
+
+def _validate_ordered_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    return tuple(identifiers)
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

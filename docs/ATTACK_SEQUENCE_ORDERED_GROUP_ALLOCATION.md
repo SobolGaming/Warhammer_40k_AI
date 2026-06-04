@@ -39,11 +39,17 @@ flowchart TD
 The Gather Attack Dice step groups unresolved ranged pools for the selected
 target only when their deterministic identical-attack signature matches. The
 signature includes hit basis, hit/wound modifiers, Strength, AP, Damage,
-applicable structured weapon abilities/keywords, targeting rule IDs, and shooting
-type. It deliberately excludes Attacks, range, attacker model identity, wargear
-ID, and Firing Deck provenance; those remain per-contribution replay evidence in
-the gathered group payload. Melee attack splitting and melee identical-attack
-gathering remain Phase 15 Fight-phase work.
+applicable structured weapon abilities/keywords, targeting rule IDs, shooting
+type, attacker model ID, wargear/profile IDs, visible and in-range target model
+IDs, and optional Firing Deck source unit/model IDs. These provenance fields are
+part of the signature because the current resolver turns a gathered group into a
+single synthetic `RangedAttackPool`; the copied pool identity must therefore be
+identical across every contribution before hit/wound attribution, Precision
+visibility, cover/LOS, save, damage, event attribution, or Firing Deck/source
+attribution can run through that synthetic pool. It deliberately excludes only
+the Attacks count and raw weapon range value; per-contribution attack counts
+remain replay evidence in the gathered group payload. Melee attack splitting and
+melee identical-attack gathering remain Phase 15 Fight-phase work.
 
 The following diagram is the Resolve Attack Dice subgraph for one gathered group.
 Normal damage and mortal wounds share the same engine-owned decision/replay path,
