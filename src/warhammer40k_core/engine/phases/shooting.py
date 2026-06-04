@@ -57,7 +57,7 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -200,6 +200,22 @@ class _AvailableWeapon(TypedDict):
     weapon_profile: WeaponProfile
     firing_deck_source_unit_instance_id: NotRequired[str]
     firing_deck_source_model_instance_id: NotRequired[str]
+
+
+type _ShootingUnitCandidateCacheKey = tuple[str, str, str]
+type _ShootingModelCandidateCacheKey = tuple[
+    str,
+    str,
+    str,
+    str | None,
+    str | None,
+    str,
+    str,
+]
+type _ShootingModelCandidateCache = dict[
+    _ShootingModelCandidateCacheKey,
+    ShootingTargetCandidate,
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -1319,16 +1335,23 @@ def _request_shooting_declaration(
         else _validate_identifier_tuple("shooting target_unit_ids", target_unit_ids)
     )
     target_candidates: list[JsonValue] = []
+    target_candidate_cache: dict[
+        _ShootingUnitCandidateCacheKey,
+        tuple[ShootingTargetCandidate, ...],
+    ] = {}
     for weapon in available_weapons:
         profile = weapon["weapon_profile"]
-        candidates = shooting_target_candidates_for_unit(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            attacker_unit=unit,
-            weapon_profile=profile,
-            target_unit_ids=candidate_target_unit_ids,
-            terrain_features=terrain_features,
-        )
+        candidate_cache_key = _shooting_unit_candidate_cache_key(weapon)
+        if candidate_cache_key not in target_candidate_cache:
+            target_candidate_cache[candidate_cache_key] = shooting_target_candidates_for_unit(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                attacker_unit=unit,
+                weapon_profile=profile,
+                target_unit_ids=candidate_target_unit_ids,
+                terrain_features=terrain_features,
+            )
+        candidates = target_candidate_cache[candidate_cache_key]
         target_candidates.extend(
             _target_candidate_payload_for_request(
                 state=state,
@@ -3199,6 +3222,7 @@ def _unit_has_legal_shooting_declaration(
         else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
     )
     terrain_features = _terrain_features_for_state(state)
+    candidate_cache: _ShootingModelCandidateCache = {}
     for weapon in _available_weapons_for_unit(
         state=state,
         unit=unit,
@@ -3207,12 +3231,12 @@ def _unit_has_legal_shooting_declaration(
         selected_shooting_type=selected_shooting_type,
     ):
         for target_unit_id in resolved_target_unit_ids:
-            candidate = shooting_target_candidate_for_model(
+            candidate = _cached_shooting_target_candidate_for_model(
+                cache=candidate_cache,
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
                 attacker_unit=unit,
-                attacker_model_instance_id=weapon["model_instance_id"],
-                weapon_profile=weapon["weapon_profile"],
+                weapon=weapon,
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
             )
@@ -3242,25 +3266,120 @@ def _legal_shooting_types_for_unit(
     player_id: str | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
 ) -> tuple[ShootingType, ...]:
-    legal_types: list[ShootingType] = []
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    resolved_target_unit_ids = (
+        _enemy_placed_unit_ids(state=state, player_id=actor_id)
+        if target_unit_ids is None
+        else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
+    )
+    scenario = _battlefield_scenario(state)
+    terrain_features = _terrain_features_for_state(state)
+    candidate_cache: _ShootingModelCandidateCache = {}
+    legal_types: set[ShootingType] = set()
     for shooting_type in (
         ShootingType.NORMAL,
         ShootingType.ASSAULT,
         ShootingType.CLOSE_QUARTERS,
         ShootingType.INDIRECT,
     ):
-        if _unit_has_legal_shooting_declaration(
+        for weapon in _available_weapons_for_unit(
             state=state,
-            scenario=_battlefield_scenario(state),
             unit=unit,
-            ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
-            player_id=player_id,
-            target_unit_ids=target_unit_ids,
+            player_id=actor_id,
             selected_shooting_type=shooting_type,
         ):
-            legal_types.append(shooting_type)
-    return tuple(legal_types)
+            for target_unit_id in resolved_target_unit_ids:
+                candidate = _cached_shooting_target_candidate_for_model(
+                    cache=candidate_cache,
+                    scenario=scenario,
+                    ruleset_descriptor=ruleset_descriptor,
+                    attacker_unit=unit,
+                    weapon=weapon,
+                    target_unit_id=target_unit_id,
+                    terrain_features=terrain_features,
+                )
+                if not candidate.is_legal:
+                    continue
+                if _shooting_types_for_selected_type(
+                    state=state,
+                    base_types=candidate.shooting_types,
+                    unit=unit,
+                    weapon_profile=weapon["weapon_profile"],
+                    selected_shooting_type=shooting_type,
+                    player_id=actor_id,
+                    army_catalog=army_catalog,
+                ):
+                    legal_types.add(shooting_type)
+                    break
+            if shooting_type in legal_types:
+                break
+    return tuple(
+        shooting_type
+        for shooting_type in (
+            ShootingType.NORMAL,
+            ShootingType.ASSAULT,
+            ShootingType.CLOSE_QUARTERS,
+            ShootingType.INDIRECT,
+        )
+        if shooting_type in legal_types
+    )
+
+
+def _cached_shooting_target_candidate_for_model(
+    *,
+    cache: _ShootingModelCandidateCache,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    attacker_unit: UnitInstance,
+    weapon: _AvailableWeapon,
+    target_unit_id: str,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+) -> ShootingTargetCandidate:
+    cache_key = _shooting_model_candidate_cache_key(weapon=weapon, target_unit_id=target_unit_id)
+    if cache_key not in cache:
+        cache[cache_key] = shooting_target_candidate_for_model(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            attacker_unit=attacker_unit,
+            attacker_model_instance_id=weapon["model_instance_id"],
+            weapon_profile=weapon["weapon_profile"],
+            target_unit_id=target_unit_id,
+            terrain_features=terrain_features,
+        )
+    return cache[cache_key]
+
+
+def _shooting_unit_candidate_cache_key(
+    weapon: _AvailableWeapon,
+) -> _ShootingUnitCandidateCacheKey:
+    profile = weapon["weapon_profile"]
+    return (
+        weapon["wargear_id"],
+        profile.profile_id,
+        _weapon_profile_cache_fingerprint(profile),
+    )
+
+
+def _shooting_model_candidate_cache_key(
+    *,
+    weapon: _AvailableWeapon,
+    target_unit_id: str,
+) -> _ShootingModelCandidateCacheKey:
+    profile = weapon["weapon_profile"]
+    return (
+        weapon["model_instance_id"],
+        weapon["wargear_id"],
+        profile.profile_id,
+        weapon.get("firing_deck_source_unit_instance_id"),
+        weapon.get("firing_deck_source_model_instance_id"),
+        _weapon_profile_cache_fingerprint(profile),
+        target_unit_id,
+    )
+
+
+def _weapon_profile_cache_fingerprint(weapon_profile: WeaponProfile) -> str:
+    return canonical_json(weapon_profile.to_payload())
 
 
 def shooting_unit_can_select_to_shoot(

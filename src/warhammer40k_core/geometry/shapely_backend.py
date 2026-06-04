@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+from functools import lru_cache
 from typing import TYPE_CHECKING, Protocol, cast
 
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose, validate_point3
@@ -12,6 +13,8 @@ if TYPE_CHECKING:
 
 _FOOTPRINT_QUAD_SEGS = 64
 _EPSILON = 1e-9
+_cached_geometry_module: _GeometryModule | None = None
+_cached_affinity_module: _AffinityModule | None = None
 
 
 class _Geometry(Protocol):
@@ -109,7 +112,7 @@ def footprint_for_terrain(terrain: TerrainVolume) -> _Geometry:
     valid_terrain = _validate_terrain("terrain", terrain)
     half_width = valid_terrain.width / 2.0
     half_depth = valid_terrain.depth / 2.0
-    return _geometry_module().box(
+    return _box(
         valid_terrain.bottom_center.x - half_width,
         valid_terrain.bottom_center.y - half_depth,
         valid_terrain.bottom_center.x + half_width,
@@ -123,7 +126,7 @@ def base_footprint_within_bounds(
     bounds: tuple[float, float, float, float],
 ) -> bool:
     min_x, min_y, max_x, max_y = bounds
-    surface = _geometry_module().box(min_x, min_y, max_x, max_y)
+    surface = _box(min_x, min_y, max_x, max_y)
     return surface.covers(footprint_for_base(base, pose))
 
 
@@ -133,7 +136,7 @@ def base_footprint_intersects_bounds(
     bounds: tuple[float, float, float, float],
 ) -> bool:
     min_x, min_y, max_x, max_y = bounds
-    surface = _geometry_module().box(min_x, min_y, max_x, max_y)
+    surface = _box(min_x, min_y, max_x, max_y)
     return surface.intersects(footprint_for_base(base, pose))
 
 
@@ -143,7 +146,7 @@ def base_footprint_distance_to_bounds(
     bounds: tuple[float, float, float, float],
 ) -> float:
     min_x, min_y, max_x, max_y = bounds
-    surface = _geometry_module().box(min_x, min_y, max_x, max_y)
+    surface = _box(min_x, min_y, max_x, max_y)
     return surface.distance(footprint_for_base(base, pose))
 
 
@@ -224,11 +227,28 @@ def segment_intersects_model_footprint(
 
 
 def _geometry_module() -> _GeometryModule:
-    return cast(_GeometryModule, importlib.import_module("shapely.geometry"))
+    global _cached_geometry_module
+    if _cached_geometry_module is None:
+        _cached_geometry_module = cast(
+            _GeometryModule,
+            importlib.import_module("shapely.geometry"),
+        )
+    return _cached_geometry_module
 
 
 def _affinity_module() -> _AffinityModule:
-    return cast(_AffinityModule, importlib.import_module("shapely.affinity"))
+    global _cached_affinity_module
+    if _cached_affinity_module is None:
+        _cached_affinity_module = cast(
+            _AffinityModule,
+            importlib.import_module("shapely.affinity"),
+        )
+    return _cached_affinity_module
+
+
+@lru_cache(maxsize=4096)
+def _box(min_x: float, min_y: float, max_x: float, max_y: float) -> _Geometry:
+    return _geometry_module().box(min_x, min_y, max_x, max_y)
 
 
 def _validate_terrain(field_name: str, value: object) -> TerrainVolume:

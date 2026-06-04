@@ -34,9 +34,9 @@ def test_phase10u_pathing_smoke_profiles_crowded_infantry_validation() -> None:
     assert result.valid_path_count == 1
     assert result.invalid_path_count == 0
     assert result.path_sampled_pose_count > 0
-    assert result.model_collision_broadphase_check_count > 0
-    assert result.model_collision_broadphase_rejection_count > 0
-    assert result.dominant_work_counter == "model_collision_broadphase_check_count"
+    assert result.model_collision_broadphase_check_count == 0
+    assert result.model_collision_broadphase_rejection_count == 0
+    assert result.dominant_work_counter == "path_sampled_pose_count"
 
 
 def test_phase10u_terrain_legality_smoke_profiles_ruins_validation() -> None:

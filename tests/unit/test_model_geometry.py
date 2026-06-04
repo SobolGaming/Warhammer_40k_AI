@@ -48,6 +48,16 @@ def test_base_overlap_and_distance_are_deterministic() -> None:
     assert not bases_overlap(first, first_pose, second, separated_pose)
 
 
+def test_circular_base_edge_contact_has_zero_distance_and_overlaps() -> None:
+    first = CircularBase(radius=1.0)
+    second = CircularBase(radius=0.5)
+    first_pose = Pose.at(0.0, 0.0)
+    touching_pose = Pose.at(1.5, 0.0)
+
+    assert math.isclose(base_distance(first, first_pose, second, touching_pose), 0.0)
+    assert bases_overlap(first, first_pose, second, touching_pose)
+
+
 def test_oval_base_distance_and_overlap_use_exact_footprints() -> None:
     first = OvalBase(length=4.0, width=1.0)
     second = OvalBase(length=4.0, width=1.0)

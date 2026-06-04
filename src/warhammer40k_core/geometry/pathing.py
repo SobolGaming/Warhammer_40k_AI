@@ -2322,10 +2322,11 @@ def model_is_within_battlefield_footprint(
 
 
 def _models_overlap_with_volume(first: Model, second: Model) -> bool:
-    return (
-        first.base_overlaps(second)
-        and first.volume.vertical_gap_to(first.pose, second.volume, second.pose) == 0.0
-    )
+    if first.volume.vertical_gap_to(first.pose, second.volume, second.pose) != 0.0:
+        return False
+    if not _model_pair_can_overlap_horizontally(first, second):
+        return False
+    return first.base_overlaps(second)
 
 
 def _models_are_in_enemy_engagement_range(
@@ -2375,12 +2376,15 @@ def _has_non_endpoint_interior_pose(path: tuple[Pose, ...]) -> bool:
 def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
     for index, first in enumerate(models):
         for second in models[index + 1 :]:
-            if (
-                first.base_overlaps(second)
-                and first.volume.vertical_gap_to(first.pose, second.volume, second.pose) == 0.0
-            ):
+            if _models_overlap_with_volume(first, second):
                 return (first.model_id, second.model_id)
     return None
+
+
+def _model_pair_can_overlap_horizontally(first: Model, second: Model) -> bool:
+    return first.pose.distance_2d_to(second.pose) <= (
+        first.base.max_radius() + second.base.max_radius()
+    )
 
 
 def _invalid(

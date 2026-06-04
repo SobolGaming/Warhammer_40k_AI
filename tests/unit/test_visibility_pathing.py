@@ -259,6 +259,44 @@ def test_path_query_checks_engagement_range_along_witness_path() -> None:
     assert result.failure.blocker_id == "enemy"
 
 
+def test_collision_set_prunes_x_disjoint_model_blockers_before_broadphase() -> None:
+    mover = _model("mover", 0.0, 0.0)
+    near_x_far_y = _model("near-x-far-y", 0.0, 20.0)
+    far_x = _model("far-x", 20.0, 0.0)
+    collision_set = CollisionSet(model_blockers=(near_x_far_y, far_x))
+
+    result = collision_set.model_collision_query(mover)
+
+    assert result.blocker_ids == ()
+    assert result.broadphase_check_count == 1
+    assert result.exact_check_count == 0
+
+
+def test_collision_set_prunes_x_disjoint_terrain_blockers_before_broadphase() -> None:
+    mover = _model("mover", 0.0, 0.0)
+    near_x_far_y = TerrainVolume(
+        terrain_id="near-x-far-y",
+        bottom_center=Point3(0.0, 20.0, 0.0),
+        width=1.0,
+        depth=1.0,
+        height=3.0,
+    )
+    far_x = TerrainVolume(
+        terrain_id="far-x",
+        bottom_center=Point3(20.0, 0.0, 0.0),
+        width=1.0,
+        depth=1.0,
+        height=3.0,
+    )
+    collision_set = CollisionSet(terrain_blockers=(near_x_far_y, far_x))
+
+    result = collision_set.terrain_collision_query(mover)
+
+    assert result.blocker_ids == ()
+    assert result.broadphase_check_count == 1
+    assert result.exact_check_count == 0
+
+
 def test_path_query_checks_coherency_after_group_movement() -> None:
     first = _model("mover-1", 0.0, 0.0)
     second = _model("mover-2", 1.0, 0.0)
