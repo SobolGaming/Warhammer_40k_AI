@@ -58,8 +58,6 @@ from warhammer40k_core.engine.phases.command import (
     CommandPhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
-    PLACE_DISEMBARK_UNIT_DECISION_TYPE,
-    PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_DISEMBARK_UNIT_DECISION_TYPE,
     SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
@@ -133,9 +131,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
         SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
         SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
-        PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
         SELECT_DISEMBARK_UNIT_DECISION_TYPE,
-        PLACE_DISEMBARK_UNIT_DECISION_TYPE,
         SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -181,7 +177,7 @@ class GameLifecycle:
     decision_controller: DecisionController = field(default_factory=_new_decision_controller)
     reaction_queue: ReactionQueue = field(default_factory=ReactionQueue)
     state: GameState | None = None
-    parameterized_movement_proposals: bool = False
+    parameterized_movement_proposals: bool = True
     _config: GameConfig | None = None
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
@@ -191,6 +187,14 @@ class GameLifecycle:
         default_factory=TriggeredMovementHandler
     )
     _battle_round_flow: BattleRoundFlow | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.parameterized_movement_proposals) is not bool:
+            raise GameLifecycleError(
+                "GameLifecycle parameterized_movement_proposals must be a bool."
+            )
+        if not self.parameterized_movement_proposals:
+            raise GameLifecycleError("GameLifecycle requires parameterized movement proposals.")
 
     def start(self, config: GameConfig) -> LifecycleStatus:
         if type(config) is not GameConfig:

@@ -4,6 +4,7 @@ import json
 from typing import cast
 
 import pytest
+from tests.movement_submission_helpers import submit_default_movement_proposal_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -242,12 +243,17 @@ def _submit_result(
     option_id: str,
     result_id: str,
 ) -> LifecycleStatus:
-    return lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
         )
+    )
+    return submit_default_movement_proposal_if_pending(
+        lifecycle,
+        status,
+        result_id=f"{result_id}-proposal",
     )
 
 
