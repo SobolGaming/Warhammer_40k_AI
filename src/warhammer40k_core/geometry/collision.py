@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from bisect import bisect_right
+from dataclasses import dataclass, field
 from typing import Self, TypedDict
 
 from warhammer40k_core.geometry.pose import GeometryError
@@ -58,11 +59,91 @@ class CollisionQueryResult:
         return self.broadphase_check_count - self.exact_check_count
 
 
+type _ModelIndexEntry = tuple[float, float, Model]
+type _TerrainIndexEntry = tuple[float, float, TerrainVolume]
+
+
+@dataclass(frozen=True, slots=True)
+class _HorizontalModelIndex:
+    entries: tuple[_ModelIndexEntry, ...]
+    min_x_values: tuple[float, ...]
+
+    @classmethod
+    def build(cls, models: tuple[Model, ...]) -> Self:
+        entries = tuple(
+            sorted(
+                (
+                    (
+                        model.pose.position.x - model.base.max_radius(),
+                        model.pose.position.x + model.base.max_radius(),
+                        model,
+                    )
+                    for model in models
+                ),
+                key=lambda entry: (entry[0], entry[1], entry[2].model_id),
+            )
+        )
+        return cls(
+            entries=entries,
+            min_x_values=tuple(entry[0] for entry in entries),
+        )
+
+    def candidates(self, *, min_x: float, max_x: float) -> tuple[Model, ...]:
+        end_index = bisect_right(self.min_x_values, max_x)
+        return tuple(
+            model
+            for _entry_min_x, entry_max_x, model in self.entries[:end_index]
+            if entry_max_x >= min_x
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class _HorizontalTerrainIndex:
+    entries: tuple[_TerrainIndexEntry, ...]
+    min_x_values: tuple[float, ...]
+
+    @classmethod
+    def build(cls, terrain: tuple[TerrainVolume, ...]) -> Self:
+        entries = tuple(
+            sorted(
+                (
+                    (bounds[0], bounds[2], volume)
+                    for volume in terrain
+                    for bounds in (volume.horizontal_bounds(),)
+                ),
+                key=lambda entry: (entry[0], entry[1], entry[2].terrain_id),
+            )
+        )
+        return cls(
+            entries=entries,
+            min_x_values=tuple(entry[0] for entry in entries),
+        )
+
+    def candidates(self, *, min_x: float, max_x: float) -> tuple[TerrainVolume, ...]:
+        end_index = bisect_right(self.min_x_values, max_x)
+        return tuple(
+            volume
+            for _entry_min_x, entry_max_x, volume in self.entries[:end_index]
+            if entry_max_x >= min_x
+        )
+
+
 @dataclass(frozen=True, slots=True)
 class CollisionSet:
     model_blockers: tuple[Model, ...] = ()
     terrain_blockers: tuple[TerrainVolume, ...] = ()
     engagement_blockers: tuple[Model, ...] = ()
+    _model_blocker_index: _HorizontalModelIndex = field(init=False, repr=False, compare=False)
+    _terrain_blocker_index: _HorizontalTerrainIndex = field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
+    _engagement_blocker_index: _HorizontalModelIndex = field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
 
     def __post_init__(self) -> None:
         if type(self.model_blockers) is not tuple:
@@ -101,6 +182,21 @@ class CollisionSet:
             "engagement_blockers",
             tuple(sorted(engagement_blockers, key=lambda model: model.model_id)),
         )
+        object.__setattr__(
+            self,
+            "_model_blocker_index",
+            _HorizontalModelIndex.build(self.model_blockers),
+        )
+        object.__setattr__(
+            self,
+            "_terrain_blocker_index",
+            _HorizontalTerrainIndex.build(self.terrain_blockers),
+        )
+        object.__setattr__(
+            self,
+            "_engagement_blocker_index",
+            _HorizontalModelIndex.build(self.engagement_blockers),
+        )
 
     @classmethod
     def empty(cls) -> Self:
@@ -135,7 +231,12 @@ class CollisionSet:
         moving_model = _validate_model("model", model)
         colliding: list[str] = []
         exact_check_count = 0
-        for blocker in self.model_blockers:
+        candidate_min_x, candidate_max_x = _model_candidate_x_bounds(moving_model)
+        candidates = self._model_blocker_index.candidates(
+            min_x=candidate_min_x,
+            max_x=candidate_max_x,
+        )
+        for blocker in candidates:
             if not _model_collision_broadphase_match(moving_model, blocker):
                 continue
             exact_check_count += 1
@@ -151,7 +252,7 @@ class CollisionSet:
                 colliding.append(blocker.model_id)
         return CollisionQueryResult(
             blocker_ids=tuple(sorted(colliding)),
-            broadphase_check_count=len(self.model_blockers),
+            broadphase_check_count=len(candidates),
             exact_check_count=exact_check_count,
         )
 
@@ -162,7 +263,12 @@ class CollisionSet:
         moving_model = _validate_model("model", model)
         colliding: list[str] = []
         exact_check_count = 0
-        for terrain in self.terrain_blockers:
+        candidate_min_x, candidate_max_x = _terrain_candidate_x_bounds(moving_model)
+        candidates = self._terrain_blocker_index.candidates(
+            min_x=candidate_min_x,
+            max_x=candidate_max_x,
+        )
+        for terrain in candidates:
             if not _terrain_collision_broadphase_match(moving_model, terrain):
                 continue
             exact_check_count += 1
@@ -170,7 +276,7 @@ class CollisionSet:
                 colliding.append(terrain.terrain_id)
         return CollisionQueryResult(
             blocker_ids=tuple(sorted(colliding)),
-            broadphase_check_count=len(self.terrain_blockers),
+            broadphase_check_count=len(candidates),
             exact_check_count=exact_check_count,
         )
 
@@ -197,7 +303,15 @@ class CollisionSet:
         vertical_limit = _validate_non_negative_number("vertical_inches", vertical_inches)
         engagement: list[str] = []
         exact_check_count = 0
-        for blocker in self.engagement_blockers:
+        candidate_min_x, candidate_max_x = _model_candidate_x_bounds(
+            moving_model,
+            extra_horizontal_inches=horizontal_limit,
+        )
+        candidates = self._engagement_blocker_index.candidates(
+            min_x=candidate_min_x,
+            max_x=candidate_max_x,
+        )
+        for blocker in candidates:
             if not _engagement_broadphase_match(
                 moving_model,
                 blocker,
@@ -214,7 +328,7 @@ class CollisionSet:
                 engagement.append(blocker.model_id)
         return CollisionQueryResult(
             blocker_ids=tuple(sorted(engagement)),
-            broadphase_check_count=len(self.engagement_blockers),
+            broadphase_check_count=len(candidates),
             exact_check_count=exact_check_count,
         )
 
@@ -365,3 +479,17 @@ def _model_terrain_vertical_gap(model: Model, terrain: TerrainVolume) -> float:
     if terrain_top < model_bottom:
         return model_bottom - terrain_top
     return 0.0
+
+
+def _model_candidate_x_bounds(
+    moving_model: Model,
+    *,
+    extra_horizontal_inches: float = 0.0,
+) -> tuple[float, float]:
+    radius = moving_model.base.max_radius() + extra_horizontal_inches
+    model_x = moving_model.pose.position.x
+    return (model_x - radius, model_x + radius)
+
+
+def _terrain_candidate_x_bounds(moving_model: Model) -> tuple[float, float]:
+    return _model_candidate_x_bounds(moving_model)

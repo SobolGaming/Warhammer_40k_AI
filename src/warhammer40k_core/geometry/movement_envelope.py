@@ -547,13 +547,22 @@ class MovementEnvelope:
         valid_models = tuple(_validate_model("MovementEnvelope model", model) for model in models)
         if len(valid_models) < 2:
             return True
+        if len(valid_models) - 1 < self.required_coherency_neighbors:
+            return False
 
-        for model in valid_models:
-            coherent_neighbors = sum(
-                model.model_id != other.model_id and self._models_are_coherent_pair(model, other)
-                for other in valid_models
-            )
-            if coherent_neighbors < self.required_coherency_neighbors:
+        coherent_neighbor_counts = [0 for _model in valid_models]
+        for index, first in enumerate(valid_models):
+            for other_index in range(index + 1, len(valid_models)):
+                second = valid_models[other_index]
+                if (
+                    coherent_neighbor_counts[index] >= self.required_coherency_neighbors
+                    and coherent_neighbor_counts[other_index] >= self.required_coherency_neighbors
+                ):
+                    continue
+                if self._models_are_coherent_pair(first, second):
+                    coherent_neighbor_counts[index] += 1
+                    coherent_neighbor_counts[other_index] += 1
+            if coherent_neighbor_counts[index] < self.required_coherency_neighbors:
                 return False
         return True
 
@@ -581,11 +590,18 @@ class MovementEnvelope:
         )
 
     def _models_are_coherent_pair(self, first: Model, second: Model) -> bool:
-        return (
-            first.base_distance_to(second) <= self.coherency_horizontal_inches
-            and first.volume.vertical_gap_to(first.pose, second.volume, second.pose)
-            <= self.coherency_vertical_inches
-        )
+        if (
+            first.volume.vertical_gap_to(first.pose, second.volume, second.pose)
+            > self.coherency_vertical_inches
+        ):
+            return False
+        if not _model_pair_can_be_within_horizontal_distance(
+            first,
+            second,
+            horizontal_inches=self.coherency_horizontal_inches,
+        ):
+            return False
+        return first.base_distance_to(second) <= self.coherency_horizontal_inches
 
 
 def _validate_pose_path(field_name: str, value: object) -> tuple[Pose, ...]:
@@ -602,6 +618,18 @@ def _validate_model(field_name: str, value: object) -> Model:
     if type(value) is not Model:
         raise GeometryError(f"{field_name} must be a Model.")
     return value
+
+
+def _model_pair_can_be_within_horizontal_distance(
+    first: Model,
+    second: Model,
+    *,
+    horizontal_inches: float,
+) -> bool:
+    center_distance = first.pose.distance_2d_to(second.pose)
+    return center_distance <= (
+        first.base.max_radius() + second.base.max_radius() + horizontal_inches
+    )
 
 
 def _validate_movement_segments(

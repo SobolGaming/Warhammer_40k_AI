@@ -161,6 +161,9 @@ def base_distance(
     first_valid_pose = validate_pose("first_pose", first_pose)
     second_base = validate_base_shape("second", second)
     second_valid_pose = validate_pose("second_pose", second_pose)
+    if type(first_base) is CircularBase and type(second_base) is CircularBase:
+        center_distance = first_valid_pose.distance_2d_to(second_valid_pose)
+        return max(0.0, center_distance - first_base.radius - second_base.radius)
     return shapely_backend.base_footprint_distance(
         first_base,
         first_valid_pose,
@@ -179,6 +182,9 @@ def bases_overlap(
     first_valid_pose = validate_pose("first_pose", first_pose)
     second_base = validate_base_shape("second", second)
     second_valid_pose = validate_pose("second_pose", second_pose)
+    if type(first_base) is CircularBase and type(second_base) is CircularBase:
+        center_distance = first_valid_pose.distance_2d_to(second_valid_pose)
+        return center_distance <= first_base.radius + second_base.radius
     return shapely_backend.base_footprints_intersect(
         first_base,
         first_valid_pose,

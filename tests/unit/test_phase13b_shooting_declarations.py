@@ -8,6 +8,7 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetWargearOption
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec, DiceRollState
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.modifiers import ModifierStack, RollModifier
@@ -23,6 +24,7 @@ from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
     DamageProfile,
     DevastatingWoundsEffect,
+    RangeProfile,
     WeaponKeyword,
     WeaponProfile,
     WeaponProfilePayload,
@@ -458,6 +460,120 @@ def test_phase14f_indirect_shooting_type_requires_indirect_fire_weapon_profiles(
     assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in targeting_rule_ids
     assert INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in targeting_rule_ids
     assert INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in targeting_rule_ids
+
+
+def test_shooting_target_candidate_cache_uses_full_weapon_profile_identity() -> None:
+    catalog = _catalog_with_same_profile_id_target_cache_collision_weapons()
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=catalog,
+        game_id="phase14-profile-cache-key-regression",
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    type_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase14-profile-cache-select-unit",
+        )
+    )
+
+    assert {option.option_id for option in type_request.options} == {ShootingType.NORMAL.value}
+
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=type_request,
+            option_id=ShootingType.NORMAL.value,
+            result_id="phase14-profile-cache-select-normal",
+        )
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+    target_unit_id = units["enemy"].unit_instance_id
+    first_model_id = units["intercessor-1"].own_models[0].model_instance_id
+    first_model_weapons = [
+        weapon for weapon in weapons if weapon["model_instance_id"] == first_model_id
+    ]
+
+    assert {weapon["wargear_id"] for weapon in first_model_weapons} == {
+        "phase14-cache-long-rifle",
+        "phase14-cache-short-mortar",
+    }
+    assert {weapon["weapon_profile_id"] for weapon in first_model_weapons} == {"default"}
+    long_weapon = next(
+        weapon
+        for weapon in first_model_weapons
+        if weapon["wargear_id"] == "phase14-cache-long-rifle"
+    )
+    short_weapon = next(
+        weapon
+        for weapon in first_model_weapons
+        if weapon["wargear_id"] == "phase14-cache-short-mortar"
+    )
+    assert (
+        cast(WeaponProfilePayload, long_weapon["weapon_profile"])["range_profile"][
+            "distance_inches"
+        ]
+        == 36
+    )
+    assert (
+        cast(WeaponProfilePayload, short_weapon["weapon_profile"])["range_profile"][
+            "distance_inches"
+        ]
+        == 6
+    )
+
+    same_profile_candidates = [
+        candidate
+        for candidate in target_candidates
+        if candidate["weapon_profile_id"] == "default"
+        and candidate["target_unit_instance_id"] == target_unit_id
+    ]
+    legal_candidates = [
+        candidate for candidate in same_profile_candidates if candidate["is_legal"] is True
+    ]
+    illegal_candidates = [
+        candidate for candidate in same_profile_candidates if candidate["is_legal"] is False
+    ]
+    assert len(legal_candidates) == len(units["intercessor-1"].own_models)
+    assert len(illegal_candidates) == len(units["intercessor-1"].own_models)
+    assert {candidate["violation_code"] for candidate in illegal_candidates} == {
+        ShootingTargetViolationCode.OUT_OF_RANGE.value
+    }
+
+    invalid_short_proposal = _proposal_from_declarations(
+        request=declaration_request,
+        declarations=(
+            WeaponDeclaration.from_payload(
+                _weapon_payload_to_declaration_payload(
+                    weapon=short_weapon,
+                    target_unit_id=target_unit_id,
+                )
+            ),
+        ),
+    )
+    before_records = len(lifecycle.decision_controller.records)
+
+    invalid_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=invalid_short_proposal.to_payload(),
+        result_id="phase14-profile-cache-invalid-short",
+    )
+    invalid_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], invalid_status.payload)["proposal_validation"],
+    )
+    invalid_violation = cast(list[dict[str, object]], invalid_validation["violations"])[0]
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_violation["violation_code"] == "target_out_of_range"
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
 
 
 def test_phase14f_select_shooting_type_rejects_drift_before_mutation() -> None:
@@ -12126,6 +12242,71 @@ def _catalog_with_replaced_bolt_profiles(
             continue
         updated_wargear.append(wargear)
     return replace(catalog, wargear=tuple(updated_wargear))
+
+
+def _catalog_with_same_profile_id_target_cache_collision_weapons() -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    long_profile = replace(
+        base_profile,
+        profile_id="default",
+        name="Phase 14 cache long rifle",
+        range_profile=RangeProfile.distance(36),
+        keywords=(),
+        abilities=(),
+    )
+    short_profile = replace(
+        base_profile,
+        profile_id="default",
+        name="Phase 14 cache short mortar",
+        range_profile=RangeProfile.distance(6),
+        keywords=(WeaponKeyword.INDIRECT_FIRE,),
+        abilities=(),
+    )
+    long_wargear = Wargear(
+        wargear_id="phase14-cache-long-rifle",
+        name="Phase 14 cache long rifle",
+        weapon_profiles=(long_profile,),
+    )
+    short_wargear = Wargear(
+        wargear_id="phase14-cache-short-mortar",
+        name="Phase 14 cache short mortar",
+        weapon_profiles=(short_profile,),
+    )
+    updated_datasheets: list[DatasheetDefinition] = []
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id != "core-intercessor-like-infantry":
+            updated_datasheets.append(datasheet)
+            continue
+        updated_datasheets.append(
+            replace(
+                datasheet,
+                wargear_options=(
+                    DatasheetWargearOption(
+                        option_id="phase14-cache-profile-id-collision-weapons",
+                        model_profile_id="core-intercessor-like",
+                        default_wargear_ids=(
+                            long_wargear.wargear_id,
+                            short_wargear.wargear_id,
+                        ),
+                        allowed_wargear_ids=(
+                            long_wargear.wargear_id,
+                            short_wargear.wargear_id,
+                        ),
+                        min_selections=2,
+                        max_selections=2,
+                    ),
+                ),
+            )
+        )
+    return replace(
+        catalog,
+        datasheets=tuple(updated_datasheets),
+        wargear=(*catalog.wargear, long_wargear, short_wargear),
+    )
 
 
 def _config(
