@@ -46,6 +46,7 @@ from warhammer40k_core.engine.attack_sequence import (
     PendingGroupedDamage,
     SaveDieEntryPayload,
     WoundRoll,
+    apply_damage_allocation_model_decision,
     attack_sequence_step_from_token,
     cover_for_allocated_model,
     deadly_demise_mortal_wounds_roll_spec,
@@ -179,7 +180,7 @@ from warhammer40k_core.engine.transports import (
     TransportCapacityProfile,
     TransportCargoState,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     BLAST_RULE_ID,
     FIRE_OVERWATCH_RULE_ID,
@@ -5865,6 +5866,203 @@ def test_phase14l_range_and_firing_deck_provenance_prevent_unsafe_gathering() ->
         range_limited_pool.target_in_range_model_ids,
     }
     assert any(group.signature.firing_deck_source_unit_instance_id is not None for group in groups)
+
+
+def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(23.0, 35.0, facing_degrees=180.0),
+        game_id="phase14l-shooting-test1",
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender = replace(
+        defender,
+        own_models=tuple(_phase14l_test1_target_model(model) for model in defender.own_models),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    base_profile = _first_weapon_profile(lifecycle, attacker)
+    boltgun_profile = replace(
+        base_profile,
+        profile_id="phase14l-test1-bolt-identical",
+        name="Phase 14L Test 1 boltgun",
+        attack_profile=AttackProfile.fixed(2),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    bolt_pistol_profile = replace(
+        boltgun_profile,
+        name="Phase 14L Test 1 bolt pistol",
+        attack_profile=AttackProfile.fixed(1),
+    )
+    heavy_bolter_profile = replace(
+        base_profile,
+        profile_id="phase14l-test1-heavy-bolter",
+        name="Phase 14L Test 1 heavy bolter",
+        attack_profile=AttackProfile.fixed(3),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 5),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -1),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    target_model_ids = tuple(model.model_instance_id for model in defender.own_models)
+    safe_attacker_model_id = attacker.own_models[0].model_instance_id
+    bolt_pools = (
+        RangedAttackPool(
+            attacker_model_instance_id=safe_attacker_model_id,
+            wargear_id="phase14l-test1-bolt-identical",
+            weapon_profile_id=boltgun_profile.profile_id,
+            weapon_profile=boltgun_profile,
+            target_unit_instance_id=defender.unit_instance_id,
+            shooting_type=ShootingType.NORMAL,
+            attacks=2,
+            target_visible_model_ids=target_model_ids,
+            target_in_range_model_ids=target_model_ids,
+        ),
+        RangedAttackPool(
+            attacker_model_instance_id=safe_attacker_model_id,
+            wargear_id="phase14l-test1-bolt-identical",
+            weapon_profile_id=boltgun_profile.profile_id,
+            weapon_profile=boltgun_profile,
+            target_unit_instance_id=defender.unit_instance_id,
+            shooting_type=ShootingType.NORMAL,
+            attacks=2,
+            target_visible_model_ids=target_model_ids,
+            target_in_range_model_ids=target_model_ids,
+        ),
+        RangedAttackPool(
+            attacker_model_instance_id=safe_attacker_model_id,
+            wargear_id="phase14l-test1-bolt-identical",
+            weapon_profile_id=bolt_pistol_profile.profile_id,
+            weapon_profile=bolt_pistol_profile,
+            target_unit_instance_id=defender.unit_instance_id,
+            shooting_type=ShootingType.NORMAL,
+            attacks=1,
+            target_visible_model_ids=target_model_ids,
+            target_in_range_model_ids=target_model_ids,
+        ),
+    )
+    heavy_pool = RangedAttackPool(
+        attacker_model_instance_id=safe_attacker_model_id,
+        wargear_id="phase14l-test1-heavy-bolter",
+        weapon_profile_id=heavy_bolter_profile.profile_id,
+        weapon_profile=heavy_bolter_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=3,
+        target_visible_model_ids=target_model_ids,
+        target_in_range_model_ids=target_model_ids,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14l-shooting-test1",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(*bolt_pools, heavy_pool),
+    ).with_selected_target_unit(defender.unit_instance_id)
+    groups = gathered_attack_groups_for_target(
+        attack_sequence=sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+    bolt_group = next(group for group in groups if group.total_attacks == 5)
+    heavy_group = next(group for group in groups if group.total_attacks == 3)
+
+    assert len(groups) == 2
+    assert bolt_group.pool_indices == (0, 1, 2)
+    assert tuple(contribution.attacks for contribution in bolt_group.contributions) == (2, 2, 1)
+    assert heavy_group.pool_indices == (3,)
+
+    manager = DiceRollManager(
+        "phase14l-shooting-test1",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=_phase14l_test1_dice_results(
+            bolt_profile=boltgun_profile,
+            heavy_profile=heavy_bolter_profile,
+            first_save_model_id=target_model_ids[0],
+            second_save_model_id=target_model_ids[1],
+        ),
+    )
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence.with_current_gathered_group(bolt_group),
+        already_allocated_model_ids=(),
+        dice_manager=manager,
+    )
+    remaining_sequence, allocated_ids, status = _drain_damage_model_choices_with_manager(
+        lifecycle=lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=allocated_ids,
+        status=status,
+        dice_manager=manager,
+        result_id_prefix="phase14l-shooting-test1-damage-model",
+    )
+    hit_payloads = _attack_step_payloads(lifecycle, AttackSequenceStep.HIT)
+    wound_payloads = _attack_step_payloads(lifecycle, AttackSequenceStep.WOUND)
+    save_payloads = _attack_step_payloads(lifecycle, AttackSequenceStep.SAVE)
+    damage_payloads = _attack_step_payloads(lifecycle, AttackSequenceStep.DAMAGE)
+    damage_applications = [
+        cast(dict[str, object], event["payload"])["damage_application"]
+        for event in damage_payloads
+        if cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+    destroyed_payloads = _event_payloads(lifecycle, "model_destroyed")
+
+    assert remaining_sequence is None
+    assert status is None
+    assert [
+        cast(dict[str, object], event["payload"])["unmodified_roll"] for event in hit_payloads
+    ] == [2, 4, 6, 4, 3, 4, 4, 2]
+    assert [
+        cast(dict[str, object], event["payload"])["unmodified_roll"] for event in wound_payloads
+    ] == [6, 3, 5, 1, 3, 6]
+    assert [
+        cast(dict[str, object], event["payload"])["unmodified_roll"] for event in save_payloads
+    ] == [2, 4, 6, 3, 5]
+    assert [event["attack_context_id"] for event in save_payloads] == [
+        "phase14l-shooting-test1:pool-001:attack-004",
+        "phase14l-shooting-test1:pool-001:attack-003",
+        "phase14l-shooting-test1:pool-001:attack-002",
+        "phase14l-shooting-test1:pool-004:attack-002",
+        "phase14l-shooting-test1:pool-004:attack-001",
+    ]
+    assert [
+        cast(dict[str, object], event["payload"])["resolution_rule"] for event in save_payloads
+    ] == [
+        SaveResolutionRule.FAILED.value,
+        SaveResolutionRule.ARMOUR_SAVE.value,
+        SaveResolutionRule.INVULNERABLE_SAVE.value,
+        SaveResolutionRule.FAILED.value,
+        SaveResolutionRule.INVULNERABLE_SAVE.value,
+    ]
+    assert [cast(dict[str, object], event["payload"])["final_roll"] for event in save_payloads] == [
+        2,
+        4,
+        6,
+        2,
+        5,
+    ]
+    assert len(damage_applications) == 2
+    assert [
+        cast(dict[str, object], application)["destroyed"] for application in damage_applications
+    ] == [True, True]
+    assert {
+        cast(dict[str, object], application)["model_instance_id"]
+        for application in damage_applications
+    } == {target_model_ids[0], target_model_ids[1]}
+    assert {payload["model_instance_id"] for payload in destroyed_payloads} == {
+        target_model_ids[0],
+        target_model_ids[1],
+    }
+    assert len(_attack_step_payloads(lifecycle, AttackSequenceStep.CRITICAL_HIT)) == 1
+    assert len(_attack_step_payloads(lifecycle, AttackSequenceStep.CRITICAL_WOUND)) == 2
 
 
 def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None:
@@ -12662,6 +12860,207 @@ def _continue_damage_model_choices(
         )
         result_index += 1
     return _stored_shooting_attack_sequence(lifecycle), None
+
+
+def _drain_damage_model_choices_with_manager(
+    *,
+    lifecycle: GameLifecycle,
+    attack_sequence: AttackSequence | None,
+    allocated_ids: tuple[str, ...],
+    status: LifecycleStatus | None,
+    dice_manager: DiceRollManager,
+    result_id_prefix: str,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    state = _state(lifecycle)
+    current_sequence = attack_sequence
+    current_allocated_ids = allocated_ids
+    current_status = status
+    for index in range(128):
+        if current_status is None:
+            if current_sequence is None:
+                return None, current_allocated_ids, None
+            current_sequence, current_allocated_ids, current_status = (
+                resolve_attack_sequence_until_blocked(
+                    state=state,
+                    decisions=lifecycle.decision_controller,
+                    ruleset_descriptor=_ruleset(),
+                    attack_sequence=current_sequence,
+                    already_allocated_model_ids=current_allocated_ids,
+                    dice_manager=dice_manager,
+                )
+            )
+            continue
+        if current_status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION:
+            return current_sequence, current_allocated_ids, current_status
+        request = _decision_request(current_status)
+        if request.decision_type != SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
+            return current_sequence, current_allocated_ids, current_status
+        if current_sequence is None:
+            raise AssertionError("Damage allocation decision requires an attack sequence.")
+        result = DecisionResult.for_request(
+            result_id=f"{result_id_prefix}-{index:03d}",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+        lifecycle.decision_controller.submit_result(result)
+        current_sequence, current_allocated_ids, current_status = (
+            apply_damage_allocation_model_decision(
+                state=state,
+                decisions=lifecycle.decision_controller,
+                ruleset_descriptor=_ruleset(),
+                attack_sequence=current_sequence,
+                result=result,
+                already_allocated_model_ids=current_allocated_ids,
+                dice_manager=dice_manager,
+            )
+        )
+    raise AssertionError("Attack sequence damage allocation choices did not drain.")
+
+
+def _phase14l_test1_target_model(model: ModelInstance) -> ModelInstance:
+    overrides = (
+        (Characteristic.TOUGHNESS, 3),
+        (Characteristic.WOUNDS, 1),
+        (Characteristic.SAVE, 3),
+        (Characteristic.INVULNERABLE_SAVE, 5),
+    )
+    override_values = dict(overrides)
+    seen: set[Characteristic] = set()
+    characteristics: list[CharacteristicValue] = []
+    for value in model.characteristics:
+        if value.characteristic in override_values:
+            characteristics.append(
+                CharacteristicValue.from_raw(
+                    value.characteristic,
+                    override_values[value.characteristic],
+                )
+            )
+            seen.add(value.characteristic)
+            continue
+        characteristics.append(value)
+    for characteristic, raw_value in overrides:
+        if characteristic not in seen:
+            characteristics.append(CharacteristicValue.from_raw(characteristic, raw_value))
+    return replace(
+        model,
+        characteristics=tuple(characteristics),
+        starting_wounds=1,
+        wounds_remaining=1,
+    )
+
+
+def _phase14l_test1_dice_results(
+    *,
+    bolt_profile: WeaponProfile,
+    heavy_profile: WeaponProfile,
+    first_save_model_id: str,
+    second_save_model_id: str,
+) -> tuple[DiceRollResult, ...]:
+    results: list[DiceRollResult] = []
+    bolt_wound_rolls = iter((6, 3, 5, 1))
+    for attack_number, hit_roll in enumerate((2, 4, 6, 4, 3), start=1):
+        attack_context_id = f"phase14l-shooting-test1:pool-001:attack-{attack_number:03d}"
+        results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14l-test1-bolt-hit-{attack_number}",
+                spec=_phase14l_test1_hit_spec(
+                    profile=bolt_profile,
+                    attack_context_id=attack_context_id,
+                ),
+                value=hit_roll,
+            )
+        )
+        if hit_roll >= 3:
+            results.append(
+                _fixed_roll_result(
+                    roll_id=f"phase14l-test1-bolt-wound-{attack_number}",
+                    spec=_phase14l_test1_wound_spec(
+                        profile=bolt_profile,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=next(bolt_wound_rolls),
+                )
+            )
+    for attack_number, save_roll in ((2, 6), (3, 4), (4, 2)):
+        attack_context_id = f"phase14l-shooting-test1:pool-001:attack-{attack_number:03d}"
+        results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14l-test1-bolt-save-{attack_number}",
+                spec=saving_throw_roll_spec(
+                    save_kind=SaveKind.INVULNERABLE,
+                    player_id="player-b",
+                    allocated_model_id=first_save_model_id,
+                    attack_context_id=attack_context_id,
+                ),
+                value=save_roll,
+            )
+        )
+
+    heavy_wound_rolls = iter((3, 6))
+    for attack_number, hit_roll in enumerate((4, 4, 2), start=1):
+        attack_context_id = f"phase14l-shooting-test1:pool-004:attack-{attack_number:03d}"
+        results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14l-test1-heavy-hit-{attack_number}",
+                spec=_phase14l_test1_hit_spec(
+                    profile=heavy_profile,
+                    attack_context_id=attack_context_id,
+                ),
+                value=hit_roll,
+            )
+        )
+        if hit_roll >= 4:
+            results.append(
+                _fixed_roll_result(
+                    roll_id=f"phase14l-test1-heavy-wound-{attack_number}",
+                    spec=_phase14l_test1_wound_spec(
+                        profile=heavy_profile,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=next(heavy_wound_rolls),
+                )
+            )
+    for attack_number, save_roll in ((1, 5), (2, 3)):
+        attack_context_id = f"phase14l-shooting-test1:pool-004:attack-{attack_number:03d}"
+        results.append(
+            _fixed_roll_result(
+                roll_id=f"phase14l-test1-heavy-save-{attack_number}",
+                spec=saving_throw_roll_spec(
+                    save_kind=SaveKind.INVULNERABLE,
+                    player_id="player-b",
+                    allocated_model_id=second_save_model_id,
+                    attack_context_id=attack_context_id,
+                ),
+                value=save_roll,
+            )
+        )
+    return tuple(results)
+
+
+def _phase14l_test1_hit_spec(
+    *,
+    profile: WeaponProfile,
+    attack_context_id: str,
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+
+
+def _phase14l_test1_wound_spec(
+    *,
+    profile: WeaponProfile,
+    attack_context_id: str,
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
 
 
 def _store_shooting_attack_sequence(
