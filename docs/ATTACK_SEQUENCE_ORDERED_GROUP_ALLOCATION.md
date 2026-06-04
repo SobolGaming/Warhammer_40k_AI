@@ -1,11 +1,55 @@
 # Attack Sequence Ordered Group Allocation
 
-This diagram summarizes the CORE V2 pooled attack sequence for ordered group
-allocation. Normal damage and mortal wounds share the same engine-owned
-decision/replay path, but normal damage walks sorted save dice through ordered
-allocation groups before resolving model damage. Mortal wounds bypass saving
-throws and route directly to mortal-wound allocation and model damage
-resolution.
+This document summarizes the CORE V2 ranged attack sequence. Phase 14L adds the
+rulebook Select Enemy Unit and Gather Attack Dice layer before the existing
+ordered group allocation resolver. The gathered attack group then feeds the same
+engine-owned hit, wound, allocation, save, damage, mortal-wound, and destruction
+reaction path shown in the second diagram.
+
+```mermaid
+flowchart TD
+    start([Ranged attack sequence starts])
+    target_count{Unresolved pools target<br/>two or more enemy units?}
+    select_target["Select Enemy Unit<br/>select_resolve_target_unit"]
+    auto_target["Auto-record only remaining target unit"]
+    group_count{Selected target has<br/>two or more identical-attack groups?}
+    select_group["Gather Attack Dice<br/>select_attack_weapon_group"]
+    auto_group["Auto-record only remaining gathered group"]
+    resolve["Resolve Attack Dice<br/>existing ordered group allocation subgraph"]
+    same_target{Unused weapons remain<br/>for the same target?}
+    other_target{Unused weapons remain<br/>for another target?}
+    done([Attack sequence complete])
+
+    start --> target_count
+    target_count -- "Yes" --> select_target
+    target_count -- "No" --> auto_target
+    select_target --> group_count
+    auto_target --> group_count
+    group_count -- "Yes" --> select_group
+    group_count -- "No" --> auto_group
+    select_group --> resolve
+    auto_group --> resolve
+    resolve --> same_target
+    same_target -- "Yes" --> group_count
+    same_target -- "No" --> other_target
+    other_target -- "Yes" --> target_count
+    other_target -- "No" --> done
+```
+
+The Gather Attack Dice step groups unresolved ranged pools for the selected
+target only when their deterministic identical-attack signature matches. The
+signature includes hit basis, hit/wound modifiers, Strength, AP, Damage,
+applicable structured weapon abilities/keywords, targeting rule IDs, and shooting
+type. It deliberately excludes Attacks, range, attacker model identity, wargear
+ID, and Firing Deck provenance; those remain per-contribution replay evidence in
+the gathered group payload. Melee attack splitting and melee identical-attack
+gathering remain Phase 15 Fight-phase work.
+
+The following diagram is the Resolve Attack Dice subgraph for one gathered group.
+Normal damage and mortal wounds share the same engine-owned decision/replay path,
+but normal damage walks sorted save dice through ordered allocation groups before
+resolving model damage. Mortal wounds bypass saving throws and route directly to
+mortal-wound allocation and model damage resolution.
 
 ```mermaid
 flowchart TD

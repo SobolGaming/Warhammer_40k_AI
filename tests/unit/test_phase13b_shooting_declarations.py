@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
@@ -29,6 +29,8 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.attack_sequence import (
+    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackModifierStackSet,
     AttackResolutionContextPayload,
     AttackSequence,
@@ -38,7 +40,9 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackSequenceStep,
     DeferredMortalWounds,
     FastDiceGroup,
+    GatheredAttackGroup,
     HitRoll,
+    IdenticalAttackSignature,
     PendingGroupedDamage,
     SaveDieEntryPayload,
     WoundRoll,
@@ -46,6 +50,8 @@ from warhammer40k_core.engine.attack_sequence import (
     cover_for_allocated_model,
     deadly_demise_mortal_wounds_roll_spec,
     deadly_demise_trigger_roll_spec,
+    gathered_attack_groups_for_target,
+    identical_attack_signature,
     resolve_attack_sequence_until_blocked,
     wound_roll_target_number,
 )
@@ -1820,6 +1826,7 @@ def test_phase14k_damage_model_choice_malformed_payload_rejects_before_queue_pop
             "selected_model_id": defender.own_models[2].model_instance_id,
         },
     )
+    before_records = lifecycle.decision_controller.records
 
     status = lifecycle.submit_decision(bad_result)
 
@@ -1829,7 +1836,7 @@ def test_phase14k_damage_model_choice_malformed_payload_rejects_before_queue_pop
     )
     assert cast(dict[str, object], status.payload)["field"] == "payload"
     assert lifecycle.decision_controller.queue.peek_next() == request
-    assert lifecycle.decision_controller.records == ()
+    assert lifecycle.decision_controller.records == before_records
 
 
 def test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_pop() -> None:
@@ -1848,6 +1855,7 @@ def test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_
         request=request,
         selected_option_id=defender.own_models[1].model_instance_id,
     )
+    before_records = lifecycle.decision_controller.records
 
     status = lifecycle.submit_decision(result)
 
@@ -1857,7 +1865,7 @@ def test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_
     )
     assert cast(dict[str, object], status.payload)["field"] == "pending_grouped_damage"
     assert lifecycle.decision_controller.queue.peek_next() == request
-    assert lifecycle.decision_controller.records == ()
+    assert lifecycle.decision_controller.records == before_records
 
 
 def test_phase14k_damage_model_choice_dead_selected_model_rejects_before_queue_pop() -> None:
@@ -2626,7 +2634,12 @@ def test_phase14e_allocation_order_request_after_grouped_wound_pool() -> None:
     attack_events = _event_payloads(lifecycle, "attack_sequence_step")
 
     assert remaining_sequence is not None
-    assert remaining_sequence == sequence
+    assert remaining_sequence.attack_pools == sequence.attack_pools
+    assert remaining_sequence.used_pool_indices == ()
+    assert remaining_sequence.selected_target_unit_instance_id == defender.unit_instance_id
+    assert remaining_sequence.current_gathered_group is not None
+    assert remaining_sequence.current_gathered_group.total_attacks == 2
+    assert remaining_sequence.pool_index == 0
     assert request.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE
     assert len(request.options) == 2
     assert [context["attack_context_id"] for context in attack_contexts] == [
@@ -5474,6 +5487,415 @@ def test_phase13c_attack_payloads_hooks_and_fast_dice_groups() -> None:
         ).reason
         == "random_damage_order_can_affect_outcome"
     )
+
+
+def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    base_profile = replace(_first_weapon_profile(lifecycle, attacker), keywords=(), abilities=())
+    first_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=base_profile,
+        attacks=2,
+    )
+    second_pool = replace(
+        first_pool,
+        attacker_model_instance_id=attacker.own_models[1].model_instance_id,
+        attacks=4,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14l-identical-gather",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(first_pool, second_pool),
+    )
+
+    groups = gathered_attack_groups_for_target(
+        attack_sequence=sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+    assert len(groups) == 1
+    assert groups[0].total_attacks == 6
+    assert groups[0].pool_indices == (0, 1)
+    assert "attacks" not in identical_attack_signature(first_pool).to_payload()
+    assert IdenticalAttackSignature.from_payload(groups[0].signature.to_payload()) == (
+        groups[0].signature
+    )
+    assert GatheredAttackGroup.from_payload(groups[0].to_payload()) == groups[0]
+
+    strength_profile = replace(
+        base_profile,
+        profile_id="phase14l-different-strength",
+        strength=CharacteristicValue.from_raw(
+            Characteristic.STRENGTH,
+            base_profile.strength.final + 1,
+        ),
+    )
+    torrent_profile = replace(
+        base_profile,
+        profile_id="phase14l-torrent",
+        keywords=(WeaponKeyword.TORRENT,),
+    )
+    lethal_profile = replace(
+        base_profile,
+        profile_id="phase14l-lethal",
+        keywords=(WeaponKeyword.LETHAL_HITS,),
+        abilities=(AbilityDescriptor.lethal_hits(),),
+    )
+    different_pools = (
+        first_pool,
+        replace(
+            first_pool,
+            weapon_profile_id=strength_profile.profile_id,
+            weapon_profile=strength_profile,
+        ),
+        replace(first_pool, hit_roll_modifier=1),
+        replace(
+            first_pool,
+            weapon_profile_id=torrent_profile.profile_id,
+            weapon_profile=torrent_profile,
+        ),
+        replace(
+            first_pool,
+            weapon_profile_id=lethal_profile.profile_id,
+            weapon_profile=lethal_profile,
+        ),
+    )
+    signatures = {identical_attack_signature(pool) for pool in different_pools}
+    assert len(signatures) == len(different_pools)
+
+
+def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        keywords=(),
+        abilities=(),
+    )
+    pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=2,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14l-malformed-gather-state",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(pool,),
+    ).with_selected_target_unit(defender.unit_instance_id)
+    group = gathered_attack_groups_for_target(
+        attack_sequence=sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )[0]
+    contribution = group.contributions[0]
+
+    with pytest.raises(GameLifecycleError, match="hit_roll_modifier"):
+        IdenticalAttackSignature(
+            hit_basis=group.signature.hit_basis,
+            hit_roll_modifier=cast(Any, "0"),
+            wound_roll_modifiers=group.signature.wound_roll_modifiers,
+            strength=group.signature.strength,
+            armor_penetration=group.signature.armor_penetration,
+            damage=group.signature.damage,
+            weapon_rule_tokens=group.signature.weapon_rule_tokens,
+            targeting_rule_ids=group.signature.targeting_rule_ids,
+            shooting_type=group.signature.shooting_type,
+        )
+    with pytest.raises(GameLifecycleError, match="Firing Deck source unit and model"):
+        type(contribution)(
+            pool_index=contribution.pool_index,
+            attacker_model_instance_id=contribution.attacker_model_instance_id,
+            wargear_id=contribution.wargear_id,
+            weapon_profile_id=contribution.weapon_profile_id,
+            target_unit_instance_id=contribution.target_unit_instance_id,
+            attacks=contribution.attacks,
+            firing_deck_source_unit_instance_id="transport",
+            firing_deck_source_model_instance_id=None,
+        )
+    with pytest.raises(GameLifecycleError, match="must be an IdenticalAttackSignature"):
+        GatheredAttackGroup(
+            group_id=group.group_id,
+            target_unit_instance_id=group.target_unit_instance_id,
+            signature=cast(Any, group.signature.to_payload()),
+            pool_indices=group.pool_indices,
+            total_attacks=group.total_attacks,
+            contributions=group.contributions,
+        )
+    with pytest.raises(GameLifecycleError, match="total attacks drift"):
+        GatheredAttackGroup(
+            group_id=group.group_id,
+            target_unit_instance_id=group.target_unit_instance_id,
+            signature=group.signature,
+            pool_indices=group.pool_indices,
+            total_attacks=group.total_attacks + 1,
+            contributions=group.contributions,
+        )
+    with pytest.raises(GameLifecycleError, match="contribution target drift"):
+        GatheredAttackGroup(
+            group_id=group.group_id,
+            target_unit_instance_id=group.target_unit_instance_id,
+            signature=group.signature,
+            pool_indices=group.pool_indices,
+            total_attacks=group.total_attacks,
+            contributions=(
+                replace(contribution, target_unit_instance_id="army-beta:other-target"),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="gathered group target drift"):
+        AttackSequence(
+            sequence_id=sequence.sequence_id,
+            attacker_player_id=sequence.attacker_player_id,
+            attacking_unit_instance_id=sequence.attacking_unit_instance_id,
+            attack_pools=sequence.attack_pools,
+            selected_target_unit_instance_id="army-beta:other-target",
+            current_gathered_group=group,
+            pool_index=group.primary_pool_index,
+        )
+
+    missing_descriptor_profile = replace(
+        weapon_profile,
+        profile_id="phase14l-missing-ability-descriptor",
+        keywords=(WeaponKeyword.SUSTAINED_HITS,),
+        abilities=(),
+    )
+    with pytest.raises(GameLifecycleError, match="structured ability descriptor"):
+        identical_attack_signature(
+            replace(
+                pool,
+                weapon_profile_id=missing_descriptor_profile.profile_id,
+                weapon_profile=missing_descriptor_profile,
+            )
+        )
+
+
+def test_phase14l_attack_sequence_round_trips_current_gathered_group_json_safe() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        keywords=(),
+        abilities=(),
+    )
+    pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14l-round-trip",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(pool,),
+    ).with_selected_target_unit(defender.unit_instance_id)
+    group = gathered_attack_groups_for_target(
+        attack_sequence=sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )[0]
+    sequence = sequence.with_current_gathered_group(group)
+
+    encoded = json.loads(json.dumps(sequence.to_payload(), sort_keys=True))
+    assert AttackSequence.from_payload(encoded) == sequence
+    assert "object at 0x" not in json.dumps(encoded, sort_keys=True)
+
+
+def test_phase14l_select_target_and_attack_group_branch_precedence_records() -> None:
+    base_lifecycle, base_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    base_profile = _first_weapon_profile(base_lifecycle, base_units["intercessor-1"])
+    heavy_profile = replace(
+        base_profile,
+        profile_id="phase14l-heavy-bolt",
+        strength=CharacteristicValue.from_raw(
+            Characteristic.STRENGTH,
+            base_profile.strength.final + 1,
+        ),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            ("enemy-a", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            ("enemy-b", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+        catalog=_catalog_with_extra_bolt_profile(heavy_profile),
+        game_id="phase14l-branch-precedence",
+    )
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=first_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase14l-branch-select-shooter",
+    )
+    declarations = _phase14l_multi_target_declarations(
+        declaration_request=declaration_request,
+        first_target_id=units["enemy-a"].unit_instance_id,
+        second_target_id=units["enemy-b"].unit_instance_id,
+        extra_profile_id=heavy_profile.profile_id,
+    )
+    proposal = _proposal_from_declarations(
+        request=declaration_request,
+        declarations=declarations,
+    )
+    target_request = _decision_request(
+        _submit_payload(
+            lifecycle,
+            request=declaration_request,
+            payload=proposal.to_payload(),
+            result_id="phase14l-branch-declaration",
+        )
+    )
+
+    assert target_request.decision_type == SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE
+    assert {option.option_id for option in target_request.options} == {
+        f"resolve-target:{units['enemy-a'].unit_instance_id}",
+        f"resolve-target:{units['enemy-b'].unit_instance_id}",
+    }
+    group_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=target_request,
+            option_id=f"resolve-target:{units['enemy-a'].unit_instance_id}",
+            result_id="phase14l-branch-target-a",
+        )
+    )
+
+    assert group_request.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE
+    assert len(group_request.options) == 2
+    after_first_group = _submit_result(
+        lifecycle,
+        request=group_request,
+        option_id=group_request.options[0].option_id,
+        result_id="phase14l-branch-first-group",
+    )
+    _submit_phase13f_pending_attack_choices(
+        lifecycle,
+        status=after_first_group,
+        result_id_prefix="phase14l-branch-drain",
+    )
+
+    sequence_records = tuple(
+        record
+        for record in lifecycle.decision_controller.records
+        if record.request.decision_type
+        in {SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE, SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE}
+    )
+    target_order = tuple(
+        cast(dict[str, object], record.result.payload)["target_unit_instance_id"]
+        for record in sequence_records
+        if record.request.decision_type == SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE
+    )
+    group_target_order = tuple(
+        cast(dict[str, object], record.result.payload)["target_unit_instance_id"]
+        for record in sequence_records
+        if record.request.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE
+    )
+
+    assert target_order[:2] == (
+        units["enemy-a"].unit_instance_id,
+        units["enemy-b"].unit_instance_id,
+    )
+    assert group_target_order[:2] == (
+        units["enemy-a"].unit_instance_id,
+        units["enemy-a"].unit_instance_id,
+    )
+    assert any(record.result.result_id.endswith(":auto-result") for record in sequence_records)
+
+
+def test_phase14l_single_target_and_group_auto_records_finite_choices() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=first_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase14l-auto-select-shooter",
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+    )
+
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase14l-auto-declaration",
+    )
+
+    auto_records = tuple(
+        record
+        for record in lifecycle.decision_controller.records
+        if record.request.decision_type
+        in {SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE, SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE}
+    )
+    assert tuple(record.request.decision_type for record in auto_records[:2]) == (
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    )
+    assert all(record.result.result_id.endswith(":auto-result") for record in auto_records[:2])
+
+
+def test_phase14l_attack_sequence_selection_invalid_before_queue_pop() -> None:
+    lifecycle, units, heavy_profile = _phase14l_multi_group_lifecycle(
+        game_id="phase14l-invalid-before-pop"
+    )
+    target_request = _phase14l_submit_multi_group_declaration(
+        lifecycle=lifecycle,
+        units=units,
+        heavy_profile=heavy_profile,
+        result_prefix="phase14l-invalid",
+    )
+    before_records = len(lifecycle.decision_controller.records)
+
+    malformed_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase14l-invalid-target-malformed",
+            request_id=target_request.request_id,
+            decision_type=target_request.decision_type,
+            actor_id=target_request.actor_id,
+            selected_option_id="not-a-real-option",
+            payload={},
+        )
+    )
+
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert len(lifecycle.decision_controller.records) == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (target_request,)
+
+    group_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=target_request,
+            option_id=f"resolve-target:{units['enemy-a'].unit_instance_id}",
+            result_id="phase14l-invalid-target-valid",
+        )
+    )
+    before_group_records = len(lifecycle.decision_controller.records)
+    state = _state(lifecycle)
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    assert shooting_state.attack_sequence is not None
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=shooting_state.attack_sequence.without_selected_target_unit(),
+        allocated_model_ids_this_phase=shooting_state.allocated_model_ids_this_phase,
+    )
+
+    drift_status = _submit_result(
+        lifecycle,
+        request=group_request,
+        option_id=group_request.options[0].option_id,
+        result_id="phase14l-invalid-group-drift",
+    )
+
+    assert drift_status.status_kind is LifecycleStatusKind.INVALID
+    assert len(lifecycle.decision_controller.records) == before_group_records
+    assert lifecycle.decision_controller.queue.pending_requests == (group_request,)
 
 
 def test_phase13c_modifier_stack_host_payload_and_validation() -> None:
@@ -10752,12 +11174,19 @@ def _submit_phase13f_pending_attack_choices(
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     }
+    attack_sequence_choice_types = {
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    }
     current = status
     for index in range(128):
         if current.status_kind is LifecycleStatusKind.UNSUPPORTED:
             return current
         request = _decision_request(current)
-        if request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
+        if (
+            request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
+            or request.decision_type in attack_sequence_choice_types
+        ):
             return current
         if request.decision_type not in attack_decision_types:
             raise AssertionError(f"Unexpected Phase 13F decision type {request.decision_type}.")
@@ -11158,6 +11587,138 @@ def _proposal_from_request(
     )
 
 
+def _proposal_from_declarations(
+    *,
+    request: DecisionRequest,
+    declarations: tuple[WeaponDeclaration, ...],
+) -> ShootingDeclarationProposal:
+    payload = cast(dict[str, object], request.payload)
+    proposal_request = cast(dict[str, object], payload["proposal_request"])
+    return ShootingDeclarationProposal(
+        proposal_request_id=cast(str, proposal_request["request_id"]),
+        proposal_kind="shooting_declaration",
+        player_id=cast(str, proposal_request["active_player_id"]),
+        battle_round=cast(int, proposal_request["battle_round"]),
+        unit_instance_id=cast(str, proposal_request["unit_instance_id"]),
+        source_decision_request_id=cast(str, proposal_request["source_decision_request_id"]),
+        source_decision_result_id=cast(str, proposal_request["source_decision_result_id"]),
+        declarations=declarations,
+        firing_deck_selection=None,
+        visibility_cache_key=cast(str, proposal_request["visibility_cache_key"]),
+    )
+
+
+def _phase14l_multi_group_lifecycle(
+    *,
+    game_id: str,
+) -> tuple[GameLifecycle, dict[str, UnitInstance], WeaponProfile]:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id=None,
+    )
+    heavy_profile = replace(
+        base_profile,
+        profile_id=f"{game_id}-heavy-bolt",
+        strength=CharacteristicValue.from_raw(
+            Characteristic.STRENGTH,
+            base_profile.strength.final + 1,
+        ),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            ("enemy-a", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            ("enemy-b", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+        catalog=_catalog_with_extra_bolt_profile(heavy_profile),
+        game_id=game_id,
+    )
+    return lifecycle, units, heavy_profile
+
+
+def _phase14l_submit_multi_group_declaration(
+    *,
+    lifecycle: GameLifecycle,
+    units: dict[str, UnitInstance],
+    heavy_profile: WeaponProfile,
+    result_prefix: str,
+) -> DecisionRequest:
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=first_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id=f"{result_prefix}-select-shooter",
+    )
+    declarations = _phase14l_multi_target_declarations(
+        declaration_request=declaration_request,
+        first_target_id=units["enemy-a"].unit_instance_id,
+        second_target_id=units["enemy-b"].unit_instance_id,
+        extra_profile_id=heavy_profile.profile_id,
+    )
+    proposal = _proposal_from_declarations(
+        request=declaration_request,
+        declarations=declarations,
+    )
+    return _decision_request(
+        _submit_payload(
+            lifecycle,
+            request=declaration_request,
+            payload=proposal.to_payload(),
+            result_id=f"{result_prefix}-declaration",
+        )
+    )
+
+
+def _phase14l_multi_target_declarations(
+    *,
+    declaration_request: DecisionRequest,
+    first_target_id: str,
+    second_target_id: str,
+    extra_profile_id: str,
+) -> tuple[WeaponDeclaration, ...]:
+    payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+    base_weapons = [weapon for weapon in weapons if weapon["weapon_profile_id"] != extra_profile_id]
+    extra_weapons = [
+        weapon for weapon in weapons if weapon["weapon_profile_id"] == extra_profile_id
+    ]
+    first_base_weapon = base_weapons[0]
+    extra_weapon = next(
+        weapon
+        for weapon in extra_weapons
+        if weapon["model_instance_id"] != first_base_weapon["model_instance_id"]
+    )
+    used_model_ids = {
+        cast(str, first_base_weapon["model_instance_id"]),
+        cast(str, extra_weapon["model_instance_id"]),
+    }
+    second_base_weapon = next(
+        weapon for weapon in base_weapons if weapon["model_instance_id"] not in used_model_ids
+    )
+    return (
+        WeaponDeclaration.from_payload(
+            _weapon_payload_to_declaration_payload(
+                weapon=first_base_weapon,
+                target_unit_id=first_target_id,
+            )
+        ),
+        WeaponDeclaration.from_payload(
+            _weapon_payload_to_declaration_payload(
+                weapon=extra_weapon,
+                target_unit_id=first_target_id,
+            )
+        ),
+        WeaponDeclaration.from_payload(
+            _weapon_payload_to_declaration_payload(
+                weapon=second_base_weapon,
+                target_unit_id=second_target_id,
+            )
+        ),
+    )
+
+
 def _weapon_payload_to_declaration_payload(
     *,
     weapon: dict[str, object],
@@ -11521,7 +12082,7 @@ def _assert_stale_damage_model_choice_rejected_before_queue_pop(
     )
     assert cast(dict[str, object], status.payload)["field"] == "selected_model_id"
     assert lifecycle.decision_controller.queue.peek_next() == request
-    assert lifecycle.decision_controller.records == before_records == ()
+    assert lifecycle.decision_controller.records == before_records
     assert _save_and_damage_step_payloads(lifecycle) == before_attack_events
 
 

@@ -6,6 +6,8 @@ from typing import Self, TypedDict
 
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
 from warhammer40k_core.engine.attack_sequence import (
+    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     current_legal_damage_allocation_model_ids,
 )
@@ -144,6 +146,8 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -159,6 +163,8 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -349,6 +355,22 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 decisions=self.decision_controller,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type
+            in (
+                SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+                SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+            )
+        ):
+            invalid_status = self._shooting_phase_handler.invalid_attack_sequence_selection_status(
+                state=state,
+                request=pending_request,
+                result=result,
             )
             if invalid_status is not None:
                 return invalid_status

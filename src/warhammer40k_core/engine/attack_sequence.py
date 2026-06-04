@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
+from hashlib import sha256
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -27,6 +28,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
 )
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityKind,
     DamageProfile,
     DamageProfilePayload,
     RangeProfileKind,
@@ -100,7 +102,12 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventRecord,
+    JsonValue,
+    canonical_json,
+    validate_json_value,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -164,6 +171,14 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    )
+)
+SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE = "select_resolve_target_unit"
+SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE = "select_attack_weapon_group"
+ATTACK_RESOLUTION_SELECTION_DECISION_TYPES = frozenset(
+    (
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     )
 )
 DAMAGE_ALLOCATION_RULE_ID = "core_rules_damage_allocation"
@@ -300,6 +315,9 @@ class AttackSequencePayload(TypedDict):
     attacker_player_id: str
     attacking_unit_instance_id: str
     attack_pools: list[RangedAttackPoolPayload]
+    used_pool_indices: list[int]
+    selected_target_unit_instance_id: str | None
+    current_gathered_group: GatheredAttackGroupPayload | None
     pool_index: int
     attack_index: int
     generated_hit_index: int
@@ -397,6 +415,38 @@ class AttackModifierStackSetPayload(TypedDict):
     damage: ModifierStackPayload | None
     hit_roll_modifiers: list[RollModifierPayload]
     wound_roll_modifiers: list[RollModifierPayload]
+
+
+class IdenticalAttackSignaturePayload(TypedDict):
+    hit_basis: str
+    hit_roll_modifier: int
+    wound_roll_modifiers: list[str]
+    strength: str
+    armor_penetration: str
+    damage: str
+    weapon_rule_tokens: list[str]
+    targeting_rule_ids: list[str]
+    shooting_type: str
+
+
+class GatheredAttackContributionPayload(TypedDict):
+    pool_index: int
+    attacker_model_instance_id: str
+    wargear_id: str
+    weapon_profile_id: str
+    target_unit_instance_id: str
+    attacks: int
+    firing_deck_source_unit_instance_id: str | None
+    firing_deck_source_model_instance_id: str | None
+
+
+class GatheredAttackGroupPayload(TypedDict):
+    group_id: str
+    target_unit_instance_id: str
+    signature: IdenticalAttackSignaturePayload
+    pool_indices: list[int]
+    total_attacks: int
+    contributions: list[GatheredAttackContributionPayload]
 
 
 @dataclass(frozen=True, slots=True)
@@ -959,11 +1009,298 @@ class DeferredMortalWounds:
 
 
 @dataclass(frozen=True, slots=True)
+class IdenticalAttackSignature:
+    hit_basis: str
+    hit_roll_modifier: int
+    wound_roll_modifiers: tuple[str, ...]
+    strength: str
+    armor_penetration: str
+    damage: str
+    weapon_rule_tokens: tuple[str, ...]
+    targeting_rule_ids: tuple[str, ...]
+    shooting_type: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "hit_basis",
+            _validate_identifier("IdenticalAttackSignature hit_basis", self.hit_basis),
+        )
+        if type(self.hit_roll_modifier) is not int:
+            raise GameLifecycleError("IdenticalAttackSignature hit_roll_modifier must be an int.")
+        object.__setattr__(
+            self,
+            "wound_roll_modifiers",
+            _validate_identifier_tuple(
+                "IdenticalAttackSignature wound_roll_modifiers",
+                self.wound_roll_modifiers,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "strength",
+            _validate_identifier("IdenticalAttackSignature strength", self.strength),
+        )
+        object.__setattr__(
+            self,
+            "armor_penetration",
+            _validate_identifier(
+                "IdenticalAttackSignature armor_penetration",
+                self.armor_penetration,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "damage",
+            _validate_identifier("IdenticalAttackSignature damage", self.damage),
+        )
+        object.__setattr__(
+            self,
+            "weapon_rule_tokens",
+            _validate_identifier_tuple(
+                "IdenticalAttackSignature weapon_rule_tokens",
+                self.weapon_rule_tokens,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "targeting_rule_ids",
+            _validate_identifier_tuple(
+                "IdenticalAttackSignature targeting_rule_ids",
+                self.targeting_rule_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "shooting_type",
+            _validate_identifier("IdenticalAttackSignature shooting_type", self.shooting_type),
+        )
+
+    def stable_hash(self) -> str:
+        encoded = canonical_json(self.to_payload()).encode("utf-8")
+        return sha256(encoded).hexdigest()[:16]
+
+    def to_payload(self) -> IdenticalAttackSignaturePayload:
+        return {
+            "hit_basis": self.hit_basis,
+            "hit_roll_modifier": self.hit_roll_modifier,
+            "wound_roll_modifiers": list(self.wound_roll_modifiers),
+            "strength": self.strength,
+            "armor_penetration": self.armor_penetration,
+            "damage": self.damage,
+            "weapon_rule_tokens": list(self.weapon_rule_tokens),
+            "targeting_rule_ids": list(self.targeting_rule_ids),
+            "shooting_type": self.shooting_type,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: IdenticalAttackSignaturePayload) -> Self:
+        return cls(
+            hit_basis=payload["hit_basis"],
+            hit_roll_modifier=payload["hit_roll_modifier"],
+            wound_roll_modifiers=tuple(payload["wound_roll_modifiers"]),
+            strength=payload["strength"],
+            armor_penetration=payload["armor_penetration"],
+            damage=payload["damage"],
+            weapon_rule_tokens=tuple(payload["weapon_rule_tokens"]),
+            targeting_rule_ids=tuple(payload["targeting_rule_ids"]),
+            shooting_type=payload["shooting_type"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class GatheredAttackContribution:
+    pool_index: int
+    attacker_model_instance_id: str
+    wargear_id: str
+    weapon_profile_id: str
+    target_unit_instance_id: str
+    attacks: int
+    firing_deck_source_unit_instance_id: str | None = None
+    firing_deck_source_model_instance_id: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "pool_index",
+            _validate_non_negative_int("GatheredAttackContribution pool_index", self.pool_index),
+        )
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_identifier(
+                "GatheredAttackContribution attacker_model_instance_id",
+                self.attacker_model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "wargear_id",
+            _validate_identifier("GatheredAttackContribution wargear_id", self.wargear_id),
+        )
+        object.__setattr__(
+            self,
+            "weapon_profile_id",
+            _validate_identifier(
+                "GatheredAttackContribution weapon_profile_id",
+                self.weapon_profile_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier(
+                "GatheredAttackContribution target_unit_instance_id",
+                self.target_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attacks",
+            _validate_positive_int("GatheredAttackContribution attacks", self.attacks),
+        )
+        object.__setattr__(
+            self,
+            "firing_deck_source_unit_instance_id",
+            _validate_optional_identifier(
+                "GatheredAttackContribution firing_deck_source_unit_instance_id",
+                self.firing_deck_source_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "firing_deck_source_model_instance_id",
+            _validate_optional_identifier(
+                "GatheredAttackContribution firing_deck_source_model_instance_id",
+                self.firing_deck_source_model_instance_id,
+            ),
+        )
+        if (self.firing_deck_source_unit_instance_id is None) != (
+            self.firing_deck_source_model_instance_id is None
+        ):
+            raise GameLifecycleError(
+                "GatheredAttackContribution Firing Deck source unit and model must be supplied "
+                "together."
+            )
+
+    def to_payload(self) -> GatheredAttackContributionPayload:
+        return {
+            "pool_index": self.pool_index,
+            "attacker_model_instance_id": self.attacker_model_instance_id,
+            "wargear_id": self.wargear_id,
+            "weapon_profile_id": self.weapon_profile_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "attacks": self.attacks,
+            "firing_deck_source_unit_instance_id": self.firing_deck_source_unit_instance_id,
+            "firing_deck_source_model_instance_id": self.firing_deck_source_model_instance_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: GatheredAttackContributionPayload) -> Self:
+        return cls(
+            pool_index=payload["pool_index"],
+            attacker_model_instance_id=payload["attacker_model_instance_id"],
+            wargear_id=payload["wargear_id"],
+            weapon_profile_id=payload["weapon_profile_id"],
+            target_unit_instance_id=payload["target_unit_instance_id"],
+            attacks=payload["attacks"],
+            firing_deck_source_unit_instance_id=payload["firing_deck_source_unit_instance_id"],
+            firing_deck_source_model_instance_id=payload["firing_deck_source_model_instance_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class GatheredAttackGroup:
+    group_id: str
+    target_unit_instance_id: str
+    signature: IdenticalAttackSignature
+    pool_indices: tuple[int, ...]
+    total_attacks: int
+    contributions: tuple[GatheredAttackContribution, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "group_id",
+            _validate_identifier("GatheredAttackGroup group_id", self.group_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier(
+                "GatheredAttackGroup target_unit_instance_id",
+                self.target_unit_instance_id,
+            ),
+        )
+        if type(self.signature) is not IdenticalAttackSignature:
+            raise GameLifecycleError(
+                "GatheredAttackGroup signature must be an IdenticalAttackSignature."
+            )
+        object.__setattr__(
+            self,
+            "pool_indices",
+            _validate_pool_index_tuple("GatheredAttackGroup pool_indices", self.pool_indices),
+        )
+        object.__setattr__(
+            self,
+            "total_attacks",
+            _validate_positive_int("GatheredAttackGroup total_attacks", self.total_attacks),
+        )
+        object.__setattr__(
+            self,
+            "contributions",
+            _validate_gathered_attack_contributions(self.contributions),
+        )
+        if tuple(contribution.pool_index for contribution in self.contributions) != (
+            self.pool_indices
+        ):
+            raise GameLifecycleError("GatheredAttackGroup contribution pool indices drift.")
+        if sum(contribution.attacks for contribution in self.contributions) != self.total_attacks:
+            raise GameLifecycleError("GatheredAttackGroup total attacks drift.")
+        if any(
+            contribution.target_unit_instance_id != self.target_unit_instance_id
+            for contribution in self.contributions
+        ):
+            raise GameLifecycleError("GatheredAttackGroup contribution target drift.")
+
+    @property
+    def primary_pool_index(self) -> int:
+        return self.pool_indices[0]
+
+    def to_payload(self) -> GatheredAttackGroupPayload:
+        return {
+            "group_id": self.group_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "signature": self.signature.to_payload(),
+            "pool_indices": list(self.pool_indices),
+            "total_attacks": self.total_attacks,
+            "contributions": [contribution.to_payload() for contribution in self.contributions],
+        }
+
+    @classmethod
+    def from_payload(cls, payload: GatheredAttackGroupPayload) -> Self:
+        return cls(
+            group_id=payload["group_id"],
+            target_unit_instance_id=payload["target_unit_instance_id"],
+            signature=IdenticalAttackSignature.from_payload(payload["signature"]),
+            pool_indices=tuple(payload["pool_indices"]),
+            total_attacks=payload["total_attacks"],
+            contributions=tuple(
+                GatheredAttackContribution.from_payload(contribution)
+                for contribution in payload["contributions"]
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class AttackSequence:
     sequence_id: str
     attacker_player_id: str
     attacking_unit_instance_id: str
     attack_pools: tuple[RangedAttackPool, ...]
+    used_pool_indices: tuple[int, ...] = ()
+    selected_target_unit_instance_id: str | None = None
+    current_gathered_group: GatheredAttackGroup | None = None
     pool_index: int = 0
     attack_index: int = 0
     generated_hit_index: int = 0
@@ -995,6 +1332,39 @@ class AttackSequence:
             "attack_pools",
             _validate_attack_pools(self.attack_pools),
         )
+        object.__setattr__(
+            self,
+            "used_pool_indices",
+            _validate_pool_index_tuple("AttackSequence used_pool_indices", self.used_pool_indices),
+        )
+        _validate_pool_indices_within_attack_pools(
+            field_name="AttackSequence used_pool_indices",
+            pool_indices=self.used_pool_indices,
+            attack_pools=self.attack_pools,
+        )
+        object.__setattr__(
+            self,
+            "selected_target_unit_instance_id",
+            _validate_optional_identifier(
+                "AttackSequence selected_target_unit_instance_id",
+                self.selected_target_unit_instance_id,
+            ),
+        )
+        if self.current_gathered_group is not None:
+            if type(self.current_gathered_group) is not GatheredAttackGroup:
+                raise GameLifecycleError(
+                    "AttackSequence current_gathered_group must be a GatheredAttackGroup."
+                )
+            _validate_gathered_group_matches_attack_pools(
+                attack_pools=self.attack_pools,
+                used_pool_indices=self.used_pool_indices,
+                gathered_group=self.current_gathered_group,
+            )
+            if (
+                self.selected_target_unit_instance_id
+                != self.current_gathered_group.target_unit_instance_id
+            ):
+                raise GameLifecycleError("AttackSequence gathered group target drift.")
         object.__setattr__(
             self,
             "pool_index",
@@ -1036,6 +1406,16 @@ class AttackSequence:
         if self.pool_index > len(self.attack_pools):
             raise GameLifecycleError("AttackSequence pool_index is outside attack_pools.")
         if self.pool_index == len(self.attack_pools):
+            if self.used_pool_indices and len(self.used_pool_indices) != len(self.attack_pools):
+                raise GameLifecycleError("Completed AttackSequence has unresolved attack pools.")
+            if self.selected_target_unit_instance_id is not None:
+                raise GameLifecycleError(
+                    "Completed AttackSequence cannot have selected target state."
+                )
+            if self.current_gathered_group is not None:
+                raise GameLifecycleError(
+                    "Completed AttackSequence cannot have current_gathered_group."
+                )
             if self.pending_grouped_damage is not None:
                 raise GameLifecycleError(
                     "Completed AttackSequence cannot have pending_grouped_damage."
@@ -1049,7 +1429,12 @@ class AttackSequence:
                     "Completed AttackSequence must not include a current hit roll."
                 )
             return
-        if self.attack_index >= self.attack_pools[self.pool_index].attacks:
+        if (
+            self.current_gathered_group is not None
+            and self.pool_index != self.current_gathered_group.primary_pool_index
+        ):
+            raise GameLifecycleError("AttackSequence pool_index must match gathered group.")
+        if self.attack_index >= self.current_pool().attacks:
             raise GameLifecycleError("AttackSequence attack_index is outside current pool.")
         if self.generated_hit_index > 0:
             if self.current_hit_roll is None:
@@ -1079,11 +1464,19 @@ class AttackSequence:
 
     @property
     def is_complete(self) -> bool:
-        return self.pool_index == len(self.attack_pools)
+        return self.pool_index == len(self.attack_pools) or (
+            len(self.used_pool_indices) == len(self.attack_pools)
+            and self.current_gathered_group is None
+        )
 
     def current_pool(self) -> RangedAttackPool:
         if self.is_complete:
             raise GameLifecycleError("Completed AttackSequence has no current pool.")
+        if self.current_gathered_group is not None:
+            return _synthetic_pool_for_gathered_group(
+                attack_pools=self.attack_pools,
+                gathered_group=self.current_gathered_group,
+            )
         return self.attack_pools[self.pool_index]
 
     def attack_context_id(self) -> str:
@@ -1111,6 +1504,9 @@ class AttackSequence:
                 attacker_player_id=self.attacker_player_id,
                 attacking_unit_instance_id=self.attacking_unit_instance_id,
                 attack_pools=self.attack_pools,
+                used_pool_indices=self.used_pool_indices,
+                selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+                current_gathered_group=self.current_gathered_group,
                 pool_index=self.pool_index,
                 attack_index=next_attack_index,
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
@@ -1122,6 +1518,9 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
             pool_index=next_pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
@@ -1146,6 +1545,9 @@ class AttackSequence:
                 attacker_player_id=self.attacker_player_id,
                 attacking_unit_instance_id=self.attacking_unit_instance_id,
                 attack_pools=self.attack_pools,
+                used_pool_indices=self.used_pool_indices,
+                selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+                current_gathered_group=self.current_gathered_group,
                 pool_index=self.pool_index,
                 attack_index=self.attack_index,
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
@@ -1156,6 +1558,9 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
             pool_index=self.pool_index,
             attack_index=self.attack_index,
             generated_hit_index=next_generated_hit_index,
@@ -1172,6 +1577,9 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
             pool_index=self.pool_index,
             attack_index=self.attack_index,
             generated_hit_index=self.generated_hit_index,
@@ -1192,6 +1600,9 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
             pool_index=self.pool_index,
             attack_index=self.attack_index,
             generated_hit_index=self.generated_hit_index,
@@ -1208,6 +1619,9 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
             pool_index=self.pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
@@ -1220,7 +1634,61 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
             pool_index=self.pool_index,
+            attack_index=0,
+            deferred_mortal_wounds=self.deferred_mortal_wounds,
+        )
+
+    def with_selected_target_unit(self, target_unit_instance_id: str) -> Self:
+        target_id = _validate_identifier("AttackSequence selected target", target_unit_instance_id)
+        if target_id not in unresolved_target_unit_ids(self):
+            raise GameLifecycleError("Selected resolve target has no unresolved attack pools.")
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=target_id,
+            pool_index=_first_unresolved_pool_index_for_target(
+                attack_sequence=self,
+                target_unit_instance_id=target_id,
+            ),
+            attack_index=0,
+            deferred_mortal_wounds=self.deferred_mortal_wounds,
+        )
+
+    def without_selected_target_unit(self) -> Self:
+        next_pool_index = _first_unresolved_pool_index(self)
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=None,
+            pool_index=next_pool_index,
+            attack_index=0,
+            deferred_mortal_wounds=self.deferred_mortal_wounds,
+        )
+
+    def with_current_gathered_group(self, gathered_group: GatheredAttackGroup) -> Self:
+        if type(gathered_group) is not GatheredAttackGroup:
+            raise GameLifecycleError("AttackSequence gathered group is invalid.")
+        if self.selected_target_unit_instance_id != gathered_group.target_unit_instance_id:
+            raise GameLifecycleError("Gathered attack group target drift.")
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=gathered_group,
+            pool_index=gathered_group.primary_pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
         )
@@ -1231,6 +1699,13 @@ class AttackSequence:
             "attacker_player_id": self.attacker_player_id,
             "attacking_unit_instance_id": self.attacking_unit_instance_id,
             "attack_pools": [pool.to_payload() for pool in self.attack_pools],
+            "used_pool_indices": list(self.used_pool_indices),
+            "selected_target_unit_instance_id": self.selected_target_unit_instance_id,
+            "current_gathered_group": (
+                None
+                if self.current_gathered_group is None
+                else self.current_gathered_group.to_payload()
+            ),
             "pool_index": self.pool_index,
             "attack_index": self.attack_index,
             "generated_hit_index": self.generated_hit_index,
@@ -1255,6 +1730,13 @@ class AttackSequence:
             attacking_unit_instance_id=payload["attacking_unit_instance_id"],
             attack_pools=tuple(
                 RangedAttackPool.from_payload(pool) for pool in payload["attack_pools"]
+            ),
+            used_pool_indices=tuple(payload["used_pool_indices"]),
+            selected_target_unit_instance_id=payload["selected_target_unit_instance_id"],
+            current_gathered_group=(
+                None
+                if payload["current_gathered_group"] is None
+                else GatheredAttackGroup.from_payload(payload["current_gathered_group"])
             ),
             pool_index=payload["pool_index"],
             attack_index=payload["attack_index"],
@@ -1394,6 +1876,30 @@ def wound_roll_target_number(*, strength: int, toughness: int) -> int:
     return 5
 
 
+def apply_resolve_target_unit_decision(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+) -> AttackSequence:
+    record = decisions.record_for_result(result)
+    result.validate_for_request(record.request)
+    return attack_sequence.with_selected_target_unit(selected_resolve_target_from_result(result))
+
+
+def apply_attack_weapon_group_decision(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+) -> AttackSequence:
+    record = decisions.record_for_result(result)
+    result.validate_for_request(record.request)
+    return attack_sequence.with_current_gathered_group(
+        selected_attack_weapon_group_from_result(result)
+    )
+
+
 def resolve_attack_sequence_until_blocked(
     *,
     state: GameState,
@@ -1428,6 +1934,16 @@ def resolve_attack_sequence_until_blocked(
                 return None, allocated_model_ids, None
             current = next_current
             continue
+        if current.current_gathered_group is None:
+            current, status = _select_or_request_next_gathered_group(
+                state=state,
+                decisions=decisions,
+                attack_sequence=current,
+            )
+            if status is not None:
+                return current, allocated_model_ids, status
+            if current.is_complete:
+                break
         next_current, allocated_model_ids, status = _resolve_grouped_current_pool(
             state=state,
             decisions=decisions,
@@ -1467,6 +1983,121 @@ def resolve_attack_sequence_until_blocked(
     if hazardous_status is not None:
         return current, allocated_model_ids, hazardous_status
     return None, allocated_model_ids, None
+
+
+def _select_or_request_next_gathered_group(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+) -> tuple[AttackSequence, LifecycleStatus | None]:
+    current = attack_sequence
+    while current.current_gathered_group is None and not current.is_complete:
+        target_ids = unresolved_target_unit_ids(current)
+        if not target_ids:
+            return (
+                AttackSequence(
+                    sequence_id=current.sequence_id,
+                    attacker_player_id=current.attacker_player_id,
+                    attacking_unit_instance_id=current.attacking_unit_instance_id,
+                    attack_pools=current.attack_pools,
+                    used_pool_indices=tuple(range(len(current.attack_pools))),
+                    pool_index=len(current.attack_pools),
+                    attack_index=0,
+                    deferred_mortal_wounds=current.deferred_mortal_wounds,
+                ),
+                None,
+            )
+        if current.selected_target_unit_instance_id is None:
+            request = build_select_resolve_target_unit_request(
+                request_id=state.next_decision_request_id(),
+                state=state,
+                attack_sequence=current,
+            )
+            if len(target_ids) > 1:
+                decisions.request_decision(request)
+                return (
+                    current,
+                    LifecycleStatus.waiting_for_decision(
+                        stage=GameLifecycleStage.BATTLE,
+                        decision_request=request,
+                        payload={
+                            "phase": BattlePhase.SHOOTING.value,
+                            "decision_type": SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+                            "sequence_id": current.sequence_id,
+                        },
+                    ),
+                )
+            target_id = next(iter(target_ids))
+            _record_auto_attack_sequence_selection(
+                decisions=decisions,
+                request=request,
+                option_id=_resolve_target_option_id(target_id),
+            )
+            current = current.with_selected_target_unit(target_id)
+            continue
+        target_unit_instance_id = current.selected_target_unit_instance_id
+        groups = gathered_attack_groups_for_target(
+            attack_sequence=current,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+        if not groups:
+            current = current.without_selected_target_unit()
+            continue
+        request = build_select_attack_weapon_group_request(
+            request_id=state.next_decision_request_id(),
+            state=state,
+            attack_sequence=current,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+        if len(groups) > 1:
+            decisions.request_decision(request)
+            return (
+                current,
+                LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=request,
+                    payload={
+                        "phase": BattlePhase.SHOOTING.value,
+                        "decision_type": SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+                        "sequence_id": current.sequence_id,
+                        "target_unit_instance_id": target_unit_instance_id,
+                    },
+                ),
+            )
+        group = next(iter(groups))
+        _record_auto_attack_sequence_selection(
+            decisions=decisions,
+            request=request,
+            option_id=group.group_id,
+        )
+        current = current.with_current_gathered_group(group)
+    return current, None
+
+
+def _record_auto_attack_sequence_selection(
+    *,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    option_id: str,
+) -> DecisionResult:
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id=f"{request.request_id}:auto-result",
+        request=request,
+        selected_option_id=option_id,
+    )
+    decisions.submit_result(result)
+    decisions.event_log.append(
+        "attack_sequence_auto_selection_recorded",
+        {
+            "request_id": request.request_id,
+            "result_id": result.result_id,
+            "decision_type": request.decision_type,
+            "selected_option_id": option_id,
+        },
+    )
+    return result
 
 
 def apply_allocation_order_decision(
@@ -2586,6 +3217,9 @@ def _grouped_wounded_contexts_for_pool(
             attacker_player_id=attack_sequence.attacker_player_id,
             attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
             attack_pools=attack_sequence.attack_pools,
+            used_pool_indices=attack_sequence.used_pool_indices,
+            selected_target_unit_instance_id=attack_sequence.selected_target_unit_instance_id,
+            current_gathered_group=attack_sequence.current_gathered_group,
             pool_index=attack_sequence.pool_index,
             attack_index=attack_index,
             deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
@@ -2603,6 +3237,8 @@ def _grouped_wounded_contexts_for_pool(
             if attack_context["wound_roll"]["successful"]:
                 wounded_contexts.append((current, attack_context))
             hit_roll = HitRoll.from_payload(attack_context["hit_roll"])
+            if current.generated_hit_index + 1 >= hit_roll.generated_hits:
+                break
             next_sequence = current.advanced_after_generated_hit(hit_roll)
             if (
                 next_sequence.pool_index != current.pool_index
@@ -3086,12 +3722,37 @@ def _alive_allocated_model_ids(
 def _advance_after_current_pool(*, attack_sequence: AttackSequence) -> AttackSequence:
     if attack_sequence.is_complete:
         raise GameLifecycleError("Completed AttackSequence cannot advance pool.")
-    next_pool_index = attack_sequence.pool_index + 1
+    used_pool_indices = attack_sequence.used_pool_indices
+    selected_target_unit_instance_id = attack_sequence.selected_target_unit_instance_id
+    current_group = attack_sequence.current_gathered_group
+    if current_group is not None:
+        used_pool_indices = tuple(sorted({*used_pool_indices, *current_group.pool_indices}))
+        if any(
+            pool_index not in used_pool_indices
+            and pool.target_unit_instance_id == current_group.target_unit_instance_id
+            for pool_index, pool in enumerate(attack_sequence.attack_pools)
+        ):
+            selected_target_unit_instance_id = current_group.target_unit_instance_id
+        else:
+            selected_target_unit_instance_id = None
+    if selected_target_unit_instance_id is None:
+        next_pool_index = _first_unresolved_pool_index_from(
+            attack_pools=attack_sequence.attack_pools,
+            used_pool_indices=used_pool_indices,
+        )
+    else:
+        next_pool_index = _first_unresolved_pool_index_for_target_from(
+            attack_pools=attack_sequence.attack_pools,
+            used_pool_indices=used_pool_indices,
+            target_unit_instance_id=selected_target_unit_instance_id,
+        )
     return AttackSequence(
         sequence_id=attack_sequence.sequence_id,
         attacker_player_id=attack_sequence.attacker_player_id,
         attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
         attack_pools=attack_sequence.attack_pools,
+        used_pool_indices=used_pool_indices,
+        selected_target_unit_instance_id=selected_target_unit_instance_id,
         pool_index=next_pool_index,
         attack_index=0,
         deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
@@ -3112,6 +3773,9 @@ def _attack_sequence_for_context(
         attacker_player_id=attack_sequence.attacker_player_id,
         attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
         attack_pools=attack_sequence.attack_pools,
+        used_pool_indices=attack_sequence.used_pool_indices,
+        selected_target_unit_instance_id=attack_sequence.selected_target_unit_instance_id,
+        current_gathered_group=attack_sequence.current_gathered_group,
         pool_index=attack_context["pool_index"],
         attack_index=attack_context["attack_index"],
         generated_hit_index=attack_context["generated_hit_index"],
@@ -3534,6 +4198,8 @@ def _advance_after_resolved_hit(
     hit_roll = HitRoll.from_payload(attack_context["hit_roll"])
     if hit_roll.generated_hits <= attack_sequence.generated_hit_index:
         raise GameLifecycleError("Resolved hit context has invalid generated hits.")
+    if attack_sequence.current_gathered_group is not None:
+        return attack_sequence
     return attack_sequence.advanced_after_generated_hit(hit_roll)
 
 
@@ -5478,6 +6144,180 @@ def _current_allocation_group_for_order(
     return None
 
 
+def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignature:
+    if type(pool) is not RangedAttackPool:
+        raise GameLifecycleError("identical_attack_signature requires a RangedAttackPool.")
+    profile = pool.weapon_profile
+    _validate_weapon_profile_signature_shape(profile)
+    hit_basis = (
+        "auto_hit:torrent"
+        if WeaponKeyword.TORRENT in profile.keywords
+        else f"hit_target:{_hit_skill(profile)}"
+    )
+    return IdenticalAttackSignature(
+        hit_basis=hit_basis,
+        hit_roll_modifier=pool.hit_roll_modifier,
+        wound_roll_modifiers=(),
+        strength=canonical_json(profile.strength.to_payload()),
+        armor_penetration=canonical_json(profile.armor_penetration.to_payload()),
+        damage=canonical_json(profile.damage_profile.to_payload()),
+        weapon_rule_tokens=_weapon_rule_tokens_for_signature(profile),
+        targeting_rule_ids=tuple(sorted(pool.targeting_rule_ids)),
+        shooting_type=pool.shooting_type.value,
+    )
+
+
+def unresolved_target_unit_ids(attack_sequence: AttackSequence) -> tuple[str, ...]:
+    if type(attack_sequence) is not AttackSequence:
+        raise GameLifecycleError("Unresolved target lookup requires an AttackSequence.")
+    used = set(attack_sequence.used_pool_indices)
+    target_ids = {
+        pool.target_unit_instance_id
+        for pool_index, pool in enumerate(attack_sequence.attack_pools)
+        if pool_index not in used
+    }
+    return tuple(sorted(target_ids))
+
+
+def gathered_attack_groups_for_target(
+    *,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+) -> tuple[GatheredAttackGroup, ...]:
+    if type(attack_sequence) is not AttackSequence:
+        raise GameLifecycleError("Gathered attack grouping requires an AttackSequence.")
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    used = set(attack_sequence.used_pool_indices)
+    grouped_indices: dict[IdenticalAttackSignature, list[int]] = {}
+    for pool_index, pool in enumerate(attack_sequence.attack_pools):
+        if pool_index in used or pool.target_unit_instance_id != target_id:
+            continue
+        signature = identical_attack_signature(pool)
+        grouped_indices.setdefault(signature, []).append(pool_index)
+    groups = tuple(
+        _gathered_attack_group_from_indices(
+            attack_sequence=attack_sequence,
+            target_unit_instance_id=target_id,
+            signature=signature,
+            pool_indices=tuple(indices),
+        )
+        for signature, indices in grouped_indices.items()
+    )
+    return tuple(sorted(groups, key=lambda group: group.group_id))
+
+
+def build_select_resolve_target_unit_request(
+    *,
+    request_id: str,
+    state: GameState,
+    attack_sequence: AttackSequence,
+) -> DecisionRequest:
+    target_ids = unresolved_target_unit_ids(attack_sequence)
+    if not target_ids:
+        raise GameLifecycleError("Resolve target selection requires unresolved target units.")
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        actor_id=attack_sequence.attacker_player_id,
+        payload=validate_json_value(
+            {
+                "submission_kind": SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.SHOOTING.value,
+                "sequence_id": attack_sequence.sequence_id,
+                "attacker_player_id": attack_sequence.attacker_player_id,
+                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                "target_unit_instance_ids": list(target_ids),
+            }
+        ),
+        options=tuple(
+            DecisionOption(
+                option_id=_resolve_target_option_id(target_id),
+                label=target_id,
+                payload=validate_json_value(
+                    {
+                        "submission_kind": SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+                        "sequence_id": attack_sequence.sequence_id,
+                        "target_unit_instance_id": target_id,
+                    }
+                ),
+            )
+            for target_id in target_ids
+        ),
+    )
+
+
+def build_select_attack_weapon_group_request(
+    *,
+    request_id: str,
+    state: GameState,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+) -> DecisionRequest:
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    groups = gathered_attack_groups_for_target(
+        attack_sequence=attack_sequence,
+        target_unit_instance_id=target_id,
+    )
+    if not groups:
+        raise GameLifecycleError("Attack weapon group selection requires unresolved groups.")
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        actor_id=attack_sequence.attacker_player_id,
+        payload=validate_json_value(
+            {
+                "submission_kind": SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.SHOOTING.value,
+                "sequence_id": attack_sequence.sequence_id,
+                "attacker_player_id": attack_sequence.attacker_player_id,
+                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                "target_unit_instance_id": target_id,
+                "group_ids": [group.group_id for group in groups],
+            }
+        ),
+        options=tuple(
+            DecisionOption(
+                option_id=group.group_id,
+                label=group.group_id,
+                payload=validate_json_value(
+                    {
+                        "submission_kind": SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+                        "sequence_id": attack_sequence.sequence_id,
+                        "target_unit_instance_id": target_id,
+                        "gathered_group": group.to_payload(),
+                    }
+                ),
+            )
+            for group in groups
+        ),
+    )
+
+
+def selected_resolve_target_from_result(result: DecisionResult) -> str:
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Resolve target selection requires a DecisionResult.")
+    payload = _payload_object(result.payload)
+    if payload.get("submission_kind") != SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE:
+        raise GameLifecycleError("Resolve target selection payload kind is invalid.")
+    return _payload_string(payload, key="target_unit_instance_id")
+
+
+def selected_attack_weapon_group_from_result(result: DecisionResult) -> GatheredAttackGroup:
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Attack weapon group selection requires a DecisionResult.")
+    payload = _payload_object(result.payload)
+    if payload.get("submission_kind") != SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE:
+        raise GameLifecycleError("Attack weapon group selection payload kind is invalid.")
+    gathered_payload = payload["gathered_group"]
+    if not isinstance(gathered_payload, dict):
+        raise GameLifecycleError("Attack weapon group payload must contain gathered_group.")
+    return GatheredAttackGroup.from_payload(cast(GatheredAttackGroupPayload, gathered_payload))
+
+
 def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
     profile = pool.weapon_profile
     return (
@@ -5501,6 +6341,199 @@ def _pool_id(pool: RangedAttackPool) -> str:
     )
 
 
+def _resolve_target_option_id(target_unit_instance_id: str) -> str:
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    return f"resolve-target:{target_id}"
+
+
+def _gathered_attack_group_from_indices(
+    *,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+    signature: IdenticalAttackSignature,
+    pool_indices: tuple[int, ...],
+) -> GatheredAttackGroup:
+    _validate_pool_indices_within_attack_pools(
+        field_name="Gathered attack pool_indices",
+        pool_indices=pool_indices,
+        attack_pools=attack_sequence.attack_pools,
+    )
+    contributions = tuple(
+        _gathered_attack_contribution(
+            pool_index=pool_index,
+            pool=attack_sequence.attack_pools[pool_index],
+        )
+        for pool_index in pool_indices
+    )
+    total_attacks = sum(contribution.attacks for contribution in contributions)
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    return GatheredAttackGroup(
+        group_id=f"attack-group:{target_id}:{signature.stable_hash()}",
+        target_unit_instance_id=target_id,
+        signature=signature,
+        pool_indices=pool_indices,
+        total_attacks=total_attacks,
+        contributions=contributions,
+    )
+
+
+def _gathered_attack_contribution(
+    *,
+    pool_index: int,
+    pool: RangedAttackPool,
+) -> GatheredAttackContribution:
+    return GatheredAttackContribution(
+        pool_index=pool_index,
+        attacker_model_instance_id=pool.attacker_model_instance_id,
+        wargear_id=pool.wargear_id,
+        weapon_profile_id=pool.weapon_profile_id,
+        target_unit_instance_id=pool.target_unit_instance_id,
+        attacks=pool.attacks,
+        firing_deck_source_unit_instance_id=pool.firing_deck_source_unit_instance_id,
+        firing_deck_source_model_instance_id=pool.firing_deck_source_model_instance_id,
+    )
+
+
+def _synthetic_pool_for_gathered_group(
+    *,
+    attack_pools: tuple[RangedAttackPool, ...],
+    gathered_group: GatheredAttackGroup,
+) -> RangedAttackPool:
+    _validate_pool_indices_within_attack_pools(
+        field_name="GatheredAttackGroup pool_indices",
+        pool_indices=gathered_group.pool_indices,
+        attack_pools=attack_pools,
+    )
+    base_pool = attack_pools[gathered_group.primary_pool_index]
+    return RangedAttackPool(
+        attacker_model_instance_id=base_pool.attacker_model_instance_id,
+        wargear_id=base_pool.wargear_id,
+        weapon_profile_id=base_pool.weapon_profile_id,
+        weapon_profile=base_pool.weapon_profile,
+        target_unit_instance_id=gathered_group.target_unit_instance_id,
+        shooting_type=base_pool.shooting_type,
+        attacks=gathered_group.total_attacks,
+        target_visible_model_ids=base_pool.target_visible_model_ids,
+        target_in_range_model_ids=base_pool.target_in_range_model_ids,
+        hit_roll_modifier=base_pool.hit_roll_modifier,
+        targeting_rule_ids=base_pool.targeting_rule_ids,
+        firing_deck_source_unit_instance_id=base_pool.firing_deck_source_unit_instance_id,
+        firing_deck_source_model_instance_id=base_pool.firing_deck_source_model_instance_id,
+    )
+
+
+def _first_unresolved_pool_index(attack_sequence: AttackSequence) -> int:
+    return _first_unresolved_pool_index_from(
+        attack_pools=attack_sequence.attack_pools,
+        used_pool_indices=attack_sequence.used_pool_indices,
+    )
+
+
+def _first_unresolved_pool_index_from(
+    *,
+    attack_pools: tuple[RangedAttackPool, ...],
+    used_pool_indices: tuple[int, ...],
+) -> int:
+    used = set(used_pool_indices)
+    for pool_index in range(len(attack_pools)):
+        if pool_index not in used:
+            return pool_index
+    return len(attack_pools)
+
+
+def _first_unresolved_pool_index_for_target(
+    *,
+    attack_sequence: AttackSequence,
+    target_unit_instance_id: str,
+) -> int:
+    return _first_unresolved_pool_index_for_target_from(
+        attack_pools=attack_sequence.attack_pools,
+        used_pool_indices=attack_sequence.used_pool_indices,
+        target_unit_instance_id=target_unit_instance_id,
+    )
+
+
+def _first_unresolved_pool_index_for_target_from(
+    *,
+    attack_pools: tuple[RangedAttackPool, ...],
+    used_pool_indices: tuple[int, ...],
+    target_unit_instance_id: str,
+) -> int:
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    used = set(used_pool_indices)
+    for pool_index, pool in enumerate(attack_pools):
+        if pool_index not in used and pool.target_unit_instance_id == target_id:
+            return pool_index
+    raise GameLifecycleError("Target unit has no unresolved attack pools.")
+
+
+def _weapon_rule_tokens_for_signature(profile: WeaponProfile) -> tuple[str, ...]:
+    _validate_weapon_profile_signature_shape(profile)
+    tokens: list[str] = [f"keyword:{keyword.value}" for keyword in profile.keywords]
+    tokens.extend(
+        f"ability:{canonical_json(ability.to_payload())}" for ability in profile.abilities
+    )
+    return tuple(sorted(tokens))
+
+
+def _validate_weapon_profile_signature_shape(profile: WeaponProfile) -> None:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("Identical attack signature requires a WeaponProfile.")
+    ability_kinds = {ability.ability_kind for ability in profile.abilities}
+    required_ability_kinds_by_keyword = {
+        WeaponKeyword.SUSTAINED_HITS: AbilityKind.SUSTAINED_HITS,
+        WeaponKeyword.LETHAL_HITS: AbilityKind.LETHAL_HITS,
+        WeaponKeyword.RAPID_FIRE: AbilityKind.RAPID_FIRE,
+        WeaponKeyword.MELTA: AbilityKind.MELTA,
+        WeaponKeyword.CLEAVE: AbilityKind.CLEAVE,
+        WeaponKeyword.HUNTER: AbilityKind.HUNTER,
+        WeaponKeyword.DEVASTATING_WOUNDS: AbilityKind.DEVASTATING_WOUNDS,
+        WeaponKeyword.HEAVY: AbilityKind.HEAVY,
+    }
+    for keyword, ability_kind in required_ability_kinds_by_keyword.items():
+        if keyword in profile.keywords and ability_kind not in ability_kinds:
+            raise GameLifecycleError(
+                f"{keyword.value} requires a structured ability descriptor for identical attacks."
+            )
+    for ability in profile.abilities:
+        if ability.ability_kind is AbilityKind.DEVASTATING_WOUNDS:
+            devastating_wounds_resolution(profile)
+            continue
+        if ability.ability_kind is AbilityKind.ANTI_KEYWORD:
+            continue
+        if ability.ability_kind in required_ability_kinds_by_keyword.values():
+            continue
+        raise GameLifecycleError("Unsupported weapon ability kind for identical attacks.")
+
+
+def _validate_gathered_group_matches_attack_pools(
+    *,
+    attack_pools: tuple[RangedAttackPool, ...],
+    used_pool_indices: tuple[int, ...],
+    gathered_group: GatheredAttackGroup,
+) -> None:
+    _validate_pool_indices_within_attack_pools(
+        field_name="GatheredAttackGroup pool_indices",
+        pool_indices=gathered_group.pool_indices,
+        attack_pools=attack_pools,
+    )
+    used = set(used_pool_indices)
+    if any(pool_index in used for pool_index in gathered_group.pool_indices):
+        raise GameLifecycleError("GatheredAttackGroup contains already used attack pools.")
+    for contribution in gathered_group.contributions:
+        pool = attack_pools[contribution.pool_index]
+        expected = _gathered_attack_contribution(
+            pool_index=contribution.pool_index,
+            pool=pool,
+        )
+        if contribution != expected:
+            raise GameLifecycleError("GatheredAttackGroup contribution pool drift.")
+        if pool.target_unit_instance_id != gathered_group.target_unit_instance_id:
+            raise GameLifecycleError("GatheredAttackGroup target pool drift.")
+        if identical_attack_signature(pool) != gathered_group.signature:
+            raise GameLifecycleError("GatheredAttackGroup signature drift.")
+
+
 def _validate_attack_pools(values: object) -> tuple[RangedAttackPool, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError("AttackSequence attack_pools must be a tuple.")
@@ -5512,6 +6545,54 @@ def _validate_attack_pools(values: object) -> tuple[RangedAttackPool, ...]:
     if not pools:
         raise GameLifecycleError("AttackSequence requires at least one attack pool.")
     return tuple(pools)
+
+
+def _validate_pool_index_tuple(field_name: str, values: object) -> tuple[int, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    indices: list[int] = []
+    seen: set[int] = set()
+    for value in cast(tuple[object, ...], values):
+        index = _validate_non_negative_int(f"{field_name} value", value)
+        if index in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(index)
+        indices.append(index)
+    return tuple(sorted(indices))
+
+
+def _validate_pool_indices_within_attack_pools(
+    *,
+    field_name: str,
+    pool_indices: tuple[int, ...],
+    attack_pools: tuple[RangedAttackPool, ...],
+) -> None:
+    _validate_pool_index_tuple(field_name, pool_indices)
+    _validate_attack_pools(attack_pools)
+    for pool_index in pool_indices:
+        if pool_index >= len(attack_pools):
+            raise GameLifecycleError(f"{field_name} contains an index outside attack_pools.")
+
+
+def _validate_gathered_attack_contributions(
+    values: object,
+) -> tuple[GatheredAttackContribution, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("GatheredAttackGroup contributions must be a tuple.")
+    contributions: list[GatheredAttackContribution] = []
+    seen: set[int] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not GatheredAttackContribution:
+            raise GameLifecycleError(
+                "GatheredAttackGroup contributions must contain gathered attack contributions."
+            )
+        if value.pool_index in seen:
+            raise GameLifecycleError("GatheredAttackGroup contributions duplicate pool indices.")
+        seen.add(value.pool_index)
+        contributions.append(value)
+    if not contributions:
+        raise GameLifecycleError("GatheredAttackGroup contributions must not be empty.")
+    return tuple(sorted(contributions, key=lambda contribution: contribution.pool_index))
 
 
 def _validate_deferred_mortal_wounds(values: object) -> tuple[DeferredMortalWounds, ...]:
