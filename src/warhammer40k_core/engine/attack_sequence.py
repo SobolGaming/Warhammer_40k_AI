@@ -49,6 +49,7 @@ from warhammer40k_core.engine.core_stratagem_effects import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+    SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -61,6 +62,7 @@ from warhammer40k_core.engine.damage_allocation import (
     AttackAllocationPayload,
     AttackAllocationRuleContext,
     AttackAllocationRuleContextPayload,
+    DamageAllocationModelDecision,
     DamageApplication,
     DamageApplicationPayload,
     DamageKind,
@@ -80,6 +82,7 @@ from warhammer40k_core.engine.damage_allocation import (
     allocation_groups_for_context,
     apply_damage_to_model,
     build_allocation_order_request,
+    build_damage_allocation_model_request,
     build_destruction_reaction_request,
     build_feel_no_pain_request,
     continue_mortal_wound_application,
@@ -157,6 +160,7 @@ if TYPE_CHECKING:
 ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
     (
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
@@ -1505,6 +1509,67 @@ def apply_allocation_order_decision(
     )
 
 
+def apply_damage_allocation_model_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+    dice_manager: DiceRollManager | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    record = decisions.record_for_result(result)
+    request = record.request
+    decision = DamageAllocationModelDecision.from_result(request=request, result=result)
+    attack_context = cast(AttackResolutionContextPayload, decision.attack_context)
+    _validate_attack_context_matches_sequence(
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        context_name="Damage allocation model",
+    )
+    if attack_sequence.pending_grouped_damage is None:
+        raise GameLifecycleError("Damage allocation model decision requires grouped damage.")
+    manager = (
+        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        if dice_manager is None
+        else dice_manager
+    )
+    return _resolve_grouped_damage_from(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        manager=manager,
+        attack_sequence=attack_sequence.with_pending_grouped_damage(
+            attack_sequence.pending_grouped_damage.with_allocated_model_ids(
+                already_allocated_model_ids
+            )
+        ),
+        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+        selected_model_id=decision.selected_model_id,
+    )
+
+
+def current_legal_damage_allocation_model_ids(
+    *,
+    state: GameState,
+    attack_sequence: AttackSequence,
+) -> tuple[str, ...] | None:
+    if attack_sequence.pending_grouped_damage is None:
+        raise GameLifecycleError("Damage allocation model legality requires grouped damage.")
+    current_group = _current_allocation_group_for_order(
+        state=state,
+        allocation_groups=attack_sequence.pending_grouped_damage.ordered_allocation_groups(),
+    )
+    if current_group is None:
+        return None
+    return _legal_model_ids_for_allocation_group_damage(
+        state=state,
+        allocation_group=current_group,
+    )
+
+
 def apply_precision_allocation_decision(
     *,
     state: GameState,
@@ -2831,6 +2896,7 @@ def _resolve_grouped_damage_from(
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
+    selected_model_id: str | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if attack_sequence.pending_grouped_damage is None:
         raise GameLifecycleError("Grouped damage resume requires pending grouped damage.")
@@ -2866,23 +2932,57 @@ def _resolve_grouped_damage_from(
                 current_pending.allocated_model_ids,
                 None,
             )
-        updated_allocated_ids = tuple(
-            sorted({*current_pending.allocated_model_ids, *current_group.model_ids})
-        )
-        current_model_id = _current_model_id_for_allocation_group(
+        legal_group_model_ids = _legal_model_ids_for_allocation_group_damage(
             state=state,
             allocation_group=current_group,
         )
-        legal_group_model_ids = tuple(
-            model_id
-            for model_id in current_group.ordered_model_ids_for_damage()
-            if _model_is_alive(state=state, model_instance_id=model_id)
+        if not legal_group_model_ids:
+            raise GameLifecycleError("Allocation group has no alive legal damage models.")
+        if selected_model_id is not None:
+            current_model_id = _validate_identifier(
+                "selected_model_id",
+                selected_model_id,
+            )
+            if current_model_id not in legal_group_model_ids:
+                raise GameLifecycleError("Selected damage allocation model is not legal.")
+            allocation_forced = False
+            selected_model_id = None
+        elif len(legal_group_model_ids) > 1:
+            request = build_damage_allocation_model_request(
+                request_id=state.next_decision_request_id(),
+                defender_player_id=attack_context["defender_player_id"],
+                attack_context=validate_json_value(attack_context),
+                allocation_context=allocation_context,
+                allocation_group=current_group,
+                legal_model_ids=legal_group_model_ids,
+                save_die=validate_json_value(save_die),
+            )
+            decisions.request_decision(request)
+            return (
+                attack_sequence.with_pending_grouped_damage(current_pending),
+                current_pending.allocated_model_ids,
+                LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=request,
+                    payload={
+                        "phase": BattlePhase.SHOOTING.value,
+                        "decision_type": SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+                        "attack_context_id": attack_context["attack_context_id"],
+                        "allocation_group_id": current_group.group_id,
+                    },
+                ),
+            )
+        else:
+            current_model_id = next(iter(legal_group_model_ids))
+            allocation_forced = True
+        updated_allocated_ids = tuple(
+            sorted({*current_pending.allocated_model_ids, *current_group.model_ids})
         )
         allocation = AttackAllocation(
             target_unit_instance_id=allocation_context.target_unit_instance_id,
             allocated_model_id=current_model_id,
             legal_model_ids=legal_group_model_ids,
-            forced=True,
+            forced=allocation_forced,
             rule_context=allocation_context,
             source_rule_ids=(
                 ()
@@ -5337,6 +5437,28 @@ def _current_model_id_for_allocation_group(
         if _model_is_alive(state=state, model_instance_id=model_id):
             return model_id
     raise GameLifecycleError("Allocation group has no alive models.")
+
+
+def _legal_model_ids_for_allocation_group_damage(
+    *,
+    state: GameState,
+    allocation_group: AllocationGroup,
+) -> tuple[str, ...]:
+    if type(allocation_group) is not AllocationGroup:
+        raise GameLifecycleError("Damage allocation group must be an AllocationGroup.")
+    alive_models = tuple(
+        model_by_id(state=state, model_instance_id=model_id)
+        for model_id in allocation_group.model_ids
+        if _model_is_alive(state=state, model_instance_id=model_id)
+    )
+    wounded_model_ids = tuple(
+        model.model_instance_id
+        for model in alive_models
+        if model.wounds_remaining < model.starting_wounds
+    )
+    if wounded_model_ids:
+        return wounded_model_ids
+    return tuple(model.model_instance_id for model in alive_models)
 
 
 def _current_allocation_group_for_order(

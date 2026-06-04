@@ -60,6 +60,7 @@ from warhammer40k_core.engine.core_stratagem_effects import GO_TO_GROUND_EFFECT_
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+    SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -70,6 +71,7 @@ from warhammer40k_core.engine.damage_allocation import (
     AttackAllocation,
     AttackAllocationConstraint,
     AttackAllocationRuleContext,
+    DamageAllocationModelDecision,
     DamageApplication,
     DamageKind,
     DestructionReactionDecision,
@@ -1459,7 +1461,7 @@ def test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation() -> N
             )
         )
 
-    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=_ruleset(),
@@ -1470,6 +1472,13 @@ def test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation() -> N
             event_log=lifecycle.decision_controller.event_log,
             injected_results=tuple(injected_results),
         ),
+    )
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=allocated_ids,
+        status=status,
+        result_id_prefix="phase14e-grouped-saves-model",
     )
     attack_events = _event_payloads(lifecycle, "attack_sequence_step")
     all_records = lifecycle.decision_controller.event_log.records
@@ -1510,7 +1519,7 @@ def test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation() -> N
     )
 
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert max(save_roll_indexes) < min(damage_record_indexes)
     assert save_context_ids == [
         "phase14e-grouped-saves:pool-001:attack-002",
@@ -1526,6 +1535,379 @@ def test_phase14e_grouped_saves_roll_before_low_to_high_damage_allocation() -> N
         "phase14e-grouped-saves:pool-001:attack-002",
         "phase14e-grouped-saves:pool-001:attack-003",
     ]
+
+
+def test_phase14k_grouped_damage_requests_defender_model_choice_inside_current_group() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    selected_model = defender.own_models[3]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14k-current-group-model-choice",
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14k-current-group-model-choice",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    attack_context_id = "phase14k-current-group-model-choice:pool-001:attack-001"
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender.own_models[0].model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14k-current-group-model-choice",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14k-current-group-model-choice-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                        ),
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14k-current-group-model-choice-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                        ),
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14k-current-group-model-choice-save",
+                    spec=save_spec,
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    request_payload = cast(dict[str, object], request.payload)
+    option_ids = {option.option_id for option in request.options}
+
+    assert remaining_sequence is not None
+    assert remaining_sequence.pending_grouped_damage is not None
+    assert allocated_ids == ()
+    assert request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+    assert request.actor_id == "player-b"
+    assert option_ids == {model.model_instance_id for model in defender.own_models}
+    assert request_payload["selection_kind"] == "damage_allocation_model"
+    assert request_payload["legal_model_ids"] == [
+        model.model_instance_id for model in defender.own_models
+    ]
+    assert all(
+        cast(dict[str, object], event["payload"])["damage_application"] is None
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == "damage"
+    )
+
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        state.shooting_phase_state = ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            shot_unit_ids=(attacker.unit_instance_id,),
+            attack_pools=remaining_sequence.attack_pools,
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+    else:
+        state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+    selection_result = DecisionResult.for_request(
+        result_id="phase14k-current-group-model-choice-select",
+        request=request,
+        selected_option_id=selected_model.model_instance_id,
+    )
+    decision = DamageAllocationModelDecision.from_result(
+        request=request,
+        result=selection_result,
+    )
+    final_status = lifecycle.submit_decision(selection_result)
+    damage_payloads = [
+        cast(dict[str, object], cast(dict[str, object], event["payload"])["damage_application"])
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == "damage"
+        and cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+    save_payloads = [
+        cast(dict[str, object], event["payload"])
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == "save"
+    ]
+
+    assert final_status.status_kind in {
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    assert decision.selected_model_id == selected_model.model_instance_id
+    assert damage_payloads[-1]["model_instance_id"] == selected_model.model_instance_id
+    assert save_payloads[-1]["allocated_model_id"] == selected_model.model_instance_id
+
+
+def test_phase14k_grouped_damage_auto_selects_only_wounded_model_in_current_group() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    wounded_model = replace(defender.own_models[2], wounds_remaining=1)
+    defender = replace(
+        defender,
+        own_models=(
+            *defender.own_models[:2],
+            wounded_model,
+            *defender.own_models[3:],
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14k-current-group-wounded-forced",
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14k-current-group-wounded-forced",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    attack_context_id = "phase14k-current-group-wounded-forced:pool-001:attack-001"
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14k-current-group-wounded-forced",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14k-current-group-wounded-forced-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                        ),
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14k-current-group-wounded-forced-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                        ),
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14k-current-group-wounded-forced-save",
+                    spec=saving_throw_roll_spec(
+                        save_kind=SaveKind.ARMOUR,
+                        player_id="player-b",
+                        allocated_model_id=wounded_model.model_instance_id,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    damage_payloads = [
+        cast(dict[str, object], cast(dict[str, object], event["payload"])["damage_application"])
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] == "damage"
+        and cast(dict[str, object], event["payload"])["damage_application"] is not None
+    ]
+    model_choice_requests = [
+        payload
+        for payload in _event_payloads(lifecycle, "decision_requested")
+        if payload["decision_type"] == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+    ]
+
+    assert remaining_sequence is None
+    assert status is None
+    assert damage_payloads[-1]["model_instance_id"] == wounded_model.model_instance_id
+    assert model_choice_requests == []
+
+
+def test_phase14k_damage_model_choice_payload_round_trips_json_safe() -> None:
+    lifecycle, request, _remaining_sequence, _allocated_ids, defender = (
+        _damage_model_choice_lifecycle(sequence_id="phase14k-model-choice-round-trip")
+    )
+    selected_model = defender.own_models[1]
+    request_round_trip = DecisionRequest.from_payload(request.to_payload())
+    result = DecisionResult.for_request(
+        result_id="phase14k-model-choice-round-trip-result",
+        request=request_round_trip,
+        selected_option_id=selected_model.model_instance_id,
+    )
+    result_round_trip = DecisionResult.from_payload(result.to_payload())
+    decision = DamageAllocationModelDecision.from_result(
+        request=request_round_trip,
+        result=result_round_trip,
+    )
+    decision_payload_json = json.dumps(decision.to_payload(), sort_keys=True)
+
+    assert request_round_trip == request
+    assert result_round_trip == result
+    assert decision.selected_model_id == selected_model.model_instance_id
+    assert "object at 0x" not in decision_payload_json
+    assert lifecycle.decision_controller.queue.peek_next() == request
+
+
+def test_phase14k_damage_model_choice_malformed_payload_rejects_before_queue_pop() -> None:
+    lifecycle, request, _remaining_sequence, _allocated_ids, defender = (
+        _damage_model_choice_lifecycle(sequence_id="phase14k-model-choice-malformed")
+    )
+    bad_result = DecisionResult(
+        result_id="phase14k-model-choice-malformed-result",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=defender.own_models[1].model_instance_id,
+        payload={
+            "submission_kind": SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+            "selected_model_id": defender.own_models[2].model_instance_id,
+        },
+    )
+
+    status = lifecycle.submit_decision(bad_result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], status.payload)["invalid_reason"] == (
+        "invalid_damage_allocation_model_result"
+    )
+    assert cast(dict[str, object], status.payload)["field"] == "payload"
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert lifecycle.decision_controller.records == ()
+
+
+def test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_pop() -> None:
+    lifecycle, request, remaining_sequence, allocated_ids, defender = (
+        _damage_model_choice_lifecycle(sequence_id="phase14k-model-choice-stale")
+    )
+    state = _state(lifecycle)
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence.without_pending_grouped_damage(),
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    result = DecisionResult.for_request(
+        result_id="phase14k-model-choice-stale-result",
+        request=request,
+        selected_option_id=defender.own_models[1].model_instance_id,
+    )
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], status.payload)["invalid_reason"] == (
+        "invalid_damage_allocation_model_result"
+    )
+    assert cast(dict[str, object], status.payload)["field"] == "pending_grouped_damage"
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert lifecycle.decision_controller.records == ()
+
+
+def test_phase14k_damage_model_choice_dead_selected_model_rejects_before_queue_pop() -> None:
+    lifecycle, request, _remaining_sequence, _allocated_ids, defender = (
+        _damage_model_choice_lifecycle(sequence_id="phase14k-model-choice-dead-drift")
+    )
+    selected_model = defender.own_models[1]
+    defender_after_drift = replace(
+        defender,
+        own_models=tuple(
+            replace(model, wounds_remaining=0)
+            if model.model_instance_id == selected_model.model_instance_id
+            else model
+            for model in defender.own_models
+        ),
+    )
+    _replace_unit_instance_in_state(state=_state(lifecycle), replacement=defender_after_drift)
+
+    _assert_stale_damage_model_choice_rejected_before_queue_pop(
+        lifecycle=lifecycle,
+        request=request,
+        selected_model_id=selected_model.model_instance_id,
+        result_id="phase14k-model-choice-dead-drift-result",
+    )
+
+
+def test_phase14k_damage_model_choice_wounded_priority_drift_rejects_before_queue_pop() -> None:
+    lifecycle, request, _remaining_sequence, _allocated_ids, defender = (
+        _damage_model_choice_lifecycle(sequence_id="phase14k-model-choice-wounded-drift")
+    )
+    selected_model = defender.own_models[1]
+    wounded_model = defender.own_models[2]
+    assert wounded_model.starting_wounds > 1
+    defender_after_drift = replace(
+        defender,
+        own_models=tuple(
+            replace(model, wounds_remaining=wounded_model.starting_wounds - 1)
+            if model.model_instance_id == wounded_model.model_instance_id
+            else model
+            for model in defender.own_models
+        ),
+    )
+    _replace_unit_instance_in_state(state=_state(lifecycle), replacement=defender_after_drift)
+
+    _assert_stale_damage_model_choice_rejected_before_queue_pop(
+        lifecycle=lifecycle,
+        request=request,
+        selected_model_id=selected_model.model_instance_id,
+        result_id="phase14k-model-choice-wounded-drift-result",
+    )
 
 
 def test_phase14h_pooled_walk_recomputes_save_after_group_transition() -> None:
@@ -1623,7 +2005,7 @@ def test_phase14h_pooled_walk_recomputes_save_after_group_transition() -> None:
             )
         )
 
-    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=_ruleset(),
@@ -1634,6 +2016,13 @@ def test_phase14h_pooled_walk_recomputes_save_after_group_transition() -> None:
             event_log=lifecycle.decision_controller.event_log,
             injected_results=tuple(injected_results),
         ),
+    )
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=allocated_ids,
+        status=status,
+        result_id_prefix="phase14h-lazy-save-transition-model",
     )
     save_payloads = [
         cast(dict[str, object], event["payload"])
@@ -1651,7 +2040,7 @@ def test_phase14h_pooled_walk_recomputes_save_after_group_transition() -> None:
     ]
 
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert save_payloads[1]["allocated_model_id"] == later_models[0].model_instance_id
     assert save_payloads[1]["target_number"] == 5
     assert cast(dict[str, object], save_payloads[1]["option"])["characteristic_target_number"] == 4
@@ -1691,7 +2080,7 @@ def test_phase14i_impossible_armour_save_remains_real_save_roll() -> None:
         ),
     )
 
-    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=_ruleset(),
@@ -1738,6 +2127,13 @@ def test_phase14i_impossible_armour_save_remains_real_save_roll() -> None:
             ),
         ),
     )
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=allocated_ids,
+        status=status,
+        result_id_prefix="phase14i-impossible-armour-model",
+    )
     save_payload = next(
         cast(dict[str, object], event["payload"])
         for event in _event_payloads(lifecycle, "attack_sequence_step")
@@ -1758,7 +2154,7 @@ def test_phase14i_impossible_armour_save_remains_real_save_roll() -> None:
     option = cast(dict[str, object], save_payload["option"])
 
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert save_roll_types == ["attack_sequence.save.armour"]
     assert save_payload["save_kind"] == SaveKind.ARMOUR.value
     assert save_payload["target_number"] == 9
@@ -1795,7 +2191,7 @@ def test_phase14i_no_save_damage_order_die_is_not_a_save_roll() -> None:
         ),
     )
 
-    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=_ruleset(),
@@ -1833,6 +2229,13 @@ def test_phase14i_no_save_damage_order_die_is_not_a_save_roll() -> None:
             ),
         ),
     )
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=allocated_ids,
+        status=status,
+        result_id_prefix="phase14i-no-save-order-model",
+    )
     save_payload = next(
         cast(dict[str, object], event["payload"])
         for event in _event_payloads(lifecycle, "attack_sequence_step")
@@ -1848,7 +2251,7 @@ def test_phase14i_no_save_damage_order_die_is_not_a_save_roll() -> None:
     ]
 
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert roll_types == ["attack_sequence.wound", "attack_sequence.allocation_order.no_save"]
     assert save_payload["save_kind"] is None
     assert save_payload["target_number"] is None
@@ -2250,6 +2653,15 @@ def test_phase14e_allocation_order_request_after_grouped_wound_pool() -> None:
             selected_option_id=request.options[0].option_id,
         )
     )
+    _final_sequence, drained_status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=None,
+        allocated_ids=(),
+        status=final_status,
+        result_id_prefix="phase14e-allocation-order-grouped-model",
+    )
+    assert drained_status is not None
+    final_status = drained_status
     final_attack_events = _event_payloads(lifecycle, "attack_sequence_step")
 
     assert final_status.status_kind in {
@@ -2387,6 +2799,15 @@ def test_phase14e_grouped_failed_saves_transition_to_next_ordered_group() -> Non
             selected_option_id=selected_option.option_id,
         )
     )
+    _final_sequence, drained_status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=None,
+        allocated_ids=(),
+        status=final_status,
+        result_id_prefix="phase14e-ordered-group-transition-model",
+    )
+    assert drained_status is not None
+    final_status = drained_status
     damage_model_ids = [
         cast(
             dict[str, object],
@@ -2598,7 +3019,7 @@ def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
         ),
     )
 
-    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=_ruleset(),
@@ -2668,6 +3089,13 @@ def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
             ),
         ),
     )
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=allocated_ids,
+        status=status,
+        result_id_prefix="phase14e-grouped-lethal-sustained-model",
+    )
     events = _event_payloads(lifecycle, "attack_sequence_step")
     grouped_allocation = next(
         cast(dict[str, object], event["payload"])
@@ -2685,7 +3113,7 @@ def test_phase14e_grouped_lethal_sustained_hits_use_grouped_host() -> None:
     ]
 
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert (
         cast(dict[str, object], _attack_step_payload(events, AttackSequenceStep.HIT)["payload"])[
             "generated_hits"
@@ -8879,6 +9307,15 @@ def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
         status=status,
         result_id_prefix="phase13f-attack",
     )
+    _, drained_next_selection_status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=None,
+        allocated_ids=(),
+        status=next_selection_status,
+        result_id_prefix="phase13f-full-gate-model",
+    )
+    assert drained_next_selection_status is not None
+    next_selection_status = drained_next_selection_status
     next_selection_request = _decision_request(next_selection_status)
     complete_option = next(
         option
@@ -10310,6 +10747,7 @@ def _submit_phase13f_pending_attack_choices(
     result_id_prefix: str,
 ) -> LifecycleStatus:
     attack_decision_types = {
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
@@ -10955,6 +11393,215 @@ def _replace_unit_instance_in_state(
             state.army_definitions[army_index] = replace(army, units=units)
             return
     raise AssertionError(f"Missing unit {replacement.unit_instance_id}.")
+
+
+def _damage_model_choice_lifecycle(
+    *,
+    sequence_id: str,
+) -> tuple[GameLifecycle, DecisionRequest, AttackSequence, tuple[str, ...], UnitInstance]:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",), game_id=sequence_id)
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id=f"{sequence_id}-profile",
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                        ),
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=(
+                            f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}"
+                        ),
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}-save",
+                    spec=saving_throw_roll_spec(
+                        save_kind=SaveKind.ARMOUR,
+                        player_id="player-b",
+                        allocated_model_id=defender.own_models[0].model_instance_id,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    if remaining_sequence is None:
+        raise AssertionError("Damage model choice fixture unexpectedly completed.")
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        state.shooting_phase_state = ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            shot_unit_ids=(attacker.unit_instance_id,),
+            attack_pools=remaining_sequence.attack_pools,
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+    else:
+        state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+    return (
+        lifecycle,
+        _decision_request(cast(LifecycleStatus, status)),
+        remaining_sequence,
+        allocated_ids,
+        defender,
+    )
+
+
+def _assert_stale_damage_model_choice_rejected_before_queue_pop(
+    *,
+    lifecycle: GameLifecycle,
+    request: DecisionRequest,
+    selected_model_id: str,
+    result_id: str,
+) -> None:
+    before_attack_events = _save_and_damage_step_payloads(lifecycle)
+    before_records = lifecycle.decision_controller.records
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=request,
+        selected_option_id=selected_model_id,
+    )
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], status.payload)["invalid_reason"] == (
+        "invalid_damage_allocation_model_result"
+    )
+    assert cast(dict[str, object], status.payload)["field"] == "selected_model_id"
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert lifecycle.decision_controller.records == before_records == ()
+    assert _save_and_damage_step_payloads(lifecycle) == before_attack_events
+
+
+def _save_and_damage_step_payloads(
+    lifecycle: GameLifecycle,
+) -> tuple[dict[str, object], ...]:
+    return tuple(
+        event
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] in {AttackSequenceStep.SAVE.value, AttackSequenceStep.DAMAGE.value}
+    )
+
+
+def _continue_damage_model_choices(
+    lifecycle: GameLifecycle,
+    *,
+    attack_sequence: AttackSequence | None,
+    allocated_ids: tuple[str, ...],
+    status: LifecycleStatus | None,
+    result_id_prefix: str,
+) -> tuple[AttackSequence | None, LifecycleStatus | None]:
+    if attack_sequence is not None:
+        _store_shooting_attack_sequence(
+            lifecycle=lifecycle,
+            attack_sequence=attack_sequence,
+            allocated_ids=allocated_ids,
+        )
+    current_status = status
+    result_index = 1
+    while current_status is not None:
+        if current_status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION:
+            return _stored_shooting_attack_sequence(lifecycle), current_status
+        request = _decision_request(current_status)
+        if request.decision_type != SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
+            return _stored_shooting_attack_sequence(lifecycle), current_status
+        current_status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"{result_id_prefix}-{result_index:03d}",
+                request=request,
+                selected_option_id=request.options[0].option_id,
+            )
+        )
+        result_index += 1
+    return _stored_shooting_attack_sequence(lifecycle), None
+
+
+def _store_shooting_attack_sequence(
+    *,
+    lifecycle: GameLifecycle,
+    attack_sequence: AttackSequence,
+    allocated_ids: tuple[str, ...],
+) -> None:
+    state = _state(lifecycle)
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        state.shooting_phase_state = ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id=attack_sequence.attacker_player_id,
+            selected_unit_ids=(attack_sequence.attacking_unit_instance_id,),
+            shot_unit_ids=(attack_sequence.attacking_unit_instance_id,),
+            attack_pools=attack_sequence.attack_pools,
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+        return
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=attack_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+
+
+def _stored_shooting_attack_sequence(lifecycle: GameLifecycle) -> AttackSequence | None:
+    state = _state(lifecycle)
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if out_of_phase_state is not None:
+        return out_of_phase_state.attack_sequence
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        return None
+    return shooting_state.attack_sequence
 
 
 def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:

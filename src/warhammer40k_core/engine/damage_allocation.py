@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 
 SELECT_ALLOCATION_ORDER_DECISION_TYPE = "select_allocation_order"
+SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE = "select_damage_allocation_model"
 SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
 SELECT_DESTRUCTION_REACTION_DECISION_TYPE = "select_destruction_reaction"
@@ -114,6 +115,17 @@ class AllocationOrderDecisionPayload(TypedDict):
     attack_context: JsonValue
     allocation_context: AttackAllocationRuleContextPayload
     allocation_groups: list[AllocationGroupPayload]
+
+
+class DamageAllocationModelDecisionPayload(TypedDict):
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_model_id: str
+    attack_context: JsonValue
+    allocation_context: AttackAllocationRuleContextPayload
+    allocation_group: AllocationGroupPayload
+    legal_model_ids: list[str]
 
 
 class DamageApplicationPayload(TypedDict):
@@ -797,6 +809,97 @@ class AllocationOrderDecision:
             "attack_context": self.attack_context,
             "allocation_context": self.allocation_context.to_payload(),
             "allocation_groups": [group.to_payload() for group in self.allocation_groups],
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class DamageAllocationModelDecision:
+    request_id: str
+    result_id: str
+    player_id: str
+    selected_model_id: str
+    attack_context: JsonValue
+    allocation_context: AttackAllocationRuleContext
+    allocation_group: AllocationGroup
+    legal_model_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier(
+                "DamageAllocationModelDecision request_id",
+                self.request_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier(
+                "DamageAllocationModelDecision result_id",
+                self.result_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("DamageAllocationModelDecision player_id", self.player_id),
+        )
+        selected_model_id = _validate_identifier(
+            "DamageAllocationModelDecision selected_model_id",
+            self.selected_model_id,
+        )
+        object.__setattr__(self, "selected_model_id", selected_model_id)
+        object.__setattr__(self, "attack_context", validate_json_value(self.attack_context))
+        if type(self.allocation_context) is not AttackAllocationRuleContext:
+            raise GameLifecycleError(
+                "DamageAllocationModelDecision allocation_context must be allocation context."
+            )
+        if type(self.allocation_group) is not AllocationGroup:
+            raise GameLifecycleError(
+                "DamageAllocationModelDecision allocation_group must be an AllocationGroup."
+            )
+        legal_model_ids = _validate_ordered_identifier_tuple(
+            "DamageAllocationModelDecision legal_model_ids",
+            self.legal_model_ids,
+        )
+        object.__setattr__(self, "legal_model_ids", legal_model_ids)
+        if selected_model_id not in legal_model_ids:
+            raise GameLifecycleError("DamageAllocationModelDecision selected model must be legal.")
+
+    @classmethod
+    def from_result(cls, *, request: DecisionRequest, result: DecisionResult) -> Self:
+        result.validate_for_request(request)
+        payload = _payload_object(result.payload)
+        actor_id = result.actor_id
+        if actor_id is None:
+            raise GameLifecycleError("DamageAllocationModelDecision requires a defender actor.")
+        request_payload = _payload_object(request.payload)
+        return cls(
+            request_id=request.request_id,
+            result_id=result.result_id,
+            player_id=actor_id,
+            selected_model_id=_payload_string(payload, key="selected_model_id"),
+            attack_context=validate_json_value(request_payload["attack_context"]),
+            allocation_context=AttackAllocationRuleContext.from_payload(
+                cast(AttackAllocationRuleContextPayload, request_payload["allocation_context"])
+            ),
+            allocation_group=AllocationGroup.from_payload(
+                cast(AllocationGroupPayload, request_payload["allocation_group"])
+            ),
+            legal_model_ids=_payload_string_tuple(request_payload, key="legal_model_ids"),
+        )
+
+    def to_payload(self) -> DamageAllocationModelDecisionPayload:
+        return {
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+            "player_id": self.player_id,
+            "selected_model_id": self.selected_model_id,
+            "attack_context": self.attack_context,
+            "allocation_context": self.allocation_context.to_payload(),
+            "allocation_group": self.allocation_group.to_payload(),
+            "legal_model_ids": list(self.legal_model_ids),
         }
 
 
@@ -1857,6 +1960,61 @@ def build_allocation_order_request(
                 ),
             )
             for option_index, ordered_groups in enumerate(ordered_group_options, start=1)
+        ),
+    )
+
+
+def build_damage_allocation_model_request(
+    *,
+    request_id: str,
+    defender_player_id: str,
+    attack_context: JsonValue,
+    allocation_context: AttackAllocationRuleContext,
+    allocation_group: AllocationGroup,
+    legal_model_ids: tuple[str, ...],
+    save_die: JsonValue,
+) -> DecisionRequest:
+    if type(allocation_context) is not AttackAllocationRuleContext:
+        raise GameLifecycleError("Damage allocation model request requires an allocation context.")
+    if type(allocation_group) is not AllocationGroup:
+        raise GameLifecycleError("Damage allocation model request requires an allocation group.")
+    model_ids = _validate_ordered_identifier_tuple(
+        "Damage allocation model legal_model_ids",
+        legal_model_ids,
+    )
+    if len(model_ids) < 2:
+        raise GameLifecycleError("Damage allocation model request requires a player choice.")
+    _validate_subset(
+        field_name="Damage allocation model legal_model_ids",
+        values=model_ids,
+        universe=allocation_group.model_ids,
+    )
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+        actor_id=defender_player_id,
+        payload=validate_json_value(
+            {
+                "attack_context": validate_json_value(attack_context),
+                "allocation_context": allocation_context.to_payload(),
+                "allocation_group": allocation_group.to_payload(),
+                "legal_model_ids": list(model_ids),
+                "save_die": validate_json_value(save_die),
+                "selection_kind": "damage_allocation_model",
+            }
+        ),
+        options=tuple(
+            DecisionOption(
+                option_id=model_id,
+                label=model_id,
+                payload=validate_json_value(
+                    {
+                        "submission_kind": SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+                        "selected_model_id": model_id,
+                    }
+                ),
+            )
+            for model_id in model_ids
         ),
     )
 

@@ -341,6 +341,24 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   destroyed or exhausted, remaining failed saves advance to the next group in
   `ordered_group_ids`. Stale, drifted, wrong-actor, wrong-option, or
   payload-mismatched submissions reject before queue pop and before mutation.
+- `select_damage_allocation_model`: finite defending-player choice emitted
+  during Inflict Damage when the current ordered allocation group contains more
+  than one currently legal model for the sorted save die being walked. Option
+  IDs are current legal model IDs; adapters must select one pending option ID
+  and must not invent model IDs. The selected option payload includes
+  `submission_kind: "select_damage_allocation_model"` and
+  `selected_model_id`. The request payload includes `selection_kind:
+  "damage_allocation_model"`, the save die's `attack_context`, the current
+  `allocation_context`, the current `allocation_group`, `legal_model_ids`, and
+  the replay-safe `save_die`. Legal model IDs are evaluated from current state:
+  if any alive model in the current group has lost one or more wounds, only
+  those wounded model IDs are legal; otherwise all alive model IDs in the
+  current group are legal. The engine auto-resolves this step only when exactly
+  one legal model remains. Stale, drifted, wrong-actor, wrong-option,
+  payload-mismatched, exhausted-pending-damage, or no-pending-grouped-damage
+  submissions reject before queue pop and before mutation. Accepted selections
+  resume the same grouped save/damage resolver, and the save and damage events
+  for that die carry the selected model ID.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Explosives mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves.
 
 Phase 13E implements this destroyed-model attack-resolution decision:
@@ -382,7 +400,7 @@ Required Phase 13 adapter-contract tests:
 - valid shooting target/weapon declaration through the chosen finite or parameterized submission path;
 - stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, and invalid-visibility submission rejection without mutation where required;
 - Firing Deck declaration validation, replay, and end-of-phase ineligible-unit state;
-- defender allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, pooled save sorting, grouped failed-save transition to the next ordered group, pool-of-one convergence through the grouped resolver, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
+- defender allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, current-group damage-model choice through finite decisions, wounded-model forced choice inside current groups, pooled save sorting, grouped failed-save transition to the next ordered group, pool-of-one convergence through the grouped resolver, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
 - Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, grouped priority-group promotion, selected-group destruction, and normal Bodyguard-protected fallback;
 - optional or competing Feel No Pain decisions through finite decisions;
 - Smokescreen, Fire Overwatch, and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;
