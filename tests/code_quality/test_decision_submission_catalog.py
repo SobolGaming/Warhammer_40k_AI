@@ -11,7 +11,8 @@ TABLE_HEADER = (
     "| Decision Description | Decision Options | Phase (or Phases the Decision can be made in) | "
     "List of Tests that verify implementation |"
 )
-RETIRED_FINITE_PLACEMENT_TOKENS = (
+RETIRED_PLACEMENT_FALLBACK_TOKENS = (
+    "_deterministic_disembark_placement",
     "place_disembark_unit",
     "place_reinforcement_unit",
 )
@@ -42,21 +43,21 @@ def test_decision_submission_catalog_lists_runtime_decision_and_proposal_tokens(
     assert not missing, "Decision submission catalog is missing tokens: " + ", ".join(missing)
 
 
-def test_retired_finite_placement_decisions_do_not_reappear() -> None:
+def test_retired_placement_fallback_decisions_do_not_reappear() -> None:
     catalog = CATALOG_PATH.read_text(encoding="utf-8")
-    catalog_matches = [token for token in RETIRED_FINITE_PLACEMENT_TOKENS if token in catalog]
+    catalog_matches = [token for token in RETIRED_PLACEMENT_FALLBACK_TOKENS if token in catalog]
 
     source_matches: list[str] = []
     for path in _source_paths():
         text = path.read_text(encoding="utf-8")
-        for token in RETIRED_FINITE_PLACEMENT_TOKENS:
+        for token in RETIRED_PLACEMENT_FALLBACK_TOKENS:
             if token in text:
                 source_matches.append(f"{path.relative_to(ROOT)}:{token}")
 
-    assert not catalog_matches, "Retired finite placement tokens in catalog: " + ", ".join(
+    assert not catalog_matches, "Retired placement fallback tokens in catalog: " + ", ".join(
         catalog_matches
     )
-    assert not source_matches, "Retired finite placement tokens in source: " + ", ".join(
+    assert not source_matches, "Retired placement fallback tokens in source: " + ", ".join(
         source_matches
     )
 

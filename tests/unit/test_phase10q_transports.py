@@ -610,6 +610,102 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
     assert lifecycle.state.to_payload() == state.to_payload()
 
 
+def test_disembark_selection_does_not_depend_on_engine_built_placement() -> None:
+    scenario, passenger, transport, enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        _unit_placement_at(
+            enemy,
+            army_id="army-beta",
+            player_id="player-b",
+            poses=_disembark_poses()[: len(enemy.own_models)],
+        )
+    )
+    cargo_state = _cargo_state(
+        transport=transport,
+        embarked_unit_ids=(passenger.unit_instance_id,),
+        started_unit_ids=(passenger.unit_instance_id,),
+        battle_round=1,
+    )
+    state.record_transport_cargo_state(cargo_state)
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+
+    blocked_scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    transport_placement = blocked_scenario.battlefield_state.unit_placement_by_id(
+        transport.unit_instance_id
+    )
+    blocked_right_side_placement = _unit_placement_at(
+        passenger,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=_disembark_poses()[: len(passenger.own_models)],
+    )
+    blocked_resolution = resolve_disembark(
+        scenario=blocked_scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo_state.for_movement_phase(battle_round=1),
+        selection=DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=blocked_right_side_placement,
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ),
+        unit=passenger,
+        transport_placement=transport_placement,
+    )
+    assert not blocked_resolution.is_valid
+
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
+    assert passenger.unit_instance_id in {option.option_id for option in disembark_request.options}
+
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase10q-select-placement-agnostic-disembark",
+        )
+    )
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+
+    status = _submit_disembark_placement_payload(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        passenger=passenger,
+        transport=transport,
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        poses=_left_side_disembark_poses()[: len(passenger.own_models)],
+        result_id="phase10q-place-placement-agnostic-disembark",
+    )
+
+    assert status is None
+    assert passenger.unit_instance_id in _placed_unit_ids(state)
+    assert _last_event_payload(decisions, "unit_disembarked")["phase_body_status"] == (
+        "unit_disembarked"
+    )
+
+
 def test_transport_normal_move_emits_post_move_disembark_decision_after_pre_move_decline() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     state = _battle_state(scenario)
@@ -2187,24 +2283,25 @@ def _submit_disembark_placement_payload(
     disembark_mode: DisembarkModeKind,
     transport_movement_status: TransportMovementStatus,
     result_id: str,
+    poses: tuple[Pose, ...] | None = None,
 ) -> LifecycleStatus | None:
     proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
-    poses = _disembark_poses()[: len(passenger.own_models)]
+    placement_poses = _disembark_poses()[: len(passenger.own_models)] if poses is None else poses
     if transport_movement_status is TransportMovementStatus.NORMAL_MOVE:
-        poses = tuple(
+        placement_poses = tuple(
             Pose.at(
                 pose.position.x - 0.5,
                 pose.position.y,
                 pose.position.z,
                 facing_degrees=pose.facing.degrees,
             )
-            for pose in poses
+            for pose in placement_poses
         )
     placement = _unit_placement_at(
         passenger,
         army_id="army-alpha",
         player_id="player-a",
-        poses=poses,
+        poses=placement_poses,
     )
     payload = PlacementProposalPayload(
         proposal_request_id=proposal.request_id,
@@ -2260,6 +2357,14 @@ def _decision_request(status: LifecycleStatus | None) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _last_event_payload(decisions: DecisionController, event_type: str) -> dict[str, object]:
+    for event in reversed(decisions.event_log.records):
+        if event.event_type == event_type:
+            assert isinstance(event.payload, dict)
+            return cast(dict[str, object], event.payload)
+    raise AssertionError(f"Missing event type: {event_type}")
 
 
 def _placed_unit_ids(state: GameState) -> set[str]:
@@ -2541,6 +2646,16 @@ def _disembark_poses(*, z_inches: float = 0.0) -> tuple[Pose, ...]:
         Pose.at(14.0, 11.2, z_inches),
         Pose.at(13.1, 12.5, z_inches),
         Pose.at(12.8, 10.5, z_inches),
+    )
+
+
+def _left_side_disembark_poses(*, z_inches: float = 0.0) -> tuple[Pose, ...]:
+    return (
+        Pose.at(6.9, 8.5, z_inches),
+        Pose.at(6.0, 9.8, z_inches),
+        Pose.at(6.0, 11.2, z_inches),
+        Pose.at(6.9, 12.5, z_inches),
+        Pose.at(7.2, 10.5, z_inches),
     )
 
 

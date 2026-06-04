@@ -1100,6 +1100,63 @@ class MovementUnitSelection:
 
 
 @dataclass(frozen=True, slots=True)
+class DisembarkCandidate:
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    transport_unit_instance_id: str
+    disembark_mode: DisembarkModeKind
+    transport_movement_status: TransportMovementStatus
+    restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("DisembarkCandidate player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("DisembarkCandidate battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "DisembarkCandidate unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "transport_unit_instance_id",
+            _validate_identifier(
+                "DisembarkCandidate transport_unit_instance_id",
+                self.transport_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "disembark_mode",
+            disembark_mode_kind_from_token(self.disembark_mode),
+        )
+        object.__setattr__(
+            self,
+            "transport_movement_status",
+            transport_movement_status_from_token(self.transport_movement_status),
+        )
+        object.__setattr__(
+            self,
+            "restriction_overrides",
+            _validate_transport_restriction_override_tuple(
+                "DisembarkCandidate restriction_overrides",
+                self.restriction_overrides,
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MovementPhaseState:
     battle_round: int
     active_player_id: str
@@ -1921,7 +1978,6 @@ class MovementPhaseHandler:
                 state=state,
                 decisions=decisions,
                 movement_state=movement_state,
-                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
             if disembark_status is not None:
                 return disembark_status
@@ -2939,12 +2995,10 @@ def _request_pre_move_disembark_if_available(
     state: GameState,
     decisions: DecisionController,
     movement_state: MovementPhaseState,
-    ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus | None:
     entries = _pre_move_disembark_entries(
         state=state,
         movement_state=movement_state,
-        ruleset_descriptor=ruleset_descriptor,
     )
     if not entries:
         return None
@@ -2981,13 +3035,11 @@ def _request_post_normal_move_disembark_if_available(
     state: GameState,
     decisions: DecisionController,
     movement_state: MovementPhaseState,
-    ruleset_descriptor: RulesetDescriptor,
     transport_unit_instance_id: str,
 ) -> LifecycleStatus | None:
     entries = _post_normal_move_disembark_entries(
         state=state,
         movement_state=movement_state,
-        ruleset_descriptor=ruleset_descriptor,
         transport_unit_instance_id=transport_unit_instance_id,
     )
     if not entries:
@@ -3026,18 +3078,15 @@ def _pre_move_disembark_entries(
     *,
     state: GameState,
     movement_state: MovementPhaseState,
-    ruleset_descriptor: RulesetDescriptor,
-) -> tuple[DisembarkSelection, ...]:
+) -> tuple[DisembarkCandidate, ...]:
     scenario = _battlefield_scenario(state)
     declined_unit_ids = set(movement_state.declined_disembark_unit_ids)
-    entries: list[DisembarkSelection] = []
+    entries: list[DisembarkCandidate] = []
     for cargo_state in state.transport_cargo_states:
         if cargo_state.player_id != _active_player_id(state):
             continue
         active_cargo = cargo_state.for_movement_phase(battle_round=state.battle_round)
-        transport_placement = scenario.battlefield_state.unit_placement_by_id(
-            active_cargo.transport_unit_instance_id
-        )
+        scenario.battlefield_state.unit_placement_by_id(active_cargo.transport_unit_instance_id)
         for unit_instance_id in active_cargo.embarked_unit_instance_ids:
             if unit_instance_id in declined_unit_ids:
                 continue
@@ -3052,40 +3101,25 @@ def _pre_move_disembark_entries(
                 is not None
             ):
                 continue
-            unit = _unit_instance_by_id(state=state, unit_instance_id=unit_instance_id)
-            selection = DisembarkSelection(
-                player_id=active_cargo.player_id,
-                battle_round=state.battle_round,
-                unit_instance_id=unit_instance_id,
-                transport_unit_instance_id=active_cargo.transport_unit_instance_id,
-                attempted_placement=_deterministic_disembark_placement(
-                    unit=unit,
-                    transport_placement=transport_placement,
-                ),
-                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
-                transport_movement_status=TransportMovementStatus.NOT_MOVED,
+            entries.append(
+                DisembarkCandidate(
+                    player_id=active_cargo.player_id,
+                    battle_round=state.battle_round,
+                    unit_instance_id=unit_instance_id,
+                    transport_unit_instance_id=active_cargo.transport_unit_instance_id,
+                    disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+                    transport_movement_status=TransportMovementStatus.NOT_MOVED,
+                )
             )
-            resolution = resolve_disembark(
-                scenario=scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                cargo_state=active_cargo,
-                selection=selection,
-                unit=unit,
-                transport_placement=transport_placement,
-                objective_markers=_objective_markers_for_state(state),
-            )
-            if resolution.is_valid:
-                entries.append(selection)
-    return tuple(sorted(entries, key=lambda selection: selection.unit_instance_id))
+    return tuple(sorted(entries, key=lambda candidate: candidate.unit_instance_id))
 
 
 def _post_normal_move_disembark_entries(
     *,
     state: GameState,
     movement_state: MovementPhaseState,
-    ruleset_descriptor: RulesetDescriptor,
     transport_unit_instance_id: str,
-) -> tuple[DisembarkSelection, ...]:
+) -> tuple[DisembarkCandidate, ...]:
     scenario = _battlefield_scenario(state)
     requested_transport_id = _validate_identifier(
         "transport_unit_instance_id",
@@ -3096,10 +3130,8 @@ def _post_normal_move_disembark_entries(
         return ()
     active_cargo = cargo_state.for_movement_phase(battle_round=state.battle_round)
     declined_unit_ids = set(movement_state.declined_post_normal_move_disembark_unit_ids)
-    transport_placement = scenario.battlefield_state.unit_placement_by_id(
-        active_cargo.transport_unit_instance_id
-    )
-    entries: list[DisembarkSelection] = []
+    scenario.battlefield_state.unit_placement_by_id(active_cargo.transport_unit_instance_id)
+    entries: list[DisembarkCandidate] = []
     for unit_instance_id in active_cargo.embarked_unit_instance_ids:
         if unit_instance_id in declined_unit_ids:
             continue
@@ -3114,35 +3146,21 @@ def _post_normal_move_disembark_entries(
             is not None
         ):
             continue
-        unit = _unit_instance_by_id(state=state, unit_instance_id=unit_instance_id)
-        selection = DisembarkSelection(
-            player_id=active_cargo.player_id,
-            battle_round=state.battle_round,
-            unit_instance_id=unit_instance_id,
-            transport_unit_instance_id=active_cargo.transport_unit_instance_id,
-            attempted_placement=_deterministic_disembark_placement(
-                unit=unit,
-                transport_placement=transport_placement,
-            ),
-            disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
-            transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        entries.append(
+            DisembarkCandidate(
+                player_id=active_cargo.player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_instance_id,
+                transport_unit_instance_id=active_cargo.transport_unit_instance_id,
+                disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+                transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+            )
         )
-        resolution = resolve_disembark(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            cargo_state=active_cargo,
-            selection=selection,
-            unit=unit,
-            transport_placement=transport_placement,
-            objective_markers=_objective_markers_for_state(state),
-        )
-        if resolution.is_valid:
-            entries.append(selection)
-    return tuple(sorted(entries, key=lambda selection: selection.unit_instance_id))
+    return tuple(sorted(entries, key=lambda candidate: candidate.unit_instance_id))
 
 
 def _disembark_unit_selection_options(
-    selections: tuple[DisembarkSelection, ...],
+    selections: tuple[DisembarkCandidate, ...],
 ) -> tuple[DecisionOption, ...]:
     unit_ids = tuple(selection.unit_instance_id for selection in selections)
     options = [
@@ -3201,13 +3219,11 @@ def _apply_disembark_unit_selection_decision(
         entries = _pre_move_disembark_entries(
             state=state,
             movement_state=movement_state,
-            ruleset_descriptor=ruleset_descriptor,
         )
     elif disembark_mode is DisembarkModeKind.RAPID_DISEMBARK:
         entries = _post_normal_move_disembark_entries(
             state=state,
             movement_state=movement_state,
-            ruleset_descriptor=ruleset_descriptor,
             transport_unit_instance_id=_payload_string(
                 request_payload,
                 key="transport_unit_instance_id",
@@ -3297,7 +3313,7 @@ def _request_disembark_placement(
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
-    selection: DisembarkSelection,
+    selection: DisembarkCandidate,
     ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus:
     proposal_request = MovementProposalRequest(
@@ -4943,7 +4959,6 @@ def _complete_activation_then_request_post_normal_disembark_if_available(
         state=state,
         decisions=decisions,
         movement_state=movement_state,
-        ruleset_descriptor=ruleset_descriptor,
         transport_unit_instance_id=transport_unit_instance_id,
     )
 
@@ -5054,7 +5069,6 @@ def _apply_embark_transport_selection_decision(
             state=state,
             decisions=decisions,
             movement_state=movement_state,
-            ruleset_descriptor=ruleset_descriptor,
             transport_unit_instance_id=declined_unit_id,
         )
     if transport_decision != "embark_unit":
@@ -7307,53 +7321,6 @@ def _unit_instance_by_id(*, state: GameState, unit_instance_id: str) -> UnitInst
     raise GameLifecycleError("Unknown unit_instance_id.")
 
 
-def _deterministic_disembark_placement(
-    *,
-    unit: UnitInstance,
-    transport_placement: UnitPlacement,
-) -> UnitPlacement:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Disembark placement requires a UnitInstance.")
-    if type(transport_placement) is not UnitPlacement:
-        raise GameLifecycleError("Disembark placement requires a Transport UnitPlacement.")
-    if not transport_placement.model_placements:
-        raise GameLifecycleError("Disembark placement requires a placed Transport model.")
-    origin = transport_placement.model_placements[0].pose
-    offsets = (
-        (3.1, -1.5),
-        (4.0, -0.2),
-        (4.0, 1.2),
-        (3.1, 2.5),
-        (2.8, 0.5),
-    )
-    model_placements: list[ModelPlacement] = []
-    for index, model in enumerate(unit.own_models):
-        offset_x, offset_y = offsets[index % len(offsets)]
-        row = index // len(offsets)
-        pose = Pose.at(
-            x=origin.position.x + offset_x + (row * 1.0),
-            y=origin.position.y + offset_y,
-            z=origin.position.z,
-            facing_degrees=origin.facing.degrees,
-        )
-        army_id = unit.unit_instance_id.split(":", maxsplit=1)[0]
-        model_placements.append(
-            ModelPlacement(
-                army_id=army_id,
-                player_id=transport_placement.player_id,
-                unit_instance_id=unit.unit_instance_id,
-                model_instance_id=model.model_instance_id,
-                pose=pose,
-            )
-        )
-    return UnitPlacement(
-        army_id=unit.unit_instance_id.split(":", maxsplit=1)[0],
-        player_id=transport_placement.player_id,
-        unit_instance_id=unit.unit_instance_id,
-        model_placements=tuple(model_placements),
-    )
-
-
 def _transport_status_for_movement_action(
     action: MovementPhaseActionKind,
 ) -> TransportMovementStatus:
@@ -7530,6 +7497,22 @@ def _validate_movement_action_tuple(
             raise GameLifecycleError(f"{field_name} must not contain duplicates.")
         seen.add(action)
     return actions
+
+
+def _validate_transport_restriction_override_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[TransportRestrictionOverride, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    overrides: list[TransportRestrictionOverride] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TransportRestrictionOverride:
+            raise GameLifecycleError(
+                f"{field_name} must contain TransportRestrictionOverride values."
+            )
+        overrides.append(value)
+    return tuple(sorted(overrides, key=lambda override: override.override_kind.value))
 
 
 def _validate_path_validation_result_tuple(
