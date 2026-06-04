@@ -10,6 +10,7 @@ from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+    SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -145,6 +146,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
@@ -159,6 +161,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
@@ -339,6 +342,18 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 decisions=self.decision_controller,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+        ):
+            invalid_status = _invalid_damage_allocation_model_status(
+                state=state,
+                request=pending_request,
+                result=result,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -842,6 +857,67 @@ def _invalid_finite_decision_status(
             message="Decision result payload does not match the selected option.",
             payload={"invalid_reason": invalid_reason, "field": "payload"},
         )
+    return None
+
+
+def _invalid_damage_allocation_model_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    invalid_status = _invalid_finite_decision_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason="invalid_damage_allocation_model_result",
+    )
+    if invalid_status is not None:
+        return invalid_status
+    request_payload = request.payload
+    if not isinstance(request_payload, Mapping):
+        raise GameLifecycleError("Damage allocation model request payload must be an object.")
+    attack_context = request_payload.get("attack_context")
+    if not isinstance(attack_context, Mapping):
+        raise GameLifecycleError("Damage allocation model attack context must be an object.")
+    attack_sequence = _active_attack_sequence_for_state(state)
+    if attack_sequence is None or attack_sequence.pending_grouped_damage is None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Damage allocation model has no pending grouped damage.",
+            payload={
+                "invalid_reason": "invalid_damage_allocation_model_result",
+                "field": "pending_grouped_damage",
+            },
+        )
+    pending = attack_sequence.pending_grouped_damage
+    if pending.next_index >= len(pending.sorted_save_dice):
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Damage allocation model pending die is exhausted.",
+            payload={
+                "invalid_reason": "invalid_damage_allocation_model_result",
+                "field": "next_index",
+            },
+        )
+    current_context = pending.sorted_save_dice[pending.next_index]["attack_context"]
+    expected_fields: tuple[tuple[str, object], ...] = (
+        ("sequence_id", attack_sequence.sequence_id),
+        ("attack_context_id", current_context["attack_context_id"]),
+        ("pool_index", attack_sequence.pool_index),
+        ("attack_index", current_context["attack_index"]),
+        ("generated_hit_index", current_context["generated_hit_index"]),
+    )
+    for field_name, expected_value in expected_fields:
+        if attack_context.get(field_name) != expected_value:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Damage allocation model attack context no longer matches state.",
+                payload={
+                    "invalid_reason": "invalid_damage_allocation_model_result",
+                    "field": field_name,
+                },
+            )
     return None
 
 
