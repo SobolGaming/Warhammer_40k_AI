@@ -2333,6 +2333,8 @@ Required tests:
 
 ## Phase 14K: cutover hardening and static audits
 
+Status: In progress.
+
 Invariants:
 
 - CI fails on active retired edition IDs, pivot-cost policies, old terrain kinds, old cover save/AP exceptions, optional armour-versus-invulnerable save choice, 1" engagement, old coherency thresholds, Battle-shock auto-expiry, separate Reinforcements phase steps, 9" reserve-arrival enemy-distance policies, replacement draws outside New Orders, retired Core Stratagem names, and old Aircraft minimum-move policy;
