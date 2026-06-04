@@ -16,14 +16,25 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
+    ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
+    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     AttackSequencePayload,
     apply_allocation_order_decision,
+    apply_attack_weapon_group_decision,
     apply_damage_allocation_model_decision,
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
+    apply_resolve_target_unit_decision,
+    build_select_attack_weapon_group_request,
+    build_select_resolve_target_unit_request,
+    gathered_attack_groups_for_target,
     resolve_attack_sequence_until_blocked,
+    selected_attack_weapon_group_from_result,
+    selected_resolve_target_from_result,
+    unresolved_target_unit_ids,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -39,6 +50,7 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
+    DecisionError,
     DecisionOption,
     DecisionRequest,
     parameterized_decision_option,
@@ -1068,6 +1080,90 @@ class ShootingPhaseHandler:
             )
         return None
 
+    def invalid_attack_sequence_selection_status(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        if request.decision_type not in ATTACK_RESOLUTION_SELECTION_DECISION_TYPES:
+            raise GameLifecycleError(
+                "Attack sequence selection prevalidation received unsupported decision_type."
+            )
+        try:
+            result.validate_for_request(request)
+        except DecisionError as exc:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Attack sequence selection result is malformed.",
+                payload={
+                    "invalid_reason": "attack_sequence_selection_malformed",
+                    "detail": str(exc),
+                },
+            )
+        attack_sequence = _attack_sequence_for_selection_request(state=state, request=request)
+        if request.decision_type == SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE:
+            selected_target_id = selected_resolve_target_from_result(result)
+            if selected_target_id not in unresolved_target_unit_ids(attack_sequence):
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Resolve target selection is no longer legal.",
+                    payload={
+                        "invalid_reason": "resolve_target_option_drift",
+                        "selected_target_unit_instance_id": selected_target_id,
+                    },
+                )
+            expected_request = build_select_resolve_target_unit_request(
+                request_id=request.request_id,
+                state=state,
+                attack_sequence=attack_sequence,
+            )
+            return _invalid_if_current_option_payload_drifted(
+                state=state,
+                result=result,
+                expected_request=expected_request,
+                invalid_reason="resolve_target_payload_drift",
+            )
+        selected_group = selected_attack_weapon_group_from_result(result)
+        if (
+            attack_sequence.selected_target_unit_instance_id
+            != selected_group.target_unit_instance_id
+        ):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Attack weapon group target context drifted.",
+                payload={
+                    "invalid_reason": "attack_group_target_drift",
+                    "selected_target_unit_instance_id": selected_group.target_unit_instance_id,
+                },
+            )
+        current_groups = gathered_attack_groups_for_target(
+            attack_sequence=attack_sequence,
+            target_unit_instance_id=selected_group.target_unit_instance_id,
+        )
+        if selected_group.group_id not in {group.group_id for group in current_groups}:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Attack weapon group selection is no longer legal.",
+                payload={
+                    "invalid_reason": "attack_group_option_drift",
+                    "selected_group_id": selected_group.group_id,
+                },
+            )
+        expected_request = build_select_attack_weapon_group_request(
+            request_id=request.request_id,
+            state=state,
+            attack_sequence=attack_sequence,
+            target_unit_instance_id=selected_group.target_unit_instance_id,
+        )
+        return _invalid_if_current_option_payload_drifted(
+            state=state,
+            result=result,
+            expected_request=expected_request,
+            invalid_reason="attack_group_payload_drift",
+        )
+
     def apply_decision(
         self,
         *,
@@ -1100,6 +1196,13 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
+            )
+            return None
+        if result.decision_type in ATTACK_RESOLUTION_SELECTION_DECISION_TYPES:
+            _apply_attack_sequence_selection_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
             )
             return None
         if result.decision_type in ATTACK_ALLOCATION_DECISION_TYPES:
@@ -1794,6 +1897,57 @@ def _apply_attack_sequence_decision(
         allocated_model_ids_this_phase=allocated_model_ids,
     )
     return status
+
+
+def _apply_attack_sequence_selection_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> None:
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
+        state.out_of_phase_shooting_state = out_of_phase_state.with_attack_sequence_update(
+            attack_sequence=_apply_attack_sequence_selection_to_sequence(
+                attack_sequence=out_of_phase_state.attack_sequence,
+                result=result,
+                decisions=decisions,
+            ),
+            allocated_model_ids=out_of_phase_state.allocated_model_ids,
+        )
+        return
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None or shooting_state.attack_sequence is None:
+        raise GameLifecycleError("Attack sequence selection requires active attack_sequence.")
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=_apply_attack_sequence_selection_to_sequence(
+            attack_sequence=shooting_state.attack_sequence,
+            result=result,
+            decisions=decisions,
+        ),
+        allocated_model_ids_this_phase=shooting_state.allocated_model_ids_this_phase,
+    )
+
+
+def _apply_attack_sequence_selection_to_sequence(
+    *,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> AttackSequence:
+    if result.decision_type == SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE:
+        return apply_resolve_target_unit_decision(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            result=result,
+        )
+    if result.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE:
+        return apply_attack_weapon_group_decision(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            result=result,
+        )
+    raise GameLifecycleError("Unsupported attack sequence selection decision type.")
 
 
 def _apply_attack_sequence_decision_to_sequence(
@@ -3230,6 +3384,60 @@ def _unit_has_indirect_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCa
 def _unit_has_already_shot(*, state: GameState, unit_instance_id: str) -> bool:
     shooting_state = state.shooting_phase_state
     return shooting_state is not None and unit_instance_id in shooting_state.shot_unit_ids
+
+
+def _attack_sequence_for_selection_request(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+) -> AttackSequence:
+    payload = _decision_payload_object(request.payload)
+    sequence_id = _payload_string(payload, key="sequence_id")
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if (
+        out_of_phase_state is not None
+        and out_of_phase_state.attack_sequence is not None
+        and out_of_phase_state.attack_sequence.sequence_id == sequence_id
+    ):
+        return out_of_phase_state.attack_sequence
+    shooting_state = state.shooting_phase_state
+    if (
+        shooting_state is not None
+        and shooting_state.attack_sequence is not None
+        and shooting_state.attack_sequence.sequence_id == sequence_id
+    ):
+        return shooting_state.attack_sequence
+    raise GameLifecycleError("Attack sequence selection request has no active sequence.")
+
+
+def _invalid_if_current_option_payload_drifted(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    expected_request: DecisionRequest,
+    invalid_reason: str,
+) -> LifecycleStatus | None:
+    try:
+        expected_option = expected_request.option_by_id(result.selected_option_id)
+    except DecisionError:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Attack sequence selection option is no longer legal.",
+            payload={
+                "invalid_reason": invalid_reason,
+                "selected_option_id": result.selected_option_id,
+            },
+        )
+    if result.payload != expected_option.payload:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Attack sequence selection payload drifted.",
+            payload={
+                "invalid_reason": invalid_reason,
+                "selected_option_id": result.selected_option_id,
+            },
+        )
+    return None
 
 
 def _proposal_request_from_decision_request(

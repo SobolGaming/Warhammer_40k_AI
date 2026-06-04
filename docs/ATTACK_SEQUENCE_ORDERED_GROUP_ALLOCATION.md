@@ -1,11 +1,68 @@
 # Attack Sequence Ordered Group Allocation
 
-This diagram summarizes the CORE V2 pooled attack sequence for ordered group
-allocation. Normal damage and mortal wounds share the same engine-owned
-decision/replay path, but normal damage walks sorted save dice through ordered
-allocation groups before resolving model damage. Mortal wounds bypass saving
-throws and route directly to mortal-wound allocation and model damage
-resolution.
+This document summarizes the CORE V2 ranged attack sequence. Phase 14L adds the
+rulebook Select Enemy Unit and Gather Attack Dice layer before the existing
+ordered group allocation resolver. The gathered attack group then feeds the same
+engine-owned hit, wound, allocation, save, damage, mortal-wound, and destruction
+reaction path shown in the second diagram.
+
+```mermaid
+flowchart TD
+    start([Ranged attack sequence starts])
+    target_count{Unresolved pools target<br/>two or more enemy units?}
+    select_target["Select Enemy Unit<br/>select_resolve_target_unit"]
+    auto_target["Auto-record only remaining target unit"]
+    group_count{Selected target has<br/>two or more identical-attack groups?}
+    select_group["Gather Attack Dice<br/>select_attack_weapon_group"]
+    auto_group["Auto-record only remaining gathered group"]
+    resolve["Resolve Attack Dice<br/>existing ordered group allocation subgraph"]
+    same_target{Unused weapons remain<br/>for the same target?}
+    other_target{Unused weapons remain<br/>for another target?}
+    done([Attack sequence complete])
+
+    start --> target_count
+    target_count -- "Yes" --> select_target
+    target_count -- "No" --> auto_target
+    select_target --> group_count
+    auto_target --> group_count
+    group_count -- "Yes" --> select_group
+    group_count -- "No" --> auto_group
+    select_group --> resolve
+    auto_group --> resolve
+    resolve --> same_target
+    same_target -- "Yes" --> group_count
+    same_target -- "No" --> other_target
+    other_target -- "Yes" --> target_count
+    other_target -- "No" --> done
+```
+
+The Gather Attack Dice step groups unresolved ranged pools for the selected
+target only when their deterministic identical-attack signature matches. The
+signature includes hit basis, hit/wound modifiers, Strength, AP, Damage,
+applicable structured weapon abilities/keywords, targeting rule IDs, shooting
+type, attacker model ID, visible and in-range target model IDs, and optional
+Firing Deck source unit/model IDs. Wargear/profile IDs are omitted so distinct
+weapons with identical resolution characteristics can gather together; each
+contribution still carries its original IDs, and multi-contribution groups
+resolve through a deterministic gathered weapon-pool identity. These retained
+provenance fields are part of the signature because the current resolver turns a
+gathered group into a single synthetic `RangedAttackPool`; copied observer,
+visibility, range, and source identity must therefore be identical across every
+contribution before Precision visibility, cover/LOS, save, damage, or Firing
+Deck/source attribution can run through that synthetic pool. It deliberately
+excludes the Attacks count, raw weapon range value, wargear ID, and weapon
+profile ID; per-contribution attack counts and original source IDs remain on the
+gathered payload. Attack-step event payloads expose the original `weapon_profile_id`
+for single-pool groups and a deterministic `gathered-profile:<attack-group>` ID
+for multi-contribution gathered groups.
+remain replay evidence in the gathered group payload. Melee attack splitting and
+melee identical-attack gathering remain Phase 15 Fight-phase work.
+
+The following diagram is the Resolve Attack Dice subgraph for one gathered group.
+Normal damage and mortal wounds share the same engine-owned decision/replay path,
+but normal damage walks sorted save dice through ordered allocation groups before
+resolving model damage. Mortal wounds bypass saving throws and route directly to
+mortal-wound allocation and model damage resolution.
 
 ```mermaid
 flowchart TD
@@ -83,7 +140,10 @@ Key constraints:
   same-tier group orders exist.
 - Normal damage rolls all pooled saving throw dice before applying normal
   damage, then resolves save events while walking the sorted dice. A real armour
-  or invulnerable save with a target above 6 remains a saving throw; an effect
+  or invulnerable save remains a saving throw even when the target is above 6 or
+  AP makes success impossible on a D6. If both InSv and Sv exist, the engine
+  checks one die in ordered rule order: unmodified 1 fails, InSv can succeed,
+  then the AP-modified Save can succeed, otherwise damage is inflicted. An effect
   that permits no saving throw may use an internal
   `attack_sequence.allocation_order.no_save` die only for deterministic ordering.
 - Normal damage stays on the current model until that model is destroyed. If
