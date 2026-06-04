@@ -5,7 +5,10 @@ from dataclasses import dataclass, field
 from typing import Self, TypedDict
 
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
-from warhammer40k_core.engine.attack_sequence import AttackSequence
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    current_legal_damage_allocation_model_ids,
+)
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.damage_allocation import (
@@ -918,6 +921,45 @@ def _invalid_damage_allocation_model_status(
                     "field": field_name,
                 },
             )
+    selected_payload = next(
+        option.payload
+        for option in request.options
+        if option.option_id == result.selected_option_id
+    )
+    if not isinstance(selected_payload, Mapping):
+        raise GameLifecycleError("Damage allocation model option payload must be an object.")
+    selected_model_id = selected_payload.get("selected_model_id")
+    if selected_model_id != result.selected_option_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Damage allocation model selected model does not match the option.",
+            payload={
+                "invalid_reason": "invalid_damage_allocation_model_result",
+                "field": "selected_model_id",
+            },
+        )
+    legal_model_ids = current_legal_damage_allocation_model_ids(
+        state=state,
+        attack_sequence=attack_sequence,
+    )
+    if legal_model_ids is None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Damage allocation model has no current allocation group.",
+            payload={
+                "invalid_reason": "invalid_damage_allocation_model_result",
+                "field": "allocation_group",
+            },
+        )
+    if selected_model_id not in legal_model_ids:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Damage allocation model selected model is no longer legal.",
+            payload={
+                "invalid_reason": "invalid_damage_allocation_model_result",
+                "field": "selected_model_id",
+            },
+        )
     return None
 
 

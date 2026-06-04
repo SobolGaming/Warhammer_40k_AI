@@ -1551,6 +1551,25 @@ def apply_damage_allocation_model_decision(
     )
 
 
+def current_legal_damage_allocation_model_ids(
+    *,
+    state: GameState,
+    attack_sequence: AttackSequence,
+) -> tuple[str, ...] | None:
+    if attack_sequence.pending_grouped_damage is None:
+        raise GameLifecycleError("Damage allocation model legality requires grouped damage.")
+    current_group = _current_allocation_group_for_order(
+        state=state,
+        allocation_groups=attack_sequence.pending_grouped_damage.ordered_allocation_groups(),
+    )
+    if current_group is None:
+        return None
+    return _legal_model_ids_for_allocation_group_damage(
+        state=state,
+        allocation_group=current_group,
+    )
+
+
 def apply_precision_allocation_decision(
     *,
     state: GameState,

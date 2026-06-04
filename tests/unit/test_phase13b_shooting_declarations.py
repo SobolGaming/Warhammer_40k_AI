@@ -1860,6 +1860,56 @@ def test_phase14k_damage_model_choice_stale_pending_damage_rejects_before_queue_
     assert lifecycle.decision_controller.records == ()
 
 
+def test_phase14k_damage_model_choice_dead_selected_model_rejects_before_queue_pop() -> None:
+    lifecycle, request, _remaining_sequence, _allocated_ids, defender = (
+        _damage_model_choice_lifecycle(sequence_id="phase14k-model-choice-dead-drift")
+    )
+    selected_model = defender.own_models[1]
+    defender_after_drift = replace(
+        defender,
+        own_models=tuple(
+            replace(model, wounds_remaining=0)
+            if model.model_instance_id == selected_model.model_instance_id
+            else model
+            for model in defender.own_models
+        ),
+    )
+    _replace_unit_instance_in_state(state=_state(lifecycle), replacement=defender_after_drift)
+
+    _assert_stale_damage_model_choice_rejected_before_queue_pop(
+        lifecycle=lifecycle,
+        request=request,
+        selected_model_id=selected_model.model_instance_id,
+        result_id="phase14k-model-choice-dead-drift-result",
+    )
+
+
+def test_phase14k_damage_model_choice_wounded_priority_drift_rejects_before_queue_pop() -> None:
+    lifecycle, request, _remaining_sequence, _allocated_ids, defender = (
+        _damage_model_choice_lifecycle(sequence_id="phase14k-model-choice-wounded-drift")
+    )
+    selected_model = defender.own_models[1]
+    wounded_model = defender.own_models[2]
+    assert wounded_model.starting_wounds > 1
+    defender_after_drift = replace(
+        defender,
+        own_models=tuple(
+            replace(model, wounds_remaining=wounded_model.starting_wounds - 1)
+            if model.model_instance_id == wounded_model.model_instance_id
+            else model
+            for model in defender.own_models
+        ),
+    )
+    _replace_unit_instance_in_state(state=_state(lifecycle), replacement=defender_after_drift)
+
+    _assert_stale_damage_model_choice_rejected_before_queue_pop(
+        lifecycle=lifecycle,
+        request=request,
+        selected_model_id=selected_model.model_instance_id,
+        result_id="phase14k-model-choice-wounded-drift-result",
+    )
+
+
 def test_phase14h_pooled_walk_recomputes_save_after_group_transition() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -11445,6 +11495,43 @@ def _damage_model_choice_lifecycle(
         remaining_sequence,
         allocated_ids,
         defender,
+    )
+
+
+def _assert_stale_damage_model_choice_rejected_before_queue_pop(
+    *,
+    lifecycle: GameLifecycle,
+    request: DecisionRequest,
+    selected_model_id: str,
+    result_id: str,
+) -> None:
+    before_attack_events = _save_and_damage_step_payloads(lifecycle)
+    before_records = lifecycle.decision_controller.records
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=request,
+        selected_option_id=selected_model_id,
+    )
+
+    status = lifecycle.submit_decision(result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], status.payload)["invalid_reason"] == (
+        "invalid_damage_allocation_model_result"
+    )
+    assert cast(dict[str, object], status.payload)["field"] == "selected_model_id"
+    assert lifecycle.decision_controller.queue.peek_next() == request
+    assert lifecycle.decision_controller.records == before_records == ()
+    assert _save_and_damage_step_payloads(lifecycle) == before_attack_events
+
+
+def _save_and_damage_step_payloads(
+    lifecycle: GameLifecycle,
+) -> tuple[dict[str, object], ...]:
+    return tuple(
+        event
+        for event in _event_payloads(lifecycle, "attack_sequence_step")
+        if event["step"] in {AttackSequenceStep.SAVE.value, AttackSequenceStep.DAMAGE.value}
     )
 
 
