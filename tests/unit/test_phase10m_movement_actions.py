@@ -431,18 +431,23 @@ def test_aircraft_normal_move_records_cost_free_aircraft_rotation() -> None:
         base_size=BaseSizeDefinition.oval(length_mm=120.0, width_mm=80.0),
     )
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
+    moving_model = scenario.model_instance_for_placement(unit_placement.model_placements[0])
+    movement_inches = float(_model_movement_inches(moving_model))
 
     resolution = resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
-        path_witness=_single_model_aircraft_pivot_witness(unit_placement, movement_inches=20.0),
+        path_witness=_single_model_aircraft_pivot_witness(
+            unit_placement,
+            movement_inches=movement_inches,
+        ),
     )
 
     movement_distance_witness = resolution.path_validation_results[0].movement_distance_witness
     assert movement_distance_witness is not None
     assert resolution.is_valid
-    assert movement_distance_witness.total_distance_inches == 20.0
+    assert movement_distance_witness.total_distance_inches == movement_inches
     assert len(movement_distance_witness.rotation_events) == 1
     assert movement_distance_witness.rotation_events[0].facing_delta_degrees == 90.0
 

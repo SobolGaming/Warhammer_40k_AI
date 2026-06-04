@@ -70,10 +70,8 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
-    _aircraft_minimum_move_unavailable,  # pyright: ignore[reportPrivateUsage]
     _model_base_movement_inches,  # pyright: ignore[reportPrivateUsage]
     _model_movement_budget_inches,  # pyright: ignore[reportPrivateUsage]
-    _translated_forward_pose,  # pyright: ignore[reportPrivateUsage]
     resolve_advance_move,
     resolve_normal_move,
 )
@@ -84,11 +82,8 @@ from warhammer40k_core.engine.reserves import (
     ReservePlacementViolationCode,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase
-from warhammer40k_core.geometry.movement_envelope import (
-    AircraftBaseMovementWitness,
-    MovementDistanceWitness,
-)
+from warhammer40k_core.geometry.base import BaseShape, CircularBase
+from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
@@ -99,7 +94,7 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, Terrain
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
-def test_aircraft_policy_records_cost_free_rotation_and_validates_forward_move() -> None:
+def test_aircraft_policy_records_cost_free_rotation_without_retired_move_limits() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()
     ruleset = _ruleset()
     unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
@@ -136,149 +131,43 @@ def test_aircraft_policy_records_cost_free_rotation_and_validates_forward_move()
     )
 
     assert policy.uses_aircraft_rules
-    assert policy.minimum_move_inches == 20.0
-    assert policy.maximum_pivot_degrees == 90.0
+    assert "minimum_" + "move_inches" not in policy.to_payload()
+    assert "maximum_" + "pivot_degrees" not in policy.to_payload()
     assert distance.total_distance_inches == 20.0
     assert len(distance.rotation_events) == 1
     assert distance.rotation_events[0].facing_delta_degrees == 90.0
     assert policy.validate_normal_move_witness(moving_model=moving_model, witness=witness) == ()
 
 
-def test_circular_aircraft_base_twenty_inch_translation_satisfies_minimum() -> None:
+def test_aircraft_policy_does_not_reject_short_sideways_or_pivoting_paths() -> None:
     _scenario, aircraft, _enemy = _aircraft_scenario()
     moving_model = _aircraft_geometry_model(
         aircraft=aircraft,
         base=CircularBase(radius=1.0),
         pose=Pose.at(10.0, 10.0),
     )
-    witness = _model_path_witness(moving_model, Pose.at(30.0, 10.0))
     policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
-
-    violations, minimum_result = policy.validate_normal_move_witness_with_minimum_result(
-        moving_model=moving_model,
-        witness=witness,
-    )
-
-    assert violations == ()
-    assert minimum_result is not None
-    assert minimum_result.minimum_move_satisfied
-    assert minimum_result.base_movement_witness.used_circular_center_shortcut
-    assert math.isclose(
-        minimum_result.base_movement_witness.minimum_point_distance_inches,
-        20.0,
-        rel_tol=0.0,
-        abs_tol=1e-9,
-    )
-    payload = minimum_result.base_movement_witness.to_payload()
-    assert AircraftBaseMovementWitness.from_payload(payload).to_payload() == payload
-
-
-def test_circular_aircraft_base_short_translation_fails_minimum() -> None:
-    _scenario, aircraft, _enemy = _aircraft_scenario()
-    moving_model = _aircraft_geometry_model(
-        aircraft=aircraft,
-        base=CircularBase(radius=1.0),
-        pose=Pose.at(10.0, 10.0),
-    )
-    witness = _model_path_witness(moving_model, Pose.at(29.99, 10.0))
-    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
-
-    violations, minimum_result = policy.validate_normal_move_witness_with_minimum_result(
-        moving_model=moving_model,
-        witness=witness,
-    )
-
-    assert minimum_result is not None
-    assert not minimum_result.minimum_move_satisfied
-    assert math.isclose(
-        minimum_result.base_movement_witness.minimum_point_distance_inches,
-        19.99,
-        rel_tol=0.0,
-        abs_tol=1e-9,
-    )
-    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED in {
-        violation.violation_code for violation in violations
-    }
-
-
-def test_non_circular_aircraft_base_uses_footprint_aware_minimum_move() -> None:
-    _scenario, aircraft, _enemy = _aircraft_scenario()
-    moving_model = _aircraft_geometry_model(
-        aircraft=aircraft,
-        base=OvalBase(length=8.0, width=2.0),
-        pose=Pose.at(10.0, 10.0),
-    )
-    center_translation_with_rotation = _model_path_witness(
-        moving_model,
-        Pose.at(30.0, 10.0, facing_degrees=180.0),
-    )
-    pure_translation = _model_path_witness(moving_model, Pose.at(30.0, 10.0))
-    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
-
-    failing_violations, failing_result = policy.validate_normal_move_witness_with_minimum_result(
-        moving_model=moving_model,
-        witness=center_translation_with_rotation,
-    )
-    passing_violations, passing_result = policy.validate_normal_move_witness_with_minimum_result(
-        moving_model=moving_model,
-        witness=pure_translation,
-    )
-
-    assert failing_result is not None
-    assert failing_result.base_movement_witness.minimum_point_distance_inches < 20.0
-    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED in {
-        violation.violation_code for violation in failing_violations
-    }
-    assert passing_result is not None
-    assert passing_result.minimum_move_satisfied
-    assert math.isclose(
-        passing_result.base_movement_witness.minimum_point_distance_inches,
-        20.0,
-        rel_tol=0.0,
-        abs_tol=1e-9,
-    )
-    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED not in {
-        violation.violation_code for violation in passing_violations
-    }
-
-
-def test_aircraft_pivot_after_move_does_not_satisfy_minimum_move() -> None:
-    _scenario, aircraft, _enemy = _aircraft_scenario()
-    moving_model = _aircraft_geometry_model(
-        aircraft=aircraft,
-        base=CircularBase(radius=1.0),
-        pose=Pose.at(10.0, 10.0),
-    )
-    witness = PathWitness.for_paths(
-        (
+    witnesses = (
+        _model_path_witness(moving_model, Pose.at(12.0, 10.0)),
+        _model_path_witness(moving_model, Pose.at(10.0, 12.0)),
+        PathWitness.for_paths(
             (
-                moving_model.model_id,
                 (
-                    moving_model.pose,
-                    Pose.at(29.0, 10.0),
-                    Pose.at(29.0, 10.0, facing_degrees=90.0),
+                    moving_model.model_id,
+                    (
+                        moving_model.pose,
+                        Pose.at(12.0, 10.0, facing_degrees=180.0),
+                        Pose.at(12.0, 12.0, facing_degrees=270.0),
+                    ),
                 ),
-            ),
-        )
-    )
-    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
-
-    violations, minimum_result = policy.validate_normal_move_witness_with_minimum_result(
-        moving_model=moving_model,
-        witness=witness,
+            )
+        ),
     )
 
-    assert minimum_result is not None
-    assert minimum_result.base_movement_witness.movement_end_pose == Pose.at(29.0, 10.0)
-    assert math.isclose(
-        minimum_result.base_movement_witness.minimum_point_distance_inches,
-        19.0,
-        rel_tol=0.0,
-        abs_tol=1e-9,
+    assert all(
+        policy.validate_normal_move_witness(moving_model=moving_model, witness=witness) == ()
+        for witness in witnesses
     )
-    assert AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED in {
-        violation.violation_code for violation in violations
-    }
 
 
 def test_hover_mode_state_changes_aircraft_policy_and_round_trips() -> None:
@@ -298,7 +187,8 @@ def test_hover_mode_state_changes_aircraft_policy_and_round_trips() -> None:
     assert not policy.uses_aircraft_rules
     assert "AIRCRAFT" not in policy.effective_keywords
     assert policy.can_declare_charge
-    assert policy.minimum_move_inches is None
+    assert "minimum_" + "move_inches" not in policy.to_payload()
+    assert "maximum_" + "pivot_degrees" not in policy.to_payload()
 
     hover_payload = cast(
         HoverModeStatePayload,
@@ -339,7 +229,7 @@ def test_persisted_hover_mode_state_changes_movement_action_availability() -> No
     assert aircraft_policy_payload["uses_aircraft_rules"] is False
 
 
-def test_persisted_hover_mode_disables_aircraft_minimum_move_and_pivot_restrictions() -> None:
+def test_persisted_hover_mode_disables_aircraft_movement_rules() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
     state.record_hover_mode_state(_hover_state_for_aircraft(aircraft))
     assert state.battlefield_state is not None
@@ -466,19 +356,6 @@ def test_aircraft_movement_budget_helpers_fail_fast() -> None:
             movement_mode=MovementMode.NORMAL,
             movement_phase_action=cast(MovementPhaseActionKind, object()),
         )
-    with pytest.raises(GameLifecycleError, match="geometry Model"):
-        _aircraft_minimum_move_unavailable(
-            moving_model=cast(Model, object()),
-            battlefield_width_inches=60.0,
-            battlefield_depth_inches=44.0,
-            minimum_move_inches=20.0,
-        )
-    with pytest.raises(GameLifecycleError, match="movement_inches must be a number"):
-        _translated_forward_pose(Pose.at(0.0, 0.0), movement_inches=cast(float, object()))
-    with pytest.raises(GameLifecycleError, match="movement_inches must be finite"):
-        _translated_forward_pose(Pose.at(0.0, 0.0), movement_inches=float("inf"))
-    with pytest.raises(GameLifecycleError, match="movement_inches must be at least 1"):
-        _translated_forward_pose(Pose.at(0.0, 0.0), movement_inches=0.0)
 
 
 def test_persisted_hover_mode_state_round_trips_through_lifecycle_payload() -> None:
@@ -617,34 +494,31 @@ def test_standard_aircraft_action_policy_allows_only_normal_move_even_in_engagem
     assert MovementPhaseActionKind.ADVANCE in result.unavailable_actions
 
 
-def test_aircraft_normal_move_rejects_short_or_non_forward_paths() -> None:
+def test_aircraft_normal_move_uses_datasheet_budget_without_direction_restriction() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
     model_placement = unit_placement.model_placements[0]
-    short_witness = PathWitness.for_paths(
+    movement_inches = float(_model_movement_inches(aircraft.own_models[0]))
+    short_witness = PathWitness.for_straight_line_endpoints(
         (
             (
                 model_placement.model_instance_id,
-                (
-                    model_placement.pose,
-                    Pose.at(
-                        model_placement.pose.position.x + 10.0,
-                        model_placement.pose.position.y,
-                    ),
+                model_placement.pose,
+                Pose.at(
+                    model_placement.pose.position.x + movement_inches,
+                    model_placement.pose.position.y,
                 ),
             ),
         )
     )
-    sideways_witness = PathWitness.for_paths(
+    sideways_witness = PathWitness.for_straight_line_endpoints(
         (
             (
                 model_placement.model_instance_id,
-                (
-                    model_placement.pose,
-                    Pose.at(
-                        model_placement.pose.position.x,
-                        model_placement.pose.position.y + 20.0,
-                    ),
+                model_placement.pose,
+                Pose.at(
+                    model_placement.pose.position.x,
+                    model_placement.pose.position.y + movement_inches,
                 ),
             ),
         )
@@ -663,19 +537,11 @@ def test_aircraft_normal_move_rejects_short_or_non_forward_paths() -> None:
         path_witness=sideways_witness,
     )
 
-    assert not short_result.is_valid
-    assert (
-        short_result.path_validation_results[0].violations[0].violation_code
-        == "aircraft_minimum_move_required"
-    )
-    assert not sideways_result.is_valid
-    assert (
-        sideways_result.path_validation_results[0].violations[0].violation_code
-        == "aircraft_forward_move_required"
-    )
+    assert short_result.is_valid
+    assert sideways_result.is_valid
 
 
-def test_aircraft_policy_rejects_invalid_pivot_sequences() -> None:
+def test_aircraft_policy_does_not_reject_pivot_sequences() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
     model_placement = unit_placement.model_placements[0]
@@ -697,7 +563,7 @@ def test_aircraft_policy_rejects_invalid_pivot_sequences() -> None:
                         facing_degrees=90.0,
                     ),
                     Pose.at(
-                        moving_model.pose.position.x + 20.0,
+                        moving_model.pose.position.x + 2.0,
                         moving_model.pose.position.y,
                         facing_degrees=90.0,
                     ),
@@ -712,7 +578,7 @@ def test_aircraft_policy_rejects_invalid_pivot_sequences() -> None:
                 (
                     moving_model.pose,
                     Pose.at(
-                        moving_model.pose.position.x + 20.0,
+                        moving_model.pose.position.x + 2.0,
                         moving_model.pose.position.y,
                         facing_degrees=90.0,
                     ),
@@ -727,17 +593,17 @@ def test_aircraft_policy_rejects_invalid_pivot_sequences() -> None:
                 (
                     moving_model.pose,
                     Pose.at(
-                        moving_model.pose.position.x + 20.0,
+                        moving_model.pose.position.x + 2.0,
                         moving_model.pose.position.y,
                         facing_degrees=0.0,
                     ),
                     Pose.at(
-                        moving_model.pose.position.x + 20.0,
+                        moving_model.pose.position.x + 2.0,
                         moving_model.pose.position.y,
                         facing_degrees=100.0,
                     ),
                     Pose.at(
-                        moving_model.pose.position.x + 20.0,
+                        moving_model.pose.position.x + 2.0,
                         moving_model.pose.position.y,
                         facing_degrees=120.0,
                     ),
@@ -768,11 +634,9 @@ def test_aircraft_policy_rejects_invalid_pivot_sequences() -> None:
         )
     }
 
-    assert AircraftMovementViolationCode.AIRCRAFT_PIVOT_BEFORE_MOVE in before_move_codes
-    assert AircraftMovementViolationCode.AIRCRAFT_TRANSLATION_AFTER_PIVOT in before_move_codes
-    assert AircraftMovementViolationCode.AIRCRAFT_PIVOT_DURING_TRANSLATION in simultaneous_codes
-    assert AircraftMovementViolationCode.AIRCRAFT_PIVOT_LIMIT_EXCEEDED in excessive_codes
-    assert AircraftMovementViolationCode.AIRCRAFT_MULTIPLE_PIVOTS in excessive_codes
+    assert before_move_codes == set()
+    assert simultaneous_codes == set()
+    assert excessive_codes == set()
 
 
 def test_aircraft_reserve_transition_removes_unit_and_records_reserve_state() -> None:
@@ -826,7 +690,7 @@ def test_invalid_aircraft_reserve_transition_is_typed_and_cannot_mutate() -> Non
         ruleset_descriptor=_ruleset(),
         unit_placement=unit_placement,
         battle_round=1,
-        reason=AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE,
+        reason=AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED,
     )
     payload = cast(
         AircraftReserveTransitionPayload,
@@ -847,8 +711,9 @@ def test_invalid_aircraft_reserve_transition_is_typed_and_cannot_mutate() -> Non
         )
 
 
-def test_aircraft_default_normal_move_witness_moves_twenty_forward_without_reserves() -> None:
+def test_aircraft_default_normal_move_witness_uses_datasheet_budget_without_reserves() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
+    movement_inches = float(_model_movement_inches(aircraft.own_models[0]))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
         unit_instance_id=aircraft.unit_instance_id,
@@ -860,7 +725,7 @@ def test_aircraft_default_normal_move_witness_moves_twenty_forward_without_reser
     default_witness = PathWitness.from_payload(cast(PathWitnessPayload, normal_payload["witness"]))
     model_id = aircraft.own_models[0].model_instance_id
 
-    assert default_witness.final_pose_for_model(model_id) == Pose.at(30.0, 10.0)
+    assert default_witness.final_pose_for_model(model_id) == Pose.at(10.0 + movement_inches, 10.0)
 
     status = _submit_handler_decision(
         handler,
@@ -875,7 +740,7 @@ def test_aircraft_default_normal_move_witness_moves_twenty_forward_without_reser
     assert state.reserve_state_for_unit(aircraft.unit_instance_id) is None
     assert state.battlefield_state is not None
     moved_placement = state.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
-    assert moved_placement.model_placements[0].pose == Pose.at(30.0, 10.0)
+    assert moved_placement.model_placements[0].pose == Pose.at(10.0 + movement_inches, 10.0)
     completed_payload = _last_event_payload(decisions, "movement_activation_completed")
     assert completed_payload["displacement_kind"] == "normal_move"
     transition_batch = cast(dict[str, object], completed_payload["transition_batch"])
@@ -883,7 +748,8 @@ def test_aircraft_default_normal_move_witness_moves_twenty_forward_without_reser
     assert transition_batch["removals"] == []
     model_payload = _single_model_movement_payload(completed_payload)
     distance_witness = cast(dict[str, object], model_payload["movement_distance_witness"])
-    assert distance_witness["budget"] is None
+    budget = cast(dict[str, object], distance_witness["budget"])
+    assert budget["max_distance_inches"] == movement_inches
 
 
 def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() -> None:
@@ -943,8 +809,9 @@ def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() 
 def test_aircraft_edge_transition_uses_full_base_footprint_containment() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()
     aircraft_radius = _first_model_radius_x(aircraft)
+    movement_inches = float(_model_movement_inches(aircraft.own_models[0]))
     aircraft_pose = Pose.at(
-        60.0 - aircraft_radius + 0.1 - 20.0,
+        60.0 - aircraft_radius + 0.1 - movement_inches,
         10.0,
     )
     state = _battle_state_from_scenario(
@@ -981,7 +848,7 @@ def test_aircraft_edge_transition_uses_full_base_footprint_containment() -> None
     )
 
 
-def test_aircraft_submitted_short_witness_is_invalid_when_minimum_move_fits() -> None:
+def test_aircraft_submitted_over_budget_witness_is_invalid() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
     assert state.battlefield_state is not None
     original_battlefield_payload = state.battlefield_state.to_payload()
@@ -992,7 +859,10 @@ def test_aircraft_submitted_short_witness_is_invalid_when_minimum_move_fits() ->
     unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
         aircraft.unit_instance_id
     )
-    short_witness = _single_model_forward_witness(unit_placement, movement_inches=10.0)
+    over_budget_witness = _single_model_forward_witness(
+        unit_placement,
+        movement_inches=float(_model_movement_inches(aircraft.own_models[0])) + 1.0,
+    )
 
     status = _submit_custom_normal_move_decision(
         handler,
@@ -1000,20 +870,20 @@ def test_aircraft_submitted_short_witness_is_invalid_when_minimum_move_fits() ->
         decisions=decisions,
         request=action_request,
         unit_placement=unit_placement,
-        witness=short_witness,
-        result_id="phase10r-aircraft-short-witness-invalid",
+        witness=over_budget_witness,
+        result_id="phase10r-aircraft-over-budget-witness-invalid",
     )
 
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.INVALID
     status_payload = cast(dict[str, object], status.payload)
-    assert status_payload["violation_code"] == "aircraft_minimum_move_required"
+    assert status_payload["violation_code"] == "movement_distance_exceeded"
     assert state.reserve_state_for_unit(aircraft.unit_instance_id) is None
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == original_battlefield_payload
 
 
-def test_normal_move_rejects_aircraft_minimum_move_witness_replay_drift() -> None:
+def test_normal_move_rejects_aircraft_model_movement_payload_replay_drift() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
@@ -1022,14 +892,15 @@ def test_normal_move_rejects_aircraft_minimum_move_witness_replay_drift() -> Non
     unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
         aircraft.unit_instance_id
     )
-    witness = _single_model_forward_witness(unit_placement, movement_inches=20.0)
+    witness = _single_model_forward_witness(
+        unit_placement,
+        movement_inches=float(_model_movement_inches(aircraft.own_models[0])),
+    )
 
-    def mutate_minimum_move_witness(payload: dict[str, object]) -> None:
+    def mutate_model_movement_payload(payload: dict[str, object]) -> None:
         model_movements = cast(list[object], payload["model_movements"])
         model_payload = cast(dict[str, object], model_movements[0])
-        minimum_result = cast(dict[str, object], model_payload["aircraft_minimum_move_result"])
-        base_witness = cast(dict[str, object], minimum_result["base_movement_witness"])
-        base_witness["minimum_point_distance_inches"] = 19.0
+        model_payload["movement_inches"] = 1.0
 
     status = _submit_custom_normal_move_decision(
         handler,
@@ -1038,18 +909,18 @@ def test_normal_move_rejects_aircraft_minimum_move_witness_replay_drift() -> Non
         request=action_request,
         unit_placement=unit_placement,
         witness=witness,
-        result_id="phase10r-aircraft-minimum-witness-drift",
-        payload_mutation=mutate_minimum_move_witness,
+        result_id="phase10r-aircraft-model-movement-drift",
+        payload_mutation=mutate_model_movement_payload,
     )
 
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.INVALID
     status_payload = cast(dict[str, object], status.payload)
-    assert status_payload["violation_code"] == "normal_move_aircraft_minimum_move_witness_drift"
+    assert status_payload["violation_code"] == "normal_move_model_movement_witness_drift"
 
 
-def test_aircraft_short_witness_transitions_when_mandatory_minimum_move_cannot_fit() -> None:
-    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(40.0, 10.0))
+def test_aircraft_short_witness_remains_on_battlefield_when_inside_board() -> None:
+    state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(20.0, 10.0))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
         unit_instance_id=aircraft.unit_instance_id,
@@ -1057,7 +928,10 @@ def test_aircraft_short_witness_transitions_when_mandatory_minimum_move_cannot_f
     unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
         aircraft.unit_instance_id
     )
-    short_witness = _single_model_forward_witness(unit_placement, movement_inches=10.0)
+    short_witness = _single_model_forward_witness(
+        unit_placement,
+        movement_inches=max(float(_model_movement_inches(aircraft.own_models[0])) - 1.0, 1.0),
+    )
 
     status = _submit_custom_normal_move_decision(
         handler,
@@ -1066,24 +940,18 @@ def test_aircraft_short_witness_transitions_when_mandatory_minimum_move_cannot_f
         request=action_request,
         unit_placement=unit_placement,
         witness=short_witness,
-        result_id="phase10r-aircraft-short-witness-minimum-unavailable",
+        result_id="phase10r-aircraft-short-witness-no-reserve",
     )
 
     assert status is None
     assert state.battlefield_state is not None
-    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
-        state.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
-    reserve_state = state.reserve_state_for_unit(aircraft.unit_instance_id)
-    assert reserve_state is not None
-    assert reserve_state.required_arrival_source_rule_id == (
-        AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE.value
+    moved_placement = state.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    assert moved_placement.model_placements[0].pose == short_witness.final_pose_for_model(
+        moved_placement.model_placements[0].model_instance_id
     )
+    assert state.reserve_state_for_unit(aircraft.unit_instance_id) is None
     completed_payload = _last_event_payload(decisions, "movement_activation_completed")
-    transition_payload = cast(dict[str, object], completed_payload["aircraft_reserve_transition"])
-    assert (
-        transition_payload["reason"]
-        == AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE.value
-    )
+    assert "aircraft_reserve_transition" not in completed_payload
 
 
 def test_aircraft_arrival_uses_reserve_battlefield_and_terrain_validation() -> None:
@@ -1094,7 +962,7 @@ def test_aircraft_arrival_uses_reserve_battlefield_and_terrain_validation() -> N
         ruleset_descriptor=_ruleset(),
         unit_placement=unit_placement,
         battle_round=1,
-        reason=AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE,
+        reason=AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED,
     )
     assert transition.reserve_state is not None
     reserve_scenario = BattlefieldScenario(

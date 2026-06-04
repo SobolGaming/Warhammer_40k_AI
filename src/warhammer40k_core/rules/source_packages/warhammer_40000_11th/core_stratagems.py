@@ -242,7 +242,7 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             source_id=f"{source_prefix}:rapid-ingress",
             when_descriptor="end of the opponent movement phase",
             target_descriptor="one unit from the player's army in reserves",
-            effect_descriptor="arrive from reserves as if it were the reinforcements step",
+            effect_descriptor="arrive from reserves during the opponent Movement phase end window",
             restrictions_descriptor="matched play same stratagem per phase",
             trigger_kind="end_phase",
             phase="movement",

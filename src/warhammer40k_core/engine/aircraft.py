@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 from enum import StrEnum
-from itertools import pairwise
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -27,38 +25,22 @@ from warhammer40k_core.engine.reserves import (
     resolve_reserve_arrival,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.geometry.movement_envelope import (
-    AircraftBaseMovementWitness,
-    AircraftBaseMovementWitnessPayload,
-)
 from warhammer40k_core.geometry.pathing import PathWitness
-from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
 
 _AIRCRAFT_KEYWORD = "AIRCRAFT"
 _FLY_KEYWORD = "FLY"
-_AIRCRAFT_MINIMUM_MOVE_INCHES = 20.0
-_AIRCRAFT_MAXIMUM_PIVOT_DEGREES = 90.0
 _AIRCRAFT_RESERVE_DESTINATION_ID = "strategic_reserves"
-_EPSILON = 1e-9
 
 
 class AircraftReserveTransitionReason(StrEnum):
     BATTLEFIELD_EDGE_CROSSED = "aircraft_battlefield_edge_crossed"
-    MINIMUM_MOVE_UNAVAILABLE = "aircraft_minimum_move_unavailable"
 
 
 class AircraftMovementViolationCode(StrEnum):
     UNIT_NOT_AIRCRAFT = "unit_not_aircraft"
     HOVER_MODE_USES_NORMAL_MOVEMENT = "hover_mode_uses_normal_movement"
-    AIRCRAFT_MINIMUM_MOVE_REQUIRED = "aircraft_minimum_move_required"
-    AIRCRAFT_FORWARD_MOVE_REQUIRED = "aircraft_forward_move_required"
-    AIRCRAFT_PIVOT_LIMIT_EXCEEDED = "aircraft_pivot_limit_exceeded"
-    AIRCRAFT_PIVOT_BEFORE_MOVE = "aircraft_pivot_before_move"
-    AIRCRAFT_MULTIPLE_PIVOTS = "aircraft_multiple_pivots"
-    AIRCRAFT_TRANSLATION_AFTER_PIVOT = "aircraft_translation_after_pivot"
-    AIRCRAFT_PIVOT_DURING_TRANSLATION = "aircraft_pivot_during_translation"
 
 
 class HoverModeStatePayload(TypedDict):
@@ -79,8 +61,6 @@ class AircraftMovementPolicyPayload(TypedDict):
     has_aircraft_keyword: bool
     hover_mode_active: bool
     uses_aircraft_rules: bool
-    minimum_move_inches: float | None
-    maximum_pivot_degrees: float | None
     can_move_over_other_models: bool
     other_models_can_move_over_this_aircraft: bool
     can_declare_charge: bool
@@ -91,13 +71,6 @@ class AircraftMovementViolationPayload(TypedDict):
     violation_code: str
     message: str
     model_instance_id: str | None
-
-
-class AircraftMinimumMoveResultPayload(TypedDict):
-    model_instance_id: str
-    minimum_move_inches: float
-    minimum_move_satisfied: bool
-    base_movement_witness: AircraftBaseMovementWitnessPayload
 
 
 class AircraftReserveTransitionPayload(TypedDict):
@@ -196,91 +169,6 @@ class HoverModeState:
 
 
 @dataclass(frozen=True, slots=True)
-class AircraftMinimumMoveResult:
-    model_instance_id: str
-    minimum_move_inches: float
-    minimum_move_satisfied: bool
-    base_movement_witness: AircraftBaseMovementWitness
-
-    def __post_init__(self) -> None:
-        model_instance_id = _validate_identifier(
-            "AircraftMinimumMoveResult model_instance_id",
-            self.model_instance_id,
-        )
-        minimum_move_inches = _validate_positive_number(
-            "AircraftMinimumMoveResult minimum_move_inches",
-            self.minimum_move_inches,
-        )
-        _validate_bool(
-            "AircraftMinimumMoveResult minimum_move_satisfied",
-            self.minimum_move_satisfied,
-        )
-        if type(self.base_movement_witness) is not AircraftBaseMovementWitness:
-            raise GameLifecycleError(
-                "AircraftMinimumMoveResult base_movement_witness must be "
-                "AircraftBaseMovementWitness."
-            )
-        if self.base_movement_witness.model_id != model_instance_id:
-            raise GameLifecycleError("AircraftMinimumMoveResult model_id drift.")
-        if not math.isclose(
-            self.base_movement_witness.minimum_move_inches,
-            minimum_move_inches,
-            rel_tol=0.0,
-            abs_tol=1e-9,
-        ):
-            raise GameLifecycleError("AircraftMinimumMoveResult minimum move drift.")
-        if self.base_movement_witness.minimum_move_satisfied != self.minimum_move_satisfied:
-            raise GameLifecycleError("AircraftMinimumMoveResult satisfaction drift.")
-        object.__setattr__(self, "model_instance_id", model_instance_id)
-        object.__setattr__(self, "minimum_move_inches", minimum_move_inches)
-
-    @classmethod
-    def for_model_path(
-        cls,
-        *,
-        moving_model: Model,
-        witness: PathWitness,
-        minimum_move_inches: float,
-    ) -> Self:
-        if type(moving_model) is not Model:
-            raise GameLifecycleError("Aircraft minimum move requires a Model.")
-        if type(witness) is not PathWitness:
-            raise GameLifecycleError("Aircraft minimum move requires a PathWitness.")
-        path = witness.poses_for_model(moving_model.model_id)
-        movement_end_pose = _aircraft_movement_endpoint_before_pivot(path)
-        base_witness = AircraftBaseMovementWitness.for_model_movement(
-            model=moving_model,
-            movement_end_pose=movement_end_pose,
-            minimum_move_inches=minimum_move_inches,
-        )
-        return cls(
-            model_instance_id=moving_model.model_id,
-            minimum_move_inches=minimum_move_inches,
-            minimum_move_satisfied=base_witness.minimum_move_satisfied,
-            base_movement_witness=base_witness,
-        )
-
-    def to_payload(self) -> AircraftMinimumMoveResultPayload:
-        return {
-            "model_instance_id": self.model_instance_id,
-            "minimum_move_inches": self.minimum_move_inches,
-            "minimum_move_satisfied": self.minimum_move_satisfied,
-            "base_movement_witness": self.base_movement_witness.to_payload(),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: AircraftMinimumMoveResultPayload) -> Self:
-        return cls(
-            model_instance_id=payload["model_instance_id"],
-            minimum_move_inches=payload["minimum_move_inches"],
-            minimum_move_satisfied=payload["minimum_move_satisfied"],
-            base_movement_witness=AircraftBaseMovementWitness.from_payload(
-                payload["base_movement_witness"]
-            ),
-        )
-
-
-@dataclass(frozen=True, slots=True)
 class AircraftMovementPolicy:
     ruleset_descriptor_hash: str
     unit_instance_id: str
@@ -290,8 +178,6 @@ class AircraftMovementPolicy:
     has_aircraft_keyword: bool
     hover_mode_active: bool
     uses_aircraft_rules: bool
-    minimum_move_inches: float | None
-    maximum_pivot_degrees: float | None
     can_move_over_other_models: bool
     other_models_can_move_over_this_aircraft: bool
     can_declare_charge: bool
@@ -348,36 +234,10 @@ class AircraftMovementPolicy:
             ("fight_phase_restriction_exposed", self.fight_phase_restriction_exposed),
         ):
             _validate_bool(f"AircraftMovementPolicy {field_name}", value)
-        object.__setattr__(
-            self,
-            "minimum_move_inches",
-            _validate_optional_positive_number(
-                "AircraftMovementPolicy minimum_move_inches",
-                self.minimum_move_inches,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "maximum_pivot_degrees",
-            _validate_optional_positive_number(
-                "AircraftMovementPolicy maximum_pivot_degrees",
-                self.maximum_pivot_degrees,
-            ),
-        )
         if self.uses_aircraft_rules and not self.has_aircraft_keyword:
             raise GameLifecycleError("AircraftMovementPolicy cannot use rules without AIRCRAFT.")
         if self.hover_mode_active and self.uses_aircraft_rules:
             raise GameLifecycleError("Hover mode must disable AIRCRAFT movement rules.")
-        if self.uses_aircraft_rules and (
-            self.minimum_move_inches is None or self.maximum_pivot_degrees is None
-        ):
-            raise GameLifecycleError("AIRCRAFT movement policy requires minimum move and pivot.")
-        if not self.uses_aircraft_rules and (
-            self.minimum_move_inches is not None or self.maximum_pivot_degrees is not None
-        ):
-            raise GameLifecycleError(
-                "Non-AIRCRAFT movement policy must not include aircraft-only limits."
-            )
 
     @classmethod
     def from_unit(
@@ -417,8 +277,6 @@ class AircraftMovementPolicy:
             has_aircraft_keyword=has_aircraft,
             hover_mode_active=hover_active,
             uses_aircraft_rules=uses_aircraft_rules,
-            minimum_move_inches=_AIRCRAFT_MINIMUM_MOVE_INCHES if uses_aircraft_rules else None,
-            maximum_pivot_degrees=_AIRCRAFT_MAXIMUM_PIVOT_DEGREES if uses_aircraft_rules else None,
             can_move_over_other_models=uses_aircraft_rules or _FLY_KEYWORD in effective_keywords,
             other_models_can_move_over_this_aircraft=uses_aircraft_rules,
             can_declare_charge=not uses_aircraft_rules,
@@ -434,18 +292,6 @@ class AircraftMovementPolicy:
         moving_model: Model,
         witness: PathWitness,
     ) -> tuple[AircraftMovementViolation, ...]:
-        violations, _minimum_move_result = self.validate_normal_move_witness_with_minimum_result(
-            moving_model=moving_model,
-            witness=witness,
-        )
-        return violations
-
-    def validate_normal_move_witness_with_minimum_result(
-        self,
-        *,
-        moving_model: Model,
-        witness: PathWitness,
-    ) -> tuple[tuple[AircraftMovementViolation, ...], AircraftMinimumMoveResult | None]:
         if type(moving_model) is not Model:
             raise GameLifecycleError("Aircraft movement validation requires a Model.")
         if type(witness) is not PathWitness:
@@ -454,39 +300,13 @@ class AircraftMovementPolicy:
             raise GameLifecycleError("Aircraft movement validation model is not in policy.")
         if not self.has_aircraft_keyword:
             return (
-                (
-                    AircraftMovementViolation(
-                        violation_code=AircraftMovementViolationCode.UNIT_NOT_AIRCRAFT,
-                        message="Unit does not have the AIRCRAFT keyword.",
-                        model_instance_id=moving_model.model_id,
-                    ),
+                AircraftMovementViolation(
+                    violation_code=AircraftMovementViolationCode.UNIT_NOT_AIRCRAFT,
+                    message="Unit does not have the AIRCRAFT keyword.",
+                    model_instance_id=moving_model.model_id,
                 ),
-                None,
             )
-        if self.hover_mode_active:
-            return ((), None)
-        path = witness.poses_for_model(moving_model.model_id)
-        minimum_move_inches = _required_number(
-            "AircraftMovementPolicy minimum_move_inches",
-            self.minimum_move_inches,
-        )
-        minimum_move_result = AircraftMinimumMoveResult.for_model_path(
-            moving_model=moving_model,
-            witness=witness,
-            minimum_move_inches=minimum_move_inches,
-        )
-        return (
-            _validate_aircraft_normal_move_path(
-                model_instance_id=moving_model.model_id,
-                poses=path,
-                minimum_move_result=minimum_move_result,
-                maximum_pivot_degrees=_required_number(
-                    "AircraftMovementPolicy maximum_pivot_degrees",
-                    self.maximum_pivot_degrees,
-                ),
-            ),
-            minimum_move_result,
-        )
+        return ()
 
     def to_payload(self) -> AircraftMovementPolicyPayload:
         return {
@@ -498,8 +318,6 @@ class AircraftMovementPolicy:
             "has_aircraft_keyword": self.has_aircraft_keyword,
             "hover_mode_active": self.hover_mode_active,
             "uses_aircraft_rules": self.uses_aircraft_rules,
-            "minimum_move_inches": self.minimum_move_inches,
-            "maximum_pivot_degrees": self.maximum_pivot_degrees,
             "can_move_over_other_models": self.can_move_over_other_models,
             "other_models_can_move_over_this_aircraft": (
                 self.other_models_can_move_over_this_aircraft
@@ -519,8 +337,6 @@ class AircraftMovementPolicy:
             has_aircraft_keyword=payload["has_aircraft_keyword"],
             hover_mode_active=payload["hover_mode_active"],
             uses_aircraft_rules=payload["uses_aircraft_rules"],
-            minimum_move_inches=payload["minimum_move_inches"],
-            maximum_pivot_degrees=payload["maximum_pivot_degrees"],
             can_move_over_other_models=payload["can_move_over_other_models"],
             other_models_can_move_over_this_aircraft=payload[
                 "other_models_can_move_over_this_aircraft"
@@ -865,138 +681,6 @@ def _aircraft_reserve_transition_batch(
     )
 
 
-def _validate_aircraft_normal_move_path(
-    *,
-    model_instance_id: str,
-    poses: tuple[Pose, ...],
-    minimum_move_result: AircraftMinimumMoveResult,
-    maximum_pivot_degrees: float,
-) -> tuple[AircraftMovementViolation, ...]:
-    violations: list[AircraftMovementViolation] = []
-    if type(minimum_move_result) is not AircraftMinimumMoveResult:
-        raise GameLifecycleError("AIRCRAFT minimum move result is required.")
-    if minimum_move_result.model_instance_id != model_instance_id:
-        raise GameLifecycleError("AIRCRAFT minimum move result model drift.")
-    start_facing_degrees = poses[0].facing.degrees
-    translation_distance = 0.0
-    pivot_count = 0
-    pivot_seen = False
-    for start_pose, end_pose in pairwise(poses):
-        segment_distance = start_pose.distance_2d_to(end_pose)
-        facing_delta = _angle_delta_degrees(start_pose.facing.degrees, end_pose.facing.degrees)
-        is_translation = segment_distance > _EPSILON
-        is_pivot = facing_delta > _EPSILON
-        if is_translation and is_pivot:
-            violations.append(
-                AircraftMovementViolation(
-                    violation_code=(
-                        AircraftMovementViolationCode.AIRCRAFT_PIVOT_DURING_TRANSLATION
-                    ),
-                    message="AIRCRAFT pivots must happen after translation.",
-                    model_instance_id=model_instance_id,
-                )
-            )
-        if is_translation:
-            translation_distance += segment_distance
-            if pivot_seen:
-                violations.append(
-                    AircraftMovementViolation(
-                        violation_code=(
-                            AircraftMovementViolationCode.AIRCRAFT_TRANSLATION_AFTER_PIVOT
-                        ),
-                        message="AIRCRAFT cannot translate after its final pivot.",
-                        model_instance_id=model_instance_id,
-                    )
-                )
-            if not _segment_is_forward(start_pose, end_pose, start_facing_degrees):
-                violations.append(
-                    AircraftMovementViolation(
-                        violation_code=(
-                            AircraftMovementViolationCode.AIRCRAFT_FORWARD_MOVE_REQUIRED
-                        ),
-                        message="AIRCRAFT must move straight forward before pivoting.",
-                        model_instance_id=model_instance_id,
-                    )
-                )
-        if is_pivot:
-            pivot_count += 1
-            pivot_seen = True
-            if translation_distance <= _EPSILON:
-                violations.append(
-                    AircraftMovementViolation(
-                        violation_code=AircraftMovementViolationCode.AIRCRAFT_PIVOT_BEFORE_MOVE,
-                        message="AIRCRAFT can only pivot after it has moved.",
-                        model_instance_id=model_instance_id,
-                    )
-                )
-            if pivot_count > 1:
-                violations.append(
-                    AircraftMovementViolation(
-                        violation_code=AircraftMovementViolationCode.AIRCRAFT_MULTIPLE_PIVOTS,
-                        message="AIRCRAFT can only pivot once.",
-                        model_instance_id=model_instance_id,
-                    )
-                )
-            if facing_delta > maximum_pivot_degrees:
-                violations.append(
-                    AircraftMovementViolation(
-                        violation_code=(
-                            AircraftMovementViolationCode.AIRCRAFT_PIVOT_LIMIT_EXCEEDED
-                        ),
-                        message="AIRCRAFT pivot exceeds 90 degrees.",
-                        model_instance_id=model_instance_id,
-                    )
-                )
-    if not minimum_move_result.minimum_move_satisfied:
-        violations.append(
-            AircraftMovementViolation(
-                violation_code=AircraftMovementViolationCode.AIRCRAFT_MINIMUM_MOVE_REQUIRED,
-                message="AIRCRAFT must move at least 20 inches before pivoting.",
-                model_instance_id=model_instance_id,
-            )
-        )
-    return tuple(violations)
-
-
-def _aircraft_movement_endpoint_before_pivot(poses: tuple[Pose, ...]) -> Pose:
-    if type(poses) is not tuple:
-        raise GameLifecycleError("AIRCRAFT path poses must be a tuple.")
-    path = tuple(poses)
-    if len(path) < 2:
-        raise GameLifecycleError("AIRCRAFT path must contain at least two poses.")
-    movement_end_pose = path[0]
-    pivot_seen = False
-    for start_pose, end_pose in pairwise(path):
-        segment_distance = start_pose.distance_2d_to(end_pose)
-        facing_delta = _angle_delta_degrees(start_pose.facing.degrees, end_pose.facing.degrees)
-        is_translation = segment_distance > _EPSILON
-        is_pivot = facing_delta > _EPSILON
-        if is_translation and not pivot_seen:
-            movement_end_pose = end_pose
-        if is_pivot:
-            pivot_seen = True
-    return movement_end_pose
-
-
-def _segment_is_forward(start_pose: Pose, end_pose: Pose, facing_degrees: float) -> bool:
-    dx = end_pose.position.x - start_pose.position.x
-    dy = end_pose.position.y - start_pose.position.y
-    if math.hypot(dx, dy) <= _EPSILON:
-        return True
-    segment_degrees = math.degrees(math.atan2(dy, dx)) % 360.0
-    return _angle_delta_degrees(segment_degrees, facing_degrees) <= 1e-6
-
-
-def _angle_delta_degrees(first: float, second: float) -> float:
-    return abs((first - second + 180.0) % 360.0 - 180.0)
-
-
-def _required_number(field_name: str, value: float | None) -> float:
-    if value is None:
-        raise GameLifecycleError(f"{field_name} is required.")
-    return value
-
-
 def _validate_aircraft_movement_violations(
     field_name: str,
     values: object,
@@ -1067,25 +751,3 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"{field_name} must be at least 1.")
     return value
-
-
-def _validate_optional_positive_number(field_name: str, value: object | None) -> float | None:
-    if value is None:
-        return None
-    return _validate_positive_number(field_name, value)
-
-
-def _validate_positive_number(field_name: str, value: object) -> float:
-    number = _validate_finite_number(field_name, value)
-    if number <= 0.0:
-        raise GameLifecycleError(f"{field_name} must be greater than 0.")
-    return number
-
-
-def _validate_finite_number(field_name: str, value: object) -> float:
-    if not isinstance(value, int | float) or type(value) is bool:
-        raise GameLifecycleError(f"{field_name} must be a number.")
-    number = float(value)
-    if not math.isfinite(number):
-        raise GameLifecycleError(f"{field_name} must be finite.")
-    return number

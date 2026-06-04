@@ -115,6 +115,7 @@ LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS = (
 
 _DEFAULT_BATTLEFIELD_WIDTH_INCHES = 60.0
 _DEFAULT_BATTLEFIELD_DEPTH_INCHES = 44.0
+_RESERVE_ENEMY_DISTANCE_INCHES = 8.0
 _EPSILON = 1e-9
 _RESERVES_RULE_ID = "reserves"
 _STRATEGIC_RESERVES_RULE_ID = "strategic_reserves"
@@ -923,7 +924,7 @@ class LargeModelReservePlacementException:
 @dataclass(frozen=True, slots=True)
 class StrategicReserveRule:
     edge_distance_inches: float = 6.0
-    enemy_horizontal_distance_inches: float = 9.0
+    enemy_horizontal_distance_inches: float = _RESERVE_ENEMY_DISTANCE_INCHES
     earliest_arrival_battle_round: int = 2
 
     def __post_init__(self) -> None:
@@ -1358,7 +1359,7 @@ def resolve_reserve_arrival(
         enemy_distance_inches=(
             strategic_rule.enemy_horizontal_distance_inches
             if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES
-            else 9.0
+            else _RESERVE_ENEMY_DISTANCE_INCHES
         ),
     )
     coherency_result = unit_placement_coherency_result(
@@ -1966,7 +1967,7 @@ def _reserve_arrival_transition_batch(
                 placement_kind=placement_kind,
                 pose=model_placement.pose,
                 source_phase=BattlePhase.MOVEMENT.value,
-                source_step="reinforcements",
+                source_step="move_units",
                 source_rule_id=source_rule_id,
                 source_event_id=None,
             )

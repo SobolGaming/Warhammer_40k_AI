@@ -329,7 +329,7 @@ def test_oversized_strategic_reserve_exception_still_rejects_enemy_distance() ->
     scenario = _with_model_pose(
         scenario,
         model_instance_id=enemy_model_id,
-        pose=Pose.at(x=15.0, y=17.0, z=0.0, facing_degrees=180.0),
+        pose=Pose.at(x=15.0, y=16.0, z=0.0, facing_degrees=180.0),
     )
 
     result = resolve_reserve_arrival(
