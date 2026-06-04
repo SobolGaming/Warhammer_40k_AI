@@ -3748,6 +3748,7 @@ def _resolve_grouped_damage_from(
             attack_context=attack_context,
             roll_state=roll_state,
             saving_throw=saving_throw,
+            save_options=save_options,
             allocation_group=current_group,
             allocated_model_id=current_model_id,
         )
@@ -4029,9 +4030,11 @@ def _emit_grouped_save_die_event(
     attack_context: AttackResolutionContextPayload,
     roll_state: DiceRollState,
     saving_throw: SavingThrow | None,
+    save_options: tuple[SaveOption, ...],
     allocation_group: AllocationGroup,
     allocated_model_id: str,
 ) -> None:
+    save_option_payloads = [option.to_payload() for option in save_options]
     if saving_throw is None:
         payload = validate_json_value(
             {
@@ -4042,6 +4045,7 @@ def _emit_grouped_save_die_event(
                 "final_roll": roll_state.current_total,
                 "successful": False,
                 "option": None,
+                "save_options": save_option_payloads,
                 "allocation_group_id": allocation_group.group_id,
                 "allocated_model_id": allocated_model_id,
             }
@@ -4050,6 +4054,7 @@ def _emit_grouped_save_die_event(
         payload = validate_json_value(
             {
                 **saving_throw.to_payload(),
+                "save_options": save_option_payloads,
                 "allocation_group_id": allocation_group.group_id,
                 "allocated_model_id": allocated_model_id,
             }

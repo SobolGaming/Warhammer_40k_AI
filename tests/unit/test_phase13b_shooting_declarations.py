@@ -2272,6 +2272,7 @@ def test_phase14i_no_save_damage_order_die_is_not_a_save_roll() -> None:
     assert save_payload["target_number"] is None
     assert save_payload["successful"] is False
     assert save_payload["option"] is None
+    assert save_payload["save_options"] == []
 
 
 def test_phase14h_pending_grouped_damage_round_trips_across_fnp_pause() -> None:
@@ -4882,6 +4883,7 @@ def test_phase14e_armour_save_can_succeed_after_invulnerable_save_fails() -> Non
     )
     payload = cast(dict[str, object], save_payload["payload"])
     option = cast(dict[str, object], payload["option"])
+    save_options = cast(list[dict[str, object]], payload["save_options"])
     damage_payload = _attack_step_payload(
         tuple(
             event
@@ -4902,6 +4904,12 @@ def test_phase14e_armour_save_can_succeed_after_invulnerable_save_fails() -> Non
     assert payload["resolution_rule"] == SaveResolutionRule.ARMOUR_SAVE.value
     assert option["save_kind"] == SaveKind.ARMOUR.value
     assert option["target_number"] == 3
+    assert [save_option["save_kind"] for save_option in save_options] == [
+        SaveKind.ARMOUR.value,
+        SaveKind.INVULNERABLE.value,
+    ]
+    assert [save_option["target_number"] for save_option in save_options] == [3, 5]
+    assert save_options[0] == option
     assert damage_event_payload["damage_application"] is None
 
 
