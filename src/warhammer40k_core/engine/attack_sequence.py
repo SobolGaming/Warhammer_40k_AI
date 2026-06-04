@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from hashlib import sha256
 from typing import TYPE_CHECKING, Self, TypedDict, cast
@@ -419,8 +419,6 @@ class AttackModifierStackSetPayload(TypedDict):
 
 class IdenticalAttackSignaturePayload(TypedDict):
     attacker_model_instance_id: str
-    wargear_id: str
-    weapon_profile_id: str
     target_visible_model_ids: list[str]
     target_in_range_model_ids: list[str]
     hit_basis: str
@@ -1018,8 +1016,6 @@ class DeferredMortalWounds:
 @dataclass(frozen=True, slots=True)
 class IdenticalAttackSignature:
     attacker_model_instance_id: str
-    wargear_id: str
-    weapon_profile_id: str
     target_visible_model_ids: tuple[str, ...]
     target_in_range_model_ids: tuple[str, ...]
     hit_basis: str
@@ -1041,19 +1037,6 @@ class IdenticalAttackSignature:
             _validate_identifier(
                 "IdenticalAttackSignature attacker_model_instance_id",
                 self.attacker_model_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "wargear_id",
-            _validate_identifier("IdenticalAttackSignature wargear_id", self.wargear_id),
-        )
-        object.__setattr__(
-            self,
-            "weapon_profile_id",
-            _validate_identifier(
-                "IdenticalAttackSignature weapon_profile_id",
-                self.weapon_profile_id,
             ),
         )
         object.__setattr__(
@@ -1157,8 +1140,6 @@ class IdenticalAttackSignature:
     def to_payload(self) -> IdenticalAttackSignaturePayload:
         return {
             "attacker_model_instance_id": self.attacker_model_instance_id,
-            "wargear_id": self.wargear_id,
-            "weapon_profile_id": self.weapon_profile_id,
             "target_visible_model_ids": list(self.target_visible_model_ids),
             "target_in_range_model_ids": list(self.target_in_range_model_ids),
             "hit_basis": self.hit_basis,
@@ -1178,8 +1159,6 @@ class IdenticalAttackSignature:
     def from_payload(cls, payload: IdenticalAttackSignaturePayload) -> Self:
         return cls(
             attacker_model_instance_id=payload["attacker_model_instance_id"],
-            wargear_id=payload["wargear_id"],
-            weapon_profile_id=payload["weapon_profile_id"],
             target_visible_model_ids=tuple(payload["target_visible_model_ids"]),
             target_in_range_model_ids=tuple(payload["target_in_range_model_ids"]),
             hit_basis=payload["hit_basis"],
@@ -4046,6 +4025,7 @@ def _emit_grouped_save_die_event(
                 "successful": False,
                 "option": None,
                 "save_options": save_option_payloads,
+                "weapon_profile_id": attack_context["weapon_profile_id"],
                 "allocation_group_id": allocation_group.group_id,
                 "allocated_model_id": allocated_model_id,
             }
@@ -4055,6 +4035,7 @@ def _emit_grouped_save_die_event(
             {
                 **saving_throw.to_payload(),
                 "save_options": save_option_payloads,
+                "weapon_profile_id": attack_context["weapon_profile_id"],
                 "allocation_group_id": allocation_group.group_id,
                 "allocated_model_id": allocated_model_id,
             }
@@ -5270,7 +5251,12 @@ def _roll_hit_and_wound(
                 attack_context_id=attack_context_id,
                 pool_index=attack_sequence.pool_index,
                 attack_index=attack_sequence.attack_index,
-                payload=validate_json_value(hit_roll.to_payload()),
+                payload=validate_json_value(
+                    {
+                        **hit_roll.to_payload(),
+                        "weapon_profile_id": pool.weapon_profile_id,
+                    }
+                ),
             ),
         )
         if hit_roll.critical:
@@ -5283,7 +5269,12 @@ def _roll_hit_and_wound(
                     attack_context_id=attack_context_id,
                     pool_index=attack_sequence.pool_index,
                     attack_index=attack_sequence.attack_index,
-                    payload=validate_json_value(hit_roll.to_payload()),
+                    payload=validate_json_value(
+                        {
+                            **hit_roll.to_payload(),
+                            "weapon_profile_id": pool.weapon_profile_id,
+                        }
+                    ),
                 ),
             )
     else:
@@ -5336,7 +5327,12 @@ def _roll_hit_and_wound(
             attack_context_id=attack_context_id,
             pool_index=attack_sequence.pool_index,
             attack_index=attack_sequence.attack_index,
-            payload=validate_json_value(wound_roll.to_payload()),
+            payload=validate_json_value(
+                {
+                    **wound_roll.to_payload(),
+                    "weapon_profile_id": pool.weapon_profile_id,
+                }
+            ),
         ),
     )
     if wound_roll.critical:
@@ -5349,7 +5345,12 @@ def _roll_hit_and_wound(
                 attack_context_id=attack_context_id,
                 pool_index=attack_sequence.pool_index,
                 attack_index=attack_sequence.attack_index,
-                payload=validate_json_value(wound_roll.to_payload()),
+                payload=validate_json_value(
+                    {
+                        **wound_roll.to_payload(),
+                        "weapon_profile_id": pool.weapon_profile_id,
+                    }
+                ),
             ),
         )
     return {
@@ -5610,6 +5611,7 @@ def _emit_damage_event(
             "saving_throw": resolved_saving_throw,
             "damage_application": None if damage is None else damage.to_payload(),
             "feel_no_pain": None if feel_no_pain is None else feel_no_pain.to_payload(),
+            "weapon_profile_id": attack_sequence.current_pool().weapon_profile_id,
         }
     )
     damage_event = _emit_event(
@@ -6274,8 +6276,6 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
     )
     return IdenticalAttackSignature(
         attacker_model_instance_id=pool.attacker_model_instance_id,
-        wargear_id=pool.wargear_id,
-        weapon_profile_id=pool.weapon_profile_id,
         target_visible_model_ids=pool.target_visible_model_ids,
         target_in_range_model_ids=pool.target_in_range_model_ids,
         hit_basis=hit_basis,
@@ -6552,11 +6552,22 @@ def _synthetic_pool_for_gathered_group(
         attack_pools=attack_pools,
     )
     base_pool = attack_pools[gathered_group.primary_pool_index]
+    wargear_id = base_pool.wargear_id
+    weapon_profile = base_pool.weapon_profile
+    weapon_profile_id = base_pool.weapon_profile_id
+    if len(gathered_group.pool_indices) > 1:
+        wargear_id = f"gathered-wargear:{gathered_group.group_id}"
+        weapon_profile_id = f"gathered-profile:{gathered_group.group_id}"
+        weapon_profile = replace(
+            base_pool.weapon_profile,
+            profile_id=weapon_profile_id,
+            name=f"Gathered weapon pool {gathered_group.group_id}",
+        )
     return RangedAttackPool(
         attacker_model_instance_id=base_pool.attacker_model_instance_id,
-        wargear_id=base_pool.wargear_id,
-        weapon_profile_id=base_pool.weapon_profile_id,
-        weapon_profile=base_pool.weapon_profile,
+        wargear_id=wargear_id,
+        weapon_profile_id=weapon_profile_id,
+        weapon_profile=weapon_profile,
         target_unit_instance_id=gathered_group.target_unit_instance_id,
         shooting_type=base_pool.shooting_type,
         attacks=gathered_group.total_attacks,

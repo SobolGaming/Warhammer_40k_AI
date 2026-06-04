@@ -5657,8 +5657,6 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     assert groups[0].group_id.count(":") == 1
     assert "attacks" not in identical_attack_signature(first_pool).to_payload()
     assert groups[0].signature.attacker_model_instance_id == first_pool.attacker_model_instance_id
-    assert groups[0].signature.wargear_id == first_pool.wargear_id
-    assert groups[0].signature.weapon_profile_id == first_pool.weapon_profile_id
     assert groups[0].signature.target_visible_model_ids == first_pool.target_visible_model_ids
     assert groups[0].signature.target_in_range_model_ids == first_pool.target_in_range_model_ids
     assert IdenticalAttackSignature.from_payload(groups[0].signature.to_payload()) == (
@@ -5672,6 +5670,9 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     )
     assert synthetic_pool.attacks == 6
     assert synthetic_pool.attacker_model_instance_id == first_pool.attacker_model_instance_id
+    assert synthetic_pool.wargear_id == f"gathered-wargear:{groups[0].group_id}"
+    assert synthetic_pool.weapon_profile_id == f"gathered-profile:{groups[0].group_id}"
+    assert synthetic_pool.weapon_profile.profile_id == synthetic_pool.weapon_profile_id
     assert synthetic_pool.target_visible_model_ids == first_pool.target_visible_model_ids
     assert synthetic_pool.target_in_range_model_ids == first_pool.target_in_range_model_ids
     assert synthetic_pool.firing_deck_source_unit_instance_id is None
@@ -5709,16 +5710,10 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
             firing_deck_source_unit_instance_id="army-alpha:transport-1",
             firing_deck_source_model_instance_id="army-alpha:transport-1:model-001",
         ),
-        replace(first_pool, wargear_id="phase14l-other-wargear"),
         replace(
             first_pool,
             weapon_profile_id=strength_profile.profile_id,
             weapon_profile=strength_profile,
-        ),
-        replace(
-            first_pool,
-            weapon_profile_id="phase14l-equal-profile-id",
-            weapon_profile=replace(base_profile, profile_id="phase14l-equal-profile-id"),
         ),
         replace(first_pool, hit_roll_modifier=1),
         replace(
@@ -5734,6 +5729,16 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     )
     signatures = {identical_attack_signature(pool) for pool in different_pools}
     assert len(signatures) == len(different_pools)
+    matching_id_only_pools = (
+        first_pool,
+        replace(
+            first_pool,
+            wargear_id="phase14l-other-wargear",
+            weapon_profile_id="phase14l-equal-profile-id",
+            weapon_profile=replace(base_profile, profile_id="phase14l-equal-profile-id"),
+        ),
+    )
+    assert len({identical_attack_signature(pool) for pool in matching_id_only_pools}) == 1
 
 
 def test_phase14l_precision_visibility_provenance_prevents_unsafe_gathering() -> None:
@@ -5905,6 +5910,7 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
     )
     bolt_pistol_profile = replace(
         boltgun_profile,
+        profile_id="phase14l-test1-bolt-pistol",
         name="Phase 14L Test 1 bolt pistol",
         attack_profile=AttackProfile.fixed(1),
     )
@@ -5947,7 +5953,7 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
         ),
         RangedAttackPool(
             attacker_model_instance_id=safe_attacker_model_id,
-            wargear_id="phase14l-test1-bolt-identical",
+            wargear_id="phase14l-test1-bolt-pistol",
             weapon_profile_id=bolt_pistol_profile.profile_id,
             weapon_profile=bolt_pistol_profile,
             target_unit_instance_id=defender.unit_instance_id,
@@ -5984,13 +5990,20 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
     assert len(groups) == 2
     assert bolt_group.pool_indices == (0, 1, 2)
     assert tuple(contribution.attacks for contribution in bolt_group.contributions) == (2, 2, 1)
+    assert {contribution.weapon_profile_id for contribution in bolt_group.contributions} == {
+        boltgun_profile.profile_id,
+        bolt_pistol_profile.profile_id,
+    }
     assert heavy_group.pool_indices == (3,)
+    bolt_synthetic_profile = (
+        sequence.with_current_gathered_group(bolt_group).current_pool().weapon_profile
+    )
 
     manager = DiceRollManager(
         "phase14l-shooting-test1",
         event_log=lifecycle.decision_controller.event_log,
         injected_results=_phase14l_test1_dice_results(
-            bolt_profile=boltgun_profile,
+            bolt_profile=bolt_synthetic_profile,
             heavy_profile=heavy_bolter_profile,
             first_save_model_id=target_model_ids[0],
             second_save_model_id=target_model_ids[1],
@@ -6028,6 +6041,9 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
     assert [
         cast(dict[str, object], event["payload"])["unmodified_roll"] for event in hit_payloads
     ] == [2, 4, 6, 4, 3, 4, 4, 2]
+    assert [
+        cast(dict[str, object], event["payload"])["weapon_profile_id"] for event in hit_payloads[:5]
+    ] == [bolt_synthetic_profile.profile_id] * 5
     assert [
         cast(dict[str, object], event["payload"])["unmodified_roll"] for event in wound_payloads
     ] == [6, 3, 5, 1, 3, 6]
@@ -6103,8 +6119,6 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
     with pytest.raises(GameLifecycleError, match="hit_roll_modifier"):
         IdenticalAttackSignature(
             attacker_model_instance_id=group.signature.attacker_model_instance_id,
-            wargear_id=group.signature.wargear_id,
-            weapon_profile_id=group.signature.weapon_profile_id,
             target_visible_model_ids=group.signature.target_visible_model_ids,
             target_in_range_model_ids=group.signature.target_in_range_model_ids,
             hit_basis=group.signature.hit_basis,
@@ -6126,8 +6140,6 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
     with pytest.raises(GameLifecycleError, match="Firing Deck source unit and model"):
         IdenticalAttackSignature(
             attacker_model_instance_id=group.signature.attacker_model_instance_id,
-            wargear_id=group.signature.wargear_id,
-            weapon_profile_id=group.signature.weapon_profile_id,
             target_visible_model_ids=group.signature.target_visible_model_ids,
             target_in_range_model_ids=group.signature.target_in_range_model_ids,
             hit_basis=group.signature.hit_basis,

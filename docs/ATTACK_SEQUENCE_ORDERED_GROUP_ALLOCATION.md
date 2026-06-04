@@ -40,14 +40,21 @@ The Gather Attack Dice step groups unresolved ranged pools for the selected
 target only when their deterministic identical-attack signature matches. The
 signature includes hit basis, hit/wound modifiers, Strength, AP, Damage,
 applicable structured weapon abilities/keywords, targeting rule IDs, shooting
-type, attacker model ID, wargear/profile IDs, visible and in-range target model
-IDs, and optional Firing Deck source unit/model IDs. These provenance fields are
-part of the signature because the current resolver turns a gathered group into a
-single synthetic `RangedAttackPool`; the copied pool identity must therefore be
-identical across every contribution before hit/wound attribution, Precision
-visibility, cover/LOS, save, damage, event attribution, or Firing Deck/source
-attribution can run through that synthetic pool. It deliberately excludes only
-the Attacks count and raw weapon range value; per-contribution attack counts
+type, attacker model ID, visible and in-range target model IDs, and optional
+Firing Deck source unit/model IDs. Wargear/profile IDs are omitted so distinct
+weapons with identical resolution characteristics can gather together; each
+contribution still carries its original IDs, and multi-contribution groups
+resolve through a deterministic gathered weapon-pool identity. These retained
+provenance fields are part of the signature because the current resolver turns a
+gathered group into a single synthetic `RangedAttackPool`; copied observer,
+visibility, range, and source identity must therefore be identical across every
+contribution before Precision visibility, cover/LOS, save, damage, or Firing
+Deck/source attribution can run through that synthetic pool. It deliberately
+excludes the Attacks count, raw weapon range value, wargear ID, and weapon
+profile ID; per-contribution attack counts and original source IDs remain on the
+gathered payload. Attack-step event payloads expose the original `weapon_profile_id`
+for single-pool groups and a deterministic `gathered-profile:<attack-group>` ID
+for multi-contribution gathered groups.
 remain replay evidence in the gathered group payload. Melee attack splitting and
 melee identical-attack gathering remain Phase 15 Fight-phase work.
 

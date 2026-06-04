@@ -304,18 +304,25 @@ attacker-visible attack-resolution decisions:
 - `select_attack_weapon_group`: finite attacking-player choice emitted after a
   target unit is selected when that target has two or more unresolved
   identical-attack groups. Option IDs use deterministic `attack-group:<hash>`
-  values derived from the selected target, the full synthetic-pool-safe
+  values derived from the selected target, the full resolver-safe
   identical-attack signature, and contributing pool indices. The selected option
   payload includes
   `submission_kind: "select_attack_weapon_group"`, `target_unit_instance_id`,
   `sequence_id`, and a JSON-safe `gathered_group` payload with the
   identical-attack signature, contributing pool indices, per-pool attack counts,
-  and total gathered attacks. The signature includes every pool field the
-  current single synthetic-pool resolver copies for downstream hit/wound,
-  Precision visibility, cover/LOS, event attribution, and Firing Deck/source
-  attribution, including attacker model ID, wargear/profile IDs, visible and
-  in-range target model IDs, targeting rule IDs, shooting type, and optional
-  Firing Deck source unit/model IDs. If exactly one group remains for the
+  and total gathered attacks. Multi-contribution groups resolve through a
+  deterministic gathered weapon-pool identity, while each contribution preserves
+  its original wargear and weapon-profile IDs in the gathered payload. The
+  signature includes every provenance field the current synthetic-pool resolver
+  copies for downstream Precision visibility, cover/LOS, and Firing Deck/source
+  attribution, including attacker model ID, visible and in-range target model
+  IDs, targeting rule IDs, shooting type, and optional Firing Deck source
+  unit/model IDs. Wargear/profile IDs are intentionally omitted from the
+  signature so weapons with identical resolution characteristics and structured
+  rule tokens can gather into the same deterministic weapon pool. Attack-step
+  event payloads include `weapon_profile_id`; this is the original profile ID
+  for single-pool groups and a deterministic `gathered-profile:<attack-group>`
+  ID for multi-contribution gathered groups. If exactly one group remains for the
   selected target, the engine records an automatic finite choice instead of
   emitting a pending request.
 
