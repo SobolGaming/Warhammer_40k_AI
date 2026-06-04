@@ -7,7 +7,11 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
+from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
+    RulesetDescriptor,
+    TerrainFeatureKind,
+)
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
@@ -22,12 +26,20 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
+)
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalPayload,
+    MovementProposalRequest,
+    PlacementProposalPayload,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -39,7 +51,6 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.movement import (
     COMPLETE_DISEMBARKS_OPTION_ID,
     DECLINE_EMBARK_OPTION_ID,
-    PLACE_DISEMBARK_UNIT_DECISION_TYPE,
     SELECT_DISEMBARK_UNIT_DECISION_TYPE,
     SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -88,6 +99,7 @@ from warhammer40k_core.engine.transports import (
     transport_restriction_override_kind_from_token,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -197,7 +209,7 @@ def test_lifecycle_replay_accepts_embarked_models_accounted_by_transport_cargo_s
     )
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
         "reaction_queue": {"frames": []},
@@ -220,12 +232,16 @@ def test_normal_move_ending_near_transport_emits_embark_decision() -> None:
         unit_instance_id=passenger.unit_instance_id,
     )
 
-    status = _submit_handler_decision(
+    status = _submit_action_and_movement_payload(
         handler,
         state=state,
         decisions=decisions,
         request=action_request,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        unit=passenger,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        dx=6.0,
         result_id="phase10q-normal-move",
     )
 
@@ -246,12 +262,16 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
         unit_instance_id=passenger.unit_instance_id,
     )
     embark_request = _decision_request(
-        _submit_handler_decision(
+        _submit_action_and_movement_payload(
             handler,
             state=state,
             decisions=decisions,
             request=action_request,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            unit=passenger,
+            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+            movement_mode=MovementMode.NORMAL,
+            dx=6.0,
             result_id="phase10q-normal-move",
         )
     )
@@ -276,7 +296,7 @@ def test_lifecycle_embark_selection_updates_battlefield_and_cargo_atomically() -
 
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
         "reaction_queue": {"frames": []},
@@ -296,12 +316,16 @@ def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None
     )
 
     embark_request = _decision_request(
-        _submit_handler_decision(
+        _submit_action_and_movement_payload(
             handler,
             state=state,
             decisions=decisions,
             request=action_request,
             option_id=MovementPhaseActionKind.ADVANCE.value,
+            unit=passenger,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            movement_mode=MovementMode.ADVANCE,
+            dx=7.0,
             result_id="phase10q-advance",
         )
     )
@@ -327,7 +351,7 @@ def test_lifecycle_advance_then_embark_replay_preserves_advanced_state() -> None
     )
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
         "reaction_queue": {"frames": []},
@@ -351,12 +375,17 @@ def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> N
     assert fall_back_option_id in {option.option_id for option in action_request.options}
 
     embark_request = _decision_request(
-        _submit_handler_decision(
+        _submit_action_and_movement_payload(
             handler,
             state=state,
             decisions=decisions,
             request=action_request,
             option_id=fall_back_option_id,
+            unit=passenger,
+            movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+            movement_mode=MovementMode.FALL_BACK,
+            fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
+            dy=6.0,
             result_id="phase10q-fall-back",
         )
     )
@@ -382,7 +411,7 @@ def test_lifecycle_fall_back_then_embark_replay_preserves_fell_back_state() -> N
     )
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
         "reaction_queue": {"frames": []},
@@ -401,12 +430,16 @@ def test_lifecycle_embark_decline_leaves_unit_placed_and_completes_activation() 
         unit_instance_id=passenger.unit_instance_id,
     )
     embark_request = _decision_request(
-        _submit_handler_decision(
+        _submit_action_and_movement_payload(
             handler,
             state=state,
             decisions=decisions,
             request=action_request,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            unit=passenger,
+            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+            movement_mode=MovementMode.NORMAL,
+            dx=6.0,
             result_id="phase10q-normal-move",
         )
     )
@@ -439,12 +472,16 @@ def test_invalid_lifecycle_embark_returns_invalid_without_embark_mutation() -> N
         unit_instance_id=passenger.unit_instance_id,
     )
     embark_request = _decision_request(
-        _submit_handler_decision(
+        _submit_action_and_movement_payload(
             handler,
             state=state,
             decisions=decisions,
             request=action_request,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            unit=passenger,
+            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+            movement_mode=MovementMode.NORMAL,
+            dx=6.0,
             result_id="phase10q-normal-move",
         )
     )
@@ -518,14 +555,17 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
             result_id="phase10q-select-disembark",
         )
     )
-    assert placement_request.decision_type == PLACE_DISEMBARK_UNIT_DECISION_TYPE
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
 
-    status = _submit_handler_decision(
+    status = _submit_disembark_placement_payload(
         handler,
         state=state,
         decisions=decisions,
         request=placement_request,
-        option_id=BattlefieldPlacementKind.DISEMBARK.value,
+        passenger=passenger,
+        transport=transport,
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
         result_id="phase10q-place-disembark",
     )
 
@@ -560,7 +600,7 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
 
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
         "reaction_queue": {"frames": []},
@@ -645,14 +685,17 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
             result_id="phase10q-select-post-normal-disembark",
         )
     )
-    assert placement_request.decision_type == PLACE_DISEMBARK_UNIT_DECISION_TYPE
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
 
-    status = _submit_handler_decision(
+    status = _submit_disembark_placement_payload(
         handler,
         state=state,
         decisions=decisions,
         request=placement_request,
-        option_id=BattlefieldPlacementKind.DISEMBARK.value,
+        passenger=passenger,
+        transport=transport,
+        disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
         result_id="phase10q-place-post-normal-disembark",
     )
 
@@ -691,7 +734,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
 
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": decisions.to_payload(),
         "reaction_queue": {"frames": []},
@@ -718,7 +761,7 @@ def test_replay_rejects_transport_cargo_when_transport_is_not_placed() -> None:
     )
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
         "reaction_queue": {"frames": []},
@@ -746,7 +789,7 @@ def test_replay_rejects_transport_cargo_when_transport_model_is_removed() -> Non
     )
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
         "reaction_queue": {"frames": []},
@@ -773,7 +816,7 @@ def test_replay_rejects_advanced_state_for_unplaced_unremoved_unembarked_unit() 
     state.record_advanced_unit_state(_advanced_unit_state(passenger.unit_instance_id))
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
         "reaction_queue": {"frames": []},
@@ -806,7 +849,7 @@ def test_replay_rejects_fell_back_state_for_unplaced_unremoved_unembarked_unit()
     )
     payload: GameLifecyclePayload = {
         "config": None,
-        "parameterized_movement_proposals": False,
+        "parameterized_movement_proposals": True,
         "state": state.to_payload(),
         "decisions": DecisionController().to_payload(),
         "reaction_queue": {"frames": []},
@@ -2021,6 +2064,16 @@ def _rapid_disembark_request_after_transport_normal_move(
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         result_id="phase10q-transport-normal-move",
     )
+    movement_proposal_request = _decision_request(post_move_disembark_status)
+    assert movement_proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    post_move_disembark_status = _submit_transport_normal_move_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=movement_proposal_request,
+        transport=transport,
+        result_id="phase10q-transport-normal-move-proposal",
+    )
     return handler, decisions, _decision_request(post_move_disembark_status)
 
 
@@ -2044,6 +2097,162 @@ def _submit_handler_decision(
         result=result,
         decisions=decisions,
     )
+
+
+def _submit_action_and_movement_payload(
+    handler: MovementPhaseHandler,
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    option_id: str,
+    unit: UnitInstance,
+    movement_phase_action: MovementPhaseActionKind,
+    movement_mode: MovementMode,
+    dx: float = 0.0,
+    dy: float = 0.0,
+    fall_back_mode: FallBackModeKind | None = None,
+    result_id: str,
+) -> LifecycleStatus | None:
+    proposal_status = _submit_handler_decision(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=request,
+        option_id=option_id,
+        result_id=result_id,
+    )
+    proposal_request = _decision_request(proposal_status)
+    assert proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    assert state.battlefield_state is not None
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    payload = MovementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=proposal.proposal_kind,
+        unit_instance_id=unit.unit_instance_id,
+        movement_phase_action=movement_phase_action.value,
+        witness=_shift_witness(unit_placement, dx=dx, dy=dy),
+        movement_mode=movement_mode.value,
+        fall_back_mode=None if fall_back_mode is None else fall_back_mode.value,
+    ).to_payload()
+    return _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=proposal_request,
+        payload=validate_json_value(payload),
+        result_id=f"{result_id}-proposal",
+    )
+
+
+def _submit_transport_normal_move_payload(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    transport: UnitInstance,
+    result_id: str,
+) -> LifecycleStatus | None:
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert state.battlefield_state is not None
+    transport_placement = state.battlefield_state.unit_placement_by_id(transport.unit_instance_id)
+    payload = MovementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=proposal.proposal_kind,
+        unit_instance_id=transport.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+        witness=_shift_witness(transport_placement, dx=-0.5),
+        movement_mode=MovementMode.NORMAL.value,
+    ).to_payload()
+    return _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=request,
+        payload=validate_json_value(payload),
+        result_id=result_id,
+    )
+
+
+def _submit_disembark_placement_payload(
+    handler: MovementPhaseHandler,
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    passenger: UnitInstance,
+    transport: UnitInstance,
+    disembark_mode: DisembarkModeKind,
+    transport_movement_status: TransportMovementStatus,
+    result_id: str,
+) -> LifecycleStatus | None:
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    poses = _disembark_poses()[: len(passenger.own_models)]
+    if transport_movement_status is TransportMovementStatus.NORMAL_MOVE:
+        poses = tuple(
+            Pose.at(
+                pose.position.x - 0.5,
+                pose.position.y,
+                pose.position.z,
+                facing_degrees=pose.facing.degrees,
+            )
+            for pose in poses
+        )
+    placement = _unit_placement_at(
+        passenger,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=poses,
+    )
+    payload = PlacementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=proposal.proposal_kind,
+        unit_instance_id=passenger.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=placement,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=disembark_mode,
+        transport_movement_status=transport_movement_status,
+    ).to_payload()
+    return _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=request,
+        payload=validate_json_value(payload),
+        result_id=result_id,
+    )
+
+
+def _submit_parameterized_handler_payload(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    payload: JsonValue,
+    result_id: str,
+) -> LifecycleStatus | None:
+    result = DecisionResult(
+        result_id=result_id,
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id="submit_parameterized_payload",
+        payload=payload,
+    )
+    invalid_status = handler.invalid_proposal_submission_status(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+    )
+    if invalid_status is not None:
+        return invalid_status
+    decisions.submit_result(result)
+    return handler.apply_decision(state=state, result=result, decisions=decisions)
 
 
 def _decision_request(status: LifecycleStatus | None) -> DecisionRequest:
@@ -2298,6 +2507,31 @@ def _unit_placement_at(
             for model, pose in zip(unit.own_models, poses, strict=False)
         ),
     )
+
+
+def _shift_witness(
+    unit_placement: UnitPlacement,
+    *,
+    dx: float,
+    dy: float = 0.0,
+) -> PathWitness:
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement in unit_placement.model_placements:
+        start = placement.pose
+        end = Pose.at(
+            start.position.x + dx,
+            start.position.y + dy,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        midpoint = Pose.at(
+            start.position.x + (dx / 2.0),
+            start.position.y + (dy / 2.0),
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
 
 
 def _disembark_poses(*, z_inches: float = 0.0) -> tuple[Pose, ...]:

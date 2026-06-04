@@ -29,6 +29,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import MOVEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
@@ -88,6 +89,7 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
 
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}",
         f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}",
     }
     assert MovementPhaseActionKind.NORMAL_MOVE.value not in {
@@ -112,6 +114,7 @@ def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
     )
     if fall_back_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
         assert _decision_request(fall_back_status).decision_type in {
+            MOVEMENT_PROPOSAL_DECISION_TYPE,
             SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
             SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         }
@@ -450,69 +453,6 @@ def test_aircraft_normal_move_records_cost_free_aircraft_rotation() -> None:
     assert movement_distance_witness.total_distance_inches == movement_inches
     assert len(movement_distance_witness.rotation_events) == 1
     assert movement_distance_witness.rotation_events[0].facing_delta_degrees == 90.0
-
-
-def test_normal_move_payload_rejects_distance_witness_drift() -> None:
-    scenario = _vehicle_scenario_with_active_unit_keywords_and_base(
-        keywords=("Vehicle",),
-        base_size=BaseSizeDefinition.rectangular(length_mm=100.0, width_mm=60.0),
-    )
-    unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
-    resolution = resolve_normal_move(
-        scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
-        unit_placement=unit_placement,
-        path_witness=_single_model_pivot_witness(unit_placement, movement_inches=8.0),
-    )
-    payload = json.loads(
-        json.dumps(
-            {
-                "witness": resolution.witness.to_payload(),
-                **resolution.movement_payload,
-            },
-            sort_keys=True,
-        )
-    )
-    assert isinstance(payload, dict)
-    assert resolution.selected_payload_drift_code(cast(dict[str, JsonValue], payload)) is None
-    model_movements = cast(list[dict[str, object]], payload["model_movements"])
-    distance_witness = cast(dict[str, object], model_movements[0]["movement_distance_witness"])
-    budget = cast(dict[str, object], distance_witness["budget"])
-    budget["straight_line_distance_inches"] = 9.0
-    budget["total_distance_inches"] = 9.0
-    budget["remaining_distance_inches"] = 3.0
-
-    assert resolution.selected_payload_drift_code(cast(dict[str, JsonValue], payload)) == (
-        "normal_move_model_movement_witness_drift"
-    )
-
-
-def test_normal_move_payload_rejects_path_witness_drift() -> None:
-    scenario = _vehicle_scenario()
-    unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
-    resolution = resolve_normal_move(
-        scenario=scenario,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
-        unit_placement=unit_placement,
-        path_witness=_single_model_pivot_witness(unit_placement, movement_inches=8.0),
-    )
-    payload = {
-        "witness": PathWitness.for_straight_line_endpoints(
-            (
-                (
-                    unit_placement.model_placements[0].model_instance_id,
-                    unit_placement.model_placements[0].pose,
-                    Pose.at(10.0, 6.0),
-                ),
-            )
-        ).to_payload(),
-        **resolution.movement_payload,
-    }
-
-    assert (
-        resolution.selected_payload_drift_code(cast(dict[str, JsonValue], payload))
-        == "normal_move_witness_drift"
-    )
 
 
 def test_normal_move_rejects_witness_model_set_drift() -> None:

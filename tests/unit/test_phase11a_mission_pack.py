@@ -20,10 +20,16 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, Terrain
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    ModelPlacement,
+    UnitPlacement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -34,6 +40,10 @@ from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
     MissionSetupError,
     instantiate_terrain_layout_template,
+)
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalRequest,
+    PlacementProposalPayload,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -54,6 +64,7 @@ from warhammer40k_core.engine.reserves import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -489,14 +500,21 @@ def test_live_reinforcements_without_mission_setup_fails_fast() -> None:
             result_id="phase11a-select-missing-setup",
         )
     )
+    reserve_unit = _reserve_unit(state=state, reserve_state=reserve_state)
+    placement = _single_model_reserve_placement(
+        reserve_unit=reserve_unit,
+        pose=_south_edge_touching_pose(reserve_unit=reserve_unit, x=6.0),
+    )
 
     with pytest.raises(GameLifecycleError, match="Live Reinforcements requires MissionSetup"):
-        _submit_handler_decision(
+        _submit_reserve_placement_payload(
             handler=handler,
             state=state,
             decisions=decisions,
             request=placement_request,
-            option_id=BattlefieldPlacementKind.STRATEGIC_RESERVES.value,
+            reserve_unit=reserve_unit,
+            placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            attempted_placement=placement,
             result_id="phase11a-place-missing-setup",
         )
 
@@ -522,13 +540,20 @@ def test_live_reinforcements_use_mission_deployment_zones_for_round_2_restrictio
             result_id="phase11a-select-reserve",
         )
     )
+    reserve_unit = _reserve_unit(state=state, reserve_state=reserve_state)
+    placement = _single_model_reserve_placement(
+        reserve_unit=reserve_unit,
+        pose=_enemy_deployment_zone_center_pose(state=state, player_id="player-a"),
+    )
 
-    invalid_status = _submit_handler_decision(
+    invalid_status = _submit_reserve_placement_payload(
         handler=handler,
         state=state,
         decisions=decisions,
         request=placement_request,
-        option_id=BattlefieldPlacementKind.STRATEGIC_RESERVES.value,
+        reserve_unit=reserve_unit,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=placement,
         result_id="phase11a-place-reserve",
     )
 
@@ -561,7 +586,12 @@ def test_live_reinforcements_use_instantiated_mission_terrain_for_endpoint_valid
             result_id="phase11a-select-terrain",
         )
     )
-    pose = _strategic_reserves_option_pose(placement_request)
+    reserve_unit = _reserve_unit(state=state, reserve_state=reserve_state)
+    placement = _single_model_reserve_placement(
+        reserve_unit=reserve_unit,
+        pose=_south_edge_touching_pose(reserve_unit=reserve_unit, x=6.0),
+    )
+    pose = _first_placement_pose(placement)
     assert state.mission_setup is not None
     state.mission_setup = replace(
         state.mission_setup,
@@ -573,12 +603,14 @@ def test_live_reinforcements_use_instantiated_mission_terrain_for_endpoint_valid
         ),
     )
 
-    invalid_status = _submit_handler_decision(
+    invalid_status = _submit_reserve_placement_payload(
         handler=handler,
         state=state,
         decisions=decisions,
         request=placement_request,
-        option_id=BattlefieldPlacementKind.STRATEGIC_RESERVES.value,
+        reserve_unit=reserve_unit,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=placement,
         result_id="phase11a-place-terrain",
     )
 
@@ -707,30 +739,120 @@ def _submit_handler_decision(
     return handler.apply_decision(state=state, decisions=decisions, result=result)
 
 
+def _submit_reserve_placement_payload(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    reserve_unit: UnitInstance,
+    placement_kind: BattlefieldPlacementKind,
+    attempted_placement: UnitPlacement,
+    result_id: str,
+) -> LifecycleStatus | None:
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    payload = PlacementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=proposal.proposal_kind,
+        unit_instance_id=reserve_unit.unit_instance_id,
+        placement_kind=placement_kind,
+        attempted_placement=attempted_placement,
+    ).to_payload()
+    return _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=request,
+        payload=validate_json_value(payload),
+        result_id=result_id,
+    )
+
+
+def _submit_parameterized_handler_payload(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    payload: JsonValue,
+    result_id: str,
+) -> LifecycleStatus | None:
+    result = DecisionResult(
+        result_id=result_id,
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=payload,
+    )
+    invalid_status = handler.invalid_proposal_submission_status(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+    )
+    if invalid_status is not None:
+        return invalid_status
+    decisions.submit_result(result)
+    return handler.apply_decision(state=state, decisions=decisions, result=result)
+
+
 def _decision_request(status: LifecycleStatus | None) -> DecisionRequest:
     assert status is not None
     assert status.decision_request is not None
     return status.decision_request
 
 
-def _strategic_reserves_option_pose(request: DecisionRequest) -> dict[str, float]:
-    payload = request.option_by_id(BattlefieldPlacementKind.STRATEGIC_RESERVES.value).payload
-    assert isinstance(payload, dict)
-    attempted = payload["attempted_placement"]
-    assert isinstance(attempted, dict)
-    placements = attempted["model_placements"]
-    assert isinstance(placements, list)
-    first = placements[0]
-    assert isinstance(first, dict)
-    pose = first["pose"]
-    assert isinstance(pose, dict)
-    position = pose["position"]
-    assert isinstance(position, dict)
-    x = position["x"]
-    y = position["y"]
-    assert isinstance(x, int | float)
-    assert isinstance(y, int | float)
-    return {"x": float(x), "y": float(y)}
+def _reserve_unit(*, state: GameState, reserve_state: ReserveState) -> UnitInstance:
+    army = state.army_definition_for_player(reserve_state.player_id)
+    assert army is not None
+    return army.unit_by_id(reserve_state.unit_instance_id)
+
+
+def _single_model_reserve_placement(*, reserve_unit: UnitInstance, pose: Pose) -> UnitPlacement:
+    return UnitPlacement(
+        army_id="army-alpha",
+        player_id="player-a",
+        unit_instance_id=reserve_unit.unit_instance_id,
+        model_placements=(
+            ModelPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id=reserve_unit.unit_instance_id,
+                model_instance_id=reserve_unit.own_models[0].model_instance_id,
+                pose=pose,
+            ),
+        ),
+    )
+
+
+def _south_edge_touching_pose(*, reserve_unit: UnitInstance, x: float) -> Pose:
+    return Pose.at(
+        x=x,
+        y=_base_radius_inches(reserve_unit),
+        z=0.0,
+        facing_degrees=0.0,
+    )
+
+
+def _enemy_deployment_zone_center_pose(*, state: GameState, player_id: str) -> Pose:
+    assert state.mission_setup is not None
+    zone = state.mission_setup.enemy_deployment_zones_for_player(player_id)[0]
+    return Pose.at(
+        x=(zone.min_x + zone.max_x) / 2.0,
+        y=(zone.min_y + zone.max_y) / 2.0,
+        z=0.0,
+        facing_degrees=0.0,
+    )
+
+
+def _first_placement_pose(placement: UnitPlacement) -> dict[str, float]:
+    pose = placement.model_placements[0].pose
+    return {"x": pose.position.x, "y": pose.position.y}
+
+
+def _base_radius_inches(reserve_unit: UnitInstance) -> float:
+    return reserve_unit.own_models[0].geometry.primary_part().radius_x_inches
 
 
 def _blocking_terrain_feature(*, x: float, y: float) -> TerrainFeatureDefinition:

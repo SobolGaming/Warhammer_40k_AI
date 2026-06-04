@@ -5,9 +5,14 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_action_and_movement_proposal,
+    submit_default_movement_proposal_if_pending,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -470,40 +475,22 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
     normal_payload = cast(dict[str, object], normal_option.payload)
     assert "action" not in normal_payload
     assert normal_payload["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
-    assert normal_payload["displacement_kind"] == ModelDisplacementKind.NORMAL_MOVE.value
-    assert normal_payload["movement_inches"] == 6
-    assert normal_payload["witness"] is not None
-    model_movements_raw = normal_payload["model_movements"]
-    assert isinstance(model_movements_raw, list)
-    model_movements = cast(list[object], model_movements_raw)
-    for model_movement_raw in model_movements:
-        assert isinstance(model_movement_raw, dict)
-        model_movement = cast(dict[str, object], model_movement_raw)
-        base_size = model_movement["base_size"]
-        assert isinstance(base_size, dict)
-        assert base_size["diameter_mm"] == 32.0
-        movement_distance_witness = model_movement["movement_distance_witness"]
-        assert isinstance(movement_distance_witness, dict)
-        witness_payload = cast(dict[str, object], movement_distance_witness)
-        budget = witness_payload["budget"]
-        assert isinstance(budget, dict)
-        budget_payload = cast(dict[str, object], budget)
-        assert set(budget_payload) == {
-            "max_distance_inches",
-            "straight_line_distance_inches",
-            "total_distance_inches",
-            "remaining_distance_inches",
-            "exceeded_by_inches",
-        }
-        assert budget_payload["straight_line_distance_inches"] == 6.0
-        assert budget_payload["total_distance_inches"] == 6.0
-        assert budget_payload["remaining_distance_inches"] == 0.0
+    assert set(normal_payload) == {"movement_phase_action", "unit_instance_id", "movement_mode"}
 
-    follow_up = _submit_result(
+    follow_up = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-        result_id="phase10c-result-000004",
+        action_result_id="phase10c-result-000004",
+        proposal_result_id="phase10c-normal-proposal-000004",
+        unit_instance_id=before_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=before_placement.unit_instance_id,
+            dx=6.0,
+        ),
     )
 
     assert follow_up.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -553,11 +540,20 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
 def test_next_movement_unit_is_queued_only_after_activation_terminal_event() -> None:
     lifecycle, action_request = _advance_to_movement_action_request()
 
-    status = _submit_result(
+    status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-        result_id="phase10c-result-000004",
+        action_result_id="phase10c-result-000004",
+        proposal_result_id="phase10c-normal-proposal-000004",
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            dx=6.0,
+        ),
     )
     _decline_optional_stratagem_if_pending(
         lifecycle,
@@ -579,11 +575,20 @@ def test_advance_movement_mode_completes_activation_and_queues_next_unit() -> No
     lifecycle, action_request = _advance_to_movement_action_request()
     assert lifecycle.state is not None
 
-    status = _submit_result(
+    status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.ADVANCE.value,
-        result_id="phase10c-result-000004",
+        action_result_id="phase10c-result-000004",
+        proposal_result_id="phase10c-advance-proposal-000004",
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        movement_phase_action=MovementPhaseActionKind.ADVANCE,
+        movement_mode=MovementMode.ADVANCE,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            dx=6.0,
+        ),
     )
     status = _decline_optional_stratagem_if_pending(
         lifecycle,
@@ -673,12 +678,17 @@ def _submit_result(
     option_id: str,
     result_id: str,
 ) -> LifecycleStatus:
-    return lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
         )
+    )
+    return submit_default_movement_proposal_if_pending(
+        lifecycle,
+        status,
+        result_id=f"{result_id}-proposal",
     )
 
 

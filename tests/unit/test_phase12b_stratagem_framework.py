@@ -1975,7 +1975,7 @@ def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
     return GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
-            "parameterized_movement_proposals": False,
+            "parameterized_movement_proposals": True,
             "state": state.to_payload(),
             "decisions": DecisionController().to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),

@@ -5,9 +5,13 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    submit_action_and_movement_proposal,
+    submit_default_movement_proposal_if_pending,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battle_shock import BattleShockedUnitState
 from warhammer40k_core.engine.battlefield_state import (
@@ -24,7 +28,6 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -222,11 +225,21 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
     lifecycle, action_request = _advance_to_fall_back_action_request(
         game_id=_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID,
     )
-    fall_back_status = _submit_result(
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    unit_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    fall_back_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=_DESPERATE_FALL_BACK_OPTION_ID,
-        result_id="phase10o-result-000004",
+        action_result_id="phase10o-result-000004",
+        proposal_result_id="phase10o-desperate-failed-proposal",
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
     removal_request = _decision_request(fall_back_status)
 
@@ -331,7 +344,7 @@ def test_fall_back_without_desperate_escape_completes_immediately() -> None:
     )
 
 
-def test_fall_back_payload_round_trip_and_drift_codes() -> None:
+def test_fall_back_payload_round_trip() -> None:
     scenario = _engaged_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
         "army-alpha:intercessor-unit-1"
@@ -342,41 +355,8 @@ def test_fall_back_payload_round_trip_and_drift_codes() -> None:
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
-    payload = json.loads(
-        json.dumps(
-            {
-                "witness": resolution.witness.to_payload(),
-                **resolution.movement_payload,
-            },
-            sort_keys=True,
-        )
-    )
-
-    assert isinstance(payload, dict)
-    fall_back_payload = cast(dict[str, JsonValue], payload)
-    assert resolution.selected_payload_drift_code(fall_back_payload) is None
     assert FallBackActionResult.from_payload(resolution.to_payload()).to_payload() == (
         resolution.to_payload()
-    )
-
-    drifted_witness_payload = {
-        "witness": _fall_back_witness(
-            unit_placement,
-            first_model_end_pose=Pose.at(6.0, 11.0),
-        ).to_payload(),
-        **resolution.movement_payload,
-    }
-    assert (
-        resolution.selected_payload_drift_code(cast(dict[str, JsonValue], drifted_witness_payload))
-        == "fall_back_witness_drift"
-    )
-
-    model_movement_payload = cast(dict[str, JsonValue], payload)
-    model_movements = cast(list[dict[str, JsonValue]], model_movement_payload["model_movements"])
-    model_movements[0]["distance_used_inches"] = 5.0
-    assert (
-        resolution.selected_payload_drift_code(model_movement_payload)
-        == "fall_back_model_movement_witness_drift"
     )
 
 
@@ -388,11 +368,18 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
     battlefield_state = state.battlefield_state
     assert battlefield_state is not None
     before_battlefield_payload = battlefield_state.to_payload()
-    fall_back_status = _submit_result(
+    unit_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    fall_back_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=_DESPERATE_FALL_BACK_OPTION_ID,
-        result_id="phase10o-fall-back-failed-0001",
+        action_result_id="phase10o-fall-back-failed-0001",
+        proposal_result_id="phase10o-two-choice-proposal",
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
     removal_request = _decision_request(fall_back_status)
     destroyed_model_ids = (
@@ -879,12 +866,17 @@ def _submit_result(
     option_id: str,
     result_id: str,
 ) -> LifecycleStatus:
-    return lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
         )
+    )
+    return submit_default_movement_proposal_if_pending(
+        lifecycle,
+        status,
+        result_id=f"{result_id}-proposal",
     )
 
 

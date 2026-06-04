@@ -32,6 +32,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -40,6 +41,12 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    PlacementProposalPayload,
+    ProposalKind,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -49,7 +56,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.movement import (
     COMPLETE_REINFORCEMENTS_OPTION_ID,
-    PLACE_REINFORCEMENT_UNIT_DECISION_TYPE,
     SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     MovementPhaseHandler,
     MovementPhaseState,
@@ -143,14 +149,29 @@ def test_reinforcements_valid_strategic_reserves_arrival_mutates_state_atomicall
         result_id="phase10p-select-strategic",
     )
     placement_request = _decision_request(placement_status)
-    assert placement_request.decision_type == PLACE_REINFORCEMENT_UNIT_DECISION_TYPE
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    placement_proposal = MovementProposalRequest.from_decision_request_payload(
+        placement_request.payload
+    )
+    assert placement_proposal.proposal_kind is ProposalKind.STRATEGIC_RESERVES
 
-    result_status = _submit_handler_decision(
+    result_status = _submit_reserve_placement_payload(
         handler=handler,
         state=state,
         decisions=decisions,
         request=placement_request,
-        option_id=BattlefieldPlacementKind.STRATEGIC_RESERVES.value,
+        reserve_unit=reserve_unit,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+        ),
+        large_model_exceptions=(
+            LargeModelReservePlacementException(
+                model_instance_id=reserve_unit.own_models[0].model_instance_id,
+                battlefield_edge=BattlefieldEdge.SOUTH,
+            ),
+        ),
         result_id="phase10p-place-strategic",
     )
     if result_status is None:
@@ -194,13 +215,19 @@ def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() ->
         result_id="phase10p-select-deep-strike",
     )
     placement_request = _decision_request(placement_status)
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
 
-    result_status = _submit_handler_decision(
+    result_status = _submit_reserve_placement_payload(
         handler=handler,
         state=state,
         decisions=decisions,
         request=placement_request,
-        option_id=BattlefieldPlacementKind.DEEP_STRIKE.value,
+        reserve_unit=deep_strike_unit,
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=deep_strike_unit,
+            pose=Pose.at(x=16.0, y=4.25, z=0.0, facing_degrees=0.0),
+        ),
         result_id="phase10p-place-deep-strike",
     )
     if result_status is None:
@@ -216,7 +243,7 @@ def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() ->
 
 
 def test_reinforcements_invalid_arrival_does_not_mutate_state() -> None:
-    state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve(
+    state, _scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
         ruleset_descriptor=_chapter_approved_ruleset(),
     )
     before_battlefield = state.battlefield_state.to_payload() if state.battlefield_state else None
@@ -236,12 +263,23 @@ def test_reinforcements_invalid_arrival_does_not_mutate_state() -> None:
     )
     placement_request = _decision_request(placement_status)
 
-    invalid_status = _submit_handler_decision(
+    invalid_status = _submit_reserve_placement_payload(
         handler=handler,
         state=state,
         decisions=decisions,
         request=placement_request,
-        option_id=BattlefieldPlacementKind.STRATEGIC_RESERVES.value,
+        reserve_unit=reserve_unit,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=_single_model_reserve_placement(
+            reserve_unit=reserve_unit,
+            pose=_south_edge_touching_pose(base_diameter_mm=200.0, x=15.0),
+        ),
+        large_model_exceptions=(
+            LargeModelReservePlacementException(
+                model_instance_id=reserve_unit.own_models[0].model_instance_id,
+                battlefield_edge=BattlefieldEdge.SOUTH,
+            ),
+        ),
         result_id="phase10p-place-invalid",
     )
 
@@ -1256,7 +1294,7 @@ def test_replay_load_rejects_arrived_reserve_with_unaccounted_embarked_units() -
         GameLifecyclePayload,
         {
             "config": None,
-            "parameterized_movement_proposals": False,
+            "parameterized_movement_proposals": True,
             "state": state.to_payload(),
             "decisions": DecisionController().to_payload(),
             "reaction_queue": {"frames": []},
@@ -1848,6 +1886,66 @@ def _submit_handler_decision(
         request=request,
         selected_option_id=option_id,
     )
+    decisions.submit_result(result)
+    return handler.apply_decision(state=state, decisions=decisions, result=result)
+
+
+def _submit_reserve_placement_payload(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    reserve_unit: UnitInstance,
+    placement_kind: BattlefieldPlacementKind,
+    attempted_placement: UnitPlacement,
+    result_id: str,
+    large_model_exceptions: tuple[LargeModelReservePlacementException, ...] = (),
+) -> LifecycleStatus | None:
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    payload = PlacementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=proposal.proposal_kind,
+        unit_instance_id=reserve_unit.unit_instance_id,
+        placement_kind=placement_kind,
+        attempted_placement=attempted_placement,
+        large_model_exceptions=large_model_exceptions,
+    ).to_payload()
+    return _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=request,
+        payload=validate_json_value(payload),
+        result_id=result_id,
+    )
+
+
+def _submit_parameterized_handler_payload(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    payload: JsonValue,
+    result_id: str,
+) -> LifecycleStatus | None:
+    result = DecisionResult(
+        result_id=result_id,
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id="submit_parameterized_payload",
+        payload=payload,
+    )
+    invalid_status = handler.invalid_proposal_submission_status(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+    )
+    if invalid_status is not None:
+        return invalid_status
     decisions.submit_result(result)
     return handler.apply_decision(state=state, decisions=decisions, result=result)
 

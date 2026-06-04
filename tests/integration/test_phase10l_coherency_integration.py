@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_action_and_movement_proposal,
+    submit_default_movement_proposal_if_pending,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.game_state import GameConfig, GameState
@@ -20,6 +23,10 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -32,7 +39,6 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
@@ -67,18 +73,25 @@ def test_invalid_normal_move_does_not_mutate_state_and_keeps_selection_recoverab
     active_selection = movement_state.active_selection
     assert active_selection is not None
 
-    _force_selected_model_movement(lifecycle, movement_inches=30)
-
-    status = _submit_result(
+    status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-        result_id="phase10l-integration-result-000004",
+        action_result_id="phase10l-integration-result-000004",
+        proposal_result_id="phase10l-integration-proposal-000004",
+        unit_instance_id=active_selection.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=active_selection.unit_instance_id,
+            dx=30.0,
+        ),
     )
 
     assert status.status_kind is LifecycleStatusKind.INVALID
     status_payload = cast(dict[str, object], status.payload)
-    assert status_payload["phase_body_status"] == "movement_action_invalid"
+    assert status_payload["phase_body_status"] == "movement_proposal_invalid"
     assert status_payload["movement_phase_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
     assert lifecycle.state is state
     assert state.battlefield_state is not None
@@ -86,22 +99,22 @@ def test_invalid_normal_move_does_not_mutate_state_and_keeps_selection_recoverab
     assert state.movement_phase_state is not None
     assert state.movement_phase_state.active_selection == active_selection
 
-    invalid_event = _last_event_payload(lifecycle, "movement_action_invalid")
+    invalid_event = _last_event_payload(lifecycle, "movement_proposal_invalid")
     assert invalid_event["phase_body_status"] == "movement_action_invalid"
-    assert invalid_event["violation_code"] == "normal_move_model_movement_witness_drift"
+    assert invalid_event["violation_code"] == "movement_distance_exceeded"
     assert "rollback_record" not in invalid_event
 
     retry_status = lifecycle.advance_until_decision_or_terminal()
     retry_request = _decision_request(retry_status)
-    assert retry_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert retry_request.actor_id == "player-a"
-    assert retry_request.payload == {
-        "game_id": "phase10l-integration-game",
-        "battle_round": 1,
-        "phase": BattlePhase.MOVEMENT.value,
-        "active_player_id": "player-a",
-        "unit_instance_id": active_selection.unit_instance_id,
-    }
+    retry_proposal = MovementProposalRequest.from_decision_request_payload(retry_request.payload)
+    assert retry_proposal.game_id == "phase10l-integration-game"
+    assert retry_proposal.battle_round == 1
+    assert retry_proposal.phase == BattlePhase.MOVEMENT.value
+    assert retry_proposal.actor_id == "player-a"
+    assert retry_proposal.unit_instance_id == active_selection.unit_instance_id
+    assert retry_proposal.movement_phase_action == MovementPhaseActionKind.NORMAL_MOVE.value
 
 
 def _advance_to_movement_unit_selection(
@@ -142,67 +155,6 @@ def _advance_to_movement_action_request() -> tuple[GameLifecycle, DecisionReques
     return lifecycle, action_request
 
 
-def _force_selected_model_movement(
-    lifecycle: GameLifecycle,
-    *,
-    movement_inches: int,
-) -> None:
-    state = _require_state(lifecycle)
-    movement_state = state.movement_phase_state
-    assert movement_state is not None
-    active_selection = movement_state.active_selection
-    assert active_selection is not None
-    for army_index, army in enumerate(state.army_definitions):
-        updated_unit = _unit_with_selected_model_movement(
-            army=army,
-            unit_instance_id=active_selection.unit_instance_id,
-            movement_inches=movement_inches,
-        )
-        if updated_unit is None:
-            continue
-        units = tuple(
-            updated_unit if unit.unit_instance_id == updated_unit.unit_instance_id else unit
-            for unit in army.units
-        )
-        state.army_definitions[army_index] = replace(army, units=units)
-        return
-    raise AssertionError("Selected unit was not found in mustered armies.")
-
-
-def _unit_with_selected_model_movement(
-    *,
-    army: ArmyDefinition,
-    unit_instance_id: str,
-    movement_inches: int,
-) -> UnitInstance | None:
-    for unit in army.units:
-        if unit.unit_instance_id != unit_instance_id:
-            continue
-        selected_model_id = unit.own_models[-1].model_instance_id
-        own_models = tuple(
-            _model_with_movement(model, movement_inches=movement_inches)
-            if model.model_instance_id == selected_model_id
-            else model
-            for model in unit.own_models
-        )
-        return replace(unit, own_models=own_models)
-    return None
-
-
-def _model_with_movement(
-    model: ModelInstance,
-    *,
-    movement_inches: int,
-) -> ModelInstance:
-    characteristics = tuple(
-        CharacteristicValue.from_raw(Characteristic.MOVEMENT, movement_inches)
-        if characteristic.characteristic is Characteristic.MOVEMENT
-        else characteristic
-        for characteristic in model.characteristics
-    )
-    return replace(model, characteristics=characteristics)
-
-
 def _payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
     return cast(
         GameLifecyclePayload,
@@ -217,12 +169,17 @@ def _submit_result(
     option_id: str,
     result_id: str,
 ) -> LifecycleStatus:
-    return lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
         )
+    )
+    return submit_default_movement_proposal_if_pending(
+        lifecycle,
+        status,
+        result_id=f"{result_id}-proposal",
     )
 
 
