@@ -4,9 +4,14 @@ import json
 from typing import cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_action_and_movement_proposal,
+    submit_default_movement_proposal_if_pending,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -222,11 +227,20 @@ def test_deploy_armies_emits_deployment_placement_records() -> None:
 def test_normal_move_emits_displacement_records() -> None:
     lifecycle, action_request = _advance_to_movement_action_request()
 
-    _submit_result(
+    submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-        result_id="phase10d-result-000004",
+        action_result_id="phase10d-result-000004",
+        proposal_result_id="phase10d-normal-proposal-000004",
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            dx=6.0,
+        ),
     )
 
     assert lifecycle.state is not None
@@ -287,11 +301,20 @@ def test_remain_stationary_emits_no_transition_records() -> None:
 def test_advance_emits_displacement_records() -> None:
     lifecycle, action_request = _advance_to_movement_action_request()
 
-    _submit_result(
+    submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
         option_id=MovementPhaseActionKind.ADVANCE.value,
-        result_id="phase10d-result-000004",
+        action_result_id="phase10d-result-000004",
+        proposal_result_id="phase10d-advance-proposal-000004",
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        movement_phase_action=MovementPhaseActionKind.ADVANCE,
+        movement_mode=MovementMode.ADVANCE,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id="army-alpha:intercessor-unit-1",
+            dx=6.0,
+        ),
     )
 
     assert lifecycle.state is not None
@@ -415,12 +438,17 @@ def _submit_result(
     option_id: str,
     result_id: str,
 ) -> LifecycleStatus:
-    return lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=result_id,
             request=request,
             selected_option_id=option_id,
         )
+    )
+    return submit_default_movement_proposal_if_pending(
+        lifecycle,
+        status,
+        result_id=f"{result_id}-proposal",
     )
 
 

@@ -7,6 +7,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    submit_default_handler_movement_proposal_if_pending,
+    submit_handler_movement_proposal,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
@@ -42,9 +46,9 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -84,11 +88,7 @@ from warhammer40k_core.engine.reserves import (
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.base import BaseShape, CircularBase
 from warhammer40k_core.geometry.movement_envelope import MovementDistanceWitness
-from warhammer40k_core.geometry.pathing import (
-    PathValidationContext,
-    PathWitness,
-    PathWitnessPayload,
-)
+from warhammer40k_core.geometry.pathing import PathValidationContext, PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 from warhammer40k_core.geometry.volume import Model, ModelVolume
@@ -223,10 +223,11 @@ def test_persisted_hover_mode_state_changes_movement_action_availability() -> No
         for option in action_request.options
         if option.option_id == MovementPhaseActionKind.NORMAL_MOVE.value
     )
-    assert isinstance(normal_payload, dict)
-    aircraft_policy_payload = cast(dict[str, object], normal_payload["aircraft_movement_policy"])
-    assert aircraft_policy_payload["hover_mode_active"] is True
-    assert aircraft_policy_payload["uses_aircraft_rules"] is False
+    assert normal_payload == {
+        "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
+        "unit_instance_id": aircraft.unit_instance_id,
+        "movement_mode": MovementMode.NORMAL.value,
+    }
 
 
 def test_persisted_hover_mode_disables_aircraft_movement_rules() -> None:
@@ -417,7 +418,7 @@ def test_game_state_hover_mode_state_recording_is_fail_fast_and_queryable() -> N
         state.record_hover_mode_state(hover_state)
 
 
-def test_normal_move_rejects_stale_aircraft_policy_after_hover_state_changes() -> None:
+def test_normal_move_proposal_uses_current_hover_state_after_action_request() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
@@ -434,10 +435,10 @@ def test_normal_move_rejects_stale_aircraft_policy_after_hover_state_changes() -
         result_id="phase10r-stale-aircraft-policy",
     )
 
-    assert status is not None
-    assert status.status_kind is LifecycleStatusKind.INVALID
-    status_payload = cast(dict[str, object], status.payload)
-    assert status_payload["violation_code"] == "normal_move_aircraft_policy_drift"
+    assert status is None
+    completed_payload = _last_event_payload(decisions, "movement_activation_completed")
+    model_payload = _single_model_movement_payload(completed_payload)
+    assert model_payload["movement_mode"] == MovementMode.NORMAL.value
 
 
 def test_other_models_can_transit_aircraft_but_not_end_on_them() -> None:
@@ -711,28 +712,34 @@ def test_invalid_aircraft_reserve_transition_is_typed_and_cannot_mutate() -> Non
         )
 
 
-def test_aircraft_default_normal_move_witness_uses_datasheet_budget_without_reserves() -> None:
+def test_aircraft_submitted_normal_move_witness_uses_datasheet_budget_without_reserves() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
     movement_inches = float(_model_movement_inches(aircraft.own_models[0]))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
         unit_instance_id=aircraft.unit_instance_id,
     )
-    normal_payload = cast(
-        dict[str, object],
-        action_request.option_by_id(MovementPhaseActionKind.NORMAL_MOVE.value).payload,
+    unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
+        aircraft.unit_instance_id
     )
-    default_witness = PathWitness.from_payload(cast(PathWitnessPayload, normal_payload["witness"]))
+    submitted_witness = _single_model_forward_witness(
+        unit_placement,
+        movement_inches=movement_inches,
+    )
     model_id = aircraft.own_models[0].model_instance_id
 
-    assert default_witness.final_pose_for_model(model_id) == Pose.at(10.0 + movement_inches, 10.0)
+    assert submitted_witness.final_pose_for_model(model_id) == Pose.at(
+        10.0 + movement_inches,
+        10.0,
+    )
 
-    status = _submit_handler_decision(
+    status = _submit_custom_normal_move_decision(
         handler,
         state=state,
         decisions=decisions,
         request=action_request,
-        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        unit_placement=unit_placement,
+        witness=submitted_witness,
         result_id="phase10r-aircraft-default-normal-move",
     )
 
@@ -761,12 +768,19 @@ def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() 
         unit_instance_id=aircraft.unit_instance_id,
     )
 
-    status = _submit_handler_decision(
+    unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
+        aircraft.unit_instance_id
+    )
+    status = _submit_custom_normal_move_decision(
         handler,
         state=state,
         decisions=decisions,
         request=action_request,
-        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        unit_placement=unit_placement,
+        witness=_single_model_forward_witness(
+            unit_placement,
+            movement_inches=float(_model_movement_inches(aircraft.own_models[0])),
+        ),
         result_id=f"phase10r-{expected_reason.value}",
     )
 
@@ -826,12 +840,19 @@ def test_aircraft_edge_transition_uses_full_base_footprint_containment() -> None
         unit_instance_id=aircraft.unit_instance_id,
     )
 
-    status = _submit_handler_decision(
+    unit_placement = _scenario_from_state(state).battlefield_state.unit_placement_by_id(
+        aircraft.unit_instance_id
+    )
+    status = _submit_custom_normal_move_decision(
         handler,
         state=state,
         decisions=decisions,
         request=action_request,
-        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        unit_placement=unit_placement,
+        witness=_single_model_forward_witness(
+            unit_placement,
+            movement_inches=movement_inches,
+        ),
         result_id="phase10r-aircraft-footprint-edge",
     )
 
@@ -883,7 +904,7 @@ def test_aircraft_submitted_over_budget_witness_is_invalid() -> None:
     assert state.battlefield_state.to_payload() == original_battlefield_payload
 
 
-def test_normal_move_rejects_aircraft_model_movement_payload_replay_drift() -> None:
+def test_normal_move_rejects_movement_proposal_context_drift() -> None:
     state, aircraft = _aircraft_battle_state(aircraft_pose=Pose.at(10.0, 10.0))
     handler, decisions, action_request = _movement_action_request_for_unit(
         state=state,
@@ -897,10 +918,8 @@ def test_normal_move_rejects_aircraft_model_movement_payload_replay_drift() -> N
         movement_inches=float(_model_movement_inches(aircraft.own_models[0])),
     )
 
-    def mutate_model_movement_payload(payload: dict[str, object]) -> None:
-        model_movements = cast(list[object], payload["model_movements"])
-        model_payload = cast(dict[str, object], model_movements[0])
-        model_payload["movement_inches"] = 1.0
+    def mutate_movement_mode(payload: dict[str, JsonValue]) -> None:
+        payload["movement_mode"] = MovementMode.ADVANCE.value
 
     status = _submit_custom_normal_move_decision(
         handler,
@@ -909,14 +928,17 @@ def test_normal_move_rejects_aircraft_model_movement_payload_replay_drift() -> N
         request=action_request,
         unit_placement=unit_placement,
         witness=witness,
-        result_id="phase10r-aircraft-model-movement-drift",
-        payload_mutation=mutate_model_movement_payload,
+        result_id="phase10r-aircraft-movement-mode-drift",
+        payload_mutation=mutate_movement_mode,
     )
 
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.INVALID
     status_payload = cast(dict[str, object], status.payload)
-    assert status_payload["violation_code"] == "normal_move_model_movement_witness_drift"
+    proposal_validation = cast(dict[str, object], status_payload["proposal_validation"])
+    violations = cast(list[object], proposal_validation["violations"])
+    first_violation = cast(dict[str, object], violations[0])
+    assert first_violation["violation_code"] == "proposal_movement_mode_drift"
 
 
 def test_aircraft_short_witness_remains_on_battlefield_when_inside_board() -> None:
@@ -1098,6 +1120,7 @@ def test_non_aircraft_engaged_by_aircraft_and_enemy_unit_must_remain_or_fall_bac
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
         f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}",
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}",
     }
 
 
@@ -1372,54 +1395,31 @@ def _submit_custom_normal_move_decision(
     unit_placement: UnitPlacement,
     witness: PathWitness,
     result_id: str,
-    payload_mutation: Callable[[dict[str, object]], None] | None = None,
+    payload_mutation: Callable[[dict[str, JsonValue]], None] | None = None,
 ) -> LifecycleStatus | None:
-    resolution = resolve_normal_move(
-        scenario=_scenario_from_state(state),
-        ruleset_descriptor=_ruleset(),
-        unit_placement=unit_placement,
-        path_witness=witness,
-        hover_mode_states=tuple(state.hover_mode_states),
-    )
-    custom_payload_data: dict[str, object] = {
-        "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
-        "displacement_kind": "normal_move",
-        "unit_instance_id": unit_placement.unit_instance_id,
-        "witness": resolution.witness.to_payload(),
-        **resolution.movement_payload,
-    }
-    if payload_mutation is not None:
-        payload_mutation(custom_payload_data)
-    custom_payload = validate_json_value(custom_payload_data)
-    custom_options = tuple(
-        DecisionOption(
-            option_id=option.option_id,
-            label=option.label,
-            payload=custom_payload,
-        )
-        if option.option_id == MovementPhaseActionKind.NORMAL_MOVE.value
-        else option
-        for option in request.options
-    )
-    custom_request = DecisionRequest(
-        request_id=request.request_id,
-        decision_type=request.decision_type,
-        actor_id=request.actor_id,
-        payload=request.payload,
-        options=custom_options,
-    )
-    decisions.queue.remove_by_id(request.request_id)
-    decisions.request_decision(custom_request)
     result = DecisionResult.for_request(
         result_id=result_id,
-        request=custom_request,
+        request=request,
         selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
     )
     decisions.submit_result(result)
-    return handler.apply_decision(
+    proposal_status = handler.apply_decision(
         state=state,
         result=result,
         decisions=decisions,
+    )
+    proposal_request = _decision_request(proposal_status)
+    return submit_handler_movement_proposal(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=proposal_request,
+        result_id=f"{result_id}-proposal",
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=witness,
+        payload_mutation=payload_mutation,
     )
 
 
@@ -1465,10 +1465,17 @@ def _submit_handler_decision(
         selected_option_id=option_id,
     )
     decisions.submit_result(result)
-    return handler.apply_decision(
+    status = handler.apply_decision(
         state=state,
         result=result,
         decisions=decisions,
+    )
+    return submit_default_handler_movement_proposal_if_pending(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        status=status,
+        result_id=f"{result_id}-proposal",
     )
 
 

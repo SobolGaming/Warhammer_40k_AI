@@ -5,13 +5,17 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_action_and_movement_proposal,
+)
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatus,
@@ -1288,12 +1292,20 @@ def test_started_mission_action_is_interrupted_by_runtime_normal_move() -> None:
     assert action_request is not None
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
 
-    status = lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase14d-runtime-cancel-normal-move",
-            request=action_request,
-            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
-        )
+    status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        action_result_id="phase14d-runtime-cancel-normal-move",
+        proposal_result_id="phase14d-runtime-cancel-normal-move-proposal",
+        unit_instance_id=action.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=action.unit_instance_id,
+            dx=6.0,
+        ),
     )
     _decline_stratagem_window_if_pending(
         lifecycle,

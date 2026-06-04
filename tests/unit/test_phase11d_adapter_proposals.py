@@ -169,6 +169,13 @@ def test_parameterized_lifecycle_resume_preserves_pending_movement_proposal_mode
     assert proposal_request.is_parameterized_submission_request()
 
 
+def test_non_parameterized_movement_mode_is_rejected() -> None:
+    with pytest.raises(GameLifecycleError, match="requires parameterized movement proposals"):
+        GameLifecycle(parameterized_movement_proposals=False)
+    with pytest.raises(GameLifecycleError, match="requires parameterized proposals"):
+        MovementPhaseHandler(parameterized_proposals=False)
+
+
 def test_parameterized_normal_move_proposal_request_matches_golden_fixture() -> None:
     session, _action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
