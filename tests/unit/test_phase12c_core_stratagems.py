@@ -85,6 +85,7 @@ from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_catalog_records
 from warhammer40k_core.engine.stratagems import (
+    COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY,
     COMMAND_REROLL_DICE_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     EXPLOSIVES_TARGET_CONTEXT_KEY,
@@ -116,6 +117,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.engine.weapon_abilities import SNAP_SHOOTING_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
@@ -137,9 +139,7 @@ def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None
     assert "random_damage" not in command_reroll.definition.eligible_roll_types
     assert "battle_shock_roll" not in command_reroll.definition.eligible_roll_types
     roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-a")
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -190,9 +190,7 @@ def test_command_reroll_source_eligibility_rejects_unlisted_roll_type_before_que
         actor_id="player-a",
         roll_type="validation_roll",
     )
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -243,9 +241,7 @@ def test_command_reroll_rejects_opponent_roll_actor_drift_before_queue_pop() -> 
     _grant_cp(state, player_id="player-a", amount=1)
     command_reroll = _source_stratagem_record("command-reroll")
     roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-b")
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -319,9 +315,7 @@ def test_phase14i_command_reroll_accepts_real_attack_and_save_roll_specs(
     _grant_cp(state, player_id="player-a", amount=1)
     command_reroll = _source_stratagem_record("command-reroll")
     roll_state = _roll_command_reroll_candidate_from_spec(lifecycle, spec=roll_spec)
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -361,9 +355,7 @@ def test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor
         actor_id="player-a",
         roll_type="number_of_attacks_roll",
     )
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -414,9 +406,7 @@ def test_phase14i_command_reroll_excludes_unlisted_roll_classes(
         actor_id="player-a",
         roll_type=roll_type,
     )
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -464,9 +454,7 @@ def test_phase14i_command_reroll_non_charge_multi_dice_roll_selects_one_die() ->
         quantity=2,
         values=(1, 5),
     )
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -533,9 +521,7 @@ def test_phase14i_command_reroll_charge_roll_keeps_whole_roll_selection() -> Non
         quantity=2,
         values=(1, 2),
     )
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
-    )
+    trigger_payload = _command_reroll_trigger_payload(roll_state)
     context = _context(
         state=state,
         player_id="player-a",
@@ -567,14 +553,166 @@ def test_phase14i_command_reroll_charge_roll_keeps_whole_roll_selection() -> Non
     assert rerolls[0]["selected_indices"] == [0, 1]
 
 
+def test_command_reroll_requires_affected_unit_context_and_records_it() -> None:
+    unit_id = "army-alpha:intercessor-unit-1"
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    _grant_cp(state, player_id="player-a", amount=1)
+    command_reroll = _source_stratagem_record("command-reroll")
+    roll_state = _roll_command_reroll_candidate(
+        lifecycle,
+        actor_id="player-a",
+        roll_type="charge_roll",
+        quantity=2,
+        values=(1, 2),
+    )
+    missing_unit_context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=validate_json_value(
+            {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
+        ),
+    )
+
+    assert (
+        request_stratagem_use(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            catalog_records=(command_reroll,),
+            context=missing_unit_context,
+        ).status_kind
+        is LifecycleStatusKind.UNSUPPORTED
+    )
+
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=_command_reroll_trigger_payload(roll_state, unit_instance_id=unit_id),
+    )
+    request = _decision_request(
+        request_stratagem_use(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            catalog_records=(command_reroll,),
+            context=context,
+        )
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14i-command-reroll-affected-unit",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+    )
+
+    use_record = state.stratagem_use_records[0]
+    assert use_record.affected_unit_instance_ids == (unit_id,)
+    assert _last_event_payload(lifecycle.decision_controller, "stratagem_used")[
+        "affected_unit_instance_ids"
+    ] == [unit_id]
+
+
+def test_command_reroll_rejects_unknown_affected_unit_context() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    _grant_cp(state, player_id="player-a", amount=1)
+    command_reroll = _source_stratagem_record("command-reroll")
+    roll_state = _roll_command_reroll_candidate(
+        lifecycle,
+        actor_id="player-a",
+        roll_type="charge_roll",
+        quantity=2,
+        values=(1, 2),
+    )
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=_command_reroll_trigger_payload(
+            roll_state,
+            unit_instance_id="army-alpha:missing-unit",
+        ),
+    )
+
+    status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=(command_reroll,),
+        context=context,
+    )
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.stratagem_use_records == []
+
+
+def test_command_reroll_is_blocked_after_same_phase_stratagem_on_unit() -> None:
+    unit_id = "army-alpha:intercessor-unit-1"
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    _grant_cp(state, player_id="player-a", amount=1)
+    state.record_stratagem_use(
+        StratagemUseRecord(
+            use_id="phase14i-prior-unit-stratagem",
+            player_id="player-a",
+            stratagem_id="heroic-intervention-placeholder",
+            source_id="source:heroic-intervention-placeholder",
+            battle_round=state.battle_round,
+            phase=BattlePhase.CHARGE,
+            timing_window_id=None,
+            request_id="phase14i-prior-unit-stratagem-request",
+            result_id="phase14i-prior-unit-stratagem-result",
+            selected_option_id="phase14i-prior-unit-stratagem-option",
+            target_binding=StratagemTargetBinding(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                target_player_id="player-a",
+                target_unit_instance_id=unit_id,
+            ),
+            affected_unit_instance_ids=(unit_id,),
+            command_point_cost=0,
+            command_point_transaction_id=None,
+            handler_id="record_only",
+        )
+    )
+    command_reroll = _source_stratagem_record("command-reroll")
+    roll_state = _roll_command_reroll_candidate(
+        lifecycle,
+        actor_id="player-a",
+        roll_type="charge_roll",
+        quantity=2,
+        values=(1, 2),
+    )
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=_command_reroll_trigger_payload(roll_state, unit_instance_id=unit_id),
+    )
+    status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=(command_reroll,),
+        context=context,
+    )
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert len(state.stratagem_use_records) == 1
+    assert state.command_point_total("player-a") == 1
+
+
 def test_command_reroll_source_handler_can_resume_reaction_parent() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     _grant_cp(state, player_id="player-b", amount=1)
     roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-b")
-    trigger_payload = validate_json_value(
-        {COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload())}
+    trigger_payload = _command_reroll_trigger_payload(
+        roll_state,
+        unit_instance_id="army-beta:enemy-unit",
     )
     context = _context(
         state=state,
@@ -969,6 +1107,7 @@ def test_phase14i_new_orders_rejects_second_use_in_same_game_before_cp_spend() -
                 target_player_id="player-a",
                 target_secondary_mission_id="phase14i-prior-secondary-card",
             ),
+            affected_unit_instance_ids=(),
             command_point_cost=1,
             command_point_transaction_id="phase14i-previous-new-orders-cp",
             handler_id=record.definition.handler_id,
@@ -2045,7 +2184,12 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
     explosives_payload = _last_event_payload(lifecycle.decision_controller, "explosives_resolved")
     assert status.status_kind is not LifecycleStatusKind.INVALID
     assert state.command_point_total("player-a") == 0
-    assert state.stratagem_use_records[0].handler_id == "core:explosives"
+    use_record = state.stratagem_use_records[0]
+    assert use_record.handler_id == "core:explosives"
+    assert use_record.affected_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+        "army-beta:enemy-unit",
+    )
     assert explosives_payload["explosives_unit_instance_id"] == ("army-alpha:intercessor-unit-1")
     assert explosives_payload["target_unit_instance_id"] == "army-beta:enemy-unit"
     mortal_wounds = explosives_payload["mortal_wounds"]
@@ -2135,6 +2279,153 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
     assert shot_status.payload == {"invalid_reason": "explosives_unit_already_shot"}
     assert shot_state.command_point_total("player-a") == 1
     assert shot_state.stratagem_use_records == []
+
+
+def test_phase13d_explosives_blocks_enemy_unit_from_later_same_phase_stratagem() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(
+            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+        ),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    _grant_cp(state, player_id="player-b", amount=1)
+
+    explosives_status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="explosives",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        result_id="phase13d-explosives-blocks-enemy",
+        trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
+    )
+    command_reroll = _source_stratagem_record("command-reroll")
+    roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-b")
+    context = _context(
+        state=state,
+        player_id="player-b",
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        trigger_payload=_command_reroll_trigger_payload(
+            roll_state,
+            unit_instance_id="army-beta:enemy-unit",
+        ),
+    )
+    command_reroll_status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=(command_reroll,),
+        context=context,
+    )
+
+    assert explosives_status.status_kind is not LifecycleStatusKind.INVALID
+    assert command_reroll_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert len(state.stratagem_use_records) == 1
+    assert state.command_point_total("player-b") == 1
+
+
+def test_phase13d_explosives_canonicalizes_attached_enemy_component_target() -> None:
+    attached_id = "attached-unit:army-beta:enemy-command-unit"
+    lifecycle = _battle_lifecycle(
+        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+    )
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(
+            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+        ),
+    )
+    _mark_attached_unit_join(
+        state,
+        player_id="player-b",
+        attached_unit_instance_id=attached_id,
+        component_unit_instance_ids=("army-beta:enemy-unit", "army-beta:enemy-unit-2"),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="explosives",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        result_id="phase13d-explosives-attached-enemy-target",
+        trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.stratagem_use_records[0].affected_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+        attached_id,
+    )
+
+
+def test_phase13d_explosives_unknown_enemy_target_rejects_before_queue_pop() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Infantry", "Battleline", "Grenades"),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    record = _source_stratagem_record("explosives")
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:missing-unit"},
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
+    )
+    waiting = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+    request = _decision_request(waiting)
+    invalid_status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase13d-explosives-unknown-enemy-target",
+            proposal=_proposal_request_from_decision(request).with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-a",
+                    target_unit_instance_id="army-alpha:intercessor-unit-1",
+                )
+            ),
+        )
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_status.payload == {"invalid_reason": "unknown_explosives_target"}
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
 
 
 def test_phase13d_explosives_mortal_wounds_route_decline_allowed_feel_no_pain() -> None:
@@ -2716,6 +3007,19 @@ def _roll_command_reroll_candidate_from_spec(
     )
 
 
+def _command_reroll_trigger_payload(
+    roll_state: DiceRollState,
+    *,
+    unit_instance_id: str = "army-alpha:intercessor-unit-1",
+) -> JsonValue:
+    return validate_json_value(
+        {
+            COMMAND_REROLL_DICE_CONTEXT_KEY: validate_json_value(roll_state.to_payload()),
+            COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY: unit_instance_id,
+        }
+    )
+
+
 def _context(
     *,
     state: GameState,
@@ -2960,6 +3264,40 @@ def _replace_unit_poses(
                 )
             )
         )
+    )
+
+
+def _mark_attached_unit_join(
+    state: GameState,
+    *,
+    player_id: str,
+    attached_unit_instance_id: str,
+    component_unit_instance_ids: tuple[str, ...],
+) -> None:
+    source_id = f"attached-unit-join:{attached_unit_instance_id}"
+    component_id_set = set(component_unit_instance_ids)
+    component_starting_model_count = 0
+    updated_records: list[StartingStrengthRecord] = []
+    for record in state.starting_strength_records:
+        if record.unit_instance_id not in component_id_set:
+            updated_records.append(record)
+            continue
+        component_starting_model_count += record.starting_model_count
+        updated_records.append(replace(record, source_id=source_id))
+    if component_starting_model_count == 0:
+        raise AssertionError("Attached-unit test fixture did not find component records.")
+    updated_records.append(
+        StartingStrengthRecord(
+            player_id=player_id,
+            unit_instance_id=attached_unit_instance_id,
+            starting_model_count=component_starting_model_count,
+            single_model_starting_wounds=None,
+            source_id=source_id,
+        )
+    )
+    state.starting_strength_records = sorted(
+        updated_records,
+        key=lambda record: record.unit_instance_id,
     )
 
 
