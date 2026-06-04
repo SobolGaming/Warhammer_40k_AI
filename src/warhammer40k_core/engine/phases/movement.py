@@ -32,7 +32,6 @@ from warhammer40k_core.engine.actions import (
     interrupt_mission_action_for_displacement,
 )
 from warhammer40k_core.engine.aircraft import (
-    AircraftMinimumMoveResult,
     AircraftMovementPolicy,
     AircraftMovementPolicyPayload,
     AircraftMovementViolation,
@@ -154,7 +153,6 @@ from warhammer40k_core.geometry.pathing import (
     PathWitnessPayload,
     TerrainPathLegalityResult,
     TerrainPathLegalityResultPayload,
-    model_is_within_battlefield_footprint,
 )
 from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
@@ -1515,36 +1513,9 @@ class NormalMoveResolution:
         expected_aircraft_policy = self.movement_payload.get("aircraft_movement_policy")
         if selected_payload.get("aircraft_movement_policy") != expected_aircraft_policy:
             return "normal_move_aircraft_policy_drift"
-        expected_model_movements = self.movement_payload["model_movements"]
-        expected_aircraft_minimum = _aircraft_minimum_move_payloads(expected_model_movements)
-        if expected_aircraft_minimum:
-            selected_aircraft_minimum = _aircraft_minimum_move_payloads(
-                selected_payload.get("model_movements")
-            )
-            if selected_aircraft_minimum != expected_aircraft_minimum:
-                return "normal_move_aircraft_minimum_move_witness_drift"
-        if selected_payload.get("model_movements") != expected_model_movements:
+        if selected_payload.get("model_movements") != self.movement_payload["model_movements"]:
             return "normal_move_model_movement_witness_drift"
         return None
-
-
-def _aircraft_minimum_move_payloads(
-    model_movements: object,
-) -> dict[str, JsonValue] | None:
-    validated_model_movements = validate_json_value(model_movements)
-    if not isinstance(validated_model_movements, list):
-        return None
-    payloads: dict[str, JsonValue] = {}
-    for value in validated_model_movements:
-        if not isinstance(value, dict):
-            return None
-        model_instance_id = value.get("model_instance_id")
-        if type(model_instance_id) is not str:
-            return None
-        minimum_move_payload = value.get("aircraft_minimum_move_result")
-        if minimum_move_payload is not None:
-            payloads[model_instance_id] = minimum_move_payload
-    return payloads
 
 
 @dataclass(frozen=True, slots=True)
@@ -5237,19 +5208,6 @@ def _aircraft_reserve_transition_reason_for_normal_move(
     }
     if "battlefield_edge_crossed" in violation_codes:
         return AircraftReserveTransitionReason.BATTLEFIELD_EDGE_CROSSED
-    if "aircraft_minimum_move_required" in violation_codes and any(
-        _aircraft_minimum_move_unavailable(
-            moving_model=geometry_model_for_placement(
-                model=scenario.model_instance_for_placement(placement),
-                placement=placement,
-            ),
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
-            minimum_move_inches=_aircraft_minimum_move_inches(policy),
-        )
-        for placement in unit_placement.model_placements
-    ):
-        return AircraftReserveTransitionReason.MINIMUM_MOVE_UNAVAILABLE
     return None
 
 
@@ -6743,15 +6701,11 @@ def _resolve_unit_move(
             movement_distance_budget_inches=movement_distance_budget_inches,
         ).validate()
         aircraft_violations: tuple[AircraftMovementViolation, ...] = ()
-        aircraft_minimum_move_result: AircraftMinimumMoveResult | None = None
         if (
             aircraft_policy.uses_aircraft_rules
             and movement_phase_action is MovementPhaseActionKind.NORMAL_MOVE
         ):
-            (
-                aircraft_violations,
-                aircraft_minimum_move_result,
-            ) = aircraft_policy.validate_normal_move_witness_with_minimum_result(
+            aircraft_violations = aircraft_policy.validate_normal_move_witness(
                 moving_model=moving_model,
                 witness=model_witness,
             )
@@ -6811,10 +6765,6 @@ def _resolve_unit_move(
             "path_validation_result": path_result.to_payload(),
             "terrain_path_legality_result": terrain_result.to_payload(),
         }
-        if aircraft_minimum_move_result is not None:
-            model_movement_payload["aircraft_minimum_move_result"] = (
-                aircraft_minimum_move_result.to_payload()
-            )
         if aircraft_violations:
             model_movement_payload["aircraft_movement_violations"] = [
                 violation.to_payload() for violation in aircraft_violations
@@ -7886,8 +7836,6 @@ def _model_movement_budget_inches(
 ) -> float | None:
     if type(movement_phase_action) is not MovementPhaseActionKind:
         raise GameLifecycleError("movement_phase_action must be a MovementPhaseActionKind.")
-    if aircraft_policy.uses_aircraft_rules:
-        return None
     movement_budget = (
         _model_base_movement_inches(
             model=model,
@@ -7963,8 +7911,6 @@ def _model_default_movement_distance_inches(
     movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
 ) -> float:
-    if aircraft_policy.uses_aircraft_rules:
-        return _aircraft_minimum_move_inches(aircraft_policy)
     movement_budget = _model_movement_budget_inches(
         model=model,
         aircraft_policy=aircraft_policy,
@@ -7984,58 +7930,11 @@ def _default_move_end_pose(
     aircraft_policy: AircraftMovementPolicy,
     movement_inches: float,
 ) -> Pose:
-    if aircraft_policy.uses_aircraft_rules:
-        return _translated_forward_pose(start_pose, movement_inches=movement_inches)
     return Pose.at(
         x=start_pose.position.x + movement_inches,
         y=start_pose.position.y,
         z=start_pose.position.z,
         facing_degrees=start_pose.facing.degrees,
-    )
-
-
-def _aircraft_minimum_move_inches(aircraft_policy: AircraftMovementPolicy) -> float:
-    if type(aircraft_policy) is not AircraftMovementPolicy:
-        raise GameLifecycleError("Aircraft minimum move requires an AircraftMovementPolicy.")
-    minimum_move_inches = aircraft_policy.minimum_move_inches
-    if minimum_move_inches is None:
-        raise GameLifecycleError("AIRCRAFT movement policy requires minimum_move_inches.")
-    return minimum_move_inches
-
-
-def _aircraft_minimum_move_unavailable(
-    *,
-    moving_model: Model,
-    battlefield_width_inches: float,
-    battlefield_depth_inches: float,
-    minimum_move_inches: float,
-) -> bool:
-    if type(moving_model) is not Model:
-        raise GameLifecycleError("Aircraft minimum move requires a geometry Model.")
-    endpoint = _translated_forward_pose(moving_model.pose, movement_inches=minimum_move_inches)
-    width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
-    depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
-    return not model_is_within_battlefield_footprint(
-        _model_at_pose(moving_model, endpoint),
-        battlefield_width_inches=width,
-        battlefield_depth_inches=depth,
-    )
-
-
-def _translated_forward_pose(pose: Pose, *, movement_inches: float) -> Pose:
-    if type(movement_inches) not in (int, float):
-        raise GameLifecycleError("movement_inches must be a number.")
-    distance = float(movement_inches)
-    if not math.isfinite(distance):
-        raise GameLifecycleError("movement_inches must be finite.")
-    if distance < 1.0:
-        raise GameLifecycleError("movement_inches must be at least 1.")
-    facing_radians = math.radians(pose.facing.degrees)
-    return Pose.at(
-        x=pose.position.x + (distance * math.cos(facing_radians)),
-        y=pose.position.y + (distance * math.sin(facing_radians)),
-        z=pose.position.z,
-        facing_degrees=pose.facing.degrees,
     )
 
 
@@ -8522,20 +8421,6 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return stripped
-
-
-def _validate_positive_number(field_name: str, value: object) -> float:
-    if type(value) is int:
-        number = float(value)
-    elif type(value) is float:
-        number = value
-    else:
-        raise GameLifecycleError(f"{field_name} must be a number.")
-    if not math.isfinite(number):
-        raise GameLifecycleError(f"{field_name} must be finite.")
-    if number <= 0.0:
-        raise GameLifecycleError(f"{field_name} must be greater than 0.")
-    return number
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

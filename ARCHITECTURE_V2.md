@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks; it does not implement Charge/Fight execution. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is in progress**: the attack/save cutover audit now rejects retired save/allocation decision surfaces, and grouped Inflict Damage emits a defender `select_damage_allocation_model` finite decision when the current allocation group has multiple legal model choices. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, layout geometry, and the remaining broad Phase 14K retired-shape audits remain pending source work.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks; it does not implement Charge/Fight execution. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
 
 Completed / implemented foundation:
 
@@ -92,6 +92,7 @@ Completed / implemented foundation:
 | 14F | Complete | Shooting-type cutover with finite shooting-type selection and supported grouped attack resolution |
 | 14G | Complete | Charge/Fight source contract for Phase 15 implementation |
 | 14J | Complete | Mission/catalog replacement slice with Force Dispositions, Primary Mission matrix source tracking, and Tactical Secondary score/retain decisions |
+| 14K | Complete | Cutover hardening/static audits, damage model allocation choice hardening, aircraft minimum-move retirement, and reserve-arrival policy cutover |
 
 Next / planned sequence:
 
@@ -99,7 +100,6 @@ Next / planned sequence:
 |---|---:|---|
 | 14E | In progress | Allocation-group host and grouped-host weapon abilities are implemented for supported fixed-damage pools; melee-only Cleave/Lance execution waits on Phase 15 Charge/Fight |
 | 14H, 14I | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
-| 14K | In progress | Cutover hardening/static audits; attack/save allocation model-choice hardening is implemented |
 | 15A-15F | Planned | Charge and Fight phases implemented directly from the 11th Edition Phase 14G contract |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
@@ -720,10 +720,8 @@ Modules:
 Objects:
 
 - `AircraftMovementPolicy`
-- `AircraftMinimumMoveResult`
-- `AircraftBaseMovementWitness`
-- `BasePointDistanceWitness`
 - `AircraftReserveTransition`
+- `AircraftReserveTransitionReason`
 - `HoverModeState`
 
 Complete foundation scope:
@@ -2333,7 +2331,7 @@ Required tests:
 
 ## Phase 14K: cutover hardening and static audits
 
-Status: In progress.
+Status: Complete.
 
 Invariants:
 
@@ -2343,11 +2341,14 @@ Invariants:
 - no adapter, headless, UI, network, AI, or test path can choose a retired ruleset;
 - `ARCHITECTURE_V2.md`, `README.md`, and source-package docs agree on 11th Edition-only scope.
 
-Required tests:
+Implemented tests:
 
-- static audits fail on each retired rule-shape identifier;
-- attack/save cutover audit rejects retired save-kind and attack-allocation decision surfaces and confirms the current-group damage model decision is registered in runtime and the adapter contract;
-- grouped Inflict Damage tests cover valid defender model selection, wounded-model forced auto-selection, stale and malformed submission rejection before queue pop, and JSON-safe request/result/decision round-trip;
+- static audits fail on active retired rule-shape identifiers for edition identity,
+  pivot-cost policy, attack/save choice surfaces, old aircraft minimum-move and
+  pivot-limit policy, reserve-arrival source-step and enemy-distance policy,
+  descriptor primitive drift, and retired Core Stratagem names;
+- attack/save cutover audit rejects retired save-kind and attack-allocation decision surfaces and confirms the current-group damage model decision plus pre-pop selected-model legality validation are registered in runtime and the adapter contract;
+- grouped Inflict Damage tests cover valid defender model selection, wounded-model forced auto-selection, selected-model death drift, wounded-model-priority drift, stale and malformed submission rejection before queue pop, and JSON-safe request/result/decision round-trip;
 - representative smoke game reaches the current implemented phase using 11th Edition descriptors only;
 - replay determinism holds after fixture regeneration;
 - import-linter and decision-contract audits still pass.
