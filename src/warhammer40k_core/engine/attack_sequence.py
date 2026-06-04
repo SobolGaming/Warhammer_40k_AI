@@ -3723,23 +3723,23 @@ def _resolve_grouped_damage_from(
             "allocation": allocation.to_payload(),
             "save_options": [],
         }
-        save_option = _mandatory_save_option_for_allocation(
+        save_options = _save_options_for_allocation(
             state=state,
             ruleset_descriptor=ruleset_descriptor,
             attack_sequence=save_attack_sequence,
             attack_context=attack_context,
             allocated_model_id=current_model_id,
         )
-        if save_option is not None:
+        if save_options:
             damage_attack_context = {
                 **damage_attack_context,
-                "save_options": [save_option.to_payload()],
+                "save_options": [option.to_payload() for option in save_options],
             }
         roll_state = DiceRollState.from_payload(save_die["roll_state"])
         saving_throw = (
             None
-            if save_option is None
-            else resolve_saving_throw(option=save_option, roll_state=roll_state)
+            if not save_options
+            else resolve_saving_throw(options=save_options, roll_state=roll_state)
         )
         _emit_grouped_save_die_event(
             decisions=decisions,
@@ -3977,14 +3977,15 @@ def _roll_grouped_saves(
             state=state,
             allocation_group=allocation_group,
         )
-        save_option = _mandatory_save_option_for_allocation(
+        save_options = _save_options_for_allocation(
             state=state,
             ruleset_descriptor=ruleset_descriptor,
             attack_sequence=wounded_sequence,
             attack_context=attack_context,
             allocated_model_id=current_model_id,
         )
-        if save_option is None:
+        save_roll_option = mandatory_save_option(save_options)
+        if save_roll_option is None:
             roll_state = manager.roll(
                 _no_save_damage_order_roll_spec(
                     player_id=attack_context["defender_player_id"],
@@ -3995,7 +3996,7 @@ def _roll_grouped_saves(
         else:
             roll_state = manager.roll(
                 saving_throw_roll_spec(
-                    save_kind=save_option.save_kind,
+                    save_kind=save_roll_option.save_kind,
                     player_id=attack_context["defender_player_id"],
                     allocated_model_id=current_model_id,
                     attack_context_id=attack_context["attack_context_id"],
@@ -4081,14 +4082,14 @@ def _no_save_damage_order_roll_spec(
     )
 
 
-def _mandatory_save_option_for_allocation(
+def _save_options_for_allocation(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
     attack_sequence: AttackSequence,
     attack_context: AttackResolutionContextPayload,
     allocated_model_id: str,
-) -> SaveOption | None:
+) -> tuple[SaveOption, ...]:
     pool = attack_sequence.current_pool()
     cover_result = _cover_for_allocated_model(
         state=state,
@@ -4128,13 +4129,12 @@ def _mandatory_save_option_for_allocation(
         cover_result=cover_result,
         no_saves_allowed=no_saves_allowed,
     )
-    save_options = _save_options_with_effect_invulnerable(
+    return _save_options_with_effect_invulnerable(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
         armor_penetration=pool.weapon_profile.armor_penetration.final,
         save_options=save_options,
     )
-    return mandatory_save_option(save_options)
 
 
 def _resolve_lost_wound_stage(

@@ -133,7 +133,10 @@ Key constraints:
   same-tier group orders exist.
 - Normal damage rolls all pooled saving throw dice before applying normal
   damage, then resolves save events while walking the sorted dice. A real armour
-  or invulnerable save with a target above 6 remains a saving throw; an effect
+  or invulnerable save remains a saving throw even when the target is above 6 or
+  AP makes success impossible on a D6. If both InSv and Sv exist, the engine
+  checks one die in ordered rule order: unmodified 1 fails, InSv can succeed,
+  then the AP-modified Save can succeed, otherwise damage is inflicted. An effect
   that permits no saving throw may use an internal
   `attack_sequence.allocation_order.no_save` die only for deterministic ordering.
 - Normal damage stays on the current model until that model is destroyed. If

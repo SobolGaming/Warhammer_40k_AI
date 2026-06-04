@@ -152,6 +152,7 @@ from warhammer40k_core.engine.saves import (
     PlungingFireModifierResult,
     SaveKind,
     SaveOption,
+    SaveResolutionRule,
     SavingThrow,
     cover_result_has_bonus,
     mandatory_save_option,
@@ -2050,8 +2051,11 @@ def test_phase14h_pooled_walk_recomputes_save_after_group_transition() -> None:
     assert remaining_sequence is None
     assert status is not None
     assert save_payloads[1]["allocated_model_id"] == later_models[0].model_instance_id
-    assert save_payloads[1]["target_number"] == 5
-    assert cast(dict[str, object], save_payloads[1]["option"])["characteristic_target_number"] == 4
+    assert save_payloads[1]["target_number"] == 4
+    assert save_payloads[1]["final_roll"] == 2
+    option = cast(dict[str, object], save_payloads[1]["option"])
+    assert option["target_number"] == 5
+    assert option["characteristic_target_number"] == 4
     assert save_payloads[1]["successful"] is False
     assert damaged_model_ids[:2] == [
         first_model.model_instance_id,
@@ -2165,8 +2169,10 @@ def test_phase14i_impossible_armour_save_remains_real_save_roll() -> None:
     assert status is not None
     assert save_roll_types == ["attack_sequence.save.armour"]
     assert save_payload["save_kind"] == SaveKind.ARMOUR.value
-    assert save_payload["target_number"] == 9
+    assert save_payload["target_number"] == 3
+    assert save_payload["final_roll"] == 0
     assert save_payload["successful"] is False
+    assert save_payload["resolution_rule"] == SaveResolutionRule.FAILED.value
     assert option["save_kind"] == SaveKind.ARMOUR.value
     assert option["target_number"] == 9
 
@@ -4679,7 +4685,7 @@ def test_phase14i_impossible_save_options_are_not_filtered_out() -> None:
     )
 
 
-def test_phase14e_invulnerable_save_is_mandatory_without_save_kind_decision() -> None:
+def test_phase14e_invulnerable_and_armour_save_checks_have_no_save_kind_decision() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
@@ -4767,15 +4773,135 @@ def test_phase14e_invulnerable_save_is_mandatory_without_save_kind_decision() ->
     )
     payload = cast(dict[str, object], save_payload["payload"])
 
-    assert payload["save_kind"] == SaveKind.INVULNERABLE.value
-    assert payload["target_number"] == 4
+    option = cast(dict[str, object], payload["option"])
+
+    assert payload["save_kind"] == SaveKind.ARMOUR.value
+    assert payload["target_number"] == 3
+    assert payload["final_roll"] == 2
     assert payload["successful"] is False
+    assert payload["resolution_rule"] == SaveResolutionRule.FAILED.value
+    assert option["save_kind"] == SaveKind.ARMOUR.value
+    assert option["target_number"] == 4
     retired_save_choice_type = "select_" + "saving_throw_kind"
     assert not any(
         event.event_type == "decision_requested"
         and cast(dict[str, object], event.payload)["decision_type"] == retired_save_choice_type
         for event in lifecycle.decision_controller.event_log.records
     )
+
+
+def test_phase14e_armour_save_can_succeed_after_invulnerable_save_fails() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = replace(
+        defender.own_models[0],
+        characteristics=(
+            *defender.own_models[0].characteristics,
+            CharacteristicValue.from_raw(Characteristic.INVULNERABLE_SAVE, 5),
+        ),
+    )
+    defender = replace(defender, own_models=(defender_model, *defender.own_models[1:]))
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14e-ordered-save-check",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+    )
+    attack_context_id = "phase14e-ordered-save-check:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.INVULNERABLE,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14e-ordered-save-check",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14e-ordered-save-check",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14e-ordered-save-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-ordered-save-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14e-ordered-save-save",
+                    spec=save_spec,
+                    value=4,
+                ),
+            ),
+        ),
+    )
+    save_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.SAVE,
+    )
+    payload = cast(dict[str, object], save_payload["payload"])
+    option = cast(dict[str, object], payload["option"])
+    damage_payload = _attack_step_payload(
+        tuple(
+            event
+            for event in _event_payloads(lifecycle, "attack_sequence_step")
+            if event["step"] == AttackSequenceStep.DAMAGE.value
+        ),
+        AttackSequenceStep.DAMAGE,
+    )
+    damage_event_payload = cast(dict[str, object], damage_payload["payload"])
+
+    assert remaining_sequence is None
+    assert status is None
+    assert payload["save_kind"] == SaveKind.ARMOUR.value
+    assert payload["target_number"] == 3
+    assert payload["unmodified_roll"] == 4
+    assert payload["final_roll"] == 4
+    assert payload["successful"] is True
+    assert payload["resolution_rule"] == SaveResolutionRule.ARMOUR_SAVE.value
+    assert option["save_kind"] == SaveKind.ARMOUR.value
+    assert option["target_number"] == 3
+    assert damage_event_payload["damage_application"] is None
 
 
 def test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll() -> None:
@@ -6175,6 +6301,65 @@ def test_phase13c_decision_payloads_validate_fail_fast() -> None:
     assert mandatory_save_option(options=()) is None
 
 
+def test_phase14e_save_roll_checks_one_invulnerable_then_armour() -> None:
+    armour_option = SaveOption(
+        save_kind=SaveKind.ARMOUR,
+        target_number=3,
+        characteristic_target_number=3,
+        armor_penetration=0,
+    )
+    invulnerable_option = SaveOption(
+        save_kind=SaveKind.INVULNERABLE,
+        target_number=5,
+        characteristic_target_number=5,
+        armor_penetration=0,
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.INVULNERABLE,
+        player_id="player-b",
+        allocated_model_id="model-a",
+        attack_context_id="phase14e-ordered-save-helper",
+    )
+    manager = DiceRollManager("phase14e-ordered-save-helper")
+
+    one = resolve_saving_throw(
+        options=(armour_option, invulnerable_option),
+        roll_state=manager.roll_fixed(save_spec, [1]),
+    )
+    invulnerable_success = resolve_saving_throw(
+        options=(armour_option, invulnerable_option),
+        roll_state=manager.roll_fixed(save_spec, [5]),
+    )
+    armour_success = resolve_saving_throw(
+        options=(armour_option, invulnerable_option),
+        roll_state=manager.roll_fixed(save_spec, [4]),
+    )
+    ap_failed_armour_option = SaveOption(
+        save_kind=SaveKind.ARMOUR,
+        target_number=6,
+        characteristic_target_number=3,
+        armor_penetration=-3,
+    )
+    ap_failure = resolve_saving_throw(
+        options=(ap_failed_armour_option, invulnerable_option),
+        roll_state=manager.roll_fixed(save_spec, [4]),
+    )
+
+    assert one.successful is False
+    assert one.resolution_rule is SaveResolutionRule.UNMODIFIED_ONE
+    assert one.save_kind is SaveKind.ARMOUR
+    assert invulnerable_success.successful is True
+    assert invulnerable_success.resolution_rule is SaveResolutionRule.INVULNERABLE_SAVE
+    assert invulnerable_success.save_kind is SaveKind.INVULNERABLE
+    assert armour_success.successful is True
+    assert armour_success.resolution_rule is SaveResolutionRule.ARMOUR_SAVE
+    assert armour_success.save_kind is SaveKind.ARMOUR
+    assert armour_success.final_roll == 4
+    assert ap_failure.successful is False
+    assert ap_failure.resolution_rule is SaveResolutionRule.FAILED
+    assert ap_failure.final_roll == 1
+
+
 def test_phase14e_allocation_order_decision_payloads_validate_before_mutation() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -6843,6 +7028,31 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="SaveOption values"):
         mandatory_save_option(options=(cast(SaveOption, "not-an-option"),))
 
+    one_roll = DiceRollManager("phase14e-validation-one").roll_fixed(
+        saving_throw_roll_spec(
+            save_kind=SaveKind.ARMOUR,
+            player_id="player-b",
+            allocated_model_id="model-a",
+            attack_context_id="phase14e-validation-one-context",
+        ),
+        [1],
+    )
+    two_roll = DiceRollManager("phase14e-validation-two").roll_fixed(
+        saving_throw_roll_spec(
+            save_kind=SaveKind.ARMOUR,
+            player_id="player-b",
+            allocated_model_id="model-a",
+            attack_context_id="phase14e-validation-two-context",
+        ),
+        [2],
+    )
+    invulnerable_option = SaveOption(
+        save_kind=SaveKind.INVULNERABLE,
+        target_number=4,
+        characteristic_target_number=4,
+        armor_penetration=0,
+    )
+
     with pytest.raises(GameLifecycleError, match="target_number must match"):
         SavingThrow(
             save_kind=SaveKind.ARMOUR,
@@ -6851,6 +7061,7 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             unmodified_roll=4,
             final_roll=4,
             successful=True,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
             option=valid_option,
         )
     with pytest.raises(GameLifecycleError, match="D6 value"):
@@ -6861,6 +7072,7 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             unmodified_roll=7,
             final_roll=7,
             successful=True,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
             option=valid_option,
         )
     with pytest.raises(GameLifecycleError, match="final_roll"):
@@ -6871,6 +7083,7 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             unmodified_roll=3,
             final_roll=cast(int, "bad-roll"),
             successful=True,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
             option=valid_option,
         )
     with pytest.raises(GameLifecycleError, match="successful"):
@@ -6881,6 +7094,106 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
             unmodified_roll=3,
             final_roll=3,
             successful=cast(bool, "yes"),
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="SaveResolutionRule token"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=3,
+            successful=True,
+            resolution_rule=cast(SaveResolutionRule, 3),
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported SaveResolutionRule"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=3,
+            successful=True,
+            resolution_rule=cast(SaveResolutionRule, "not-a-resolution"),
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="Unmodified-one"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=3,
+            successful=False,
+            resolution_rule=SaveResolutionRule.UNMODIFIED_ONE,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="Invulnerable save resolution requires"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=3,
+            successful=True,
+            resolution_rule=SaveResolutionRule.INVULNERABLE_SAVE,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="Invulnerable save resolution does not match"):
+        SavingThrow(
+            save_kind=SaveKind.INVULNERABLE,
+            target_number=4,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=3,
+            successful=True,
+            resolution_rule=SaveResolutionRule.INVULNERABLE_SAVE,
+            option=invulnerable_option,
+        )
+    with pytest.raises(GameLifecycleError, match="Armour save resolution requires"):
+        SavingThrow(
+            save_kind=SaveKind.INVULNERABLE,
+            target_number=4,
+            roll_state=save_roll,
+            unmodified_roll=4,
+            final_roll=4,
+            successful=True,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
+            option=invulnerable_option,
+        )
+    with pytest.raises(GameLifecycleError, match="Armour save resolution does not match"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=two_roll,
+            unmodified_roll=2,
+            final_roll=2,
+            successful=True,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="roll of 1"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=one_roll,
+            unmodified_roll=1,
+            final_roll=1,
+            successful=False,
+            resolution_rule=SaveResolutionRule.FAILED,
+            option=valid_option,
+        )
+    with pytest.raises(GameLifecycleError, match="Failed save resolution does not match"):
+        SavingThrow(
+            save_kind=SaveKind.ARMOUR,
+            target_number=3,
+            roll_state=save_roll,
+            unmodified_roll=3,
+            final_roll=3,
+            successful=False,
+            resolution_rule=SaveResolutionRule.FAILED,
             option=valid_option,
         )
     invalid_roll_state_throw = SavingThrow(
@@ -6890,10 +7203,26 @@ def test_phase14e_save_and_plunging_fire_validation_is_fail_fast() -> None:
         unmodified_roll=3,
         final_roll=3,
         successful=True,
+        resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
         option=valid_option,
     )
     with pytest.raises(GameLifecycleError, match="roll_state"):
         invalid_roll_state_throw.to_payload()
+    with pytest.raises(GameLifecycleError, match="option or options"):
+        resolve_saving_throw(
+            option=valid_option,
+            options=(valid_option,),
+            roll_state=save_roll,
+        )
+    with pytest.raises(GameLifecycleError, match="option must be SaveOption"):
+        resolve_saving_throw(
+            option=cast(SaveOption, "bad-option"),
+            roll_state=save_roll,
+        )
+    with pytest.raises(GameLifecycleError, match="requires save options"):
+        resolve_saving_throw(roll_state=save_roll)
+    with pytest.raises(GameLifecycleError, match="at least one save option"):
+        resolve_saving_throw(options=(), roll_state=save_roll)
 
     with pytest.raises(GameLifecycleError, match="supported"):
         PlungingFireModifier(
@@ -9245,21 +9574,23 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="success flag"):
         resolve_saving_throw(option=armour_option, roll_state=save_roll).__class__(
             save_kind=SaveKind.ARMOUR,
-            target_number=armour_option.target_number,
+            target_number=armour_option.characteristic_target_number,
             roll_state=save_roll,
             unmodified_roll=4,
-            final_roll=4,
+            final_roll=3,
             successful=False,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
             option=armour_option,
         )
     with pytest.raises(GameLifecycleError, match="save_kind must match option"):
         SavingThrow(
             save_kind=SaveKind.INVULNERABLE,
-            target_number=armour_option.target_number,
+            target_number=armour_option.characteristic_target_number,
             roll_state=save_roll,
             unmodified_roll=3,
-            final_roll=3,
+            final_roll=2,
             successful=True,
+            resolution_rule=SaveResolutionRule.ARMOUR_SAVE,
             option=armour_option,
         )
     with pytest.raises(GameLifecycleError, match="roll_state must be DiceRollState"):

@@ -347,11 +347,14 @@ Defender shooting decisions include:
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
 - shooting-coupled reactive Stratagem choices such as Smokescreen through the existing `use_stratagem` or Stratagem target-proposal contract.
 
-Saving throw kind is not an adapter choice in the 11th Edition contract. If the
-current allocation group has an Invulnerable Save, the engine must use that
-Invulnerable Save. Armour Saves with AP modifiers are used only when the current
-allocation group has no Invulnerable Save. Adapters must not offer, submit,
-apply, or replay an armour-versus-invulnerable choice.
+Saving throw kind is not an adapter choice in the 11th Edition contract. The
+engine rolls one saving throw die for the current allocation group, retains both
+armour and Invulnerable Save options when both exist, and checks that die in
+ordered rule order: an unmodified 1 fails; otherwise an InSv succeeds if the die
+is at least the InSv characteristic; otherwise the armour Save succeeds if the
+AP-modified result is at least the Sv characteristic; otherwise the save fails.
+Adapters must not offer, submit, apply, or replay an armour-versus-invulnerable
+choice.
 
 Phase 13C implements these defender-visible attack-resolution decisions:
 
@@ -381,12 +384,13 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   the grouped pool before applying normal damage, sorts those dice from lowest
   to highest, then walks them against the current ordered group. Real armour or
   invulnerable saving throw options are retained even when the target is above 6
-  and cannot succeed on a D6. Effects that permit no saving throw may roll an
-  internal `attack_sequence.allocation_order.no_save` die for deterministic ordering;
-  that die is not a saving throw and is not Command Re-roll eligible. The save
-  event for each die is emitted when that die is walked, so the payload reflects
-  the model and save profile that are current at damage time. When a group is
-  destroyed or exhausted, remaining failed saves advance to the next group in
+  or AP makes success impossible on a D6. Effects that permit no saving throw
+  may roll an internal `attack_sequence.allocation_order.no_save` die for
+  deterministic ordering; that die is not a saving throw and is not Command
+  Re-roll eligible. The save event for each die is emitted when that die is
+  walked, so the payload reflects the model, all current save options, and the
+  ordered save condition that resolved the die through `resolution_rule`. When
+  a group is destroyed or exhausted, remaining failed saves advance to the next group in
   `ordered_group_ids`. Stale, drifted, wrong-actor, wrong-option, or
   payload-mismatched submissions reject before queue pop and before mutation.
 - `select_damage_allocation_model`: finite defending-player choice emitted
@@ -449,7 +453,7 @@ Required Phase 13 adapter-contract tests:
 - valid ranged `select_resolve_target_unit` and `select_attack_weapon_group` choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`, including automatic single-option recording and stale/drift/malformed invalid submission rejection before queue pop;
 - stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-target, invalid-weapon, and invalid-visibility submission rejection without mutation where required;
 - Firing Deck declaration validation, replay, and end-of-phase ineligible-unit state;
-- defender allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, current-group damage-model choice through finite decisions, wounded-model forced choice inside current groups, pooled save sorting, grouped failed-save transition to the next ordered group, pool-of-one convergence through the grouped resolver, and mandatory Invulnerable Save resolution with no save-kind adapter choice;
+- defender allocation-order round-trip through finite decisions, automatic forced allocation-tier ordering, same-tier ordered-group options, current-group damage-model choice through finite decisions, wounded-model forced choice inside current groups, pooled save sorting, grouped failed-save transition to the next ordered group, pool-of-one convergence through the grouped resolver, and ordered InSv-then-armour Save resolution with no save-kind adapter choice;
 - Precision allocation choice round-trip through finite attacker decisions, including decline, pool-scoped selected Character-group persistence, grouped priority-group promotion, selected-group destruction, and normal Bodyguard-protected fallback;
 - optional or competing Feel No Pain decisions through finite decisions;
 - Smokescreen, Fire Overwatch, and other shooting-coupled reactive Stratagem windows through `use_stratagem` or target proposals;

@@ -22,6 +22,13 @@ class SaveKind(StrEnum):
     INVULNERABLE = "invulnerable"
 
 
+class SaveResolutionRule(StrEnum):
+    UNMODIFIED_ONE = "unmodified_1"
+    INVULNERABLE_SAVE = "invulnerable_save"
+    ARMOUR_SAVE = "armour_save"
+    FAILED = "failed"
+
+
 class SaveOptionPayload(TypedDict):
     save_kind: str
     target_number: int
@@ -39,6 +46,7 @@ class SavingThrowPayload(TypedDict):
     unmodified_roll: int
     final_roll: int
     successful: bool
+    resolution_rule: str
     option: SaveOptionPayload
 
 
@@ -131,10 +139,16 @@ class SavingThrow:
     unmodified_roll: int
     final_roll: int
     successful: bool
+    resolution_rule: SaveResolutionRule
     option: SaveOption
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "save_kind", save_kind_from_token(self.save_kind))
+        object.__setattr__(
+            self,
+            "resolution_rule",
+            save_resolution_rule_from_token(self.resolution_rule),
+        )
         object.__setattr__(
             self,
             "target_number",
@@ -142,15 +156,41 @@ class SavingThrow:
         )
         if self.save_kind is not self.option.save_kind:
             raise GameLifecycleError("SavingThrow save_kind must match option.")
-        if self.target_number != self.option.target_number:
-            raise GameLifecycleError("SavingThrow target_number must match option.")
+        if self.target_number != self.option.characteristic_target_number:
+            raise GameLifecycleError("SavingThrow target_number must match save characteristic.")
         if type(self.unmodified_roll) is not int or not 1 <= self.unmodified_roll <= 6:
             raise GameLifecycleError("SavingThrow unmodified_roll must be a D6 value.")
         if type(self.final_roll) is not int:
             raise GameLifecycleError("SavingThrow final_roll must be an integer.")
         if type(self.successful) is not bool:
             raise GameLifecycleError("SavingThrow successful must be a bool.")
-        expected_success = self.unmodified_roll != 1 and self.final_roll >= self.target_number
+        expected_final_roll = _final_roll_for_save_option(
+            option=self.option,
+            unmodified_roll=self.unmodified_roll,
+        )
+        if self.final_roll != expected_final_roll:
+            raise GameLifecycleError("SavingThrow final_roll does not match save option.")
+        expected_success = self.resolution_rule in {
+            SaveResolutionRule.INVULNERABLE_SAVE,
+            SaveResolutionRule.ARMOUR_SAVE,
+        }
+        if self.resolution_rule is SaveResolutionRule.UNMODIFIED_ONE and self.unmodified_roll != 1:
+            raise GameLifecycleError("Unmodified-one save resolution requires a roll of 1.")
+        if self.resolution_rule is SaveResolutionRule.INVULNERABLE_SAVE:
+            if self.save_kind is not SaveKind.INVULNERABLE:
+                raise GameLifecycleError("Invulnerable save resolution requires an InSv option.")
+            if self.unmodified_roll < self.target_number:
+                raise GameLifecycleError("Invulnerable save resolution does not match the roll.")
+        if self.resolution_rule is SaveResolutionRule.ARMOUR_SAVE:
+            if self.save_kind is not SaveKind.ARMOUR:
+                raise GameLifecycleError("Armour save resolution requires an armour option.")
+            if self.unmodified_roll == 1 or self.final_roll < self.target_number:
+                raise GameLifecycleError("Armour save resolution does not match the roll.")
+        if self.resolution_rule is SaveResolutionRule.FAILED:
+            if self.unmodified_roll == 1:
+                raise GameLifecycleError("A roll of 1 must use unmodified-one save resolution.")
+            if self.final_roll >= self.target_number:
+                raise GameLifecycleError("Failed save resolution does not match the roll.")
         if self.successful != expected_success:
             raise GameLifecycleError("SavingThrow success flag does not match roll semantics.")
 
@@ -164,6 +204,7 @@ class SavingThrow:
             "unmodified_roll": self.unmodified_roll,
             "final_roll": self.final_roll,
             "successful": self.successful,
+            "resolution_rule": self.resolution_rule.value,
             "option": self.option.to_payload(),
         }
 
@@ -331,6 +372,17 @@ def save_kind_from_token(token: object) -> SaveKind:
         raise GameLifecycleError(f"Unsupported SaveKind token: {token}.") from exc
 
 
+def save_resolution_rule_from_token(token: object) -> SaveResolutionRule:
+    if type(token) is SaveResolutionRule:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("SaveResolutionRule token must be a string.")
+    try:
+        return SaveResolutionRule(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported SaveResolutionRule token: {token}.") from exc
+
+
 def save_options_for_model(
     *,
     model: ModelInstance,
@@ -432,21 +484,110 @@ def saving_throw_roll_spec(
 
 def resolve_saving_throw(
     *,
-    option: SaveOption,
     roll_state: DiceRollState,
+    option: SaveOption | None = None,
+    options: tuple[SaveOption, ...] | None = None,
 ) -> SavingThrow:
     if type(roll_state) is not DiceRollState:
         raise GameLifecycleError("Saving throw roll_state must be DiceRollState.")
+    save_options = _save_options_for_resolution(option=option, options=options)
     unmodified = roll_state.current_total
+    resolved_option, resolution_rule = _resolve_save_option_for_roll(
+        options=save_options,
+        unmodified_roll=unmodified,
+    )
+    final_roll = _final_roll_for_save_option(
+        option=resolved_option,
+        unmodified_roll=unmodified,
+    )
     return SavingThrow(
-        save_kind=option.save_kind,
-        target_number=option.target_number,
+        save_kind=resolved_option.save_kind,
+        target_number=resolved_option.characteristic_target_number,
         roll_state=roll_state,
         unmodified_roll=unmodified,
-        final_roll=unmodified,
-        successful=unmodified != 1 and unmodified >= option.target_number,
-        option=option,
+        final_roll=final_roll,
+        successful=(
+            resolution_rule
+            in {SaveResolutionRule.INVULNERABLE_SAVE, SaveResolutionRule.ARMOUR_SAVE}
+        ),
+        resolution_rule=resolution_rule,
+        option=resolved_option,
     )
+
+
+def _save_options_for_resolution(
+    *,
+    option: SaveOption | None,
+    options: tuple[SaveOption, ...] | None,
+) -> tuple[SaveOption, ...]:
+    if option is not None and options is not None:
+        raise GameLifecycleError("Saving throw resolution must receive option or options.")
+    if option is not None:
+        if type(option) is not SaveOption:
+            raise GameLifecycleError("Saving throw option must be SaveOption.")
+        return _selectable_save_options((option,))
+    if options is None:
+        raise GameLifecycleError("Saving throw resolution requires save options.")
+    save_options = _selectable_save_options(options)
+    if not save_options:
+        raise GameLifecycleError("Saving throw resolution requires at least one save option.")
+    return save_options
+
+
+def _resolve_save_option_for_roll(
+    *,
+    options: tuple[SaveOption, ...],
+    unmodified_roll: int,
+) -> tuple[SaveOption, SaveResolutionRule]:
+    if type(unmodified_roll) is not int or not 1 <= unmodified_roll <= 6:
+        raise GameLifecycleError("Saving throw unmodified_roll must be a D6 value.")
+    if unmodified_roll == 1:
+        return (
+            _last_checked_save_option(options),
+            SaveResolutionRule.UNMODIFIED_ONE,
+        )
+    invulnerable_option = next(
+        (option for option in options if option.save_kind is SaveKind.INVULNERABLE),
+        None,
+    )
+    if (
+        invulnerable_option is not None
+        and unmodified_roll >= invulnerable_option.characteristic_target_number
+    ):
+        return invulnerable_option, SaveResolutionRule.INVULNERABLE_SAVE
+    armour_option = next(
+        (option for option in options if option.save_kind is SaveKind.ARMOUR),
+        None,
+    )
+    if armour_option is not None and (
+        _final_roll_for_save_option(option=armour_option, unmodified_roll=unmodified_roll)
+        >= armour_option.characteristic_target_number
+    ):
+        return armour_option, SaveResolutionRule.ARMOUR_SAVE
+    return _last_checked_save_option(options), SaveResolutionRule.FAILED
+
+
+def _last_checked_save_option(options: tuple[SaveOption, ...]) -> SaveOption:
+    armour_option = next(
+        (option for option in options if option.save_kind is SaveKind.ARMOUR),
+        None,
+    )
+    if armour_option is not None:
+        return armour_option
+    invulnerable_option = next(
+        (option for option in options if option.save_kind is SaveKind.INVULNERABLE),
+        None,
+    )
+    if invulnerable_option is None:
+        raise GameLifecycleError("Saving throw resolution requires at least one save option.")
+    return invulnerable_option
+
+
+def _final_roll_for_save_option(*, option: SaveOption, unmodified_roll: int) -> int:
+    if option.save_kind is SaveKind.INVULNERABLE:
+        return unmodified_roll
+    cover_modifier = 1 if option.cover_applied else 0
+    return unmodified_roll + option.armor_penetration + cover_modifier
 
 
 def cover_result_has_bonus(cover_result: BenefitOfCoverResult | None) -> bool:
