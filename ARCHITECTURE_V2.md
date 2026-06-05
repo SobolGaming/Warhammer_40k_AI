@@ -2362,49 +2362,228 @@ Phase 15 implements Charge/Fight from the Phase 14G source contract. Do not intr
 
 ## Phase 15A: Charge phase declaration and charge roll
 
+Phase 15A makes charge eligibility, charge declaration, and the 2D6 charge roll player-facing decisions under the adapter contract, implementing the Phase 14G charge declaration contract. It does not move models; charge movement is Phase 15B.
+
+Modules:
+
+- `engine/phases/charge.py`
+- `engine/charge_declaration.py`
+- `engine/movement_legality.py`
+- `engine/dice.py` and Phase 10J dice/reroll helpers are consumed, not reimplemented
+- `engine/decision_controller.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `ChargePhaseState`
+- `ChargeEligibilityContext`
+- `ChargingUnitSelection`
+- `ChargeTargetCandidate`
+- `ChargeDeclarationProposal`
+- `ChargeRollRequest`
+- `ChargeRollResult`
+- `ChargeDistanceState`
+
 Invariants:
 
-- eligible charging units are derived from state;
+- all charger choices are player-facing decisions and must use `DecisionRequest` -> `FiniteOptionSubmission` or `ParameterizedSubmission` -> `DecisionResult` -> `GameLifecycle.submit_decision(...)` -> `DecisionRecord`/`EventRecord`;
+- Phase 15A must update `docs/ADAPTER_DECISION_CONTRACT.md` with every new charging-unit selection, charge-target declaration, charge-roll request, option payload, proposal payload, and viewer-visibility rule introduced;
+- finite charge options use deterministic option IDs and JSON-safe payloads; parameterized charge declaration proposals reject stale, drifted, malformed, schema-invalid, or wrong-context submissions before queue pop unless the contract explicitly allows recorded rule-invalid retry attempts;
+- eligible charging units are derived from current state;
+- charge declaration validates within-12" of a target, unengaged, no Advance/Fall Back this turn, and battlefield presence per the Phase 14G charge contract;
 - units that Advanced/Fell Back cannot charge unless a rule permits;
-- targets are selected according to ruleset descriptor;
-- charge roll is deterministic and replay-facing;
-- failed charges do not move models.
+- one or more targets are declared before the charge roll, all within 12", and selected according to the ruleset `charge_policy` descriptor;
+- the charge roll is a deterministic, replay-facing 2D6 roll resolved after target declaration;
+- charge-roll rerolls are explicit `DecisionRequest`s only when a legal reroll source exists, and Command Re-roll cannot reroll a Charge roll per the Phase 14I Core Stratagem contract;
+- charge-target validity after the roll requires every declared target to be within both 12" and the rolled maximum distance;
+- a charge fails if the rolled distance cannot satisfy the Phase 15B endpoint requirement against every declared target;
+- failed charges do not move models and emit no displacement records.
+
+Required tests:
+
+- charging-unit selection goes through finite `DecisionRequest`/`DecisionResult` submission and records deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads;
+- charge-target declaration goes through the adapter contract, including stale/drift/malformed invalid submission coverage and replay payload round-trip;
+- eligible charging-unit derivation rejects Advanced/Fell Back/engaged/off-battlefield units;
+- targets beyond 12" at declaration are rejected without mutation;
+- the 2D6 charge roll is deterministic and replay-facing;
+- a reroll request appears only with a legal reroll source and Command Re-roll cannot be applied to the Charge roll;
+- a charge whose rolled distance cannot reach a declared target fails and moves no models;
+- failed charge emits no displacement record and leaves charger state unmutated.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/movement_distance.py`
+- `src/warhammer40k_ai/utility/dice.py`
 
 ## Phase 15B: charge movement, terrain, FLY, and endpoint rules
 
+Phase 15B resolves the charge move as a parameterized movement proposal that consumes the shared movement/pathing/terrain/coherency validators and enforces the Phase 14G charge-endpoint constraints. Charge moves require a `PathWitness` or a typed invalid result; endpoint-only validation is forbidden.
+
+Modules:
+
+- `engine/phases/charge.py`
+- `engine/movement_proposals.py`
+- `engine/movement_legality.py`
+- `geometry/pathing.py`
+- `geometry/terrain.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `ChargeMoveProposal`
+- `ChargeMoveResolution`
+- `ChargeEndpointWitness`
+- `ChargeEngagementResult`
+- `ChargeTerrainPolicy`
+- `FlyChargePolicy`
+
 Invariants:
 
-- charge movement consumes pathing, terrain, free-rotation, and coherency validation;
-- at least one charging model must satisfy the charge endpoint requirement;
-- charge may end in Engagement Range according to charge policy;
-- charging over terrain and charging with FLY are distinct policies;
-- charge movement emits displacement records;
-- charge endpoints use the 2"/5" engagement policy and the 11th Edition charge target constraints; no retired terrain-type engagement exception is retained.
+- charge moves are parameterized movement proposals submitted through `GameLifecycle.submit_decision(...)` and require a `PathWitness` or a typed invalid result; endpoint-only charge validation is forbidden;
+- charge movement consumes the shared precise-distance, free-rotation, terrain, pathing, and coherency validators rather than reimplementing distance accounting;
+- no model may move farther than the rolled charge distance;
+- the resolved charge must end closer to one or more declared targets, end within Engagement Range of every declared target if possible, end within 1" if possible, and end not in Engagement Range of any non-target unit, per the Phase 14G charge-move contract;
+- at least one charging model must satisfy the charge endpoint requirement or the charge is invalid and moves no models;
+- charge endpoints use the 2"/5" engagement policy and the 11th Edition charge-target constraints; no retired terrain-type engagement exception is retained;
+- charging over terrain and charging with `FLY` are distinct, descriptor-driven policies;
+- charge movement emits displacement records only after all validators pass;
+- charging grants Fights First until the end of the turn (recorded for Phase 15C fight-order state).
+
+Required tests:
+
+- charge-move proposal validates a `PathWitness` and rejects endpoint-only movement;
+- charge move consumes precise-distance, free-rotation, terrain, pathing, and coherency validators;
+- a charge that cannot place at least one model within Engagement Range of every declared target is invalid and moves no models;
+- charge endpoint rejection when it would leave a non-target unit in Engagement Range;
+- `FLY` charge and over-terrain charge follow distinct policies and produce distinct witnesses;
+- charge move over the rolled distance for round, non-round, `VEHICLE`, `MONSTER`, and baseless `FRAME` models never debits distance for rotation;
+- successful charge emits displacement records and records Fights-First status until end of turn;
+- failed/invalid charge move does not mutate battlefield state.
+
+CORE V1 relevant areas:
+
+- `src/warhammer40k_ai/engine/decision_handlers/movement.py`
+- `src/warhammer40k_ai/pathing/validation.py`
+- `src/warhammer40k_ai/pathing/rules_profile.py`
 
 ## Phase 15C: fight order, Fights First, and remaining combats
 
+Phase 15C builds the Fight phase skeleton (Start, Pile In, Fight, Consolidate, End), derives fight eligibility, and sequences Fights First then Remaining Combats with deterministic, replay-safe activation order. Fight activation selection and fight interrupts are player-facing decisions routed through the lifecycle.
+
+Modules:
+
+- `engine/phases/fight.py`
+- `engine/fight_order.py`
+- `engine/sequencing.py`
+- `engine/timing_windows.py`
+- `engine/reaction_queue.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `FightPhaseState`
+- `FightStepState`
+- `FightOrderState`
+- `FightEligibilityContext`
+- `FightActivationSelection`
+- `FightsFirstRegistry`
+- `EligibleToFightPass`
+- `FightInterruptRequest`
+
 Invariants:
 
-- Fight phase has Fights First then Remaining Combats;
-- a unit is eligible to fight if it made a Charge move this turn, was engaged in
-  melee at the start of the Fight phase, or is engaged in melee at activation
-  time;
-- eligible units are selected in correct order;
-- charging units and Fight First effects are represented in fight-order state;
-- fight interrupts use typed decision metadata.
+- the Fight phase has the Start, Pile In, Fight, Consolidate, and End steps per the Phase 14G fight contract;
+- activation order resolves Fights First combats before Remaining Combats, alternating per the PDF sequence with the active player choosing first within each tier;
+- a unit is eligible to fight if it made a Charge move this turn, was engaged in melee at the start of the Fight phase, or is engaged in melee at activation time;
+- charging units and Fights First effects are represented in fight-order state and Fights First is sourced from a structured registry, not ad hoc flags;
+- fight activation selection is a player-facing `DecisionRequest` resolved through `GameLifecycle.submit_decision(...)` with deterministic option IDs and JSON-safe payloads;
+- an eligible-to-fight pass is available to a player only when all of that player's eligible units are more than 5" from all enemy units;
+- Normal Fight and Overrun Fight are explicit fight types, and Overrun Fight cannot be selected unless the unit is otherwise eligible to fight;
+- fight interrupts (such as Counter-offensive) use typed decision metadata and reuse the Phase 12A reaction queue rather than a private fight-order path;
+- fight-order resolution is deterministic and replay-safe;
+- Phase 15C must update `docs/ADAPTER_DECISION_CONTRACT.md` with each new fight activation, eligible-to-fight pass, fight-type, and fight-interrupt decision payload.
+
+Required tests:
+
+- Fight phase exposes Start, Pile In, Fight, Consolidate, and End steps;
+- fight eligibility covers charged units, units engaged at Fight phase start, and units engaged at activation time;
+- Fights First combats resolve before Remaining Combats with deterministic active-player-first alternation;
+- fight activation selection goes through `GameLifecycle.submit_decision(...)` and round-trips deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads;
+- the eligible-to-fight pass is offered only when every eligible unit is more than 5" from all enemy units;
+- Overrun Fight cannot be selected unless the unit is otherwise eligible to fight;
+- a fight interrupt fires once at the legal timing through the reaction queue and resumes the parent fight sequence;
+- fight order is deterministic and replay-safe across re-runs from `DecisionRecord`.
 
 ## Phase 15D: pile-in, melee attacks, and consolidate
 
+Phase 15D resolves a single combat activation: the Pile In displacement, melee target selection and the melee attack sequence, then the Consolidate displacement. Pile In and Consolidate are group-aware movement displacements that require a `PathWitness`, and melee attacks reuse the Phase 13C attack-sequence infrastructure.
+
+Modules:
+
+- `engine/phases/fight.py`
+- `engine/movement_proposals.py`
+- `engine/movement_legality.py`
+- `engine/attack_sequence.py`
+- `engine/damage_allocation.py`
+- `geometry/pathing.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `PileInProposal`
+- `ConsolidateProposal`
+- `ConsolidationModeSelection`
+- `MeleeTargetSelection`
+- `MeleeAttackPool`
+- `FightDisplacementRecord`
+
 Invariants:
 
-- Pile-in and Consolidate are model displacements, not Movement phase actions;
-- Pile-in/Consolidate consume movement/pathing/terrain/coherency validators;
-- melee target selection follows engagement/eligibility rules;
-- melee attack sequence reuses attack-sequence infrastructure;
-- consolidation endpoint rules are explicit;
-- fight eligibility and melee target selection use the 2"/5" engagement range and the 11th Edition terrain-area policies.
+- Pile In and Consolidate are model displacements, not Movement phase actions, and are submitted through `GameLifecycle.submit_decision(...)`;
+- Pile In and Consolidate consume the shared movement/pathing/terrain/coherency validators and require a `PathWitness` or a typed invalid result; endpoint-only validation is forbidden;
+- Pile In and Consolidate use the group-aware model APIs (`UnitGroup.alive_models()` / group-aware placement) when the rules operate on the attached rules unit as a whole;
+- both players make Pile In and Consolidate moves with the active player resolving first per the Phase 14G fight contract;
+- melee target selection follows engagement/eligibility rules and uses the 2"/5" engagement range with the 11th Edition terrain-area policies;
+- the melee attack sequence reuses the Phase 13C attack-sequence and damage-allocation infrastructure (Hit uses WS, then wound, allocate, save, damage) and the Phase 13D melee weapon-ability machinery, not a private melee resolver;
+- consolidation endpoint rules are explicit, and consolidation mode selection supports Ongoing, Engaging, and Objective modes per the Phase 14G contract;
+- Engaging Consolidation that newly engages an enemy unit emits opponent fight decisions for that newly engaged eligible unit;
+- melee target declaration, Pile In/Consolidate proposals, and consolidation-mode selection are player-facing decisions with deterministic option IDs and JSON-safe payloads, and Phase 15D must update `docs/ADAPTER_DECISION_CONTRACT.md` for each.
+
+Required tests:
+
+- Pile In and Consolidate proposals validate a `PathWitness` and reject endpoint-only movement;
+- Pile In and Consolidation use group-aware movement APIs for attached rules units;
+- melee target selection obeys engagement/eligibility rules and the 2"/5" engagement range;
+- melee attacks resolve through the shared attack sequence and can destroy models, emitting removal records;
+- melee weapon abilities resolve through the Phase 13D ability machinery in the melee context;
+- consolidation Ongoing, Engaging, and Objective modes each enforce their explicit endpoint rules;
+- Engaging Consolidation emits opponent fight decisions for newly engaged eligible units;
+- Pile In/Consolidate/melee declarations round-trip deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads and reject stale/drift/malformed submissions without mutation.
 
 ## Phase 15E: fight-phase Stratagems and melee abilities
+
+Modules:
+
+- `engine/phases/charge.py`
+- `engine/phases/fight.py`
+- `engine/stratagems.py`
+- `engine/stratagem_catalog.py`
+- `engine/core_stratagem_effects.py`
+- `engine/weapon_abilities.py`
+- `engine/timing_windows.py`
+- `engine/reaction_queue.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `HeroicInterventionProposal`
+- `CounterOffensiveInterrupt`
+- `EpicChallengeBinding`
+- `CrushingImpactResult`
+- `FightFirstEffect`
+- `FightOnDeathEffect`
+- `MeleeWeaponAbilityEffect`
 
 Initial coverage:
 
@@ -2440,10 +2619,14 @@ Required tests:
 
 Required tests:
 
-- full Charge phase can complete;
-- full Fight phase can complete;
-- charge movement, pile-in, and consolidate emit displacement records;
-- melee attacks can destroy models;
+- full Charge phase can complete for both players;
+- full Fight phase can complete for both players;
+- charge consumes declaration, charge roll, charge movement, and endpoint validation through the shared decision path;
+- the Fight phase consumes fight order, Pile In, melee attack sequence, damage allocation, removal records, and Consolidate;
+- charge movement, Pile In, and Consolidate emit displacement records;
+- melee attacks can destroy models and emit removal records;
+- Charge/Fight completion waits for all pending charger, defender, and charge/fight-coupled reaction decisions to resolve through `GameLifecycle.submit_decision(...)`;
+- invalid declarations and invalid charge/fight moves do not mutate state;
 - fight order is deterministic and replay-safe.
 
 ---

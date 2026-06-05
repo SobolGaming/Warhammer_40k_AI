@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, and Phase 14L ranged attack target/group gathering decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, and Phase 15A charge declaration decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, and Phase 14L ranged attack target/group gathering decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, and Phase 15A charge declaration decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -41,6 +41,7 @@ The shared contract uses these objects and payloads:
 - `DecisionRecord`: replay-facing record of a request/result pair.
 - `ProposalRequestPayload`: neutral parameterized physical-action request embedded inside a `DecisionRequest.payload`.
 - `MovementProposalPayload`: parameterized movement answer, including `PathWitness`, `movement_mode`, and the explicit `fall_back_mode` when Fall Back was selected.
+- `ChargeDeclarationProposal`: parameterized Charge phase declaration answer containing selected target unit IDs and replay-safe source request/result context.
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
 - `EventRecord`: deterministic event-log payload.
@@ -63,6 +64,8 @@ Relevant modules:
 - `src/warhammer40k_core/engine/decision_result.py`
 - `src/warhammer40k_core/engine/decision_record.py`
 - `src/warhammer40k_core/engine/movement_proposals.py`
+- `src/warhammer40k_core/engine/charge_declaration.py`
+- `src/warhammer40k_core/engine/phases/charge.py`
 - `src/warhammer40k_core/engine/timing_windows.py`
 - `src/warhammer40k_core/engine/reaction_queue.py`
 - `src/warhammer40k_core/engine/sequencing.py`
@@ -102,6 +105,7 @@ Finite decisions are bounded option choices already enumerated by the engine. Ex
 - Mission Action start selection;
 - unit selection;
 - movement action selection;
+- charge unit selection;
 - shooting unit selection;
 - defender attack-allocation model selection;
 - optional defensive ability choices;
@@ -467,6 +471,39 @@ Required Phase 13 adapter-contract tests:
 - replay/payload round-trip with no Python object reprs or memory addresses;
 - viewer-scoped projection/event redaction for any hidden target, allocation, defensive ability, or reaction-window information.
 
+## Phase 15 Charge Decisions
+
+Phase 15A implements Charge phase eligibility, declaration, and deterministic charge-distance rolls. It does not move models. Charge movement remains a Phase 15B physical proposal and must not be synthesized by adapters from the Phase 15A roll result.
+
+Phase 15A exposes these active-player decisions:
+
+- `select_charging_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_charge_phase`. Unit option payloads include `submission_kind: "select_charging_unit"`, game, round, phase, active player, selected unit ID, target candidates, and the current eligibility context. The completion option uses `submission_kind: "complete_charge_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player charging units.
+- `submit_charge_declaration`: parameterized active-player choice emitted after `select_charging_unit`. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "charge_declaration"`, game, battle round, phase, active player, selected charging unit ID, source unit-selection request/result IDs, `ruleset_descriptor_hash`, `max_declaration_range_inches`, and current JSON-safe target candidates.
+
+Charge target candidates are engine-enumerated from battlefield state and the active ruleset's `charge_policy`. Phase 15A rejects chargers that Advanced, Fell Back, are within Engagement Range, are off the battlefield, already failed a Charge phase declaration, or have no legal target, unless a future source-backed rule explicitly marks that unit as allowed to declare a charge. Target candidates are legal only when at least one model in the enemy unit is within the descriptor-sourced declaration range, currently 12".
+
+`submit_charge_declaration` submissions must use `selected_option_id: "submit_parameterized_payload"` and a `ChargeDeclarationProposal` payload containing:
+
+- `proposal_request_id`, `proposal_kind: "charge_declaration"`, player ID, battle round, charging unit ID, source request/result IDs, ruleset descriptor hash, and max declaration range;
+- sorted `target_unit_instance_ids` selected from the pending request's legal target candidates.
+
+Malformed, schema-invalid, stale, drifted, wrong-actor, wrong-unit, wrong-phase, wrong-ruleset, empty-target, duplicate-target, unsorted-target, unknown-target, non-candidate-target, or current-range-invalid declarations reject before the pending request is popped, before a `DecisionRecord` is created, and before any dice or state mutation occurs. Phase 15A does not allow recorded rule-invalid retry attempts.
+
+Accepted declarations emit `charge_declaration_accepted`, roll 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`, and emit `charge_roll_resolved`. The generated charge-roll `DiceRollSpec` includes `reroll_forbidden_rule_ids` with `phase15a:charge-roll-command-reroll-forbidden`, so Phase 15A Charge rolls must not emit a Command Re-roll request even though the source-backed 11th Edition Stratagem catalog contains Charge as an eligible roll class. A failed Charge emits `charge_failed`, mutates no model placement, emits no displacement payload, and returns to the next charging-unit choice. A successful Charge records a `ChargeDistanceState`, emits `charge_move_required`, and stops with typed unsupported status `charge_move_pending_phase15b` until Phase 15B supplies the movement proposal contract.
+
+Charge declarations and charge rolls are public table information in the current rules scope. Viewer-scoped projections and event deltas still must not leak hidden opponent information through option counts, target candidates, invalid diagnostics, roll metadata, or derived fields if future hidden deployment, reserve, or secret objective mechanics affect Charge eligibility.
+
+Required Phase 15A adapter-contract tests:
+
+- valid charging-unit selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid charge declaration through `ParameterizedSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- malformed, stale, drifted, schema-invalid, wrong-context, and current-range-invalid declaration rejection without queue pop or mutation;
+- deterministic JSON-safe declaration, roll, decision-record, event, and lifecycle payload round-trip;
+- Advanced, Fell Back, engaged, off-battlefield, and no-target eligibility gating;
+- failed Charge declarations produce no movement or displacement payload;
+- successful Charge declarations stop at the typed Phase 15B unsupported movement boundary;
+- viewer-scoped projection/event redaction for any future hidden Charge eligibility or target information.
+
 ## Parameterized Proposals
 
 Parameterized proposals are used when the exact physical result cannot be safely enumerated as finite options.
@@ -480,6 +517,7 @@ The contract currently covers these proposal families:
 - Deep Strike placement;
 - Strategic Reserves placement;
 - Disembark placement;
+- Charge declaration target selection;
 - ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - Stratagem target or placement proposals introduced by Phase 12 and later phase gates.
 

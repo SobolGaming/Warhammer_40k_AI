@@ -131,6 +131,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.charge import SELECT_CHARGING_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
     AdvanceRollRequest,
@@ -10534,7 +10535,7 @@ def test_shooting_phase_completion_uses_finite_lifecycle_option() -> None:
 
     assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
     state = _state(lifecycle)
-    assert state.current_battle_phase is BattlePhase.CHARGE
+    assert state.current_battle_phase is BattlePhase.FIGHT
     assert state.shooting_phase_state is None
     assert complete_payload["submission_kind"] == COMPLETE_SHOOTING_PHASE_OPTION_ID
     assert complete_payload["skipped_unit_ids"] == [units["intercessor-1"].unit_instance_id]
@@ -10628,7 +10629,9 @@ def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
     hit_events = _attack_step_payloads(lifecycle, AttackSequenceStep.HIT)
     save_events = _attack_step_payloads(lifecycle, AttackSequenceStep.SAVE)
 
-    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert final_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert final_status.decision_request is not None
+    assert final_status.decision_request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
     assert _state(lifecycle).current_battle_phase is BattlePhase.CHARGE
     assert _state(lifecycle).shooting_phase_state is None
     assert accepted_pool["target_visible_model_ids"]
@@ -10664,7 +10667,7 @@ def test_phase13f_shooting_completion_runs_for_both_players() -> None:
     )
     state = _state(lifecycle)
     assert player_a_status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert state.current_battle_phase is BattlePhase.CHARGE
+    assert state.current_battle_phase is BattlePhase.FIGHT
 
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.active_player_id = "player-b"
@@ -11711,7 +11714,7 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
     state.mission_setup = replace(state.mission_setup, terrain_features=(blocking_ruin,))
     status = lifecycle.advance_until_decision_or_terminal()
     assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert state.current_battle_phase is BattlePhase.CHARGE
+    assert state.current_battle_phase is BattlePhase.FIGHT
 
 
 def test_shooting_los_uses_third_party_model_blockers() -> None:

@@ -55,6 +55,11 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
     UnsupportedPhaseHandler,
 )
+from warhammer40k_core.engine.phases.charge import (
+    SELECT_CHARGING_UNIT_DECISION_TYPE,
+    SUBMIT_CHARGE_DECLARATION_DECISION_TYPE,
+    ChargePhaseHandler,
+)
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
     CommandPhaseHandler,
@@ -156,6 +161,12 @@ _SHOOTING_DECISION_TYPES = frozenset(
         DICE_REROLL_DECISION_TYPE,
     )
 )
+_CHARGE_DECISION_TYPES = frozenset(
+    (
+        SELECT_CHARGING_UNIT_DECISION_TYPE,
+        SUBMIT_CHARGE_DECLARATION_DECISION_TYPE,
+    )
+)
 _REACTION_FRAME_DECISION_TYPES = frozenset(
     (
         REACTION_DECISION_TYPE,
@@ -189,6 +200,7 @@ class GameLifecycle:
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
     _movement_phase_handler: MovementPhaseHandler = field(default_factory=MovementPhaseHandler)
     _shooting_phase_handler: ShootingPhaseHandler = field(default_factory=ShootingPhaseHandler)
+    _charge_phase_handler: ChargePhaseHandler = field(default_factory=ChargePhaseHandler)
     _triggered_movement_handler: TriggeredMovementHandler = field(
         default_factory=TriggeredMovementHandler
     )
@@ -215,6 +227,9 @@ class GameLifecycle:
         self._shooting_phase_handler = ShootingPhaseHandler(
             ruleset_descriptor=config.ruleset_descriptor,
             army_catalog=config.army_catalog,
+        )
+        self._charge_phase_handler = ChargePhaseHandler(
+            ruleset_descriptor=config.ruleset_descriptor
         )
         self._triggered_movement_handler = TriggeredMovementHandler(
             ruleset_descriptor=config.ruleset_descriptor
@@ -351,6 +366,20 @@ class GameLifecycle:
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
             invalid_status = self._shooting_phase_handler.invalid_declaration_submission_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SUBMIT_CHARGE_DECLARATION_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            invalid_status = self._charge_phase_handler.invalid_declaration_submission_status(
                 state=state,
                 request=pending_request,
                 result=result,
@@ -621,6 +650,15 @@ class GameLifecycle:
             if shooting_status is not None:
                 return shooting_status
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type in _CHARGE_DECISION_TYPES:
+            charge_status = self._charge_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if charge_status is not None:
+                return charge_status
+            return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
             triggered_status = self._triggered_movement_handler.apply_decision(
                 state=state,
@@ -744,6 +782,9 @@ class GameLifecycle:
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor,
                 army_catalog=None if config is None else config.army_catalog,
             ),
+            _charge_phase_handler=ChargePhaseHandler(
+                ruleset_descriptor=None if config is None else config.ruleset_descriptor
+            ),
             _triggered_movement_handler=TriggeredMovementHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
@@ -762,7 +803,7 @@ class GameLifecycle:
             BattlePhase.COMMAND: self._command_phase_handler,
             BattlePhase.MOVEMENT: self._movement_phase_handler,
             BattlePhase.SHOOTING: self._shooting_phase_handler,
-            BattlePhase.CHARGE: UnsupportedPhaseHandler(BattlePhase.CHARGE),
+            BattlePhase.CHARGE: self._charge_phase_handler,
             BattlePhase.FIGHT: UnsupportedPhaseHandler(BattlePhase.FIGHT),
         }
 
@@ -1058,6 +1099,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_battlefield_state_consistency(state=state, config=config)
     _validate_movement_phase_state_consistency(state=state)
     _validate_shooting_phase_state_consistency(state=state)
+    _validate_charge_phase_state_consistency(state=state)
     _validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
@@ -1409,6 +1451,60 @@ def _validate_shooting_phase_state_consistency(*, state: GameState) -> None:
         raise GameLifecycleError(
             "shooting_phase_state active selection is not active player's unit."
         )
+
+
+def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
+    charge_state = state.charge_phase_state
+    if charge_state is None:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("charge_phase_state requires battle stage.")
+    if state.current_battle_phase is not BattlePhase.CHARGE:
+        raise GameLifecycleError("charge_phase_state requires CHARGE phase.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("charge_phase_state requires active player.")
+    if charge_state.active_player_id != state.active_player_id:
+        raise GameLifecycleError("charge_phase_state active player drift.")
+    if charge_state.battle_round != state.battle_round:
+        raise GameLifecycleError("charge_phase_state battle round drift.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("charge_phase_state requires battlefield_state.")
+    unit_owner_by_id = {
+        unit.unit_instance_id: army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    active_player_unit_ids = {
+        unit_id
+        for unit_id, player_id in unit_owner_by_id.items()
+        if player_id == state.active_player_id
+    }
+    for unit_id in (*charge_state.selected_unit_ids, *charge_state.failed_unit_ids):
+        if unit_id not in active_player_unit_ids:
+            raise GameLifecycleError(
+                "charge_phase_state selected unit is not active player's unit."
+            )
+    active_selection = charge_state.active_selection
+    if active_selection is not None:
+        if active_selection.unit_instance_id not in charge_state.selected_unit_ids:
+            raise GameLifecycleError("charge_phase_state active selection drift.")
+        if active_selection.unit_instance_id not in active_player_unit_ids:
+            raise GameLifecycleError(
+                "charge_phase_state active selection is not active player's unit."
+            )
+    for distance_state in charge_state.distance_states:
+        roll_result = distance_state.roll_result
+        charging_unit_id = roll_result.request.unit_instance_id
+        if charging_unit_id not in charge_state.selected_unit_ids:
+            raise GameLifecycleError("charge_phase_state roll unit was not selected.")
+        if charging_unit_id not in active_player_unit_ids:
+            raise GameLifecycleError("charge_phase_state roll unit is not active player's unit.")
+        for target_unit_id in roll_result.request.target_unit_instance_ids:
+            target_owner = unit_owner_by_id.get(target_unit_id)
+            if target_owner is None:
+                raise GameLifecycleError("charge_phase_state target unit is unknown.")
+            if target_owner == state.active_player_id:
+                raise GameLifecycleError("charge_phase_state target unit is not an enemy.")
 
 
 def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:

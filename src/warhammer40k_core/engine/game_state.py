@@ -80,6 +80,10 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
     game_lifecycle_stage_from_token,
 )
+from warhammer40k_core.engine.phases.charge import (
+    ChargePhaseState,
+    ChargePhaseStatePayload,
+)
 from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
     AdvancedUnitStatePayload,
@@ -198,6 +202,7 @@ class GameStatePayload(TypedDict):
     battlefield_state: BattlefieldRuntimeStatePayload | None
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
+    charge_phase_state: ChargePhaseStatePayload | None
     shooting_phase_state: ShootingPhaseStatePayload | None
     out_of_phase_shooting_state: OutOfPhaseShootingStatePayload | None
     feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
@@ -592,6 +597,7 @@ class GameState:
     battlefield_state: BattlefieldRuntimeState | None = None
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
+    charge_phase_state: ChargePhaseState | None = None
     shooting_phase_state: ShootingPhaseState | None = None
     out_of_phase_shooting_state: OutOfPhaseShootingState | None = None
     feel_no_pain_sources_by_model_id: dict[str, tuple[FeelNoPainSource, ...]] = field(
@@ -720,6 +726,7 @@ class GameState:
         self.movement_phase_state = _validate_optional_movement_phase_state(
             self.movement_phase_state
         )
+        self.charge_phase_state = _validate_optional_charge_phase_state(self.charge_phase_state)
         self.shooting_phase_state = _validate_optional_shooting_phase_state(
             self.shooting_phase_state
         )
@@ -865,6 +872,9 @@ class GameState:
         shooting_state = self.shooting_phase_state
         if shooting_state is not None and shooting_state.active_selection is not None:
             return shooting_state.active_selection.player_id
+        charge_state = self.charge_phase_state
+        if charge_state is not None and charge_state.active_selection is not None:
+            return charge_state.active_selection.player_id
         movement_state = self.movement_phase_state
         if movement_state is not None and movement_state.active_selection is not None:
             return movement_state.active_selection.player_id
@@ -1054,6 +1064,8 @@ class GameState:
                 self.movement_phase_state = None
             if completed_phase is BattlePhase.SHOOTING:
                 self.shooting_phase_state = None
+            if completed_phase is BattlePhase.CHARGE:
+                self.charge_phase_state = None
             self.out_of_phase_shooting_state = None
             self.battle_phase_index += 1
             self._expire_persisting_effects_at_current_phase_start()
@@ -1080,6 +1092,8 @@ class GameState:
             self.movement_phase_state = None
         if completed_phase is BattlePhase.SHOOTING:
             self.shooting_phase_state = None
+        if completed_phase is BattlePhase.CHARGE:
+            self.charge_phase_state = None
         self.out_of_phase_shooting_state = None
         completed_round = self.battle_round
         battle_round_ended = self._active_player_is_last_in_round(completed_player_id)
@@ -1099,6 +1113,7 @@ class GameState:
             self.command_step_state = None
             self.movement_phase_state = None
             self.shooting_phase_state = None
+            self.charge_phase_state = None
             self.out_of_phase_shooting_state = None
             return completed_phase
         self.battle_phase_index = 0
@@ -2291,6 +2306,9 @@ class GameState:
                 if self.movement_phase_state is None
                 else self.movement_phase_state.to_payload()
             ),
+            "charge_phase_state": (
+                None if self.charge_phase_state is None else self.charge_phase_state.to_payload()
+            ),
             "shooting_phase_state": (
                 None
                 if self.shooting_phase_state is None
@@ -2499,6 +2517,11 @@ class GameState:
                 None
                 if payload["movement_phase_state"] is None
                 else MovementPhaseState.from_payload(payload["movement_phase_state"])
+            ),
+            charge_phase_state=(
+                None
+                if payload["charge_phase_state"] is None
+                else ChargePhaseState.from_payload(payload["charge_phase_state"])
             ),
             shooting_phase_state=(
                 None
@@ -3002,6 +3025,16 @@ def _validate_optional_movement_phase_state(
         return None
     if type(value) is not MovementPhaseState:
         raise GameLifecycleError("GameState movement_phase_state must be a MovementPhaseState.")
+    return value
+
+
+def _validate_optional_charge_phase_state(
+    value: object | None,
+) -> ChargePhaseState | None:
+    if value is None:
+        return None
+    if type(value) is not ChargePhaseState:
+        raise GameLifecycleError("GameState charge_phase_state must be a ChargePhaseState.")
     return value
 
 
