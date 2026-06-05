@@ -106,6 +106,7 @@ class FightPhaseStatePayload(TypedDict):
     activation_selections: list[FightActivationSelectionPayload]
     eligible_passes: list[EligibleToFightPassPayload]
     resolved_interrupt_ids: list[str]
+    resolved_interrupt_source_effect_ids: list[str]
     fights_first_registry: FightsFirstRegistryPayload
     phase_complete: bool
 
@@ -577,6 +578,7 @@ class FightPhaseState:
     activation_selections: tuple[FightActivationSelection, ...] = ()
     eligible_passes: tuple[EligibleToFightPass, ...] = ()
     resolved_interrupt_ids: tuple[str, ...] = ()
+    resolved_interrupt_source_effect_ids: tuple[str, ...] = ()
     fights_first_registry: FightsFirstRegistry = field(default_factory=FightsFirstRegistry)
     phase_complete: bool = False
 
@@ -649,6 +651,14 @@ class FightPhaseState:
                 self.resolved_interrupt_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "resolved_interrupt_source_effect_ids",
+            _validate_identifier_tuple(
+                "FightPhaseState resolved_interrupt_source_effect_ids",
+                self.resolved_interrupt_source_effect_ids,
+            ),
+        )
         if type(self.fights_first_registry) is not FightsFirstRegistry:
             raise GameLifecycleError(
                 "FightPhaseState fights_first_registry must be FightsFirstRegistry."
@@ -658,6 +668,11 @@ class FightPhaseState:
         _validate_unique_unit_ids(self.activated_unit_ids)
         _validate_unique_unit_ids(self.eligible_at_start_unit_ids)
         _validate_unique_interrupt_ids(self.resolved_interrupt_ids)
+        _validate_unique_interrupt_source_effect_ids(self.resolved_interrupt_source_effect_ids)
+        _validate_resolved_interrupt_tracking(
+            interrupt_ids=self.resolved_interrupt_ids,
+            source_effect_ids=self.resolved_interrupt_source_effect_ids,
+        )
 
     @classmethod
     def start(
@@ -700,6 +715,7 @@ class FightPhaseState:
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
             resolved_interrupt_ids=self.resolved_interrupt_ids,
+            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
             fights_first_registry=self.fights_first_registry,
             phase_complete=self.phase_complete,
         )
@@ -720,6 +736,7 @@ class FightPhaseState:
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
             resolved_interrupt_ids=self.resolved_interrupt_ids,
+            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
             fights_first_registry=self.fights_first_registry,
             phase_complete=False,
         )
@@ -748,6 +765,7 @@ class FightPhaseState:
             activation_selections=(*self.activation_selections, selection),
             eligible_passes=self.eligible_passes,
             resolved_interrupt_ids=self.resolved_interrupt_ids,
+            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
             fights_first_registry=self.fights_first_registry,
             phase_complete=False,
         )
@@ -772,14 +790,18 @@ class FightPhaseState:
             activation_selections=self.activation_selections,
             eligible_passes=(*self.eligible_passes, eligible_pass),
             resolved_interrupt_ids=self.resolved_interrupt_ids,
+            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
             fights_first_registry=self.fights_first_registry,
             phase_complete=False,
         )
 
-    def with_resolved_interrupt(self, interrupt_id: str) -> Self:
+    def with_resolved_interrupt(self, *, interrupt_id: str, source_effect_id: str) -> Self:
         resolved_interrupt_id = _validate_identifier("interrupt_id", interrupt_id)
+        resolved_source_effect_id = _validate_identifier("source_effect_id", source_effect_id)
         if resolved_interrupt_id in self.resolved_interrupt_ids:
             raise GameLifecycleError("Fight interrupt has already resolved.")
+        if resolved_source_effect_id in self.resolved_interrupt_source_effect_ids:
+            raise GameLifecycleError("Fight interrupt source has already resolved.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
@@ -793,6 +815,10 @@ class FightPhaseState:
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
             resolved_interrupt_ids=(*self.resolved_interrupt_ids, resolved_interrupt_id),
+            resolved_interrupt_source_effect_ids=(
+                *self.resolved_interrupt_source_effect_ids,
+                resolved_source_effect_id,
+            ),
             fights_first_registry=self.fights_first_registry,
             phase_complete=False,
         )
@@ -813,6 +839,7 @@ class FightPhaseState:
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
             resolved_interrupt_ids=self.resolved_interrupt_ids,
+            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
             fights_first_registry=self.fights_first_registry,
             phase_complete=True,
         )
@@ -835,6 +862,7 @@ class FightPhaseState:
                 eligible_pass.to_payload() for eligible_pass in self.eligible_passes
             ],
             "resolved_interrupt_ids": list(self.resolved_interrupt_ids),
+            "resolved_interrupt_source_effect_ids": list(self.resolved_interrupt_source_effect_ids),
             "fights_first_registry": self.fights_first_registry.to_payload(),
             "phase_complete": self.phase_complete,
         }
@@ -862,6 +890,9 @@ class FightPhaseState:
                 for eligible_pass in payload["eligible_passes"]
             ),
             resolved_interrupt_ids=tuple(payload["resolved_interrupt_ids"]),
+            resolved_interrupt_source_effect_ids=tuple(
+                payload["resolved_interrupt_source_effect_ids"]
+            ),
             fights_first_registry=FightsFirstRegistry.from_payload(
                 payload["fights_first_registry"]
             ),
@@ -1380,6 +1411,20 @@ def _validate_unique_unit_ids(unit_ids: tuple[str, ...]) -> None:
 def _validate_unique_interrupt_ids(interrupt_ids: tuple[str, ...]) -> None:
     if len(set(interrupt_ids)) != len(interrupt_ids):
         raise GameLifecycleError("FightPhaseState interrupt IDs must be unique.")
+
+
+def _validate_unique_interrupt_source_effect_ids(source_effect_ids: tuple[str, ...]) -> None:
+    if len(set(source_effect_ids)) != len(source_effect_ids):
+        raise GameLifecycleError("FightPhaseState interrupt source effect IDs must be unique.")
+
+
+def _validate_resolved_interrupt_tracking(
+    *,
+    interrupt_ids: tuple[str, ...],
+    source_effect_ids: tuple[str, ...],
+) -> None:
+    if len(interrupt_ids) != len(source_effect_ids):
+        raise GameLifecycleError("FightPhaseState resolved interrupt tracking drift.")
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

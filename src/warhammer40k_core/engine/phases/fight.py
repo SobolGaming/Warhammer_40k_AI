@@ -261,6 +261,15 @@ def invalid_fight_interrupt_status(
                 "field": "interrupt_id",
             },
         )
+    if interrupt.source_effect_id in fight_state.resolved_interrupt_source_effect_ids:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight interrupt source has already resolved.",
+            payload={
+                "invalid_reason": "invalid_fight_interrupt_result",
+                "field": "source_effect_id",
+            },
+        )
     if result.selected_option_id == DECLINE_FIGHT_INTERRUPT_OPTION_ID:
         return None
     policy = ruleset_descriptor.fight_policy
@@ -593,7 +602,10 @@ def _apply_fight_interrupt_decision(
     fight_state = _require_fight_state(state)
     interrupt = fight_interrupt_request_from_payload(result.payload)
     if result.selected_option_id == DECLINE_FIGHT_INTERRUPT_OPTION_ID:
-        state.fight_phase_state = fight_state.with_resolved_interrupt(interrupt.interrupt_id)
+        state.fight_phase_state = fight_state.with_resolved_interrupt(
+            interrupt_id=interrupt.interrupt_id,
+            source_effect_id=interrupt.source_effect_id,
+        )
         decisions.event_log.append(
             "fight_interrupt_declined",
             validate_json_value(
@@ -615,7 +627,8 @@ def _apply_fight_interrupt_decision(
         interrupt_id=interrupt.interrupt_id,
     )
     state.fight_phase_state = fight_state.with_activation(selection).with_resolved_interrupt(
-        interrupt.interrupt_id
+        interrupt_id=interrupt.interrupt_id,
+        source_effect_id=interrupt.source_effect_id,
     )
     decisions.event_log.append(
         "fight_interrupt_activation_selected",
@@ -654,7 +667,10 @@ def _request_fight_interrupt_if_available(
             player_id=player_id,
         ):
             interrupt_id = f"fight-interrupt:{source_effect_id}:{trigger_event_id}"
-            if interrupt_id in fight_state.resolved_interrupt_ids:
+            if (
+                interrupt_id in fight_state.resolved_interrupt_ids
+                or source_effect_id in fight_state.resolved_interrupt_source_effect_ids
+            ):
                 continue
             contexts = eligible_fight_contexts_for_player(
                 state=state,

@@ -16,8 +16,9 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_order import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND,
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
@@ -53,6 +54,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.fight import invalid_fight_interrupt_status
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
@@ -275,6 +277,63 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
     assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 1
 
 
+def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("alpha-1", "alpha-2"),
+        enemy_unit_ids=("enemy-1", "enemy-2", "enemy-3"),
+        origins={
+            "alpha-1": Pose.at(10.0, 20.0),
+            "enemy-1": Pose.at(13.0, 20.0),
+            "alpha-2": Pose.at(10.0, 40.0),
+            "enemy-2": Pose.at(13.0, 40.0),
+            "enemy-3": Pose.at(14.5, 40.0),
+        },
+        game_id="phase15c-interrupt-source-accepted",
+        fight_interrupt_unit_keys=("enemy-1",),
+    )
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    interrupt_status = _submit_normal_fight(
+        lifecycle,
+        request=first_request,
+        unit=units["alpha-1"],
+        result_id="phase15c-trigger-accepted-source-interrupt",
+    )
+    interrupt_request = _decision_request(interrupt_status)
+    interrupt_source_effect_id = _interrupt_source_effect_id(interrupt_request)
+    after_interrupt_status = _submit_normal_fight(
+        lifecycle,
+        request=interrupt_request,
+        unit=units["enemy-1"],
+        result_id="phase15c-accepted-source-interrupt",
+    )
+    enemy_normal_request = _decision_request(after_interrupt_status)
+    after_enemy_normal_status = _submit_normal_fight(
+        lifecycle,
+        request=enemy_normal_request,
+        unit=units["enemy-2"],
+        result_id="phase15c-enemy-normal-after-interrupt",
+    )
+    alpha_second_request = _decision_request(after_enemy_normal_status)
+    after_alpha_second_status = _submit_normal_fight(
+        lifecycle,
+        request=alpha_second_request,
+        unit=units["alpha-2"],
+        result_id="phase15c-alpha-second-after-interrupt",
+    )
+    resumed_request = _decision_request(after_alpha_second_status)
+    state = _state(lifecycle)
+
+    assert resumed_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    assert resumed_request.actor_id == "player-b"
+    assert _request_unit_ids(resumed_request) == [units["enemy-3"].unit_instance_id]
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.resolved_interrupt_source_effect_ids == (
+        interrupt_source_effect_id,
+    )
+    assert len(_event_payloads(lifecycle, "fight_interrupt_requested")) == 1
+    assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 1
+
+
 def test_fight_interrupt_decline_records_once_and_resumes_parent_sequence() -> None:
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -307,9 +366,89 @@ def test_fight_interrupt_decline_records_once_and_resumes_parent_sequence() -> N
     assert resumed_request.actor_id == "player-b"
     assert state.fight_phase_state is not None
     assert state.fight_phase_state.resolved_interrupt_ids
+    assert state.fight_phase_state.resolved_interrupt_source_effect_ids
     assert len(_event_payloads(lifecycle, "fight_interrupt_declined")) == 1
     assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 0
     assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == 1
+
+
+def test_fight_interrupt_source_is_not_offered_again_after_decline() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("alpha-1", "alpha-2"),
+        enemy_unit_ids=("enemy-1", "enemy-2"),
+        origins={
+            "alpha-1": Pose.at(10.0, 20.0),
+            "enemy-1": Pose.at(13.0, 20.0),
+            "alpha-2": Pose.at(10.0, 40.0),
+            "enemy-2": Pose.at(13.0, 40.0),
+        },
+        game_id="phase15c-interrupt-source-declined",
+        fight_interrupt_unit_keys=("enemy-1",),
+    )
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    interrupt_status = _submit_normal_fight(
+        lifecycle,
+        request=first_request,
+        unit=units["alpha-1"],
+        result_id="phase15c-trigger-declined-source-interrupt",
+    )
+    interrupt_request = _decision_request(interrupt_status)
+    interrupt_source_effect_id = _interrupt_source_effect_id(interrupt_request)
+    after_decline_status = _submit_option(
+        lifecycle,
+        request=interrupt_request,
+        option_id=DECLINE_FIGHT_INTERRUPT_OPTION_ID,
+        result_id="phase15c-declined-source-interrupt",
+    )
+    enemy_normal_request = _decision_request(after_decline_status)
+    after_enemy_normal_status = _submit_normal_fight(
+        lifecycle,
+        request=enemy_normal_request,
+        unit=units["enemy-1"],
+        result_id="phase15c-enemy-normal-after-decline",
+    )
+    alpha_second_request = _decision_request(after_enemy_normal_status)
+    stale_source_request = _retriggered_interrupt_request(interrupt_request)
+    stale_interrupt_result = FiniteOptionSubmission(
+        request_id=stale_source_request.request_id,
+        selected_option_id=DECLINE_FIGHT_INTERRUPT_OPTION_ID,
+        result_id="phase15c-replayed-declined-source-interrupt",
+    ).to_result(stale_source_request)
+    stale_source_status = invalid_fight_interrupt_status(
+        state=_state(lifecycle),
+        request=stale_source_request,
+        result=stale_interrupt_result,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+    )
+    after_alpha_second_status = _submit_normal_fight(
+        lifecycle,
+        request=alpha_second_request,
+        unit=units["alpha-2"],
+        result_id="phase15c-alpha-second-after-decline",
+    )
+    resumed_request = _decision_request(after_alpha_second_status)
+    pending_before_replayed_submit = lifecycle.decision_controller.queue.pending_requests
+    replayed_submit_status = lifecycle.submit_decision(stale_interrupt_result)
+    state = _state(lifecycle)
+
+    assert stale_source_status is not None
+    assert stale_source_status.status_kind is LifecycleStatusKind.INVALID
+    assert stale_source_status.payload == {
+        "invalid_reason": "invalid_fight_interrupt_result",
+        "field": "source_effect_id",
+    }
+    assert resumed_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    assert resumed_request.actor_id == "player-b"
+    assert _request_unit_ids(resumed_request) == [units["enemy-2"].unit_instance_id]
+    assert replayed_submit_status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.pending_requests == pending_before_replayed_submit
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.resolved_interrupt_source_effect_ids == (
+        interrupt_source_effect_id,
+    )
+    assert len(_event_payloads(lifecycle, "fight_interrupt_requested")) == 1
+    assert len(_event_payloads(lifecycle, "fight_interrupt_declined")) == 1
+    assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 0
 
 
 def test_fight_phase_state_nested_payloads_round_trip() -> None:
@@ -352,7 +491,7 @@ def test_fight_phase_state_nested_payloads_round_trip() -> None:
         fight_state.with_next_player("player-b")
         .with_eligible_pass(eligible_pass)
         .with_activation(activation)
-        .with_resolved_interrupt("interrupt-a")
+        .with_resolved_interrupt(interrupt_id="interrupt-a", source_effect_id="effect-interrupt-a")
         .with_next_band()
         .with_phase_complete()
     )
@@ -493,7 +632,48 @@ def test_fight_phase_state_rejects_drifted_or_malformed_nested_records() -> None
     with pytest.raises(GameLifecycleError, match="already activated"):
         base_state.with_activation(activation).with_activation(activation)
     with pytest.raises(GameLifecycleError, match="already resolved"):
-        base_state.with_resolved_interrupt("interrupt-a").with_resolved_interrupt("interrupt-a")
+        base_state.with_resolved_interrupt(
+            interrupt_id="interrupt-a",
+            source_effect_id="effect-interrupt-a",
+        ).with_resolved_interrupt(
+            interrupt_id="interrupt-a",
+            source_effect_id="effect-interrupt-b",
+        )
+    with pytest.raises(GameLifecycleError, match="source has already resolved"):
+        base_state.with_resolved_interrupt(
+            interrupt_id="interrupt-a",
+            source_effect_id="effect-interrupt-a",
+        ).with_resolved_interrupt(
+            interrupt_id="interrupt-b",
+            source_effect_id="effect-interrupt-a",
+        )
+    with pytest.raises(GameLifecycleError, match="source effect IDs must be unique"):
+        FightPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            step_states=base_state.step_states,
+            ordering_bands=policy.ordering_bands,
+            current_band_index=0,
+            next_player_id="player-a",
+            eligible_at_start_unit_ids=("unit-a",),
+            resolved_interrupt_ids=("interrupt-a", "interrupt-b"),
+            resolved_interrupt_source_effect_ids=(
+                "effect-interrupt-a",
+                "effect-interrupt-a",
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="resolved interrupt tracking drift"):
+        FightPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            step_states=base_state.step_states,
+            ordering_bands=policy.ordering_bands,
+            current_band_index=0,
+            next_player_id="player-a",
+            eligible_at_start_unit_ids=("unit-a",),
+            resolved_interrupt_ids=("interrupt-a",),
+            resolved_interrupt_source_effect_ids=(),
+        )
 
 
 def _fight_lifecycle(
@@ -815,6 +995,50 @@ def _request_unit_ids(request: DecisionRequest) -> list[str]:
     payload = cast(dict[str, object], request.payload)
     contexts = cast(list[dict[str, object]], payload["eligible_contexts"])
     return [cast(str, context["unit_instance_id"]) for context in contexts]
+
+
+def _interrupt_source_effect_id(request: DecisionRequest) -> str:
+    payload = cast(dict[str, object], request.payload)
+    handler_payload = cast(dict[str, object], payload["handler_payload"])
+    interrupt = cast(dict[str, object], handler_payload["interrupt"])
+    return cast(str, interrupt["source_effect_id"])
+
+
+def _retriggered_interrupt_request(request: DecisionRequest) -> DecisionRequest:
+    payload = cast(dict[str, object], request.payload)
+    handler_payload = cast(dict[str, object], payload["handler_payload"])
+    original_interrupt = cast(dict[str, object], handler_payload["interrupt"])
+    interrupt = dict(original_interrupt)
+    interrupt_id = cast(str, interrupt["interrupt_id"])
+    trigger_event_id = cast(str, interrupt["trigger_event_id"])
+    interrupt["interrupt_id"] = f"{interrupt_id}:later-trigger"
+    interrupt["trigger_event_id"] = f"{trigger_event_id}:later-trigger"
+
+    retriggered_handler_payload = dict(handler_payload)
+    retriggered_handler_payload["interrupt"] = interrupt
+    retriggered_payload = dict(payload)
+    retriggered_payload["handler_payload"] = retriggered_handler_payload
+    retriggered_payload["interrupt"] = interrupt
+
+    return DecisionRequest(
+        request_id=f"{request.request_id}:later-trigger",
+        decision_type=FIGHT_INTERRUPT_DECISION_TYPE,
+        actor_id=request.actor_id,
+        payload=cast(JsonValue, retriggered_payload),
+        options=(
+            DecisionOption(
+                option_id=DECLINE_FIGHT_INTERRUPT_OPTION_ID,
+                label="Decline Fight Interrupt",
+                payload=cast(
+                    JsonValue,
+                    {
+                        "submission_kind": "decline_fight_interrupt",
+                        "interrupt": interrupt,
+                    },
+                ),
+            ),
+        ),
+    )
 
 
 def _state(lifecycle: GameLifecycle) -> GameState:
