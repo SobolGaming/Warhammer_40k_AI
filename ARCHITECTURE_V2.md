@@ -2362,7 +2362,7 @@ Phase 15 implements Charge/Fight from the Phase 14G source contract. Do not intr
 
 ## Phase 15A: Charge phase declaration and charge roll
 
-Phase 15A makes charge eligibility, charge declaration, and the 2D6 charge roll player-facing decisions under the adapter contract, implementing the Phase 14G charge declaration contract. It does not move models; charge movement is Phase 15B.
+Phase 15A makes charge eligibility, charging-unit declaration, and the deterministic 2D6 Charge roll use the shared adapter/lifecycle path. It does not select charge targets and does not move models; Charge Move target selection, "if you still want to" choice, path proposal, and endpoint validation are Phase 15B.
 
 Modules:
 
@@ -2379,36 +2379,33 @@ Objects:
 - `ChargeEligibilityContext`
 - `ChargingUnitSelection`
 - `ChargeTargetCandidate`
-- `ChargeDeclarationProposal`
 - `ChargeRollRequest`
 - `ChargeRollResult`
 - `ChargeDistanceState`
 
 Invariants:
 
-- all charger choices are player-facing decisions and must use `DecisionRequest` -> `FiniteOptionSubmission` or `ParameterizedSubmission` -> `DecisionResult` -> `GameLifecycle.submit_decision(...)` -> `DecisionRecord`/`EventRecord`;
-- Phase 15A must update `docs/ADAPTER_DECISION_CONTRACT.md` with every new charging-unit selection, charge-target declaration, charge-roll request, option payload, proposal payload, and viewer-visibility rule introduced;
-- finite charge options use deterministic option IDs and JSON-safe payloads; parameterized charge declaration proposals reject stale, drifted, malformed, schema-invalid, or wrong-context submissions before queue pop unless the contract explicitly allows recorded rule-invalid retry attempts;
+- all charging-unit declaration choices are player-facing decisions and must use `DecisionRequest` -> `FiniteOptionSubmission` -> `DecisionResult` -> `GameLifecycle.submit_decision(...)` -> `DecisionRecord`/`EventRecord`;
+- Phase 15A must update `docs/ADAPTER_DECISION_CONTRACT.md` with every new charging-unit selection, charge-roll request, option payload, roll payload, and viewer-visibility rule introduced;
+- finite charge options use deterministic option IDs and JSON-safe payloads;
 - eligible charging units are derived from current state;
 - charge declaration validates within-12" of a target, unengaged, no Advance/Fall Back this turn, and battlefield presence per the Phase 14G charge contract;
 - units that Advanced/Fell Back cannot charge unless a rule permits;
-- one or more targets are declared before the charge roll, all within 12", and selected according to the ruleset `charge_policy` descriptor;
-- the charge roll is a deterministic, replay-facing 2D6 roll resolved after target declaration;
+- charge targets are not selected before the roll; the Charge Move step selects one or more targets after the roll from enemy units within both 12" and the rolled maximum distance;
+- the charge roll is a deterministic, replay-facing 2D6 roll resolved immediately after the charging-unit declaration;
 - charge-roll rerolls are explicit `DecisionRequest`s only when a legal reroll source exists, and Command Re-roll cannot reroll a Charge roll per the Phase 14I Core Stratagem contract;
-- charge-target validity after the roll requires every declared target to be within both 12" and the rolled maximum distance;
-- a charge fails if the rolled distance cannot satisfy the Phase 15B endpoint requirement against every declared target;
-- failed charges do not move models and emit no displacement records.
+- if no enemy unit is within both 12" and the rolled maximum distance, the charge resolves with no move, no model placement mutation, and no displacement records;
+- if one or more enemy units are within both 12" and the rolled maximum distance, Phase 15A records `ChargeDistanceState`, emits the Phase 15B movement boundary, and leaves target selection/path validation to Phase 15B.
 
 Required tests:
 
 - charging-unit selection goes through finite `DecisionRequest`/`DecisionResult` submission and records deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads;
-- charge-target declaration goes through the adapter contract, including stale/drift/malformed invalid submission coverage and replay payload round-trip;
 - eligible charging-unit derivation rejects Advanced/Fell Back/engaged/off-battlefield units;
-- targets beyond 12" at declaration are rejected without mutation;
 - the 2D6 charge roll is deterministic and replay-facing;
 - a reroll request appears only with a legal reroll source and Command Re-roll cannot be applied to the Charge roll;
-- a charge whose rolled distance cannot reach a declared target fails and moves no models;
-- failed charge emits no displacement record and leaves charger state unmutated.
+- a charge roll that reaches no enemy unit within both 12" and the rolled maximum distance resolves with no move;
+- no-move Charge roll emits no displacement record and leaves charger placement unmutated;
+- a reachable-target Charge roll stops at the typed Phase 15B boundary with the maximum distance and reachable-target snapshot.
 
 CORE V1 relevant areas:
 
@@ -2418,7 +2415,7 @@ CORE V1 relevant areas:
 
 ## Phase 15B: charge movement, terrain, FLY, and endpoint rules
 
-Phase 15B resolves the charge move as a parameterized movement proposal that consumes the shared movement/pathing/terrain/coherency validators and enforces the Phase 14G charge-endpoint constraints. Charge moves require a `PathWitness` or a typed invalid result; endpoint-only validation is forbidden.
+Phase 15B resolves the post-roll Charge Move as a parameterized movement proposal that first selects one or more charge targets from enemy units within both 12" and the rolled maximum distance, then consumes the shared movement/pathing/terrain/coherency validators and enforces the Phase 14G charge-endpoint constraints. Charge moves require a `PathWitness` or a typed invalid/no-move result; endpoint-only validation is forbidden.
 
 Modules:
 
@@ -2441,6 +2438,7 @@ Objects:
 Invariants:
 
 - charge moves are parameterized movement proposals submitted through `GameLifecycle.submit_decision(...)` and require a `PathWitness` or a typed invalid result; endpoint-only charge validation is forbidden;
+- before moving, Phase 15B selects one or more charge targets from enemy units within both 12" and the rolled maximum distance, or records the active player's no-move choice when allowed;
 - charge movement consumes the shared precise-distance, free-rotation, terrain, pathing, and coherency validators rather than reimplementing distance accounting;
 - no model may move farther than the rolled charge distance;
 - the resolved charge must end closer to one or more declared targets, end within Engagement Range of every declared target if possible, end within 1" if possible, and end not in Engagement Range of any non-target unit, per the Phase 14G charge-move contract;

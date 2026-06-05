@@ -57,7 +57,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
-    SUBMIT_CHARGE_DECLARATION_DECISION_TYPE,
     ChargePhaseHandler,
 )
 from warhammer40k_core.engine.phases.command import (
@@ -161,12 +160,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         DICE_REROLL_DECISION_TYPE,
     )
 )
-_CHARGE_DECISION_TYPES = frozenset(
-    (
-        SELECT_CHARGING_UNIT_DECISION_TYPE,
-        SUBMIT_CHARGE_DECLARATION_DECISION_TYPE,
-    )
-)
+_CHARGE_DECISION_TYPES = frozenset((SELECT_CHARGING_UNIT_DECISION_TYPE,))
 _REACTION_FRAME_DECISION_TYPES = frozenset(
     (
         REACTION_DECISION_TYPE,
@@ -366,20 +360,6 @@ class GameLifecycle:
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
             invalid_status = self._shooting_phase_handler.invalid_declaration_submission_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SUBMIT_CHARGE_DECLARATION_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            invalid_status = self._charge_phase_handler.invalid_declaration_submission_status(
                 state=state,
                 request=pending_request,
                 result=result,
@@ -1479,7 +1459,7 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
         for unit_id, player_id in unit_owner_by_id.items()
         if player_id == state.active_player_id
     }
-    for unit_id in (*charge_state.selected_unit_ids, *charge_state.failed_unit_ids):
+    for unit_id in charge_state.selected_unit_ids:
         if unit_id not in active_player_unit_ids:
             raise GameLifecycleError(
                 "charge_phase_state selected unit is not active player's unit."
@@ -1499,7 +1479,7 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
             raise GameLifecycleError("charge_phase_state roll unit was not selected.")
         if charging_unit_id not in active_player_unit_ids:
             raise GameLifecycleError("charge_phase_state roll unit is not active player's unit.")
-        for target_unit_id in roll_result.request.target_unit_instance_ids:
+        for target_unit_id in roll_result.reachable_target_distances_inches:
             target_owner = unit_owner_by_id.get(target_unit_id)
             if target_owner is None:
                 raise GameLifecycleError("charge_phase_state target unit is unknown.")

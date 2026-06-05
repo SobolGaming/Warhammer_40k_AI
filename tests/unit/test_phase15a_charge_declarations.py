@@ -6,30 +6,25 @@ from typing import cast
 
 import pytest
 
-from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
+from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.charge_declaration import (
-    CHARGE_DECLARATION_PROPOSAL_KIND,
+    CHARGE_MOVE_PENDING_STATUS,
+    CHARGE_NO_MOVE_POSSIBLE_STATUS,
     CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,
-    ChargeDeclarationProposal,
-    ChargeDeclarationProposalPayload,
-    ChargeDeclarationProposalRequest,
     ChargeDistanceState,
     ChargeRollRequest,
     ChargeRollResult,
     ChargeRollResultPayload,
     ChargeTargetCandidate,
     ChargeTargetCandidatePayload,
-    charge_declaration_missing_field,
-    charge_declaration_proposal_from_json,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
-from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -48,7 +43,6 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import (
     COMPLETE_CHARGE_PHASE_OPTION_ID,
     SELECT_CHARGING_UNIT_DECISION_TYPE,
-    SUBMIT_CHARGE_DECLARATION_DECISION_TYPE,
     ChargePhaseState,
     ChargingUnitSelection,
 )
@@ -67,7 +61,7 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
-def test_charging_unit_selection_and_declaration_use_lifecycle_records() -> None:
+def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() -> None:
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
@@ -88,62 +82,35 @@ def test_charging_unit_selection_and_declaration_use_lifecycle_records() -> None
     assert target_candidates[0]["target_unit_instance_id"] == units["enemy"].unit_instance_id
     assert target_candidates[0]["is_legal"] is True
 
-    declaration_request = _decision_request(
-        _submit_option(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase15a-select-charger",
-        )
-    )
-    assert declaration_request.decision_type == SUBMIT_CHARGE_DECLARATION_DECISION_TYPE
-    assert declaration_request.is_parameterized_submission_request()
-
-    proposal = _proposal_from_request(
-        request=declaration_request,
-        target_unit_id=units["enemy"].unit_instance_id,
-    )
-    proposal_payload = proposal.to_payload()
-    decoded_proposal = cast(
-        ChargeDeclarationProposalPayload,
-        json.loads(json.dumps(proposal_payload, sort_keys=True)),
-    )
-    assert ChargeDeclarationProposal.from_payload(decoded_proposal) == proposal
-
-    status = _submit_payload(
+    status = _submit_option(
         lifecycle,
-        request=declaration_request,
-        payload=proposal_payload,
-        result_id="phase15a-submit-declaration",
+        request=selection_request,
+        option_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15a-select-charger",
     )
     event_types = [event.event_type for event in lifecycle.decision_controller.event_log.records]
-    roll_payload = _last_event_payload(lifecycle, "charge_roll_resolved")
-    roll_result = ChargeRollResult.from_payload(
-        cast(ChargeRollResultPayload, roll_payload["roll_result"])
-    )
+    roll_result = _roll_result_from_event(lifecycle, "charge_roll_resolved")
     lifecycle_payload = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
 
-    assert status.status_kind in {
-        LifecycleStatusKind.UNSUPPORTED,
-        LifecycleStatusKind.WAITING_FOR_DECISION,
-    }
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert [record.request.decision_type for record in lifecycle.decision_controller.records] == [
         SELECT_CHARGING_UNIT_DECISION_TYPE,
-        SUBMIT_CHARGE_DECLARATION_DECISION_TYPE,
     ]
     assert "charging_unit_selected" in event_types
-    assert "charge_declaration_accepted" in event_types
+    assert "charge_declaration_accepted" not in event_types
     assert "charge_roll_resolved" in event_types
+    assert "charge_move_required" in event_types
     assert roll_result.request.unit_instance_id == units["intercessor-1"].unit_instance_id
-    assert roll_result.request.target_unit_instance_ids == (units["enemy"].unit_instance_id,)
+    assert roll_result.move_available is True
+    assert units["enemy"].unit_instance_id in roll_result.reachable_target_distances_inches
     assert 2 <= roll_result.value <= 12
     assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
 
 
-def test_successful_charge_declaration_creates_phase15b_movement_boundary() -> None:
+def test_successful_charge_roll_creates_phase15b_movement_boundary() -> None:
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
@@ -152,24 +119,15 @@ def test_successful_charge_declaration_creates_phase15b_movement_boundary() -> N
     state = _state(lifecycle)
     assert state.battlefield_state is not None
     before_battlefield = state.battlefield_state.to_payload()
-    declaration_request = _select_first_charger(lifecycle, unit=units["intercessor-1"])
-    proposal = _proposal_from_request(
-        request=declaration_request,
-        target_unit_id=units["enemy"].unit_instance_id,
-    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
 
-    status = _submit_payload(
+    status = _submit_option(
         lifecycle,
-        request=declaration_request,
-        payload=proposal.to_payload(),
+        request=selection_request,
+        option_id=units["intercessor-1"].unit_instance_id,
         result_id="phase15a-success-submit",
     )
-    roll_result = ChargeRollResult.from_payload(
-        cast(
-            ChargeRollResultPayload,
-            _last_event_payload(lifecycle, "charge_move_required")["roll_result"],
-        )
-    )
+    roll_result = _roll_result_from_event(lifecycle, "charge_move_required")
     after_state = _state(lifecycle)
     assert after_state.battlefield_state is not None
     assert after_state.charge_phase_state is not None
@@ -182,12 +140,47 @@ def test_successful_charge_declaration_creates_phase15b_movement_boundary() -> N
     assert status_payload["phase_body_status"] == "charge_move_pending_phase15b"
     assert repeated_status.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert repeated_payload["phase_body_status"] == "charge_move_pending_phase15b"
-    assert roll_result.succeeded is True
-    assert roll_result.status == "move_pending"
+    assert roll_result.move_available is True
+    assert roll_result.status == CHARGE_MOVE_PENDING_STATUS
     assert pending_distance_state is not None
     assert pending_distance_state.roll_result == roll_result
     assert after_state.battlefield_state.to_payload() == before_battlefield
-    assert _event_payloads(lifecycle, "charge_failed") == ()
+    assert _event_payloads(lifecycle, "charge_no_move_possible") == ()
+    assert all(
+        not _payload_has_displacements(cast(dict[str, object], event.payload))
+        for event in lifecycle.decision_controller.event_log.records
+    )
+
+
+def test_charge_roll_with_no_reachable_targets_resolves_without_model_movement() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(27.0, 20.0), model_count=5),
+        game_id="phase15a-no-move-charge",
+    )
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15a-no-move-submit",
+    )
+    roll_result = _roll_result_from_event(lifecycle, "charge_no_move_possible")
+    after_state = _state(lifecycle)
+    assert after_state.battlefield_state is not None
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert after_state.current_battle_phase is BattlePhase.FIGHT
+    assert after_state.charge_phase_state is None
+    assert roll_result.move_available is False
+    assert roll_result.status == CHARGE_NO_MOVE_POSSIBLE_STATUS
+    assert roll_result.reachable_target_distances_inches == {}
+    assert after_state.battlefield_state.to_payload() == before_battlefield
+    assert _event_payloads(lifecycle, "charge_move_required") == ()
     assert all(
         not _payload_has_displacements(cast(dict[str, object], event.payload))
         for event in lifecycle.decision_controller.event_log.records
@@ -220,245 +213,6 @@ def test_charge_phase_completion_option_records_skipped_units_and_advances() -> 
     assert completion_declared["skipped_unit_ids"] == [units["intercessor-1"].unit_instance_id]
     assert completed["phase_body_status"] == "charge_phase_complete"
     assert _event_payloads(lifecycle, "charge_roll_resolved") == ()
-
-
-def test_charge_declaration_value_objects_reject_schema_and_request_drift() -> None:
-    request = _charge_declaration_request()
-    proposal = _charge_declaration_proposal(request)
-
-    with pytest.raises(GameLifecycleError, match="is_legal must be a bool"):
-        ChargeTargetCandidate(
-            target_unit_instance_id="target-x",
-            closest_distance_inches=3.0,
-            is_legal=cast(bool, "true"),
-        )
-    with pytest.raises(GameLifecycleError, match="must not carry violation_code"):
-        ChargeTargetCandidate(
-            target_unit_instance_id="target-x",
-            closest_distance_inches=3.0,
-            is_legal=True,
-            violation_code="target_out_of_declaration_range",
-        )
-    with pytest.raises(GameLifecycleError, match="requires violation_code"):
-        ChargeTargetCandidate(
-            target_unit_instance_id="target-x",
-            closest_distance_inches=13.0,
-            is_legal=False,
-        )
-    with pytest.raises(GameLifecycleError, match="payload missing target_unit_instance_id"):
-        ChargeTargetCandidate.from_payload(cast(ChargeTargetCandidatePayload, {}))
-    with pytest.raises(GameLifecycleError, match="target_unit_instance_ids must be sorted"):
-        replace(proposal, target_unit_instance_ids=("target-b", "target-a"))
-    with pytest.raises(GameLifecycleError, match="requires a proposal request"):
-        proposal.validation_result_for_request(cast(ChargeDeclarationProposalRequest, object()))
-    with pytest.raises(GameLifecycleError, match="target_unit_instance_ids must be a list"):
-        charge_declaration_proposal_from_json(
-            {
-                **proposal.to_payload(),
-                "target_unit_instance_ids": "target-a",
-            }
-        )
-
-    assert charge_declaration_missing_field("not-a-payload") == "payload"
-
-    drift_cases = (
-        (replace(proposal, proposal_request_id="other-request"), "proposal_request_id_drift"),
-        (replace(proposal, player_id="player-b"), "proposal_player_drift"),
-        (replace(proposal, battle_round=2), "proposal_battle_round_drift"),
-        (replace(proposal, unit_instance_id="unit-b"), "proposal_unit_drift"),
-        (
-            replace(proposal, source_decision_request_id="source-request-b"),
-            "proposal_source_request_drift",
-        ),
-        (
-            replace(proposal, source_decision_result_id="source-result-b"),
-            "proposal_source_result_drift",
-        ),
-        (replace(proposal, ruleset_descriptor_hash="ruleset-b"), "proposal_ruleset_drift"),
-        (replace(proposal, max_declaration_range_inches=11.0), "proposal_max_range_drift"),
-        (
-            replace(proposal, target_unit_instance_ids=("target-b",)),
-            "proposal_target_not_in_request",
-        ),
-    )
-
-    assert proposal.validation_result_for_request(request).is_valid is True
-    for drifted_proposal, violation_code in drift_cases:
-        validation = drifted_proposal.validation_result_for_request(request)
-        assert validation.is_valid is False
-        assert validation.violations[0].violation_code == violation_code
-
-
-def test_charge_roll_and_phase_state_value_objects_reject_drift() -> None:
-    request = _charge_roll_request(player_id="player-a", unit_instance_id="unit-a")
-    roll_state = DiceRollManager("phase15a-value-objects").roll_fixed(request.spec, [3, 4])
-    roll_result = ChargeRollResult.from_roll_state(
-        request=request,
-        roll_state=roll_state,
-        target_distances_inches={"target-a": 3.0},
-    )
-    assert roll_result.succeeded is True
-
-    request_payload = request.to_payload()
-    spec_payload = cast(dict[str, object], request_payload["spec"])
-    spec_payload["roll_type"] = "wrong-roll-type"
-    with pytest.raises(GameLifecycleError, match="spec payload drift"):
-        ChargeRollRequest.from_payload(request_payload)
-    with pytest.raises(GameLifecycleError, match="value must match"):
-        replace(roll_result, value=8)
-    with pytest.raises(GameLifecycleError, match="target distance keys drift"):
-        replace(roll_result, target_distances_inches={"target-b": 3.0})
-    with pytest.raises(GameLifecycleError, match="success flag drift"):
-        replace(roll_result, succeeded=False, status="failed")
-    with pytest.raises(GameLifecycleError, match="status drift"):
-        replace(roll_result, status="failed")
-    with pytest.raises(GameLifecycleError, match="source request drift"):
-        ChargeDistanceState(
-            roll_result=roll_result,
-            source_decision_request_id="source-request-b",
-            source_decision_result_id=request.source_decision_result_id,
-        )
-    with pytest.raises(GameLifecycleError, match="source result drift"):
-        ChargeDistanceState(
-            roll_result=roll_result,
-            source_decision_request_id=request.source_decision_request_id,
-            source_decision_result_id="source-result-b",
-        )
-
-    selection = ChargingUnitSelection(
-        player_id="player-a",
-        battle_round=1,
-        unit_instance_id="unit-a",
-        request_id="select-request",
-        result_id="select-result",
-    )
-    phase_state = ChargePhaseState(
-        battle_round=1,
-        active_player_id="player-a",
-    )
-    selected_state = phase_state.with_unit_selection(selection)
-    pending_state = selected_state.with_charge_roll_result(roll_result)
-
-    assert pending_state.move_pending_distance_state() is not None
-    with pytest.raises(GameLifecycleError, match="failed_unit_ids must be selected first"):
-        ChargePhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            failed_unit_ids=("unit-a",),
-        )
-    with pytest.raises(GameLifecycleError, match="active player drift"):
-        ChargePhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            selected_unit_ids=("unit-a",),
-            active_selection=replace(selection, player_id="player-b"),
-        )
-    with pytest.raises(GameLifecycleError, match="Cannot select"):
-        ChargePhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            phase_complete=True,
-        ).with_unit_selection(selection)
-    with pytest.raises(GameLifecycleError, match="requires active_selection"):
-        phase_state.with_charge_roll_result(roll_result)
-    with pytest.raises(GameLifecycleError, match="roll player drift"):
-        selected_state.with_charge_roll_result(
-            _charge_roll_result(player_id="player-b", unit_instance_id="unit-a")
-        )
-    with pytest.raises(GameLifecycleError, match="cannot have active_selection"):
-        replace(pending_state, phase_complete=True)
-
-
-def test_invalid_charge_declaration_submissions_do_not_consume_pending_request() -> None:
-    lifecycle, units = _charge_lifecycle(
-        alpha_unit_ids=("intercessor-1",),
-        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
-        game_id="phase15a-invalid",
-    )
-    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_option(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase15a-invalid-select",
-        )
-    )
-    proposal = dict(
-        _proposal_from_request(
-            request=declaration_request,
-            target_unit_id=units["enemy"].unit_instance_id,
-        ).to_payload()
-    )
-    del proposal["target_unit_instance_ids"]
-    before_records = len(lifecycle.decision_controller.records)
-
-    status = _submit_payload(
-        lifecycle,
-        request=declaration_request,
-        payload=proposal,
-        result_id="phase15a-invalid-submit",
-    )
-    validation = cast(
-        dict[str, object], cast(dict[str, object], status.payload)["proposal_validation"]
-    )
-    violation = cast(list[dict[str, object]], validation["violations"])[0]
-
-    assert status.status_kind is LifecycleStatusKind.INVALID
-    assert violation["violation_code"] == "proposal_payload_missing_field"
-    assert violation["field"] == "target_unit_instance_ids"
-    assert len(lifecycle.decision_controller.records) == before_records
-    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
-    assert not _event_payloads(lifecycle, "dice_rolled")
-
-
-def test_charge_declaration_rejects_current_range_drift_before_queue_pop() -> None:
-    lifecycle, units = _charge_lifecycle(
-        alpha_unit_ids=("intercessor-1",),
-        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
-        game_id="phase15a-range-drift",
-    )
-    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    declaration_request = _decision_request(
-        _submit_option(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase15a-range-select",
-        )
-    )
-    proposal = _proposal_from_request(
-        request=declaration_request,
-        target_unit_id=units["enemy"].unit_instance_id,
-    )
-    state = _state(lifecycle)
-    assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.with_unit_placement(
-        _unit_placement_at(
-            units["enemy"],
-            army_id="army-beta",
-            player_id="player-b",
-            poses=_compact_test_unit_poses(origin=Pose.at(80.0, 20.0), model_count=5),
-        )
-    )
-    before_records = len(lifecycle.decision_controller.records)
-
-    status = _submit_payload(
-        lifecycle,
-        request=declaration_request,
-        payload=proposal.to_payload(),
-        result_id="phase15a-range-submit",
-    )
-    validation = cast(
-        dict[str, object], cast(dict[str, object], status.payload)["proposal_validation"]
-    )
-    violation = cast(list[dict[str, object]], validation["violations"])[0]
-
-    assert status.status_kind is LifecycleStatusKind.INVALID
-    assert violation["violation_code"] == "charge_target_out_of_range"
-    assert len(lifecycle.decision_controller.records) == before_records
-    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
-    assert not _event_payloads(lifecycle, "dice_rolled")
 
 
 def test_charge_phase_filters_ineligible_units() -> None:
@@ -530,22 +284,15 @@ def test_charge_roll_forbids_command_reroll_request() -> None:
         enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
         game_id="phase15a-no-command-reroll",
     )
-    declaration_request = _select_first_charger(lifecycle, unit=units["intercessor-1"])
-    proposal = _proposal_from_request(
-        request=declaration_request,
-        target_unit_id=units["enemy"].unit_instance_id,
-    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
 
-    _submit_payload(
+    _submit_option(
         lifecycle,
-        request=declaration_request,
-        payload=proposal.to_payload(),
+        request=selection_request,
+        option_id=units["intercessor-1"].unit_instance_id,
         result_id="phase15a-no-reroll-submit",
     )
-    roll_payload = _last_event_payload(lifecycle, "charge_roll_resolved")
-    roll_result = ChargeRollResult.from_payload(
-        cast(ChargeRollResultPayload, roll_payload["roll_result"])
-    )
+    roll_result = _roll_result_from_event(lifecycle, "charge_roll_resolved")
     requested_decision_types = {
         cast(dict[str, object], event.payload)["decision_type"]
         for event in lifecycle.decision_controller.event_log.records
@@ -561,43 +308,133 @@ def test_charge_roll_forbids_command_reroll_request() -> None:
     } != {DICE_REROLL_DECISION_TYPE}
 
 
-def test_charge_declaration_failure_does_not_move_models_or_emit_displacements() -> None:
-    lifecycle, units = _charge_lifecycle(
-        alpha_unit_ids=("intercessor-1",),
-        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(23.2, 20.0), model_count=5),
-        game_id="phase15a-failed-charge-1",
+def test_charge_roll_and_phase_state_value_objects_reject_drift() -> None:
+    request = _charge_roll_request(player_id="player-a", unit_instance_id="unit-a")
+    roll_state = DiceRollManager("phase15a-value-objects").roll_fixed(request.spec, [3, 4])
+    roll_result = ChargeRollResult.from_roll_state(
+        request=request,
+        roll_state=roll_state,
+        reachable_target_distances_inches={"target-a": 3.0},
     )
-    state = _state(lifecycle)
-    assert state.battlefield_state is not None
-    before_battlefield = state.battlefield_state.to_payload()
-    declaration_request = _select_first_charger(lifecycle, unit=units["intercessor-1"])
-    proposal = _proposal_from_request(
-        request=declaration_request,
-        target_unit_id=units["enemy"].unit_instance_id,
-    )
+    assert roll_result.move_available is True
 
-    status = _submit_payload(
-        lifecycle,
-        request=declaration_request,
-        payload=proposal.to_payload(),
-        result_id="phase15a-failed-submit",
-    )
-    roll_result = ChargeRollResult.from_payload(
-        cast(
-            ChargeRollResultPayload, _last_event_payload(lifecycle, "charge_failed")["roll_result"]
+    with pytest.raises(GameLifecycleError, match="is_legal must be a bool"):
+        ChargeTargetCandidate(
+            target_unit_instance_id="target-x",
+            closest_distance_inches=3.0,
+            is_legal=cast(bool, "true"),
         )
-    )
-    after_state = _state(lifecycle)
-    assert after_state.battlefield_state is not None
+    with pytest.raises(GameLifecycleError, match="must not carry violation_code"):
+        ChargeTargetCandidate(
+            target_unit_instance_id="target-x",
+            closest_distance_inches=3.0,
+            is_legal=True,
+            violation_code="target_out_of_declaration_range",
+        )
+    with pytest.raises(GameLifecycleError, match="requires violation_code"):
+        ChargeTargetCandidate(
+            target_unit_instance_id="target-x",
+            closest_distance_inches=13.0,
+            is_legal=False,
+        )
+    with pytest.raises(GameLifecycleError, match="payload missing target_unit_instance_id"):
+        ChargeTargetCandidate.from_payload(cast(ChargeTargetCandidatePayload, {}))
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert roll_result.succeeded is False
-    assert after_state.battlefield_state.to_payload() == before_battlefield
-    assert _event_payloads(lifecycle, "charge_move_required") == ()
-    assert all(
-        not _payload_has_displacements(cast(dict[str, object], event.payload))
-        for event in lifecycle.decision_controller.event_log.records
+    request_payload = request.to_payload()
+    spec_payload = cast(dict[str, object], request_payload["spec"])
+    spec_payload["roll_type"] = "wrong-roll-type"
+    with pytest.raises(GameLifecycleError, match="spec payload drift"):
+        ChargeRollRequest.from_payload(request_payload)
+    with pytest.raises(GameLifecycleError, match="value must match"):
+        replace(roll_result, value=8)
+    with pytest.raises(GameLifecycleError, match="exceeds roll"):
+        replace(roll_result, reachable_target_distances_inches={"target-a": 8.0})
+    with pytest.raises(GameLifecycleError, match="move_available flag drift"):
+        replace(roll_result, move_available=False)
+    with pytest.raises(GameLifecycleError, match="status drift"):
+        replace(roll_result, status=CHARGE_NO_MOVE_POSSIBLE_STATUS)
+    with pytest.raises(GameLifecycleError, match="source request drift"):
+        ChargeDistanceState(
+            roll_result=roll_result,
+            source_decision_request_id="source-request-b",
+            source_decision_result_id=request.source_decision_result_id,
+        )
+    with pytest.raises(GameLifecycleError, match="source result drift"):
+        ChargeDistanceState(
+            roll_result=roll_result,
+            source_decision_request_id=request.source_decision_request_id,
+            source_decision_result_id="source-result-b",
+        )
+
+    selection = ChargingUnitSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id="unit-a",
+        request_id="select-request",
+        result_id="select-result",
     )
+    phase_state = ChargePhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+    )
+    selected_state = phase_state.with_unit_selection(selection)
+    pending_state = selected_state.with_charge_roll_result(roll_result)
+
+    assert pending_state.move_pending_distance_state() is not None
+    with pytest.raises(GameLifecycleError, match="active player drift"):
+        ChargePhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("unit-a",),
+            active_selection=replace(selection, player_id="player-b"),
+        )
+    with pytest.raises(GameLifecycleError, match="Cannot select"):
+        ChargePhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            phase_complete=True,
+        ).with_unit_selection(selection)
+    with pytest.raises(GameLifecycleError, match="requires active_selection"):
+        phase_state.with_charge_roll_result(roll_result)
+    with pytest.raises(GameLifecycleError, match="roll player drift"):
+        selected_state.with_charge_roll_result(
+            _charge_roll_result(player_id="player-b", unit_instance_id="unit-a")
+        )
+    with pytest.raises(GameLifecycleError, match="cannot have active_selection"):
+        replace(pending_state, phase_complete=True)
+
+
+def test_charge_roll_value_objects_reject_malformed_scalars_and_mappings() -> None:
+    request = _charge_roll_request(player_id="player-a", unit_instance_id="unit-a")
+    roll_state = DiceRollManager("phase15a-malformed-value-objects").roll_fixed(
+        request.spec,
+        [2, 3],
+    )
+    roll_result = ChargeRollResult.from_roll_state(
+        request=request,
+        roll_state=roll_state,
+        reachable_target_distances_inches={"target-a": 3.0},
+    )
+
+    with pytest.raises(GameLifecycleError, match="payload missing candidate"):
+        ChargeTargetCandidate.from_payload(cast(ChargeTargetCandidatePayload, "bad-candidate"))
+    with pytest.raises(GameLifecycleError, match="request_id must be a string"):
+        replace(request, request_id=cast(str, 1))
+    with pytest.raises(GameLifecycleError, match="battle_round must be greater than zero"):
+        replace(request, battle_round=0)
+    with pytest.raises(GameLifecycleError, match="reachable target distances must be a dict"):
+        replace(roll_result, reachable_target_distances_inches=cast(dict[str, float], []))
+    with pytest.raises(GameLifecycleError, match="reachable target key must be a string"):
+        replace(
+            roll_result,
+            reachable_target_distances_inches={cast(str, 1): 3.0},
+        )
+    with pytest.raises(GameLifecycleError, match="must be finite"):
+        replace(roll_result, reachable_target_distances_inches={"target-a": float("inf")})
+    with pytest.raises(GameLifecycleError, match="must not be negative"):
+        replace(roll_result, reachable_target_distances_inches={"target-a": -1.0})
+    with pytest.raises(GameLifecycleError, match="move_available must be a bool"):
+        replace(roll_result, move_available=cast(bool, "true"))
 
 
 def _charge_lifecycle(
@@ -670,49 +507,6 @@ def _charge_lifecycle(
     return GameLifecycle.from_payload(payload), units
 
 
-def _charge_declaration_request() -> ChargeDeclarationProposalRequest:
-    return ChargeDeclarationProposalRequest(
-        request_id="charge-request",
-        active_player_id="player-a",
-        battle_round=1,
-        unit_instance_id="unit-a",
-        source_decision_request_id="source-request-a",
-        source_decision_result_id="source-result-a",
-        ruleset_descriptor_hash="ruleset-a",
-        max_declaration_range_inches=12.0,
-        target_candidates=(
-            ChargeTargetCandidate(
-                target_unit_instance_id="target-a",
-                closest_distance_inches=3.0,
-                is_legal=True,
-            ),
-            ChargeTargetCandidate(
-                target_unit_instance_id="target-b",
-                closest_distance_inches=13.0,
-                is_legal=False,
-                violation_code="target_out_of_declaration_range",
-            ),
-        ),
-    )
-
-
-def _charge_declaration_proposal(
-    request: ChargeDeclarationProposalRequest,
-) -> ChargeDeclarationProposal:
-    return ChargeDeclarationProposal(
-        proposal_request_id=request.request_id,
-        proposal_kind=CHARGE_DECLARATION_PROPOSAL_KIND,
-        player_id=request.active_player_id,
-        battle_round=request.battle_round,
-        unit_instance_id=request.unit_instance_id,
-        source_decision_request_id=request.source_decision_request_id,
-        source_decision_result_id=request.source_decision_result_id,
-        ruleset_descriptor_hash=request.ruleset_descriptor_hash,
-        max_declaration_range_inches=request.max_declaration_range_inches,
-        target_unit_instance_ids=("target-a",),
-    )
-
-
 def _charge_roll_request(*, player_id: str, unit_instance_id: str) -> ChargeRollRequest:
     return ChargeRollRequest(
         request_id=f"charge-roll-{player_id}-{unit_instance_id}",
@@ -720,7 +514,6 @@ def _charge_roll_request(*, player_id: str, unit_instance_id: str) -> ChargeRoll
         battle_round=1,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
-        target_unit_instance_ids=("target-a",),
         source_decision_request_id="source-request-a",
         source_decision_result_id="source-result-a",
     )
@@ -735,7 +528,7 @@ def _charge_roll_result(*, player_id: str, unit_instance_id: str) -> ChargeRollR
     return ChargeRollResult.from_roll_state(
         request=request,
         roll_state=roll_state,
-        target_distances_inches={"target-a": 3.0},
+        reachable_target_distances_inches={"target-a": 3.0},
     )
 
 
@@ -878,43 +671,6 @@ def _unit_placement_at(
     )
 
 
-def _select_first_charger(lifecycle: GameLifecycle, *, unit: UnitInstance) -> DecisionRequest:
-    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    return _decision_request(
-        _submit_option(
-            lifecycle,
-            request=selection_request,
-            option_id=unit.unit_instance_id,
-            result_id=f"select-{unit.unit_instance_id}",
-        )
-    )
-
-
-def _proposal_from_request(
-    *,
-    request: DecisionRequest,
-    target_unit_id: str,
-) -> ChargeDeclarationProposal:
-    raw = _proposal_request_payload(request)
-    return ChargeDeclarationProposal(
-        proposal_request_id=cast(str, raw["request_id"]),
-        proposal_kind=cast(str, raw["proposal_kind"]),
-        player_id=cast(str, raw["active_player_id"]),
-        battle_round=cast(int, raw["battle_round"]),
-        unit_instance_id=cast(str, raw["unit_instance_id"]),
-        source_decision_request_id=cast(str, raw["source_decision_request_id"]),
-        source_decision_result_id=cast(str, raw["source_decision_result_id"]),
-        ruleset_descriptor_hash=cast(str, raw["ruleset_descriptor_hash"]),
-        max_declaration_range_inches=cast(float, raw["max_declaration_range_inches"]),
-        target_unit_instance_ids=(target_unit_id,),
-    )
-
-
-def _proposal_request_payload(request: DecisionRequest) -> dict[str, object]:
-    payload = cast(dict[str, object], request.payload)
-    return cast(dict[str, object], payload["proposal_request"])
-
-
 def _advanced_unit_state(unit_instance_id: str) -> AdvancedUnitState:
     request = AdvanceRollRequest.for_unit(
         request_id=f"{unit_instance_id}:advance-roll",
@@ -957,22 +713,6 @@ def _submit_option(
     )
 
 
-def _submit_payload(
-    lifecycle: GameLifecycle,
-    *,
-    request: DecisionRequest,
-    payload: object,
-    result_id: str,
-) -> LifecycleStatus:
-    return lifecycle.submit_decision(
-        ParameterizedSubmission(
-            request_id=request.request_id,
-            payload=validate_json_value(payload),
-            result_id=result_id,
-        ).to_result(request)
-    )
-
-
 def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
@@ -982,6 +722,11 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
 def _state(lifecycle: GameLifecycle) -> GameState:
     assert lifecycle.state is not None
     return lifecycle.state
+
+
+def _roll_result_from_event(lifecycle: GameLifecycle, event_type: str) -> ChargeRollResult:
+    payload = _last_event_payload(lifecycle, event_type)
+    return ChargeRollResult.from_payload(cast(ChargeRollResultPayload, payload["roll_result"]))
 
 
 def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, object]:
