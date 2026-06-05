@@ -395,6 +395,7 @@ def _advance_to_next_fight_request(
             )
         if (
             current.current_ordering_band is FightOrderingBandKind.REMAINING_COMBATS
+            and current.fight_order_state.remaining_combats_activation_since_band_entry
             and _fights_first_contexts_available(
                 state=state,
                 fight_state=current,

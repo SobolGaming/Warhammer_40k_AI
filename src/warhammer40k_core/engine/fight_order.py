@@ -105,6 +105,7 @@ class FightOrderStatePayload(TypedDict):
     engaged_at_fight_step_start_unit_ids: list[str]
     selected_to_fight_unit_ids: list[str]
     passed_player_ids: list[str]
+    remaining_combats_activation_since_band_entry: bool
     activation_selections: list[FightActivationSelectionPayload]
     eligible_passes: list[EligibleToFightPassPayload]
     resolved_interrupts: list[ResolvedFightInterruptPayload]
@@ -614,6 +615,7 @@ class FightOrderState:
     engaged_at_fight_step_start_unit_ids: tuple[str, ...]
     selected_to_fight_unit_ids: tuple[str, ...] = ()
     passed_player_ids: tuple[str, ...] = ()
+    remaining_combats_activation_since_band_entry: bool = False
     activation_selections: tuple[FightActivationSelection, ...] = ()
     eligible_passes: tuple[EligibleToFightPass, ...] = ()
     resolved_interrupts: tuple[ResolvedFightInterrupt, ...] = ()
@@ -659,6 +661,10 @@ class FightOrderState:
                 self.passed_player_ids,
             ),
         )
+        if type(self.remaining_combats_activation_since_band_entry) is not bool:
+            raise GameLifecycleError(
+                "FightOrderState remaining_combats_activation_since_band_entry must be a bool."
+            )
         object.__setattr__(
             self,
             "activation_selections",
@@ -722,6 +728,9 @@ class FightOrderState:
             engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
             selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=self.passed_player_ids,
+            remaining_combats_activation_since_band_entry=(
+                self.remaining_combats_activation_since_band_entry
+            ),
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
             resolved_interrupts=self.resolved_interrupts,
@@ -742,6 +751,7 @@ class FightOrderState:
             engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
             selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=(),
+            remaining_combats_activation_since_band_entry=False,
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
             resolved_interrupts=self.resolved_interrupts,
@@ -767,6 +777,10 @@ class FightOrderState:
                 for player_id in self.passed_player_ids
                 if player_id != selection.player_id
             ),
+            remaining_combats_activation_since_band_entry=(
+                self.remaining_combats_activation_since_band_entry
+                or selection.ordering_band is FightOrderingBandKind.REMAINING_COMBATS
+            ),
             activation_selections=(*self.activation_selections, selection),
             eligible_passes=self.eligible_passes,
             resolved_interrupts=self.resolved_interrupts,
@@ -785,6 +799,9 @@ class FightOrderState:
             engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
             selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=tuple(sorted({*self.passed_player_ids, eligible_pass.player_id})),
+            remaining_combats_activation_since_band_entry=(
+                self.remaining_combats_activation_since_band_entry
+            ),
             activation_selections=self.activation_selections,
             eligible_passes=(*self.eligible_passes, eligible_pass),
             resolved_interrupts=self.resolved_interrupts,
@@ -807,6 +824,9 @@ class FightOrderState:
             engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
             selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=self.passed_player_ids,
+            remaining_combats_activation_since_band_entry=(
+                self.remaining_combats_activation_since_band_entry
+            ),
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
             resolved_interrupts=(*self.resolved_interrupts, resolved_interrupt),
@@ -821,6 +841,9 @@ class FightOrderState:
             "engaged_at_fight_step_start_unit_ids": list(self.engaged_at_fight_step_start_unit_ids),
             "selected_to_fight_unit_ids": list(self.selected_to_fight_unit_ids),
             "passed_player_ids": list(self.passed_player_ids),
+            "remaining_combats_activation_since_band_entry": (
+                self.remaining_combats_activation_since_band_entry
+            ),
             "activation_selections": [
                 selection.to_payload() for selection in self.activation_selections
             ],
@@ -846,6 +869,9 @@ class FightOrderState:
             ),
             selected_to_fight_unit_ids=tuple(payload["selected_to_fight_unit_ids"]),
             passed_player_ids=tuple(payload["passed_player_ids"]),
+            remaining_combats_activation_since_band_entry=payload[
+                "remaining_combats_activation_since_band_entry"
+            ],
             activation_selections=tuple(
                 FightActivationSelection.from_payload(selection)
                 for selection in payload["activation_selections"]

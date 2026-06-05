@@ -236,6 +236,86 @@ def test_eligible_to_fight_pass_is_offered_only_when_all_eligible_units_are_more
     ]
 
 
+def test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activation() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("alpha-first", "alpha-remaining"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "alpha-first": Pose.at(10.0, 20.0),
+            "alpha-remaining": Pose.at(10.0, 40.0),
+            "enemy": Pose.at(13.0, 40.0),
+        },
+        game_id="phase15c-pass-before-remaining",
+        charge_fights_first_unit_keys=("alpha-first",),
+    )
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_payload = cast(dict[str, object], first_request.payload)
+
+    after_pass_status = _submit_option(
+        lifecycle,
+        request=first_request,
+        option_id=ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
+        result_id="phase15c-pass-before-remaining",
+    )
+    next_request = _decision_request(after_pass_status)
+    next_payload = cast(dict[str, object], next_request.payload)
+
+    assert first_request.actor_id == "player-a"
+    assert first_payload["ordering_band"] == "fights_first"
+    assert _request_unit_ids(first_request) == [units["alpha-first"].unit_instance_id]
+    assert next_request.actor_id == "player-a"
+    assert next_payload["ordering_band"] == "remaining_combats"
+    assert _request_unit_ids(next_request) == [units["alpha-remaining"].unit_instance_id]
+    assert _event_payloads(lifecycle, "fight_activation_selection_requested")[-1][
+        "eligible_unit_ids"
+    ] == [units["alpha-remaining"].unit_instance_id]
+
+
+def test_fights_first_pass_completes_phase_when_no_remaining_units_exist() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("alpha-first",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "alpha-first": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(30.0, 20.0),
+        },
+        game_id="phase15c-pass-completes",
+        charge_fights_first_unit_keys=("alpha-first",),
+    )
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    status = _submit_option(
+        lifecycle,
+        request=first_request,
+        option_id=ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
+        result_id="phase15c-pass-completes",
+    )
+    requested_fight_activations = _event_payloads(
+        lifecycle,
+        "fight_activation_selection_requested",
+    )
+    completion_payload = _last_event_payload(lifecycle, "fight_phase_completed")
+    fight_phase_payload = cast(dict[str, object], completion_payload["fight_phase_state"])
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert fight_phase_payload["phase_complete"] is True
+    assert requested_fight_activations == (
+        {
+            "game_id": "phase15c-pass-completes",
+            "battle_round": 1,
+            "phase": "fight",
+            "active_player_id": "player-a",
+            "player_id": "player-a",
+            "ordering_band": "fights_first",
+            "request_id": first_request.request_id,
+            "eligible_unit_ids": [units["alpha-first"].unit_instance_id],
+            "eligible_pass_available": True,
+            "phase_body_status": "fight_activation_required",
+        },
+    )
+    assert len(_event_payloads(lifecycle, "fight_phase_completed")) == 1
+
+
 def test_fight_activation_options_follow_normal_and_overrun_source_eligibility() -> None:
     engaged_lifecycle, engaged_units = _fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -693,6 +773,17 @@ def test_fight_order_state_rejects_drifted_or_malformed_nested_records() -> None
             next_player_id="player-a",
             engaged_at_fight_step_start_unit_ids=("unit-a",),
             activation_selections=cast(tuple[FightActivationSelection, ...], ("bad",)),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="remaining_combats_activation_since_band_entry must be a bool",
+    ):
+        FightOrderState(
+            ordering_bands=policy.ordering_bands,
+            current_band_index=0,
+            next_player_id="player-a",
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
+            remaining_combats_activation_since_band_entry=cast(bool, "false"),
         )
     with pytest.raises(GameLifecycleError, match="eligible_passes must contain"):
         FightOrderState(
