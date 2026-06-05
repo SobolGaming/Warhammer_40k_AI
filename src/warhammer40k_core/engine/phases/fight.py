@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset_descriptor import (
+    FightOrderingBandKind,
     FightPolicyDescriptor,
-    FightTypeKind,
     RulesetDescriptor,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -34,6 +34,7 @@ from warhammer40k_core.engine.fight_order import (
     fight_interrupt_option_payload,
     fight_interrupt_request_from_payload,
     fight_interrupt_sources_for_player,
+    legal_fight_types_for_context,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -252,7 +253,8 @@ def invalid_fight_interrupt_status(
             },
         )
     interrupt = fight_interrupt_request_from_payload(result.payload)
-    if interrupt.interrupt_id in fight_state.resolved_interrupt_ids:
+    fight_order_state = fight_state.fight_order_state
+    if interrupt.interrupt_id in fight_order_state.resolved_interrupt_ids:
         return LifecycleStatus.invalid(
             stage=state.stage,
             message="Fight interrupt has already resolved.",
@@ -261,7 +263,7 @@ def invalid_fight_interrupt_status(
                 "field": "interrupt_id",
             },
         )
-    if interrupt.source_effect_id in fight_state.resolved_interrupt_source_effect_ids:
+    if interrupt.source_effect_id in fight_order_state.resolved_interrupt_source_effect_ids:
         return LifecycleStatus.invalid(
             stage=state.stage,
             message="Fight interrupt source has already resolved.",
@@ -317,10 +319,13 @@ def invalid_fight_interrupt_status(
                 "field": "selected_option_id",
             },
         )
-    if selected.fight_type not in policy.fight_types:
+    if selected.fight_type not in legal_fight_types_for_context(
+        context=matching_context,
+        policy=policy,
+    ):
         return LifecycleStatus.invalid(
             stage=state.stage,
-            message="Fight interrupt selected unsupported fight type.",
+            message="Fight interrupt selected fight type is not legal for that unit.",
             payload={
                 "invalid_reason": "invalid_fight_interrupt_result",
                 "field": "fight_type",
@@ -353,7 +358,7 @@ def _ensure_fight_phase_state(
         battle_round=state.battle_round,
         active_player_id=active_player_id,
         policy=policy,
-        eligible_at_start_unit_ids=engaged_unit_ids_at_fight_start(
+        engaged_at_fight_step_start_unit_ids=engaged_unit_ids_at_fight_start(
             state=state,
             policy=policy,
         ),
@@ -379,20 +384,37 @@ def _advance_to_next_fight_request(
 ) -> _FightRequestContext:
     current = fight_state
     checked_player_ids: set[str] = set()
-    for _iteration in range(len(state.player_ids) * (len(current.ordering_bands) + 1) * 2):
+    for _iteration in range(
+        len(state.player_ids) * (len(current.fight_order_state.ordering_bands) + 1) * 2
+    ):
         if current.phase_complete:
             return _FightRequestContext(
                 fight_state=current,
                 contexts=(),
                 pass_available=False,
             )
+        if (
+            current.current_ordering_band is FightOrderingBandKind.REMAINING_COMBATS
+            and _fights_first_contexts_available(
+                state=state,
+                fight_state=current,
+                policy=policy,
+            )
+        ):
+            current = current.with_ordering_band(
+                ordering_band=FightOrderingBandKind.FIGHTS_FIRST,
+                next_player_id=current.active_player_id,
+            )
+            checked_player_ids = set()
+            continue
         contexts = (
             ()
-            if current.next_player_id in current.passed_player_ids
+            if current.fight_order_state.next_player_id
+            in current.fight_order_state.passed_player_ids
             else eligible_fight_contexts_for_player(
                 state=state,
                 fight_state=current,
-                player_id=current.next_player_id,
+                player_id=current.fight_order_state.next_player_id,
                 policy=policy,
             )
         )
@@ -402,12 +424,12 @@ def _advance_to_next_fight_request(
                 contexts=contexts,
                 pass_available=eligible_pass_is_available(contexts),
             )
-        checked_player_ids.add(current.next_player_id)
+        checked_player_ids.add(current.fight_order_state.next_player_id)
         if len(checked_player_ids) < len(state.player_ids):
             current = current.with_next_player(
                 _next_player_id(
                     player_ids=state.player_ids,
-                    current_player_id=current.next_player_id,
+                    current_player_id=current.fight_order_state.next_player_id,
                 )
             )
             continue
@@ -428,14 +450,14 @@ def _request_fight_activation(
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=FIGHT_ACTIVATION_DECISION_TYPE,
-        actor_id=fight_state.next_player_id,
+        actor_id=fight_state.fight_order_state.next_player_id,
         payload=validate_json_value(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
                 "phase": BattlePhase.FIGHT.value,
                 "active_player_id": fight_state.active_player_id,
-                "player_id": fight_state.next_player_id,
+                "player_id": fight_state.fight_order_state.next_player_id,
                 "step_states": [step.to_payload() for step in fight_state.step_states],
                 "ordering_band": fight_state.current_ordering_band.value,
                 "eligible_contexts": [context.to_payload() for context in contexts],
@@ -459,7 +481,7 @@ def _request_fight_activation(
                 "battle_round": state.battle_round,
                 "phase": BattlePhase.FIGHT.value,
                 "active_player_id": fight_state.active_player_id,
-                "player_id": fight_state.next_player_id,
+                "player_id": fight_state.fight_order_state.next_player_id,
                 "ordering_band": fight_state.current_ordering_band.value,
                 "request_id": request.request_id,
                 "eligible_unit_ids": [context.unit_instance_id for context in contexts],
@@ -476,7 +498,7 @@ def _request_fight_activation(
             "phase_body_status": _FIGHT_ACTIVATION_REQUIRED_STATUS,
             "battle_round": state.battle_round,
             "active_player_id": fight_state.active_player_id,
-            "player_id": fight_state.next_player_id,
+            "player_id": fight_state.fight_order_state.next_player_id,
             "ordering_band": fight_state.current_ordering_band.value,
             "eligible_unit_ids": [context.unit_instance_id for context in contexts],
             "eligible_pass_available": pass_available,
@@ -494,7 +516,7 @@ def _fight_activation_options(
 ) -> tuple[DecisionOption, ...]:
     options: list[DecisionOption] = []
     for context in contexts:
-        for fight_type in policy.fight_types:
+        for fight_type in legal_fight_types_for_context(context=context, policy=policy):
             options.append(
                 DecisionOption(
                     option_id=fight_activation_option_id(
@@ -518,13 +540,34 @@ def _fight_activation_options(
                 payload=eligible_pass_option_payload(
                     state=state,
                     fight_state=fight_state,
-                    player_id=fight_state.next_player_id,
+                    player_id=fight_state.fight_order_state.next_player_id,
                     contexts=contexts,
                     policy=policy,
                 ),
             )
         )
     return tuple(options)
+
+
+def _fights_first_contexts_available(
+    *,
+    state: GameState,
+    fight_state: FightPhaseState,
+    policy: FightPolicyDescriptor,
+) -> bool:
+    fights_first_state = fight_state.with_ordering_band(
+        ordering_band=FightOrderingBandKind.FIGHTS_FIRST,
+        next_player_id=fight_state.active_player_id,
+    )
+    return any(
+        eligible_fight_contexts_for_player(
+            state=state,
+            fight_state=fights_first_state,
+            player_id=player_id,
+            policy=policy,
+        )
+        for player_id in state.player_ids
+    )
 
 
 def _apply_fight_activation_decision(
@@ -668,8 +711,9 @@ def _request_fight_interrupt_if_available(
         ):
             interrupt_id = f"fight-interrupt:{source_effect_id}:{trigger_event_id}"
             if (
-                interrupt_id in fight_state.resolved_interrupt_ids
-                or source_effect_id in fight_state.resolved_interrupt_source_effect_ids
+                interrupt_id in fight_state.fight_order_state.resolved_interrupt_ids
+                or source_effect_id
+                in fight_state.fight_order_state.resolved_interrupt_source_effect_ids
             ):
                 continue
             contexts = eligible_fight_contexts_for_player(
@@ -773,7 +817,7 @@ def _fight_interrupt_options(
         )
     ]
     for context in contexts:
-        for fight_type in policy.fight_types:
+        for fight_type in legal_fight_types_for_context(context=context, policy=policy):
             options.append(
                 DecisionOption(
                     option_id=fight_activation_option_id(
@@ -825,7 +869,7 @@ def _invalid_fight_pass_status(
                 "field": "eligible_unit_ids",
             },
         )
-    if eligible_pass.player_id != fight_state.next_player_id:
+    if eligible_pass.player_id != fight_state.fight_order_state.next_player_id:
         return LifecycleStatus.invalid(
             stage=state.stage,
             message="Eligible-to-fight pass player drifted.",
@@ -872,7 +916,7 @@ def _invalid_fight_activation_selection_status(
                 "field": "selected_option_id",
             },
         )
-    if selected.player_id != fight_state.next_player_id:
+    if selected.player_id != fight_state.fight_order_state.next_player_id:
         return LifecycleStatus.invalid(
             stage=state.stage,
             message="Fight activation player drifted.",
@@ -918,13 +962,13 @@ def _invalid_fight_activation_selection_status(
                 "field": "eligibility_context",
             },
         )
-    current_context_unit_ids = {context.unit_instance_id for context in current_contexts}
-    if selected.fight_type is FightTypeKind.OVERRUN and (
-        selected.unit_instance_id not in current_context_unit_ids
+    if selected.fight_type not in legal_fight_types_for_context(
+        context=matching_context,
+        policy=policy,
     ):
         return LifecycleStatus.invalid(
             stage=state.stage,
-            message="Overrun Fight cannot be selected for an ineligible unit.",
+            message="Fight type is not legal for the selected unit.",
             payload={
                 "invalid_reason": "invalid_fight_activation_result",
                 "field": "fight_type",

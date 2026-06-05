@@ -12,6 +12,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     FightEligibilityKind,
     FightPolicyDescriptor,
+    FightTypeKind,
     RulesetDescriptor,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -29,9 +30,11 @@ from warhammer40k_core.engine.fight_order import (
     FIGHTS_FIRST_EFFECT_KIND,
     EligibleToFightPass,
     FightActivationSelection,
+    FightOrderState,
     FightPhaseState,
     FightsFirstRegistry,
     FightsFirstSource,
+    ResolvedFightInterrupt,
     fight_activation_option_id,
 )
 from warhammer40k_core.engine.game_state import (
@@ -155,6 +158,40 @@ def test_fights_first_resolves_before_remaining_combats_with_active_player_alter
     assert _request_unit_ids(third_request) == [units["alpha-remaining"].unit_instance_id]
 
 
+def test_remaining_combat_returns_to_fights_first_when_new_fights_first_unit_is_eligible() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("alpha-remaining", "alpha-late"),
+        enemy_unit_ids=("enemy-remaining", "enemy-late-first"),
+        origins={
+            "alpha-remaining": Pose.at(10.0, 20.0),
+            "enemy-remaining": Pose.at(13.0, 20.0),
+            "alpha-late": Pose.at(70.0, 70.0),
+            "enemy-late-first": Pose.at(86.0, 70.0),
+        },
+        game_id="phase15c-return-to-fights-first",
+        fights_first_unit_keys=("enemy-late-first",),
+    )
+    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_payload = cast(dict[str, object], first_request.payload)
+
+    _move_unit_to(lifecycle, unit=units["enemy-late-first"], origin=Pose.at(73.0, 70.0))
+    after_remaining_status = _submit_normal_fight(
+        lifecycle,
+        request=first_request,
+        unit=units["alpha-remaining"],
+        result_id="phase15c-alpha-remaining-before-late-first",
+    )
+    next_request = _decision_request(after_remaining_status)
+    next_payload = cast(dict[str, object], next_request.payload)
+
+    assert first_request.actor_id == "player-a"
+    assert first_payload["ordering_band"] == "remaining_combats"
+    assert _request_unit_ids(first_request) == [units["alpha-remaining"].unit_instance_id]
+    assert next_request.actor_id == "player-b"
+    assert next_payload["ordering_band"] == "fights_first"
+    assert _request_unit_ids(next_request) == [units["enemy-late-first"].unit_instance_id]
+
+
 def test_eligible_to_fight_pass_is_offered_only_when_all_eligible_units_are_more_than_five() -> (
     None
 ):
@@ -199,7 +236,51 @@ def test_eligible_to_fight_pass_is_offered_only_when_all_eligible_units_are_more
     ]
 
 
-def test_overrun_fight_rejects_when_unit_is_no_longer_eligible() -> None:
+def test_fight_activation_options_follow_normal_and_overrun_source_eligibility() -> None:
+    engaged_lifecycle, engaged_units = _fight_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "intercessor-1": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(13.0, 20.0),
+        },
+        game_id="phase15c-fight-type-engaged",
+    )
+    engaged_request = _decision_request(engaged_lifecycle.advance_until_decision_or_terminal())
+    engaged_unit_id = engaged_units["intercessor-1"].unit_instance_id
+
+    charged_lifecycle, charged_units = _fight_lifecycle(
+        alpha_unit_ids=("charger",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "charger": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(30.0, 20.0),
+        },
+        game_id="phase15c-fight-type-overrun",
+        charge_fights_first_unit_keys=("charger",),
+    )
+    charged_request = _decision_request(charged_lifecycle.advance_until_decision_or_terminal())
+    charged_unit_id = charged_units["charger"].unit_instance_id
+
+    assert fight_activation_option_id(
+        unit_instance_id=engaged_unit_id,
+        fight_type=FightTypeKind.NORMAL,
+    ) in _request_option_ids(engaged_request)
+    assert fight_activation_option_id(
+        unit_instance_id=engaged_unit_id,
+        fight_type=FightTypeKind.OVERRUN,
+    ) not in _request_option_ids(engaged_request)
+    assert fight_activation_option_id(
+        unit_instance_id=charged_unit_id,
+        fight_type=FightTypeKind.NORMAL,
+    ) not in _request_option_ids(charged_request)
+    assert fight_activation_option_id(
+        unit_instance_id=charged_unit_id,
+        fight_type=FightTypeKind.OVERRUN,
+    ) in _request_option_ids(charged_request)
+
+
+def test_fight_activation_rejects_when_engagement_context_is_stale() -> None:
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("enemy",),
@@ -217,7 +298,7 @@ def test_overrun_fight_rejects_when_unit_is_no_longer_eligible() -> None:
     )
     option_id = fight_activation_option_id(
         unit_instance_id=units["intercessor-1"].unit_instance_id,
-        fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[1],
+        fight_type=FightTypeKind.NORMAL,
     )
 
     status = _submit_option(
@@ -314,6 +395,18 @@ def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() 
         result_id="phase15c-enemy-normal-after-interrupt",
     )
     alpha_second_request = _decision_request(after_enemy_normal_status)
+    stale_source_request = _retriggered_interrupt_request(interrupt_request)
+    stale_interrupt_result = FiniteOptionSubmission(
+        request_id=stale_source_request.request_id,
+        selected_option_id=DECLINE_FIGHT_INTERRUPT_OPTION_ID,
+        result_id="phase15c-replayed-accepted-source-interrupt",
+    ).to_result(stale_source_request)
+    stale_source_status = invalid_fight_interrupt_status(
+        state=_state(lifecycle),
+        request=stale_source_request,
+        result=stale_interrupt_result,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+    )
     after_alpha_second_status = _submit_normal_fight(
         lifecycle,
         request=alpha_second_request,
@@ -321,13 +414,23 @@ def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() 
         result_id="phase15c-alpha-second-after-interrupt",
     )
     resumed_request = _decision_request(after_alpha_second_status)
+    pending_before_replayed_submit = lifecycle.decision_controller.queue.pending_requests
+    replayed_submit_status = lifecycle.submit_decision(stale_interrupt_result)
     state = _state(lifecycle)
 
+    assert stale_source_status is not None
+    assert stale_source_status.status_kind is LifecycleStatusKind.INVALID
+    assert stale_source_status.payload == {
+        "invalid_reason": "invalid_fight_interrupt_result",
+        "field": "source_effect_id",
+    }
     assert resumed_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
     assert resumed_request.actor_id == "player-b"
     assert _request_unit_ids(resumed_request) == [units["enemy-3"].unit_instance_id]
+    assert replayed_submit_status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.pending_requests == pending_before_replayed_submit
     assert state.fight_phase_state is not None
-    assert state.fight_phase_state.resolved_interrupt_source_effect_ids == (
+    assert state.fight_phase_state.fight_order_state.resolved_interrupt_source_effect_ids == (
         interrupt_source_effect_id,
     )
     assert len(_event_payloads(lifecycle, "fight_interrupt_requested")) == 1
@@ -365,8 +468,8 @@ def test_fight_interrupt_decline_records_once_and_resumes_parent_sequence() -> N
     assert resumed_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
     assert resumed_request.actor_id == "player-b"
     assert state.fight_phase_state is not None
-    assert state.fight_phase_state.resolved_interrupt_ids
-    assert state.fight_phase_state.resolved_interrupt_source_effect_ids
+    assert state.fight_phase_state.fight_order_state.resolved_interrupt_ids
+    assert state.fight_phase_state.fight_order_state.resolved_interrupt_source_effect_ids
     assert len(_event_payloads(lifecycle, "fight_interrupt_declined")) == 1
     assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 0
     assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == 1
@@ -443,7 +546,7 @@ def test_fight_interrupt_source_is_not_offered_again_after_decline() -> None:
     assert replayed_submit_status.status_kind is LifecycleStatusKind.INVALID
     assert lifecycle.decision_controller.queue.pending_requests == pending_before_replayed_submit
     assert state.fight_phase_state is not None
-    assert state.fight_phase_state.resolved_interrupt_source_effect_ids == (
+    assert state.fight_phase_state.fight_order_state.resolved_interrupt_source_effect_ids == (
         interrupt_source_effect_id,
     )
     assert len(_event_payloads(lifecycle, "fight_interrupt_requested")) == 1
@@ -451,7 +554,7 @@ def test_fight_interrupt_source_is_not_offered_again_after_decline() -> None:
     assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 0
 
 
-def test_fight_phase_state_nested_payloads_round_trip() -> None:
+def test_fight_phase_state_wraps_fight_order_state_payloads_round_trip() -> None:
     policy = RulesetDescriptor.warhammer_40000_eleventh().fight_policy
     source = FightsFirstSource(
         unit_instance_id="unit-a",
@@ -464,7 +567,7 @@ def test_fight_phase_state_nested_payloads_round_trip() -> None:
         battle_round=1,
         active_player_id="player-a",
         policy=policy,
-        eligible_at_start_unit_ids=("unit-a",),
+        engaged_at_fight_step_start_unit_ids=("unit-a",),
         fights_first_registry=registry,
     )
     eligible_pass = EligibleToFightPass(
@@ -500,25 +603,32 @@ def test_fight_phase_state_nested_payloads_round_trip() -> None:
     assert registry.charged_unit_ids() == ("unit-a",)
     assert FightsFirstSource.from_payload(source.to_payload()) == source
     assert FightsFirstRegistry.from_payload(registry.to_payload()) == registry
+    assert "ordering_bands" not in populated.to_payload()
+    assert "fight_order_state" in populated.to_payload()
+    assert (
+        FightOrderState.from_payload(populated.fight_order_state.to_payload())
+        == populated.fight_order_state
+    )
     assert FightPhaseState.from_payload(populated.to_payload()) == populated
 
 
-def test_fight_phase_state_rejects_drifted_or_malformed_nested_records() -> None:
+def test_fight_order_state_rejects_drifted_or_malformed_nested_records() -> None:
     policy = RulesetDescriptor.warhammer_40000_eleventh().fight_policy
     base_state = FightPhaseState.start(
         battle_round=1,
         active_player_id="player-a",
         policy=policy,
-        eligible_at_start_unit_ids=("unit-a",),
+        engaged_at_fight_step_start_unit_ids=("unit-a",),
         fights_first_registry=FightsFirstRegistry(),
     )
+    base_order_state = base_state.fight_order_state
     activation = FightActivationSelection(
         player_id="player-a",
         battle_round=1,
         unit_instance_id="unit-a",
         ordering_band=base_state.current_ordering_band,
         fight_type=policy.fight_types[0],
-        eligibility_reasons=(FightEligibilityKind.ENGAGED_AT_FIGHT_PHASE_START,),
+        eligibility_reasons=(FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,),
         request_id="request-activation",
         result_id="result-activation",
         interrupt_id=None,
@@ -529,7 +639,7 @@ def test_fight_phase_state_rejects_drifted_or_malformed_nested_records() -> None
         unit_instance_id="unit-b",
         ordering_band=base_state.current_ordering_band,
         fight_type=policy.fight_types[0],
-        eligibility_reasons=(FightEligibilityKind.ENGAGED_AT_FIGHT_PHASE_START,),
+        eligibility_reasons=(FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,),
         request_id="request-drifted",
         result_id="result-drifted",
         interrupt_id=None,
@@ -555,7 +665,7 @@ def test_fight_phase_state_rejects_drifted_or_malformed_nested_records() -> None
             battle_round=1,
             active_player_id="player-a",
             policy=cast(FightPolicyDescriptor, object()),
-            eligible_at_start_unit_ids=("unit-a",),
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
             fights_first_registry=FightsFirstRegistry(),
         )
     with pytest.raises(GameLifecycleError, match="sources must be a tuple"):
@@ -567,63 +677,53 @@ def test_fight_phase_state_rejects_drifted_or_malformed_nested_records() -> None
             battle_round=1,
             active_player_id="player-a",
             step_states=(),
-            ordering_bands=policy.ordering_bands,
-            current_band_index=0,
-            next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a",),
+            fight_order_state=base_order_state,
         )
     with pytest.raises(GameLifecycleError, match="current_band_index is out of range"):
-        FightPhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            step_states=base_state.step_states,
+        FightOrderState(
             ordering_bands=policy.ordering_bands,
             current_band_index=99,
             next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a",),
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
         )
     with pytest.raises(GameLifecycleError, match="activation_selections must contain"):
-        FightPhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            step_states=base_state.step_states,
+        FightOrderState(
             ordering_bands=policy.ordering_bands,
             current_band_index=0,
             next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a",),
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
             activation_selections=cast(tuple[FightActivationSelection, ...], ("bad",)),
         )
     with pytest.raises(GameLifecycleError, match="eligible_passes must contain"):
-        FightPhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            step_states=base_state.step_states,
+        FightOrderState(
             ordering_bands=policy.ordering_bands,
             current_band_index=0,
             next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a",),
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
             eligible_passes=cast(tuple[EligibleToFightPass, ...], ("bad",)),
+        )
+    with pytest.raises(GameLifecycleError, match="resolved_interrupts must contain"):
+        FightOrderState(
+            ordering_bands=policy.ordering_bands,
+            current_band_index=0,
+            next_player_id="player-a",
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
+            resolved_interrupts=cast(tuple[ResolvedFightInterrupt, ...], ("bad",)),
         )
     with pytest.raises(GameLifecycleError, match="phase_complete must be a bool"):
         FightPhaseState(
             battle_round=1,
             active_player_id="player-a",
             step_states=base_state.step_states,
-            ordering_bands=policy.ordering_bands,
-            current_band_index=0,
-            next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a",),
+            fight_order_state=base_order_state,
             phase_complete=cast(bool, "false"),
         )
     with pytest.raises(GameLifecycleError, match="unit IDs must be unique"):
-        FightPhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            step_states=base_state.step_states,
+        FightOrderState(
             ordering_bands=policy.ordering_bands,
             current_band_index=0,
             next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a", "unit-a"),
+            engaged_at_fight_step_start_unit_ids=("unit-a", "unit-a"),
         )
     with pytest.raises(GameLifecycleError, match="battle round drift"):
         base_state.with_activation(drifted_activation)
@@ -648,31 +748,38 @@ def test_fight_phase_state_rejects_drifted_or_malformed_nested_records() -> None
             source_effect_id="effect-interrupt-a",
         )
     with pytest.raises(GameLifecycleError, match="source effect IDs must be unique"):
-        FightPhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            step_states=base_state.step_states,
+        FightOrderState(
             ordering_bands=policy.ordering_bands,
             current_band_index=0,
             next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a",),
-            resolved_interrupt_ids=("interrupt-a", "interrupt-b"),
-            resolved_interrupt_source_effect_ids=(
-                "effect-interrupt-a",
-                "effect-interrupt-a",
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
+            resolved_interrupts=(
+                ResolvedFightInterrupt(
+                    interrupt_id="interrupt-a",
+                    source_effect_id="effect-interrupt-a",
+                ),
+                ResolvedFightInterrupt(
+                    interrupt_id="interrupt-b",
+                    source_effect_id="effect-interrupt-a",
+                ),
             ),
         )
-    with pytest.raises(GameLifecycleError, match="resolved interrupt tracking drift"):
-        FightPhaseState(
-            battle_round=1,
-            active_player_id="player-a",
-            step_states=base_state.step_states,
+    with pytest.raises(GameLifecycleError, match="interrupt IDs must be unique"):
+        FightOrderState(
             ordering_bands=policy.ordering_bands,
             current_band_index=0,
             next_player_id="player-a",
-            eligible_at_start_unit_ids=("unit-a",),
-            resolved_interrupt_ids=("interrupt-a",),
-            resolved_interrupt_source_effect_ids=(),
+            engaged_at_fight_step_start_unit_ids=("unit-a",),
+            resolved_interrupts=(
+                ResolvedFightInterrupt(
+                    interrupt_id="interrupt-a",
+                    source_effect_id="effect-interrupt-a",
+                ),
+                ResolvedFightInterrupt(
+                    interrupt_id="interrupt-a",
+                    source_effect_id="effect-interrupt-b",
+                ),
+            ),
         )
 
 
@@ -899,6 +1006,24 @@ def _unit_placement_at(
     )
 
 
+def _move_unit_to(lifecycle: GameLifecycle, *, unit: UnitInstance, origin: Pose) -> None:
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    army_id = unit.unit_instance_id.split(":", maxsplit=1)[0]
+    state.battlefield_state = battlefield_state.with_unit_placement(
+        _unit_placement_at(
+            unit,
+            army_id=army_id,
+            player_id=_player_id_for_unit(unit),
+            poses=_compact_test_unit_poses(
+                origin=origin,
+                model_count=len(unit.own_models),
+            ),
+        )
+    )
+
+
 def _record_fights_first_effect(
     *,
     state: GameState,
@@ -995,6 +1120,10 @@ def _request_unit_ids(request: DecisionRequest) -> list[str]:
     payload = cast(dict[str, object], request.payload)
     contexts = cast(list[dict[str, object]], payload["eligible_contexts"])
     return [cast(str, context["unit_instance_id"]) for context in contexts]
+
+
+def _request_option_ids(request: DecisionRequest) -> set[str]:
+    return {option.option_id for option in request.options}
 
 
 def _interrupt_source_effect_id(request: DecisionRequest) -> str:

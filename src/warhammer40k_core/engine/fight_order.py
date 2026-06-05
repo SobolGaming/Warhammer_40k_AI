@@ -88,26 +88,34 @@ class FightInterruptRequestPayload(TypedDict):
     eligible_unit_ids: list[str]
 
 
+class ResolvedFightInterruptPayload(TypedDict):
+    interrupt_id: str
+    source_effect_id: str
+
+
 class FightStepStatePayload(TypedDict):
     step: str
     status: str
+
+
+class FightOrderStatePayload(TypedDict):
+    ordering_bands: list[str]
+    current_band_index: int
+    next_player_id: str
+    engaged_at_fight_step_start_unit_ids: list[str]
+    selected_to_fight_unit_ids: list[str]
+    passed_player_ids: list[str]
+    activation_selections: list[FightActivationSelectionPayload]
+    eligible_passes: list[EligibleToFightPassPayload]
+    resolved_interrupts: list[ResolvedFightInterruptPayload]
+    fights_first_registry: FightsFirstRegistryPayload
 
 
 class FightPhaseStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
     step_states: list[FightStepStatePayload]
-    ordering_bands: list[str]
-    current_band_index: int
-    next_player_id: str
-    eligible_at_start_unit_ids: list[str]
-    activated_unit_ids: list[str]
-    passed_player_ids: list[str]
-    activation_selections: list[FightActivationSelectionPayload]
-    eligible_passes: list[EligibleToFightPassPayload]
-    resolved_interrupt_ids: list[str]
-    resolved_interrupt_source_effect_ids: list[str]
-    fights_first_registry: FightsFirstRegistryPayload
+    fight_order_state: FightOrderStatePayload
     phase_complete: bool
 
 
@@ -541,6 +549,40 @@ class FightInterruptRequest:
 
 
 @dataclass(frozen=True, slots=True)
+class ResolvedFightInterrupt:
+    interrupt_id: str
+    source_effect_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "interrupt_id",
+            _validate_identifier("ResolvedFightInterrupt interrupt_id", self.interrupt_id),
+        )
+        object.__setattr__(
+            self,
+            "source_effect_id",
+            _validate_identifier(
+                "ResolvedFightInterrupt source_effect_id",
+                self.source_effect_id,
+            ),
+        )
+
+    def to_payload(self) -> ResolvedFightInterruptPayload:
+        return {
+            "interrupt_id": self.interrupt_id,
+            "source_effect_id": self.source_effect_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ResolvedFightInterruptPayload) -> Self:
+        return cls(
+            interrupt_id=payload["interrupt_id"],
+            source_effect_id=payload["source_effect_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class FightStepState:
     step: FightPhaseStepKind
     status: str
@@ -565,35 +607,19 @@ class FightStepState:
 
 
 @dataclass(frozen=True, slots=True)
-class FightPhaseState:
-    battle_round: int
-    active_player_id: str
-    step_states: tuple[FightStepState, ...]
+class FightOrderState:
     ordering_bands: tuple[FightOrderingBandKind, ...]
     current_band_index: int
     next_player_id: str
-    eligible_at_start_unit_ids: tuple[str, ...]
-    activated_unit_ids: tuple[str, ...] = ()
+    engaged_at_fight_step_start_unit_ids: tuple[str, ...]
+    selected_to_fight_unit_ids: tuple[str, ...] = ()
     passed_player_ids: tuple[str, ...] = ()
     activation_selections: tuple[FightActivationSelection, ...] = ()
     eligible_passes: tuple[EligibleToFightPass, ...] = ()
-    resolved_interrupt_ids: tuple[str, ...] = ()
-    resolved_interrupt_source_effect_ids: tuple[str, ...] = ()
+    resolved_interrupts: tuple[ResolvedFightInterrupt, ...] = ()
     fights_first_registry: FightsFirstRegistry = field(default_factory=FightsFirstRegistry)
-    phase_complete: bool = False
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("FightPhaseState battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "active_player_id",
-            _validate_identifier("FightPhaseState active_player_id", self.active_player_id),
-        )
-        object.__setattr__(self, "step_states", _validate_step_states(self.step_states))
         object.__setattr__(
             self,
             "ordering_bands",
@@ -607,29 +633,29 @@ class FightPhaseState:
         object.__setattr__(
             self,
             "next_player_id",
-            _validate_identifier("FightPhaseState next_player_id", self.next_player_id),
+            _validate_identifier("FightOrderState next_player_id", self.next_player_id),
         )
         object.__setattr__(
             self,
-            "eligible_at_start_unit_ids",
+            "engaged_at_fight_step_start_unit_ids",
             _validate_identifier_tuple(
-                "FightPhaseState eligible_at_start_unit_ids",
-                self.eligible_at_start_unit_ids,
+                "FightOrderState engaged_at_fight_step_start_unit_ids",
+                self.engaged_at_fight_step_start_unit_ids,
             ),
         )
         object.__setattr__(
             self,
-            "activated_unit_ids",
+            "selected_to_fight_unit_ids",
             _validate_identifier_tuple(
-                "FightPhaseState activated_unit_ids",
-                self.activated_unit_ids,
+                "FightOrderState selected_to_fight_unit_ids",
+                self.selected_to_fight_unit_ids,
             ),
         )
         object.__setattr__(
             self,
             "passed_player_ids",
             _validate_identifier_tuple(
-                "FightPhaseState passed_player_ids",
+                "FightOrderState passed_player_ids",
                 self.passed_player_ids,
             ),
         )
@@ -645,55 +671,34 @@ class FightPhaseState:
         )
         object.__setattr__(
             self,
-            "resolved_interrupt_ids",
-            _validate_identifier_tuple(
-                "FightPhaseState resolved_interrupt_ids",
-                self.resolved_interrupt_ids,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "resolved_interrupt_source_effect_ids",
-            _validate_identifier_tuple(
-                "FightPhaseState resolved_interrupt_source_effect_ids",
-                self.resolved_interrupt_source_effect_ids,
-            ),
+            "resolved_interrupts",
+            _validate_resolved_interrupts(self.resolved_interrupts),
         )
         if type(self.fights_first_registry) is not FightsFirstRegistry:
             raise GameLifecycleError(
-                "FightPhaseState fights_first_registry must be FightsFirstRegistry."
+                "FightOrderState fights_first_registry must be FightsFirstRegistry."
             )
-        if type(self.phase_complete) is not bool:
-            raise GameLifecycleError("FightPhaseState phase_complete must be a bool.")
-        _validate_unique_unit_ids(self.activated_unit_ids)
-        _validate_unique_unit_ids(self.eligible_at_start_unit_ids)
+        _validate_unique_unit_ids(self.selected_to_fight_unit_ids)
+        _validate_unique_unit_ids(self.engaged_at_fight_step_start_unit_ids)
         _validate_unique_interrupt_ids(self.resolved_interrupt_ids)
         _validate_unique_interrupt_source_effect_ids(self.resolved_interrupt_source_effect_ids)
-        _validate_resolved_interrupt_tracking(
-            interrupt_ids=self.resolved_interrupt_ids,
-            source_effect_ids=self.resolved_interrupt_source_effect_ids,
-        )
 
     @classmethod
     def start(
         cls,
         *,
-        battle_round: int,
-        active_player_id: str,
         policy: FightPolicyDescriptor,
-        eligible_at_start_unit_ids: tuple[str, ...],
+        next_player_id: str,
+        engaged_at_fight_step_start_unit_ids: tuple[str, ...],
         fights_first_registry: FightsFirstRegistry,
     ) -> Self:
         if type(policy) is not FightPolicyDescriptor:
-            raise GameLifecycleError("FightPhaseState start requires a FightPolicyDescriptor.")
+            raise GameLifecycleError("FightOrderState start requires a FightPolicyDescriptor.")
         return cls(
-            battle_round=battle_round,
-            active_player_id=active_player_id,
-            step_states=tuple(_initial_step_state(step) for step in policy.steps),
             ordering_bands=policy.ordering_bands,
             current_band_index=0,
-            next_player_id=active_player_id,
-            eligible_at_start_unit_ids=eligible_at_start_unit_ids,
+            next_player_id=next_player_id,
+            engaged_at_fight_step_start_unit_ids=engaged_at_fight_step_start_unit_ids,
             fights_first_registry=fights_first_registry,
         )
 
@@ -701,62 +706,62 @@ class FightPhaseState:
     def current_ordering_band(self) -> FightOrderingBandKind:
         return self.ordering_bands[self.current_band_index]
 
+    @property
+    def resolved_interrupt_ids(self) -> tuple[str, ...]:
+        return tuple(interrupt.interrupt_id for interrupt in self.resolved_interrupts)
+
+    @property
+    def resolved_interrupt_source_effect_ids(self) -> tuple[str, ...]:
+        return tuple(interrupt.source_effect_id for interrupt in self.resolved_interrupts)
+
     def with_next_player(self, player_id: str) -> Self:
         return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step_states=self.step_states,
             ordering_bands=self.ordering_bands,
             current_band_index=self.current_band_index,
             next_player_id=_validate_identifier("player_id", player_id),
-            eligible_at_start_unit_ids=self.eligible_at_start_unit_ids,
-            activated_unit_ids=self.activated_unit_ids,
+            engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
+            selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=self.passed_player_ids,
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
-            resolved_interrupt_ids=self.resolved_interrupt_ids,
-            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
+            resolved_interrupts=self.resolved_interrupts,
             fights_first_registry=self.fights_first_registry,
-            phase_complete=self.phase_complete,
         )
 
-    def with_next_band(self) -> Self:
-        if self.current_band_index + 1 >= len(self.ordering_bands):
-            return self.with_phase_complete()
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step_states=self.step_states,
-            ordering_bands=self.ordering_bands,
+    def with_next_band(self, *, next_player_id: str) -> Self:
+        return self.with_ordering_band(
             current_band_index=self.current_band_index + 1,
-            next_player_id=self.active_player_id,
-            eligible_at_start_unit_ids=self.eligible_at_start_unit_ids,
-            activated_unit_ids=self.activated_unit_ids,
+            next_player_id=next_player_id,
+        )
+
+    def with_ordering_band(self, *, current_band_index: int, next_player_id: str) -> Self:
+        return type(self)(
+            ordering_bands=self.ordering_bands,
+            current_band_index=_validate_band_index(current_band_index, self.ordering_bands),
+            next_player_id=_validate_identifier("next_player_id", next_player_id),
+            engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
+            selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=(),
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
-            resolved_interrupt_ids=self.resolved_interrupt_ids,
-            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
+            resolved_interrupts=self.resolved_interrupts,
             fights_first_registry=self.fights_first_registry,
-            phase_complete=False,
         )
 
     def with_activation(self, selection: FightActivationSelection) -> Self:
         if type(selection) is not FightActivationSelection:
             raise GameLifecycleError("Fight activation requires FightActivationSelection.")
-        if selection.battle_round != self.battle_round:
-            raise GameLifecycleError("Fight activation battle round drift.")
-        if selection.unit_instance_id in self.activated_unit_ids:
+        if selection.unit_instance_id in self.selected_to_fight_unit_ids:
             raise GameLifecycleError("Fight activation unit already activated.")
         return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step_states=self.step_states,
             ordering_bands=self.ordering_bands,
             current_band_index=self.current_band_index,
             next_player_id=self.next_player_id,
-            eligible_at_start_unit_ids=self.eligible_at_start_unit_ids,
-            activated_unit_ids=(*self.activated_unit_ids, selection.unit_instance_id),
+            engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
+            selected_to_fight_unit_ids=(
+                *self.selected_to_fight_unit_ids,
+                selection.unit_instance_id,
+            ),
             passed_player_ids=tuple(
                 player_id
                 for player_id in self.passed_player_ids
@@ -764,96 +769,57 @@ class FightPhaseState:
             ),
             activation_selections=(*self.activation_selections, selection),
             eligible_passes=self.eligible_passes,
-            resolved_interrupt_ids=self.resolved_interrupt_ids,
-            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
+            resolved_interrupts=self.resolved_interrupts,
             fights_first_registry=self.fights_first_registry,
-            phase_complete=False,
         )
 
     def with_eligible_pass(self, eligible_pass: EligibleToFightPass) -> Self:
         if type(eligible_pass) is not EligibleToFightPass:
             raise GameLifecycleError("Fight pass requires EligibleToFightPass.")
-        if eligible_pass.battle_round != self.battle_round:
-            raise GameLifecycleError("Fight pass battle round drift.")
         if eligible_pass.ordering_band is not self.current_ordering_band:
             raise GameLifecycleError("Fight pass ordering band drift.")
         return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step_states=self.step_states,
             ordering_bands=self.ordering_bands,
             current_band_index=self.current_band_index,
             next_player_id=self.next_player_id,
-            eligible_at_start_unit_ids=self.eligible_at_start_unit_ids,
-            activated_unit_ids=self.activated_unit_ids,
+            engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
+            selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=tuple(sorted({*self.passed_player_ids, eligible_pass.player_id})),
             activation_selections=self.activation_selections,
             eligible_passes=(*self.eligible_passes, eligible_pass),
-            resolved_interrupt_ids=self.resolved_interrupt_ids,
-            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
+            resolved_interrupts=self.resolved_interrupts,
             fights_first_registry=self.fights_first_registry,
-            phase_complete=False,
         )
 
     def with_resolved_interrupt(self, *, interrupt_id: str, source_effect_id: str) -> Self:
-        resolved_interrupt_id = _validate_identifier("interrupt_id", interrupt_id)
-        resolved_source_effect_id = _validate_identifier("source_effect_id", source_effect_id)
-        if resolved_interrupt_id in self.resolved_interrupt_ids:
+        resolved_interrupt = ResolvedFightInterrupt(
+            interrupt_id=interrupt_id,
+            source_effect_id=source_effect_id,
+        )
+        if resolved_interrupt.interrupt_id in self.resolved_interrupt_ids:
             raise GameLifecycleError("Fight interrupt has already resolved.")
-        if resolved_source_effect_id in self.resolved_interrupt_source_effect_ids:
+        if resolved_interrupt.source_effect_id in self.resolved_interrupt_source_effect_ids:
             raise GameLifecycleError("Fight interrupt source has already resolved.")
         return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step_states=self.step_states,
             ordering_bands=self.ordering_bands,
             current_band_index=self.current_band_index,
             next_player_id=self.next_player_id,
-            eligible_at_start_unit_ids=self.eligible_at_start_unit_ids,
-            activated_unit_ids=self.activated_unit_ids,
+            engaged_at_fight_step_start_unit_ids=self.engaged_at_fight_step_start_unit_ids,
+            selected_to_fight_unit_ids=self.selected_to_fight_unit_ids,
             passed_player_ids=self.passed_player_ids,
             activation_selections=self.activation_selections,
             eligible_passes=self.eligible_passes,
-            resolved_interrupt_ids=(*self.resolved_interrupt_ids, resolved_interrupt_id),
-            resolved_interrupt_source_effect_ids=(
-                *self.resolved_interrupt_source_effect_ids,
-                resolved_source_effect_id,
-            ),
+            resolved_interrupts=(*self.resolved_interrupts, resolved_interrupt),
             fights_first_registry=self.fights_first_registry,
-            phase_complete=False,
         )
 
-    def with_phase_complete(self) -> Self:
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step_states=tuple(
-                FightStepState(step=state.step, status="complete") for state in self.step_states
-            ),
-            ordering_bands=self.ordering_bands,
-            current_band_index=self.current_band_index,
-            next_player_id=self.next_player_id,
-            eligible_at_start_unit_ids=self.eligible_at_start_unit_ids,
-            activated_unit_ids=self.activated_unit_ids,
-            passed_player_ids=self.passed_player_ids,
-            activation_selections=self.activation_selections,
-            eligible_passes=self.eligible_passes,
-            resolved_interrupt_ids=self.resolved_interrupt_ids,
-            resolved_interrupt_source_effect_ids=self.resolved_interrupt_source_effect_ids,
-            fights_first_registry=self.fights_first_registry,
-            phase_complete=True,
-        )
-
-    def to_payload(self) -> FightPhaseStatePayload:
+    def to_payload(self) -> FightOrderStatePayload:
         return {
-            "battle_round": self.battle_round,
-            "active_player_id": self.active_player_id,
-            "step_states": [step.to_payload() for step in self.step_states],
             "ordering_bands": [band.value for band in self.ordering_bands],
             "current_band_index": self.current_band_index,
             "next_player_id": self.next_player_id,
-            "eligible_at_start_unit_ids": list(self.eligible_at_start_unit_ids),
-            "activated_unit_ids": list(self.activated_unit_ids),
+            "engaged_at_fight_step_start_unit_ids": list(self.engaged_at_fight_step_start_unit_ids),
+            "selected_to_fight_unit_ids": list(self.selected_to_fight_unit_ids),
             "passed_player_ids": list(self.passed_player_ids),
             "activation_selections": [
                 selection.to_payload() for selection in self.activation_selections
@@ -861,25 +827,24 @@ class FightPhaseState:
             "eligible_passes": [
                 eligible_pass.to_payload() for eligible_pass in self.eligible_passes
             ],
-            "resolved_interrupt_ids": list(self.resolved_interrupt_ids),
-            "resolved_interrupt_source_effect_ids": list(self.resolved_interrupt_source_effect_ids),
+            "resolved_interrupts": [
+                resolved_interrupt.to_payload() for resolved_interrupt in self.resolved_interrupts
+            ],
             "fights_first_registry": self.fights_first_registry.to_payload(),
-            "phase_complete": self.phase_complete,
         }
 
     @classmethod
-    def from_payload(cls, payload: FightPhaseStatePayload) -> Self:
+    def from_payload(cls, payload: FightOrderStatePayload) -> Self:
         return cls(
-            battle_round=payload["battle_round"],
-            active_player_id=payload["active_player_id"],
-            step_states=tuple(FightStepState.from_payload(step) for step in payload["step_states"]),
             ordering_bands=tuple(
                 fight_ordering_band_kind_from_token(band) for band in payload["ordering_bands"]
             ),
             current_band_index=payload["current_band_index"],
             next_player_id=payload["next_player_id"],
-            eligible_at_start_unit_ids=tuple(payload["eligible_at_start_unit_ids"]),
-            activated_unit_ids=tuple(payload["activated_unit_ids"]),
+            engaged_at_fight_step_start_unit_ids=tuple(
+                payload["engaged_at_fight_step_start_unit_ids"]
+            ),
+            selected_to_fight_unit_ids=tuple(payload["selected_to_fight_unit_ids"]),
             passed_player_ids=tuple(payload["passed_player_ids"]),
             activation_selections=tuple(
                 FightActivationSelection.from_payload(selection)
@@ -889,13 +854,153 @@ class FightPhaseState:
                 EligibleToFightPass.from_payload(eligible_pass)
                 for eligible_pass in payload["eligible_passes"]
             ),
-            resolved_interrupt_ids=tuple(payload["resolved_interrupt_ids"]),
-            resolved_interrupt_source_effect_ids=tuple(
-                payload["resolved_interrupt_source_effect_ids"]
+            resolved_interrupts=tuple(
+                ResolvedFightInterrupt.from_payload(resolved_interrupt)
+                for resolved_interrupt in payload["resolved_interrupts"]
             ),
             fights_first_registry=FightsFirstRegistry.from_payload(
                 payload["fights_first_registry"]
             ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class FightPhaseState:
+    battle_round: int
+    active_player_id: str
+    step_states: tuple[FightStepState, ...]
+    fight_order_state: FightOrderState
+    phase_complete: bool = False
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("FightPhaseState battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier("FightPhaseState active_player_id", self.active_player_id),
+        )
+        object.__setattr__(self, "step_states", _validate_step_states(self.step_states))
+        if type(self.fight_order_state) is not FightOrderState:
+            raise GameLifecycleError("FightPhaseState fight_order_state must be FightOrderState.")
+        if type(self.phase_complete) is not bool:
+            raise GameLifecycleError("FightPhaseState phase_complete must be a bool.")
+
+    @classmethod
+    def start(
+        cls,
+        *,
+        battle_round: int,
+        active_player_id: str,
+        policy: FightPolicyDescriptor,
+        engaged_at_fight_step_start_unit_ids: tuple[str, ...],
+        fights_first_registry: FightsFirstRegistry,
+    ) -> Self:
+        if type(policy) is not FightPolicyDescriptor:
+            raise GameLifecycleError("FightPhaseState start requires a FightPolicyDescriptor.")
+        return cls(
+            battle_round=battle_round,
+            active_player_id=active_player_id,
+            step_states=tuple(_initial_step_state(step) for step in policy.steps),
+            fight_order_state=FightOrderState.start(
+                policy=policy,
+                next_player_id=active_player_id,
+                engaged_at_fight_step_start_unit_ids=engaged_at_fight_step_start_unit_ids,
+                fights_first_registry=fights_first_registry,
+            ),
+        )
+
+    @property
+    def current_ordering_band(self) -> FightOrderingBandKind:
+        return self.fight_order_state.current_ordering_band
+
+    def with_next_player(self, player_id: str) -> Self:
+        return self._with_order_state(self.fight_order_state.with_next_player(player_id))
+
+    def with_next_band(self) -> Self:
+        if self.fight_order_state.current_band_index + 1 >= len(
+            self.fight_order_state.ordering_bands
+        ):
+            return self.with_phase_complete()
+        return self._with_order_state(
+            self.fight_order_state.with_next_band(next_player_id=self.active_player_id)
+        )
+
+    def with_ordering_band(
+        self,
+        *,
+        ordering_band: FightOrderingBandKind,
+        next_player_id: str,
+    ) -> Self:
+        band = fight_ordering_band_kind_from_token(ordering_band)
+        return self._with_order_state(
+            self.fight_order_state.with_ordering_band(
+                current_band_index=self.fight_order_state.ordering_bands.index(band),
+                next_player_id=next_player_id,
+            )
+        )
+
+    def with_activation(self, selection: FightActivationSelection) -> Self:
+        if type(selection) is not FightActivationSelection:
+            raise GameLifecycleError("Fight activation requires FightActivationSelection.")
+        if selection.battle_round != self.battle_round:
+            raise GameLifecycleError("Fight activation battle round drift.")
+        return self._with_order_state(self.fight_order_state.with_activation(selection))
+
+    def with_eligible_pass(self, eligible_pass: EligibleToFightPass) -> Self:
+        if type(eligible_pass) is not EligibleToFightPass:
+            raise GameLifecycleError("Fight pass requires EligibleToFightPass.")
+        if eligible_pass.battle_round != self.battle_round:
+            raise GameLifecycleError("Fight pass battle round drift.")
+        return self._with_order_state(self.fight_order_state.with_eligible_pass(eligible_pass))
+
+    def with_resolved_interrupt(self, *, interrupt_id: str, source_effect_id: str) -> Self:
+        return self._with_order_state(
+            self.fight_order_state.with_resolved_interrupt(
+                interrupt_id=interrupt_id,
+                source_effect_id=source_effect_id,
+            )
+        )
+
+    def with_phase_complete(self) -> Self:
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step_states=tuple(
+                FightStepState(step=state.step, status="complete") for state in self.step_states
+            ),
+            fight_order_state=self.fight_order_state,
+            phase_complete=True,
+        )
+
+    def _with_order_state(self, fight_order_state: FightOrderState) -> Self:
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step_states=self.step_states,
+            fight_order_state=fight_order_state,
+            phase_complete=False,
+        )
+
+    def to_payload(self) -> FightPhaseStatePayload:
+        return {
+            "battle_round": self.battle_round,
+            "active_player_id": self.active_player_id,
+            "step_states": [step.to_payload() for step in self.step_states],
+            "fight_order_state": self.fight_order_state.to_payload(),
+            "phase_complete": self.phase_complete,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: FightPhaseStatePayload) -> Self:
+        return cls(
+            battle_round=payload["battle_round"],
+            active_player_id=payload["active_player_id"],
+            step_states=tuple(FightStepState.from_payload(step) for step in payload["step_states"]),
+            fight_order_state=FightOrderState.from_payload(payload["fight_order_state"]),
             phase_complete=payload["phase_complete"],
         )
 
@@ -910,7 +1015,7 @@ def eligible_fight_contexts_for_player(
     requested_player_id = _validate_identifier("player_id", player_id)
     contexts: list[FightEligibilityContext] = []
     for unit_id in _unit_ids_for_player(state=state, player_id=requested_player_id):
-        if unit_id in fight_state.activated_unit_ids:
+        if unit_id in fight_state.fight_order_state.selected_to_fight_unit_ids:
             continue
         reasons = _eligibility_reasons_for_unit(
             state=state,
@@ -921,7 +1026,7 @@ def eligible_fight_contexts_for_player(
         if not reasons:
             continue
         band = fight_state.current_ordering_band
-        has_fights_first = fight_state.fights_first_registry.has_unit(unit_id)
+        has_fights_first = fight_state.fight_order_state.fights_first_registry.has_unit(unit_id)
         if band is FightOrderingBandKind.FIGHTS_FIRST and not has_fights_first:
             continue
         if band is FightOrderingBandKind.REMAINING_COMBATS and has_fights_first:
@@ -948,6 +1053,25 @@ def eligible_pass_is_available(contexts: tuple[FightEligibilityContext, ...]) ->
     if not contexts:
         return False
     return all(context.more_than_pass_distance_from_all_enemies for context in contexts)
+
+
+def legal_fight_types_for_context(
+    *,
+    context: FightEligibilityContext,
+    policy: FightPolicyDescriptor,
+) -> tuple[FightTypeKind, ...]:
+    types: list[FightTypeKind] = []
+    currently_engaged = FightEligibilityKind.CURRENTLY_ENGAGED in context.eligibility_reasons
+    engaged_at_step_start = (
+        FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START in context.eligibility_reasons
+    )
+    if FightTypeKind.NORMAL in policy.fight_types and currently_engaged:
+        types.append(FightTypeKind.NORMAL)
+    if FightTypeKind.OVERRUN in policy.fight_types and (
+        not currently_engaged or not engaged_at_step_start
+    ):
+        types.append(FightTypeKind.OVERRUN)
+    return tuple(types)
 
 
 def engaged_unit_ids_at_fight_start(
@@ -1131,18 +1255,19 @@ def _eligibility_reasons_for_unit(
     reasons: list[FightEligibilityKind] = []
     if (
         FightEligibilityKind.CHARGED_THIS_TURN in policy.eligibility_kinds
-        and unit_instance_id in fight_state.fights_first_registry.charged_unit_ids()
+        and unit_instance_id
+        in fight_state.fight_order_state.fights_first_registry.charged_unit_ids()
     ):
         reasons.append(FightEligibilityKind.CHARGED_THIS_TURN)
     if (
-        FightEligibilityKind.ENGAGED_AT_FIGHT_PHASE_START in policy.eligibility_kinds
-        and unit_instance_id in fight_state.eligible_at_start_unit_ids
+        FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START in policy.eligibility_kinds
+        and unit_instance_id in fight_state.fight_order_state.engaged_at_fight_step_start_unit_ids
     ):
-        reasons.append(FightEligibilityKind.ENGAGED_AT_FIGHT_PHASE_START)
-    if FightEligibilityKind.ENGAGED_AT_ACTIVATION in policy.eligibility_kinds:
+        reasons.append(FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START)
+    if FightEligibilityKind.CURRENTLY_ENGAGED in policy.eligibility_kinds:
         owner = _owner_for_unit(state=state, unit_instance_id=unit_instance_id)
         if _unit_is_engaged(state=state, player_id=owner, unit_instance_id=unit_instance_id):
-            reasons.append(FightEligibilityKind.ENGAGED_AT_ACTIVATION)
+            reasons.append(FightEligibilityKind.CURRENTLY_ENGAGED)
     return tuple(reasons)
 
 
@@ -1326,26 +1451,26 @@ def _validate_step_state(value: object) -> FightStepState:
 
 def _validate_ordering_bands(values: object) -> tuple[FightOrderingBandKind, ...]:
     if type(values) is not tuple:
-        raise GameLifecycleError("FightPhaseState ordering_bands must be a tuple.")
+        raise GameLifecycleError("FightOrderState ordering_bands must be a tuple.")
     bands = tuple(
         fight_ordering_band_kind_from_token(value) for value in cast(tuple[object, ...], values)
     )
     if not bands:
-        raise GameLifecycleError("FightPhaseState ordering_bands must not be empty.")
+        raise GameLifecycleError("FightOrderState ordering_bands must not be empty.")
     return bands
 
 
 def _validate_band_index(index: object, bands: tuple[FightOrderingBandKind, ...]) -> int:
     if type(index) is not int:
-        raise GameLifecycleError("FightPhaseState current_band_index must be an int.")
+        raise GameLifecycleError("FightOrderState current_band_index must be an int.")
     if index < 0 or index >= len(bands):
-        raise GameLifecycleError("FightPhaseState current_band_index is out of range.")
+        raise GameLifecycleError("FightOrderState current_band_index is out of range.")
     return index
 
 
 def _validate_activation_selections(values: object) -> tuple[FightActivationSelection, ...]:
     if type(values) is not tuple:
-        raise GameLifecycleError("FightPhaseState activation_selections must be a tuple.")
+        raise GameLifecycleError("FightOrderState activation_selections must be a tuple.")
     return tuple(
         _validate_activation_selection(value) for value in cast(tuple[object, ...], values)
     )
@@ -1354,21 +1479,35 @@ def _validate_activation_selections(values: object) -> tuple[FightActivationSele
 def _validate_activation_selection(value: object) -> FightActivationSelection:
     if type(value) is not FightActivationSelection:
         raise GameLifecycleError(
-            "FightPhaseState activation_selections must contain FightActivationSelection."
+            "FightOrderState activation_selections must contain FightActivationSelection."
         )
     return value
 
 
 def _validate_eligible_passes(values: object) -> tuple[EligibleToFightPass, ...]:
     if type(values) is not tuple:
-        raise GameLifecycleError("FightPhaseState eligible_passes must be a tuple.")
+        raise GameLifecycleError("FightOrderState eligible_passes must be a tuple.")
     return tuple(_validate_eligible_pass(value) for value in cast(tuple[object, ...], values))
 
 
 def _validate_eligible_pass(value: object) -> EligibleToFightPass:
     if type(value) is not EligibleToFightPass:
         raise GameLifecycleError(
-            "FightPhaseState eligible_passes must contain EligibleToFightPass."
+            "FightOrderState eligible_passes must contain EligibleToFightPass."
+        )
+    return value
+
+
+def _validate_resolved_interrupts(values: object) -> tuple[ResolvedFightInterrupt, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("FightOrderState resolved_interrupts must be a tuple.")
+    return tuple(_validate_resolved_interrupt(value) for value in cast(tuple[object, ...], values))
+
+
+def _validate_resolved_interrupt(value: object) -> ResolvedFightInterrupt:
+    if type(value) is not ResolvedFightInterrupt:
+        raise GameLifecycleError(
+            "FightOrderState resolved_interrupts must contain ResolvedFightInterrupt."
         )
     return value
 
@@ -1405,26 +1544,17 @@ def _validate_identifier_tuple(
 
 def _validate_unique_unit_ids(unit_ids: tuple[str, ...]) -> None:
     if len(set(unit_ids)) != len(unit_ids):
-        raise GameLifecycleError("FightPhaseState unit IDs must be unique.")
+        raise GameLifecycleError("FightOrderState unit IDs must be unique.")
 
 
 def _validate_unique_interrupt_ids(interrupt_ids: tuple[str, ...]) -> None:
     if len(set(interrupt_ids)) != len(interrupt_ids):
-        raise GameLifecycleError("FightPhaseState interrupt IDs must be unique.")
+        raise GameLifecycleError("FightOrderState interrupt IDs must be unique.")
 
 
 def _validate_unique_interrupt_source_effect_ids(source_effect_ids: tuple[str, ...]) -> None:
     if len(set(source_effect_ids)) != len(source_effect_ids):
-        raise GameLifecycleError("FightPhaseState interrupt source effect IDs must be unique.")
-
-
-def _validate_resolved_interrupt_tracking(
-    *,
-    interrupt_ids: tuple[str, ...],
-    source_effect_ids: tuple[str, ...],
-) -> None:
-    if len(interrupt_ids) != len(source_effect_ids):
-        raise GameLifecycleError("FightPhaseState resolved interrupt tracking drift.")
+        raise GameLifecycleError("FightOrderState interrupt source effect IDs must be unique.")
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

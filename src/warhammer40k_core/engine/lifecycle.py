@@ -1623,7 +1623,8 @@ def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
         raise GameLifecycleError("fight_phase_state battle round drift.")
     if state.battlefield_state is None:
         raise GameLifecycleError("fight_phase_state requires battlefield_state.")
-    if fight_state.next_player_id not in state.player_ids:
+    fight_order_state = fight_state.fight_order_state
+    if fight_order_state.next_player_id not in state.player_ids:
         raise GameLifecycleError("fight_phase_state next player is not in this game.")
     unit_owner_by_id = {
         unit.unit_instance_id: army.player_id
@@ -1632,22 +1633,22 @@ def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
     }
     known_unit_ids = set(unit_owner_by_id)
     for unit_id in (
-        *fight_state.eligible_at_start_unit_ids,
-        *fight_state.activated_unit_ids,
-        *fight_state.fights_first_registry.charged_unit_ids(),
+        *fight_order_state.engaged_at_fight_step_start_unit_ids,
+        *fight_order_state.selected_to_fight_unit_ids,
+        *fight_order_state.fights_first_registry.charged_unit_ids(),
     ):
         if unit_id not in known_unit_ids:
             raise GameLifecycleError("fight_phase_state unit is unknown.")
-    for player_id in fight_state.passed_player_ids:
+    for player_id in fight_order_state.passed_player_ids:
         if player_id not in state.player_ids:
             raise GameLifecycleError("fight_phase_state passed player is not in this game.")
-    for selection in fight_state.activation_selections:
+    for selection in fight_order_state.activation_selections:
         owner = unit_owner_by_id.get(selection.unit_instance_id)
         if owner is None:
             raise GameLifecycleError("fight_phase_state activation unit is unknown.")
         if owner != selection.player_id:
             raise GameLifecycleError("fight_phase_state activation player drift.")
-    for eligible_pass in fight_state.eligible_passes:
+    for eligible_pass in fight_order_state.eligible_passes:
         if eligible_pass.player_id not in state.player_ids:
             raise GameLifecycleError("fight_phase_state pass player is not in this game.")
         for unit_id in eligible_pass.eligible_unit_ids:
