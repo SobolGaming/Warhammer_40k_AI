@@ -905,6 +905,19 @@ view = project_game_view(
 )
 ```
 
+When the visible pending request is parameterized, `GameViewPayload.pending_proposal`
+is the adapter-visible proposal request object. It always includes
+`request_id`, `decision_type`, and `actor_id` copied from the pending
+`DecisionRequest`, followed by the family-specific proposal fields such as
+`proposal_kind`, movement context, placement kinds, Stratagem catalog context,
+or future shooting/charge details. This shape is intentionally consistent across
+`submit_movement_proposal`, `submit_placement_proposal`,
+`submit_stratagem_target_proposal`, and later parameterized decision families so
+clients can perform submission and stale-request checks without special-casing
+nested proposal payloads. Non-parameterized requests, hidden requests for a
+non-owning viewer, and views with no pending request expose
+`pending_proposal: null`.
+
 Visibility examples:
 
 - local hot-seat UI: viewer-scoped player projection;

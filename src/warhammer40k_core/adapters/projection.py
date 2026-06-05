@@ -153,7 +153,26 @@ def _proposal_view(
     proposal_request = request.payload.get("proposal_request")
     if not isinstance(proposal_request, dict):
         raise GameLifecycleError("Parameterized DecisionRequest payload missing proposal_request.")
-    return validate_json_value(proposal_request)
+    return validate_json_value(_metadata_bearing_proposal_request(request, proposal_request))
+
+
+def _metadata_bearing_proposal_request(
+    request: DecisionRequest,
+    proposal_request: dict[str, JsonValue],
+) -> dict[str, JsonValue]:
+    metadata: dict[str, JsonValue] = {
+        "request_id": request.request_id,
+        "decision_type": request.decision_type,
+        "actor_id": request.actor_id,
+    }
+    for key, value in metadata.items():
+        if key not in proposal_request:
+            continue
+        if proposal_request[key] != value:
+            raise GameLifecycleError(
+                "Parameterized proposal_request metadata must match DecisionRequest."
+            )
+    return {**metadata, **proposal_request}
 
 
 def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest | None:
