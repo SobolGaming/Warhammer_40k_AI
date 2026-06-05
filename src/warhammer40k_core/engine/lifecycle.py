@@ -33,6 +33,9 @@ from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_INTERRUPT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameConfigPayload,
@@ -73,7 +76,10 @@ from warhammer40k_core.engine.phases.command import (
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
     invalid_fight_activation_status,
+    invalid_fight_attack_sequence_selection_status,
     invalid_fight_interrupt_status,
+    invalid_fight_movement_proposal_status,
+    invalid_melee_declaration_status,
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
@@ -173,7 +179,20 @@ _SHOOTING_DECISION_TYPES = frozenset(
     )
 )
 _CHARGE_DECISION_TYPES = frozenset((SELECT_CHARGING_UNIT_DECISION_TYPE,))
-_FIGHT_DECISION_TYPES = frozenset((FIGHT_ACTIVATION_DECISION_TYPE,))
+_FIGHT_DECISION_TYPES = frozenset(
+    (
+        FIGHT_ACTIVATION_DECISION_TYPE,
+        SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+        MOVEMENT_PROPOSAL_DECISION_TYPE,
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    )
+)
 _REACTION_FRAME_DECISION_TYPES = frozenset(
     (
         REACTION_DECISION_TYPE,
@@ -240,7 +259,10 @@ class GameLifecycle:
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=config.ruleset_descriptor
         )
-        self._fight_phase_handler = FightPhaseHandler(ruleset_descriptor=config.ruleset_descriptor)
+        self._fight_phase_handler = FightPhaseHandler(
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+        )
         self._triggered_movement_handler = TriggeredMovementHandler(
             ruleset_descriptor=config.ruleset_descriptor
         )
@@ -346,7 +368,15 @@ class GameLifecycle:
             and stratagem_placement_request is None
         ):
             result.validate_for_request(pending_request)
-            if _is_charge_move_proposal_request(pending_request):
+            if _is_fight_movement_proposal_request(pending_request):
+                malformed_status = invalid_fight_movement_proposal_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                    decisions=self.decision_controller,
+                    ruleset_descriptor=self._require_config().ruleset_descriptor,
+                )
+            elif _is_charge_move_proposal_request(pending_request):
                 malformed_status = invalid_charge_move_proposal_status(
                     state=state,
                     request=pending_request,
@@ -395,17 +425,46 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and pending_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            invalid_status = invalid_melee_declaration_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type
             in (
                 SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
                 SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
             )
         ):
-            invalid_status = self._shooting_phase_handler.invalid_attack_sequence_selection_status(
+            if _fight_attack_sequence_is_active_for_request(
                 state=state,
                 request=pending_request,
-                result=result,
-            )
+            ):
+                invalid_status = invalid_fight_attack_sequence_selection_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                )
+            else:
+                invalid_status = (
+                    self._shooting_phase_handler.invalid_attack_sequence_selection_status(
+                        state=state,
+                        request=pending_request,
+                        result=result,
+                    )
+                )
             if invalid_status is not None:
                 return invalid_status
         if (
@@ -655,6 +714,19 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if (
             record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and _is_fight_movement_proposal_request(record.request)
+        ):
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
+            if fight_status is not None:
+                return fight_status
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
             and _is_charge_move_proposal_request(record.request)
         ):
             charge_status = self._charge_phase_handler.apply_decision(
@@ -675,6 +747,29 @@ class GameLifecycle:
             if movement_status is not None:
                 return movement_status
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
+            if resolves_reaction_frame and fight_status is not None:
+                if fight_status.decision_request is not None:
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=fight_status.decision_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+                else:
+                    self.reaction_queue.resolve_reaction(
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
+            if fight_status is not None:
+                return fight_status
+            return self.advance_until_decision_or_terminal()
         if (
             record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
             and is_mortal_wound_feel_no_pain_request(record.request)
@@ -692,6 +787,32 @@ class GameLifecycle:
                 if explosives_status is not None:
                     return explosives_status
                 return self.advance_until_decision_or_terminal()
+        if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
+            state=state,
+            request=record.request,
+        ):
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
+            if resolves_reaction_frame:
+                if fight_status is not None and fight_status.decision_request is not None:
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=fight_status.decision_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+                else:
+                    self.reaction_queue.resolve_reaction(
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
+            if fight_status is not None:
+                return fight_status
+            return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _SHOOTING_DECISION_TYPES:
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             shooting_status = self._shooting_phase_handler.apply_decision(
@@ -719,6 +840,7 @@ class GameLifecycle:
                 return charge_status
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _FIGHT_DECISION_TYPES:
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             fight_status = self._fight_phase_handler.apply_decision(
                 state=state,
                 result=result,
@@ -726,22 +848,41 @@ class GameLifecycle:
                 reaction_queue=self.reaction_queue,
             )
             if fight_status is not None:
+                if resolves_reaction_frame:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=fight_status,
+                    )
                 return fight_status
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
-            fight_status = self._fight_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.resolve_reaction(
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                self._continue_or_resolve_fight_reaction(
                     result=result,
-                    decisions=self.decision_controller,
+                    status=advanced_status,
                 )
+            return advanced_status
+        if record.request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
             if fight_status is not None:
+                if resolves_reaction_frame:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=fight_status,
+                    )
                 return fight_status
+            if resolves_reaction_frame:
+                advanced_status = self.advance_until_decision_or_terminal()
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=advanced_status,
+                )
+                return advanced_status
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
             triggered_status = self._triggered_movement_handler.apply_decision(
@@ -870,7 +1011,8 @@ class GameLifecycle:
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
             _fight_phase_handler=FightPhaseHandler(
-                ruleset_descriptor=None if config is None else config.ruleset_descriptor
+                ruleset_descriptor=None if config is None else config.ruleset_descriptor,
+                army_catalog=None if config is None else config.army_catalog,
             ),
             _triggered_movement_handler=TriggeredMovementHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
@@ -920,6 +1062,36 @@ class GameLifecycle:
             raise GameLifecycleError("Reaction frame check requires a DecisionResult.")
         frames = self.reaction_queue.frames
         return bool(frames and frames[-1].request_id == result.request_id)
+
+    def _continue_or_resolve_fight_reaction(
+        self,
+        *,
+        result: DecisionResult,
+        status: LifecycleStatus,
+    ) -> None:
+        if type(result) is not DecisionResult:
+            raise GameLifecycleError("Fight reaction handling requires a DecisionResult.")
+        if type(status) is not LifecycleStatus:
+            raise GameLifecycleError("Fight reaction handling requires a LifecycleStatus.")
+        if self._fight_interrupt_activation_is_active() and status.decision_request is not None:
+            self.reaction_queue.continue_reaction(
+                result=result,
+                next_request_id=status.decision_request.request_id,
+                decisions=self.decision_controller,
+            )
+            return
+        self.reaction_queue.resolve_reaction(
+            result=result,
+            decisions=self.decision_controller,
+        )
+
+    def _fight_interrupt_activation_is_active(self) -> bool:
+        state = self._require_state()
+        fight_state = state.fight_phase_state
+        if fight_state is None:
+            return False
+        activation = fight_state.active_activation
+        return activation is not None and activation.interrupt_id is not None
 
     def _record_stratagem_window_declined(self, result: DecisionResult) -> None:
         record = self.decision_controller.record_for_result(result)
@@ -982,6 +1154,66 @@ def _is_charge_move_proposal_request(request: DecisionRequest) -> bool:
         proposal_request.phase == BattlePhase.CHARGE.value
         or proposal_request.proposal_kind is ProposalKind.CHARGE_MOVE
     )
+
+
+def _is_fight_movement_proposal_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Fight proposal routing requires a DecisionRequest.")
+    if request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
+        return False
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    return proposal_request.phase == BattlePhase.FIGHT.value or proposal_request.proposal_kind in {
+        ProposalKind.PILE_IN,
+        ProposalKind.CONSOLIDATE,
+    }
+
+
+def _fight_attack_sequence_is_active_for_request(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+) -> bool:
+    if request.decision_type not in (
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    ):
+        return False
+    fight_state = state.fight_phase_state
+    if fight_state is None or fight_state.attack_sequence is None:
+        return False
+    if request.decision_type in (
+        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    ):
+        return True
+    payload = request.payload
+    if not isinstance(payload, dict):
+        return False
+    sequence_id = payload.get("sequence_id")
+    return type(sequence_id) is str and sequence_id == fight_state.attack_sequence.sequence_id
+
+
+def _fight_decision_owns_request(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+) -> bool:
+    if request.decision_type in {
+        FIGHT_ACTIVATION_DECISION_TYPE,
+        SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    }:
+        return True
+    if _is_fight_movement_proposal_request(request):
+        return True
+    return _fight_attack_sequence_is_active_for_request(state=state, request=request)
 
 
 def _invalid_finite_decision_status(

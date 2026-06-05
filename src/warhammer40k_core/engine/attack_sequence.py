@@ -4,7 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from hashlib import sha256
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -26,6 +26,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     LineOfSightPolicy,
     RulesetDescriptor,
     TerrainFeatureKind,
+    battle_phase_kind_from_token,
 )
 from warhammer40k_core.core.weapon_profiles import (
     AbilityKind,
@@ -312,6 +313,7 @@ class WoundRollPayload(TypedDict):
 
 class AttackSequencePayload(TypedDict):
     sequence_id: str
+    source_phase: NotRequired[str]
     attacker_player_id: str
     attacking_unit_instance_id: str
     attack_pools: list[RangedAttackPoolPayload]
@@ -328,6 +330,7 @@ class AttackSequencePayload(TypedDict):
 
 class AttackResolutionContextPayload(TypedDict):
     sequence_id: str
+    source_phase: str
     attack_context_id: str
     pool_index: int
     attack_index: int
@@ -1365,6 +1368,7 @@ class AttackSequence:
     attacker_player_id: str
     attacking_unit_instance_id: str
     attack_pools: tuple[RangedAttackPool, ...]
+    source_phase: BattlePhase = BattlePhase.SHOOTING
     used_pool_indices: tuple[int, ...] = ()
     selected_target_unit_instance_id: str | None = None
     current_gathered_group: GatheredAttackGroup | None = None
@@ -1380,6 +1384,11 @@ class AttackSequence:
             self,
             "sequence_id",
             _validate_identifier("AttackSequence sequence_id", self.sequence_id),
+        )
+        object.__setattr__(
+            self,
+            "source_phase",
+            battle_phase_kind_from_token(self.source_phase),
         )
         object.__setattr__(
             self,
@@ -1521,9 +1530,11 @@ class AttackSequence:
         attacker_player_id: str,
         attacking_unit_instance_id: str,
         attack_pools: tuple[RangedAttackPool, ...],
+        source_phase: BattlePhase = BattlePhase.SHOOTING,
     ) -> Self:
         return cls(
             sequence_id=sequence_id,
+            source_phase=source_phase,
             attacker_player_id=attacker_player_id,
             attacking_unit_instance_id=attacking_unit_instance_id,
             attack_pools=attack_pools,
@@ -1571,6 +1582,7 @@ class AttackSequence:
                 attacker_player_id=self.attacker_player_id,
                 attacking_unit_instance_id=self.attacking_unit_instance_id,
                 attack_pools=self.attack_pools,
+                source_phase=self.source_phase,
                 used_pool_indices=self.used_pool_indices,
                 selected_target_unit_instance_id=self.selected_target_unit_instance_id,
                 current_gathered_group=self.current_gathered_group,
@@ -1585,6 +1597,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
             current_gathered_group=self.current_gathered_group,
@@ -1612,6 +1625,7 @@ class AttackSequence:
                 attacker_player_id=self.attacker_player_id,
                 attacking_unit_instance_id=self.attacking_unit_instance_id,
                 attack_pools=self.attack_pools,
+                source_phase=self.source_phase,
                 used_pool_indices=self.used_pool_indices,
                 selected_target_unit_instance_id=self.selected_target_unit_instance_id,
                 current_gathered_group=self.current_gathered_group,
@@ -1625,6 +1639,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
             current_gathered_group=self.current_gathered_group,
@@ -1644,6 +1659,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
             current_gathered_group=self.current_gathered_group,
@@ -1667,6 +1683,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
             current_gathered_group=self.current_gathered_group,
@@ -1686,6 +1703,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
             current_gathered_group=self.current_gathered_group,
@@ -1701,6 +1719,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
             current_gathered_group=self.current_gathered_group,
@@ -1718,6 +1737,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=target_id,
             pool_index=_first_unresolved_pool_index_for_target(
@@ -1735,6 +1755,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=None,
             pool_index=next_pool_index,
@@ -1752,6 +1773,7 @@ class AttackSequence:
             attacker_player_id=self.attacker_player_id,
             attacking_unit_instance_id=self.attacking_unit_instance_id,
             attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
             used_pool_indices=self.used_pool_indices,
             selected_target_unit_instance_id=self.selected_target_unit_instance_id,
             current_gathered_group=gathered_group,
@@ -1763,6 +1785,7 @@ class AttackSequence:
     def to_payload(self) -> AttackSequencePayload:
         return {
             "sequence_id": self.sequence_id,
+            "source_phase": self.source_phase.value,
             "attacker_player_id": self.attacker_player_id,
             "attacking_unit_instance_id": self.attacking_unit_instance_id,
             "attack_pools": [pool.to_payload() for pool in self.attack_pools],
@@ -1793,6 +1816,9 @@ class AttackSequence:
     def from_payload(cls, payload: AttackSequencePayload) -> Self:
         return cls(
             sequence_id=payload["sequence_id"],
+            source_phase=battle_phase_kind_from_token(
+                payload.get("source_phase", BattlePhase.SHOOTING.value)
+            ),
             attacker_player_id=payload["attacker_player_id"],
             attacking_unit_instance_id=payload["attacking_unit_instance_id"],
             attack_pools=tuple(
@@ -2065,6 +2091,7 @@ def _select_or_request_next_gathered_group(
             return (
                 AttackSequence(
                     sequence_id=current.sequence_id,
+                    source_phase=current.source_phase,
                     attacker_player_id=current.attacker_player_id,
                     attacking_unit_instance_id=current.attacking_unit_instance_id,
                     attack_pools=current.attack_pools,
@@ -2089,7 +2116,7 @@ def _select_or_request_next_gathered_group(
                         stage=GameLifecycleStage.BATTLE,
                         decision_request=request,
                         payload={
-                            "phase": BattlePhase.SHOOTING.value,
+                            "phase": current.source_phase.value,
                             "decision_type": SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
                             "sequence_id": current.sequence_id,
                         },
@@ -2125,7 +2152,7 @@ def _select_or_request_next_gathered_group(
                     stage=GameLifecycleStage.BATTLE,
                     decision_request=request,
                     payload={
-                        "phase": BattlePhase.SHOOTING.value,
+                        "phase": current.source_phase.value,
                         "decision_type": SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
                         "sequence_id": current.sequence_id,
                         "target_unit_instance_id": target_unit_instance_id,
@@ -2658,7 +2685,7 @@ def _apply_deferred_mortal_wounds(
                     stage=GameLifecycleStage.BATTLE,
                     decision_request=routed.request,
                     payload={
-                        "phase": BattlePhase.SHOOTING.value,
+                        "phase": attack_sequence.source_phase.value,
                         "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                         "sequence_id": attack_sequence.sequence_id,
                         "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
@@ -2758,7 +2785,7 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
                 stage=GameLifecycleStage.BATTLE,
                 decision_request=routed.request,
                 payload={
-                    "phase": BattlePhase.SHOOTING.value,
+                    "phase": attack_sequence.source_phase.value,
                     "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                     "sequence_id": attack_sequence.sequence_id,
                     "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
@@ -2845,7 +2872,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
                 stage=GameLifecycleStage.BATTLE,
                 decision_request=routed.request,
                 payload={
-                    "phase": BattlePhase.SHOOTING.value,
+                    "phase": attack_sequence.source_phase.value,
                     "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                     "sequence_id": attack_sequence.sequence_id,
                     "source_rule_id": routed.progress.source_rule_id,
@@ -3284,6 +3311,7 @@ def _grouped_wounded_contexts_for_pool(
     for attack_index in range(pool.attacks):
         current = AttackSequence(
             sequence_id=attack_sequence.sequence_id,
+            source_phase=attack_sequence.source_phase,
             attacker_player_id=attack_sequence.attacker_player_id,
             attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
             attack_pools=attack_sequence.attack_pools,
@@ -3431,7 +3459,7 @@ def _continue_grouped_allocation_for_wound_contexts(
                         stage=GameLifecycleStage.BATTLE,
                         decision_request=precision_request,
                         payload={
-                            "phase": BattlePhase.SHOOTING.value,
+                            "phase": attack_sequence.source_phase.value,
                             "decision_type": SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
                             "attack_context_id": grouped_attack_context["attack_context_id"],
                         },
@@ -3493,7 +3521,7 @@ def _continue_grouped_allocation_for_wound_contexts(
                 stage=GameLifecycleStage.BATTLE,
                 decision_request=request,
                 payload={
-                    "phase": BattlePhase.SHOOTING.value,
+                    "phase": attack_sequence.source_phase.value,
                     "decision_type": SELECT_ALLOCATION_ORDER_DECISION_TYPE,
                     "attack_context_id": grouped_attack_context["attack_context_id"],
                 },
@@ -3672,7 +3700,7 @@ def _resolve_grouped_damage_from(
                     stage=GameLifecycleStage.BATTLE,
                     decision_request=request,
                     payload={
-                        "phase": BattlePhase.SHOOTING.value,
+                        "phase": attack_sequence.source_phase.value,
                         "decision_type": SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
                         "attack_context_id": attack_context["attack_context_id"],
                         "allocation_group_id": current_group.group_id,
@@ -3835,6 +3863,7 @@ def _advance_after_current_pool(*, attack_sequence: AttackSequence) -> AttackSeq
         )
     return AttackSequence(
         sequence_id=attack_sequence.sequence_id,
+        source_phase=attack_sequence.source_phase,
         attacker_player_id=attack_sequence.attacker_player_id,
         attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
         attack_pools=attack_sequence.attack_pools,
@@ -3857,6 +3886,7 @@ def _attack_sequence_for_context(
         raise GameLifecycleError("Grouped attack context pool drift.")
     return AttackSequence(
         sequence_id=attack_sequence.sequence_id,
+        source_phase=attack_sequence.source_phase,
         attacker_player_id=attack_sequence.attacker_player_id,
         attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
         attack_pools=attack_sequence.attack_pools,
@@ -4204,7 +4234,7 @@ def _resolve_lost_wound_stage(
             stage=GameLifecycleStage.BATTLE,
             decision_request=request,
             payload={
-                "phase": BattlePhase.SHOOTING.value,
+                "phase": attack_sequence.source_phase.value,
                 "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                 "attack_context_id": attack_sequence.attack_context_id(),
             },
@@ -4360,7 +4390,7 @@ def _destruction_reaction_status_if_needed(
         stage=GameLifecycleStage.BATTLE,
         decision_request=request,
         payload={
-            "phase": BattlePhase.SHOOTING.value,
+            "phase": attack_sequence.source_phase.value,
             "decision_type": SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
             "attack_context_id": attack_sequence.attack_context_id(),
             "model_instance_id": damage.model_instance_id,
@@ -4633,7 +4663,7 @@ def _route_deadly_demise_mortal_wounds(
                 stage=GameLifecycleStage.BATTLE,
                 decision_request=routed.request,
                 payload={
-                    "phase": BattlePhase.SHOOTING.value,
+                    "phase": attack_sequence.source_phase.value,
                     "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                     "sequence_id": attack_sequence.sequence_id,
                     "source_rule_id": source.source_rule_id,
@@ -5184,7 +5214,7 @@ def _pre_removal_destruction_reaction_context_payload(
                 "destroyed_model_controller_player_id",
                 destroyed_model_controller_player_id,
             ),
-            "source_phase": BattlePhase.SHOOTING.value,
+            "source_phase": attack_context["source_phase"],
             "source_step": AttackSequenceStep.DAMAGE.value,
             "destroyed_model_rules_triggered": True,
         }
@@ -5215,7 +5245,7 @@ def _destruction_reaction_context_payload(
             "destroyed_model_controller_player_id",
             destroyed_model_controller_player_id,
         ),
-        "source_phase": BattlePhase.SHOOTING.value,
+        "source_phase": attack_context["source_phase"],
         "source_step": AttackSequenceStep.DAMAGE.value,
         "removal_record": validate_json_value(destroyed_emission.removal_record.to_payload()),
         "transition_batch": validate_json_value(destroyed_emission.transition_batch.to_payload()),
@@ -5355,6 +5385,7 @@ def _roll_hit_and_wound(
         )
     return {
         "sequence_id": attack_sequence.sequence_id,
+        "source_phase": attack_sequence.source_phase.value,
         "attack_context_id": attack_context_id,
         "pool_index": attack_sequence.pool_index,
         "attack_index": attack_sequence.attack_index,
@@ -5629,6 +5660,7 @@ def _emit_damage_event(
     if damage is not None and damage.destroyed:
         removal_record = _destroyed_model_removal_record(
             model_instance_id=damage.model_instance_id,
+            source_phase=attack_sequence.source_phase.value,
             source_event_id=damage_event.event_id,
         )
         transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
@@ -5658,12 +5690,13 @@ def _emit_damage_event(
 def _destroyed_model_removal_record(
     *,
     model_instance_id: str,
+    source_phase: str,
     source_event_id: str,
 ) -> ModelRemovalRecord:
     return ModelRemovalRecord(
         model_instance_id=model_instance_id,
         removal_kind=BattlefieldRemovalKind.DESTROYED,
-        source_phase=BattlePhase.SHOOTING.value,
+        source_phase=source_phase,
         source_step=AttackSequenceStep.DAMAGE.value,
         source_rule_id=DAMAGE_ALLOCATION_RULE_ID,
         source_event_id=source_event_id,
@@ -5966,7 +5999,7 @@ def _hazardous_feel_no_pain_status(
         stage=GameLifecycleStage.BATTLE,
         decision_request=request,
         payload={
-            "phase": BattlePhase.SHOOTING.value,
+            "phase": attack_sequence.source_phase.value,
             "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
             "sequence_id": attack_sequence.sequence_id,
             "source_rule_id": HAZARDOUS_RULE_ID,
@@ -6349,7 +6382,7 @@ def build_select_resolve_target_unit_request(
                 "submission_kind": SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
-                "phase": BattlePhase.SHOOTING.value,
+                "phase": attack_sequence.source_phase.value,
                 "sequence_id": attack_sequence.sequence_id,
                 "attacker_player_id": attack_sequence.attacker_player_id,
                 "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
@@ -6396,7 +6429,7 @@ def build_select_attack_weapon_group_request(
                 "submission_kind": SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
-                "phase": BattlePhase.SHOOTING.value,
+                "phase": attack_sequence.source_phase.value,
                 "sequence_id": attack_sequence.sequence_id,
                 "attacker_player_id": attack_sequence.attacker_player_id,
                 "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
@@ -6997,6 +7030,11 @@ def _validate_grouped_request_context_matches_sequence(
 ) -> None:
     if attack_context["sequence_id"] != attack_sequence.sequence_id:
         raise GameLifecycleError(f"{context_name} attack context sequence drift.")
+    if (
+        battle_phase_kind_from_token(attack_context["source_phase"])
+        is not attack_sequence.source_phase
+    ):
+        raise GameLifecycleError(f"{context_name} source phase drift.")
     if attack_context["attack_context_id"] != (
         f"{attack_sequence.sequence_id}:pool-{attack_sequence.pool_index + 1:03d}:grouped"
     ):
@@ -7022,6 +7060,11 @@ def _validate_attack_context_matches_sequence(
         return
     if attack_context["sequence_id"] != attack_sequence.sequence_id:
         raise GameLifecycleError(f"{context_name} attack context sequence drift.")
+    if (
+        battle_phase_kind_from_token(attack_context["source_phase"])
+        is not attack_sequence.source_phase
+    ):
+        raise GameLifecycleError(f"{context_name} source phase drift.")
     if attack_context["attack_context_id"] != attack_sequence.attack_context_id():
         raise GameLifecycleError(f"{context_name} attack context ID drift.")
     if attack_context["pool_index"] != attack_sequence.pool_index:
@@ -7042,6 +7085,11 @@ def _attack_context_matches_pending_grouped_damage(
         return False
     if attack_context["sequence_id"] != attack_sequence.sequence_id:
         return False
+    if (
+        battle_phase_kind_from_token(attack_context["source_phase"])
+        is not attack_sequence.source_phase
+    ):
+        return False
     if attack_context["pool_index"] != attack_sequence.pool_index:
         return False
     if pending.next_index >= len(pending.sorted_save_dice):
@@ -7049,6 +7097,7 @@ def _attack_context_matches_pending_grouped_damage(
     current_context = pending.sorted_save_dice[pending.next_index]["attack_context"]
     return (
         attack_context["attack_context_id"] == current_context["attack_context_id"]
+        and attack_context["source_phase"] == current_context["source_phase"]
         and attack_context["attack_index"] == current_context["attack_index"]
         and attack_context["generated_hit_index"] == current_context["generated_hit_index"]
     )

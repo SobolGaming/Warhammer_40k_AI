@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
 
-from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
+from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     FightEligibilityKind,
+    FightPhaseStepKind,
     FightPolicyDescriptor,
     FightTypeKind,
     RulesetDescriptor,
@@ -18,6 +20,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_order import (
@@ -37,6 +40,10 @@ from warhammer40k_core.engine.fight_order import (
     ResolvedFightInterrupt,
     fight_activation_option_id,
 )
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposalRequest,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -50,6 +57,11 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -57,7 +69,10 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
-from warhammer40k_core.engine.phases.fight import invalid_fight_interrupt_status
+from warhammer40k_core.engine.phases.fight import (
+    invalid_fight_activation_status,
+    invalid_fight_interrupt_status,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
@@ -75,7 +90,7 @@ def test_fight_phase_exposes_source_steps_and_records_json_safe_activation() -> 
         game_id="phase15c-basic",
     )
 
-    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    request = _advance_to_fight_order_request(lifecycle)
     request_payload = cast(dict[str, object], request.payload)
     option_id = fight_activation_option_id(
         unit_instance_id=units["intercessor-1"].unit_instance_id,
@@ -107,11 +122,355 @@ def test_fight_phase_exposes_source_steps_and_records_json_safe_activation() -> 
     ]
     assert option_id in {option.option_id for option in request.options}
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert activation_event["phase15d_resolution"] == "deferred"
-    assert [record.request.decision_type for record in lifecycle.decision_controller.records] == [
-        FIGHT_ACTIVATION_DECISION_TYPE,
-    ]
+    assert "phase15d_resolution" not in activation_event
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    assert lifecycle.decision_controller.records[-1].request.decision_type == (
+        FIGHT_ACTIVATION_DECISION_TYPE
+    )
     assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+
+
+def test_phase15d_lifecycle_accepts_melee_declaration_for_engaged_character() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-lifecycle-melee",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+
+    activation_request = _advance_to_fight_order_request(lifecycle)
+    melee_status = _submit_option(
+        lifecycle,
+        request=activation_request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=units["attacker"].unit_instance_id,
+            fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[0],
+        ),
+        result_id="phase15d-lifecycle-melee-activation",
+    )
+    melee_request = _decision_request(melee_status)
+    accepted_status = _submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id="phase15d-lifecycle-melee-declaration",
+    )
+    requested = _last_event_payload(lifecycle, "melee_declaration_requested")
+    accepted = _last_event_payload(lifecycle, "melee_declaration_accepted")
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert requested["available_weapon_count"] == 1
+    assert accepted["attack_sequence_id"] == (
+        "melee-sequence:phase15d-lifecycle-melee:round-01:"
+        f"{units['attacker'].unit_instance_id}:phase15d-lifecycle-melee-declaration"
+    )
+    assert accepted_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+
+
+def test_phase15d_fight_activation_prevalidation_rejects_drifted_results() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-activation-prevalidation",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    request = _advance_to_fight_order_request(lifecycle)
+    result = DecisionResult.for_request(
+        result_id="phase15d-valid-activation-result",
+        request=request,
+        selected_option_id=fight_activation_option_id(
+            unit_instance_id=units["attacker"].unit_instance_id,
+            fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[0],
+        ),
+    )
+    state = _state(lifecycle)
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+
+    cases = (
+        (replace(result, request_id="phase15d-other-request"), "request_id"),
+        (replace(result, decision_type="other_decision_type"), "decision_type"),
+        (replace(result, actor_id="player-b"), "actor_id"),
+        (replace(result, selected_option_id="phase15d-missing-option"), "selected_option_id"),
+        (replace(result, payload=cast(JsonValue, {"submission_kind": "drifted"})), "payload"),
+    )
+
+    for drifted, expected_field in cases:
+        status = invalid_fight_activation_status(
+            state=state,
+            request=request,
+            result=drifted,
+            ruleset_descriptor=ruleset,
+        )
+
+        assert status is not None
+        assert cast(dict[str, object], status.payload)["field"] == expected_field
+
+    selected_option = request.option_by_id(result.selected_option_id)
+    payload = cast(dict[str, JsonValue], result.payload)
+    current_band = cast(str, payload["ordering_band"])
+    other_band = "fights_first" if current_band == "remaining_combats" else "remaining_combats"
+    missing_unit_id = "army-alpha:missing-fight-unit"
+    missing_unit_option_id = fight_activation_option_id(
+        unit_instance_id=missing_unit_id,
+        fight_type=FightTypeKind.NORMAL,
+    )
+    overrun_option_id = fight_activation_option_id(
+        unit_instance_id=units["attacker"].unit_instance_id,
+        fight_type=FightTypeKind.OVERRUN,
+    )
+    context_payload = cast(dict[str, JsonValue], payload["eligibility_context"])
+    stale_context_payload: dict[str, JsonValue] = {
+        **context_payload,
+        "closest_enemy_distance_inches": 99.0,
+        "more_than_pass_distance_from_all_enemies": True,
+    }
+    payload_cases = (
+        (
+            {**payload, "fight_type": FightTypeKind.OVERRUN.value},
+            result.selected_option_id,
+            "selected_option_id",
+        ),
+        ({**payload, "player_id": "player-b"}, result.selected_option_id, "player_id"),
+        ({**payload, "ordering_band": other_band}, result.selected_option_id, "ordering_band"),
+        (
+            {**payload, "unit_instance_id": missing_unit_id},
+            missing_unit_option_id,
+            "unit_instance_id",
+        ),
+        (
+            {**payload, "eligibility_context": stale_context_payload},
+            result.selected_option_id,
+            "eligibility_context",
+        ),
+        (
+            {**payload, "fight_type": FightTypeKind.OVERRUN.value},
+            overrun_option_id,
+            "fight_type",
+        ),
+    )
+
+    for drifted_payload, option_id, expected_field in payload_cases:
+        drifted_option = replace(
+            selected_option,
+            option_id=option_id,
+            payload=cast(JsonValue, drifted_payload),
+        )
+        status = invalid_fight_activation_status(
+            state=state,
+            request=replace(request, options=(drifted_option,)),
+            result=replace(
+                result,
+                selected_option_id=option_id,
+                payload=cast(JsonValue, drifted_payload),
+            ),
+            ruleset_descriptor=ruleset,
+        )
+
+        assert status is not None
+        assert cast(dict[str, object], status.payload)["field"] == expected_field
+
+    state.fight_phase_state = None
+    missing_state = invalid_fight_activation_status(
+        state=state,
+        request=request,
+        result=result,
+        ruleset_descriptor=ruleset,
+    )
+
+    assert missing_state is not None
+    assert cast(dict[str, object], missing_state.payload)["field"] == "fight_phase_state"
+
+
+def test_phase15d_fight_activation_prevalidation_rejects_stale_eligible_pass_payloads() -> None:
+    lifecycle, _units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(30.0, 20.0),
+        },
+        game_id="phase15d-pass-prevalidation",
+        charge_fights_first_unit_keys=("attacker",),
+    )
+    request = _advance_to_fight_order_request(lifecycle)
+    result = DecisionResult.for_request(
+        result_id="phase15d-valid-pass-result",
+        request=request,
+        selected_option_id=ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
+    )
+    payload = cast(dict[str, JsonValue], result.payload)
+    state = _state(lifecycle)
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+
+    cases = (
+        ({**payload, "eligible_unit_ids": []}, "eligible_unit_ids"),
+        ({**payload, "player_id": "player-b"}, "player_id"),
+        ({**payload, "pass_distance_inches": 99.0}, "pass_distance_inches"),
+    )
+
+    for drifted_payload, expected_field in cases:
+        drifted_options = tuple(
+            replace(option, payload=cast(JsonValue, drifted_payload))
+            if option.option_id == ELIGIBLE_TO_FIGHT_PASS_OPTION_ID
+            else option
+            for option in request.options
+        )
+        drifted_request = replace(request, options=drifted_options)
+        status = invalid_fight_activation_status(
+            state=state,
+            request=drifted_request,
+            result=replace(result, payload=cast(JsonValue, drifted_payload)),
+            ruleset_descriptor=ruleset,
+        )
+
+        assert status is not None
+        assert cast(dict[str, object], status.payload)["field"] == expected_field
+
+
+def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submission() -> None:
+    lifecycle, _units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-lifecycle-invalid-movement",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    context = cast(dict[str, JsonValue], proposal_request.context)
+
+    malformed_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id="phase15d-malformed-fight-movement",
+            payload=cast(JsonValue, {}),
+        ).to_result(request)
+    )
+    missing_witness_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id="phase15d-invalid-fight-movement-no-witness",
+            payload=cast(
+                JsonValue,
+                {
+                    "proposal_request_id": proposal_request.request_id,
+                    "proposal_kind": proposal_request.proposal_kind.value,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "movement_phase_action": proposal_request.movement_phase_action,
+                    "movement_mode": context["movement_mode"],
+                    "pile_in_target_unit_instance_ids": ["army-beta:enemy"],
+                },
+            ),
+        ).to_result(request)
+    )
+
+    malformed_payload = cast(dict[str, object], malformed_status.payload)
+    malformed_validation = cast(
+        dict[str, object],
+        malformed_payload["proposal_validation"],
+    )
+    malformed_violations = cast(list[dict[str, object]], malformed_validation["violations"])
+    missing_witness_payload = cast(dict[str, object], missing_witness_status.payload)
+    missing_witness_validation = cast(
+        dict[str, object],
+        missing_witness_payload["proposal_validation"],
+    )
+    missing_witness_violations = cast(
+        list[dict[str, object]],
+        missing_witness_validation["violations"],
+    )
+
+    assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert malformed_violations[0]["violation_code"] == "proposal_payload_missing_field"
+    assert missing_witness_status.status_kind is LifecycleStatusKind.INVALID
+    assert missing_witness_violations[0]["violation_code"] == "fight_movement_witness_required"
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+
+
+def test_phase15d_lifecycle_rejects_malformed_and_rule_invalid_melee_declarations() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-lifecycle-invalid-melee",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    activation_request = _advance_to_fight_order_request(lifecycle)
+    melee_status = _submit_option(
+        lifecycle,
+        request=activation_request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=units["attacker"].unit_instance_id,
+            fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[0],
+        ),
+        result_id="phase15d-invalid-melee-activation",
+    )
+    melee_request = _decision_request(melee_status)
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+
+    malformed_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=melee_request.request_id,
+            result_id="phase15d-malformed-melee",
+            payload=cast(JsonValue, {}),
+        ).to_result(melee_request)
+    )
+    empty_declaration_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=melee_request.request_id,
+            result_id="phase15d-empty-melee",
+            payload=cast(
+                JsonValue,
+                {
+                    "proposal_request_id": proposal_request.request_id,
+                    "proposal_kind": proposal_request.proposal_kind,
+                    "player_id": proposal_request.actor_id,
+                    "battle_round": proposal_request.battle_round,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "source_decision_request_id": (proposal_request.source_decision_request_id),
+                    "source_decision_result_id": proposal_request.source_decision_result_id,
+                    "declarations": [],
+                },
+            ),
+        ).to_result(melee_request)
+    )
+
+    malformed_payload = cast(dict[str, object], malformed_status.payload)
+    malformed_validation = cast(dict[str, object], malformed_payload["proposal_validation"])
+    malformed_violations = cast(list[dict[str, object]], malformed_validation["violations"])
+    empty_payload = cast(dict[str, object], empty_declaration_status.payload)
+    empty_validation = cast(dict[str, object], empty_payload["proposal_validation"])
+    empty_violations = cast(list[dict[str, object]], empty_validation["violations"])
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    assert malformed_violations[0]["violation_code"] == "proposal_payload_malformed"
+    assert empty_declaration_status.status_kind is LifecycleStatusKind.INVALID
+    assert empty_violations[0]["violation_code"] == "melee_declaration_required"
+    assert lifecycle.decision_controller.queue.pending_requests == (melee_request,)
 
 
 def test_fights_first_resolves_before_remaining_combats_with_active_player_alternation() -> None:
@@ -128,7 +487,7 @@ def test_fights_first_resolves_before_remaining_combats_with_active_player_alter
         fights_first_unit_keys=("alpha-first", "enemy-first"),
     )
 
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
     first_payload = cast(dict[str, object], first_request.payload)
     first_status = _submit_normal_fight(
         lifecycle,
@@ -171,7 +530,7 @@ def test_remaining_combat_returns_to_fights_first_when_new_fights_first_unit_is_
         game_id="phase15c-return-to-fights-first",
         fights_first_unit_keys=("enemy-late-first",),
     )
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
     first_payload = cast(dict[str, object], first_request.payload)
 
     _move_unit_to(lifecycle, unit=units["enemy-late-first"], origin=Pose.at(73.0, 70.0))
@@ -204,7 +563,7 @@ def test_eligible_to_fight_pass_is_offered_only_when_all_eligible_units_are_more
         },
         game_id="phase15c-pass-close",
     )
-    close_request = _decision_request(close_lifecycle.advance_until_decision_or_terminal())
+    close_request = _advance_to_fight_order_request(close_lifecycle)
 
     far_lifecycle, far_units = _fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -216,7 +575,7 @@ def test_eligible_to_fight_pass_is_offered_only_when_all_eligible_units_are_more
         game_id="phase15c-pass-far",
         charge_fights_first_unit_keys=("intercessor-1",),
     )
-    far_request = _decision_request(far_lifecycle.advance_until_decision_or_terminal())
+    far_request = _advance_to_fight_order_request(far_lifecycle)
     pass_status = _submit_option(
         far_lifecycle,
         request=far_request,
@@ -248,7 +607,7 @@ def test_fights_first_pass_does_not_reoffer_same_unit_before_remaining_activatio
         game_id="phase15c-pass-before-remaining",
         charge_fights_first_unit_keys=("alpha-first",),
     )
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
     first_payload = cast(dict[str, object], first_request.payload)
 
     after_pass_status = _submit_option(
@@ -282,7 +641,7 @@ def test_fights_first_pass_completes_phase_when_no_remaining_units_exist() -> No
         game_id="phase15c-pass-completes",
         charge_fights_first_unit_keys=("alpha-first",),
     )
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
 
     status = _submit_option(
         lifecycle,
@@ -326,7 +685,7 @@ def test_fight_activation_options_follow_normal_and_overrun_source_eligibility()
         },
         game_id="phase15c-fight-type-engaged",
     )
-    engaged_request = _decision_request(engaged_lifecycle.advance_until_decision_or_terminal())
+    engaged_request = _advance_to_fight_order_request(engaged_lifecycle)
     engaged_unit_id = engaged_units["intercessor-1"].unit_instance_id
 
     charged_lifecycle, charged_units = _fight_lifecycle(
@@ -339,7 +698,7 @@ def test_fight_activation_options_follow_normal_and_overrun_source_eligibility()
         game_id="phase15c-fight-type-overrun",
         charge_fights_first_unit_keys=("charger",),
     )
-    charged_request = _decision_request(charged_lifecycle.advance_until_decision_or_terminal())
+    charged_request = _advance_to_fight_order_request(charged_lifecycle)
     charged_unit_id = charged_units["charger"].unit_instance_id
 
     assert fight_activation_option_id(
@@ -360,6 +719,47 @@ def test_fight_activation_options_follow_normal_and_overrun_source_eligibility()
     ) in _request_option_ids(charged_request)
 
 
+def test_phase15d_overrun_activation_requests_overrun_pile_in_proposal() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("charger",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "charger": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(30.0, 20.0),
+        },
+        game_id="phase15d-overrun-pile-in",
+        charge_fights_first_unit_keys=("charger",),
+    )
+    request = _advance_to_fight_order_request(lifecycle)
+    charger_id = units["charger"].unit_instance_id
+    status = _submit_option(
+        lifecycle,
+        request=request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=charger_id,
+            fight_type=FightTypeKind.OVERRUN,
+        ),
+        result_id="phase15d-overrun-activation",
+    )
+    movement_request = _decision_request(status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        movement_request.payload
+    )
+    context = cast(dict[str, JsonValue], proposal_request.context)
+    event_payload = _last_event_payload(lifecycle, "overrun_pile_in_requested")
+    activation_payload = cast(dict[str, JsonValue], event_payload["activation_selection"])
+
+    assert movement_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert proposal_request.proposal_kind is ProposalKind.PILE_IN
+    assert proposal_request.unit_instance_id == charger_id
+    assert proposal_request.source_decision_request_id == request.request_id
+    assert proposal_request.source_decision_result_id == "phase15d-overrun-activation"
+    assert context["fight_movement_timing"] == "overrun"
+    assert context["movement_mode"] == ProposalKind.PILE_IN.value
+    assert event_payload["proposal_kind"] == ProposalKind.PILE_IN.value
+    assert activation_payload["fight_type"] == FightTypeKind.OVERRUN.value
+
+
 def test_fight_activation_rejects_when_engagement_context_is_stale() -> None:
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -370,7 +770,7 @@ def test_fight_activation_rejects_when_engagement_context_is_stale() -> None:
         },
         game_id="phase15c-overrun-stale",
     )
-    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    request = _advance_to_fight_order_request(lifecycle)
     state = _state(lifecycle)
     assert state.battlefield_state is not None
     state.battlefield_state = state.battlefield_state.without_unit_placement(
@@ -393,7 +793,10 @@ def test_fight_activation_rejects_when_engagement_context_is_stale() -> None:
     assert status_payload["invalid_reason"] == "invalid_fight_activation_result"
     assert status_payload["field"] == "eligibility_context"
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
-    assert lifecycle.decision_controller.records == ()
+    assert all(
+        record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+        for record in lifecycle.decision_controller.records
+    )
 
 
 def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() -> None:
@@ -407,7 +810,7 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
         game_id="phase15c-interrupt",
         fight_interrupt_unit_keys=("enemy",),
     )
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
     interrupt_status = _submit_normal_fight(
         lifecycle,
         request=first_request,
@@ -419,11 +822,14 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
         unit_instance_id=units["enemy"].unit_instance_id,
         fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[0],
     )
-    completed_status = _submit_option(
+    completed_status = _resolve_phase15d_activation(
         lifecycle,
-        request=interrupt_request,
-        option_id=interrupt_option_id,
-        result_id="phase15c-resolve-interrupt",
+        _submit_option(
+            lifecycle,
+            request=interrupt_request,
+            option_id=interrupt_option_id,
+            result_id="phase15c-resolve-interrupt",
+        ),
     )
 
     assert interrupt_request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE
@@ -452,7 +858,7 @@ def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() 
         game_id="phase15c-interrupt-source-accepted",
         fight_interrupt_unit_keys=("enemy-1",),
     )
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
     interrupt_status = _submit_normal_fight(
         lifecycle,
         request=first_request,
@@ -528,7 +934,7 @@ def test_fight_interrupt_decline_records_once_and_resumes_parent_sequence() -> N
         game_id="phase15c-interrupt-decline",
         fight_interrupt_unit_keys=("enemy",),
     )
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
     interrupt_status = _submit_normal_fight(
         lifecycle,
         request=first_request,
@@ -568,7 +974,7 @@ def test_fight_interrupt_source_is_not_offered_again_after_decline() -> None:
         game_id="phase15c-interrupt-source-declined",
         fight_interrupt_unit_keys=("enemy-1",),
     )
-    first_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    first_request = _advance_to_fight_order_request(lifecycle)
     interrupt_status = _submit_normal_fight(
         lifecycle,
         request=first_request,
@@ -756,6 +1162,7 @@ def test_fight_order_state_rejects_drifted_or_malformed_nested_records() -> None
         FightPhaseState(
             battle_round=1,
             active_player_id="player-a",
+            current_step=FightPhaseStepKind.FIGHT,
             step_states=(),
             fight_order_state=base_order_state,
         )
@@ -805,6 +1212,7 @@ def test_fight_order_state_rejects_drifted_or_malformed_nested_records() -> None
         FightPhaseState(
             battle_round=1,
             active_player_id="player-a",
+            current_step=FightPhaseStepKind.FIGHT,
             step_states=base_state.step_states,
             fight_order_state=base_order_state,
             phase_complete=cast(bool, "false"),
@@ -883,11 +1291,17 @@ def _fight_lifecycle(
     fights_first_unit_keys: tuple[str, ...] = (),
     charge_fights_first_unit_keys: tuple[str, ...] = (),
     fight_interrupt_unit_keys: tuple[str, ...] = (),
+    datasheet_id: str = "core-intercessor-like-infantry",
+    model_profile_id: str = "core-intercessor-like",
+    model_count: int = 5,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = _config(
         game_id=game_id,
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=enemy_unit_ids,
+        datasheet_id=datasheet_id,
+        model_profile_id=model_profile_id,
+        model_count=model_count,
     )
     armies = _mustered_armies(config)
     scenario = create_deterministic_battlefield_scenario(
@@ -963,6 +1377,9 @@ def _config(
     game_id: str,
     alpha_unit_ids: tuple[str, ...],
     enemy_unit_ids: tuple[str, ...],
+    datasheet_id: str,
+    model_profile_id: str,
+    model_count: int,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
@@ -977,12 +1394,18 @@ def _config(
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=alpha_unit_ids,
+                datasheet_id=datasheet_id,
+                model_profile_id=model_profile_id,
+                model_count=model_count,
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=enemy_unit_ids,
+                datasheet_id=datasheet_id,
+                model_profile_id=model_profile_id,
+                model_count=model_count,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1026,6 +1449,9 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    datasheet_id: str,
+    model_profile_id: str,
+    model_count: int,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1037,18 +1463,32 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_id="core-combined-arms",
         ),
-        unit_selections=tuple(_unit_selection(unit_id) for unit_id in unit_selection_ids),
+        unit_selections=tuple(
+            _unit_selection(
+                unit_id,
+                datasheet_id=datasheet_id,
+                model_profile_id=model_profile_id,
+                model_count=model_count,
+            )
+            for unit_id in unit_selection_ids
+        ),
     )
 
 
-def _unit_selection(unit_selection_id: str) -> UnitMusterSelection:
+def _unit_selection(
+    unit_selection_id: str,
+    *,
+    datasheet_id: str,
+    model_profile_id: str,
+    model_count: int,
+) -> UnitMusterSelection:
     return UnitMusterSelection(
         unit_selection_id=unit_selection_id,
-        datasheet_id="core-intercessor-like-infantry",
+        datasheet_id=datasheet_id,
         model_profile_selections=(
             ModelProfileSelection(
-                model_profile_id="core-intercessor-like",
-                model_count=5,
+                model_profile_id=model_profile_id,
+                model_count=model_count,
             ),
         ),
     )
@@ -1167,6 +1607,51 @@ def _player_id_for_unit(unit: UnitInstance) -> str:
     return "player-a" if army_id == "army-alpha" else "player-b"
 
 
+def _advance_to_fight_order_request(lifecycle: GameLifecycle) -> DecisionRequest:
+    return _decision_request(
+        _drain_fight_movement_requests(
+            lifecycle,
+            lifecycle.advance_until_decision_or_terminal(),
+        )
+    )
+
+
+def _drain_fight_movement_requests(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    current = status
+    while (
+        current.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+        and current.decision_request is not None
+        and current.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    ):
+        request = current.decision_request
+        proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+        assert proposal_request.proposal_kind in {
+            ProposalKind.PILE_IN,
+            ProposalKind.CONSOLIDATE,
+        }
+        context = cast(dict[str, JsonValue], proposal_request.context)
+        current = lifecycle.submit_decision(
+            ParameterizedSubmission(
+                request_id=request.request_id,
+                result_id=f"{request.request_id}:phase15c-no-move",
+                payload=cast(
+                    JsonValue,
+                    {
+                        "proposal_request_id": proposal_request.request_id,
+                        "proposal_kind": proposal_request.proposal_kind.value,
+                        "unit_instance_id": proposal_request.unit_instance_id,
+                        "movement_phase_action": proposal_request.movement_phase_action,
+                        "movement_mode": context["movement_mode"],
+                    },
+                ),
+            ).to_result(request)
+        )
+    return current
+
+
 def _submit_normal_fight(
     lifecycle: GameLifecycle,
     *,
@@ -1174,7 +1659,7 @@ def _submit_normal_fight(
     unit: UnitInstance,
     result_id: str,
 ) -> LifecycleStatus:
-    return _submit_option(
+    status = _submit_option(
         lifecycle,
         request=request,
         option_id=fight_activation_option_id(
@@ -1182,6 +1667,100 @@ def _submit_normal_fight(
             fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[0],
         ),
         result_id=result_id,
+    )
+    return _resolve_phase15d_activation(lifecycle, status)
+
+
+def _resolve_phase15d_activation(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    current = status
+    decision_index = 0
+    while (
+        current.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+        and current.decision_request is not None
+    ):
+        request = current.decision_request
+        if request.decision_type in {
+            FIGHT_ACTIVATION_DECISION_TYPE,
+            FIGHT_INTERRUPT_DECISION_TYPE,
+        }:
+            return current
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            return _drain_fight_movement_requests(lifecycle, current)
+        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            current = _submit_minimal_melee_declaration(
+                lifecycle,
+                request=request,
+                result_id=f"{request.request_id}:phase15c-melee",
+            )
+            continue
+        if request.is_parameterized_submission_request():
+            return current
+        if not request.options:
+            return current
+        current = _submit_option(
+            lifecycle,
+            request=request,
+            option_id=request.options[0].option_id,
+            result_id=f"{request.request_id}:phase15c-auto-{decision_index:03d}",
+        )
+        decision_index += 1
+    return current
+
+
+def _submit_minimal_melee_declaration(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    result_id: str,
+) -> LifecycleStatus:
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(request)
+    declarations: list[dict[str, object]] = []
+    primary_model_ids: set[str] = set()
+    for weapon in proposal_request.available_weapons:
+        weapon_payload = cast(dict[str, object], weapon)
+        model_id = cast(str, weapon_payload["model_instance_id"])
+        if model_id in primary_model_ids:
+            continue
+        if weapon_payload["is_extra_attacks"] is True:
+            continue
+        engaged_target_ids = cast(
+            list[str],
+            weapon_payload["engaged_target_unit_instance_ids"],
+        )
+        if not engaged_target_ids:
+            continue
+        primary_model_ids.add(model_id)
+        declarations.append(
+            {
+                "attacker_model_instance_id": model_id,
+                "wargear_id": weapon_payload["wargear_id"],
+                "weapon_profile_id": weapon_payload["weapon_profile_id"],
+                "target_allocations": [
+                    {"target_unit_instance_id": engaged_target_ids[0]},
+                ],
+            }
+        )
+    return lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload=cast(
+                JsonValue,
+                {
+                    "proposal_request_id": proposal_request.request_id,
+                    "proposal_kind": proposal_request.proposal_kind,
+                    "player_id": proposal_request.actor_id,
+                    "battle_round": proposal_request.battle_round,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "source_decision_request_id": (proposal_request.source_decision_request_id),
+                    "source_decision_result_id": proposal_request.source_decision_result_id,
+                    "declarations": declarations,
+                },
+            ),
+        ).to_result(request)
     )
 
 
