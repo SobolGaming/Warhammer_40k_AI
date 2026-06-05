@@ -60,6 +60,7 @@ from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_order import FightPhaseState, FightPhaseStatePayload
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupPayload
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
@@ -203,6 +204,7 @@ class GameStatePayload(TypedDict):
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
     charge_phase_state: ChargePhaseStatePayload | None
+    fight_phase_state: FightPhaseStatePayload | None
     shooting_phase_state: ShootingPhaseStatePayload | None
     out_of_phase_shooting_state: OutOfPhaseShootingStatePayload | None
     feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
@@ -598,6 +600,7 @@ class GameState:
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
     charge_phase_state: ChargePhaseState | None = None
+    fight_phase_state: FightPhaseState | None = None
     shooting_phase_state: ShootingPhaseState | None = None
     out_of_phase_shooting_state: OutOfPhaseShootingState | None = None
     feel_no_pain_sources_by_model_id: dict[str, tuple[FeelNoPainSource, ...]] = field(
@@ -727,6 +730,7 @@ class GameState:
             self.movement_phase_state
         )
         self.charge_phase_state = _validate_optional_charge_phase_state(self.charge_phase_state)
+        self.fight_phase_state = _validate_optional_fight_phase_state(self.fight_phase_state)
         self.shooting_phase_state = _validate_optional_shooting_phase_state(
             self.shooting_phase_state
         )
@@ -1066,6 +1070,8 @@ class GameState:
                 self.shooting_phase_state = None
             if completed_phase is BattlePhase.CHARGE:
                 self.charge_phase_state = None
+            if completed_phase is BattlePhase.FIGHT:
+                self.fight_phase_state = None
             self.out_of_phase_shooting_state = None
             self.battle_phase_index += 1
             self._expire_persisting_effects_at_current_phase_start()
@@ -1094,6 +1100,8 @@ class GameState:
             self.shooting_phase_state = None
         if completed_phase is BattlePhase.CHARGE:
             self.charge_phase_state = None
+        if completed_phase is BattlePhase.FIGHT:
+            self.fight_phase_state = None
         self.out_of_phase_shooting_state = None
         completed_round = self.battle_round
         battle_round_ended = self._active_player_is_last_in_round(completed_player_id)
@@ -1114,6 +1122,7 @@ class GameState:
             self.movement_phase_state = None
             self.shooting_phase_state = None
             self.charge_phase_state = None
+            self.fight_phase_state = None
             self.out_of_phase_shooting_state = None
             return completed_phase
         self.battle_phase_index = 0
@@ -2309,6 +2318,9 @@ class GameState:
             "charge_phase_state": (
                 None if self.charge_phase_state is None else self.charge_phase_state.to_payload()
             ),
+            "fight_phase_state": (
+                None if self.fight_phase_state is None else self.fight_phase_state.to_payload()
+            ),
             "shooting_phase_state": (
                 None
                 if self.shooting_phase_state is None
@@ -2522,6 +2534,11 @@ class GameState:
                 None
                 if payload["charge_phase_state"] is None
                 else ChargePhaseState.from_payload(payload["charge_phase_state"])
+            ),
+            fight_phase_state=(
+                None
+                if payload["fight_phase_state"] is None
+                else FightPhaseState.from_payload(payload["fight_phase_state"])
             ),
             shooting_phase_state=(
                 None
@@ -3035,6 +3052,16 @@ def _validate_optional_charge_phase_state(
         return None
     if type(value) is not ChargePhaseState:
         raise GameLifecycleError("GameState charge_phase_state must be a ChargePhaseState.")
+    return value
+
+
+def _validate_optional_fight_phase_state(
+    value: object | None,
+) -> FightPhaseState | None:
+    if value is None:
+        return None
+    if type(value) is not FightPhaseState:
+        raise GameLifecycleError("GameState fight_phase_state must be a FightPhaseState.")
     return value
 
 

@@ -31,7 +31,13 @@ from warhammer40k_core.engine.charge_declaration import (
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.fight_order import FIGHT_ACTIVATION_DECISION_TYPE
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -63,6 +69,7 @@ from warhammer40k_core.engine.phases.charge import (
     resolve_charge_move,
 )
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
@@ -217,8 +224,10 @@ def test_charge_roll_with_no_reachable_targets_resolves_without_model_movement()
     after_state = _state(lifecycle)
     assert after_state.battlefield_state is not None
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert after_state.current_battle_phase is BattlePhase.FIGHT
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert after_state.current_battle_phase is BattlePhase.MOVEMENT
     assert after_state.charge_phase_state is None
     assert roll_result.move_available is False
     assert roll_result.status == CHARGE_NO_MOVE_POSSIBLE_STATUS
@@ -278,7 +287,9 @@ def test_phase15b_charge_move_proposal_applies_witness_records_displacements_and
     after_state = _state(lifecycle)
     assert after_state.battlefield_state is not None
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
     assert after_state.current_battle_phase is BattlePhase.FIGHT
     assert after_state.charge_phase_state is None
     assert after_state.battlefield_state.to_payload() != before_battlefield
@@ -335,8 +346,10 @@ def test_phase15b_charge_move_no_move_choice_records_decline_without_mutation() 
     after_state = _state(lifecycle)
     assert after_state.battlefield_state is not None
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert after_state.current_battle_phase is BattlePhase.FIGHT
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert after_state.current_battle_phase is BattlePhase.MOVEMENT
     assert after_state.charge_phase_state is None
     assert after_state.battlefield_state.to_payload() == before_battlefield
     assert after_state.persisting_effects_for_unit(units["intercessor-1"].unit_instance_id) == ()
@@ -948,10 +961,12 @@ def test_charge_phase_completion_option_records_skipped_units_and_advances() -> 
     completed = _last_event_payload(lifecycle, "charge_phase_completed")
     state = _state(lifecycle)
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert state.current_battle_phase is BattlePhase.FIGHT
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
     assert state.charge_phase_state is None
-    assert lifecycle.decision_controller.queue.pending_requests == ()
+    assert lifecycle.decision_controller.queue.pending_requests == (status.decision_request,)
     assert completion_declared["phase_body_status"] == "charge_phase_complete"
     assert completion_declared["skipped_unit_ids"] == [units["intercessor-1"].unit_instance_id]
     assert completed["phase_body_status"] == "charge_phase_complete"
@@ -1384,6 +1399,14 @@ def _charge_lifecycle(
     for army in armies:
         state.record_army_definition(army)
     state.record_battlefield_state(battlefield)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
