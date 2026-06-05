@@ -1158,6 +1158,23 @@ def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() ->
     assert stale.payload == {"invalid_reason": "stale_phase"}
 
 
+def test_stratagem_target_pending_proposal_projection_includes_request_metadata() -> None:
+    lifecycle = _battle_lifecycle()
+    request = _parameterized_request(lifecycle)
+    proposal_request = _proposal_request_from_decision(request)
+    view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
+    pending_proposal = cast(dict[str, object], view["pending_proposal"])
+
+    assert view["pending_decision"] is not None
+    assert view["pending_decision"]["request_id"] == request.request_id
+    assert pending_proposal["request_id"] == request.request_id
+    assert pending_proposal["decision_type"] == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert pending_proposal["actor_id"] == request.actor_id
+    assert pending_proposal["proposal_kind"] == proposal_request.proposal_kind
+    assert pending_proposal["context"] == proposal_request.context.to_payload()
+    assert pending_proposal["catalog_record"] == proposal_request.catalog_record.to_payload()
+
+
 def test_parameterized_stratagem_proposal_uses_actual_restriction_policy() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)

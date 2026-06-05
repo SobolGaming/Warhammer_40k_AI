@@ -185,8 +185,10 @@ def test_parameterized_normal_move_proposal_request_matches_golden_fixture() -> 
         )
     )
     proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    view = session.view(viewer_player_id=proposal.actor_id)
 
     assert proposal.to_payload() == _golden_json("phase11d_normal_move_proposal_request.json")
+    assert view["pending_proposal"] == proposal.to_payload()
 
 
 def test_invalid_movement_proposal_returns_typed_invalid_without_mutation() -> None:
@@ -1203,6 +1205,27 @@ def test_projection_and_local_session_boundaries_are_fail_fast() -> None:
     )
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
         project_game_view(lifecycle=empty_lifecycle, viewer_player_id="player-a")
+
+    mismatched_lifecycle = GameLifecycle(
+        state=_session_state(session),
+        parameterized_movement_proposals=session.lifecycle.parameterized_movement_proposals,
+    )
+    mismatched_lifecycle.decision_controller.request_decision(
+        DecisionRequest(
+            request_id="phase11d-mismatched-parameterized-request",
+            decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id="player-a",
+            payload={
+                "proposal_request": {
+                    "request_id": "phase11d-other-parameterized-request",
+                    "proposal_kind": ProposalKind.NORMAL_MOVE.value,
+                }
+            },
+            options=(parameterized_decision_option(),),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="metadata must match DecisionRequest"):
+        project_game_view(lifecycle=mismatched_lifecycle, viewer_player_id="player-a")
 
 
 def _local_session_at_first_movement_action() -> tuple[LocalGameSession, DecisionRequest]:
