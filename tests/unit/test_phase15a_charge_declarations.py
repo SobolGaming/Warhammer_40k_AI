@@ -215,6 +215,93 @@ def test_charge_phase_completion_option_records_skipped_units_and_advances() -> 
     assert _event_payloads(lifecycle, "charge_roll_resolved") == ()
 
 
+def test_stale_charging_unit_selection_after_advance_rejects_before_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-stale-advanced",
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    state = _state(lifecycle)
+    state.record_advanced_unit_state(_advanced_unit_state(units["intercessor-1"].unit_instance_id))
+
+    status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15a-stale-advanced-submit",
+    )
+
+    _assert_invalid_charge_submission_keeps_pending_clean(
+        lifecycle,
+        request=selection_request,
+        status=status,
+        expected_field="unit_instance_id",
+    )
+
+
+def test_stale_charging_unit_selection_after_target_drift_rejects_before_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-stale-target",
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        _unit_placement_at(
+            units["enemy"],
+            army_id="army-beta",
+            player_id="player-b",
+            poses=_compact_test_unit_poses(
+                origin=Pose.at(80.0, 80.0, facing_degrees=180.0),
+                model_count=len(units["enemy"].own_models),
+            ),
+        )
+    )
+
+    status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15a-stale-target-submit",
+    )
+
+    _assert_invalid_charge_submission_keeps_pending_clean(
+        lifecycle,
+        request=selection_request,
+        status=status,
+        expected_field="unit_instance_id",
+    )
+
+
+def test_stale_charge_phase_completion_rejects_skipped_unit_drift_before_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-stale-complete",
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    state = _state(lifecycle)
+    state.record_advanced_unit_state(_advanced_unit_state(units["intercessor-1"].unit_instance_id))
+
+    status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=COMPLETE_CHARGE_PHASE_OPTION_ID,
+        result_id="phase15a-stale-complete-submit",
+    )
+
+    _assert_invalid_charge_submission_keeps_pending_clean(
+        lifecycle,
+        request=selection_request,
+        status=status,
+        expected_field="skipped_unit_ids",
+    )
+    assert _event_payloads(lifecycle, "charge_phase_completion_declared") == ()
+
+
 def test_charge_phase_filters_ineligible_units() -> None:
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=(
@@ -717,6 +804,25 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _assert_invalid_charge_submission_keeps_pending_clean(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    status: LifecycleStatus,
+    expected_field: str,
+) -> None:
+    payload = cast(dict[str, object], status.payload)
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert payload["invalid_reason"] == "invalid_charging_unit_result"
+    assert payload["field"] == expected_field
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert lifecycle.decision_controller.records == ()
+    assert _event_payloads(lifecycle, "charging_unit_selected") == ()
+    assert _event_payloads(lifecycle, "charge_roll_resolved") == ()
+    assert _event_payloads(lifecycle, "charge_move_required") == ()
+    assert _event_payloads(lifecycle, "charge_no_move_possible") == ()
 
 
 def _state(lifecycle: GameLifecycle) -> GameState:

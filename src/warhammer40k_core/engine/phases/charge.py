@@ -411,6 +411,70 @@ class ChargePhaseHandler:
         raise GameLifecycleError("Charge phase received unsupported decision type.")
 
 
+def invalid_charging_unit_selection_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    invalid_status = _invalid_charging_unit_finite_decision_status(
+        state=state,
+        request=request,
+        result=result,
+    )
+    if invalid_status is not None:
+        return invalid_status
+    charge_state = state.charge_phase_state
+    if charge_state is None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charging unit selection has no active charge phase state.",
+            payload={
+                "invalid_reason": "invalid_charging_unit_result",
+                "field": "charge_phase_state",
+            },
+        )
+    current_legal_ids = _legal_charging_unit_ids(
+        state=state,
+        charge_state=charge_state,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+    payload = _decision_payload_object(result.payload)
+    if result.selected_option_id == COMPLETE_CHARGE_PHASE_OPTION_ID:
+        submitted_skipped = _payload_identifier_list(payload, key="skipped_unit_ids")
+        if submitted_skipped != current_legal_ids:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Charge phase completion skipped units no longer match legal units.",
+                payload={
+                    "invalid_reason": "invalid_charging_unit_result",
+                    "field": "skipped_unit_ids",
+                },
+            )
+        return None
+    selected_unit_id = _payload_string(payload, key="unit_instance_id")
+    if selected_unit_id != result.selected_option_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charging unit selection payload does not match the selected option.",
+            payload={
+                "invalid_reason": "invalid_charging_unit_result",
+                "field": "unit_instance_id",
+            },
+        )
+    if selected_unit_id not in current_legal_ids:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charging unit selection is no longer legal.",
+            payload={
+                "invalid_reason": "invalid_charging_unit_result",
+                "field": "unit_instance_id",
+            },
+        )
+    return None
+
+
 def _apply_charging_unit_selection_decision(
     *,
     state: GameState,
@@ -426,11 +490,8 @@ def _apply_charging_unit_selection_decision(
     if charge_state is None:
         raise GameLifecycleError("Charging unit selection requires charge_phase_state.")
     if result.selected_option_id == COMPLETE_CHARGE_PHASE_OPTION_ID:
-        skipped_unit_ids = _legal_charging_unit_ids(
-            state=state,
-            charge_state=charge_state,
-            ruleset_descriptor=ruleset_descriptor,
-        )
+        payload = _decision_payload_object(result.payload)
+        skipped_unit_ids = _payload_identifier_list(payload, key="skipped_unit_ids")
         state.charge_phase_state = charge_state.with_phase_complete(
             skipped_unit_ids=skipped_unit_ids,
         )
@@ -917,6 +978,66 @@ def _payload_string(payload: dict[str, object], *, key: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Payload field {key} must be a string.")
     return _validate_identifier(key, value)
+
+
+def _payload_identifier_list(payload: dict[str, object], *, key: str) -> tuple[str, ...]:
+    value = payload.get(key)
+    if type(value) is not list:
+        raise GameLifecycleError(f"Payload field {key} must be a list.")
+    raw_values = cast(list[object], value)
+    validated = tuple(_validate_identifier(key, raw_value) for raw_value in raw_values)
+    if len(set(validated)) != len(validated):
+        raise GameLifecycleError(f"Payload field {key} must not contain duplicates.")
+    return tuple(sorted(validated))
+
+
+def _invalid_charging_unit_finite_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if result.request_id != request.request_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result does not match the pending charge request.",
+            payload={"invalid_reason": "invalid_charging_unit_result", "field": "request_id"},
+        )
+    if result.decision_type != request.decision_type:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result type does not match the pending charge request.",
+            payload={"invalid_reason": "invalid_charging_unit_result", "field": "decision_type"},
+        )
+    if result.actor_id != request.actor_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result actor does not match the pending charge request.",
+            payload={"invalid_reason": "invalid_charging_unit_result", "field": "actor_id"},
+        )
+    selected_payload: JsonValue = None
+    selected_option_found = False
+    for option in request.options:
+        if option.option_id == result.selected_option_id:
+            selected_payload = option.payload
+            selected_option_found = True
+            break
+    if not selected_option_found:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result selected option is not pending for charge.",
+            payload={
+                "invalid_reason": "invalid_charging_unit_result",
+                "field": "selected_option_id",
+            },
+        )
+    if result.payload != selected_payload:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result payload does not match the pending charge option.",
+            payload={"invalid_reason": "invalid_charging_unit_result", "field": "payload"},
+        )
+    return None
 
 
 def _ruleset_descriptor_for_handler(handler: ChargePhaseHandler) -> RulesetDescriptor:

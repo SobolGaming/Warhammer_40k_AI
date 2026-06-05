@@ -58,6 +58,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
     ChargePhaseHandler,
+    invalid_charging_unit_selection_status,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -392,6 +393,19 @@ class GameLifecycle:
                 state=state,
                 request=pending_request,
                 result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
+        ):
+            invalid_status = invalid_charging_unit_selection_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
             )
             if invalid_status is not None:
                 return invalid_status
