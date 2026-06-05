@@ -42,6 +42,7 @@ class ProposalKind(StrEnum):
     NORMAL_MOVE = "normal_move"
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
+    CHARGE_MOVE = "charge_move"
     REINFORCEMENT = "reinforcement_placement"
     DEEP_STRIKE = "deep_strike_placement"
     STRATEGIC_RESERVES = "strategic_reserves_placement"

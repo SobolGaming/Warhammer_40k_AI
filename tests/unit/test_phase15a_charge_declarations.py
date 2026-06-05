@@ -6,12 +6,17 @@ from typing import cast
 
 import pytest
 
-from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
+from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldScenario,
+    ModelDisplacementKind,
+    ModelPlacement,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
     CHARGE_NO_MOVE_POSSIBLE_STATUS,
@@ -25,6 +30,7 @@ from warhammer40k_core.engine.charge_declaration import (
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -33,6 +39,12 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_legality import MovementLegalityContext
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -43,8 +55,12 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import (
     COMPLETE_CHARGE_PHASE_OPTION_ID,
     SELECT_CHARGING_UNIT_DECISION_TYPE,
+    ChargeEndpointWitness,
+    ChargeMoveProposal,
+    ChargeMoveResolution,
     ChargePhaseState,
     ChargingUnitSelection,
+    resolve_charge_move,
 )
 from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
@@ -56,8 +72,16 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+from warhammer40k_core.engine.unit_coherency import MovementRollbackRecord, UnitCoherencyResult
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.pathing import (
+    PathValidationResult,
+    PathWitness,
+    TerrainPathLegalityResult,
+)
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.volume import Model, ModelVolume
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
 
@@ -95,7 +119,17 @@ def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() 
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    proposal = MovementProposalRequest.from_decision_request_payload(
+        status.decision_request.payload
+    )
+    assert status.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert proposal.proposal_kind is ProposalKind.CHARGE_MOVE
+    assert proposal.phase == BattlePhase.CHARGE.value
+    assert proposal.movement_phase_action == "charge_move"
+    assert proposal.unit_instance_id == units["intercessor-1"].unit_instance_id
+    assert cast(dict[str, object], proposal.context)["movement_mode"] == "charge"
     assert [record.request.decision_type for record in lifecycle.decision_controller.records] == [
         SELECT_CHARGING_UNIT_DECISION_TYPE,
     ]
@@ -103,6 +137,7 @@ def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() 
     assert "charge_declaration_accepted" not in event_types
     assert "charge_roll_resolved" in event_types
     assert "charge_move_required" in event_types
+    assert "charge_move_proposal_requested" in event_types
     assert roll_result.request.unit_instance_id == units["intercessor-1"].unit_instance_id
     assert roll_result.move_available is True
     assert units["enemy"].unit_instance_id in roll_result.reachable_target_distances_inches
@@ -136,10 +171,19 @@ def test_successful_charge_roll_creates_phase15b_movement_boundary() -> None:
     status_payload = cast(dict[str, object], status.payload)
     repeated_payload = cast(dict[str, object], repeated_status.payload)
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert status_payload["phase_body_status"] == "charge_move_pending_phase15b"
-    assert repeated_status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert repeated_payload["phase_body_status"] == "charge_move_pending_phase15b"
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    proposal = MovementProposalRequest.from_decision_request_payload(
+        status.decision_request.payload
+    )
+    assert status.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert proposal.proposal_kind is ProposalKind.CHARGE_MOVE
+    assert proposal.unit_instance_id == units["intercessor-1"].unit_instance_id
+    assert status_payload["phase_body_status"] == "charge_move_proposal_required"
+    assert status_payload["reachable_target_unit_instance_ids"] == [units["enemy"].unit_instance_id]
+    assert repeated_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert repeated_status.decision_request == status.decision_request
+    assert repeated_payload["pending_request_id"] == status.decision_request.request_id
     assert roll_result.move_available is True
     assert roll_result.status == CHARGE_MOVE_PENDING_STATUS
     assert pending_distance_state is not None
@@ -185,6 +229,705 @@ def test_charge_roll_with_no_reachable_targets_resolves_without_model_movement()
         not _payload_has_displacements(cast(dict[str, object], event.payload))
         for event in lifecycle.decision_controller.event_log.records
     )
+
+
+def test_phase15b_charge_move_proposal_applies_witness_records_displacements_and_fights_first() -> (
+    None
+):
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-success-charge",
+    )
+    proposal_request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15b-select-success",
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+    target_unit_id = units["enemy"].unit_instance_id
+    witness = _charge_path_witness_for_unit(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        dx=3.0,
+    )
+
+    status = _submit_charge_move_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase15b-submit-success",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=proposal.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(target_unit_id,),
+            witness=witness,
+        ),
+    )
+    completed = _last_event_payload(lifecycle, "charge_move_completed")
+    transition_batch = cast(dict[str, object], completed["transition_batch"])
+    displacements = cast(list[dict[str, object]], transition_batch["displacements"])
+    endpoint_witness = cast(dict[str, object], completed["endpoint_witness"])
+    persisting_effect = cast(dict[str, object], completed["persisting_effect"])
+    effect_payload = cast(dict[str, object], persisting_effect["effect_payload"])
+    after_state = _state(lifecycle)
+    assert after_state.battlefield_state is not None
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert after_state.current_battle_phase is BattlePhase.FIGHT
+    assert after_state.charge_phase_state is None
+    assert after_state.battlefield_state.to_payload() != before_battlefield
+    assert len(displacements) == len(units["intercessor-1"].own_models)
+    assert {record["displacement_kind"] for record in displacements} == {"charge_move"}
+    assert {record["source_phase"] for record in displacements} == {"charge"}
+    assert {record["source_step"] for record in displacements} == {"charge_move"}
+    assert all(record["path_witness"] is not None for record in displacements)
+    assert endpoint_witness["engaged_target_unit_instance_ids"] == [target_unit_id]
+    assert endpoint_witness["preferred_distance_target_unit_instance_ids"] == [target_unit_id]
+    assert endpoint_witness["non_target_engaged_unit_instance_ids"] == []
+    assert persisting_effect["started_phase"] == "charge"
+    assert cast(dict[str, object], persisting_effect["expiration"])["expiration_kind"] == "end_turn"
+    assert effect_payload["effect_kind"] == "charge_grants_fights_first"
+    assert after_state.persisting_effects_for_unit(units["intercessor-1"].unit_instance_id)
+    assert [record.request.decision_type for record in lifecycle.decision_controller.records] == [
+        SELECT_CHARGING_UNIT_DECISION_TYPE,
+        MOVEMENT_PROPOSAL_DECISION_TYPE,
+    ]
+    assert _event_payloads(lifecycle, "charge_move_invalid") == ()
+
+
+def test_phase15b_charge_move_no_move_choice_records_decline_without_mutation() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-success-charge",
+    )
+    proposal_request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15b-select-no-move",
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+
+    status = _submit_charge_move_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase15b-submit-no-move",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=proposal.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(),
+            witness=None,
+        ),
+    )
+    declined = _last_event_payload(lifecycle, "charge_move_declined")
+    after_state = _state(lifecycle)
+    assert after_state.battlefield_state is not None
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert after_state.current_battle_phase is BattlePhase.FIGHT
+    assert after_state.charge_phase_state is None
+    assert after_state.battlefield_state.to_payload() == before_battlefield
+    assert after_state.persisting_effects_for_unit(units["intercessor-1"].unit_instance_id) == ()
+    assert declined["phase_body_status"] == "charge_move_declined"
+    assert _event_payloads(lifecycle, "charge_move_completed") == ()
+    assert _event_payloads(lifecycle, "charge_move_invalid") == ()
+
+
+def test_phase15b_charge_target_without_witness_rejects_before_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-success-charge",
+    )
+    proposal_request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15b-select-missing-witness",
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+
+    status = _submit_charge_move_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase15b-submit-missing-witness",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=proposal.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+            witness=None,
+        ),
+    )
+    invalid = _last_event_payload(lifecycle, "charge_move_proposal_invalid")
+    proposal_validation = cast(dict[str, object], invalid["proposal_validation"])
+    violations = cast(list[dict[str, object]], proposal_validation["violations"])
+    after_state = _state(lifecycle)
+    assert after_state.battlefield_state is not None
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
+    assert len(lifecycle.decision_controller.records) == 1
+    assert after_state.battlefield_state.to_payload() == before_battlefield
+    assert violations[0]["violation_code"] == "charge_move_witness_required"
+    assert _event_payloads(lifecycle, "charge_move_invalid") == ()
+
+
+def test_phase15b_endpoint_only_charge_witness_records_rejected_attempt_and_retries() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-success-charge",
+    )
+    proposal_request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15b-select-success",
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+
+    status = _submit_charge_move_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase15b-submit-endpoint-only",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=proposal.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+            witness=_charge_path_witness_for_unit(
+                lifecycle,
+                unit_instance_id=units["intercessor-1"].unit_instance_id,
+                dx=3.0,
+                endpoint_only=True,
+            ),
+        ),
+    )
+    invalid = _last_event_payload(lifecycle, "charge_move_invalid")
+    retry_request = lifecycle.decision_controller.queue.pending_requests[0]
+    after_state = _state(lifecycle)
+    assert after_state.battlefield_state is not None
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], status.payload)["violation_code"] == "endpoint_only_path"
+    assert invalid["violation_code"] == "endpoint_only_path"
+    assert retry_request.request_id != proposal_request.request_id
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert len(lifecycle.decision_controller.records) == 2
+    assert after_state.battlefield_state.to_payload() == before_battlefield
+    assert len(_event_payloads(lifecycle, "charge_move_proposal_requested")) == 2
+
+
+def test_phase15b_charge_move_rejects_non_target_engagement_without_mutation() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        enemy_unit_ids=("enemy-1", "enemy-2"),
+        enemy_origins={
+            "enemy-1": Pose.at(20.0, 20.0, facing_degrees=180.0),
+            "enemy-2": Pose.at(18.6, 22.1, facing_degrees=180.0),
+        },
+        game_id="phase15a-success-charge",
+    )
+    proposal_request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15b-select-success",
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+
+    status = _submit_charge_move_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase15b-submit-non-target-engagement",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=proposal.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(units["enemy-1"].unit_instance_id,),
+            witness=_charge_path_witness_for_unit(
+                lifecycle,
+                unit_instance_id=units["intercessor-1"].unit_instance_id,
+                dx=3.0,
+            ),
+        ),
+    )
+    invalid = _last_event_payload(lifecycle, "charge_move_invalid")
+    endpoint_witness = cast(dict[str, object], invalid["endpoint_witness"])
+    after_state = _state(lifecycle)
+    assert after_state.battlefield_state is not None
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid["violation_code"] == "charge_non_target_engaged"
+    assert endpoint_witness["non_target_engaged_unit_instance_ids"] == [
+        units["enemy-2"].unit_instance_id
+    ]
+    assert after_state.battlefield_state.to_payload() == before_battlefield
+    assert len(lifecycle.decision_controller.records) == 2
+    assert lifecycle.decision_controller.queue.pending_requests[0].request_id != (
+        proposal_request.request_id
+    )
+
+
+def test_phase15b_charge_movement_legality_applies_fly_transit_policy() -> None:
+    ruleset_descriptor = RulesetDescriptor.warhammer_40000_eleventh(
+        descriptor_version="core-v2-phase15b-fly-test"
+    )
+    walking_context = MovementLegalityContext.from_keywords(
+        keywords=(),
+        ruleset_descriptor=ruleset_descriptor,
+        movement_mode=MovementMode.CHARGE,
+        movement_phase_action=None,
+        displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+    )
+    flying_context = MovementLegalityContext.from_keywords(
+        keywords=("FLY",),
+        ruleset_descriptor=ruleset_descriptor,
+        movement_mode=MovementMode.CHARGE,
+        movement_phase_action=None,
+        displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+    )
+
+    moving_model = Model(
+        model_id="fly-check-model",
+        pose=Pose.at(1.0, 1.0),
+        base=CircularBase(radius=0.5),
+        volume=ModelVolume(height=2.0),
+    )
+    witness = PathWitness.for_paths((("fly-check-model", (Pose.at(1.0, 1.0), Pose.at(2.0, 1.0))),))
+    walking_path_context = walking_context.to_path_validation_context(
+        moving_model=moving_model,
+        witness=witness,
+        battlefield_width_inches=44.0,
+        battlefield_depth_inches=44.0,
+    )
+    flying_path_context = flying_context.to_path_validation_context(
+        moving_model=moving_model,
+        witness=witness,
+        battlefield_width_inches=44.0,
+        battlefield_depth_inches=44.0,
+    )
+
+    assert walking_path_context.to_payload()["may_transit_enemy_models"] is False
+    assert flying_path_context.to_payload()["may_transit_enemy_models"] is True
+    assert flying_path_context.to_payload()["may_transit_enemy_engagement"] is True
+
+
+def test_phase15b_charge_move_proposal_value_object_rejects_request_drift() -> None:
+    request = _charge_move_proposal_request_for_value_tests()
+    witness = PathWitness.for_paths((("model-a", (Pose.at(1.0, 1.0), Pose.at(2.0, 1.0))),))
+    valid_proposal = ChargeMoveProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        unit_instance_id="unit-a",
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=("target-a",),
+        witness=witness,
+    )
+
+    round_tripped = ChargeMoveProposal.from_payload(valid_proposal.to_payload())
+
+    assert round_tripped == valid_proposal
+    assert valid_proposal.validation_result_for_request(request).is_valid
+    assert (
+        replace(valid_proposal, proposal_request_id="request-b")
+        .validation_result_for_request(request)
+        .violations[0]
+        .violation_code
+        == "stale_proposal_request"
+    )
+    assert (
+        valid_proposal.validation_result_for_request(
+            replace(request, proposal_kind=ProposalKind.NORMAL_MOVE)
+        )
+        .violations[0]
+        .violation_code
+        == "proposal_kind_drift"
+    )
+    assert (
+        replace(valid_proposal, unit_instance_id="unit-b")
+        .validation_result_for_request(request)
+        .violations[0]
+        .violation_code
+        == "proposal_unit_drift"
+    )
+    assert (
+        valid_proposal.validation_result_for_request(
+            replace(request, movement_phase_action="normal_move")
+        )
+        .violations[0]
+        .violation_code
+        == "proposal_action_drift"
+    )
+    assert (
+        valid_proposal.validation_result_for_request(
+            replace(
+                request,
+                context={
+                    **dict(request.context or {}),
+                    "movement_mode": "normal",
+                },
+            )
+        )
+        .violations[0]
+        .violation_code
+        == "proposal_movement_mode_drift"
+    )
+    assert replace(
+        valid_proposal,
+        charge_target_unit_instance_ids=("target-b",),
+    ).validation_result_for_request(request).violations[0].violation_code == (
+        "charge_target_not_reachable"
+    )
+    assert replace(
+        valid_proposal,
+        charge_target_unit_instance_ids=(),
+    ).validation_result_for_request(request).violations[0].violation_code == (
+        "no_move_witness_forbidden"
+    )
+    assert (
+        replace(valid_proposal, witness=None)
+        .validation_result_for_request(request)
+        .violations[0]
+        .violation_code
+        == "charge_move_witness_required"
+    )
+
+
+def test_phase15b_charge_move_proposal_value_object_rejects_malformed_fields() -> None:
+    request = _charge_move_proposal_request_for_value_tests()
+    witness = PathWitness.for_paths((("model-a", (Pose.at(1.0, 1.0), Pose.at(2.0, 1.0))),))
+    valid_proposal = ChargeMoveProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        unit_instance_id="unit-a",
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=("target-a",),
+        witness=witness,
+    )
+
+    with pytest.raises(GameLifecycleError, match="proposal_kind must be charge_move"):
+        replace(valid_proposal, proposal_kind=ProposalKind.NORMAL_MOVE)
+    with pytest.raises(GameLifecycleError, match="movement_mode must be charge"):
+        replace(valid_proposal, movement_mode=MovementMode.NORMAL)
+    with pytest.raises(GameLifecycleError, match="movement_phase_action must be charge_move"):
+        replace(valid_proposal, movement_phase_action="normal_move")
+    with pytest.raises(GameLifecycleError, match="must not contain duplicates"):
+        replace(valid_proposal, charge_target_unit_instance_ids=("target-a", "target-a"))
+    with pytest.raises(GameLifecycleError, match="witness must be a PathWitness"):
+        replace(valid_proposal, witness=cast(PathWitness, object()))
+    with pytest.raises(GameLifecycleError, match="Unsupported ProposalKind token"):
+        ChargeMoveProposal.from_payload(
+            {
+                **valid_proposal.to_payload(),
+                "proposal_kind": "bad-proposal-kind",
+            }
+        )
+
+
+def test_phase15b_charge_endpoint_witness_payload_sorts_and_rejects_malformed_fields() -> None:
+    witness = ChargeEndpointWitness(
+        selected_target_unit_instance_ids=("target-b", "target-a"),
+        target_distances_before_inches={"target-b": 5.0, "target-a": 3.0},
+        target_distances_after_inches={"target-b": 2.0, "target-a": 1.0},
+        engaged_target_unit_instance_ids=("target-b",),
+        preferred_distance_target_unit_instance_ids=("target-a",),
+        non_target_engaged_unit_instance_ids=("enemy-c",),
+    )
+
+    payload = witness.to_payload()
+
+    assert payload["selected_target_unit_instance_ids"] == ["target-a", "target-b"]
+    assert list(payload["target_distances_before_inches"]) == ["target-a", "target-b"]
+    assert list(payload["target_distances_after_inches"]) == ["target-a", "target-b"]
+    assert payload["engaged_target_unit_instance_ids"] == ["target-b"]
+    assert payload["preferred_distance_target_unit_instance_ids"] == ["target-a"]
+    assert payload["non_target_engaged_unit_instance_ids"] == ["enemy-c"]
+    with pytest.raises(GameLifecycleError, match="distances must be non-negative"):
+        replace(witness, target_distances_after_inches={"target-a": -1.0})
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        replace(
+            witness,
+            engaged_target_unit_instance_ids=cast(tuple[str, ...], ["target-a"]),
+        )
+
+
+def test_phase15b_invalid_charge_move_resolution_cannot_emit_transition_batch() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15b-invalid-resolution",
+    )
+    proposal_request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15b-select-invalid-resolution",
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    unit_placement = state.battlefield_state.unit_placement_by_id(
+        units["intercessor-1"].unit_instance_id
+    )
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    proposal_context = cast(dict[str, object], proposal.context)
+    maximum_distance = proposal_context["maximum_distance_inches"]
+    assert type(maximum_distance) is int
+
+    resolution = resolve_charge_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-phase15a-test"
+        ),
+        unit_placement=unit_placement,
+        selected_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+        maximum_distance_inches=maximum_distance,
+        path_witness=_charge_path_witness_for_unit(
+            lifecycle,
+            unit_instance_id=units["intercessor-1"].unit_instance_id,
+            dx=3.0,
+            endpoint_only=True,
+        ),
+    )
+
+    assert not resolution.is_valid
+    with pytest.raises(GameLifecycleError, match="Invalid Charge Move"):
+        resolution.transition_batch(before=unit_placement)
+
+
+def test_phase15b_charge_move_resolution_value_object_rejects_malformed_fields() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15b-resolution-value-object",
+    )
+    resolution, _unit_placement = _resolved_charge_move_for_tests(
+        lifecycle,
+        units=units,
+        unit_key="intercessor-1",
+        target_key="enemy",
+        dx=3.0,
+    )
+
+    with pytest.raises(GameLifecycleError, match="attempted_placement unit drift"):
+        replace(resolution, unit_instance_id="unit-b")
+    with pytest.raises(GameLifecycleError, match="attempted_placement must be UnitPlacement"):
+        replace(resolution, attempted_placement=cast(UnitPlacement, object()))
+    with pytest.raises(GameLifecycleError, match="witness must be a PathWitness"):
+        replace(resolution, witness=cast(PathWitness, object()))
+    with pytest.raises(GameLifecycleError, match="endpoint_witness must be ChargeEndpointWitness"):
+        replace(resolution, endpoint_witness=cast(ChargeEndpointWitness, object()))
+    with pytest.raises(GameLifecycleError, match="path_validation_results must be a tuple"):
+        replace(
+            resolution,
+            path_validation_results=cast(tuple[PathValidationResult, ...], []),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="path_validation_results must contain PathValidationResult",
+    ):
+        replace(
+            resolution,
+            path_validation_results=cast(tuple[PathValidationResult, ...], (object(),)),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="terrain_path_legality_results must be a tuple",
+    ):
+        replace(
+            resolution,
+            terrain_path_legality_results=cast(tuple[TerrainPathLegalityResult, ...], []),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="terrain_path_legality_results must contain TerrainPathLegalityResult",
+    ):
+        replace(
+            resolution,
+            terrain_path_legality_results=cast(
+                tuple[TerrainPathLegalityResult, ...],
+                (object(),),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="coherency_result must be UnitCoherencyResult"):
+        replace(resolution, coherency_result=cast(UnitCoherencyResult, object()))
+    with pytest.raises(GameLifecycleError, match="rollback_record must be MovementRollbackRecord"):
+        replace(resolution, rollback_record=cast(MovementRollbackRecord, object()))
+    with pytest.raises(GameLifecycleError, match="movement_payload must be a JSON object"):
+        replace(resolution, movement_payload=cast(dict[str, JsonValue], []))
+
+
+def test_phase15b_resolve_charge_move_rejects_malformed_inputs() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15b-resolve-inputs",
+    )
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    unit_placement = state.battlefield_state.unit_placement_by_id(
+        units["intercessor-1"].unit_instance_id
+    )
+    witness = _charge_path_witness_for_unit(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        dx=3.0,
+    )
+    ruleset_descriptor = RulesetDescriptor.warhammer_40000_eleventh(
+        descriptor_version="core-v2-phase15a-test"
+    )
+    selected_target_unit_instance_ids = (units["enemy"].unit_instance_id,)
+
+    with pytest.raises(GameLifecycleError, match="requires a BattlefieldScenario"):
+        resolve_charge_move(
+            scenario=cast(BattlefieldScenario, object()),
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=selected_target_unit_instance_ids,
+            maximum_distance_inches=6,
+            path_witness=witness,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=cast(RulesetDescriptor, object()),
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=selected_target_unit_instance_ids,
+            maximum_distance_inches=6,
+            path_witness=witness,
+        )
+    with pytest.raises(GameLifecycleError, match="unit_placement must be a UnitPlacement"):
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=cast(UnitPlacement, object()),
+            selected_target_unit_instance_ids=selected_target_unit_instance_ids,
+            maximum_distance_inches=6,
+            path_witness=witness,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a PathWitness"):
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=selected_target_unit_instance_ids,
+            maximum_distance_inches=6,
+            path_witness=cast(PathWitness, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="maximum distance must be an int"):
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=selected_target_unit_instance_ids,
+            maximum_distance_inches=cast(int, 6.0),
+            path_witness=witness,
+        )
+    with pytest.raises(GameLifecycleError, match="maximum distance must be a 2D6 value"):
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=selected_target_unit_instance_ids,
+            maximum_distance_inches=1,
+            path_witness=witness,
+        )
+    with pytest.raises(
+        GameLifecycleError, match="selected_target_unit_instance_ids must be a tuple"
+    ):
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=cast(
+                tuple[str, ...],
+                [units["enemy"].unit_instance_id],
+            ),
+            maximum_distance_inches=6,
+            path_witness=witness,
+        )
+    with pytest.raises(GameLifecycleError, match="witness must match the selected unit models"):
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=selected_target_unit_instance_ids,
+            maximum_distance_inches=6,
+            path_witness=PathWitness.for_paths(
+                (("wrong-model", (Pose.at(1.0, 1.0), Pose.at(2.0, 1.0))),)
+            ),
+        )
+
+
+def test_phase15b_malformed_charge_move_payload_rejects_before_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15a-success-charge",
+    )
+    proposal_request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id="phase15b-select-success",
+    )
+
+    status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=proposal_request.request_id,
+            result_id="phase15b-submit-malformed",
+            payload={
+                "proposal_request_id": proposal_request.request_id,
+                "unit_instance_id": units["intercessor-1"].unit_instance_id,
+                "movement_phase_action": "charge_move",
+                "movement_mode": "charge",
+                "charge_target_unit_instance_ids": [units["enemy"].unit_instance_id],
+            },
+        ).to_result(proposal_request)
+    )
+    invalid = _last_event_payload(lifecycle, "charge_move_proposal_invalid")
+    proposal_validation = cast(dict[str, object], invalid["proposal_validation"])
+    violations = cast(list[dict[str, object]], proposal_validation["violations"])
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
+    assert len(lifecycle.decision_controller.records) == 1
+    assert violations[0]["violation_code"] == "proposal_payload_missing_field"
+    assert violations[0]["field"] == "proposal_kind"
 
 
 def test_charge_phase_completion_option_records_skipped_units_and_advances() -> None:
@@ -468,6 +1211,19 @@ def test_charge_roll_and_phase_state_value_objects_reject_drift() -> None:
     pending_state = selected_state.with_charge_roll_result(roll_result)
 
     assert pending_state.move_pending_distance_state() is not None
+    with pytest.raises(GameLifecycleError, match="phase_complete must be a bool"):
+        ChargePhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            phase_complete=cast(bool, "false"),
+        )
+    with pytest.raises(GameLifecycleError, match="active_selection must be ChargingUnitSelection"):
+        ChargePhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("unit-a",),
+            active_selection=cast(ChargingUnitSelection, object()),
+        )
     with pytest.raises(GameLifecycleError, match="active player drift"):
         ChargePhaseState(
             battle_round=1,
@@ -475,18 +1231,70 @@ def test_charge_roll_and_phase_state_value_objects_reject_drift() -> None:
             selected_unit_ids=("unit-a",),
             active_selection=replace(selection, player_id="player-b"),
         )
+    with pytest.raises(GameLifecycleError, match="battle round drift"):
+        ChargePhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("unit-a",),
+            active_selection=replace(selection, battle_round=2),
+        )
+    with pytest.raises(GameLifecycleError, match="active_selection must be selected"):
+        ChargePhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("unit-b",),
+            active_selection=selection,
+        )
+    with pytest.raises(GameLifecycleError, match="selection must be ChargingUnitSelection"):
+        phase_state.with_unit_selection(cast(ChargingUnitSelection, object()))
     with pytest.raises(GameLifecycleError, match="Cannot select"):
         ChargePhaseState(
             battle_round=1,
             active_player_id="player-a",
             phase_complete=True,
         ).with_unit_selection(selection)
+    with pytest.raises(GameLifecycleError, match="requires no active selection"):
+        selected_state.with_unit_selection(replace(selection, unit_instance_id="unit-b"))
+    with pytest.raises(GameLifecycleError, match="selection player drift"):
+        phase_state.with_unit_selection(replace(selection, player_id="player-b"))
+    with pytest.raises(GameLifecycleError, match="selection battle round drift"):
+        phase_state.with_unit_selection(replace(selection, battle_round=2))
+    with pytest.raises(GameLifecycleError, match="already selected"):
+        replace(phase_state, selected_unit_ids=("unit-a",)).with_unit_selection(selection)
+    with pytest.raises(GameLifecycleError, match="roll result must be ChargeRollResult"):
+        selected_state.with_charge_roll_result(cast(ChargeRollResult, object()))
+    with pytest.raises(GameLifecycleError, match="after phase completion"):
+        replace(selected_state, phase_complete=True, active_selection=None).with_charge_roll_result(
+            roll_result
+        )
     with pytest.raises(GameLifecycleError, match="requires active_selection"):
         phase_state.with_charge_roll_result(roll_result)
     with pytest.raises(GameLifecycleError, match="roll player drift"):
         selected_state.with_charge_roll_result(
             _charge_roll_result(player_id="player-b", unit_instance_id="unit-a")
         )
+    with pytest.raises(GameLifecycleError, match="roll battle round drift"):
+        selected_state.with_charge_roll_result(
+            replace(roll_result, request=replace(roll_result.request, battle_round=2))
+        )
+    with pytest.raises(GameLifecycleError, match="roll unit drift"):
+        selected_state.with_charge_roll_result(
+            _charge_roll_result(player_id="player-a", unit_instance_id="unit-b")
+        )
+    with pytest.raises(GameLifecycleError, match="after phase completion"):
+        ChargePhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            phase_complete=True,
+        ).with_charge_move_resolved("unit-a")
+    with pytest.raises(GameLifecycleError, match="requires active_selection"):
+        phase_state.with_charge_move_resolved("unit-a")
+    with pytest.raises(GameLifecycleError, match="resolution unit drift"):
+        pending_state.with_charge_move_resolved("unit-b")
+    with pytest.raises(GameLifecycleError, match="requires pending distance state"):
+        selected_state.with_charge_move_resolved("unit-a")
+    with pytest.raises(GameLifecycleError, match="completion requires no active selection"):
+        selected_state.with_phase_complete()
     with pytest.raises(GameLifecycleError, match="cannot have active_selection"):
         replace(pending_state, phase_complete=True)
 
@@ -797,6 +1605,136 @@ def _submit_option(
             selected_option_id=option_id,
             result_id=result_id,
         ).to_result(request)
+    )
+
+
+def _charge_move_request_after_selection(
+    lifecycle: GameLifecycle,
+    *,
+    unit_instance_id: str,
+    result_id: str,
+) -> DecisionRequest:
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=unit_instance_id,
+        result_id=result_id,
+    )
+    request = _decision_request(status)
+    assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert proposal.proposal_kind is ProposalKind.CHARGE_MOVE
+    assert proposal.unit_instance_id == unit_instance_id
+    return request
+
+
+def _charge_move_proposal_request_for_value_tests() -> MovementProposalRequest:
+    return MovementProposalRequest(
+        request_id="request-a",
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-a",
+        game_id="phase15b-value-object",
+        battle_round=1,
+        phase=BattlePhase.CHARGE.value,
+        unit_instance_id="unit-a",
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        source_decision_request_id="source-request-a",
+        source_decision_result_id="source-result-a",
+        movement_phase_action="charge_move",
+        context={
+            "movement_mode": "charge",
+            "maximum_distance_inches": 6,
+            "reachable_target_unit_instance_ids": ["target-a"],
+            "reachable_target_distances_inches": {"target-a": 3.0},
+        },
+    )
+
+
+def _submit_charge_move_proposal(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    result_id: str,
+    proposal: ChargeMoveProposal,
+) -> LifecycleStatus:
+    return lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload=cast(JsonValue, proposal.to_payload()),
+        ).to_result(request)
+    )
+
+
+def _charge_path_witness_for_unit(
+    lifecycle: GameLifecycle,
+    *,
+    unit_instance_id: str,
+    dx: float,
+    dy: float = 0.0,
+    endpoint_only: bool = False,
+) -> PathWitness:
+    state = _state(lifecycle)
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Charge Move witness helper requires battlefield_state.")
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement in unit_placement.model_placements:
+        start = placement.pose
+        end = Pose.at(
+            start.position.x + dx,
+            start.position.y + dy,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        if endpoint_only:
+            model_paths.append((placement.model_instance_id, (start, end)))
+            continue
+        midpoint = Pose.at(
+            start.position.x + (dx / 2.0),
+            start.position.y + (dy / 2.0),
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _resolved_charge_move_for_tests(
+    lifecycle: GameLifecycle,
+    *,
+    units: dict[str, UnitInstance],
+    unit_key: str,
+    target_key: str,
+    dx: float,
+) -> tuple[ChargeMoveResolution, UnitPlacement]:
+    state = _state(lifecycle)
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Charge Move resolution helper requires battlefield_state.")
+    unit = units[unit_key]
+    target = units[target_key]
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    return (
+        resolve_charge_move(
+            scenario=scenario,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+                descriptor_version="core-v2-phase15a-test"
+            ),
+            unit_placement=unit_placement,
+            selected_target_unit_instance_ids=(target.unit_instance_id,),
+            maximum_distance_inches=6,
+            path_witness=_charge_path_witness_for_unit(
+                lifecycle,
+                unit_instance_id=unit.unit_instance_id,
+                dx=dx,
+            ),
+        ),
+        unit_placement,
     )
 
 
