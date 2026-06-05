@@ -29,6 +29,10 @@ from warhammer40k_core.engine.decision_controller import (
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FIGHT_INTERRUPT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameConfigPayload,
@@ -55,7 +59,6 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     PhaseHandler,
     SetupStep,
-    UnsupportedPhaseHandler,
 )
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -66,6 +69,11 @@ from warhammer40k_core.engine.phases.charge import (
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
     CommandPhaseHandler,
+)
+from warhammer40k_core.engine.phases.fight import (
+    FightPhaseHandler,
+    invalid_fight_activation_status,
+    invalid_fight_interrupt_status,
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
@@ -165,9 +173,11 @@ _SHOOTING_DECISION_TYPES = frozenset(
     )
 )
 _CHARGE_DECISION_TYPES = frozenset((SELECT_CHARGING_UNIT_DECISION_TYPE,))
+_FIGHT_DECISION_TYPES = frozenset((FIGHT_ACTIVATION_DECISION_TYPE,))
 _REACTION_FRAME_DECISION_TYPES = frozenset(
     (
         REACTION_DECISION_TYPE,
+        FIGHT_INTERRUPT_DECISION_TYPE,
         STRATAGEM_DECISION_TYPE,
         STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -199,6 +209,7 @@ class GameLifecycle:
     _movement_phase_handler: MovementPhaseHandler = field(default_factory=MovementPhaseHandler)
     _shooting_phase_handler: ShootingPhaseHandler = field(default_factory=ShootingPhaseHandler)
     _charge_phase_handler: ChargePhaseHandler = field(default_factory=ChargePhaseHandler)
+    _fight_phase_handler: FightPhaseHandler = field(default_factory=FightPhaseHandler)
     _triggered_movement_handler: TriggeredMovementHandler = field(
         default_factory=TriggeredMovementHandler
     )
@@ -229,6 +240,7 @@ class GameLifecycle:
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=config.ruleset_descriptor
         )
+        self._fight_phase_handler = FightPhaseHandler(ruleset_descriptor=config.ruleset_descriptor)
         self._triggered_movement_handler = TriggeredMovementHandler(
             ruleset_descriptor=config.ruleset_descriptor
         )
@@ -414,6 +426,35 @@ class GameLifecycle:
             and pending_request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
         ):
             invalid_status = invalid_charging_unit_selection_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+        ):
+            invalid_status = invalid_fight_activation_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE
+        ):
+            result.validate_for_request(pending_request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            invalid_status = invalid_fight_interrupt_status(
                 state=state,
                 request=pending_request,
                 result=result,
@@ -677,6 +718,31 @@ class GameLifecycle:
             if charge_status is not None:
                 return charge_status
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type in _FIGHT_DECISION_TYPES:
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
+            if fight_status is not None:
+                return fight_status
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            if fight_status is not None:
+                return fight_status
+            return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
             triggered_status = self._triggered_movement_handler.apply_decision(
                 state=state,
@@ -803,6 +869,9 @@ class GameLifecycle:
             _charge_phase_handler=ChargePhaseHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
+            _fight_phase_handler=FightPhaseHandler(
+                ruleset_descriptor=None if config is None else config.ruleset_descriptor
+            ),
             _triggered_movement_handler=TriggeredMovementHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
@@ -822,7 +891,7 @@ class GameLifecycle:
             BattlePhase.MOVEMENT: self._movement_phase_handler,
             BattlePhase.SHOOTING: self._shooting_phase_handler,
             BattlePhase.CHARGE: self._charge_phase_handler,
-            BattlePhase.FIGHT: UnsupportedPhaseHandler(BattlePhase.FIGHT),
+            BattlePhase.FIGHT: self._fight_phase_handler,
         }
 
     def _pending_decision_request(self) -> DecisionRequest | None:
@@ -1130,6 +1199,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_movement_phase_state_consistency(state=state)
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
+    _validate_fight_phase_state_consistency(state=state)
     _validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
@@ -1535,6 +1605,57 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
                 raise GameLifecycleError("charge_phase_state target unit is unknown.")
             if target_owner == state.active_player_id:
                 raise GameLifecycleError("charge_phase_state target unit is not an enemy.")
+
+
+def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
+    fight_state = state.fight_phase_state
+    if fight_state is None:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("fight_phase_state requires battle stage.")
+    if state.current_battle_phase is not BattlePhase.FIGHT:
+        raise GameLifecycleError("fight_phase_state requires FIGHT phase.")
+    if state.active_player_id is None:
+        raise GameLifecycleError("fight_phase_state requires active player.")
+    if fight_state.active_player_id != state.active_player_id:
+        raise GameLifecycleError("fight_phase_state active player drift.")
+    if fight_state.battle_round != state.battle_round:
+        raise GameLifecycleError("fight_phase_state battle round drift.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("fight_phase_state requires battlefield_state.")
+    if fight_state.next_player_id not in state.player_ids:
+        raise GameLifecycleError("fight_phase_state next player is not in this game.")
+    unit_owner_by_id = {
+        unit.unit_instance_id: army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    known_unit_ids = set(unit_owner_by_id)
+    for unit_id in (
+        *fight_state.eligible_at_start_unit_ids,
+        *fight_state.activated_unit_ids,
+        *fight_state.fights_first_registry.charged_unit_ids(),
+    ):
+        if unit_id not in known_unit_ids:
+            raise GameLifecycleError("fight_phase_state unit is unknown.")
+    for player_id in fight_state.passed_player_ids:
+        if player_id not in state.player_ids:
+            raise GameLifecycleError("fight_phase_state passed player is not in this game.")
+    for selection in fight_state.activation_selections:
+        owner = unit_owner_by_id.get(selection.unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("fight_phase_state activation unit is unknown.")
+        if owner != selection.player_id:
+            raise GameLifecycleError("fight_phase_state activation player drift.")
+    for eligible_pass in fight_state.eligible_passes:
+        if eligible_pass.player_id not in state.player_ids:
+            raise GameLifecycleError("fight_phase_state pass player is not in this game.")
+        for unit_id in eligible_pass.eligible_unit_ids:
+            owner = unit_owner_by_id.get(unit_id)
+            if owner is None:
+                raise GameLifecycleError("fight_phase_state pass unit is unknown.")
+            if owner != eligible_pass.player_id:
+                raise GameLifecycleError("fight_phase_state pass unit player drift.")
 
 
 def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:

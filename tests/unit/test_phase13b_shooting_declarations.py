@@ -116,7 +116,13 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    GameStatePayload,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -133,6 +139,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import SELECT_CHARGING_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
@@ -7968,7 +7975,7 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle() -> Non
     )
     updated_model = model_by_id(state=state, model_instance_id=defender_model.model_instance_id)
 
-    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    _assert_waiting_for_movement_unit(final_status)
     assert updated_model.is_alive is False
 
 
@@ -8104,7 +8111,7 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
     reaction_payload = _last_event_payload(lifecycle, "destruction_reaction_resolved")
     selected_source = cast(dict[str, object], reaction_payload["selected_source"])
 
-    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    _assert_waiting_for_movement_unit(final_status)
     assert selected_source["source_id"] == selected_reaction_source.source_id
     assert selected_source["reaction_kind"] == selected_source_kind.value
     assert reaction_payload["selected_reaction_kind"] == selected_source_kind.value
@@ -8532,7 +8539,7 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
     updated_battlefield = state.battlefield_state
     assert updated_battlefield is not None
 
-    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    _assert_waiting_for_movement_unit(final_status)
     assert defender_model.model_instance_id not in updated_battlefield.placed_model_ids()
     assert _event_payloads(lifecycle, "deadly_demise_mortal_wounds_applied")
     assert _event_payloads(lifecycle, "model_destroyed")
@@ -8707,7 +8714,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         == deadly_demise_source.source_id
     )
 
-    assert final_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    _assert_waiting_for_movement_unit(final_status)
     assert defender_model.model_instance_id not in final_battlefield.placed_model_ids()
     assert any(
         payload["model_instance_id"] == defender_model.model_instance_id
@@ -9041,7 +9048,7 @@ def test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue(
     )
     reaction_payload = _last_event_payload(lifecycle, "destruction_reaction_resolved")
 
-    assert decline_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    _assert_waiting_for_movement_unit(decline_status)
     assert reaction_payload["selected_source"] is None
     assert reaction_payload["action_host"] is None
     assert reaction_payload["execution_status"] == "declined"
@@ -10533,9 +10540,9 @@ def test_shooting_phase_completion_uses_finite_lifecycle_option() -> None:
         result_id="phase13b-complete-shooting",
     )
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    _assert_waiting_for_movement_unit(status)
     state = _state(lifecycle)
-    assert state.current_battle_phase is BattlePhase.FIGHT
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
     assert state.shooting_phase_state is None
     assert complete_payload["submission_kind"] == COMPLETE_SHOOTING_PHASE_OPTION_ID
     assert complete_payload["skipped_unit_ids"] == [units["intercessor-1"].unit_instance_id]
@@ -10666,9 +10673,10 @@ def test_phase13f_shooting_completion_runs_for_both_players() -> None:
         result_id="phase13f-player-a-complete",
     )
     state = _state(lifecycle)
-    assert player_a_status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert state.current_battle_phase is BattlePhase.FIGHT
+    player_a_movement_request = _assert_waiting_for_movement_unit(player_a_status)
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
 
+    lifecycle.decision_controller.queue.remove_by_id(player_a_movement_request.request_id)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.active_player_id = "player-b"
     player_b_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -10681,7 +10689,7 @@ def test_phase13f_shooting_completion_runs_for_both_players() -> None:
     )
     player_b_completed = _last_event_payload(lifecycle, "shooting_phase_completed")
 
-    assert player_b_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    _assert_waiting_for_movement_unit(player_b_status)
     assert player_b_request.actor_id == "player-b"
     assert units["enemy"].unit_instance_id in player_b_option_ids
     assert player_b_completed["active_player_id"] == "player-b"
@@ -11713,8 +11721,8 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
     state.battlefield_state = scenario.battlefield_state
     state.mission_setup = replace(state.mission_setup, terrain_features=(blocking_ruin,))
     status = lifecycle.advance_until_decision_or_terminal()
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert state.current_battle_phase is BattlePhase.FIGHT
+    _assert_waiting_for_movement_unit(status)
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
 
 
 def test_shooting_los_uses_third_party_model_blockers() -> None:
@@ -12057,6 +12065,7 @@ def _submit_phase13f_pending_attack_choices(
         request = _decision_request(current)
         if (
             request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
+            or request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
             or request.decision_type in attack_sequence_choice_types
         ):
             return current
@@ -12161,6 +12170,14 @@ def _shooting_lifecycle(
     for army in armies:
         state.record_army_definition(army)
     state.record_battlefield_state(battlefield)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -12763,6 +12780,12 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _assert_waiting_for_movement_unit(status: LifecycleStatus) -> DecisionRequest:
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    return request
 
 
 def _state(lifecycle: GameLifecycle) -> GameState:
@@ -13436,6 +13459,8 @@ def _submit_all_pending_fnp_declines(
         if status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION:
             return
         current_request = _decision_request(status)
+        if current_request.decision_type != SELECT_FEEL_NO_PAIN_DECISION_TYPE:
+            return
         result_index += 1
 
 

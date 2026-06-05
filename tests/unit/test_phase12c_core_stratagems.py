@@ -64,6 +64,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
@@ -339,8 +340,9 @@ def test_phase14i_command_reroll_accepts_real_attack_and_save_roll_specs(
         )
     )
 
-    assert state.command_point_total("player-a") == 0
     assert len(state.stratagem_use_records) == 1
+    assert state.stratagem_use_records[-1].command_point_cost == 1
+    assert state.stratagem_use_records[-1].command_point_transaction_id is not None
     assert _has_event(lifecycle.decision_controller, "command_reroll_resolved")
 
 
@@ -379,8 +381,9 @@ def test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor
         )
     )
 
-    assert state.command_point_total("player-a") == 0
     assert len(state.stratagem_use_records) == 1
+    assert state.stratagem_use_records[-1].command_point_cost == 1
+    assert state.stratagem_use_records[-1].command_point_transaction_id is not None
     assert _has_event(lifecycle.decision_controller, "command_reroll_resolved")
 
 
@@ -502,8 +505,9 @@ def test_phase14i_command_reroll_non_charge_multi_dice_roll_selects_one_die() ->
     rerolls = cast(list[dict[str, object]], updated_roll_state["rerolls"])
 
     assert resolved.status_kind is not LifecycleStatusKind.INVALID
-    assert state.command_point_total("player-a") == 0
     assert len(state.stratagem_use_records) == 1
+    assert state.stratagem_use_records[-1].command_point_cost == 1
+    assert state.stratagem_use_records[-1].command_point_transaction_id is not None
     assert cast(dict[str, object], payload["reroll_result"])["selected_option_id"] == "reroll:0"
     assert rerolls[0]["selected_indices"] == [0]
 
@@ -2124,7 +2128,8 @@ def test_phase13d_smokescreen_registers_defensive_effects() -> None:
     smoke_persisting_effect = cast(dict[str, JsonValue], smoke_event["persisting_effect"])
     smoke_expiration = cast(dict[str, JsonValue], smoke_persisting_effect["expiration"])
     assert smoke_status.status_kind is not LifecycleStatusKind.INVALID
-    assert smoke_state.command_point_total("player-a") == 0
+    assert smoke_state.stratagem_use_records[-1].command_point_cost == 1
+    assert smoke_state.stratagem_use_records[-1].command_point_transaction_id is not None
     assert smoke_effect["effect_kind"] == "core_stratagem:smokescreen"
     assert smoke_effect["benefit_of_cover"] is True
     assert smoke_effect["hit_roll_modifier"] == -1
@@ -2792,7 +2797,7 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
     restored_reserve_state = restored_state.reserve_state_for_unit(reserve_state.unit_instance_id)
     assert restored_reserve_state is not None
     assert restored_reserve_state.status is ReserveStatus.IN_RESERVES
-    assert restored_state.command_point_total("player-b") == 1
+    assert restored_state.command_point_total("player-b") == 2
     assert restored_state.stratagem_use_records == []
     assert restored.reaction_queue.frames == ()
     assert _has_event(restored.decision_controller, "stratagem_window_declined")
@@ -2800,7 +2805,8 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
         _last_event_payload(restored.decision_controller, "reaction_parent_resumed")["resume_token"]
         == "rapid-ingress-end-movement-round-02-player-player-b-resume"
     )
-    assert declined.status_kind is LifecycleStatusKind.UNSUPPORTED
+    declined_request = _decision_request(declined)
+    assert declined_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
     assert not _has_event(restored.decision_controller, "rapid_ingress_resolved")
 
 
@@ -3737,6 +3743,15 @@ def _state(lifecycle: GameLifecycle) -> GameState:
 
 def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
+    if phase is not BattlePhase.COMMAND:
+        _record_default_fixed_secondary_choices_for_missing_players(state)
+
+
+def _record_default_fixed_secondary_choices_for_missing_players(state: GameState) -> None:
+    for player_id in state.missing_secondary_mission_player_ids():
+        state.record_secondary_mission_choice(
+            _secondary_choice(player_id=player_id, mode=SecondaryMissionMode.FIXED)
+        )
 
 
 def _lifecycle_payload_copy(lifecycle: GameLifecycle) -> GameLifecyclePayload:
