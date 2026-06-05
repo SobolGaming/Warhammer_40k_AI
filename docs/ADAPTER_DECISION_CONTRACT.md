@@ -584,23 +584,85 @@ Example Normal Move submission:
               "facing": {"degrees": 0.0}
             },
             {
+              "position": {"x": 7.5, "y": 6.0, "z": 0.0},
+              "facing": {"degrees": 0.0}
+            },
+            {
               "position": {"x": 9.0, "y": 6.0, "z": 0.0},
+              "facing": {"degrees": 0.0}
+            }
+          ]
+        },
+        {
+          "model_id": "army-alpha:intercessor-unit-1:model-2",
+          "poses": [
+            {
+              "position": {"x": 6.0, "y": 8.0, "z": 0.0},
+              "facing": {"degrees": 0.0}
+            },
+            {
+              "position": {"x": 6.0, "y": 8.0, "z": 0.0},
               "facing": {"degrees": 0.0}
             }
           ]
         }
       ]
     },
-    "model_movements": []
+    "model_movements": [
+      {
+        "model_instance_id": "army-alpha:intercessor-unit-1:model-1",
+        "path": [
+          {
+            "position": {"x": 6.0, "y": 6.0, "z": 0.0},
+            "facing": {"degrees": 0.0}
+          },
+          {
+            "position": {"x": 7.5, "y": 6.0, "z": 0.0},
+            "facing": {"degrees": 0.0}
+          },
+          {
+            "position": {"x": 9.0, "y": 6.0, "z": 0.0},
+            "facing": {"degrees": 0.0}
+          }
+        ],
+        "final_pose": {
+          "position": {"x": 9.0, "y": 6.0, "z": 0.0},
+          "facing": {"degrees": 0.0}
+        }
+      },
+      {
+        "model_instance_id": "army-alpha:intercessor-unit-1:model-2",
+        "path": [
+          {
+            "position": {"x": 6.0, "y": 8.0, "z": 0.0},
+            "facing": {"degrees": 0.0}
+          },
+          {
+            "position": {"x": 6.0, "y": 8.0, "z": 0.0},
+            "facing": {"degrees": 0.0}
+          }
+        ],
+        "final_pose": {
+          "position": {"x": 6.0, "y": 8.0, "z": 0.0},
+          "facing": {"degrees": 0.0}
+        }
+      }
+    ]
   }
 }
 ```
 
+Every alive model in the moving unit must appear in the `PathWitness`. A model that does not
+move is submitted as an explicit zero-displacement path with identical start and end poses.
+Endpoint-only path evidence is invalid for real displacement; moving paths must include
+non-endpoint path evidence. `model_movements` remains an optional adapter annotation, but when
+present it should be complete and 1:1 with the witness, including zero-displacement models.
+
 Producer examples:
 
-- local UI: user drags models and submits endpoints plus `PathWitness`;
-- CLI: user enters coordinates and the adapter builds a `PathWitness`;
-- AI: movement solver generates endpoints plus `PathWitness`;
+- local UI: user drags models and submits final poses plus `PathWitness` path evidence;
+- CLI: user enters coordinates and the adapter builds a `PathWitness` with path evidence;
+- AI: movement solver generates final poses plus `PathWitness` path evidence;
 - network UI: client sends serialized proposal payload;
 - replay: recorded proposal payload is resubmitted.
 

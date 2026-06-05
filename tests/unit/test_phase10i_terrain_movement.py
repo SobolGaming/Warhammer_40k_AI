@@ -55,6 +55,25 @@ def test_model_can_move_freely_over_terrain_at_or_below_threshold() -> None:
     )
 
 
+def test_terrain_path_legality_accepts_explicit_zero_displacement_no_op_witness() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    witness = PathWitness.for_paths(((mover.model_id, (mover.pose, mover.pose)),))
+    context = _normal_legality_context().to_terrain_path_legality_context(
+        moving_model=mover,
+        witness=witness,
+        terrain=(),
+        terrain_features=(),
+        contact_footprint_available=True,
+        sample_interval_inches=0.5,
+    )
+
+    result = context.validate()
+
+    assert result.is_valid
+    assert result.sampled_pose_count == 2
+    assert result.segments == ()
+
+
 def test_model_cannot_pass_through_wall_without_traversal_permission() -> None:
     mover = _model("vehicle-mover", 1.0, 1.0)
     ruins = _ruins_blocking_wall_feature()

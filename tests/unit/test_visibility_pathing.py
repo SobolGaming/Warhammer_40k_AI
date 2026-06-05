@@ -187,6 +187,38 @@ def test_path_query_rejects_endpoint_only_movement_witness() -> None:
     assert result.failure.reason is PathFailureReason.ENDPOINT_ONLY_PATH
 
 
+def test_path_query_accepts_explicit_zero_displacement_no_op_witness() -> None:
+    query = _query_for_single_model(_single_model_witness(Pose.at(0.0, 0.0), Pose.at(0.0, 0.0)))
+
+    result = query.evaluate()
+
+    assert result.is_valid
+    assert result.metrics.sampled_pose_count == 2
+
+
+def test_path_query_accepts_stationary_model_in_group_witness() -> None:
+    first = _model("mover-1", 0.0, 0.0)
+    second = _model("mover-2", 2.0, 0.0)
+    unit_group = UnitGroup.single(_unit("movers", "mover-1", "mover-2"))
+    witness = PathWitness.for_paths(
+        (
+            ("mover-1", (Pose.at(0.0, 0.0), Pose.at(0.25, 0.0), Pose.at(0.5, 0.0))),
+            ("mover-2", (Pose.at(2.0, 0.0), Pose.at(2.0, 0.0))),
+        )
+    )
+
+    result = PathQuery(
+        unit_group=unit_group,
+        spatial_index=SpatialIndex.empty().with_model(first).with_model(second),
+        witness=witness,
+        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        collision_set=CollisionSet.empty(),
+    ).evaluate()
+
+    assert result.is_valid
+    assert result.metrics.sampled_pose_count == 5
+
+
 @pytest.mark.parametrize(
     "poses",
     [
