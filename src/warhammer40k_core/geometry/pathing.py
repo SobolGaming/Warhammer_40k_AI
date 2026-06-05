@@ -1107,7 +1107,7 @@ class TerrainPathLegalityContext:
                 segments=(),
                 sampled_pose_count=len(sampled_path),
             )
-        if len(path) < 3 or not _has_non_endpoint_interior_pose(path):
+        if _is_endpoint_only_real_movement_path(path):
             return TerrainPathLegalityResult.invalid(
                 TerrainTraversalViolation(
                     violation_code="endpoint_only_path",
@@ -1698,7 +1698,7 @@ class PathQuery:
                     model_id=model_id,
                     metrics=metrics.to_metrics(),
                 )
-            if len(path) < 3 or not _has_non_endpoint_interior_pose(path):
+            if _is_endpoint_only_real_movement_path(path):
                 return _invalid(
                     PathFailureReason.ENDPOINT_ONLY_PATH,
                     "PathWitness must include path evidence beyond start and end poses.",
@@ -2371,6 +2371,17 @@ def _has_non_endpoint_interior_pose(path: tuple[Pose, ...]) -> bool:
     start = path[0]
     end = path[-1]
     return any(pose != start and pose != end for pose in path[1:-1])
+
+
+def _is_endpoint_only_real_movement_path(path: tuple[Pose, ...]) -> bool:
+    if _is_zero_displacement_path(path):
+        return False
+    return len(path) < 3 or not _has_non_endpoint_interior_pose(path)
+
+
+def _is_zero_displacement_path(path: tuple[Pose, ...]) -> bool:
+    start = path[0]
+    return all(pose == start for pose in path[1:])
 
 
 def _moving_models_overlap(models: tuple[Model, ...]) -> tuple[str, str] | None:
