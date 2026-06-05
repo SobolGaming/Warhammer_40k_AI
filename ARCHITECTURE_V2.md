@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the provisional Phase 15C fight activation/pass/interrupt slice, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop; melee attack splitting and gathering remain Phase 15 work. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. Phase 14H and 14I are still not marked complete; their transport/attached/reserve/aircraft/revival and Core Stratagem/source-contract scopes remain listed below. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop; melee attack splitting and gathering remain Phase 15 work. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is in progress**: PR 91 added a provisional fight activation/pass/interrupt slice, but the phase is not complete until Fight-step ordering is represented by a first-class `FightOrderState` rather than folded into `FightPhaseState`, and the Pile In, Fight, and Consolidate steps align with the 11th Edition step text. Phase 14H and 14I are still not marked complete; their transport/attached/reserve/aircraft/revival and Core Stratagem/source-contract scopes remain listed below. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
 
 Completed / implemented foundation:
 
@@ -103,7 +103,10 @@ Next / planned sequence:
 |---|---:|---|
 | 14E | In progress | Allocation-group host and grouped-host weapon abilities are implemented for supported fixed-damage pools; melee-only Cleave/Lance execution waits on Phase 15 Charge/Fight |
 | 14H, 14I | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
-| 15C-15F | Planned | Fight phase and remaining Charge/Fight gates implemented directly from the 11th Edition Phase 14G contract |
+| 15C | In progress | Fight phase skeleton and fight-order correction: first-class `FightOrderState`, Fights First/Remaining Combats loop, activation/pass/interrupt decisions |
+| 15D | Planned | Pile In step, melee attack resolution, and Consolidate step from the 11th Edition Fight phase |
+| 15E | Planned | Fight-phase Stratagems and melee abilities |
+| 15F | Planned | Charge/Fight completion gate and remaining Charge/Fight hardening |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
@@ -164,7 +167,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Fall Back: Ordered Retreat vs Desperate Escape modes, hazard rolls for Desperate Escape, enemy-model traversal, post-move Battle-shock roll, and shooting/charge/action restrictions | Phase 10O, 11C, 14D |
 | Shooting phase: Normal, Assault, Close-quarters, Indirect, and Snap shooting-type cutover through finite shooting-type selection, declaration, grouped attacks, saves, and damage; close-quarters engaged targeting and weapon-selection restrictions; Indirect cover/no-reroll enforcement and fail ranges; engaged MONSTER/VEHICLE targeting; `[BLAST]` engaged-target bans; Assault/Advanced weapon gating; Fire Overwatch/Snap routing | Phase 13B-13F, 14F |
 | Charge phase: charge eligibility, charge-target declaration after the roll, target-within-roll-distance validation, within-1" and engaged-if-possible model movement clauses, all-target engagement requirement, non-target engagement ban, and Fights First grant | Phase 15A, 15B, 14G |
-| Fight phase: both-player pile-in step, Fights First alternating selection, eligible-to-fight if charged/engaged at Fight phase start/engaged at activation, eligible-to-fight pass rule when all eligible units are more than 5" from enemies, Normal Fight, Overrun Fight, both-player consolidation step, and Ongoing/Engaging/Objective consolidation modes | Phase 15C, 15D, 14G |
+| Fight phase: Start, Pile In, Fight, Consolidate, and End steps; both-player pile-in step; Fights First and Remaining Combats alternating selection; eligible-to-fight if not already selected and charged this turn, engaged now, or engaged at the start of the Fight step; explicit Normal Fight and Overrun Fight selection; eligible-to-fight pass rule when all eligible units are more than 5" from enemies; both-player consolidation step; and Ongoing/Engaging/Objective consolidation modes | Phase 15C, 15D, 14G |
 | Actions: start eligibility exclusions, including Battle-shocked units and units that shot earlier in the current Shooting phase; TITANIC exceptions, action-imposed shooting/charge restrictions, cancellation by moves except pile-in/consolidation, cancellation on leaving battlefield, and completion effects | Phase 11E, 17C-17D, 14D, 14F |
 | Stratagem framework: same stratagem once per phase, same unit targeted by at most one stratagem per phase unless stated, optional additional CP sections, and source-backed 11th Edition Core Stratagem definitions | Phase 12B, 12C, 12D, 14I |
 | Core Stratagems: Command Re-roll partial-die semantics and no Leadership/Battle-shock coverage, Epic Challenge, Insane Bravery, New Orders, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch via Snap Shooting at end of opponent's Movement phase, Smokescreen, Heroic Intervention modes, and Counteroffensive | Phase 12B, 12C, 13D, 15E, 14I |
@@ -2162,9 +2165,9 @@ Invariants:
 - charge moves must end closer to targets, within 1" if possible, engaged if possible, engaged with every target, and not engaged with non-targets;
 - charging grants Fights First until end of turn;
 - Fight phase has Start, Pile In, Fight, Consolidate, and End steps;
-- a unit is eligible to fight if it made a Charge move this turn, was engaged in
-  melee at the start of the Fight phase, or is engaged in melee at activation
-  time;
+- a unit is eligible to fight if it has not already been selected to fight this
+  phase and it made a Charge move this turn, is currently engaged, or was
+  engaged at the start of the Fight step;
 - both players make pile-in and consolidation moves, active player first;
 - Fights First and remaining combats alternate per the PDF sequence;
 - eligible-to-fight pass is available when all of a player's eligible units are more than 5" from enemy units;
@@ -2175,8 +2178,8 @@ Required Phase 15 tests:
 
 - charge-target and charge-move proposals validate path witnesses and target constraints;
 - Pile-in and consolidation use group-aware movement APIs;
-- fight eligibility covers charged units, units engaged at Fight phase start, and
-  units engaged at activation time;
+- fight eligibility covers units that charged this turn, units currently
+  engaged, and units engaged at the start of the Fight step;
 - Fight selection pass and Fights First fallback ordering are deterministic;
 - Overrun Fight cannot be selected unless the unit is otherwise eligible to fight;
 - Engaging Consolidation emits opponent fight decisions for newly engaged eligible units.
@@ -2473,7 +2476,11 @@ CORE V1 relevant areas:
 
 ## Phase 15C: fight order, Fights First, and remaining combats
 
-Phase 15C builds the Fight phase skeleton (Start, Pile In, Fight, Consolidate, End), derives fight eligibility, and sequences Fights First then Remaining Combats with deterministic, replay-safe activation order. Fight activation selection and fight interrupts are player-facing decisions routed through the lifecycle.
+Status: In progress. PR 91 implemented a provisional fight activation/pass/interrupt slice, but Phase 15C is not complete until Fight-step ordering is represented by a first-class `FightOrderState` rather than folded into `FightPhaseState`.
+
+Phase 15C owns the Fight-step ordering state inside the 11th Edition Fight phase. The outer Fight phase still exposes the Start, Pile In, Fight, Consolidate, and End steps, but the Fights First/Remaining Combats cursor, chooser alternation, Fight-step engagement snapshot, selected-to-fight set, pass state, activation records, and fight-interrupt source consumption belong to `FightOrderState`.
+
+Pile In and Consolidate are separate both-player steps before and after the Fight step. Phase 15C exposes their step boundaries and the Fight-step snapshots needed by Phase 15D; it does not collapse normal fights into a per-activation Pile In -> attacks -> Consolidate flow.
 
 Modules:
 
@@ -2483,6 +2490,7 @@ Modules:
 - `engine/timing_windows.py`
 - `engine/reaction_queue.py`
 - `docs/ADAPTER_DECISION_CONTRACT.md`
+- `docs/DECISION_SUBMISSION_CATALOG.md`
 
 Objects:
 
@@ -2493,35 +2501,60 @@ Objects:
 - `FightActivationSelection`
 - `FightsFirstRegistry`
 - `EligibleToFightPass`
+- `ResolvedFightInterrupt`
 - `FightInterruptRequest`
 
 Invariants:
 
-- the Fight phase has the Start, Pile In, Fight, Consolidate, and End steps per the Phase 14G fight contract;
-- activation order resolves Fights First combats before Remaining Combats, alternating per the PDF sequence with the active player choosing first within each tier;
-- a unit is eligible to fight if it made a Charge move this turn, was engaged in melee at the start of the Fight phase, or is engaged in melee at activation time;
+- `FightPhaseState` is the outer phase envelope: battle round, active player, Start/Pile In/Fight/Consolidate/End step exposure, and references to the active Fight, movement, or attack sub-state;
+- `FightPhaseState` must not directly own Fight-step ordering internals such as ordering band, chooser cursor, selected-to-fight units, pass state, activation sequence, or consumed interrupt sources except through a nested or referenced `FightOrderState`;
+- `FightOrderState` is replay-safe and owns the Fight-step-start engagement snapshot, current ordering band (`fights_first` or `remaining_combats`), next chooser, selected-to-fight unit IDs, activation selections, eligible-to-fight passes, and resolved fight-interrupt source records;
+- the Fight phase has the Start, Pile In, Fight, Consolidate, and End steps per the 11th Edition source text;
+- Start and End of Fight phase timing windows resolve phase-start and phase-end rules; they do not substitute for the Fight-step-start engagement snapshot;
+- a unit is eligible to fight only if it has not already been selected to fight this phase and it made a Charge move this turn, is currently engaged, or was engaged at the start of the Fight step;
+- Fight-step-start engagement is a distinct snapshot; current engagement is evaluated from current state, not as a separate source-contract reason;
+- `FightEligibilityKind` names and serialized payload tokens must match source semantics before Phase 15C is complete: charged this turn, currently engaged, and engaged at the start of the Fight step;
+- when a unit is selected to fight, the engine selects one legal fight type for that unit through the same lifecycle path;
+- Normal Fight is legal only for an engaged unit;
+- Overrun Fight is legal only when the unit is otherwise eligible to fight and is unengaged, or was unengaged at the start of the Fight step but became engaged during the Fight phase;
+- Fights First Combats starts with the player whose turn it is;
+- if the current Fights First chooser has no legal Fights First unit and no Fights First units are eligible, the sequence moves to Remaining Combats and that same player selects next;
+- if the current Fights First chooser has no legal Fights First unit but at least one Fights First unit remains eligible for the other player, the other player selects next;
+- Remaining Combats starts with the player who moved the sequence onto that step;
+- if the current Remaining Combats chooser has no legal unit and no units are eligible, the Fight step ends;
+- if the current Remaining Combats chooser has no legal unit but at least one unit remains eligible for the other player, the other player selects next;
+- after resolving a Remaining Combats fight, if one or more Fights First units are now eligible, the sequence returns to Fights First Combats;
 - charging units and Fights First effects are represented in fight-order state and Fights First is sourced from a structured registry, not ad hoc flags;
 - fight activation selection is a player-facing `DecisionRequest` resolved through `GameLifecycle.submit_decision(...)` with deterministic option IDs and JSON-safe payloads;
 - an eligible-to-fight pass is available to a player only when all of that player's eligible units are more than 5" from all enemy units;
-- Normal Fight and Overrun Fight are explicit fight types, and Overrun Fight cannot be selected unless the unit is otherwise eligible to fight;
-- fight interrupts (such as Counter-offensive) use typed decision metadata and reuse the Phase 12A reaction queue rather than a private fight-order path;
+- fight interrupts, such as Counter-offensive, use typed decision metadata and reuse the Phase 12A reaction queue rather than a private fight-order path;
+- fight-interrupt resolution is source-scoped for the Fight phase: accepted and declined interrupt answers consume the underlying source effect ID, and later enemy activations cannot re-offer the same source with a new trigger event ID;
+- stale, repeated-source, wrong-context, malformed, or ineligible fight-interrupt submissions reject before queue pop and before activation/decline records are created;
 - fight-order resolution is deterministic and replay-safe;
 - Phase 15C must update `docs/ADAPTER_DECISION_CONTRACT.md` with each new fight activation, eligible-to-fight pass, fight-type, and fight-interrupt decision payload.
 
 Required tests:
 
 - Fight phase exposes Start, Pile In, Fight, Consolidate, and End steps;
-- fight eligibility covers charged units, units engaged at Fight phase start, and units engaged at activation time;
-- Fights First combats resolve before Remaining Combats with deterministic active-player-first alternation;
+- `FightPhaseState` serializes only the outer phase envelope while `FightOrderState` serializes ordering internals and round-trips deterministically;
+- fight eligibility covers units that charged this turn, units currently engaged, units engaged at the start of the Fight step, and the already-selected exclusion;
+- Fights First combats resolve before Remaining Combats with the exact no-unit fallback, other-player fallback, and return-to-Fights-First behavior from the source text;
 - fight activation selection goes through `GameLifecycle.submit_decision(...)` and round-trips deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads;
 - the eligible-to-fight pass is offered only when every eligible unit is more than 5" from all enemy units;
-- Overrun Fight cannot be selected unless the unit is otherwise eligible to fight;
-- a fight interrupt fires once at the legal timing through the reaction queue and resumes the parent fight sequence;
+- Normal Fight and Overrun Fight enforce their distinct eligibility rules;
+- a fight interrupt fires once at legal timing through the reaction queue and resumes the parent fight sequence;
+- a declined fight interrupt consumes its source effect ID for the Fight phase and is not re-offered after a later enemy activation;
+- an accepted fight interrupt consumes its source effect ID for the Fight phase and is not re-offered after a later enemy activation;
+- a hand-crafted repeated-source fight-interrupt submission returns a typed invalid lifecycle status before queue pop, keeps the pending request clean, and records no new activation or decline event;
 - fight order is deterministic and replay-safe across re-runs from `DecisionRecord`.
 
-## Phase 15D: pile-in, melee attacks, and consolidate
+## Phase 15D: Pile In step, melee attacks, and Consolidate step
 
-Phase 15D resolves a single combat activation: the Pile In displacement, melee target selection and the melee attack sequence, then the Consolidate displacement. Pile In and Consolidate are group-aware movement displacements that require a `PathWitness`, and melee attacks reuse the Phase 13C attack-sequence infrastructure.
+Status: Planned.
+
+Phase 15D implements the physical movement and attack bodies around the Phase 15C fight-order decisions. Pile In is a separate both-player step before the Fight step. Melee attacks resolve when Phase 15C selects a unit to fight. Consolidate is a separate both-player step after the Fight step. Only Overrun Fight includes an activation-local additional pile-in move before attacks.
+
+Pile In and Consolidate are group-aware movement displacements that require a `PathWitness`, and melee attacks reuse the Phase 13C attack-sequence infrastructure.
 
 Modules:
 
@@ -2536,8 +2569,10 @@ Modules:
 Objects:
 
 - `PileInProposal`
+- `PileInTargetSelection`
 - `ConsolidateProposal`
 - `ConsolidationModeSelection`
+- `ConsolidationTargetSelection`
 - `MeleeTargetSelection`
 - `MeleeAttackPool`
 - `FightDisplacementRecord`
@@ -2547,20 +2582,48 @@ Invariants:
 - Pile In and Consolidate are model displacements, not Movement phase actions, and are submitted through `GameLifecycle.submit_decision(...)`;
 - Pile In and Consolidate consume the shared movement/pathing/terrain/coherency validators and require a `PathWitness` or a typed invalid result; endpoint-only validation is forbidden;
 - Pile In and Consolidate use the group-aware model APIs (`UnitGroup.alive_models()` / group-aware placement) when the rules operate on the attached rules unit as a whole;
-- both players make Pile In and Consolidate moves with the active player resolving first per the Phase 14G fight contract;
+- during the Pile In step, both players may make Pile In moves with eligible units they choose, active player resolving all such moves first, followed by the opponent;
+- each unit can make no more than one Pile In move during the Pile In step;
+- a Pile In move has a maximum distance of 3";
+- a unit is eligible to Pile In during the Fight phase if it is engaged, made a Charge move this turn, or was selected to make an Overrun Fight this phase;
+- before a Pile In move, an engaged unit selects every enemy unit it is engaged with as pile-in targets;
+- before a Pile In move, an unengaged unit selects one or more enemy units within 5" as pile-in targets;
+- models in base contact with one or more enemy models cannot be moved by a Pile In move;
+- each model moved by a Pile In move must end closer to the closest pile-in target and engaged with that target if possible;
+- after a Pile In move, the moving unit must be engaged;
+- after a Pile In move, each model that started the move engaged with an enemy unit must still be engaged with that enemy unit;
 - melee target selection follows engagement/eligibility rules and uses the 2"/5" engagement range with the 11th Edition terrain-area policies;
+- Normal Fight resolves Making Attacks for an engaged selected unit;
+- Overrun Fight grants one additional Pile In move for that selected unit, then resolves Making Attacks;
 - the melee attack sequence reuses the Phase 13C attack-sequence and damage-allocation infrastructure (Hit uses WS, then wound, allocate, save, damage) and the Phase 13D melee weapon-ability machinery, not a private melee resolver;
-- consolidation endpoint rules are explicit, and consolidation mode selection supports Ongoing, Engaging, and Objective modes per the Phase 14G contract;
-- Engaging Consolidation that newly engages an enemy unit emits opponent fight decisions for that newly engaged eligible unit;
+- during the Consolidate step, both players may make Consolidation moves with eligible units they choose, active player resolving all such moves first, followed by the opponent;
+- each unit can make no more than one Consolidation move during the Consolidate step;
+- a Consolidation move has a maximum distance of 3";
+- a unit is eligible to Consolidate if it was eligible to fight this phase;
+- before a Consolidation move, an engaged unit must choose Ongoing Consolidation and select every enemy unit it is engaged with;
+- before a Consolidation move, an unengaged unit within 3" of one or more enemy units must choose Engaging Consolidation and select one or more of those enemy units;
+- before a Consolidation move, an unengaged unit not within 3" of an enemy but within 3" of one or more objectives must choose Objective Consolidation and select one objective;
+- Ongoing Consolidation cannot move models in base contact with enemy models, and each moved model must end closer to the closest selected enemy unit and engaged with it if possible;
+- Engaging Consolidation requires each moved model to end closer to the closest selected enemy unit and engaged with it if possible;
+- Objective Consolidation requires each moved model to end within range of the selected objective if possible, or closer to it if not;
+- after Ongoing Consolidation, each model that started the move engaged with an enemy unit must still be engaged with that enemy unit;
+- after Engaging Consolidation, the moving unit must be engaged with every selected enemy unit;
+- after Objective Consolidation, the moving unit must be within range of the selected objective;
+- Engaging Consolidation that engages enemy units not already selected to fight this phase requires the opponent to select those units one at a time; when each is selected, it becomes eligible to fight and is selected to fight;
 - melee target declaration, Pile In/Consolidate proposals, and consolidation-mode selection are player-facing decisions with deterministic option IDs and JSON-safe payloads, and Phase 15D must update `docs/ADAPTER_DECISION_CONTRACT.md` for each.
 
 Required tests:
 
+- Pile In step offers active-player units before opponent units and never allows a unit to Pile In more than once during that step;
 - Pile In and Consolidate proposals validate a `PathWitness` and reject endpoint-only movement;
 - Pile In and Consolidation use group-aware movement APIs for attached rules units;
+- Pile In target selection follows engaged-target and unengaged-within-5" branches;
+- Pile In movement enforces base-contact immobility, closer-to-target movement, engage-if-possible, post-move engagement, and continuing engagement for models already engaged at move start;
+- Overrun Fight's additional Pile In move is separate from the normal Pile In step and still enforces the Pile In movement constraints;
 - melee target selection obeys engagement/eligibility rules and the 2"/5" engagement range;
 - melee attacks resolve through the shared attack sequence and can destroy models, emitting removal records;
 - melee weapon abilities resolve through the Phase 13D ability machinery in the melee context;
+- Consolidate step offers active-player units before opponent units and never allows a unit to Consolidate more than once during that step;
 - consolidation Ongoing, Engaging, and Objective modes each enforce their explicit endpoint rules;
 - Engaging Consolidation emits opponent fight decisions for newly engaged eligible units;
 - Pile In/Consolidate/melee declarations round-trip deterministic JSON-safe `DecisionRecord`/`EventRecord` payloads and reject stale/drift/malformed submissions without mutation.
@@ -3225,7 +3288,7 @@ Exit criteria:
 | Weapon abilities | 8D, 13D, 17F, 14I |
 | Aura abilities | 17C, 17D, 17F |
 | Charge phase | 15A, 15B, 14G |
-| Fight phase | 15C-15F, 14G |
+| Fight phase | 15C, 15D, 15E, 15F, 14G |
 | Leader/attached units | 6, 16D, 17A, 14H |
 | Faction/detachment/enhancement rules | 17C-17F, 14J |
 | Mission packs | 11A, 11E, 11F, 16A, 20A, 14J |
