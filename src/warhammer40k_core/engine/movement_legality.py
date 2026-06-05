@@ -93,6 +93,7 @@ _FLY_TRANSIT_MOVEMENT_MODES = frozenset(
         MovementMode.NORMAL,
         MovementMode.ADVANCE,
         MovementMode.FALL_BACK,
+        MovementMode.CHARGE,
         MovementMode.FLY_TAKE_TO_SKIES,
     }
 )

@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, and Phase 15A charge declaration decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, and Phase 15B Charge Move proposal decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, and Phase 15A charge declaration decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, and Phase 15B Charge Move proposal decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -42,6 +42,7 @@ The shared contract uses these objects and payloads:
 - `ProposalRequestPayload`: neutral parameterized physical-action request embedded inside a `DecisionRequest.payload`.
 - `MovementProposalPayload`: parameterized movement answer, including `PathWitness`, `movement_mode`, and the explicit `fall_back_mode` when Fall Back was selected.
 - `ChargeRollResult`: replay-safe Charge phase roll payload containing the declared charging unit, 2D6 maximum distance, and post-roll reachable target snapshot for the later Charge Move proposal.
+- `ChargeMoveProposal`: Charge phase parameterized movement answer containing the proposal request ID, `proposal_kind: "charge_move"`, charging unit ID, `movement_phase_action: "charge_move"`, `movement_mode: "charge"`, selected reachable charge target IDs, and a `PathWitness` unless the player submits the no-move choice.
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
 - `EventRecord`: deterministic event-log payload.
@@ -473,7 +474,7 @@ Required Phase 13 adapter-contract tests:
 
 ## Phase 15 Charge Decisions
 
-Phase 15A implements Charge phase eligibility, declaration, and deterministic charge-distance rolls. It does not move models. Charge movement remains a Phase 15B physical proposal and must not be synthesized by adapters from the Phase 15A roll result.
+Phase 15A implements Charge phase eligibility, declaration, and deterministic charge-distance rolls. Phase 15B implements the post-roll Charge Move as a parameterized physical proposal. Adapters must not synthesize target selection, placement mutation, displacement records, or Fights First state from the Phase 15A roll payload; they must answer the pending Phase 15B proposal request.
 
 Phase 15A exposes this active-player decision:
 
@@ -490,7 +491,32 @@ The `charge_roll_resolved` payload includes:
 - `roll_result`, including source unit-selection request/result IDs;
 - `reachable_target_distances_inches` and `reachable_target_unit_instance_ids`, containing only enemy units currently within both 12" and the rolled maximum distance.
 
-If the roll leaves no enemy unit within both 12" and the rolled maximum distance, Phase 15A emits `charge_no_move_possible`, mutates no model placement, emits no displacement payload, and continues to the next charging-unit choice. If one or more reachable targets exist, Phase 15A records a `ChargeDistanceState`, emits `charge_move_required`, and stops with typed unsupported status `charge_move_pending_phase15b` until Phase 15B supplies the Charge Move target-selection and path proposal contract. Phase 15B, not adapters and not Phase 15A, owns the "if you still want to" choice, the one-or-more charge target selection, `PathWitness`, endpoint validation, displacement records, and Fights First state.
+If the roll leaves no enemy unit within both 12" and the rolled maximum distance, Phase 15A emits `charge_no_move_possible`, mutates no model placement, emits no displacement payload, and continues to the next charging-unit choice. If one or more reachable targets exist, Phase 15A records a `ChargeDistanceState`, emits `charge_move_required`, and emits a `submit_movement_proposal` request with proposal kind `charge_move`.
+
+The Phase 15B Charge Move request uses the shared parameterized proposal wrapper:
+
+- `decision_type: "submit_movement_proposal"`;
+- `proposal_kind: "charge_move"`;
+- `phase: "charge"`;
+- `movement_phase_action: "charge_move"`;
+- `unit_instance_id`: the charging unit;
+- request context includes `movement_mode: "charge"`, `maximum_distance_inches`, `reachable_target_unit_instance_ids`, `reachable_target_distances_inches`, and the source `charge_roll` payload.
+
+Adapters answer with `ParameterizedSubmission` and the fixed `submit_parameterized_payload` option. The payload is a `ChargeMoveProposal` object with:
+
+- `proposal_request_id`;
+- `proposal_kind: "charge_move"`;
+- `unit_instance_id`;
+- `movement_phase_action: "charge_move"`;
+- `movement_mode: "charge"`;
+- `charge_target_unit_instance_ids`: zero or more target IDs from the request's reachable target list;
+- `witness`: a `PathWitness` for every model in the charging unit when one or more targets are selected.
+
+An empty `charge_target_unit_instance_ids` tuple with no witness is the active player's no-move choice. It records `charge_move_declined`, mutates no model placement, emits no displacement payload, and grants no Fights First effect.
+
+Malformed, stale, wrong-kind, wrong-unit, wrong-mode, unreachable-target, target-without-witness, no-move-with-witness, or witness-start/model-ID drift submissions reject before the pending queue is popped and before a `DecisionRecord` is created. Rule-invalid but well-formed Charge Move proposals, such as endpoint-only paths, over-distance paths, terrain/pathing/coherency failures, missing required target engagement, or non-target engagement, are recorded as rejected attempts with `charge_move_invalid`; the engine emits a fresh `charge_move` proposal request for retry and does not mutate authoritative battlefield state.
+
+Accepted Charge Move proposals consume the shared movement/pathing/terrain/coherency validators. A valid move emits `charge_move_completed`, updates authoritative model placements through engine-owned mutation only, records `BattlefieldTransitionBatch.displacements` with `displacement_kind: "charge_move"` and `source_phase: "charge"`, records endpoint witness details, and registers a `PersistingEffect` with `effect_kind: "charge_grants_fights_first"` until the end of the turn.
 
 Charge declarations and charge rolls are public table information in the current rules scope. Viewer-scoped projections and event deltas still must not leak hidden opponent information through option counts, target candidates, invalid diagnostics, roll metadata, or derived fields if future hidden deployment, reserve, or secret objective mechanics affect Charge eligibility.
 
@@ -500,7 +526,11 @@ Required Phase 15A adapter-contract tests:
 - deterministic JSON-safe unit-selection, roll, decision-record, event, and lifecycle payload round-trip;
 - Advanced, Fell Back, engaged, off-battlefield, and no-target eligibility gating;
 - no-reachable-target Charge rolls produce no movement or displacement payload;
-- reachable-target Charge rolls stop at the typed Phase 15B unsupported movement boundary with a post-roll target snapshot;
+- reachable-target Charge rolls emit a `submit_movement_proposal` request with proposal kind `charge_move` and a post-roll target snapshot;
+- valid Charge Move proposals through `ParameterizedSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)` mutate only after shared validators pass, emit displacement records, and register Fights First;
+- stale/malformed Charge Move proposals reject before queue pop and before a `DecisionRecord`;
+- rule-invalid but well-formed Charge Move proposals record rejected attempts, emit typed diagnostics, retry with a fresh request, and do not mutate battlefield state;
+- no-move Charge Move proposals record `charge_move_declined` without displacements or Fights First;
 - viewer-scoped projection/event redaction for any future hidden Charge eligibility or target information.
 
 ## Parameterized Proposals
@@ -516,10 +546,11 @@ The contract currently covers these proposal families:
 - Deep Strike placement;
 - Strategic Reserves placement;
 - Disembark placement;
+- Charge Move, including charge-target selection, no-move choice, and PathWitness movement evidence;
 - ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - Stratagem target or placement proposals introduced by Phase 12 and later phase gates.
 
-Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, shooting declaration, charge movement, pile-in, consolidate, Stratagem target binding, and mission movement or placement effects where applicable.
+Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, pile-in, consolidate, Stratagem target binding, and mission movement or placement effects where applicable.
 
 Parameterized requests are still `DecisionRequest`s. They contain a single `submit_parameterized_payload` option and embed a neutral `ProposalRequestPayload` inside `DecisionRequest.payload`.
 

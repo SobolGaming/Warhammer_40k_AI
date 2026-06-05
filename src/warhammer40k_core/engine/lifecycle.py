@@ -44,6 +44,8 @@ from warhammer40k_core.engine.mission_decisions import (
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -58,6 +60,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
     ChargePhaseHandler,
+    invalid_charge_move_proposal_status,
     invalid_charging_unit_selection_status,
 )
 from warhammer40k_core.engine.phases.command import (
@@ -331,12 +334,21 @@ class GameLifecycle:
             and stratagem_placement_request is None
         ):
             result.validate_for_request(pending_request)
-            malformed_status = self._movement_phase_handler.invalid_proposal_submission_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                decisions=self.decision_controller,
-            )
+            if _is_charge_move_proposal_request(pending_request):
+                malformed_status = invalid_charge_move_proposal_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                    decisions=self.decision_controller,
+                    ruleset_descriptor=self._require_config().ruleset_descriptor,
+                )
+            else:
+                malformed_status = self._movement_phase_handler.invalid_proposal_submission_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                    decisions=self.decision_controller,
+                )
             if malformed_status is not None:
                 return malformed_status
         if (
@@ -599,6 +611,18 @@ class GameLifecycle:
                     result=result,
                     decisions=self.decision_controller,
                 )
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and _is_charge_move_proposal_request(record.request)
+        ):
+            charge_status = self._charge_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if charge_status is not None:
+                return charge_status
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
             movement_status = self._movement_phase_handler.apply_decision(
@@ -877,6 +901,18 @@ def _payload_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+def _is_charge_move_proposal_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Charge proposal routing requires a DecisionRequest.")
+    if request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
+        return False
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    return (
+        proposal_request.phase == BattlePhase.CHARGE.value
+        or proposal_request.proposal_kind is ProposalKind.CHARGE_MOVE
+    )
 
 
 def _invalid_finite_decision_status(
