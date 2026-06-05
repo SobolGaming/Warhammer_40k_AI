@@ -65,8 +65,8 @@ def test_phase14g_fight_policy_freezes_sequence_ordering_and_modes() -> None:
     )
     assert fight_policy.eligibility_kinds == (
         FightEligibilityKind.CHARGED_THIS_TURN,
-        FightEligibilityKind.ENGAGED_AT_FIGHT_PHASE_START,
-        FightEligibilityKind.ENGAGED_AT_ACTIVATION,
+        FightEligibilityKind.CURRENTLY_ENGAGED,
+        FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,
     )
     assert fight_policy.ordering_bands == (
         FightOrderingBandKind.FIGHTS_FIRST,

@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the provisional Phase 15C fight activation/pass/interrupt slice, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop; melee attack splitting and gathering remain Phase 15 work. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is in progress**: PR 91 added a provisional fight activation/pass/interrupt slice, but the phase is not complete until Fight-step ordering is represented by a first-class `FightOrderState` rather than folded into `FightPhaseState`, and the Pile In, Fight, and Consolidate steps align with the 11th Edition step text. Phase 14H and 14I are still not marked complete; their transport/attached/reserve/aircraft/revival and Core Stratagem/source-contract scopes remain listed below. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop; melee attack splitting and gathering remain Phase 15 work. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is complete** for the Fight phase envelope, first-class `FightOrderState`, Fights First/Remaining Combats ordering loop, finite activation/pass decisions, legal Normal/Overrun fight-type filtering, and reaction-queue fight interrupts with source-scoped consumption. Phase 14H and 14I are still not marked complete; their transport/attached/reserve/aircraft/revival and Core Stratagem/source-contract scopes remain listed below. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
 
 Completed / implemented foundation:
 
@@ -96,6 +96,7 @@ Completed / implemented foundation:
 | 14L | Complete | Ranged Select Enemy Unit and Gather Attack Dice layer with identical-attack grouping |
 | 15A | Complete | Charge phase declaration, deterministic Charge roll, and reachable-target snapshot |
 | 15B | Complete | Charge Move proposal, terrain/pathing/coherency validation, endpoint rules, displacements, and Fights First |
+| 15C | Complete | Fight phase skeleton, first-class `FightOrderState`, Fights First/Remaining Combats loop, activation/pass/interrupt decisions, and Normal/Overrun fight-type filtering |
 
 Next / planned sequence:
 
@@ -103,7 +104,6 @@ Next / planned sequence:
 |---|---:|---|
 | 14E | In progress | Allocation-group host and grouped-host weapon abilities are implemented for supported fixed-damage pools; melee-only Cleave/Lance execution waits on Phase 15 Charge/Fight |
 | 14H, 14I | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
-| 15C | In progress | Fight phase skeleton and fight-order correction: first-class `FightOrderState`, Fights First/Remaining Combats loop, activation/pass/interrupt decisions |
 | 15D | Planned | Pile In step, melee attack resolution, and Consolidate step from the 11th Edition Fight phase |
 | 15E | Planned | Fight-phase Stratagems and melee abilities |
 | 15F | Planned | Charge/Fight completion gate and remaining Charge/Fight hardening |
@@ -2476,7 +2476,7 @@ CORE V1 relevant areas:
 
 ## Phase 15C: fight order, Fights First, and remaining combats
 
-Status: In progress. PR 91 implemented a provisional fight activation/pass/interrupt slice, but Phase 15C is not complete until Fight-step ordering is represented by a first-class `FightOrderState` rather than folded into `FightPhaseState`.
+Status: Complete.
 
 Phase 15C owns the Fight-step ordering state inside the 11th Edition Fight phase. The outer Fight phase still exposes the Start, Pile In, Fight, Consolidate, and End steps, but the Fights First/Remaining Combats cursor, chooser alternation, Fight-step engagement snapshot, selected-to-fight set, pass state, activation records, and fight-interrupt source consumption belong to `FightOrderState`.
 
@@ -2507,13 +2507,13 @@ Objects:
 Invariants:
 
 - `FightPhaseState` is the outer phase envelope: battle round, active player, Start/Pile In/Fight/Consolidate/End step exposure, and references to the active Fight, movement, or attack sub-state;
-- `FightPhaseState` must not directly own Fight-step ordering internals such as ordering band, chooser cursor, selected-to-fight units, pass state, activation sequence, or consumed interrupt sources except through a nested or referenced `FightOrderState`;
+- `FightPhaseState` does not directly own Fight-step ordering internals such as ordering band, chooser cursor, selected-to-fight units, pass state, activation sequence, or consumed interrupt sources except through nested `FightOrderState`;
 - `FightOrderState` is replay-safe and owns the Fight-step-start engagement snapshot, current ordering band (`fights_first` or `remaining_combats`), next chooser, selected-to-fight unit IDs, activation selections, eligible-to-fight passes, and resolved fight-interrupt source records;
 - the Fight phase has the Start, Pile In, Fight, Consolidate, and End steps per the 11th Edition source text;
 - Start and End of Fight phase timing windows resolve phase-start and phase-end rules; they do not substitute for the Fight-step-start engagement snapshot;
 - a unit is eligible to fight only if it has not already been selected to fight this phase and it made a Charge move this turn, is currently engaged, or was engaged at the start of the Fight step;
-- Fight-step-start engagement is a distinct snapshot; current engagement is evaluated from current state, not as a separate source-contract reason;
-- `FightEligibilityKind` names and serialized payload tokens must match source semantics before Phase 15C is complete: charged this turn, currently engaged, and engaged at the start of the Fight step;
+- Fight-step-start engagement is a distinct snapshot; current engagement is evaluated from current battlefield state rather than stored as a phase-start snapshot;
+- `FightEligibilityKind` names and serialized payload tokens match source semantics: charged this turn, currently engaged, and engaged at the start of the Fight step;
 - when a unit is selected to fight, the engine selects one legal fight type for that unit through the same lifecycle path;
 - Normal Fight is legal only for an engaged unit;
 - Overrun Fight is legal only when the unit is otherwise eligible to fight and is unengaged, or was unengaged at the start of the Fight step but became engaged during the Fight phase;
@@ -2531,9 +2531,9 @@ Invariants:
 - fight-interrupt resolution is source-scoped for the Fight phase: accepted and declined interrupt answers consume the underlying source effect ID, and later enemy activations cannot re-offer the same source with a new trigger event ID;
 - stale, repeated-source, wrong-context, malformed, or ineligible fight-interrupt submissions reject before queue pop and before activation/decline records are created;
 - fight-order resolution is deterministic and replay-safe;
-- Phase 15C must update `docs/ADAPTER_DECISION_CONTRACT.md` with each new fight activation, eligible-to-fight pass, fight-type, and fight-interrupt decision payload.
+- Phase 15C updates `docs/ADAPTER_DECISION_CONTRACT.md` with each new fight activation, eligible-to-fight pass, fight-type, and fight-interrupt decision payload.
 
-Required tests:
+Implemented test coverage:
 
 - Fight phase exposes Start, Pile In, Fight, Consolidate, and End steps;
 - `FightPhaseState` serializes only the outer phase envelope while `FightOrderState` serializes ordering internals and round-trips deterministically;

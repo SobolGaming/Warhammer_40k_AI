@@ -47,8 +47,8 @@ class FightPhaseStepKind(StrEnum):
 
 class FightEligibilityKind(StrEnum):
     CHARGED_THIS_TURN = "charged_this_turn"
-    ENGAGED_AT_FIGHT_PHASE_START = "engaged_at_fight_phase_start"
-    ENGAGED_AT_ACTIVATION = "engaged_at_activation"
+    CURRENTLY_ENGAGED = "currently_engaged"
+    ENGAGED_AT_FIGHT_STEP_START = "engaged_at_fight_step_start"
 
 
 class FightOrderingBandKind(StrEnum):
@@ -813,8 +813,8 @@ class FightPolicyDescriptor:
             ),
             eligibility_kinds=(
                 FightEligibilityKind.CHARGED_THIS_TURN,
-                FightEligibilityKind.ENGAGED_AT_FIGHT_PHASE_START,
-                FightEligibilityKind.ENGAGED_AT_ACTIVATION,
+                FightEligibilityKind.CURRENTLY_ENGAGED,
+                FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,
             ),
             ordering_bands=(
                 FightOrderingBandKind.FIGHTS_FIRST,
