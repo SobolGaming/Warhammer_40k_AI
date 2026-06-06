@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import TypedDict, cast
 
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
@@ -239,8 +240,22 @@ def test_phase14b_end_opponent_movement_reactions_emit_fire_overwatch_before_rap
     fire_status = lifecycle.advance_until_decision_or_terminal()
     fire_request = _decision_request(fire_status.decision_request)
     fire_context = _stratagem_context(fire_request)
+    fire_payload = _event_payload_object(fire_request.payload)
+    fire_proposal_request = _json_object(fire_payload["proposal_request"])
+    view = LocalGameSession(lifecycle=lifecycle).view(viewer_player_id="player-a")
+    pending_decision = view["pending_decision"]
+    pending_proposal = cast(dict[str, object], view["pending_proposal"])
 
     assert fire_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert pending_decision is not None
+    assert pending_decision["request_id"] == fire_request.request_id
+    assert fire_proposal_request["request_id"] == fire_request.request_id
+    assert fire_proposal_request["decision_type"] == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert fire_proposal_request["actor_id"] == "player-b"
+    assert pending_proposal["request_id"] == pending_decision["request_id"]
+    assert pending_proposal["decision_type"] == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert pending_proposal["actor_id"] == "player-b"
+    assert pending_proposal["proposal_kind"] == "stratagem_target_binding"
     assert fire_context["trigger_kind"] == TimingTriggerKind.END_PHASE.value
     assert fire_context["timing_window_id"] == (
         "fire-overwatch-end-movement-round-02-unit-army-alpha:intercessor-unit-1-player-player-b"

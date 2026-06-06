@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Self, TypedDict
 
@@ -205,11 +206,14 @@ class ReactionQueue:
         decision_type: str = REACTION_DECISION_TYPE,
         options: tuple[DecisionOption, ...],
         payload: JsonValue = None,
+        payload_factory: Callable[[str, str, str], JsonValue] | None = None,
     ) -> TriggeredDecisionRequest:
         if type(decisions) is not DecisionController:
             raise GameLifecycleError("ReactionQueue requires a DecisionController.")
         if type(reaction_window) is not ReactionWindow:
             raise GameLifecycleError("ReactionQueue requires a ReactionWindow.")
+        if payload is not None and payload_factory is not None:
+            raise GameLifecycleError("ReactionQueue payload must not also use a payload factory.")
         parent = battle_phase_kind_from_token(parent_phase)
         current_phase = state.current_battle_phase
         if current_phase is not parent:
@@ -218,6 +222,8 @@ class ReactionQueue:
             raise GameLifecycleError("ReactionQueue actor must be eligible for the window.")
 
         request_id = state.next_decision_request_id()
+        validated_decision_type = _validate_identifier("decision_type", decision_type)
+        validated_actor_id = _validate_identifier("actor_id", actor_id)
         frame = ReactionQueueFrame(
             reaction_window=reaction_window,
             parent_phase=parent,
@@ -225,7 +231,11 @@ class ReactionQueue:
             resume_token=resume_token,
             request_id=request_id,
         )
-        handler_payload = validate_json_value(payload)
+        handler_payload = validate_json_value(
+            payload
+            if payload_factory is None
+            else payload_factory(request_id, validated_decision_type, validated_actor_id)
+        )
         request_payload_base: dict[str, JsonValue] = {
             "reaction_window": validate_json_value(reaction_window.to_payload()),
             "interrupts_parent": True,
@@ -245,8 +255,8 @@ class ReactionQueue:
         request_payload = validate_json_value(request_payload_base)
         request = DecisionRequest(
             request_id=request_id,
-            decision_type=_validate_identifier("decision_type", decision_type),
-            actor_id=_validate_identifier("actor_id", actor_id),
+            decision_type=validated_decision_type,
+            actor_id=validated_actor_id,
             payload=request_payload,
             options=options,
         )

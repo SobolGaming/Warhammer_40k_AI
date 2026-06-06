@@ -1162,11 +1162,16 @@ def test_stratagem_target_pending_proposal_projection_includes_request_metadata(
     lifecycle = _battle_lifecycle()
     request = _parameterized_request(lifecycle)
     proposal_request = _proposal_request_from_decision(request)
+    request_payload = cast(dict[str, object], request.payload)
+    raw_proposal_request = cast(dict[str, object], request_payload["proposal_request"])
     view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
     pending_proposal = cast(dict[str, object], view["pending_proposal"])
 
     assert view["pending_decision"] is not None
     assert view["pending_decision"]["request_id"] == request.request_id
+    assert raw_proposal_request["request_id"] == request.request_id
+    assert raw_proposal_request["decision_type"] == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert raw_proposal_request["actor_id"] == request.actor_id
     assert pending_proposal["request_id"] == request.request_id
     assert pending_proposal["decision_type"] == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
     assert pending_proposal["actor_id"] == request.actor_id
