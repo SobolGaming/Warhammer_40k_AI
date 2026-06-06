@@ -83,6 +83,7 @@ from warhammer40k_core.engine.phases.fight import (
     invalid_fight_activation_status,
     invalid_fight_interrupt_status,
 )
+from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -152,6 +153,82 @@ def test_fight_phase_exposes_source_steps_and_records_json_safe_activation() -> 
         FIGHT_ACTIVATION_DECISION_TYPE
     )
     assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+
+
+def test_phase15f_fight_completion_gate_runs_for_both_players() -> None:
+    lifecycle, _units = _fight_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "intercessor-1": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(60.0, 20.0),
+        },
+        game_id="phase15f-fight-both-players",
+    )
+
+    player_a_status = lifecycle.advance_until_decision_or_terminal()
+    state = _state(lifecycle)
+    player_a_movement_request = _decision_request(player_a_status)
+    player_a_completed = _last_event_payload(lifecycle, "fight_phase_completed")
+
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.active_player_id == "player-b"
+    assert state.fight_phase_state is None
+    assert player_a_movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert player_a_completed["active_player_id"] == "player-a"
+
+    lifecycle.decision_controller.queue.remove_by_id(player_a_movement_request.request_id)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.active_player_id = "player-b"
+
+    player_b_status = lifecycle.advance_until_decision_or_terminal()
+    player_b_completed = _last_event_payload(lifecycle, "fight_phase_completed")
+
+    assert _decision_request(player_b_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert player_b_completed["active_player_id"] == "player-b"
+    assert len(_event_payloads(lifecycle, "fight_phase_completed")) == 2
+
+
+def test_phase15f_full_fight_gate_drains_melee_damage_before_completion() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15f-full-fight-gate",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    _wound_first_model(lifecycle, unit=units["enemy"], wounds_remaining=1)
+
+    final_status = _drain_full_fight_phase(
+        lifecycle,
+        lifecycle.advance_until_decision_or_terminal(),
+        result_id_prefix="phase15f-full-fight",
+    )
+    state = _state(lifecycle)
+    event_types = [event.event_type for event in lifecycle.decision_controller.event_log.records]
+    destroyed_payload = _last_event_payload(lifecycle, "model_destroyed")
+    transition_batch = cast(dict[str, object], destroyed_payload["transition_batch"])
+    records = [record.request.decision_type for record in lifecycle.decision_controller.records]
+
+    assert final_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert final_status.decision_request is not None
+    assert final_status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.fight_phase_state is None
+    assert transition_batch["removals"] == [destroyed_payload["removal_record"]]
+    assert FIGHT_ACTIVATION_DECISION_TYPE in records
+    assert SUBMIT_MELEE_DECLARATION_DECISION_TYPE in records
+    assert event_types.index("model_destroyed") < event_types.index("fight_phase_completed")
+    assert event_types.index("attack_sequence_completed") < event_types.index(
+        "fight_phase_completed"
+    )
+    assert _event_payloads(lifecycle, "melee_attack_sequence_completed")
+    assert _event_payloads(lifecycle, "consolidate_step_completed")
 
 
 def test_phase15d_lifecycle_accepts_melee_declaration_for_engaged_character() -> None:
@@ -2208,6 +2285,29 @@ def _move_unit_to(lifecycle: GameLifecycle, *, unit: UnitInstance, origin: Pose)
     )
 
 
+def _wound_first_model(
+    lifecycle: GameLifecycle,
+    *,
+    unit: UnitInstance,
+    wounds_remaining: int,
+) -> None:
+    if not unit.own_models:
+        raise AssertionError("Wounded test unit must contain models.")
+    wounded_model = replace(unit.own_models[0], wounds_remaining=wounds_remaining)
+    replacement = replace(unit, own_models=(wounded_model, *unit.own_models[1:]))
+    state = _state(lifecycle)
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                replacement if current.unit_instance_id == replacement.unit_instance_id else current
+                for current in army.units
+            ),
+        )
+        for army in state.army_definitions
+    ]
+
+
 def _unit_placement_payload(lifecycle: GameLifecycle, unit: UnitInstance) -> JsonValue:
     state = _state(lifecycle)
     battlefield_state = state.battlefield_state
@@ -2327,6 +2427,79 @@ def _advance_to_fight_order_request(lifecycle: GameLifecycle) -> DecisionRequest
             lifecycle.advance_until_decision_or_terminal(),
         )
     )
+
+
+def _drain_full_fight_phase(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id_prefix: str,
+) -> LifecycleStatus:
+    current = status
+    for index in range(128):
+        state = _state(lifecycle)
+        if state.current_battle_phase is not BattlePhase.FIGHT:
+            return current
+        if (
+            current.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION
+            or current.decision_request is None
+        ):
+            return current
+        request = current.decision_request
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            current = _submit_fight_movement_no_move(
+                lifecycle,
+                request=request,
+                result_id=f"{result_id_prefix}-movement-{index:03d}",
+            )
+            continue
+        if request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
+            option = _first_fight_activation_option(request)
+            current = _submit_option(
+                lifecycle,
+                request=request,
+                option_id=option.option_id,
+                result_id=f"{result_id_prefix}-activation-{index:03d}",
+            )
+            continue
+        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            current = _submit_minimal_melee_declaration(
+                lifecycle,
+                request=request,
+                result_id=f"{result_id_prefix}-melee-{index:03d}",
+            )
+            continue
+        if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            current = lifecycle.submit_decision(
+                ParameterizedSubmission(
+                    request_id=request.request_id,
+                    result_id=f"{result_id_prefix}-decline-stratagem-{index:03d}",
+                    payload=stratagem_decline_payload(),
+                ).to_result(request)
+            )
+            continue
+        if request.is_parameterized_submission_request():
+            raise AssertionError(
+                f"Unexpected parameterized Fight decision {request.decision_type}."
+            )
+        current = _submit_option(
+            lifecycle,
+            request=request,
+            option_id=request.options[0].option_id,
+            result_id=f"{result_id_prefix}-auto-{index:03d}",
+        )
+    raise AssertionError("Fight phase did not drain.")
+
+
+def _first_fight_activation_option(request: DecisionRequest) -> DecisionOption:
+    if request.decision_type != FIGHT_ACTIVATION_DECISION_TYPE:
+        raise AssertionError("Fight activation option requires a fight activation request.")
+    for option in request.options:
+        if option.option_id != ELIGIBLE_TO_FIGHT_PASS_OPTION_ID:
+            return option
+    if request.options:
+        return request.options[0]
+    raise AssertionError("Fight activation request has no options.")
 
 
 def _drain_fight_movement_requests(
