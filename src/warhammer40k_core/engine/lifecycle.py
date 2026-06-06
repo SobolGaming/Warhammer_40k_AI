@@ -716,6 +716,7 @@ class GameLifecycle:
             record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
             and _is_fight_movement_proposal_request(record.request)
         ):
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             fight_status = self._fight_phase_handler.apply_decision(
                 state=state,
                 result=result,
@@ -723,8 +724,19 @@ class GameLifecycle:
                 reaction_queue=self.reaction_queue,
             )
             if fight_status is not None:
+                if resolves_reaction_frame:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=fight_status,
+                    )
                 return fight_status
-            return self.advance_until_decision_or_terminal()
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=advanced_status,
+                )
+            return advanced_status
         if (
             record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
             and _is_charge_move_proposal_request(record.request)
@@ -756,20 +768,19 @@ class GameLifecycle:
                 reaction_queue=self.reaction_queue,
             )
             if resolves_reaction_frame and fight_status is not None:
-                if fight_status.decision_request is not None:
-                    self.reaction_queue.continue_reaction(
-                        result=result,
-                        next_request_id=fight_status.decision_request.request_id,
-                        decisions=self.decision_controller,
-                    )
-                else:
-                    self.reaction_queue.resolve_reaction(
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=fight_status,
+                )
             if fight_status is not None:
                 return fight_status
-            return self.advance_until_decision_or_terminal()
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=advanced_status,
+                )
+            return advanced_status
         if (
             record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
             and is_mortal_wound_feel_no_pain_request(record.request)
@@ -1080,6 +1091,18 @@ class GameLifecycle:
                 decisions=self.decision_controller,
             )
             return
+        if self._fight_interrupt_activation_is_active():
+            pending_request = self._pending_decision_request()
+            if pending_request is not None and _fight_decision_owns_request(
+                state=self._require_state(),
+                request=pending_request,
+            ):
+                self.reaction_queue.continue_reaction(
+                    result=result,
+                    next_request_id=pending_request.request_id,
+                    decisions=self.decision_controller,
+                )
+                return
         self.reaction_queue.resolve_reaction(
             result=result,
             decisions=self.decision_controller,
@@ -1418,6 +1441,9 @@ def _active_attack_sequence_for_state(state: GameState) -> AttackSequence | None
     out_of_phase_state = state.out_of_phase_shooting_state
     if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
         return out_of_phase_state.attack_sequence
+    fight_state = state.fight_phase_state
+    if fight_state is not None and fight_state.attack_sequence is not None:
+        return fight_state.attack_sequence
     shooting_state = state.shooting_phase_state
     if shooting_state is not None and shooting_state.attack_sequence is not None:
         return shooting_state.attack_sequence

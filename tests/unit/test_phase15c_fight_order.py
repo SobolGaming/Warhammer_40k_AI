@@ -20,6 +20,10 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attack_sequence import (
+    ATTACK_ALLOCATION_DECISION_TYPES,
+    ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
+)
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -83,6 +87,10 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+
+_ATTACK_SEQUENCE_DECISION_TYPES = frozenset(
+    (*ATTACK_RESOLUTION_SELECTION_DECISION_TYPES, *ATTACK_ALLOCATION_DECISION_TYPES)
+)
 
 
 def test_fight_phase_exposes_source_steps_and_records_json_safe_activation() -> None:
@@ -1014,6 +1022,205 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
     assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 1
 
 
+def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_sequence() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("parent", "interrupt-target"),
+        enemy_unit_ids=("parent-target", "interrupter"),
+        origins={
+            "parent": Pose.at(50.0, 20.0),
+            "parent-target": Pose.at(52.0, 20.0),
+            "interrupter": Pose.at(10.0, 20.0),
+            "interrupt-target": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-interrupt-melee-continuation",
+        fight_interrupt_unit_keys=("interrupter",),
+        enemy_unit_specs={
+            "interrupter": (
+                "core-character-leader",
+                "core-character-leader",
+                1,
+            ),
+        },
+    )
+    first_request = _advance_to_fight_order_request(lifecycle)
+    interrupt_status = _submit_normal_fight(
+        lifecycle,
+        request=first_request,
+        unit=units["parent"],
+        result_id="phase15d-trigger-interrupt-melee-continuation",
+    )
+    interrupt_request = _decision_request(interrupt_status)
+    melee_status = _submit_option(
+        lifecycle,
+        request=interrupt_request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=units["interrupter"].unit_instance_id,
+            fight_type=FightTypeKind.NORMAL,
+        ),
+        result_id="phase15d-accept-interrupt-melee-continuation",
+    )
+    melee_request = _decision_request(melee_status)
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert _active_reaction_frame_request_id(lifecycle) == melee_request.request_id
+
+    declaration_status = _submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id="phase15d-interrupt-melee-declaration",
+    )
+    attack_request = _decision_request(declaration_status)
+
+    assert attack_request.decision_type in _ATTACK_SEQUENCE_DECISION_TYPES
+    assert _event_payloads(lifecycle, "reaction_window_continued")[-1]["next_request_id"] == (
+        attack_request.request_id
+    )
+    assert _active_reaction_frame_request_id(lifecycle) == attack_request.request_id
+
+    completed_status = _resolve_phase15d_activation(lifecycle, declaration_status)
+
+    assert completed_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.reaction_queue.frames == ()
+    assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == 1
+
+
+def test_phase15d_interrupt_overrun_pile_in_continues_reaction_to_melee_declaration() -> None:
+    lifecycle, units = _overrun_interrupt_lifecycle(
+        game_id="phase15d-interrupt-overrun-continuation"
+    )
+    interrupt_request = _trigger_overrun_interrupt_request(
+        lifecycle,
+        units=units,
+        result_id="phase15d-trigger-overrun-continuation",
+    )
+    movement_status = _submit_option(
+        lifecycle,
+        request=interrupt_request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=units["interrupter"].unit_instance_id,
+            fight_type=FightTypeKind.OVERRUN,
+        ),
+        result_id="phase15d-accept-overrun-continuation",
+    )
+    movement_request = _decision_request(movement_status)
+    assert movement_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert _active_reaction_frame_request_id(lifecycle) == movement_request.request_id
+
+    pile_in_status = _submit_overrun_pile_in(
+        lifecycle,
+        request=movement_request,
+        interrupter=units["interrupter"],
+        target=units["overrun-target"],
+        result_id="phase15d-valid-overrun-pile-in-continuation",
+        endpoint_only=False,
+    )
+    melee_request = _decision_request(pile_in_status)
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert _active_reaction_frame_request_id(lifecycle) == melee_request.request_id
+
+
+def test_phase15d_interrupt_overrun_endpoint_only_retry_continues_reaction() -> None:
+    lifecycle, units = _overrun_interrupt_lifecycle(
+        game_id="phase15d-interrupt-overrun-retry-continuation"
+    )
+    interrupt_request = _trigger_overrun_interrupt_request(
+        lifecycle,
+        units=units,
+        result_id="phase15d-trigger-overrun-retry-continuation",
+    )
+    movement_status = _submit_option(
+        lifecycle,
+        request=interrupt_request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=units["interrupter"].unit_instance_id,
+            fight_type=FightTypeKind.OVERRUN,
+        ),
+        result_id="phase15d-accept-overrun-retry-continuation",
+    )
+    movement_request = _decision_request(movement_status)
+    record_count_before = len(lifecycle.decision_controller.records)
+
+    invalid_status = _submit_overrun_pile_in(
+        lifecycle,
+        request=movement_request,
+        interrupter=units["interrupter"],
+        target=units["overrun-target"],
+        result_id="phase15d-endpoint-only-overrun-pile-in-continuation",
+        endpoint_only=True,
+    )
+    retry_request = lifecycle.decision_controller.queue.pending_requests[0]
+    invalid_payload = _last_event_payload(lifecycle, "fight_movement_invalid")
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert invalid_status.decision_request is None
+    assert cast(dict[str, object], invalid_status.payload)["next_request_id"] == (
+        retry_request.request_id
+    )
+    assert len(lifecycle.decision_controller.records) == record_count_before + 1
+    assert invalid_payload["result_id"] == "phase15d-endpoint-only-overrun-pile-in-continuation"
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert _active_reaction_frame_request_id(lifecycle) == retry_request.request_id
+
+
+def test_phase15d_normal_subdecisions_do_not_mutate_reaction_frames() -> None:
+    movement_lifecycle, _movement_units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-normal-movement-no-reaction",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    movement_request = _decision_request(movement_lifecycle.advance_until_decision_or_terminal())
+    movement_status = _submit_fight_movement_no_move(
+        movement_lifecycle,
+        request=movement_request,
+        result_id="phase15d-normal-movement-no-reaction",
+    )
+
+    assert movement_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert movement_status.status_kind is not LifecycleStatusKind.INVALID
+    assert movement_lifecycle.reaction_queue.frames == ()
+
+    melee_lifecycle, melee_units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-normal-melee-no-reaction",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    activation_request = _advance_to_fight_order_request(melee_lifecycle)
+    melee_status = _submit_option(
+        melee_lifecycle,
+        request=activation_request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=melee_units["attacker"].unit_instance_id,
+            fight_type=FightTypeKind.NORMAL,
+        ),
+        result_id="phase15d-normal-activation-no-reaction",
+    )
+    melee_request = _decision_request(melee_status)
+    declaration_status = _submit_minimal_melee_declaration(
+        melee_lifecycle,
+        request=melee_request,
+        result_id="phase15d-normal-melee-declaration-no-reaction",
+    )
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert declaration_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert melee_lifecycle.reaction_queue.frames == ()
+
+
 def test_fight_interrupt_source_is_not_offered_again_after_accepted_interrupt() -> None:
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("alpha-1", "alpha-2"),
@@ -1464,6 +1671,8 @@ def _fight_lifecycle(
     datasheet_id: str = "core-intercessor-like-infantry",
     model_profile_id: str = "core-intercessor-like",
     model_count: int = 5,
+    alpha_unit_specs: dict[str, tuple[str, str, int]] | None = None,
+    enemy_unit_specs: dict[str, tuple[str, str, int]] | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = _config(
         game_id=game_id,
@@ -1472,6 +1681,8 @@ def _fight_lifecycle(
         datasheet_id=datasheet_id,
         model_profile_id=model_profile_id,
         model_count=model_count,
+        alpha_unit_specs=alpha_unit_specs,
+        enemy_unit_specs=enemy_unit_specs,
     )
     armies = _mustered_armies(config)
     scenario = create_deterministic_battlefield_scenario(
@@ -1542,6 +1753,48 @@ def _fight_lifecycle(
     return GameLifecycle.from_payload(payload), units
 
 
+def _overrun_interrupt_lifecycle(
+    *,
+    game_id: str,
+) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
+    return _fight_lifecycle(
+        alpha_unit_ids=("parent", "overrun-target"),
+        enemy_unit_ids=("parent-target", "interrupter"),
+        origins={
+            "parent": Pose.at(50.0, 20.0),
+            "parent-target": Pose.at(52.0, 20.0),
+            "interrupter": Pose.at(10.0, 20.0),
+            "overrun-target": Pose.at(14.0, 20.0),
+        },
+        game_id=game_id,
+        charge_fights_first_unit_keys=("parent", "interrupter"),
+        fight_interrupt_unit_keys=("interrupter",),
+        enemy_unit_specs={
+            "interrupter": (
+                "core-character-leader",
+                "core-character-leader",
+                1,
+            ),
+        },
+    )
+
+
+def _trigger_overrun_interrupt_request(
+    lifecycle: GameLifecycle,
+    *,
+    units: dict[str, UnitInstance],
+    result_id: str,
+) -> DecisionRequest:
+    first_request = _advance_to_fight_order_request(lifecycle)
+    interrupt_status = _submit_normal_fight(
+        lifecycle,
+        request=first_request,
+        unit=units["parent"],
+        result_id=result_id,
+    )
+    return _decision_request(interrupt_status)
+
+
 def _config(
     *,
     game_id: str,
@@ -1550,6 +1803,8 @@ def _config(
     datasheet_id: str,
     model_profile_id: str,
     model_count: int,
+    alpha_unit_specs: dict[str, tuple[str, str, int]] | None = None,
+    enemy_unit_specs: dict[str, tuple[str, str, int]] | None = None,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
@@ -1567,6 +1822,7 @@ def _config(
                 datasheet_id=datasheet_id,
                 model_profile_id=model_profile_id,
                 model_count=model_count,
+                unit_specs=alpha_unit_specs,
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -1576,6 +1832,7 @@ def _config(
                 datasheet_id=datasheet_id,
                 model_profile_id=model_profile_id,
                 model_count=model_count,
+                unit_specs=enemy_unit_specs,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1622,6 +1879,7 @@ def _army_muster_request(
     datasheet_id: str,
     model_profile_id: str,
     model_count: int,
+    unit_specs: dict[str, tuple[str, str, int]] | None = None,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1634,15 +1892,52 @@ def _army_muster_request(
             detachment_id="core-combined-arms",
         ),
         unit_selections=tuple(
-            _unit_selection(
+            _unit_selection_for_id(
                 unit_id,
-                datasheet_id=datasheet_id,
-                model_profile_id=model_profile_id,
-                model_count=model_count,
+                unit_specs=unit_specs,
+                default_datasheet_id=datasheet_id,
+                default_model_profile_id=model_profile_id,
+                default_model_count=model_count,
             )
             for unit_id in unit_selection_ids
         ),
     )
+
+
+def _unit_selection_for_id(
+    unit_id: str,
+    *,
+    unit_specs: dict[str, tuple[str, str, int]] | None,
+    default_datasheet_id: str,
+    default_model_profile_id: str,
+    default_model_count: int,
+) -> UnitMusterSelection:
+    datasheet_id, model_profile_id, model_count = _unit_selection_spec(
+        unit_id=unit_id,
+        unit_specs=unit_specs,
+        default_datasheet_id=default_datasheet_id,
+        default_model_profile_id=default_model_profile_id,
+        default_model_count=default_model_count,
+    )
+    return _unit_selection(
+        unit_id,
+        datasheet_id=datasheet_id,
+        model_profile_id=model_profile_id,
+        model_count=model_count,
+    )
+
+
+def _unit_selection_spec(
+    *,
+    unit_id: str,
+    unit_specs: dict[str, tuple[str, str, int]] | None,
+    default_datasheet_id: str,
+    default_model_profile_id: str,
+    default_model_count: int,
+) -> tuple[str, str, int]:
+    if unit_specs is not None and unit_id in unit_specs:
+        return unit_specs[unit_id]
+    return (default_datasheet_id, default_model_profile_id, default_model_count)
 
 
 def _unit_selection(
@@ -2010,6 +2305,65 @@ def _submit_fight_movement_proposal(
     )
 
 
+def _submit_fight_movement_no_move(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    result_id: str,
+) -> LifecycleStatus:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    context = cast(dict[str, JsonValue], proposal_request.context)
+    return lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload=cast(
+                JsonValue,
+                {
+                    "proposal_request_id": proposal_request.request_id,
+                    "proposal_kind": proposal_request.proposal_kind.value,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "movement_phase_action": proposal_request.movement_phase_action,
+                    "movement_mode": context["movement_mode"],
+                },
+            ),
+        ).to_result(request)
+    )
+
+
+def _submit_overrun_pile_in(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    interrupter: UnitInstance,
+    target: UnitInstance,
+    result_id: str,
+    endpoint_only: bool,
+) -> LifecycleStatus:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert proposal_request.proposal_kind is ProposalKind.PILE_IN
+    proposal = FightMovementProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.PILE_IN,
+        unit_instance_id=interrupter.unit_instance_id,
+        movement_phase_action=PILE_IN_ACTION,
+        movement_mode=MovementMode.PILE_IN,
+        pile_in_target_unit_instance_ids=(target.unit_instance_id,),
+        witness=_fight_movement_witness_for_unit(
+            lifecycle=lifecycle,
+            unit=interrupter,
+            dx=2.0,
+            endpoint_only=endpoint_only,
+        ),
+    )
+    return _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=proposal,
+        result_id=result_id,
+    )
+
+
 def _submit_option(
     lifecycle: GameLifecycle,
     *,
@@ -2040,6 +2394,13 @@ def _request_unit_ids(request: DecisionRequest) -> list[str]:
 
 def _request_option_ids(request: DecisionRequest) -> set[str]:
     return {option.option_id for option in request.options}
+
+
+def _active_reaction_frame_request_id(lifecycle: GameLifecycle) -> str:
+    assert lifecycle.reaction_queue.frames
+    request_id = lifecycle.reaction_queue.frames[-1].request_id
+    assert request_id is not None
+    return request_id
 
 
 def _interrupt_source_effect_id(request: DecisionRequest) -> str:
