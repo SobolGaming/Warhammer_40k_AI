@@ -114,14 +114,17 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
     apply_command_reroll_decision,
     apply_explosives_mortal_wound_feel_no_pain_decision,
+    apply_heroic_intervention_charge_move,
     apply_stratagem_decision,
     apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
     invalid_command_reroll_decision_status,
+    invalid_heroic_intervention_charge_move_status,
     invalid_stratagem_placement_proposal_status,
     invalid_stratagem_target_proposal_status,
     invalid_stratagem_use_status,
     is_command_reroll_decision_request,
+    is_heroic_intervention_charge_move_request,
     is_stratagem_placement_proposal_request,
     is_stratagem_window_decline_result,
     stratagem_window_decline_allowed,
@@ -199,6 +202,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         FIGHT_INTERRUPT_DECISION_TYPE,
         STRATAGEM_DECISION_TYPE,
         STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        MOVEMENT_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -368,7 +372,13 @@ class GameLifecycle:
             and stratagem_placement_request is None
         ):
             result.validate_for_request(pending_request)
-            if _is_fight_movement_proposal_request(pending_request):
+            if is_heroic_intervention_charge_move_request(pending_request):
+                malformed_status = invalid_heroic_intervention_charge_move_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                )
+            elif _is_fight_movement_proposal_request(pending_request):
                 malformed_status = invalid_fight_movement_proposal_status(
                     state=state,
                     request=pending_request,
@@ -714,6 +724,36 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if (
             record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and is_heroic_intervention_charge_move_request(record.request)
+        ):
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            heroic_status = apply_heroic_intervention_charge_move(
+                state=state,
+                request=record.request,
+                result=result,
+                decisions=self.decision_controller,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if heroic_status is not None:
+                if resolves_reaction_frame:
+                    retry_request = self._pending_decision_request()
+                    if retry_request is not None and is_heroic_intervention_charge_move_request(
+                        retry_request
+                    ):
+                        self.reaction_queue.continue_reaction(
+                            result=result,
+                            next_request_id=retry_request.request_id,
+                            decisions=self.decision_controller,
+                        )
+                return heroic_status
+            if resolves_reaction_frame:
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
             and _is_fight_movement_proposal_request(record.request)
         ):
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
@@ -946,6 +986,13 @@ class GameLifecycle:
             if is_stratagem_window_decline_result(result):
                 self._record_stratagem_window_declined(result)
                 if resolves_reaction_frame:
+                    if self._fight_interrupt_activation_is_active():
+                        advanced_status = self.advance_until_decision_or_terminal()
+                        self._continue_or_resolve_fight_reaction(
+                            result=result,
+                            status=advanced_status,
+                        )
+                        return advanced_status
                     self.reaction_queue.resolve_reaction(
                         result=result,
                         decisions=self.decision_controller,
@@ -958,12 +1005,17 @@ class GameLifecycle:
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
             )
+            advanced_status = self.advance_until_decision_or_terminal()
             if resolves_reaction_frame:
-                follow_up_request = self._pending_decision_request()
-                if follow_up_request is not None:
+                if self._fight_interrupt_activation_is_active():
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                elif advanced_status.decision_request is not None:
                     self.reaction_queue.continue_reaction(
                         result=result,
-                        next_request_id=follow_up_request.request_id,
+                        next_request_id=advanced_status.decision_request.request_id,
                         decisions=self.decision_controller,
                     )
                 else:
@@ -971,7 +1023,7 @@ class GameLifecycle:
                         result=result,
                         decisions=self.decision_controller,
                     )
-            return self.advance_until_decision_or_terminal()
+            return advanced_status
         if record.request.decision_type == SEQUENCING_DECISION_TYPE:
             if sequencing_decision is None:
                 sequencing_decision = apply_sequencing_decision_from_request(
@@ -1532,6 +1584,11 @@ def _validate_reaction_queue_consistency(
         and not is_stratagem_placement_proposal_request(pending_request)
     ):
         raise GameLifecycleError("Lifecycle reaction queue pending placement decision drift.")
+    if (
+        pending_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+        and not is_heroic_intervention_charge_move_request(pending_request)
+    ):
+        raise GameLifecycleError("Lifecycle reaction queue pending movement decision drift.")
     seen_request_ids: set[str] = set()
     for frame in frames:
         if frame.request_id is None:

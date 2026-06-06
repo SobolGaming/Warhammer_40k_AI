@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -46,6 +47,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionError,
     DecisionOption,
     DecisionRequest,
+    parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -110,6 +112,19 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
+from warhammer40k_core.engine.stratagems import (
+    CORE_COUNTEROFFENSIVE_HANDLER_ID,
+    CORE_EPIC_CHALLENGE_HANDLER_ID,
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemCatalogIndex,
+    StratagemEligibilityContext,
+    StratagemTargetProposal,
+    request_stratagem_target_proposal,
+    stratagem_target_proposal_from_index,
+    stratagem_target_proposal_request_payload,
+    stratagem_window_declined_for_context,
+)
 from warhammer40k_core.engine.timing_windows import (
     ReactionWindow,
     TimingTriggerKind,
@@ -145,6 +160,7 @@ _ENDPOINT_ONLY_PATH_VIOLATION_CODE = "endpoint_only_path"
 class FightPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     army_catalog: ArmyCatalog | None = None
+    stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
 
     def __post_init__(self) -> None:
         if (
@@ -156,6 +172,8 @@ class FightPhaseHandler:
             )
         if self.army_catalog is not None and type(self.army_catalog) is not ArmyCatalog:
             raise GameLifecycleError("FightPhaseHandler army_catalog must be an ArmyCatalog.")
+        if type(self.stratagem_index) is not StratagemCatalogIndex:
+            raise GameLifecycleError("FightPhaseHandler stratagem_index must be an index.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -376,6 +394,7 @@ def _advance_fight_attack_sequence(
         ),
     )
     return _complete_active_fight_activation(
+        handler=handler,
         state=state,
         decisions=decisions,
         reaction_queue=reaction_queue,
@@ -436,12 +455,21 @@ def _advance_active_fight_activation(
             ),
         )
         return _complete_active_fight_activation(
+            handler=handler,
             state=state,
             decisions=decisions,
             reaction_queue=reaction_queue,
             policy=policy,
             activation=activation,
         )
+    epic_status = _request_epic_challenge_if_available(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        activation=activation,
+    )
+    if epic_status is not None:
+        return epic_status
     request = build_melee_declaration_request(
         request_id=state.next_decision_request_id(),
         game_id=state.game_id,
@@ -485,6 +513,7 @@ def _advance_active_fight_activation(
 
 def _complete_active_fight_activation(
     *,
+    handler: FightPhaseHandler,
     state: GameState,
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
@@ -505,6 +534,17 @@ def _complete_active_fight_activation(
             }
         ),
     )
+    counteroffensive_status = _request_counteroffensive_if_available(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        fought_selection=activation,
+        trigger_event_id=event.event_id,
+        policy=policy,
+    )
+    if counteroffensive_status is not None:
+        return counteroffensive_status
     return _request_fight_interrupt_if_available(
         state=state,
         decisions=decisions,
@@ -1066,6 +1106,7 @@ def _apply_melee_declaration_decision(
         army_catalog=_army_catalog_for_handler(handler),
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
         sequence_id=sequence_id,
+        state=state,
     )
     fight_state = _require_fight_state(state)
     state.fight_phase_state = fight_state.with_attack_sequence_update(
@@ -2181,6 +2222,164 @@ def _apply_fight_interrupt_decision(
     return None
 
 
+def _request_counteroffensive_if_available(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+    fought_selection: FightActivationSelection,
+    trigger_event_id: str,
+    policy: FightPolicyDescriptor,
+) -> LifecycleStatus | None:
+    if reaction_queue is None:
+        return None
+    for player_id in state.player_ids:
+        if player_id == fought_selection.player_id:
+            continue
+        contexts = eligible_fight_contexts_for_player(
+            state=state,
+            fight_state=_require_fight_state(state),
+            player_id=player_id,
+            policy=policy,
+        )
+        if not contexts:
+            continue
+        window_id = (
+            f"counteroffensive-round-{state.battle_round:02d}-"
+            f"after-{fought_selection.unit_instance_id}-player-{player_id}"
+        )
+        trigger_payload = validate_json_value(
+            {
+                "fought_unit_instance_id": fought_selection.unit_instance_id,
+                "fought_selection": fought_selection.to_payload(),
+                "trigger_event_id": trigger_event_id,
+                "eligible_unit_instance_ids": [context.unit_instance_id for context in contexts],
+            }
+        )
+        context = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=player_id,
+            trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+            timing_window_id=window_id,
+            trigger_payload=trigger_payload,
+        )
+        if stratagem_window_declined_for_context(decisions=decisions, context=context):
+            continue
+        proposal = stratagem_target_proposal_from_index(
+            state=state,
+            index=handler.stratagem_index,
+            context=context,
+            handler_id=CORE_COUNTEROFFENSIVE_HANDLER_ID,
+        )
+        if proposal is None:
+            continue
+        reaction_window = ReactionWindow(
+            timing_window=TimingWindow(
+                window_id=window_id,
+                descriptor=TimingWindowDescriptor(
+                    descriptor_id="core-counteroffensive-after-enemy-fought",
+                    trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+                    source_rule_id=CORE_COUNTEROFFENSIVE_HANDLER_ID,
+                    phase=BattlePhase.FIGHT,
+                    source_step="fight",
+                    metadata=trigger_payload,
+                ),
+                game_id=state.game_id,
+                battle_round=state.battle_round,
+                active_player_id=_active_player_id(state),
+                phase=BattlePhase.FIGHT,
+                trigger_event_id=trigger_event_id,
+            ),
+            eligible_player_ids=(player_id,),
+        )
+        triggered = reaction_queue.emit_decision_request(
+            state=state,
+            decisions=decisions,
+            reaction_window=reaction_window,
+            parent_phase=BattlePhase.FIGHT,
+            parent_step="fight",
+            resume_token=f"{window_id}-resume",
+            actor_id=player_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            options=(parameterized_decision_option(),),
+            payload_factory=_stratagem_target_proposal_payload_factory(proposal),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=triggered.decision_request,
+            payload={
+                "phase": BattlePhase.FIGHT.value,
+                "phase_body_status": "counteroffensive_reaction_pending",
+                "request_id": triggered.decision_request.request_id,
+                "reacting_player_id": player_id,
+            },
+        )
+    return None
+
+
+def _request_epic_challenge_if_available(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    activation: FightActivationSelection,
+) -> LifecycleStatus | None:
+    unit = _unit_by_id(state=state, unit_instance_id=activation.unit_instance_id)
+    if not _unit_has_keyword(unit, "CHARACTER"):
+        return None
+    window_id = f"epic-challenge-round-{state.battle_round:02d}-unit-{activation.unit_instance_id}"
+    trigger_payload = validate_json_value(
+        {
+            "selected_unit_instance_id": activation.unit_instance_id,
+            "activation_selection": activation.to_payload(),
+        }
+    )
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=activation.player_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        timing_window_id=window_id,
+        trigger_payload=trigger_payload,
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    proposal = stratagem_target_proposal_from_index(
+        state=state,
+        index=handler.stratagem_index,
+        context=context,
+        handler_id=CORE_EPIC_CHALLENGE_HANDLER_ID,
+    )
+    if proposal is None:
+        return None
+    return request_stratagem_target_proposal(
+        state=state,
+        decisions=decisions,
+        proposal_request=proposal,
+        allow_decline=True,
+    )
+
+
+def _stratagem_target_proposal_payload_factory(
+    proposal: StratagemTargetProposal,
+) -> Callable[[str, str, str], JsonValue]:
+    if type(proposal) is not StratagemTargetProposal:
+        raise GameLifecycleError(
+            "Stratagem target proposal payload factory requires a StratagemTargetProposal."
+        )
+
+    def payload_factory(request_id: str, decision_type: str, actor_id: str) -> JsonValue:
+        return stratagem_target_proposal_request_payload(
+            proposal,
+            request_id=request_id,
+            decision_type=decision_type,
+            actor_id=actor_id,
+            allow_decline=True,
+        )
+
+    return payload_factory
+
+
 def _request_fight_interrupt_if_available(
     *,
     state: GameState,
@@ -2602,6 +2801,20 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Fight phase requires an active player.")
     return state.active_player_id
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
+
+
+def _canonical_keyword(keyword: str) -> str:
+    if type(keyword) is not str:
+        raise GameLifecycleError("Unit keyword must be a string.")
+    stripped = keyword.strip()
+    if not stripped:
+        raise GameLifecycleError("Unit keyword must not be empty.")
+    return stripped.upper().replace(" ", "_").replace("-", "_")
 
 
 def _next_player_id(*, player_ids: tuple[str, ...], current_player_id: str) -> str:

@@ -172,8 +172,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             2,
             "strategic_ploy",
             "gw-11e-core-stratagems:core:counteroffensive",
-            "unsupported:phase-14g:fight-order-interrupt-unit",
-            "unsupported:phase-14g:counteroffensive",
+            "counteroffensive_unit",
+            "core:counteroffensive",
             "core",
             None,
         ),
@@ -183,8 +183,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "strategic_ploy",
             "gw-11e-core-stratagems:core:crushing-impact",
-            "unsupported:phase-14g:vehicle-charge-target-binding",
-            "unsupported:phase-14g:crushing-impact",
+            "crushing_impact_unit",
+            "core:crushing-impact",
             "core",
             None,
         ),
@@ -194,8 +194,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "epic_deed",
             "gw-11e-core-stratagems:core:epic-challenge",
-            "unsupported:phase-14g:character-model-fight-binding",
-            "unsupported:phase-14g:epic-challenge",
+            "epic_challenge_unit",
+            "core:epic-challenge",
             "core",
             None,
         ),
@@ -227,8 +227,8 @@ def test_source_backed_core_stratagem_catalog_snapshot_and_availability() -> Non
             1,
             "strategic_ploy",
             "gw-11e-core-stratagems:core:heroic-intervention",
-            "unsupported:phase-14g:heroic-intervention-charge-unit",
-            "unsupported:phase-14g:heroic-intervention",
+            "heroic_intervention_unit",
+            "core:heroic-intervention",
             "core",
             None,
         ),
@@ -533,20 +533,20 @@ def test_player_stratagem_index_filters_detachments_without_changing_options() -
 def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions() -> None:
     finite_lifecycle = _battle_lifecycle()
     finite_state = _state(finite_lifecycle)
-    _set_current_battle_phase(finite_state, BattlePhase.CHARGE)
+    _set_current_battle_phase(finite_state, BattlePhase.SHOOTING)
     _grant_cp(finite_state, player_id="player-a", amount=1)
     finite_context = _context(
         state=finite_state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
     )
-    deferred_core_stratagem = _source_stratagem_record("crushing-impact")
+    unsupported_source_stratagem = _source_stratagem_record("armour-of-contempt")
     finite_request = create_stratagem_use_decision_request(
         state=finite_state,
         context=finite_context,
         options=(
             _stratagem_option_for_record(
-                record=deferred_core_stratagem,
+                record=unsupported_source_stratagem,
                 context=finite_context,
                 binding=_friendly_binding(),
             ),
@@ -569,17 +569,17 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
 
     parameterized_lifecycle = _battle_lifecycle()
     parameterized_state = _state(parameterized_lifecycle)
-    _set_current_battle_phase(parameterized_state, BattlePhase.CHARGE)
+    _set_current_battle_phase(parameterized_state, BattlePhase.SHOOTING)
     _grant_cp(parameterized_state, player_id="player-a", amount=1)
-    deferred_core_stratagem = _source_stratagem_record("crushing-impact")
+    unsupported_source_stratagem = _source_stratagem_record("armour-of-contempt")
     parameterized_context = _context(
         state=parameterized_state,
         player_id="player-a",
-        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
     )
     proposal_request = StratagemTargetProposal.for_request(
         context=parameterized_context,
-        catalog_record=deferred_core_stratagem,
+        catalog_record=unsupported_source_stratagem,
     )
     unavailable_proposal = request_stratagem_target_proposal(
         state=parameterized_state,
@@ -590,7 +590,7 @@ def test_unsupported_source_handlers_reject_finite_and_parameterized_submissions
     assert unavailable_proposal.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert unavailable_proposal.payload == {
         "player_id": "player-a",
-        "stratagem_id": "crushing-impact",
+        "stratagem_id": "armour-of-contempt",
         "unavailable_reason": "unsupported_handler",
     }
     assert parameterized_state.command_point_total("player-a") == 1
@@ -833,8 +833,10 @@ def test_different_stratagem_same_unit_same_phase_suppresses_options() -> None:
     first_use = state.stratagem_use_records[0]
 
     assert first_use.affected_unit_instance_ids == (unit_id,)
+    assert first_use.targeted_unit_instance_ids == (unit_id,)
     assert StratagemUseRecord.from_payload(first_use.to_payload()) == first_use
     assert first_use.to_payload()["affected_unit_instance_ids"] == [unit_id]
+    assert first_use.to_payload()["targeted_unit_instance_ids"] == [unit_id]
     second_catalog = (
         _core_stratagem(
             stratagem_id="second-targeted-buff",
@@ -883,9 +885,26 @@ def test_different_stratagem_same_unit_same_phase_suppresses_options() -> None:
         )
         == 1
     )
+    override_catalog = (
+        _core_stratagem(
+            stratagem_id="same-target-exception",
+            command_point_cost=1,
+            target_spec=target_spec,
+            restriction_policy=StratagemRestrictionPolicy(same_unit_target_per_phase=False),
+        ),
+    )
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    override_status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=override_catalog,
+        context=context,
+    )
+
+    assert override_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
 
 
-def test_opponent_stratagem_affecting_unit_blocks_same_phase_stratagem() -> None:
+def test_opponent_stratagem_targeting_unit_does_not_block_player_same_phase_stratagem() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
@@ -928,22 +947,67 @@ def test_opponent_stratagem_affecting_unit_blocks_same_phase_stratagem() -> None
         ),
     )
 
-    blocked = request_stratagem_use(
+    allowed = request_stratagem_use(
         state=state,
         decisions=lifecycle.decision_controller,
         catalog_records=player_a_catalog,
         context=player_a_context,
     )
 
-    assert blocked.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert allowed.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert (
-        stratagem_use_options(
-            state=state,
-            catalog_records=player_a_catalog,
-            context=player_a_context,
+        len(
+            stratagem_use_options(
+                state=state,
+                catalog_records=player_a_catalog,
+                context=player_a_context,
+            )
         )
-        == ()
+        == 1
     )
+
+
+def test_same_stratagem_restriction_uses_active_player_phase_instance() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=2)
+    unit_id = "army-alpha:intercessor-unit-1"
+    target_spec = StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT)
+    catalog = (
+        _core_stratagem(
+            stratagem_id="active-player-instance-test",
+            command_point_cost=1,
+            target_spec=target_spec,
+        ),
+    )
+    first_context = _context(state=state, player_id="player-a")
+    first_request = _decision_request(
+        request_stratagem_use(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            catalog_records=catalog,
+            context=first_context,
+        )
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12b-first-active-player-phase-instance",
+            request=first_request,
+            selected_option_id=_option_id_for_target(first_request, unit_id),
+        )
+    )
+
+    state.active_player_id = "player-b"
+    second_context = _context(state=state, player_id="player-a")
+    same_player_different_turn_status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=catalog,
+        context=second_context,
+    )
+
+    assert same_player_different_turn_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
 
 
 def test_stratagem_use_record_rejects_duplicate_affected_unit_ids() -> None:
@@ -957,6 +1021,7 @@ def test_stratagem_use_record_rejects_duplicate_affected_unit_ids() -> None:
             source_id="source:duplicate-affected-unit-test",
             battle_round=1,
             phase=BattlePhase.MOVEMENT,
+            active_player_id="player-a",
             timing_window_id=None,
             request_id="phase12b-duplicate-affected-unit-request",
             result_id="phase12b-duplicate-affected-unit-result",
@@ -966,6 +1031,7 @@ def test_stratagem_use_record_rejects_duplicate_affected_unit_ids() -> None:
                 target_player_id="player-a",
                 target_unit_instance_id=unit_id,
             ),
+            targeted_unit_instance_ids=(unit_id,),
             affected_unit_instance_ids=(unit_id, unit_id),
             command_point_cost=0,
             command_point_transaction_id=None,
@@ -1911,6 +1977,7 @@ def _stratagem_option_for_record(
                 "context": context.to_payload(),
                 "catalog_record": record.to_payload(),
                 "target_binding": binding.to_payload(),
+                "effect_selection": None,
             }
         ),
     )
