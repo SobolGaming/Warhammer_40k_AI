@@ -986,6 +986,13 @@ class GameLifecycle:
             if is_stratagem_window_decline_result(result):
                 self._record_stratagem_window_declined(result)
                 if resolves_reaction_frame:
+                    if self._fight_interrupt_activation_is_active():
+                        advanced_status = self.advance_until_decision_or_terminal()
+                        self._continue_or_resolve_fight_reaction(
+                            result=result,
+                            status=advanced_status,
+                        )
+                        return advanced_status
                     self.reaction_queue.resolve_reaction(
                         result=result,
                         decisions=self.decision_controller,
