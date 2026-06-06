@@ -90,6 +90,7 @@ from warhammer40k_core.engine.movement_proposals import (
     PlacementProposalPayload,
     PlacementProposalPayloadPayload,
     ProposalKind,
+    ProposalValidationResult,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -101,7 +102,9 @@ from warhammer40k_core.engine.phases.charge import (
     CHARGE_MOVE_ACTION,
     ChargeMoveProposal,
     ChargeMoveProposalPayload,
+    charge_move_invalid_message,
     charge_move_violation_code,
+    charge_move_violation_field,
     resolve_charge_move,
 )
 from warhammer40k_core.engine.phases.shooting import (
@@ -2036,23 +2039,51 @@ def apply_heroic_intervention_charge_move(
         maximum_distance_inches=maximum_distance,
     )
     if violation is not None:
+        message = charge_move_invalid_message(violation)
+        invalid_validation = ProposalValidationResult.invalid(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            violation_code=violation,
+            message=message,
+            field=charge_move_violation_field(violation),
+        )
         payload = validate_json_value(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
                 "phase": BattlePhase.CHARGE.value,
+                "phase_body_status": "heroic_intervention_charge_move_invalid",
+                "unit_instance_id": resolution.unit_instance_id,
                 "request_id": result.request_id,
                 "result_id": result.result_id,
                 "proposal_request_id": proposal_request.request_id,
                 "violation_code": violation,
+                "proposal_validation": invalid_validation.to_payload(),
                 **resolution.movement_payload,
             }
         )
         decisions.event_log.append("heroic_intervention_charge_move_invalid", payload)
+        retry_request = _request_heroic_intervention_charge_move_retry(
+            state=state,
+            decisions=decisions,
+            proposal_request=proposal_request,
+            rejected_result=result,
+        )
         return LifecycleStatus.invalid(
             stage=state.stage,
-            message=f"Heroic Intervention charge move is invalid: {violation}.",
-            payload=payload,
+            message=message,
+            payload={
+                "phase": BattlePhase.CHARGE.value,
+                "phase_body_status": "heroic_intervention_charge_move_invalid",
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "unit_instance_id": resolution.unit_instance_id,
+                "movement_phase_action": CHARGE_MOVE_ACTION,
+                "violation_code": violation,
+                "next_request_id": retry_request.request_id,
+                "proposal_validation": validate_json_value(invalid_validation.to_payload()),
+            },
         )
     transition_batch = resolution.transition_batch(before=unit_placement)
     battlefield_state = state.battlefield_state
@@ -2094,6 +2125,54 @@ def apply_heroic_intervention_charge_move(
         },
     )
     return None
+
+
+def _request_heroic_intervention_charge_move_retry(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    proposal_request: MovementProposalRequest,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    retry_proposal = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.CHARGE.value,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        movement_phase_action=CHARGE_MOVE_ACTION,
+        context=dict(proposal_request.context or {}),
+    )
+    request = retry_proposal.to_decision_request()
+    decisions.request_decision(request)
+    use_record = _stratagem_use_from_proposal_context(proposal_request)
+    context = _heroic_intervention_request_context(proposal_request)
+    reachable = _heroic_intervention_requested_reachable_distances(proposal_request)
+    decisions.event_log.append(
+        "heroic_intervention_charge_move_requested",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.CHARGE.value,
+            "stratagem_use": use_record.to_payload(),
+            "mode": _heroic_intervention_mode_from_request(proposal_request),
+            "charge_roll_state": context["charge_roll_state"],
+            "maximum_distance_inches": _heroic_intervention_maximum_distance(proposal_request),
+            "reachable_target_unit_instance_ids": list(reachable),
+            "reachable_target_distances_inches": reachable,
+            "request_id": request.request_id,
+            "previous_proposal_request_id": proposal_request.request_id,
+            "rejected_result_id": rejected_result.result_id,
+            "phase_body_status": "heroic_intervention_charge_move_proposal_required",
+        },
+    )
+    return request
 
 
 def stratagem_availability_kind_from_token(token: object) -> StratagemAvailabilityKind:

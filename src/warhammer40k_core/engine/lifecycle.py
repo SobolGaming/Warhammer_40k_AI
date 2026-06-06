@@ -735,6 +735,16 @@ class GameLifecycle:
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
             )
             if heroic_status is not None:
+                if resolves_reaction_frame:
+                    retry_request = self._pending_decision_request()
+                    if retry_request is not None and is_heroic_intervention_charge_move_request(
+                        retry_request
+                    ):
+                        self.reaction_queue.continue_reaction(
+                            result=result,
+                            next_request_id=retry_request.request_id,
+                            decisions=self.decision_controller,
+                        )
                 return heroic_status
             if resolves_reaction_frame:
                 self.reaction_queue.resolve_reaction(
@@ -988,12 +998,17 @@ class GameLifecycle:
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
             )
+            advanced_status = self.advance_until_decision_or_terminal()
             if resolves_reaction_frame:
-                follow_up_request = self._pending_decision_request()
-                if follow_up_request is not None:
+                if self._fight_interrupt_activation_is_active():
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                elif advanced_status.decision_request is not None:
                     self.reaction_queue.continue_reaction(
                         result=result,
-                        next_request_id=follow_up_request.request_id,
+                        next_request_id=advanced_status.decision_request.request_id,
                         decisions=self.decision_controller,
                     )
                 else:
@@ -1001,7 +1016,7 @@ class GameLifecycle:
                         result=result,
                         decisions=self.decision_controller,
                     )
-            return self.advance_until_decision_or_terminal()
+            return advanced_status
         if record.request.decision_type == SEQUENCING_DECISION_TYPE:
             if sequencing_decision is None:
                 sequencing_decision = apply_sequencing_decision_from_request(

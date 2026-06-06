@@ -2443,6 +2443,14 @@ def charge_move_violation_code(
     return None
 
 
+def charge_move_invalid_message(violation_code: str) -> str:
+    return _charge_move_invalid_message(violation_code)
+
+
+def charge_move_violation_field(violation_code: str) -> str:
+    return _charge_move_violation_field(violation_code)
+
+
 def _charge_endpoint_violation_code(
     *,
     endpoint_witness: ChargeEndpointWitness,

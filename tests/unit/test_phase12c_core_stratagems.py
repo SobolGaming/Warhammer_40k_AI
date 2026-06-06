@@ -118,6 +118,7 @@ from warhammer40k_core.engine.stratagems import (
     create_stratagem_target_proposal_decision_request,
     create_stratagem_use_decision_request,
     invalid_heroic_intervention_charge_move_status,
+    is_heroic_intervention_charge_move_request,
     is_stratagem_window_decline_result,
     request_stratagem_target_proposal,
     request_stratagem_use,
@@ -1992,9 +1993,127 @@ def test_phase15e_heroic_intervention_charge_rejects_endpoint_only_witness() -> 
         "heroic_intervention_charge_move_invalid",
     )
 
+    assert isinstance(status.payload, dict)
+    status_payload = status.payload
     assert status.status_kind is LifecycleStatusKind.INVALID
-    assert cast(dict[str, JsonValue], status.payload)["violation_code"] == "endpoint_only_path"
+    assert status_payload["violation_code"] == "endpoint_only_path"
+    retry_request_id = status_payload["next_request_id"]
+    assert type(retry_request_id) is str
+    retry_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    retry_proposal_request = MovementProposalRequest.from_decision_request_payload(
+        retry_request.payload
+    )
+    assert retry_request.request_id == retry_request_id
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert is_heroic_intervention_charge_move_request(retry_request)
+    assert retry_proposal_request.context == proposal_request.context
     assert invalid["violation_code"] == "endpoint_only_path"
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == before_battlefield
+    assert state.persisting_effects_for_unit(heroic_unit_id) == ()
+
+
+def test_phase15e_heroic_intervention_reaction_invalid_charge_continues_to_retry() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+    heroic_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=heroic_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+    _grant_cp(state, player_id="player-a", amount=2)
+    target_proposal_request = StratagemTargetProposal.for_request(
+        context=_context(
+            state=state,
+            player_id="player-a",
+            trigger_kind=TimingTriggerKind.END_PHASE,
+        ),
+        catalog_record=_source_stratagem_record("heroic-intervention"),
+    )
+    lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=_reaction_window_for_trigger(
+            state,
+            eligible_player_id="player-a",
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            source_rule_id="phase15e-heroic-retry-reaction",
+            window_id="phase15e-heroic-retry-window",
+            phase=BattlePhase.CHARGE,
+        ),
+        parent_phase=BattlePhase.CHARGE,
+        parent_step="end_charge_phase_reactions",
+        resume_token="phase15e_heroic_retry_resume_token",
+        actor_id="player-a",
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        options=(parameterized_decision_option(),),
+        payload=validate_json_value(
+            {"proposal_request": validate_json_value(target_proposal_request.to_payload())}
+        ),
+    )
+    target_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    target_status = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=target_request,
+            result_id="phase15e-heroic-reaction-target",
+            proposal=_proposal_request_from_decision(target_request).with_binding(
+                StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                    target_player_id="player-a",
+                    target_unit_instance_id=heroic_unit_id,
+                ),
+                effect_selection={
+                    HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+                },
+            ),
+        )
+    )
+    movement_request = _decision_request(target_status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        movement_request.payload
+    )
+    witness = _path_witness_for_unit_delta(
+        state,
+        unit_instance_id=heroic_unit_id,
+        dy=2.0,
+        endpoint_only=True,
+    )
+
+    status = _submit_heroic_charge_move_proposal(
+        lifecycle,
+        request=movement_request,
+        result_id="phase15e-heroic-reaction-invalid-charge",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(enemy_unit_id,),
+            witness=witness,
+        ),
+    )
+    retry_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(status.payload, dict)
+    assert status.payload["next_request_id"] == retry_request.request_id
+    assert is_heroic_intervention_charge_move_request(retry_request)
+    assert len(lifecycle.reaction_queue.frames) == 1
+    assert lifecycle.reaction_queue.frames[0].request_id == retry_request.request_id
+    assert not _has_event(lifecycle.decision_controller, "reaction_parent_resumed")
     assert state.battlefield_state is not None
     assert state.battlefield_state.to_payload() == before_battlefield
     assert state.persisting_effects_for_unit(heroic_unit_id) == ()
@@ -4199,12 +4318,13 @@ def _reaction_window_for_trigger(
     trigger_kind: TimingTriggerKind,
     source_rule_id: str,
     window_id: str,
+    phase: BattlePhase = BattlePhase.MOVEMENT,
 ) -> ReactionWindow:
     descriptor = TimingWindowDescriptor(
         descriptor_id="phase12c-reaction-window",
         trigger_kind=trigger_kind,
         source_rule_id=source_rule_id,
-        phase=BattlePhase.MOVEMENT,
+        phase=phase,
     )
     window = TimingWindow(
         window_id=window_id,
@@ -4212,7 +4332,7 @@ def _reaction_window_for_trigger(
         game_id=state.game_id,
         battle_round=state.battle_round,
         active_player_id=state.active_player_id,
-        phase=BattlePhase.MOVEMENT,
+        phase=phase,
         trigger_event_id="phase12c-trigger-event",
     )
     return ReactionWindow(

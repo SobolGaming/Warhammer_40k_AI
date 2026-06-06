@@ -25,6 +25,7 @@ from warhammer40k_core.engine.attack_sequence import (
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -83,6 +84,13 @@ from warhammer40k_core.engine.phases.fight import (
     invalid_fight_interrupt_status,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemTargetBinding,
+    StratagemTargetKind,
+    StratagemTargetProposal,
+    StratagemTargetProposalPayload,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -1020,6 +1028,83 @@ def test_fight_interrupt_uses_reaction_queue_once_and_resumes_parent_sequence() 
     assert len(_event_payloads(lifecycle, "fight_interrupt_requested")) == 1
     assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == 1
     assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 1
+
+
+def test_counteroffensive_acceptance_continues_reaction_to_melee_subflow() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("parent",),
+        enemy_unit_ids=("counteroffensive-unit",),
+        origins={
+            "parent": Pose.at(10.0, 20.0),
+            "counteroffensive-unit": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15e-counteroffensive-reaction-continuation",
+        enemy_unit_specs={
+            "counteroffensive-unit": (
+                "core-character-leader",
+                "core-character-leader",
+                1,
+            ),
+        },
+    )
+    state = _state(lifecycle)
+    state.gain_command_points(
+        player_id="player-b",
+        amount=2,
+        source_id="phase15e-counteroffensive-reaction-cp",
+        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+        cap_exempt=True,
+    )
+    first_request = _advance_to_fight_order_request(lifecycle)
+    counteroffensive_status = _submit_normal_fight(
+        lifecycle,
+        request=first_request,
+        unit=units["parent"],
+        result_id="phase15e-trigger-counteroffensive-reaction",
+    )
+    counteroffensive_request = _decision_request(counteroffensive_status)
+    counteroffensive_proposal = _stratagem_target_proposal_from_request(
+        counteroffensive_request
+    ).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-b",
+            target_unit_instance_id=units["counteroffensive-unit"].unit_instance_id,
+        )
+    )
+
+    assert counteroffensive_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert _active_reaction_frame_request_id(lifecycle) == counteroffensive_request.request_id
+
+    melee_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=counteroffensive_request.request_id,
+            result_id="phase15e-accept-counteroffensive-reaction",
+            payload=cast(JsonValue, {"proposal": counteroffensive_proposal.to_payload()}),
+        ).to_result(counteroffensive_request)
+    )
+    melee_request = _decision_request(melee_status)
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert _active_reaction_frame_request_id(lifecycle) == melee_request.request_id
+    assert _event_payloads(lifecycle, "reaction_parent_resumed") == ()
+
+    attack_status = _submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id="phase15e-counteroffensive-melee-declaration",
+    )
+    attack_request = _decision_request(attack_status)
+
+    assert attack_request.decision_type in _ATTACK_SEQUENCE_DECISION_TYPES
+    assert _active_reaction_frame_request_id(lifecycle) == attack_request.request_id
+    assert _event_payloads(lifecycle, "reaction_parent_resumed") == ()
+
+    completed_status = _resolve_phase15d_activation(lifecycle, attack_status)
+
+    assert completed_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.reaction_queue.frames == ()
+    assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == 1
 
 
 def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_sequence() -> None:
@@ -2409,6 +2494,13 @@ def _request_unit_ids(request: DecisionRequest) -> list[str]:
 
 def _request_option_ids(request: DecisionRequest) -> set[str]:
     return {option.option_id for option in request.options}
+
+
+def _stratagem_target_proposal_from_request(request: DecisionRequest) -> StratagemTargetProposal:
+    payload = cast(dict[str, JsonValue], request.payload)
+    return StratagemTargetProposal.from_payload(
+        cast(StratagemTargetProposalPayload, payload["proposal_request"])
+    )
 
 
 def _active_reaction_frame_request_id(lifecycle: GameLifecycle) -> str:
