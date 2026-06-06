@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from itertools import combinations
@@ -104,6 +105,7 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogIndex,
     StratagemEligibilityContext,
+    StratagemTargetProposal,
     stratagem_target_proposal_from_index,
     stratagem_target_proposal_request_payload,
     stratagem_window_declined_for_context,
@@ -2394,10 +2396,7 @@ def _request_rapid_ingress_reaction_if_available(
             actor_id=player_id,
             decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
             options=(parameterized_decision_option(),),
-            payload=stratagem_target_proposal_request_payload(
-                proposal,
-                allow_decline=True,
-            ),
+            payload_factory=_stratagem_target_proposal_payload_factory(proposal),
         )
         return LifecycleStatus.waiting_for_decision(
             stage=GameLifecycleStage.BATTLE,
@@ -2491,10 +2490,7 @@ def _request_fire_overwatch_reaction_if_available(
                 actor_id=player_id,
                 decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
                 options=(parameterized_decision_option(),),
-                payload=stratagem_target_proposal_request_payload(
-                    proposal,
-                    allow_decline=True,
-                ),
+                payload_factory=_stratagem_target_proposal_payload_factory(proposal),
             )
             return LifecycleStatus.waiting_for_decision(
                 stage=GameLifecycleStage.BATTLE,
@@ -2510,6 +2506,26 @@ def _request_fire_overwatch_reaction_if_available(
                 },
             )
     return None
+
+
+def _stratagem_target_proposal_payload_factory(
+    proposal: StratagemTargetProposal,
+) -> Callable[[str, str, str], JsonValue]:
+    if type(proposal) is not StratagemTargetProposal:
+        raise GameLifecycleError(
+            "Stratagem target proposal payload factory requires a StratagemTargetProposal."
+        )
+
+    def payload_factory(request_id: str, decision_type: str, actor_id: str) -> JsonValue:
+        return stratagem_target_proposal_request_payload(
+            proposal,
+            request_id=request_id,
+            decision_type=decision_type,
+            actor_id=actor_id,
+            allow_decline=True,
+        )
+
+    return payload_factory
 
 
 def _active_player_end_movement_overwatch_trigger_unit_ids(

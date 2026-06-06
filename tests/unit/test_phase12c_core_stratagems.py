@@ -882,6 +882,9 @@ def test_stratagem_decline_helpers_require_decline_results_and_marked_requests()
     )
     declinable_payload = stratagem_target_proposal_request_payload(
         proposal_request,
+        request_id="phase12c-declinable-proposal-request",
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.player_id,
         allow_decline=True,
     )
     assert isinstance(declinable_payload, dict)
@@ -889,6 +892,9 @@ def test_stratagem_decline_helpers_require_decline_results_and_marked_requests()
     with pytest.raises(GameLifecycleError, match="decline allowance"):
         stratagem_target_proposal_request_payload(
             proposal_request,
+            request_id="phase12c-declinable-proposal-request",
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=proposal_request.player_id,
             allow_decline=cast(bool, "yes"),
         )
     request = create_stratagem_target_proposal_decision_request(

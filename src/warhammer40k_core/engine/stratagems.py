@@ -253,6 +253,9 @@ class StratagemTargetBindingPayload(TypedDict):
 
 
 class StratagemTargetProposalPayload(TypedDict):
+    request_id: NotRequired[str]
+    decision_type: NotRequired[str]
+    actor_id: NotRequired[str]
     proposal_kind: str
     context: StratagemEligibilityContextPayload
     catalog_record: StratagemCatalogRecordPayload
@@ -1469,12 +1472,16 @@ def create_stratagem_target_proposal_decision_request(
         raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
     if type(allow_decline) is not bool:
         raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
+    request_id = state.next_decision_request_id()
     return DecisionRequest(
-        request_id=state.next_decision_request_id(),
+        request_id=request_id,
         decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
         actor_id=proposal_request.player_id,
         payload=stratagem_target_proposal_request_payload(
             proposal_request,
+            request_id=request_id,
+            decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+            actor_id=proposal_request.player_id,
             allow_decline=allow_decline,
         ),
         options=(parameterized_decision_option(),),
@@ -1484,14 +1491,35 @@ def create_stratagem_target_proposal_decision_request(
 def stratagem_target_proposal_request_payload(
     proposal_request: StratagemTargetProposal,
     *,
+    request_id: str,
+    decision_type: str,
+    actor_id: str,
     allow_decline: bool = False,
 ) -> JsonValue:
     if type(proposal_request) is not StratagemTargetProposal:
         raise GameLifecycleError("Stratagem proposal request must be a StratagemTargetProposal.")
+    validated_request_id = _validate_identifier("Stratagem proposal request_id", request_id)
+    validated_decision_type = _validate_identifier(
+        "Stratagem proposal decision_type",
+        decision_type,
+    )
+    validated_actor_id = _validate_identifier("Stratagem proposal actor_id", actor_id)
+    if validated_decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        raise GameLifecycleError("Stratagem proposal decision_type is unsupported.")
+    if validated_actor_id != proposal_request.player_id:
+        raise GameLifecycleError("Stratagem proposal actor_id must match proposal player.")
     if type(allow_decline) is not bool:
         raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
+    proposal_payload = validate_json_value(proposal_request.to_payload())
+    if not isinstance(proposal_payload, dict):
+        raise GameLifecycleError("Stratagem proposal payload must be an object.")
     payload: dict[str, JsonValue] = {
-        "proposal_request": validate_json_value(proposal_request.to_payload())
+        "proposal_request": {
+            "request_id": validated_request_id,
+            "decision_type": validated_decision_type,
+            "actor_id": validated_actor_id,
+            **proposal_payload,
+        }
     }
     if allow_decline:
         payload["declinable"] = True
