@@ -2508,6 +2508,7 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
     )
     attack_context: AttackResolutionContextPayload = {
         "sequence_id": sequence.sequence_id,
+        "source_phase": sequence.source_phase.value,
         "attack_context_id": attack_context_id,
         "pool_index": 0,
         "attack_index": 0,
@@ -10567,6 +10568,7 @@ def test_phase13f_full_shooting_gate_drains_attacks_before_completion() -> None:
         ),
         enemy_pose=Pose.at(25.0, 35.0),
         catalog=_catalog_with_extra_bolt_profile(profile),
+        game_id="phase13f-full-gate-0000",
     )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]

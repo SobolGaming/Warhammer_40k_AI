@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the Phase 14E allocation-host foundation, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to the Phase 15 Charge/Fight host because no fight-phase attack declaration host exists yet. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop; melee attack splitting and gathering remain Phase 15 work. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is complete** for the Fight phase envelope, first-class `FightOrderState`, Fights First/Remaining Combats ordering loop, finite activation/pass decisions, legal Normal/Overrun fight-type filtering, and reaction-queue fight interrupts with source-scoped consumption. Phase 14H and 14I are still not marked complete; their transport/attached/reserve/aircraft/revival and Core Stratagem/source-contract scopes remain listed below. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
+Everything through **Phase 14D** is treated as implemented at the time this file was updated. **Phase 14E remains in progress**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, and no illegal Devastating Wounds spillover. Cleave is represented as a structured descriptor/helper, while full Cleave dice gathering and Lance charge-gated wound modifiers remain tied to later fight ability work. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is complete** for the Fight phase envelope, first-class `FightOrderState`, Fights First/Remaining Combats ordering loop, finite activation/pass decisions, legal Normal/Overrun fight-type filtering, and reaction-queue fight interrupts with source-scoped consumption. **Phase 15D is complete** for Pile In and Consolidate proposal routing, PathWitness-based fight movement validation, Overrun's additional Pile In hook, melee declaration requests, one-primary-melee-weapon selection with optional `[EXTRA ATTACKS]`, model-engaged target validation, split melee attack counts, and reuse of the shared attack sequence. Phase 14H and 14I are still not marked complete; their transport/attached/reserve/aircraft/revival and Core Stratagem/source-contract scopes remain listed below. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
 
 Completed / implemented foundation:
 
@@ -97,6 +97,7 @@ Completed / implemented foundation:
 | 15A | Complete | Charge phase declaration, deterministic Charge roll, and reachable-target snapshot |
 | 15B | Complete | Charge Move proposal, terrain/pathing/coherency validation, endpoint rules, displacements, and Fights First |
 | 15C | Complete | Fight phase skeleton, first-class `FightOrderState`, Fights First/Remaining Combats loop, activation/pass/interrupt decisions, and Normal/Overrun fight-type filtering |
+| 15D | Complete | Pile In/Consolidate proposals, fight movement validation, melee declarations, split melee attack pools, and shared attack-sequence reuse |
 
 Next / planned sequence:
 
@@ -104,7 +105,6 @@ Next / planned sequence:
 |---|---:|---|
 | 14E | In progress | Allocation-group host and grouped-host weapon abilities are implemented for supported fixed-damage pools; melee-only Cleave/Lance execution waits on Phase 15 Charge/Fight |
 | 14H, 14I | Next | Remaining mandatory 11th Edition migration/revalidation for completed Phases 1-13F plus source contracts for unimplemented rules |
-| 15D | Planned | Pile In step, melee attack resolution, and Consolidate step from the 11th Edition Fight phase |
 | 15E | Planned | Fight-phase Stratagems and melee abilities |
 | 15F | Planned | Charge/Fight completion gate and remaining Charge/Fight hardening |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
@@ -156,7 +156,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Starting Strength, Below Half-strength, At Half-strength, Battle-shock persistence/recovery, CP gain, Battle-shocked restrictions, and appendix handling for units that cannot be exactly half-strength | Phase 11C, 14C |
 | Moving core: straight-line distance, free rotations, no pivot costs, per-model Move budgets when a unit has mixed Move characteristics, Set Up rollback, model overlap/surface checks, and end-of-turn coherency cleanup without destroyed-model triggers | Phase 10A-10T, 11E, 14C, 14D |
 | Unit coherency and engagement: 2"/5" engagement range, one-neighbor coherency plus 9"/5" max-spread coherency across every model | Phase 10G, 10L, 10M, 10N, 10O, 15A-15D, 14C |
-| Making attacks: ranged weapon selection, ranged Select Enemy Unit, ranged identical-attack aggregation, melee one-weapon selection plus `[EXTRA ATTACKS]`, target eligibility, and declared melee attack splitting across multiple engaged targets | Phase 13B, 13C, 13D, 14E, 14L, 15C |
+| Making attacks: ranged weapon selection, ranged Select Enemy Unit, ranged identical-attack aggregation, melee one-weapon selection plus `[EXTRA ATTACKS]`, target eligibility, and declared melee attack splitting across multiple engaged targets | Phase 13B, 13C, 13D, 14E, 14L, 15D |
 | Attack sequence: sequential full weapon-ability host plus grouped fixed-damage hit/wound/save-before-allocation/damage host, mandatory Invulnerable Save precedence, defender ordered allocation decisions, low-to-high failed-save resolution, and current group transitions | Phase 13C, 13E, 14E |
 | Attack sequence 11th Edition allocation host: save-before-allocation batching, allocation groups, defender ordered allocation decision, save resolution from lowest to highest result, current allocation group transitions, and damage allocation to wounded models first | Phase 14E |
 | Mortal wounds, normal-damage-before-mortal ordering, hazard rolls as unit-level rolls that allocate through mortal-wound rules, and `[DEVASTATING WOUNDS]` mortal-wound cap of one destroyed model per critical wound | Phase 13C, 13D, 13E, 14C, 14E remaining |
@@ -2550,11 +2550,11 @@ Implemented test coverage:
 
 ## Phase 15D: Pile In step, melee attacks, and Consolidate step
 
-Status: Planned.
+Status: Complete.
 
 Phase 15D implements the physical movement and attack bodies around the Phase 15C fight-order decisions. Pile In is a separate both-player step before the Fight step. Melee attacks resolve when Phase 15C selects a unit to fight. Consolidate is a separate both-player step after the Fight step. Only Overrun Fight includes an activation-local additional pile-in move before attacks.
 
-Pile In and Consolidate are group-aware movement displacements that require a `PathWitness`, and melee attacks reuse the Phase 13C attack-sequence infrastructure.
+Pile In and Consolidate are fight movement displacements that require a `PathWitness` for physical movement, reject endpoint-only witnesses, and use the shared movement/pathing/terrain/coherency validators. Melee attacks reuse the Phase 13C attack-sequence infrastructure: fight declarations lower to ordinary attack pools, then Select Enemy Unit, Gather Attack Dice, hit, wound, allocation, save, damage, and reaction handling continue through the same engine path used by Shooting.
 
 Modules:
 
@@ -2568,13 +2568,13 @@ Modules:
 
 Objects:
 
-- `PileInProposal`
-- `PileInTargetSelection`
-- `ConsolidateProposal`
-- `ConsolidationModeSelection`
-- `ConsolidationTargetSelection`
-- `MeleeTargetSelection`
-- `MeleeAttackPool`
+- `FightMovementProposal`
+- `FightMovementResolution`
+- `MeleeDeclarationProposalRequest`
+- `MeleeDeclarationProposal`
+- `MeleeWeaponDeclaration`
+- `MeleeTargetAllocation`
+- `RangedAttackPool` reused as the shared attack-sequence pool type
 - `FightDisplacementRecord`
 
 Invariants:
@@ -2593,6 +2593,10 @@ Invariants:
 - after a Pile In move, the moving unit must be engaged;
 - after a Pile In move, each model that started the move engaged with an enemy unit must still be engaged with that enemy unit;
 - melee target selection follows engagement/eligibility rules and uses the 2"/5" engagement range with the 11th Edition terrain-area policies;
+- while fighting, each fighting model must select one available non-extra melee weapon; `[EXTRA ATTACKS]` weapons can be added without counting as that primary selection;
+- melee target declarations are scoped to the attacking model: each target unit must be engaged with the model that has the selected melee weapon;
+- a melee weapon cannot declare more targets than its Attacks characteristic;
+- when a melee weapon targets more than one unit, the declaration must allocate at least one attack to each target and exactly the fixed Attacks characteristic across all targets; random-Attacks split declarations return a typed invalid result until a fixed attack count is available;
 - Normal Fight resolves Making Attacks for an engaged selected unit;
 - Overrun Fight grants one additional Pile In move for that selected unit, then resolves Making Attacks;
 - the melee attack sequence reuses the Phase 13C attack-sequence and damage-allocation infrastructure (Hit uses WS, then wound, allocate, save, damage) and the Phase 13D melee weapon-ability machinery, not a private melee resolver;
@@ -2610,7 +2614,7 @@ Invariants:
 - after Engaging Consolidation, the moving unit must be engaged with every selected enemy unit;
 - after Objective Consolidation, the moving unit must be within range of the selected objective;
 - Engaging Consolidation that engages enemy units not already selected to fight this phase requires the opponent to select those units one at a time; when each is selected, it becomes eligible to fight and is selected to fight;
-- melee target declaration, Pile In/Consolidate proposals, and consolidation-mode selection are player-facing decisions with deterministic option IDs and JSON-safe payloads, and Phase 15D must update `docs/ADAPTER_DECISION_CONTRACT.md` for each.
+- melee target declaration, Pile In/Consolidate proposals, and consolidation-mode selection are player-facing parameterized decisions with deterministic request/source context and JSON-safe payloads, and Phase 15D updates `docs/ADAPTER_DECISION_CONTRACT.md` for each.
 
 Required tests:
 

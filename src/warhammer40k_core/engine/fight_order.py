@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     fight_phase_step_kind_from_token,
     fight_type_kind_from_token,
 )
+from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequencePayload
 from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -32,6 +33,7 @@ DECLINE_FIGHT_INTERRUPT_OPTION_ID = "decline_fight_interrupt"
 FIGHT_INTERRUPT_EFFECT_KIND = "fight_interrupt"
 FIGHTS_FIRST_EFFECT_KIND = "fights_first"
 CHARGE_FIGHTS_FIRST_EFFECT_KIND = "charge_grants_fights_first"
+_UNSET = object()
 
 
 class FightsFirstSourcePayload(TypedDict):
@@ -98,6 +100,13 @@ class FightStepStatePayload(TypedDict):
     status: str
 
 
+class FightMovementStepStatePayload(TypedDict):
+    step: str
+    next_player_id: str
+    completed_player_ids: list[str]
+    completed_unit_ids: list[str]
+
+
 class FightOrderStatePayload(TypedDict):
     ordering_bands: list[str]
     current_band_index: int
@@ -115,8 +124,15 @@ class FightOrderStatePayload(TypedDict):
 class FightPhaseStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
+    current_step: str
     step_states: list[FightStepStatePayload]
+    pile_in_state: FightMovementStepStatePayload | None
+    consolidate_state: FightMovementStepStatePayload | None
     fight_order_state: FightOrderStatePayload
+    active_activation: FightActivationSelectionPayload | None
+    attack_sequence: AttackSequencePayload | None
+    allocated_model_ids_this_phase: list[str]
+    overrun_pile_in_completed_activation_result_ids: list[str]
     phase_complete: bool
 
 
@@ -608,6 +624,77 @@ class FightStepState:
 
 
 @dataclass(frozen=True, slots=True)
+class FightMovementStepState:
+    step: FightPhaseStepKind
+    next_player_id: str
+    completed_player_ids: tuple[str, ...] = ()
+    completed_unit_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "step", _fight_movement_step_kind(self.step))
+        object.__setattr__(
+            self,
+            "next_player_id",
+            _validate_identifier("FightMovementStepState next_player_id", self.next_player_id),
+        )
+        completed_player_ids = _validate_identifier_tuple(
+            "FightMovementStepState completed_player_ids",
+            self.completed_player_ids,
+        )
+        completed_unit_ids = _validate_identifier_tuple(
+            "FightMovementStepState completed_unit_ids",
+            self.completed_unit_ids,
+        )
+        _validate_unique_unit_ids(completed_player_ids)
+        _validate_unique_unit_ids(completed_unit_ids)
+        object.__setattr__(self, "completed_player_ids", completed_player_ids)
+        object.__setattr__(self, "completed_unit_ids", completed_unit_ids)
+
+    @classmethod
+    def start(cls, *, step: FightPhaseStepKind, next_player_id: str) -> Self:
+        return cls(step=step, next_player_id=next_player_id)
+
+    def with_completed_unit(self, *, unit_instance_id: str) -> Self:
+        unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        if unit_id in self.completed_unit_ids:
+            raise GameLifecycleError("Fight movement unit has already completed this step.")
+        return type(self)(
+            step=self.step,
+            next_player_id=self.next_player_id,
+            completed_player_ids=self.completed_player_ids,
+            completed_unit_ids=(*self.completed_unit_ids, unit_id),
+        )
+
+    def with_completed_player(self, *, next_player_id: str) -> Self:
+        player_id = self.next_player_id
+        if player_id in self.completed_player_ids:
+            raise GameLifecycleError("Fight movement player has already completed this step.")
+        return type(self)(
+            step=self.step,
+            next_player_id=next_player_id,
+            completed_player_ids=(*self.completed_player_ids, player_id),
+            completed_unit_ids=self.completed_unit_ids,
+        )
+
+    def to_payload(self) -> FightMovementStepStatePayload:
+        return {
+            "step": self.step.value,
+            "next_player_id": self.next_player_id,
+            "completed_player_ids": list(self.completed_player_ids),
+            "completed_unit_ids": list(self.completed_unit_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: FightMovementStepStatePayload) -> Self:
+        return cls(
+            step=fight_phase_step_kind_from_token(payload["step"]),
+            next_player_id=payload["next_player_id"],
+            completed_player_ids=tuple(payload["completed_player_ids"]),
+            completed_unit_ids=tuple(payload["completed_unit_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class FightOrderState:
     ordering_bands: tuple[FightOrderingBandKind, ...]
     current_band_index: int
@@ -894,8 +981,15 @@ class FightOrderState:
 class FightPhaseState:
     battle_round: int
     active_player_id: str
+    current_step: FightPhaseStepKind
     step_states: tuple[FightStepState, ...]
     fight_order_state: FightOrderState
+    pile_in_state: FightMovementStepState | None = None
+    consolidate_state: FightMovementStepState | None = None
+    active_activation: FightActivationSelection | None = None
+    attack_sequence: AttackSequence | None = None
+    allocated_model_ids_this_phase: tuple[str, ...] = ()
+    overrun_pile_in_completed_activation_result_ids: tuple[str, ...] = ()
     phase_complete: bool = False
 
     def __post_init__(self) -> None:
@@ -909,9 +1003,50 @@ class FightPhaseState:
             "active_player_id",
             _validate_identifier("FightPhaseState active_player_id", self.active_player_id),
         )
+        object.__setattr__(
+            self,
+            "current_step",
+            fight_phase_step_kind_from_token(self.current_step),
+        )
         object.__setattr__(self, "step_states", _validate_step_states(self.step_states))
         if type(self.fight_order_state) is not FightOrderState:
             raise GameLifecycleError("FightPhaseState fight_order_state must be FightOrderState.")
+        if self.pile_in_state is not None and type(self.pile_in_state) is not (
+            FightMovementStepState
+        ):
+            raise GameLifecycleError(
+                "FightPhaseState pile_in_state must be FightMovementStepState."
+            )
+        if self.consolidate_state is not None and type(self.consolidate_state) is not (
+            FightMovementStepState
+        ):
+            raise GameLifecycleError(
+                "FightPhaseState consolidate_state must be FightMovementStepState."
+            )
+        if self.active_activation is not None and type(self.active_activation) is not (
+            FightActivationSelection
+        ):
+            raise GameLifecycleError(
+                "FightPhaseState active_activation must be FightActivationSelection."
+            )
+        if self.attack_sequence is not None and type(self.attack_sequence) is not AttackSequence:
+            raise GameLifecycleError("FightPhaseState attack_sequence must be AttackSequence.")
+        object.__setattr__(
+            self,
+            "allocated_model_ids_this_phase",
+            _validate_identifier_tuple(
+                "FightPhaseState allocated_model_ids_this_phase",
+                self.allocated_model_ids_this_phase,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "overrun_pile_in_completed_activation_result_ids",
+            _validate_identifier_tuple(
+                "FightPhaseState overrun_pile_in_completed_activation_result_ids",
+                self.overrun_pile_in_completed_activation_result_ids,
+            ),
+        )
         if type(self.phase_complete) is not bool:
             raise GameLifecycleError("FightPhaseState phase_complete must be a bool.")
 
@@ -930,7 +1065,20 @@ class FightPhaseState:
         return cls(
             battle_round=battle_round,
             active_player_id=active_player_id,
-            step_states=tuple(_initial_step_state(step) for step in policy.steps),
+            current_step=FightPhaseStepKind.PILE_IN,
+            step_states=_step_states_for_current_step(
+                steps=policy.steps,
+                current_step=FightPhaseStepKind.PILE_IN,
+                phase_complete=False,
+            ),
+            pile_in_state=FightMovementStepState.start(
+                step=FightPhaseStepKind.PILE_IN,
+                next_player_id=active_player_id,
+            ),
+            consolidate_state=FightMovementStepState.start(
+                step=FightPhaseStepKind.CONSOLIDATE,
+                next_player_id=active_player_id,
+            ),
             fight_order_state=FightOrderState.start(
                 policy=policy,
                 next_player_id=active_player_id,
@@ -991,23 +1139,156 @@ class FightPhaseState:
             )
         )
 
+    def with_current_step(
+        self,
+        *,
+        current_step: FightPhaseStepKind,
+        policy: FightPolicyDescriptor,
+    ) -> Self:
+        if type(policy) is not FightPolicyDescriptor:
+            raise GameLifecycleError("FightPhaseState current-step update requires policy.")
+        step = fight_phase_step_kind_from_token(current_step)
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=step,
+            step_states=_step_states_for_current_step(
+                steps=policy.steps,
+                current_step=step,
+                phase_complete=False,
+            ),
+            pile_in_state=self.pile_in_state,
+            consolidate_state=self.consolidate_state,
+            fight_order_state=self.fight_order_state,
+            active_activation=self.active_activation,
+            attack_sequence=self.attack_sequence,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
+            overrun_pile_in_completed_activation_result_ids=(
+                self.overrun_pile_in_completed_activation_result_ids
+            ),
+            phase_complete=False,
+        )
+
+    def with_pile_in_state(self, pile_in_state: FightMovementStepState) -> Self:
+        if type(pile_in_state) is not FightMovementStepState:
+            raise GameLifecycleError("FightPhaseState pile_in_state update requires state.")
+        if pile_in_state.step is not FightPhaseStepKind.PILE_IN:
+            raise GameLifecycleError("FightPhaseState pile_in_state step drift.")
+        return self._replace(pile_in_state=pile_in_state)
+
+    def with_consolidate_state(self, consolidate_state: FightMovementStepState) -> Self:
+        if type(consolidate_state) is not FightMovementStepState:
+            raise GameLifecycleError("FightPhaseState consolidate_state update requires state.")
+        if consolidate_state.step is not FightPhaseStepKind.CONSOLIDATE:
+            raise GameLifecycleError("FightPhaseState consolidate_state step drift.")
+        return self._replace(consolidate_state=consolidate_state)
+
+    def with_active_activation(self, selection: FightActivationSelection | None) -> Self:
+        if selection is not None:
+            if type(selection) is not FightActivationSelection:
+                raise GameLifecycleError(
+                    "FightPhaseState active activation update requires selection."
+                )
+            if selection.battle_round != self.battle_round:
+                raise GameLifecycleError("Fight activation battle round drift.")
+        return self._replace(active_activation=selection)
+
+    def with_attack_sequence_update(
+        self,
+        *,
+        attack_sequence: AttackSequence | None,
+        allocated_model_ids_this_phase: tuple[str, ...],
+    ) -> Self:
+        if attack_sequence is not None and type(attack_sequence) is not AttackSequence:
+            raise GameLifecycleError("FightPhaseState attack_sequence update requires sequence.")
+        return self._replace(
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=allocated_model_ids_this_phase,
+        )
+
+    def with_overrun_pile_in_completed(self, *, activation_result_id: str) -> Self:
+        result_id = _validate_identifier("activation_result_id", activation_result_id)
+        if result_id in self.overrun_pile_in_completed_activation_result_ids:
+            raise GameLifecycleError("Overrun pile-in has already completed for this activation.")
+        return self._replace(
+            overrun_pile_in_completed_activation_result_ids=(
+                *self.overrun_pile_in_completed_activation_result_ids,
+                result_id,
+            ),
+        )
+
+    def overrun_pile_in_is_completed(self, *, activation_result_id: str) -> bool:
+        result_id = _validate_identifier("activation_result_id", activation_result_id)
+        return result_id in self.overrun_pile_in_completed_activation_result_ids
+
     def with_phase_complete(self) -> Self:
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
+            current_step=FightPhaseStepKind.END,
             step_states=tuple(
                 FightStepState(step=state.step, status="complete") for state in self.step_states
             ),
+            pile_in_state=self.pile_in_state,
+            consolidate_state=self.consolidate_state,
             fight_order_state=self.fight_order_state,
+            active_activation=None,
+            attack_sequence=None,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
+            overrun_pile_in_completed_activation_result_ids=(
+                self.overrun_pile_in_completed_activation_result_ids
+            ),
             phase_complete=True,
         )
 
     def _with_order_state(self, fight_order_state: FightOrderState) -> Self:
+        return self._replace(fight_order_state=fight_order_state)
+
+    def _replace(
+        self,
+        *,
+        current_step: FightPhaseStepKind | None = None,
+        step_states: tuple[FightStepState, ...] | None = None,
+        fight_order_state: FightOrderState | None = None,
+        pile_in_state: FightMovementStepState | None | object = _UNSET,
+        consolidate_state: FightMovementStepState | None | object = _UNSET,
+        active_activation: FightActivationSelection | None | object = _UNSET,
+        attack_sequence: AttackSequence | None | object = _UNSET,
+        allocated_model_ids_this_phase: tuple[str, ...] | None = None,
+        overrun_pile_in_completed_activation_result_ids: tuple[str, ...] | None = None,
+    ) -> Self:
+        next_pile_in_state = self.pile_in_state if pile_in_state is _UNSET else pile_in_state
+        next_consolidate_state = (
+            self.consolidate_state if consolidate_state is _UNSET else consolidate_state
+        )
+        next_active_activation = (
+            self.active_activation if active_activation is _UNSET else active_activation
+        )
+        next_attack_sequence = (
+            self.attack_sequence if attack_sequence is _UNSET else attack_sequence
+        )
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
-            step_states=self.step_states,
-            fight_order_state=fight_order_state,
+            current_step=self.current_step if current_step is None else current_step,
+            step_states=self.step_states if step_states is None else step_states,
+            pile_in_state=cast(FightMovementStepState | None, next_pile_in_state),
+            consolidate_state=cast(FightMovementStepState | None, next_consolidate_state),
+            fight_order_state=(
+                self.fight_order_state if fight_order_state is None else fight_order_state
+            ),
+            active_activation=cast(FightActivationSelection | None, next_active_activation),
+            attack_sequence=cast(AttackSequence | None, next_attack_sequence),
+            allocated_model_ids_this_phase=(
+                self.allocated_model_ids_this_phase
+                if allocated_model_ids_this_phase is None
+                else allocated_model_ids_this_phase
+            ),
+            overrun_pile_in_completed_activation_result_ids=(
+                self.overrun_pile_in_completed_activation_result_ids
+                if overrun_pile_in_completed_activation_result_ids is None
+                else overrun_pile_in_completed_activation_result_ids
+            ),
             phase_complete=False,
         )
 
@@ -1015,8 +1296,25 @@ class FightPhaseState:
         return {
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
+            "current_step": self.current_step.value,
             "step_states": [step.to_payload() for step in self.step_states],
+            "pile_in_state": None
+            if self.pile_in_state is None
+            else self.pile_in_state.to_payload(),
+            "consolidate_state": (
+                None if self.consolidate_state is None else self.consolidate_state.to_payload()
+            ),
             "fight_order_state": self.fight_order_state.to_payload(),
+            "active_activation": (
+                None if self.active_activation is None else self.active_activation.to_payload()
+            ),
+            "attack_sequence": (
+                None if self.attack_sequence is None else self.attack_sequence.to_payload()
+            ),
+            "allocated_model_ids_this_phase": list(self.allocated_model_ids_this_phase),
+            "overrun_pile_in_completed_activation_result_ids": list(
+                self.overrun_pile_in_completed_activation_result_ids
+            ),
             "phase_complete": self.phase_complete,
         }
 
@@ -1025,8 +1323,33 @@ class FightPhaseState:
         return cls(
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
+            current_step=fight_phase_step_kind_from_token(payload["current_step"]),
             step_states=tuple(FightStepState.from_payload(step) for step in payload["step_states"]),
+            pile_in_state=(
+                None
+                if payload["pile_in_state"] is None
+                else FightMovementStepState.from_payload(payload["pile_in_state"])
+            ),
+            consolidate_state=(
+                None
+                if payload["consolidate_state"] is None
+                else FightMovementStepState.from_payload(payload["consolidate_state"])
+            ),
             fight_order_state=FightOrderState.from_payload(payload["fight_order_state"]),
+            active_activation=(
+                None
+                if payload["active_activation"] is None
+                else FightActivationSelection.from_payload(payload["active_activation"])
+            ),
+            attack_sequence=(
+                None
+                if payload["attack_sequence"] is None
+                else AttackSequence.from_payload(payload["attack_sequence"])
+            ),
+            allocated_model_ids_this_phase=tuple(payload["allocated_model_ids_this_phase"]),
+            overrun_pile_in_completed_activation_result_ids=tuple(
+                payload["overrun_pile_in_completed_activation_result_ids"]
+            ),
             phase_complete=payload["phase_complete"],
         )
 
@@ -1433,10 +1756,38 @@ def _placed_unit_ids(state: GameState) -> set[str]:
     }
 
 
-def _initial_step_state(step: FightPhaseStepKind) -> FightStepState:
-    step_value = fight_phase_step_kind_from_token(step)
-    status = "active" if step_value is FightPhaseStepKind.FIGHT else "pending"
-    return FightStepState(step=step_value, status=status)
+def _step_states_for_current_step(
+    *,
+    steps: tuple[FightPhaseStepKind, ...],
+    current_step: FightPhaseStepKind,
+    phase_complete: bool,
+) -> tuple[FightStepState, ...]:
+    if not steps:
+        raise GameLifecycleError("FightPolicyDescriptor steps must not be empty.")
+    selected_step = fight_phase_step_kind_from_token(current_step)
+    step_values = tuple(fight_phase_step_kind_from_token(step) for step in steps)
+    if selected_step not in step_values:
+        raise GameLifecycleError("FightPhaseState current_step is not in policy steps.")
+    if phase_complete:
+        return tuple(FightStepState(step=step, status="complete") for step in step_values)
+    current_index = step_values.index(selected_step)
+    states: list[FightStepState] = []
+    for index, step in enumerate(step_values):
+        if index < current_index:
+            status = "complete"
+        elif index == current_index:
+            status = "active"
+        else:
+            status = "pending"
+        states.append(FightStepState(step=step, status=status))
+    return tuple(states)
+
+
+def _fight_movement_step_kind(step: object) -> FightPhaseStepKind:
+    step_kind = fight_phase_step_kind_from_token(step)
+    if step_kind not in {FightPhaseStepKind.PILE_IN, FightPhaseStepKind.CONSOLIDATE}:
+        raise GameLifecycleError("Fight movement step must be Pile In or Consolidate.")
+    return step_kind
 
 
 def _validate_fights_first_sources(values: object) -> tuple[FightsFirstSource, ...]:

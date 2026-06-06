@@ -31,7 +31,6 @@ from warhammer40k_core.engine.charge_declaration import (
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.fight_order import FIGHT_ACTIVATION_DECISION_TYPE
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -289,7 +288,11 @@ def test_phase15b_charge_move_proposal_applies_witness_records_displacements_and
 
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
-    assert status.decision_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    assert status.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    fight_movement_request = MovementProposalRequest.from_decision_request_payload(
+        status.decision_request.payload
+    )
+    assert fight_movement_request.proposal_kind is ProposalKind.PILE_IN
     assert after_state.current_battle_phase is BattlePhase.FIGHT
     assert after_state.charge_phase_state is None
     assert after_state.battlefield_state.to_payload() != before_battlefield

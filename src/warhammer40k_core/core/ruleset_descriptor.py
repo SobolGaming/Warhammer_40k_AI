@@ -21,6 +21,8 @@ class MovementMode(StrEnum):
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
     CHARGE = "charge"
+    PILE_IN = "pile_in"
+    CONSOLIDATE = "consolidate"
     FLY_TAKE_TO_SKIES = "fly_take_to_skies"
 
 
@@ -2297,6 +2299,24 @@ def _movement_policy_for_eleventh() -> MovementPolicyDescriptor:
                 may_transit_enemy_engagement=True,
                 may_end_in_enemy_engagement=True,
                 requires_charge_target=True,
+                ignores_vertical_distance=False,
+                ignores_models=False,
+                ignores_terrain=False,
+            ),
+            MovementModePolicy(
+                movement_mode=MovementMode.PILE_IN,
+                may_transit_enemy_engagement=True,
+                may_end_in_enemy_engagement=True,
+                requires_charge_target=False,
+                ignores_vertical_distance=False,
+                ignores_models=False,
+                ignores_terrain=False,
+            ),
+            MovementModePolicy(
+                movement_mode=MovementMode.CONSOLIDATE,
+                may_transit_enemy_engagement=True,
+                may_end_in_enemy_engagement=True,
+                requires_charge_target=False,
                 ignores_vertical_distance=False,
                 ignores_models=False,
                 ignores_terrain=False,
