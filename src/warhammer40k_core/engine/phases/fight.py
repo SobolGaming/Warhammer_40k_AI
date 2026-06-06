@@ -79,6 +79,7 @@ from warhammer40k_core.engine.fight_resolution import (
     MELEE_DECLARATION_PROPOSAL_KIND,
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     FightMovementProposal,
+    FightMovementResolution,
     MeleeDeclarationProposal,
     MeleeDeclarationProposalRequest,
     available_melee_weapons_payloads,
@@ -137,6 +138,7 @@ _UNIT_FOUGHT_STATUS = "unit_fought"
 _FIGHT_INTERRUPT_REQUIRED_STATUS = "fight_interrupt_required"
 _FIGHT_INTERRUPT_DECLINED_STATUS = "fight_interrupt_declined"
 _FIGHT_INTERRUPT_RECORDED_STATUS = "fight_interrupt_recorded"
+_ENDPOINT_ONLY_PATH_VIOLATION_CODE = "endpoint_only_path"
 
 
 @dataclass(frozen=True, slots=True)
@@ -703,6 +705,67 @@ def _request_overrun_pile_in(
     )
 
 
+def _request_fight_movement_proposal_retry(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    proposal_request: MovementProposalRequest,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    if proposal_request.movement_phase_action is None:
+        raise GameLifecycleError("Fight movement retry requires movement_phase_action.")
+    context = dict(proposal_request.context or {})
+    retry_proposal = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.FIGHT.value,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=proposal_request.proposal_kind,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        movement_phase_action=proposal_request.movement_phase_action,
+        context=context,
+    )
+    request = retry_proposal.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "fight_movement_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "phase_body_status": _fight_movement_required_status(
+                    proposal_request.proposal_kind
+                ),
+                "request_id": request.request_id,
+                "player_id": proposal_request.actor_id,
+                "unit_instance_id": proposal_request.unit_instance_id,
+                "proposal_kind": proposal_request.proposal_kind.value,
+                "movement_phase_action": proposal_request.movement_phase_action,
+                "movement_mode": _payload_string(context, key="movement_mode"),
+                "source_decision_request_id": proposal_request.source_decision_request_id,
+                "source_decision_result_id": proposal_request.source_decision_result_id,
+                "previous_proposal_request_id": proposal_request.request_id,
+                "rejected_result_id": rejected_result.result_id,
+                "context": context,
+            }
+        ),
+    )
+    return request
+
+
+def _fight_movement_required_status(proposal_kind: ProposalKind) -> str:
+    if proposal_kind is ProposalKind.PILE_IN:
+        return _FIGHT_PILE_IN_REQUIRED_STATUS
+    if proposal_kind is ProposalKind.CONSOLIDATE:
+        return _FIGHT_CONSOLIDATE_REQUIRED_STATUS
+    raise GameLifecycleError("Proposal kind is not a fight movement step.")
+
+
 def invalid_fight_movement_proposal_status(
     *,
     state: GameState,
@@ -711,7 +774,6 @@ def invalid_fight_movement_proposal_status(
     ruleset_descriptor: RulesetDescriptor,
     decisions: DecisionController,
 ) -> LifecycleStatus | None:
-    del decisions
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
     parsed = _parse_fight_movement_proposal_or_invalid(
         state=state,
@@ -722,7 +784,10 @@ def invalid_fight_movement_proposal_status(
         return parsed
     proposal = parsed
     proposal_validation = proposal.validation_result_for_request(proposal_request)
-    if not proposal_validation.is_valid:
+    if not proposal_validation.is_valid and not _proposal_validation_has_code(
+        proposal_validation,
+        _ENDPOINT_ONLY_PATH_VIOLATION_CODE,
+    ):
         return _reject_invalid_fight_proposal(
             state=state,
             proposal_validation=proposal_validation,
@@ -745,25 +810,18 @@ def invalid_fight_movement_proposal_status(
             proposal_validation=rule_validation,
             message="Fight movement proposal is not currently legal.",
         )
-    resolution = resolve_fight_movement(
-        scenario=_battlefield_scenario(state),
-        ruleset_descriptor=ruleset_descriptor,
-        proposal=proposal,
-        terrain_features=_terrain_features_for_state(state),
-    )
-    resolution_violation = fight_movement_resolution_violation(
+    witness_validation = _fight_movement_witness_matches_current_unit_status(
+        state=state,
         proposal_request=proposal_request,
         proposal=proposal,
-        resolution=resolution,
-        scenario=_battlefield_scenario(state),
-        ruleset_descriptor=ruleset_descriptor,
     )
-    if resolution_violation is not None:
+    if witness_validation is not None:
         return _reject_invalid_fight_proposal(
             state=state,
-            proposal_validation=resolution_violation,
-            message="Fight movement proposal endpoint is not legal.",
+            proposal_validation=witness_validation,
+            message="Fight movement witness does not match the current unit.",
         )
+    del decisions
     return None
 
 
@@ -900,6 +958,22 @@ def _apply_fight_movement_proposal(
     record = decisions.record_for_result(result)
     proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
     proposal = fight_movement_proposal_from_payload(result.payload)
+    proposal_validation = proposal.validation_result_for_request(proposal_request)
+    if not proposal_validation.is_valid:
+        if not _proposal_validation_has_code(
+            proposal_validation,
+            _ENDPOINT_ONLY_PATH_VIOLATION_CODE,
+        ):
+            raise GameLifecycleError("Recorded fight movement proposal drifted before application.")
+        return _reject_recorded_invalid_fight_movement(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=proposal_validation,
+            resolution=None,
+            message="Fight movement PathWitness must include sampled transit poses.",
+        )
     scenario = _battlefield_scenario(state)
     resolution = resolve_fight_movement(
         scenario=scenario,
@@ -915,10 +989,15 @@ def _apply_fight_movement_proposal(
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
     )
     if resolution_violation is not None:
-        return _reject_invalid_fight_proposal(
+        violation_code = _first_proposal_violation_code(resolution_violation)
+        return _reject_recorded_invalid_fight_movement(
             state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
             proposal_validation=resolution_violation,
-            message="Fight movement proposal became invalid before application.",
+            resolution=resolution,
+            message=_fight_movement_invalid_message(violation_code),
         )
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
@@ -1343,6 +1422,128 @@ def _reject_invalid_fight_proposal(
             "proposal_validation": validate_json_value(proposal_validation.to_payload()),
         },
     )
+
+
+def _reject_recorded_invalid_fight_movement(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    proposal_request: MovementProposalRequest,
+    proposal_validation: ProposalValidationResult,
+    resolution: FightMovementResolution | None,
+    message: str,
+) -> LifecycleStatus:
+    violation_code = _first_proposal_violation_code(proposal_validation)
+    event_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": _active_player_id(state),
+        "phase": BattlePhase.FIGHT.value,
+        "unit_instance_id": proposal_request.unit_instance_id,
+        "request_id": result.request_id,
+        "result_id": result.result_id,
+        "phase_body_status": _FIGHT_MOVEMENT_INVALID_STATUS,
+        "violation_code": violation_code,
+        "proposal_request_id": proposal_request.request_id,
+        "proposal_kind": proposal_request.proposal_kind.value,
+        "movement_phase_action": proposal_request.movement_phase_action,
+        "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+    }
+    if resolution is not None:
+        event_payload["resolution"] = validate_json_value(resolution.to_payload())
+    invalid_payload = validate_json_value(event_payload)
+    decisions.event_log.append("fight_movement_invalid", invalid_payload)
+    retry_request = _request_fight_movement_proposal_retry(
+        state=state,
+        decisions=decisions,
+        proposal_request=proposal_request,
+        rejected_result=result,
+    )
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message=message,
+        payload={
+            "phase": BattlePhase.FIGHT.value,
+            "phase_body_status": _FIGHT_MOVEMENT_INVALID_STATUS,
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "unit_instance_id": proposal_request.unit_instance_id,
+            "movement_phase_action": proposal_request.movement_phase_action,
+            "proposal_kind": proposal_request.proposal_kind.value,
+            "violation_code": violation_code,
+            "next_request_id": retry_request.request_id,
+            "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+        },
+    )
+
+
+def _fight_movement_witness_matches_current_unit_status(
+    *,
+    state: GameState,
+    proposal_request: MovementProposalRequest,
+    proposal: FightMovementProposal,
+) -> ProposalValidationResult | None:
+    witness = proposal.witness
+    if witness is None:
+        return None
+    unit_placement = _battlefield_scenario(state).battlefield_state.unit_placement_by_id(
+        proposal.unit_instance_id
+    )
+    expected_model_ids = tuple(
+        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
+    )
+    if tuple(sorted(witness.model_ids())) != expected_model_ids:
+        return ProposalValidationResult.invalid(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            violation_code="fight_movement_witness_model_drift",
+            message="Fight movement witness must match selected unit models.",
+            field="witness",
+            status="stale",
+        )
+    for placement in unit_placement.model_placements:
+        if witness.poses_for_model(placement.model_instance_id)[0] != placement.pose:
+            return ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="fight_movement_witness_start_drift",
+                message="Fight movement witness must start at current model poses.",
+                field="witness",
+                status="stale",
+            )
+    return None
+
+
+def _proposal_validation_has_code(
+    proposal_validation: ProposalValidationResult,
+    violation_code: str,
+) -> bool:
+    return any(
+        violation.violation_code == violation_code for violation in proposal_validation.violations
+    )
+
+
+def _first_proposal_violation_code(proposal_validation: ProposalValidationResult) -> str:
+    if not proposal_validation.violations:
+        raise GameLifecycleError("Invalid proposal validation requires at least one violation.")
+    return proposal_validation.violations[0].violation_code
+
+
+def _fight_movement_invalid_message(violation_code: str) -> str:
+    if violation_code == _ENDPOINT_ONLY_PATH_VIOLATION_CODE:
+        return "Fight movement PathWitness must include sampled transit poses."
+    if violation_code == "movement_distance_exceeded":
+        return "Fight movement path exceeds the maximum distance."
+    if violation_code in {
+        "path_intersects_model",
+        "path_intersects_battlefield_feature",
+        "path_exits_battlefield",
+        "terrain_blocked",
+        "movement_endpoint_coherency_failed",
+    }:
+        return "Fight movement path is not legal."
+    return "Fight movement proposal endpoint is not legal."
 
 
 def _fight_attack_sequence_for_request(

@@ -11,10 +11,12 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
+    ConsolidationModeKind,
     FightEligibilityKind,
     FightPhaseStepKind,
     FightPolicyDescriptor,
     FightTypeKind,
+    MovementMode,
     RulesetDescriptor,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -41,7 +43,10 @@ from warhammer40k_core.engine.fight_order import (
     fight_activation_option_id,
 )
 from warhammer40k_core.engine.fight_resolution import (
+    CONSOLIDATE_ACTION,
+    PILE_IN_ACTION,
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    FightMovementProposal,
     MeleeDeclarationProposalRequest,
 )
 from warhammer40k_core.engine.game_state import (
@@ -75,6 +80,7 @@ from warhammer40k_core.engine.phases.fight import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
@@ -380,6 +386,22 @@ def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submiss
             ),
         ).to_result(request)
     )
+    stale_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id="phase15d-stale-fight-movement",
+            payload=cast(
+                JsonValue,
+                {
+                    "proposal_request_id": f"{proposal_request.request_id}:stale",
+                    "proposal_kind": proposal_request.proposal_kind.value,
+                    "unit_instance_id": proposal_request.unit_instance_id,
+                    "movement_phase_action": proposal_request.movement_phase_action,
+                    "movement_mode": context["movement_mode"],
+                },
+            ),
+        ).to_result(request)
+    )
 
     malformed_payload = cast(dict[str, object], malformed_status.payload)
     malformed_validation = cast(
@@ -396,13 +418,161 @@ def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submiss
         list[dict[str, object]],
         missing_witness_validation["violations"],
     )
+    stale_payload = cast(dict[str, object], stale_status.payload)
+    stale_validation = cast(
+        dict[str, object],
+        stale_payload["proposal_validation"],
+    )
+    stale_violations = cast(list[dict[str, object]], stale_validation["violations"])
 
     assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert malformed_status.status_kind is LifecycleStatusKind.INVALID
     assert malformed_violations[0]["violation_code"] == "proposal_payload_missing_field"
     assert missing_witness_status.status_kind is LifecycleStatusKind.INVALID
     assert missing_witness_violations[0]["violation_code"] == "fight_movement_witness_required"
+    assert stale_status.status_kind is LifecycleStatusKind.INVALID
+    assert stale_violations[0]["violation_code"] == "stale_proposal_request"
+    assert lifecycle.decision_controller.records == ()
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
+
+
+def test_phase15d_endpoint_only_pile_in_records_rejected_attempt_and_retries() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-endpoint-only-retry",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    before_placement = _unit_placement_payload(lifecycle, units["attacker"])
+    assert proposal_request.movement_phase_action == PILE_IN_ACTION
+    proposal = FightMovementProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.PILE_IN,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action=PILE_IN_ACTION,
+        movement_mode=MovementMode.PILE_IN,
+        pile_in_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+        witness=_fight_movement_witness_for_unit(
+            lifecycle=lifecycle,
+            unit=units["attacker"],
+            dx=0.25,
+            endpoint_only=True,
+        ),
+    )
+
+    status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=proposal,
+        result_id="phase15d-endpoint-only-pile-in",
+    )
+
+    retry_request = lifecycle.decision_controller.queue.pending_requests[0]
+    retry_proposal_request = MovementProposalRequest.from_decision_request_payload(
+        retry_request.payload
+    )
+    invalid_payload = _last_event_payload(lifecycle, "fight_movement_invalid")
+    invalid_validation = cast(dict[str, object], invalid_payload["proposal_validation"])
+    invalid_violations = cast(list[dict[str, object]], invalid_validation["violations"])
+    status_payload = cast(dict[str, object], status.payload)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status_payload["violation_code"] == "endpoint_only_path"
+    assert status_payload["next_request_id"] == retry_request.request_id
+    assert len(lifecycle.decision_controller.records) == 1
+    assert lifecycle.decision_controller.records[0].request == request
+    assert lifecycle.decision_controller.records[0].result.result_id == (
+        "phase15d-endpoint-only-pile-in"
+    )
+    assert invalid_payload["result_id"] == "phase15d-endpoint-only-pile-in"
+    assert invalid_violations[0]["violation_code"] == "endpoint_only_path"
+    assert _unit_placement_payload(lifecycle, units["attacker"]) == before_placement
+    assert retry_request.request_id != request.request_id
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert retry_proposal_request.proposal_kind is ProposalKind.PILE_IN
+    assert retry_proposal_request.unit_instance_id == proposal_request.unit_instance_id
+    assert retry_proposal_request.source_decision_request_id == (
+        proposal_request.source_decision_request_id
+    )
+    assert retry_proposal_request.source_decision_result_id == (
+        proposal_request.source_decision_result_id
+    )
+
+
+def test_phase15d_over_distance_consolidate_records_rejected_attempt_and_retries() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("charger",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "charger": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(14.0, 20.0),
+        },
+        game_id="phase15d-consolidate-retry",
+        charge_fights_first_unit_keys=("charger",),
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    _start_consolidate_step(lifecycle)
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    before_placement = _unit_placement_payload(lifecycle, units["charger"])
+    assert proposal_request.movement_phase_action == CONSOLIDATE_ACTION
+    proposal = FightMovementProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.ENGAGING,
+        consolidate_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+        witness=_fight_movement_witness_for_unit(
+            lifecycle=lifecycle,
+            unit=units["charger"],
+            dx=3.5,
+            endpoint_only=False,
+        ),
+    )
+
+    status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=proposal,
+        result_id="phase15d-over-distance-consolidate",
+    )
+
+    retry_request = lifecycle.decision_controller.queue.pending_requests[0]
+    retry_proposal_request = MovementProposalRequest.from_decision_request_payload(
+        retry_request.payload
+    )
+    invalid_payload = _last_event_payload(lifecycle, "fight_movement_invalid")
+    invalid_validation = cast(dict[str, object], invalid_payload["proposal_validation"])
+    invalid_violations = cast(list[dict[str, object]], invalid_validation["violations"])
+    status_payload = cast(dict[str, object], status.payload)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status_payload["violation_code"] == "movement_distance_exceeded"
+    assert status_payload["next_request_id"] == retry_request.request_id
+    assert len(lifecycle.decision_controller.records) == 1
+    assert lifecycle.decision_controller.records[0].request == request
+    assert lifecycle.decision_controller.records[0].result.result_id == (
+        "phase15d-over-distance-consolidate"
+    )
+    assert invalid_payload["result_id"] == "phase15d-over-distance-consolidate"
+    assert invalid_violations[0]["violation_code"] == "movement_distance_exceeded"
+    assert _unit_placement_payload(lifecycle, units["charger"]) == before_placement
+    assert retry_request.request_id != request.request_id
+    assert retry_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert retry_proposal_request.proposal_kind is ProposalKind.CONSOLIDATE
+    assert retry_proposal_request.unit_instance_id == proposal_request.unit_instance_id
 
 
 def test_phase15d_lifecycle_rejects_malformed_and_rule_invalid_melee_declarations() -> None:
@@ -1555,6 +1725,66 @@ def _move_unit_to(lifecycle: GameLifecycle, *, unit: UnitInstance, origin: Pose)
     )
 
 
+def _unit_placement_payload(lifecycle: GameLifecycle, unit: UnitInstance) -> JsonValue:
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    return cast(
+        JsonValue,
+        battlefield_state.unit_placement_by_id(unit.unit_instance_id).to_payload(),
+    )
+
+
+def _fight_movement_witness_for_unit(
+    *,
+    lifecycle: GameLifecycle,
+    unit: UnitInstance,
+    dx: float,
+    endpoint_only: bool,
+) -> PathWitness:
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    unit_placement = battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement in unit_placement.model_placements:
+        start = placement.pose
+        end = Pose.at(
+            start.position.x + dx,
+            start.position.y,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        if endpoint_only:
+            model_paths.append((placement.model_instance_id, (start, end)))
+            continue
+        midpoint = Pose.at(
+            start.position.x + (dx / 2.0),
+            start.position.y,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _start_consolidate_step(lifecycle: GameLifecycle) -> None:
+    state = _state(lifecycle)
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    active_player_id = state.active_player_id
+    assert active_player_id is not None
+    state.fight_phase_state = FightPhaseState.start(
+        battle_round=state.battle_round,
+        active_player_id=active_player_id,
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(),
+        fights_first_registry=FightsFirstRegistry.from_state(state),
+    ).with_current_step(
+        current_step=FightPhaseStepKind.CONSOLIDATE,
+        policy=policy,
+    )
+
+
 def _record_fights_first_effect(
     *,
     state: GameState,
@@ -1760,6 +1990,22 @@ def _submit_minimal_melee_declaration(
                     "declarations": declarations,
                 },
             ),
+        ).to_result(request)
+    )
+
+
+def _submit_fight_movement_proposal(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    proposal: FightMovementProposal,
+    result_id: str,
+) -> LifecycleStatus:
+    return lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload=cast(JsonValue, proposal.to_payload()),
         ).to_result(request)
     )
 
