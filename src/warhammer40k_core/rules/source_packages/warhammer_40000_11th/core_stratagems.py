@@ -31,6 +31,7 @@ class SourceStratagemRow:
     target_policy_id: str
     handler_id: str
     eligible_roll_types: tuple[str, ...] = ()
+    same_unit_target_per_phase: bool = True
     once_per_turn: bool = False
     once_per_battle: bool = False
     once_per_target_per_phase: bool = False
@@ -58,6 +59,7 @@ class SourceStratagemRow:
             "target_policy_id": self.target_policy_id,
             "handler_id": self.handler_id,
             "eligible_roll_types": list(self.eligible_roll_types),
+            "same_unit_target_per_phase": self.same_unit_target_per_phase,
             "once_per_turn": self.once_per_turn,
             "once_per_battle": self.once_per_battle,
             "once_per_target_per_phase": self.once_per_target_per_phase,
@@ -126,8 +128,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="fight",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14g:fight-order-interrupt-unit",
-            handler_id="unsupported:phase-14g:counteroffensive",
+            target_policy_id="counteroffensive_unit",
+            handler_id="core:counteroffensive",
         ),
         SourceStratagemRow(
             stratagem_id="epic-challenge",
@@ -137,16 +139,18 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:epic-challenge",
-            when_descriptor="fight phase before resolving attacks",
-            target_descriptor="one character model from the player's army",
-            effect_descriptor="character attacks gain precision for that fight",
+            when_descriptor="fight phase just after a friendly character unit is selected to fight",
+            target_descriptor="that character unit",
+            effect_descriptor=(
+                "select one character model; that model's melee weapons gain Precision"
+            ),
             restrictions_descriptor="matched play same stratagem per phase",
-            trigger_kind="start_phase",
+            trigger_kind="just_after_friendly_unit_selected_to_fight",
             phase="fight",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14g:character-model-fight-binding",
-            handler_id="unsupported:phase-14g:epic-challenge",
+            target_policy_id="epic_challenge_unit",
+            handler_id="core:epic-challenge",
         ),
         SourceStratagemRow(
             stratagem_id="fire-overwatch",
@@ -196,19 +200,26 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:heroic-intervention",
-            when_descriptor="opponent charge phase after an enemy unit ends a charge move",
-            target_descriptor="one eligible nearby unit from the player's army",
-            effect_descriptor="the target unit declares a charge against the enemy unit",
+            when_descriptor="end of the opponent charge phase",
+            target_descriptor=(
+                "one friendly unengaged unit within 12 inches of enemy units; vehicles must be "
+                "character or walker units"
+            ),
+            effect_descriptor=(
+                "resolve a charge using Leap to Defend or the +1CP Into the Fray mode"
+            ),
             restrictions_descriptor="matched play same stratagem per phase",
-            trigger_kind="after_enemy_unit_ends_move",
+            trigger_kind="end_phase",
             phase="charge",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14g:heroic-intervention-charge-unit",
-            handler_id="unsupported:phase-14g:heroic-intervention",
+            target_policy_id="heroic_intervention_unit",
+            handler_id="core:heroic-intervention",
             effect_payload={
-                "modes": ["leap_to_defend", "into_the_fray"],
-                "optional_additional_command_point_cost": 1,
+                "modes": [
+                    {"mode": "leap_to_defend", "additional_command_point_cost": 0},
+                    {"mode": "into_the_fray", "additional_command_point_cost": 1},
+                ],
             },
         ),
         SourceStratagemRow(
@@ -308,8 +319,8 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             phase="charge",
             target_kind="friendly_unit",
             enumerable=False,
-            target_policy_id="unsupported:phase-14g:vehicle-charge-target-binding",
-            handler_id="unsupported:phase-14g:crushing-impact",
+            target_policy_id="crushing_impact_unit",
+            handler_id="core:crushing-impact",
         ),
     )
 

@@ -1274,6 +1274,8 @@ class GameState:
             raise GameLifecycleError("StratagemUseRecord battle_round drift.")
         if use_record.phase is not self.current_battle_phase:
             raise GameLifecycleError("StratagemUseRecord phase drift.")
+        if use_record.active_player_id != self.active_player_id:
+            raise GameLifecycleError("StratagemUseRecord active_player_id drift.")
         if any(stored.use_id == use_record.use_id for stored in self.stratagem_use_records):
             raise GameLifecycleError("StratagemUseRecord use_id must be unique.")
         self.stratagem_use_records.append(use_record)

@@ -2412,6 +2412,19 @@ def _charge_move_violation_code(
     ruleset_descriptor: RulesetDescriptor,
     maximum_distance_inches: int,
 ) -> str | None:
+    return charge_move_violation_code(
+        resolution=resolution,
+        ruleset_descriptor=ruleset_descriptor,
+        maximum_distance_inches=maximum_distance_inches,
+    )
+
+
+def charge_move_violation_code(
+    *,
+    resolution: ChargeMoveResolution,
+    ruleset_descriptor: RulesetDescriptor,
+    maximum_distance_inches: int,
+) -> str | None:
     for path_result in resolution.path_validation_results:
         if not path_result.is_valid:
             return path_result.violations[0].violation_code

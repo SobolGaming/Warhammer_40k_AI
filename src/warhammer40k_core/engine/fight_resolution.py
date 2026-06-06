@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import NotRequired, Self, TypedDict, cast
+from dataclasses import dataclass, replace
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.objectives import ObjectiveMarker, ObjectiveMarkerPayload
@@ -61,6 +61,9 @@ from warhammer40k_core.geometry.pathing import (
 from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 PILE_IN_ACTION = "pile_in"
 CONSOLIDATE_ACTION = "consolidate"
@@ -1333,12 +1336,19 @@ def melee_attack_sequence_from_proposal(
     army_catalog: ArmyCatalog,
     dice_manager: DiceRollManager,
     sequence_id: str,
+    state: GameState | None = None,
 ) -> AttackSequence:
     unit = _unit_by_id(scenario=scenario, unit_instance_id=proposal.unit_instance_id)
     available = _available_melee_weapons_by_key(unit=unit, army_catalog=army_catalog)
     pools: list[RangedAttackPool] = []
     for declaration_index, declaration in enumerate(proposal.declarations):
         profile = available[declaration.weapon_key]
+        profile = _epic_challenge_profile_if_applicable(
+            state=state,
+            unit_instance_id=proposal.unit_instance_id,
+            attacker_model_instance_id=declaration.attacker_model_instance_id,
+            profile=profile,
+        )
         resolved_attacks = attacks_for_profile(
             profile,
             manager=dice_manager,
@@ -1393,6 +1403,36 @@ def melee_attack_sequence_from_proposal(
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=tuple(pools),
     )
+
+
+def _epic_challenge_profile_if_applicable(
+    *,
+    state: GameState | None,
+    unit_instance_id: str,
+    attacker_model_instance_id: str,
+    profile: WeaponProfile,
+) -> WeaponProfile:
+    if state is None:
+        return profile
+    model_id = _validate_identifier("attacker_model_instance_id", attacker_model_instance_id)
+    unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for effect in state.persisting_effects:
+        if unit_id not in effect.target_unit_instance_ids:
+            continue
+        effect_payload = effect.effect_payload
+        if not isinstance(effect_payload, dict):
+            continue
+        if effect_payload.get("effect_kind") != "epic_challenge_precision":
+            continue
+        if effect_payload.get("model_instance_id") != model_id:
+            continue
+        if WeaponKeyword.PRECISION in profile.keywords:
+            return profile
+        return replace(
+            profile,
+            keywords=tuple(sorted((*profile.keywords, WeaponKeyword.PRECISION))),
+        )
+    return profile
 
 
 def _pile_in_rule_validation(

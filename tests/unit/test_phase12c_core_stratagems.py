@@ -8,7 +8,7 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -37,6 +37,7 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -52,7 +53,9 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
     PlacementProposalPayload,
     ProposalKind,
 )
@@ -63,6 +66,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
 from warhammer40k_core.engine.phases.movement import (
     SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
@@ -84,17 +88,27 @@ from warhammer40k_core.engine.reserves import (
 )
 from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
-from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_catalog_records
+from warhammer40k_core.engine.stratagem_catalog import (
+    eleventh_edition_stratagem_catalog_records,
+    eleventh_edition_stratagem_index,
+)
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY,
     COMMAND_REROLL_DICE_CONTEXT_KEY,
+    CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY,
+    CRUSHING_IMPACT_MODEL_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY,
     EXPLOSIVES_TARGET_CONTEXT_KEY,
     FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY,
+    HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
+    HEROIC_INTERVENTION_MODE_INTO_THE_FRAY,
     SELECTED_TARGET_UNIT_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemAvailabilityKind,
     StratagemCatalogRecord,
+    StratagemCategory,
     StratagemEligibilityContext,
     StratagemTargetBinding,
     StratagemTargetKind,
@@ -103,11 +117,19 @@ from warhammer40k_core.engine.stratagems import (
     StratagemUseRecord,
     create_stratagem_target_proposal_decision_request,
     create_stratagem_use_decision_request,
+    invalid_heroic_intervention_charge_move_status,
+    is_stratagem_window_decline_result,
     request_stratagem_target_proposal,
     request_stratagem_use,
+    request_stratagem_use_from_index,
+    stratagem_availability_kind_from_token,
+    stratagem_category_from_token,
+    stratagem_decline_option,
     stratagem_decline_payload,
+    stratagem_target_kind_from_token,
     stratagem_target_proposal_request_payload,
     stratagem_use_options,
+    stratagem_window_context_from_request,
     stratagem_window_decline_allowed,
     stratagem_window_decline_event_payload,
 )
@@ -124,6 +146,7 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
     WeaponDeclaration,
 )
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
 
@@ -653,7 +676,7 @@ def test_command_reroll_rejects_unknown_affected_unit_context() -> None:
     assert state.stratagem_use_records == []
 
 
-def test_command_reroll_is_blocked_after_same_phase_stratagem_on_unit() -> None:
+def test_command_reroll_is_not_blocked_by_same_phase_unit_targeting() -> None:
     unit_id = "army-alpha:intercessor-unit-1"
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -667,6 +690,7 @@ def test_command_reroll_is_blocked_after_same_phase_stratagem_on_unit() -> None:
             source_id="source:heroic-intervention-placeholder",
             battle_round=state.battle_round,
             phase=BattlePhase.CHARGE,
+            active_player_id=state.active_player_id,
             timing_window_id=None,
             request_id="phase14i-prior-unit-stratagem-request",
             result_id="phase14i-prior-unit-stratagem-result",
@@ -676,6 +700,7 @@ def test_command_reroll_is_blocked_after_same_phase_stratagem_on_unit() -> None:
                 target_player_id="player-a",
                 target_unit_instance_id=unit_id,
             ),
+            targeted_unit_instance_ids=(unit_id,),
             affected_unit_instance_ids=(unit_id,),
             command_point_cost=0,
             command_point_transaction_id=None,
@@ -703,7 +728,7 @@ def test_command_reroll_is_blocked_after_same_phase_stratagem_on_unit() -> None:
         context=context,
     )
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert len(state.stratagem_use_records) == 1
     assert state.command_point_total("player-a") == 1
 
@@ -930,6 +955,89 @@ def test_stratagem_decline_helpers_require_decline_results_and_marked_requests()
     with pytest.raises(GameLifecycleError, match="decline result"):
         stratagem_window_decline_event_payload(request=request, result=non_decline_result)
 
+    use_request = create_stratagem_use_decision_request(
+        state=state,
+        context=proposal_request.context,
+        options=(stratagem_decline_option(),),
+    )
+    use_decline_result = DecisionResult(
+        result_id="phase12c-use-decline-helper",
+        request_id=use_request.request_id,
+        decision_type=STRATAGEM_DECISION_TYPE,
+        actor_id=use_request.actor_id,
+        selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        payload=stratagem_decline_payload(),
+    )
+
+    assert is_stratagem_window_decline_result(use_decline_result)
+    assert stratagem_window_decline_allowed(request=use_request, result=use_decline_result)
+    assert stratagem_window_context_from_request(use_request) == proposal_request.context
+    assert stratagem_window_context_from_request(request) == proposal_request.context
+
+    with pytest.raises(GameLifecycleError, match="requires a DecisionResult"):
+        is_stratagem_window_decline_result(cast(DecisionResult, object()))
+    with pytest.raises(GameLifecycleError, match="requires a DecisionRequest"):
+        stratagem_window_decline_allowed(
+            request=cast(DecisionRequest, object()),
+            result=use_decline_result,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a DecisionRequest"):
+        stratagem_window_context_from_request(cast(DecisionRequest, object()))
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        stratagem_window_context_from_request(
+            DecisionRequest(
+                request_id="phase12c-bad-use-context-payload",
+                decision_type=STRATAGEM_DECISION_TYPE,
+                actor_id="player-a",
+                payload=None,
+                options=(stratagem_decline_option(),),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="missing context"):
+        stratagem_window_context_from_request(
+            DecisionRequest(
+                request_id="phase12c-missing-use-context",
+                decision_type=STRATAGEM_DECISION_TYPE,
+                actor_id="player-a",
+                payload={},
+                options=(stratagem_decline_option(),),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="payload is malformed"):
+        stratagem_window_context_from_request(
+            DecisionRequest(
+                request_id="phase12c-malformed-use-context",
+                decision_type=STRATAGEM_DECISION_TYPE,
+                actor_id="player-a",
+                payload={"stratagem_context": {}},
+                options=(stratagem_decline_option(),),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="not a Stratagem window request"):
+        stratagem_window_context_from_request(
+            DecisionRequest(
+                request_id="phase12c-non-stratagem-context",
+                decision_type="not_stratagem",
+                actor_id="player-a",
+                payload={},
+                options=(parameterized_decision_option(),),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="Stratagem use requires a DecisionController"):
+        request_stratagem_use(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            catalog_records=(),
+            context=proposal_request.context,
+        )
+    with pytest.raises(GameLifecycleError, match="Stratagem use requires a DecisionController"):
+        request_stratagem_use_from_index(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            index=eleventh_edition_stratagem_index(),
+            context=proposal_request.context,
+        )
+
 
 def test_command_phase_progression_offers_insane_bravery_from_index_before_battle_shock() -> None:
     lifecycle = _battle_lifecycle()
@@ -1108,6 +1216,7 @@ def test_phase14i_new_orders_rejects_second_use_in_same_game_before_cp_spend() -
             source_id=record.definition.source_id,
             battle_round=1,
             phase=BattlePhase.COMMAND,
+            active_player_id=state.active_player_id,
             timing_window_id=None,
             request_id="phase14i-previous-new-orders-request",
             result_id="phase14i-previous-new-orders-result",
@@ -1117,6 +1226,7 @@ def test_phase14i_new_orders_rejects_second_use_in_same_game_before_cp_spend() -
                 target_player_id="player-a",
                 target_secondary_mission_id="phase14i-prior-secondary-card",
             ),
+            targeted_unit_instance_ids=(),
             affected_unit_instance_ids=(),
             command_point_cost=1,
             command_point_transaction_id="phase14i-previous-new-orders-cp",
@@ -1371,23 +1481,151 @@ def test_tactical_secondary_target_binding_requires_card_fields() -> None:
         )
 
 
-def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None:
-    deferred_ids = {
-        "counteroffensive",
-        "crushing-impact",
-        "epic-challenge",
-        "heroic-intervention",
+def test_stratagem_use_record_validates_phase_scoped_target_fields() -> None:
+    record = StratagemUseRecord(
+        use_id="use-a",
+        player_id="player-a",
+        stratagem_id="command-reroll",
+        source_id="source-a",
+        battle_round=1,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-b",
+        timing_window_id=None,
+        request_id="request-a",
+        result_id="result-a",
+        selected_option_id="option-a",
+        target_binding=StratagemTargetBinding.none(),
+        targeted_unit_instance_ids=("unit-b", "unit-a"),
+        affected_unit_instance_ids=("unit-b", "unit-a"),
+        command_point_cost=0,
+        command_point_transaction_id=None,
+        handler_id="core:command-reroll",
+        effect_selection={"mode": "test"},
+        effect_payload={"effect": "payload"},
+    )
+
+    payload = record.to_payload()
+    restored = StratagemUseRecord.from_payload(payload)
+
+    assert restored.active_player_id == "player-b"
+    assert restored.targeted_unit_instance_ids == ("unit-a", "unit-b")
+    assert restored.affected_unit_instance_ids == ("unit-a", "unit-b")
+    assert restored.effect_selection == {"mode": "test"}
+
+    with pytest.raises(GameLifecycleError, match="target_binding"):
+        replace(record, target_binding=cast(StratagemTargetBinding, object()))
+    with pytest.raises(GameLifecycleError, match="active_player_id"):
+        replace(record, active_player_id=cast(str | None, 1))
+    with pytest.raises(GameLifecycleError, match="must be unique"):
+        replace(record, affected_unit_instance_ids=("unit-a", "unit-a"))
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        replace(record, targeted_unit_instance_ids=cast(tuple[str, ...], ["unit-a"]))
+    with pytest.raises(GameLifecycleError, match="must not be negative"):
+        replace(record, command_point_cost=-1)
+
+
+def test_stratagem_target_proposal_round_trips_effect_selection() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+    )
+    catalog_record = _source_stratagem_record("crushing-impact")
+    proposal = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=catalog_record,
+    )
+    binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_instance_id="army-alpha:tank-unit",
+    )
+
+    assert proposal.game_id == state.game_id
+    assert proposal.player_id == "player-a"
+    assert proposal.battle_round == state.battle_round
+    assert proposal.phase is state.current_battle_phase
+    assert proposal.stratagem_id == "crushing-impact"
+    assert proposal.target_spec == catalog_record.definition.target_spec
+
+    bound = proposal.with_binding(
+        binding,
+        effect_selection={
+            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
+            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: "army-alpha:tank-model-1",
+        },
+    )
+    updated = bound.with_effect_selection(
+        {
+            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit-2",
+            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: "army-alpha:tank-model-2",
+        }
+    )
+    restored = StratagemTargetProposal.from_payload(updated.to_payload())
+
+    assert restored.target_binding == binding
+    assert restored.effect_selection == {
+        CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit-2",
+        CRUSHING_IMPACT_MODEL_CONTEXT_KEY: "army-alpha:tank-model-2",
     }
-    deferred_records = tuple(
-        _source_stratagem_record(stratagem_id) for stratagem_id in deferred_ids
+
+
+def test_stratagem_framework_token_parsers_are_strict() -> None:
+    assert (
+        stratagem_availability_kind_from_token(StratagemAvailabilityKind.CORE)
+        is StratagemAvailabilityKind.CORE
     )
-    assert {record.definition.stratagem_id for record in deferred_records} == deferred_ids
-    assert all(record.availability_kind.value == "core" for record in deferred_records)
-    assert all(
-        record.definition.handler_id.startswith("unsupported:")
-        and record.definition.target_spec.target_policy_id.startswith("unsupported:")
-        for record in deferred_records
+    assert stratagem_availability_kind_from_token("core") is StratagemAvailabilityKind.CORE
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        stratagem_availability_kind_from_token(1)
+    with pytest.raises(GameLifecycleError, match="Unsupported StratagemAvailabilityKind"):
+        stratagem_availability_kind_from_token("unknown")
+
+    assert (
+        stratagem_category_from_token(StratagemCategory.BATTLE_TACTIC)
+        is StratagemCategory.BATTLE_TACTIC
     )
+    assert stratagem_category_from_token("battle_tactic") is StratagemCategory.BATTLE_TACTIC
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        stratagem_category_from_token(1)
+    with pytest.raises(GameLifecycleError, match="Unsupported StratagemCategory"):
+        stratagem_category_from_token("unknown")
+
+    assert stratagem_target_kind_from_token(StratagemTargetKind.FRIENDLY_UNIT) is (
+        StratagemTargetKind.FRIENDLY_UNIT
+    )
+    assert stratagem_target_kind_from_token("friendly_unit") is StratagemTargetKind.FRIENDLY_UNIT
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        stratagem_target_kind_from_token(1)
+    with pytest.raises(GameLifecycleError, match="Unsupported StratagemTargetKind"):
+        stratagem_target_kind_from_token("unknown")
+
+
+def test_phase15e_core_stratagem_descriptors_are_supported_and_window_scoped() -> None:
+    phase15e_records = tuple(
+        _source_stratagem_record(stratagem_id)
+        for stratagem_id in (
+            "counteroffensive",
+            "crushing-impact",
+            "epic-challenge",
+            "heroic-intervention",
+        )
+    )
+    assert {
+        record.definition.stratagem_id: (
+            record.definition.handler_id,
+            record.definition.target_spec.target_policy_id,
+        )
+        for record in phase15e_records
+    } == {
+        "counteroffensive": ("core:counteroffensive", "counteroffensive_unit"),
+        "crushing-impact": ("core:crushing-impact", "crushing_impact_unit"),
+        "epic-challenge": ("core:epic-challenge", "epic_challenge_unit"),
+        "heroic-intervention": ("core:heroic-intervention", "heroic_intervention_unit"),
+    }
+    assert all(record.availability_kind.value == "core" for record in phase15e_records)
 
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -1401,12 +1639,12 @@ def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None
     assert (
         stratagem_use_options(
             state=state,
-            catalog_records=deferred_records,
+            catalog_records=phase15e_records,
             context=context,
         )
         == ()
     )
-    for record in deferred_records:
+    for record in phase15e_records:
         proposal_request = StratagemTargetProposal.for_request(
             context=context,
             catalog_record=record,
@@ -1417,12 +1655,828 @@ def test_deferred_core_stratagem_descriptors_exist_and_fail_explicitly() -> None
             proposal_request=proposal_request,
         )
         assert unavailable.status_kind is LifecycleStatusKind.UNSUPPORTED
-        assert unavailable.payload == {
-            "player_id": "player-a",
-            "stratagem_id": record.definition.stratagem_id,
-            "unavailable_reason": "unsupported_handler",
-        }
+        payload = cast(dict[str, JsonValue], unavailable.payload)
+        assert payload["player_id"] == "player-a"
+        assert payload["stratagem_id"] == record.definition.stratagem_id
+        assert payload["unavailable_reason"] != "unsupported_handler"
     assert len(lifecycle.decision_controller.queue.pending_requests) == 0
+
+
+def test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp() -> None:
+    insufficient_lifecycle = _battle_lifecycle()
+    insufficient_state = _state(insufficient_lifecycle)
+    _set_current_battle_phase(insufficient_state, BattlePhase.CHARGE)
+    insufficient_state.active_player_id = "player-b"
+    _replace_unit_poses(
+        insufficient_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        insufficient_state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=5.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _grant_cp(insufficient_state, player_id="player-a", amount=1)
+    rejected = _submit_source_stratagem_target(
+        insufficient_lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-insufficient-into-the-fray",
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+        },
+    )
+
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    assert rejected.payload == {"invalid_reason": "insufficient_command_points"}
+    assert insufficient_state.command_point_total("player-a") == 1
+    assert insufficient_state.stratagem_use_records == []
+
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=5.0 + index * 2.0, y=6.0) for index in range(5)),
+    )
+    _grant_cp(state, player_id="player-a", amount=2)
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-into-the-fray",
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+        },
+    )
+    request = _decision_request(status)
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    proposal_payload = cast(dict[str, JsonValue], request_payload["proposal_request"])
+    context_payload = cast(dict[str, JsonValue], proposal_payload["context"])
+
+    assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert state.command_point_total("player-a") == 0
+    assert state.stratagem_use_records[0].command_point_cost == 2
+    assert state.stratagem_use_records[0].effect_selection == {
+        HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+    }
+    assert context_payload["mode"] == HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+    maximum_distance = context_payload["maximum_distance_inches"]
+    assert type(maximum_distance) is int
+    assert maximum_distance <= 6
+
+
+def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_first() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+    heroic_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=heroic_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+    _grant_cp(state, player_id="player-a", amount=2)
+    waiting = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id=heroic_unit_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-into-the-fray-charge",
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+        },
+    )
+    request = _decision_request(waiting)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    witness = _path_witness_for_unit_delta(
+        state,
+        unit_instance_id=heroic_unit_id,
+        dy=2.0,
+    )
+
+    status = _submit_heroic_charge_move_proposal(
+        lifecycle,
+        request=request,
+        result_id="phase15e-heroic-charge-move",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(enemy_unit_id,),
+            witness=witness,
+        ),
+    )
+    completed = _last_event_payload(
+        lifecycle.decision_controller,
+        "heroic_intervention_charge_move_completed",
+    )
+    transition_batch = cast(dict[str, JsonValue], completed["transition_batch"])
+    displacements = cast(list[dict[str, JsonValue]], transition_batch["displacements"])
+    persisting_effect = cast(dict[str, JsonValue], completed["persisting_effect"])
+    effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() != before_battlefield
+    assert len(displacements) == 5
+    assert {cast(str, record["displacement_kind"]) for record in displacements} == {"charge_move"}
+    assert effect_payload["effect_kind"] == "charge_grants_fights_first"
+    assert effect_payload["stratagem_use_id"] == state.stratagem_use_records[0].use_id
+    assert state.persisting_effects_for_unit(heroic_unit_id)
+
+
+def test_phase15e_heroic_intervention_charge_move_rejects_missing_witness() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+    heroic_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=heroic_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    _grant_cp(state, player_id="player-a", amount=2)
+    waiting = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id=heroic_unit_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-into-the-fray-missing-witness",
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+        },
+    )
+    request = _decision_request(waiting)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+
+    status = _submit_heroic_charge_move_proposal(
+        lifecycle,
+        request=request,
+        result_id="phase15e-heroic-charge-missing-witness",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(enemy_unit_id,),
+            witness=None,
+        ),
+    )
+    payload = cast(dict[str, JsonValue], status.payload)
+    validation = cast(dict[str, JsonValue], payload["proposal_validation"])
+    violations = cast(list[dict[str, JsonValue]], validation["violations"])
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert violations[0]["violation_code"] == "charge_move_witness_required"
+    assert not _has_event(
+        lifecycle.decision_controller,
+        "heroic_intervention_charge_move_completed",
+    )
+
+
+def test_phase15e_heroic_intervention_charge_no_move_records_decline() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+    heroic_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=heroic_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+    _grant_cp(state, player_id="player-a", amount=2)
+    waiting = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id=heroic_unit_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-into-the-fray-no-move",
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+        },
+    )
+    request = _decision_request(waiting)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+
+    status = _submit_heroic_charge_move_proposal(
+        lifecycle,
+        request=request,
+        result_id="phase15e-heroic-charge-no-move",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(),
+            witness=None,
+        ),
+    )
+    declined = _last_event_payload(
+        lifecycle.decision_controller,
+        "heroic_intervention_charge_move_declined",
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert declined["proposal_request_id"] == proposal_request.request_id
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == before_battlefield
+    assert state.persisting_effects_for_unit(heroic_unit_id) == ()
+
+
+def test_phase15e_heroic_intervention_charge_rejects_endpoint_only_witness() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+    heroic_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=heroic_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+    _grant_cp(state, player_id="player-a", amount=2)
+    waiting = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id=heroic_unit_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-into-the-fray-endpoint-only",
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+        },
+    )
+    request = _decision_request(waiting)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    witness = _path_witness_for_unit_delta(
+        state,
+        unit_instance_id=heroic_unit_id,
+        dy=2.0,
+        endpoint_only=True,
+    )
+
+    status = _submit_heroic_charge_move_proposal(
+        lifecycle,
+        request=request,
+        result_id="phase15e-heroic-charge-endpoint-only",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(enemy_unit_id,),
+            witness=witness,
+        ),
+    )
+    invalid = _last_event_payload(
+        lifecycle.decision_controller,
+        "heroic_intervention_charge_move_invalid",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, JsonValue], status.payload)["violation_code"] == "endpoint_only_path"
+    assert invalid["violation_code"] == "endpoint_only_path"
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.to_payload() == before_battlefield
+    assert state.persisting_effects_for_unit(heroic_unit_id) == ()
+
+
+def test_phase15e_heroic_intervention_charge_prevalidation_rejects_malformed_and_drift() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+    heroic_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=heroic_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    _grant_cp(state, player_id="player-a", amount=2)
+    waiting = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id=heroic_unit_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-into-the-fray-prevalidation",
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+        },
+    )
+    request = _decision_request(waiting)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+
+    bad_option = invalid_heroic_intervention_charge_move_status(
+        state=state,
+        request=request,
+        result=DecisionResult(
+            result_id="phase15e-heroic-bad-option",
+            request_id=request.request_id,
+            decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id="bad-option",
+            payload=None,
+        ),
+    )
+    bad_payload = invalid_heroic_intervention_charge_move_status(
+        state=state,
+        request=request,
+        result=DecisionResult(
+            result_id="phase15e-heroic-bad-payload",
+            request_id=request.request_id,
+            decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=None,
+        ),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=50.0) for index in range(5)),
+    )
+    stale_reachable = invalid_heroic_intervention_charge_move_status(
+        state=state,
+        request=request,
+        result=DecisionResult(
+            result_id="phase15e-heroic-stale-reachable",
+            request_id=request.request_id,
+            decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(
+                ChargeMoveProposal(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=proposal_request.proposal_kind,
+                    unit_instance_id=proposal_request.unit_instance_id,
+                    movement_phase_action="charge_move",
+                    movement_mode=MovementMode.CHARGE,
+                    charge_target_unit_instance_ids=(),
+                    witness=None,
+                ).to_payload()
+            ),
+        ),
+    )
+
+    assert bad_option is not None
+    assert bad_option.payload == {"invalid_reason": "malformed"}
+    assert bad_payload is not None
+    assert bad_payload.payload == {"invalid_reason": "malformed"}
+    assert stale_reachable is not None
+    assert stale_reachable.payload == {
+        "invalid_reason": "heroic_intervention_reachable_targets_drift"
+    }
+
+
+def test_phase15e_core_stratagem_effect_selection_rejects_malformed_payloads() -> None:
+    heroic_lifecycle = _battle_lifecycle()
+    heroic_state = _state(heroic_lifecycle)
+    _set_current_battle_phase(heroic_state, BattlePhase.CHARGE)
+    heroic_state.active_player_id = "player-b"
+    _grant_cp(heroic_state, player_id="player-a", amount=2)
+    heroic_status = _submit_source_stratagem_target(
+        heroic_lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-unknown-mode",
+        effect_selection={HEROIC_INTERVENTION_MODE_CONTEXT_KEY: "unsupported-mode"},
+    )
+
+    crushing_lifecycle = _battle_lifecycle()
+    crushing_state = _state(crushing_lifecycle)
+    _set_current_battle_phase(crushing_state, BattlePhase.CHARGE)
+    crushing_state.active_player_id = "player-a"
+    _grant_cp(crushing_state, player_id="player-a", amount=1)
+    crushing_status = _submit_source_stratagem_target(
+        crushing_lifecycle,
+        stratagem_id="crushing-impact",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        result_id="phase15e-crushing-missing-model",
+        effect_selection={CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
+    )
+
+    epic_lifecycle = _battle_lifecycle()
+    epic_state = _state(epic_lifecycle)
+    _set_current_battle_phase(epic_state, BattlePhase.FIGHT)
+    epic_state.active_player_id = "player-a"
+    _grant_cp(epic_state, player_id="player-a", amount=1)
+    epic_status = _submit_source_stratagem_target(
+        epic_lifecycle,
+        stratagem_id="epic-challenge",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        result_id="phase15e-epic-malformed-effect-selection",
+        trigger_payload={"selected_unit_instance_id": "army-alpha:intercessor-unit-1"},
+        effect_selection="bad-effect-selection",
+    )
+
+    assert heroic_status.status_kind is LifecycleStatusKind.INVALID
+    assert heroic_status.payload == {"invalid_reason": "heroic_intervention_mode_unknown"}
+    assert heroic_state.command_point_total("player-a") == 2
+    assert crushing_status.status_kind is LifecycleStatusKind.INVALID
+    assert crushing_status.payload == {"invalid_reason": "model_instance_id_required"}
+    assert crushing_state.command_point_total("player-a") == 1
+    assert epic_status.status_kind is LifecycleStatusKind.INVALID
+    assert epic_status.payload == {"invalid_reason": "effect_selection_malformed"}
+    assert epic_state.command_point_total("player-a") == 1
+
+
+def test_phase15e_core_stratagem_target_policies_reject_invalid_official_contexts() -> None:
+    heroic_vehicle_lifecycle = _battle_lifecycle()
+    heroic_vehicle_state = _state(heroic_vehicle_lifecycle)
+    _set_current_battle_phase(heroic_vehicle_state, BattlePhase.CHARGE)
+    heroic_vehicle_state.active_player_id = "player-b"
+    _replace_unit_keywords(
+        heroic_vehicle_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Vehicle",),
+    )
+    _replace_unit_poses(
+        heroic_vehicle_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        heroic_vehicle_state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _grant_cp(heroic_vehicle_state, player_id="player-a", amount=1)
+    heroic_vehicle = _submit_source_stratagem_target(
+        heroic_vehicle_lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-vehicle",
+    )
+
+    heroic_range_lifecycle = _battle_lifecycle()
+    heroic_range_state = _state(heroic_range_lifecycle)
+    _set_current_battle_phase(heroic_range_state, BattlePhase.CHARGE)
+    heroic_range_state.active_player_id = "player-b"
+    _replace_unit_poses(
+        heroic_range_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        heroic_range_state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=50.0) for index in range(5)),
+    )
+    _grant_cp(heroic_range_state, player_id="player-a", amount=1)
+    heroic_range = _submit_source_stratagem_target(
+        heroic_range_lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="phase15e-heroic-range",
+    )
+
+    crushing_missing_lifecycle = _battle_lifecycle()
+    crushing_missing_state = _state(crushing_missing_lifecycle)
+    _set_current_battle_phase(crushing_missing_state, BattlePhase.CHARGE)
+    crushing_missing_state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        crushing_missing_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Monster",),
+    )
+    _grant_cp(crushing_missing_state, player_id="player-a", amount=1)
+    crushing_missing = _submit_source_stratagem_target(
+        crushing_missing_lifecycle,
+        stratagem_id="crushing-impact",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        result_id="phase15e-crushing-missing-enemy",
+    )
+
+    crushing_model_lifecycle = _battle_lifecycle()
+    crushing_model_state = _state(crushing_model_lifecycle)
+    _set_current_battle_phase(crushing_model_state, BattlePhase.CHARGE)
+    crushing_model_state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        crushing_model_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Vehicle",),
+    )
+    _grant_cp(crushing_model_state, player_id="player-a", amount=1)
+    crushing_model = _submit_source_stratagem_target(
+        crushing_model_lifecycle,
+        stratagem_id="crushing-impact",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        result_id="phase15e-crushing-model-not-in-unit",
+        effect_selection={
+            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
+            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: _first_model_id(
+                crushing_model_state,
+                unit_instance_id="army-beta:enemy-unit",
+            ),
+        },
+    )
+
+    epic_selected_lifecycle = _battle_lifecycle()
+    epic_selected_state = _state(epic_selected_lifecycle)
+    _set_current_battle_phase(epic_selected_state, BattlePhase.FIGHT)
+    epic_selected_state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        epic_selected_state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Character",),
+    )
+    _grant_cp(epic_selected_state, player_id="player-a", amount=1)
+    epic_selected = _submit_source_stratagem_target(
+        epic_selected_lifecycle,
+        stratagem_id="epic-challenge",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        result_id="phase15e-epic-wrong-selected-unit",
+        trigger_payload={"selected_unit_instance_id": "army-beta:enemy-unit"},
+        effect_selection={
+            EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY: _first_model_id(
+                epic_selected_state,
+                unit_instance_id="army-alpha:intercessor-unit-1",
+            )
+        },
+    )
+
+    epic_character_lifecycle = _battle_lifecycle()
+    epic_character_state = _state(epic_character_lifecycle)
+    _set_current_battle_phase(epic_character_state, BattlePhase.FIGHT)
+    epic_character_state.active_player_id = "player-a"
+    _grant_cp(epic_character_state, player_id="player-a", amount=1)
+    epic_character = _submit_source_stratagem_target(
+        epic_character_lifecycle,
+        stratagem_id="epic-challenge",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        result_id="phase15e-epic-not-character",
+        trigger_payload={"selected_unit_instance_id": "army-alpha:intercessor-unit-1"},
+        effect_selection={
+            EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY: _first_model_id(
+                epic_character_state,
+                unit_instance_id="army-alpha:intercessor-unit-1",
+            )
+        },
+    )
+
+    counteroffensive_lifecycle = _battle_lifecycle()
+    counteroffensive_state = _state(counteroffensive_lifecycle)
+    _set_current_battle_phase(counteroffensive_state, BattlePhase.FIGHT)
+    counteroffensive_state.active_player_id = "player-a"
+    _grant_cp(counteroffensive_state, player_id="player-b", amount=2)
+    counteroffensive = _submit_source_stratagem_target(
+        counteroffensive_lifecycle,
+        stratagem_id="counteroffensive",
+        player_id="player-b",
+        target_unit_id="army-beta:enemy-unit",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+        result_id="phase15e-counteroffensive-no-fight-state",
+        trigger_payload={
+            "fought_unit_instance_id": "army-alpha:intercessor-unit-1",
+            "eligible_unit_instance_ids": ["army-beta:enemy-unit"],
+        },
+    )
+
+    assert heroic_vehicle.payload == {
+        "invalid_reason": "heroic_intervention_vehicle_not_character_or_walker"
+    }
+    assert heroic_range.payload == {"invalid_reason": "heroic_intervention_unit_not_within_12"}
+    assert crushing_missing.payload == {"invalid_reason": "missing_crushing_impact_enemy_target"}
+    assert crushing_model.payload == {"invalid_reason": "crushing_impact_model_not_in_unit"}
+    assert epic_selected.payload == {"invalid_reason": "epic_challenge_unit_not_selected_to_fight"}
+    assert epic_character.payload == {"invalid_reason": "epic_challenge_unit_not_character"}
+    assert counteroffensive.payload == {
+        "invalid_reason": "counteroffensive_requires_fight_phase_state"
+    }
+
+
+def test_phase15e_counteroffensive_selects_next_fight_activation() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    state.active_player_id = "player-a"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=2.0 + index * 2.0, y=0.0) for index in range(5)),
+    )
+    policy = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+        descriptor_version="phase15e-counteroffensive-test"
+    ).fight_policy
+    state.fight_phase_state = FightPhaseState.start(
+        battle_round=state.battle_round,
+        active_player_id=state.active_player_id,
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(
+            "army-alpha:intercessor-unit-1",
+            "army-beta:enemy-unit",
+        ),
+        fights_first_registry=FightsFirstRegistry(),
+    ).with_next_band()
+    _grant_cp(state, player_id="player-b", amount=2)
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="counteroffensive",
+        player_id="player-b",
+        target_unit_id="army-beta:enemy-unit",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+        result_id="phase15e-counteroffensive",
+        trigger_payload={
+            "fought_unit_instance_id": "army-alpha:intercessor-unit-1",
+            "eligible_unit_instance_ids": ["army-beta:enemy-unit"],
+        },
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.command_point_total("player-b") == 0
+    assert state.fight_phase_state is not None
+    activation = state.fight_phase_state.fight_order_state.activation_selections[-1]
+    assert activation.unit_instance_id == "army-beta:enemy-unit"
+    assert activation.interrupt_id is not None
+    assert activation.interrupt_id.startswith("counteroffensive:")
+    effect_payload = cast(dict[str, JsonValue], state.persisting_effects[-1].effect_payload)
+    assert effect_payload["effect_kind"] == "fights_first"
+    assert _last_event_payload(
+        lifecycle.decision_controller,
+        "counteroffensive_activation_selected",
+    )
+
+
+def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Vehicle", "Monster"),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=index * 4.0, y=0.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=2.0 + index * 4.0, y=0.0) for index in range(5)),
+    )
+    source_model_id = _first_model_id(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="crushing-impact",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        result_id="phase15e-crushing-impact",
+        effect_selection={
+            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
+            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: source_model_id,
+        },
+    )
+    event = _last_event_payload(lifecycle.decision_controller, "crushing_impact_resolved")
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.command_point_total("player-a") == 0
+    assert state.stratagem_use_records[0].targeted_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+    )
+    assert state.stratagem_use_records[0].affected_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+        "army-beta:enemy-unit",
+    )
+    assert event["source_model_instance_id"] == source_model_id
+    assert event["target_unit_instance_id"] == "army-beta:enemy-unit"
+    assert 0 <= cast(int, event["enemy_mortal_wounds"]) <= 6
+
+
+def test_phase15e_epic_challenge_registers_selected_character_model_precision() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    state.active_player_id = "player-a"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        keywords=("Character", "Infantry"),
+    )
+    character_model_id = _first_model_id(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="epic-challenge",
+        player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        result_id="phase15e-epic-challenge",
+        trigger_payload={"selected_unit_instance_id": "army-alpha:intercessor-unit-1"},
+        effect_selection={EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY: character_model_id},
+    )
+    event = _last_event_payload(
+        lifecycle.decision_controller,
+        "epic_challenge_precision_registered",
+    )
+    persisted = cast(dict[str, JsonValue], event["persisting_effect"])
+    effect_payload = cast(dict[str, JsonValue], persisted["effect_payload"])
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.stratagem_use_records[0].command_point_cost == 1
+    assert effect_payload["effect_kind"] == "epic_challenge_precision"
+    assert effect_payload["model_instance_id"] == character_model_id
+    assert effect_payload["weapon_keyword"] == "Precision"
 
 
 def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() -> None:
@@ -2292,7 +3346,7 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
     assert shot_state.stratagem_use_records == []
 
 
-def test_phase13d_explosives_blocks_enemy_unit_from_later_same_phase_stratagem() -> None:
+def test_phase13d_explosives_enemy_effect_does_not_block_opponent_targeting() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
@@ -2340,7 +3394,14 @@ def test_phase13d_explosives_blocks_enemy_unit_from_later_same_phase_stratagem()
     )
 
     assert explosives_status.status_kind is not LifecycleStatusKind.INVALID
-    assert command_reroll_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.stratagem_use_records[0].targeted_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+    )
+    assert state.stratagem_use_records[0].affected_unit_instance_ids == (
+        "army-alpha:intercessor-unit-1",
+        "army-beta:enemy-unit",
+    )
+    assert command_reroll_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert len(state.stratagem_use_records) == 1
     assert state.command_point_total("player-b") == 1
 
@@ -3176,6 +4237,25 @@ def _target_proposal_result(
     )
 
 
+def _submit_heroic_charge_move_proposal(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    result_id: str,
+    proposal: ChargeMoveProposal,
+) -> LifecycleStatus:
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(proposal.to_payload()),
+        )
+    )
+
+
 def _submit_source_stratagem_target(
     lifecycle: GameLifecycle,
     *,
@@ -3185,6 +4265,7 @@ def _submit_source_stratagem_target(
     trigger_kind: TimingTriggerKind,
     result_id: str,
     trigger_payload: JsonValue = None,
+    effect_selection: JsonValue = None,
 ) -> LifecycleStatus:
     state = _state(lifecycle)
     record = _source_stratagem_record(stratagem_id)
@@ -3209,7 +4290,8 @@ def _submit_source_stratagem_target(
             target_kind=StratagemTargetKind.FRIENDLY_UNIT,
             target_player_id=player_id,
             target_unit_instance_id=target_unit_id,
-        )
+        ),
+        effect_selection=effect_selection,
     )
     return lifecycle.submit_decision(
         _target_proposal_result(
@@ -3235,6 +4317,7 @@ def _handcrafted_stratagem_option(
                 "context": context.to_payload(),
                 "catalog_record": record.to_payload(),
                 "target_binding": binding.to_payload(),
+                "effect_selection": None,
             }
         ),
     )
@@ -3277,6 +4360,47 @@ def _replace_unit_poses(
             )
         )
     )
+
+
+def _path_witness_for_unit_delta(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    dx: float = 0.0,
+    dy: float = 0.0,
+    endpoint_only: bool = False,
+) -> PathWitness:
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    placement = battlefield_state.unit_placement_by_id(unit_instance_id)
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for model_placement in placement.model_placements:
+        start = model_placement.pose
+        midpoint = Pose.at(
+            x=start.position.x + (dx / 2.0),
+            y=start.position.y + (dy / 2.0),
+            z=start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        end = Pose.at(
+            x=start.position.x + dx,
+            y=start.position.y + dy,
+            z=start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        if endpoint_only:
+            model_paths.append((model_placement.model_instance_id, (start, end)))
+            continue
+        model_paths.append((model_placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _first_model_id(state: GameState, *, unit_instance_id: str) -> str:
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == unit_instance_id:
+                return unit.own_models[0].model_instance_id
+    raise AssertionError(f"Missing unit {unit_instance_id}.")
 
 
 def _mark_attached_unit_join(

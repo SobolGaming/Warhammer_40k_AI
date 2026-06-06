@@ -19,6 +19,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
+    MovementMode,
     RulesetDescriptor,
     battle_phase_kind_from_token,
 )
@@ -76,7 +77,14 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_order import (
+    FIGHTS_FIRST_EFFECT_KIND,
+    FightActivationSelection,
+    eligible_fight_contexts_for_player,
+    legal_fight_types_for_context,
+)
 from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
     PlacementProposalPayload,
@@ -88,6 +96,13 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.phases.charge import (
+    CHARGE_MOVE_ACTION,
+    ChargeMoveProposal,
+    ChargeMoveProposalPayload,
+    charge_move_violation_code,
+    resolve_charge_move,
 )
 from warhammer40k_core.engine.phases.shooting import (
     request_out_of_phase_shooting_declaration,
@@ -135,6 +150,10 @@ CORE_FIRE_OVERWATCH_HANDLER_ID = FIRE_OVERWATCH_RULE_ID
 CORE_GO_TO_GROUND_HANDLER_ID = "core:go-to-ground"
 CORE_EXPLOSIVES_HANDLER_ID = "core:explosives"
 CORE_SMOKESCREEN_HANDLER_ID = "core:smokescreen"
+CORE_HEROIC_INTERVENTION_HANDLER_ID = "core:heroic-intervention"
+CORE_COUNTEROFFENSIVE_HANDLER_ID = "core:counteroffensive"
+CORE_CRUSHING_IMPACT_HANDLER_ID = "core:crushing-impact"
+CORE_EPIC_CHALLENGE_HANDLER_ID = "core:epic-challenge"
 COMMAND_REROLL_DICE_CONTEXT_KEY = "dice_roll_state"
 COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY = "affected_unit_instance_id"
 INSANE_BRAVERY_TARGET_POLICY_ID = "battle_shock_test_unit"
@@ -144,10 +163,23 @@ FIRE_OVERWATCH_TARGET_POLICY_ID = "out_of_phase_shooting_unit"
 GO_TO_GROUND_TARGET_POLICY_ID = "selected_target_infantry_unit"
 EXPLOSIVES_TARGET_POLICY_ID = "explosives_unit_and_enemy_target"
 SMOKESCREEN_TARGET_POLICY_ID = "selected_target_smoke_unit"
+HEROIC_INTERVENTION_TARGET_POLICY_ID = "heroic_intervention_unit"
+COUNTEROFFENSIVE_TARGET_POLICY_ID = "counteroffensive_unit"
+CRUSHING_IMPACT_TARGET_POLICY_ID = "crushing_impact_unit"
+EPIC_CHALLENGE_TARGET_POLICY_ID = "epic_challenge_unit"
 EXPLOSIVES_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
+CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
+CRUSHING_IMPACT_MODEL_CONTEXT_KEY = "model_instance_id"
+EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY = "character_model_instance_id"
+HEROIC_INTERVENTION_MODE_CONTEXT_KEY = "mode"
+HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND = "leap_to_defend"
+HEROIC_INTERVENTION_MODE_INTO_THE_FRAY = "into_the_fray"
 SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
 FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY = "moved_unit_instance_id"
 FIRE_OVERWATCH_MAX_RANGE_INCHES = 24.0
+HEROIC_INTERVENTION_TARGET_RANGE_INCHES = 12.0
+HEROIC_INTERVENTION_INTO_THE_FRAY_TARGET_RANGE_INCHES = 6.0
+CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT = 6
 
 
 class StratagemAvailabilityKind(StrEnum):
@@ -176,15 +208,18 @@ class StratagemUseRecordPayload(TypedDict):
     source_id: str
     battle_round: int
     phase: str
+    active_player_id: str | None
     timing_window_id: str | None
     request_id: str
     result_id: str
     selected_option_id: str
     target_binding: StratagemTargetBindingPayload
+    targeted_unit_instance_ids: list[str]
     affected_unit_instance_ids: list[str]
     command_point_cost: int
     command_point_transaction_id: str | None
     handler_id: str
+    effect_selection: JsonValue
     effect_payload: JsonValue
 
 
@@ -196,6 +231,7 @@ class StratagemTimingDescriptorPayload(TypedDict):
 
 class StratagemRestrictionPolicyPayload(TypedDict):
     same_stratagem_per_phase: bool
+    same_unit_target_per_phase: bool
     once_per_turn: bool
     once_per_battle: bool
     once_per_target_per_phase: bool
@@ -260,6 +296,7 @@ class StratagemTargetProposalPayload(TypedDict):
     context: StratagemEligibilityContextPayload
     catalog_record: StratagemCatalogRecordPayload
     target_binding: StratagemTargetBindingPayload | None
+    effect_selection: JsonValue
 
 
 @dataclass(frozen=True, slots=True)
@@ -319,6 +356,7 @@ class StratagemTimingDescriptor:
 @dataclass(frozen=True, slots=True)
 class StratagemRestrictionPolicy:
     same_stratagem_per_phase: bool = True
+    same_unit_target_per_phase: bool = True
     once_per_turn: bool = False
     once_per_battle: bool = False
     once_per_target_per_phase: bool = False
@@ -331,6 +369,14 @@ class StratagemRestrictionPolicy:
             _validate_bool(
                 "StratagemRestrictionPolicy same_stratagem_per_phase",
                 self.same_stratagem_per_phase,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "same_unit_target_per_phase",
+            _validate_bool(
+                "StratagemRestrictionPolicy same_unit_target_per_phase",
+                self.same_unit_target_per_phase,
             ),
         )
         object.__setattr__(
@@ -363,6 +409,7 @@ class StratagemRestrictionPolicy:
     def to_payload(self) -> StratagemRestrictionPolicyPayload:
         return {
             "same_stratagem_per_phase": self.same_stratagem_per_phase,
+            "same_unit_target_per_phase": self.same_unit_target_per_phase,
             "once_per_turn": self.once_per_turn,
             "once_per_battle": self.once_per_battle,
             "once_per_target_per_phase": self.once_per_target_per_phase,
@@ -373,6 +420,7 @@ class StratagemRestrictionPolicy:
     def from_payload(cls, payload: StratagemRestrictionPolicyPayload) -> Self:
         return cls(
             same_stratagem_per_phase=payload["same_stratagem_per_phase"],
+            same_unit_target_per_phase=payload["same_unit_target_per_phase"],
             once_per_turn=payload["once_per_turn"],
             once_per_battle=payload["once_per_battle"],
             once_per_target_per_phase=payload["once_per_target_per_phase"],
@@ -865,6 +913,7 @@ class StratagemTargetProposal:
     context: StratagemEligibilityContext
     catalog_record: StratagemCatalogRecord
     target_binding: StratagemTargetBinding | None = None
+    effect_selection: JsonValue = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -893,6 +942,7 @@ class StratagemTargetProposal:
             raise GameLifecycleError(
                 "StratagemTargetProposal target_binding must be a target binding."
             )
+        object.__setattr__(self, "effect_selection", validate_json_value(self.effect_selection))
 
     @property
     def game_id(self) -> str:
@@ -931,12 +981,27 @@ class StratagemTargetProposal:
             catalog_record=catalog_record,
         )
 
-    def with_binding(self, binding: StratagemTargetBinding) -> Self:
+    def with_binding(
+        self,
+        binding: StratagemTargetBinding,
+        *,
+        effect_selection: JsonValue = None,
+    ) -> Self:
         return type(self)(
             proposal_kind=self.proposal_kind,
             context=self.context,
             catalog_record=self.catalog_record,
             target_binding=binding,
+            effect_selection=effect_selection,
+        )
+
+    def with_effect_selection(self, effect_selection: JsonValue) -> Self:
+        return type(self)(
+            proposal_kind=self.proposal_kind,
+            context=self.context,
+            catalog_record=self.catalog_record,
+            target_binding=self.target_binding,
+            effect_selection=effect_selection,
         )
 
     def to_payload(self) -> StratagemTargetProposalPayload:
@@ -947,6 +1012,7 @@ class StratagemTargetProposal:
             "target_binding": (
                 None if self.target_binding is None else self.target_binding.to_payload()
             ),
+            "effect_selection": self.effect_selection,
         }
 
     @classmethod
@@ -961,6 +1027,7 @@ class StratagemTargetProposal:
                 if binding_payload is None
                 else StratagemTargetBinding.from_payload(binding_payload)
             ),
+            effect_selection=payload["effect_selection"],
         )
 
 
@@ -986,15 +1053,18 @@ class StratagemUseRecord:
     source_id: str
     battle_round: int
     phase: BattlePhaseKind
+    active_player_id: str | None
     timing_window_id: str | None
     request_id: str
     result_id: str
     selected_option_id: str
     target_binding: StratagemTargetBinding
+    targeted_unit_instance_ids: tuple[str, ...]
     affected_unit_instance_ids: tuple[str, ...]
     command_point_cost: int
     command_point_transaction_id: str | None
     handler_id: str
+    effect_selection: JsonValue = None
     effect_payload: JsonValue = None
 
     def __post_init__(self) -> None:
@@ -1026,6 +1096,14 @@ class StratagemUseRecord:
         object.__setattr__(self, "phase", battle_phase_kind_from_token(self.phase))
         object.__setattr__(
             self,
+            "active_player_id",
+            _validate_optional_identifier(
+                "StratagemUseRecord active_player_id",
+                self.active_player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
             "timing_window_id",
             _validate_optional_identifier(
                 "StratagemUseRecord timing_window_id",
@@ -1052,6 +1130,8 @@ class StratagemUseRecord:
         )
         if type(self.target_binding) is not StratagemTargetBinding:
             raise GameLifecycleError("StratagemUseRecord target_binding must be a binding.")
+        targeted_unit_ids = _validate_stratagem_affected_unit_ids(self.targeted_unit_instance_ids)
+        object.__setattr__(self, "targeted_unit_instance_ids", targeted_unit_ids)
         affected_unit_ids = _validate_stratagem_affected_unit_ids(self.affected_unit_instance_ids)
         object.__setattr__(self, "affected_unit_instance_ids", affected_unit_ids)
         object.__setattr__(
@@ -1075,6 +1155,7 @@ class StratagemUseRecord:
             "handler_id",
             _validate_identifier("StratagemUseRecord handler_id", self.handler_id),
         )
+        object.__setattr__(self, "effect_selection", validate_json_value(self.effect_selection))
         object.__setattr__(self, "effect_payload", validate_json_value(self.effect_payload))
 
     def to_payload(self) -> StratagemUseRecordPayload:
@@ -1085,15 +1166,18 @@ class StratagemUseRecord:
             "source_id": self.source_id,
             "battle_round": self.battle_round,
             "phase": self.phase.value,
+            "active_player_id": self.active_player_id,
             "timing_window_id": self.timing_window_id,
             "request_id": self.request_id,
             "result_id": self.result_id,
             "selected_option_id": self.selected_option_id,
             "target_binding": self.target_binding.to_payload(),
+            "targeted_unit_instance_ids": list(self.targeted_unit_instance_ids),
             "affected_unit_instance_ids": list(self.affected_unit_instance_ids),
             "command_point_cost": self.command_point_cost,
             "command_point_transaction_id": self.command_point_transaction_id,
             "handler_id": self.handler_id,
+            "effect_selection": self.effect_selection,
             "effect_payload": self.effect_payload,
         }
 
@@ -1106,15 +1190,18 @@ class StratagemUseRecord:
             source_id=payload["source_id"],
             battle_round=payload["battle_round"],
             phase=battle_phase_kind_from_token(payload["phase"]),
+            active_player_id=payload["active_player_id"],
             timing_window_id=payload["timing_window_id"],
             request_id=payload["request_id"],
             result_id=payload["result_id"],
             selected_option_id=payload["selected_option_id"],
             target_binding=StratagemTargetBinding.from_payload(payload["target_binding"]),
+            targeted_unit_instance_ids=tuple(payload["targeted_unit_instance_ids"]),
             affected_unit_instance_ids=tuple(payload["affected_unit_instance_ids"]),
             command_point_cost=payload["command_point_cost"],
             command_point_transaction_id=payload["command_point_transaction_id"],
             handler_id=payload["handler_id"],
+            effect_selection=payload["effect_selection"],
             effect_payload=payload["effect_payload"],
         )
 
@@ -1566,6 +1653,7 @@ def invalid_stratagem_use_status(
     context = selection[0]
     record = selection[1]
     target_binding = selection[2]
+    effect_selection = selection[3]
     drift = _context_state_drift(state=state, context=context)
     if drift is not None:
         return _invalid(state, "Stale stratagem decision context.", drift)
@@ -1576,6 +1664,7 @@ def invalid_stratagem_use_status(
         record=record,
         context=context,
         target_binding=target_binding,
+        effect_selection=effect_selection,
     )
     if violation is not None:
         return _invalid(state, "Stratagem decision is no longer legal.", violation)
@@ -1595,7 +1684,7 @@ def apply_stratagem_decision(
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Stratagem application requires a DecisionController.")
     selection = _require_stratagem_selection(result.payload)
-    context, catalog_record, target_binding = selection
+    context, catalog_record, target_binding, effect_selection = selection
     return _apply_stratagem_use(
         state=state,
         result=result,
@@ -1603,6 +1692,7 @@ def apply_stratagem_decision(
         context=context,
         catalog_record=catalog_record,
         target_binding=target_binding,
+        effect_selection=effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
@@ -1616,6 +1706,7 @@ def _apply_stratagem_use(
     context: StratagemEligibilityContext,
     catalog_record: StratagemCatalogRecord,
     target_binding: StratagemTargetBinding,
+    effect_selection: JsonValue,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
 ) -> StratagemUseRecord:
@@ -1627,18 +1718,23 @@ def _apply_stratagem_use(
         record=catalog_record,
         context=context,
         target_binding=target_binding,
+        effect_selection=effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
     if violation is not None:
         raise GameLifecycleError(f"Prevalidated stratagem is no longer legal: {violation}.")
     use_id = _next_stratagem_use_id(state=state, player_id=context.player_id)
+    command_point_cost = _selected_command_point_cost(
+        definition=definition,
+        effect_selection=effect_selection,
+    )
     spend_result: CommandPointSpendResult | None = None
     transaction_id: str | None = None
-    if definition.command_point_cost > 0:
+    if command_point_cost > 0:
         spend_result = state.spend_command_points(
             player_id=context.player_id,
-            amount=definition.command_point_cost,
+            amount=command_point_cost,
             source_id=use_id,
         )
         if spend_result.status is not CommandPointSpendStatus.APPLIED:
@@ -1648,11 +1744,18 @@ def _apply_stratagem_use(
         transaction_id = spend_result.transaction.transaction_id
         decisions.event_log.append("command_points_spent", spend_result.to_payload())
     try:
+        targeted_unit_ids = _stratagem_targeted_unit_ids(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+        )
         affected_unit_ids = _stratagem_affected_unit_ids(
             state=state,
             definition=definition,
             context=context,
             target_binding=target_binding,
+            effect_selection=effect_selection,
         )
     except GameLifecycleError as exc:
         raise GameLifecycleError(
@@ -1665,15 +1768,18 @@ def _apply_stratagem_use(
         source_id=definition.source_id,
         battle_round=context.battle_round,
         phase=context.phase,
+        active_player_id=context.active_player_id,
         timing_window_id=context.timing_window_id,
         request_id=result.request_id,
         result_id=result.result_id,
         selected_option_id=result.selected_option_id,
         target_binding=target_binding,
+        targeted_unit_instance_ids=targeted_unit_ids,
         affected_unit_instance_ids=affected_unit_ids,
-        command_point_cost=definition.command_point_cost,
+        command_point_cost=command_point_cost,
         command_point_transaction_id=transaction_id,
         handler_id=definition.handler_id,
+        effect_selection=effect_selection,
         effect_payload=definition.effect_payload,
     )
     state.record_stratagem_use(use_record)
@@ -1729,6 +1835,7 @@ def invalid_stratagem_target_proposal_status(
         record=request_proposal.catalog_record,
         context=request_proposal.context,
         target_binding=submitted_proposal.target_binding,
+        effect_selection=submitted_proposal.effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
@@ -1763,6 +1870,7 @@ def apply_stratagem_target_proposal(
         context=proposal.context,
         catalog_record=proposal.catalog_record,
         target_binding=proposal.target_binding,
+        effect_selection=proposal.effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
@@ -1830,6 +1938,164 @@ def apply_stratagem_placement_proposal(
     )
 
 
+def is_heroic_intervention_charge_move_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Heroic Intervention proposal check requires a request.")
+    if request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
+        return False
+    proposal_request = _movement_proposal_request_from_payload(request.payload)
+    return (
+        proposal_request is not None
+        and proposal_request.context is not None
+        and proposal_request.context.get("stratagem_handler_id")
+        == CORE_HEROIC_INTERVENTION_HANDLER_ID
+    )
+
+
+def invalid_heroic_intervention_charge_move_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if result.selected_option_id != PARAMETERIZED_DECISION_OPTION_ID:
+        return _invalid(state, "Heroic Intervention proposal selected invalid option.", "malformed")
+    proposal_request = _movement_proposal_request_from_payload(request.payload)
+    if proposal_request is None or not is_heroic_intervention_charge_move_request(request):
+        return _invalid(state, "Malformed Heroic Intervention proposal request.", "malformed")
+    submitted = _heroic_intervention_charge_move_from_result_payload(result.payload)
+    if submitted is None:
+        return _invalid(state, "Malformed Heroic Intervention proposal payload.", "malformed")
+    validation = submitted.validation_result_for_request(proposal_request)
+    if not validation.is_valid:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Heroic Intervention proposal context drift.",
+            payload={"proposal_validation": validate_json_value(validation.to_payload())},
+        )
+    request_error = _heroic_intervention_charge_move_request_error(
+        state=state,
+        proposal_request=proposal_request,
+        proposal=submitted,
+    )
+    if request_error is not None:
+        return _invalid(
+            state,
+            "Heroic Intervention charge move is not legal.",
+            request_error,
+        )
+    return None
+
+
+def apply_heroic_intervention_charge_move(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    proposal_request = _movement_proposal_request_from_payload(request.payload)
+    if proposal_request is None or not is_heroic_intervention_charge_move_request(request):
+        raise GameLifecycleError("Heroic Intervention proposal was not prevalidated.")
+    proposal = _heroic_intervention_charge_move_from_result_payload(result.payload)
+    if proposal is None:
+        raise GameLifecycleError("Heroic Intervention proposal payload was not prevalidated.")
+    if proposal.is_no_move_choice:
+        decisions.event_log.append(
+            "heroic_intervention_charge_move_declined",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "proposal_request_id": proposal_request.request_id,
+            },
+        )
+        return None
+    if proposal.witness is None:
+        raise GameLifecycleError("Validated Heroic Intervention proposal requires a witness.")
+    use_record = _stratagem_use_from_proposal_context(proposal_request)
+    maximum_distance = _heroic_intervention_maximum_distance(proposal_request)
+    scenario = _battlefield_scenario_for_stratagem(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    resolution = resolve_charge_move(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        selected_target_unit_instance_ids=proposal.charge_target_unit_instance_ids,
+        maximum_distance_inches=maximum_distance,
+        path_witness=proposal.witness,
+        hover_mode_states=tuple(state.hover_mode_states),
+        terrain_features=_stratagem_terrain_features(state),
+    )
+    violation = charge_move_violation_code(
+        resolution=resolution,
+        ruleset_descriptor=ruleset_descriptor,
+        maximum_distance_inches=maximum_distance,
+    )
+    if violation is not None:
+        payload = validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "proposal_request_id": proposal_request.request_id,
+                "violation_code": violation,
+                **resolution.movement_payload,
+            }
+        )
+        decisions.event_log.append("heroic_intervention_charge_move_invalid", payload)
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message=f"Heroic Intervention charge move is invalid: {violation}.",
+            payload=payload,
+        )
+    transition_batch = resolution.transition_batch(before=unit_placement)
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Heroic Intervention requires battlefield_state.")
+    state.replace_battlefield_state(
+        battlefield_state.with_unit_placement(resolution.attempted_placement)
+    )
+    effect = PersistingEffect(
+        effect_id=f"{result.result_id}:heroic-intervention:fights-first",
+        source_rule_id=use_record.source_id,
+        owner_player_id=use_record.player_id,
+        target_unit_instance_ids=(proposal.unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.CHARGE,
+        expiration=EffectExpiration.end_turn(
+            battle_round=state.battle_round,
+            player_id=state.active_player_id or use_record.player_id,
+        ),
+        effect_payload={
+            "effect_kind": "charge_grants_fights_first",
+            "source_rule_id": use_record.source_id,
+            "stratagem_use_id": use_record.use_id,
+        },
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "heroic_intervention_charge_move_completed",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.CHARGE.value,
+            "stratagem_use": use_record.to_payload(),
+            "proposal_request_id": proposal_request.request_id,
+            "transition_batch": transition_batch.to_payload(),
+            "persisting_effect": effect.to_payload(),
+            **resolution.movement_payload,
+        },
+    )
+    return None
+
+
 def stratagem_availability_kind_from_token(token: object) -> StratagemAvailabilityKind:
     if type(token) is StratagemAvailabilityKind:
         return token
@@ -1882,6 +2148,7 @@ def _stratagem_decision_option(
                 "context": context.to_payload(),
                 "catalog_record": record.to_payload(),
                 "target_binding": target_binding.to_payload(),
+                "effect_selection": None,
             }
         ),
     )
@@ -1889,7 +2156,15 @@ def _stratagem_decision_option(
 
 def _stratagem_selection_from_result_payload(
     payload: JsonValue,
-) -> tuple[StratagemEligibilityContext, StratagemCatalogRecord, StratagemTargetBinding] | None:
+) -> (
+    tuple[
+        StratagemEligibilityContext,
+        StratagemCatalogRecord,
+        StratagemTargetBinding,
+        JsonValue,
+    ]
+    | None
+):
     if not isinstance(payload, dict):
         return None
     if payload.get("submission_kind") != STRATAGEM_DECISION_TYPE:
@@ -1897,6 +2172,7 @@ def _stratagem_selection_from_result_payload(
     context_payload = payload.get("context")
     record_payload = payload.get("catalog_record")
     binding_payload = payload.get("target_binding")
+    effect_selection = payload.get("effect_selection")
     if not isinstance(context_payload, dict):
         return None
     if not isinstance(record_payload, dict):
@@ -1914,6 +2190,7 @@ def _stratagem_selection_from_result_payload(
             StratagemTargetBinding.from_payload(
                 cast(StratagemTargetBindingPayload, binding_payload)
             ),
+            validate_json_value(effect_selection),
         )
     except (KeyError, GameLifecycleError):  # fmt: skip
         return None
@@ -1921,7 +2198,7 @@ def _stratagem_selection_from_result_payload(
 
 def _require_stratagem_selection(
     payload: JsonValue,
-) -> tuple[StratagemEligibilityContext, StratagemCatalogRecord, StratagemTargetBinding]:
+) -> tuple[StratagemEligibilityContext, StratagemCatalogRecord, StratagemTargetBinding, JsonValue]:
     selection = _stratagem_selection_from_result_payload(payload)
     if selection is None:
         raise GameLifecycleError("Stratagem decision payload was not prevalidated.")
@@ -1951,6 +2228,7 @@ def _stratagem_unavailable_reason(
     record: StratagemCatalogRecord,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue = None,
     ruleset_descriptor: RulesetDescriptor | None = None,
     army_catalog: ArmyCatalog | None = None,
 ) -> str | None:
@@ -1965,7 +2243,17 @@ def _stratagem_unavailable_reason(
         return "unsupported_handler"
     if not record.definition.timing.matches(context):
         return "timing_window_mismatch"
-    if state.command_point_total(context.player_id) < record.definition.command_point_cost:
+    effect_selection_error = _effect_selection_error(
+        definition=record.definition,
+        effect_selection=effect_selection,
+    )
+    if effect_selection_error is not None:
+        return effect_selection_error
+    command_point_cost = _selected_command_point_cost(
+        definition=record.definition,
+        effect_selection=effect_selection,
+    )
+    if state.command_point_total(context.player_id) < command_point_cost:
         return "insufficient_command_points"
     if not _detachment_gate_allows(state=state, record=record, player_id=context.player_id):
         return "detachment_gate_closed"
@@ -1974,6 +2262,8 @@ def _stratagem_unavailable_reason(
         definition=record.definition,
         context=context,
         target_binding=target_binding,
+        effect_selection=effect_selection,
+        ruleset_descriptor=ruleset_descriptor,
     )
     if handler_reason is not None:
         return handler_reason
@@ -2035,12 +2325,152 @@ def _detachment_gate_allows(
     return False
 
 
+def _effect_selection_error(
+    *,
+    definition: StratagemDefinition,
+    effect_selection: JsonValue,
+) -> str | None:
+    if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        return _heroic_intervention_mode_error(
+            definition=definition,
+            effect_selection=effect_selection,
+        )
+    if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID:
+        if effect_selection is None:
+            return None
+        return _required_effect_selection_fields_error(
+            effect_selection=effect_selection,
+            field_names=(
+                CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY,
+                CRUSHING_IMPACT_MODEL_CONTEXT_KEY,
+            ),
+        )
+    if definition.handler_id == CORE_EPIC_CHALLENGE_HANDLER_ID:
+        if effect_selection is None:
+            return None
+        return _required_effect_selection_fields_error(
+            effect_selection=effect_selection,
+            field_names=(EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY,),
+        )
+    if effect_selection is not None:
+        return "effect_selection_not_supported"
+    return None
+
+
+def _selected_command_point_cost(
+    *,
+    definition: StratagemDefinition,
+    effect_selection: JsonValue,
+) -> int:
+    if definition.handler_id != CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        return definition.command_point_cost
+    return definition.command_point_cost + _heroic_intervention_mode_additional_cost(
+        definition=definition,
+        effect_selection=effect_selection,
+    )
+
+
+def _heroic_intervention_mode_error(
+    *,
+    definition: StratagemDefinition,
+    effect_selection: JsonValue,
+) -> str | None:
+    if effect_selection is None:
+        return None
+    mode = _effect_selection_string_or_none(
+        effect_selection=effect_selection,
+        key=HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
+    )
+    if mode is None:
+        return "heroic_intervention_mode_required"
+    if mode not in _heroic_intervention_mode_costs(definition):
+        return "heroic_intervention_mode_unknown"
+    return None
+
+
+def _heroic_intervention_mode(
+    *,
+    definition: StratagemDefinition,
+    effect_selection: JsonValue,
+) -> str:
+    if effect_selection is None:
+        return HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND
+    mode = _effect_selection_string_or_none(
+        effect_selection=effect_selection,
+        key=HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
+    )
+    if mode is None or mode not in _heroic_intervention_mode_costs(definition):
+        raise GameLifecycleError("Heroic Intervention mode was not prevalidated.")
+    return mode
+
+
+def _heroic_intervention_mode_additional_cost(
+    *,
+    definition: StratagemDefinition,
+    effect_selection: JsonValue,
+) -> int:
+    mode = _heroic_intervention_mode(definition=definition, effect_selection=effect_selection)
+    return _heroic_intervention_mode_costs(definition)[mode]
+
+
+def _heroic_intervention_mode_costs(definition: StratagemDefinition) -> Mapping[str, int]:
+    payload = definition.effect_payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Heroic Intervention source payload requires modes.")
+    modes = payload.get("modes")
+    if not isinstance(modes, list):
+        raise GameLifecycleError("Heroic Intervention source payload modes must be a list.")
+    costs: dict[str, int] = {}
+    for mode_payload in modes:
+        if not isinstance(mode_payload, dict):
+            raise GameLifecycleError("Heroic Intervention mode payload must be an object.")
+        mode = mode_payload.get("mode")
+        cost = mode_payload.get("additional_command_point_cost")
+        if type(mode) is not str or type(cost) is not int:
+            raise GameLifecycleError("Heroic Intervention mode payload is malformed.")
+        costs[_validate_identifier("Heroic Intervention mode", mode)] = _validate_non_negative_int(
+            "Heroic Intervention additional CP cost",
+            cost,
+        )
+    if HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND not in costs:
+        raise GameLifecycleError("Heroic Intervention modes require Leap to Defend.")
+    return MappingProxyType(dict(sorted(costs.items())))
+
+
+def _required_effect_selection_fields_error(
+    *,
+    effect_selection: JsonValue,
+    field_names: tuple[str, ...],
+) -> str | None:
+    if not isinstance(effect_selection, dict):
+        return "effect_selection_malformed"
+    for field_name in field_names:
+        if type(effect_selection.get(field_name)) is not str:
+            return f"{field_name}_required"
+    return None
+
+
+def _effect_selection_string_or_none(
+    *,
+    effect_selection: JsonValue,
+    key: str,
+) -> str | None:
+    if not isinstance(effect_selection, dict):
+        return None
+    value = effect_selection.get(key)
+    if type(value) is not str:
+        return None
+    return _validate_identifier(key, value)
+
+
 def _handler_unavailable_reason(
     *,
     state: GameState,
     definition: StratagemDefinition,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue,
+    ruleset_descriptor: RulesetDescriptor | None,
 ) -> str | None:
     if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
         return _command_reroll_context_error(
@@ -2106,6 +2536,57 @@ def _handler_unavailable_reason(
             context=context,
             target_binding=target_binding,
         )
+    if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        if context.trigger_kind is not TimingTriggerKind.END_PHASE:
+            return "heroic_intervention_requires_end_charge_phase"
+        if context.phase is not BattlePhase.CHARGE:
+            return "heroic_intervention_requires_charge_phase"
+        if context.active_player_id == context.player_id:
+            return "heroic_intervention_requires_opponent_turn"
+        return None
+    if definition.handler_id == CORE_COUNTEROFFENSIVE_HANDLER_ID:
+        if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT:
+            return "counteroffensive_requires_enemy_fought_trigger"
+        if context.phase is not BattlePhase.FIGHT:
+            return "counteroffensive_requires_fight_phase"
+        if context.active_player_id is None:
+            return "counteroffensive_requires_active_player"
+        if target_binding is not None:
+            return _counteroffensive_target_context_error(
+                state=state,
+                context=context,
+                target_binding=target_binding,
+                ruleset_descriptor=ruleset_descriptor,
+            )
+        return None
+    if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID:
+        if context.trigger_kind is not TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE:
+            return "crushing_impact_requires_charge_move_trigger"
+        if context.phase is not BattlePhase.CHARGE:
+            return "crushing_impact_requires_charge_phase"
+        if context.active_player_id != context.player_id:
+            return "crushing_impact_requires_own_charge_phase"
+        if target_binding is None:
+            return None
+        return _crushing_impact_context_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+        )
+    if definition.handler_id == CORE_EPIC_CHALLENGE_HANDLER_ID:
+        if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT:
+            return "epic_challenge_requires_selected_to_fight_trigger"
+        if context.phase is not BattlePhase.FIGHT:
+            return "epic_challenge_requires_fight_phase"
+        if target_binding is None:
+            return None
+        return _epic_challenge_context_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+        )
     return None
 
 
@@ -2121,8 +2602,7 @@ def _restriction_violation(
     previous_uses = state.stratagem_use_records_for_player(player_id)
     if policy.same_stratagem_per_phase and any(
         use.stratagem_id == definition.stratagem_id
-        and use.battle_round == context.battle_round
-        and use.phase is context.phase
+        and _same_stratagem_phase(use=use, context=context)
         for use in previous_uses
     ):
         return "same_stratagem_per_phase"
@@ -2143,29 +2623,58 @@ def _restriction_violation(
         and target_binding.target_unit_instance_id is not None
         and any(
             use.stratagem_id == definition.stratagem_id
-            and use.battle_round == context.battle_round
-            and use.phase is context.phase
+            and _same_stratagem_phase(use=use, context=context)
             and use.target_binding.target_unit_instance_id == target_binding.target_unit_instance_id
             for use in previous_uses
         )
     ):
         return "once_per_target_per_phase"
-    affected_unit_ids = _stratagem_affected_unit_ids(
+    targeted_unit_ids = _stratagem_targeted_unit_ids(
         state=state,
         definition=definition,
         context=context,
         target_binding=target_binding,
     )
-    if affected_unit_ids:
-        affected_unit_id_set = set(affected_unit_ids)
+    if policy.same_unit_target_per_phase and targeted_unit_ids:
+        targeted_unit_id_set = set(targeted_unit_ids)
         if any(
-            use.battle_round == context.battle_round
-            and use.phase is context.phase
-            and affected_unit_id_set.intersection(use.affected_unit_instance_ids)
-            for use in state.stratagem_use_records
+            _same_stratagem_phase(use=use, context=context)
+            and targeted_unit_id_set.intersection(use.targeted_unit_instance_ids)
+            for use in previous_uses
         ):
-            return "affected_unit_already_stratagem_target"
+            return "targeted_unit_already_stratagem_target"
     return None
+
+
+def _same_stratagem_phase(*, use: StratagemUseRecord, context: StratagemEligibilityContext) -> bool:
+    return (
+        use.battle_round == context.battle_round
+        and use.phase is context.phase
+        and use.active_player_id == context.active_player_id
+    )
+
+
+def _stratagem_targeted_unit_ids(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> tuple[str, ...]:
+    raw_unit_ids: list[str] = []
+    if target_binding is not None and target_binding.target_unit_instance_id is not None:
+        raw_unit_ids.append(target_binding.target_unit_instance_id)
+    if not raw_unit_ids:
+        return ()
+    return _validate_stratagem_affected_unit_ids(
+        tuple(
+            _canonical_stratagem_affected_unit_id(
+                state=state,
+                unit_instance_id=unit_instance_id,
+            )
+            for unit_instance_id in raw_unit_ids
+        )
+    )
 
 
 def _stratagem_affected_unit_ids(
@@ -2174,6 +2683,7 @@ def _stratagem_affected_unit_ids(
     definition: StratagemDefinition,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue = None,
 ) -> tuple[str, ...]:
     raw_unit_ids: list[str] = []
     if target_binding is not None and target_binding.target_unit_instance_id is not None:
@@ -2184,6 +2694,10 @@ def _stratagem_affected_unit_ids(
         explosives_target_id = _explosives_target_unit_id_or_none(context)
         if explosives_target_id is not None:
             raw_unit_ids.append(explosives_target_id)
+    if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID and target_binding is not None:
+        crushing_target_id = _crushing_impact_enemy_target_id_or_none(effect_selection)
+        if crushing_target_id is not None:
+            raw_unit_ids.append(crushing_target_id)
     if not raw_unit_ids:
         return ()
     return _validate_stratagem_affected_unit_ids(
@@ -2433,6 +2947,35 @@ def _target_binding_error(
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
         )
+    if target_spec.target_policy_id == HEROIC_INTERVENTION_TARGET_POLICY_ID:
+        if context is None:
+            return None
+        return _heroic_intervention_target_binding_error(
+            state=state,
+            player_id=player_id,
+            target_binding=target_binding,
+        )
+    if target_spec.target_policy_id == COUNTEROFFENSIVE_TARGET_POLICY_ID:
+        return None
+    if target_spec.target_policy_id == CRUSHING_IMPACT_TARGET_POLICY_ID:
+        if not (
+            _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="MONSTER")
+            or _target_unit_has_keyword(
+                state=state,
+                target_binding=target_binding,
+                keyword="VEHICLE",
+            )
+        ):
+            return "unit_not_monster_or_vehicle"
+        return None
+    if target_spec.target_policy_id == EPIC_CHALLENGE_TARGET_POLICY_ID:
+        if not _target_unit_has_keyword(
+            state=state,
+            target_binding=target_binding,
+            keyword="CHARACTER",
+        ):
+            return "unit_not_character"
+        return None
     if target_spec.target_policy_id not in {"friendly_unit", "any_unit"}:
         return "unsupported_target_policy"
     return None
@@ -2750,6 +3293,133 @@ def _fire_overwatch_triggering_enemy_unit_id_or_none(
     return _validate_identifier("Fire Overwatch moved unit id", unit_id)
 
 
+def _heroic_intervention_target_binding_error(
+    *,
+    state: GameState,
+    player_id: str,
+    target_binding: StratagemTargetBinding,
+) -> str | None:
+    target_unit_id = _require_target_unit_id(target_binding)
+    target_unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
+    if _unit_has_keyword(target_unit, "VEHICLE") and not (
+        _unit_has_keyword(target_unit, "CHARACTER") or _unit_has_keyword(target_unit, "WALKER")
+    ):
+        return "heroic_intervention_vehicle_not_character_or_walker"
+    if _unit_is_within_enemy_engagement_range(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=target_unit_id,
+    ):
+        return "heroic_intervention_unit_engaged"
+    if not _friendly_unit_within_enemy_range(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=target_unit_id,
+        distance_inches=HEROIC_INTERVENTION_TARGET_RANGE_INCHES,
+    ):
+        return "heroic_intervention_unit_not_within_12"
+    return None
+
+
+def _crushing_impact_context_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    effect_selection: JsonValue,
+) -> str | None:
+    source_unit_id = _require_target_unit_id(target_binding)
+    enemy_unit_id = _crushing_impact_enemy_target_id_or_none(effect_selection)
+    if enemy_unit_id is None:
+        return "missing_crushing_impact_enemy_target"
+    enemy_owner = _unit_owner(state=state, unit_instance_id=enemy_unit_id)
+    if enemy_owner is None:
+        return "unknown_crushing_impact_enemy_target"
+    if enemy_owner == context.player_id:
+        return "crushing_impact_target_not_enemy"
+    model_id = _crushing_impact_model_id_or_none(effect_selection)
+    if model_id is None:
+        return "missing_crushing_impact_model"
+    if model_id not in _unit_by_id(state=state, unit_instance_id=source_unit_id).own_model_ids():
+        return "crushing_impact_model_not_in_unit"
+    if not _model_is_alive_and_placed(state=state, model_instance_id=model_id):
+        return "crushing_impact_model_not_alive_and_placed"
+    if not _units_are_engaged(
+        state=state,
+        first_unit_instance_id=source_unit_id,
+        second_unit_instance_id=enemy_unit_id,
+    ):
+        return "crushing_impact_units_not_engaged"
+    if not _model_engaged_with_unit(
+        state=state,
+        model_instance_id=model_id,
+        target_unit_instance_id=enemy_unit_id,
+    ):
+        return "crushing_impact_model_not_engaged_with_target"
+    if _model_toughness(state=state, model_instance_id=model_id) is None:
+        return "crushing_impact_model_missing_toughness"
+    return None
+
+
+def _counteroffensive_target_context_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    ruleset_descriptor: RulesetDescriptor | None,
+) -> str | None:
+    fight_state = state.fight_phase_state
+    if fight_state is None:
+        return "counteroffensive_requires_fight_phase_state"
+    descriptor = (
+        _stratagem_ruleset_descriptor() if ruleset_descriptor is None else ruleset_descriptor
+    )
+    target_unit_id = _require_target_unit_id(target_binding)
+    contexts = eligible_fight_contexts_for_player(
+        state=state,
+        fight_state=fight_state,
+        player_id=context.player_id,
+        policy=descriptor.fight_policy,
+    )
+    for fight_context in contexts:
+        if fight_context.unit_instance_id != target_unit_id:
+            continue
+        if legal_fight_types_for_context(
+            context=fight_context,
+            policy=descriptor.fight_policy,
+        ):
+            return None
+        return "counteroffensive_target_has_no_legal_fight_type"
+    return "counteroffensive_target_not_eligible_to_fight"
+
+
+def _epic_challenge_context_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    effect_selection: JsonValue,
+) -> str | None:
+    target_unit_id = _require_target_unit_id(target_binding)
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return "missing_epic_challenge_trigger_context"
+    selected_unit_id = trigger_payload.get("selected_unit_instance_id")
+    if selected_unit_id != target_unit_id:
+        return "epic_challenge_unit_not_selected_to_fight"
+    model_id = _epic_challenge_character_model_id_or_none(effect_selection)
+    if model_id is None:
+        return "missing_epic_challenge_character_model"
+    unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
+    if model_id not in unit.own_model_ids():
+        return "epic_challenge_model_not_in_unit"
+    if not _unit_has_keyword(unit, "CHARACTER"):
+        return "epic_challenge_unit_not_character"
+    if not _model_is_alive_and_placed(state=state, model_instance_id=model_id):
+        return "epic_challenge_model_not_alive_and_placed"
+    return None
+
+
 def _units_are_within_range_inches(
     *,
     state: GameState,
@@ -2772,6 +3442,134 @@ def _units_are_within_range_inches(
             if first_model.range_to(second_model) <= distance_inches:
                 return True
     return False
+
+
+def _friendly_unit_within_enemy_range(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+    distance_inches: float,
+) -> bool:
+    for army in state.army_definitions:
+        if army.player_id == player_id:
+            continue
+        for unit in army.units:
+            if _units_are_within_range_inches(
+                state=state,
+                first_unit_instance_id=unit_instance_id,
+                second_unit_instance_id=unit.unit_instance_id,
+                distance_inches=distance_inches,
+            ):
+                return True
+    return False
+
+
+def _units_are_engaged(
+    *,
+    state: GameState,
+    first_unit_instance_id: str,
+    second_unit_instance_id: str,
+) -> bool:
+    return _any_models_within_engagement_range(
+        first_models=_geometry_models_for_unit(
+            state=state,
+            unit_instance_id=first_unit_instance_id,
+        ),
+        second_models=_geometry_models_for_unit(
+            state=state,
+            unit_instance_id=second_unit_instance_id,
+        ),
+    )
+
+
+def _model_engaged_with_unit(
+    *,
+    state: GameState,
+    model_instance_id: str,
+    target_unit_instance_id: str,
+) -> bool:
+    model = _geometry_model_for_model_id(state=state, model_instance_id=model_instance_id)
+    return _any_models_within_engagement_range(
+        first_models=(model,),
+        second_models=_geometry_models_for_unit(
+            state=state,
+            unit_instance_id=target_unit_instance_id,
+        ),
+    )
+
+
+def _geometry_model_for_model_id(*, state: GameState, model_instance_id: str) -> Model:
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Stratagem model geometry requires battlefield_state.")
+    for army in state.army_definitions:
+        for unit in army.units:
+            for model in unit.own_models:
+                if model.model_instance_id != requested_model_id:
+                    continue
+                try:
+                    return geometry_model_for_placement(
+                        model=model,
+                        placement=battlefield_state.model_placement_by_id(model.model_instance_id),
+                    )
+                except PlacementError as exc:
+                    raise GameLifecycleError("Stratagem model placement is invalid.") from exc
+    raise GameLifecycleError("model_instance_id is unknown.")
+
+
+def _model_is_alive_and_placed(*, state: GameState, model_instance_id: str) -> bool:
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Stratagem model placement requires battlefield_state.")
+    placed_model_ids = set(battlefield_state.placed_model_ids())
+    for army in state.army_definitions:
+        for unit in army.units:
+            for model in unit.own_models:
+                if model.model_instance_id == requested_model_id:
+                    return model.is_alive and requested_model_id in placed_model_ids
+    raise GameLifecycleError("model_instance_id is unknown.")
+
+
+def _model_toughness(*, state: GameState, model_instance_id: str) -> int | None:
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            for model in unit.own_models:
+                if model.model_instance_id != requested_model_id:
+                    continue
+                for value in model.characteristics:
+                    if value.characteristic is Characteristic.TOUGHNESS:
+                        return value.final
+                return None
+    raise GameLifecycleError("model_instance_id is unknown.")
+
+
+def _crushing_impact_enemy_target_id_or_none(
+    effect_selection: JsonValue,
+) -> str | None:
+    return _effect_selection_string_or_none(
+        effect_selection=effect_selection,
+        key=CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY,
+    )
+
+
+def _crushing_impact_model_id_or_none(effect_selection: JsonValue) -> str | None:
+    return _effect_selection_string_or_none(
+        effect_selection=effect_selection,
+        key=CRUSHING_IMPACT_MODEL_CONTEXT_KEY,
+    )
+
+
+def _epic_challenge_character_model_id_or_none(
+    effect_selection: JsonValue,
+) -> str | None:
+    return _effect_selection_string_or_none(
+        effect_selection=effect_selection,
+        key=EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY,
+    )
 
 
 def _explosives_context_error(
@@ -3156,6 +3954,99 @@ def _movement_proposal_request_from_payload(payload: JsonValue) -> MovementPropo
         return None
 
 
+def _heroic_intervention_charge_move_from_result_payload(
+    payload: JsonValue,
+) -> ChargeMoveProposal | None:
+    if not isinstance(payload, dict):
+        return None
+    try:
+        return ChargeMoveProposal.from_payload(cast(ChargeMoveProposalPayload, payload))
+    except (KeyError, GameLifecycleError):  # fmt: skip
+        return None
+
+
+def _heroic_intervention_charge_move_request_error(
+    *,
+    state: GameState,
+    proposal_request: MovementProposalRequest,
+    proposal: ChargeMoveProposal,
+) -> str | None:
+    use_record = _stratagem_use_from_proposal_context(proposal_request)
+    if use_record.player_id != proposal_request.actor_id:
+        return "heroic_intervention_actor_drift"
+    if use_record.stratagem_id != "heroic-intervention":
+        return "heroic_intervention_use_drift"
+    maximum_distance = _heroic_intervention_maximum_distance(proposal_request)
+    mode = _heroic_intervention_mode_from_request(proposal_request)
+    current_reachable = _heroic_intervention_reachable_target_distances(
+        state=state,
+        player_id=use_record.player_id,
+        heroic_unit_id=proposal.unit_instance_id,
+        mode=mode,
+        maximum_distance_inches=maximum_distance,
+    )
+    requested_reachable = _heroic_intervention_requested_reachable_distances(proposal_request)
+    if current_reachable != requested_reachable:
+        return "heroic_intervention_reachable_targets_drift"
+    if proposal.is_no_move_choice:
+        return None
+    if proposal.witness is None:
+        return "heroic_intervention_witness_required"
+    if not set(proposal.charge_target_unit_instance_ids).issubset(set(current_reachable)):
+        return "heroic_intervention_target_not_reachable"
+    return None
+
+
+def _heroic_intervention_maximum_distance(proposal_request: MovementProposalRequest) -> int:
+    context = _heroic_intervention_request_context(proposal_request)
+    value = context.get("maximum_distance_inches")
+    if type(value) is not int:
+        raise GameLifecycleError("Heroic Intervention request requires maximum distance.")
+    if value < 2 or value > 12:
+        raise GameLifecycleError("Heroic Intervention maximum distance is invalid.")
+    return value
+
+
+def _heroic_intervention_mode_from_request(proposal_request: MovementProposalRequest) -> str:
+    context = _heroic_intervention_request_context(proposal_request)
+    value = context.get("mode")
+    if type(value) is not str:
+        raise GameLifecycleError("Heroic Intervention request requires mode.")
+    return _validate_identifier("Heroic Intervention mode", value)
+
+
+def _heroic_intervention_requested_reachable_distances(
+    proposal_request: MovementProposalRequest,
+) -> dict[str, float]:
+    context = _heroic_intervention_request_context(proposal_request)
+    value = context.get("reachable_target_distances_inches")
+    if not isinstance(value, dict):
+        raise GameLifecycleError("Heroic Intervention request requires reachable target map.")
+    distances: dict[str, float] = {}
+    for unit_id, distance in value.items():
+        if type(unit_id) is not str:
+            raise GameLifecycleError("Heroic Intervention reachable target map is malformed.")
+        if type(distance) is int:
+            distance_value = float(distance)
+        elif type(distance) is float:
+            distance_value = distance
+        else:
+            raise GameLifecycleError("Heroic Intervention reachable target map is malformed.")
+        distances[_validate_identifier("Heroic Intervention target id", unit_id)] = float(
+            distance_value
+        )
+    return dict(sorted(distances.items()))
+
+
+def _heroic_intervention_request_context(
+    proposal_request: MovementProposalRequest,
+) -> dict[str, JsonValue]:
+    context = proposal_request.context
+    if context is None:
+        raise GameLifecycleError("Heroic Intervention request requires context.")
+    return context
+
+
 def _placement_proposal_from_result_payload(payload: JsonValue) -> PlacementProposalPayload | None:
     if not isinstance(payload, dict):
         return None
@@ -3415,6 +4306,45 @@ def _apply_supported_stratagem_handler(
             state=state,
             decisions=decisions,
             context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == CORE_COUNTEROFFENSIVE_HANDLER_ID:
+        _apply_counteroffensive_handler(
+            state=state,
+            decisions=decisions,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+        return
+    if definition.handler_id == CORE_CRUSHING_IMPACT_HANDLER_ID:
+        _apply_crushing_impact_handler(
+            state=state,
+            decisions=decisions,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == CORE_EPIC_CHALLENGE_HANDLER_ID:
+        _apply_epic_challenge_handler(
+            state=state,
+            decisions=decisions,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        _apply_heroic_intervention_handler(
+            state=state,
+            decisions=decisions,
+            result=result,
+            context=context,
+            definition=definition,
             target_binding=target_binding,
             use_record=use_record,
         )
@@ -4038,6 +4968,434 @@ def _emit_explosives_resolved(
             ),
         },
     )
+
+
+def _apply_counteroffensive_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+    ruleset_descriptor: RulesetDescriptor,
+) -> None:
+    target_unit_id = _require_target_unit_id(target_binding)
+    fight_state = state.fight_phase_state
+    if fight_state is None:
+        raise GameLifecycleError("Counteroffensive requires fight_phase_state.")
+    contexts = eligible_fight_contexts_for_player(
+        state=state,
+        fight_state=fight_state,
+        player_id=use_record.player_id,
+        policy=ruleset_descriptor.fight_policy,
+    )
+    fight_context = next(
+        (candidate for candidate in contexts if candidate.unit_instance_id == target_unit_id),
+        None,
+    )
+    if fight_context is None:
+        raise GameLifecycleError("Counteroffensive target was not prevalidated.")
+    fight_types = legal_fight_types_for_context(
+        context=fight_context,
+        policy=ruleset_descriptor.fight_policy,
+    )
+    if not fight_types:
+        raise GameLifecycleError("Counteroffensive target has no legal fight type.")
+    interrupt_id = f"counteroffensive:{use_record.use_id}"
+    selection = FightActivationSelection(
+        player_id=use_record.player_id,
+        battle_round=use_record.battle_round,
+        unit_instance_id=target_unit_id,
+        ordering_band=fight_context.ordering_band,
+        fight_type=fight_types[0],
+        eligibility_reasons=fight_context.eligibility_reasons,
+        request_id=use_record.request_id,
+        result_id=use_record.result_id,
+        interrupt_id=interrupt_id,
+    )
+    effect = PersistingEffect(
+        effect_id=f"{use_record.use_id}:counteroffensive:fights-first",
+        source_rule_id=use_record.source_id,
+        owner_player_id=use_record.player_id,
+        target_unit_instance_ids=(target_unit_id,),
+        started_battle_round=use_record.battle_round,
+        started_phase=use_record.phase,
+        expiration=EffectExpiration.end_phase(
+            battle_round=use_record.battle_round,
+            phase=use_record.phase,
+            player_id=context.active_player_id or use_record.player_id,
+        ),
+        effect_payload={
+            "effect_kind": FIGHTS_FIRST_EFFECT_KIND,
+            "source_rule_id": use_record.source_id,
+            "stratagem_use_id": use_record.use_id,
+        },
+    )
+    state.record_persisting_effect(effect)
+    state.fight_phase_state = fight_state.with_activation(selection).with_active_activation(
+        selection
+    )
+    decisions.event_log.append(
+        "counteroffensive_activation_selected",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "persisting_effect": effect.to_payload(),
+            "activation_selection": selection.to_payload(),
+        },
+    )
+
+
+def _apply_crushing_impact_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    context_error = _crushing_impact_context_error(
+        state=state,
+        context=context,
+        target_binding=target_binding,
+        effect_selection=use_record.effect_selection,
+    )
+    if context_error is not None:
+        raise GameLifecycleError("Prevalidated Crushing Impact context failed.")
+    source_unit_id = _require_target_unit_id(target_binding)
+    enemy_unit_id = _crushing_impact_enemy_target_id_or_none(use_record.effect_selection)
+    model_id = _crushing_impact_model_id_or_none(use_record.effect_selection)
+    if enemy_unit_id is None or model_id is None:
+        raise GameLifecycleError("Crushing Impact selection was not prevalidated.")
+    toughness = _model_toughness(state=state, model_instance_id=model_id)
+    if toughness is None:
+        raise GameLifecycleError("Crushing Impact model Toughness was not prevalidated.")
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    roll_state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=toughness, sides=6),
+            reason=f"Crushing Impact mortal wounds for {use_record.use_id}",
+            roll_type="stratagem.crushing_impact",
+            actor_id=use_record.player_id,
+        )
+    )
+    source_mortal_wounds = sum(1 for value in roll_state.current_values if value == 1)
+    enemy_mortal_wounds = min(
+        CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT,
+        sum(1 for value in roll_state.current_values if value >= 5),
+    )
+    source_application = _apply_stratagem_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        use_record=use_record,
+        application_id=f"{use_record.use_id}:crushing-impact:self",
+        target_unit_instance_id=source_unit_id,
+        mortal_wounds=source_mortal_wounds,
+        source_context=validate_json_value(
+            {
+                "source_kind": "crushing_impact_self",
+                "stratagem_use": use_record.to_payload(),
+                "roll_state": roll_state.to_payload(),
+            }
+        ),
+    )
+    if decisions.queue.pending_requests:
+        return
+    enemy_application = _apply_stratagem_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        use_record=use_record,
+        application_id=f"{use_record.use_id}:crushing-impact:enemy",
+        target_unit_instance_id=enemy_unit_id,
+        mortal_wounds=enemy_mortal_wounds,
+        source_context=validate_json_value(
+            {
+                "source_kind": "crushing_impact_enemy",
+                "stratagem_use": use_record.to_payload(),
+                "roll_state": roll_state.to_payload(),
+            }
+        ),
+    )
+    decisions.event_log.append(
+        "crushing_impact_resolved",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "source_unit_instance_id": source_unit_id,
+            "source_model_instance_id": model_id,
+            "target_unit_instance_id": enemy_unit_id,
+            "roll_state": roll_state.to_payload(),
+            "source_mortal_wounds": source_mortal_wounds,
+            "enemy_mortal_wounds": enemy_mortal_wounds,
+            "source_mortal_wound_application": (
+                None if source_application is None else source_application.to_payload()
+            ),
+            "enemy_mortal_wound_application": (
+                None if enemy_application is None else enemy_application.to_payload()
+            ),
+        },
+    )
+
+
+def _apply_epic_challenge_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    context_error = _epic_challenge_context_error(
+        state=state,
+        context=context,
+        target_binding=target_binding,
+        effect_selection=use_record.effect_selection,
+    )
+    if context_error is not None:
+        raise GameLifecycleError("Prevalidated Epic Challenge context failed.")
+    target_unit_id = _require_target_unit_id(target_binding)
+    model_id = _epic_challenge_character_model_id_or_none(use_record.effect_selection)
+    if model_id is None:
+        raise GameLifecycleError("Epic Challenge model was not prevalidated.")
+    effect = PersistingEffect(
+        effect_id=f"{use_record.use_id}:epic-challenge:precision",
+        source_rule_id=use_record.source_id,
+        owner_player_id=use_record.player_id,
+        target_unit_instance_ids=(target_unit_id,),
+        started_battle_round=use_record.battle_round,
+        started_phase=use_record.phase,
+        expiration=EffectExpiration.end_phase(
+            battle_round=use_record.battle_round,
+            phase=use_record.phase,
+            player_id=context.active_player_id or use_record.player_id,
+        ),
+        effect_payload={
+            "effect_kind": "epic_challenge_precision",
+            "source_rule_id": use_record.source_id,
+            "stratagem_use_id": use_record.use_id,
+            "model_instance_id": model_id,
+            "weapon_keyword": "Precision",
+        },
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "epic_challenge_precision_registered",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "persisting_effect": effect.to_payload(),
+        },
+    )
+
+
+def _apply_heroic_intervention_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    target_unit_id = _require_target_unit_id(target_binding)
+    mode = _heroic_intervention_mode(
+        definition=definition,
+        effect_selection=use_record.effect_selection,
+    )
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    roll_state = manager.roll(
+        DiceRollSpec(
+            expression=DiceExpression(quantity=2, sides=6),
+            reason=f"Heroic Intervention charge roll for {use_record.use_id}",
+            roll_type="charge_roll",
+            actor_id=use_record.player_id,
+            reroll_forbidden_rule_ids=(CORE_COMMAND_REROLL_HANDLER_ID,),
+        )
+    )
+    maximum_distance = roll_state.current_total
+    if mode == HEROIC_INTERVENTION_MODE_INTO_THE_FRAY and maximum_distance > 6:
+        maximum_distance = 6
+    reachable = _heroic_intervention_reachable_target_distances(
+        state=state,
+        player_id=use_record.player_id,
+        heroic_unit_id=target_unit_id,
+        mode=mode,
+        maximum_distance_inches=maximum_distance,
+    )
+    proposal_request = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=context.player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.CHARGE.value,
+        unit_instance_id=target_unit_id,
+        proposal_kind=ProposalKind.CHARGE_MOVE,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        movement_phase_action=CHARGE_MOVE_ACTION,
+        context=cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    "stratagem_handler_id": CORE_HEROIC_INTERVENTION_HANDLER_ID,
+                    "stratagem_use": use_record.to_payload(),
+                    "mode": mode,
+                    "movement_mode": MovementMode.CHARGE.value,
+                    "charge_roll_state": roll_state.to_payload(),
+                    "maximum_distance_inches": maximum_distance,
+                    "reachable_target_unit_instance_ids": list(reachable),
+                    "reachable_target_distances_inches": reachable,
+                }
+            ),
+        ),
+    )
+    request = proposal_request.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "heroic_intervention_charge_move_requested",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.CHARGE.value,
+            "stratagem_use": use_record.to_payload(),
+            "mode": mode,
+            "charge_roll_state": roll_state.to_payload(),
+            "maximum_distance_inches": maximum_distance,
+            "reachable_target_unit_instance_ids": list(reachable),
+            "reachable_target_distances_inches": reachable,
+            "request_id": request.request_id,
+        },
+    )
+
+
+def _apply_stratagem_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    use_record: StratagemUseRecord,
+    application_id: str,
+    target_unit_instance_id: str,
+    mortal_wounds: int,
+    source_context: JsonValue,
+) -> MortalWoundApplication | None:
+    if mortal_wounds <= 0:
+        return None
+    progress = MortalWoundApplicationProgress.start(
+        application_id=application_id,
+        source_rule_id=use_record.handler_id,
+        source_context=validate_json_value(source_context),
+        target_unit_instance_id=target_unit_instance_id,
+        defender_player_id=unit_owner_player_id(
+            state=state,
+            unit_instance_id=target_unit_instance_id,
+        ),
+        mortal_wounds=mortal_wounds,
+        spill_over=True,
+    )
+    routed = continue_mortal_wound_application(
+        state=state,
+        request_id=state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=manager,
+    )
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        return None
+    if routed.application is None:
+        raise GameLifecycleError("Stratagem mortal wounds did not produce application.")
+    return routed.application
+
+
+def _heroic_intervention_reachable_target_distances(
+    *,
+    state: GameState,
+    player_id: str,
+    heroic_unit_id: str,
+    mode: str,
+    maximum_distance_inches: int,
+) -> dict[str, float]:
+    distances: dict[str, float] = {}
+    for enemy_unit_id in _enemy_unit_ids_for_player(state=state, player_id=player_id):
+        distance = _closest_unit_distance_inches(
+            state=state,
+            first_unit_instance_id=heroic_unit_id,
+            second_unit_instance_id=enemy_unit_id,
+        )
+        if distance > float(maximum_distance_inches):
+            continue
+        if (
+            mode == HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
+            and distance > HEROIC_INTERVENTION_INTO_THE_FRAY_TARGET_RANGE_INCHES
+        ):
+            continue
+        if mode == HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND and not _unit_made_charge_move(
+            state=state,
+            unit_instance_id=enemy_unit_id,
+        ):
+            continue
+        distances[enemy_unit_id] = distance
+    return dict(sorted(distances.items()))
+
+
+def _enemy_unit_ids_for_player(*, state: GameState, player_id: str) -> tuple[str, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    ids: list[str] = []
+    for army in state.army_definitions:
+        if army.player_id == requested_player_id:
+            continue
+        ids.extend(unit.unit_instance_id for unit in army.units)
+    return tuple(sorted(ids))
+
+
+def _closest_unit_distance_inches(
+    *,
+    state: GameState,
+    first_unit_instance_id: str,
+    second_unit_instance_id: str,
+) -> float:
+    first_models = _geometry_models_for_unit(
+        state=state,
+        unit_instance_id=first_unit_instance_id,
+    )
+    second_models = _geometry_models_for_unit(
+        state=state,
+        unit_instance_id=second_unit_instance_id,
+    )
+    if not first_models or not second_models:
+        raise GameLifecycleError("Stratagem unit distance requires placed models.")
+    return min(
+        first_model.range_to(second_model)
+        for first_model in first_models
+        for second_model in second_models
+    )
+
+
+def _unit_made_charge_move(*, state: GameState, unit_instance_id: str) -> bool:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for effect in state.persisting_effects:
+        if requested_unit_id not in effect.target_unit_instance_ids:
+            continue
+        effect_payload = effect.effect_payload
+        if not isinstance(effect_payload, dict):
+            continue
+        if effect_payload.get("effect_kind") == "charge_grants_fights_first":
+            return True
+    return False
 
 
 def _apply_command_point_effects(

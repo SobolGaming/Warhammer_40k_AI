@@ -90,6 +90,7 @@ def _record_from_source_row(row: source_data.SourceStratagemRow) -> StratagemCat
                 phase=None if row.phase is None else battle_phase_kind_from_token(row.phase),
             ),
             restriction_policy=StratagemRestrictionPolicy(
+                same_unit_target_per_phase=row.same_unit_target_per_phase,
                 once_per_turn=row.once_per_turn,
                 once_per_battle=row.once_per_battle,
                 once_per_target_per_phase=row.once_per_target_per_phase,
