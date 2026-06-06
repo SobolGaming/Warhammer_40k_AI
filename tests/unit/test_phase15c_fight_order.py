@@ -1077,7 +1077,22 @@ def test_phase15d_interrupt_melee_declaration_continues_reaction_to_attack_seque
     )
     assert _active_reaction_frame_request_id(lifecycle) == attack_request.request_id
 
-    completed_status = _resolve_phase15d_activation(lifecycle, declaration_status)
+    parent_resume_count_before_attack = len(_event_payloads(lifecycle, "reaction_parent_resumed"))
+    next_attack_status = _submit_option(
+        lifecycle,
+        request=attack_request,
+        option_id=attack_request.options[0].option_id,
+        result_id="phase15d-interrupt-first-attack-sequence-decision",
+    )
+    next_attack_request = _decision_request(next_attack_status)
+
+    assert next_attack_request.decision_type in _ATTACK_SEQUENCE_DECISION_TYPES
+    assert _active_reaction_frame_request_id(lifecycle) == next_attack_request.request_id
+    assert len(_event_payloads(lifecycle, "reaction_parent_resumed")) == (
+        parent_resume_count_before_attack
+    )
+
+    completed_status = _resolve_phase15d_activation(lifecycle, next_attack_status)
 
     assert completed_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert lifecycle.reaction_queue.frames == ()

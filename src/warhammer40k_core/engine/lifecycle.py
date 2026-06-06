@@ -809,21 +809,20 @@ class GameLifecycle:
                 decisions=self.decision_controller,
                 reaction_queue=self.reaction_queue,
             )
-            if resolves_reaction_frame:
-                if fight_status is not None and fight_status.decision_request is not None:
-                    self.reaction_queue.continue_reaction(
-                        result=result,
-                        next_request_id=fight_status.decision_request.request_id,
-                        decisions=self.decision_controller,
-                    )
-                else:
-                    self.reaction_queue.resolve_reaction(
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
             if fight_status is not None:
+                if resolves_reaction_frame:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=fight_status,
+                    )
                 return fight_status
-            return self.advance_until_decision_or_terminal()
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=advanced_status,
+                )
+            return advanced_status
         if record.request.decision_type in _SHOOTING_DECISION_TYPES:
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             shooting_status = self._shooting_phase_handler.apply_decision(
