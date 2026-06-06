@@ -3643,17 +3643,6 @@ def _resolve_grouped_damage_from(
             attack_sequence=attack_sequence,
             attack_context=attack_context,
         )
-        base_allocation_context = current_pending.allocation_context()
-        allocation_context = allocation_context_for_unit(
-            state=state,
-            target_unit_instance_id=pool.target_unit_instance_id,
-            already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
-                state=state,
-                target_unit_instance_id=pool.target_unit_instance_id,
-                allocated_model_ids=current_pending.allocated_model_ids,
-            ),
-            attacker_constraint=base_allocation_context.attacker_constraint,
-        )
         ordered_groups = current_pending.ordered_allocation_groups()
         current_group = _current_allocation_group_for_order(
             state=state,
@@ -3667,6 +3656,17 @@ def _resolve_grouped_damage_from(
                 current_pending.allocated_model_ids,
                 None,
             )
+        base_allocation_context = current_pending.allocation_context()
+        allocation_context = allocation_context_for_unit(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            already_allocated_model_ids=_alive_allocated_model_ids_for_target_unit(
+                state=state,
+                target_unit_instance_id=pool.target_unit_instance_id,
+                allocated_model_ids=current_pending.allocated_model_ids,
+            ),
+            attacker_constraint=base_allocation_context.attacker_constraint,
+        )
         legal_group_model_ids = _legal_model_ids_for_allocation_group_damage(
             state=state,
             allocation_group=current_group,

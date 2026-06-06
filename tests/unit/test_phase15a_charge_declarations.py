@@ -361,6 +361,52 @@ def test_phase15b_charge_move_no_move_choice_records_decline_without_mutation() 
     assert _event_payloads(lifecycle, "charge_move_invalid") == ()
 
 
+def test_phase15f_charge_completion_gate_runs_for_both_players() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(20.0, 20.0), model_count=5),
+        game_id="phase15f-charge-both-players",
+    )
+
+    player_a_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    player_a_status = _submit_option(
+        lifecycle,
+        request=player_a_request,
+        option_id=COMPLETE_CHARGE_PHASE_OPTION_ID,
+        result_id="phase15f-player-a-complete-charge",
+    )
+    state = _state(lifecycle)
+    player_a_movement_request = _decision_request(player_a_status)
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.active_player_id == "player-b"
+    assert state.charge_phase_state is None
+    assert player_a_movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+
+    lifecycle.decision_controller.queue.remove_by_id(player_a_movement_request.request_id)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
+    state.active_player_id = "player-b"
+
+    player_b_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    player_b_status = _submit_option(
+        lifecycle,
+        request=player_b_request,
+        option_id=COMPLETE_CHARGE_PHASE_OPTION_ID,
+        result_id="phase15f-player-b-complete-charge",
+    )
+    player_b_completed = _last_event_payload(lifecycle, "charge_phase_completed")
+
+    assert player_b_request.actor_id == "player-b"
+    assert units["enemy"].unit_instance_id in {
+        option.option_id for option in player_b_request.options
+    }
+    assert _decision_request(player_b_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert player_b_completed["active_player_id"] == "player-b"
+    assert len(_event_payloads(lifecycle, "charge_phase_completed")) == 2
+    assert [record.request.decision_type for record in lifecycle.decision_controller.records].count(
+        SELECT_CHARGING_UNIT_DECISION_TYPE
+    ) == 2
+
+
 def test_phase15b_charge_target_without_witness_rejects_before_queue_pop() -> None:
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("intercessor-1",),
