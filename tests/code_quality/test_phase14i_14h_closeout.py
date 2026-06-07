@@ -14,6 +14,7 @@ ARCHITECTURE_PATH = ROOT / "ARCHITECTURE_V2.md"
 README_PATH = ROOT / "README.md"
 TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
+DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -69,14 +70,18 @@ def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> N
     assert "descriptors with owning phase IDs" in phase14i_section
 
 
-def test_phase14h_blockers_are_explicit_until_advanced_cutover_finishes() -> None:
+def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit() -> None:
     transport_source = TRANSPORTS_PATH.read_text(encoding="utf-8")
     attack_sequence_source = ATTACK_SEQUENCE_PATH.read_text(encoding="utf-8")
+    damage_allocation_source = DAMAGE_ALLOCATION_PATH.read_text(encoding="utf-8")
 
     assert "Combat Disembark requires a dedicated source-backed transport path." in (
         transport_source
     )
-    assert "Mixed Toughness target units are deferred to Phase 14H/16D." in (attack_sequence_source)
+    assert "attached_unit_bodyguard_model_ids" in attack_sequence_source
+    assert "_highest_toughness_for_models" in attack_sequence_source
+    assert '"attached-role:leader" in model.source_ids' in damage_allocation_source
+    assert '"attached-role:support" in model.source_ids' in damage_allocation_source
 
 
 def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
@@ -92,3 +97,5 @@ def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
     assert "Phase 14H remains deferred" in readme
     assert "Phase 14H is complete" not in architecture
     assert "Phase 14H is complete" not in readme
+    assert "mixed-Toughness attached-unit attack handling" not in architecture
+    assert "mixed-Toughness attached-unit attack handling" not in readme

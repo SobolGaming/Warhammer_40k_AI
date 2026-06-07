@@ -2491,6 +2491,10 @@ def _attached_unit_model_roles(
         model.model_instance_id
         for model in alive_models
         if "attached-role:character" in model.source_ids
+        or "attached-role:leader" in model.source_ids
+        or "attached-role:support" in model.source_ids
+        or "runtime-attached-unit:leader" in model.source_ids
+        or "runtime-attached-unit:support" in model.source_ids
         or model.datasheet_id in character_datasheet_ids
         or any(
             source_id == f"datasheet:{datasheet_id}"

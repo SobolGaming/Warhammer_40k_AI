@@ -5319,7 +5319,7 @@ def _roll_hit_and_wound(
         return None
 
     target_unit = unit_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
-    toughness = _target_unit_toughness(target_unit)
+    toughness = _target_unit_toughness(state=state, unit=target_unit)
     if (
         attack_sequence.generated_hit_index == 0
         and hit_roll.critical
@@ -6216,22 +6216,60 @@ def _hit_skill(profile: WeaponProfile) -> int:
     return _validate_d6_target("Weapon skill target", profile.skill.final)
 
 
-def _target_unit_toughness(unit: UnitInstance) -> int:
+def _target_unit_toughness(*, state: GameState, unit: UnitInstance) -> int:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Target unit must be a UnitInstance.")
-    alive_models = unit.alive_own_models()
-    if not alive_models:
-        raise GameLifecycleError("Target unit has no alive models.")
-    toughness_values: set[int] = set()
-    for model in alive_models:
-        for value in model.characteristics:
-            if value.characteristic is Characteristic.TOUGHNESS:
-                toughness_values.add(value.final)
-    if not toughness_values:
-        raise GameLifecycleError("Target unit models require Toughness.")
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=unit.unit_instance_id,
+    )
+    alive_model_ids = allocation_context.alive_model_ids
+    if _unit_has_keyword(unit, "ATTACHED_UNIT"):
+        model_ids = (
+            allocation_context.attached_unit_bodyguard_model_ids
+            if allocation_context.attached_unit_bodyguard_model_ids
+            else alive_model_ids
+        )
+        return _highest_toughness_for_models(state=state, model_instance_ids=model_ids)
+    toughness_values = _toughness_values_for_models(
+        state=state,
+        model_instance_ids=alive_model_ids,
+    )
     if len(toughness_values) != 1:
         raise GameLifecycleError("Mixed Toughness target units are deferred to Phase 14H/16D.")
     return next(iter(toughness_values))
+
+
+def _highest_toughness_for_models(
+    *,
+    state: GameState,
+    model_instance_ids: tuple[str, ...],
+) -> int:
+    toughness_values = _toughness_values_for_models(
+        state=state,
+        model_instance_ids=model_instance_ids,
+    )
+    return max(toughness_values)
+
+
+def _toughness_values_for_models(
+    *,
+    state: GameState,
+    model_instance_ids: tuple[str, ...],
+) -> set[int]:
+    model_ids = _validate_identifier_tuple("target toughness model IDs", model_instance_ids)
+    if not model_ids:
+        raise GameLifecycleError("Target unit has no alive models.")
+    toughness_values: set[int] = set()
+    for model_id in model_ids:
+        model = model_by_id(state=state, model_instance_id=model_id)
+        for value in model.characteristics:
+            if value.characteristic is Characteristic.TOUGHNESS:
+                toughness_values.add(value.final)
+                break
+        else:
+            raise GameLifecycleError("Target unit models require Toughness.")
+    return toughness_values
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:

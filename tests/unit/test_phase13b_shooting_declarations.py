@@ -3731,6 +3731,295 @@ def test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound() -> None:
     assert cast(dict[str, object], wound_events[0]["payload"])["skipped"] is True
 
 
+def test_phase14h_attached_unit_uses_highest_bodyguard_toughness_for_wounds() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[0], role="bodyguard"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=5,
+    )
+    leader_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[1], role="leader"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=7,
+    )
+    attached_defender = replace(defender, own_models=(bodyguard_model, leader_model))
+    _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-attached-bodyguard-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-attached-bodyguard-toughness:pool-001:attack-001"
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-attached-bodyguard-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=attached_defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-attached-bodyguard-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-bodyguard-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-bodyguard-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=3,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert wound_payload["toughness"] == 5
+    assert wound_payload["target_number"] == 3
+    assert wound_payload["successful"] is True
+
+
+def test_phase14h_attached_unit_uses_support_toughness_after_bodyguard_destroyed() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = _model_with_characteristic(
+        _model_with_attached_role(
+            replace(
+                defender.own_models[0],
+                wounds_remaining=0,
+            ),
+            role="bodyguard",
+        ),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=5,
+    )
+    support_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[1], role="support"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=7,
+    )
+    attached_defender = replace(defender, own_models=(bodyguard_model, support_model))
+    _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.with_removed_models((bodyguard_model.model_instance_id,))
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-attached-support-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-attached-support-toughness:pool-001:attack-001"
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-attached-support-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=attached_defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-attached-support-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-support-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-support-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=4,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert wound_payload["toughness"] == 7
+    assert wound_payload["target_number"] == 5
+    assert wound_payload["successful"] is False
+
+
+def test_phase14h_attached_unit_uses_leader_toughness_after_bodyguard_destroyed() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = _model_with_characteristic(
+        _model_with_attached_role(
+            replace(
+                defender.own_models[0],
+                wounds_remaining=0,
+            ),
+            role="bodyguard",
+        ),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=5,
+    )
+    leader_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[1], role="leader"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=7,
+    )
+    attached_defender = replace(defender, own_models=(bodyguard_model, leader_model))
+    _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.with_removed_models((bodyguard_model.model_instance_id,))
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-attached-leader-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-attached-leader-toughness:pool-001:attack-001"
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-attached-leader-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=attached_defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-attached-leader-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-leader-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-leader-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=4,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert wound_payload["toughness"] == 7
+    assert wound_payload["target_number"] == 5
+    assert wound_payload["successful"] is False
+
+
 def test_phase14i_sustained_hits_slash_keyword_gate_controls_generated_hits() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -13058,6 +13347,37 @@ def _fixed_roll_result(
         values=(value,),
         source="fixed",
     )
+
+
+def _model_with_characteristic(
+    model: ModelInstance,
+    *,
+    characteristic: Characteristic,
+    raw_value: int,
+) -> ModelInstance:
+    replacement = CharacteristicValue.from_raw(characteristic, raw_value)
+    characteristics = tuple(
+        replacement if value.characteristic is characteristic else value
+        for value in model.characteristics
+    )
+    if replacement not in characteristics:
+        characteristics = (*characteristics, replacement)
+    return replace(model, characteristics=characteristics)
+
+
+def _model_with_attached_role(model: ModelInstance, *, role: str) -> ModelInstance:
+    if role not in {"bodyguard", "leader", "support"}:
+        raise AssertionError(f"Unsupported attached role in test fixture: {role}.")
+    source_ids = {
+        source_id
+        for source_id in model.source_ids
+        if not source_id.startswith(("attached-role:", "runtime-attached-unit:"))
+        and source_id != "datasheet:core-character-leader"
+    }
+    source_ids.add(f"runtime-attached-unit:{role}")
+    if role in {"leader", "support"}:
+        source_ids.add(f"attached-role:{role}")
+    return replace(model, source_ids=tuple(sorted(source_ids)))
 
 
 def _attack_pool_for_test(
