@@ -697,7 +697,6 @@ def _target_candidate(
     if _unit_has_keyword(target_unit, "LONE_OPERATIVE") and not _lone_operative_target_allowed(
         scenario=scenario,
         attacker_unit=attacker_unit,
-        target_unit=target_unit,
         target_unit_id=target_unit_id,
     ):
         return _invalid_candidate(
@@ -1199,7 +1198,6 @@ def _lone_operative_target_allowed(
     *,
     scenario: BattlefieldScenario,
     attacker_unit: UnitInstance,
-    target_unit: UnitInstance,
     target_unit_id: str,
 ) -> bool:
     target_distance = _closest_distance_between_units(
@@ -1207,23 +1205,7 @@ def _lone_operative_target_allowed(
         first_unit_id=attacker_unit.unit_instance_id,
         second_unit_id=target_unit_id,
     )
-    if target_distance > 12.0:
-        return False
-    attacker_owner = _player_id_for_unit(scenario, attacker_unit.unit_instance_id)
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == attacker_owner:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            if unit_placement.unit_instance_id == target_unit.unit_instance_id:
-                continue
-            other_distance = _closest_distance_between_units(
-                scenario=scenario,
-                first_unit_id=attacker_unit.unit_instance_id,
-                second_unit_id=unit_placement.unit_instance_id,
-            )
-            if other_distance + 1e-9 < target_distance:
-                return False
-    return True
+    return target_distance <= 12.0
 
 
 def _closest_distance_between_units(

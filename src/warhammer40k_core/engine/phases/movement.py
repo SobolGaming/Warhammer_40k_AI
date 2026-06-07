@@ -236,6 +236,7 @@ class MovementPhaseStatePayload(TypedDict):
     declined_post_normal_move_disembark_unit_ids: list[str]
     selected_unit_ids: list[str]
     moved_unit_ids: list[str]
+    movement_distance_records: NotRequired[list[MovementDistanceRecordPayload]]
     active_selection: MovementUnitSelectionPayload | None
 
 
@@ -252,6 +253,11 @@ class MovementActionAvailabilityResultPayload(TypedDict):
     context: MovementActionAvailabilityContextPayload
     available_actions: list[str]
     unavailable_actions: list[str]
+
+
+class MovementDistanceRecordPayload(TypedDict):
+    unit_instance_id: str
+    maximum_model_distance_inches: float
 
 
 class AdvanceRollRequestPayload(TypedDict):
@@ -1159,6 +1165,40 @@ class DisembarkCandidate:
 
 
 @dataclass(frozen=True, slots=True)
+class MovementDistanceRecord:
+    unit_instance_id: str
+    maximum_model_distance_inches: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("MovementDistanceRecord unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "maximum_model_distance_inches",
+            _validate_non_negative_finite_number(
+                "MovementDistanceRecord maximum_model_distance_inches",
+                self.maximum_model_distance_inches,
+            ),
+        )
+
+    def to_payload(self) -> MovementDistanceRecordPayload:
+        return {
+            "unit_instance_id": self.unit_instance_id,
+            "maximum_model_distance_inches": self.maximum_model_distance_inches,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: MovementDistanceRecordPayload) -> Self:
+        return cls(
+            unit_instance_id=payload["unit_instance_id"],
+            maximum_model_distance_inches=payload["maximum_model_distance_inches"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MovementPhaseState:
     battle_round: int
     active_player_id: str
@@ -1168,6 +1208,7 @@ class MovementPhaseState:
     declined_post_normal_move_disembark_unit_ids: tuple[str, ...] = ()
     selected_unit_ids: tuple[str, ...] = ()
     moved_unit_ids: tuple[str, ...] = ()
+    movement_distance_records: tuple[MovementDistanceRecord, ...] = ()
     active_selection: MovementUnitSelection | None = None
 
     def __post_init__(self) -> None:
@@ -1222,10 +1263,23 @@ class MovementPhaseState:
                 self.moved_unit_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "movement_distance_records",
+            _validate_movement_distance_records(
+                "MovementPhaseState movement_distance_records",
+                self.movement_distance_records,
+            ),
+        )
         for unit_id in self.moved_unit_ids:
             if unit_id not in self.selected_unit_ids:
                 raise GameLifecycleError(
                     "MovementPhaseState moved_unit_ids must be in selected_unit_ids."
+                )
+        for record in self.movement_distance_records:
+            if record.unit_instance_id not in self.moved_unit_ids:
+                raise GameLifecycleError(
+                    "MovementPhaseState movement_distance_records must be in moved_unit_ids."
                 )
         if self.step is MovementPhaseStepKind.REINFORCEMENTS:
             raise GameLifecycleError("Reinforcements is not a Movement phase step.")
@@ -1290,6 +1344,7 @@ class MovementPhaseState:
             ),
             selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
             moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
             active_selection=selection,
         )
 
@@ -1312,6 +1367,7 @@ class MovementPhaseState:
             ),
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
             active_selection=None,
         )
 
@@ -1335,6 +1391,7 @@ class MovementPhaseState:
             ),
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
             active_selection=None,
         )
 
@@ -1364,11 +1421,21 @@ class MovementPhaseState:
             ),
             selected_unit_ids=(*self.selected_unit_ids, moved_unit_id),
             moved_unit_ids=(*self.moved_unit_ids, moved_unit_id),
+            movement_distance_records=self.movement_distance_records,
             active_selection=None,
         )
 
-    def with_activation_complete(self, unit_instance_id: str) -> Self:
+    def with_activation_complete(
+        self,
+        unit_instance_id: str,
+        *,
+        maximum_model_distance_inches: float,
+    ) -> Self:
         completed_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        maximum_distance = _validate_non_negative_finite_number(
+            "maximum_model_distance_inches",
+            maximum_model_distance_inches,
+        )
         if self.step is not MovementPhaseStepKind.MOVE_UNITS:
             raise GameLifecycleError("Movement activation completion requires Move Units step.")
         if self.active_selection is None:
@@ -1388,6 +1455,13 @@ class MovementPhaseState:
             ),
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=(*self.moved_unit_ids, completed_unit_id),
+            movement_distance_records=(
+                *self.movement_distance_records,
+                MovementDistanceRecord(
+                    unit_instance_id=completed_unit_id,
+                    maximum_model_distance_inches=maximum_distance,
+                ),
+            ),
             active_selection=None,
         )
 
@@ -1420,6 +1494,7 @@ class MovementPhaseState:
             ),
             selected_unit_ids=selected,
             moved_unit_ids=moved,
+            movement_distance_records=self.movement_distance_records,
             active_selection=None,
         )
 
@@ -1439,6 +1514,7 @@ class MovementPhaseState:
             ),
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
             active_selection=None,
         )
 
@@ -1454,6 +1530,9 @@ class MovementPhaseState:
             ),
             "selected_unit_ids": list(self.selected_unit_ids),
             "moved_unit_ids": list(self.moved_unit_ids),
+            "movement_distance_records": [
+                record.to_payload() for record in self.movement_distance_records
+            ],
             "active_selection": (
                 None if self.active_selection is None else self.active_selection.to_payload()
             ),
@@ -1473,6 +1552,10 @@ class MovementPhaseState:
             ),
             selected_unit_ids=tuple(payload["selected_unit_ids"]),
             moved_unit_ids=tuple(payload["moved_unit_ids"]),
+            movement_distance_records=tuple(
+                MovementDistanceRecord.from_payload(record_payload)
+                for record_payload in payload.get("movement_distance_records", [])
+            ),
             active_selection=(
                 None
                 if active_selection_payload is None
@@ -5259,7 +5342,8 @@ def _complete_movement_activation_with_record_ids(
         displacement_kind=displacement_kind,
     )
     state.movement_phase_state = movement_state.with_activation_complete(
-        active_selection.unit_instance_id
+        active_selection.unit_instance_id,
+        maximum_model_distance_inches=_maximum_model_distance_inches_from_witness(witness),
     )
     event_payload: dict[str, JsonValue] = {
         "game_id": state.game_id,
@@ -5279,6 +5363,18 @@ def _complete_movement_activation_with_record_ids(
         event_payload["transition_batch"] = validate_json_value(transition_batch.to_payload())
     event_payload.update(movement_payload)
     decisions.event_log.append("movement_activation_completed", event_payload)
+
+
+def _maximum_model_distance_inches_from_witness(witness: PathWitness | None) -> float:
+    if witness is None:
+        return 0.0
+    maximum_distance = 0.0
+    for _model_id, poses in witness.model_paths:
+        model_distance = 0.0
+        for index in range(1, len(poses)):
+            model_distance += poses[index - 1].distance_3d_to(poses[index])
+        maximum_distance = max(maximum_distance, model_distance)
+    return maximum_distance
 
 
 def _interrupt_started_mission_actions_for_movement_activation(
@@ -7211,7 +7307,7 @@ def _movement_distance_modifier_inches(
         raise GameLifecycleError("RulesetDescriptor does not support Take to the Skies.")
     if "FLY" not in aircraft_policy.effective_keywords:
         raise GameLifecycleError("Take to the Skies requires the FLY keyword.")
-    if aircraft_policy.hover_mode_active:
+    if "HOVER" in aircraft_policy.effective_keywords:
         return 0.0
     return movement_mode_policy.movement_distance_modifier
 
@@ -7640,6 +7736,24 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     return tuple(validated)
 
 
+def _validate_movement_distance_records(
+    field_name: str,
+    values: object,
+) -> tuple[MovementDistanceRecord, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    records: list[MovementDistanceRecord] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not MovementDistanceRecord:
+            raise GameLifecycleError(f"{field_name} must contain MovementDistanceRecord values.")
+        if value.unit_instance_id in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicate unit IDs.")
+        seen.add(value.unit_instance_id)
+        records.append(value)
+    return tuple(sorted(records, key=lambda record: record.unit_instance_id))
+
+
 def _validate_objective_marker_tuple(
     field_name: str,
     values: object,
@@ -7684,6 +7798,17 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"{field_name} must be at least 1.")
     return value
+
+
+def _validate_non_negative_finite_number(field_name: str, value: object) -> float:
+    if not isinstance(value, int | float) or type(value) is bool:
+        raise GameLifecycleError(f"{field_name} must be a number.")
+    number = float(value)
+    if not math.isfinite(number):
+        raise GameLifecycleError(f"{field_name} must be finite.")
+    if number < 0.0:
+        raise GameLifecycleError(f"{field_name} must not be negative.")
+    return number
 
 
 def _validate_bool(field_name: str, value: object) -> bool:

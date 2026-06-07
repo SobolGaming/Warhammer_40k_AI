@@ -256,10 +256,11 @@ def anti_keyword_critical_threshold(
     *,
     profile: WeaponProfile,
     target_keywords: tuple[str, ...],
+    selected_ability_id: str | None = None,
 ) -> int | None:
     _validate_weapon_profile(profile)
     target_keyword_set = _target_keyword_set(target_keywords)
-    matching_thresholds: list[int] = []
+    matching_descriptors: list[AbilityDescriptor] = []
     for ability in profile.abilities:
         if ability.ability_kind is not AbilityKind.ANTI_KEYWORD:
             continue
@@ -285,10 +286,25 @@ def anti_keyword_critical_threshold(
         if type(threshold) is not int:
             raise GameLifecycleError("Anti ability threshold parameter must be an integer.")
         if _canonical_keyword(keyword) in target_keyword_set:
-            matching_thresholds.append(threshold)
-    if not matching_thresholds:
+            matching_descriptors.append(ability)
+    if not matching_descriptors:
         return None
-    return min(matching_thresholds)
+    if len(matching_descriptors) > 1 or selected_ability_id is not None:
+        selected_descriptor = _selected_duplicate_ability_descriptor(
+            tuple(matching_descriptors),
+            selected_ability_id=selected_ability_id,
+        )
+    else:
+        selected_descriptor = matching_descriptors[0]
+    threshold = _ability_parameter_by_name(
+        profile=profile,
+        ability_kind=AbilityKind.ANTI_KEYWORD,
+        parameter_name="threshold",
+        ability_id=selected_descriptor.ability_id,
+    )
+    if type(threshold) is not int:
+        raise GameLifecycleError("Anti ability threshold parameter must be an integer.")
+    return threshold
 
 
 def devastating_wounds_resolution(profile: WeaponProfile) -> DevastatingWoundsResolution | None:

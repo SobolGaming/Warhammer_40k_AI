@@ -2722,7 +2722,12 @@ def _unit_remained_stationary(
     movement_state = state.movement_phase_state
     if movement_state is None:
         return True
-    return unit.unit_instance_id not in movement_state.moved_unit_ids
+    if unit.unit_instance_id not in movement_state.moved_unit_ids:
+        return True
+    for record in movement_state.movement_distance_records:
+        if record.unit_instance_id == unit.unit_instance_id:
+            return record.maximum_model_distance_inches <= 3.0
+    return False
 
 
 def _target_visible_to_friendly_unit(

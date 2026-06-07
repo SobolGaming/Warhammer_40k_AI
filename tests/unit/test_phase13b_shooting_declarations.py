@@ -144,7 +144,9 @@ from warhammer40k_core.engine.phases.movement import (
     AdvanceRollRequest,
     AdvanceRollResult,
     MovementDiceRecord,
+    MovementDistanceRecord,
     MovementPhaseActionKind,
+    MovementPhaseState,
 )
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
@@ -848,6 +850,68 @@ def test_phase13d_advanced_unit_allowed_to_shoot_does_not_gain_heavy_modifier() 
     assert pool_payload["weapon_profile_id"] == assault_heavy_profile.profile_id
     assert pool_payload["hit_roll_modifier"] == 0
     assert HEAVY_RULE_ID not in targeting_rule_ids
+
+
+def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_inches() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    heavy_profile = replace(
+        base_profile,
+        profile_id="phase13d-small-move-heavy-rifle",
+        name="Phase 13D small move Heavy rifle",
+        keywords=(WeaponKeyword.HEAVY,),
+        abilities=(AbilityDescriptor.heavy(),),
+    )
+
+    for moved_inches, expected_modifier in ((3.0, 1), (3.1, 0)):
+        moved_id = str(moved_inches).replace(".", "-")
+        catalog = _catalog_with_extra_bolt_profile(heavy_profile)
+        lifecycle, units = _shooting_lifecycle(
+            alpha_unit_ids=("intercessor-1",),
+            game_id=f"phase13d-heavy-moved-{moved_id}",
+            catalog=catalog,
+        )
+        state = _state(lifecycle)
+        attacker = units["intercessor-1"]
+        state.movement_phase_state = MovementPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            moved_unit_ids=(attacker.unit_instance_id,),
+            movement_distance_records=(
+                MovementDistanceRecord(
+                    unit_instance_id=attacker.unit_instance_id,
+                    maximum_model_distance_inches=moved_inches,
+                ),
+            ),
+        )
+        selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+        declaration_request = _select_shooting_unit_and_type(
+            lifecycle,
+            selection_request=selection_request,
+            unit_instance_id=attacker.unit_instance_id,
+            selection_result_id=f"phase13d-select-heavy-moved-{moved_id}",
+        )
+        proposal = _proposal_from_request(
+            request=declaration_request,
+            target_unit_id=units["enemy"].unit_instance_id,
+            weapon_profile_id=heavy_profile.profile_id,
+        )
+
+        _submit_payload(
+            lifecycle,
+            request=declaration_request,
+            payload=proposal.to_payload(),
+            result_id=f"phase13d-declare-heavy-moved-{moved_id}",
+        )
+
+        accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+        pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+        targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+        assert pool_payload["hit_roll_modifier"] == expected_modifier
+        assert (HEAVY_RULE_ID in targeting_rule_ids) is (expected_modifier == 1)
 
 
 def test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects() -> None:
@@ -11214,6 +11278,54 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
     )
     assert close_candidates[0].is_legal
     assert close_candidates[0].shooting_types == (ShootingType.NORMAL,)
+
+
+def test_phase13d_lone_operative_within_twelve_is_visible_even_with_closer_enemy() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            ("lone-target", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            ("closer-enemy", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    profile = _first_weapon_profile(lifecycle, attacker)
+    lone_target = replace(
+        units["lone-target"],
+        keywords=(*units["lone-target"].keywords, "Lone Operative"),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=lone_target)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=lone_target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=_compact_test_unit_poses(origin=Pose.at(26.0, 35.0), model_count=5),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=units["closer-enemy"],
+        army_id="army-beta",
+        player_id="player-b",
+        poses=_compact_test_unit_poses(origin=Pose.at(16.0, 42.0), model_count=5),
+    )
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(lone_target.unit_instance_id,),
+    )
+
+    assert candidates[0].is_legal
+    assert candidates[0].shooting_types == (ShootingType.NORMAL,)
 
 
 def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
