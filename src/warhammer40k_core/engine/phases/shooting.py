@@ -10,6 +10,8 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AbilityKind,
     RangeProfileKind,
     WeaponKeyword,
     WeaponProfile,
@@ -94,6 +96,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     melta_rule_id,
     rapid_fire_attack_bonus,
     rapid_fire_rule_id,
+    weapon_ability_selection_request,
 )
 from warhammer40k_core.engine.weapon_declaration import (
     SHOOTING_DECLARATION_PROPOSAL_KIND,
@@ -1510,6 +1513,19 @@ def _target_candidate_payload_for_request(
     forced_shooting_type: ShootingType | None,
 ) -> JsonValue:
     payload = dict(candidate)
+    payload["required_weapon_ability_selections"] = _required_weapon_ability_selections_for_target(
+        state=state,
+        proposal_request_id=_embedded_weapon_ability_request_prefix(
+            state=state,
+            attacker_unit_id=unit.unit_instance_id,
+            weapon_profile=weapon_profile,
+        ),
+        weapon_profile=weapon_profile,
+        target_unit_id=_payload_string(
+            cast(dict[str, object], payload), key="target_unit_instance_id"
+        ),
+        player_id=player_id,
+    )
     payload["shooting_types"] = [
         shooting_type.value
         for shooting_type in _shooting_types_for_candidate_payload(
@@ -1525,6 +1541,40 @@ def _target_candidate_payload_for_request(
         )
     ]
     return validate_json_value(payload)
+
+
+def _embedded_weapon_ability_request_prefix(
+    *,
+    state: GameState,
+    attacker_unit_id: str,
+    weapon_profile: WeaponProfile,
+) -> str:
+    return f"{state.game_id}:shooting-declaration:{attacker_unit_id}:{weapon_profile.profile_id}"
+
+
+def _required_weapon_ability_selections_for_target(
+    *,
+    state: GameState,
+    proposal_request_id: str,
+    weapon_profile: WeaponProfile,
+    target_unit_id: str,
+    player_id: str,
+) -> list[JsonValue]:
+    target_unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
+    selection_request = weapon_ability_selection_request(
+        weapon_profile,
+        AbilityKind.ANTI_KEYWORD,
+        target_keywords=target_unit.keywords,
+        actor_id=player_id,
+        request_id=f"{proposal_request_id}:{target_unit_id}:anti-keyword",
+        source_context={
+            "phase": BattlePhase.SHOOTING.value,
+            "target_unit_instance_id": target_unit_id,
+        },
+    )
+    if selection_request is None:
+        return []
+    return [validate_json_value(selection_request.to_payload())]
 
 
 def _shooting_types_for_candidate_payload(
@@ -2280,6 +2330,20 @@ def _attack_pools_or_validation(
                 message=candidate.message or "Declared target is not legal.",
                 field="declarations",
             )
+        target_unit = _unit_by_id(
+            state=state,
+            unit_instance_id=declaration.target_unit_instance_id,
+        )
+        ability_selection_validation = _validate_duplicate_weapon_ability_selection(
+            proposal=proposal,
+            declaration=declaration,
+            declaration_index=declaration_index,
+            weapon_profile=weapon_profile,
+            target_unit=target_unit,
+            player_id=player_id,
+        )
+        if ability_selection_validation is not None:
+            return ability_selection_validation
         allowed_shooting_types = _shooting_types_for_declaration_candidate(
             state=state,
             scenario=scenario,
@@ -2328,10 +2392,7 @@ def _attack_pools_or_validation(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit=unit,
-            target_unit=_unit_by_id(
-                state=state,
-                unit_instance_id=declaration.target_unit_instance_id,
-            ),
+            target_unit=target_unit,
             weapon_profile=weapon_profile,
             shooting_type=declaration.shooting_type,
             base_attacks=attacks,
@@ -2366,6 +2427,85 @@ def _attack_pools_or_validation(
             field="declarations",
         )
     return (tuple(attack_pools), ineligible_unit_ids)
+
+
+def _validate_duplicate_weapon_ability_selection(
+    *,
+    proposal: ShootingDeclarationProposal,
+    declaration: WeaponDeclaration,
+    declaration_index: int,
+    weapon_profile: WeaponProfile,
+    target_unit: UnitInstance,
+    player_id: str,
+) -> ShootingProposalValidationResult | None:
+    ability_by_id: dict[str, AbilityDescriptor] = {
+        ability.ability_id: ability for ability in weapon_profile.abilities
+    }
+    selected_abilities: list[AbilityDescriptor] = []
+    for selected_id in declaration.selected_weapon_ability_ids:
+        selected_ability = ability_by_id.get(selected_id)
+        if selected_ability is None:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="weapon_ability_selection_unavailable",
+                message="Selected weapon ability ID is not on the declared weapon profile.",
+                field="declarations",
+            )
+        if selected_ability.ability_kind is not AbilityKind.ANTI_KEYWORD:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="weapon_ability_selection_unsupported",
+                message="This shooting declaration only supports duplicate Anti selections.",
+                field="declarations",
+            )
+        selected_abilities.append(selected_ability)
+
+    selected_anti_ids: tuple[str, ...] = tuple(
+        ability.ability_id
+        for ability in selected_abilities
+        if ability.ability_kind is AbilityKind.ANTI_KEYWORD
+    )
+    selection_request = weapon_ability_selection_request(
+        weapon_profile,
+        AbilityKind.ANTI_KEYWORD,
+        target_keywords=target_unit.keywords,
+        actor_id=player_id,
+        request_id=(
+            f"{proposal.proposal_request_id}:declaration-{declaration_index:03d}:anti-keyword"
+        ),
+        source_context={
+            "phase": BattlePhase.SHOOTING.value,
+            "proposal_request_id": proposal.proposal_request_id,
+            "declaration_index": declaration_index,
+            "target_unit_instance_id": target_unit.unit_instance_id,
+        },
+    )
+    if selection_request is None:
+        if selected_anti_ids:
+            return ShootingProposalValidationResult.invalid(
+                proposal_request_id=proposal.proposal_request_id,
+                violation_code="weapon_ability_selection_not_required",
+                message="Selected Anti ability ID was supplied when no duplicate choice exists.",
+                field="declarations",
+            )
+        return None
+
+    legal_ids = {option.option_id for option in selection_request.options}
+    if len(selected_anti_ids) != 1:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="weapon_ability_selection_required",
+            message="Duplicate matching Anti abilities require exactly one selected ability ID.",
+            field="declarations",
+        )
+    if selected_anti_ids[0] not in legal_ids:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal.proposal_request_id,
+            violation_code="weapon_ability_selection_invalid",
+            message="Selected Anti ability ID is not legal for this target.",
+            field="declarations",
+        )
+    return None
 
 
 def _out_of_phase_allowed_target_unit_ids(
@@ -2722,7 +2862,12 @@ def _unit_remained_stationary(
     movement_state = state.movement_phase_state
     if movement_state is None:
         return True
-    return unit.unit_instance_id not in movement_state.moved_unit_ids
+    if unit.unit_instance_id not in movement_state.moved_unit_ids:
+        return True
+    for record in movement_state.movement_distance_records:
+        if record.unit_instance_id == unit.unit_instance_id:
+            return record.maximum_model_distance_inches <= 3.0
+    return False
 
 
 def _target_visible_to_friendly_unit(

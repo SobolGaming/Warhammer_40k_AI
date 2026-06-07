@@ -49,6 +49,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementDistanceRecord,
     MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
@@ -247,6 +248,18 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
         selected_unit_ids=("army-alpha:intercessor-unit-1",),
         active_selection=selection,
     )
+    completed_state = MovementPhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+        selected_unit_ids=("army-alpha:intercessor-unit-1",),
+        moved_unit_ids=("army-alpha:intercessor-unit-1",),
+        movement_distance_records=(
+            MovementDistanceRecord(
+                unit_instance_id="army-alpha:intercessor-unit-1",
+                maximum_model_distance_inches=2.5,
+            ),
+        ),
+    )
     selection_payload = cast(
         MovementUnitSelectionPayload,
         json.loads(json.dumps(selection.to_payload(), sort_keys=True)),
@@ -254,6 +267,40 @@ def test_movement_phase_state_payloads_and_fail_fast_validation() -> None:
 
     assert MovementUnitSelection.from_payload(selection_payload) == selection
     assert MovementPhaseState.from_payload(state.to_payload()) == state
+    assert MovementPhaseState.from_payload(completed_state.to_payload()) == completed_state
+    with pytest.raises(
+        GameLifecycleError,
+        match="movement_distance_records must be in moved_unit_ids",
+    ):
+        MovementPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-unit-1",),
+            moved_unit_ids=("army-alpha:intercessor-unit-1",),
+            movement_distance_records=(
+                MovementDistanceRecord(
+                    unit_instance_id="other-unit",
+                    maximum_model_distance_inches=1.0,
+                ),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="must not contain duplicate unit IDs"):
+        MovementPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-unit-1",),
+            moved_unit_ids=("army-alpha:intercessor-unit-1",),
+            movement_distance_records=(
+                MovementDistanceRecord(
+                    unit_instance_id="army-alpha:intercessor-unit-1",
+                    maximum_model_distance_inches=1.0,
+                ),
+                MovementDistanceRecord(
+                    unit_instance_id="army-alpha:intercessor-unit-1",
+                    maximum_model_distance_inches=2.0,
+                ),
+            ),
+        )
     with pytest.raises(GameLifecycleError, match="duplicates"):
         MovementPhaseState(
             battle_round=1,

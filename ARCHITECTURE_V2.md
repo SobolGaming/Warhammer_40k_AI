@@ -176,7 +176,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Attached units: Leader and Support components, one Leader and one Support per bodyguard unless stated, bodyguard Toughness for attacks, destroyed-unit trigger identity, keyword union without model keyword inheritance, source-scoped ability persistence, and revive into attached unit | Phase 6, 13C, 13E, 16D, 17F, 14H |
 | Strategic Reserves and repositioned units: 50% points cap, no Fortifications, second-round ingress, 6" battlefield-edge setup, more-than-8" enemy distance, pre-third-round opponent-deployment-zone ban, third-round destruction exceptions, and move-history/effect persistence for repositioned units | Phase 10P, 11F, 16C, 14H |
 | Flying, Surge, and Aircraft: surge target selection and no-repeat-move restriction, optional `take to the skies` declaration with `-2"` budget unless Hover, FLY through all models/terrain and ignores vertical distance, Aircraft-only ingress, end-of-opponent-turn reserve transition, Aircraft engagement exceptions, and aircraft charge/fight restrictions | Phase 10R, 10S, 15B, 15D, 14D, 14H |
-| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection, `[ANTI]`, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]`, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative X", `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
+| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection for implemented families, `[ANTI]` including duplicate Shooting selection, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]` movement-evidence slice, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative default 12" targeting gate, `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17F, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
 | Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2025-26 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
@@ -605,7 +605,10 @@ Invariants:
 - Strategic Reserves arriving from battle round 3 onward must be wholly within 6" of a battlefield edge;
 - Strategic Reserves cannot be set up within 8" horizontally of enemy units, i.e. they must be more than 8" away;
 - Deep Strike units may be placed in Reserves during Declare Battle Formations if every model has Deep Strike;
-- Deep Strike placement uses its source setup policy and, under the 11th Edition Core Rules, is more than 8" horizontally from all enemy units;
+- each time a Deep Strike unit makes an Ingress Move, if every model in that
+  unit has Deep Strike, it can be set up anywhere on the battlefield that is
+  more than 8" horizontally from all enemy units, even within the opponent's
+  deployment zone;
 - a unit arriving from Strategic Reserves with Deep Strike may choose either Strategic Reserves setup rules or Deep Strike setup rules;
 - reserve placements validate battlefield edges, enemy distance restrictions, terrain endpoints, coherency, model overlap, and deployment restrictions;
 - mandatory arrivals are requeued or fail explicitly according to rules;
@@ -614,14 +617,16 @@ Invariants:
 Required tests:
 
 - Movement phase offers legal Ingress Move choices during Move Units;
-- Deep Strike placement uses `BattlefieldPlacementKind.DEEP_STRIKE`;
+- Deep Strike Ingress placement uses `BattlefieldPlacementKind.DEEP_STRIKE`;
 - Strategic Reserves placement uses `BattlefieldPlacementKind.STRATEGIC_RESERVES`;
 - illegal reserve placement fails without mutating state;
 - reserve placement validates coherency and Engagement Range setup restriction;
 - reserve placement validates terrain endpoint support;
 - Strategic Reserves battle-round-2 edge/enemy-deployment-zone/more-than-8" restrictions are enforced;
 - Strategic Reserves battle-round-3 edge restrictions are enforced;
-- Deep Strike and Strategic Reserves choose the correct placement policy;
+- Deep Strike and Strategic Reserves choose the correct placement policy,
+  including Deep Strike's permission to ignore opponent-deployment-zone bans
+  while preserving the more-than-8" horizontal enemy-distance restriction;
 - unarrived Reserves count as destroyed at game end.
 
 CORE V1 relevant areas:
@@ -713,7 +718,12 @@ CORE V1 relevant areas:
 
 Status: Complete foundation; setup-phase declarations are explicitly deferred.
 
-This phase adds typed `AIRCRAFT` movement policy, persisted Hover-mode policy switching, lifecycle aircraft reserve transitions, aircraft-aware pathing for other models, and reserve arrival validation through the same placement legality path used by Phase 10P.
+This phase adds typed `AIRCRAFT` movement policy, lifecycle aircraft reserve
+transitions, aircraft-aware pathing for other models, and reserve arrival
+validation through the same placement legality path used by Phase 10P. The
+source-backed `HOVER` ability itself is not a deployment-mode switch; Phase 14I
+owns the rule that a `HOVER` unit taking to the skies does not subtract 2" from
+its movement budget.
 
 Modules:
 
@@ -732,7 +742,7 @@ Objects:
 
 Complete foundation scope:
 
-- Aircraft/Hover movement policy;
+- Aircraft movement policy and deferred Hover rule wiring;
 - aircraft reserve transitions;
 - mandatory Strategic Reserves deployment during battle formation;
 - end-of-opponent-turn reserve transition metadata.
@@ -937,9 +947,29 @@ Required tests:
 
 Status: Complete.
 
-This phase brings in Chapter Approved 2025-26 mission data: mission sequence, deployment maps, objective marker positions, mission pool, mission decks, secondary mission cards, Challenger cards, terrain layout templates, and tournament scoring caps.
+This phase brings in Chapter Approved 2025-26 mission data: mission sequence,
+deployment maps, objective marker positions, mission pool, mission decks,
+secondary mission cards, Challenger cards, terrain layout templates, and
+tournament scoring caps.
 
-Phase 11A terrain layout import preserves source slot rotations in terrain feature `source_id` metadata for audit/replay provenance. Runtime `TerrainFeatureTemplate` geometry intentionally instantiates the conservative axis-aligned bounding footprint of each rotated slot, with axis-aligned ruins walls/floors inside that footprint. Exact rotated ruin walls, floor polygons, and visibility/pathing polygons are deferred to the terrain/visibility geometry slices rather than treated as complete in Phase 11A.
+Phase 11A terrain layout import has two layers. `core/terrain_layouts.py`
+defines pure geometry domain templates, while `rules/mission_pack_import.py`
+transcribes the Chapter Approved 2025-26 layout slot table into `layout-1`
+through `layout-8`. Each slot preserves the source preset, rotation, and world
+origin in terrain feature `source_id` metadata for audit/replay provenance.
+Runtime `TerrainFeatureTemplate` geometry intentionally instantiates the
+conservative axis-aligned bounding footprint of each rotated slot, with
+axis-aligned ruins walls/floors inside that footprint. Exact rotated ruin walls,
+floor polygons, and visibility/pathing polygons are deferred to the
+terrain/visibility geometry slices rather than treated as complete in Phase 11A.
+
+The UI may map `layout-1` through `layout-8` to thematic `Layout1.png` through
+`Layout8.png` artwork, but those PNGs are not authoritative geometry. Engine
+visibility, movement, collision, objective, deployment, and reserve-placement
+legality must run from the instantiated terrain feature payloads in
+`MissionSetup`. Until exact rotated terrain geometry is implemented, any UI
+overlay must either visualize those conservative runtime footprints or clearly
+avoid presenting the PNG as the engine collision/LoS ground truth.
 
 Modules:
 
@@ -968,7 +998,14 @@ Invariants:
 - deployment zones are geometry objects tied to deployment maps;
 - objective marker positions are source-defined and use center-point measurement;
 - Chapter Approved objective markers are flat 40mm markers and do not impede movement/placement;
-- terrain layout templates are data and can instantiate pregenerated terrain pieces with conservative axis-aligned occupancy footprints;
+- terrain layout templates are data and can instantiate pregenerated terrain
+  pieces with conservative axis-aligned occupancy footprints;
+- Chapter Approved `layout-1` through `layout-8` runtime terrain geometry is the
+  instantiated `TerrainLayoutTemplate` data, not the `Layout*.png` artwork used
+  by UI presentation;
+- source slot rotation/origin provenance is preserved in `source_id`, but until
+  exact rotated geometry exists, runtime occupancy/LoS/collision must not infer
+  angled footprints from that provenance or from UI images;
 - live reserve-arrival validation receives mission deployment-zone geometry for reserve placement validation;
 - live placement validators receive instantiated terrain features instead of resolver-local test fixtures;
 - tournament mission pool is deterministic and replay-facing;
@@ -981,6 +1018,13 @@ Required tests:
 - objective marker positions round-trip;
 - objective marker terrain/movement policy is flat/non-blocking for Chapter Approved;
 - terrain layout template instantiates deterministic terrain features;
+- all eight Chapter Approved terrain layouts preserve slot rotation/origin
+  provenance in feature `source_id` values while producing deterministic
+  conservative runtime footprint payloads;
+- UI-facing layout IDs can resolve to artwork, but engine legality tests prove
+  pathing, visibility, collision, deployment, reserve placement, and objective
+  queries consume `MissionSetup.terrain_features` rather than `Layout*.png`
+  dimensions or image-derived polygons;
 - live reserve-arrival validation rejects battle-round-2 Strategic Reserves in enemy deployment zones using mission data;
 - live reserve-arrival validation rejects illegal terrain endpoints using instantiated terrain layout data;
 - mission pool selection is deterministic;
@@ -1671,7 +1715,18 @@ Invariants:
 - units that Advanced/Fell Back cannot shoot unless a rule permits;
 - engaged units obey Close-quarters shooting restrictions and shooting-at-engaged-`MONSTER`/`VEHICLE` target rules;
 - shooting at engaged units applies the correct Hit-roll penalty unless the attack is a qualifying `[CLOSE-QUARTERS]`/`[PISTOL]` attack;
-- Lone Operative prevents ranged targeting unless the attacker is within the required distance and closest-eligible-target condition when applicable;
+- a unit containing one or more models with a `[CLOSE-QUARTERS]` weapon can use
+  Close-quarters Shooting;
+- when a unit uses another shooting type, each non-`MONSTER`/non-`VEHICLE` model
+  in that unit can select either one or more of its `[CLOSE-QUARTERS]` weapons
+  or one or more of its other ranged weapons, but not both groups for that
+  model in the same declaration;
+- the completed Lone Operative targeting slice enforces the default 12" gate
+  for units with the canonical `LONE_OPERATIVE` keyword and does not require
+  the Lone Operative target to be the closest eligible target;
+- attached-unit suppression, `Lone Operative X"` distance overrides,
+  model-distance measurement, and the `[INDIRECT FIRE]` within-distance
+  exception remain future source-backed work until implemented with regressions;
 - ranged weapons validate range and visibility at target selection time;
 - targets for all of a unit's ranged weapons are declared before any attack is resolved;
 - a weapon remains resolved against a target selected as visible/in range even if later attacks remove visible/in-range models before resolution;
@@ -1686,8 +1741,14 @@ Required tests:
 - eligible unit selection;
 - Advanced/Fell Back restriction;
 - target range/visibility validation;
-- Lone Operative targeting gate, including closest-eligible-target behavior;
-- Close-quarters shooting, shooting at engaged `MONSTER`/`VEHICLE`, `[CLOSE-QUARTERS]`/`[PISTOL]`, and `[BLAST]` interactions;
+- Lone Operative tests cover the default 12" gate for canonical
+  `LONE_OPERATIVE` units and prove no closest-target requirement; attached-unit
+  suppression, `Lone Operative X"` distance overrides, model-distance
+  measurement, and the `[INDIRECT FIRE]` within-distance exception must be
+  added before the full official Lone Operative rule is marked complete;
+- Close-quarters Shooting availability, shooting at engaged `MONSTER`/`VEHICLE`,
+  `[CLOSE-QUARTERS]`/`[PISTOL]`, per-model close-quarters-versus-other-ranged
+  weapon declaration exclusivity, and `[BLAST]` interactions;
 - Firing Deck consumes selected embarked models/weapons, rejects duplicate or illegal embarked weapon use, attaches temporary Transport attacks, and marks selected embarked units ineligible to shoot;
 - selected target remains valid for declared weapon resolution after casualties;
 - weapon declaration payload round-trip;
@@ -1833,12 +1894,41 @@ Invariants:
 - ability handlers modify the attack sequence only in declared timing windows;
 - shooting-coupled Core Stratagems reuse the Phase 12B Stratagem definition, decision, target-binding, CP ledger, and replay contract;
 - every shooting-coupled Core Stratagem timing hook is registered through `StratagemCatalogIndex`; Shooting phase code must not scan the full catalog when a shooting event occurs;
+- duplicated weapon abilities are never cumulative, including duplicate
+  instances whose numbers or target keywords differ;
+- the implemented duplicate weapon ability lifecycle slice covers duplicate
+  `[ANTI]` descriptors in Shooting declarations: the controlling player's
+  Select-Weapons-step source-instance choice is adapter-visible on the target
+  candidate, stored on `WeaponDeclaration`/`RangedAttackPool`, and carried into
+  attack events/context before the Anti Critical Wound threshold is read;
+- numbered weapon abilities such as `[SUSTAINED HITS 1]` and `[SUSTAINED HITS
+  2]`, and non-Anti keyworded duplicate families, remain future lifecycle
+  threading work; they must fail explicitly or stay unsupported rather than
+  stack unselected duplicate effects;
 - Assault changes shooting eligibility and restricts attacks to Assault weapons after Advance;
 - Rapid Fire, Blast, Cleave, Melta, Heavy, Lance, and Indirect Fire modify characteristics/rolls through typed modifier stacks and consume Phase 10J dice/random-characteristic semantics rather than reimplementing dice;
 - Twin-linked grants a Wound-roll reroll permission and consumes Phase 10J reroll semantics;
-- `[CLOSE-QUARTERS]` modifies close-quarters shooting eligibility, engaged targeting, and weapon selection restrictions; `[PISTOL]` is an exact alias for all rules purposes;
+- `[CLOSE-QUARTERS]` modifies Close-quarters Shooting eligibility, engaged
+  targeting, and per-model ranged weapon-selection exclusivity for other
+  shooting types; `[PISTOL]` is an exact alias for all rules purposes;
 - Torrent bypasses Hit rolls and interacts correctly with Indirect Fire restrictions;
-- Lethal Hits and Sustained Hits consume Critical Hit events, and Lethal Hits remains an active-player choice because automatic wounds can prevent Critical Wound abilities;
+- `[IGNORES COVER]` removes Benefit of Cover from the target for each attack
+  made with that weapon, including Benefit of Cover from terrain, Stealth,
+  Smokescreen, Indirect Fire, or any other rule that gives a model or unit
+  Benefit of Cover;
+- the completed `[HEAVY]` slice applies the typed +1 Hit-roll modifier only
+  when movement evidence shows the attacking unit did not Advance/Fall Back and
+  no model in that unit moved more than 3" this turn; own-Shooting-phase
+  timing, unengaged, and set-up-this-turn denial gates remain future work before
+  the full official Heavy rule is marked complete;
+- `[LETHAL HITS]` consumes Critical Hit events and is an active-player choice:
+  for each Critical Hit, the attacker can choose for that attack to
+  automatically wound and skip the Wound roll, or decline so the attack can make
+  a Wound roll and potentially become a Critical Wound;
+- Sustained Hits consumes Critical Hit events and preserves generated-hit wound
+  context;
+- `[LANCE]` adds 1 to the Wound roll for each attack made with that weapon only
+  if the attacking model's unit made a Charge move this turn;
 - Anti modifies Critical Wound thresholds based on target keywords;
 - `[HUNTER X]` weapons can only target units that match at least one listed
   keyword in X, including composite keyword lists such as `MONSTER` or
@@ -1862,13 +1952,34 @@ Required tests:
 - Fire Overwatch has end-of-opponent-Movement-phase reaction tests proving it creates an out-of-phase Snap Shooting state, rejects out-of-range, engaged, TITANIC, shooting-ineligible, and no-legal-declaration selected friendly unit bindings before CP spend, applies the unmodified-6 hit policy while preserving Torrent auto-hit behavior, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
 - Smokescreen and Explosives have decision-contract tests from their legal shooting-resolution windows;
 - unsupported weapon ability descriptor does not execute;
+- duplicate `[ANTI]` weapon ability declarations are non-cumulative, require a
+  Select-Weapons-step source-instance selection in Shooting declarations, carry
+  the selected descriptor into attack-pool and attack-step payloads, and use
+  only the selected keyword gate/Critical Wound threshold;
+- duplicate numbered weapon abilities such as `[SUSTAINED HITS 1]` versus
+  `[SUSTAINED HITS 2]` and non-Anti keyworded duplicate families require future
+  lifecycle tests before those families are marked complete;
 - Hunter X rejects target declarations that lack every required keyword match and
   accepts declarations with at least one listed target keyword;
 - modifier interactions are deterministic;
 - random Attacks and random Damage consume Phase 10J dice/reroll semantics;
 - Twin-linked cannot reroll a Wound roll twice;
+- `[IGNORES COVER]` strips Benefit of Cover from terrain, Stealth, Smokescreen,
+  Indirect Fire, and other source-backed cover sources for attacks made with
+  that weapon;
+- `[HEAVY]` tests cover typed movement evidence, per-model moved-more-than-3"
+  denial, and +1 Hit-roll modifier application for the current shooting
+  declaration path; own-Shooting-phase-only timing, unengaged requirement, and
+  set-up-this-turn denial require future regressions before full official
+  coverage is claimed;
+- `[LETHAL HITS]` Critical Hit choices cover accept-to-auto-wound/skip-Wound-roll
+  and decline-to-roll-wound paths, including interactions with Critical Wound
+  abilities such as `[DEVASTATING WOUNDS]`;
+- `[LANCE]` adds +1 to Wound rolls only when the attacking model's unit made a
+  Charge move this turn and is absent for non-charged, out-of-phase, and
+  non-Lance attacks;
 - Indirect Fire applies Benefit of Cover, disables Hit-roll rerolls, and enforces unmodified 1-5 fail or stationary-plus-friendly-visibility unmodified 1-3 fail;
-- Close-quarters shooting and shooting at engaged MONSTER/VEHICLE restrictions interact correctly with `[BLAST]` bans;
+- Close-quarters Shooting and shooting at engaged MONSTER/VEHICLE restrictions interact correctly with `[BLAST]` bans and per-model `[CLOSE-QUARTERS]` versus other-ranged weapon exclusivity;
 - Hazardous and Devastating Wounds mortal-wound allocation ordering is correct.
 - Fire Overwatch rejects invalid target bindings before CP spend and does not create marker-only effects;
 - Smokescreen expires at the correct timing endpoint;
@@ -1883,6 +1994,17 @@ Invariants:
 - defender allocation choices are emitted as `DecisionRequest`s unless allocation is forced by the rules;
 - optional Feel No Pain source/use and optional destruction-reaction choices remain in the shared adapter decision path and may not be answered by UI/headless/network-specific code; mandatory save routing, including Invulnerable Save precedence, is engine-owned;
 - mandatory destruction reactions, including Deadly Demise-style rules, are engine-triggered and are not adapter decline choices;
+- `DEADLY DEMISE X` rolls one deterministic D6 each time a model in that unit is
+  destroyed, after any units embarked within it have made Emergency Disembark
+  moves and before the destroyed model is removed from the battlefield;
+- if the Deadly Demise roll is a 6, that model suffers Deadly Demise and each
+  unit within 6" of that model suffers X mortal wounds;
+- if X is random, the engine rolls the random mortal-wound amount separately
+  for each unit within 6";
+- when a Transport model with embarked units is destroyed by attacks, unresolved
+  attacks from the attacking unit resolve first, then Emergency Disembark
+  resolves, then Deadly Demise rolls and mortal wounds resolve, and finally the
+  destroyed Transport model is removed;
 - Deadly Demise resolves before destroyed-model removal, including its trigger roll, eligible nearby-unit mortal-wound packets, and any routed Feel No Pain choices;
 - models destroyed by Deadly Demise mortal-wound packets use the same destroyed-model removal record, transition batch, and destruction-reaction host as attack damage;
 - defender allocation and destruction records are viewer-scoped where hidden information can differ;
@@ -1905,7 +2027,12 @@ Required tests:
 - destroyed-model pool round-trip supports later healing/revival without object
   reprs or component identity loss;
 - destroyed-model reaction timing;
-- Deadly Demise failed roll, successful mortal wounds, pre-removal measurement, and Feel No Pain pause/resume ordering;
+- Deadly Demise failed roll, successful 6 trigger, fixed and random X mortal
+  wounds, one random X roll per affected unit, pre-removal 6" measurement, and
+  Feel No Pain pause/resume ordering;
+- destroyed Transport ordering covers unresolved attacking-unit attacks,
+  Emergency Disembark before Deadly Demise, Deadly Demise before removal, and
+  deterministic event ordering matching the source example;
 - Deadly Demise secondary casualties emit removal records, optional reaction requests, and chained mandatory Deadly Demise resolutions deterministically;
 - non-triggering coherency cleanup removal.
 
@@ -2017,7 +2144,11 @@ Invariants:
 - Fall Back mode selection supports Ordered Retreat and Desperate Escape;
 - `MONSTER` and `VEHICLE` units can move through friendly and enemy models that
   are not `MONSTER` or `VEHICLE` only when making Normal or Advance moves;
-- Flying units can optionally take to the skies for Normal, Advance, and Fall Back movement-phase actions through finite option IDs and parameterized proposal payload context, subtracting 2" unless Hover applies; Charge integration remains a Phase 15 charge-move task;
+- Flying units can optionally take to the skies for Normal, Advance, and Fall
+  Back movement-phase actions through finite option IDs and parameterized
+  proposal payload context, subtracting 2" unless `HOVER` applies; when a
+  `HOVER` unit takes to the skies, the 2" subtraction is not applied. Charge
+  integration remains a Phase 15 charge-move task;
 - terrain areas and Exposed/Light/Dense categories replace retired terrain-feature policies;
 - Dense movement, vertical movement, stable non-ground endpoints, Solid, Hidden,
   Gone to Ground, Obscuring, and Benefit of Cover are represented from
@@ -2035,7 +2166,8 @@ Required tests:
   enemy-distance validation where applicable;
 - Monster/Vehicle model traversal is legal for Normal and Advance moves only and
   remains illegal through other Monster/Vehicle models;
-- FLY take-to-the-skies changes pathing and movement budget deterministically;
+- FLY take-to-the-skies changes pathing and movement budget deterministically,
+  including the no-2" subtraction rule for `HOVER` units;
 - terrain visibility and terrain movement consume terrain-area descriptors,
   including Light/Dense Hidden eligibility and Gone to Ground detection modifiers;
 - objective-control geometry supports terrain areas and marker fallback;
@@ -2198,7 +2330,7 @@ Invariants:
 - Tactical Disembark uses 3" wholly-within setup, is mandatory when the Transport remained stationary or has not yet been selected to move and a legal 3" setup exists, forbids Remain Stationary, and immediately routes the unit through the shared Movement phase decision path for a Normal or Advance move;
 - Combat Disembark uses 6" wholly-within setup when Rapid/Tactical conditions do not apply, makes one Hazard roll for each model through the shared Hazard/mortal-wound allocation service, can set up engaged only with enemy units that the Transport is engaged with, writes through Battle-shock, and prevents charges until end of turn;
 - Emergency Disembark uses 6" wholly-within setup for units embarked in a Transport that was just destroyed, makes one Hazard roll for each model before setup through the shared Hazard/mortal-wound allocation service, requires each model to be set up as close as possible to that Transport, destroys each model that cannot be placed that way, writes through Battle-shock, and prevents charges until end of turn;
-- destroyed-Transport Disembark/Emergency Disembark orchestration happens from the real destruction event before Transport removal and before/alongside Deadly Demise resolution according to the source timing, with embarked units not using stale battlefield placements or endpoint-only movement shortcuts;
+- destroyed-Transport Disembark/Emergency Disembark orchestration happens from the real destruction event before Transport removal and before Deadly Demise resolution according to the source timing, with embarked units not using stale battlefield placements or endpoint-only movement shortcuts;
 - Attached units support runtime-instantiated attached rules units from army-list
   Leader and Support declarations, one Leader and one Support per Bodyguard
   unless stated, Bodyguard Toughness for incoming attacks, keyword union without
@@ -2226,7 +2358,10 @@ Required tests:
 - attached-unit formation is instantiated at runtime from valid army-list
   declarations and emits replay-safe component role metadata;
 - attached-unit ability persistence ends when the relevant source model/unit is destroyed and resumes if revived;
-- Strategic Reserves and Deep Strike use the more-than-8" horizontal distance policy;
+- Strategic Reserves and Deep Strike use their distinct source policies: Deep
+  Strike Ingress requires every model in the unit to have Deep Strike, permits
+  setup within the opponent's deployment zone, and still requires more-than-8"
+  horizontal distance from all enemy units;
 - repositioned units preserve advance/fall-back/disembark history;
 - Surge and Aircraft restrictions are regression-tested;
 - revival placement honors attached-unit and engagement constraints;
@@ -2244,10 +2379,87 @@ Invariants:
   Secondary Mission card, and immediately draws one replacement Secondary Mission
   card;
 - Heroic Intervention supports Leap to Defend and Into the Fray modes, including the optional +1 CP section;
-- duplicate core/weapon ability instances require deterministic controlling-player selection at the timing stated by the PDF;
+- duplicate core/weapon ability instances are not cumulative, regardless of
+  included numbers or keywords;
+- duplicate core ability instances require deterministic controlling-player
+  selection at the timing the source ability applies, unless the source rule
+  forces a unique instance;
+- duplicate weapon ability instances require deterministic controlling-player
+  selection each time the unit makes attacks in the Select Weapons step before
+  their effects can resolve; the implemented lifecycle wiring currently covers
+  Shooting declarations with duplicate `[ANTI]` descriptors, and other weapon
+  duplicate families remain future/unsupported until their hosts carry the
+  selected descriptor ID into attack resolution;
+- duplicate selection requests and forced duplicate-resolution records preserve
+  ability family, source IDs, selected source instance, timing window, affected
+  unit/weapon context, and JSON-safe replay metadata;
+- multiple instances of a numbered core ability are duplicates even when the
+  number varies;
+- multiple instances of a numbered weapon ability are duplicates even when the
+  number varies; lifecycle completion for numbered weapon families requires
+  future Select-Weapons threading and regressions;
+- multiple instances of a keyworded weapon ability are duplicates even when the
+  keyword varies; the completed lifecycle slice covers duplicate `[ANTI]`
+  descriptors in Shooting declarations and does not mark other keyworded
+  families complete;
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
 - `[HUNTER X]` is target eligibility, not an attack modifier: the weapon can
   only be declared into units matching at least one listed keyword;
+- `STEALTH` applies only when every model in the targeted unit has that ability;
+  each time a ranged attack targets that unit, the unit has Benefit of Cover
+  against that attack;
+- `STEALTH` creates an attack-scoped Benefit of Cover source, not terrain
+  occupancy, a persistent terrain state, or a save-side modifier; existing
+  Benefit of Cover and `[IGNORES COVER]` handling must consume the structured
+  Stealth source record;
+- `[PSYCHIC]` attacks are attacks made with `[PSYCHIC]` weapons and must be
+  tagged as psychic attacks for later trigger matching;
+- each time an attack is made with a `[PSYCHIC]` weapon, the attacking player
+  can ignore any or all modifiers to that attack's BS or WS characteristic and
+  any or all modifiers to that attack's Hit roll; this choice does not apply to
+  Strength, AP, Damage, Attacks, Wound rolls, saves, or other characteristics
+  unless another source-backed rule says so;
+- `[PSYCHIC]` modifier-ignore choices are player-facing choices when more than
+  one legal modifier outcome exists and must use deterministic
+  `DecisionRequest`/`DecisionResult` payloads, not an automatic best-result
+  shortcut;
+- each weapon with `[ONE SHOT]` can be selected to make attacks with only once
+  per battle, and every weapon-selection path must consume the same
+  deterministic one-shot use state;
+- `[ONE SHOT]` state is per weapon instance, not per profile name or per unit
+  type; a model with multiple one-shot weapons tracks each separately;
+- if a destroyed model is returned to a unit, all of its `[ONE SHOT]` weapons
+  that were already selected to make attacks earlier in the battle remain spent
+  and cannot be selected again;
+- if a new unit is added to an army, all `[ONE SHOT]` weapons in that new unit
+  start unspent and can be selected once per battle;
+- `HOVER` applies each time the unit takes to the skies: the unit uses the
+  source-backed FLY take-to-the-skies path but does not subtract the normal 2"
+  movement-budget cost;
+- `HOVER` is not a separate deployment mode or generic movement discount; it
+  modifies only the take-to-the-skies budget subtraction at the moment that
+  movement mode is selected;
+- Super-heavy Walker applies only when a unit with that source-backed ability
+  makes a Normal, Advance, or Fall Back move; it does not apply to Charge, Pile
+  In, Consolidate, Scout, setup placement, or reserve-arrival movement unless a
+  future source-backed rule explicitly says otherwise;
+- Super-heavy Walker model-transit permission lets models in that unit move
+  through models, including `MONSTER` and `VEHICLE` models, but not through
+  `TITANIC` models; endpoint model-overlap prohibition still applies;
+- Super-heavy Walker terrain permission lets models in that unit move
+  horizontally through sections of terrain features that are 4" or less in
+  height; taller sections and non-horizontal terrain movement still use the
+  ordinary terrain/pathing validators;
+- before a Super-heavy Walker Normal, Advance, or Fall Back move, the
+  controlling player can select all models in that unit to gain `MOBILE` until
+  that move ends; this is an adapter-visible player choice and any
+  implementation PR must update `docs/ADAPTER_DECISION_CONTRACT.md`;
+- `MOBILE` is a temporary structured keyword/capability that enables horizontal
+  Dense terrain traversal through the normal movement/terrain validator, not a
+  raw text shortcut or permanent unit keyword;
+- if `MOBILE` was selected for a Super-heavy Walker move, the engine rolls one
+  deterministic D6 when that move ends; on a 1, that unit becomes
+  Battle-shocked through the normal Battle-shock state and event path;
 - core abilities listed in the 11th Edition Core Rules are either implemented with source-backed tests or explicitly unsupported with reason.
 
 Required tests:
@@ -2256,9 +2468,67 @@ Required tests:
 - each Core Stratagem has target-binding, CP ledger, timing-window, and replay coverage;
 - New Orders rejects second use in the same game and emits deterministic
   discard-and-replacement-draw mission deck records;
-- duplicate ability selection is deterministic and adapter-visible when a player choice exists;
+- duplicate ability selection tests prove implemented duplicate core/weapon
+  paths are non-cumulative, source-linked, deterministic, and adapter-visible
+  when a player choice exists;
+- duplicate selection replay tests cover implemented duplicate paths with
+  stale/drifted submissions and no Python object reprs or memory addresses;
+  numbered weapon families and non-Anti keyworded weapon families require
+  additional tests before lifecycle completion is claimed;
+- duplicate `[ANTI]` weapon tests prove selection happens in Select Weapons for
+  Shooting declarations and that unselected matching Anti descriptors do not
+  affect Wound resolution; other duplicate weapon families remain required
+  future coverage;
 - Hunter X target declaration accepts at least one listed keyword match and
   rejects target units with none;
+- `STEALTH` grants Benefit of Cover against ranged attacks only when every model
+  in the target unit has the ability, rejects mixed-model units, and does not
+  affect melee attacks;
+- `STEALTH` Benefit of Cover uses an ability source record and still interacts
+  with `[IGNORES COVER]` through the same structured Benefit of Cover host as
+  terrain and Smokescreen sources;
+- `[PSYCHIC]` attacks are tagged as psychic attacks in attack records and event
+  payloads;
+- `[PSYCHIC]` modifier-ignore choices can ignore all, none, or an arbitrary
+  legal subset of BS/WS characteristic modifiers and Hit-roll modifiers for
+  that attack, while leaving non-covered modifiers untouched;
+- `[PSYCHIC]` modifier-ignore submissions reject stale, drifted, malformed, and
+  wrong-attack-context payloads before mutation and round-trip through replay;
+- `[ONE SHOT]` first weapon selection is legal and records the weapon instance
+  as spent for the battle; a second selection of the same weapon instance is
+  rejected in normal, out-of-phase, transport, and replay declaration paths;
+- `[ONE SHOT]` tracking distinguishes two one-shot weapons on the same model,
+  identical profiles on different models, and attacks generated by temporary
+  attachment paths;
+- returned destroyed models keep prior spent `[ONE SHOT]` state, while newly
+  added units receive fresh unspent `[ONE SHOT]` weapon state;
+- `[ONE SHOT]` state is deterministic, JSON-safe, and contains no Python object
+  reprs or memory addresses;
+- `HOVER` units that take to the skies keep the FLY pathing behavior and do not
+  subtract 2" from the movement budget;
+- non-`HOVER` units that take to the skies still subtract 2" from the movement
+  budget;
+- `HOVER` does not alter Normal, Advance, Fall Back, Charge, Scout, Pile In,
+  Consolidate, setup placement, or reserve placement unless the unit has
+  selected the take-to-the-skies movement mode;
+- Super-heavy Walker movement is offered only for Normal, Advance, and Fall
+  Back moves and is absent from Charge, Pile In, Consolidate, Scout, setup
+  placement, and reserve-arrival contexts;
+- Super-heavy Walker through-model pathing permits traversal through ordinary,
+  `MONSTER`, and `VEHICLE` models, rejects traversal through `TITANIC` models,
+  and still rejects overlapping endpoints;
+- Super-heavy Walker terrain pathing permits horizontal movement through terrain
+  feature sections 4" or less in height and rejects unsupported taller-section
+  or non-horizontal shortcuts;
+- the optional `MOBILE` selection is a finite lifecycle decision with
+  deterministic JSON-safe payloads, rejects stale/drift/malformed submissions
+  before mutation, and grants `MOBILE` only until that move ends;
+- selecting `MOBILE` enables horizontal Dense-terrain traversal during that
+  move, then expires before any later movement, visibility, or scoring context
+  can consume it;
+- the post-`MOBILE` D6 roll is deterministic and replay-facing; a result of 1
+  records Battle-shock for the unit, while 2-6 leaves Battle-shock state
+  unchanged;
 - every supported core ability has focused tests and an unsupported-descriptor audit row where not yet implemented.
 
 ## Phase 14J: mission and catalog replacement
@@ -2710,41 +2980,408 @@ Required tests:
 
 ## Phase 16A: deployment rules and deployment-zone placement
 
+Status: Planned.
+
+Phase 16A replaces the Phase 10A deterministic placement bridge with real
+source-backed Deploy Armies setup. Deployment is a setup placement operation:
+the engine may validate final set-up poses directly for deployment placement
+proposals, but any movement-like pre-battle displacement remains owned by Phase
+16B and must use movement witnesses.
+
+Modules:
+
+- `engine/setup_flow.py`
+- `engine/deployment.py`
+- `engine/movement_proposals.py`
+- `engine/battlefield_state.py`
+- `engine/endpoint_placement.py`
+- `engine/mission_setup.py`
+- `core/deployment_zones.py`
+- `core/missions.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `DeploymentSetupState`
+- `DeploymentOrderPolicy`
+- `DeploymentUnitSelection`
+- `DeploymentPlacementProposal`
+- `DeploymentLegalityContext`
+- `DeploymentPlacementResolution`
+- `DeploymentZoneAssignment`
+- `BattlefieldTransitionBatch`
+
 Invariants:
 
-- deployment zones come from mission map;
-- Attacker/Defender and deployment order are mission/ruleset policy;
-- deployed units validate terrain endpoint, coherency, Engagement Range setup restriction, and model overlap;
-- deployment emits placement records.
+- deployment zones come from the selected source-backed mission map and
+  deployment layout; deployment-zone geometry must not be invented from player
+  IDs, default board halves, or test-only coordinates;
+- Attacker/Defender, deployment order, and any first-deploying-player policy are
+  mission/ruleset setup policy, not adapter behavior;
+- deployment choices are player-facing and must flow through
+  `DecisionRequest` -> `DecisionResult` -> validation ->
+  `GameLifecycle.submit_decision(...)` -> engine mutation;
+- deployment unit options include only units that are not declared in Reserves,
+  not starting embarked, not already deployed, and not otherwise removed by a
+  setup legality consequence;
+- deployment placement proposals must include every alive model in the selected
+  rules unit, including attached rules-unit models when applicable;
+- ordinary deployment must set up the unit wholly within the owning player's
+  legal deployment zone unless a source-backed rule modifies that setup
+  permission;
+- `INFILTRATORS` modifies deployment setup only when every model in the unit has
+  that ability, allowing that unit to be set up anywhere on the battlefield more
+  than 8" horizontally from the opponent's deployment zone and all enemy units;
+- deployment endpoint validation checks battlefield bounds, terrain endpoint
+  legality, model overlap, base/volume occupancy, unit coherency, Engagement
+  Range setup restrictions, objective-marker endpoint permissions, and any
+  source-backed Fortification or large-model restrictions;
+- deployment terrain legality consumes the selected `MissionSetup` terrain
+  feature payloads exactly as the engine will use them for movement,
+  visibility, collision, objective, and reserve-placement legality; UI layout
+  artwork and image-derived polygons are not gameplay inputs;
+- endpoint-style placement evidence is legal only for explicit set-up placement
+  operations such as deployment; it must not be reused for redeployments that
+  move models, Scout moves, or later movement actions;
+- deployment emits deterministic placement records with deployment setup-step
+  identity, source mission/deployment-map identity, placement kind, model IDs,
+  poses, and event IDs;
+- deployed attached units are represented as one rules unit for physical
+  operations, with component metadata preserved for destroyed-unit triggers;
+- hidden or secret pre-battle information must remain viewer-scoped in pending
+  requests, placement diagnostics, projections, and event deltas.
+
+Required tests:
+
+- Deploy Armies no longer creates a battlefield through the deterministic
+  placement bridge;
+- deployment unit selection and placement submission use the shared lifecycle
+  decision path and produce deterministic JSON-safe `DecisionRecord` and
+  `EventRecord` payloads;
+- deployment zones load from `MissionSetup` and reject unknown, stale, or
+  wrong-player zone IDs before queue pop;
+- valid deployment places every model wholly within the correct deployment zone
+  and records one placement per model;
+- valid `INFILTRATORS` deployment can place a qualifying unit outside its
+  deployment zone when every model has the ability and every model is more than
+  8" horizontally from the opponent's deployment zone and all enemy units;
+- deployment rejects out-of-bounds poses, illegal terrain endpoints, model
+  overlap, broken coherency, Engagement Range violations, omitted models, extra
+  models, and wrong-unit model IDs without mutating state;
+- deployment legality for `layout-1` through `layout-8` uses the conservative
+  runtime terrain footprints from `MissionSetup` and cannot be satisfied by
+  `Layout*.png` artwork bounds, rotated-image silhouettes, or adapter-local
+  terrain overlays;
+- `INFILTRATORS` deployment rejects mixed-ability units, omitted/extra models,
+  positions within 8" horizontally of the opponent's deployment zone, and
+  positions within 8" horizontally of any enemy unit;
+- attached rules-unit deployment validates over group-aware model sets rather
+  than component-only `UnitPlacement` data;
+- units declared as Reserves, starting embarked, already deployed, or destroyed
+  by a setup legality consequence are absent from deployment options;
+- stale, drifted, malformed, wrong-actor, wrong-step, wrong-placement-kind, or
+  wrong-ruleset-hash submissions reject before queue pop and before a
+  `DecisionRecord`;
+- replay restore during Deploy Armies reproduces the same pending deployment
+  request and validation context.
 
 ## Phase 16B: redeployments, Scouts, Infiltrators, and pre-battle abilities
 
+Status: Planned.
+
+Phase 16B owns source-backed setup rules that occur after ordinary deployment
+or otherwise modify setup legality before the first battle round. Infiltrators
+is a deployment-time setup permission, not a pre-battle move. Redeploy is a
+remove-and-set-up operation. Scout moves and similar pre-battle moves are real
+physical movement and require movement evidence. Scouts are resolved from the
+official `Scouts X"` shape during Resolve Pre-battle Abilities, including the
+Strategic Reserves set-up branch and the Dedicated Transport branch.
+
+Modules:
+
+- `engine/setup_flow.py`
+- `engine/prebattle.py`
+- `engine/timing_windows.py`
+- `engine/reaction_queue.py`
+- `engine/movement_proposals.py`
+- `engine/triggered_movement.py`
+- `engine/reserves.py`
+- `engine/transports.py`
+- `engine/battlefield_state.py`
+- `geometry/pathing.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `PreBattleTimingWindowState`
+- `PreBattleAbilityDescriptor`
+- `RedeploySelection`
+- `RedeployPlacementProposal`
+- `RedeployResolution`
+- `ScoutAbilityInstance`
+- `ScoutReserveSetupProposal`
+- `ScoutMoveProposal`
+- `ScoutMoveResolution`
+- `DedicatedTransportScoutMoveCandidate`
+- `InfiltratorSetupPermission`
+- `InfiltratorDeploymentLegalityContext`
+- `PreBattleActionRecord`
+
 Invariants:
 
-- redeployments occur after deployment and before first turn;
-- redeploy is removal + placement, not displacement;
-- Scout moves are pre-battle displacements and require the unit to start wholly
-  within its controlling player's deployment zone before the Scout move is made;
-- Infiltrators modify setup legality;
-- all pre-battle abilities use timing windows and source IDs.
+- redeployments occur at their source-backed setup timing after deployment and
+  before battle begins; ordering among multiple redeploy/pre-battle effects uses
+  timing windows and the Phase 12A sequencing path where needed;
+- redeploy is removal plus set-up placement, not a displacement, movement-phase
+  action, destroyed-model trigger, or silent battlefield rewrite;
+- redeploy records deterministic removal and placement events with source IDs,
+  setup step, model IDs, before/after poses, and no movement-distance payload;
+- redeploy placement validates the same endpoint, terrain, coherency, overlap,
+  deployment-zone, and Engagement Range setup restrictions as deployment, plus
+  any source-specific distance or target restrictions;
+- Scouts always takes the source-backed form `Scouts X"`; X is the maximum
+  Scout Move distance and must come from the structured ability descriptor, not
+  parsed at runtime from raw text;
+- duplicated `Scouts X"` instances use the official numbered-core-ability
+  duplicate rule with the Scouts exception: if every model shares a Scouts
+  value, that shared value is a legal selected instance, but when Scouts values
+  vary across models the selected X must be the lowest legal Scouts distance
+  needed to satisfy the all-model unit requirement; for example, a unit where
+  every model has both `Scouts 6"` and `Scouts 8"` can select `Scouts 8"`, while
+  a unit with one `Scouts 6"` model and five `Scouts 8"` models must use
+  `Scouts 6"`;
+- Scouts choices are available only during Resolve Pre-battle Abilities and only
+  when every model in the source Scouts unit has the Scouts ability; the
+  Dedicated Transport branch separately requires every embarked model in that
+  transport to have Scouts;
+- if a Scouts unit is in Strategic Reserves, the controlling player can set up
+  that unit anywhere wholly within their deployment zone; this is setup
+  placement, not a Move Units reserve arrival or a Scout Move displacement;
+- if a Scouts unit is wholly within its controlling player's deployment zone,
+  it can make one Scout Move;
+- if a Scouts unit is embarked within a `DEDICATED TRANSPORT` that is wholly
+  within its controlling player's deployment zone, and every model embarked
+  within that `DEDICATED TRANSPORT` has Scouts, that `DEDICATED TRANSPORT` can
+  make one Scout Move with its cargo state intact;
+- Scout moves consume shared movement/pathing/terrain/coherency validators and
+  require a `PathWitness` for every alive model; endpoint-only Scout movement is
+  invalid;
+- after a Scout Move, the moved unit or `DEDICATED TRANSPORT` must be more than
+  8" horizontally from all enemy units; this is a horizontal-distance predicate
+  and equality at 8" is not legal;
+- Scout moves are not Movement phase actions and must not mark a unit as having
+  Advanced, Fallen Back, Remained Stationary, shot, or started a Mission Action;
+- units without Scouts, units whose models do not all have Scouts, destroyed
+  units, non-Strategic-Reserves reserve units, and embarked units outside the
+  Dedicated Transport branch are never legal Scout candidates;
+- a Dedicated Transport carrying any model without Scouts cannot make a Scout
+  Move through the embarked-unit branch, even if another embarked unit has
+  Scouts;
+- Infiltrators is resolved during deployment: if every model in the unit has
+  `INFILTRATORS`, that unit can be set up anywhere on the battlefield that is
+  more than 8" horizontally from the opponent's deployment zone and all enemy
+  units;
+- Infiltrators does not create a late private placement path, pre-battle
+  movement, redeploy effect, or reserve-arrival shortcut; it is an alternate
+  deployment setup permission consumed by the ordinary deployment placement
+  validator;
+- Infiltrators placement still validates terrain endpoint legality, coherency,
+  model overlap, battlefield bounds, and any source-backed setup restrictions;
+- all pre-battle abilities use typed timing windows, source IDs, deterministic
+  option/proposal payloads, and replay-safe records;
+- any Phase 16B decision type, proposal kind, option family, or viewer-visible
+  payload newly exposed to adapters must update
+  `docs/ADAPTER_DECISION_CONTRACT.md` in the same implementation PR.
+
+Required tests:
+
+- redeploy decisions occur only at legal pre-battle timing and after initial
+  deployment state exists;
+- valid redeploy emits deterministic removal and placement records rather than
+  displacement records;
+- redeploy rejects stale unit state, wrong actor, wrong setup step, illegal
+  zone, illegal terrain endpoint, broken coherency, overlap, and Engagement
+  Range violations without mutation;
+- Scouts option emission covers all three official branches: Strategic Reserves
+  set-up wholly within deployment zone, unit Scout Move from wholly within
+  deployment zone, and Dedicated Transport Scout Move from wholly within
+  deployment zone with all embarked models having Scouts;
+- Scouts Strategic Reserves setup records deterministic setup placement, removes
+  or transitions the reserve state, does not use Move Units arrival timing, and
+  rejects placement outside the controlling player's deployment zone;
+- Scout proposals validate `PathWitness` start poses against current battlefield
+  state, use X from `Scouts X"` as the maximum distance, and reject
+  endpoint-only movement;
+- duplicated Scouts tests cover the official examples: every model with both
+  `Scouts 6"` and `Scouts 8"` can select `Scouts 8"`, while one model with
+  `Scouts 6"` and five models with `Scouts 8"` must use `Scouts 6"` and reject
+  an 8" Scout Move;
+- Scout movement rejects any final state that is not more than 8" horizontally
+  from all enemy units;
+- unit Scout Move eligibility requires every model in the moving unit to have
+  Scouts and the unit to start wholly within its controlling player's deployment
+  zone; it rejects embarked, destroyed, already Scout-moved, no-ability, and
+  mixed-ability units;
+- Dedicated Transport Scout Move eligibility requires the transport to be a
+  `DEDICATED TRANSPORT`, start wholly within its controlling player's deployment
+  zone, carry at least one embarked unit, and have every embarked model possess
+  Scouts; it rejects mixed cargo where any embarked model lacks Scouts;
+- Scout movement uses shared terrain/pathing/coherency validators and does not
+  write Movement phase action state;
+- Infiltrators modify deployment placement legality only during deployment and
+  only for units where every model has `INFILTRATORS`;
+- Infiltrators placement rejects positions that are not more than 8"
+  horizontally from the opponent's deployment zone or are not more than 8"
+  horizontally from every enemy unit; equality at 8" is not legal;
+- Infiltrators placement rejects mixed-ability units and must not be offered as
+  a Scout, redeploy, reserve-arrival, or post-deployment pre-battle action;
+- multiple pre-battle abilities resolve in deterministic source/timing order,
+  including sequencing decisions when both players have simultaneous effects;
+- replay restore inside a pre-battle timing window reproduces pending
+  redeploy/Scout requests and validation context;
+- viewer-scoped projections and event deltas do not leak hidden pre-battle
+  choices or secret setup information.
 
 ## Phase 16C: reserves declarations, Strategic Reserves limits, and Deep Strike setup
 
+Status: Planned.
+
+Phase 16C completes Declare Battle Formations for reserves-related setup. Phase
+10P/14D/14K already own supported arrival validation during Move Units; this
+phase owns the pre-battle declaration state that decides which units start on
+the battlefield, in Strategic Reserves, in another source-backed reserves state,
+or embarked.
+
+Modules:
+
+- `engine/setup_flow.py`
+- `engine/reserves.py`
+- `engine/transports.py`
+- `engine/aircraft.py`
+- `engine/army_mustering.py`
+- `engine/mission_setup.py`
+- `core/ruleset_descriptor.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `BattleFormationDeclarationState`
+- `ReserveDeclarationRequest`
+- `ReserveDeclarationSelection`
+- `StrategicReserveDeclaration`
+- `ReserveLegalityContext`
+- `DeepStrikeSetupDeclaration`
+- `AircraftReserveDeclaration`
+- `ReserveState`
+- `ReserveLegalityReport`
+
 Invariants:
 
-- Strategic Reserves limits are validated during setup;
-- Deep Strike and similar abilities are setup/arrival mechanisms;
-- reserve declarations are replay-facing decisions;
-- illegal reserve declarations fail before battle starts.
+- reserve declarations are setup player choices and must be replay-facing
+  `DecisionRequest`/`DecisionResult` submissions or source-backed engine
+  consequences recorded before battle begins;
+- each mustered runtime rules unit has exactly one initial formation state:
+  deployed, declared in Reserves, starting embarked, destroyed by a setup
+  legality consequence, or explicitly unsupported with reason;
+- Strategic Reserves limits are validated during setup from source-backed battle
+  size, points, unit, and mission policy; missing points or limit data is an
+  import blocker or awaiting-source row, not a default;
+- Strategic Reserves cannot include source-forbidden units such as
+  `FORTIFICATIONS` unless a later source-backed exception states otherwise;
+- Deep Strike and similar abilities are explicit setup/arrival mechanisms with
+  source-linked permission; they must not be represented as generic teleport
+  fallback behavior;
+- Deep Strike declaration/arrival requires every model in the unit to have Deep
+  Strike; each Deep Strike Ingress Move can set up anywhere on the battlefield
+  more than 8" horizontally from all enemy units, including inside the
+  opponent's deployment zone;
+- Aircraft mandatory reserve behavior is declared during Declare Battle
+  Formations and creates normal `ReserveState` records consumed by later
+  aircraft/arrival policies;
+- reserve declarations preserve `declared_during_step`, reserve kind, origin,
+  source rule IDs, owning player, unit IDs, points contribution, and later
+  arrival restrictions in deterministic payloads;
+- units declared in Reserves are absent from Deploy Armies placement options and
+  can arrive only through the shared Move Units/reserve-arrival decision path;
+- Reserve destruction timing is the active ruleset/mission-pack policy and must
+  remain replay-safe;
+- illegal reserve declarations fail before battle starts and cannot be repaired
+  by silently deploying the unit, dropping the unit, or changing reserve kind.
+
+Required tests:
+
+- valid Strategic Reserves declaration records deterministic JSON-safe
+  `ReserveState` and `DecisionRecord` payloads;
+- Strategic Reserves points/percentage limits, battle-size limits, forbidden
+  unit kinds, duplicate declarations, wrong-player units, and unknown unit IDs
+  are rejected before battle starts;
+- units with Deep Strike or similar setup permissions can be declared in the
+  correct reserve kind and later expose only source-backed arrival proposal
+  kinds;
+- Deep Strike arrival rejects mixed-ability units, placements within or equal to
+  8" horizontally from enemy units, and any accidental Strategic Reserves
+  opponent-deployment-zone ban applied to Deep Strike placements;
+- units without a source-backed Deep Strike/reserve permission cannot use that
+  reserve kind;
+- Aircraft reserve declarations are mandatory where the active ruleset requires
+  them and are serialized as ordinary reserve state, not a private aircraft
+  list;
+- declared reserve units are excluded from deployment options and included in
+  Move Units reserve-arrival options at legal timing only;
+- stale, malformed, wrong-step, wrong-actor, duplicate, and ruleset-drifted
+  reserve declaration submissions reject before queue pop;
+- replay restore before and after Declare Battle Formations preserves identical
+  reserve declarations, source context, and arrival restrictions;
+- setup completion fails if any mustered unit has no legal initial formation
+  state.
 
 ## Phase 16D: leader attachment, enhancements, army construction, and roster legality completion
+
+Status: Planned.
+
+Phase 16D finishes source-backed army construction and runtime instantiation.
+The output is not a loose list of component units: it is a deterministic set of
+army definitions, runtime unit instances, attached rules units, starting
+strength records, enhancement records, Dedicated Transport manifests, and
+legality reports that later phases consume without guessing.
+
+Modules:
+
+- `engine/army_mustering.py`
+- `engine/unit_factory.py`
+- `engine/setup_flow.py`
+- `engine/transports.py`
+- `engine/unit_state.py`
+- `engine/attack_sequence.py`
+- `engine/damage_allocation.py`
+- `core/army_catalog.py`
+- `core/attached_unit.py`
+- `core/unit_group.py`
+- `core/faction.py`
+- `core/detachment.py`
+
+Objects:
+
+- `ArmyMusterRequest`
+- `ArmyDefinition`
+- `BattleSizeMusteringPolicy`
+- `FactionSelection`
+- `DetachmentSelection`
+- `RosterUnitSelection`
+- `AttachmentDeclaration`
+- `AttachedUnitRuntimeBinding`
+- `EnhancementAssignment`
+- `WarlordSelection`
+- `DedicatedTransportManifest`
+- `RosterLegalityReport`
+- `StartingStrengthRecord`
 
 Invariants:
 
 - mustering order is Battle Size, Army Roster, Faction, Detachment Rules, Units, then Warlord promotion;
 - battle size defines points limit, detachment points, enhancement limit, unit limit, and mission-compatible battlefield expectations;
 - Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit Limit 2, doubled for `BATTLELINE` units;
-- Strike Force is 2000 points, 4 Detachment Points, Enhancement Limit 5, and Unit Limit 3, doubled for `BATTLELINE` units;
+- Strike Force is 2000 points, 4 Detachment Points, Enhancement Limit 4, and Unit Limit 3, doubled for `BATTLELINE` units;
 - army faction is a selected Faction keyword and every included unit must be legal for that faction or an allowed exception;
 - detachment selection spends Detachment Points and grants access to detachment rules, units, Stratagems, and Enhancements; missing detachment point values are explicit awaiting-source data, not defaults;
 - the army must include at least one eligible `CHARACTER` model to be Warlord;
@@ -2756,11 +3393,22 @@ Invariants:
 - Enhancement count is capped by Battle Size;
 - no unit can have more than one Enhancement;
 - each Enhancement must be unique;
+- selected units, wargear, enhancements, faction, detachment, Warlord, and
+  attachment declarations come from catalog/source records and preserve source
+  IDs in deterministic payloads;
+- source-awaiting army construction data blocks the affected roster path instead
+  of substituting a point cost, attachment rule, base size, transport capacity,
+  or enhancement eligibility default;
+- runtime unit instance IDs, model instance IDs, attached-unit IDs, action IDs,
+  and setup event IDs are deterministic from the source roster and game seed;
 - Leader and Support attachments are declared on the army list, not in Declare
   Battle Formations, and mustering turns those declarations into runtime
   attached rules-unit instances rather than only retaining component units;
 - Enhancements are selected after Attached Units are created, so the one-Enhancement-per-squad restriction applies across the attached rules unit;
 - every Dedicated Transport must start the battle with at least one unit embarked or it cannot be deployed and counts as destroyed during the first battle round;
+- Dedicated Transport starting cargo is a source-backed setup manifest and must
+  be consistent with transport capacity, datasheet restrictions, component
+  attached-unit state, and Deploy Armies option filtering;
 - Leader attachment restrictions are validated before battle;
 - each Bodyguard unit can have at most one Leader and one Support attached unless a rule says otherwise;
 - while attached, the runtime-instantiated Attached unit is treated as one unit
@@ -2769,30 +3417,117 @@ Invariants:
 - attacks against Attached units use Bodyguard Toughness until the attacking unit resolves all attacks;
 - attacks cannot be allocated to Character models in Attached units until the Bodyguard is destroyed unless a rule such as Precision permits it;
 - when Bodyguard or Leader components are destroyed, surviving units split at the correct timing and recover original Starting Strength;
-- destroyed-unit triggers for Attached-unit components use only the destroyed component's own keywords.
+- destroyed-unit triggers for Attached-unit components use only the destroyed component's own keywords;
+- persisting effects, Battle-shock state, transport cargo, reserve state,
+  action state, objective control, attack allocation, visibility, movement, and
+  replay payloads refer to attached rules units through explicit group-aware
+  APIs and stable component-role metadata;
+- roster validation cannot use broad exception handling, partial test objects,
+  `getattr(..., default)` fallbacks, or duck-typed unit/model fields.
 
 Required tests:
 
 - Incursion and Strike Force points, detachment points, enhancement limits, and unit limits;
 - Epic Hero uniqueness and Enhancement denial;
 - Enhancement count, uniqueness, Character-only, and one-per-attached-squad restrictions;
-- Dedicated Transport empty-at-start consequence;
+- source-awaiting detachment point, enhancement eligibility, base-size,
+  transport-capacity, or attachment-rule data blocks the affected roster path
+  with typed diagnostics;
+- Dedicated Transport starting cargo legality and empty-at-start consequence;
 - Leader/Support/Bodyguard legal attachment, army-list attachment timing, and
   runtime instantiation of the attached rules unit with deterministic component
   role metadata;
 - Warlord faction-keyword requirement;
+- deterministic runtime IDs and source provenance for unit instances, model
+  instances, attached units, Warlord, Enhancement, Dedicated Transport, and
+  starting cargo records;
 - Attached-unit coherency uses `UnitGroup.alive_models()`/group-aware placement data across Leader and Bodyguard models;
 - Attached-unit Toughness and Character allocation protection;
 - Attached-unit split timing after attacks resolve;
-- destroyed-unit trigger identity for Leader vs Bodyguard components.
+- destroyed-unit trigger identity for Leader vs Bodyguard components;
+- transport, reserve, damage allocation, movement, visibility, event logging,
+  and replay tests consume the attached rules-unit identity rather than
+  ambiguous `unit.models` semantics;
+- canonical army construction fixtures use real domain objects and fail if a
+  required field is omitted.
 
 ## Phase 16E: pre-battle/setup completion gate
+
+Status: Planned.
+
+Phase 16E is the hard gate between setup and battle. It drains setup decisions,
+pre-battle timing windows, pending placement/redeploy/reserve/transport work,
+and legality audits before battle round one can start. It also removes the
+temporary assumption that a deterministic placement bridge can stand in for
+real setup.
+
+Modules:
+
+- `engine/setup_flow.py`
+- `engine/lifecycle.py`
+- `engine/game_state.py`
+- `engine/replay.py`
+- `engine/battlefield_state.py`
+- `adapters/projection.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
+
+Objects:
+
+- `SetupCompletionGate`
+- `SetupDecisionDrainState`
+- `SetupLegalityReport`
+- `PreBattleReadinessSnapshot`
+- `BattleStartRecord`
+- `SetupReplayCheckpoint`
+
+Invariants:
+
+- setup completion is engine-owned and cannot be forced by an adapter, UI,
+  network client, replay driver, or test helper;
+- battle starts only after the ruleset setup sequence is complete, the decision
+  queue is empty, reaction/timing windows are drained, and no setup proposal is
+  pending;
+- setup completion validates mustered armies, source-backed mission setup,
+  Attacker/Defender state, secondary mission choices, battle formation
+  declarations, deployment placements, redeployments, reserves declarations,
+  starting transport cargo, Leader/Support attachments, Enhancements, Warlord,
+  pre-battle abilities, first-turn state, and Dedicated Transport consequences;
+- every alive non-reserve, non-embarked, non-destroyed model that should start
+  on the battlefield has exactly one legal placement record;
+- every deployed rules unit, including attached rules units, passes group-aware
+  coherency, terrain endpoint, overlap, and Engagement Range setup validation;
+- all setup-created records are deterministic, JSON-safe, source-linked, and
+  replay-restorable without Python object reprs or memory addresses;
+- no deterministic placement bridge, silent fallback deployment, or local-only
+  test placement path can satisfy the setup gate;
+- invalid setup produces typed diagnostics and leaves the game in setup rather
+  than partially entering battle;
+- viewer-scoped setup information remains redacted in projections, event deltas,
+  replay traces, and invalid-submission diagnostics when visibility can differ.
 
 Required tests:
 
 - full setup sequence can complete without deterministic placement bridge;
-- deployment, redeploy, reserves, transports, leaders, and pre-battle abilities are resolved through DecisionRequests;
-- battle starts only after setup legality is complete.
+- deployment, redeploy, reserves, transports, leaders, enhancements, Warlord
+  selection, first-turn determination, and pre-battle abilities are resolved
+  through `DecisionRequest`/`DecisionResult` or deterministic source-backed
+  setup records;
+- battle starts only after setup legality is complete;
+- setup completion rejects missing army, missing mission setup, unresolved
+  secondary mission choice, unresolved Attacker/Defender, unresolved battle
+  formation declaration, undeployed required unit, illegal reserve declaration,
+  empty Dedicated Transport consequence not applied, unresolved redeploy/Scout
+  request, illegal attached-unit placement, or pending decision queue entries;
+- battle start emits deterministic `BattleStartRecord`/event payloads and enters
+  battle round one at the source-backed first battle phase with the correct
+  active player;
+- replay from a setup checkpoint through battle start produces the same logical
+  state hash, event log, and pending-decision state;
+- setup completion payloads contain no Python object reprs or memory addresses;
+- viewer-scoped setup projections and event deltas do not leak hidden reserves,
+  secret secondary choices, or other hidden pre-battle information;
+- code-quality audits reject any remaining setup gate path that calls the
+  deterministic placement bridge after Phase 16A-16E are implemented.
 
 ---
 

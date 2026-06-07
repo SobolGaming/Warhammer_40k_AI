@@ -331,6 +331,25 @@ def test_hover_aircraft_can_advance_twenty_plus_d6() -> None:
     assert budget["max_distance_inches"] == 21.0
 
 
+def test_hover_keyword_take_to_the_skies_does_not_subtract_two_inches() -> None:
+    scenario, aircraft, _enemy = _aircraft_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)
+    model_placement = unit_placement.model_placements[0]
+    model = scenario.model_instance_for_placement(model_placement)
+    policy = AircraftMovementPolicy.from_unit(unit=aircraft, ruleset_descriptor=_ruleset())
+    movement_inches = _model_movement_inches(model)
+
+    assert "HOVER" in policy.effective_keywords
+    assert _model_movement_budget_inches(
+        model=model,
+        aircraft_policy=policy,
+        ruleset_descriptor=_ruleset(),
+        movement_bonus_inches=0,
+        movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+    ) == float(movement_inches)
+
+
 def test_aircraft_movement_budget_helpers_fail_fast() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id(aircraft.unit_instance_id)

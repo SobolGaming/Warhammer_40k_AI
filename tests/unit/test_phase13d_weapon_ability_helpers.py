@@ -208,6 +208,51 @@ def test_phase13d_anti_keyword_threshold_matches_canonical_target_keywords() -> 
     assert anti_keyword_critical_threshold(profile=profile, target_keywords=("vehicle",)) is None
 
 
+def test_phase14i_duplicate_anti_keyword_abilities_require_selected_descriptor() -> None:
+    profile = _profile(
+        keywords=(),
+        abilities=(
+            AbilityDescriptor.anti_keyword("VEHICLE", 4),
+            AbilityDescriptor.anti_keyword("INFANTRY", 2),
+        ),
+    )
+
+    request = weapon_ability_selection_request(
+        profile,
+        AbilityKind.ANTI_KEYWORD,
+        target_keywords=("vehicle", "infantry"),
+        actor_id="player-a",
+        request_id="phase14i-duplicate-anti-selection",
+    )
+
+    assert request is not None
+    assert tuple(option.option_id for option in request.options) == (
+        "anti-keyword:infantry:2",
+        "anti-keyword:vehicle:4",
+    )
+    with pytest.raises(GameLifecycleError, match="requires controlling-player selection"):
+        anti_keyword_critical_threshold(
+            profile=profile,
+            target_keywords=("vehicle", "infantry"),
+        )
+    assert (
+        anti_keyword_critical_threshold(
+            profile=profile,
+            target_keywords=("vehicle", "infantry"),
+            selected_ability_id="anti-keyword:vehicle:4",
+        )
+        == 4
+    )
+    assert (
+        anti_keyword_critical_threshold(
+            profile=profile,
+            target_keywords=("vehicle", "infantry"),
+            selected_ability_id="anti-keyword:infantry:2",
+        )
+        == 2
+    )
+
+
 def test_phase14i_keyword_gated_weapon_abilities_match_target_keywords() -> None:
     profile = _profile(
         keywords=(WeaponKeyword.LETHAL_HITS, WeaponKeyword.SUSTAINED_HITS),

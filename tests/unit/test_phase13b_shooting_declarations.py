@@ -144,7 +144,9 @@ from warhammer40k_core.engine.phases.movement import (
     AdvanceRollRequest,
     AdvanceRollResult,
     MovementDiceRecord,
+    MovementDistanceRecord,
     MovementPhaseActionKind,
+    MovementPhaseState,
 )
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
@@ -204,6 +206,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     PRECISION_RULE_ID,
     RAPID_FIRE_RULE_ID,
     SNAP_SHOOTING_RULE_ID,
+    WEAPON_ABILITY_SELECTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.weapon_declaration import (
     RangedAttackPool,
@@ -848,6 +851,68 @@ def test_phase13d_advanced_unit_allowed_to_shoot_does_not_gain_heavy_modifier() 
     assert pool_payload["weapon_profile_id"] == assault_heavy_profile.profile_id
     assert pool_payload["hit_roll_modifier"] == 0
     assert HEAVY_RULE_ID not in targeting_rule_ids
+
+
+def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_inches() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    heavy_profile = replace(
+        base_profile,
+        profile_id="phase13d-small-move-heavy-rifle",
+        name="Phase 13D small move Heavy rifle",
+        keywords=(WeaponKeyword.HEAVY,),
+        abilities=(AbilityDescriptor.heavy(),),
+    )
+
+    for moved_inches, expected_modifier in ((3.0, 1), (3.1, 0)):
+        moved_id = str(moved_inches).replace(".", "-")
+        catalog = _catalog_with_extra_bolt_profile(heavy_profile)
+        lifecycle, units = _shooting_lifecycle(
+            alpha_unit_ids=("intercessor-1",),
+            game_id=f"phase13d-heavy-moved-{moved_id}",
+            catalog=catalog,
+        )
+        state = _state(lifecycle)
+        attacker = units["intercessor-1"]
+        state.movement_phase_state = MovementPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            moved_unit_ids=(attacker.unit_instance_id,),
+            movement_distance_records=(
+                MovementDistanceRecord(
+                    unit_instance_id=attacker.unit_instance_id,
+                    maximum_model_distance_inches=moved_inches,
+                ),
+            ),
+        )
+        selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+        declaration_request = _select_shooting_unit_and_type(
+            lifecycle,
+            selection_request=selection_request,
+            unit_instance_id=attacker.unit_instance_id,
+            selection_result_id=f"phase13d-select-heavy-moved-{moved_id}",
+        )
+        proposal = _proposal_from_request(
+            request=declaration_request,
+            target_unit_id=units["enemy"].unit_instance_id,
+            weapon_profile_id=heavy_profile.profile_id,
+        )
+
+        _submit_payload(
+            lifecycle,
+            request=declaration_request,
+            payload=proposal.to_payload(),
+            result_id=f"phase13d-declare-heavy-moved-{moved_id}",
+        )
+
+        accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+        pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+        targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+        assert pool_payload["hit_roll_modifier"] == expected_modifier
+        assert (HEAVY_RULE_ID in targeting_rule_ids) is (expected_modifier == 1)
 
 
 def test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects() -> None:
@@ -2519,6 +2584,7 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
         "attacker_model_instance_id": attacker.own_models[0].model_instance_id,
         "target_unit_instance_id": defender.unit_instance_id,
         "weapon_profile_id": weapon_profile.profile_id,
+        "selected_weapon_ability_ids": [],
         "damage_profile": weapon_profile.damage_profile.to_payload(),
         "hit_roll": hit_roll.to_payload(),
         "wound_roll": wound_roll.to_payload(),
@@ -11216,6 +11282,54 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
     assert close_candidates[0].shooting_types == (ShootingType.NORMAL,)
 
 
+def test_phase13d_lone_operative_within_twelve_is_visible_even_with_closer_enemy() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            ("lone-target", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            ("closer-enemy", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    profile = _first_weapon_profile(lifecycle, attacker)
+    lone_target = replace(
+        units["lone-target"],
+        keywords=(*units["lone-target"].keywords, "Lone Operative"),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=lone_target)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=lone_target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=_compact_test_unit_poses(origin=Pose.at(26.0, 35.0), model_count=5),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=units["closer-enemy"],
+        army_id="army-beta",
+        player_id="player-b",
+        poses=_compact_test_unit_poses(origin=Pose.at(16.0, 42.0), model_count=5),
+    )
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(lone_target.unit_instance_id,),
+    )
+
+    assert candidates[0].is_legal
+    assert candidates[0].shooting_types == (ShootingType.NORMAL,)
+
+
 def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -11929,6 +12043,115 @@ def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence
     assert pool.target_in_range_model_ids == ("army-beta:enemy:model-001",)
 
 
+def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution() -> None:
+    anti_vehicle = AbilityDescriptor.anti_keyword("Vehicle", 4)
+    anti_infantry = AbilityDescriptor.anti_keyword("Infantry", 2)
+    duplicate_anti_profile = replace(
+        _weapon_profile_by_wargear(
+            wargear_id="core-bolt-rifle",
+            weapon_profile_id="core-bolt-rifle:standard",
+        ),
+        profile_id="phase14i-duplicate-anti-bolt-rifle",
+        name="Phase 14I duplicate Anti bolt rifle",
+        attack_profile=AttackProfile.fixed(1),
+        keywords=(WeaponKeyword.TORRENT,),
+        abilities=(anti_vehicle, anti_infantry),
+        damage_profile=DamageProfile.fixed(1),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14i-duplicate-anti",
+        catalog=_catalog_with_extra_bolt_profile(duplicate_anti_profile),
+    )
+    state = _state(lifecycle)
+    defender_keywords = {
+        keyword.upper().replace(" ", "_").replace("-", "_") for keyword in units["enemy"].keywords
+    }
+    defender = replace(
+        units["enemy"],
+        keywords=tuple(sorted({*defender_keywords, "INFANTRY", "VEHICLE"})),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase14i-duplicate-anti-select",
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+    required_selection_payloads = [
+        cast(dict[str, object], selection_payload)
+        for candidate in target_candidates
+        if candidate["target_unit_instance_id"] == defender.unit_instance_id
+        for selection_payload in cast(
+            list[object],
+            candidate["required_weapon_ability_selections"],
+        )
+    ]
+    anti_selection_request = next(
+        payload
+        for payload in required_selection_payloads
+        if payload["decision_type"] == WEAPON_ABILITY_SELECTION_DECISION_TYPE
+    )
+    anti_options = cast(list[dict[str, object]], anti_selection_request["options"])
+
+    assert {option["option_id"] for option in anti_options} == {
+        anti_vehicle.ability_id,
+        anti_infantry.ability_id,
+    }
+
+    missing_selection_proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+        weapon_profile_id=duplicate_anti_profile.profile_id,
+    )
+    missing_selection_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=missing_selection_proposal.to_payload(),
+        result_id="phase14i-duplicate-anti-missing-selection",
+    )
+    missing_selection_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], missing_selection_status.payload)["proposal_validation"],
+    )
+    assert missing_selection_status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(list[dict[str, object]], missing_selection_validation["violations"])[0][
+            "violation_code"
+        ]
+        == "weapon_ability_selection_required"
+    )
+    assert lifecycle.decision_controller.queue.peek_next() == declaration_request
+
+    selected_proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+        weapon_profile_id=duplicate_anti_profile.profile_id,
+        selected_weapon_ability_ids=(anti_vehicle.ability_id,),
+    )
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=selected_proposal.to_payload(),
+        result_id="phase14i-duplicate-anti-selected",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, status.payload
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    wound_payloads = _attack_step_payloads(lifecycle, AttackSequenceStep.WOUND)
+
+    assert pool_payload["selected_weapon_ability_ids"] == [anti_vehicle.ability_id]
+    assert wound_payloads
+    assert cast(dict[str, object], wound_payloads[0]["payload"])["selected_weapon_ability_ids"] == [
+        anti_vehicle.ability_id
+    ]
+    assert cast(dict[str, object], wound_payloads[0]["payload"])["critical_threshold"] == 4
+
+
 def test_shooting_declaration_request_drift_diagnostics_are_typed() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -12467,6 +12690,7 @@ def _proposal_from_request(
     target_unit_id: str,
     firing_deck_unit: UnitInstance | None = None,
     weapon_profile_id: str | None = None,
+    selected_weapon_ability_ids: tuple[str, ...] = (),
 ) -> ShootingDeclarationProposal:
     payload = cast(dict[str, object], request.payload)
     proposal_request = cast(dict[str, object], payload["proposal_request"])
@@ -12489,6 +12713,7 @@ def _proposal_from_request(
             weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
             target_unit_instance_id=target_unit_id,
             shooting_type=_first_shooting_type(target_candidate),
+            selected_weapon_ability_ids=selected_weapon_ability_ids,
         )
     ]
     firing_deck_selection = None
@@ -12687,6 +12912,7 @@ def _weapon_payload_to_declaration_payload(
         "weapon_profile_id": cast(str, weapon["weapon_profile_id"]),
         "target_unit_instance_id": target_unit_id,
         "shooting_type": shooting_type.value,
+        "selected_weapon_ability_ids": [],
         "firing_deck_source_unit_instance_id": None,
         "firing_deck_source_model_instance_id": None,
     }

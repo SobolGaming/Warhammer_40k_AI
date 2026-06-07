@@ -155,7 +155,8 @@ def test_phase14b_effective_active_player_scope_restores_after_selected_unit_con
     movement_state = state.movement_phase_state
     assert movement_state is not None
     state.movement_phase_state = movement_state.with_activation_complete(
-        "army-alpha:intercessor-unit-1"
+        "army-alpha:intercessor-unit-1",
+        maximum_model_distance_inches=0.0,
     )
     shooting_selection = ShootingUnitSelection(
         player_id="player-a",

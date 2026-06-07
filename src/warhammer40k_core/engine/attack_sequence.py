@@ -341,6 +341,7 @@ class AttackResolutionContextPayload(TypedDict):
     attacker_model_instance_id: str
     target_unit_instance_id: str
     weapon_profile_id: str
+    selected_weapon_ability_ids: list[str]
     damage_profile: DamageProfilePayload
     hit_roll: HitRollPayload
     wound_roll: WoundRollPayload
@@ -5285,6 +5286,7 @@ def _roll_hit_and_wound(
                     {
                         **hit_roll.to_payload(),
                         "weapon_profile_id": pool.weapon_profile_id,
+                        "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                     }
                 ),
             ),
@@ -5303,6 +5305,7 @@ def _roll_hit_and_wound(
                         {
                             **hit_roll.to_payload(),
                             "weapon_profile_id": pool.weapon_profile_id,
+                            "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                         }
                     ),
                 ),
@@ -5361,6 +5364,7 @@ def _roll_hit_and_wound(
                 {
                     **wound_roll.to_payload(),
                     "weapon_profile_id": pool.weapon_profile_id,
+                    "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                 }
             ),
         ),
@@ -5379,6 +5383,7 @@ def _roll_hit_and_wound(
                     {
                         **wound_roll.to_payload(),
                         "weapon_profile_id": pool.weapon_profile_id,
+                        "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                     }
                 ),
             ),
@@ -5399,6 +5404,7 @@ def _roll_hit_and_wound(
         "attacker_model_instance_id": pool.attacker_model_instance_id,
         "target_unit_instance_id": pool.target_unit_instance_id,
         "weapon_profile_id": pool.weapon_profile_id,
+        "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
         "damage_profile": pool.weapon_profile.damage_profile.to_payload(),
         "hit_roll": hit_roll.to_payload(),
         "wound_roll": wound_roll.to_payload(),
@@ -5511,6 +5517,7 @@ def _roll_wound(
     critical_threshold = anti_keyword_critical_threshold(
         profile=pool.weapon_profile,
         target_keywords=target_keywords,
+        selected_ability_id=_selected_anti_keyword_ability_id(pool),
     )
     if critical_threshold is None:
         critical_threshold = 6
@@ -5587,6 +5594,7 @@ def _reroll_wound_for_twin_linked_if_needed(
     critical_threshold = anti_keyword_critical_threshold(
         profile=pool.weapon_profile,
         target_keywords=target_keywords,
+        selected_ability_id=_selected_anti_keyword_ability_id(pool),
     )
     if critical_threshold is None:
         critical_threshold = 6
@@ -5616,6 +5624,24 @@ def _reroll_wound_for_twin_linked_if_needed(
         },
     )
     return wound_roll
+
+
+def _selected_anti_keyword_ability_id(pool: RangedAttackPool) -> str | None:
+    ability_by_id = {ability.ability_id: ability for ability in pool.weapon_profile.abilities}
+    selected_ids: list[str] = []
+    for ability_id in pool.selected_weapon_ability_ids:
+        ability = ability_by_id.get(ability_id)
+        if ability is None:
+            raise GameLifecycleError(
+                "Selected weapon ability ID is not on the attack pool profile."
+            )
+        if ability.ability_kind is AbilityKind.ANTI_KEYWORD:
+            selected_ids.append(ability_id)
+    if len(selected_ids) > 1:
+        raise GameLifecycleError("Attack pool must not select multiple Anti ability IDs.")
+    if not selected_ids:
+        return None
+    return selected_ids[0]
 
 
 def _emit_damage_event(
@@ -6317,7 +6343,13 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
         strength=canonical_json(profile.strength.to_payload()),
         armor_penetration=canonical_json(profile.armor_penetration.to_payload()),
         damage=canonical_json(profile.damage_profile.to_payload()),
-        weapon_rule_tokens=_weapon_rule_tokens_for_signature(profile),
+        weapon_rule_tokens=(
+            *_weapon_rule_tokens_for_signature(profile),
+            *(
+                f"selected-weapon-ability:{ability_id}"
+                for ability_id in pool.selected_weapon_ability_ids
+            ),
+        ),
         targeting_rule_ids=tuple(sorted(pool.targeting_rule_ids)),
         shooting_type=pool.shooting_type.value,
         firing_deck_source_unit_instance_id=pool.firing_deck_source_unit_instance_id,
@@ -6486,6 +6518,7 @@ def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
         profile.damage_profile.to_payload(),
         tuple(keyword.value for keyword in profile.keywords),
         tuple(ability.to_payload() for ability in profile.abilities),
+        pool.selected_weapon_ability_ids,
         pool.shooting_type.value,
         pool.hit_roll_modifier,
         pool.targeting_rule_ids,
@@ -6608,6 +6641,7 @@ def _synthetic_pool_for_gathered_group(
         target_in_range_model_ids=base_pool.target_in_range_model_ids,
         hit_roll_modifier=base_pool.hit_roll_modifier,
         targeting_rule_ids=base_pool.targeting_rule_ids,
+        selected_weapon_ability_ids=base_pool.selected_weapon_ability_ids,
         firing_deck_source_unit_instance_id=base_pool.firing_deck_source_unit_instance_id,
         firing_deck_source_model_instance_id=base_pool.firing_deck_source_model_instance_id,
     )

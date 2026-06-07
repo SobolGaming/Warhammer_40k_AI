@@ -20,6 +20,7 @@ class WeaponDeclarationPayload(TypedDict):
     weapon_profile_id: str
     target_unit_instance_id: str
     shooting_type: str
+    selected_weapon_ability_ids: list[str]
     firing_deck_source_unit_instance_id: str | None
     firing_deck_source_model_instance_id: str | None
 
@@ -49,6 +50,7 @@ class RangedAttackPoolPayload(TypedDict):
     target_in_range_model_ids: list[str]
     hit_roll_modifier: int
     targeting_rule_ids: list[str]
+    selected_weapon_ability_ids: list[str]
     firing_deck_source_unit_instance_id: str | None
     firing_deck_source_model_instance_id: str | None
 
@@ -83,6 +85,7 @@ class WeaponDeclaration:
     weapon_profile_id: str
     target_unit_instance_id: str
     shooting_type: ShootingType
+    selected_weapon_ability_ids: tuple[str, ...] = ()
     firing_deck_source_unit_instance_id: str | None = None
     firing_deck_source_model_instance_id: str | None = None
 
@@ -119,6 +122,14 @@ class WeaponDeclaration:
         object.__setattr__(self, "shooting_type", shooting_type_from_token(self.shooting_type))
         object.__setattr__(
             self,
+            "selected_weapon_ability_ids",
+            _validate_identifier_tuple(
+                "WeaponDeclaration selected_weapon_ability_ids",
+                self.selected_weapon_ability_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
             "firing_deck_source_unit_instance_id",
             _validate_optional_identifier(
                 "WeaponDeclaration firing_deck_source_unit_instance_id",
@@ -151,6 +162,7 @@ class WeaponDeclaration:
             "weapon_profile_id": self.weapon_profile_id,
             "target_unit_instance_id": self.target_unit_instance_id,
             "shooting_type": self.shooting_type.value,
+            "selected_weapon_ability_ids": list(self.selected_weapon_ability_ids),
             "firing_deck_source_unit_instance_id": self.firing_deck_source_unit_instance_id,
             "firing_deck_source_model_instance_id": self.firing_deck_source_model_instance_id,
         }
@@ -166,6 +178,7 @@ class WeaponDeclaration:
             weapon_profile_id=payload["weapon_profile_id"],
             target_unit_instance_id=payload["target_unit_instance_id"],
             shooting_type=shooting_type_from_token(payload["shooting_type"]),
+            selected_weapon_ability_ids=tuple(payload["selected_weapon_ability_ids"]),
             firing_deck_source_unit_instance_id=payload["firing_deck_source_unit_instance_id"],
             firing_deck_source_model_instance_id=payload["firing_deck_source_model_instance_id"],
         )
@@ -380,6 +393,7 @@ class RangedAttackPool:
     target_in_range_model_ids: tuple[str, ...]
     hit_roll_modifier: int = 0
     targeting_rule_ids: tuple[str, ...] = ()
+    selected_weapon_ability_ids: tuple[str, ...] = ()
     firing_deck_source_unit_instance_id: str | None = None
     firing_deck_source_model_instance_id: str | None = None
 
@@ -451,6 +465,14 @@ class RangedAttackPool:
         )
         object.__setattr__(
             self,
+            "selected_weapon_ability_ids",
+            _validate_identifier_tuple(
+                "RangedAttackPool selected_weapon_ability_ids",
+                self.selected_weapon_ability_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
             "firing_deck_source_unit_instance_id",
             _validate_optional_identifier(
                 "RangedAttackPool firing_deck_source_unit_instance_id",
@@ -498,6 +520,7 @@ class RangedAttackPool:
             target_in_range_model_ids=target_in_range_model_ids,
             hit_roll_modifier=hit_roll_modifier,
             targeting_rule_ids=targeting_rule_ids,
+            selected_weapon_ability_ids=declaration.selected_weapon_ability_ids,
             firing_deck_source_unit_instance_id=declaration.firing_deck_source_unit_instance_id,
             firing_deck_source_model_instance_id=declaration.firing_deck_source_model_instance_id,
         )
@@ -515,6 +538,7 @@ class RangedAttackPool:
             "target_in_range_model_ids": list(self.target_in_range_model_ids),
             "hit_roll_modifier": self.hit_roll_modifier,
             "targeting_rule_ids": list(self.targeting_rule_ids),
+            "selected_weapon_ability_ids": list(self.selected_weapon_ability_ids),
             "firing_deck_source_unit_instance_id": self.firing_deck_source_unit_instance_id,
             "firing_deck_source_model_instance_id": self.firing_deck_source_model_instance_id,
         }
@@ -533,6 +557,7 @@ class RangedAttackPool:
             target_in_range_model_ids=tuple(payload["target_in_range_model_ids"]),
             hit_roll_modifier=payload["hit_roll_modifier"],
             targeting_rule_ids=tuple(payload["targeting_rule_ids"]),
+            selected_weapon_ability_ids=tuple(payload["selected_weapon_ability_ids"]),
             firing_deck_source_unit_instance_id=payload["firing_deck_source_unit_instance_id"],
             firing_deck_source_model_instance_id=payload["firing_deck_source_model_instance_id"],
         )
@@ -769,6 +794,7 @@ def _weapon_declaration_missing_field(payload: object) -> str | None:
         "weapon_profile_id",
         "target_unit_instance_id",
         "shooting_type",
+        "selected_weapon_ability_ids",
         "firing_deck_source_unit_instance_id",
         "firing_deck_source_model_instance_id",
     )
