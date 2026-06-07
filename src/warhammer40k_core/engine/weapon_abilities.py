@@ -31,6 +31,7 @@ INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID = "weapon-ability:indirect-fire:no-hit-rero
 INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID = (
     "weapon-ability:indirect-fire:stationary-friendly-visible"
 )
+LANCE_RULE_ID = "weapon-ability:lance"
 LETHAL_HITS_RULE_ID = "weapon-ability:lethal-hits"
 MELTA_RULE_ID = "weapon-ability:melta"
 PRECISION_RULE_ID = "weapon-ability:precision"
