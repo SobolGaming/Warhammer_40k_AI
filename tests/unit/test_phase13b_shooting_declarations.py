@@ -206,6 +206,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     PRECISION_RULE_ID,
     RAPID_FIRE_RULE_ID,
     SNAP_SHOOTING_RULE_ID,
+    WEAPON_ABILITY_SELECTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.weapon_declaration import (
     RangedAttackPool,
@@ -2583,6 +2584,7 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
         "attacker_model_instance_id": attacker.own_models[0].model_instance_id,
         "target_unit_instance_id": defender.unit_instance_id,
         "weapon_profile_id": weapon_profile.profile_id,
+        "selected_weapon_ability_ids": [],
         "damage_profile": weapon_profile.damage_profile.to_payload(),
         "hit_roll": hit_roll.to_payload(),
         "wound_roll": wound_roll.to_payload(),
@@ -12041,6 +12043,115 @@ def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence
     assert pool.target_in_range_model_ids == ("army-beta:enemy:model-001",)
 
 
+def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution() -> None:
+    anti_vehicle = AbilityDescriptor.anti_keyword("Vehicle", 4)
+    anti_infantry = AbilityDescriptor.anti_keyword("Infantry", 2)
+    duplicate_anti_profile = replace(
+        _weapon_profile_by_wargear(
+            wargear_id="core-bolt-rifle",
+            weapon_profile_id="core-bolt-rifle:standard",
+        ),
+        profile_id="phase14i-duplicate-anti-bolt-rifle",
+        name="Phase 14I duplicate Anti bolt rifle",
+        attack_profile=AttackProfile.fixed(1),
+        keywords=(WeaponKeyword.TORRENT,),
+        abilities=(anti_vehicle, anti_infantry),
+        damage_profile=DamageProfile.fixed(1),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14i-duplicate-anti",
+        catalog=_catalog_with_extra_bolt_profile(duplicate_anti_profile),
+    )
+    state = _state(lifecycle)
+    defender_keywords = {
+        keyword.upper().replace(" ", "_").replace("-", "_") for keyword in units["enemy"].keywords
+    }
+    defender = replace(
+        units["enemy"],
+        keywords=tuple(sorted({*defender_keywords, "INFANTRY", "VEHICLE"})),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=defender)
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        selection_result_id="phase14i-duplicate-anti-select",
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+    required_selection_payloads = [
+        cast(dict[str, object], selection_payload)
+        for candidate in target_candidates
+        if candidate["target_unit_instance_id"] == defender.unit_instance_id
+        for selection_payload in cast(
+            list[object],
+            candidate["required_weapon_ability_selections"],
+        )
+    ]
+    anti_selection_request = next(
+        payload
+        for payload in required_selection_payloads
+        if payload["decision_type"] == WEAPON_ABILITY_SELECTION_DECISION_TYPE
+    )
+    anti_options = cast(list[dict[str, object]], anti_selection_request["options"])
+
+    assert {option["option_id"] for option in anti_options} == {
+        anti_vehicle.ability_id,
+        anti_infantry.ability_id,
+    }
+
+    missing_selection_proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+        weapon_profile_id=duplicate_anti_profile.profile_id,
+    )
+    missing_selection_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=missing_selection_proposal.to_payload(),
+        result_id="phase14i-duplicate-anti-missing-selection",
+    )
+    missing_selection_validation = cast(
+        dict[str, object],
+        cast(dict[str, object], missing_selection_status.payload)["proposal_validation"],
+    )
+    assert missing_selection_status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(list[dict[str, object]], missing_selection_validation["violations"])[0][
+            "violation_code"
+        ]
+        == "weapon_ability_selection_required"
+    )
+    assert lifecycle.decision_controller.queue.peek_next() == declaration_request
+
+    selected_proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+        weapon_profile_id=duplicate_anti_profile.profile_id,
+        selected_weapon_ability_ids=(anti_vehicle.ability_id,),
+    )
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=selected_proposal.to_payload(),
+        result_id="phase14i-duplicate-anti-selected",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, status.payload
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    wound_payloads = _attack_step_payloads(lifecycle, AttackSequenceStep.WOUND)
+
+    assert pool_payload["selected_weapon_ability_ids"] == [anti_vehicle.ability_id]
+    assert wound_payloads
+    assert cast(dict[str, object], wound_payloads[0]["payload"])["selected_weapon_ability_ids"] == [
+        anti_vehicle.ability_id
+    ]
+    assert cast(dict[str, object], wound_payloads[0]["payload"])["critical_threshold"] == 4
+
+
 def test_shooting_declaration_request_drift_diagnostics_are_typed() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -12579,6 +12690,7 @@ def _proposal_from_request(
     target_unit_id: str,
     firing_deck_unit: UnitInstance | None = None,
     weapon_profile_id: str | None = None,
+    selected_weapon_ability_ids: tuple[str, ...] = (),
 ) -> ShootingDeclarationProposal:
     payload = cast(dict[str, object], request.payload)
     proposal_request = cast(dict[str, object], payload["proposal_request"])
@@ -12601,6 +12713,7 @@ def _proposal_from_request(
             weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
             target_unit_instance_id=target_unit_id,
             shooting_type=_first_shooting_type(target_candidate),
+            selected_weapon_ability_ids=selected_weapon_ability_ids,
         )
     ]
     firing_deck_selection = None
@@ -12799,6 +12912,7 @@ def _weapon_payload_to_declaration_payload(
         "weapon_profile_id": cast(str, weapon["weapon_profile_id"]),
         "target_unit_instance_id": target_unit_id,
         "shooting_type": shooting_type.value,
+        "selected_weapon_ability_ids": [],
         "firing_deck_source_unit_instance_id": None,
         "firing_deck_source_model_instance_id": None,
     }

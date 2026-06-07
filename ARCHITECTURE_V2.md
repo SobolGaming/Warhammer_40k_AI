@@ -176,7 +176,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Attached units: Leader and Support components, one Leader and one Support per bodyguard unless stated, bodyguard Toughness for attacks, destroyed-unit trigger identity, keyword union without model keyword inheritance, source-scoped ability persistence, and revive into attached unit | Phase 6, 13C, 13E, 16D, 17F, 14H |
 | Strategic Reserves and repositioned units: 50% points cap, no Fortifications, second-round ingress, 6" battlefield-edge setup, more-than-8" enemy distance, pre-third-round opponent-deployment-zone ban, third-round destruction exceptions, and move-history/effect persistence for repositioned units | Phase 10P, 11F, 16C, 14H |
 | Flying, Surge, and Aircraft: surge target selection and no-repeat-move restriction, optional `take to the skies` declaration with `-2"` budget unless Hover, FLY through all models/terrain and ignores vertical distance, Aircraft-only ingress, end-of-opponent-turn reserve transition, Aircraft engagement exceptions, and aircraft charge/fight restrictions | Phase 10R, 10S, 15B, 15D, 14D, 14H |
-| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection, `[ANTI]`, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]`, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative X", `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
+| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection for implemented families, `[ANTI]` including duplicate Shooting selection, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]` movement-evidence slice, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative default 12" targeting gate, `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17F, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
 | Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2025-26 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
@@ -1721,11 +1721,12 @@ Invariants:
   in that unit can select either one or more of its `[CLOSE-QUARTERS]` weapons
   or one or more of its other ranged weapons, but not both groups for that
   model in the same declaration;
-- Lone Operative applies only while the unit is not part of an attached unit;
-  the unit is not visible to enemy models unless those enemy models are within
-  the ability distance, normally 12" or the X value in `Lone Operative X"`;
-- `[INDIRECT FIRE]` weapons cannot target a Lone Operative unit unless the
-  attacking model is within the same Lone Operative distance of that unit;
+- the completed Lone Operative targeting slice enforces the default 12" gate
+  for units with the canonical `LONE_OPERATIVE` keyword and does not require
+  the Lone Operative target to be the closest eligible target;
+- attached-unit suppression, `Lone Operative X"` distance overrides,
+  model-distance measurement, and the `[INDIRECT FIRE]` within-distance
+  exception remain future source-backed work until implemented with regressions;
 - ranged weapons validate range and visibility at target selection time;
 - targets for all of a unit's ranged weapons are declared before any attack is resolved;
 - a weapon remains resolved against a target selected as visible/in range even if later attacks remove visible/in-range models before resolution;
@@ -1740,10 +1741,11 @@ Required tests:
 - eligible unit selection;
 - Advanced/Fell Back restriction;
 - target range/visibility validation;
-- Lone Operative visibility and `[INDIRECT FIRE]` targeting gates cover
-  unattached units, attached-unit suppression, 12" default distance, `Lone
-  Operative X"` distance overrides, model-distance measurement, and no
-  closest-target requirement;
+- Lone Operative tests cover the default 12" gate for canonical
+  `LONE_OPERATIVE` units and prove no closest-target requirement; attached-unit
+  suppression, `Lone Operative X"` distance overrides, model-distance
+  measurement, and the `[INDIRECT FIRE]` within-distance exception must be
+  added before the full official Lone Operative rule is marked complete;
 - Close-quarters Shooting availability, shooting at engaged `MONSTER`/`VEHICLE`,
   `[CLOSE-QUARTERS]`/`[PISTOL]`, per-model close-quarters-versus-other-ranged
   weapon declaration exclusivity, and `[BLAST]` interactions;
@@ -1894,15 +1896,15 @@ Invariants:
 - every shooting-coupled Core Stratagem timing hook is registered through `StratagemCatalogIndex`; Shooting phase code must not scan the full catalog when a shooting event occurs;
 - duplicated weapon abilities are never cumulative, including duplicate
   instances whose numbers or target keywords differ;
-- duplicated weapon ability selection is made by the controlling player each
-  time that unit makes attacks, in the Select Weapons step, and the selected
-  source instance is captured in the weapon declaration/attack context before
-  any attack-sequence handler reads it;
+- the implemented duplicate weapon ability lifecycle slice covers duplicate
+  `[ANTI]` descriptors in Shooting declarations: the controlling player's
+  Select-Weapons-step source-instance choice is adapter-visible on the target
+  candidate, stored on `WeaponDeclaration`/`RangedAttackPool`, and carried into
+  attack events/context before the Anti Critical Wound threshold is read;
 - numbered weapon abilities such as `[SUSTAINED HITS 1]` and `[SUSTAINED HITS
-  2]` are one duplicate ability family and require selection of one instance;
-- keyworded weapon abilities such as `[ANTI-VEHICLE 4+]` and
-  `[ANTI-INFANTRY 2+]` are one duplicate ability family and require selection
-  of one instance, not simultaneous matching against both keyword sets;
+  2]`, and non-Anti keyworded duplicate families, remain future lifecycle
+  threading work; they must fail explicitly or stay unsupported rather than
+  stack unselected duplicate effects;
 - Assault changes shooting eligibility and restricts attacks to Assault weapons after Advance;
 - Rapid Fire, Blast, Cleave, Melta, Heavy, Lance, and Indirect Fire modify characteristics/rolls through typed modifier stacks and consume Phase 10J dice/random-characteristic semantics rather than reimplementing dice;
 - Twin-linked grants a Wound-roll reroll permission and consumes Phase 10J reroll semantics;
@@ -1914,10 +1916,11 @@ Invariants:
   made with that weapon, including Benefit of Cover from terrain, Stealth,
   Smokescreen, Indirect Fire, or any other rule that gives a model or unit
   Benefit of Cover;
-- `[HEAVY]` applies only in the attacking player's Shooting phase, only if the
-  attacking unit is unengaged, was not set up on the battlefield this turn, and
-  no model in that unit has moved more than 3" this turn; when legal, it adds 1
-  to the Hit roll for attacks made with that weapon;
+- the completed `[HEAVY]` slice applies the typed +1 Hit-roll modifier only
+  when movement evidence shows the attacking unit did not Advance/Fall Back and
+  no model in that unit moved more than 3" this turn; own-Shooting-phase
+  timing, unengaged, and set-up-this-turn denial gates remain future work before
+  the full official Heavy rule is marked complete;
 - `[LETHAL HITS]` consumes Critical Hit events and is an active-player choice:
   for each Critical Hit, the attacker can choose for that attack to
   automatically wound and skip the Wound roll, or decline so the attack can make
@@ -1949,14 +1952,13 @@ Required tests:
 - Fire Overwatch has end-of-opponent-Movement-phase reaction tests proving it creates an out-of-phase Snap Shooting state, rejects out-of-range, engaged, TITANIC, shooting-ineligible, and no-legal-declaration selected friendly unit bindings before CP spend, applies the unmodified-6 hit policy while preserving Torrent auto-hit behavior, emits shooting declaration and attack-sequence decisions through the lifecycle, and resumes the parent reaction frame after completion;
 - Smokescreen and Explosives have decision-contract tests from their legal shooting-resolution windows;
 - unsupported weapon ability descriptor does not execute;
-- duplicate weapon ability declarations are non-cumulative and require
-  Select-Weapons-step source-instance selection each time the unit makes
-  attacks;
-- duplicate numbered weapon abilities test `[SUSTAINED HITS 1]` versus
-  `[SUSTAINED HITS 2]` as a single duplicate family with one selected effect;
-- duplicate keyworded weapon abilities test `[ANTI-VEHICLE 4+]` versus
-  `[ANTI-INFANTRY 2+]` as a single duplicate family with one selected keyword
-  gate and one selected critical-wound threshold;
+- duplicate `[ANTI]` weapon ability declarations are non-cumulative, require a
+  Select-Weapons-step source-instance selection in Shooting declarations, carry
+  the selected descriptor into attack-pool and attack-step payloads, and use
+  only the selected keyword gate/Critical Wound threshold;
+- duplicate numbered weapon abilities such as `[SUSTAINED HITS 1]` versus
+  `[SUSTAINED HITS 2]` and non-Anti keyworded duplicate families require future
+  lifecycle tests before those families are marked complete;
 - Hunter X rejects target declarations that lack every required keyword match and
   accepts declarations with at least one listed target keyword;
 - modifier interactions are deterministic;
@@ -1965,9 +1967,11 @@ Required tests:
 - `[IGNORES COVER]` strips Benefit of Cover from terrain, Stealth, Smokescreen,
   Indirect Fire, and other source-backed cover sources for attacks made with
   that weapon;
-- `[HEAVY]` tests cover own-Shooting-phase-only timing, unengaged requirement,
-  set-up-this-turn denial, per-model moved-more-than-3" denial, and +1 Hit-roll
-  modifier application when all gates pass;
+- `[HEAVY]` tests cover typed movement evidence, per-model moved-more-than-3"
+  denial, and +1 Hit-roll modifier application for the current shooting
+  declaration path; own-Shooting-phase-only timing, unengaged requirement, and
+  set-up-this-turn denial require future regressions before full official
+  coverage is claimed;
 - `[LETHAL HITS]` Critical Hit choices cover accept-to-auto-wound/skip-Wound-roll
   and decline-to-roll-wound paths, including interactions with Critical Wound
   abilities such as `[DEVASTATING WOUNDS]`;
@@ -2381,18 +2385,23 @@ Invariants:
   selection at the timing the source ability applies, unless the source rule
   forces a unique instance;
 - duplicate weapon ability instances require deterministic controlling-player
-  selection each time the unit makes attacks in the Select Weapons step; attack
-  handlers consume only the selected instance and must not add the effects of
-  unselected duplicate instances;
+  selection each time the unit makes attacks in the Select Weapons step before
+  their effects can resolve; the implemented lifecycle wiring currently covers
+  Shooting declarations with duplicate `[ANTI]` descriptors, and other weapon
+  duplicate families remain future/unsupported until their hosts carry the
+  selected descriptor ID into attack resolution;
 - duplicate selection requests and forced duplicate-resolution records preserve
   ability family, source IDs, selected source instance, timing window, affected
   unit/weapon context, and JSON-safe replay metadata;
 - multiple instances of a numbered core ability are duplicates even when the
   number varies;
 - multiple instances of a numbered weapon ability are duplicates even when the
-  number varies;
+  number varies; lifecycle completion for numbered weapon families requires
+  future Select-Weapons threading and regressions;
 - multiple instances of a keyworded weapon ability are duplicates even when the
-  keyword varies;
+  keyword varies; the completed lifecycle slice covers duplicate `[ANTI]`
+  descriptors in Shooting declarations and does not mark other keyworded
+  families complete;
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
 - `[HUNTER X]` is target eligibility, not an attack modifier: the weapon can
   only be declared into units matching at least one listed keyword;
@@ -2459,15 +2468,17 @@ Required tests:
 - each Core Stratagem has target-binding, CP ledger, timing-window, and replay coverage;
 - New Orders rejects second use in the same game and emits deterministic
   discard-and-replacement-draw mission deck records;
-- duplicate ability selection tests prove duplicate core and weapon abilities
-  are non-cumulative, source-linked, deterministic, and adapter-visible when a
-  player choice exists;
-- duplicate selection replay tests cover numbered core abilities, numbered
-  weapon abilities, keyworded weapon abilities, forced source-rule selection,
-  stale/drifted submissions, and no Python object reprs or memory addresses;
-- weapon duplicate tests prove selection happens in Select Weapons each time the
-  unit makes attacks and that unselected duplicate instances do not affect Hit,
-  Wound, Save, Damage, eligibility, or generated-attack behavior;
+- duplicate ability selection tests prove implemented duplicate core/weapon
+  paths are non-cumulative, source-linked, deterministic, and adapter-visible
+  when a player choice exists;
+- duplicate selection replay tests cover implemented duplicate paths with
+  stale/drifted submissions and no Python object reprs or memory addresses;
+  numbered weapon families and non-Anti keyworded weapon families require
+  additional tests before lifecycle completion is claimed;
+- duplicate `[ANTI]` weapon tests prove selection happens in Select Weapons for
+  Shooting declarations and that unselected matching Anti descriptors do not
+  affect Wound resolution; other duplicate weapon families remain required
+  future coverage;
 - Hunter X target declaration accepts at least one listed keyword match and
   rejects target units with none;
 - `STEALTH` grants Benefit of Cover against ranged attacks only when every model
