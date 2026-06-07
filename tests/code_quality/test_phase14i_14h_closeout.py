@@ -15,6 +15,7 @@ README_PATH = ROOT / "README.md"
 TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
 DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
+HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -74,10 +75,13 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     transport_source = TRANSPORTS_PATH.read_text(encoding="utf-8")
     attack_sequence_source = ATTACK_SEQUENCE_PATH.read_text(encoding="utf-8")
     damage_allocation_source = DAMAGE_ALLOCATION_PATH.read_text(encoding="utf-8")
+    hazard_source = HAZARD_PATH.read_text(encoding="utf-8")
 
-    assert "Combat Disembark requires a dedicated source-backed transport path." in (
-        transport_source
-    )
+    assert "def resolve_combat_disembark(" in transport_source
+    assert "Combat Disembark requires resolve_combat_disembark." in transport_source
+    assert "combat_disembark.hazard_roll" in transport_source
+    assert "HAZARD_ROLL_FAILURE_THRESHOLD = 2" in hazard_source
+    assert "hazard_mortal_wounds_per_failed_roll" in attack_sequence_source
     assert "attached_unit_bodyguard_model_ids" in attack_sequence_source
     assert "_highest_toughness_for_models" in attack_sequence_source
     assert '"attached-role:leader" in model.source_ids' in damage_allocation_source

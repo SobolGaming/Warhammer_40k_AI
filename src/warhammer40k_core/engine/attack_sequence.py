@@ -109,6 +109,11 @@ from warhammer40k_core.engine.event_log import (
     canonical_json,
     validate_json_value,
 )
+from warhammer40k_core.engine.hazard import (
+    hazard_mortal_wounds_per_failed_roll,
+    hazard_roll_failed,
+    hazard_roll_spec,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -5889,8 +5894,7 @@ def _resolve_hazardous_tests(
         sorted({pool.weapon_profile_id for pool in hazardous_pools})
     )
     roll_state = manager.roll(
-        DiceRollSpec(
-            expression=DiceExpression(quantity=1, sides=6),
+        hazard_roll_spec(
             reason=(
                 f"Hazardous test for {attack_sequence.attacking_unit_instance_id} after shooting"
             ),
@@ -5898,7 +5902,7 @@ def _resolve_hazardous_tests(
             actor_id=attack_sequence.attacking_unit_instance_id,
         )
     )
-    hazardous_failed = roll_state.current_total <= 2
+    hazardous_failed = hazard_roll_failed(roll_state)
     mortal_wounds = 0
     if not hazardous_failed:
         _emit_hazardous_test_resolved(
@@ -6104,9 +6108,7 @@ def _hazardous_mortal_wounds_for_attacker(
     attacking_unit_instance_id: str,
 ) -> int:
     unit = unit_by_id(state=state, unit_instance_id=attacking_unit_instance_id)
-    if _unit_has_keyword(unit, "MONSTER") or _unit_has_keyword(unit, "VEHICLE"):
-        return 3
-    return 1
+    return hazard_mortal_wounds_per_failed_roll(unit)
 
 
 def _cover_for_allocated_model(
