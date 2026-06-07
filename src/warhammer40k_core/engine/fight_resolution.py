@@ -47,6 +47,12 @@ from warhammer40k_core.engine.unit_coherency import (
     resolve_unit_movement_endpoint_coherency,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import (
+    LANCE_RULE_ID,
+    cleave_attack_bonus,
+    cleave_rule_id,
+    has_weapon_keyword,
+)
 from warhammer40k_core.engine.weapon_declaration import (
     RangedAttackPool,
     WeaponDeclaration,
@@ -1289,13 +1295,13 @@ def validate_melee_declaration_rules(
                 message="Declared melee model is not engaged with any enemy unit.",
                 field="attacker_model_instance_id",
             )
-        attack_allocation_validation = _validate_melee_target_allocation_counts(
+        target_count_validation = _validate_melee_target_count_limit(
             request=request,
             declaration=declaration,
             profile=profile,
         )
-        if attack_allocation_validation is not None:
-            return attack_allocation_validation
+        if target_count_validation is not None:
+            return target_count_validation
         for allocation in declaration.target_allocations:
             if allocation.target_unit_instance_id not in engaged_target_ids:
                 return _invalid_melee_validation(
@@ -1304,6 +1310,14 @@ def validate_melee_declaration_rules(
                     message="Melee declaration target is not engaged with the attacking model.",
                     field="target_allocations",
                 )
+        attack_allocation_validation = _validate_melee_target_allocation_counts(
+            request=request,
+            declaration=declaration,
+            profile=profile,
+            scenario=scenario,
+        )
+        if attack_allocation_validation is not None:
+            return attack_allocation_validation
         if _is_extra_attacks_weapon(profile):
             continue
         if declaration.attacker_model_instance_id in declared_primary_model_ids:
@@ -1359,7 +1373,8 @@ def melee_attack_sequence_from_proposal(
             ),
             actor_id=proposal.player_id,
         )
-        if len(declaration.target_allocations) > 1:
+        single_target = len(declaration.target_allocations) == 1
+        if not single_target:
             declared_total = sum(
                 _require_declared_melee_attacks(allocation)
                 for allocation in declaration.target_allocations
@@ -1367,10 +1382,24 @@ def melee_attack_sequence_from_proposal(
             if declared_total != resolved_attacks:
                 raise GameLifecycleError("Melee split attack total drifted after validation.")
         for allocation in declaration.target_allocations:
+            cleave_bonus = _cleave_attack_bonus_for_target(
+                scenario=scenario,
+                profile=profile,
+                single_target=single_target,
+                target_unit_instance_id=allocation.target_unit_instance_id,
+            )
             attacks = (
-                resolved_attacks
-                if len(declaration.target_allocations) == 1
+                resolved_attacks + cleave_bonus
+                if single_target
                 else _require_declared_melee_attacks(allocation)
+            )
+            targeting_rule_ids = _melee_targeting_rule_ids(
+                profile=profile,
+                cleave_bonus=cleave_bonus,
+                unit_made_charge_move=_unit_made_charge_move(
+                    state=state,
+                    unit_instance_id=proposal.unit_instance_id,
+                ),
             )
             target_model_ids = _engaged_model_ids_for_model_and_target_unit(
                 scenario=scenario,
@@ -1393,7 +1422,7 @@ def melee_attack_sequence_from_proposal(
                     target_visible_model_ids=target_model_ids,
                     target_in_range_model_ids=target_model_ids,
                     hit_roll_modifier=0,
-                    targeting_rule_ids=(MELEE_TARGETING_RULE_ID,),
+                    targeting_rule_ids=targeting_rule_ids,
                 )
             )
     return AttackSequence(
@@ -2408,23 +2437,31 @@ def _validate_melee_target_allocation_counts(
     request: MeleeDeclarationProposalRequest,
     declaration: MeleeWeaponDeclaration,
     profile: WeaponProfile,
+    scenario: BattlefieldScenario,
 ) -> ProposalValidationResult | None:
-    maximum_attacks = _maximum_attacks_for_profile(profile)
+    target_count_validation = _validate_melee_target_count_limit(
+        request=request,
+        declaration=declaration,
+        profile=profile,
+    )
+    if target_count_validation is not None:
+        return target_count_validation
     target_count = len(declaration.target_allocations)
-    if target_count > maximum_attacks:
-        return _invalid_melee_validation(
-            request=request,
-            violation_code="melee_target_count_exceeds_attacks",
-            message="Melee declaration cannot select more target units than weapon Attacks.",
-            field="target_allocations",
-        )
     fixed_attacks = profile.attack_profile.fixed_attacks
     if target_count == 1:
         declared_attacks = declaration.target_allocations[0].attacks
+        expected_attacks = fixed_attacks
+        if expected_attacks is not None:
+            expected_attacks += _cleave_attack_bonus_for_target(
+                scenario=scenario,
+                profile=profile,
+                single_target=True,
+                target_unit_instance_id=declaration.target_allocations[0].target_unit_instance_id,
+            )
         if (
             declared_attacks is not None
-            and fixed_attacks is not None
-            and declared_attacks != fixed_attacks
+            and expected_attacks is not None
+            and declared_attacks != expected_attacks
         ):
             return _invalid_melee_validation(
                 request=request,
@@ -2465,6 +2502,71 @@ def _validate_melee_target_allocation_counts(
             field="target_allocations",
         )
     return None
+
+
+def _validate_melee_target_count_limit(
+    *,
+    request: MeleeDeclarationProposalRequest,
+    declaration: MeleeWeaponDeclaration,
+    profile: WeaponProfile,
+) -> ProposalValidationResult | None:
+    maximum_attacks = _maximum_attacks_for_profile(profile)
+    if len(declaration.target_allocations) > maximum_attacks:
+        return _invalid_melee_validation(
+            request=request,
+            violation_code="melee_target_count_exceeds_attacks",
+            message="Melee declaration cannot select more target units than weapon Attacks.",
+            field="target_allocations",
+        )
+    return None
+
+
+def _cleave_attack_bonus_for_target(
+    *,
+    scenario: BattlefieldScenario,
+    profile: WeaponProfile,
+    single_target: bool,
+    target_unit_instance_id: str,
+) -> int:
+    target_unit = _unit_by_id(scenario=scenario, unit_instance_id=target_unit_instance_id)
+    return cleave_attack_bonus(
+        profile,
+        single_target=single_target,
+        target_model_count=len(target_unit.alive_own_models()),
+    )
+
+
+def _melee_targeting_rule_ids(
+    *,
+    profile: WeaponProfile,
+    cleave_bonus: int,
+    unit_made_charge_move: bool,
+) -> tuple[str, ...]:
+    rule_ids: list[str] = [MELEE_TARGETING_RULE_ID]
+    if cleave_bonus > 0:
+        rule_ids.append(cleave_rule_id(cleave_bonus))
+    if unit_made_charge_move and has_weapon_keyword(profile, WeaponKeyword.LANCE):
+        rule_ids.append(LANCE_RULE_ID)
+    return tuple(dict.fromkeys(rule_ids))
+
+
+def _unit_made_charge_move(
+    *,
+    state: GameState | None,
+    unit_instance_id: str,
+) -> bool:
+    if state is None:
+        return False
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for effect in state.persisting_effects:
+        if requested_unit_id not in effect.target_unit_instance_ids:
+            continue
+        effect_payload = effect.effect_payload
+        if not isinstance(effect_payload, dict):
+            continue
+        if effect_payload.get("effect_kind") == "charge_grants_fights_first":
+            return True
+    return False
 
 
 def _invalid_melee_validation(

@@ -6,23 +6,36 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     ConsolidationModeKind,
     MovementMode,
     RulesetDescriptor,
 )
 from warhammer40k_core.core.wargear import Wargear
-from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AttackProfile,
+    WeaponKeyword,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequenceStep,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelDisplacementKind,
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ACTION,
@@ -49,6 +62,7 @@ from warhammer40k_core.engine.fight_resolution import (
     resolve_fight_movement,
     validate_melee_declaration_rules,
 )
+from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
@@ -56,7 +70,7 @@ from warhammer40k_core.engine.list_validation import (
     WargearSelection,
 )
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
@@ -65,6 +79,7 @@ from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyViolation,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import CLEAVE_RULE_ID, LANCE_RULE_ID
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
     PathWitness,
@@ -212,6 +227,135 @@ def test_phase15d_extra_attacks_weapon_can_be_added_to_primary_melee_weapon() ->
         "core-extra-blade",
     ]
     assert [pool.attacks for pool in sequence.attack_pools] == [5, 5]
+
+
+def test_phase14e_melee_cleave_adds_single_target_attacks_from_target_model_count() -> None:
+    catalog, ruleset, scenario, attacker, target_a, _target_b = _melee_fixture(
+        leader_keywords=(WeaponKeyword.CLEAVE,),
+        leader_abilities=(AbilityDescriptor.cleave(2),),
+        target_a_datasheet_id="core-intercessor-like-infantry",
+        target_a_model_profile_id="core-intercessor-like",
+        target_a_model_count=10,
+        target_b_pose=Pose.at(30.0, 30.0),
+    )
+    request = _melee_request(
+        catalog=catalog,
+        ruleset=ruleset,
+        scenario=scenario,
+        attacker=attacker,
+    )
+    proposal = _melee_proposal(
+        request=request,
+        attacker=attacker,
+        declarations=(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                wargear_id="core-leader-blade",
+                weapon_profile_id="core-leader-blade:standard",
+                target_allocations=(MeleeTargetAllocation(target_a.unit_instance_id, attacks=9),),
+            ),
+        ),
+    )
+
+    validation = validate_melee_declaration_rules(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=proposal,
+        army_catalog=catalog,
+    )
+    sequence = melee_attack_sequence_from_proposal(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        army_catalog=catalog,
+        dice_manager=DiceRollManager("phase14e-melee-cleave"),
+        sequence_id="phase14e-melee-cleave-sequence",
+    )
+
+    assert validation.is_valid
+    assert len(target_a.alive_own_models()) == 10
+    assert sequence.attack_pools[0].attacks == 9
+    assert sequence.attack_pools[0].targeting_rule_ids == (
+        MELEE_TARGETING_RULE_ID,
+        f"{CLEAVE_RULE_ID}:4",
+    )
+
+
+def test_phase14e_melee_lance_uses_charge_move_wound_modifier() -> None:
+    catalog, ruleset, scenario, attacker, target_a, _target_b = _melee_fixture(
+        leader_keywords=(WeaponKeyword.LANCE,),
+        target_b_pose=Pose.at(30.0, 30.0),
+    )
+    request = _melee_request(
+        catalog=catalog,
+        ruleset=ruleset,
+        scenario=scenario,
+        attacker=attacker,
+    )
+    proposal = _melee_proposal(
+        request=request,
+        attacker=attacker,
+        declarations=(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                wargear_id="core-leader-blade",
+                weapon_profile_id="core-leader-blade:standard",
+                target_allocations=(MeleeTargetAllocation(target_a.unit_instance_id),),
+            ),
+        ),
+    )
+    state = _attack_sequence_state(
+        game_id="phase14e-melee-lance",
+        ruleset=ruleset,
+        scenario=scenario,
+    )
+    _record_charge_move_effect(state=state, unit=attacker)
+    sequence = melee_attack_sequence_from_proposal(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        army_catalog=catalog,
+        dice_manager=DiceRollManager("phase14e-melee-lance-attacks"),
+        sequence_id="phase14e-melee-lance-sequence",
+        state=state,
+    )
+    attack_context_id = sequence.attack_context_id()
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=sequence.current_pool().weapon_profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id=sequence.attacker_player_id,
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=sequence.current_pool().weapon_profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id=sequence.attacker_player_id,
+    )
+    decisions = DecisionController()
+    dice_manager = DiceRollManager(
+        "phase14e-melee-lance-resolution",
+        event_log=decisions.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id="phase14e-lance-hit", spec=hit_spec, value=3),
+            _fixed_roll_result(roll_id="phase14e-lance-wound", spec=wound_spec, value=2),
+        ),
+    )
+
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset,
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    wound_payload = _attack_step_payload(decisions, AttackSequenceStep.WOUND)
+
+    assert LANCE_RULE_ID in sequence.attack_pools[0].targeting_rule_ids
+    assert wound_payload["modifier"] == 1
+    assert wound_payload["capped_modifier"] == 1
+    assert wound_payload["final_roll"] == 3
+    assert wound_payload["successful"] is True
 
 
 def test_phase15d_melee_request_and_proposal_payloads_round_trip() -> None:
@@ -2036,8 +2180,13 @@ def test_phase15d_resolve_fight_movement_fails_fast_on_wrong_context() -> None:
 def _melee_fixture(
     *,
     include_extra_attacks: bool = False,
+    leader_keywords: tuple[WeaponKeyword, ...] = (),
+    leader_abilities: tuple[AbilityDescriptor, ...] = (),
     target_a_pose: Pose | None = None,
     target_b_pose: Pose | None = None,
+    target_a_datasheet_id: str = "core-character-leader",
+    target_a_model_profile_id: str = "core-character-leader",
+    target_a_model_count: int = 1,
 ) -> tuple[
     ArmyCatalog,
     RulesetDescriptor,
@@ -2048,9 +2197,18 @@ def _melee_fixture(
 ]:
     resolved_target_a_pose = Pose.at(12.0, 10.0) if target_a_pose is None else target_a_pose
     resolved_target_b_pose = Pose.at(10.0, 12.0) if target_b_pose is None else target_b_pose
-    catalog = _catalog(include_extra_attacks=include_extra_attacks)
+    catalog = _catalog(
+        include_extra_attacks=include_extra_attacks,
+        leader_keywords=leader_keywords,
+        leader_abilities=leader_abilities,
+    )
     ruleset = RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase15d-test")
-    armies = _armies(catalog)
+    armies = _armies(
+        catalog,
+        target_a_datasheet_id=target_a_datasheet_id,
+        target_a_model_profile_id=target_a_model_profile_id,
+        target_a_model_count=target_a_model_count,
+    )
     attacker = armies[0].unit_by_id("army-alpha:attacker")
     if include_extra_attacks:
         attacker = replace(
@@ -2156,8 +2314,37 @@ def _movement_witness_for_unit(
     return PathWitness.for_paths(tuple(model_paths))
 
 
-def _catalog(*, include_extra_attacks: bool) -> ArmyCatalog:
+def _catalog(
+    *,
+    include_extra_attacks: bool,
+    leader_keywords: tuple[WeaponKeyword, ...] = (),
+    leader_abilities: tuple[AbilityDescriptor, ...] = (),
+) -> ArmyCatalog:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    if leader_keywords or leader_abilities:
+        leader_blade = next(
+            wargear for wargear in catalog.wargear if wargear.wargear_id == "core-leader-blade"
+        )
+        leader_profile = leader_blade.weapon_profiles[0]
+        updated_leader_blade = replace(
+            leader_blade,
+            weapon_profiles=(
+                replace(
+                    leader_profile,
+                    keywords=tuple(sorted(leader_keywords)),
+                    abilities=leader_abilities,
+                ),
+            ),
+        )
+        catalog = replace(
+            catalog,
+            wargear=tuple(
+                updated_leader_blade
+                if wargear.wargear_id == updated_leader_blade.wargear_id
+                else wargear
+                for wargear in catalog.wargear
+            ),
+        )
     if not include_extra_attacks:
         return catalog
     leader_blade = next(
@@ -2183,7 +2370,13 @@ def _catalog(*, include_extra_attacks: bool) -> ArmyCatalog:
     )
 
 
-def _armies(catalog: ArmyCatalog) -> tuple[ArmyDefinition, ArmyDefinition]:
+def _armies(
+    catalog: ArmyCatalog,
+    *,
+    target_a_datasheet_id: str = "core-character-leader",
+    target_a_model_profile_id: str = "core-character-leader",
+    target_a_model_count: int = 1,
+) -> tuple[ArmyDefinition, ArmyDefinition]:
     return (
         muster_army(
             catalog=catalog,
@@ -2196,11 +2389,30 @@ def _armies(catalog: ArmyCatalog) -> tuple[ArmyDefinition, ArmyDefinition]:
         ),
         muster_army(
             catalog=catalog,
-            request=_army_request(
-                catalog=catalog,
+            request=ArmyMusterRequest(
                 army_id="army-beta",
                 player_id="player-b",
-                unit_ids=("target-a", "target-b"),
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_id="core-combined-arms",
+                ),
+                unit_selections=(
+                    _unit_muster_selection(
+                        unit_selection_id="target-a",
+                        datasheet_id=target_a_datasheet_id,
+                        model_profile_id=target_a_model_profile_id,
+                        model_count=target_a_model_count,
+                    ),
+                    _unit_muster_selection(
+                        unit_selection_id="target-b",
+                        datasheet_id="core-character-leader",
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
             ),
         ),
     )
@@ -2224,17 +2436,32 @@ def _army_request(
             detachment_id="core-combined-arms",
         ),
         unit_selections=tuple(
-            UnitMusterSelection(
+            _unit_muster_selection(
                 unit_selection_id=unit_id,
                 datasheet_id="core-character-leader",
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-character-leader",
-                        model_count=1,
-                    ),
-                ),
+                model_profile_id="core-character-leader",
+                model_count=1,
             )
             for unit_id in unit_ids
+        ),
+    )
+
+
+def _unit_muster_selection(
+    *,
+    unit_selection_id: str,
+    datasheet_id: str,
+    model_profile_id: str,
+    model_count: int,
+) -> UnitMusterSelection:
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id=model_profile_id,
+                model_count=model_count,
+            ),
         ),
     )
 
@@ -2250,16 +2477,93 @@ def _unit_placement(
         army_id=army_id,
         player_id=player_id,
         unit_instance_id=unit.unit_instance_id,
-        model_placements=(
+        model_placements=tuple(
             ModelPlacement(
                 army_id=army_id,
                 player_id=player_id,
                 unit_instance_id=unit.unit_instance_id,
-                model_instance_id=unit.own_models[0].model_instance_id,
-                pose=pose,
-            ),
+                model_instance_id=model.model_instance_id,
+                pose=Pose.at(
+                    pose.position.x,
+                    pose.position.y + (index * 2.0),
+                    pose.position.z,
+                    facing_degrees=pose.facing.degrees,
+                ),
+            )
+            for index, model in enumerate(unit.own_models)
         ),
     )
+
+
+def _attack_sequence_state(
+    *,
+    game_id: str,
+    ruleset: RulesetDescriptor,
+    scenario: BattlefieldScenario,
+) -> GameState:
+    state = GameState(
+        game_id=game_id,
+        ruleset_descriptor_hash=ruleset.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(ruleset.setup_sequence.steps),
+        battle_phase_sequence=tuple(ruleset.battle_phase_sequence.phases),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+        setup_step_index=None,
+        battle_phase_index=tuple(ruleset.battle_phase_sequence.phases).index(BattlePhaseKind.FIGHT),
+        battle_round=1,
+        active_player_id="player-a",
+    )
+    for army in scenario.armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(scenario.battlefield_state)
+    return state
+
+
+def _record_charge_move_effect(*, state: GameState, unit: UnitInstance) -> None:
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id=f"{unit.unit_instance_id}:phase14e-charge",
+            source_rule_id="core-rules:charge:fights-first",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.CHARGE,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id="player-a",
+            ),
+            effect_payload={"effect_kind": "charge_grants_fights_first"},
+        )
+    )
+
+
+def _fixed_roll_result(
+    *,
+    roll_id: str,
+    spec: DiceRollSpec,
+    value: int,
+) -> DiceRollResult:
+    return DiceRollResult.from_values(
+        roll_id=roll_id,
+        spec=spec,
+        values=(value,),
+        source="fixed",
+    )
+
+
+def _attack_step_payload(
+    decisions: DecisionController,
+    step: AttackSequenceStep,
+) -> dict[str, object]:
+    for event in decisions.event_log.records:
+        if event.event_type != "attack_sequence_step":
+            continue
+        payload = cast(dict[str, object], event.payload)
+        if payload["step"] == step.value:
+            return cast(dict[str, object], payload["payload"])
+    raise AssertionError(f"Missing attack sequence step {step.value}.")
 
 
 def _melee_request(

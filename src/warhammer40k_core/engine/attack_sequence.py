@@ -139,6 +139,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
     INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID,
     INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID,
+    LANCE_RULE_ID,
     MELTA_RULE_ID,
     PRECISION_RULE_ID,
     SNAP_SHOOTING_RULE_ID,
@@ -5340,6 +5341,7 @@ def _roll_hit_and_wound(
             target_keywords=target_unit.keywords,
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
+            wound_modifier=_wound_roll_modifier(pool),
         )
         wound_roll = _reroll_wound_for_twin_linked_if_needed(
             manager=manager,
@@ -5535,6 +5537,15 @@ def _roll_wound(
         critical=critical,
         critical_threshold=critical_threshold,
     )
+
+
+def _wound_roll_modifier(pool: RangedAttackPool) -> int:
+    if type(pool) is not RangedAttackPool:
+        raise GameLifecycleError("Wound roll modifier requires a RangedAttackPool.")
+    modifier = 0
+    if LANCE_RULE_ID in pool.targeting_rule_ids:
+        modifier += 1
+    return modifier
 
 
 def _reroll_wound_for_twin_linked_if_needed(
