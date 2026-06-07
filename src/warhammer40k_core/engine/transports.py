@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
 from warhammer40k_core.core.objectives import ObjectiveMarker
@@ -23,22 +23,28 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatchPayload,
     ModelPlacementRecord,
     ModelRemovalRecord,
+    PlacementError,
     UnitPlacement,
     UnitPlacementPayload,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
     terrain_endpoint_placement_violation,
 )
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import (
+    CORE_HAZARD_ROLLS_RULE_ID,
     HAZARD_ROLL_FAILURE_THRESHOLD,
     hazard_mortal_wounds_per_failed_roll,
     hazard_roll_failed,
     hazard_roll_spec,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
@@ -48,6 +54,13 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.damage_allocation import (
+        MortalWoundApplication,
+        MortalWoundApplicationPayload,
+    )
+    from warhammer40k_core.engine.game_state import GameState
 
 
 class TransportMovementStatus(StrEnum):
@@ -217,6 +230,17 @@ class CombatDisembarkPayload(TypedDict):
     disembarked_unit_state: DisembarkedUnitStatePayload | None
 
 
+class TransportHazardMortalWoundsPayload(TypedDict):
+    source_rule_id: str
+    source_kind: str
+    disembark_mode: str
+    disembark: CombatDisembarkPayload | DestroyedTransportDisembarkPayload
+    mortal_wounds: int
+    mortal_wound_application: MortalWoundApplicationPayload | None
+    pending_mortal_wound_request: DecisionRequestPayload | None
+    pending_mortal_wound_request_id: str | None
+
+
 class FiringDeckWeaponSelectionPayload(TypedDict):
     embarked_unit_instance_id: str
     model_instance_id: str
@@ -254,6 +278,8 @@ _TACTICAL_DISEMBARK_RULE_ID = "core_rules_tactical_disembark"
 _COMBAT_DISEMBARK_RULE_ID = "core_rules_combat_disembark"
 _DESTROYED_TRANSPORT_RULE_ID = "core_rules_destroyed_transport"
 _EMERGENCY_DISEMBARK_RULE_ID = "core_rules_emergency_disembark"
+TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND = "transport_hazard_mortal_wounds"
+TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE = "transport_hazard_mortal_wounds_resolved"
 
 
 @dataclass(frozen=True, slots=True)
@@ -1506,6 +1532,166 @@ class CombatDisembark:
 
 
 @dataclass(frozen=True, slots=True)
+class TransportHazardMortalWounds:
+    source_rule_id: str
+    source_kind: str
+    disembark: CombatDisembark | DestroyedTransportDisembark
+    mortal_wound_application: MortalWoundApplication | None = None
+    pending_mortal_wound_request: DecisionRequest | None = None
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.damage_allocation import (
+            MortalWoundApplication,
+            is_mortal_wound_feel_no_pain_request,
+            mortal_wound_feel_no_pain_source_context,
+        )
+
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("TransportHazardMortalWounds source_rule_id", self.source_rule_id),
+        )
+        if self.source_rule_id != CORE_HAZARD_ROLLS_RULE_ID:
+            raise GameLifecycleError("TransportHazardMortalWounds source_rule_id drift.")
+        object.__setattr__(
+            self,
+            "source_kind",
+            _validate_identifier("TransportHazardMortalWounds source_kind", self.source_kind),
+        )
+        if self.source_kind != TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND:
+            raise GameLifecycleError("TransportHazardMortalWounds source_kind drift.")
+        if type(self.disembark) not in {CombatDisembark, DestroyedTransportDisembark}:
+            raise GameLifecycleError(
+                "TransportHazardMortalWounds requires a transport hazard disembark."
+            )
+        if not self.disembark.placement.is_valid:
+            raise GameLifecycleError(
+                "TransportHazardMortalWounds requires a valid disembark placement."
+            )
+        application = self.mortal_wound_application
+        request = self.pending_mortal_wound_request
+        if application is not None and type(application) is not MortalWoundApplication:
+            raise GameLifecycleError(
+                "TransportHazardMortalWounds mortal_wound_application must be "
+                "MortalWoundApplication."
+            )
+        if request is not None and type(request) is not DecisionRequest:
+            raise GameLifecycleError(
+                "TransportHazardMortalWounds pending_mortal_wound_request must be DecisionRequest."
+            )
+        if self.mortal_wounds == 0 and (application is not None or request is not None):
+            raise GameLifecycleError("TransportHazardMortalWounds cannot route zero mortal wounds.")
+        if self.mortal_wounds > 0 and (application is None) == (request is None):
+            raise GameLifecycleError(
+                "TransportHazardMortalWounds requires exactly one completed application or "
+                "pending request."
+            )
+        if application is not None:
+            if application.target_unit_instance_id != self.disembark.unit_instance_id:
+                raise GameLifecycleError("TransportHazardMortalWounds application target drift.")
+            if application.mortal_wounds != self.mortal_wounds:
+                raise GameLifecycleError(
+                    "TransportHazardMortalWounds application mortal wound drift."
+                )
+        if request is not None:
+            if not is_mortal_wound_feel_no_pain_request(request):
+                raise GameLifecycleError(
+                    "TransportHazardMortalWounds request must use mortal wound Feel No Pain."
+                )
+            source_context = mortal_wound_feel_no_pain_source_context(request)
+            if not isinstance(source_context, dict):
+                raise GameLifecycleError(
+                    "TransportHazardMortalWounds request source context is invalid."
+                )
+            if source_context.get("source_kind") != TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND:
+                raise GameLifecycleError("TransportHazardMortalWounds request source kind drift.")
+            if source_context.get("unit_instance_id") != self.disembark.unit_instance_id:
+                raise GameLifecycleError("TransportHazardMortalWounds request unit drift.")
+            if source_context.get("transport_unit_instance_id") != (
+                self.disembark.transport_unit_instance_id
+            ):
+                raise GameLifecycleError("TransportHazardMortalWounds request transport drift.")
+            if source_context.get("disembark_mode") != self.disembark_mode.value:
+                raise GameLifecycleError("TransportHazardMortalWounds request mode drift.")
+            if source_context.get("mortal_wounds") != self.mortal_wounds:
+                raise GameLifecycleError("TransportHazardMortalWounds request mortal wound drift.")
+
+    @property
+    def disembark_mode(self) -> DisembarkModeKind:
+        if type(self.disembark) is CombatDisembark:
+            return DisembarkModeKind.COMBAT_DISEMBARK
+        if type(self.disembark) is DestroyedTransportDisembark:
+            return self.disembark.disembark_mode
+        raise GameLifecycleError("Unsupported transport hazard disembark.")
+
+    @property
+    def mortal_wounds(self) -> int:
+        return self.disembark.mortal_wound_count
+
+    def to_payload(self) -> TransportHazardMortalWoundsPayload:
+        return {
+            "source_rule_id": self.source_rule_id,
+            "source_kind": self.source_kind,
+            "disembark_mode": self.disembark_mode.value,
+            "disembark": self.disembark.to_payload(),
+            "mortal_wounds": self.mortal_wounds,
+            "mortal_wound_application": None
+            if self.mortal_wound_application is None
+            else self.mortal_wound_application.to_payload(),
+            "pending_mortal_wound_request": None
+            if self.pending_mortal_wound_request is None
+            else self.pending_mortal_wound_request.to_payload(),
+            "pending_mortal_wound_request_id": None
+            if self.pending_mortal_wound_request is None
+            else self.pending_mortal_wound_request.request_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TransportHazardMortalWoundsPayload) -> Self:
+        from warhammer40k_core.engine.damage_allocation import MortalWoundApplication
+
+        disembark_mode = disembark_mode_kind_from_token(payload["disembark_mode"])
+        if disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
+            disembark: CombatDisembark | DestroyedTransportDisembark = CombatDisembark.from_payload(
+                payload["disembark"]
+            )
+        elif disembark_mode in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }:
+            disembark = DestroyedTransportDisembark.from_payload(
+                cast(DestroyedTransportDisembarkPayload, payload["disembark"])
+            )
+        else:
+            raise GameLifecycleError(
+                "TransportHazardMortalWounds requires a hazard disembark mode."
+            )
+        application_payload = payload["mortal_wound_application"]
+        request_payload = payload["pending_mortal_wound_request"]
+        result = cls(
+            source_rule_id=payload["source_rule_id"],
+            source_kind=payload["source_kind"],
+            disembark=disembark,
+            mortal_wound_application=None
+            if application_payload is None
+            else MortalWoundApplication.from_payload(application_payload),
+            pending_mortal_wound_request=None
+            if request_payload is None
+            else DecisionRequest.from_payload(request_payload),
+        )
+        if result.mortal_wounds != payload["mortal_wounds"]:
+            raise GameLifecycleError("TransportHazardMortalWounds mortal wound drift.")
+        expected_request_id = (
+            None
+            if result.pending_mortal_wound_request is None
+            else result.pending_mortal_wound_request.request_id
+        )
+        if expected_request_id != payload["pending_mortal_wound_request_id"]:
+            raise GameLifecycleError("TransportHazardMortalWounds pending request drift.")
+        return result
+
+
+@dataclass(frozen=True, slots=True)
 class FiringDeckWeaponSelection:
     embarked_unit_instance_id: str
     model_instance_id: str
@@ -2089,6 +2275,244 @@ def apply_destroyed_transport_disembark_to_battlefield(
             disembark.destroyed_model_instance_ids
         )
     return updated
+
+
+def apply_transport_hazard_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    disembark: CombatDisembark | DestroyedTransportDisembark,
+    dice_manager: DiceRollManager,
+) -> TransportHazardMortalWounds:
+    from warhammer40k_core.engine.damage_allocation import (
+        MortalWoundApplicationProgress,
+        continue_mortal_wound_application,
+        unit_owner_player_id,
+    )
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Transport hazard mortal wounds require GameState.")
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Transport hazard mortal wounds require DecisionController.")
+    if type(disembark) not in {CombatDisembark, DestroyedTransportDisembark}:
+        raise GameLifecycleError(
+            "Transport hazard mortal wounds require a transport hazard disembark."
+        )
+    if type(dice_manager) is not DiceRollManager:
+        raise GameLifecycleError("Transport hazard mortal wounds require DiceRollManager.")
+    if state.battle_round != disembark.battle_round:
+        raise GameLifecycleError("Transport hazard mortal wounds battle_round drift.")
+    if not disembark.placement.is_valid:
+        raise GameLifecycleError(
+            "Transport hazard mortal wounds require a valid disembark placement."
+        )
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Transport hazard mortal wounds require battlefield_state.")
+    try:
+        battlefield.unit_placement_by_id(disembark.unit_instance_id)
+    except PlacementError as exc:
+        raise GameLifecycleError(
+            "Transport hazard mortal wounds require the disembarked unit to be placed."
+        ) from exc
+
+    mortal_wounds = disembark.mortal_wound_count
+    if mortal_wounds == 0:
+        resolved = TransportHazardMortalWounds(
+            source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
+            source_kind=TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+            disembark=disembark,
+        )
+        _emit_transport_hazard_mortal_wounds_resolved(decisions=decisions, result=resolved)
+        return resolved
+
+    progress = MortalWoundApplicationProgress.start(
+        application_id=(
+            f"{disembark.unit_instance_id}:{disembark_mode_for_hazard(disembark).value}:"
+            f"transport-hazard-mortal-wounds:r{disembark.battle_round}"
+        ),
+        source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
+        source_context=_transport_hazard_source_context(
+            disembark=disembark,
+            mortal_wounds=mortal_wounds,
+        ),
+        target_unit_instance_id=disembark.unit_instance_id,
+        defender_player_id=unit_owner_player_id(
+            state=state,
+            unit_instance_id=disembark.unit_instance_id,
+        ),
+        mortal_wounds=mortal_wounds,
+        spill_over=True,
+    )
+    routed = continue_mortal_wound_application(
+        state=state,
+        request_id=state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=dice_manager,
+    )
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        return TransportHazardMortalWounds(
+            source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
+            source_kind=TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+            disembark=disembark,
+            pending_mortal_wound_request=routed.request,
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Transport hazard mortal wounds did not produce application.")
+    resolved = TransportHazardMortalWounds(
+        source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
+        source_kind=TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+        disembark=disembark,
+        mortal_wound_application=routed.application,
+    )
+    _emit_transport_hazard_mortal_wounds_resolved(decisions=decisions, result=resolved)
+    return resolved
+
+
+def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.damage_allocation import (
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        is_mortal_wound_feel_no_pain_request,
+        mortal_wound_feel_no_pain_source_context,
+        resolve_mortal_wound_feel_no_pain_decision,
+    )
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Transport hazard Feel No Pain requires GameState.")
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Transport hazard Feel No Pain requires DecisionResult.")
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Transport hazard Feel No Pain requires DecisionController.")
+    record = decisions.record_for_result(result)
+    request = record.request
+    if not is_mortal_wound_feel_no_pain_request(request):
+        raise GameLifecycleError("Transport hazard Feel No Pain requires mortal wound context.")
+    source_context = mortal_wound_feel_no_pain_source_context(request)
+    disembark = _transport_hazard_disembark_from_source_context(source_context)
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    routed = resolve_mortal_wound_feel_no_pain_decision(
+        state=state,
+        request=request,
+        result=result,
+        next_request_id=state.next_decision_request_id(),
+        dice_manager=manager,
+    )
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=state.stage,
+            decision_request=routed.request,
+            payload={
+                "phase": state.current_battle_phase.value
+                if state.current_battle_phase is not None
+                else None,
+                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "source_rule_id": CORE_HAZARD_ROLLS_RULE_ID,
+                "source_kind": TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+            },
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Transport hazard Feel No Pain did not finish routing.")
+    resolved = TransportHazardMortalWounds(
+        source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
+        source_kind=TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+        disembark=disembark,
+        mortal_wound_application=routed.application,
+    )
+    _emit_transport_hazard_mortal_wounds_resolved(decisions=decisions, result=resolved)
+    return None
+
+
+def disembark_mode_for_hazard(
+    disembark: CombatDisembark | DestroyedTransportDisembark,
+) -> DisembarkModeKind:
+    if type(disembark) is CombatDisembark:
+        return DisembarkModeKind.COMBAT_DISEMBARK
+    if type(disembark) is DestroyedTransportDisembark:
+        return disembark.disembark_mode
+    raise GameLifecycleError("Unsupported transport hazard disembark.")
+
+
+def _transport_hazard_source_context(
+    *,
+    disembark: CombatDisembark | DestroyedTransportDisembark,
+    mortal_wounds: int,
+) -> JsonValue:
+    return validate_json_value(
+        {
+            "source_kind": TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+            "source_rule_id": CORE_HAZARD_ROLLS_RULE_ID,
+            "player_id": disembark.player_id,
+            "battle_round": disembark.battle_round,
+            "unit_instance_id": disembark.unit_instance_id,
+            "transport_unit_instance_id": disembark.transport_unit_instance_id,
+            "disembark_mode": disembark_mode_for_hazard(disembark).value,
+            "mortal_wounds": mortal_wounds,
+            "disembark": disembark.to_payload(),
+        }
+    )
+
+
+def _transport_hazard_disembark_from_source_context(
+    source_context: JsonValue,
+) -> CombatDisembark | DestroyedTransportDisembark:
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Transport hazard source context is invalid.")
+    if source_context.get("source_kind") != TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND:
+        raise GameLifecycleError("Transport hazard source kind is invalid.")
+    if source_context.get("source_rule_id") != CORE_HAZARD_ROLLS_RULE_ID:
+        raise GameLifecycleError("Transport hazard source_rule_id is invalid.")
+    mode = disembark_mode_kind_from_token(source_context.get("disembark_mode"))
+    disembark_payload = source_context.get("disembark")
+    if not isinstance(disembark_payload, dict):
+        raise GameLifecycleError("Transport hazard disembark payload is invalid.")
+    if mode is DisembarkModeKind.COMBAT_DISEMBARK:
+        disembark: CombatDisembark | DestroyedTransportDisembark = CombatDisembark.from_payload(
+            cast(CombatDisembarkPayload, disembark_payload)
+        )
+    elif mode in {
+        DisembarkModeKind.DESTROYED_TRANSPORT,
+        DisembarkModeKind.EMERGENCY_DISEMBARK,
+    }:
+        disembark = DestroyedTransportDisembark.from_payload(
+            cast(DestroyedTransportDisembarkPayload, disembark_payload)
+        )
+    else:
+        raise GameLifecycleError("Transport hazard source mode is invalid.")
+    if source_context.get("player_id") != disembark.player_id:
+        raise GameLifecycleError("Transport hazard source player drift.")
+    if source_context.get("battle_round") != disembark.battle_round:
+        raise GameLifecycleError("Transport hazard source battle_round drift.")
+    if source_context.get("unit_instance_id") != disembark.unit_instance_id:
+        raise GameLifecycleError("Transport hazard source unit drift.")
+    if source_context.get("transport_unit_instance_id") != disembark.transport_unit_instance_id:
+        raise GameLifecycleError("Transport hazard source transport drift.")
+    if source_context.get("mortal_wounds") != disembark.mortal_wound_count:
+        raise GameLifecycleError("Transport hazard source mortal wound drift.")
+    return disembark
+
+
+def _emit_transport_hazard_mortal_wounds_resolved(
+    *,
+    decisions: DecisionController,
+    result: TransportHazardMortalWounds,
+) -> None:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Transport hazard event requires DecisionController.")
+    if type(result) is not TransportHazardMortalWounds:
+        raise GameLifecycleError("Transport hazard event requires TransportHazardMortalWounds.")
+    decisions.event_log.append(
+        TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
+        result.to_payload(),
+    )
 
 
 def resolve_firing_deck_selection(

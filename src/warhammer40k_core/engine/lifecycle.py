@@ -130,6 +130,10 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_window_decline_allowed,
     stratagem_window_decline_event_payload,
 )
+from warhammer40k_core.engine.transports import (
+    TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+    apply_transport_hazard_mortal_wound_feel_no_pain_decision,
+)
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     TriggeredMovementHandler,
@@ -837,6 +841,18 @@ class GameLifecycle:
                 )
                 if explosives_status is not None:
                     return explosives_status
+                return self.advance_until_decision_or_terminal()
+            if (
+                isinstance(source_context, dict)
+                and source_context.get("source_kind") == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
+            ):
+                transport_hazard_status = apply_transport_hazard_mortal_wound_feel_no_pain_decision(
+                    state=state,
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+                if transport_hazard_status is not None:
+                    return transport_hazard_status
                 return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
             state=state,

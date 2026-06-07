@@ -80,6 +80,8 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "def resolve_combat_disembark(" in transport_source
     assert "Combat Disembark requires resolve_combat_disembark." in transport_source
     assert "combat_disembark.hazard_roll" in transport_source
+    assert "apply_transport_hazard_mortal_wounds" in transport_source
+    assert "transport_hazard_mortal_wounds" in transport_source
     assert "HAZARD_ROLL_FAILURE_THRESHOLD = 2" in hazard_source
     assert "hazard_mortal_wounds_per_failed_roll" in attack_sequence_source
     assert "attached_unit_bodyguard_model_ids" in attack_sequence_source
