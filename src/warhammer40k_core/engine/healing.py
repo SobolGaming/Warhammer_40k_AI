@@ -25,7 +25,7 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.unit_coherency import unit_placement_coherency_result
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -514,25 +514,63 @@ def apply_healing_model_decision(
         raise GameLifecycleError("Healing decision application requires a DecisionResult.")
     _validate_effect_for_state(state=state, effect=effect)
     pending_request = decisions.queue.peek_next()
-    result.validate_for_request(pending_request)
-    selection = HealingModelSelection.from_result(request=pending_request, result=result)
-    _validate_selection_matches_effect(selection=selection, effect=effect)
-    candidates = _healing_candidates_for_next_step(state=state, effect=effect)
-    if selection.selection_kind is not candidates.step_kind:
-        raise GameLifecycleError("Healing model selection kind is stale.")
-    if selection.legal_model_ids != candidates.model_ids:
-        raise GameLifecycleError("Healing model legal candidates are stale.")
-    if selection.selected_model_id not in candidates.model_ids:
-        raise GameLifecycleError("Healing model selection is no longer legal.")
+    request_effect = healing_effect_from_request(request=pending_request)
+    if request_effect.to_payload() != effect.to_payload():
+        raise GameLifecycleError("Healing request effect drift.")
+    _validated_healing_selection(
+        state=state,
+        request=pending_request,
+        result=result,
+        effect=effect,
+    )
     decisions.submit_result(result)
+    return apply_recorded_healing_model_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        request=pending_request,
+        result=result,
+        effect=effect,
+    )
+
+
+def apply_recorded_healing_model_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    request: DecisionRequest,
+    result: DecisionResult,
+    effect: HealingEffect | None = None,
+) -> tuple[HealingEffect, DecisionRequest | None]:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Healing decision application requires a DecisionController.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Healing decision application requires a RulesetDescriptor.")
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Healing decision application requires a DecisionRequest.")
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Healing decision application requires a DecisionResult.")
+    decisions.record_for_result(result)
+    request_effect = healing_effect_from_request(request=request)
+    active_effect = request_effect if effect is None else effect
+    if request_effect.to_payload() != active_effect.to_payload():
+        raise GameLifecycleError("Healing request effect drift.")
+    _validate_effect_for_state(state=state, effect=active_effect)
+    selection, candidates = _validated_healing_selection(
+        state=state,
+        request=request,
+        result=result,
+        effect=active_effect,
+    )
     step = _apply_selected_healing_step(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
-        effect=effect,
+        effect=active_effect,
         candidates=candidates,
         selection=selection,
     )
-    updated = effect.with_step(step)
+    updated = active_effect.with_step(step)
     _emit_healing_step(decisions=decisions, effect=updated, step=step)
     return resolve_healing_until_blocked(
         state=state,
@@ -540,6 +578,58 @@ def apply_healing_model_decision(
         ruleset_descriptor=ruleset_descriptor,
         effect=updated,
     )
+
+
+def healing_effect_from_request(*, request: DecisionRequest) -> HealingEffect:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Healing effect routing requires a DecisionRequest.")
+    if request.decision_type != SELECT_HEALING_MODEL_DECISION_TYPE:
+        raise GameLifecycleError("Healing effect routing requires a healing request.")
+    payload = request.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Healing request payload must be an object.")
+    effect_payload = payload.get("effect")
+    if not isinstance(effect_payload, dict):
+        raise GameLifecycleError("Healing request payload missing effect.")
+    return HealingEffect.from_payload(cast(HealingEffectPayload, effect_payload))
+
+
+def invalid_healing_model_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Healing decision validation requires a DecisionRequest.")
+    if request.decision_type != SELECT_HEALING_MODEL_DECISION_TYPE:
+        raise GameLifecycleError("Healing decision validation requires a healing request.")
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Healing decision validation requires a DecisionResult.")
+    invalid_reason = "invalid_healing_model_selection_result"
+    finite_status = _invalid_finite_healing_decision_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason=invalid_reason,
+    )
+    if finite_status is not None:
+        return finite_status
+    effect = healing_effect_from_request(request=request)
+    _validate_effect_for_state(state=state, effect=effect)
+    selection = HealingModelSelection.from_result(request=request, result=result)
+    stale_field = _healing_selection_stale_field(
+        state=state,
+        selection=selection,
+        effect=effect,
+    )
+    if stale_field is not None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Healing model selection no longer matches state.",
+            payload={"invalid_reason": invalid_reason, "field": stale_field},
+        )
+    return None
 
 
 def healing_step_kind_from_token(token: object) -> HealingStepKind:
@@ -945,6 +1035,97 @@ def _validate_selection_matches_effect(
         raise GameLifecycleError("Healing selection source_rule_id drift.")
     if selection.source_context != effect.source_context:
         raise GameLifecycleError("Healing selection source_context drift.")
+
+
+def _validated_healing_selection(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    effect: HealingEffect,
+) -> tuple[HealingModelSelection, _HealingStepCandidates]:
+    result.validate_for_request(request)
+    selection = HealingModelSelection.from_result(request=request, result=result)
+    _validate_selection_matches_effect(selection=selection, effect=effect)
+    candidates = _healing_candidates_for_next_step(state=state, effect=effect)
+    if selection.selection_kind is not candidates.step_kind:
+        raise GameLifecycleError("Healing model selection kind is stale.")
+    if selection.legal_model_ids != candidates.model_ids:
+        raise GameLifecycleError("Healing model legal candidates are stale.")
+    if selection.selected_model_id not in candidates.model_ids:
+        raise GameLifecycleError("Healing model selection is no longer legal.")
+    return selection, candidates
+
+
+def _healing_selection_stale_field(
+    *,
+    state: GameState,
+    selection: HealingModelSelection,
+    effect: HealingEffect,
+) -> str | None:
+    if selection.effect_id != effect.effect_id:
+        return "effect_id"
+    if selection.target_unit_instance_id != effect.target_unit_instance_id:
+        return "target_unit_instance_id"
+    if selection.step_index != effect.next_step_index():
+        return "step_index"
+    if selection.source_rule_id != effect.source_rule_id:
+        return "source_rule_id"
+    if selection.source_context != effect.source_context:
+        return "source_context"
+    candidates = _healing_candidates_for_next_step(state=state, effect=effect)
+    if selection.selection_kind is not candidates.step_kind:
+        return "selection_kind"
+    if selection.legal_model_ids != candidates.model_ids:
+        return "legal_model_ids"
+    if selection.selected_model_id not in candidates.model_ids:
+        return "model_instance_id"
+    return None
+
+
+def _invalid_finite_healing_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    invalid_reason: str,
+) -> LifecycleStatus | None:
+    if result.request_id != request.request_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result does not match the pending healing request.",
+            payload={"invalid_reason": invalid_reason, "field": "request_id"},
+        )
+    if result.decision_type != request.decision_type:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result type does not match the pending healing request.",
+            payload={"invalid_reason": invalid_reason, "field": "decision_type"},
+        )
+    if result.actor_id != request.actor_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result actor does not match the pending healing request.",
+            payload={"invalid_reason": invalid_reason, "field": "actor_id"},
+        )
+    if result.selected_option_id not in {option.option_id for option in request.options}:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result selected option is not pending for healing.",
+            payload={"invalid_reason": invalid_reason, "field": "selected_option_id"},
+        )
+    selected_payload = next(
+        option.payload
+        for option in request.options
+        if option.option_id == result.selected_option_id
+    )
+    if result.payload != selected_payload:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result payload does not match the selected healing option.",
+            payload={"invalid_reason": invalid_reason, "field": "payload"},
+        )
+    return None
 
 
 def _healing_selection_payload_for_model(

@@ -78,6 +78,12 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+from warhammer40k_core.engine.timing_windows import (
+    ReactionWindow,
+    TimingTriggerKind,
+    TimingWindow,
+    TimingWindowDescriptor,
+)
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
@@ -1897,6 +1903,113 @@ def test_transport_hazard_mortal_wounds_resume_decline_allowed_feel_no_pain() ->
     assert final_payload["mortal_wound_application"] is not None
 
 
+def test_lifecycle_transport_hazard_fnp_continues_reaction_frame() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    disembark_scenario = _without_unit(scenario, passenger.unit_instance_id)
+    attempted_placement = _unit_placement_at(
+        passenger,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(pose.position.x + 3.0, pose.position.y) for pose in _disembark_poses()),
+    )
+    combat_result = resolve_combat_disembark(
+        scenario=disembark_scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=_cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        ),
+        selection=DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ),
+        unit=passenger,
+        transport_placement=disembark_scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+        dice_manager=DiceRollManager(
+            "phase14h-transport-hazard-reaction-fnp",
+            injected_results=_combat_hazard_roll_results(
+                attempted_placement,
+                values=(1, 1, 6, 6, 6),
+                roll_id_prefix="phase14h-transport-hazard-reaction-fnp",
+            ),
+        ),
+    )
+    updated_battlefield = apply_combat_disembark_to_battlefield(
+        battlefield_state=disembark_scenario.battlefield_state,
+        disembark=combat_result,
+    )
+    state = _battle_state(disembark_scenario, game_id="phase14h-transport-hazard-reaction-fnp")
+    state.battlefield_state = updated_battlefield
+    target_model = passenger.own_models[0]
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=target_model.model_instance_id,
+        sources=(FeelNoPainSource(source_id="phase14h-transport-reaction-fnp", threshold=5),),
+        decline_allowed=True,
+    )
+    lifecycle = GameLifecycle(state=state)
+    routed = apply_transport_hazard_mortal_wounds(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        disembark=combat_result,
+        dice_manager=DiceRollManager(
+            "phase14h-transport-hazard-reaction-route",
+            event_log=lifecycle.decision_controller.event_log,
+        ),
+    )
+    seed_request = routed.pending_mortal_wound_request
+    assert seed_request is not None
+    lifecycle.decision_controller.queue.remove_by_id(seed_request.request_id)
+    lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=_transport_reaction_window(state=state, eligible_player_id="player-a"),
+        parent_phase=BattlePhase.MOVEMENT,
+        parent_step="phase14h_transport_hazard_reaction",
+        resume_token="phase14h_transport_hazard_reaction_resume",
+        actor_id="player-a",
+        decision_type=seed_request.decision_type,
+        options=seed_request.options,
+        payload=seed_request.payload,
+    )
+    reaction_request = lifecycle.decision_controller.queue.peek_next()
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14h-transport-hazard-reaction-fnp-decline",
+            request=reaction_request,
+            selected_option_id="decline",
+        )
+    )
+    follow_up_request = lifecycle.decision_controller.queue.peek_next()
+    continued_event = cast(
+        dict[str, object],
+        [
+            record.payload
+            for record in lifecycle.decision_controller.event_log.records
+            if record.event_type == "reaction_window_continued"
+        ][-1],
+    )
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request == follow_up_request
+    assert follow_up_request.decision_type == "select_feel_no_pain"
+    assert lifecycle.reaction_queue.frames[-1].request_id == follow_up_request.request_id
+    assert continued_event["next_request_id"] == follow_up_request.request_id
+    assert not any(
+        record.event_type == "reaction_parent_resumed"
+        for record in lifecycle.decision_controller.event_log.records
+    )
+
+
 def test_emergency_disembark_hazard_mortal_wounds_use_shared_damage_service() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     disembark_scenario = _without_unit(scenario, passenger.unit_instance_id)
@@ -3269,6 +3382,31 @@ def _battle_state(
         active_player_id="player-a",
         army_definitions=list(scenario.armies),
         battlefield_state=scenario.battlefield_state,
+    )
+
+
+def _transport_reaction_window(
+    *,
+    state: GameState,
+    eligible_player_id: str,
+) -> ReactionWindow:
+    return ReactionWindow(
+        timing_window=TimingWindow(
+            window_id="phase14h-transport-hazard-reaction-window",
+            descriptor=TimingWindowDescriptor(
+                descriptor_id="phase14h-transport-hazard-reaction-descriptor",
+                trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+                source_rule_id="phase14h-transport-hazard-reaction-rule",
+                phase=BattlePhase.MOVEMENT,
+                source_step="phase14h_transport_hazard_reaction",
+            ),
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            active_player_id=state.active_player_id,
+            phase=BattlePhase.MOVEMENT,
+            trigger_event_id=None,
+        ),
+        eligible_player_ids=(eligible_player_id,),
     )
 
 

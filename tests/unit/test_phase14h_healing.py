@@ -29,20 +29,29 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.healing import (
     SELECT_HEALING_MODEL_DECISION_TYPE,
     HealingEffect,
+    HealingEffectPayload,
     HealingModelSelection,
     HealingStep,
     HealingStepKind,
     apply_healing_model_decision,
+    apply_recorded_healing_model_decision,
+    healing_effect_from_request,
     healing_step_kind_from_token,
+    invalid_healing_model_decision_status,
     resolve_healing_until_blocked,
 )
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
@@ -191,6 +200,455 @@ def test_healing_selection_drift_rejects_before_queue_pop() -> None:
     assert decisions.queue.pending_requests == (request,)
     assert decisions.records == ()
     assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 1
+
+
+def test_lifecycle_submit_healing_model_decision_routes_through_submit_decision() -> None:
+    state = _battle_state()
+    lifecycle = _lifecycle_for_state(state)
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+    state = lifecycle_state
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    bodyguard_id = unit.own_models[0].model_instance_id
+    leader_id = unit.own_models[1].model_instance_id
+    effect = HealingEffect(
+        effect_id="phase14h-lifecycle-healing",
+        target_unit_instance_id=unit_id,
+        amount=2,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert (
+        HealingEffect.from_payload(
+            cast(HealingEffectPayload, request_payload["effect"])
+        ).to_payload()
+        == effect.to_payload()
+    )
+    pending_request = lifecycle.decision_controller.queue.peek_next()
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14h-lifecycle-healing-result",
+            request=pending_request,
+            selected_option_id=_option_for_model(pending_request, leader_id).option_id,
+        )
+    )
+
+    assert status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.TERMINAL,
+    }
+    assert lifecycle.decision_controller.records[-1].request.decision_type == (
+        SELECT_HEALING_MODEL_DECISION_TYPE
+    )
+    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 2
+    assert model_by_id(state=state, model_instance_id=bodyguard_id).wounds_remaining == 2
+    assert not any(
+        request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
+        for request in lifecycle.decision_controller.queue.pending_requests
+    )
+
+
+def test_lifecycle_healing_selection_stale_rejects_before_queue_pop() -> None:
+    state = _battle_state()
+    lifecycle = _lifecycle_for_state(state)
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+    state = lifecycle_state
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    bodyguard_id = unit.own_models[0].model_instance_id
+    leader_id = unit.own_models[1].model_instance_id
+    effect = HealingEffect(
+        effect_id="phase14h-lifecycle-healing-stale",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    _set_model_wounds(state, model_instance_id=bodyguard_id, wounds_remaining=2)
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14h-lifecycle-healing-stale-result",
+            request=request,
+            selected_option_id=_option_for_model(request, leader_id).option_id,
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {
+        "invalid_reason": "invalid_healing_model_selection_result",
+        "field": "legal_model_ids",
+    }
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert lifecycle.decision_controller.records == ()
+    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 1
+
+
+def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_choice() -> None:
+    state = _battle_state()
+    lifecycle = _lifecycle_for_state(state)
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+    state = lifecycle_state
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _unit_by_id(state, unit_id)
+    removed = tuple(
+        _remove_model(state, model_instance_id=model.model_instance_id)
+        for model in unit.own_models[:3]
+    )
+    effect = HealingEffect(
+        effect_id="phase14h-lifecycle-healing-follow-up",
+        target_unit_instance_id=unit_id,
+        amount=3,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+        revival_placements=removed,
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    selected_model_id = removed[2].model_instance_id
+
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14h-lifecycle-healing-follow-up-result",
+            request=request,
+            selected_option_id=_option_for_model(request, selected_model_id).option_id,
+        )
+    )
+    follow_up_request = lifecycle.decision_controller.queue.peek_next()
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request == follow_up_request
+    assert status.payload == {
+        "decision_type": SELECT_HEALING_MODEL_DECISION_TYPE,
+        "effect_id": effect.effect_id,
+        "target_unit_instance_id": unit_id,
+    }
+    assert follow_up_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
+    assert model_by_id(state=state, model_instance_id=selected_model_id).wounds_remaining == 2
+
+
+def test_healing_lifecycle_validation_helpers_cover_invalid_finite_fields() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    leader_id = unit.own_models[1].model_instance_id
+    effect = HealingEffect(
+        effect_id="phase14h-healing-helper-validation",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    option = _option_for_model(request, leader_id)
+
+    wrong_request_id = DecisionResult(
+        request_id="phase14h-healing-wrong-request",
+        result_id="phase14h-healing-wrong-request",
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=option.option_id,
+        payload=option.payload,
+    )
+    wrong_actor = DecisionResult(
+        request_id=request.request_id,
+        result_id="phase14h-healing-wrong-actor",
+        decision_type=request.decision_type,
+        actor_id="player-a",
+        selected_option_id=option.option_id,
+        payload=option.payload,
+    )
+    wrong_option = DecisionResult(
+        request_id=request.request_id,
+        result_id="phase14h-healing-wrong-option",
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id="phase14h-healing-missing-option",
+        payload=option.payload,
+    )
+    wrong_payload = DecisionResult(
+        request_id=request.request_id,
+        result_id="phase14h-healing-wrong-payload",
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=option.option_id,
+        payload={"source_id": None},
+    )
+
+    def invalid_field(result: DecisionResult) -> object:
+        status = invalid_healing_model_decision_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        assert status is not None
+        return cast(dict[str, object], status.payload)["field"]
+
+    assert healing_effect_from_request(request=request).to_payload() == effect.to_payload()
+    assert invalid_field(wrong_request_id) == "request_id"
+    assert invalid_field(wrong_actor) == "actor_id"
+    assert invalid_field(wrong_option) == "selected_option_id"
+    assert invalid_field(wrong_payload) == "payload"
+
+
+def test_healing_request_routing_rejects_malformed_request_contexts() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    leader_id = unit.own_models[1].model_instance_id
+    effect = HealingEffect(
+        effect_id="phase14h-healing-malformed-routing",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    option = _option_for_model(request, leader_id)
+    result = DecisionResult.for_request(
+        result_id="phase14h-healing-malformed-routing-result",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    wrong_decision_type = DecisionResult(
+        request_id=request.request_id,
+        result_id="phase14h-healing-wrong-decision-type",
+        decision_type="wrong_healing_result_type",
+        actor_id=request.actor_id,
+        selected_option_id=option.option_id,
+        payload=option.payload,
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires a DecisionRequest"):
+        healing_effect_from_request(request=cast(DecisionRequest, object()))
+    with pytest.raises(GameLifecycleError, match="requires a healing request"):
+        healing_effect_from_request(
+            request=replace(request, decision_type="wrong_healing_request_type")
+        )
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        healing_effect_from_request(request=replace(request, payload=None))
+    with pytest.raises(GameLifecycleError, match="payload missing effect"):
+        healing_effect_from_request(request=replace(request, payload={}))
+    with pytest.raises(GameLifecycleError, match="requires a DecisionRequest"):
+        invalid_healing_model_decision_status(
+            state=state,
+            request=cast(DecisionRequest, object()),
+            result=result,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a healing request"):
+        invalid_healing_model_decision_status(
+            state=state,
+            request=replace(request, decision_type="wrong_healing_request_type"),
+            result=result,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a DecisionResult"):
+        invalid_healing_model_decision_status(
+            state=state,
+            request=request,
+            result=cast(DecisionResult, object()),
+        )
+
+    status = invalid_healing_model_decision_status(
+        state=state,
+        request=request,
+        result=wrong_decision_type,
+    )
+
+    assert status is not None
+    assert status.payload == {
+        "invalid_reason": "invalid_healing_model_selection_result",
+        "field": "decision_type",
+    }
+
+
+@pytest.mark.parametrize(
+    ("field_name", "replacement_value", "expected_field"),
+    [
+        ("effect_id", "phase14h-healing-stale-effect", "effect_id"),
+        ("target_unit_instance_id", "phase14h-healing-stale-target", "target_unit_instance_id"),
+        ("step_index", 2, "step_index"),
+        ("source_rule_id", "phase14h-healing-stale-source", "source_rule_id"),
+        ("source_context", {"phase14h": "stale"}, "source_context"),
+        ("selection_kind", HealingStepKind.REVIVE_MODEL.value, "selection_kind"),
+    ],
+)
+def test_healing_lifecycle_validation_reports_stale_selection_fields(
+    field_name: str,
+    replacement_value: JsonValue,
+    expected_field: str,
+) -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    leader_id = unit.own_models[1].model_instance_id
+    effect = HealingEffect(
+        effect_id="phase14h-healing-stale-selection-fields",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    option = _option_for_model(request, leader_id)
+    option_payload = dict(cast(dict[str, JsonValue], option.payload))
+    option_payload[field_name] = replacement_value
+    if field_name == "selection_kind":
+        assert state.battlefield_state is not None
+        option_payload["revival_placement"] = cast(
+            JsonValue,
+            state.battlefield_state.model_placement_by_id(leader_id).to_payload(),
+        )
+    drifted_option = replace(option, payload=option_payload)
+    drifted_request = replace(request, options=(drifted_option,))
+    result = DecisionResult.for_request(
+        result_id=f"phase14h-healing-stale-selection-{expected_field}",
+        request=drifted_request,
+        selected_option_id=drifted_option.option_id,
+    )
+
+    status = invalid_healing_model_decision_status(
+        state=state,
+        request=drifted_request,
+        result=result,
+    )
+
+    assert status is not None
+    assert status.payload == {
+        "invalid_reason": "invalid_healing_model_selection_result",
+        "field": expected_field,
+    }
+
+
+def test_recorded_healing_model_decision_rejects_effect_drift_without_mutation() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    leader_id = unit.own_models[1].model_instance_id
+    effect = HealingEffect(
+        effect_id="phase14h-recorded-healing",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="phase14h-recorded-healing-result",
+        request=request,
+        selected_option_id=_option_for_model(request, leader_id).option_id,
+    )
+    decisions.submit_result(result)
+
+    with pytest.raises(GameLifecycleError, match="effect drift"):
+        apply_recorded_healing_model_decision(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=_ruleset(),
+            request=request,
+            result=result,
+            effect=HealingEffect(
+                effect_id="phase14h-recorded-healing-drift",
+                target_unit_instance_id=unit_id,
+                amount=1,
+                opposing_player_id="player-b",
+                phase_start_model_ids=_placed_model_ids(state, unit_id),
+            ),
+        )
+
+    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 1
+
+
+def test_recorded_healing_model_decision_can_replay_from_request_effect() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _replace_with_attached_wounded_unit(state, unit_id=unit_id)
+    leader_id = unit.own_models[1].model_instance_id
+    effect = HealingEffect(
+        effect_id="phase14h-recorded-healing-request-effect",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+    )
+    _blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="phase14h-recorded-healing-request-effect-result",
+        request=request,
+        selected_option_id=_option_for_model(request, leader_id).option_id,
+    )
+    decisions.submit_result(result)
+
+    resolved, follow_up = apply_recorded_healing_model_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        request=request,
+        result=result,
+    )
+
+    assert follow_up is None
+    assert resolved.is_complete()
+    assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 2
 
 
 def test_multiple_wounded_non_attached_unit_rejects_without_choice() -> None:
@@ -897,6 +1355,19 @@ def _battle_state() -> GameState:
         state.complete_current_setup_step()
     assert state.stage is GameLifecycleStage.BATTLE
     return state
+
+
+def _lifecycle_for_state(state: GameState) -> GameLifecycle:
+    config = _config()
+    return GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": DecisionController().to_payload(),
+            "reaction_queue": {"frames": []},
+        }
+    )
 
 
 def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> SecondaryMissionChoice:
