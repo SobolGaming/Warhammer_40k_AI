@@ -22,6 +22,7 @@ from warhammer40k_core.core.modifiers import (
     RollModifier,
     RollModifierPayload,
 )
+from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     LineOfSightPolicy,
     RulesetDescriptor,
@@ -37,11 +38,13 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
     BattlefieldRemovalKind,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
     ModelRemovalRecord,
     PlacementError,
+    UnitPlacement,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.core_stratagem_effects import (
@@ -114,6 +117,14 @@ from warhammer40k_core.engine.hazard import (
     hazard_roll_failed,
     hazard_roll_spec,
 )
+from warhammer40k_core.engine.movement_proposals import (
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    PlacementProposalPayload,
+    PlacementProposalPayloadPayload,
+    ProposalKind,
+    ProposalValidationResult,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -135,6 +146,17 @@ from warhammer40k_core.engine.shooting_targets import (
     PLUNGING_FIRE_RULE_ID,
     shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
+)
+from warhammer40k_core.engine.transports import (
+    DestroyedTransportDisembark,
+    DestroyedTransportDisembarkPayload,
+    DisembarkModeKind,
+    DisembarkSelection,
+    TransportCargoState,
+    TransportMovementStatus,
+    apply_destroyed_transport_disembark_to_battlefield,
+    apply_transport_hazard_mortal_wounds,
+    resolve_destroyed_transport_disembark,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
@@ -332,6 +354,7 @@ class AttackSequencePayload(TypedDict):
     current_hit_roll: HitRollPayload | None
     deferred_mortal_wounds: list[DeferredMortalWoundsPayload]
     pending_grouped_damage: PendingGroupedDamagePayload | None
+    pending_destroyed_transport_disembark: PendingDestroyedTransportDisembarkPayload | None
 
 
 class AttackResolutionContextPayload(TypedDict):
@@ -367,6 +390,18 @@ class PendingGroupedDamagePayload(TypedDict):
     allocation_context_payload: AttackAllocationRuleContextPayload
     allocated_model_ids: list[str]
     next_index: int
+
+
+class PendingDestroyedTransportDisembarkPayload(TypedDict):
+    attack_context: AttackResolutionContextPayload
+    damage_application: DamageApplicationPayload
+    saving_throw: JsonValue
+    feel_no_pain: FeelNoPainResolutionPayload
+    destroyed_model_controller_player_id: str
+    transport_unit_instance_id: str
+    pending_unit_instance_ids: list[str]
+    resolved_disembarks: list[DestroyedTransportDisembarkPayload]
+    pending_sources: list[DestructionReactionSourcePayload]
 
 
 class LostWoundContextPayload(TypedDict):
@@ -926,6 +961,154 @@ class PendingGroupedDamage:
 
 
 @dataclass(frozen=True, slots=True)
+class PendingDestroyedTransportDisembark:
+    attack_context: AttackResolutionContextPayload
+    damage_application: DamageApplication
+    saving_throw_payload: JsonValue
+    feel_no_pain: FeelNoPainResolution
+    destroyed_model_controller_player_id: str
+    transport_unit_instance_id: str
+    pending_unit_instance_ids: tuple[str, ...]
+    resolved_disembarks: tuple[DestroyedTransportDisembark, ...] = ()
+    pending_sources: tuple[DestructionReactionSource, ...] = ()
+
+    def __post_init__(self) -> None:
+        attack_context = validate_json_value(self.attack_context)
+        if not isinstance(attack_context, dict):
+            raise GameLifecycleError(
+                "Pending destroyed Transport attack_context must be an object."
+            )
+        object.__setattr__(
+            self,
+            "attack_context",
+            cast(AttackResolutionContextPayload, attack_context),
+        )
+        if type(self.damage_application) is not DamageApplication:
+            raise GameLifecycleError(
+                "Pending destroyed Transport damage_application must be DamageApplication."
+            )
+        if not self.damage_application.destroyed:
+            raise GameLifecycleError("Pending destroyed Transport requires destroyed damage.")
+        if (
+            self.damage_application.target_unit_instance_id
+            != self.attack_context["target_unit_instance_id"]
+        ):
+            raise GameLifecycleError("Pending destroyed Transport damage target drift.")
+        object.__setattr__(
+            self,
+            "saving_throw_payload",
+            validate_json_value(self.saving_throw_payload),
+        )
+        if type(self.feel_no_pain) is not FeelNoPainResolution:
+            raise GameLifecycleError(
+                "Pending destroyed Transport feel_no_pain must be FeelNoPainResolution."
+            )
+        object.__setattr__(
+            self,
+            "destroyed_model_controller_player_id",
+            _validate_identifier(
+                "Pending destroyed Transport controller",
+                self.destroyed_model_controller_player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "transport_unit_instance_id",
+            _validate_identifier(
+                "Pending destroyed Transport transport_unit_instance_id",
+                self.transport_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "pending_unit_instance_ids",
+            _validate_identifier_tuple(
+                "Pending destroyed Transport unit ids",
+                self.pending_unit_instance_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "resolved_disembarks",
+            _validate_destroyed_transport_disembark_tuple(self.resolved_disembarks),
+        )
+        object.__setattr__(
+            self,
+            "pending_sources",
+            _validate_destruction_reaction_source_tuple(
+                "Pending destroyed Transport pending_sources",
+                self.pending_sources,
+            ),
+        )
+        resolved_unit_ids = {disembark.unit_instance_id for disembark in self.resolved_disembarks}
+        if resolved_unit_ids & set(self.pending_unit_instance_ids):
+            raise GameLifecycleError("Pending destroyed Transport unit appears in both states.")
+        for disembark in self.resolved_disembarks:
+            if disembark.transport_unit_instance_id != self.transport_unit_instance_id:
+                raise GameLifecycleError("Pending destroyed Transport disembark transport drift.")
+            if disembark.battle_round < 1:
+                raise GameLifecycleError("Pending destroyed Transport disembark round drift.")
+
+    @property
+    def next_unit_instance_id(self) -> str | None:
+        if not self.pending_unit_instance_ids:
+            return None
+        return self.pending_unit_instance_ids[0]
+
+    def with_resolved_disembark(self, disembark: DestroyedTransportDisembark) -> Self:
+        if type(disembark) is not DestroyedTransportDisembark:
+            raise GameLifecycleError("Resolved destroyed Transport disembark is invalid.")
+        if self.next_unit_instance_id != disembark.unit_instance_id:
+            raise GameLifecycleError("Resolved destroyed Transport disembark unit drift.")
+        return type(self)(
+            attack_context=self.attack_context,
+            damage_application=self.damage_application,
+            saving_throw_payload=self.saving_throw_payload,
+            feel_no_pain=self.feel_no_pain,
+            destroyed_model_controller_player_id=self.destroyed_model_controller_player_id,
+            transport_unit_instance_id=self.transport_unit_instance_id,
+            pending_unit_instance_ids=self.pending_unit_instance_ids[1:],
+            resolved_disembarks=(*self.resolved_disembarks, disembark),
+            pending_sources=self.pending_sources,
+        )
+
+    def to_payload(self) -> PendingDestroyedTransportDisembarkPayload:
+        return {
+            "attack_context": self.attack_context,
+            "damage_application": self.damage_application.to_payload(),
+            "saving_throw": self.saving_throw_payload,
+            "feel_no_pain": self.feel_no_pain.to_payload(),
+            "destroyed_model_controller_player_id": self.destroyed_model_controller_player_id,
+            "transport_unit_instance_id": self.transport_unit_instance_id,
+            "pending_unit_instance_ids": list(self.pending_unit_instance_ids),
+            "resolved_disembarks": [
+                disembark.to_payload() for disembark in self.resolved_disembarks
+            ],
+            "pending_sources": [source.to_payload() for source in self.pending_sources],
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PendingDestroyedTransportDisembarkPayload) -> Self:
+        return cls(
+            attack_context=payload["attack_context"],
+            damage_application=DamageApplication.from_payload(payload["damage_application"]),
+            saving_throw_payload=payload["saving_throw"],
+            feel_no_pain=FeelNoPainResolution.from_payload(payload["feel_no_pain"]),
+            destroyed_model_controller_player_id=payload["destroyed_model_controller_player_id"],
+            transport_unit_instance_id=payload["transport_unit_instance_id"],
+            pending_unit_instance_ids=tuple(payload["pending_unit_instance_ids"]),
+            resolved_disembarks=tuple(
+                DestroyedTransportDisembark.from_payload(disembark)
+                for disembark in payload["resolved_disembarks"]
+            ),
+            pending_sources=tuple(
+                DestructionReactionSource.from_payload(source)
+                for source in payload["pending_sources"]
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class AttackModifierStackSet:
     attacks: ModifierStack | None = None
     strength: ModifierStack | None = None
@@ -1385,6 +1568,7 @@ class AttackSequence:
     current_hit_roll: HitRoll | None = None
     deferred_mortal_wounds: tuple[DeferredMortalWounds, ...] = ()
     pending_grouped_damage: PendingGroupedDamage | None = None
+    pending_destroyed_transport_disembark: PendingDestroyedTransportDisembark | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1486,6 +1670,15 @@ class AttackSequence:
                 raise GameLifecycleError(
                     "AttackSequence pending_grouped_damage requires no generated hit state."
                 )
+        if (
+            self.pending_destroyed_transport_disembark is not None
+            and type(self.pending_destroyed_transport_disembark)
+            is not PendingDestroyedTransportDisembark
+        ):
+            raise GameLifecycleError(
+                "AttackSequence pending_destroyed_transport_disembark must be "
+                "PendingDestroyedTransportDisembark."
+            )
         if self.pool_index > len(self.attack_pools):
             raise GameLifecycleError("AttackSequence pool_index is outside attack_pools.")
         if self.pool_index == len(self.attack_pools):
@@ -1502,6 +1695,10 @@ class AttackSequence:
             if self.pending_grouped_damage is not None:
                 raise GameLifecycleError(
                     "Completed AttackSequence cannot have pending_grouped_damage."
+                )
+            if self.pending_destroyed_transport_disembark is not None:
+                raise GameLifecycleError(
+                    "Completed AttackSequence cannot have pending destroyed Transport state."
                 )
             if self.attack_index != 0:
                 raise GameLifecycleError("Completed AttackSequence must have attack_index 0.")
@@ -1597,6 +1794,7 @@ class AttackSequence:
                 attack_index=next_attack_index,
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
                 pending_grouped_damage=self.pending_grouped_damage,
+                pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
             )
         next_pool_index = self.pool_index + 1
         return type(self)(
@@ -1612,6 +1810,7 @@ class AttackSequence:
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
+            pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
         )
 
     def advanced_after_generated_hit(self, hit_roll: HitRoll) -> Self:
@@ -1640,6 +1839,7 @@ class AttackSequence:
                 attack_index=self.attack_index,
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
                 pending_grouped_damage=self.pending_grouped_damage,
+                pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
             ).advanced_after_attack()
         return type(self)(
             sequence_id=self.sequence_id,
@@ -1656,6 +1856,7 @@ class AttackSequence:
             current_hit_roll=hit_roll,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
+            pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
         )
 
     def with_deferred_mortal_wounds(self, deferred: DeferredMortalWounds) -> Self:
@@ -1676,6 +1877,7 @@ class AttackSequence:
             current_hit_roll=self.current_hit_roll,
             deferred_mortal_wounds=(*self.deferred_mortal_wounds, deferred),
             pending_grouped_damage=self.pending_grouped_damage,
+            pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
         )
 
     def without_deferred_mortal_wounds(self) -> Self:
@@ -1700,6 +1902,7 @@ class AttackSequence:
             current_hit_roll=self.current_hit_roll,
             deferred_mortal_wounds=deferred_mortal_wounds,
             pending_grouped_damage=self.pending_grouped_damage,
+            pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
         )
 
     def with_pending_grouped_damage(self, pending: PendingGroupedDamage) -> Self:
@@ -1718,6 +1921,7 @@ class AttackSequence:
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
             pending_grouped_damage=pending,
+            pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
         )
 
     def without_pending_grouped_damage(self) -> Self:
@@ -1733,6 +1937,48 @@ class AttackSequence:
             pool_index=self.pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+        )
+
+    def with_pending_destroyed_transport_disembark(
+        self,
+        pending: PendingDestroyedTransportDisembark,
+    ) -> Self:
+        if type(pending) is not PendingDestroyedTransportDisembark:
+            raise GameLifecycleError("AttackSequence destroyed Transport pending state is invalid.")
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
+            pool_index=self.pool_index,
+            attack_index=self.attack_index,
+            generated_hit_index=self.generated_hit_index,
+            current_hit_roll=self.current_hit_roll,
+            deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_grouped_damage=self.pending_grouped_damage,
+            pending_destroyed_transport_disembark=pending,
+        )
+
+    def without_pending_destroyed_transport_disembark(self) -> Self:
+        return type(self)(
+            sequence_id=self.sequence_id,
+            attacker_player_id=self.attacker_player_id,
+            attacking_unit_instance_id=self.attacking_unit_instance_id,
+            attack_pools=self.attack_pools,
+            source_phase=self.source_phase,
+            used_pool_indices=self.used_pool_indices,
+            selected_target_unit_instance_id=self.selected_target_unit_instance_id,
+            current_gathered_group=self.current_gathered_group,
+            pool_index=self.pool_index,
+            attack_index=self.attack_index,
+            generated_hit_index=self.generated_hit_index,
+            current_hit_roll=self.current_hit_roll,
+            deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_grouped_damage=self.pending_grouped_damage,
         )
 
     def with_selected_target_unit(self, target_unit_instance_id: str) -> Self:
@@ -1753,6 +1999,7 @@ class AttackSequence:
             ),
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
         )
 
     def without_selected_target_unit(self) -> Self:
@@ -1768,6 +2015,7 @@ class AttackSequence:
             pool_index=next_pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
         )
 
     def with_current_gathered_group(self, gathered_group: GatheredAttackGroup) -> Self:
@@ -1787,6 +2035,7 @@ class AttackSequence:
             pool_index=gathered_group.primary_pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
         )
 
     def to_payload(self) -> AttackSequencePayload:
@@ -1817,10 +2066,16 @@ class AttackSequence:
                 if self.pending_grouped_damage is None
                 else self.pending_grouped_damage.to_payload()
             ),
+            "pending_destroyed_transport_disembark": (
+                None
+                if self.pending_destroyed_transport_disembark is None
+                else self.pending_destroyed_transport_disembark.to_payload()
+            ),
         }
 
     @classmethod
     def from_payload(cls, payload: AttackSequencePayload) -> Self:
+        pending_destroyed_transport_payload = payload.get("pending_destroyed_transport_disembark")
         return cls(
             sequence_id=payload["sequence_id"],
             source_phase=battle_phase_kind_from_token(
@@ -1854,6 +2109,13 @@ class AttackSequence:
                 None
                 if payload["pending_grouped_damage"] is None
                 else PendingGroupedDamage.from_payload(payload["pending_grouped_damage"])
+            ),
+            pending_destroyed_transport_disembark=(
+                None
+                if pending_destroyed_transport_payload is None
+                else PendingDestroyedTransportDisembark.from_payload(
+                    pending_destroyed_transport_payload
+                )
             ),
         )
 
@@ -2019,6 +2281,24 @@ def resolve_attack_sequence_until_blocked(
         else dice_manager
     )
     while not current.is_complete:
+        if current.pending_destroyed_transport_disembark is not None:
+            next_current, allocated_model_ids, status = (
+                _continue_pending_destroyed_transport_disembark(
+                    state=state,
+                    decisions=decisions,
+                    ruleset_descriptor=ruleset_descriptor,
+                    manager=manager,
+                    attack_sequence=current,
+                    allocated_model_ids=allocated_model_ids,
+                    hooks=active_hooks,
+                )
+            )
+            if status is not None:
+                return next_current, allocated_model_ids, status
+            if next_current is None:
+                return None, allocated_model_ids, None
+            current = next_current
+            continue
         if current.pending_grouped_damage is not None:
             next_current, allocated_model_ids, status = _resolve_grouped_damage_from(
                 state=state,
@@ -2083,6 +2363,852 @@ def resolve_attack_sequence_until_blocked(
     if hazardous_status is not None:
         return current, allocated_model_ids, hazardous_status
     return None, allocated_model_ids, None
+
+
+def is_destroyed_transport_disembark_proposal_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError(
+            "Destroyed Transport disembark proposal routing requires a DecisionRequest."
+        )
+    if request.decision_type != PLACEMENT_PROPOSAL_DECISION_TYPE:
+        return False
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    if proposal_request.proposal_kind is not ProposalKind.DISEMBARK:
+        return False
+    context = proposal_request.context or {}
+    return context.get("destruction_timing") == "destroyed_transport"
+
+
+def invalid_destroyed_transport_disembark_proposal_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+) -> LifecycleStatus | None:
+    if not is_destroyed_transport_disembark_proposal_request(request):
+        raise GameLifecycleError(
+            "Destroyed Transport disembark prevalidation received unsupported request."
+        )
+    result.validate_for_request(request)
+    pending = attack_sequence.pending_destroyed_transport_disembark
+    if pending is None:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=MovementProposalRequest.from_decision_request_payload(request.payload),
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=request.request_id,
+                proposal_kind=ProposalKind.DISEMBARK,
+                violation_code="destroyed_transport_context_missing",
+                message="Destroyed Transport placement has no pending attack context.",
+                field=None,
+            ),
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal has no pending context.",
+        )
+    parsed = _parse_destroyed_transport_disembark_submission_or_invalid(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+    )
+    if isinstance(parsed, LifecycleStatus):
+        return parsed
+    proposal_request, submission = parsed
+    proposal_validation = submission.validation_result_for_request(proposal_request)
+    if not proposal_validation.is_valid:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=proposal_validation,
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal does not match request.",
+        )
+    field = _missing_destroyed_transport_disembark_field(submission)
+    if field is not None:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="proposal_payload_missing_field",
+                message=f"Destroyed Transport disembark proposal missing {field}.",
+                field=field,
+            ),
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal is incomplete.",
+        )
+    if submission.unit_instance_id != pending.next_unit_instance_id:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="destroyed_transport_unit_drift",
+                message="Destroyed Transport disembark unit does not match pending cargo.",
+                field="unit_instance_id",
+            ),
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal unit drifted.",
+        )
+    if submission.disembark_mode is not DisembarkModeKind.EMERGENCY_DISEMBARK:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="destroyed_transport_mode_drift",
+                message="Destroyed Transport disembark must use Emergency Disembark mode.",
+                field="disembark_mode",
+            ),
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal mode drifted.",
+        )
+    if submission.transport_unit_instance_id != pending.transport_unit_instance_id:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="destroyed_transport_transport_drift",
+                message="Destroyed Transport disembark transport does not match pending context.",
+                field="transport_unit_instance_id",
+            ),
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal transport drifted.",
+        )
+    if submission.transport_movement_status is not TransportMovementStatus.NOT_MOVED:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="destroyed_transport_status_drift",
+                message="Destroyed Transport disembark must use destroyed timing.",
+                field="transport_movement_status",
+            ),
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal timing drifted.",
+        )
+    return None
+
+
+def apply_destroyed_transport_disembark_proposal_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+    already_allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks | None = None,
+    dice_manager: DiceRollManager | None = None,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    record = decisions.record_for_result(result)
+    request = record.request
+    if not is_destroyed_transport_disembark_proposal_request(request):
+        raise GameLifecycleError(
+            "Destroyed Transport disembark apply received unsupported request."
+        )
+    pending = attack_sequence.pending_destroyed_transport_disembark
+    if pending is None:
+        raise GameLifecycleError("Destroyed Transport disembark apply requires pending state.")
+    parsed = _parse_destroyed_transport_disembark_submission_or_invalid(
+        state=state,
+        request=request,
+        result=result,
+        decisions=decisions,
+    )
+    if isinstance(parsed, LifecycleStatus):
+        return attack_sequence, already_allocated_model_ids, parsed
+    proposal_request, submission = parsed
+    if (
+        submission.transport_unit_instance_id is None
+        or submission.disembark_mode is None
+        or submission.transport_movement_status is None
+    ):
+        raise GameLifecycleError("Destroyed Transport disembark submission drifted.")
+    manager = (
+        DiceRollManager(state.game_id, event_log=decisions.event_log)
+        if dice_manager is None
+        else dice_manager
+    )
+    disembark = _resolve_destroyed_transport_disembark_submission(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        pending=pending,
+        submission=submission,
+        dice_manager=manager,
+    )
+    if not disembark.placement.is_valid:
+        status = _destroyed_transport_placement_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            disembark=disembark,
+        )
+        _request_destroyed_transport_disembark_placement_retry(
+            state=state,
+            decisions=decisions,
+            proposal_request=proposal_request,
+            pending=pending,
+            rejected_result=result,
+        )
+        return attack_sequence, already_allocated_model_ids, status
+    _apply_valid_destroyed_transport_disembark(
+        state=state,
+        decisions=decisions,
+        disembark=disembark,
+        result=result,
+        source_phase=attack_sequence.source_phase,
+    )
+    updated_pending = pending.with_resolved_disembark(disembark)
+    updated_sequence = attack_sequence.with_pending_destroyed_transport_disembark(updated_pending)
+    routed = apply_transport_hazard_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        disembark=disembark,
+        dice_manager=manager,
+    )
+    if routed.pending_mortal_wound_request is not None:
+        return (
+            updated_sequence,
+            already_allocated_model_ids,
+            LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=routed.pending_mortal_wound_request,
+                payload={
+                    "phase": attack_sequence.source_phase.value,
+                    "battle_round": state.battle_round,
+                    "active_player_id": disembark.player_id,
+                    "unit_instance_id": disembark.unit_instance_id,
+                    "transport_unit_instance_id": disembark.transport_unit_instance_id,
+                    "disembark_mode": disembark.disembark_mode.value,
+                    "decision_type": routed.pending_mortal_wound_request.decision_type,
+                    "phase_body_status": "destroyed_transport_hazard_feel_no_pain_required",
+                },
+            ),
+        )
+    return _continue_pending_destroyed_transport_disembark(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        manager=manager,
+        attack_sequence=updated_sequence,
+        allocated_model_ids=already_allocated_model_ids,
+        hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+    )
+
+
+def _continue_pending_destroyed_transport_disembark(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    allocated_model_ids: tuple[str, ...],
+    hooks: AttackSequenceHooks,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    pending = attack_sequence.pending_destroyed_transport_disembark
+    if pending is None:
+        raise GameLifecycleError("Destroyed Transport continuation requires pending state.")
+    if pending.next_unit_instance_id is not None:
+        request = _request_destroyed_transport_disembark_placement(
+            state=state,
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            pending=pending,
+        )
+        return (
+            attack_sequence,
+            allocated_model_ids,
+            LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=request,
+                payload={
+                    "phase": attack_sequence.source_phase.value,
+                    "decision_type": PLACEMENT_PROPOSAL_DECISION_TYPE,
+                    "unit_instance_id": pending.next_unit_instance_id,
+                    "transport_unit_instance_id": pending.transport_unit_instance_id,
+                    "phase_body_status": "destroyed_transport_disembark_placement_required",
+                },
+            ),
+        )
+
+    sequence_without_pending = attack_sequence.without_pending_destroyed_transport_disembark()
+    _remove_resolved_destroyed_transport_cargo_state(
+        state=state,
+        transport_unit_instance_id=pending.transport_unit_instance_id,
+    )
+    mandatory_status = _resolve_mandatory_destruction_reactions_before_removal(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=sequence_without_pending,
+        attack_context=pending.attack_context,
+        damage=pending.damage_application,
+        saving_throw_payload=pending.saving_throw_payload,
+        feel_no_pain=pending.feel_no_pain,
+        destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+        sources=pending.pending_sources,
+    )
+    if mandatory_status is not None:
+        return sequence_without_pending, allocated_model_ids, mandatory_status
+    remove_destroyed_model_from_battlefield(
+        state=state,
+        model_instance_id=pending.damage_application.model_instance_id,
+    )
+    destroyed_emission = _emit_damage_event(
+        decisions=decisions,
+        hooks=hooks,
+        attack_sequence=sequence_without_pending,
+        damage=pending.damage_application,
+        saving_throw=None,
+        saving_throw_payload=pending.saving_throw_payload,
+        feel_no_pain=pending.feel_no_pain,
+    )
+    reaction_status = _destruction_reaction_status_if_needed(
+        state=state,
+        decisions=decisions,
+        attack_sequence=sequence_without_pending,
+        attack_context=pending.attack_context,
+        damage=pending.damage_application,
+        destroyed_emission=destroyed_emission,
+        destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+    )
+    if reaction_status is not None:
+        return sequence_without_pending, allocated_model_ids, reaction_status
+    if sequence_without_pending.pending_grouped_damage is not None:
+        return _continue_grouped_damage_after_interruption(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            attack_sequence=sequence_without_pending,
+            allocated_model_ids=allocated_model_ids,
+            status=None,
+            hooks=hooks,
+            dice_manager=manager,
+        )
+    return (
+        _advance_after_resolved_hit(
+            attack_sequence=sequence_without_pending,
+            attack_context=pending.attack_context,
+        ),
+        allocated_model_ids,
+        None,
+    )
+
+
+def _remove_resolved_destroyed_transport_cargo_state(
+    *,
+    state: GameState,
+    transport_unit_instance_id: str,
+) -> None:
+    cargo_state = state.transport_cargo_state_for_transport(transport_unit_instance_id)
+    if cargo_state is None:
+        raise GameLifecycleError("Destroyed Transport cargo state is missing before removal.")
+    if cargo_state.embarked_unit_instance_ids:
+        raise GameLifecycleError("Destroyed Transport cargo state still has embarked units.")
+    state.remove_transport_cargo_state(transport_unit_instance_id)
+
+
+def _begin_destroyed_transport_disembark_if_needed(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    damage: DamageApplication | None,
+    saving_throw_payload: JsonValue,
+    feel_no_pain: FeelNoPainResolution,
+    destroyed_model_controller_player_id: str,
+    sources: tuple[DestructionReactionSource, ...] = (),
+) -> tuple[AttackSequence, LifecycleStatus | None]:
+    if damage is None or not damage.destroyed:
+        return attack_sequence, None
+    cargo_state = _destroyed_transport_cargo_state_for_damage(state=state, damage=damage)
+    if cargo_state is None or not cargo_state.embarked_unit_instance_ids:
+        return attack_sequence, None
+    pending = PendingDestroyedTransportDisembark(
+        attack_context=attack_context,
+        damage_application=damage,
+        saving_throw_payload=saving_throw_payload,
+        feel_no_pain=feel_no_pain,
+        destroyed_model_controller_player_id=destroyed_model_controller_player_id,
+        transport_unit_instance_id=cargo_state.transport_unit_instance_id,
+        pending_unit_instance_ids=cargo_state.embarked_unit_instance_ids,
+        pending_sources=sources,
+    )
+    updated_sequence = attack_sequence.with_pending_destroyed_transport_disembark(pending)
+    request = _request_destroyed_transport_disembark_placement(
+        state=state,
+        decisions=decisions,
+        attack_sequence=updated_sequence,
+        pending=pending,
+    )
+    return (
+        updated_sequence,
+        LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload={
+                "phase": attack_sequence.source_phase.value,
+                "decision_type": PLACEMENT_PROPOSAL_DECISION_TYPE,
+                "unit_instance_id": pending.next_unit_instance_id,
+                "transport_unit_instance_id": pending.transport_unit_instance_id,
+                "phase_body_status": "destroyed_transport_disembark_placement_required",
+            },
+        ),
+    )
+
+
+def _request_destroyed_transport_disembark_placement(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    pending: PendingDestroyedTransportDisembark,
+) -> DecisionRequest:
+    unit_instance_id = pending.next_unit_instance_id
+    if unit_instance_id is None:
+        raise GameLifecycleError("Destroyed Transport placement request requires pending cargo.")
+    attack_context_id = pending.attack_context["attack_context_id"]
+    proposal_request = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=pending.destroyed_model_controller_player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=attack_sequence.source_phase.value,
+        unit_instance_id=unit_instance_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        source_decision_request_id=f"{attack_context_id}:destroyed-transport",
+        source_decision_result_id=f"{attack_context_id}:destroyed-transport",
+        placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
+        context={
+            "destruction_timing": "destroyed_transport",
+            "transport_unit_instance_id": pending.transport_unit_instance_id,
+            "disembark_mode": DisembarkModeKind.EMERGENCY_DISEMBARK.value,
+            "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+            "attack_sequence_id": attack_sequence.sequence_id,
+            "attack_context_id": attack_context_id,
+            "destroyed_model_instance_id": pending.damage_application.model_instance_id,
+        },
+    )
+    request = proposal_request.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "destroyed_transport_disembark_placement_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": attack_sequence.source_phase.value,
+                "active_player_id": pending.destroyed_model_controller_player_id,
+                "unit_instance_id": unit_instance_id,
+                "transport_unit_instance_id": pending.transport_unit_instance_id,
+                "disembark_mode": DisembarkModeKind.EMERGENCY_DISEMBARK.value,
+                "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+                "request_id": request.request_id,
+                "attack_sequence_id": attack_sequence.sequence_id,
+                "attack_context_id": attack_context_id,
+                "destroyed_model_instance_id": pending.damage_application.model_instance_id,
+                "remaining_embarked_unit_ids": list(pending.pending_unit_instance_ids),
+                "phase_body_status": "destroyed_transport_disembark_placement_required",
+            }
+        ),
+    )
+    return request
+
+
+def _parse_destroyed_transport_disembark_submission_or_invalid(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> tuple[MovementProposalRequest, PlacementProposalPayload] | LifecycleStatus:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    try:
+        submission = PlacementProposalPayload.from_payload(
+            cast(PlacementProposalPayloadPayload, _payload_object(result.payload))
+        )
+    except (GameLifecycleError, PlacementError, KeyError, TypeError) as exc:
+        return _destroyed_transport_proposal_invalid_status(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_request=proposal_request,
+            proposal_validation=_destroyed_transport_proposal_parse_failure(
+                proposal_request=proposal_request,
+                error=exc,
+            ),
+            event_type="destroyed_transport_disembark_proposal_invalid",
+            message="Destroyed Transport disembark proposal payload is malformed.",
+        )
+    return proposal_request, submission
+
+
+def _destroyed_transport_proposal_parse_failure(
+    *,
+    proposal_request: MovementProposalRequest,
+    error: GameLifecycleError | PlacementError | KeyError | TypeError,
+) -> ProposalValidationResult:
+    if type(error) is KeyError:
+        missing = _key_error_field(error)
+        return ProposalValidationResult.invalid(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            violation_code="proposal_payload_missing_field",
+            message=f"Proposal payload missing required field: {missing}.",
+            field=missing,
+        )
+    message = str(error)
+    field: str | None = "attempted_placement"
+    violation_code = "proposal_payload_malformed"
+    if "proposal_kind" in message:
+        field = "proposal_kind"
+    elif "disembark_mode" in message or "DisembarkModeKind" in message:
+        field = "disembark_mode"
+    elif "transport_movement_status" in message or "TransportMovementStatus" in message:
+        field = "transport_movement_status"
+    elif "transport_unit_instance_id" in message:
+        field = "transport_unit_instance_id"
+    return ProposalValidationResult.invalid(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        violation_code=violation_code,
+        message=f"Proposal payload is malformed: {message}",
+        field=field,
+    )
+
+
+def _key_error_field(error: KeyError) -> str:
+    if len(error.args) != 1:
+        return "payload"
+    key = error.args[0]
+    if type(key) is str and key.strip():
+        return key.strip()
+    return "payload"
+
+
+def _missing_destroyed_transport_disembark_field(
+    submission: PlacementProposalPayload,
+) -> str | None:
+    if submission.transport_unit_instance_id is None:
+        return "transport_unit_instance_id"
+    if submission.disembark_mode is None:
+        return "disembark_mode"
+    if submission.transport_movement_status is None:
+        return "transport_movement_status"
+    return None
+
+
+def _destroyed_transport_proposal_invalid_status(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    proposal_request: MovementProposalRequest,
+    proposal_validation: ProposalValidationResult,
+    event_type: str,
+    message: str,
+) -> LifecycleStatus:
+    payload = validate_json_value(
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": proposal_request.actor_id,
+            "phase": proposal_request.phase,
+            "unit_instance_id": proposal_request.unit_instance_id,
+            "proposal_kind": proposal_request.proposal_kind.value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": proposal_validation.status,
+            "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+        }
+    )
+    decisions.event_log.append(event_type, payload)
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message=message,
+        payload=payload,
+    )
+
+
+def _destroyed_transport_placement_invalid_status(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    proposal_request: MovementProposalRequest,
+    disembark: DestroyedTransportDisembark,
+) -> LifecycleStatus:
+    first_violation = disembark.placement.violations[0]
+    proposal_validation = ProposalValidationResult.invalid(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        violation_code=first_violation.violation_code.value,
+        message=first_violation.message,
+        field=None,
+    )
+    payload = validate_json_value(
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": disembark.player_id,
+            "phase": proposal_request.phase,
+            "unit_instance_id": disembark.unit_instance_id,
+            "transport_unit_instance_id": disembark.transport_unit_instance_id,
+            "disembark_mode": disembark.disembark_mode.value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "invalid",
+            "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+            "destroyed_transport_disembark": validate_json_value(disembark.to_payload()),
+        }
+    )
+    decisions.event_log.append("destroyed_transport_disembark_placement_invalid", payload)
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message="Destroyed Transport disembark placement is not currently legal.",
+        payload=payload,
+    )
+
+
+def _request_destroyed_transport_disembark_placement_retry(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    proposal_request: MovementProposalRequest,
+    pending: PendingDestroyedTransportDisembark,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    context = proposal_request.context or {}
+    attack_sequence_id = context.get("attack_sequence_id")
+    attack_context_id = context.get("attack_context_id")
+    if type(attack_sequence_id) is not str or not attack_sequence_id:
+        raise GameLifecycleError("Destroyed Transport retry missing attack_sequence_id.")
+    if type(attack_context_id) is not str or not attack_context_id:
+        raise GameLifecycleError("Destroyed Transport retry missing attack_context_id.")
+    retry_proposal = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=proposal_request.phase,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=proposal_request.proposal_kind,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        placement_kinds=proposal_request.placement_kinds,
+        context=dict(proposal_request.context or {}),
+    )
+    request = retry_proposal.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "destroyed_transport_disembark_placement_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": proposal_request.phase,
+                "active_player_id": proposal_request.actor_id,
+                "unit_instance_id": proposal_request.unit_instance_id,
+                "transport_unit_instance_id": pending.transport_unit_instance_id,
+                "disembark_mode": DisembarkModeKind.EMERGENCY_DISEMBARK.value,
+                "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+                "request_id": request.request_id,
+                "previous_proposal_request_id": proposal_request.request_id,
+                "rejected_result_id": rejected_result.result_id,
+                "attack_sequence_id": attack_sequence_id,
+                "attack_context_id": attack_context_id,
+                "destroyed_model_instance_id": pending.damage_application.model_instance_id,
+                "remaining_embarked_unit_ids": list(pending.pending_unit_instance_ids),
+                "phase_body_status": "destroyed_transport_disembark_placement_required",
+            }
+        ),
+    )
+    return request
+
+
+def _resolve_destroyed_transport_disembark_submission(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    pending: PendingDestroyedTransportDisembark,
+    submission: PlacementProposalPayload,
+    dice_manager: DiceRollManager,
+) -> DestroyedTransportDisembark:
+    if submission.transport_unit_instance_id is None or submission.disembark_mode is None:
+        raise GameLifecycleError("Destroyed Transport disembark submission is incomplete.")
+    cargo_state = state.transport_cargo_state_for_transport(submission.transport_unit_instance_id)
+    if cargo_state is None:
+        raise GameLifecycleError("Destroyed Transport disembark cargo state is missing.")
+    unit = unit_by_id(state=state, unit_instance_id=submission.unit_instance_id)
+    transport_placement = _destroyed_transport_placement(
+        state=state,
+        pending=pending,
+    )
+    selection = DisembarkSelection(
+        player_id=pending.destroyed_model_controller_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=submission.unit_instance_id,
+        transport_unit_instance_id=submission.transport_unit_instance_id,
+        attempted_placement=submission.attempted_placement,
+        disembark_mode=submission.disembark_mode,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        restriction_overrides=submission.restriction_overrides,
+    )
+    mission_setup = state.mission_setup
+    return resolve_destroyed_transport_disembark(
+        scenario=_battlefield_scenario_for_attack_sequence(state),
+        ruleset_descriptor=ruleset_descriptor,
+        cargo_state=cargo_state,
+        selection=selection,
+        unit=unit,
+        transport_placement=transport_placement,
+        dice_manager=dice_manager,
+        battlefield_width_inches=(
+            60.0 if mission_setup is None else mission_setup.battlefield_width_inches
+        ),
+        battlefield_depth_inches=(
+            44.0 if mission_setup is None else mission_setup.battlefield_depth_inches
+        ),
+        terrain_features=() if mission_setup is None else mission_setup.terrain_features,
+        objective_markers=_objective_markers_for_attack_sequence(state),
+    )
+
+
+def _apply_valid_destroyed_transport_disembark(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    disembark: DestroyedTransportDisembark,
+    result: DecisionResult,
+    source_phase: BattlePhase,
+) -> None:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Destroyed Transport disembark requires battlefield_state.")
+    if disembark.placement.updated_cargo_state is None:
+        raise GameLifecycleError("Destroyed Transport disembark requires updated cargo state.")
+    if disembark.placement.disembarked_unit_state is None:
+        raise GameLifecycleError("Destroyed Transport disembark requires disembarked state.")
+    state.replace_battlefield_state(
+        apply_destroyed_transport_disembark_to_battlefield(
+            battlefield_state=battlefield_state,
+            disembark=disembark,
+        )
+    )
+    state.replace_transport_cargo_state(disembark.placement.updated_cargo_state)
+    state.record_disembarked_unit_state(disembark.placement.disembarked_unit_state)
+    decisions.event_log.append(
+        "unit_disembarked",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": disembark.player_id,
+                "phase": source_phase.value,
+                "unit_instance_id": disembark.unit_instance_id,
+                "transport_unit_instance_id": disembark.transport_unit_instance_id,
+                "disembark_mode": disembark.disembark_mode.value,
+                "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "phase_body_status": "destroyed_transport_unit_disembarked",
+                "updated_cargo_state": validate_json_value(
+                    disembark.placement.updated_cargo_state.to_payload()
+                ),
+                "disembarked_unit_state": validate_json_value(
+                    disembark.placement.disembarked_unit_state.to_payload()
+                ),
+                "transition_batch": validate_json_value(
+                    disembark.placement.transition_batch.to_payload()
+                )
+                if disembark.placement.transition_batch is not None
+                else None,
+                "destroyed_transport_disembark": validate_json_value(disembark.to_payload()),
+            }
+        ),
+    )
+
+
+def _destroyed_transport_cargo_state_for_damage(
+    *,
+    state: GameState,
+    damage: DamageApplication,
+) -> TransportCargoState | None:
+    target_unit = unit_by_id(state=state, unit_instance_id=damage.target_unit_instance_id)
+    if not any(
+        model.model_instance_id == damage.model_instance_id for model in target_unit.own_models
+    ):
+        raise GameLifecycleError("Destroyed model is not in the damaged unit.")
+    for cargo_state in state.transport_cargo_states:
+        if cargo_state.transport_unit_instance_id == target_unit.unit_instance_id:
+            if len(target_unit.own_models) != 1:
+                raise GameLifecycleError(
+                    "Destroyed Transport orchestration currently requires one model per "
+                    "Transport cargo state."
+                )
+            return cargo_state
+    return None
+
+
+def _destroyed_transport_placement(
+    *,
+    state: GameState,
+    pending: PendingDestroyedTransportDisembark,
+) -> UnitPlacement:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Destroyed Transport disembark requires battlefield_state.")
+    try:
+        return battlefield.unit_placement_by_id(pending.transport_unit_instance_id)
+    except PlacementError as exc:
+        raise GameLifecycleError(
+            "Destroyed Transport must still be placed before removal."
+        ) from exc
+
+
+def _battlefield_scenario_for_attack_sequence(state: GameState) -> BattlefieldScenario:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Attack sequence requires battlefield_state.")
+    return BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=battlefield,
+    )
+
+
+def _objective_markers_for_attack_sequence(state: GameState) -> tuple[ObjectiveMarker, ...]:
+    if state.mission_setup is None:
+        return ()
+    return tuple(marker.to_objective_marker() for marker in state.mission_setup.objective_markers)
 
 
 def _select_or_request_next_gathered_group(
@@ -3799,8 +4925,18 @@ def _resolve_grouped_damage_from(
         )
         pending_for_die = pending_for_die.with_allocated_model_ids(resolved_allocated_ids)
         if status is not None:
+            interrupted_sequence = attack_sequence.with_pending_grouped_damage(pending_for_die)
+            if (
+                _next_sequence is not None
+                and _next_sequence.pending_destroyed_transport_disembark is not None
+            ):
+                interrupted_sequence = (
+                    interrupted_sequence.with_pending_destroyed_transport_disembark(
+                        _next_sequence.pending_destroyed_transport_disembark
+                    )
+                )
             return (
-                attack_sequence.with_pending_grouped_damage(pending_for_die),
+                interrupted_sequence,
                 pending_for_die.allocated_model_ids,
                 status,
             )
@@ -4274,6 +5410,27 @@ def _apply_damage_after_feel_no_pain(
             damage_kind=damage_kind,
             remove_destroyed_model=False,
         )
+    destroyed_model_controller_player_id = attack_context["defender_player_id"]
+    attack_sequence, destroyed_transport_status = _begin_destroyed_transport_disembark_if_needed(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        damage=damage,
+        saving_throw_payload=saving_throw_payload,
+        feel_no_pain=resolution,
+        destroyed_model_controller_player_id=destroyed_model_controller_player_id,
+        sources=tuple(
+            source
+            for source in _state_destruction_reaction_sources(
+                state=state,
+                model_instance_id=model_instance_id,
+            )
+            if not source.optional
+        ),
+    )
+    if destroyed_transport_status is not None:
+        return attack_sequence, allocated_model_ids, destroyed_transport_status
     mandatory_status = _resolve_mandatory_destruction_reactions_before_removal(
         state=state,
         decisions=decisions,
@@ -6882,6 +8039,43 @@ def _validate_deferred_mortal_wounds(values: object) -> tuple[DeferredMortalWoun
             )
         deferred.append(value)
     return tuple(deferred)
+
+
+def _validate_destroyed_transport_disembark_tuple(
+    values: object,
+) -> tuple[DestroyedTransportDisembark, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Destroyed Transport disembarks must be a tuple.")
+    disembarks: list[DestroyedTransportDisembark] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DestroyedTransportDisembark:
+            raise GameLifecycleError(
+                "Destroyed Transport disembarks must contain DestroyedTransportDisembark."
+            )
+        if value.unit_instance_id in seen:
+            raise GameLifecycleError("Destroyed Transport disembarks duplicate units.")
+        seen.add(value.unit_instance_id)
+        disembarks.append(value)
+    return tuple(disembarks)
+
+
+def _validate_destruction_reaction_source_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DestructionReactionSource, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    sources: list[DestructionReactionSource] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DestructionReactionSource:
+            raise GameLifecycleError(f"{field_name} must contain DestructionReactionSource.")
+        if value.source_id in seen:
+            raise GameLifecycleError(f"{field_name} must not duplicate source IDs.")
+        seen.add(value.source_id)
+        sources.append(value)
+    return tuple(sources)
 
 
 def _validate_save_die_entry_tuple(values: object) -> tuple[SaveDieEntryPayload, ...]:

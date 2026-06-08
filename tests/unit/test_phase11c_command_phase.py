@@ -23,7 +23,7 @@ from warhammer40k_core.engine.battle_shock import (
     friendly_stratagem_target_permission,
     stratagem_target_permission_status_from_token,
 )
-from warhammer40k_core.engine.battlefield_state import UnitPlacement
+from warhammer40k_core.engine.battlefield_state import PlacementError, UnitPlacement
 from warhammer40k_core.engine.command_points import (
     CommandPhaseStep,
     CommandPointGainResult,
@@ -40,6 +40,7 @@ from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -65,13 +66,35 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     LifecycleStatus,
     LifecycleStatusKind,
+    SetupStep,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
     CommandPhaseHandler,
 )
+from warhammer40k_core.engine.phases.movement import (
+    AdvancedUnitState,
+    AdvanceRollRequest,
+    AdvanceRollResult,
+    FellBackUnitState,
+    MovementDiceRecord,
+    MovementPhaseActionKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserves import (
+    ReserveDestructionTimingPolicy,
+    ReserveKind,
+    ReserveOrigin,
+    StrategicReserveDeclaration,
+)
+from warhammer40k_core.engine.setup_flow import SetupFlow
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+from warhammer40k_core.engine.transports import (
+    DisembarkedUnitState,
+    DisembarkModeKind,
+    TransportCapacityProfile,
+    TransportMovementStatus,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContext,
@@ -358,10 +381,605 @@ def test_starting_strength_and_below_half_work_for_single_and_multi_model_units(
 
     assert multi_request.below_half_strength_context.starting_model_count == 5
     assert multi_request.below_half_strength_context.current_model_count == 2
+    assert not multi_request.below_half_strength_context.is_at_half_strength
     assert single_request.below_half_strength_context.starting_model_count == 1
     assert single_request.below_half_strength_context.single_model_starting_wounds == 5
     assert single_request.below_half_strength_context.single_model_wounds_remaining == 2
+    assert not single_request.below_half_strength_context.is_at_half_strength
     assert single_request.below_half_strength_context.is_below_half_strength
+
+    even_multi = BelowHalfStrengthContext(
+        player_id="player-a",
+        unit_instance_id="army-alpha:even-unit",
+        starting_model_count=4,
+        current_model_count=2,
+        single_model_starting_wounds=None,
+        single_model_wounds_remaining=None,
+    )
+    even_single = BelowHalfStrengthContext(
+        player_id="player-a",
+        unit_instance_id="army-alpha:even-character",
+        starting_model_count=1,
+        current_model_count=1,
+        single_model_starting_wounds=6,
+        single_model_wounds_remaining=3,
+    )
+
+    assert even_multi.is_at_half_strength
+    assert not even_multi.is_below_half_strength
+    assert even_single.is_at_half_strength
+    assert not even_single.is_below_half_strength
+
+
+def test_runtime_added_unit_records_starting_strength_when_added() -> None:
+    state = _battle_state()
+    added_unit = _runtime_unit_for_selection(
+        player_id="player-a",
+        army_id="army-alpha",
+        unit_selection_id="summoned-unit-1",
+    )
+
+    record = state.add_unit_to_army(
+        player_id="player-a",
+        unit=added_unit,
+        source_id="phase11c-add-unit-rule",
+    )
+
+    assert record == state.starting_strength_record_for_unit(added_unit.unit_instance_id)
+    assert record.source_id == "phase11c-add-unit-rule"
+    assert record.starting_model_count == len(added_unit.own_models)
+    assert _unit_by_id(state, added_unit.unit_instance_id) == added_unit
+    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
+        state.to_payload()
+    )
+
+    with pytest.raises(GameLifecycleError, match="already exists"):
+        state.add_unit_to_army(
+            player_id="player-a",
+            unit=added_unit,
+            source_id="phase11c-add-unit-rule",
+        )
+    with pytest.raises(GameLifecycleError, match="added unit must be a UnitInstance"):
+        state.add_unit_to_army(
+            player_id="player-a",
+            unit=cast(Any, object()),
+            source_id="phase11c-add-unit-rule",
+        )
+    with pytest.raises(GameLifecycleError, match="source_id must not be empty"):
+        state.add_unit_to_army(
+            player_id="player-a",
+            unit=added_unit,
+            source_id=" ",
+        )
+
+    unmustered = GameState.from_config(_config())
+    with pytest.raises(GameLifecycleError, match="before the player's army is mustered"):
+        unmustered.add_unit_to_army(
+            player_id="player-a",
+            unit=added_unit,
+            source_id="phase11c-add-unit-rule",
+        )
+
+
+def test_setup_declarations_keep_reserve_and_embarked_units_off_battlefield() -> None:
+    config = _config(
+        player_a_units=(
+            _default_unit_selection("reserve-unit"),
+            _default_unit_selection("passenger-unit"),
+            _unit_selection(
+                unit_selection_id="transport-unit",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        )
+    )
+    state = GameState.from_config(config)
+    decisions = DecisionController()
+    flow = SetupFlow()
+    flow.advance(state=state, decisions=decisions, config=config)
+    while state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
+        state.complete_current_setup_step()
+    reserve_unit = _unit_by_id(state, "army-alpha:reserve-unit")
+    passenger = _unit_by_id(state, "army-alpha:passenger-unit")
+    transport = _unit_by_id(state, "army-alpha:transport-unit")
+
+    reserve_states = state.apply_strategic_reserve_declarations(
+        declarations=(
+            StrategicReserveDeclaration.for_unit(
+                unit=reserve_unit,
+                player_id="player-a",
+                unit_points=100,
+                embarked_unit_points=0,
+                points_limit=100,
+            ),
+        ),
+        destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2025_26(),
+    )
+    cargo_state = state.declare_battle_formation_embarkation(
+        player_id="player-a",
+        transport_unit_instance_id=transport.unit_instance_id,
+        embarked_unit_instance_ids=(passenger.unit_instance_id,),
+        capacity_profile=TransportCapacityProfile(
+            transport_datasheet_id=transport.datasheet_id,
+            max_model_count=10,
+            allowed_keywords=("INFANTRY",),
+        ),
+    )
+
+    state.complete_current_setup_step()
+    flow.advance(state=state, decisions=decisions, config=config)
+
+    assert state.battlefield_state is not None
+    assert reserve_states == (state.reserve_state_for_unit(reserve_unit.unit_instance_id),)
+    assert cargo_state == state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert state.battlefield_state.unit_placement_by_id(transport.unit_instance_id)
+    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
+        state.battlefield_state.unit_placement_by_id(reserve_unit.unit_instance_id)
+    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
+        state.battlefield_state.unit_placement_by_id(passenger.unit_instance_id)
+    assert set(state.battlefield_state.placed_model_ids()).isdisjoint(
+        reserve_unit.own_model_ids() + passenger.own_model_ids()
+    )
+    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
+        state.to_payload()
+    )
+
+
+def test_setup_declarations_reject_points_and_transport_capacity_drift() -> None:
+    config = _config(
+        player_a_units=(
+            _default_unit_selection("reserve-unit"),
+            _default_unit_selection("passenger-unit"),
+            _unit_selection(
+                unit_selection_id="transport-unit",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        )
+    )
+    state = GameState.from_config(config)
+    decisions = DecisionController()
+    flow = SetupFlow()
+    flow.advance(state=state, decisions=decisions, config=config)
+    while state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
+        state.complete_current_setup_step()
+    reserve_unit = _unit_by_id(state, "army-alpha:reserve-unit")
+    passenger = _unit_by_id(state, "army-alpha:passenger-unit")
+    transport = _unit_by_id(state, "army-alpha:transport-unit")
+
+    with pytest.raises(GameLifecycleError, match="exceed the player's points limit"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=60,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+                StrategicReserveDeclaration.for_unit(
+                    unit=passenger,
+                    player_id="player-a",
+                    unit_points=60,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+            ),
+            destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2025_26(),
+        )
+    with pytest.raises(GameLifecycleError, match="exceeds Transport capacity"):
+        state.declare_battle_formation_embarkation(
+            player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=4,
+                allowed_keywords=("INFANTRY",),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="capacity profile datasheet drift"):
+        state.declare_battle_formation_embarkation(
+            player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id="other-transport",
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+        )
+
+
+def test_setup_declarations_reject_duplicate_and_drift_contexts() -> None:
+    config = _config(
+        player_a_units=(
+            _default_unit_selection("reserve-unit"),
+            _default_unit_selection("passenger-unit"),
+            _unit_selection(
+                unit_selection_id="transport-unit",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        )
+    )
+    state = _setup_state_at_declare_battle_formations(config)
+    reserve_unit = _unit_by_id(state, "army-alpha:reserve-unit")
+    passenger = _unit_by_id(state, "army-alpha:passenger-unit")
+    transport = _unit_by_id(state, "army-alpha:transport-unit")
+    policy = ReserveDestructionTimingPolicy.chapter_approved_2025_26()
+
+    assert (
+        state.apply_strategic_reserve_declarations(
+            declarations=(),
+            destruction_deadline_policy=policy,
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="declarations must be a tuple"):
+        state.apply_strategic_reserve_declarations(
+            declarations=cast(Any, []),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="ReserveDestructionTimingPolicy"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+            ),
+            destruction_deadline_policy=cast(Any, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="must contain StrategicReserveDeclaration"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(cast(Any, object()),),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration(
+                    player_id="player-a",
+                    unit_instance_id="army-alpha:missing-unit",
+                    reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+                    declared_during_step=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+            ),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="player_id drift"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration(
+                    player_id="player-b",
+                    unit_instance_id=reserve_unit.unit_instance_id,
+                    reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+                    declared_during_step=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+            ),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="must not duplicate units"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+            ),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="use one points limit"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+                StrategicReserveDeclaration.for_unit(
+                    unit=passenger,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=120,
+                ),
+            ),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="embarked unit is unknown"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                    embarked_unit_instance_ids=("army-alpha:missing-passenger",),
+                ),
+            ),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="embarked unit player_id drift"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                    embarked_unit_instance_ids=("army-beta:intercessor-unit-3",),
+                ),
+            ),
+            destruction_deadline_policy=policy,
+        )
+    with pytest.raises(GameLifecycleError, match="also declare embarked units"):
+        state.apply_strategic_reserve_declarations(
+            declarations=(
+                StrategicReserveDeclaration.for_unit(
+                    unit=reserve_unit,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                    embarked_unit_instance_ids=(passenger.unit_instance_id,),
+                ),
+                StrategicReserveDeclaration.for_unit(
+                    unit=passenger,
+                    player_id="player-a",
+                    unit_points=10,
+                    embarked_unit_points=0,
+                    points_limit=100,
+                ),
+            ),
+            destruction_deadline_policy=policy,
+        )
+
+    with pytest.raises(GameLifecycleError, match="requires a TRANSPORT"):
+        state.declare_battle_formation_embarkation(
+            player_id="player-a",
+            transport_unit_instance_id=reserve_unit.unit_instance_id,
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=reserve_unit.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="cannot embark itself"):
+        state.declare_battle_formation_embarkation(
+            player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            embarked_unit_instance_ids=(transport.unit_instance_id,),
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+        state.declare_battle_formation_embarkation(
+            player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            embarked_unit_instance_ids=("army-alpha:missing-passenger",),
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+        )
+
+
+def test_repositioned_unit_preserves_move_history_and_effects() -> None:
+    state = _battle_state()
+    state.advance_to_next_battle_phase()
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    unit_id = "army-alpha:intercessor-unit-1"
+    unit = _unit_by_id(state, unit_id)
+    fell_back = FellBackUnitState(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit_id,
+    )
+    effect = PersistingEffect(
+        effect_id="phase11c-repositioned-effect",
+        source_rule_id="phase14h-repositioned-rule",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(unit_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.MOVEMENT,
+        expiration=EffectExpiration.end_turn(
+            battle_round=state.battle_round,
+            player_id="player-a",
+        ),
+        effect_payload={"modifier": "phase14h-repositioned-effect"},
+    )
+    state.record_fell_back_unit_state(fell_back)
+    state.record_persisting_effect(effect)
+
+    reserve_state = state.reposition_unit_to_strategic_reserves(
+        player_id="player-a",
+        unit_instance_id=unit_id,
+        reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+        required_arrival_battle_round=2,
+        required_arrival_phase=BattlePhase.MOVEMENT,
+        required_arrival_source_rule_id="phase14h-required-arrival",
+    )
+
+    assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
+    assert reserve_state.reserve_origin is ReserveOrigin.DURING_BATTLE_ABILITY
+    assert reserve_state.entered_reserves_battle_round == 1
+    assert reserve_state.entered_reserves_phase == BattlePhase.MOVEMENT.value
+    assert reserve_state.required_arrival_battle_round == 2
+    assert reserve_state.required_arrival_phase == BattlePhase.MOVEMENT.value
+    assert reserve_state.required_arrival_source_rule_id == "phase14h-required-arrival"
+    assert reserve_state.destruction_deadline_policy.exclude_during_battle_strategic_reserves
+    assert state.reserve_state_for_unit(unit_id) == reserve_state
+    assert (
+        state.fell_back_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        == fell_back
+    )
+    assert state.persisting_effects_for_unit(unit_id) == (effect,)
+    assert state.battlefield_state is not None
+    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
+        state.battlefield_state.unit_placement_by_id(unit_id)
+    assert set(state.battlefield_state.removed_model_ids).isdisjoint(unit.own_model_ids())
+    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
+        state.to_payload()
+    )
+
+
+def test_repositioned_unit_preserves_advance_history() -> None:
+    state = _battle_state()
+    state.advance_to_next_battle_phase()
+    unit_id = "army-alpha:intercessor-unit-1"
+    advanced = _advanced_unit_state(state=state, unit_instance_id=unit_id)
+    state.record_advanced_unit_state(advanced)
+
+    state.reposition_unit_to_strategic_reserves(
+        player_id="player-a",
+        unit_instance_id=unit_id,
+    )
+
+    assert (
+        state.advanced_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        == advanced
+    )
+    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
+        state.to_payload()
+    )
+
+
+def test_repositioned_unit_preserves_disembark_history() -> None:
+    state = _battle_state(
+        player_a_units=(
+            _default_unit_selection("passenger-unit"),
+            _unit_selection(
+                unit_selection_id="transport-unit",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        )
+    )
+    state.advance_to_next_battle_phase()
+    unit_id = "army-alpha:passenger-unit"
+    disembarked = DisembarkedUnitState.for_mode(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit_id,
+        transport_unit_instance_id="army-alpha:transport-unit",
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.REMAIN_STATIONARY,
+    )
+    state.record_disembarked_unit_state(disembarked)
+
+    state.reposition_unit_to_strategic_reserves(
+        player_id="player-a",
+        unit_instance_id=unit_id,
+    )
+
+    assert (
+        state.disembarked_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        == disembarked
+    )
+    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
+        state.to_payload()
+    )
+
+
+def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
+    setup_state = GameState.from_config(_config())
+    with pytest.raises(GameLifecycleError, match="only enter reserves during battle"):
+        setup_state.reposition_unit_to_strategic_reserves(
+            player_id="player-a",
+            unit_instance_id="army-alpha:intercessor-unit-1",
+        )
+
+    state = _battle_state()
+    unit_id = "army-alpha:intercessor-unit-1"
+    assert state.battlefield_state is not None
+    before_battlefield = state.battlefield_state.to_payload()
+    with pytest.raises(GameLifecycleError, match="during-battle reserve origin"):
+        state.reposition_unit_to_strategic_reserves(
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+        )
+    with pytest.raises(GameLifecycleError, match="player_id drift"):
+        state.reposition_unit_to_strategic_reserves(
+            player_id="player-b",
+            unit_instance_id=unit_id,
+        )
+    assert state.battlefield_state.to_payload() == before_battlefield
+    assert state.reserve_state_for_unit(unit_id) is None
+
+    state.advance_to_next_battle_phase()
+    with pytest.raises(GameLifecycleError, match="destruction_deadline_policy must be a policy"):
+        state.reposition_unit_to_strategic_reserves(
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            destruction_deadline_policy=cast(Any, object()),
+        )
+    assert state.battlefield_state is not None
+    unplaced_state = GameState.from_payload(_game_state_payload_copy(state))
+    assert unplaced_state.battlefield_state is not None
+    unplaced_state.battlefield_state = unplaced_state.battlefield_state.without_unit_placement(
+        unit_id
+    )
+    with pytest.raises(GameLifecycleError, match="must be on the battlefield"):
+        unplaced_state.reposition_unit_to_strategic_reserves(
+            player_id="player-a",
+            unit_instance_id=unit_id,
+        )
+    state.reposition_unit_to_strategic_reserves(
+        player_id="player-a",
+        unit_instance_id=unit_id,
+    )
+    with pytest.raises(GameLifecycleError, match="already has a ReserveState"):
+        state.reposition_unit_to_strategic_reserves(
+            player_id="player-a",
+            unit_instance_id=unit_id,
+        )
 
 
 def test_attached_unit_split_recovers_original_starting_strength_records() -> None:
@@ -646,6 +1264,11 @@ def test_strength_context_validation_rejects_drift_and_invalid_shapes() -> None:
     with pytest.raises(GameLifecycleError, match="below-starting payload drift"):
         BelowHalfStrengthContext.from_payload(below_starting_payload)
 
+    at_half_payload = context.to_payload()
+    at_half_payload["is_at_half_strength"] = True
+    with pytest.raises(GameLifecycleError, match="at-half payload drift"):
+        BelowHalfStrengthContext.from_payload(at_half_payload)
+
     below_half_payload = context.to_payload()
     below_half_payload["is_below_half_strength"] = True
     with pytest.raises(GameLifecycleError, match="below-half payload drift"):
@@ -669,12 +1292,72 @@ def test_strength_context_validation_rejects_drift_and_invalid_shapes() -> None:
         )
     with pytest.raises(GameLifecycleError, match="requires a UnitInstance"):
         StartingStrengthRecord.from_unit(player_id="player-a", unit=cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="starting strength units must be a tuple"):
+        starting_strength_records_for_units(player_id="player-a", units=cast(Any, [unit]))
+    with pytest.raises(
+        GameLifecycleError, match="StartingStrengthRecord player_id must be a string"
+    ):
+        StartingStrengthRecord(
+            player_id=cast(Any, 1),
+            unit_instance_id="unit-a",
+            starting_model_count=2,
+            single_model_starting_wounds=None,
+            source_id="test",
+        )
     with pytest.raises(GameLifecycleError, match="current_model_count exceeds"):
         BelowHalfStrengthContext(
             player_id="player-a",
             unit_instance_id="unit-a",
             starting_model_count=1,
             current_model_count=2,
+            single_model_starting_wounds=5,
+            single_model_wounds_remaining=5,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="BelowHalfStrengthContext starting_model_count must be an integer",
+    ):
+        BelowHalfStrengthContext(
+            player_id="player-a",
+            unit_instance_id="unit-a",
+            starting_model_count=cast(Any, "1"),
+            current_model_count=1,
+            single_model_starting_wounds=5,
+            single_model_wounds_remaining=5,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="BelowHalfStrengthContext starting_model_count must be at least 1",
+    ):
+        BelowHalfStrengthContext(
+            player_id="player-a",
+            unit_instance_id="unit-a",
+            starting_model_count=0,
+            current_model_count=0,
+            single_model_starting_wounds=None,
+            single_model_wounds_remaining=None,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="BelowHalfStrengthContext current_model_count must be an integer",
+    ):
+        BelowHalfStrengthContext(
+            player_id="player-a",
+            unit_instance_id="unit-a",
+            starting_model_count=1,
+            current_model_count=cast(Any, "1"),
+            single_model_starting_wounds=5,
+            single_model_wounds_remaining=5,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="BelowHalfStrengthContext current_model_count must not be negative",
+    ):
+        BelowHalfStrengthContext(
+            player_id="player-a",
+            unit_instance_id="unit-a",
+            starting_model_count=1,
+            current_model_count=-1,
             single_model_starting_wounds=5,
             single_model_wounds_remaining=5,
         )
@@ -1237,6 +1920,33 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
     raise AssertionError(f"missing unit {unit_instance_id}")
 
 
+def _advanced_unit_state(*, state: GameState, unit_instance_id: str) -> AdvancedUnitState:
+    request = AdvanceRollRequest.for_unit(
+        request_id=f"phase11c-advance-{unit_instance_id}",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=unit_instance_id,
+    )
+    roll_state = DiceRollManager("phase11c-repositioned-advance").roll_fixed(
+        request.spec,
+        [3],
+    )
+    advance_roll = AdvanceRollResult.from_roll_state(request=request, roll_state=roll_state)
+    return AdvancedUnitState(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit_instance_id,
+        movement_dice_record=MovementDiceRecord(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            advance_roll=advance_roll,
+        ),
+    )
+
+
 def _center_marker_definition(state: GameState) -> ObjectiveMarkerDefinition:
     if state.mission_setup is None:
         raise AssertionError("test state requires mission setup")
@@ -1275,6 +1985,16 @@ def _battle_state(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
     while state.current_setup_step is not None:
+        state.complete_current_setup_step()
+    return state
+
+
+def _setup_state_at_declare_battle_formations(config: GameConfig) -> GameState:
+    state = GameState.from_config(config)
+    decisions = DecisionController()
+    flow = SetupFlow()
+    flow.advance(state=state, decisions=decisions, config=config)
+    while state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
         state.complete_current_setup_step()
     return state
 
@@ -1366,6 +2086,25 @@ def _default_unit_selection(unit_selection_id: str) -> UnitMusterSelection:
     )
 
 
+def _runtime_unit_for_selection(
+    *,
+    player_id: str,
+    army_id: str,
+    unit_selection_id: str,
+) -> UnitInstance:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    army = muster_army(
+        catalog=catalog,
+        request=_army_muster_request(
+            catalog=catalog,
+            player_id=player_id,
+            army_id=army_id,
+            unit_selections=(_default_unit_selection(unit_selection_id),),
+        ),
+    )
+    return army.unit_by_id(f"{army_id}:{unit_selection_id}")
+
+
 def _unit_selection(
     *,
     unit_selection_id: str,
@@ -1390,6 +2129,10 @@ def _mustered_armies(config: GameConfig) -> tuple[ArmyDefinition, ...]:
         muster_army(catalog=config.army_catalog, request=request)
         for request in config.army_muster_requests
     )
+
+
+def _game_state_payload_copy(state: GameState) -> GameStatePayload:
+    return cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
 
 
 def _event_index(decisions: DecisionController, event_type: str) -> int:

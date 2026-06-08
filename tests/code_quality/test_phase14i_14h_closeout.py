@@ -16,6 +16,9 @@ TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
 DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
 HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
+GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
+UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
+ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -82,6 +85,8 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     attack_sequence_source = ATTACK_SEQUENCE_PATH.read_text(encoding="utf-8")
     damage_allocation_source = DAMAGE_ALLOCATION_PATH.read_text(encoding="utf-8")
     hazard_source = HAZARD_PATH.read_text(encoding="utf-8")
+    game_state_source = GAME_STATE_PATH.read_text(encoding="utf-8")
+    unit_state_source = UNIT_STATE_PATH.read_text(encoding="utf-8")
 
     assert "def resolve_combat_disembark(" in transport_source
     assert "Combat Disembark requires resolve_combat_disembark." in transport_source
@@ -90,6 +95,15 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "transport_hazard_mortal_wounds" in transport_source
     assert "HAZARD_ROLL_FAILURE_THRESHOLD = 2" in hazard_source
     assert "hazard_mortal_wounds_per_failed_roll" in attack_sequence_source
+    assert "pending_destroyed_transport_disembark" in attack_sequence_source
+    assert "destroyed_transport_disembark_placement_requested" in attack_sequence_source
+    assert "apply_destroyed_transport_disembark_proposal_decision" in attack_sequence_source
+    assert "remove_transport_cargo_state" in game_state_source
+    assert "def add_unit_to_army(" in game_state_source
+    assert "def apply_strategic_reserve_declarations(" in game_state_source
+    assert "def declare_battle_formation_embarkation(" in game_state_source
+    assert "def reposition_unit_to_strategic_reserves(" in game_state_source
+    assert "is_at_half_strength" in unit_state_source
     assert "attached_unit_bodyguard_model_ids" in attack_sequence_source
     assert "_highest_toughness_for_models" in attack_sequence_source
     assert '"attached-role:leader" in model.source_ids' in damage_allocation_source
@@ -111,10 +125,18 @@ def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
     assert "Phase 14H is complete" not in readme
     assert "Movement-phase Combat Disembark fallback now requires" in architecture
     assert "Movement-phase Combat Disembark fallback now requires" in readme
-    assert "destroyed-Transport orchestration from real destruction timing" in architecture
-    assert "destroyed-Transport orchestration from real destruction timing" in readme
-    assert "player-facing destruction-time host remains Phase 14H work" in (
-        ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
-    ).read_text(encoding="utf-8")
+    assert "runtime army-list Attached Unit formation plus" in architecture
+    assert "runtime attached-unit formation/healing/revival" in readme
+    assert "full repositioned-unit effect persistence" not in architecture
+    assert "setup-time reserve/transport declarations" not in architecture
+    assert "setup-time Strategic Reserve declarations" in architecture
+    assert "setup-time Strategic Reserve declarations" in readme
+    assert "repositioned units preserve Advance/Fall Back/Disembark" in architecture
+    assert "repositioned units preserve Advance/Fall Back/Disembark" in readme
+    assert "destroyed-Transport orchestration from real destruction timing" not in architecture
+    assert "destroyed-Transport orchestration from real destruction timing" not in readme
+    adapter_contract = ADAPTER_CONTRACT_PATH.read_text(encoding="utf-8")
+    assert "player-facing destruction-time host remains Phase 14H work" not in adapter_contract
+    assert "actual destruction event before Transport removal and Deadly Demise" in adapter_contract
     assert "mixed-Toughness attached-unit attack handling" not in architecture
     assert "mixed-Toughness attached-unit attack handling" not in readme

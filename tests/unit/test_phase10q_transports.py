@@ -2174,12 +2174,10 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
     assert result.placement.is_valid
     assert result.roll_threshold == HAZARD_ROLL_FAILURE_THRESHOLD
     assert result.mortal_wounds_per_failed_roll == 1
-    assert len(result.model_rolls) == len(partial_placement.model_placements)
+    assert len(result.model_rolls) == len(passenger.own_models)
     assert result.destroyed_model_instance_ids == (passenger.own_models[-1].model_instance_id,)
     assert result.disembarked_unit_state is not None
-    assert result.disembarked_unit_state.battle_shocked_until == (
-        "controller_next_command_phase_start"
-    )
+    assert result.disembarked_unit_state.battle_shocked_until == "end_of_turn"
     assert result.disembarked_unit_state.disembark_mode is (DisembarkModeKind.EMERGENCY_DISEMBARK)
     updated_battlefield = apply_destroyed_transport_disembark_to_battlefield(
         battlefield_state=disembark_scenario.battlefield_state,

@@ -22,6 +22,7 @@ from warhammer40k_core.engine.attack_sequence import (
     apply_allocation_order_decision,
     apply_attack_weapon_group_decision,
     apply_damage_allocation_model_decision,
+    apply_destroyed_transport_disembark_proposal_decision,
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
@@ -29,6 +30,7 @@ from warhammer40k_core.engine.attack_sequence import (
     build_select_attack_weapon_group_request,
     build_select_resolve_target_unit_request,
     gathered_attack_groups_for_target,
+    is_destroyed_transport_disembark_proposal_request,
     resolve_attack_sequence_until_blocked,
     selected_attack_weapon_group_from_result,
     selected_resolve_target_from_result,
@@ -101,6 +103,7 @@ from warhammer40k_core.engine.fight_resolution import (
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
     ProposalKind,
     ProposalValidationResult,
@@ -255,6 +258,13 @@ class FightPhaseHandler:
             )
             return None
         if result.decision_type in ATTACK_ALLOCATION_DECISION_TYPES:
+            return _apply_fight_attack_sequence_decision(
+                handler=self,
+                state=state,
+                result=result,
+                decisions=decisions,
+            )
+        if result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_fight_attack_sequence_decision(
                 handler=self,
                 state=state,
@@ -1215,6 +1225,22 @@ def _apply_fight_attack_sequence_decision(
             attack_sequence=fight_state.attack_sequence,
             result=result,
             already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
+        )
+    elif (
+        result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+        and is_destroyed_transport_disembark_proposal_request(
+            decisions.record_for_result(result).request
+        )
+    ):
+        updated_sequence, allocated_model_ids, status = (
+            apply_destroyed_transport_disembark_proposal_decision(
+                state=state,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
+                attack_sequence=fight_state.attack_sequence,
+                result=result,
+                already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
+            )
         )
     else:
         raise GameLifecycleError("Unsupported fight attack sequence decision type.")

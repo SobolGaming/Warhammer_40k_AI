@@ -1042,7 +1042,7 @@ class DisembarkedUnitState:
             can_move_further=False,
             can_choose_remain_stationary=False,
             can_declare_charge=False,
-            battle_shocked_until="controller_next_command_phase_start",
+            battle_shocked_until="end_of_turn",
             source_rule_id=(
                 _EMERGENCY_DISEMBARK_RULE_ID
                 if mode is DisembarkModeKind.EMERGENCY_DISEMBARK
@@ -1332,8 +1332,11 @@ class DestroyedTransportDisembark:
                 placement.model_instance_id
                 for placement in self.placement.selection.attempted_placement.model_placements
             }
+            expected_roll_model_ids = set(placed_model_ids)
+            if self.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK:
+                expected_roll_model_ids.update(self.destroyed_model_instance_ids)
             rolled_model_ids = {roll.model_instance_id for roll in self.model_rolls}
-            if rolled_model_ids != placed_model_ids:
+            if rolled_model_ids != expected_roll_model_ids:
                 raise GameLifecycleError("DestroyedTransportDisembark roll model drift.")
 
     @property
@@ -2218,31 +2221,29 @@ def resolve_destroyed_transport_disembark(
         objective_markers=objective_markers,
     )
     roll_threshold = HAZARD_ROLL_FAILURE_THRESHOLD
-    model_rolls: list[DestroyedTransportModelRoll] = []
-    if placement.is_valid:
-        for model_placement in selection.attempted_placement.model_placements:
-            roll_state = dice_manager.roll(
-                hazard_roll_spec(
-                    reason=(
-                        "Destroyed Transport disembark roll for "
-                        f"{model_placement.model_instance_id}"
-                    ),
-                    roll_type="destroyed_transport_disembark",
-                    actor_id=model_placement.model_instance_id,
-                )
-            )
-            model_rolls.append(
-                DestroyedTransportModelRoll(
-                    model_instance_id=model_placement.model_instance_id,
-                    roll_state=roll_state,
-                    mortal_wound_inflicted=hazard_roll_failed(roll_state),
-                )
-            )
     expected_model_ids = {model.model_instance_id for model in unit.own_models}
     placed_model_ids = {
         placement.model_instance_id for placement in selection.attempted_placement.model_placements
     }
     destroyed_model_ids = tuple(sorted(expected_model_ids - placed_model_ids)) if emergency else ()
+    model_rolls: list[DestroyedTransportModelRoll] = []
+    if placement.is_valid:
+        roll_model_ids = tuple(sorted(expected_model_ids if emergency else placed_model_ids))
+        for model_instance_id in roll_model_ids:
+            roll_state = dice_manager.roll(
+                hazard_roll_spec(
+                    reason=(f"Destroyed Transport disembark roll for {model_instance_id}"),
+                    roll_type="destroyed_transport_disembark",
+                    actor_id=model_instance_id,
+                )
+            )
+            model_rolls.append(
+                DestroyedTransportModelRoll(
+                    model_instance_id=model_instance_id,
+                    roll_state=roll_state,
+                    mortal_wound_inflicted=hazard_roll_failed(roll_state),
+                )
+            )
     return DestroyedTransportDisembark(
         player_id=selection.player_id,
         battle_round=selection.battle_round,
