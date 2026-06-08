@@ -104,6 +104,7 @@ class TransportOperationViolationCode(StrEnum):
     OBJECTIVE_MARKER_ENDPOINT_OVERLAP = "objective_marker_endpoint_overlap"
     ENEMY_ENGAGEMENT_RANGE = "enemy_engagement_range"
     UNIT_COHERENCY_BROKEN = "unit_coherency_broken"
+    COMBAT_DISEMBARK_TACTICAL_AVAILABLE = "combat_disembark_tactical_available"
     FIRING_DECK_CAPACITY_EXCEEDED = "firing_deck_capacity_exceeded"
     FIRING_DECK_UNIT_NOT_EMBARKED = "firing_deck_unit_not_embarked"
     FIRING_DECK_UNIT_ALREADY_SHOT = "firing_deck_unit_already_shot"

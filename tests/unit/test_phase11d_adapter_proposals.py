@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import cast
 
@@ -45,6 +46,7 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
+    ModelMovementProposalPayload,
     MovementProposalPayload,
     MovementProposalRequest,
     PlacementProposalPayload,
@@ -70,6 +72,8 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserves import (
+    BattlefieldEdge,
+    LargeModelReservePlacementException,
     ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveState,
@@ -80,6 +84,8 @@ from warhammer40k_core.engine.transports import (
     TransportCapacityProfile,
     TransportCargoState,
     TransportMovementStatus,
+    TransportRestrictionOverride,
+    TransportRestrictionOverrideKind,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import PathWitness
@@ -582,6 +588,83 @@ def test_fall_back_mode_drift_and_malformed_payload_keep_pending_request() -> No
     assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
 
 
+def test_movement_proposal_model_movement_payload_contracts_are_fail_fast() -> None:
+    session, _action_request = _local_session_at_first_movement_action()
+    proposal_request = _decision_request(
+        session.submit_option(
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            result_id="phase11d-model-movement-action",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    before = _unit_placement(_session_state(session), proposal.unit_instance_id)
+    model_movement = cast(
+        ModelMovementProposalPayload,
+        {
+            "model_instance_id": before.model_placements[0].model_instance_id,
+            "path": [],
+            "final_pose": {},
+        },
+    )
+    payload = MovementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=ProposalKind.NORMAL_MOVE,
+        unit_instance_id=proposal.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+        movement_mode=MovementMode.NORMAL.value,
+        witness=_shift_witness(before, dx=1.0),
+        model_movements=(model_movement,),
+    )
+    payload_payload = payload.to_payload()
+
+    assert payload.model_movements == (model_movement,)
+    assert payload_payload.get("model_movements") == [model_movement]
+    assert MovementProposalPayload.from_payload(payload_payload).model_movements == (
+        model_movement,
+    )
+
+    invalid_cases = (
+        (
+            (cast(ModelMovementProposalPayload, []),),
+            "model_movements must contain objects",
+        ),
+        (
+            (
+                cast(
+                    ModelMovementProposalPayload,
+                    {"path": [], "final_pose": {}},
+                ),
+            ),
+            "model_movements require model_instance_id",
+        ),
+        (
+            (
+                cast(
+                    ModelMovementProposalPayload,
+                    {"model_instance_id": " ", "path": [], "final_pose": {}},
+                ),
+            ),
+            "model_movements require model_instance_id",
+        ),
+        (
+            (model_movement, model_movement),
+            "model_movements must not contain duplicates",
+        ),
+    )
+
+    for model_movements, message in invalid_cases:
+        with pytest.raises(GameLifecycleError, match=message):
+            MovementProposalPayload(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=ProposalKind.NORMAL_MOVE,
+                unit_instance_id=proposal.unit_instance_id,
+                movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+                movement_mode=MovementMode.NORMAL.value,
+                witness=_shift_witness(before, dx=1.0),
+                model_movements=model_movements,
+            )
+
+
 def test_valid_reserve_placement_proposal_emits_placement_records() -> None:
     state, reserve_state, reserve_unit = _battle_state_with_reserve()
     handler, decisions, selection_request = _enter_reinforcements_choice(state=state)
@@ -624,6 +707,95 @@ def test_valid_reserve_placement_proposal_emits_placement_records() -> None:
     assert cast(list[dict[str, object]], transition_batch["placements"])[0]["placement_kind"] == (
         BattlefieldPlacementKind.STRATEGIC_RESERVES.value
     )
+
+
+def test_placement_proposal_tuple_contracts_are_fail_fast() -> None:
+    _state, reserve_state, reserve_unit = _battle_state_with_reserve()
+    base_placement = _reserve_placement(reserve_unit=reserve_unit)
+    large_model_exception = LargeModelReservePlacementException(
+        model_instance_id=reserve_unit.own_models[1].model_instance_id,
+        battlefield_edge=BattlefieldEdge.WEST,
+    )
+    earlier_large_model_exception = LargeModelReservePlacementException(
+        model_instance_id=reserve_unit.own_models[0].model_instance_id,
+        battlefield_edge=BattlefieldEdge.SOUTH,
+    )
+    restriction_override = TransportRestrictionOverride(
+        override_kind=TransportRestrictionOverrideKind.ALLOW_EMBARK_AFTER_DISEMBARK,
+        source_rule_id="phase11d-transport-override",
+    )
+    valid_payload = PlacementProposalPayload(
+        proposal_request_id="phase11d-placement-tuple-contracts",
+        proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+        unit_instance_id=reserve_state.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=base_placement,
+        large_model_exceptions=(large_model_exception, earlier_large_model_exception),
+        restriction_overrides=(restriction_override,),
+    )
+
+    assert valid_payload.large_model_exceptions == (
+        earlier_large_model_exception,
+        large_model_exception,
+    )
+    assert valid_payload.restriction_overrides == (restriction_override,)
+
+    with pytest.raises(GameLifecycleError, match="large_model_exceptions must be a tuple"):
+        PlacementProposalPayload(
+            proposal_request_id="phase11d-placement-large-exceptions-list",
+            proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+            unit_instance_id=reserve_state.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            attempted_placement=base_placement,
+            large_model_exceptions=cast(tuple[LargeModelReservePlacementException, ...], []),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="large_model_exceptions must contain LargeModelReservePlacementException values",
+    ):
+        PlacementProposalPayload(
+            proposal_request_id="phase11d-placement-large-exceptions-member",
+            proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+            unit_instance_id=reserve_state.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            attempted_placement=base_placement,
+            large_model_exceptions=(
+                cast(LargeModelReservePlacementException, restriction_override),
+            ),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="large_model_exceptions must not contain duplicate model IDs",
+    ):
+        PlacementProposalPayload(
+            proposal_request_id="phase11d-placement-large-exceptions-duplicate",
+            proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+            unit_instance_id=reserve_state.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            attempted_placement=base_placement,
+            large_model_exceptions=(large_model_exception, large_model_exception),
+        )
+    with pytest.raises(GameLifecycleError, match="restriction_overrides must be a tuple"):
+        PlacementProposalPayload(
+            proposal_request_id="phase11d-placement-overrides-list",
+            proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+            unit_instance_id=reserve_state.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            attempted_placement=base_placement,
+            restriction_overrides=cast(tuple[TransportRestrictionOverride, ...], []),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="restriction_overrides must contain TransportRestrictionOverride values",
+    ):
+        PlacementProposalPayload(
+            proposal_request_id="phase11d-placement-overrides-member",
+            proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+            unit_instance_id=reserve_state.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+            attempted_placement=base_placement,
+            restriction_overrides=(cast(TransportRestrictionOverride, large_model_exception),),
+        )
 
 
 def test_invalid_placement_proposal_returns_invalid_without_mutation() -> None:
@@ -887,6 +1059,65 @@ def test_disembark_placement_wrong_mode_keeps_pending_request_clean() -> None:
     assert violation["violation_code"] == "proposal_disembark_mode_drift"
     assert len(decisions.records) == before_record_count
     assert decisions.queue.pending_requests == (placement_request,)
+
+
+def test_disembark_placement_allowed_mode_context_is_fail_fast() -> None:
+    state, passenger, transport = _battle_state_with_embarked_passenger()
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        parameterized_proposals=True,
+    )
+    decisions = DecisionController()
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase14h-select-disembark-allowed-mode-contract",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    assert proposal.context is not None
+    payload = PlacementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        unit_instance_id=passenger.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=_disembark_placement(passenger),
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    )
+    bad_context_cases = (
+        (
+            DisembarkModeKind.TACTICAL_DISEMBARK.value,
+            "allowed_disembark_modes must be a list",
+        ),
+        (
+            [DisembarkModeKind.TACTICAL_DISEMBARK.value, 7],
+            "allowed_disembark_modes must contain strings",
+        ),
+        (
+            [DisembarkModeKind.TACTICAL_DISEMBARK.value, "unsupported_disembark"],
+            "Unsupported DisembarkModeKind token",
+        ),
+    )
+
+    for raw_allowed_modes, message in bad_context_cases:
+        context = cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    **proposal.context,
+                    "allowed_disembark_modes": raw_allowed_modes,
+                }
+            ),
+        )
+        with pytest.raises(GameLifecycleError, match=message):
+            payload.validation_result_for_request(replace(proposal, context=context))
 
 
 def test_disembark_placement_missing_required_field_keeps_pending_request_clean() -> None:

@@ -23,7 +23,7 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14G** is treated as implemented at the time this file was updated. **Phase 14E is complete**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, no illegal Devastating Wounds spillover, melee Cleave dice gathering, and Lance charge-gated Wound-roll modifiers. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14H remains deferred** because movement-phase Combat Disembark fallback, runtime attached-unit formation/healing/revival, and the remaining advanced transport/repositioning setup contracts still need source-backed implementation work; attached-unit mixed-Toughness attack handling now uses source-backed Bodyguard/Leader/Support role evidence, Combat/Emergency hazard rolls share the official 1-2 Hazard Roll threshold, and direct transport hazard damage routes through the shared mortal-wound and Feel No Pain service. **Phase 14I is complete** for the current Core Stratagem and core-ability source cutover: all 11th Edition Core Stratagem source rows have supported handlers, implemented duplicate weapon ability selection is adapter-visible and replay-safe, and unimplemented Core ability families are fail-closed as explicit unsupported descriptors with future owning phase IDs. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is complete** for the Fight phase envelope, first-class `FightOrderState`, Fights First/Remaining Combats ordering loop, finite activation/pass decisions, legal Normal/Overrun fight-type filtering, and reaction-queue fight interrupts with source-scoped consumption. **Phase 15D is complete** for Pile In and Consolidate proposal routing, PathWitness-based fight movement validation, Overrun's additional Pile In hook, melee declaration requests, one-primary-melee-weapon selection with optional `[EXTRA ATTACKS]`, model-engaged target validation, split melee attack counts, and reuse of the shared attack sequence. **Phase 15E is complete** for source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge through the shared Stratagem/Charge/Fight decision path. **Phase 15F is complete** for Charge/Fight completion gates, full both-player phase completion coverage, Fight damage/removal draining before completion, and deterministic replay-safe fight-order hardening. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
+Everything through **Phase 14G** is treated as implemented at the time this file was updated. **Phase 14E is complete**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, no illegal Devastating Wounds spillover, melee Cleave dice gathering, and Lance charge-gated Wound-roll modifiers. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14H remains deferred** because destroyed-Transport orchestration from real destruction timing, runtime attached-unit formation/healing/revival, and the remaining advanced transport/repositioning setup contracts still need source-backed implementation work; attached-unit mixed-Toughness attack handling now uses source-backed Bodyguard/Leader/Support role evidence, Movement-phase Combat Disembark fallback now requires engine-owned Tactical-invalid evidence, Combat/Emergency hazard rolls share the official 1-2 Hazard Roll threshold, and direct transport hazard damage routes through the shared mortal-wound and Feel No Pain service. **Phase 14I is complete** for the current Core Stratagem and core-ability source cutover: all 11th Edition Core Stratagem source rows have supported handlers, implemented duplicate weapon ability selection is adapter-visible and replay-safe, and unimplemented Core ability families are fail-closed as explicit unsupported descriptors with future owning phase IDs. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is complete** for the Fight phase envelope, first-class `FightOrderState`, Fights First/Remaining Combats ordering loop, finite activation/pass decisions, legal Normal/Overrun fight-type filtering, and reaction-queue fight interrupts with source-scoped consumption. **Phase 15D is complete** for Pile In and Consolidate proposal routing, PathWitness-based fight movement validation, Overrun's additional Pile In hook, melee declaration requests, one-primary-melee-weapon selection with optional `[EXTRA ATTACKS]`, model-engaged target validation, split melee attack counts, and reuse of the shared attack sequence. **Phase 15E is complete** for source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge through the shared Stratagem/Charge/Fight decision path. **Phase 15F is complete** for Charge/Fight completion gates, full both-player phase completion coverage, Fight damage/removal draining before completion, and deterministic replay-safe fight-order hardening. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
 
 Completed / implemented foundation:
 
@@ -2329,11 +2329,13 @@ source-backed Bodyguard/Leader/Support rule: attacks use the highest alive
 Bodyguard Toughness while any Bodyguard models remain, otherwise the highest
 alive Leader/Support/character Toughness. Direct Combat/Emergency transport
 hazard damage now routes through the shared mortal-wound and Feel No Pain
-service. The open blockers are still
-Movement-phase Combat Disembark fallback from impossible Tactical placement,
-runtime army-list Attached Unit formation plus healing/revival, full
-repositioned-unit effect persistence, and the remaining setup-time
-reserve/transport declarations.
+service. Movement-phase Combat Disembark fallback now accepts Combat mode only
+when the pending placement proposal advertises that fallback and the engine
+first proves the same submitted placement is invalid as Tactical Disembark. The
+open blockers are still destroyed-Transport orchestration from real destruction
+timing before Transport removal and Deadly Demise resolution, runtime army-list
+Attached Unit formation plus healing/revival, full repositioned-unit effect
+persistence, and the remaining setup-time reserve/transport declarations.
 
 Phase 14D follow-up findings for movement-mode exposure, Fall Back mode
 payloads, and runtime Mission Action interruption are complete in Phase 14D; the
@@ -2442,61 +2444,12 @@ Invariants:
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
 - `[HUNTER X]` is target eligibility, not an attack modifier: the weapon can
   only be declared into units matching at least one listed keyword;
-- `STEALTH` applies only when every model in the targeted unit has that ability;
-  each time a ranged attack targets that unit, the unit has Benefit of Cover
-  against that attack;
-- `STEALTH` creates an attack-scoped Benefit of Cover source, not terrain
-  occupancy, a persistent terrain state, or a save-side modifier; existing
-  Benefit of Cover and `[IGNORES COVER]` handling must consume the structured
-  Stealth source record;
-- `[PSYCHIC]` attacks are attacks made with `[PSYCHIC]` weapons and must be
-  tagged as psychic attacks for later trigger matching;
-- each time an attack is made with a `[PSYCHIC]` weapon, the attacking player
-  can ignore any or all modifiers to that attack's BS or WS characteristic and
-  any or all modifiers to that attack's Hit roll; this choice does not apply to
-  Strength, AP, Damage, Attacks, Wound rolls, saves, or other characteristics
-  unless another source-backed rule says so;
-- `[PSYCHIC]` modifier-ignore choices are player-facing choices when more than
-  one legal modifier outcome exists and must use deterministic
-  `DecisionRequest`/`DecisionResult` payloads, not an automatic best-result
-  shortcut;
-- each weapon with `[ONE SHOT]` can be selected to make attacks with only once
-  per battle, and every weapon-selection path must consume the same
-  deterministic one-shot use state;
-- `[ONE SHOT]` state is per weapon instance, not per profile name or per unit
-  type; a model with multiple one-shot weapons tracks each separately;
-- if a destroyed model is returned to a unit, all of its `[ONE SHOT]` weapons
-  that were already selected to make attacks earlier in the battle remain spent
-  and cannot be selected again;
-- if a new unit is added to an army, all `[ONE SHOT]` weapons in that new unit
-  start unspent and can be selected once per battle;
-- `HOVER` applies each time the unit takes to the skies: the unit uses the
-  source-backed FLY take-to-the-skies path but does not subtract the normal 2"
-  movement-budget cost;
-- `HOVER` is not a separate deployment mode or generic movement discount; it
-  modifies only the take-to-the-skies budget subtraction at the moment that
-  movement mode is selected;
-- Super-heavy Walker applies only when a unit with that source-backed ability
-  makes a Normal, Advance, or Fall Back move; it does not apply to Charge, Pile
-  In, Consolidate, Scout, setup placement, or reserve-arrival movement unless a
-  future source-backed rule explicitly says otherwise;
-- Super-heavy Walker model-transit permission lets models in that unit move
-  through models, including `MONSTER` and `VEHICLE` models, but not through
-  `TITANIC` models; endpoint model-overlap prohibition still applies;
-- Super-heavy Walker terrain permission lets models in that unit move
-  horizontally through sections of terrain features that are 4" or less in
-  height; taller sections and non-horizontal terrain movement still use the
-  ordinary terrain/pathing validators;
-- before a Super-heavy Walker Normal, Advance, or Fall Back move, the
-  controlling player can select all models in that unit to gain `MOBILE` until
-  that move ends; this is an adapter-visible player choice and any
-  implementation PR must update `docs/ADAPTER_DECISION_CONTRACT.md`;
-- `MOBILE` is a temporary structured keyword/capability that enables horizontal
-  Dense terrain traversal through the normal movement/terrain validator, not a
-  raw text shortcut or permanent unit keyword;
-- if `MOBILE` was selected for a Super-heavy Walker move, the engine rolls one
-  deterministic D6 when that move ends; on a 1, that unit becomes
-  Battle-shocked through the normal Battle-shock state and event path;
+- future ability-runtime families such as `STEALTH`, `[PSYCHIC]`,
+  `[ONE SHOT]`, `HOVER`, Super-heavy Walker, and `MOBILE` remain future
+  runtime work until an owning phase adds source-backed hosts, adapter-contract
+  updates for player-facing choices, and focused regressions; Phase 14I records
+  their source-backed contracts or explicit unsupported descriptors, but does
+  not mark those runtime effects complete;
 - core abilities listed in the 11th Edition Core Rules are either implemented with source-backed tests or explicitly unsupported with reason.
 
 Required tests:
@@ -2518,54 +2471,10 @@ Required tests:
   future coverage;
 - Hunter X target declaration accepts at least one listed keyword match and
   rejects target units with none;
-- `STEALTH` grants Benefit of Cover against ranged attacks only when every model
-  in the target unit has the ability, rejects mixed-model units, and does not
-  affect melee attacks;
-- `STEALTH` Benefit of Cover uses an ability source record and still interacts
-  with `[IGNORES COVER]` through the same structured Benefit of Cover host as
-  terrain and Smokescreen sources;
-- `[PSYCHIC]` attacks are tagged as psychic attacks in attack records and event
-  payloads;
-- `[PSYCHIC]` modifier-ignore choices can ignore all, none, or an arbitrary
-  legal subset of BS/WS characteristic modifiers and Hit-roll modifiers for
-  that attack, while leaving non-covered modifiers untouched;
-- `[PSYCHIC]` modifier-ignore submissions reject stale, drifted, malformed, and
-  wrong-attack-context payloads before mutation and round-trip through replay;
-- `[ONE SHOT]` first weapon selection is legal and records the weapon instance
-  as spent for the battle; a second selection of the same weapon instance is
-  rejected in normal, out-of-phase, transport, and replay declaration paths;
-- `[ONE SHOT]` tracking distinguishes two one-shot weapons on the same model,
-  identical profiles on different models, and attacks generated by temporary
-  attachment paths;
-- returned destroyed models keep prior spent `[ONE SHOT]` state, while newly
-  added units receive fresh unspent `[ONE SHOT]` weapon state;
-- `[ONE SHOT]` state is deterministic, JSON-safe, and contains no Python object
-  reprs or memory addresses;
-- `HOVER` units that take to the skies keep the FLY pathing behavior and do not
-  subtract 2" from the movement budget;
-- non-`HOVER` units that take to the skies still subtract 2" from the movement
-  budget;
-- `HOVER` does not alter Normal, Advance, Fall Back, Charge, Scout, Pile In,
-  Consolidate, setup placement, or reserve placement unless the unit has
-  selected the take-to-the-skies movement mode;
-- Super-heavy Walker movement is offered only for Normal, Advance, and Fall
-  Back moves and is absent from Charge, Pile In, Consolidate, Scout, setup
-  placement, and reserve-arrival contexts;
-- Super-heavy Walker through-model pathing permits traversal through ordinary,
-  `MONSTER`, and `VEHICLE` models, rejects traversal through `TITANIC` models,
-  and still rejects overlapping endpoints;
-- Super-heavy Walker terrain pathing permits horizontal movement through terrain
-  feature sections 4" or less in height and rejects unsupported taller-section
-  or non-horizontal shortcuts;
-- the optional `MOBILE` selection is a finite lifecycle decision with
-  deterministic JSON-safe payloads, rejects stale/drift/malformed submissions
-  before mutation, and grants `MOBILE` only until that move ends;
-- selecting `MOBILE` enables horizontal Dense-terrain traversal during that
-  move, then expires before any later movement, visibility, or scoring context
-  can consume it;
-- the post-`MOBILE` D6 roll is deterministic and replay-facing; a result of 1
-  records Battle-shock for the unit, while 2-6 leaves Battle-shock state
-  unchanged;
+- future ability-runtime families such as `STEALTH`, `[PSYCHIC]`,
+  `[ONE SHOT]`, `HOVER`, Super-heavy Walker, and `MOBILE` require focused
+  implementation tests, replay coverage, and adapter-contract updates in their
+  owning phases before runtime completion can be claimed;
 - every supported core ability has focused tests and an unsupported-descriptor audit row where not yet implemented.
 
 ## Phase 14J: mission and catalog replacement

@@ -628,6 +628,209 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
     assert lifecycle.state.to_payload() == state.to_payload()
 
 
+def test_movement_phase_combat_disembark_requires_tactical_impossible_evidence() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario, game_id="phase14h-movement-combat-disembark")
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        )
+    )
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    disembark_payload = cast(dict[str, object], disembark_request.payload)
+    assert disembark_payload["disembark_mode"] == DisembarkModeKind.TACTICAL_DISEMBARK.value
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase14h-select-combat-disembark-fallback",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    assert proposal.context is not None
+    assert proposal.context["allowed_disembark_modes"] == [
+        DisembarkModeKind.TACTICAL_DISEMBARK.value,
+        DisembarkModeKind.COMBAT_DISEMBARK.value,
+    ]
+
+    status = _submit_disembark_placement_payload(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        passenger=passenger,
+        transport=transport,
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        poses=tuple(Pose.at(pose.position.x + 3.0, pose.position.y) for pose in _disembark_poses()),
+        result_id="phase14h-place-combat-disembark-fallback",
+    )
+
+    assert status is None
+    stored_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert stored_cargo is not None
+    assert stored_cargo.embarked_unit_instance_ids == ()
+    disembarked_state = state.disembarked_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+    )
+    assert disembarked_state is not None
+    assert disembarked_state.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK
+    assert disembarked_state.battle_shocked_until == "end_of_turn"
+    assert disembarked_state.can_declare_charge is False
+    assert state.movement_phase_state is not None
+    assert passenger.unit_instance_id in state.movement_phase_state.selected_unit_ids
+    assert passenger.unit_instance_id in state.movement_phase_state.moved_unit_ids
+    disembark_event = _last_event_payload(decisions, "unit_disembarked")
+    tactical_violations = cast(
+        list[dict[str, object]],
+        disembark_event["tactical_fallback_violations"],
+    )
+    assert {violation["violation_code"] for violation in tactical_violations} == {
+        TransportOperationViolationCode.DISEMBARK_DISTANCE.value
+    }
+    hazard_event = _last_event_payload(decisions, TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE)
+    assert hazard_event["source_kind"] == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
+    assert hazard_event["disembark_mode"] == DisembarkModeKind.COMBAT_DISEMBARK.value
+
+
+def test_movement_phase_combat_disembark_rejects_when_tactical_placement_is_legal() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario, game_id="phase14h-combat-disembark-tactical-available")
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        )
+    )
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase14h-select-combat-disembark-reject",
+        )
+    )
+    before_battlefield = state.battlefield_state
+    before_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+
+    status = _submit_disembark_placement_payload(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        passenger=passenger,
+        transport=transport,
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        result_id="phase14h-place-combat-disembark-reject",
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert state.battlefield_state == before_battlefield
+    assert state.transport_cargo_state_for_transport(transport.unit_instance_id) == before_cargo
+    assert passenger.unit_instance_id not in _placed_unit_ids(state)
+    invalid_event = _last_event_payload(decisions, "combat_disembark_tactical_available")
+    violations = cast(list[dict[str, object]], invalid_event["violations"])
+    assert violations[0]["violation_code"] == (
+        TransportOperationViolationCode.COMBAT_DISEMBARK_TACTICAL_AVAILABLE.value
+    )
+
+
+def test_movement_phase_combat_disembark_rejects_invalid_combat_placement() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario, game_id="phase14h-combat-disembark-invalid-placement")
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        )
+    )
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase14h-select-combat-disembark-invalid-placement",
+        )
+    )
+    before_battlefield = state.battlefield_state
+    before_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+
+    status = _submit_disembark_placement_payload(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        passenger=passenger,
+        transport=transport,
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        poses=tuple(Pose.at(pose.position.x + 8.0, pose.position.y) for pose in _disembark_poses()),
+        result_id="phase14h-place-combat-disembark-invalid-placement",
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert state.battlefield_state == before_battlefield
+    assert state.transport_cargo_state_for_transport(transport.unit_instance_id) == before_cargo
+    assert passenger.unit_instance_id not in _placed_unit_ids(state)
+    invalid_event = _last_event_payload(decisions, "combat_disembark_placement_invalid")
+    violations = cast(list[dict[str, object]], invalid_event["violations"])
+    assert TransportOperationViolationCode.DISEMBARK_DISTANCE.value in {
+        violation["violation_code"] for violation in violations
+    }
+
+
 def test_disembark_selection_does_not_depend_on_engine_built_placement() -> None:
     scenario, passenger, transport, enemy, _catalog = _transport_scenario()
     state = _battle_state(scenario)
@@ -1692,6 +1895,86 @@ def test_transport_hazard_mortal_wounds_resume_decline_allowed_feel_no_pain() ->
     assert final_payload["pending_mortal_wound_request_id"] is None
     assert final_payload["mortal_wounds"] == 1
     assert final_payload["mortal_wound_application"] is not None
+
+
+def test_emergency_disembark_hazard_mortal_wounds_use_shared_damage_service() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    disembark_scenario = _without_unit(scenario, passenger.unit_instance_id)
+    attempted_placement = _unit_placement_at(
+        passenger,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=_disembark_poses(),
+    )
+    emergency_result = resolve_destroyed_transport_disembark(
+        scenario=disembark_scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=_cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        ),
+        selection=DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ),
+        unit=passenger,
+        transport_placement=disembark_scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+        dice_manager=DiceRollManager(
+            "phase14h-transport-hazard-emergency",
+            injected_results=_destroyed_transport_hazard_roll_results(
+                attempted_placement,
+                values=(1, 6, 6, 6, 6),
+                roll_id_prefix="phase14h-transport-hazard-emergency",
+            ),
+        ),
+    )
+    updated_battlefield = apply_destroyed_transport_disembark_to_battlefield(
+        battlefield_state=disembark_scenario.battlefield_state,
+        disembark=emergency_result,
+    )
+    state = _battle_state(disembark_scenario, game_id="phase14h-emergency-hazard")
+    state.battlefield_state = updated_battlefield
+    decisions = DecisionController()
+    target_model = passenger.own_models[0]
+
+    routed = apply_transport_hazard_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        disembark=emergency_result,
+        dice_manager=DiceRollManager("phase14h-emergency-hazard", event_log=decisions.event_log),
+    )
+    event_payloads = [
+        record.payload
+        for record in decisions.event_log.records
+        if record.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE
+    ]
+
+    assert emergency_result.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
+    assert emergency_result.roll_threshold == HAZARD_ROLL_FAILURE_THRESHOLD
+    assert emergency_result.mortal_wound_count == 1
+    assert routed.mortal_wounds == 1
+    assert routed.pending_mortal_wound_request is None
+    assert routed.mortal_wound_application is not None
+    assert routed.mortal_wound_application.target_unit_instance_id == passenger.unit_instance_id
+    assert (
+        model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
+        == target_model.wounds_remaining - 1
+    )
+    assert TransportHazardMortalWounds.from_payload(routed.to_payload()) == routed
+    assert len(event_payloads) == 1
+    final_payload = cast(dict[str, JsonValue], event_payloads[0])
+    assert final_payload["source_kind"] == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
+    assert final_payload["disembark_mode"] == DisembarkModeKind.EMERGENCY_DISEMBARK.value
+    assert final_payload == routed.to_payload()
 
 
 def test_combat_disembark_can_only_set_up_engaged_with_transport_engagement() -> None:
@@ -3101,6 +3384,34 @@ def _combat_hazard_roll_results(
             spec=hazard_roll_spec(
                 reason=f"Combat Disembark hazard roll for {model_placement.model_instance_id}",
                 roll_type="combat_disembark.hazard_roll",
+                actor_id=model_placement.model_instance_id,
+            ),
+            values=(roll_value,),
+            source="injected",
+        )
+        for index, (model_placement, roll_value) in enumerate(
+            zip(attempted_placement.model_placements, values, strict=True),
+            start=1,
+        )
+    )
+
+
+def _destroyed_transport_hazard_roll_results(
+    attempted_placement: UnitPlacement,
+    *,
+    values: tuple[int, ...],
+    roll_id_prefix: str,
+) -> tuple[DiceRollResult, ...]:
+    if len(values) != len(attempted_placement.model_placements):
+        raise AssertionError("Destroyed Transport hazard roll values must match placed models.")
+    return tuple(
+        DiceRollResult.from_values(
+            roll_id=f"{roll_id_prefix}-{index:03d}",
+            spec=hazard_roll_spec(
+                reason=(
+                    f"Destroyed Transport disembark roll for {model_placement.model_instance_id}"
+                ),
+                roll_type="destroyed_transport_disembark",
                 actor_id=model_placement.model_instance_id,
             ),
             values=(roll_value,),

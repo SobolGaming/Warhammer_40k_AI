@@ -69,6 +69,12 @@ def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> N
     assert "Phase 14I is complete" in readme
     assert "explicit unsupported" in phase14i_section
     assert "descriptors with owning phase IDs" in phase14i_section
+    assert "future ability-runtime families" in phase14i_section
+    assert "runtime effects complete" in phase14i_section
+    assert "STEALTH grants Benefit of Cover against ranged attacks" not in phase14i_section
+    assert "[PSYCHIC] modifier-ignore submissions" not in phase14i_section
+    assert "[ONE SHOT] first weapon selection is legal" not in phase14i_section
+    assert "Super-heavy Walker movement is offered" not in phase14i_section
 
 
 def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit() -> None:
@@ -103,5 +109,12 @@ def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
     assert "Phase 14H remains deferred" in readme
     assert "Phase 14H is complete" not in architecture
     assert "Phase 14H is complete" not in readme
+    assert "Movement-phase Combat Disembark fallback now requires" in architecture
+    assert "Movement-phase Combat Disembark fallback now requires" in readme
+    assert "destroyed-Transport orchestration from real destruction timing" in architecture
+    assert "destroyed-Transport orchestration from real destruction timing" in readme
+    assert "player-facing destruction-time host remains Phase 14H work" in (
+        ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
+    ).read_text(encoding="utf-8")
     assert "mixed-Toughness attached-unit attack handling" not in architecture
     assert "mixed-Toughness attached-unit attack handling" not in readme

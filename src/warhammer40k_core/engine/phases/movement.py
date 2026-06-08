@@ -117,6 +117,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.transports import (
+    CombatDisembark,
     DisembarkedUnitState,
     DisembarkModeKind,
     DisembarkResolution,
@@ -124,13 +125,18 @@ from warhammer40k_core.engine.transports import (
     EmbarkResolution,
     EmbarkSelection,
     EmbarkSelectionPayload,
+    TransportCargoState,
     TransportMovementStatus,
     TransportOperationViolation,
+    TransportOperationViolationCode,
     TransportRestrictionOverride,
     TransportRestrictionOverridePayload,
+    apply_combat_disembark_to_battlefield,
     apply_disembark_to_battlefield,
     apply_embark_to_battlefield,
+    apply_transport_hazard_mortal_wounds,
     disembark_mode_kind_from_token,
+    resolve_combat_disembark,
     resolve_disembark,
     resolve_embark,
     transport_movement_status_from_token,
@@ -3430,6 +3436,9 @@ def _request_disembark_placement(
         context={
             "transport_unit_instance_id": selection.transport_unit_instance_id,
             "disembark_mode": selection.disembark_mode.value,
+            "allowed_disembark_modes": list(
+                _allowed_disembark_modes_for_placement_request(selection)
+            ),
             "transport_movement_status": selection.transport_movement_status.value,
             "restriction_overrides": [
                 validate_json_value(override.to_payload())
@@ -3449,6 +3458,9 @@ def _request_disembark_placement(
             "unit_instance_id": selection.unit_instance_id,
             "transport_unit_instance_id": selection.transport_unit_instance_id,
             "disembark_mode": selection.disembark_mode.value,
+            "allowed_disembark_modes": list(
+                _allowed_disembark_modes_for_placement_request(selection)
+            ),
             "proposal_kind": ProposalKind.DISEMBARK.value,
             "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
             "request_id": request.request_id,
@@ -3468,6 +3480,9 @@ def _request_disembark_placement(
             "unit_instance_id": selection.unit_instance_id,
             "transport_unit_instance_id": selection.transport_unit_instance_id,
             "disembark_mode": selection.disembark_mode.value,
+            "allowed_disembark_modes": list(
+                _allowed_disembark_modes_for_placement_request(selection)
+            ),
             "proposal_kind": ProposalKind.DISEMBARK.value,
             "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
             "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
@@ -3509,6 +3524,17 @@ def _resolve_disembark_placement_submission(
     transport_placement = scenario.battlefield_state.unit_placement_by_id(
         transport_unit_instance_id
     )
+    if disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
+        return _resolve_combat_disembark_placement_submission(
+            state=state,
+            result=result,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            selection=selection,
+            cargo_state=cargo_state,
+            scenario=scenario,
+            transport_placement=transport_placement,
+        )
     resolution = resolve_disembark(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -3541,6 +3567,107 @@ def _resolve_disembark_placement_submission(
         result=result,
     )
     return None
+
+
+def _allowed_disembark_modes_for_placement_request(
+    selection: DisembarkCandidate,
+) -> tuple[str, ...]:
+    if selection.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK:
+        return (
+            DisembarkModeKind.TACTICAL_DISEMBARK.value,
+            DisembarkModeKind.COMBAT_DISEMBARK.value,
+        )
+    return (selection.disembark_mode.value,)
+
+
+def _resolve_combat_disembark_placement_submission(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    selection: DisembarkSelection,
+    cargo_state: TransportCargoState,
+    scenario: BattlefieldScenario,
+    transport_placement: UnitPlacement,
+) -> LifecycleStatus | None:
+    active_player_id = _active_player_id(state)
+    unit = _unit_instance_by_id(state=state, unit_instance_id=selection.unit_instance_id)
+    tactical_selection = replace(
+        selection,
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+    )
+    tactical_resolution = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        cargo_state=cargo_state,
+        selection=tactical_selection,
+        unit=unit,
+        transport_placement=transport_placement,
+        objective_markers=_objective_markers_for_state(state),
+    )
+    if tactical_resolution.is_valid:
+        invalid_payload = _transport_operation_invalid_payload(
+            state=state,
+            active_player_id=active_player_id,
+            unit_instance_id=selection.unit_instance_id,
+            transport_unit_instance_id=selection.transport_unit_instance_id,
+            result=result,
+            phase_body_status="combat_disembark_tactical_available",
+            violations=(
+                TransportOperationViolation(
+                    violation_code=(
+                        TransportOperationViolationCode.COMBAT_DISEMBARK_TACTICAL_AVAILABLE
+                    ),
+                    message=(
+                        "Combat Disembark requires engine-owned evidence that the submitted "
+                        "placement is not legal as Tactical Disembark."
+                    ),
+                    unit_instance_id=selection.unit_instance_id,
+                    blocker_id=selection.transport_unit_instance_id,
+                ),
+            ),
+        )
+        decisions.event_log.append("combat_disembark_tactical_available", invalid_payload)
+        return LifecycleStatus.invalid(
+            stage=GameLifecycleStage.BATTLE,
+            message="Combat Disembark requires Tactical-impossible evidence.",
+            payload=invalid_payload,
+        )
+
+    combat_result = resolve_combat_disembark(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        cargo_state=cargo_state,
+        selection=selection,
+        unit=unit,
+        transport_placement=transport_placement,
+        dice_manager=_dice_roll_manager_for_state(state=state, decisions=decisions),
+        objective_markers=_objective_markers_for_state(state),
+    )
+    if not combat_result.placement.is_valid:
+        invalid_payload = _transport_operation_invalid_payload(
+            state=state,
+            active_player_id=active_player_id,
+            unit_instance_id=selection.unit_instance_id,
+            transport_unit_instance_id=selection.transport_unit_instance_id,
+            result=result,
+            phase_body_status="combat_disembark_placement_invalid",
+            violations=combat_result.placement.violations,
+        )
+        decisions.event_log.append("combat_disembark_placement_invalid", invalid_payload)
+        return LifecycleStatus.invalid(
+            stage=GameLifecycleStage.BATTLE,
+            message="Combat Disembark placement is invalid.",
+            payload=invalid_payload,
+        )
+    return _apply_valid_combat_disembark(
+        state=state,
+        decisions=decisions,
+        combat_disembark=combat_result,
+        tactical_resolution=tactical_resolution,
+        result=result,
+    )
 
 
 def _parse_movement_proposal_submission_or_invalid(
@@ -3821,6 +3948,85 @@ def _apply_valid_disembark(
             else None,
         },
     )
+
+
+def _apply_valid_combat_disembark(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    combat_disembark: CombatDisembark,
+    tactical_resolution: DisembarkResolution,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Combat Disembark placement requires battlefield_state.")
+    disembark = combat_disembark.placement
+    if disembark.updated_cargo_state is None or disembark.disembarked_unit_state is None:
+        raise GameLifecycleError("Valid Combat Disembark requires state records.")
+    state.replace_battlefield_state(
+        apply_combat_disembark_to_battlefield(
+            battlefield_state=battlefield_state,
+            disembark=combat_disembark,
+        )
+    )
+    state.replace_transport_cargo_state(disembark.updated_cargo_state)
+    state.record_disembarked_unit_state(disembark.disembarked_unit_state)
+    movement_state = state.movement_phase_state
+    if movement_state is None:
+        raise GameLifecycleError("Combat Disembark requires movement_phase_state.")
+    state.movement_phase_state = movement_state.with_post_normal_move_disembark_counted_as_moved(
+        disembark.selection.unit_instance_id
+    )
+    decisions.event_log.append(
+        "unit_disembarked",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": disembark.selection.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": disembark.selection.unit_instance_id,
+            "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
+            "disembark_mode": disembark.selection.disembark_mode.value,
+            "transport_movement_status": disembark.selection.transport_movement_status.value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "unit_disembarked",
+            "updated_cargo_state": validate_json_value(disembark.updated_cargo_state.to_payload()),
+            "disembarked_unit_state": validate_json_value(
+                disembark.disembarked_unit_state.to_payload()
+            ),
+            "transition_batch": validate_json_value(disembark.transition_batch.to_payload())
+            if disembark.transition_batch is not None
+            else None,
+            "tactical_fallback_violations": [
+                validate_json_value(violation.to_payload())
+                for violation in tactical_resolution.violations
+            ],
+        },
+    )
+    routed = apply_transport_hazard_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        disembark=combat_disembark,
+        dice_manager=_dice_roll_manager_for_state(state=state, decisions=decisions),
+    )
+    if routed.pending_mortal_wound_request is not None:
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=routed.pending_mortal_wound_request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "battle_round": state.battle_round,
+                "active_player_id": disembark.selection.player_id,
+                "unit_instance_id": disembark.selection.unit_instance_id,
+                "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
+                "disembark_mode": disembark.selection.disembark_mode.value,
+                "decision_type": routed.pending_mortal_wound_request.decision_type,
+                "phase_body_status": "transport_hazard_feel_no_pain_required",
+            },
+        )
+    return None
 
 
 def _request_movement_action(
