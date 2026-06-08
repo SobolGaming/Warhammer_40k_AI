@@ -43,6 +43,11 @@ class UnitMusterSelectionPayload(TypedDict):
     wargear_selections: list[WargearSelectionPayload]
 
 
+class AttachmentDeclarationPayload(TypedDict):
+    source_unit_selection_id: str
+    bodyguard_unit_selection_id: str
+
+
 @dataclass(frozen=True, slots=True)
 class ModelProfileSelection:
     model_profile_id: str
@@ -246,6 +251,47 @@ class UnitMusterSelection:
                 WargearSelection.from_payload(selection)
                 for selection in payload["wargear_selections"]
             ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AttachmentDeclaration:
+    source_unit_selection_id: str
+    bodyguard_unit_selection_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_unit_selection_id",
+            _validate_unprefixed_identifier(
+                "AttachmentDeclaration source_unit_selection_id",
+                self.source_unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "bodyguard_unit_selection_id",
+            _validate_unprefixed_identifier(
+                "AttachmentDeclaration bodyguard_unit_selection_id",
+                self.bodyguard_unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        if self.source_unit_selection_id == self.bodyguard_unit_selection_id:
+            raise ListValidationError("AttachmentDeclaration cannot attach a unit to itself.")
+
+    def to_payload(self) -> AttachmentDeclarationPayload:
+        return {
+            "source_unit_selection_id": self.source_unit_selection_id,
+            "bodyguard_unit_selection_id": self.bodyguard_unit_selection_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AttachmentDeclarationPayload) -> Self:
+        return cls(
+            source_unit_selection_id=payload["source_unit_selection_id"],
+            bodyguard_unit_selection_id=payload["bodyguard_unit_selection_id"],
         )
 
 

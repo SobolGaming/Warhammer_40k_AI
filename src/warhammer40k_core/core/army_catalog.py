@@ -5,6 +5,8 @@ from typing import Self, TypedDict
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
+    AttachmentEligibility,
+    AttachmentRole,
     BaseSizeDefinition,
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
@@ -299,6 +301,39 @@ class ArmyCatalog:
                     keywords=("Character", "Leader", "Infantry"),
                     faction_keywords=("CORE Marines",),
                     wargear_id=leader_wargear.wargear_id,
+                    attachment_eligibilities=(
+                        AttachmentEligibility(
+                            role=AttachmentRole.LEADER,
+                            allowed_bodyguard_datasheet_ids=("core-intercessor-like-infantry",),
+                            source_id="datasheet:core-character-leader:attachment:leader",
+                        ),
+                    ),
+                ),
+                _datasheet(
+                    datasheet_id="core-character-support",
+                    name="CORE Character Support",
+                    model_profile_id="core-character-support",
+                    min_models=1,
+                    max_models=1,
+                    base_diameter_mm=40.0,
+                    movement=6,
+                    toughness=4,
+                    save=3,
+                    wounds=4,
+                    leadership=5,
+                    objective_control=1,
+                    weapon_skill=2,
+                    ballistic_skill=2,
+                    keywords=("Character", "Support", "Infantry"),
+                    faction_keywords=("CORE Marines",),
+                    wargear_id=leader_wargear.wargear_id,
+                    attachment_eligibilities=(
+                        AttachmentEligibility(
+                            role=AttachmentRole.SUPPORT,
+                            allowed_bodyguard_datasheet_ids=("core-intercessor-like-infantry",),
+                            source_id="datasheet:core-character-support:attachment:support",
+                        ),
+                    ),
                 ),
                 _datasheet(
                     datasheet_id="core-transport",
@@ -432,6 +467,7 @@ def _datasheet(
     faction_keywords: tuple[str, ...],
     wargear_id: str,
     abilities: tuple[DatasheetAbilityDescriptor, ...] = (),
+    attachment_eligibilities: tuple[AttachmentEligibility, ...] = (),
 ) -> DatasheetDefinition:
     return DatasheetDefinition(
         datasheet_id=datasheet_id,
@@ -473,6 +509,7 @@ def _datasheet(
             ),
         ),
         abilities=abilities,
+        attachment_eligibilities=attachment_eligibilities,
         source_ids=(f"datasheet:{datasheet_id}",),
     )
 

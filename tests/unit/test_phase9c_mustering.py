@@ -20,6 +20,7 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
 )
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     ListValidationError,
     ModelProfileSelection,
@@ -65,6 +66,7 @@ def _muster_request(
     player_id: str = "player-a",
     detachment_selection: DetachmentSelection | None = None,
     unit_selections: tuple[UnitMusterSelection, ...] | None = None,
+    attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     catalog_id: str | None = None,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
@@ -80,6 +82,7 @@ def _muster_request(
             detachment_id="core-combined-arms",
         ),
         unit_selections=unit_selections if unit_selections is not None else (_unit_selection(),),
+        attachment_declarations=attachment_declarations,
     )
 
 
@@ -143,6 +146,177 @@ def test_runtime_units_use_explicit_own_model_semantics() -> None:
     assert len(unit.own_models) == 5
     assert unit.own_model_ids() == tuple(model.model_instance_id for model in unit.own_models)
     assert not hasattr(unit, "models")
+
+
+def test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(unit_selection_id="bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="support-unit",
+                datasheet_id="core-character-support",
+                model_profile_id="core-character-support",
+                model_count=1,
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+            AttachmentDeclaration(
+                source_unit_selection_id="support-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+
+    army = muster_army(catalog=catalog, request=request)
+    payload = cast(
+        ArmyDefinitionPayload,
+        json.loads(json.dumps(army.to_payload(), sort_keys=True)),
+    )
+    formation = army.attached_units[0]
+    bodyguard = army.unit_by_id("army-alpha:bodyguard-unit")
+    leader = army.unit_by_id("army-alpha:leader-unit")
+    support = army.unit_by_id("army-alpha:support-unit")
+
+    assert formation.attached_unit_instance_id == "attached-unit:army-alpha:bodyguard-unit"
+    assert formation.bodyguard_unit_instance_id == bodyguard.unit_instance_id
+    assert formation.leader_unit_instance_ids == (leader.unit_instance_id,)
+    assert formation.support_unit_instance_ids == (support.unit_instance_id,)
+    assert formation.component_unit_instance_ids == (
+        bodyguard.unit_instance_id,
+        leader.unit_instance_id,
+        support.unit_instance_id,
+    )
+    assert "ATTACHED_UNIT" in bodyguard.keywords
+    assert "runtime-attached-unit:bodyguard" in bodyguard.own_models[0].source_ids
+    assert "attached-role:leader" in leader.own_models[0].source_ids
+    assert "runtime-attached-unit:leader" in leader.own_models[0].source_ids
+    assert "attached-role:support" in support.own_models[0].source_ids
+    assert "runtime-attached-unit:support" in support.own_models[0].source_ids
+    assert "<" not in json.dumps(payload, sort_keys=True)
+    assert "object at 0x" not in json.dumps(payload, sort_keys=True)
+    assert ArmyDefinition.from_payload(payload).to_payload() == army.to_payload()
+
+
+def test_attachment_declarations_reject_missing_eligibility_and_illegal_bodyguards() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    missing_eligibility_request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(unit_selection_id="source-infantry"),
+            _unit_selection(
+                unit_selection_id="bodyguard-unit",
+                datasheet_id="core-boyz-like-infantry",
+                model_profile_id="core-boyz-like",
+                model_count=10,
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="source-infantry",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+    illegal_bodyguard_request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="bodyguard-unit",
+                datasheet_id="core-boyz-like-infantry",
+                model_profile_id="core-boyz-like",
+                model_count=10,
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+
+    with pytest.raises(ArmyMusteringError, match="no attachment eligibility"):
+        muster_army(catalog=catalog, request=missing_eligibility_request)
+    with pytest.raises(ArmyMusteringError, match="bodyguard datasheet"):
+        muster_army(catalog=catalog, request=illegal_bodyguard_request)
+
+
+def test_attachment_declarations_reject_duplicate_sources_and_duplicate_roles() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    with pytest.raises(ArmyMusteringError, match="unique source unit IDs"):
+        _muster_request(
+            catalog,
+            unit_selections=(
+                _unit_selection(unit_selection_id="bodyguard-unit"),
+                _unit_selection(unit_selection_id="second-bodyguard-unit"),
+                _unit_selection(
+                    unit_selection_id="leader-unit",
+                    datasheet_id="core-character-leader",
+                    model_profile_id="core-character-leader",
+                    model_count=1,
+                ),
+            ),
+            attachment_declarations=(
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader-unit",
+                    bodyguard_unit_selection_id="bodyguard-unit",
+                ),
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader-unit",
+                    bodyguard_unit_selection_id="second-bodyguard-unit",
+                ),
+            ),
+        )
+
+    duplicate_role_request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(unit_selection_id="bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="second-leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+            AttachmentDeclaration(
+                source_unit_selection_id="second-leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+
+    with pytest.raises(ArmyMusteringError, match="one Leader or one Support"):
+        muster_army(catalog=catalog, request=duplicate_role_request)
 
 
 def test_runtime_payloads_reject_hierarchy_and_source_drift() -> None:

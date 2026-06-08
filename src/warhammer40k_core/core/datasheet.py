@@ -29,6 +29,11 @@ class CatalogAbilitySupport(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
+class AttachmentRole(StrEnum):
+    LEADER = "leader"
+    SUPPORT = "support"
+
+
 CatalogParameterValue = int | float | str | bool
 
 REQUIRED_MODEL_CHARACTERISTICS = frozenset(
@@ -89,6 +94,12 @@ class DatasheetAbilityDescriptorPayload(TypedDict):
     parameter_tokens: list[str]
 
 
+class AttachmentEligibilityPayload(TypedDict):
+    role: str
+    allowed_bodyguard_datasheet_ids: list[str]
+    source_id: str
+
+
 class DatasheetDefinitionPayload(TypedDict):
     datasheet_id: str
     name: str
@@ -97,6 +108,7 @@ class DatasheetDefinitionPayload(TypedDict):
     composition: list[UnitCompositionDefinitionPayload]
     wargear_options: list[DatasheetWargearOptionPayload]
     abilities: list[DatasheetAbilityDescriptorPayload]
+    attachment_eligibilities: list[AttachmentEligibilityPayload]
     source_ids: list[str]
 
 
@@ -459,6 +471,45 @@ class DatasheetAbilityDescriptor:
 
 
 @dataclass(frozen=True, slots=True)
+class AttachmentEligibility:
+    role: AttachmentRole
+    allowed_bodyguard_datasheet_ids: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "role", attachment_role_from_token(self.role))
+        object.__setattr__(
+            self,
+            "allowed_bodyguard_datasheet_ids",
+            _validate_identifier_tuple(
+                "AttachmentEligibility allowed_bodyguard_datasheet_ids",
+                self.allowed_bodyguard_datasheet_ids,
+                min_length=1,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("AttachmentEligibility source_id", self.source_id),
+        )
+
+    def to_payload(self) -> AttachmentEligibilityPayload:
+        return {
+            "role": self.role.value,
+            "allowed_bodyguard_datasheet_ids": list(self.allowed_bodyguard_datasheet_ids),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AttachmentEligibilityPayload) -> Self:
+        return cls(
+            role=attachment_role_from_token(payload["role"]),
+            allowed_bodyguard_datasheet_ids=tuple(payload["allowed_bodyguard_datasheet_ids"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class DatasheetDefinition:
     datasheet_id: str
     name: str
@@ -467,6 +518,7 @@ class DatasheetDefinition:
     composition: tuple[UnitCompositionDefinition, ...]
     wargear_options: tuple[DatasheetWargearOption, ...] = ()
     abilities: tuple[DatasheetAbilityDescriptor, ...] = ()
+    attachment_eligibilities: tuple[AttachmentEligibility, ...] = ()
     source_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -513,6 +565,10 @@ class DatasheetDefinition:
             "DatasheetDefinition abilities",
             self.abilities,
         )
+        attachment_eligibilities = _validate_attachment_eligibility_tuple(
+            "DatasheetDefinition attachment_eligibilities",
+            self.attachment_eligibilities,
+        )
         object.__setattr__(
             self,
             "model_profiles",
@@ -532,6 +588,16 @@ class DatasheetDefinition:
             self,
             "abilities",
             tuple(sorted(abilities, key=lambda ability: ability.ability_id)),
+        )
+        object.__setattr__(
+            self,
+            "attachment_eligibilities",
+            tuple(
+                sorted(
+                    attachment_eligibilities,
+                    key=lambda eligibility: eligibility.source_id,
+                )
+            ),
         )
         object.__setattr__(
             self,
@@ -558,6 +624,9 @@ class DatasheetDefinition:
             "composition": [part.to_payload() for part in self.composition],
             "wargear_options": [option.to_payload() for option in self.wargear_options],
             "abilities": [ability.to_payload() for ability in self.abilities],
+            "attachment_eligibilities": [
+                eligibility.to_payload() for eligibility in self.attachment_eligibilities
+            ],
             "source_ids": list(self.source_ids),
         }
 
@@ -579,6 +648,10 @@ class DatasheetDefinition:
             ),
             abilities=tuple(
                 DatasheetAbilityDescriptor.from_payload(ability) for ability in payload["abilities"]
+            ),
+            attachment_eligibilities=tuple(
+                AttachmentEligibility.from_payload(eligibility)
+                for eligibility in payload["attachment_eligibilities"]
             ),
             source_ids=tuple(payload["source_ids"]),
         )
@@ -604,6 +677,17 @@ def catalog_ability_support_from_token(token: object) -> CatalogAbilitySupport:
         return CatalogAbilitySupport(token)
     except ValueError as exc:
         raise DatasheetCatalogError(f"Unsupported CatalogAbilitySupport token: {token}.") from exc
+
+
+def attachment_role_from_token(token: object) -> AttachmentRole:
+    if type(token) is AttachmentRole:
+        return token
+    if type(token) is not str:
+        raise DatasheetCatalogError("AttachmentRole token must be a string.")
+    try:
+        return AttachmentRole(token)
+    except ValueError as exc:
+        raise DatasheetCatalogError(f"Unsupported AttachmentRole token: {token}.") from exc
 
 
 def _characteristic_from_token(token: object) -> Characteristic:
@@ -638,7 +722,12 @@ def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str)
     return identifier
 
 
-def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+def _validate_identifier_tuple(
+    field_name: str,
+    values: tuple[str, ...],
+    *,
+    min_length: int = 0,
+) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise DatasheetCatalogError(f"{field_name} must be a tuple.")
     seen: set[str] = set()
@@ -649,6 +738,8 @@ def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tupl
             raise DatasheetCatalogError(f"{field_name} must not contain duplicates.")
         seen.add(identifier)
         validated.append(identifier)
+    if len(validated) < min_length:
+        raise DatasheetCatalogError(f"{field_name} must contain at least {min_length} values.")
     return tuple(sorted(validated))
 
 
@@ -789,5 +880,27 @@ def _validate_ability_descriptor_tuple(
         if value.ability_id in seen:
             raise DatasheetCatalogError(f"{field_name} must not contain duplicate ability IDs.")
         seen.add(value.ability_id)
+        validated.append(value)
+    return tuple(validated)
+
+
+def _validate_attachment_eligibility_tuple(
+    field_name: str,
+    values: tuple[AttachmentEligibility, ...],
+) -> tuple[AttachmentEligibility, ...]:
+    if type(values) is not tuple:
+        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
+    seen_roles: set[AttachmentRole] = set()
+    seen_sources: set[str] = set()
+    validated: list[AttachmentEligibility] = []
+    for value in values:
+        if type(value) is not AttachmentEligibility:
+            raise DatasheetCatalogError(f"{field_name} must contain attachment eligibility values.")
+        if value.role in seen_roles:
+            raise DatasheetCatalogError(f"{field_name} must not contain duplicate roles.")
+        if value.source_id in seen_sources:
+            raise DatasheetCatalogError(f"{field_name} must not contain duplicate source IDs.")
+        seen_roles.add(value.role)
+        seen_sources.add(value.source_id)
         validated.append(value)
     return tuple(validated)

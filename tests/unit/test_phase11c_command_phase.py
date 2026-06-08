@@ -49,6 +49,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
 )
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
@@ -1039,6 +1040,79 @@ def test_attached_unit_split_recovers_original_starting_strength_records() -> No
     leader_record = state.starting_strength_record_for_unit(leader_id)
     assert leader_record.starting_model_count == 1
     assert leader_record.single_model_starting_wounds == 5
+    assert attached_id not in {
+        record.unit_instance_id for record in state.starting_strength_records
+    }
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_mustered_attached_unit_uses_attached_starting_strength_until_split() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    state = GameState.from_config(_config())
+    army = muster_army(
+        catalog=catalog,
+        request=_army_muster_request(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-alpha",
+            unit_selections=(
+                _default_unit_selection("bodyguard-unit"),
+                _unit_selection(
+                    unit_selection_id="leader-unit",
+                    datasheet_id="core-character-leader",
+                    model_profile_id="core-character-leader",
+                    model_count=1,
+                ),
+                _unit_selection(
+                    unit_selection_id="support-unit",
+                    datasheet_id="core-character-support",
+                    model_profile_id="core-character-support",
+                    model_count=1,
+                ),
+            ),
+            attachment_declarations=(
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader-unit",
+                    bodyguard_unit_selection_id="bodyguard-unit",
+                ),
+                AttachmentDeclaration(
+                    source_unit_selection_id="support-unit",
+                    bodyguard_unit_selection_id="bodyguard-unit",
+                ),
+            ),
+        ),
+    )
+    state.record_army_definition(army)
+
+    attached_id = "attached-unit:army-alpha:bodyguard-unit"
+    bodyguard_id = "army-alpha:bodyguard-unit"
+    leader_id = "army-alpha:leader-unit"
+    support_id = "army-alpha:support-unit"
+    record_ids = {record.unit_instance_id for record in state.starting_strength_records}
+    attached_record = state.starting_strength_record_for_unit(attached_id)
+
+    assert attached_record.starting_model_count == 7
+    assert attached_record.single_model_starting_wounds is None
+    assert bodyguard_id not in record_ids
+    assert leader_id not in record_ids
+    assert support_id not in record_ids
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+    recovered = state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(leader_id, support_id, bodyguard_id),
+    )
+
+    assert tuple(record.unit_instance_id for record in recovered) == (
+        bodyguard_id,
+        leader_id,
+        support_id,
+    )
+    assert not state.army_definitions[0].attached_units
+    assert state.starting_strength_record_for_unit(bodyguard_id).starting_model_count == 5
+    assert state.starting_strength_record_for_unit(leader_id).single_model_starting_wounds == 5
+    assert state.starting_strength_record_for_unit(support_id).single_model_starting_wounds == 4
     assert attached_id not in {
         record.unit_instance_id for record in state.starting_strength_records
     }
@@ -2062,6 +2136,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selections: tuple[UnitMusterSelection, ...],
+    attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -2074,6 +2149,7 @@ def _army_muster_request(
             detachment_id="core-combined-arms",
         ),
         unit_selections=unit_selections,
+        attachment_declarations=attachment_declarations,
     )
 
 

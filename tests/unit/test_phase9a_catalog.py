@@ -14,6 +14,7 @@ from warhammer40k_core.core.army_catalog import (
 )
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
+    AttachmentRole,
     BaseSizeDefinition,
     BaseSizeKind,
     CatalogAbilitySupport,
@@ -157,14 +158,24 @@ def test_army_catalog_round_trips_canonical_phase9a_content_pack() -> None:
     blob = json.dumps(payload, sort_keys=True)
     deep_strike = catalog.datasheet_by_id("core-deep-strike-unit")
     infantry = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    leader = catalog.datasheet_by_id("core-character-leader")
+    support = catalog.datasheet_by_id("core-character-support")
     infantry_profile = infantry.model_profile_by_id("core-intercessor-like")
 
-    assert len(catalog.datasheets) == 6
+    assert len(catalog.datasheets) == 7
     assert catalog.faction_by_id("core-marine-force").faction_keywords == ("CORE Marines",)
     assert infantry_profile.characteristic(Characteristic.MOVEMENT).final == 6
     assert deep_strike.abilities[0].support is CatalogAbilitySupport.UNSUPPORTED
     assert deep_strike.abilities[0].source_id == (
         "datasheet:core-deep-strike-unit:ability:deep-strike"
+    )
+    assert leader.attachment_eligibilities[0].role is AttachmentRole.LEADER
+    assert leader.attachment_eligibilities[0].allowed_bodyguard_datasheet_ids == (
+        infantry.datasheet_id,
+    )
+    assert support.attachment_eligibilities[0].role is AttachmentRole.SUPPORT
+    assert support.attachment_eligibilities[0].allowed_bodyguard_datasheet_ids == (
+        infantry.datasheet_id,
     )
     assert "<" not in blob
     assert "object at 0x" not in blob

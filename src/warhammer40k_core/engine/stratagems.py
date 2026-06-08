@@ -2821,6 +2821,16 @@ def _attached_unit_id_for_component(
     unit_instance_id: str,
 ) -> str | None:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    matched_attached_ids = tuple(
+        attached_unit.attached_unit_instance_id
+        for army_definition in state.army_definitions
+        for attached_unit in army_definition.attached_units
+        if requested_unit_id in attached_unit.component_unit_instance_ids
+    )
+    if len(matched_attached_ids) > 1:
+        raise GameLifecycleError("Attached component has multiple attached identities.")
+    if matched_attached_ids:
+        return matched_attached_ids[0]
     component_record = None
     for record in state.starting_strength_records:
         if record.unit_instance_id == requested_unit_id:

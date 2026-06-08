@@ -19,6 +19,10 @@ HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
 GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
 HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
+DATASHEET_PATH = ROOT / "src" / "warhammer40k_core" / "core" / "datasheet.py"
+LIST_VALIDATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "list_validation.py"
+ARMY_MUSTERING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "army_mustering.py"
+STRATAGEMS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 
 
@@ -89,6 +93,10 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     game_state_source = GAME_STATE_PATH.read_text(encoding="utf-8")
     unit_state_source = UNIT_STATE_PATH.read_text(encoding="utf-8")
     healing_source = HEALING_PATH.read_text(encoding="utf-8")
+    datasheet_source = DATASHEET_PATH.read_text(encoding="utf-8")
+    list_validation_source = LIST_VALIDATION_PATH.read_text(encoding="utf-8")
+    army_mustering_source = ARMY_MUSTERING_PATH.read_text(encoding="utf-8")
+    stratagems_source = STRATAGEMS_PATH.read_text(encoding="utf-8")
 
     assert "def resolve_combat_disembark(" in transport_source
     assert "Combat Disembark requires resolve_combat_disembark." in transport_source
@@ -115,9 +123,20 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "apply_healing_model_decision" in healing_source
     assert "with_returned_model_placement" in healing_source
     assert "phase_start_enemy_engagement_model_ids" in healing_source
+    assert "class AttachmentEligibility" in datasheet_source
+    assert "class AttachmentDeclaration" in list_validation_source
+    assert "class AttachedUnitFormation" in army_mustering_source
+    assert "def _resolve_attached_unit_formations(" in army_mustering_source
+    assert "AttachmentRole.LEADER" in army_mustering_source
+    assert "AttachmentRole.SUPPORT" in army_mustering_source
+    assert '"runtime-attached-unit:{role}"' in army_mustering_source
+    assert "def _starting_strength_records_for_army(" in game_state_source
+    assert "def _starting_strength_record_for_attached_unit(" in game_state_source
+    assert "def _remove_attached_unit_formation(" in game_state_source
+    assert "attached_unit.component_unit_instance_ids" in stratagems_source
 
 
-def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
+def test_phase14h_docs_mark_complete_after_attached_formation_cutover() -> None:
     architecture = ARCHITECTURE_PATH.read_text(encoding="utf-8")
     readme = README_PATH.read_text(encoding="utf-8")
     phase14h_section = architecture.split("## Phase 14H:", maxsplit=1)[1].split(
@@ -125,24 +144,31 @@ def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
         maxsplit=1,
     )[0]
 
-    assert "Status: Deferred." in phase14h_section
-    assert "Phase 14H remains deferred" in architecture
-    assert "Phase 14H remains deferred" in readme
-    assert "Phase 14H is complete" not in architecture
-    assert "Phase 14H is complete" not in readme
+    assert "Status: Complete." in phase14h_section
+    assert "Phase 14H is complete" in architecture
+    assert "Phase 14H is complete" in readme
+    assert "Phase 14H remains deferred" not in architecture
+    assert "Phase 14H remains deferred" not in readme
+    assert "runtime Attached Unit formation" in architecture
+    assert "runtime Attached Unit formation" in readme
+    assert "structured army-list Leader/Support declarations" in architecture
+    assert "structured army-list Leader/Support declarations" in readme
+    assert "first-class attached rules-unit formation records" in architecture
+    assert "first-class attached rules-unit formation records" in readme
+    assert "Broader real-faction Leader/Support eligibility data" in architecture
+    assert "runtime attached-unit formation;" not in readme
+    assert "open blocker" not in phase14h_section
     assert "Healing Wounds primitive now iterates each healing amount" in architecture
-    assert "Healing Wounds iterates wound healing before REVIVED model return" in readme
-    assert "Movement-phase Combat Disembark fallback now requires" in architecture
-    assert "Movement-phase Combat Disembark fallback now requires" in readme
+    assert "healing, revival, persisting effects" in readme
+    assert "Movement-phase Combat Disembark fallback now accepts Combat mode" in architecture
+    assert "Movement-phase Combat Disembark fallback with engine-owned" in readme
     assert "Attached Unit formation" in architecture
-    assert "runtime attached-unit formation;" in readme
-    assert "runtime attached-unit formation/healing/revival" not in readme
     assert "full repositioned-unit effect persistence" not in architecture
     assert "setup-time reserve/transport declarations" not in architecture
     assert "setup-time Strategic Reserve declarations" in architecture
     assert "setup-time Strategic Reserve declarations" in readme
-    assert "repositioned units preserve Advance/Fall Back/Disembark" in architecture
-    assert "repositioned units preserve Advance/Fall Back/Disembark" in readme
+    assert "repositioned-unit Advance/Fall Back/Disembark history" in architecture
+    assert "repositioned-unit Advance/Fall Back/Disembark history" in readme
     assert "destroyed-Transport orchestration from real destruction timing" not in architecture
     assert "destroyed-Transport orchestration from real destruction timing" not in readme
     adapter_contract = ADAPTER_CONTRACT_PATH.read_text(encoding="utf-8")
