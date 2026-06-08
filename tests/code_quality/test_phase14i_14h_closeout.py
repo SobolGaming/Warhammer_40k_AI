@@ -18,6 +18,7 @@ DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage
 HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
 GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
+HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 
 
@@ -87,6 +88,7 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     hazard_source = HAZARD_PATH.read_text(encoding="utf-8")
     game_state_source = GAME_STATE_PATH.read_text(encoding="utf-8")
     unit_state_source = UNIT_STATE_PATH.read_text(encoding="utf-8")
+    healing_source = HEALING_PATH.read_text(encoding="utf-8")
 
     assert "def resolve_combat_disembark(" in transport_source
     assert "Combat Disembark requires resolve_combat_disembark." in transport_source
@@ -108,6 +110,11 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "_highest_toughness_for_models" in attack_sequence_source
     assert '"attached-role:leader" in model.source_ids' in damage_allocation_source
     assert '"attached-role:support" in model.source_ids' in damage_allocation_source
+    assert "SELECT_HEALING_MODEL_DECISION_TYPE" in healing_source
+    assert "resolve_healing_until_blocked" in healing_source
+    assert "apply_healing_model_decision" in healing_source
+    assert "with_returned_model_placement" in healing_source
+    assert "phase_start_enemy_engagement_model_ids" in healing_source
 
 
 def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
@@ -123,10 +130,13 @@ def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
     assert "Phase 14H remains deferred" in readme
     assert "Phase 14H is complete" not in architecture
     assert "Phase 14H is complete" not in readme
+    assert "Healing Wounds primitive now iterates each healing amount" in architecture
+    assert "Healing Wounds iterates wound healing before REVIVED model return" in readme
     assert "Movement-phase Combat Disembark fallback now requires" in architecture
     assert "Movement-phase Combat Disembark fallback now requires" in readme
-    assert "runtime army-list Attached Unit formation plus" in architecture
-    assert "runtime attached-unit formation/healing/revival" in readme
+    assert "Attached Unit formation" in architecture
+    assert "runtime attached-unit formation;" in readme
+    assert "runtime attached-unit formation/healing/revival" not in readme
     assert "full repositioned-unit effect persistence" not in architecture
     assert "setup-time reserve/transport declarations" not in architecture
     assert "setup-time Strategic Reserve declarations" in architecture
