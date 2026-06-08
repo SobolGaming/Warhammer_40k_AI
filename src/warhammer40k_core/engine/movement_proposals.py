@@ -697,12 +697,9 @@ class PlacementProposalPayload:
                 message="Placement kind is not allowed by the pending request.",
                 field="placement_kind",
             )
-        disembark_mode_result = _placement_proposal_context_match(
+        disembark_mode_result = _placement_proposal_disembark_mode_match(
             request=request,
             submitted_value=None if self.disembark_mode is None else self.disembark_mode.value,
-            context_key="disembark_mode",
-            violation_code="proposal_disembark_mode_drift",
-            message="Disembark proposal mode does not match the pending request.",
         )
         if disembark_mode_result is not None:
             return disembark_mode_result
@@ -864,6 +861,60 @@ def _placement_proposal_context_match(
             field=context_key,
         )
     return None
+
+
+def _placement_proposal_disembark_mode_match(
+    *,
+    request: MovementProposalRequest,
+    submitted_value: str | None,
+) -> ProposalValidationResult | None:
+    context = request.context or {}
+    expected = context.get("disembark_mode")
+    if expected is None:
+        if submitted_value is None:
+            return None
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code="proposal_disembark_mode_drift",
+            message="Disembark proposal mode does not match the pending request.",
+            field="disembark_mode",
+        )
+    if type(expected) is not str:
+        raise GameLifecycleError("Placement proposal context disembark_mode must be a string.")
+    allowed_values = _placement_proposal_allowed_disembark_modes(context)
+    if allowed_values:
+        if submitted_value in allowed_values:
+            return None
+    elif submitted_value == expected:
+        return None
+    return ProposalValidationResult.invalid(
+        proposal_request_id=request.request_id,
+        proposal_kind=request.proposal_kind,
+        violation_code="proposal_disembark_mode_drift",
+        message="Disembark proposal mode does not match the pending request.",
+        field="disembark_mode",
+    )
+
+
+def _placement_proposal_allowed_disembark_modes(
+    context: dict[str, JsonValue],
+) -> tuple[str, ...]:
+    raw_allowed_modes = context.get("allowed_disembark_modes")
+    if raw_allowed_modes is None:
+        return ()
+    if not isinstance(raw_allowed_modes, list):
+        raise GameLifecycleError(
+            "Placement proposal context allowed_disembark_modes must be a list."
+        )
+    allowed_modes: list[str] = []
+    for raw_mode in raw_allowed_modes:
+        if type(raw_mode) is not str:
+            raise GameLifecycleError(
+                "Placement proposal context allowed_disembark_modes must contain strings."
+            )
+        allowed_modes.append(disembark_mode_kind_from_token(raw_mode).value)
+    return tuple(sorted(set(allowed_modes)))
 
 
 def _validate_proposal_violations(

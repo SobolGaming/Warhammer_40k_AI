@@ -26,6 +26,7 @@ from warhammer40k_core.engine.attack_sequence import (
     apply_allocation_order_decision,
     apply_attack_weapon_group_decision,
     apply_damage_allocation_model_decision,
+    apply_destroyed_transport_disembark_proposal_decision,
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
@@ -33,6 +34,7 @@ from warhammer40k_core.engine.attack_sequence import (
     build_select_attack_weapon_group_request,
     build_select_resolve_target_unit_request,
     gathered_attack_groups_for_target,
+    is_destroyed_transport_disembark_proposal_request,
     resolve_attack_sequence_until_blocked,
     selected_attack_weapon_group_from_result,
     selected_resolve_target_from_result,
@@ -60,6 +62,7 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.movement_proposals import PLACEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -1231,6 +1234,13 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
+        if result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
+            return _apply_attack_sequence_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
 
 
@@ -2076,6 +2086,22 @@ def _apply_attack_sequence_decision_to_sequence(
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
+        )
+    elif (
+        result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+        and is_destroyed_transport_disembark_proposal_request(
+            decisions.record_for_result(result).request
+        )
+    ):
+        updated_sequence, allocated_model_ids, status = (
+            apply_destroyed_transport_disembark_proposal_decision(
+                state=state,
+                decisions=decisions,
+                ruleset_descriptor=ruleset_descriptor,
+                attack_sequence=attack_sequence,
+                result=result,
+                already_allocated_model_ids=already_allocated_model_ids,
+            )
         )
     else:
         raise GameLifecycleError("Unsupported attack sequence decision type.")

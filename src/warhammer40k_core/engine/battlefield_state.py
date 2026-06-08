@@ -1009,6 +1009,60 @@ class BattlefieldRuntimeState:
             removed_model_ids=tuple(sorted((*self.removed_model_ids, *removed_model_ids))),
         )
 
+    def with_returned_model_placement(self, returned_model_placement: ModelPlacement) -> Self:
+        if type(returned_model_placement) is not ModelPlacement:
+            raise PlacementError("returned_model_placement must be a ModelPlacement.")
+        model_id = returned_model_placement.model_instance_id
+        if model_id in set(self.placed_model_ids()):
+            raise PlacementError("BattlefieldRuntimeState returned model is already placed.")
+        if model_id not in set(self.removed_model_ids):
+            raise PlacementError("BattlefieldRuntimeState returned model was not removed.")
+
+        placed_armies: list[PlacedArmy] = []
+        did_return = False
+        for placed_army in self.placed_armies:
+            if placed_army.army_id != returned_model_placement.army_id:
+                placed_armies.append(placed_army)
+                continue
+            if placed_army.player_id != returned_model_placement.player_id:
+                raise PlacementError("BattlefieldRuntimeState returned model player drift.")
+            unit_placements: list[UnitPlacement] = []
+            did_find_unit = False
+            for unit_placement in placed_army.unit_placements:
+                if unit_placement.unit_instance_id != returned_model_placement.unit_instance_id:
+                    unit_placements.append(unit_placement)
+                    continue
+                did_find_unit = True
+                unit_placements.append(
+                    unit_placement.with_model_placements(
+                        tuple(
+                            sorted(
+                                (*unit_placement.model_placements, returned_model_placement),
+                                key=lambda placement: placement.model_instance_id,
+                            )
+                        )
+                    )
+                )
+            if not did_find_unit:
+                raise PlacementError("BattlefieldRuntimeState returned model unit is not placed.")
+            placed_armies.append(
+                PlacedArmy(
+                    army_id=placed_army.army_id,
+                    player_id=placed_army.player_id,
+                    unit_placements=tuple(unit_placements),
+                )
+            )
+            did_return = True
+        if not did_return:
+            raise PlacementError("BattlefieldRuntimeState returned model army is not placed.")
+        return type(self)(
+            battlefield_id=self.battlefield_id,
+            placed_armies=tuple(placed_armies),
+            removed_model_ids=tuple(
+                removed_id for removed_id in self.removed_model_ids if removed_id != model_id
+            ),
+        )
+
     def with_unplaced_models_marked_removed(self, model_instance_ids: tuple[str, ...]) -> Self:
         removed_model_ids = _validate_identifier_tuple(
             "model_instance_ids",

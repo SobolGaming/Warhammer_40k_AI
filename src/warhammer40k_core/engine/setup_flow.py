@@ -5,8 +5,10 @@ from itertools import combinations
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldScenario,
     BattlefieldTransitionBatch,
     ModelPlacementRecord,
+    PlacementError,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -26,6 +28,7 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
@@ -200,6 +203,18 @@ class SetupFlow:
             battlefield_id=f"{state.game_id}:phase10a-battlefield",
             armies=tuple(state.army_definitions),
         )
+        battlefield_state = scenario.battlefield_state
+        for unit_id in _setup_declared_unplaced_unit_ids(state):
+            try:
+                battlefield_state = battlefield_state.without_unit_placement(unit_id)
+            except PlacementError as exc:
+                raise GameLifecycleError(
+                    "Declared setup unit was not placed by deployment."
+                ) from exc
+        scenario = BattlefieldScenario(
+            armies=scenario.armies,
+            battlefield_state=battlefield_state,
+        )
         assert_battlefield_units_in_coherency(
             scenario=scenario,
             ruleset_descriptor=config.ruleset_descriptor,
@@ -290,6 +305,20 @@ def _secondary_mission_options(
             )
         )
     return tuple(options)
+
+
+def _setup_declared_unplaced_unit_ids(state: GameState) -> tuple[str, ...]:
+    reserve_unit_ids = {
+        reserve_state.unit_instance_id
+        for reserve_state in state.reserve_states
+        if reserve_state.status is ReserveStatus.IN_RESERVES
+    }
+    embarked_unit_ids = {
+        unit_id
+        for cargo_state in state.transport_cargo_states
+        for unit_id in cargo_state.embarked_unit_instance_ids
+    }
+    return tuple(sorted(reserve_unit_ids | embarked_unit_ids))
 
 
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:

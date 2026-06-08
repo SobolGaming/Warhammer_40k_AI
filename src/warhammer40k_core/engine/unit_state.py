@@ -23,6 +23,7 @@ class BelowHalfStrengthContextPayload(TypedDict):
     single_model_starting_wounds: int | None
     single_model_wounds_remaining: int | None
     is_below_starting_strength: bool
+    is_at_half_strength: bool
     is_below_half_strength: bool
 
 
@@ -76,9 +77,20 @@ class StartingStrengthRecord:
             )
 
     @classmethod
-    def from_unit(cls, *, player_id: str, unit: UnitInstance) -> Self:
+    def from_unit(
+        cls,
+        *,
+        player_id: str,
+        unit: UnitInstance,
+        source_id: str | None = None,
+    ) -> Self:
         if type(unit) is not UnitInstance:
             raise GameLifecycleError("StartingStrengthRecord requires a UnitInstance.")
+        record_source_id = (
+            f"army-muster:{unit.unit_instance_id}"
+            if source_id is None
+            else _validate_identifier("StartingStrengthRecord source_id", source_id)
+        )
         starting_model_count = len(unit.own_models)
         single_model_wounds = None
         if starting_model_count == 1:
@@ -88,7 +100,7 @@ class StartingStrengthRecord:
             unit_instance_id=unit.unit_instance_id,
             starting_model_count=starting_model_count,
             single_model_starting_wounds=single_model_wounds,
-            source_id=f"army-muster:{unit.unit_instance_id}",
+            source_id=record_source_id,
         )
 
     def to_payload(self) -> StartingStrengthRecordPayload:
@@ -238,6 +250,16 @@ class BelowHalfStrengthContext:
         return self.current_model_count < self.starting_model_count
 
     @property
+    def is_at_half_strength(self) -> bool:
+        if self.starting_model_count == 1:
+            remaining = self.single_model_wounds_remaining
+            starting = self.single_model_starting_wounds
+            if remaining is None or starting is None:
+                raise GameLifecycleError("Single-model wound context is incomplete.")
+            return remaining * 2 == starting
+        return self.current_model_count * 2 == self.starting_model_count
+
+    @property
     def is_below_half_strength(self) -> bool:
         if self.starting_model_count == 1:
             remaining = self.single_model_wounds_remaining
@@ -256,6 +278,7 @@ class BelowHalfStrengthContext:
             "single_model_starting_wounds": self.single_model_starting_wounds,
             "single_model_wounds_remaining": self.single_model_wounds_remaining,
             "is_below_starting_strength": self.is_below_starting_strength,
+            "is_at_half_strength": self.is_at_half_strength,
             "is_below_half_strength": self.is_below_half_strength,
         }
 
@@ -271,6 +294,8 @@ class BelowHalfStrengthContext:
         )
         if context.is_below_starting_strength != payload["is_below_starting_strength"]:
             raise GameLifecycleError("BelowHalfStrengthContext below-starting payload drift.")
+        if context.is_at_half_strength != payload["is_at_half_strength"]:
+            raise GameLifecycleError("BelowHalfStrengthContext at-half payload drift.")
         if context.is_below_half_strength != payload["is_below_half_strength"]:
             raise GameLifecycleError("BelowHalfStrengthContext below-half payload drift.")
         return context

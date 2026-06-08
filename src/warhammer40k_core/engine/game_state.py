@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
@@ -100,10 +100,15 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseStatePayload,
 )
 from warhammer40k_core.engine.reserves import (
+    ReserveDestructionTimingPolicy,
+    ReserveKind,
+    ReserveOrigin,
     ReserveState,
     ReserveStatePayload,
     ReserveStatus,
+    StrategicReserveDeclaration,
     apply_reserve_destruction_to_battlefield,
+    reserve_origin_from_token,
     resolve_unarrived_reserve_destruction,
 )
 from warhammer40k_core.engine.scoring import (
@@ -129,6 +134,7 @@ from warhammer40k_core.engine.stratagems import StratagemUseRecord, StratagemUse
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
     DisembarkedUnitStatePayload,
+    TransportCapacityProfile,
     TransportCargoState,
     TransportCargoStatePayload,
 )
@@ -1170,6 +1176,228 @@ class GameState:
         self.army_definitions.sort(key=lambda stored: stored.player_id)
         self._record_starting_strength_records_for_army(army_definition)
 
+    def add_unit_to_army(
+        self,
+        *,
+        player_id: str,
+        unit: UnitInstance,
+        source_id: str,
+    ) -> StartingStrengthRecord:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        if type(unit) is not UnitInstance:
+            raise GameLifecycleError("GameState added unit must be a UnitInstance.")
+        record_source_id = _validate_identifier("source_id", source_id)
+        existing_unit_ids = {
+            existing.unit_instance_id for army in self.army_definitions for existing in army.units
+        }
+        existing_record_ids = {record.unit_instance_id for record in self.starting_strength_records}
+        if (
+            unit.unit_instance_id in existing_unit_ids
+            or unit.unit_instance_id in existing_record_ids
+        ):
+            raise GameLifecycleError("Added unit already exists in this game.")
+
+        updated_armies: list[ArmyDefinition] = []
+        added = False
+        for army_definition in self.army_definitions:
+            if army_definition.player_id != requested_player_id:
+                updated_armies.append(army_definition)
+                continue
+            updated_armies.append(
+                replace(
+                    army_definition,
+                    units=tuple(
+                        sorted(
+                            (*army_definition.units, unit),
+                            key=lambda stored: stored.unit_instance_id,
+                        )
+                    ),
+                )
+            )
+            added = True
+        if not added:
+            raise GameLifecycleError("Cannot add a unit before the player's army is mustered.")
+
+        record = StartingStrengthRecord.from_unit(
+            player_id=requested_player_id,
+            unit=unit,
+            source_id=record_source_id,
+        )
+        self.army_definitions = sorted(updated_armies, key=lambda stored: stored.player_id)
+        self.starting_strength_records.append(record)
+        self.starting_strength_records.sort(key=lambda stored: stored.unit_instance_id)
+        return record
+
+    def apply_strategic_reserve_declarations(
+        self,
+        *,
+        declarations: tuple[StrategicReserveDeclaration, ...],
+        destruction_deadline_policy: ReserveDestructionTimingPolicy,
+    ) -> tuple[ReserveState, ...]:
+        if type(declarations) is not tuple:
+            raise GameLifecycleError("strategic reserve declarations must be a tuple.")
+        if not declarations:
+            return ()
+        if type(destruction_deadline_policy) is not ReserveDestructionTimingPolicy:
+            raise GameLifecycleError(
+                "strategic reserve destruction_deadline_policy must be "
+                "ReserveDestructionTimingPolicy."
+            )
+        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        existing_reserved_ids = {
+            state.unit_instance_id
+            for state in self.reserve_states
+            if state.status is ReserveStatus.IN_RESERVES
+        }
+        declared_unit_ids: set[str] = set()
+        declared_embarked_ids: set[str] = set()
+        points_by_player: dict[str, int] = {}
+        cap_by_player: dict[str, int] = {}
+        reserve_states: list[ReserveState] = []
+        for declaration in declarations:
+            if type(declaration) is not StrategicReserveDeclaration:
+                raise GameLifecycleError(
+                    "strategic reserve declarations must contain "
+                    "StrategicReserveDeclaration values."
+                )
+            requested_player_id = _validate_player_id(
+                declaration.player_id,
+                player_ids=self.player_ids,
+            )
+            owner = unit_owner_by_id.get(declaration.unit_instance_id)
+            if owner is None:
+                raise GameLifecycleError("Strategic Reserve declaration unit is unknown.")
+            if owner != requested_player_id:
+                raise GameLifecycleError("Strategic Reserve declaration player_id drift.")
+            if declaration.unit_instance_id in existing_reserved_ids:
+                raise GameLifecycleError("Strategic Reserve declaration unit is already reserved.")
+            if declaration.unit_instance_id in declared_unit_ids:
+                raise GameLifecycleError("Strategic Reserve declarations must not duplicate units.")
+            declared_unit_ids.add(declaration.unit_instance_id)
+            for embarked_unit_id in declaration.embarked_unit_instance_ids:
+                embarked_owner = unit_owner_by_id.get(embarked_unit_id)
+                if embarked_owner is None:
+                    raise GameLifecycleError(
+                        "Strategic Reserve declaration embarked unit is unknown."
+                    )
+                if embarked_owner != requested_player_id:
+                    raise GameLifecycleError(
+                        "Strategic Reserve declaration embarked unit player_id drift."
+                    )
+                if embarked_unit_id in declared_embarked_ids:
+                    raise GameLifecycleError(
+                        "Strategic Reserve declarations must not duplicate embarked units."
+                    )
+                declared_embarked_ids.add(embarked_unit_id)
+            previous_cap = cap_by_player.get(requested_player_id)
+            if previous_cap is not None and previous_cap != declaration.points_limit:
+                raise GameLifecycleError(
+                    "Strategic Reserve declarations must use one points limit per player."
+                )
+            cap_by_player[requested_player_id] = declaration.points_limit
+            points_by_player[requested_player_id] = points_by_player.get(requested_player_id, 0) + (
+                declaration.unit_points + declaration.embarked_unit_points
+            )
+            reserve_states.append(
+                declaration.to_reserve_state(
+                    destruction_deadline_policy=destruction_deadline_policy
+                )
+            )
+        overlap = declared_unit_ids & declared_embarked_ids
+        if overlap:
+            raise GameLifecycleError(
+                "Strategic Reserve declarations must not also declare embarked units separately."
+            )
+        for player_id, points in points_by_player.items():
+            if points > cap_by_player[player_id]:
+                raise GameLifecycleError(
+                    "Strategic Reserve declarations exceed the player's points limit."
+                )
+        self.reserve_states.extend(reserve_states)
+        self.reserve_states.sort(key=lambda state: state.unit_instance_id)
+        return tuple(sorted(reserve_states, key=lambda state: state.unit_instance_id))
+
+    def declare_battle_formation_embarkation(
+        self,
+        *,
+        player_id: str,
+        transport_unit_instance_id: str,
+        embarked_unit_instance_ids: tuple[str, ...],
+        capacity_profile: TransportCapacityProfile,
+    ) -> TransportCargoState:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_transport_id = _validate_identifier(
+            "transport_unit_instance_id",
+            transport_unit_instance_id,
+        )
+        embarked_ids = _validate_identifier_tuple(
+            "embarked_unit_instance_ids",
+            embarked_unit_instance_ids,
+            min_length=1,
+            sort_values=True,
+        )
+        if type(capacity_profile) is not TransportCapacityProfile:
+            raise GameLifecycleError(
+                "battle formation embarkation capacity_profile must be TransportCapacityProfile."
+            )
+        if self.battlefield_state is not None:
+            raise GameLifecycleError(
+                "Battle formation embarkation must be declared before deployment."
+            )
+        if self.transport_cargo_state_for_transport(requested_transport_id) is not None:
+            raise GameLifecycleError("Battle formation embarkation Transport already has cargo.")
+        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        transport_owner = unit_owner_by_id.get(requested_transport_id)
+        if transport_owner is None:
+            raise GameLifecycleError("Battle formation embarkation Transport is unknown.")
+        if transport_owner != requested_player_id:
+            raise GameLifecycleError("Battle formation embarkation Transport player_id drift.")
+        transport = self._unit_by_id(requested_transport_id)
+        if not _unit_has_keyword(transport, "TRANSPORT"):
+            raise GameLifecycleError("Battle formation embarkation requires a TRANSPORT unit.")
+        if capacity_profile.transport_datasheet_id != transport.datasheet_id:
+            raise GameLifecycleError(
+                "Battle formation embarkation capacity profile datasheet drift."
+            )
+        embarked_units: list[UnitInstance] = []
+        for unit_id in embarked_ids:
+            if unit_id == requested_transport_id:
+                raise GameLifecycleError("Battle formation embarkation cannot embark itself.")
+            owner = unit_owner_by_id.get(unit_id)
+            if owner is None:
+                raise GameLifecycleError("Battle formation embarkation unit is unknown.")
+            if owner != requested_player_id:
+                raise GameLifecycleError("Battle formation embarkation unit player_id drift.")
+            if any(
+                unit_id in cargo.embarked_unit_instance_ids for cargo in self.transport_cargo_states
+            ):
+                raise GameLifecycleError("Battle formation embarkation unit is already embarked.")
+            embarked_units.append(self._unit_by_id(unit_id))
+        disallowed = tuple(
+            unit.unit_instance_id
+            for unit in embarked_units
+            if not capacity_profile.allows_unit(unit)
+        )
+        if disallowed:
+            raise GameLifecycleError(
+                "Battle formation embarkation unit is not eligible for this Transport."
+            )
+        embarked_model_count = sum(len(unit.own_models) for unit in embarked_units)
+        if embarked_model_count > capacity_profile.max_model_count:
+            raise GameLifecycleError("Battle formation embarkation exceeds Transport capacity.")
+        cargo_state = TransportCargoState(
+            player_id=requested_player_id,
+            transport_unit_instance_id=requested_transport_id,
+            capacity_profile=capacity_profile,
+            embarked_unit_instance_ids=embarked_ids,
+            phase_battle_round=None,
+            started_phase_embarked_unit_instance_ids=embarked_ids,
+            disembarked_this_phase_unit_instance_ids=(),
+        )
+        self.transport_cargo_states.append(cargo_state)
+        self.transport_cargo_states.sort(key=lambda state: state.transport_unit_instance_id)
+        return cargo_state
+
     def army_definition_for_player(self, player_id: str) -> ArmyDefinition | None:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         for army_definition in self.army_definitions:
@@ -2010,6 +2238,86 @@ class GameState:
                 return
         raise GameLifecycleError("ReserveState does not exist for unit.")
 
+    def reposition_unit_to_strategic_reserves(
+        self,
+        *,
+        player_id: str,
+        unit_instance_id: str,
+        reserve_origin: ReserveOrigin = ReserveOrigin.DURING_BATTLE_OTHER,
+        destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
+        required_arrival_battle_round: int | None = None,
+        required_arrival_phase: BattlePhase | str | None = None,
+        required_arrival_source_rule_id: str | None = None,
+    ) -> ReserveState:
+        if self.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("Repositioned units can only enter reserves during battle.")
+        current_phase = self.current_battle_phase
+        if current_phase is None:
+            raise GameLifecycleError("Repositioned units require a current battle phase.")
+        if self.battlefield_state is None:
+            raise GameLifecycleError("Repositioned units require battlefield_state.")
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        origin = reserve_origin_from_token(reserve_origin)
+        if origin not in {
+            ReserveOrigin.DURING_BATTLE_ABILITY,
+            ReserveOrigin.DURING_BATTLE_STRATAGEM,
+            ReserveOrigin.DURING_BATTLE_OTHER,
+        }:
+            raise GameLifecycleError("Repositioned units require a during-battle reserve origin.")
+        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        owner = unit_owner_by_id.get(requested_unit_id)
+        if owner is None:
+            raise GameLifecycleError("Repositioned unit is unknown.")
+        if owner != requested_player_id:
+            raise GameLifecycleError("Repositioned unit player_id drift.")
+        if self.reserve_state_for_unit(requested_unit_id) is not None:
+            raise GameLifecycleError("Repositioned unit already has a ReserveState.")
+        try:
+            unit_placement = self.battlefield_state.unit_placement_by_id(requested_unit_id)
+        except PlacementError as exc:
+            raise GameLifecycleError(
+                "Repositioned unit must be on the battlefield before entering reserves."
+            ) from exc
+        if unit_placement.player_id != requested_player_id:
+            raise GameLifecycleError("Repositioned unit placement player_id drift.")
+        cargo_state = self.transport_cargo_state_for_transport(requested_unit_id)
+        policy = destruction_deadline_policy
+        if policy is None:
+            policy = (
+                reserve_destruction_policy_from_scoring_policy(
+                    mission_scoring_policy_from_setup(self.mission_setup)
+                )
+                if self.mission_setup is not None
+                else ReserveDestructionTimingPolicy.core_rules_default()
+            )
+        if type(policy) is not ReserveDestructionTimingPolicy:
+            raise GameLifecycleError(
+                "Repositioned unit destruction_deadline_policy must be a policy."
+            )
+        reserve_state = ReserveState.entered_during_battle(
+            player_id=requested_player_id,
+            unit_instance_id=requested_unit_id,
+            reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+            battle_round=self.battle_round,
+            phase=current_phase,
+            reserve_origin=origin,
+            destruction_deadline_policy=policy,
+            embarked_unit_instance_ids=(
+                () if cargo_state is None else cargo_state.embarked_unit_instance_ids
+            ),
+            required_arrival_battle_round=required_arrival_battle_round,
+            required_arrival_phase=required_arrival_phase,
+            required_arrival_source_rule_id=required_arrival_source_rule_id,
+        )
+        try:
+            updated_battlefield = self.battlefield_state.without_unit_placement(requested_unit_id)
+        except PlacementError as exc:
+            raise GameLifecycleError("Repositioned unit battlefield removal failed.") from exc
+        self.record_reserve_state(reserve_state)
+        self.battlefield_state = updated_battlefield
+        return reserve_state
+
     def record_hover_mode_state(self, hover_mode_state: HoverModeState) -> None:
         if type(hover_mode_state) is not HoverModeState:
             raise GameLifecycleError("hover_mode_state must be a HoverModeState.")
@@ -2110,6 +2418,16 @@ class GameState:
                 self.transport_cargo_states[index] = cargo_state
                 self.transport_cargo_states.sort(key=lambda state: state.transport_unit_instance_id)
                 return
+        raise GameLifecycleError("TransportCargoState does not exist for transport.")
+
+    def remove_transport_cargo_state(self, transport_unit_instance_id: str) -> TransportCargoState:
+        requested_transport_id = _validate_identifier(
+            "transport_unit_instance_id",
+            transport_unit_instance_id,
+        )
+        for index, stored in enumerate(self.transport_cargo_states):
+            if stored.transport_unit_instance_id == requested_transport_id:
+                return self.transport_cargo_states.pop(index)
         raise GameLifecycleError("TransportCargoState does not exist for transport.")
 
     def record_disembarked_unit_state(self, state: DisembarkedUnitState) -> None:
@@ -3594,6 +3912,25 @@ def _unit_has_aircraft_hover_keywords(keywords: tuple[str, ...]) -> bool:
         for keyword in keywords
     }
     return "AIRCRAFT" in keyword_set and "HOVER" in keyword_set
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("unit keyword check requires a UnitInstance.")
+    requested_keyword = (
+        _validate_identifier("unit keyword", keyword)
+        .upper()
+        .replace(
+            " ",
+            "_",
+        )
+        .replace("-", "_")
+    )
+    unit_keywords = {
+        _validate_identifier("unit keyword", value).upper().replace(" ", "_").replace("-", "_")
+        for value in unit.keywords
+    }
+    return requested_keyword in unit_keywords
 
 
 def _validate_state_stage_indexes(state: GameState) -> None:

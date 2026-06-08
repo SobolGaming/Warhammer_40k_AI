@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import pytest
 
+import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetWargearOption
@@ -45,20 +46,25 @@ from warhammer40k_core.engine.attack_sequence import (
     GatheredAttackGroup,
     HitRoll,
     IdenticalAttackSignature,
+    PendingDestroyedTransportDisembark,
     PendingGroupedDamage,
     SaveDieEntryPayload,
     WoundRoll,
     apply_damage_allocation_model_decision,
+    apply_destroyed_transport_disembark_proposal_decision,
     attack_sequence_step_from_token,
     cover_for_allocated_model,
     deadly_demise_mortal_wounds_roll_spec,
     deadly_demise_trigger_roll_spec,
     gathered_attack_groups_for_target,
     identical_attack_signature,
+    invalid_destroyed_transport_disembark_proposal_status,
+    is_destroyed_transport_disembark_proposal_request,
     resolve_attack_sequence_until_blocked,
     wound_roll_target_number,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
     BattlefieldRuntimeState,
     BattlefieldScenario,
     ModelPlacement,
@@ -123,6 +129,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
+from warhammer40k_core.engine.hazard import hazard_roll_spec
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -130,6 +137,12 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    PlacementProposalPayload,
+    ProposalKind,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -187,10 +200,13 @@ from warhammer40k_core.engine.shooting_types import (
     validate_shooting_type_tuple,
 )
 from warhammer40k_core.engine.transports import (
+    TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
+    DisembarkModeKind,
     FiringDeckSelection,
     FiringDeckWeaponSelection,
     TransportCapacityProfile,
     TransportCargoState,
+    TransportMovementStatus,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
@@ -3729,6 +3745,295 @@ def test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound() -> None:
     assert status is None
     assert len(wound_events) == 1
     assert cast(dict[str, object], wound_events[0]["payload"])["skipped"] is True
+
+
+def test_phase14h_attached_unit_uses_highest_bodyguard_toughness_for_wounds() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[0], role="bodyguard"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=5,
+    )
+    leader_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[1], role="leader"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=7,
+    )
+    attached_defender = replace(defender, own_models=(bodyguard_model, leader_model))
+    _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-attached-bodyguard-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-attached-bodyguard-toughness:pool-001:attack-001"
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-attached-bodyguard-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=attached_defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-attached-bodyguard-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-bodyguard-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-bodyguard-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=3,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert wound_payload["toughness"] == 5
+    assert wound_payload["target_number"] == 3
+    assert wound_payload["successful"] is True
+
+
+def test_phase14h_attached_unit_uses_support_toughness_after_bodyguard_destroyed() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = _model_with_characteristic(
+        _model_with_attached_role(
+            replace(
+                defender.own_models[0],
+                wounds_remaining=0,
+            ),
+            role="bodyguard",
+        ),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=5,
+    )
+    support_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[1], role="support"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=7,
+    )
+    attached_defender = replace(defender, own_models=(bodyguard_model, support_model))
+    _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.with_removed_models((bodyguard_model.model_instance_id,))
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-attached-support-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-attached-support-toughness:pool-001:attack-001"
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-attached-support-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=attached_defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-attached-support-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-support-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-support-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=4,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert wound_payload["toughness"] == 7
+    assert wound_payload["target_number"] == 5
+    assert wound_payload["successful"] is False
+
+
+def test_phase14h_attached_unit_uses_leader_toughness_after_bodyguard_destroyed() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = _replace_enemy_with_attached_character_fixture(state=state, defender=units["enemy"])
+    bodyguard_model = _model_with_characteristic(
+        _model_with_attached_role(
+            replace(
+                defender.own_models[0],
+                wounds_remaining=0,
+            ),
+            role="bodyguard",
+        ),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=5,
+    )
+    leader_model = _model_with_characteristic(
+        _model_with_attached_role(defender.own_models[1], role="leader"),
+        characteristic=Characteristic.TOUGHNESS,
+        raw_value=7,
+    )
+    attached_defender = replace(defender, own_models=(bodyguard_model, leader_model))
+    _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.with_removed_models((bodyguard_model.model_instance_id,))
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-attached-leader-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-attached-leader-toughness:pool-001:attack-001"
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-attached-leader-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=attached_defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-attached-leader-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-leader-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-attached-leader-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=4,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert wound_payload["toughness"] == 7
+    assert wound_payload["target_number"] == 5
+    assert wound_payload["successful"] is False
 
 
 def test_phase14i_sustained_hits_slash_keyword_gate_controls_generated_hits() -> None:
@@ -8315,6 +8620,1216 @@ def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
         event.event_type for event in lifecycle.decision_controller.event_log.records
     )
     assert event_types.index("destruction_reaction_resolved") < event_types.index("model_destroyed")
+
+
+def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14h-destroyed-transport",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger = units["enemy-passenger"]
+    transport_model = transport.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.without_unit_placement(passenger.unit_instance_id)
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=(passenger.unit_instance_id,),
+        )
+    )
+    deadly_demise_source = DestructionReactionSource(
+        source_id="phase14h-transport-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="phase14h-transport-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 0.1,
+            "mortal_wounds": {"kind": "fixed", "value": 1},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=transport_model.model_instance_id,
+        sources=(deadly_demise_source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+        damage_profile=DamageProfile.fixed(transport_model.wounds_remaining),
+    )
+    sequence_id = "phase14h-destroyed-transport"
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=transport_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-destroyed-transport",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-destroyed-transport-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-destroyed-transport-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-destroyed-transport-save",
+                    spec=save_spec,
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    proposal_context = proposal_request.context or {}
+    battlefield_before_disembark = state.battlefield_state
+    assert battlefield_before_disembark is not None
+    state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+
+    assert request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    assert request.actor_id == "player-b"
+    assert proposal_request.unit_instance_id == passenger.unit_instance_id
+    assert proposal_context["destruction_timing"] == "destroyed_transport"
+    assert proposal_context["disembark_mode"] == (DisembarkModeKind.EMERGENCY_DISEMBARK.value)
+    assert proposal_context["transport_unit_instance_id"] == transport.unit_instance_id
+    assert transport_model.model_instance_id in battlefield_before_disembark.placed_model_ids()
+    assert not any(
+        payload["model_instance_id"] == transport_model.model_instance_id
+        for payload in _event_payloads(lifecycle, "model_destroyed")
+    )
+
+    attempted_placement = _unit_placement_at(
+        passenger,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(38.1, 33.5),
+            Pose.at(39.0, 34.8),
+            Pose.at(39.0, 36.2),
+            Pose.at(38.1, 37.5),
+            Pose.at(37.8, 35.5),
+        ),
+    )
+    placement_payload = PlacementProposalPayload(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=passenger.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=attempted_placement,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    ).to_payload()
+
+    _submit_payload(
+        lifecycle,
+        request=request,
+        payload=placement_payload,
+        result_id="phase14h-destroyed-transport-emergency-placement",
+    )
+    updated_battlefield = state.battlefield_state
+    assert updated_battlefield is not None
+    disembarked_state = state.disembarked_unit_state_for_unit(
+        player_id="player-b",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+    )
+    event_records = lifecycle.decision_controller.event_log.records
+    event_types = tuple(record.event_type for record in event_records)
+    unit_disembarked_event = next(
+        record for record in event_records if record.event_type == "unit_disembarked"
+    )
+    hazard_event = next(
+        record
+        for record in event_records
+        if record.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE
+    )
+    deadly_demise_event = next(
+        record for record in event_records if record.event_type == "destruction_reaction_resolved"
+    )
+    transport_destroyed_event = next(
+        record
+        for record in event_records
+        if record.event_type == "model_destroyed"
+        and cast(dict[str, object], record.payload)["model_instance_id"]
+        == transport_model.model_instance_id
+    )
+
+    assert transport_model.model_instance_id not in updated_battlefield.placed_model_ids()
+    assert state.transport_cargo_state_for_transport(transport.unit_instance_id) is None
+    assert disembarked_state is not None
+    assert disembarked_state.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
+    assert disembarked_state.battle_shocked_until == "end_of_turn"
+    assert event_types.index("destroyed_transport_disembark_placement_requested") < (
+        event_records.index(unit_disembarked_event)
+    )
+    assert event_records.index(unit_disembarked_event) < event_records.index(hazard_event)
+    assert event_records.index(hazard_event) < event_records.index(deadly_demise_event)
+    assert event_records.index(deadly_demise_event) < event_records.index(transport_destroyed_event)
+
+
+def test_phase14h_pending_destroyed_transport_state_round_trips_and_rejects_drift() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14h-pending-destroyed-transport",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger = units["enemy-passenger"]
+    pending = _destroyed_transport_pending_for_test(
+        sequence_id="phase14h-pending-destroyed-transport",
+        attacker=attacker,
+        transport=transport,
+        passenger=passenger,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14h-pending-destroyed-transport",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    rehydrated = AttackSequence.from_payload(sequence.to_payload())
+    without_pending = rehydrated.without_pending_destroyed_transport_disembark()
+    non_destroyed_damage = DamageApplication(
+        target_unit_instance_id=transport.unit_instance_id,
+        model_instance_id=transport.own_models[0].model_instance_id,
+        damage_kind=DamageKind.NORMAL,
+        requested_damage=1,
+        wounds_lost=0,
+        excess_damage_lost=1,
+        starting_wounds_remaining=transport.own_models[0].wounds_remaining,
+        final_wounds_remaining=transport.own_models[0].wounds_remaining,
+        destroyed=False,
+    )
+    drifted_damage = DamageApplication(
+        target_unit_instance_id=passenger.unit_instance_id,
+        model_instance_id=transport.own_models[0].model_instance_id,
+        damage_kind=DamageKind.NORMAL,
+        requested_damage=transport.own_models[0].wounds_remaining,
+        wounds_lost=transport.own_models[0].wounds_remaining,
+        excess_damage_lost=0,
+        starting_wounds_remaining=transport.own_models[0].wounds_remaining,
+        final_wounds_remaining=0,
+        destroyed=True,
+    )
+
+    assert pending.next_unit_instance_id == passenger.unit_instance_id
+    assert PendingDestroyedTransportDisembark.from_payload(pending.to_payload()) == pending
+    assert rehydrated.pending_destroyed_transport_disembark == pending
+    assert without_pending.pending_destroyed_transport_disembark is None
+    with pytest.raises(GameLifecycleError, match="attack_context must be an object"):
+        PendingDestroyedTransportDisembark(
+            attack_context=cast(AttackResolutionContextPayload, "not-a-context"),
+            damage_application=pending.damage_application,
+            saving_throw_payload=pending.saving_throw_payload,
+            feel_no_pain=pending.feel_no_pain,
+            destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+            transport_unit_instance_id=pending.transport_unit_instance_id,
+            pending_unit_instance_ids=pending.pending_unit_instance_ids,
+        )
+    with pytest.raises(GameLifecycleError, match="damage_application must be DamageApplication"):
+        PendingDestroyedTransportDisembark(
+            attack_context=pending.attack_context,
+            damage_application=cast(DamageApplication, pending.damage_application.to_payload()),
+            saving_throw_payload=pending.saving_throw_payload,
+            feel_no_pain=pending.feel_no_pain,
+            destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+            transport_unit_instance_id=pending.transport_unit_instance_id,
+            pending_unit_instance_ids=pending.pending_unit_instance_ids,
+        )
+    with pytest.raises(GameLifecycleError, match="requires destroyed damage"):
+        PendingDestroyedTransportDisembark(
+            attack_context=pending.attack_context,
+            damage_application=non_destroyed_damage,
+            saving_throw_payload=pending.saving_throw_payload,
+            feel_no_pain=pending.feel_no_pain,
+            destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+            transport_unit_instance_id=pending.transport_unit_instance_id,
+            pending_unit_instance_ids=pending.pending_unit_instance_ids,
+        )
+    with pytest.raises(GameLifecycleError, match="damage target drift"):
+        PendingDestroyedTransportDisembark(
+            attack_context=pending.attack_context,
+            damage_application=drifted_damage,
+            saving_throw_payload=pending.saving_throw_payload,
+            feel_no_pain=pending.feel_no_pain,
+            destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+            transport_unit_instance_id=pending.transport_unit_instance_id,
+            pending_unit_instance_ids=pending.pending_unit_instance_ids,
+        )
+    with pytest.raises(GameLifecycleError, match="feel_no_pain must be FeelNoPainResolution"):
+        PendingDestroyedTransportDisembark(
+            attack_context=pending.attack_context,
+            damage_application=pending.damage_application,
+            saving_throw_payload=pending.saving_throw_payload,
+            feel_no_pain=cast(FeelNoPainResolution, object()),
+            destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+            transport_unit_instance_id=pending.transport_unit_instance_id,
+            pending_unit_instance_ids=pending.pending_unit_instance_ids,
+        )
+    with pytest.raises(GameLifecycleError, match="Resolved destroyed Transport disembark"):
+        pending.with_resolved_disembark(cast(Any, object()))
+
+
+def test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_payloads() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14h-destroyed-transport-prevalidation",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger = units["enemy-passenger"]
+    pending = _destroyed_transport_pending_for_test(
+        sequence_id="phase14h-destroyed-transport-prevalidation",
+        attacker=attacker,
+        transport=transport,
+        passenger=passenger,
+    )
+    base_sequence = AttackSequence.start(
+        sequence_id="phase14h-destroyed-transport-prevalidation",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    )
+    sequence = base_sequence.with_pending_destroyed_transport_disembark(pending)
+    request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=passenger.unit_instance_id,
+        request_id="phase14h-destroyed-transport-placement",
+    )
+    valid_payload = _destroyed_transport_placement_payload_for_test(
+        proposal_request=MovementProposalRequest.from_decision_request_payload(request.payload),
+        unit=passenger,
+        transport=transport,
+    )
+
+    assert is_destroyed_transport_disembark_proposal_request(request)
+    assert (
+        invalid_destroyed_transport_disembark_proposal_status(
+            state=state,
+            request=request,
+            result=_proposal_decision_result(
+                request=request,
+                payload=valid_payload,
+                result_id="phase14h-destroyed-transport-valid",
+            ),
+            decisions=lifecycle.decision_controller,
+            attack_sequence=sequence,
+        )
+        is None
+    )
+
+    missing_context_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=request,
+        result=_proposal_decision_result(
+            request=request,
+            payload=valid_payload,
+            result_id="phase14h-destroyed-transport-no-context",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=base_sequence,
+    )
+    malformed_payload = dict(valid_payload)
+    malformed_payload.pop("attempted_placement")
+    malformed_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=request,
+        result=_proposal_decision_result(
+            request=request,
+            payload=malformed_payload,
+            result_id="phase14h-destroyed-transport-malformed",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    stale_payload = dict(valid_payload)
+    stale_payload["proposal_request_id"] = "phase14h-destroyed-transport-stale"
+    stale_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=request,
+        result=_proposal_decision_result(
+            request=request,
+            payload=stale_payload,
+            result_id="phase14h-destroyed-transport-stale",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    incomplete_payload = dict(valid_payload)
+    incomplete_payload.pop("transport_unit_instance_id")
+    incomplete_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=request,
+        result=_proposal_decision_result(
+            request=request,
+            payload=incomplete_payload,
+            result_id="phase14h-destroyed-transport-incomplete",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    drifted_request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=transport.unit_instance_id,
+        request_id="phase14h-destroyed-transport-drifted-unit",
+    )
+    drifted_payload = _destroyed_transport_placement_payload_for_test(
+        proposal_request=MovementProposalRequest.from_decision_request_payload(
+            drifted_request.payload
+        ),
+        unit=transport,
+        transport=transport,
+    )
+    drifted_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=drifted_request,
+        result=_proposal_decision_result(
+            request=drifted_request,
+            payload=drifted_payload,
+            result_id="phase14h-destroyed-transport-unit-drift",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    transport_drift_payload = dict(valid_payload)
+    transport_drift_payload["transport_unit_instance_id"] = passenger.unit_instance_id
+    transport_drift_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=request,
+        result=_proposal_decision_result(
+            request=request,
+            payload=transport_drift_payload,
+            result_id="phase14h-destroyed-transport-transport-drift",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    base_proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    mode_drift_request = replace(
+        base_proposal_request,
+        request_id="phase14h-destroyed-transport-mode-drift",
+        context={
+            **dict(base_proposal_request.context or {}),
+            "allowed_disembark_modes": [DisembarkModeKind.RAPID_DISEMBARK.value],
+        },
+    ).to_decision_request()
+    mode_drift_payload = _destroyed_transport_placement_payload_for_test(
+        proposal_request=MovementProposalRequest.from_decision_request_payload(
+            mode_drift_request.payload
+        ),
+        unit=passenger,
+        transport=transport,
+    )
+    mode_drift_payload["disembark_mode"] = DisembarkModeKind.RAPID_DISEMBARK.value
+    mode_drift_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=mode_drift_request,
+        result=_proposal_decision_result(
+            request=mode_drift_request,
+            payload=mode_drift_payload,
+            result_id="phase14h-destroyed-transport-mode-drift",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    status_drift_request = replace(
+        base_proposal_request,
+        request_id="phase14h-destroyed-transport-status-drift",
+        context={
+            **dict(base_proposal_request.context or {}),
+            "transport_movement_status": TransportMovementStatus.NORMAL_MOVE.value,
+        },
+    ).to_decision_request()
+    status_drift_payload = _destroyed_transport_placement_payload_for_test(
+        proposal_request=MovementProposalRequest.from_decision_request_payload(
+            status_drift_request.payload
+        ),
+        unit=passenger,
+        transport=transport,
+    )
+    status_drift_payload["transport_movement_status"] = TransportMovementStatus.NORMAL_MOVE.value
+    status_drift_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=status_drift_request,
+        result=_proposal_decision_result(
+            request=status_drift_request,
+            payload=status_drift_payload,
+            result_id="phase14h-destroyed-transport-status-drift",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    invalid_events = _event_payloads(
+        lifecycle,
+        "destroyed_transport_disembark_proposal_invalid",
+    )
+
+    _assert_invalid_proposal_status(
+        missing_context_status,
+        expected_code="destroyed_transport_context_missing",
+        expected_field=None,
+    )
+    _assert_invalid_proposal_status(
+        malformed_status,
+        expected_code="proposal_payload_missing_field",
+        expected_field="attempted_placement",
+    )
+    _assert_invalid_proposal_status(
+        stale_status,
+        expected_code="stale_proposal_request",
+        expected_field="proposal_request_id",
+    )
+    _assert_invalid_proposal_status(
+        incomplete_status,
+        expected_code="proposal_payload_missing_field",
+        expected_field="transport_unit_instance_id",
+    )
+    _assert_invalid_proposal_status(
+        drifted_status,
+        expected_code="destroyed_transport_unit_drift",
+        expected_field="unit_instance_id",
+    )
+    _assert_invalid_proposal_status(
+        transport_drift_status,
+        expected_code="destroyed_transport_transport_drift",
+        expected_field="transport_unit_instance_id",
+    )
+    _assert_invalid_proposal_status(
+        mode_drift_status,
+        expected_code="destroyed_transport_mode_drift",
+        expected_field="disembark_mode",
+    )
+    _assert_invalid_proposal_status(
+        status_drift_status,
+        expected_code="destroyed_transport_status_drift",
+        expected_field="transport_movement_status",
+    )
+    assert len(invalid_events) == 8
+
+
+def test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requirements() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14h-destroyed-transport-fail-fast",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger = units["enemy-passenger"]
+    pending = _destroyed_transport_pending_for_test(
+        sequence_id="phase14h-destroyed-transport-fail-fast",
+        attacker=attacker,
+        transport=transport,
+        passenger=passenger,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14h-destroyed-transport-fail-fast",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    )
+    request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=passenger.unit_instance_id,
+        request_id="phase14h-destroyed-transport-fail-fast-placement",
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    attempted_placement = _unit_placement_at(
+        passenger,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(
+            Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
+            for index, _model in enumerate(passenger.own_models)
+        ),
+    )
+    submission_without_mode = PlacementProposalPayload(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=passenger.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=attempted_placement,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=None,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    )
+    submission_without_cargo = replace(
+        submission_without_mode,
+        disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+    )
+    continue_pending = _attack_sequence_private("_continue_pending_destroyed_transport_disembark")
+    request_placement = _attack_sequence_private("_request_destroyed_transport_disembark_placement")
+    remove_cargo = _attack_sequence_private("_remove_resolved_destroyed_transport_cargo_state")
+    cargo_for_damage = _attack_sequence_private("_destroyed_transport_cargo_state_for_damage")
+    resolve_submission = _attack_sequence_private(
+        "_resolve_destroyed_transport_disembark_submission"
+    )
+    retry_request = _attack_sequence_private(
+        "_request_destroyed_transport_disembark_placement_retry"
+    )
+    transport_placement = _attack_sequence_private("_destroyed_transport_placement")
+    battlefield_scenario = _attack_sequence_private("_battlefield_scenario_for_attack_sequence")
+    objective_markers = _attack_sequence_private("_objective_markers_for_attack_sequence")
+
+    with pytest.raises(GameLifecycleError, match="continuation requires pending state"):
+        continue_pending(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            manager=DiceRollManager("phase14h-fail-fast"),
+            attack_sequence=sequence,
+            allocated_model_ids=(),
+            hooks=AttackSequenceHooks.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires pending cargo"):
+        request_placement(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            attack_sequence=sequence,
+            pending=replace(pending, pending_unit_instance_ids=()),
+        )
+    with pytest.raises(GameLifecycleError, match="cargo state is missing before removal"):
+        remove_cargo(
+            state=state,
+            transport_unit_instance_id=transport.unit_instance_id,
+        )
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=(passenger.unit_instance_id,),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="cargo state still has embarked units"):
+        remove_cargo(
+            state=state,
+            transport_unit_instance_id=transport.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="Destroyed model is not in the damaged unit"):
+        cargo_for_damage(
+            state=state,
+            damage=replace(
+                pending.damage_application,
+                model_instance_id=passenger.own_models[0].model_instance_id,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="submission is incomplete"):
+        resolve_submission(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            pending=pending,
+            submission=submission_without_mode,
+            dice_manager=DiceRollManager("phase14h-fail-fast-incomplete"),
+        )
+    state_without_cargo = _state(
+        _shooting_lifecycle(
+            alpha_unit_ids=("intercessor-1",),
+            game_id="phase14h-destroyed-transport-no-cargo",
+            enemy_unit_specs=(
+                ("enemy-transport", "core-transport", "core-transport", 1),
+                ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            ),
+        )[0]
+    )
+    with pytest.raises(GameLifecycleError, match="cargo state is missing"):
+        resolve_submission(
+            state=state_without_cargo,
+            ruleset_descriptor=_ruleset(),
+            pending=pending,
+            submission=submission_without_cargo,
+            dice_manager=DiceRollManager("phase14h-fail-fast-no-cargo"),
+        )
+    with pytest.raises(GameLifecycleError, match="retry missing attack_sequence_id"):
+        retry_request(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            proposal_request=replace(
+                proposal_request,
+                context={"destruction_timing": "destroyed_transport"},
+            ),
+            pending=pending,
+            rejected_result=_proposal_decision_result(
+                request=proposal_request.to_decision_request(),
+                payload=submission_without_cargo.to_payload(),
+                result_id="phase14h-destroyed-transport-retry-missing-sequence",
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="retry missing attack_context_id"):
+        retry_request(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            proposal_request=replace(
+                proposal_request,
+                context={
+                    "destruction_timing": "destroyed_transport",
+                    "attack_sequence_id": sequence.sequence_id,
+                },
+            ),
+            pending=pending,
+            rejected_result=_proposal_decision_result(
+                request=proposal_request.to_decision_request(),
+                payload=submission_without_cargo.to_payload(),
+                result_id="phase14h-destroyed-transport-retry-missing-context",
+            ),
+        )
+
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = None
+    with pytest.raises(GameLifecycleError, match="requires battlefield_state"):
+        transport_placement(state=state, pending=pending)
+    with pytest.raises(GameLifecycleError, match="requires battlefield_state"):
+        battlefield_scenario(state)
+    state.mission_setup = None
+    assert objective_markers(state) == ()
+    state.battlefield_state = battlefield.without_unit_placement(transport.unit_instance_id)
+    with pytest.raises(GameLifecycleError, match="must still be placed"):
+        transport_placement(state=state, pending=pending)
+
+
+def test_phase14h_destroyed_transport_invalid_placement_retries_before_removal() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14h-destroyed-transport-invalid-retry",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger = units["enemy-passenger"]
+    transport_model = transport.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.without_unit_placement(passenger.unit_instance_id)
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=(passenger.unit_instance_id,),
+        )
+    )
+    pending = _destroyed_transport_pending_for_test(
+        sequence_id="phase14h-destroyed-transport-invalid-retry",
+        attacker=attacker,
+        transport=transport,
+        passenger=passenger,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14h-destroyed-transport-invalid-retry",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=passenger.unit_instance_id,
+        request_id=state.next_decision_request_id(),
+    )
+    lifecycle.decision_controller.request_decision(request)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    invalid_placement_payload = PlacementProposalPayload(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=passenger.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=_unit_placement_at(
+            passenger,
+            army_id="army-beta",
+            player_id="player-b",
+            poses=tuple(
+                Pose.at(1.0 + (1.0 * index), 1.0 + (0.3 * index))
+                for index, _model in enumerate(passenger.own_models)
+            ),
+        ),
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    ).to_payload()
+
+    status = _submit_payload(
+        lifecycle,
+        request=request,
+        payload=invalid_placement_payload,
+        result_id="phase14h-destroyed-transport-invalid-placement",
+    )
+    retry_request = lifecycle.decision_controller.queue.pending_requests[0]
+    retry_proposal = MovementProposalRequest.from_decision_request_payload(retry_request.payload)
+    invalid_event = _last_event_payload(
+        lifecycle,
+        "destroyed_transport_disembark_placement_invalid",
+    )
+    retry_event = _last_event_payload(
+        lifecycle,
+        "destroyed_transport_disembark_placement_requested",
+    )
+    battlefield_after_invalid = state.battlefield_state
+    assert battlefield_after_invalid is not None
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert retry_request.request_id != request.request_id
+    assert retry_proposal.unit_instance_id == passenger.unit_instance_id
+    assert retry_event["previous_proposal_request_id"] == request.request_id
+    assert retry_event["rejected_result_id"] == "phase14h-destroyed-transport-invalid-placement"
+    assert invalid_event["phase_body_status"] == "invalid"
+    assert transport_model.model_instance_id in battlefield_after_invalid.placed_model_ids()
+    assert state.transport_cargo_state_for_transport(transport.unit_instance_id) is not None
+    assert not any(
+        payload["model_instance_id"] == transport_model.model_instance_id
+        for payload in _event_payloads(lifecycle, "model_destroyed")
+    )
+
+
+def test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14h-destroyed-transport-multi-cargo",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger-a", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            ("enemy-passenger-b", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger_a = units["enemy-passenger-a"]
+    passenger_b = units["enemy-passenger-b"]
+    transport_model = transport.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.without_unit_placement(
+        passenger_a.unit_instance_id
+    ).without_unit_placement(passenger_b.unit_instance_id)
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(
+                passenger_a.unit_instance_id,
+                passenger_b.unit_instance_id,
+            ),
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=(
+                passenger_a.unit_instance_id,
+                passenger_b.unit_instance_id,
+            ),
+        )
+    )
+    pending = replace(
+        _destroyed_transport_pending_for_test(
+            sequence_id="phase14h-destroyed-transport-multi-cargo",
+            attacker=attacker,
+            transport=transport,
+            passenger=passenger_a,
+        ),
+        pending_unit_instance_ids=(passenger_a.unit_instance_id, passenger_b.unit_instance_id),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="phase14h-destroyed-transport-multi-cargo",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=sequence.attack_pools,
+        attack_sequence=sequence,
+    )
+    request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=passenger_a.unit_instance_id,
+        request_id=state.next_decision_request_id(),
+    )
+    lifecycle.decision_controller.request_decision(request)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    attempted_placement = _unit_placement_at(
+        passenger_a,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(38.1, 33.5),
+            Pose.at(39.0, 34.8),
+            Pose.at(39.0, 36.2),
+            Pose.at(38.1, 37.5),
+            Pose.at(37.8, 35.5),
+        ),
+    )
+    result = _proposal_decision_result(
+        request=request,
+        payload=PlacementProposalPayload(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=passenger_a.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.DISEMBARK,
+            attempted_placement=attempted_placement,
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ).to_payload(),
+        result_id="phase14h-destroyed-transport-passenger-a",
+    )
+    lifecycle.decision_controller.submit_result(result)
+
+    updated_sequence, allocated_ids, status = apply_destroyed_transport_disembark_proposal_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        result=result,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-destroyed-transport-multi-cargo",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=_destroyed_transport_hazard_roll_results_for_test(
+                attempted_placement,
+                values=(6, 6, 6, 6, 6),
+                roll_id_prefix="phase14h-destroyed-transport-passenger-a",
+            ),
+        ),
+    )
+    next_request = _decision_request(cast(LifecycleStatus, status))
+    next_proposal_request = MovementProposalRequest.from_decision_request_payload(
+        next_request.payload
+    )
+    cargo_state = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    battlefield_after_first_disembark = state.battlefield_state
+    assert updated_sequence is not None
+    assert battlefield_after_first_disembark is not None
+
+    assert allocated_ids == ()
+    assert next_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    assert next_proposal_request.unit_instance_id == passenger_b.unit_instance_id
+    assert updated_sequence.pending_destroyed_transport_disembark is not None
+    assert (
+        updated_sequence.pending_destroyed_transport_disembark.next_unit_instance_id
+        == passenger_b.unit_instance_id
+    )
+    assert cargo_state is not None
+    assert cargo_state.embarked_unit_instance_ids == (passenger_b.unit_instance_id,)
+    assert transport_model.model_instance_id in battlefield_after_first_disembark.placed_model_ids()
+    assert (
+        state.disembarked_unit_state_for_unit(
+            player_id="player-b",
+            battle_round=1,
+            unit_instance_id=passenger_a.unit_instance_id,
+        )
+        is not None
+    )
+    assert not any(
+        payload["model_instance_id"] == transport_model.model_instance_id
+        for payload in _event_payloads(lifecycle, "model_destroyed")
+    )
+
+
+def test_phase14h_destroyed_transport_apply_rejects_invalid_recorded_contexts() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="phase14h-destroyed-transport-apply-invalid",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger = units["enemy-passenger"]
+    pending = _destroyed_transport_pending_for_test(
+        sequence_id="phase14h-destroyed-transport-apply-invalid",
+        attacker=attacker,
+        transport=transport,
+        passenger=passenger,
+    )
+    base_sequence = AttackSequence.start(
+        sequence_id="phase14h-destroyed-transport-apply-invalid",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    )
+    sequence = base_sequence.with_pending_destroyed_transport_disembark(pending)
+    request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=passenger.unit_instance_id,
+        request_id="phase14h-destroyed-transport-apply-request",
+    )
+    valid_payload = _destroyed_transport_placement_payload_for_test(
+        proposal_request=MovementProposalRequest.from_decision_request_payload(request.payload),
+        unit=passenger,
+        transport=transport,
+    )
+    malformed_payload = dict(valid_payload)
+    malformed_payload.pop("attempted_placement")
+    malformed_result = _record_parameterized_result_for_apply(
+        lifecycle,
+        request=request,
+        payload=malformed_payload,
+        result_id="phase14h-destroyed-transport-apply-malformed",
+    )
+
+    same_sequence, allocated_ids, malformed_status = (
+        apply_destroyed_transport_disembark_proposal_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=sequence,
+            result=malformed_result,
+            already_allocated_model_ids=("already-allocated",),
+        )
+    )
+
+    missing_pending_request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=passenger.unit_instance_id,
+        request_id="phase14h-destroyed-transport-apply-no-pending",
+    )
+    missing_pending_result = _record_parameterized_result_for_apply(
+        lifecycle,
+        request=missing_pending_request,
+        payload=valid_payload,
+        result_id="phase14h-destroyed-transport-apply-no-pending",
+    )
+    incomplete_request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=pending,
+        sequence=sequence,
+        unit_instance_id=passenger.unit_instance_id,
+        request_id="phase14h-destroyed-transport-apply-incomplete",
+    )
+    incomplete_payload = dict(valid_payload)
+    incomplete_payload["proposal_request_id"] = incomplete_request.request_id
+    incomplete_payload.pop("transport_unit_instance_id")
+    incomplete_result = _record_parameterized_result_for_apply(
+        lifecycle,
+        request=incomplete_request,
+        payload=incomplete_payload,
+        result_id="phase14h-destroyed-transport-apply-incomplete",
+    )
+    unsupported_request = DecisionRequest(
+        request_id="phase14h-destroyed-transport-unsupported",
+        decision_type="phase14h_destroyed_transport_unsupported",
+        actor_id="player-b",
+        payload={},
+        options=(DecisionOption(option_id="noop", label="Noop", payload={}),),
+    )
+    lifecycle.decision_controller.request_decision(unsupported_request)
+    unsupported_result = DecisionResult.for_request(
+        result_id="phase14h-destroyed-transport-unsupported",
+        request=unsupported_request,
+        selected_option_id="noop",
+    )
+    lifecycle.decision_controller.submit_result(unsupported_result)
+
+    assert same_sequence == sequence
+    assert allocated_ids == ("already-allocated",)
+    assert malformed_status is not None
+    assert malformed_status.status_kind is LifecycleStatusKind.INVALID
+    with pytest.raises(GameLifecycleError, match="requires pending state"):
+        apply_destroyed_transport_disembark_proposal_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=base_sequence,
+            result=missing_pending_result,
+            already_allocated_model_ids=(),
+        )
+    with pytest.raises(GameLifecycleError, match="submission drifted"):
+        apply_destroyed_transport_disembark_proposal_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=sequence,
+            result=incomplete_result,
+            already_allocated_model_ids=(),
+        )
+    with pytest.raises(GameLifecycleError, match="received unsupported request"):
+        invalid_destroyed_transport_disembark_proposal_status(
+            state=state,
+            request=unsupported_request,
+            result=unsupported_result,
+            decisions=lifecycle.decision_controller,
+            attack_sequence=sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="routing requires a DecisionRequest"):
+        is_destroyed_transport_disembark_proposal_request(cast(DecisionRequest, object()))
+    with pytest.raises(GameLifecycleError, match="received unsupported request"):
+        apply_destroyed_transport_disembark_proposal_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=sequence,
+            result=unsupported_result,
+            already_allocated_model_ids=(),
+        )
 
 
 def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal() -> None:
@@ -13025,6 +14540,10 @@ def _ruleset() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase13b-test")
 
 
+def _attack_sequence_private(name: str) -> Any:
+    return getattr(attack_sequence_module, name)
+
+
 def _benefit_of_cover_result() -> BenefitOfCoverResult:
     source_record = CoverSourceRecord(
         feature_id="phase13c-cover-ruin",
@@ -13060,6 +14579,37 @@ def _fixed_roll_result(
     )
 
 
+def _model_with_characteristic(
+    model: ModelInstance,
+    *,
+    characteristic: Characteristic,
+    raw_value: int,
+) -> ModelInstance:
+    replacement = CharacteristicValue.from_raw(characteristic, raw_value)
+    characteristics = tuple(
+        replacement if value.characteristic is characteristic else value
+        for value in model.characteristics
+    )
+    if replacement not in characteristics:
+        characteristics = (*characteristics, replacement)
+    return replace(model, characteristics=characteristics)
+
+
+def _model_with_attached_role(model: ModelInstance, *, role: str) -> ModelInstance:
+    if role not in {"bodyguard", "leader", "support"}:
+        raise AssertionError(f"Unsupported attached role in test fixture: {role}.")
+    source_ids = {
+        source_id
+        for source_id in model.source_ids
+        if not source_id.startswith(("attached-role:", "runtime-attached-unit:"))
+        and source_id != "datasheet:core-character-leader"
+    }
+    source_ids.add(f"runtime-attached-unit:{role}")
+    if role in {"leader", "support"}:
+        source_ids.add(f"attached-role:{role}")
+    return replace(model, source_ids=tuple(sorted(source_ids)))
+
+
 def _attack_pool_for_test(
     *,
     attacker: UnitInstance,
@@ -13084,6 +14634,236 @@ def _attack_pool_for_test(
         target_visible_model_ids=defender_model_ids,
         target_in_range_model_ids=defender_model_ids,
     )
+
+
+def _destroyed_transport_pending_for_test(
+    *,
+    sequence_id: str,
+    attacker: UnitInstance,
+    transport: UnitInstance,
+    passenger: UnitInstance,
+) -> PendingDestroyedTransportDisembark:
+    transport_model = transport.own_models[0]
+    return PendingDestroyedTransportDisembark(
+        attack_context=_destroyed_transport_attack_context_for_test(
+            sequence_id=sequence_id,
+            attacker=attacker,
+            transport=transport,
+        ),
+        damage_application=DamageApplication(
+            target_unit_instance_id=transport.unit_instance_id,
+            model_instance_id=transport_model.model_instance_id,
+            damage_kind=DamageKind.NORMAL,
+            requested_damage=transport_model.wounds_remaining,
+            wounds_lost=transport_model.wounds_remaining,
+            excess_damage_lost=0,
+            starting_wounds_remaining=transport_model.wounds_remaining,
+            final_wounds_remaining=0,
+            destroyed=True,
+        ),
+        saving_throw_payload={
+            "save_kind": SaveKind.ARMOUR.value,
+            "successful": False,
+        },
+        feel_no_pain=FeelNoPainResolution.declined(
+            requested_wounds=transport_model.wounds_remaining
+        ),
+        destroyed_model_controller_player_id="player-b",
+        transport_unit_instance_id=transport.unit_instance_id,
+        pending_unit_instance_ids=(passenger.unit_instance_id,),
+        pending_sources=(
+            DestructionReactionSource(
+                source_id=f"{sequence_id}-deadly-demise",
+                reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+                source_rule_id=f"{sequence_id}-deadly-demise-rule",
+                payload={
+                    "trigger_roll_threshold": 6,
+                    "range_inches": 0.1,
+                    "mortal_wounds": {"kind": "fixed", "value": 1},
+                },
+                optional=False,
+            ),
+        ),
+    )
+
+
+def _destroyed_transport_attack_context_for_test(
+    *,
+    sequence_id: str,
+    attacker: UnitInstance,
+    transport: UnitInstance,
+) -> AttackResolutionContextPayload:
+    weapon_profile = _weapon_profile_by_wargear(
+        wargear_id=attacker.wargear_selections[0].wargear_ids[0],
+        weapon_profile_id=None,
+    )
+    strength = 10
+    toughness = 5
+    return {
+        "sequence_id": sequence_id,
+        "source_phase": BattlePhase.SHOOTING.value,
+        "attack_context_id": f"{sequence_id}:pool-001:attack-001",
+        "pool_index": 0,
+        "attack_index": 0,
+        "generated_hit_index": 0,
+        "attacker_player_id": "player-a",
+        "defender_player_id": "player-b",
+        "attacking_unit_instance_id": attacker.unit_instance_id,
+        "attacker_model_instance_id": attacker.own_models[0].model_instance_id,
+        "target_unit_instance_id": transport.unit_instance_id,
+        "weapon_profile_id": weapon_profile.profile_id,
+        "selected_weapon_ability_ids": [],
+        "damage_profile": DamageProfile.fixed(
+            transport.own_models[0].wounds_remaining
+        ).to_payload(),
+        "hit_roll": HitRoll.auto_hit(target_number=3).to_payload(),
+        "wound_roll": WoundRoll.auto_wound(
+            strength=strength,
+            toughness=toughness,
+            target_number=wound_roll_target_number(strength=strength, toughness=toughness),
+        ).to_payload(),
+        "allocation": None,
+        "save_options": [],
+    }
+
+
+def _destroyed_transport_proposal_request_for_test(
+    *,
+    state: GameState,
+    pending: PendingDestroyedTransportDisembark,
+    sequence: AttackSequence,
+    unit_instance_id: str,
+    request_id: str,
+) -> DecisionRequest:
+    attack_context_id = pending.attack_context["attack_context_id"]
+    return MovementProposalRequest(
+        request_id=request_id,
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=pending.destroyed_model_controller_player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=sequence.source_phase.value,
+        unit_instance_id=unit_instance_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        source_decision_request_id=f"{attack_context_id}:destroyed-transport",
+        source_decision_result_id=f"{attack_context_id}:destroyed-transport",
+        placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
+        context={
+            "destruction_timing": "destroyed_transport",
+            "transport_unit_instance_id": pending.transport_unit_instance_id,
+            "disembark_mode": DisembarkModeKind.EMERGENCY_DISEMBARK.value,
+            "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+            "attack_sequence_id": sequence.sequence_id,
+            "attack_context_id": attack_context_id,
+            "destroyed_model_instance_id": pending.damage_application.model_instance_id,
+        },
+    ).to_decision_request()
+
+
+def _destroyed_transport_placement_payload_for_test(
+    *,
+    proposal_request: MovementProposalRequest,
+    unit: UnitInstance,
+    transport: UnitInstance,
+) -> dict[str, JsonValue]:
+    return cast(
+        dict[str, JsonValue],
+        PlacementProposalPayload(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=unit.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.DISEMBARK,
+            attempted_placement=_unit_placement_at(
+                unit,
+                army_id="army-beta",
+                player_id="player-b",
+                poses=tuple(
+                    Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
+                    for index, _model in enumerate(unit.own_models)
+                ),
+            ),
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ).to_payload(),
+    )
+
+
+def _destroyed_transport_hazard_roll_results_for_test(
+    attempted_placement: UnitPlacement,
+    *,
+    values: tuple[int, ...],
+    roll_id_prefix: str,
+) -> tuple[DiceRollResult, ...]:
+    if len(values) != len(attempted_placement.model_placements):
+        raise AssertionError("Destroyed Transport hazard roll values must match placed models.")
+    return tuple(
+        DiceRollResult.from_values(
+            roll_id=f"{roll_id_prefix}-{index:03d}",
+            spec=hazard_roll_spec(
+                reason=(
+                    f"Destroyed Transport disembark roll for {model_placement.model_instance_id}"
+                ),
+                roll_type="destroyed_transport_disembark",
+                actor_id=model_placement.model_instance_id,
+            ),
+            values=(roll_value,),
+            source="injected",
+        )
+        for index, (model_placement, roll_value) in enumerate(
+            zip(attempted_placement.model_placements, values, strict=True),
+            start=1,
+        )
+    )
+
+
+def _proposal_decision_result(
+    *,
+    request: DecisionRequest,
+    payload: object,
+    result_id: str,
+) -> DecisionResult:
+    return DecisionResult(
+        result_id=result_id,
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id="submit_parameterized_payload",
+        payload=validate_json_value(payload),
+    )
+
+
+def _record_parameterized_result_for_apply(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    payload: object,
+    result_id: str,
+) -> DecisionResult:
+    lifecycle.decision_controller.request_decision(request)
+    result = _proposal_decision_result(
+        request=request,
+        payload=payload,
+        result_id=result_id,
+    )
+    lifecycle.decision_controller.submit_result(result)
+    return result
+
+
+def _assert_invalid_proposal_status(
+    status: LifecycleStatus | None,
+    *,
+    expected_code: str,
+    expected_field: str | None,
+) -> None:
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    payload = cast(dict[str, object], status.payload)
+    validation = cast(dict[str, object], payload["proposal_validation"])
+    violations = cast(list[dict[str, object]], validation["violations"])
+    assert validation["is_valid"] is False
+    assert violations[0]["violation_code"] == expected_code
+    assert violations[0]["field"] == expected_field
 
 
 def _replace_enemy_with_attached_character_fixture(

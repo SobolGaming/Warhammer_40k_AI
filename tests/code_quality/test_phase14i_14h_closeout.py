@@ -1,0 +1,152 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_abilities import (
+    ability_rows,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_stratagems import (
+    core_stratagem_rows,
+)
+
+ROOT = Path(__file__).resolve().parents[2]
+ARCHITECTURE_PATH = ROOT / "ARCHITECTURE_V2.md"
+README_PATH = ROOT / "README.md"
+TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
+ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
+DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
+HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
+GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
+UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
+HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
+ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
+
+
+def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
+    rows = core_stratagem_rows()
+    expected_stratagem_ids = {
+        "command-reroll",
+        "counteroffensive",
+        "crushing-impact",
+        "epic-challenge",
+        "explosives",
+        "fire-overwatch",
+        "heroic-intervention",
+        "insane-bravery",
+        "new-orders",
+        "rapid-ingress",
+        "smokescreen",
+    }
+
+    assert {row.stratagem_id for row in rows} == expected_stratagem_ids
+    assert [row.stratagem_id for row in rows if row.handler_id.startswith("unsupported:")] == []
+
+
+def test_phase14i_unsupported_core_ability_contract_is_explicit() -> None:
+    unsupported_rows = tuple(
+        row for row in ability_rows() if row.handler_id.startswith("unsupported:")
+    )
+
+    assert tuple((row.ability_id, row.handler_id) for row in unsupported_rows) == (
+        ("core-deadly-demise", "unsupported:phase-13c:deadly-demise"),
+        ("core-deep-strike", "unsupported:phase-15b:deep-strike"),
+        ("core-feel-no-pain", "unsupported:phase-13c:feel-no-pain"),
+        ("core-firing-deck", "unsupported:phase-13d:firing-deck"),
+        ("core-infiltrators", "unsupported:phase-15b:infiltrators"),
+        ("core-leader", "unsupported:phase-15c:leader"),
+        ("core-lone-operative", "unsupported:phase-13b:lone-operative"),
+        ("core-scouts", "unsupported:phase-15b:scouts"),
+        ("core-stealth", "unsupported:phase-13d:stealth"),
+    )
+
+
+def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> None:
+    architecture = ARCHITECTURE_PATH.read_text(encoding="utf-8")
+    readme = README_PATH.read_text(encoding="utf-8")
+    phase14i_section = architecture.split("## Phase 14I:", maxsplit=1)[1].split(
+        "\n## ",
+        maxsplit=1,
+    )[0]
+
+    assert "Status: Complete." in phase14i_section
+    assert "Phase 14I is complete" in architecture
+    assert "Phase 14I is complete" in readme
+    assert "explicit unsupported" in phase14i_section
+    assert "descriptors with owning phase IDs" in phase14i_section
+    assert "future ability-runtime families" in phase14i_section
+    assert "runtime effects complete" in phase14i_section
+    assert "STEALTH grants Benefit of Cover against ranged attacks" not in phase14i_section
+    assert "[PSYCHIC] modifier-ignore submissions" not in phase14i_section
+    assert "[ONE SHOT] first weapon selection is legal" not in phase14i_section
+    assert "Super-heavy Walker movement is offered" not in phase14i_section
+
+
+def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit() -> None:
+    transport_source = TRANSPORTS_PATH.read_text(encoding="utf-8")
+    attack_sequence_source = ATTACK_SEQUENCE_PATH.read_text(encoding="utf-8")
+    damage_allocation_source = DAMAGE_ALLOCATION_PATH.read_text(encoding="utf-8")
+    hazard_source = HAZARD_PATH.read_text(encoding="utf-8")
+    game_state_source = GAME_STATE_PATH.read_text(encoding="utf-8")
+    unit_state_source = UNIT_STATE_PATH.read_text(encoding="utf-8")
+    healing_source = HEALING_PATH.read_text(encoding="utf-8")
+
+    assert "def resolve_combat_disembark(" in transport_source
+    assert "Combat Disembark requires resolve_combat_disembark." in transport_source
+    assert "combat_disembark.hazard_roll" in transport_source
+    assert "apply_transport_hazard_mortal_wounds" in transport_source
+    assert "transport_hazard_mortal_wounds" in transport_source
+    assert "HAZARD_ROLL_FAILURE_THRESHOLD = 2" in hazard_source
+    assert "hazard_mortal_wounds_per_failed_roll" in attack_sequence_source
+    assert "pending_destroyed_transport_disembark" in attack_sequence_source
+    assert "destroyed_transport_disembark_placement_requested" in attack_sequence_source
+    assert "apply_destroyed_transport_disembark_proposal_decision" in attack_sequence_source
+    assert "remove_transport_cargo_state" in game_state_source
+    assert "def add_unit_to_army(" in game_state_source
+    assert "def apply_strategic_reserve_declarations(" in game_state_source
+    assert "def declare_battle_formation_embarkation(" in game_state_source
+    assert "def reposition_unit_to_strategic_reserves(" in game_state_source
+    assert "is_at_half_strength" in unit_state_source
+    assert "attached_unit_bodyguard_model_ids" in attack_sequence_source
+    assert "_highest_toughness_for_models" in attack_sequence_source
+    assert '"attached-role:leader" in model.source_ids' in damage_allocation_source
+    assert '"attached-role:support" in model.source_ids' in damage_allocation_source
+    assert "SELECT_HEALING_MODEL_DECISION_TYPE" in healing_source
+    assert "resolve_healing_until_blocked" in healing_source
+    assert "apply_healing_model_decision" in healing_source
+    assert "with_returned_model_placement" in healing_source
+    assert "phase_start_enemy_engagement_model_ids" in healing_source
+
+
+def test_phase14h_docs_do_not_mark_complete_while_blockers_remain() -> None:
+    architecture = ARCHITECTURE_PATH.read_text(encoding="utf-8")
+    readme = README_PATH.read_text(encoding="utf-8")
+    phase14h_section = architecture.split("## Phase 14H:", maxsplit=1)[1].split(
+        "\n## Phase 14I:",
+        maxsplit=1,
+    )[0]
+
+    assert "Status: Deferred." in phase14h_section
+    assert "Phase 14H remains deferred" in architecture
+    assert "Phase 14H remains deferred" in readme
+    assert "Phase 14H is complete" not in architecture
+    assert "Phase 14H is complete" not in readme
+    assert "Healing Wounds primitive now iterates each healing amount" in architecture
+    assert "Healing Wounds iterates wound healing before REVIVED model return" in readme
+    assert "Movement-phase Combat Disembark fallback now requires" in architecture
+    assert "Movement-phase Combat Disembark fallback now requires" in readme
+    assert "Attached Unit formation" in architecture
+    assert "runtime attached-unit formation;" in readme
+    assert "runtime attached-unit formation/healing/revival" not in readme
+    assert "full repositioned-unit effect persistence" not in architecture
+    assert "setup-time reserve/transport declarations" not in architecture
+    assert "setup-time Strategic Reserve declarations" in architecture
+    assert "setup-time Strategic Reserve declarations" in readme
+    assert "repositioned units preserve Advance/Fall Back/Disembark" in architecture
+    assert "repositioned units preserve Advance/Fall Back/Disembark" in readme
+    assert "destroyed-Transport orchestration from real destruction timing" not in architecture
+    assert "destroyed-Transport orchestration from real destruction timing" not in readme
+    adapter_contract = ADAPTER_CONTRACT_PATH.read_text(encoding="utf-8")
+    assert "player-facing destruction-time host remains Phase 14H work" not in adapter_contract
+    assert "actual destruction event before Transport removal and Deadly Demise" in adapter_contract
+    assert "mixed-Toughness attached-unit attack handling" not in architecture
+    assert "mixed-Toughness attached-unit attack handling" not in readme

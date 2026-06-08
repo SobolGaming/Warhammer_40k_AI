@@ -10,6 +10,8 @@ from warhammer40k_core.engine.attack_sequence import (
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     current_legal_damage_allocation_model_ids,
+    invalid_destroyed_transport_disembark_proposal_status,
+    is_destroyed_transport_disembark_proposal_request,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
@@ -41,6 +43,12 @@ from warhammer40k_core.engine.game_state import (
     GameConfigPayload,
     GameState,
     GameStatePayload,
+)
+from warhammer40k_core.engine.healing import (
+    SELECT_HEALING_MODEL_DECISION_TYPE,
+    apply_recorded_healing_model_decision,
+    healing_effect_from_request,
+    invalid_healing_model_decision_status,
 )
 from warhammer40k_core.engine.mission_decisions import (
     MISSION_DECISION_TYPES,
@@ -130,6 +138,10 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_window_decline_allowed,
     stratagem_window_decline_event_payload,
 )
+from warhammer40k_core.engine.transports import (
+    TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+    apply_transport_hazard_mortal_wound_feel_no_pain_decision,
+)
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     TriggeredMovementHandler,
@@ -212,6 +224,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        SELECT_HEALING_MODEL_DECISION_TYPE,
     )
 )
 
@@ -365,11 +378,38 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
+        destroyed_transport_placement_request = (
+            pending_request
+            if (
+                type(result) is DecisionResult
+                and pending_request is not None
+                and is_destroyed_transport_disembark_proposal_request(pending_request)
+            )
+            else None
+        )
+        if destroyed_transport_placement_request is not None:
+            result.validate_for_request(destroyed_transport_placement_request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            attack_sequence = _destroyed_transport_attack_sequence_for_request(
+                state=state,
+                request=destroyed_transport_placement_request,
+            )
+            invalid_status = invalid_destroyed_transport_disembark_proposal_status(
+                state=state,
+                request=destroyed_transport_placement_request,
+                result=result,
+                decisions=self.decision_controller,
+                attack_sequence=attack_sequence,
+            )
+            if invalid_status is not None:
+                return invalid_status
         if (
             type(result) is DecisionResult
             and pending_request is not None
             and pending_request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES
             and stratagem_placement_request is None
+            and destroyed_transport_placement_request is None
         ):
             result.validate_for_request(pending_request)
             if is_heroic_intervention_charge_move_request(pending_request):
@@ -542,6 +582,20 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 invalid_reason="invalid_mortal_wound_feel_no_pain_result",
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
+        ):
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            invalid_status = invalid_healing_model_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -789,6 +843,47 @@ class GameLifecycle:
             if charge_status is not None:
                 return charge_status
             return self.advance_until_decision_or_terminal()
+        if is_destroyed_transport_disembark_proposal_request(record.request):
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            if _destroyed_transport_request_is_fight_owned(
+                state=state,
+                request=record.request,
+            ):
+                fight_status = self._fight_phase_handler.apply_decision(
+                    state=state,
+                    result=result,
+                    decisions=self.decision_controller,
+                    reaction_queue=self.reaction_queue,
+                )
+                if fight_status is not None:
+                    if resolves_reaction_frame:
+                        self._continue_or_resolve_fight_reaction(
+                            result=result,
+                            status=fight_status,
+                        )
+                    return fight_status
+                advanced_status = self.advance_until_decision_or_terminal()
+                if resolves_reaction_frame:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                return advanced_status
+            shooting_status = self._shooting_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if resolves_reaction_frame:
+                handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                    result=result,
+                    status=shooting_status,
+                )
+                if handled_status is not None:
+                    return handled_status
+            if shooting_status is not None:
+                return shooting_status
+            return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
             movement_status = self._movement_phase_handler.apply_decision(
                 state=state,
@@ -799,6 +894,48 @@ class GameLifecycle:
             if movement_status is not None:
                 return movement_status
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            healing_effect = healing_effect_from_request(request=record.request)
+            _updated_effect, follow_up_request = apply_recorded_healing_model_decision(
+                state=state,
+                decisions=self.decision_controller,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                request=record.request,
+                result=result,
+                effect=healing_effect,
+            )
+            if follow_up_request is not None:
+                healing_status = LifecycleStatus.waiting_for_decision(
+                    stage=state.stage,
+                    decision_request=follow_up_request,
+                    payload={
+                        "decision_type": SELECT_HEALING_MODEL_DECISION_TYPE,
+                        "effect_id": healing_effect.effect_id,
+                        "target_unit_instance_id": healing_effect.target_unit_instance_id,
+                    },
+                )
+                if resolves_reaction_frame:
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=follow_up_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+                return healing_status
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                if advanced_status.decision_request is not None:
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=advanced_status.decision_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+                else:
+                    self.reaction_queue.resolve_reaction(
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
+            return advanced_status
         if record.request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             fight_status = self._fight_phase_handler.apply_decision(
@@ -838,6 +975,46 @@ class GameLifecycle:
                 if explosives_status is not None:
                     return explosives_status
                 return self.advance_until_decision_or_terminal()
+            if (
+                isinstance(source_context, dict)
+                and source_context.get("source_kind") == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
+            ):
+                resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+                transport_hazard_status = apply_transport_hazard_mortal_wound_feel_no_pain_decision(
+                    state=state,
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+                if transport_hazard_status is not None:
+                    if resolves_reaction_frame:
+                        if _fight_decision_owns_request(state=state, request=record.request):
+                            self._continue_or_resolve_fight_reaction(
+                                result=result,
+                                status=transport_hazard_status,
+                            )
+                        else:
+                            handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                                result=result,
+                                status=transport_hazard_status,
+                            )
+                            if handled_status is not None:
+                                return handled_status
+                    return transport_hazard_status
+                advanced_status = self.advance_until_decision_or_terminal()
+                if resolves_reaction_frame:
+                    if _fight_decision_owns_request(state=state, request=record.request):
+                        self._continue_or_resolve_fight_reaction(
+                            result=result,
+                            status=advanced_status,
+                        )
+                    else:
+                        handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                            result=result,
+                            status=advanced_status,
+                        )
+                        if handled_status is not None:
+                            return handled_status
+                return advanced_status
         if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
             state=state,
             request=record.request,
@@ -1218,6 +1395,64 @@ def _payload_bool(field_name: str, value: object) -> bool:
     return value
 
 
+def _destroyed_transport_attack_sequence_for_request(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+) -> AttackSequence:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    sequence_id = _proposal_context_string(proposal_request, key="attack_sequence_id")
+    fight_state = state.fight_phase_state
+    if (
+        fight_state is not None
+        and fight_state.attack_sequence is not None
+        and fight_state.attack_sequence.sequence_id == sequence_id
+    ):
+        return fight_state.attack_sequence
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if (
+        out_of_phase_state is not None
+        and out_of_phase_state.attack_sequence is not None
+        and out_of_phase_state.attack_sequence.sequence_id == sequence_id
+    ):
+        return out_of_phase_state.attack_sequence
+    shooting_state = state.shooting_phase_state
+    if (
+        shooting_state is not None
+        and shooting_state.attack_sequence is not None
+        and shooting_state.attack_sequence.sequence_id == sequence_id
+    ):
+        return shooting_state.attack_sequence
+    raise GameLifecycleError("Destroyed Transport placement request has no attack sequence.")
+
+
+def _destroyed_transport_request_is_fight_owned(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+) -> bool:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    sequence_id = _proposal_context_string(proposal_request, key="attack_sequence_id")
+    fight_state = state.fight_phase_state
+    return (
+        fight_state is not None
+        and fight_state.attack_sequence is not None
+        and fight_state.attack_sequence.sequence_id == sequence_id
+    )
+
+
+def _proposal_context_string(
+    proposal_request: MovementProposalRequest,
+    *,
+    key: str,
+) -> str:
+    context = proposal_request.context or {}
+    value = context.get(key)
+    if type(value) is not str or not value:
+        raise GameLifecycleError(f"Proposal request context missing string key: {key}.")
+    return value
+
+
 def _is_charge_move_proposal_request(request: DecisionRequest) -> bool:
     if type(request) is not DecisionRequest:
         raise GameLifecycleError("Charge proposal routing requires a DecisionRequest.")
@@ -1582,6 +1817,7 @@ def _validate_reaction_queue_consistency(
     if (
         pending_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
         and not is_stratagem_placement_proposal_request(pending_request)
+        and not is_destroyed_transport_disembark_proposal_request(pending_request)
     ):
         raise GameLifecycleError("Lifecycle reaction queue pending placement decision drift.")
     if (
