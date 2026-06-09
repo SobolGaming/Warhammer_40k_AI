@@ -14597,7 +14597,7 @@ def _mission_setup() -> MissionSetup:
         mission_pack_id=mission_pack.mission_pack_id,
         source_version=mission_pack.source_version,
         source_id=mission_pack.source_id,
-        mission_pool_entry_id="mission-primary-immovable-object-layout-3",
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         primary_mission_id="take-and-hold",
         deployment_map_id="phase13b-open-map",
         terrain_layout_id="phase13b-open-layout",

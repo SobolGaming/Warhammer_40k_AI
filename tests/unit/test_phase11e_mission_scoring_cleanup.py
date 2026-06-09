@@ -168,8 +168,8 @@ def test_take_and_hold_scores_from_battle_round_two_at_configured_command_timing
         "objective_control_record_id": ("objective-control:round-02:player-a:command:phase_end"),
         "score_count": 2,
         "controlled_objective_ids": [
-            "primary-immovable-object-layout-3-center-central",
-            "primary-immovable-object-layout-3-left-home",
+            "take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            "take-and-hold-vs-purge-the-foe-layout-3-left-home",
         ],
         "home_objective_ids": [],
         "turn_start_controlled_objective_ids": [],
@@ -219,7 +219,7 @@ def test_immovable_object_scores_central_and_non_home_objectives_by_round() -> N
     command_metadata = _transaction_metadata(command_transaction)
     assert command_metadata["scoring_rule_id"] == ("immovable-object-rounds-two-to-four-command")
     assert command_metadata["controlled_objective_ids"] == [
-        "primary-immovable-object-layout-3-center-central"
+        "take-and-hold-vs-purge-the-foe-layout-3-center-central"
     ]
 
     fifth_round_state = _battle_state_for_primary("primary-immovable-object")
@@ -325,7 +325,7 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
 
 
 def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrain() -> None:
-    feature_id = "primary-immovable-object-layout-3-center-ruin"
+    feature_id = "take-and-hold-vs-purge-the-foe-layout-3-center-ruin"
     lifecycle = _battle_lifecycle_for_primary(
         "primary-death-trap",
         objective_terrain_feature_id=feature_id,
@@ -396,7 +396,7 @@ def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrai
 
 
 def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
-    feature_id = "primary-immovable-object-layout-3-center-ruin"
+    feature_id = "take-and-hold-vs-purge-the-foe-layout-3-center-ruin"
     state = _battle_state_for_primary("primary-death-trap")
     first_turn_start = state.primary_objective_turn_start_states[0]
 
@@ -481,7 +481,7 @@ def test_booby_trap_action_is_primary_scoped_and_immediate_zero_vp() -> None:
         action_id="mission-action:phase16-zero-vp-complete",
         player_id="player-a",
         unit_instance_id="army-alpha:intercessor-unit-1",
-        target_id="primary-immovable-object-layout-3-center-ruin",
+        target_id="take-and-hold-vs-purge-the-foe-layout-3-center-ruin",
         mission_id="primary-death-trap",
         battle_round=1,
         phase=BattlePhase.SHOOTING.value,
@@ -705,12 +705,16 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
     _record_secondary_vehicle_destruction(
         state,
         "army-beta:vehicle-unit-3",
-        started_turn_objective_marker_ids=("primary-immovable-object-layout-3-center-central",),
+        started_turn_objective_marker_ids=(
+            "take-and-hold-vs-purge-the-foe-layout-3-center-central",
+        ),
     )
     _record_secondary_vehicle_destruction(
         state,
         "army-beta:vehicle-unit-4",
-        started_turn_objective_marker_ids=("primary-immovable-object-layout-3-upper-central",),
+        started_turn_objective_marker_ids=(
+            "take-and-hold-vs-purge-the-foe-layout-3-upper-central",
+        ),
     )
 
     state.score_secondary_mission_from_state(
@@ -741,14 +745,14 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
     )
     cleanse_state.record_secondary_objective_cleanse(
         player_id="player-a",
-        objective_marker_id="primary-immovable-object-layout-3-center-central",
+        objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
         action_id="phase16-cleanse-center",
         phase=BattlePhase.FIGHT,
         source_id="cleanse",
     )
     cleanse_state.record_secondary_objective_cleanse(
         player_id="player-a",
-        objective_marker_id="primary-immovable-object-layout-3-upper-central",
+        objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-upper-central",
         action_id="phase16-cleanse-northwest",
         phase=BattlePhase.FIGHT,
         source_id="cleanse",
@@ -858,7 +862,9 @@ def test_secondary_scoring_evidence_payloads_round_trip_and_fail_fast() -> None:
         phase=BattlePhase.FIGHT.value,
         destroyed_unit_instance_id="army-beta:vehicle-unit-3",
         destroyed_models=(model,),
-        started_turn_objective_marker_ids=("primary-immovable-object-layout-3-center-central",),
+        started_turn_objective_marker_ids=(
+            "take-and-hold-vs-purge-the-foe-layout-3-center-central",
+        ),
         source_id="phase16:test-destruction",
     )
     cleanse = SecondaryObjectiveCleanseState(
@@ -868,7 +874,7 @@ def test_secondary_scoring_evidence_payloads_round_trip_and_fail_fast() -> None:
         active_player_id="player-a",
         battle_round=1,
         phase=BattlePhase.SHOOTING.value,
-        objective_marker_id="primary-immovable-object-layout-3-center-central",
+        objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
         action_id="mission-action:phase16-cleanse-center",
         source_id="cleanse",
     )
@@ -921,7 +927,7 @@ def test_secondary_scoring_evidence_payloads_round_trip_and_fail_fast() -> None:
             active_player_id="player-b",
             battle_round=1,
             phase=BattlePhase.SHOOTING.value,
-            objective_marker_id="primary-immovable-object-layout-3-center-central",
+            objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             action_id="mission-action:phase16-cleanse-bad",
             source_id="cleanse",
         )
@@ -1113,11 +1119,13 @@ def test_game_state_secondary_scoring_evidence_round_trips_and_rejects_duplicate
     _record_secondary_vehicle_destruction(
         state,
         "army-beta:vehicle-unit-3",
-        started_turn_objective_marker_ids=("primary-immovable-object-layout-3-center-central",),
+        started_turn_objective_marker_ids=(
+            "take-and-hold-vs-purge-the-foe-layout-3-center-central",
+        ),
     )
     state.record_secondary_objective_cleanse(
         player_id="player-a",
-        objective_marker_id="primary-immovable-object-layout-3-center-central",
+        objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
         action_id="phase16-cleanse-center",
         phase=BattlePhase.FIGHT,
         source_id="cleanse",
@@ -2100,7 +2108,7 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
     )
     interrupted_action = _mission_action_state(
         action_id="mission-action:phase11e-start-cleanse-northwest",
-        target_id="primary-immovable-object-layout-3-upper-central",
+        target_id="take-and-hold-vs-purge-the-foe-layout-3-upper-central",
     )
     state.record_mission_action_state(interrupted_action)
     _place_unit_near_objective(
@@ -2220,7 +2228,7 @@ def test_public_payload_redacts_hidden_secondary_scoring_evidence() -> None:
     _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
     state.record_secondary_objective_cleanse(
         player_id="player-a",
-        objective_marker_id="primary-immovable-object-layout-3-center-central",
+        objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
         action_id="phase16-public-cleanse",
         phase=BattlePhase.FIGHT,
         source_id="cleanse",
@@ -2934,7 +2942,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:invalid:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -2950,7 +2958,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:started-with-completion:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -2967,7 +2975,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:completed-without-round:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -2985,7 +2993,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:eligible-not-tuple:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3001,7 +3009,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:duplicate-eligible:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3020,7 +3028,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:no-eligible:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3036,7 +3044,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:non-string-unit:player-a",
             player_id="player-a",
             unit_instance_id=cast(str, 1),
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3052,7 +3060,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:empty-unit:player-a",
             player_id="player-a",
             unit_instance_id=" ",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3068,7 +3076,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:round-not-int:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=cast(int, "1"),
             phase=BattlePhase.MOVEMENT.value,
@@ -3084,7 +3092,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:round-zero:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=0,
             phase=BattlePhase.MOVEMENT.value,
@@ -3100,7 +3108,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:vp-not-int:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3116,7 +3124,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:vp-negative:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3132,7 +3140,7 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
             action_id="cleanse:interrupted-with-score:player-a",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -3398,7 +3406,7 @@ def test_phase14c_battle_shocked_units_cannot_start_or_complete_mission_actions(
             action_id="cleanse:center:player-a",
             player_id="player-a",
             unit_instance_id=unit_id,
-            target_id="primary-immovable-object-layout-3-center-central",
+            target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -3424,7 +3432,7 @@ def test_phase14c_battle_shocked_units_cannot_start_or_complete_mission_actions(
 def _mission_action_state(
     *,
     action_id: str,
-    target_id: str = "primary-immovable-object-layout-3-center-central",
+    target_id: str = "take-and-hold-vs-purge-the-foe-layout-3-center-central",
 ) -> MissionActionState:
     return MissionActionState.start(
         action_id=action_id,
@@ -3938,8 +3946,8 @@ def _record_secondary_vehicle_destruction(
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2026_27_mission_pack(),
-        mission_pool_entry_id="mission-primary-immovable-object-layout-3",
-        terrain_layout_id="primary-immovable-object-layout-3",
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )

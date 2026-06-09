@@ -764,6 +764,27 @@ def force_disposition_rows() -> tuple[SourceForceDispositionRow, ...]:
     )
 
 
+_LAYOUT_FORCE_DISPOSITION_ORDER = {
+    "take-and-hold": 0,
+    "purge-the-foe": 1,
+    "priority-assets": 2,
+    "reconnaissance": 3,
+    "disruption": 4,
+}
+
+
+def _battlefield_layout_id_prefix(
+    player_force_disposition_id: str, opponent_force_disposition_id: str
+) -> str:
+    ordered_disposition_ids = tuple(
+        sorted(
+            (player_force_disposition_id, opponent_force_disposition_id),
+            key=lambda disposition_id: _LAYOUT_FORCE_DISPOSITION_ORDER[disposition_id],
+        )
+    )
+    return f"{ordered_disposition_ids[0]}-vs-{ordered_disposition_ids[1]}"
+
+
 def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ...]:
     implemented_mission_ids = frozenset(
         {
@@ -821,6 +842,10 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
                 if primary_mission_id in implemented_mission_ids
                 else "awaiting_source"
             )
+            battlefield_layout_id_prefix = _battlefield_layout_id_prefix(
+                player_disposition.force_disposition_id,
+                opponent_disposition.force_disposition_id,
+            )
             rows.append(
                 SourcePrimaryMissionMatrixCellRow(
                     player_force_disposition_id=player_disposition.force_disposition_id,
@@ -828,9 +853,9 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
                     primary_mission_id=primary_mission_id,
                     primary_mission_name=primary_mission_name,
                     battlefield_layout_ids=(
-                        f"{primary_mission_id}-layout-1",
-                        f"{primary_mission_id}-layout-2",
-                        f"{primary_mission_id}-layout-3",
+                        f"{battlefield_layout_id_prefix}-layout-1",
+                        f"{battlefield_layout_id_prefix}-layout-2",
+                        f"{battlefield_layout_id_prefix}-layout-3",
                     ),
                     source_status=source_status,
                 )
@@ -841,14 +866,14 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
 def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
     return (
         SourceBattlefieldLayoutRow(
-            battlefield_layout_id="primary-immovable-object-layout-3",
+            battlefield_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             name="Take and Hold vs Purge the Foe 3",
             player_force_disposition_id="take-and-hold",
             opponent_force_disposition_id="purge-the-foe",
             layout_number=3,
             primary_mission_id="primary-immovable-object",
-            deployment_map_id="primary-immovable-object-layout-3-deployment",
-            terrain_layout_id="primary-immovable-object-layout-3",
+            deployment_map_id="take-and-hold-vs-purge-the-foe-layout-3-deployment",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             battlefield_width_inches=60.0,
             battlefield_depth_inches=44.0,
             coordinate_origin="top_left",
@@ -856,35 +881,35 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
             source_status="image_estimate",
             objective_markers=(
                 SourceBattlefieldObjectiveRow(
-                    "primary-immovable-object-layout-3-left-home",
+                    "take-and-hold-vs-purge-the-foe-layout-3-left-home",
                     "Left Home Objective",
                     "home",
                     9.5,
                     10.5,
                 ),
                 SourceBattlefieldObjectiveRow(
-                    "primary-immovable-object-layout-3-right-home",
+                    "take-and-hold-vs-purge-the-foe-layout-3-right-home",
                     "Right Home Objective",
                     "home",
                     52.5,
                     34.5,
                 ),
                 SourceBattlefieldObjectiveRow(
-                    "primary-immovable-object-layout-3-upper-central",
+                    "take-and-hold-vs-purge-the-foe-layout-3-upper-central",
                     "Upper Central Objective",
                     "central",
                     28.5,
                     8.5,
                 ),
                 SourceBattlefieldObjectiveRow(
-                    "primary-immovable-object-layout-3-center-central",
+                    "take-and-hold-vs-purge-the-foe-layout-3-center-central",
                     "Center Central Objective",
                     "central",
                     30.0,
                     22.0,
                 ),
                 SourceBattlefieldObjectiveRow(
-                    "primary-immovable-object-layout-3-lower-central",
+                    "take-and-hold-vs-purge-the-foe-layout-3-lower-central",
                     "Lower Central Objective",
                     "central",
                     28.5,
@@ -893,7 +918,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
             ),
             deployment_zones=(
                 SourceBattlefieldDeploymentZoneRow(
-                    "primary-immovable-object-layout-3-attacker",
+                    "take-and-hold-vs-purge-the-foe-layout-3-attacker",
                     "attacker",
                     0.0,
                     0.0,
@@ -901,7 +926,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     44.0,
                 ),
                 SourceBattlefieldDeploymentZoneRow(
-                    "primary-immovable-object-layout-3-defender",
+                    "take-and-hold-vs-purge-the-foe-layout-3-defender",
                     "defender",
                     42.0,
                     0.0,
@@ -911,7 +936,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
             ),
             terrain_features=(
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-left-home-ruin",
+                    "take-and-hold-vs-purge-the-foe-layout-3-left-home-ruin",
                     "ruins",
                     10.5,
                     11.0,
@@ -920,7 +945,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "left home objective ruin footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-right-home-ruin",
+                    "take-and-hold-vs-purge-the-foe-layout-3-right-home-ruin",
                     "ruins",
                     52.5,
                     36.5,
@@ -929,7 +954,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "right home objective ruin footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-center-ruin",
+                    "take-and-hold-vs-purge-the-foe-layout-3-center-ruin",
                     "ruins",
                     31.0,
                     23.5,
@@ -938,7 +963,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "central ruin footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-upper-flank-ruin",
+                    "take-and-hold-vs-purge-the-foe-layout-3-upper-flank-ruin",
                     "ruins",
                     22.0,
                     36.5,
@@ -947,7 +972,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "upper flank central objective ruin footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-lower-flank-ruin",
+                    "take-and-hold-vs-purge-the-foe-layout-3-lower-flank-ruin",
                     "ruins",
                     38.0,
                     7.5,
@@ -956,7 +981,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "lower flank central objective ruin footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-left-midfield-debris",
+                    "take-and-hold-vs-purge-the-foe-layout-3-left-midfield-debris",
                     "battlefield_debris_and_statuary",
                     24.0,
                     10.5,
@@ -965,7 +990,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "left midfield debris footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-right-midfield-debris",
+                    "take-and-hold-vs-purge-the-foe-layout-3-right-midfield-debris",
                     "battlefield_debris_and_statuary",
                     37.0,
                     35.5,
@@ -974,7 +999,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "right midfield debris footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-left-no-mans-barricade",
+                    "take-and-hold-vs-purge-the-foe-layout-3-left-no-mans-barricade",
                     "barricade_and_fuel_pipes",
                     28.0,
                     7.5,
@@ -983,7 +1008,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "left no man's land barricade footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-right-no-mans-barricade",
+                    "take-and-hold-vs-purge-the-foe-layout-3-right-no-mans-barricade",
                     "barricade_and_fuel_pipes",
                     30.5,
                     38.0,
@@ -992,7 +1017,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "right no man's land barricade footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-left-midline-wall",
+                    "take-and-hold-vs-purge-the-foe-layout-3-left-midline-wall",
                     "barricade_and_fuel_pipes",
                     18.0,
                     22.0,
@@ -1001,7 +1026,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "left deployment edge wall footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-right-midline-wall",
+                    "take-and-hold-vs-purge-the-foe-layout-3-right-midline-wall",
                     "barricade_and_fuel_pipes",
                     42.0,
                     22.0,
@@ -1010,7 +1035,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "right deployment edge wall footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-left-pipe-field",
+                    "take-and-hold-vs-purge-the-foe-layout-3-left-pipe-field",
                     "barricade_and_fuel_pipes",
                     49.0,
                     8.0,
@@ -1019,7 +1044,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "left deployment pipe and rubble footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-right-pipe-field",
+                    "take-and-hold-vs-purge-the-foe-layout-3-right-pipe-field",
                     "barricade_and_fuel_pipes",
                     11.0,
                     37.0,
@@ -1028,7 +1053,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "right deployment pipe and rubble footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-left-diagonal-ruin",
+                    "take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin",
                     "ruins",
                     49.0,
                     17.0,
@@ -1037,7 +1062,7 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     "left deployment diagonal ruin footprint",
                 ),
                 SourceBattlefieldTerrainFeatureRow(
-                    "primary-immovable-object-layout-3-right-diagonal-ruin",
+                    "take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin",
                     "ruins",
                     12.5,
                     29.0,

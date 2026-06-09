@@ -72,9 +72,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as source_data,
 )
 
-PHASE16A_BATTLEFIELD_LAYOUT_ID = "primary-immovable-object-layout-3"
-PHASE16A_DEPLOYMENT_MAP_ID = "primary-immovable-object-layout-3-deployment"
-PHASE16A_MISSION_POOL_ENTRY_ID = "mission-primary-immovable-object-layout-3"
+PHASE16A_BATTLEFIELD_LAYOUT_ID = "take-and-hold-vs-purge-the-foe-layout-3"
+PHASE16A_DEPLOYMENT_MAP_ID = "take-and-hold-vs-purge-the-foe-layout-3-deployment"
+PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
 
 
 def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> None:
@@ -218,16 +218,27 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
         is MissionSourceStatus.IMPLEMENTED
     )
     assert mirror.source_status is MissionSourceStatus.AWAITING_SOURCE
-    assert len(purge_into_hold.battlefield_layout_ids) == 3
-    assert all(
-        layout_id.startswith(purge_into_hold.primary_mission_id)
-        for layout_id in purge_into_hold.battlefield_layout_ids
-    )
     assert hold_into_purge.battlefield_layout_ids == (
-        "primary-immovable-object-layout-1",
-        "primary-immovable-object-layout-2",
+        "take-and-hold-vs-purge-the-foe-layout-1",
+        "take-and-hold-vs-purge-the-foe-layout-2",
         PHASE16A_BATTLEFIELD_LAYOUT_ID,
     )
+    assert purge_into_hold.battlefield_layout_ids == hold_into_purge.battlefield_layout_ids
+    layout_disposition_order = (
+        "take-and-hold",
+        "purge-the-foe",
+        "priority-assets",
+        "reconnaissance",
+        "disruption",
+    )
+    assert {cell.battlefield_layout_ids for cell in mission_pack.primary_mission_matrix_cells} == {
+        tuple(
+            f"{first_disposition_id}-vs-{second_disposition_id}-layout-{layout_number}"
+            for layout_number in (1, 2, 3)
+        )
+        for first_index, first_disposition_id in enumerate(layout_disposition_order)
+        for second_disposition_id in layout_disposition_order[first_index:]
+    }
     assert tuple(layout.terrain_layout_id for layout in mission_pack.terrain_layout_templates) == (
         PHASE16A_BATTLEFIELD_LAYOUT_ID,
     )
@@ -467,11 +478,11 @@ def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> 
 
     assert _objective_coordinate_snapshot(mission_pack) == {
         PHASE16A_DEPLOYMENT_MAP_ID: {
-            "primary-immovable-object-layout-3-center-central": (30.0, 22.0),
-            "primary-immovable-object-layout-3-left-home": (9.5, 10.5),
-            "primary-immovable-object-layout-3-lower-central": (28.5, 35.5),
-            "primary-immovable-object-layout-3-right-home": (52.5, 34.5),
-            "primary-immovable-object-layout-3-upper-central": (28.5, 8.5),
+            "take-and-hold-vs-purge-the-foe-layout-3-center-central": (30.0, 22.0),
+            "take-and-hold-vs-purge-the-foe-layout-3-left-home": (9.5, 10.5),
+            "take-and-hold-vs-purge-the-foe-layout-3-lower-central": (28.5, 35.5),
+            "take-and-hold-vs-purge-the-foe-layout-3-right-home": (52.5, 34.5),
+            "take-and-hold-vs-purge-the-foe-layout-3-upper-central": (28.5, 8.5),
         },
     }
 
@@ -527,99 +538,99 @@ def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
         "home",
     )
     assert _terrain_feature_snapshot(terrain_layout) == {
-        "primary-immovable-object-layout-3-center-ruin": ("ruins", 31.0, 23.5, 8.0, 13.0),
-        "primary-immovable-object-layout-3-left-diagonal-ruin": (
+        "take-and-hold-vs-purge-the-foe-layout-3-center-ruin": ("ruins", 31.0, 23.5, 8.0, 13.0),
+        "take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin": (
             "ruins",
             49.0,
             17.0,
             8.0,
             9.0,
         ),
-        "primary-immovable-object-layout-3-left-home-ruin": (
+        "take-and-hold-vs-purge-the-foe-layout-3-left-home-ruin": (
             "ruins",
             10.5,
             11.0,
             7.0,
             12.0,
         ),
-        "primary-immovable-object-layout-3-left-midfield-debris": (
+        "take-and-hold-vs-purge-the-foe-layout-3-left-midfield-debris": (
             "battlefield_debris_and_statuary",
             24.0,
             10.5,
             6.0,
             5.0,
         ),
-        "primary-immovable-object-layout-3-left-midline-wall": (
+        "take-and-hold-vs-purge-the-foe-layout-3-left-midline-wall": (
             "barricade_and_fuel_pipes",
             18.0,
             22.0,
             1.0,
             12.0,
         ),
-        "primary-immovable-object-layout-3-left-no-mans-barricade": (
+        "take-and-hold-vs-purge-the-foe-layout-3-left-no-mans-barricade": (
             "barricade_and_fuel_pipes",
             28.0,
             7.5,
             1.5,
             8.0,
         ),
-        "primary-immovable-object-layout-3-left-pipe-field": (
+        "take-and-hold-vs-purge-the-foe-layout-3-left-pipe-field": (
             "barricade_and_fuel_pipes",
             49.0,
             8.0,
             8.0,
             12.0,
         ),
-        "primary-immovable-object-layout-3-lower-flank-ruin": (
+        "take-and-hold-vs-purge-the-foe-layout-3-lower-flank-ruin": (
             "ruins",
             38.0,
             7.5,
             8.0,
             15.0,
         ),
-        "primary-immovable-object-layout-3-right-diagonal-ruin": (
+        "take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin": (
             "ruins",
             12.5,
             29.0,
             7.0,
             8.0,
         ),
-        "primary-immovable-object-layout-3-right-home-ruin": (
+        "take-and-hold-vs-purge-the-foe-layout-3-right-home-ruin": (
             "ruins",
             52.5,
             36.5,
             7.0,
             13.0,
         ),
-        "primary-immovable-object-layout-3-right-midfield-debris": (
+        "take-and-hold-vs-purge-the-foe-layout-3-right-midfield-debris": (
             "battlefield_debris_and_statuary",
             37.0,
             35.5,
             6.0,
             5.0,
         ),
-        "primary-immovable-object-layout-3-right-midline-wall": (
+        "take-and-hold-vs-purge-the-foe-layout-3-right-midline-wall": (
             "barricade_and_fuel_pipes",
             42.0,
             22.0,
             1.0,
             12.0,
         ),
-        "primary-immovable-object-layout-3-right-no-mans-barricade": (
+        "take-and-hold-vs-purge-the-foe-layout-3-right-no-mans-barricade": (
             "barricade_and_fuel_pipes",
             30.5,
             38.0,
             1.5,
             8.0,
         ),
-        "primary-immovable-object-layout-3-right-pipe-field": (
+        "take-and-hold-vs-purge-the-foe-layout-3-right-pipe-field": (
             "barricade_and_fuel_pipes",
             11.0,
             37.0,
             8.0,
             10.0,
         ),
-        "primary-immovable-object-layout-3-upper-flank-ruin": (
+        "take-and-hold-vs-purge-the-foe-layout-3-upper-flank-ruin": (
             "ruins",
             22.0,
             36.5,
@@ -627,6 +638,31 @@ def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
             11.0,
         ),
     }
+
+
+def test_phase16a_battlefield_layout_identifiers_are_cross_platform_file_safe() -> None:
+    mission_pack = chapter_approved_2026_27_mission_pack()
+    layout_row = source_data.battlefield_layout_rows()[0]
+    identifiers = {
+        layout_row.battlefield_layout_id,
+        layout_row.deployment_map_id,
+        layout_row.terrain_layout_id,
+        *mission_pack.primary_mission_matrix_cell(
+            player_force_disposition_id="take-and-hold",
+            opponent_force_disposition_id="purge-the-foe",
+        ).battlefield_layout_ids,
+        *(entry.mission_pool_entry_id for entry in mission_pack.mission_pool_entries),
+        *(objective.objective_marker_id for objective in layout_row.objective_markers),
+        *(zone.deployment_zone_id for zone in layout_row.deployment_zones),
+        *(feature.feature_id for feature in layout_row.terrain_features),
+    }
+    safe_characters = set("abcdefghijklmnopqrstuvwxyz0123456789-")
+
+    assert identifiers
+    for identifier in identifiers:
+        assert identifier == identifier.strip()
+        assert not identifier.endswith(".")
+        assert set(identifier) <= safe_characters
 
 
 def test_mission_pool_selection_is_deterministic() -> None:

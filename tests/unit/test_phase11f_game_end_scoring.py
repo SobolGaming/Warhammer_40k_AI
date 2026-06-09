@@ -33,7 +33,7 @@ from warhammer40k_core.engine.scoring import (
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
-PHASE16A_MISSION_POOL_ENTRY_ID = "mission-primary-immovable-object-layout-3"
+PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
 
 
 def test_phase11f_game_end_windows_fire_once_and_final_payload_round_trips() -> None:
@@ -306,7 +306,7 @@ def _config(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID) -> G
         mission_setup=MissionSetup.from_mission_pack(
             mission_pack=chapter_approved_2026_27_mission_pack(),
             mission_pool_entry_id=mission_pool_entry_id,
-            terrain_layout_id="primary-immovable-object-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
             defender_player_id="player-b",
         ),
