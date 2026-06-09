@@ -4881,8 +4881,8 @@ def _config(
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
         mission_setup=MissionSetup.from_mission_pack(
             mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-a",
-            terrain_layout_id="layout-1",
+            mission_pool_entry_id="mission-primary-immovable-object-layout-3",
+            terrain_layout_id="primary-immovable-object-layout-3",
             attacker_player_id="player-a",
             defender_player_id="player-b",
         ),

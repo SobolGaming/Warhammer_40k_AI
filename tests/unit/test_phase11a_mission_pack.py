@@ -17,6 +17,7 @@ from warhammer40k_core.core.missions import (
     mission_source_status_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
+from warhammer40k_core.core.terrain_layouts import TerrainLayoutTemplate
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -71,6 +72,10 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as source_data,
 )
 
+PHASE16A_BATTLEFIELD_LAYOUT_ID = "primary-immovable-object-layout-3"
+PHASE16A_DEPLOYMENT_MAP_ID = "primary-immovable-object-layout-3-deployment"
+PHASE16A_MISSION_POOL_ENTRY_ID = "mission-primary-immovable-object-layout-3"
+
 
 def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
@@ -83,7 +88,9 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
     assert "object at 0x" not in encoded
     assert MissionPackDefinition.from_payload(decoded).to_payload() == payload
     assert mission_pack.sequence.steps[0] == "muster_armies"
-    assert len(mission_pack.mission_pool_entries) == 20
+    assert len(mission_pack.deployment_maps) == 1
+    assert len(mission_pack.terrain_layout_templates) == 1
+    assert len(mission_pack.mission_pool_entries) == 1
     assert len(mission_pack.secondary_missions) == 20
     assert len(mission_pack.challenger_cards) == 9
 
@@ -215,6 +222,14 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
     assert all(
         layout_id.startswith(purge_into_hold.primary_mission_id)
         for layout_id in purge_into_hold.battlefield_layout_ids
+    )
+    assert hold_into_purge.battlefield_layout_ids == (
+        "primary-immovable-object-layout-1",
+        "primary-immovable-object-layout-2",
+        PHASE16A_BATTLEFIELD_LAYOUT_ID,
+    )
+    assert tuple(layout.terrain_layout_id for layout in mission_pack.terrain_layout_templates) == (
+        PHASE16A_BATTLEFIELD_LAYOUT_ID,
     )
     assert MissionPackDefinition.from_payload(mission_pack.to_payload()).to_payload() == (
         mission_pack.to_payload()
@@ -435,7 +450,7 @@ def test_future_edition_source_identity_cannot_collide_with_eleventh_edition() -
 
 def test_deployment_map_and_objective_marker_policy_round_trip() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
-    deployment_map = mission_pack.deployment_map("tipping-point")
+    deployment_map = mission_pack.deployment_map(PHASE16A_DEPLOYMENT_MAP_ID)
     payload = deployment_map.to_payload()
     round_tripped = type(deployment_map).from_payload(payload)
 
@@ -451,54 +466,19 @@ def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> 
     mission_pack = chapter_approved_2026_27_mission_pack()
 
     assert _objective_coordinate_snapshot(mission_pack) == {
-        "crucible-of-battle": {
-            "center": (30.0, 22.0),
-            "northeast": (46.0, 10.0),
-            "northwest": (20.0, 8.0),
-            "southeast": (40.0, 36.0),
-            "southwest": (14.0, 34.0),
-        },
-        "dawn-of-war": {
-            "center": (30.0, 22.0),
-            "east": (50.0, 22.0),
-            "north": (30.0, 6.0),
-            "south": (30.0, 38.0),
-            "west": (10.0, 22.0),
-        },
-        "hammer-and-anvil": {
-            "center": (30.0, 22.0),
-            "east": (50.0, 22.0),
-            "north": (30.0, 6.0),
-            "south": (30.0, 38.0),
-            "west": (10.0, 22.0),
-        },
-        "search-and-destroy": {
-            "center": (30.0, 22.0),
-            "northeast": (46.0, 10.0),
-            "northwest": (14.0, 10.0),
-            "southeast": (46.0, 34.0),
-            "southwest": (14.0, 34.0),
-        },
-        "sweeping-engagement": {
-            "center": (30.0, 22.0),
-            "northeast": (42.0, 6.0),
-            "northwest": (10.0, 18.0),
-            "southeast": (50.0, 26.0),
-            "southwest": (18.0, 38.0),
-        },
-        "tipping-point": {
-            "center": (30.0, 22.0),
-            "northeast": (46.0, 10.0),
-            "northwest": (22.0, 8.0),
-            "southeast": (38.0, 36.0),
-            "southwest": (14.0, 34.0),
+        PHASE16A_DEPLOYMENT_MAP_ID: {
+            "primary-immovable-object-layout-3-center-central": (30.0, 22.0),
+            "primary-immovable-object-layout-3-left-home": (9.5, 10.5),
+            "primary-immovable-object-layout-3-lower-central": (28.5, 35.5),
+            "primary-immovable-object-layout-3-right-home": (52.5, 34.5),
+            "primary-immovable-object-layout-3-upper-central": (28.5, 8.5),
         },
     }
 
 
 def test_terrain_layout_template_instantiates_deterministic_features() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
-    template = mission_pack.terrain_layout_template("layout-1")
+    template = mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID)
 
     first = instantiate_terrain_layout_template(template)
     second = instantiate_terrain_layout_template(type(template).from_payload(template.to_payload()))
@@ -506,15 +486,147 @@ def test_terrain_layout_template_instantiates_deterministic_features() -> None:
     assert [feature.to_payload() for feature in first] == [
         feature.to_payload() for feature in second
     ]
-    assert {feature.feature_kind for feature in first} == {TerrainFeatureKind.RUINS}
-    assert len(first) == 12
+    assert {feature.feature_kind for feature in first} == {
+        TerrainFeatureKind.BARRICADE_AND_FUEL_PIPES,
+        TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY,
+        TerrainFeatureKind.RUINS,
+    }
+    assert len(first) == 15
     assert first[0].source_id is not None
 
 
-def test_terrain_layout_templates_match_source_slot_snapshot() -> None:
+def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
+    layout_row = source_data.battlefield_layout_rows()[0]
+    deployment_map = mission_pack.deployment_map(layout_row.deployment_map_id)
+    terrain_layout = mission_pack.terrain_layout_template(layout_row.terrain_layout_id)
+    objective_kinds = {
+        objective.objective_marker_id: objective.objective_kind
+        for objective in layout_row.objective_markers
+    }
+    attacker_zone = deployment_map.deployment_zones[0]
+    defender_zone = deployment_map.deployment_zones[1]
 
-    assert _terrain_slot_source_snapshot(mission_pack) == _EXPECTED_TERRAIN_SLOT_SNAPSHOT
+    assert layout_row.battlefield_layout_id == PHASE16A_BATTLEFIELD_LAYOUT_ID
+    assert layout_row.coordinate_origin == "top_left"
+    assert layout_row.coordinate_orientation == (
+        "x_right_along_60_inch_edge_y_down_along_44_inch_edge"
+    )
+    assert deployment_map.battlefield_width_inches == 60.0
+    assert deployment_map.battlefield_depth_inches == 44.0
+    assert attacker_zone.min_x == 0.0
+    assert attacker_zone.max_x == 18.0
+    assert defender_zone.min_x == 42.0
+    assert defender_zone.max_x == 60.0
+    assert defender_zone.min_x - attacker_zone.max_x == 24.0
+    assert tuple(sorted(objective_kinds.values())) == (
+        "central",
+        "central",
+        "central",
+        "home",
+        "home",
+    )
+    assert _terrain_feature_snapshot(terrain_layout) == {
+        "primary-immovable-object-layout-3-center-ruin": ("ruins", 31.0, 23.5, 8.0, 13.0),
+        "primary-immovable-object-layout-3-left-diagonal-ruin": (
+            "ruins",
+            49.0,
+            17.0,
+            8.0,
+            9.0,
+        ),
+        "primary-immovable-object-layout-3-left-home-ruin": (
+            "ruins",
+            10.5,
+            11.0,
+            7.0,
+            12.0,
+        ),
+        "primary-immovable-object-layout-3-left-midfield-debris": (
+            "battlefield_debris_and_statuary",
+            24.0,
+            10.5,
+            6.0,
+            5.0,
+        ),
+        "primary-immovable-object-layout-3-left-midline-wall": (
+            "barricade_and_fuel_pipes",
+            18.0,
+            22.0,
+            1.0,
+            12.0,
+        ),
+        "primary-immovable-object-layout-3-left-no-mans-barricade": (
+            "barricade_and_fuel_pipes",
+            28.0,
+            7.5,
+            1.5,
+            8.0,
+        ),
+        "primary-immovable-object-layout-3-left-pipe-field": (
+            "barricade_and_fuel_pipes",
+            49.0,
+            8.0,
+            8.0,
+            12.0,
+        ),
+        "primary-immovable-object-layout-3-lower-flank-ruin": (
+            "ruins",
+            38.0,
+            7.5,
+            8.0,
+            15.0,
+        ),
+        "primary-immovable-object-layout-3-right-diagonal-ruin": (
+            "ruins",
+            12.5,
+            29.0,
+            7.0,
+            8.0,
+        ),
+        "primary-immovable-object-layout-3-right-home-ruin": (
+            "ruins",
+            52.5,
+            36.5,
+            7.0,
+            13.0,
+        ),
+        "primary-immovable-object-layout-3-right-midfield-debris": (
+            "battlefield_debris_and_statuary",
+            37.0,
+            35.5,
+            6.0,
+            5.0,
+        ),
+        "primary-immovable-object-layout-3-right-midline-wall": (
+            "barricade_and_fuel_pipes",
+            42.0,
+            22.0,
+            1.0,
+            12.0,
+        ),
+        "primary-immovable-object-layout-3-right-no-mans-barricade": (
+            "barricade_and_fuel_pipes",
+            30.5,
+            38.0,
+            1.5,
+            8.0,
+        ),
+        "primary-immovable-object-layout-3-right-pipe-field": (
+            "barricade_and_fuel_pipes",
+            11.0,
+            37.0,
+            8.0,
+            10.0,
+        ),
+        "primary-immovable-object-layout-3-upper-flank-ruin": (
+            "ruins",
+            22.0,
+            36.5,
+            6.5,
+            11.0,
+        ),
+    }
 
 
 def test_mission_pool_selection_is_deterministic() -> None:
@@ -527,15 +639,18 @@ def test_mission_pool_selection_is_deterministic() -> None:
     assert tuple(entry.mission_pool_entry_id for entry in first_order) == tuple(
         entry.mission_pool_entry_id for entry in second_order
     )
-    assert tuple(entry.mission_pool_entry_id for entry in first_order) != tuple(
-        entry.mission_pool_entry_id for entry in alternate_order
+    assert tuple(entry.mission_pool_entry_id for entry in first_order) == (
+        PHASE16A_MISSION_POOL_ENTRY_ID,
+    )
+    assert tuple(entry.mission_pool_entry_id for entry in alternate_order) == (
+        PHASE16A_MISSION_POOL_ENTRY_ID,
     )
 
 
 def test_mission_setup_from_components_rejects_source_inconsistent_components() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
-    deployment_map = mission_pack.deployment_map("tipping-point")
-    terrain_layout = mission_pack.terrain_layout_template("layout-1")
+    deployment_map = mission_pack.deployment_map(PHASE16A_DEPLOYMENT_MAP_ID)
+    terrain_layout = mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID)
 
     with pytest.raises(MissionSetupError, match="Primary mission is not present"):
         MissionSetup.from_components(
@@ -550,7 +665,7 @@ def test_mission_setup_from_components_rejects_source_inconsistent_components() 
     with pytest.raises(MissionSetupError, match="Deployment map is not present"):
         MissionSetup.from_components(
             mission_pack=mission_pack,
-            primary_mission_id="take-and-hold",
+            primary_mission_id="primary-immovable-object",
             deployment_map=replace(deployment_map, deployment_map_id="foreign-map"),
             terrain_layout=terrain_layout,
             attacker_player_id="player-a",
@@ -560,7 +675,7 @@ def test_mission_setup_from_components_rejects_source_inconsistent_components() 
     with pytest.raises(MissionSetupError, match="Terrain layout is not present"):
         MissionSetup.from_components(
             mission_pack=mission_pack,
-            primary_mission_id="take-and-hold",
+            primary_mission_id="primary-immovable-object",
             deployment_map=deployment_map,
             terrain_layout=replace(terrain_layout, terrain_layout_id="layout-99"),
             attacker_player_id="player-a",
@@ -574,9 +689,9 @@ def test_mission_setup_from_components_rejects_illegal_pool_combination() -> Non
     with pytest.raises(MissionSetupError, match="not a legal Chapter Approved mission pool row"):
         MissionSetup.from_components(
             mission_pack=mission_pack,
-            primary_mission_id="take-and-hold",
-            deployment_map=mission_pack.deployment_map("hammer-and-anvil"),
-            terrain_layout=mission_pack.terrain_layout_template("layout-2"),
+            primary_mission_id="primary-unstoppable-force",
+            deployment_map=mission_pack.deployment_map(PHASE16A_DEPLOYMENT_MAP_ID),
+            terrain_layout=mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID),
             attacker_player_id="player-a",
             defender_player_id="player-b",
         )
@@ -586,14 +701,14 @@ def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_components(
         mission_pack=mission_pack,
-        primary_mission_id="take-and-hold",
-        deployment_map=mission_pack.deployment_map("tipping-point"),
-        terrain_layout=mission_pack.terrain_layout_template("layout-1"),
+        primary_mission_id="primary-immovable-object",
+        deployment_map=mission_pack.deployment_map(PHASE16A_DEPLOYMENT_MAP_ID),
+        terrain_layout=mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID),
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
 
-    assert setup.mission_pool_entry_id == "mission-a"
+    assert setup.mission_pool_entry_id == PHASE16A_MISSION_POOL_ENTRY_ID
     assert MissionSetup.from_payload(setup.to_payload()).to_payload() == setup.to_payload()
 
 
@@ -601,8 +716,8 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
-        mission_pool_entry_id="mission-a",
-        terrain_layout_id="layout-1",
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
@@ -616,8 +731,8 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
 def test_game_state_round_trips_populated_mission_setup() -> None:
     mission_setup = MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2026_27_mission_pack(),
-        mission_pool_entry_id="mission-a",
-        terrain_layout_id="layout-1",
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
@@ -701,8 +816,8 @@ def test_live_reinforcements_use_mission_deployment_zones_for_round_2_restrictio
     state, reserve_state = _battle_state_with_mission_setup(
         attacker_player_id="player-b",
         defender_player_id="player-a",
-        mission_pool_entry_id="mission-s",
-        terrain_layout_id="layout-5",
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
     )
     handler, decisions, selection_request = _enter_reinforcements_choice(
         state=state,
@@ -746,8 +861,8 @@ def test_live_reinforcements_use_instantiated_mission_terrain_for_endpoint_valid
     state, reserve_state = _battle_state_with_mission_setup(
         attacker_player_id="player-a",
         defender_player_id="player-b",
-        mission_pool_entry_id="mission-s",
-        terrain_layout_id="layout-5",
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         reserve_base_diameter_mm=200.0,
     )
     handler, decisions, selection_request = _enter_reinforcements_choice(
@@ -802,8 +917,8 @@ def _battle_state_with_mission_setup(
     *,
     attacker_player_id: str,
     defender_player_id: str,
-    mission_pool_entry_id: str = "mission-a",
-    terrain_layout_id: str = "layout-1",
+    mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID,
+    terrain_layout_id: str = PHASE16A_BATTLEFIELD_LAYOUT_ID,
     reserve_base_diameter_mm: float = 32.0,
 ) -> tuple[GameState, ReserveState]:
     mission_setup = MissionSetup.from_mission_pack(
@@ -1085,137 +1200,19 @@ def _objective_coordinate_snapshot(
     }
 
 
-def _terrain_slot_source_snapshot(
-    mission_pack: MissionPackDefinition,
-) -> dict[str, tuple[str, ...]]:
-    snapshot: dict[str, tuple[str, ...]] = {}
-    for template in mission_pack.terrain_layout_templates:
-        entries: list[str] = []
-        for feature in sorted(template.terrain_features, key=lambda item: item.feature_id):
-            source_id = feature.source_id
-            assert source_id is not None
-            prefix, origin = source_id.rsplit(":origin-", maxsplit=1)
-            origin_x, origin_y = origin.split("-", maxsplit=1)
-            _layout_source, preset, rotation = prefix.rsplit(":", maxsplit=2)
-            entries.append(f"{preset}|{rotation.removeprefix('rotation-')}|{origin_x}|{origin_y}")
-        snapshot[template.terrain_layout_id] = tuple(entries)
-    return snapshot
-
-
-_EXPECTED_TERRAIN_SLOT_SNAPSHOT: dict[str, tuple[str, ...]] = {
-    "layout-1": (
-        "ruin_rect_12x6_variant1|90.000000|22.000|28.000",
-        "ruin_rect_12x6_variant1|270.000000|38.000|16.000",
-        "ruin_rect_12x6_variant2|270.000000|6.000|17.000",
-        "ruin_rect_12x6_variant2|90.000000|54.000|27.000",
-        "ruin_rect_6x4_variant1|90.000000|32.000|0.000",
-        "ruin_rect_6x4_variant1|270.000000|28.000|44.000",
-        "ruin_rect_12x6_variant5|0.000000|4.000|22.000",
-        "ruin_rect_12x6_variant5|180.000000|56.000|22.000",
-        "ruin_rect_6x4_variant1|135.000000|26.600|20.600",
-        "ruin_rect_6x4_variant1|315.000000|33.400|23.400",
-        "ruin_rect_10x5_variant3|45.000000|23.000|10.000",
-        "ruin_rect_10x5_variant3|225.000000|37.000|34.000",
-    ),
-    "layout-2": (
-        "ruin_rect_12x6_variant1|41.633539|17.000|15.500",
-        "ruin_rect_12x6_variant1|221.633539|43.000|28.500",
-        "ruin_rect_12x6_variant2|270.000000|8.000|40.000",
-        "ruin_rect_12x6_variant2|90.000000|52.000|4.000",
-        "ruin_rect_12x6_variant4|270.000000|5.000|16.000",
-        "ruin_rect_12x6_variant4|90.000000|55.000|28.000",
-        "ruin_rect_10x5_variant1|0.000000|20.000|4.000",
-        "ruin_rect_10x5_variant1|180.000000|40.000|40.000",
-        "ruin_rect_6x4_variant1|0.000000|30.000|9.000",
-        "ruin_rect_6x4_variant1|180.000000|30.000|35.000",
-        "ruin_rect_6x4_variant1|0.000000|52.000|16.000",
-        "ruin_rect_6x4_variant1|180.000000|8.000|28.000",
-    ),
-    "layout-3": (
-        "ruin_rect_12x6_variant1|180.000000|34.000|10.000",
-        "ruin_rect_12x6_variant1|0.000000|26.000|34.000",
-        "ruin_rect_12x6_variant3|209.981639|14.200|38.000",
-        "ruin_rect_12x6_variant3|29.981639|45.800|6.000",
-        "ruin_rect_12x6_variant4|311.633539|2.000|19.000",
-        "ruin_rect_12x6_variant4|131.633539|58.000|25.000",
-        "ruin_rect_10x5_variant3|52.431408|21.000|14.000",
-        "ruin_rect_10x5_variant3|232.431408|39.000|30.000",
-        "ruin_rect_6x4_variant1|0.000000|10.000|4.000",
-        "ruin_rect_6x4_variant1|180.000000|50.000|40.000",
-        "ruin_rect_6x4_variant1|232.431408|22.800|31.000",
-        "ruin_rect_6x4_variant1|52.431408|37.200|13.000",
-    ),
-    "layout-4": (
-        "ruin_rect_12x6_variant1|41.633539|8.000|27.500",
-        "ruin_rect_12x6_variant1|221.633539|52.000|16.500",
-        "ruin_rect_12x6_variant2|0.000000|12.000|4.000",
-        "ruin_rect_12x6_variant2|180.000000|48.000|40.000",
-        "ruin_rect_12x6_variant4|53.615648|35.000|2.500",
-        "ruin_rect_12x6_variant4|233.615648|25.000|41.500",
-        "ruin_rect_10x5_variant2|229.028264|21.000|27.000",
-        "ruin_rect_10x5_variant2|49.028264|39.000|17.000",
-        "ruin_rect_6x4_variant1|90.000000|8.000|19.000",
-        "ruin_rect_6x4_variant1|270.000000|52.000|25.000",
-        "ruin_rect_6x4_variant1|90.000000|12.000|10.000",
-        "ruin_rect_6x4_variant1|270.000000|48.000|34.000",
-    ),
-    "layout-5": (
-        "ruin_rect_12x6_variant1|180.000000|36.000|10.000",
-        "ruin_rect_12x6_variant1|0.000000|24.000|34.000",
-        "ruin_rect_12x6_variant2|-24.443955|5.000|16.000",
-        "ruin_rect_12x6_variant2|155.556045|55.000|28.000",
-        "ruin_rect_12x6_variant4|29.981639|46.500|2.000",
-        "ruin_rect_12x6_variant4|209.981639|13.500|42.000",
-        "ruin_rect_10x5_variant3|0.000000|16.000|24.000",
-        "ruin_rect_10x5_variant3|180.000000|44.000|20.000",
-        "ruin_rect_6x4_variant1|0.000000|12.000|4.000",
-        "ruin_rect_6x4_variant1|180.000000|48.000|40.000",
-        "ruin_rect_6x4_variant1|0.000000|0.000|24.000",
-        "ruin_rect_6x4_variant1|180.000000|60.000|20.000",
-    ),
-    "layout-6": (
-        "ruin_rect_12x6_variant1|48.366461|8.500|27.000",
-        "ruin_rect_12x6_variant1|228.366461|51.500|17.000",
-        "ruin_rect_12x6_variant2|270.000000|20.000|40.000",
-        "ruin_rect_12x6_variant2|90.000000|40.000|4.000",
-        "ruin_rect_12x6_variant4|0.000000|10.000|4.000",
-        "ruin_rect_12x6_variant4|180.000000|50.000|40.000",
-        "ruin_rect_10x5_variant2|48.270488|40.400|18.600",
-        "ruin_rect_10x5_variant2|228.270488|19.600|25.400",
-        "ruin_rect_6x4_variant1|0.000000|24.000|12.000",
-        "ruin_rect_6x4_variant1|180.000000|36.000|32.000",
-        "ruin_rect_6x4_variant1|90.000000|10.000|10.000",
-        "ruin_rect_6x4_variant1|270.000000|50.000|34.000",
-    ),
-    "layout-7": (
-        "ruin_rect_12x6_variant1|90.000000|29.000|3.000",
-        "ruin_rect_12x6_variant1|270.000000|31.000|41.000",
-        "ruin_rect_6x4_variant1|0.000000|48.000|0.000",
-        "ruin_rect_6x4_variant1|180.000000|12.000|44.000",
-        "ruin_rect_12x6_variant5|90.000000|12.000|28.000",
-        "ruin_rect_12x6_variant5|270.000000|48.000|16.000",
-        "ruin_rect_10x5_variant3|270.000000|37.000|18.000",
-        "ruin_rect_10x5_variant3|90.000000|23.000|26.000",
-        "ruin_rect_6x4_variant2|90.000000|23.000|20.000",
-        "ruin_rect_6x4_variant2|270.000000|37.000|24.000",
-        "ruin_rect_12x6_variant6|90.000000|14.000|8.000",
-        "ruin_rect_12x6_variant6|270.000000|46.000|36.000",
-    ),
-    "layout-8": (
-        "ruin_rect_12x6_variant1|90.000000|28.000|0.000",
-        "ruin_rect_12x6_variant1|270.000000|32.000|44.000",
-        "ruin_rect_12x6_variant3|221.633539|15.000|40.000",
-        "ruin_rect_12x6_variant3|41.633539|45.000|4.000",
-        "ruin_rect_6x4_variant1|90.000000|37.000|10.000",
-        "ruin_rect_6x4_variant1|90.000000|37.000|16.000",
-        "ruin_rect_6x4_variant1|270.000000|23.000|34.000",
-        "ruin_rect_6x4_variant1|270.000000|23.000|28.000",
-        "ruin_rect_12x6_variant5|90.000000|19.000|13.000",
-        "ruin_rect_12x6_variant5|270.000000|41.000|31.000",
-        "ruin_rect_10x5_variant2|323.130102|4.000|10.000",
-        "ruin_rect_10x5_variant2|143.130102|56.000|34.000",
-    ),
-}
+def _terrain_feature_snapshot(
+    terrain_layout: TerrainLayoutTemplate,
+) -> dict[str, tuple[str, float, float, float, float]]:
+    return {
+        feature.feature_id: (
+            feature.feature_kind.value,
+            feature.footprint_center_x_inches,
+            feature.footprint_center_y_inches,
+            feature.footprint_width_inches,
+            feature.footprint_depth_inches,
+        )
+        for feature in terrain_layout.terrain_features
+    }
 
 
 def _config(*, mission_setup: MissionSetup | None) -> GameConfig:

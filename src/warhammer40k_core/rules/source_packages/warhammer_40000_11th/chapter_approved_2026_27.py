@@ -176,6 +176,106 @@ class SourceMissionPackScoringRow:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class SourceBattlefieldObjectiveRow:
+    objective_marker_id: str
+    name: str
+    objective_kind: str
+    x_inches: float
+    y_inches: float
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "objective_marker_id": self.objective_marker_id,
+            "name": self.name,
+            "objective_kind": self.objective_kind,
+            "x_inches": self.x_inches,
+            "y_inches": self.y_inches,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class SourceBattlefieldDeploymentZoneRow:
+    deployment_zone_id: str
+    player_role: str
+    min_x_inches: float
+    min_y_inches: float
+    max_x_inches: float
+    max_y_inches: float
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "deployment_zone_id": self.deployment_zone_id,
+            "player_role": self.player_role,
+            "min_x_inches": self.min_x_inches,
+            "min_y_inches": self.min_y_inches,
+            "max_x_inches": self.max_x_inches,
+            "max_y_inches": self.max_y_inches,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class SourceBattlefieldTerrainFeatureRow:
+    feature_id: str
+    feature_kind: str
+    footprint_center_x_inches: float
+    footprint_center_y_inches: float
+    footprint_width_inches: float
+    footprint_depth_inches: float
+    source_note: str
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "feature_id": self.feature_id,
+            "feature_kind": self.feature_kind,
+            "footprint_center_x_inches": self.footprint_center_x_inches,
+            "footprint_center_y_inches": self.footprint_center_y_inches,
+            "footprint_width_inches": self.footprint_width_inches,
+            "footprint_depth_inches": self.footprint_depth_inches,
+            "source_note": self.source_note,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class SourceBattlefieldLayoutRow:
+    battlefield_layout_id: str
+    name: str
+    player_force_disposition_id: str
+    opponent_force_disposition_id: str
+    layout_number: int
+    primary_mission_id: str
+    deployment_map_id: str
+    terrain_layout_id: str
+    battlefield_width_inches: float
+    battlefield_depth_inches: float
+    coordinate_origin: str
+    coordinate_orientation: str
+    source_status: str
+    objective_markers: tuple[SourceBattlefieldObjectiveRow, ...]
+    deployment_zones: tuple[SourceBattlefieldDeploymentZoneRow, ...]
+    terrain_features: tuple[SourceBattlefieldTerrainFeatureRow, ...]
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "battlefield_layout_id": self.battlefield_layout_id,
+            "name": self.name,
+            "player_force_disposition_id": self.player_force_disposition_id,
+            "opponent_force_disposition_id": self.opponent_force_disposition_id,
+            "layout_number": self.layout_number,
+            "primary_mission_id": self.primary_mission_id,
+            "deployment_map_id": self.deployment_map_id,
+            "terrain_layout_id": self.terrain_layout_id,
+            "battlefield_width_inches": self.battlefield_width_inches,
+            "battlefield_depth_inches": self.battlefield_depth_inches,
+            "coordinate_origin": self.coordinate_origin,
+            "coordinate_orientation": self.coordinate_orientation,
+            "source_status": self.source_status,
+            "objective_markers": [objective.to_payload() for objective in self.objective_markers],
+            "deployment_zones": [zone.to_payload() for zone in self.deployment_zones],
+            "terrain_features": [feature.to_payload() for feature in self.terrain_features],
+        }
+
+
 def source_package_definition() -> MissionSourcePackageDefinition:
     return MissionSourcePackageDefinition(
         edition_id=EDITION_ID,
@@ -738,6 +838,218 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
     return tuple(rows)
 
 
+def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
+    return (
+        SourceBattlefieldLayoutRow(
+            battlefield_layout_id="primary-immovable-object-layout-3",
+            name="Take and Hold vs Purge the Foe 3",
+            player_force_disposition_id="take-and-hold",
+            opponent_force_disposition_id="purge-the-foe",
+            layout_number=3,
+            primary_mission_id="primary-immovable-object",
+            deployment_map_id="primary-immovable-object-layout-3-deployment",
+            terrain_layout_id="primary-immovable-object-layout-3",
+            battlefield_width_inches=60.0,
+            battlefield_depth_inches=44.0,
+            coordinate_origin="top_left",
+            coordinate_orientation="x_right_along_60_inch_edge_y_down_along_44_inch_edge",
+            source_status="image_estimate",
+            objective_markers=(
+                SourceBattlefieldObjectiveRow(
+                    "primary-immovable-object-layout-3-left-home",
+                    "Left Home Objective",
+                    "home",
+                    9.5,
+                    10.5,
+                ),
+                SourceBattlefieldObjectiveRow(
+                    "primary-immovable-object-layout-3-right-home",
+                    "Right Home Objective",
+                    "home",
+                    52.5,
+                    34.5,
+                ),
+                SourceBattlefieldObjectiveRow(
+                    "primary-immovable-object-layout-3-upper-central",
+                    "Upper Central Objective",
+                    "central",
+                    28.5,
+                    8.5,
+                ),
+                SourceBattlefieldObjectiveRow(
+                    "primary-immovable-object-layout-3-center-central",
+                    "Center Central Objective",
+                    "central",
+                    30.0,
+                    22.0,
+                ),
+                SourceBattlefieldObjectiveRow(
+                    "primary-immovable-object-layout-3-lower-central",
+                    "Lower Central Objective",
+                    "central",
+                    28.5,
+                    35.5,
+                ),
+            ),
+            deployment_zones=(
+                SourceBattlefieldDeploymentZoneRow(
+                    "primary-immovable-object-layout-3-attacker",
+                    "attacker",
+                    0.0,
+                    0.0,
+                    18.0,
+                    44.0,
+                ),
+                SourceBattlefieldDeploymentZoneRow(
+                    "primary-immovable-object-layout-3-defender",
+                    "defender",
+                    42.0,
+                    0.0,
+                    60.0,
+                    44.0,
+                ),
+            ),
+            terrain_features=(
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-left-home-ruin",
+                    "ruins",
+                    10.5,
+                    11.0,
+                    7.0,
+                    12.0,
+                    "left home objective ruin footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-right-home-ruin",
+                    "ruins",
+                    52.5,
+                    36.5,
+                    7.0,
+                    13.0,
+                    "right home objective ruin footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-center-ruin",
+                    "ruins",
+                    31.0,
+                    23.5,
+                    8.0,
+                    13.0,
+                    "central ruin footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-upper-flank-ruin",
+                    "ruins",
+                    22.0,
+                    36.5,
+                    6.5,
+                    11.0,
+                    "upper flank central objective ruin footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-lower-flank-ruin",
+                    "ruins",
+                    38.0,
+                    7.5,
+                    8.0,
+                    15.0,
+                    "lower flank central objective ruin footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-left-midfield-debris",
+                    "battlefield_debris_and_statuary",
+                    24.0,
+                    10.5,
+                    6.0,
+                    5.0,
+                    "left midfield debris footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-right-midfield-debris",
+                    "battlefield_debris_and_statuary",
+                    37.0,
+                    35.5,
+                    6.0,
+                    5.0,
+                    "right midfield debris footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-left-no-mans-barricade",
+                    "barricade_and_fuel_pipes",
+                    28.0,
+                    7.5,
+                    1.5,
+                    8.0,
+                    "left no man's land barricade footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-right-no-mans-barricade",
+                    "barricade_and_fuel_pipes",
+                    30.5,
+                    38.0,
+                    1.5,
+                    8.0,
+                    "right no man's land barricade footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-left-midline-wall",
+                    "barricade_and_fuel_pipes",
+                    18.0,
+                    22.0,
+                    1.0,
+                    12.0,
+                    "left deployment edge wall footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-right-midline-wall",
+                    "barricade_and_fuel_pipes",
+                    42.0,
+                    22.0,
+                    1.0,
+                    12.0,
+                    "right deployment edge wall footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-left-pipe-field",
+                    "barricade_and_fuel_pipes",
+                    49.0,
+                    8.0,
+                    8.0,
+                    12.0,
+                    "left deployment pipe and rubble footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-right-pipe-field",
+                    "barricade_and_fuel_pipes",
+                    11.0,
+                    37.0,
+                    8.0,
+                    10.0,
+                    "right deployment pipe and rubble footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-left-diagonal-ruin",
+                    "ruins",
+                    49.0,
+                    17.0,
+                    8.0,
+                    9.0,
+                    "left deployment diagonal ruin footprint",
+                ),
+                SourceBattlefieldTerrainFeatureRow(
+                    "primary-immovable-object-layout-3-right-diagonal-ruin",
+                    "ruins",
+                    12.5,
+                    29.0,
+                    7.0,
+                    8.0,
+                    "right deployment diagonal ruin footprint",
+                ),
+            ),
+        ),
+    )
+
+
 def mission_action_rows() -> tuple[SourceMissionActionRow, ...]:
     return (
         SourceMissionActionRow(
@@ -1081,6 +1393,7 @@ def _source_payload_for_hash() -> dict[str, object]:
         "secondary_missions": [row.to_payload() for row in secondary_mission_rows()],
         "force_dispositions": [row.to_payload() for row in force_disposition_rows()],
         "primary_mission_matrix": [row.to_payload() for row in primary_mission_matrix_rows()],
+        "battlefield_layouts": [row.to_payload() for row in battlefield_layout_rows()],
         "mission_actions": [row.to_payload() for row in mission_action_rows()],
         "scoring": mission_pack_scoring_row().to_payload(),
     }
