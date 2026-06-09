@@ -465,16 +465,7 @@ class DeploymentMapDefinition:
                 player_id = attacker
             elif player_id == "defender":
                 player_id = defender
-            zones.append(
-                DeploymentZone(
-                    deployment_zone_id=zone.deployment_zone_id,
-                    player_id=player_id,
-                    min_x=zone.min_x,
-                    min_y=zone.min_y,
-                    max_x=zone.max_x,
-                    max_y=zone.max_y,
-                )
-            )
+            zones.append(zone.with_player_id(player_id))
         return tuple(sorted(zones, key=lambda item: item.deployment_zone_id))
 
     def to_payload(self) -> DeploymentMapDefinitionPayload:

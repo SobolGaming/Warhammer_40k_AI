@@ -513,9 +513,9 @@ def test_oversized_exception_preserves_other_placement_limits() -> None:
         battle_round=2,
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         enemy_deployment_zones=(
-            DeploymentZone(
-                deployment_zone_id="enemy-south-zone",
-                player_id="player-b",
+            DeploymentZone.rectangle(
+                "enemy-south-zone",
+                "player-b",
                 min_x=0.0,
                 min_y=0.0,
                 max_x=60.0,
@@ -2160,8 +2160,8 @@ def _config(*, ruleset_descriptor: RulesetDescriptor) -> GameConfig:
         ),
         mission_setup=MissionSetup.from_mission_pack(
             mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-a",
-            terrain_layout_id="layout-1",
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
             defender_player_id="player-b",
         ),

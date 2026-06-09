@@ -3767,10 +3767,10 @@ class GameState:
                         placement=model_placement,
                     )
                     if any(
-                        shapely_backend.base_footprint_intersects_bounds(
+                        shapely_backend.base_footprint_intersects_deployment_zone(
                             model.base,
                             model.pose,
-                            (zone.min_x, zone.min_y, zone.max_x, zone.max_y),
+                            zone,
                         )
                         for zone in zones
                     ):

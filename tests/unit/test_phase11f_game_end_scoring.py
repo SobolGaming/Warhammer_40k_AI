@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -31,6 +32,8 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+
+PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
 
 
 def test_phase11f_game_end_windows_fire_once_and_final_payload_round_trips() -> None:
@@ -147,8 +150,9 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
 
 
 def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
-    state = _battle_state(mission_pool_entry_id="mission-o")
+    state = _battle_state(mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID)
     assert state.mission_setup is not None
+    state.mission_setup = replace(state.mission_setup, primary_mission_id="primary-death-trap")
     policy = mission_scoring_policy_from_setup(state.mission_setup)
     state.award_victory_points(
         VictoryPointAward(
@@ -157,7 +161,7 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
             phase=BattlePhase.COMMAND.value,
             amount=44,
             source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id="terraform",
+            source_id="primary-death-trap",
             scoring_timing="phase_end",
             metadata={"scoring_rule_id": "phase11f-primary-action-base"},
         )
@@ -175,13 +179,13 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
         )
     )
 
-    terraform_transaction = state.award_victory_points(
+    death_trap_transaction = state.award_victory_points(
         policy.mission_action_award(
             player_id="player-a",
             battle_round=1,
             phase=BattlePhase.SHOOTING.value,
-            action_id="terraform:center:player-a",
-            source_id="terraform",
+            action_id="death-trap:center:player-a",
+            source_id="primary-death-trap",
             amount=5,
         )
     )
@@ -205,9 +209,9 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     player_scores = cast(list[dict[str, object]], audit["player_scores"])
     player_a_score = next(score for score in player_scores if score["player_id"] == "player-a")
 
-    assert terraform_transaction.amount == 1
+    assert death_trap_transaction.amount == 1
     assert cleanse_transaction.amount == 1
-    assert _cap_reasons(terraform_transaction) == ["primary_vp_cap"]
+    assert _cap_reasons(death_trap_transaction) == ["primary_vp_cap"]
     assert _cap_reasons(cleanse_transaction) == ["secondary_vp_cap"]
     assert player_a_score["raw_primary_vp"] == 45
     assert player_a_score["raw_secondary_vp"] == 45
@@ -246,7 +250,7 @@ def _cap_reasons(transaction: VictoryPointTransaction) -> list[str]:
     return [str(reason) for reason in reasons]
 
 
-def _battle_state(*, mission_pool_entry_id: str = "mission-a") -> GameState:
+def _battle_state(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID) -> GameState:
     config = _config(mission_pool_entry_id=mission_pool_entry_id)
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
@@ -276,7 +280,7 @@ def _battle_state(*, mission_pool_entry_id: str = "mission-a") -> GameState:
     return GameState.from_payload(state.to_payload())
 
 
-def _config(*, mission_pool_entry_id: str = "mission-a") -> GameConfig:
+def _config(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11f-game",
@@ -302,7 +306,7 @@ def _config(*, mission_pool_entry_id: str = "mission-a") -> GameConfig:
         mission_setup=MissionSetup.from_mission_pack(
             mission_pack=chapter_approved_2026_27_mission_pack(),
             mission_pool_entry_id=mission_pool_entry_id,
-            terrain_layout_id="layout-1",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
             defender_player_id="player-b",
         ),

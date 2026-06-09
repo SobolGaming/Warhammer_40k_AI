@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Protocol, cast
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose, validate_point3
 
 if TYPE_CHECKING:
+    from warhammer40k_core.core.deployment_zones import DeploymentZone
     from warhammer40k_core.geometry.base import BaseShape
     from warhammer40k_core.geometry.terrain import TerrainVolume
     from warhammer40k_core.geometry.volume import Model
@@ -34,6 +35,10 @@ class _Geometry(Protocol):
 
     def covers(self, other: _Geometry) -> bool: ...
 
+    def difference(self, other: _Geometry) -> _Geometry: ...
+
+    def union(self, other: _Geometry) -> _Geometry: ...
+
 
 class _GeometryModule(Protocol):
     def Point(self, x: float, y: float) -> _Geometry: ...
@@ -41,6 +46,8 @@ class _GeometryModule(Protocol):
     def LineString(
         self, coordinates: tuple[tuple[float, float], tuple[float, float]]
     ) -> _Geometry: ...
+
+    def Polygon(self, coordinates: tuple[tuple[float, float], ...]) -> _Geometry: ...
 
     def box(self, min_x: float, min_y: float, max_x: float, max_y: float) -> _Geometry: ...
 
@@ -120,6 +127,26 @@ def footprint_for_terrain(terrain: TerrainVolume) -> _Geometry:
     )
 
 
+def footprint_for_deployment_zone(deployment_zone: DeploymentZone) -> _Geometry:
+    valid_zone = _validate_deployment_zone("deployment_zone", deployment_zone)
+    zone_parts = tuple(
+        _deployment_zone_polygon_footprint(polygon) for polygon in valid_zone.shape.polygons
+    )
+    cutouts = tuple(
+        _deployment_zone_cutout_footprint(cutout) for cutout in valid_zone.shape.cutouts
+    )
+    adjusted_parts: list[_Geometry] = []
+    for zone_part in zone_parts:
+        adjusted_part = zone_part
+        for cutout in cutouts:
+            adjusted_part = adjusted_part.difference(cutout)
+        adjusted_parts.append(adjusted_part)
+    zone_footprint = adjusted_parts[0]
+    for adjusted_part in adjusted_parts[1:]:
+        zone_footprint = zone_footprint.union(adjusted_part)
+    return zone_footprint
+
+
 def base_footprint_within_bounds(
     base: BaseShape,
     pose: Pose,
@@ -138,6 +165,14 @@ def base_footprint_intersects_bounds(
     min_x, min_y, max_x, max_y = bounds
     surface = _box(min_x, min_y, max_x, max_y)
     return surface.intersects(footprint_for_base(base, pose))
+
+
+def base_footprint_intersects_deployment_zone(
+    base: BaseShape,
+    pose: Pose,
+    deployment_zone: DeploymentZone,
+) -> bool:
+    return footprint_for_deployment_zone(deployment_zone).intersects(footprint_for_base(base, pose))
 
 
 def base_footprint_distance_to_bounds(
@@ -249,6 +284,46 @@ def _affinity_module() -> _AffinityModule:
 @lru_cache(maxsize=4096)
 def _box(min_x: float, min_y: float, max_x: float, max_y: float) -> _Geometry:
     return _geometry_module().box(min_x, min_y, max_x, max_y)
+
+
+def _deployment_zone_polygon_footprint(
+    polygon: object,
+) -> _Geometry:
+    from warhammer40k_core.core.deployment_zones import DeploymentZonePolygon
+
+    if type(polygon) is not DeploymentZonePolygon:
+        raise GeometryError("deployment-zone polygon must be a DeploymentZonePolygon.")
+    return _geometry_module().Polygon(tuple((vertex.x, vertex.y) for vertex in polygon.vertices))
+
+
+def _deployment_zone_cutout_footprint(
+    cutout: object,
+) -> _Geometry:
+    from warhammer40k_core.core.deployment_zones import (
+        DeploymentZoneCircleCutout,
+        DeploymentZonePolygonCutout,
+    )
+
+    if type(cutout) is DeploymentZoneCircleCutout:
+        return (
+            _geometry_module()
+            .Point(cutout.center_x, cutout.center_y)
+            .buffer(
+                cutout.radius,
+                quad_segs=_FOOTPRINT_QUAD_SEGS,
+            )
+        )
+    if type(cutout) is DeploymentZonePolygonCutout:
+        return _geometry_module().Polygon(tuple((vertex.x, vertex.y) for vertex in cutout.vertices))
+    raise GeometryError("deployment-zone cutout must be a supported cutout value.")
+
+
+def _validate_deployment_zone(field_name: str, value: object) -> DeploymentZone:
+    from warhammer40k_core.core.deployment_zones import DeploymentZone
+
+    if type(value) is not DeploymentZone:
+        raise GeometryError(f"{field_name} must be a DeploymentZone.")
+    return value
 
 
 def _validate_terrain(field_name: str, value: object) -> TerrainVolume:

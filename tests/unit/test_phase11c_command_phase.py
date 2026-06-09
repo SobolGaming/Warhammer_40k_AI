@@ -2025,16 +2025,20 @@ def _center_marker_definition(state: GameState) -> ObjectiveMarkerDefinition:
     if state.mission_setup is None:
         raise AssertionError("test state requires mission setup")
     for marker in state.mission_setup.objective_markers:
-        if marker.objective_marker_id.endswith("-center"):
+        if _is_center_objective_id(marker.objective_marker_id):
             return marker
     raise AssertionError("missing center objective marker")
 
 
 def _center_objective_result(record: ObjectiveControlRecord) -> ObjectiveControlResult:
     for result in record.results:
-        if result.objective_id.endswith("-center"):
+        if _is_center_objective_id(result.objective_id):
             return result
     raise AssertionError("missing center objective result")
+
+
+def _is_center_objective_id(objective_id: str) -> bool:
+    return objective_id.endswith(("-center", "-center-central"))
 
 
 def _battle_state(
@@ -2117,8 +2121,8 @@ def _config(*, player_a_units: tuple[UnitMusterSelection, ...] | None = None) ->
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2026_27_mission_pack(),
-        mission_pool_entry_id="mission-a",
-        terrain_layout_id="layout-1",
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
