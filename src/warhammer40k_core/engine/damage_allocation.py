@@ -18,6 +18,11 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_owner_player_id,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 if TYPE_CHECKING:
@@ -1725,15 +1730,15 @@ def allocation_context_for_unit(
     already_allocated_model_ids: tuple[str, ...] = (),
     attacker_constraint: AttackAllocationConstraint | None = None,
 ) -> AttackAllocationRuleContext:
-    unit = unit_by_id(state=state, unit_instance_id=target_unit_instance_id)
-    alive_models = alive_placed_models(state=state, unit=unit)
-    bodyguard_model_ids, character_model_ids = _attached_unit_model_roles(
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
+    alive_models = alive_placed_models_for_rules_unit(state=state, rules_unit=rules_unit)
+    bodyguard_model_ids, character_model_ids = _rules_unit_model_roles(
         state=state,
-        unit=unit,
+        rules_unit=rules_unit,
         alive_models=alive_models,
     )
     return AttackAllocationRuleContext(
-        target_unit_instance_id=target_unit_instance_id,
+        target_unit_instance_id=rules_unit.unit_instance_id,
         alive_model_ids=tuple(model.model_instance_id for model in alive_models),
         wounded_model_ids=tuple(
             model.model_instance_id
@@ -2452,11 +2457,7 @@ def model_owner_player_id(*, state: GameState, model_instance_id: str) -> str:
 
 
 def unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> str:
-    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        if any(unit.unit_instance_id == requested_id for unit in army.units):
-            return army.player_id
-    raise GameLifecycleError("unit_instance_id is unknown.")
+    return rules_unit_owner_player_id(state=state, unit_instance_id=unit_instance_id)
 
 
 def alive_placed_models(*, state: GameState, unit: UnitInstance) -> tuple[ModelInstance, ...]:
@@ -2470,6 +2471,41 @@ def alive_placed_models(*, state: GameState, unit: UnitInstance) -> tuple[ModelI
         model
         for model in unit.own_models
         if model.is_alive and model.model_instance_id in placed_model_ids
+    )
+
+
+def alive_placed_models_for_rules_unit(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+) -> tuple[ModelInstance, ...]:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("alive_placed_models_for_rules_unit requires a RulesUnitView.")
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Damage allocation requires battlefield_state.")
+    placed_model_ids = set(battlefield.placed_model_ids())
+    return tuple(
+        model
+        for model in rules_unit.own_models
+        if model.is_alive and model.model_instance_id in placed_model_ids
+    )
+
+
+def _rules_unit_model_roles(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    alive_models: tuple[ModelInstance, ...],
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    if rules_unit.is_attached_rules_unit:
+        bodyguard_model_ids = rules_unit.bodyguard_model_ids(alive_models)
+        character_model_ids = rules_unit.character_model_ids(alive_models)
+        return bodyguard_model_ids, character_model_ids
+    return _attached_unit_model_roles(
+        state=state,
+        unit=rules_unit.components[0].unit,
+        alive_models=alive_models,
     )
 
 

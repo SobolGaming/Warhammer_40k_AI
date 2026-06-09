@@ -20,6 +20,10 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
@@ -348,6 +352,10 @@ def shooting_target_candidates_for_unit(
         target_unit_ids=target_unit_ids,
         terrain_features=terrain_features,
     )
+    canonical_target_unit_ids = _canonical_target_unit_ids(
+        scenario=scenario,
+        target_unit_ids=target_unit_ids,
+    )
     return tuple(
         _target_candidate(
             scenario=scenario,
@@ -358,7 +366,7 @@ def shooting_target_candidates_for_unit(
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
         )
-        for target_unit_id in target_unit_ids
+        for target_unit_id in canonical_target_unit_ids
     )
 
 
@@ -434,22 +442,28 @@ def unit_has_line_of_sight_to_target(
         if type(feature) is not TerrainFeatureDefinition:
             raise GameLifecycleError("terrain_features must contain TerrainFeatureDefinition.")
     observing_placement = _unit_placement_or_none(scenario, observing_unit.unit_instance_id)
-    target_placement = _unit_placement_or_none(scenario, target_unit_id)
-    if observing_placement is None or target_placement is None:
+    target_rules_unit = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=target_unit_id,
+    )
+    target_placements = _unit_placements_for_rules_unit_or_none(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    )
+    if observing_placement is None or target_placements is None:
         raise GameLifecycleError("Line of sight target query requires placed units.")
-    target_unit = scenario.army_by_id(target_placement.army_id).unit_by_id(target_unit_id)
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
         terrain_features=terrain_features,
     )
-    target_models = _geometry_models_for_unit_placement(
+    target_models = _geometry_models_for_unit_placements(
         scenario=scenario,
-        unit_placement=target_placement,
+        unit_placements=target_placements,
     )
     blocker_models = _shooting_dynamic_model_blockers(
         scenario=scenario,
         observing_unit_id=observing_unit.unit_instance_id,
-        target_unit_id=target_unit_id,
+        target_unit_id=target_rules_unit.unit_instance_id,
     )
     for observer_model in _geometry_models_for_unit_placement(
         scenario=scenario,
@@ -463,7 +477,7 @@ def unit_has_line_of_sight_to_target(
             terrain_features=terrain_features,
             dynamic_model_blockers=blocker_models,
             observer_keywords=observing_unit.keywords,
-            target_keywords=target_unit.keywords,
+            target_keywords=target_rules_unit.keywords,
         )
         if context.resolve_line_of_sight().visible_model_ids:
             return True
@@ -508,6 +522,11 @@ def _target_candidate(
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> ShootingTargetCandidate:
+    target_rules_unit = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=target_unit_id,
+    )
+    target_unit_id = target_rules_unit.unit_instance_id
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
         terrain_features=terrain_features,
@@ -522,7 +541,7 @@ def _target_candidate(
             visibility_cache_key=visibility_cache_key,
         )
     attacker_owner = _player_id_for_unit(scenario, attacker_unit.unit_instance_id)
-    target_owner = _player_id_for_unit(scenario, target_unit_id)
+    target_owner = target_rules_unit.owner_player_id
     if target_owner == attacker_owner:
         return _invalid_candidate(
             attacker_unit=attacker_unit,
@@ -534,8 +553,11 @@ def _target_candidate(
         )
 
     attacker_placement = _unit_placement_or_none(scenario, attacker_unit.unit_instance_id)
-    target_placement = _unit_placement_or_none(scenario, target_unit_id)
-    if attacker_placement is None or target_placement is None:
+    target_placements = _unit_placements_for_rules_unit_or_none(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    )
+    if attacker_placement is None or target_placements is None:
         return _invalid_candidate(
             attacker_unit=attacker_unit,
             weapon_profile=weapon_profile,
@@ -544,11 +566,10 @@ def _target_candidate(
             message="Ranged target selection requires placed attacker and target units.",
             visibility_cache_key=visibility_cache_key,
         )
-    target_unit = scenario.army_by_id(target_placement.army_id).unit_by_id(target_unit_id)
     hunter_rule_ids: tuple[str, ...] = ()
     if WeaponKeyword.HUNTER in weapon_profile.keywords:
         hunter_rule_ids = (HUNTER_RULE_ID,)
-        if not hunter_target_allowed(weapon_profile, target_keywords=target_unit.keywords):
+        if not hunter_target_allowed(weapon_profile, target_keywords=target_rules_unit.keywords):
             return _invalid_candidate(
                 attacker_unit=attacker_unit,
                 weapon_profile=weapon_profile,
@@ -563,9 +584,9 @@ def _target_candidate(
         attacker_placement=attacker_placement,
         attacker_model_instance_id=attacker_model_instance_id,
     )
-    target_models = _geometry_models_for_unit_placement(
+    target_models = _geometry_models_for_unit_placements(
         scenario=scenario,
-        unit_placement=target_placement,
+        unit_placements=target_placements,
     )
     range_inches = weapon_profile.range_profile.distance_inches
     if range_inches is None:
@@ -590,7 +611,7 @@ def _target_candidate(
         ruleset_descriptor=ruleset_descriptor,
         attacker_unit=attacker_unit,
         attacker_models=attacker_models,
-        target_unit=target_unit,
+        target_rules_unit=target_rules_unit,
         target_models=target_models,
         visibility_cache_key=visibility_cache_key,
         range_inches=range_inches,
@@ -630,6 +651,7 @@ def _target_candidate(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         attacker_owner=attacker_owner,
+        target_rules_unit=target_rules_unit,
         target_unit_id=target_unit_id,
         target_models=target_models,
     )
@@ -655,7 +677,7 @@ def _target_candidate(
             )
     target_engagement_validation = _target_engagement_validation(
         attacker_unit=attacker_unit,
-        target_unit=target_unit,
+        target_keywords=target_rules_unit.keywords,
         target_unit_id=target_unit_id,
         weapon_profile=weapon_profile,
         locked_context=locked_context,
@@ -694,10 +716,12 @@ def _target_candidate(
             observer_model_id=witness.observer_model_id,
         )
 
-    if _unit_has_keyword(target_unit, "LONE_OPERATIVE") and not _lone_operative_target_allowed(
-        scenario=scenario,
-        attacker_unit=attacker_unit,
-        target_unit_id=target_unit_id,
+    if _keywords_include(target_rules_unit.keywords, "LONE_OPERATIVE") and not (
+        _lone_operative_target_allowed(
+            scenario=scenario,
+            attacker_unit=attacker_unit,
+            target_rules_unit=target_rules_unit,
+        )
     ):
         return _invalid_candidate(
             attacker_unit=attacker_unit,
@@ -731,7 +755,7 @@ def _target_candidate(
     if _plunging_fire_applies(
         attacker_unit=attacker_unit,
         attacker_models=attacker_models,
-        target_unit=target_unit,
+        target_keywords=target_rules_unit.keywords,
         target_models=target_models,
         evidence=evidence,
         terrain_features=terrain_features,
@@ -743,7 +767,7 @@ def _target_candidate(
         and not has_close_quarters_weapon_keyword(weapon_profile)
     ) or (
         target_engagement_context.is_engaged_by_friendly
-        and _unit_has_vehicle_or_monster_keyword(target_unit)
+        and _keywords_include_vehicle_or_monster(target_rules_unit.keywords)
         and not has_close_quarters_weapon_keyword(weapon_profile)
     ):
         hit_roll_modifier -= 1
@@ -815,12 +839,63 @@ def _unit_placement_or_none(
         return None
 
 
+def _unit_placements_for_rules_unit_or_none(
+    *,
+    scenario: BattlefieldScenario,
+    rules_unit: RulesUnitView,
+) -> tuple[UnitPlacement, ...] | None:
+    placements: list[UnitPlacement] = []
+    for component in rules_unit.components:
+        placement = _unit_placement_or_none(scenario, component.unit.unit_instance_id)
+        if placement is None:
+            if any(model.is_alive for model in component.unit.own_models):
+                return None
+            continue
+        placements.append(placement)
+    if not placements:
+        return None
+    return tuple(placements)
+
+
+def _canonical_target_unit_ids(
+    *,
+    scenario: BattlefieldScenario,
+    target_unit_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    canonical_ids: list[str] = []
+    seen: set[str] = set()
+    for target_unit_id in target_unit_ids:
+        canonical_id = rules_unit_view_from_armies(
+            armies=scenario.armies,
+            unit_instance_id=target_unit_id,
+        ).unit_instance_id
+        if canonical_id in seen:
+            continue
+        seen.add(canonical_id)
+        canonical_ids.append(canonical_id)
+    return tuple(canonical_ids)
+
+
 def _player_id_for_unit(scenario: BattlefieldScenario, unit_instance_id: str) -> str:
-    for army in scenario.armies:
-        for unit in army.units:
-            if unit.unit_instance_id == unit_instance_id:
-                return army.player_id
-    raise GameLifecycleError("Shooting target unit_instance_id is unknown.")
+    return rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=unit_instance_id,
+    ).owner_player_id
+
+
+def _geometry_models_for_unit_placements(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placements: tuple[UnitPlacement, ...],
+) -> tuple[Model, ...]:
+    return tuple(
+        geometry_model
+        for unit_placement in unit_placements
+        for geometry_model in _geometry_models_for_unit_placement(
+            scenario=scenario,
+            unit_placement=unit_placement,
+        )
+    )
 
 
 def _geometry_models_for_unit_placement(
@@ -863,7 +938,18 @@ def shooting_dynamic_model_blockers(
 ) -> tuple[Model, ...]:
     _validate_identifier("observing_unit_id", observing_unit_id)
     _validate_identifier("target_unit_id", target_unit_id)
-    excluded_unit_ids = {observing_unit_id, target_unit_id}
+    observing_rules_unit = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=observing_unit_id,
+    )
+    target_rules_unit = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=target_unit_id,
+    )
+    excluded_unit_ids = {
+        *observing_rules_unit.component_unit_instance_ids,
+        *target_rules_unit.component_unit_instance_ids,
+    }
     blocker_models: list[Model] = []
     for placed_army in scenario.battlefield_state.placed_armies:
         for unit_placement in placed_army.unit_placements:
@@ -909,12 +995,15 @@ def _plunging_fire_applies(
     *,
     attacker_unit: UnitInstance,
     attacker_models: tuple[Model, ...],
-    target_unit: UnitInstance,
+    target_keywords: tuple[str, ...],
     target_models: tuple[Model, ...],
     evidence: _LineOfSightRangeEvidence,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> bool:
-    if _unit_has_keyword(attacker_unit, "AIRCRAFT") or _unit_has_keyword(target_unit, "AIRCRAFT"):
+    if _unit_has_keyword(attacker_unit, "AIRCRAFT") or _keywords_include(
+        target_keywords,
+        "AIRCRAFT",
+    ):
         return False
     if not evidence.visible_and_in_range_target_model_ids:
         return False
@@ -976,7 +1065,7 @@ def _best_line_of_sight_range_evidence(
     ruleset_descriptor: RulesetDescriptor,
     attacker_unit: UnitInstance,
     attacker_models: tuple[Model, ...],
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     target_models: tuple[Model, ...],
     visibility_cache_key: str,
     range_inches: int,
@@ -987,7 +1076,7 @@ def _best_line_of_sight_range_evidence(
     blocker_models = _shooting_dynamic_model_blockers(
         scenario=scenario,
         observing_unit_id=attacker_unit.unit_instance_id,
-        target_unit_id=target_unit.unit_instance_id,
+        target_unit_id=target_rules_unit.unit_instance_id,
     )
     for attacker_model in sorted(attacker_models, key=lambda model: model.model_id):
         in_range_model_ids = _target_in_range_model_ids(
@@ -1005,7 +1094,7 @@ def _best_line_of_sight_range_evidence(
             terrain_features=terrain_features,
             dynamic_model_blockers=blocker_models,
             observer_keywords=attacker_unit.keywords,
-            target_keywords=target_unit.keywords,
+            target_keywords=target_rules_unit.keywords,
         )
         witness = context.resolve_line_of_sight()
         cover_result = context.benefit_of_cover(witness)
@@ -1072,7 +1161,12 @@ def _locked_in_combat_context(
                 target_models=enemy_models,
                 ruleset_descriptor=ruleset_descriptor,
             ):
-                engaged_unit_ids.add(unit_placement.unit_instance_id)
+                engaged_unit_ids.add(
+                    rules_unit_view_from_armies(
+                        armies=scenario.armies,
+                        unit_instance_id=unit_placement.unit_instance_id,
+                    ).unit_instance_id
+                )
     return _LockedInCombatContext(
         is_locked=bool(engaged_unit_ids),
         engaged_target_unit_ids=tuple(sorted(engaged_unit_ids)),
@@ -1084,6 +1178,7 @@ def _target_engagement_context(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     attacker_owner: str,
+    target_rules_unit: RulesUnitView,
     target_unit_id: str,
     target_models: tuple[Model, ...],
 ) -> _TargetEngagementContext:
@@ -1101,9 +1196,16 @@ def _target_engagement_context(
                 target_models=target_models,
                 ruleset_descriptor=ruleset_descriptor,
             ):
-                engaged_friendly_unit_ids.add(unit_placement.unit_instance_id)
+                engaged_friendly_unit_ids.add(
+                    rules_unit_view_from_armies(
+                        armies=scenario.armies,
+                        unit_instance_id=unit_placement.unit_instance_id,
+                    ).unit_instance_id
+                )
     if target_unit_id in engaged_friendly_unit_ids:
         raise GameLifecycleError("Target engagement context included the target unit.")
+    if set(target_rules_unit.component_unit_instance_ids) & engaged_friendly_unit_ids:
+        raise GameLifecycleError("Target engagement context included a target component.")
     return _TargetEngagementContext(
         is_engaged_by_friendly=bool(engaged_friendly_unit_ids),
         engaged_friendly_unit_ids=tuple(sorted(engaged_friendly_unit_ids)),
@@ -1131,7 +1233,7 @@ def _any_models_in_engagement(
 def _target_engagement_validation(
     *,
     attacker_unit: UnitInstance,
-    target_unit: UnitInstance,
+    target_keywords: tuple[str, ...],
     target_unit_id: str,
     weapon_profile: WeaponProfile,
     locked_context: _LockedInCombatContext,
@@ -1139,7 +1241,7 @@ def _target_engagement_validation(
 ) -> str | None:
     if not target_engagement_context.is_engaged_by_friendly:
         return None
-    if _unit_has_vehicle_or_monster_keyword(target_unit):
+    if _keywords_include_vehicle_or_monster(target_keywords):
         return None
     target_is_engaged_with_attacker = target_unit_id in locked_context.engaged_target_unit_ids
     if target_is_engaged_with_attacker and has_close_quarters_weapon_keyword(weapon_profile):
@@ -1198,31 +1300,36 @@ def _lone_operative_target_allowed(
     *,
     scenario: BattlefieldScenario,
     attacker_unit: UnitInstance,
-    target_unit_id: str,
+    target_rules_unit: RulesUnitView,
 ) -> bool:
-    target_distance = _closest_distance_between_units(
+    target_distance = _closest_distance_between_unit_and_rules_unit(
         scenario=scenario,
         first_unit_id=attacker_unit.unit_instance_id,
-        second_unit_id=target_unit_id,
+        second_rules_unit=target_rules_unit,
     )
     return target_distance <= 12.0
 
 
-def _closest_distance_between_units(
+def _closest_distance_between_unit_and_rules_unit(
     *,
     scenario: BattlefieldScenario,
     first_unit_id: str,
-    second_unit_id: str,
+    second_rules_unit: RulesUnitView,
 ) -> float:
     first_placement = scenario.battlefield_state.unit_placement_by_id(first_unit_id)
-    second_placement = scenario.battlefield_state.unit_placement_by_id(second_unit_id)
+    second_placements = _unit_placements_for_rules_unit_or_none(
+        scenario=scenario,
+        rules_unit=second_rules_unit,
+    )
+    if second_placements is None:
+        raise GameLifecycleError("Distance to rules unit requires placed target models.")
     first_models = _geometry_models_for_unit_placement(
         scenario=scenario,
         unit_placement=first_placement,
     )
-    second_models = _geometry_models_for_unit_placement(
+    second_models = _geometry_models_for_unit_placements(
         scenario=scenario,
-        unit_placement=second_placement,
+        unit_placements=second_placements,
     )
     distances = tuple(
         DistanceMeasurementContext.from_models(first_model, second_model).closest_distance_inches()
@@ -1238,9 +1345,18 @@ def _unit_has_vehicle_or_monster_keyword(unit: UnitInstance) -> bool:
     return _unit_has_keyword(unit, "VEHICLE") or _unit_has_keyword(unit, "MONSTER")
 
 
+def _keywords_include_vehicle_or_monster(keywords: tuple[str, ...]) -> bool:
+    return _keywords_include(keywords, "VEHICLE") or _keywords_include(keywords, "MONSTER")
+
+
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
+
+
+def _keywords_include(keywords: tuple[str, ...], keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in keywords}
 
 
 def _canonical_keyword(keyword: str) -> str:

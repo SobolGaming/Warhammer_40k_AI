@@ -30,7 +30,12 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
     WeaponProfilePayload,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+    AttachedUnitFormation,
+    muster_army,
+)
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -132,6 +137,7 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.hazard import hazard_roll_spec
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
@@ -4009,6 +4015,265 @@ def test_phase14h_attached_unit_uses_leader_toughness_after_bodyguard_destroyed(
                 ),
                 _fixed_roll_result(
                     roll_id="phase14h-attached-leader-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=4,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is None
+    assert status is None
+    assert wound_payload["toughness"] == 7
+    assert wound_payload["target_number"] == 5
+    assert wound_payload["successful"] is False
+
+
+def test_phase14h_mustered_attached_unit_targets_and_allocates_as_rules_unit() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    bodyguard = _replace_unit_toughness(
+        state=state,
+        unit=units["bodyguard-unit"],
+        toughness=5,
+    )
+    leader = _replace_unit_toughness(
+        state=state,
+        unit=units["leader-unit"],
+        toughness=7,
+    )
+    support = _replace_unit_toughness(
+        state=state,
+        unit=units["support-unit"],
+        toughness=6,
+    )
+    formation = _attached_formation_for_player(state=state, player_id="player-b")
+    attached_id = formation.attached_unit_instance_id
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    target_candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=_first_weapon_profile(lifecycle, attacker),
+        target_unit_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
+    )
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=attached_id,
+    )
+
+    assert len(target_candidates) == 1
+    assert target_candidates[0].target_unit_instance_id == attached_id
+    assert allocation_context.target_unit_instance_id == attached_id
+    assert allocation_context.attached_unit_bodyguard_model_ids == tuple(
+        sorted(model.model_instance_id for model in bodyguard.own_models)
+    )
+    assert allocation_context.attached_unit_character_model_ids == tuple(
+        sorted(
+            (
+                leader.own_models[0].model_instance_id,
+                support.own_models[0].model_instance_id,
+            )
+        )
+    )
+    assert allocation_context.legal_model_ids() == (
+        allocation_context.attached_unit_bodyguard_model_ids
+    )
+
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-real-attached-bodyguard-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-real-attached-bodyguard-toughness:pool-001:attack-001"
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-real-attached-bodyguard-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=bodyguard,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                    target_unit_instance_id=attached_id,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-real-attached-bodyguard-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-real-attached-bodyguard-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-real-attached-bodyguard-wound",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Wound roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.wound",
+                        actor_id="player-a",
+                    ),
+                    value=3,
+                ),
+            ),
+        ),
+    )
+    wound_payload = cast(
+        dict[str, object],
+        _attack_step_payload(
+            _event_payloads(lifecycle, "attack_sequence_step"),
+            AttackSequenceStep.WOUND,
+        )["payload"],
+    )
+
+    assert remaining_sequence is not None
+    assert remaining_sequence.pending_grouped_damage is not None
+    pending_context = remaining_sequence.pending_grouped_damage.allocation_context()
+    assert pending_context.target_unit_instance_id == attached_id
+    assert pending_context.legal_model_ids() == pending_context.attached_unit_bodyguard_model_ids
+    assert status is not None
+    assert wound_payload["toughness"] == 5
+    assert wound_payload["target_number"] == 3
+    assert wound_payload["successful"] is True
+
+
+def test_phase14h_mustered_attached_unit_uses_character_toughness_after_bodyguard_removed() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    bodyguard = _replace_unit_toughness(
+        state=state,
+        unit=units["bodyguard-unit"],
+        toughness=5,
+    )
+    leader = _replace_unit_toughness(
+        state=state,
+        unit=units["leader-unit"],
+        toughness=7,
+    )
+    support = _replace_unit_toughness(
+        state=state,
+        unit=units["support-unit"],
+        toughness=6,
+    )
+    formation = _attached_formation_for_player(state=state, player_id="player-b")
+    attached_id = formation.attached_unit_instance_id
+    removed_bodyguard_ids = tuple(model.model_instance_id for model in bodyguard.own_models)
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            bodyguard,
+            own_models=tuple(replace(model, wounds_remaining=0) for model in bodyguard.own_models),
+        ),
+    )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(removed_bodyguard_ids)
+    )
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=attached_id,
+    )
+    assert allocation_context.attached_unit_bodyguard_model_ids == ()
+    assert allocation_context.legal_model_ids() == tuple(
+        sorted(
+            (
+                leader.own_models[0].model_instance_id,
+                support.own_models[0].model_instance_id,
+            )
+        )
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase14h-real-attached-leader-support-toughness",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 6),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(),
+        abilities=(),
+    )
+    attack_context_id = "phase14h-real-attached-leader-support-toughness:pool-001:attack-001"
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase14h-real-attached-leader-support-toughness",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=leader,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                    target_unit_instance_id=attached_id,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase14h-real-attached-leader-support-toughness",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase14h-real-attached-leader-support-hit",
+                    spec=DiceRollSpec(
+                        expression=DiceExpression(quantity=1, sides=6),
+                        reason=f"Hit roll for {weapon_profile.profile_id} attack "
+                        f"{attack_context_id}",
+                        roll_type="attack_sequence.hit",
+                        actor_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase14h-real-attached-leader-support-wound",
                     spec=DiceRollSpec(
                         expression=DiceExpression(quantity=1, sides=6),
                         reason=f"Wound roll for {weapon_profile.profile_id} attack "
@@ -13843,6 +14108,66 @@ def _save_payload_has_cover(event: dict[str, object]) -> bool:
     return cover_payload.get("has_benefit") is True
 
 
+def _attached_enemy_unit_specs() -> tuple[tuple[str, str, str, int], ...]:
+    return (
+        (
+            "bodyguard-unit",
+            "core-intercessor-like-infantry",
+            "core-intercessor-like",
+            5,
+        ),
+        ("leader-unit", "core-character-leader", "core-character-leader", 1),
+        ("support-unit", "core-character-support", "core-character-support", 1),
+    )
+
+
+def _attached_enemy_declarations() -> tuple[AttachmentDeclaration, ...]:
+    return (
+        AttachmentDeclaration(
+            source_unit_selection_id="leader-unit",
+            bodyguard_unit_selection_id="bodyguard-unit",
+        ),
+        AttachmentDeclaration(
+            source_unit_selection_id="support-unit",
+            bodyguard_unit_selection_id="bodyguard-unit",
+        ),
+    )
+
+
+def _attached_formation_for_player(
+    *,
+    state: GameState,
+    player_id: str,
+) -> AttachedUnitFormation:
+    for army in state.army_definitions:
+        if army.player_id == player_id:
+            if not army.attached_units:
+                raise AssertionError(f"missing attached formation for {player_id}")
+            return army.attached_units[0]
+    raise AssertionError(f"missing army for {player_id}")
+
+
+def _replace_unit_toughness(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    toughness: int,
+) -> UnitInstance:
+    replacement = replace(
+        unit,
+        own_models=tuple(
+            _model_with_characteristic(
+                model,
+                characteristic=Characteristic.TOUGHNESS,
+                raw_value=toughness,
+            )
+            for model in unit.own_models
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=replacement)
+    return replacement
+
+
 def _shooting_lifecycle(
     *,
     alpha_unit_ids: tuple[str, ...],
@@ -13850,6 +14175,7 @@ def _shooting_lifecycle(
     alpha_datasheets: dict[str, tuple[str, str, int]] | None = None,
     enemy_datasheet: tuple[str, str, int] | None = None,
     enemy_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
+    enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     embarked_unit_ids: tuple[str, ...] = (),
     enemy_pose: Pose | None = None,
     catalog: ArmyCatalog | None = None,
@@ -13861,6 +14187,7 @@ def _shooting_lifecycle(
         alpha_datasheets=alpha_datasheets,
         enemy_datasheet=enemy_datasheet,
         enemy_unit_specs=enemy_unit_specs,
+        enemy_attachment_declarations=enemy_attachment_declarations,
         catalog=catalog,
     )
     armies = _mustered_armies(config)
@@ -14076,6 +14403,7 @@ def _config(
     alpha_datasheets: dict[str, tuple[str, str, int]] | None,
     enemy_datasheet: tuple[str, str, int] | None,
     enemy_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
+    enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
@@ -14111,6 +14439,7 @@ def _config(
                 player_id="player-b",
                 army_id="army-beta",
                 unit_specs=beta_unit_specs,
+                attachment_declarations=enemy_attachment_declarations,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -14172,6 +14501,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_specs: tuple[tuple[str, str, str, int], ...],
+    attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -14196,6 +14526,7 @@ def _army_muster_request(
             )
             for unit_id, datasheet_id, model_profile_id, model_count in unit_specs
         ),
+        attachment_declarations=attachment_declarations,
     )
 
 

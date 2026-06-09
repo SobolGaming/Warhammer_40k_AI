@@ -15,17 +15,24 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     ModelPlacementPayload,
     ModelPlacementRecord,
+    PlacedArmy,
     PlacementError,
     UnitPlacement,
     geometry_model_for_placement,
 )
-from warhammer40k_core.engine.damage_allocation import model_by_id, unit_by_id, unit_owner_player_id
+from warhammer40k_core.engine.damage_allocation import model_by_id, unit_owner_player_id
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitComponent,
+    RulesUnitView,
+    rules_unit_view_by_id,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.unit_coherency import unit_placement_coherency_result
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -648,14 +655,19 @@ def _healing_candidates_for_next_step(
     state: GameState,
     effect: HealingEffect,
 ) -> _HealingStepCandidates:
-    unit = unit_by_id(state=state, unit_instance_id=effect.target_unit_instance_id)
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=effect.target_unit_instance_id,
+    )
     wounded_model_ids = tuple(
         model.model_instance_id
-        for model in unit.own_models
+        for model in rules_unit.own_models
         if model.is_alive and model.wounds_remaining < model.starting_wounds
     )
     if wounded_model_ids:
-        if len(wounded_model_ids) > 1 and not _unit_is_attached_rules_unit(unit):
+        if len(wounded_model_ids) > 1 and not _rules_unit_allows_multiple_wounded_healing(
+            rules_unit
+        ):
             raise GameLifecycleError(
                 "Multiple wounded models require an attached-unit healing decision."
             )
@@ -664,8 +676,8 @@ def _healing_candidates_for_next_step(
             model_ids=tuple(sorted(wounded_model_ids)),
         )
 
-    starting_strength = state.starting_strength_record_for_unit(unit.unit_instance_id)
-    alive_count = len(tuple(model for model in unit.own_models if model.is_alive))
+    starting_strength = state.starting_strength_record_for_unit(rules_unit.unit_instance_id)
+    alive_count = len(tuple(model for model in rules_unit.own_models if model.is_alive))
     if alive_count >= starting_strength.starting_model_count:
         return _HealingStepCandidates(step_kind=HealingStepKind.NO_EFFECT)
     battlefield = _battlefield_state(state)
@@ -673,7 +685,7 @@ def _healing_candidates_for_next_step(
     missing_model_ids = tuple(
         sorted(
             model.model_instance_id
-            for model in unit.own_models
+            for model in rules_unit.own_models
             if not model.is_alive and model.model_instance_id in removed_ids
         )
     )
@@ -854,7 +866,12 @@ def _validate_and_apply_revival(
         raise GameLifecycleError("Revived model must be a removed model.")
     if placement.model_instance_id != model.model_instance_id:
         raise GameLifecycleError("Revival placement model drift.")
-    if placement.unit_instance_id != effect.target_unit_instance_id:
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=effect.target_unit_instance_id,
+    )
+    expected_component_unit_id = rules_unit.component_unit_id_for_model(model.model_instance_id)
+    if placement.unit_instance_id != expected_component_unit_id:
         raise GameLifecycleError("Revival placement unit drift.")
     owner = unit_owner_player_id(state=state, unit_instance_id=effect.target_unit_instance_id)
     if placement.player_id != owner:
@@ -867,22 +884,26 @@ def _validate_and_apply_revival(
         model_instance_id=model.model_instance_id,
         wounds_remaining=1,
     )
-    try:
-        hypothetical_battlefield = battlefield.with_returned_model_placement(placement)
-    except PlacementError as exc:
-        raise GameLifecycleError("Revival placement cannot return model.") from exc
+    hypothetical_battlefield = _battlefield_with_returned_revival_model(
+        battlefield=battlefield,
+        rules_unit=rules_unit,
+        placement=placement,
+    )
     scenario = BattlefieldScenario(
         armies=hypothetical_armies,
         battlefield_state=hypothetical_battlefield,
     )
-    unit_placement = hypothetical_battlefield.unit_placement_by_id(effect.target_unit_instance_id)
-    coherency_result = unit_placement_coherency_result(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
-    )
-    if not coherency_result.is_coherent:
-        raise GameLifecycleError("Revival placement breaks unit coherency.")
+    if not rules_unit.is_attached_rules_unit:
+        unit_placement = hypothetical_battlefield.unit_placement_by_id(
+            effect.target_unit_instance_id
+        )
+        coherency_result = unit_placement_coherency_result(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+        )
+        if not coherency_result.is_coherent:
+            raise GameLifecycleError("Revival placement breaks unit coherency.")
     _validate_revived_model_coheres_with_phase_start_models(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -923,11 +944,17 @@ def _validate_revived_model_coheres_with_phase_start_models(
     policy = ruleset_descriptor.coherency_policy
     if policy.max_horizontal_inches is None or policy.max_vertical_inches is None:
         raise GameLifecycleError("Revival coherency policy is incomplete.")
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(effect.target_unit_instance_id)
+    rules_unit = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=effect.target_unit_instance_id,
+    )
     phase_start_ids = set(effect.phase_start_model_ids)
     phase_start_placements = tuple(
         model_placement
-        for model_placement in unit_placement.model_placements
+        for model_placement in _rules_unit_model_placements(
+            scenario=scenario,
+            rules_unit=rules_unit,
+        )
         if model_placement.model_instance_id in phase_start_ids
     )
     if not phase_start_placements:
@@ -952,11 +979,45 @@ def _validate_revived_model_coheres_with_phase_start_models(
             <= policy.max_vertical_inches
         ):
             neighbor_count += 1
-    if neighbor_count < _required_phase_start_neighbor_count(
+    if neighbor_count < _required_phase_start_neighbor_count_for_model_count(
         ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
+        model_count=len(
+            _rules_unit_model_placements(
+                scenario=scenario,
+                rules_unit=rules_unit,
+            )
+        ),
     ):
         raise GameLifecycleError("Revived model is not coherent with phase-start models.")
+
+
+def _battlefield_with_returned_revival_model(
+    *,
+    battlefield: BattlefieldRuntimeState,
+    rules_unit: RulesUnitView,
+    placement: ModelPlacement,
+) -> BattlefieldRuntimeState:
+    if _battlefield_has_unit_placement(
+        battlefield=battlefield,
+        unit_instance_id=placement.unit_instance_id,
+    ):
+        try:
+            return battlefield.with_returned_model_placement(placement)
+        except PlacementError as exc:
+            raise GameLifecycleError("Revival placement cannot return model.") from exc
+    if not rules_unit.is_attached_rules_unit:
+        raise GameLifecycleError("Revival placement cannot return model to an unplaced unit.")
+    if placement.unit_instance_id not in rules_unit.component_unit_instance_ids:
+        raise GameLifecycleError("Revival placement component is not in the attached unit.")
+    if not any(
+        _battlefield_has_unit_placement(battlefield=battlefield, unit_instance_id=component_id)
+        for component_id in rules_unit.component_unit_instance_ids
+    ):
+        raise GameLifecycleError("Revival requires an attached-unit component on the battlefield.")
+    return _battlefield_with_returned_model_new_component(
+        battlefield=battlefield,
+        placement=placement,
+    )
 
 
 def _validate_revived_model_engagement(
@@ -991,12 +1052,108 @@ def _validate_revived_model_engagement(
         raise GameLifecycleError("Revived model engages a new enemy model.")
 
 
-def _required_phase_start_neighbor_count(
+def _rules_unit_model_placements(
+    *,
+    scenario: BattlefieldScenario,
+    rules_unit: RulesUnitView,
+) -> tuple[ModelPlacement, ...]:
+    placements: list[ModelPlacement] = []
+    for unit_id in rules_unit.component_unit_instance_ids:
+        try:
+            unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_id)
+        except PlacementError as exc:
+            component = _rules_unit_component_for_unit_id(
+                rules_unit=rules_unit,
+                unit_instance_id=unit_id,
+            )
+            if not any(model.is_alive for model in component.unit.own_models):
+                continue
+            raise GameLifecycleError(
+                "Revival attached rules-unit component is not placed."
+            ) from exc
+        placements.extend(unit_placement.model_placements)
+    return tuple(sorted(placements, key=lambda placement: placement.model_instance_id))
+
+
+def _rules_unit_component_for_unit_id(
+    *,
+    rules_unit: RulesUnitView,
+    unit_instance_id: str,
+) -> RulesUnitComponent:
+    for component in rules_unit.components:
+        if component.unit.unit_instance_id == unit_instance_id:
+            return component
+    raise GameLifecycleError("Rules-unit component was not found.")
+
+
+def _battlefield_has_unit_placement(
+    *,
+    battlefield: BattlefieldRuntimeState,
+    unit_instance_id: str,
+) -> bool:
+    try:
+        battlefield.unit_placement_by_id(unit_instance_id)
+    except PlacementError:
+        return False
+    return True
+
+
+def _battlefield_with_returned_model_new_component(
+    *,
+    battlefield: BattlefieldRuntimeState,
+    placement: ModelPlacement,
+) -> BattlefieldRuntimeState:
+    if placement.model_instance_id not in set(battlefield.removed_model_ids):
+        raise GameLifecycleError("Revival placement model is not removed.")
+    placed_armies: list[PlacedArmy] = []
+    did_place = False
+    for placed_army in battlefield.placed_armies:
+        if placed_army.army_id != placement.army_id:
+            placed_armies.append(placed_army)
+            continue
+        if placed_army.player_id != placement.player_id:
+            raise GameLifecycleError("Revival placement player drift.")
+        placed_armies.append(
+            PlacedArmy(
+                army_id=placed_army.army_id,
+                player_id=placed_army.player_id,
+                unit_placements=tuple(
+                    sorted(
+                        (
+                            *placed_army.unit_placements,
+                            UnitPlacement(
+                                army_id=placement.army_id,
+                                player_id=placement.player_id,
+                                unit_instance_id=placement.unit_instance_id,
+                                model_placements=(placement,),
+                            ),
+                        ),
+                        key=lambda unit_placement: unit_placement.unit_instance_id,
+                    )
+                ),
+            )
+        )
+        did_place = True
+    if not did_place:
+        raise GameLifecycleError("Revival placement army is not on the battlefield.")
+    return BattlefieldRuntimeState(
+        battlefield_id=battlefield.battlefield_id,
+        placed_armies=tuple(placed_armies),
+        removed_model_ids=tuple(
+            sorted(
+                model_id
+                for model_id in battlefield.removed_model_ids
+                if model_id != placement.model_instance_id
+            )
+        ),
+    )
+
+
+def _required_phase_start_neighbor_count_for_model_count(
     *,
     ruleset_descriptor: RulesetDescriptor,
-    unit_placement: UnitPlacement,
+    model_count: int,
 ) -> int:
-    model_count = len(unit_placement.model_placements)
     policy = ruleset_descriptor.coherency_policy
     threshold = policy.large_unit_model_count_threshold
     if threshold is not None and model_count >= threshold:
@@ -1015,6 +1172,17 @@ def _validate_effect_for_state(*, state: GameState, effect: HealingEffect) -> No
         raise GameLifecycleError("Healing resolution requires a HealingEffect.")
     if effect.opposing_player_id not in state.player_ids:
         raise GameLifecycleError("Healing opposing player is not in this game.")
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=effect.target_unit_instance_id,
+    )
+    if (
+        rules_unit.is_attached_rules_unit
+        and effect.target_unit_instance_id != rules_unit.unit_instance_id
+    ):
+        raise GameLifecycleError(
+            "Healing an active attached unit must target the attached-unit identity."
+        )
     owner = unit_owner_player_id(state=state, unit_instance_id=effect.target_unit_instance_id)
     if effect.opposing_player_id == owner:
         raise GameLifecycleError("Healing opposing player cannot control the target unit.")
@@ -1297,6 +1465,14 @@ def _unit_is_attached_rules_unit(unit: UnitInstance) -> bool:
         for model in unit.own_models
         for source_id in model.source_ids
     )
+
+
+def _rules_unit_allows_multiple_wounded_healing(rules_unit: RulesUnitView) -> bool:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Healing rules-unit validation requires a RulesUnitView.")
+    if rules_unit.is_attached_rules_unit:
+        return True
+    return _unit_is_attached_rules_unit(rules_unit.components[0].unit)
 
 
 def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:

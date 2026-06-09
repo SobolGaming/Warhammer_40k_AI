@@ -69,6 +69,12 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_id_for_unit_id,
+    rules_unit_view_by_id,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.shooting_targets import (
     ShootingTargetCandidate,
     shooting_target_candidate_for_model,
@@ -1570,11 +1576,11 @@ def _required_weapon_ability_selections_for_target(
     target_unit_id: str,
     player_id: str,
 ) -> list[JsonValue]:
-    target_unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
+    target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     selection_request = weapon_ability_selection_request(
         weapon_profile,
         AbilityKind.ANTI_KEYWORD,
-        target_keywords=target_unit.keywords,
+        target_keywords=target_rules_unit.keywords,
         actor_id=player_id,
         request_id=f"{proposal_request_id}:{target_unit_id}:anti-keyword",
         source_context={
@@ -2356,7 +2362,7 @@ def _attack_pools_or_validation(
                 message=candidate.message or "Declared target is not legal.",
                 field="declarations",
             )
-        target_unit = _unit_by_id(
+        target_rules_unit = rules_unit_view_by_id(
             state=state,
             unit_instance_id=declaration.target_unit_instance_id,
         )
@@ -2365,7 +2371,7 @@ def _attack_pools_or_validation(
             declaration=declaration,
             declaration_index=declaration_index,
             weapon_profile=weapon_profile,
-            target_unit=target_unit,
+            target_rules_unit=target_rules_unit,
             player_id=player_id,
         )
         if ability_selection_validation is not None:
@@ -2418,7 +2424,7 @@ def _attack_pools_or_validation(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit=unit,
-            target_unit=target_unit,
+            target_rules_unit=target_rules_unit,
             weapon_profile=weapon_profile,
             shooting_type=declaration.shooting_type,
             base_attacks=attacks,
@@ -2461,7 +2467,7 @@ def _validate_duplicate_weapon_ability_selection(
     declaration: WeaponDeclaration,
     declaration_index: int,
     weapon_profile: WeaponProfile,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     player_id: str,
 ) -> ShootingProposalValidationResult | None:
     ability_by_id: dict[str, AbilityDescriptor] = {
@@ -2494,7 +2500,7 @@ def _validate_duplicate_weapon_ability_selection(
     selection_request = weapon_ability_selection_request(
         weapon_profile,
         AbilityKind.ANTI_KEYWORD,
-        target_keywords=target_unit.keywords,
+        target_keywords=target_rules_unit.keywords,
         actor_id=player_id,
         request_id=(
             f"{proposal.proposal_request_id}:declaration-{declaration_index:03d}:anti-keyword"
@@ -2503,7 +2509,7 @@ def _validate_duplicate_weapon_ability_selection(
             "phase": BattlePhase.SHOOTING.value,
             "proposal_request_id": proposal.proposal_request_id,
             "declaration_index": declaration_index,
-            "target_unit_instance_id": target_unit.unit_instance_id,
+            "target_unit_instance_id": target_rules_unit.unit_instance_id,
         },
     )
     if selection_request is None:
@@ -2691,7 +2697,7 @@ def _apply_phase13d_weapon_modifiers(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit: UnitInstance,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     weapon_profile: WeaponProfile,
     shooting_type: ShootingType,
     base_attacks: int,
@@ -2714,7 +2720,7 @@ def _apply_phase13d_weapon_modifiers(
         targeting_rule_ids.append(rapid_fire_rule_id(rapid_bonus))
 
     if has_weapon_keyword(weapon_profile, WeaponKeyword.BLAST):
-        blast_bonus = blast_attack_bonus(target_model_count=len(target_unit.alive_own_models()))
+        blast_bonus = blast_attack_bonus(target_model_count=len(target_rules_unit.alive_models()))
         if blast_bonus > 0:
             attacks += blast_bonus
             targeting_rule_ids.append(blast_rule_id(blast_bonus))
@@ -2745,7 +2751,7 @@ def _apply_phase13d_weapon_modifiers(
                 state=state,
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
-                target_unit_instance_id=target_unit.unit_instance_id,
+                target_unit_instance_id=target_rules_unit.unit_instance_id,
                 terrain_features=terrain_features,
                 player_id=player_id,
             )
@@ -2845,22 +2851,30 @@ def _unit_target_within_max_range(
 ) -> bool:
     battlefield = scenario.battlefield_state
     unit_placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
-    target_placement = battlefield.unit_placement_by_id(target_unit_id)
+    target_rules_unit = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=target_unit_id,
+    )
+    target_placements = tuple(
+        battlefield.unit_placement_by_id(component_unit_id)
+        for component_unit_id in target_rules_unit.component_unit_instance_ids
+    )
     for attacker_model_placement in unit_placement.model_placements:
         attacker_model = geometry_model_for_placement(
             model=scenario.model_instance_for_placement(attacker_model_placement),
             placement=attacker_model_placement,
         )
-        for target_model_placement in target_placement.model_placements:
-            target_model = geometry_model_for_placement(
-                model=scenario.model_instance_for_placement(target_model_placement),
-                placement=target_model_placement,
-            )
-            if DistanceMeasurementContext.from_models(
-                attacker_model,
-                target_model,
-            ).closest_distance_inches() <= float(range_inches):
-                return True
+        for target_placement in target_placements:
+            for target_model_placement in target_placement.model_placements:
+                target_model = geometry_model_for_placement(
+                    model=scenario.model_instance_for_placement(target_model_placement),
+                    placement=target_model_placement,
+                )
+                if DistanceMeasurementContext.from_models(
+                    attacker_model,
+                    target_model,
+                ).closest_distance_inches() <= float(range_inches):
+                    return True
     return False
 
 
@@ -3840,10 +3854,20 @@ def _enemy_placed_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ..
     if battlefield_state is None:
         raise GameLifecycleError("Shooting phase requires battlefield_state.")
     unit_ids: list[str] = []
+    seen: set[str] = set()
+    armies = tuple(state.army_definitions)
     for placed_army in battlefield_state.placed_armies:
         if placed_army.player_id == player_id:
             continue
-        unit_ids.extend(placement.unit_instance_id for placement in placed_army.unit_placements)
+        for placement in placed_army.unit_placements:
+            rules_unit_id = rules_unit_id_for_unit_id(
+                armies=armies,
+                unit_instance_id=placement.unit_instance_id,
+            )
+            if rules_unit_id in seen:
+                continue
+            seen.add(rules_unit_id)
+            unit_ids.append(rules_unit_id)
     return tuple(sorted(unit_ids))
 
 

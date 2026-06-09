@@ -17,6 +17,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusteringError,
     ArmyMusterRequest,
     ArmyMusterRequestPayload,
+    AttachedUnitFormation,
     muster_army,
 )
 from warhammer40k_core.engine.list_validation import (
@@ -30,6 +31,14 @@ from warhammer40k_core.engine.list_validation import (
     resolve_wargear_selections,
     validate_detachment_selection,
     validate_unit_selection_for_faction,
+)
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitComponent,
+    RulesUnitComponentRole,
+    RulesUnitView,
+    rules_unit_id_for_unit_id,
+    rules_unit_view_from_armies,
 )
 from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
@@ -207,6 +216,146 @@ def test_attachment_declarations_form_runtime_attached_unit_from_structured_cata
     assert "<" not in json.dumps(payload, sort_keys=True)
     assert "object at 0x" not in json.dumps(payload, sort_keys=True)
     assert ArmyDefinition.from_payload(payload).to_payload() == army.to_payload()
+
+
+def test_rules_unit_view_resolves_physical_and_mustered_attached_units() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(unit_selection_id="bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="support-unit",
+                datasheet_id="core-character-support",
+                model_profile_id="core-character-support",
+                model_count=1,
+            ),
+            _unit_selection(unit_selection_id="loose-unit"),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+            AttachmentDeclaration(
+                source_unit_selection_id="support-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+    army = muster_army(catalog=catalog, request=request)
+    formation = army.attached_units[0]
+    bodyguard = army.unit_by_id("army-alpha:bodyguard-unit")
+    leader = army.unit_by_id("army-alpha:leader-unit")
+    support = army.unit_by_id("army-alpha:support-unit")
+    loose_unit = army.unit_by_id("army-alpha:loose-unit")
+
+    attached_view = rules_unit_view_from_armies(
+        armies=(army,),
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    physical_view = rules_unit_view_from_armies(
+        armies=(army,),
+        unit_instance_id=loose_unit.unit_instance_id,
+    )
+
+    assert attached_view.unit_instance_id == formation.attached_unit_instance_id
+    assert (
+        rules_unit_id_for_unit_id(
+            armies=(army,),
+            unit_instance_id=support.unit_instance_id,
+        )
+        == formation.attached_unit_instance_id
+    )
+    assert attached_view.owner_player_id == "player-a"
+    assert attached_view.component_unit_instance_ids == (
+        bodyguard.unit_instance_id,
+        leader.unit_instance_id,
+        support.unit_instance_id,
+    )
+    assert (
+        attached_view.component_unit_id_for_model(leader.own_models[0].model_instance_id)
+        == leader.unit_instance_id
+    )
+    assert (
+        attached_view.component_role_for_model(support.own_models[0].model_instance_id) == "support"
+    )
+    assert attached_view.bodyguard_model_ids(attached_view.alive_models()) == tuple(
+        model.model_instance_id for model in bodyguard.own_models
+    )
+    assert attached_view.character_model_ids(attached_view.alive_models()) == (
+        leader.own_models[0].model_instance_id,
+        support.own_models[0].model_instance_id,
+    )
+    assert "ATTACHED_UNIT" in attached_view.keywords
+    assert "CORE Marines" in attached_view.faction_keywords
+    assert physical_view.unit_instance_id == loose_unit.unit_instance_id
+    assert physical_view.attached_unit is None
+    assert physical_view.bodyguard_model_ids(physical_view.alive_models()) == ()
+    assert physical_view.character_model_ids(physical_view.alive_models()) == ()
+
+
+def test_rules_unit_projection_value_objects_fail_fast() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    army = muster_army(catalog=catalog, request=_muster_request(catalog))
+    unit = army.units[0]
+    component = RulesUnitComponent(unit=unit, role="unit")
+
+    with pytest.raises(GameLifecycleError, match="UnitInstance"):
+        RulesUnitComponent(unit=cast(UnitInstance, "bad-unit"), role="unit")
+    with pytest.raises(GameLifecycleError, match="unsupported role"):
+        RulesUnitComponent(unit=unit, role=cast(RulesUnitComponentRole, "bad-role"))
+    with pytest.raises(GameLifecycleError, match="components must be a tuple"):
+        RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=army.player_id,
+            components=cast(tuple[RulesUnitComponent, ...], [component]),
+        )
+    with pytest.raises(GameLifecycleError, match="requires at least one component"):
+        RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=army.player_id,
+            components=(),
+        )
+    with pytest.raises(GameLifecycleError, match="RulesUnitComponent values"):
+        RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=army.player_id,
+            components=cast(tuple[RulesUnitComponent, ...], ("bad-component",)),
+        )
+    with pytest.raises(GameLifecycleError, match="AttachedUnitFormation"):
+        RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=army.player_id,
+            components=(component,),
+            attached_unit=cast(AttachedUnitFormation, "bad-attached-unit"),
+        )
+    with pytest.raises(GameLifecycleError, match="exactly one component"):
+        RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=army.player_id,
+            components=(component, component),
+        )
+    with pytest.raises(GameLifecycleError, match="unknown"):
+        rules_unit_view_from_armies(armies=(army,), unit_instance_id="missing-unit")
+    with pytest.raises(GameLifecycleError, match="not in the rules unit"):
+        RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=army.player_id,
+            components=(component,),
+        ).component_unit_id_for_model("missing-model")
+    with pytest.raises(GameLifecycleError, match="not in the rules unit"):
+        RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=army.player_id,
+            components=(component,),
+        ).component_role_for_model("missing-model")
 
 
 def test_attachment_declarations_reject_missing_eligibility_and_illegal_bodyguards() -> None:

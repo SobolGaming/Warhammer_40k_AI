@@ -131,6 +131,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.saves import (
     SaveKind,
     SaveOption,
@@ -3163,11 +3164,19 @@ def _destroyed_transport_cargo_state_for_damage(
     state: GameState,
     damage: DamageApplication,
 ) -> TransportCargoState | None:
-    target_unit = unit_by_id(state=state, unit_instance_id=damage.target_unit_instance_id)
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=damage.target_unit_instance_id,
+    )
     if not any(
-        model.model_instance_id == damage.model_instance_id for model in target_unit.own_models
+        model.model_instance_id == damage.model_instance_id
+        for model in target_rules_unit.own_models
     ):
         raise GameLifecycleError("Destroyed model is not in the damaged unit.")
+    target_unit = unit_by_id(
+        state=state,
+        unit_instance_id=target_rules_unit.component_unit_id_for_model(damage.model_instance_id),
+    )
     for cargo_state in state.transport_cargo_states:
         if cargo_state.transport_unit_instance_id == target_unit.unit_instance_id:
             if len(target_unit.own_models) != 1:
@@ -4968,8 +4977,11 @@ def _alive_allocated_model_ids_for_target_unit(
     target_unit_instance_id: str,
     allocated_model_ids: tuple[str, ...],
 ) -> tuple[str, ...]:
-    target_unit = unit_by_id(state=state, unit_instance_id=target_unit_instance_id)
-    target_model_ids = {model.model_instance_id for model in target_unit.own_models}
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+    )
+    target_model_ids = {model.model_instance_id for model in target_rules_unit.own_models}
     return tuple(
         model_id
         for model_id in allocated_model_ids
@@ -6480,12 +6492,18 @@ def _roll_hit_and_wound(
     if not hit_roll.successful:
         return None
 
-    target_unit = unit_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
-    toughness = _target_unit_toughness(state=state, unit=target_unit)
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=pool.target_unit_instance_id,
+    )
+    toughness = _target_unit_toughness(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    )
     if (
         attack_sequence.generated_hit_index == 0
         and hit_roll.critical
-        and lethal_hits_applies(pool.weapon_profile, target_keywords=target_unit.keywords)
+        and lethal_hits_applies(pool.weapon_profile, target_keywords=target_rules_unit.keywords)
     ):
         wound_roll = WoundRoll.auto_wound(
             strength=pool.weapon_profile.strength.final,
@@ -6500,7 +6518,7 @@ def _roll_hit_and_wound(
             manager=manager,
             pool=pool,
             toughness=toughness,
-            target_keywords=target_unit.keywords,
+            target_keywords=target_rules_unit.keywords,
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
             wound_modifier=_wound_roll_modifier(pool),
@@ -6511,7 +6529,7 @@ def _roll_hit_and_wound(
             pool=pool,
             initial_wound_roll=wound_roll,
             toughness=toughness,
-            target_keywords=target_unit.keywords,
+            target_keywords=target_rules_unit.keywords,
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
         )
@@ -6623,11 +6641,13 @@ def _roll_hit(
         )
     else:
         minimum_success = 2
-    target_unit = unit_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
     generated_hits = sustained_hits_generated_hits(
         pool.weapon_profile,
         critical_hit=unmodified == 6,
-        target_keywords=target_unit.keywords,
+        target_keywords=rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=pool.target_unit_instance_id,
+        ).keywords,
     )
     return HitRoll(
         target_number=skill,
@@ -7328,7 +7348,7 @@ def _cover_for_allocated_model(
             state=state,
             unit_instance_id=attacking_unit_id,
         ).keywords,
-        target_keywords=unit_by_id(
+        target_keywords=rules_unit_view_by_id(
             state=state,
             unit_instance_id=pool.target_unit_instance_id,
         ).keywords,
@@ -7375,15 +7395,16 @@ def _hit_skill(profile: WeaponProfile) -> int:
     return _validate_d6_target("Weapon skill target", profile.skill.final)
 
 
-def _target_unit_toughness(*, state: GameState, unit: UnitInstance) -> int:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Target unit must be a UnitInstance.")
+def _target_unit_toughness(*, state: GameState, target_unit_instance_id: str) -> int:
     allocation_context = allocation_context_for_unit(
         state=state,
-        target_unit_instance_id=unit.unit_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
     )
     alive_model_ids = allocation_context.alive_model_ids
-    if _unit_has_keyword(unit, "ATTACHED_UNIT"):
+    if (
+        allocation_context.attached_unit_bodyguard_model_ids
+        or allocation_context.attached_unit_character_model_ids
+    ):
         model_ids = (
             allocation_context.attached_unit_bodyguard_model_ids
             if allocation_context.attached_unit_bodyguard_model_ids
@@ -7429,20 +7450,6 @@ def _toughness_values_for_models(
         else:
             raise GameLifecycleError("Target unit models require Toughness.")
     return toughness_values
-
-
-def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
-
-
-def _canonical_keyword(keyword: str) -> str:
-    if type(keyword) is not str:
-        raise GameLifecycleError("Unit keyword must be a string.")
-    stripped = keyword.strip()
-    if not stripped:
-        raise GameLifecycleError("Unit keyword must not be empty.")
-    return stripped.upper().replace(" ", "_").replace("-", "_")
 
 
 def _damage_value(
