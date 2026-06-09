@@ -7,10 +7,10 @@ from dataclasses import dataclass
 from warhammer40k_core.core.missions import MissionPackError, MissionSourcePackageDefinition
 
 EDITION_ID = "warhammer_40000_11th"
-MISSION_PACK_ID = "11e-chapter-approved-2025-26"
-SOURCE_PACKAGE_ID = "gw-11e-chapter-approved-2025-26"
-SOURCE_TITLE = "Warhammer 40,000 11th Edition Chapter Approved 2025-26"
-SOURCE_VERSION = "2025-26"
+MISSION_PACK_ID = "11e-chapter-approved-2026-27"
+SOURCE_PACKAGE_ID = "gw-11e-chapter-approved-2026-27"
+SOURCE_TITLE = "Warhammer 40,000 11th Edition Chapter Approved 2026-27"
+SOURCE_VERSION = "2026-27"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-mission-source-v1"
 
 
@@ -89,6 +89,7 @@ class SourcePrimaryMissionMatrixCellRow:
     player_force_disposition_id: str
     opponent_force_disposition_id: str
     primary_mission_id: str
+    primary_mission_name: str
     battlefield_layout_ids: tuple[str, str, str]
     source_status: str
 
@@ -97,6 +98,7 @@ class SourcePrimaryMissionMatrixCellRow:
             "player_force_disposition_id": self.player_force_disposition_id,
             "opponent_force_disposition_id": self.opponent_force_disposition_id,
             "primary_mission_id": self.primary_mission_id,
+            "primary_mission_name": self.primary_mission_name,
             "battlefield_layout_ids": list(self.battlefield_layout_ids),
             "source_status": self.source_status,
         }
@@ -188,6 +190,121 @@ def source_package_definition() -> MissionSourcePackageDefinition:
 
 def primary_mission_rows() -> tuple[SourcePrimaryMissionRow, ...]:
     return (
+        SourcePrimaryMissionRow(
+            primary_mission_id="primary-immovable-object",
+            name="Immovable Object",
+            max_vp_per_turn=None,
+            scoring_kind="immovable_object",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _rule(
+                    "immovable-object-central-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "control_one_or_more_central_objectives",
+                ),
+                _rule(
+                    "immovable-object-rounds-two-to-four-command",
+                    "command_phase",
+                    "primary",
+                    5,
+                    None,
+                    "each_non_home_objective_controlled_battle_rounds_two_to_four",
+                ),
+                _rule(
+                    "immovable-object-round-five-turn-end",
+                    "turn_end",
+                    "primary",
+                    5,
+                    None,
+                    "each_non_home_objective_controlled_round_five",
+                ),
+            ),
+        ),
+        SourcePrimaryMissionRow(
+            primary_mission_id="primary-unstoppable-force",
+            name="Unstoppable Force",
+            max_vp_per_turn=None,
+            scoring_kind="unstoppable_force",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _rule(
+                    "unstoppable-force-enemy-destroyed-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "one_or_more_enemy_units_destroyed_this_turn",
+                ),
+                _rule(
+                    "unstoppable-force-objectives",
+                    "command_phase_or_round_five_turn_end",
+                    "primary",
+                    4,
+                    None,
+                    "each_non_home_objective_controlled_from_battle_round_two",
+                ),
+                _rule(
+                    "unstoppable-force-new-objective-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "control_one_or_more_new_non_home_objectives",
+                ),
+                _rule(
+                    "unstoppable-force-central-end-battle",
+                    "end_of_battle",
+                    "primary",
+                    5,
+                    None,
+                    "control_one_or_more_central_objectives_end_of_battle",
+                ),
+            ),
+        ),
+        SourcePrimaryMissionRow(
+            primary_mission_id="primary-death-trap",
+            name="Death Trap",
+            max_vp_per_turn=None,
+            scoring_kind="death_trap",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _rule(
+                    "death-trap-terrain-trapped-turn-end",
+                    "turn_end",
+                    "primary",
+                    2,
+                    None,
+                    "each_terrain_area_trapped_this_turn",
+                ),
+                _rule(
+                    "death-trap-objective-terrain-bonus-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "each_trapped_objective_terrain_area_this_turn",
+                ),
+                _rule(
+                    "death-trap-destroyed-in-trapped-terrain-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
+                ),
+                _rule(
+                    "death-trap-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    "primary",
+                    4,
+                    None,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+            ),
+        ),
         SourcePrimaryMissionRow(
             primary_mission_id="burden-of-trust",
             name="Burden of Trust",
@@ -489,10 +606,10 @@ def secondary_mission_rows() -> tuple[SourceSecondaryMissionRow, ...]:
             tactical_vp=4,
             alternate_vp=3,
         ),
-        _secondary("bring-it-down", "Bring It Down", "both", True, fixed_vp=2, tactical_vp=4),
-        _secondary("cleanse", "Cleanse", "both", True, fixed_vp=4, tactical_vp=5, alternate_vp=2),
+        _secondary_bring_it_down(),
+        _secondary_cleanse(),
         _secondary("cull-the-horde", "Cull the Horde", "both", True, fixed_vp=5, tactical_vp=5),
-        _secondary("defend-stronghold", "Defend Stronghold", "tactical", False, tactical_vp=3),
+        _secondary_defend_stronghold(),
         _secondary("display-of-might", "Display of Might", "tactical", False, tactical_vp=4),
         _secondary(
             "engage-on-all-fronts",
@@ -517,9 +634,8 @@ def secondary_mission_rows() -> tuple[SourceSecondaryMissionRow, ...]:
             "marked-for-death", "Marked for Death", "tactical", False, tactical_vp=5, alternate_vp=2
         ),
         _secondary("no-prisoners", "No Prisoners", "both", False, fixed_vp=2, tactical_vp=2, cap=5),
-        _secondary(
-            "overwhelming-force", "Overwhelming Force", "tactical", False, tactical_vp=3, cap=5
-        ),
+        _secondary_overwhelming_force(),
+        _secondary_plunder(),
         _secondary(
             "recover-assets", "Recover Assets", "tactical", False, tactical_vp=5, alternate_vp=3
         ),
@@ -549,25 +665,74 @@ def force_disposition_rows() -> tuple[SourceForceDispositionRow, ...]:
 
 
 def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ...]:
+    implemented_mission_ids = frozenset(
+        {
+            "primary-death-trap",
+            "primary-immovable-object",
+            "primary-unstoppable-force",
+        }
+    )
+    primary_mission_names = {
+        "purge-the-foe": {
+            "take-and-hold": "Unstoppable Force",
+            "purge-the-foe": "Meatgrinder",
+            "priority-assets": "Punishment",
+            "reconnaissance": "Consecrate",
+            "disruption": "Destroyer's Wrath",
+        },
+        "take-and-hold": {
+            "take-and-hold": "Battlefield Dominance",
+            "purge-the-foe": "Immovable Object",
+            "priority-assets": "Determined Acquisition",
+            "reconnaissance": "Purge and Secure",
+            "disruption": "Inescapable Dominion",
+        },
+        "priority-assets": {
+            "take-and-hold": "Secure Asset",
+            "purge-the-foe": "Vital Link",
+            "priority-assets": "Extract Relic",
+            "reconnaissance": "Vanguard Operation",
+            "disruption": "Sabotage",
+        },
+        "reconnaissance": {
+            "take-and-hold": "Reconnaissance Sweep",
+            "purge-the-foe": "Triangulation",
+            "priority-assets": "Surveil the Foe",
+            "reconnaissance": "Gather Intel",
+            "disruption": "Search and Scour",
+        },
+        "disruption": {
+            "take-and-hold": "Death Trap",
+            "purge-the-foe": "Delaying Action",
+            "priority-assets": "Locate and Deny",
+            "reconnaissance": "Outmaneuver",
+            "disruption": "Smoke and Mirrors",
+        },
+    }
     rows: list[SourcePrimaryMissionMatrixCellRow] = []
     for player_disposition in force_disposition_rows():
         for opponent_disposition in force_disposition_rows():
-            primary_mission_id = (
-                "primary-"
-                f"{player_disposition.force_disposition_id}-vs-"
-                f"{opponent_disposition.force_disposition_id}"
+            primary_mission_name = primary_mission_names[player_disposition.force_disposition_id][
+                opponent_disposition.force_disposition_id
+            ]
+            primary_mission_id = f"primary-{_mission_name_slug(primary_mission_name)}"
+            source_status = (
+                "implemented"
+                if primary_mission_id in implemented_mission_ids
+                else "awaiting_source"
             )
             rows.append(
                 SourcePrimaryMissionMatrixCellRow(
                     player_force_disposition_id=player_disposition.force_disposition_id,
                     opponent_force_disposition_id=opponent_disposition.force_disposition_id,
                     primary_mission_id=primary_mission_id,
+                    primary_mission_name=primary_mission_name,
                     battlefield_layout_ids=(
                         f"{primary_mission_id}-layout-1",
                         f"{primary_mission_id}-layout-2",
                         f"{primary_mission_id}-layout-3",
                     ),
-                    source_status="awaiting_source",
+                    source_status=source_status,
                 )
             )
     return tuple(rows)
@@ -575,6 +740,20 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
 
 def mission_action_rows() -> tuple[SourceMissionActionRow, ...]:
     return (
+        SourceMissionActionRow(
+            mission_action_id="booby-trap-terrain",
+            mission_id="primary-death-trap",
+            mission_kind="primary",
+            name="Booby Trap",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="immediate",
+            eligible_unit_policy="active_player_unit",
+            target_policy="trappable_terrain_area",
+            interruption_conditions=(),
+            victory_points=0,
+            scoring_source_id="primary-death-trap",
+        ),
         SourceMissionActionRow(
             mission_action_id="cleanse-objective",
             mission_id="cleanse",
@@ -586,8 +765,22 @@ def mission_action_rows() -> tuple[SourceMissionActionRow, ...]:
             eligible_unit_policy="active_player_infantry_or_battleline_unit",
             target_policy="objective_marker",
             interruption_conditions=("unit_moved", "unit_destroyed", "unit_left_battlefield"),
-            victory_points=5,
+            victory_points=0,
             scoring_source_id="cleanse",
+        ),
+        SourceMissionActionRow(
+            mission_action_id="plunder-terrain",
+            mission_id="plunder",
+            mission_kind="secondary",
+            name="Plunder",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="immediate",
+            eligible_unit_policy="active_player_unit",
+            target_policy="plunderable_terrain_area",
+            interruption_conditions=(),
+            victory_points=0,
+            scoring_source_id="plunder",
         ),
         SourceMissionActionRow(
             mission_action_id="establish-locus-objective",
@@ -718,6 +911,135 @@ def _secondary(
         tournament_fixed_allowed=tournament_fixed_allowed,
         scoring_rules=tuple(rules),
     )
+
+
+def _secondary_bring_it_down() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="bring-it-down",
+        name="Bring It Down",
+        availability="both",
+        tournament_fixed_allowed=True,
+        scoring_rules=(
+            _rule(
+                "bring-it-down-fixed",
+                "turn_end",
+                "fixed_secondary",
+                4,
+                None,
+                "each_enemy_model_w10_or_more_destroyed_this_turn",
+            ),
+            _rule(
+                "bring-it-down-tactical",
+                "turn_end",
+                "tactical_secondary",
+                5,
+                5,
+                "each_enemy_model_w10_or_more_destroyed_this_turn",
+            ),
+        ),
+    )
+
+
+def _secondary_cleanse() -> SourceSecondaryMissionRow:
+    rules: list[SourceScoringRuleRow] = []
+    for source_kind in ("fixed_secondary", "tactical_secondary"):
+        suffix = "fixed" if source_kind == "fixed_secondary" else "tactical"
+        rules.extend(
+            (
+                _rule(
+                    f"cleanse-{suffix}-one-objective",
+                    "your_turn_end",
+                    source_kind,
+                    2,
+                    None,
+                    "one_or_more_objectives_cleansed_this_turn",
+                ),
+                _rule(
+                    f"cleanse-{suffix}-two-objectives",
+                    "your_turn_end",
+                    source_kind,
+                    3,
+                    None,
+                    "two_or_more_objectives_cleansed_this_turn",
+                ),
+            )
+        )
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="cleanse",
+        name="Cleanse",
+        availability="both",
+        tournament_fixed_allowed=True,
+        scoring_rules=tuple(rules),
+    )
+
+
+def _secondary_defend_stronghold() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="defend-stronghold",
+        name="Defend Stronghold",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "defend-stronghold-home-objective",
+                "opponent_turn_end_or_round_five_turn_end",
+                "tactical_secondary",
+                3,
+                None,
+                "control_home_objective",
+            ),
+            _rule(
+                "defend-stronghold-no-enemy-in-deployment-zone",
+                "opponent_turn_end_or_round_five_turn_end",
+                "tactical_secondary",
+                2,
+                None,
+                "no_enemy_units_within_own_deployment_zone",
+            ),
+        ),
+    )
+
+
+def _secondary_overwhelming_force() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="overwhelming-force",
+        name="Overwhelming Force",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "overwhelming-force-tactical",
+                "turn_end",
+                "tactical_secondary",
+                3,
+                5,
+                "each_enemy_unit_started_turn_on_objective_destroyed",
+            ),
+        ),
+    )
+
+
+def _secondary_plunder() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="plunder",
+        name="Plunder",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "plunder-tactical",
+                "your_turn_end",
+                "tactical_secondary",
+                5,
+                None,
+                "one_or_more_terrain_areas_plundered_this_turn",
+            ),
+        ),
+    )
+
+
+def _mission_name_slug(name: str) -> str:
+    return name.lower().replace("'", "").replace(" ", "-")
 
 
 def _rule(

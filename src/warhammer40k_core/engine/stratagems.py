@@ -2398,7 +2398,7 @@ def _detachment_gate_allows(
             continue
         selection = army.detachment_selection
         return (
-            selection.detachment_id == record.detachment_id
+            record.detachment_id in selection.detachment_ids
             and record.definition.stratagem_id in selection.stratagem_ids
         )
     return False

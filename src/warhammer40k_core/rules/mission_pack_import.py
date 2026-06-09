@@ -31,17 +31,17 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainWallTemplate,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chapter_approved_2025_26 as source_data,
+    chapter_approved_2026_27 as source_data,
 )
 
-CHAPTER_APPROVED_2025_26_SOURCE_ID = source_data.SOURCE_PACKAGE_ID
-CHAPTER_APPROVED_2025_26_SOURCE_VERSION = source_data.SOURCE_VERSION
+CHAPTER_APPROVED_2026_27_SOURCE_ID = source_data.SOURCE_PACKAGE_ID
+CHAPTER_APPROVED_2026_27_SOURCE_VERSION = source_data.SOURCE_VERSION
 STRIKE_FORCE_BATTLEFIELD_WIDTH_INCHES = 60.0
 STRIKE_FORCE_BATTLEFIELD_DEPTH_INCHES = 44.0
 
 
-def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
-    """Build the source-linked Chapter Approved 2025-26 mission pack descriptors."""
+def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
+    """Build the source-linked Chapter Approved 2026-27 mission pack descriptors."""
 
     deployment_maps = _deployment_maps()
     terrain_layouts = _terrain_layouts()
@@ -53,9 +53,9 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
     scoring = source_data.mission_pack_scoring_row()
     return MissionPackDefinition(
         mission_pack_id=source_data.MISSION_PACK_ID,
-        name="Chapter Approved 2025-26",
-        source_version=CHAPTER_APPROVED_2025_26_SOURCE_VERSION,
-        source_id=CHAPTER_APPROVED_2025_26_SOURCE_ID,
+        name="Chapter Approved 2026-27",
+        source_version=CHAPTER_APPROVED_2026_27_SOURCE_VERSION,
+        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
         source_package=source_data.source_package_definition(),
         sequence=ChapterApprovedMissionSequence(
             sequence_id="chapter-approved-tournament-sequence",
@@ -73,12 +73,12 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
                 "resolve_prebattle_rules",
                 "begin_battle",
             ),
-            source_id=CHAPTER_APPROVED_2025_26_SOURCE_ID,
+            source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
         ),
         deployment_maps=deployment_maps,
         terrain_layout_templates=terrain_layouts,
         mission_deck=MissionDeckDefinition(
-            mission_deck_id="chapter-approved-2025-26-strike-force",
+            mission_deck_id="chapter-approved-2026-27-strike-force",
             primary_mission_ids=tuple(mission.primary_mission_id for mission in primary_missions),
             secondary_mission_ids=tuple(
                 mission.secondary_mission_id for mission in secondary_missions
@@ -87,7 +87,7 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
             deployment_map_ids=tuple(
                 deployment_map.deployment_map_id for deployment_map in deployment_maps
             ),
-            source_id=CHAPTER_APPROVED_2025_26_SOURCE_ID,
+            source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
         ),
         primary_missions=primary_missions,
         secondary_missions=secondary_missions,
@@ -101,7 +101,7 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
             secondary_vp_cap=scoring.secondary_vp_cap,
             battle_ready_vp=10,
             total_vp_cap=scoring.total_vp_cap,
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:tournament-scoring",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:tournament-scoring",
         ),
         scoring=MissionPackScoringDefinition(
             game_length_battle_rounds=scoring.game_length_battle_rounds,
@@ -122,7 +122,7 @@ def chapter_approved_2025_26_mission_pack() -> MissionPackDefinition:
             reserve_destruction_only_declare_battle_formations=(
                 scoring.reserve_destruction_only_declare_battle_formations
             ),
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:scoring",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:scoring",
         ),
     )
 
@@ -230,7 +230,7 @@ def _deployment_map(
         battlefield_depth_inches=STRIKE_FORCE_BATTLEFIELD_DEPTH_INCHES,
         objective_markers=_objective_markers(deployment_map_id, objective_positions),
         deployment_zones=tuple(zones),
-        source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:{deployment_map_id}",
+        source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:{deployment_map_id}",
     )
 
 
@@ -261,7 +261,7 @@ def _objective_markers(
             name=name,
             x_inches=x,
             y_inches=y,
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:{deployment_map_id}",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:{deployment_map_id}",
         )
         for marker_id, name, x, y in positions
     )
@@ -518,7 +518,7 @@ def _terrain_layout(
     index: int,
     slots: tuple[tuple[str, float, tuple[float, float]], ...],
 ) -> TerrainLayoutTemplate:
-    source_id = f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:layout-{index}"
+    source_id = f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:layout-{index}"
     return TerrainLayoutTemplate(
         terrain_layout_id=f"layout-{index}",
         name=f"Layout {index}",
@@ -697,9 +697,9 @@ def _primary_missions() -> tuple[PrimaryMissionDefinition, ...]:
             vp_per_controlled_objective=row.vp_per_controlled_objective,
             scoring_rules=_scoring_rules(
                 row.scoring_rules,
-                source_prefix=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary:{row.primary_mission_id}",
+                source_prefix=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:primary:{row.primary_mission_id}",
             ),
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary:{row.primary_mission_id}",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:primary:{row.primary_mission_id}",
         )
         for row in source_data.primary_mission_rows()
     )
@@ -715,10 +715,10 @@ def _secondary_missions() -> tuple[SecondaryMissionDefinition, ...]:
             scoring_rules=_scoring_rules(
                 row.scoring_rules,
                 source_prefix=(
-                    f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:secondary:{row.secondary_mission_id}"
+                    f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:secondary:{row.secondary_mission_id}"
                 ),
             ),
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:secondary:{row.secondary_mission_id}",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:secondary:{row.secondary_mission_id}",
         )
         for row in source_data.secondary_mission_rows()
     )
@@ -730,7 +730,7 @@ def _force_dispositions() -> tuple[ForceDispositionDefinition, ...]:
             force_disposition_id=row.force_disposition_id,
             name=row.name,
             source_id=(
-                f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:force-disposition:{row.force_disposition_id}"
+                f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:force-disposition:{row.force_disposition_id}"
             ),
         )
         for row in source_data.force_disposition_rows()
@@ -746,7 +746,7 @@ def _primary_mission_matrix_cells() -> tuple[PrimaryMissionMatrixCell, ...]:
             battlefield_layout_ids=row.battlefield_layout_ids,
             source_status=MissionSourceStatus(row.source_status),
             source_id=(
-                f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:primary-mission-matrix:"
+                f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:primary-mission-matrix:"
                 f"{row.player_force_disposition_id}:"
                 f"{row.opponent_force_disposition_id}"
             ),
@@ -770,7 +770,7 @@ def _mission_actions() -> tuple[MissionActionDefinition, ...]:
             interruption_conditions=row.interruption_conditions,
             victory_points=row.victory_points,
             scoring_source_id=row.scoring_source_id,
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:action:{row.mission_action_id}",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:action:{row.mission_action_id}",
         )
         for row in source_data.mission_action_rows()
     )
@@ -811,7 +811,7 @@ def _challenger_cards() -> tuple[ChallengerCardDefinition, ...]:
         ChallengerCardDefinition(
             challenger_card_id=card_id,
             name=name,
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:challenger:{card_id}",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:challenger:{card_id}",
         )
         for card_id, name in cards
     )
@@ -846,7 +846,7 @@ def _mission_pool_entries() -> tuple[MissionPoolEntry, ...]:
             primary_mission_id=primary_id,
             deployment_map_id=deployment_map_id,
             terrain_layout_ids=tuple(f"layout-{layout_id}" for layout_id in layout_ids),
-            source_id=f"{CHAPTER_APPROVED_2025_26_SOURCE_ID}:mission-pool:{entry_id}",
+            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:mission-pool:{entry_id}",
         )
         for entry_id, primary_id, deployment_map_id, layout_ids in rows
     )

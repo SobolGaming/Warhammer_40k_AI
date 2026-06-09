@@ -69,7 +69,7 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-new-0004"
 _TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-phase15d-0001"
@@ -992,7 +992,7 @@ def _config(*, game_id: str = "phase10o-desperate") -> GameConfig:
 
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id="mission-a",
         terrain_layout_id="layout-1",
         attacker_player_id="player-a",
@@ -1015,7 +1015,7 @@ def _army_muster_request(
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=tuple(
             UnitMusterSelection(

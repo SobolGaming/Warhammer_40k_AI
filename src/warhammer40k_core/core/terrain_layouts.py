@@ -251,7 +251,7 @@ class TerrainFeatureTemplate:
     footprint_depth_inches: float
     walls: tuple[TerrainWallTemplate, ...] = ()
     floors: tuple[TerrainFloorTemplate, ...] = ()
-    source_id: str = "chapter_approved_2025_26"
+    source_id: str = "chapter_approved_2026_27"
 
     def __post_init__(self) -> None:
         object.__setattr__(

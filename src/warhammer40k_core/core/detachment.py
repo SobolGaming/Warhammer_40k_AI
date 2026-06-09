@@ -3,6 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.content_scope import (
+    CatalogContentScope,
+    CatalogContentScopeError,
+    catalog_content_scope_from_token,
+)
+
 
 class DetachmentCatalogError(ValueError):
     """Raised when detachment catalog data violates CORE V2 invariants."""
@@ -12,6 +18,7 @@ class EnhancementDefinitionPayload(TypedDict):
     enhancement_id: str
     name: str
     source_id: str
+    content_scope: str
     points: int | None
     ability_descriptor_ids: list[str]
 
@@ -20,6 +27,7 @@ class StratagemDefinitionPayload(TypedDict):
     stratagem_id: str
     name: str
     source_id: str
+    content_scope: str
     command_point_cost: int
     timing_tags: list[str]
     ability_descriptor_ids: list[str]
@@ -29,6 +37,10 @@ class DetachmentDefinitionPayload(TypedDict):
     detachment_id: str
     name: str
     faction_id: str
+    content_scope: str
+    detachment_point_cost: int | None
+    unit_datasheet_ids: list[str]
+    force_disposition_ids: list[str]
     rule_source_ids: list[str]
     enhancement_ids: list[str]
     stratagem_ids: list[str]
@@ -40,6 +52,7 @@ class EnhancementDefinition:
     enhancement_id: str
     name: str
     source_id: str
+    content_scope: CatalogContentScope = CatalogContentScope.MATCHED_PLAY
     points: int | None = None
     ability_descriptor_ids: tuple[str, ...] = ()
 
@@ -65,6 +78,14 @@ class EnhancementDefinition:
         )
         object.__setattr__(
             self,
+            "content_scope",
+            _catalog_content_scope_from_token(
+                "EnhancementDefinition content_scope",
+                self.content_scope,
+            ),
+        )
+        object.__setattr__(
+            self,
             "points",
             _validate_optional_non_negative_int("EnhancementDefinition points", self.points),
         )
@@ -85,6 +106,7 @@ class EnhancementDefinition:
             "enhancement_id": self.enhancement_id,
             "name": self.name,
             "source_id": self.source_id,
+            "content_scope": self.content_scope.value,
             "points": self.points,
             "ability_descriptor_ids": list(self.ability_descriptor_ids),
         }
@@ -95,6 +117,7 @@ class EnhancementDefinition:
             enhancement_id=payload["enhancement_id"],
             name=payload["name"],
             source_id=payload["source_id"],
+            content_scope=catalog_content_scope_from_token(payload["content_scope"]),
             points=payload["points"],
             ability_descriptor_ids=tuple(payload["ability_descriptor_ids"]),
         )
@@ -106,6 +129,7 @@ class StratagemDefinition:
     name: str
     source_id: str
     command_point_cost: int
+    content_scope: CatalogContentScope = CatalogContentScope.MATCHED_PLAY
     timing_tags: tuple[str, ...] = ()
     ability_descriptor_ids: tuple[str, ...] = ()
 
@@ -128,6 +152,14 @@ class StratagemDefinition:
             self,
             "source_id",
             _validate_identifier("StratagemDefinition source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "content_scope",
+            _catalog_content_scope_from_token(
+                "StratagemDefinition content_scope",
+                self.content_scope,
+            ),
         )
         object.__setattr__(
             self,
@@ -159,6 +191,7 @@ class StratagemDefinition:
             "stratagem_id": self.stratagem_id,
             "name": self.name,
             "source_id": self.source_id,
+            "content_scope": self.content_scope.value,
             "command_point_cost": self.command_point_cost,
             "timing_tags": list(self.timing_tags),
             "ability_descriptor_ids": list(self.ability_descriptor_ids),
@@ -170,6 +203,7 @@ class StratagemDefinition:
             stratagem_id=payload["stratagem_id"],
             name=payload["name"],
             source_id=payload["source_id"],
+            content_scope=catalog_content_scope_from_token(payload["content_scope"]),
             command_point_cost=payload["command_point_cost"],
             timing_tags=tuple(payload["timing_tags"]),
             ability_descriptor_ids=tuple(payload["ability_descriptor_ids"]),
@@ -181,6 +215,10 @@ class DetachmentDefinition:
     detachment_id: str
     name: str
     faction_id: str
+    content_scope: CatalogContentScope = CatalogContentScope.MATCHED_PLAY
+    detachment_point_cost: int | None = None
+    unit_datasheet_ids: tuple[str, ...] = ()
+    force_disposition_ids: tuple[str, ...] = ()
     rule_source_ids: tuple[str, ...] = ()
     enhancement_ids: tuple[str, ...] = ()
     stratagem_ids: tuple[str, ...] = ()
@@ -205,6 +243,38 @@ class DetachmentDefinition:
             self,
             "faction_id",
             _validate_identifier("DetachmentDefinition faction_id", self.faction_id),
+        )
+        object.__setattr__(
+            self,
+            "content_scope",
+            _catalog_content_scope_from_token(
+                "DetachmentDefinition content_scope",
+                self.content_scope,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "detachment_point_cost",
+            _validate_optional_detachment_point_cost(
+                "DetachmentDefinition detachment_point_cost",
+                self.detachment_point_cost,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "unit_datasheet_ids",
+            _validate_identifier_tuple(
+                "DetachmentDefinition unit_datasheet_ids",
+                self.unit_datasheet_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "force_disposition_ids",
+            _validate_identifier_tuple(
+                "DetachmentDefinition force_disposition_ids",
+                self.force_disposition_ids,
+            ),
         )
         object.__setattr__(
             self,
@@ -241,6 +311,10 @@ class DetachmentDefinition:
             "detachment_id": self.detachment_id,
             "name": self.name,
             "faction_id": self.faction_id,
+            "content_scope": self.content_scope.value,
+            "detachment_point_cost": self.detachment_point_cost,
+            "unit_datasheet_ids": list(self.unit_datasheet_ids),
+            "force_disposition_ids": list(self.force_disposition_ids),
             "rule_source_ids": list(self.rule_source_ids),
             "enhancement_ids": list(self.enhancement_ids),
             "stratagem_ids": list(self.stratagem_ids),
@@ -253,6 +327,10 @@ class DetachmentDefinition:
             detachment_id=payload["detachment_id"],
             name=payload["name"],
             faction_id=payload["faction_id"],
+            content_scope=catalog_content_scope_from_token(payload["content_scope"]),
+            detachment_point_cost=payload["detachment_point_cost"],
+            unit_datasheet_ids=tuple(payload["unit_datasheet_ids"]),
+            force_disposition_ids=tuple(payload["force_disposition_ids"]),
             rule_source_ids=tuple(payload["rule_source_ids"]),
             enhancement_ids=tuple(payload["enhancement_ids"]),
             stratagem_ids=tuple(payload["stratagem_ids"]),
@@ -276,6 +354,13 @@ def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str)
     return identifier
 
 
+def _catalog_content_scope_from_token(field_name: str, token: object) -> CatalogContentScope:
+    try:
+        return catalog_content_scope_from_token(token)
+    except CatalogContentScopeError as exc:
+        raise DetachmentCatalogError(f"{field_name} is invalid.") from exc
+
+
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise DetachmentCatalogError(f"{field_name} must be a tuple.")
@@ -295,6 +380,16 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
         raise DetachmentCatalogError(f"{field_name} must be an integer.")
     if value < 0:
         raise DetachmentCatalogError(f"{field_name} must not be negative.")
+    return value
+
+
+def _validate_optional_detachment_point_cost(field_name: str, value: object | None) -> int | None:
+    if value is None:
+        return None
+    if type(value) is not int:
+        raise DetachmentCatalogError(f"{field_name} must be an integer.")
+    if value < 1 or value > 3:
+        raise DetachmentCatalogError(f"{field_name} must be between 1 and 3.")
     return value
 
 

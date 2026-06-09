@@ -64,7 +64,7 @@ from warhammer40k_core.engine.timing_windows import (
 )
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_reaction_window_emits_interrupt_decision_and_resumes_parent_phase() -> None:
@@ -999,7 +999,7 @@ def _transport_state_with_embarked_passenger() -> tuple[GameState, str, str]:
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=(
             UnitMusterSelection(
@@ -1041,7 +1041,7 @@ def _transport_state_with_embarked_passenger() -> tuple[GameState, str, str]:
     state = GameState.from_config(
         GameConfig(
             game_id="phase12a-transport-game",
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
                 descriptor_version="core-v2-phase12a-test"
             ),
             army_catalog=catalog,
@@ -1050,7 +1050,7 @@ def _transport_state_with_embarked_passenger() -> tuple[GameState, str, str]:
             turn_order=("player-a", "player-b"),
             fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
             mission_setup=MissionSetup.from_mission_pack(
-                mission_pack=chapter_approved_2025_26_mission_pack(),
+                mission_pack=chapter_approved_2026_27_mission_pack(),
                 mission_pool_entry_id="mission-a",
                 terrain_layout_id="layout-1",
                 attacker_player_id="player-a",
@@ -1083,7 +1083,7 @@ def _config(*, unit_selection_ids: tuple[str, ...]) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase12a-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-phase12a-test"
         ),
         army_catalog=catalog,
@@ -1105,7 +1105,7 @@ def _config(*, unit_selection_ids: tuple[str, ...]) -> GameConfig:
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
         mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2025_26_mission_pack(),
+            mission_pack=chapter_approved_2026_27_mission_pack(),
             mission_pool_entry_id="mission-a",
             terrain_layout_id="layout-1",
             attacker_player_id="player-a",
@@ -1129,7 +1129,7 @@ def _army_muster_request(
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=tuple(
             UnitMusterSelection(

@@ -59,8 +59,9 @@ duplicate weapon ability selection is adapter-visible and replay-safe, and
 unimplemented Core ability families are fail-closed as explicit unsupported
 descriptors with future owning phase IDs. **Phase 14J's mission/catalog
 replacement slice is implemented** for source-tracked 11th Edition Force
-Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per
-matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**:
+Dispositions, the named 25-cell Primary Mission matrix, three layout identifiers
+per matrix cell, and finite Tactical Secondary score/retain decisions.
+**Phase 14K is complete**:
 cutover hardening now rejects retired save/allocation choice
 surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve
 arrival enemy-distance policy, separate Reinforcements-step placement records,
@@ -133,7 +134,7 @@ Completed / implemented foundation:
 | 10T | Complete | Movement phase completion gate |
 | 10U | Complete | Movement/pathing/terrain profiling and hotspot budget gate |
 | 10V | Complete | Movement audit hardening and deferred-wiring contracts |
-| 11A | Complete | Chapter Approved 2025-26 mission pack data |
+| 11A | Complete | Chapter Approved 2026-27 mission pack data |
 | 11B | Complete | Objective control geometry and mission objective model |
 | 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
 | 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
@@ -244,7 +245,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection for implemented families, `[ANTI]` including duplicate Shooting selection, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]` movement-evidence slice, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative default 12" targeting gate, `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17F, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
-| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2025-26 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
+| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2026-27 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 16A, 16C, 16E |
 
 # Build order details
@@ -1008,18 +1009,18 @@ Required tests:
 
 # Mission pack, objectives, Command phase, and scoring
 
-## Phase 11A: Chapter Approved 2025-26 mission pack data
+## Phase 11A: Chapter Approved 2026-27 mission pack data
 
 Status: Complete.
 
-This phase brings in Chapter Approved 2025-26 mission data: mission sequence,
+This phase brings in Chapter Approved 2026-27 mission data: mission sequence,
 deployment maps, objective marker positions, mission pool, mission decks,
 secondary mission cards, Challenger cards, terrain layout templates, and
 tournament scoring caps.
 
 Phase 11A terrain layout import has two layers. `core/terrain_layouts.py`
 defines pure geometry domain templates, while `rules/mission_pack_import.py`
-transcribes the Chapter Approved 2025-26 layout slot table into `layout-1`
+transcribes the Chapter Approved 2026-27 layout slot table into `layout-1`
 through `layout-8`. Each slot preserves the source preset, rotation, and world
 origin in terrain feature `source_id` metadata for audit/replay provenance.
 Runtime `TerrainFeatureTemplate` geometry intentionally instantiates the
@@ -1058,7 +1059,7 @@ Objects:
 
 Invariants:
 
-- Chapter Approved 2025-26 is source-linked and versioned;
+- Chapter Approved 2026-27 is source-linked and versioned;
 - mission setup order is data, not driver-local enum arithmetic;
 - deployment zones are geometry objects tied to deployment maps;
 - objective marker positions are source-defined and use center-point measurement;
@@ -1320,7 +1321,7 @@ Modules:
 - `engine/actions.py`
 - `engine/turn_cleanup.py`
 - `engine/unit_coherency.py`
-- `rules/source_packages/warhammer_40000_11th/chapter_approved_2025_26.py`
+- `rules/source_packages/warhammer_40000_11th/chapter_approved_2026_27.py`
 
 Objects:
 
@@ -1350,7 +1351,7 @@ Invariants:
   immediately;
 - retained Secondary Missions do not have a two-card hand-size cap;
 - Tactical discard can discard one or more retained Secondary Missions, records
-  no replacement draw, and grants the Chapter Approved 2025-26 1 CP ordinary
+  no replacement draw, and grants the Chapter Approved 2026-27 1 CP ordinary
   discard reward only when the discarding player is the active player;
 - New Orders is a separate 1 CP Stratagem path that discards one retained
   Secondary Mission, immediately draws a replacement Secondary Mission, and is
@@ -1368,7 +1369,7 @@ Required tests:
 - primary scoring at correct timing and source-backed battle-round gates;
 - secondary scoring uses source-backed Fixed/Tactical card VP values;
 - Secondary Mission draw, score, retain, and discard flow is public or hidden according to source-backed viewer rules;
-- Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions, grants the Chapter Approved 2025-26 1 CP ordinary discard reward only on the discarding player's own turn, and does not replace discarded cards;
+- Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions, grants the Chapter Approved 2026-27 1 CP ordinary discard reward only on the discarding player's own turn, and does not replace discarded cards;
 - New Orders emits deterministic Stratagem, CP, discard, and replacement-draw
   records, rejects second use in the same game, and cannot be confused with
   ordinary Tactical discard;
@@ -2567,27 +2568,33 @@ Required tests:
 
 Status: Complete for the current source-backed slice. The engine now records the
 five 11th Edition Force Dispositions, the 25-cell player-vs-opponent Primary
-Mission matrix, three layout identifiers per cell, and engine-achievement-gated
-Tactical Secondary score/retain as an adapter-visible finite decision. Exact
-Primary Mission scoring rules, layout geometry, and confirmed 18-card Secondary
-Mission identities remain pending source work rather than guessed content.
+Mission matrix with source-tracked mission names, three layout identifiers per
+cell, and engine-achievement-gated Tactical Secondary score/retain as an
+adapter-visible finite decision. Exact Primary Mission scoring rules, layout
+geometry, and confirmed 18-card Secondary Mission identities remain pending
+source work rather than guessed content.
 
 Invariants:
 
 - mission packs, deployment maps, terrain layouts, actions, scoring, datasheets, keywords, detachments, enhancements, and faction rules are imported as 11th Edition source packages;
 - 11th Edition Primary Mission source data records the five Force Dispositions
   (`Purge The Foe`, `Take And Hold`, `Disruption`, `Reconnaissance`, and
-  `Priority Assets`), the deterministic 5x5 player-vs-opponent matrix, and
-  three source-tracked battlefield layout identifiers per matrix cell;
+  `Priority Assets`), the deterministic 5x5 player-vs-opponent matrix, the
+  source-tracked Primary Mission name for each matrix cell, and three
+  source-tracked battlefield layout identifiers per matrix cell;
 - matrix cells whose Primary Mission rules or layout geometry are not yet known
   remain `awaiting_source`, never substituted with retired-edition missions or
   invented scoring text;
 - mustering source data follows the 11th Edition order: select Battle Size,
   start Army Roster, choose Faction, select Detachment Rules, select Units, then
   promote Warlord;
-- Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit
-  Limit 2 doubled for `BATTLELINE`; Strike Force is 2000 points, 4 Detachment
-  Points, Enhancement Limit 4, and Unit Limit 3 doubled for `BATTLELINE`;
+- CORE V2 currently supports only Strike Force army construction: 2000 points,
+  a 60" x 44" battlefield expectation, 3 Detachment Points, Enhancement Limit
+  4, and Unit Limit 3 doubled for `BATTLELINE`; smaller battle sizes are
+  explicit unsupported inputs, not fallback modes;
+- active army catalogs must exclude Combat Patrol, Legends, Forge World, Kill
+  Team, and other non-matched-play content scopes instead of filtering them by
+  names or tolerating them during mustering;
 - detachment point costs are source data, and missing values remain
   awaiting-source rows rather than defaults;
 - Leader and Support Attached Units are declared on the army list, Enhancements
@@ -2598,7 +2605,7 @@ Invariants:
   Tactical-discarded Secondary Missions immediately;
 - retained Secondary Missions have no two-card hand-size cap, ordinary Tactical
   discard can happen in either player's turn but grants the Chapter Approved
-  2025-26 1 CP reward only when the discarding player is the active player, and
+  2026-27 1 CP reward only when the discarding player is the active player, and
   New Orders is the explicit once-per-game 1 CP replacement-draw exception;
 - when a Tactical Secondary Mission Card's requirements are achieved, the engine
   records a source-backed achievement context before emitting the finite scoring
@@ -2608,7 +2615,7 @@ Invariants:
 - Future PR note: when the 11th Edition mission-card source is available,
   replace the provisional Secondary Mission card source rows with the confirmed
   18-card list and re-check ordinary Tactical discard CP reward timing against
-  that source instead of assuming the Chapter Approved 2025-26 own-turn-only
+  that source instead of assuming the Chapter Approved 2026-27 own-turn-only
   rule carries forward;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, Battle Ready at
   10 VP, total score at 100 VP, and Primary and Secondary scoring at 15 VP per
@@ -2623,11 +2630,11 @@ Required tests:
 - retired source packages cannot be selected for a new game;
 - representative mission/action/scoring rows load from 11th Edition source identity;
 - Force Disposition rows and all 25 Primary Mission matrix cells load,
-  round-trip, preserve `awaiting_source` status, and expose exactly three layout
-  identifiers per cell;
-- battle-size mustering rows enforce point, Detachment Point, Enhancement Limit,
-  Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
-  faction-keyword rules;
+  round-trip, preserve source names, preserve `awaiting_source` status, and
+  expose exactly three layout identifiers per cell;
+- Strike Force mustering policy enforces point, Detachment Point, Enhancement
+  Limit, Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
+  faction-keyword rules, and rejects unsupported battle-size inputs;
 - Secondary Mission draw/retain/no-hand-size-cap/discard, New Orders
   replacement draw, and 45/45/10/100 plus 15-per-round VP caps load from source
   data and round-trip through mission scoring fixtures;
@@ -3412,10 +3419,16 @@ Invariants:
 
 - mustering order is Battle Size, Army Roster, Faction, Detachment Rules, Units, then Warlord promotion;
 - battle size defines points limit, detachment points, enhancement limit, unit limit, and mission-compatible battlefield expectations;
-- Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit Limit 2, doubled for `BATTLELINE` units;
-- Strike Force is 2000 points, 4 Detachment Points, Enhancement Limit 4, and Unit Limit 3, doubled for `BATTLELINE` units;
+- CORE V2 currently supports only Strike Force: 2000 points, 60" x 44" battlefield expectations, 3 Detachment Points, Enhancement Limit 4, and Unit Limit 3, doubled for `BATTLELINE` units;
+- Incursion, Combat Patrol, Onslaught, and other battle sizes are explicit unsupported inputs until repository policy adds them;
+- active army catalogs reject Combat Patrol, Legends, Forge World, Kill Team,
+  and other non-matched-play content scopes instead of letting those units,
+  rules, Enhancements, Stratagems, or detachments reach mustering;
 - army faction is a selected Faction keyword and every included unit must be legal for that faction or an allowed exception;
-- detachment selection spends Detachment Points and grants access to detachment rules, units, Stratagems, and Enhancements; missing detachment point values are explicit awaiting-source data, not defaults;
+- detachment selection spends Detachment Points and grants access to detachment
+  rules, units, Stratagems, Enhancements, and Force Dispositions; missing
+  detachment point values, unit grants, or Force Disposition grants are explicit
+  awaiting-source data, not defaults;
 - the army must include at least one eligible `CHARACTER` model to be Warlord;
 - the Warlord must have the same Faction keyword as the rest of the army;
 - selected Warlord gains the `WARLORD` keyword;
@@ -3459,7 +3472,14 @@ Invariants:
 
 Required tests:
 
-- Incursion and Strike Force points, detachment points, enhancement limits, and unit limits;
+- Strike Force points, battlefield dimensions, detachment points, enhancement
+  limits, unit limits, and unsupported battle-size rejection;
+- active catalog rejection for Combat Patrol, Legends, Forge World, Kill Team,
+  and other non-matched-play content scopes;
+- multi-detachment Strike Force combinations whose total Detachment Point cost
+  is less than or equal to 3, plus rejection above 3;
+- selected detachment Force Disposition union and selected-detachment unit
+  grants;
 - Epic Hero uniqueness and Enhancement denial;
 - Enhancement count, uniqueness, Character-only, and one-per-attached-squad restrictions;
 - source-awaiting detachment point, enhancement eligibility, base-size,

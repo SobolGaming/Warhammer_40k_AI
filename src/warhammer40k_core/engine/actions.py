@@ -145,7 +145,7 @@ class MissionActionState:
         object.__setattr__(
             self,
             "victory_points",
-            _validate_positive_int("MissionActionState victory_points", self.victory_points),
+            _validate_non_negative_int("MissionActionState victory_points", self.victory_points),
         )
         object.__setattr__(self, "status", mission_action_status_from_token(self.status))
         object.__setattr__(
@@ -271,6 +271,47 @@ class MissionActionState:
             score_transaction_id=transaction_id,
         )
 
+    def complete_without_award(
+        self,
+        *,
+        battle_round: int,
+        phase: str,
+        completion_timing: str,
+        battle_shocked_unit_ids: tuple[str, ...] = (),
+    ) -> Self:
+        if self.status is not MissionActionStatus.STARTED:
+            raise GameLifecycleError("Only started mission Actions can complete.")
+        if self.victory_points != 0:
+            raise GameLifecycleError("Only zero-VP mission Actions can complete without award.")
+        _reject_battle_shocked_action_unit(
+            unit_instance_id=self.unit_instance_id,
+            battle_shocked_unit_ids=battle_shocked_unit_ids,
+            action_state="complete",
+        )
+        requested_timing = _validate_identifier("completion_timing", completion_timing)
+        if requested_timing != self.completion_timing:
+            raise GameLifecycleError("Mission Action completion timing drift.")
+        return type(self)(
+            action_id=self.action_id,
+            player_id=self.player_id,
+            unit_instance_id=self.unit_instance_id,
+            target_id=self.target_id,
+            mission_id=self.mission_id,
+            battle_round_started=self.battle_round_started,
+            phase_started=self.phase_started,
+            start_timing=self.start_timing,
+            completion_timing=self.completion_timing,
+            eligible_unit_instance_ids=self.eligible_unit_instance_ids,
+            interruption_conditions=self.interruption_conditions,
+            scoring_source_id=self.scoring_source_id,
+            victory_points=self.victory_points,
+            status=MissionActionStatus.COMPLETED,
+            completed_battle_round=_validate_positive_int("battle_round", battle_round),
+            completed_phase=_validate_identifier("phase", phase),
+            interrupted_reason=None,
+            score_transaction_id=None,
+        )
+
     def interrupt(self, *, reason: str) -> Self:
         if self.status is not MissionActionStatus.STARTED:
             raise GameLifecycleError("Only started mission Actions can be interrupted.")
@@ -349,8 +390,10 @@ class MissionActionState:
         if self.status is MissionActionStatus.COMPLETED:
             if self.completed_battle_round is None or self.completed_phase is None:
                 raise GameLifecycleError("Completed mission Action requires completion fields.")
-            if self.score_transaction_id is None:
-                raise GameLifecycleError("Completed mission Action requires score transaction.")
+            if self.score_transaction_id is None and self.victory_points != 0:
+                raise GameLifecycleError("Completed scoring mission Action requires transaction.")
+            if self.score_transaction_id is not None and self.victory_points == 0:
+                raise GameLifecycleError("Completed zero-VP mission Action must not score.")
             if self.interrupted_reason is not None:
                 raise GameLifecycleError("Completed mission Action cannot be interrupted.")
         if self.status is MissionActionStatus.INTERRUPTED:
@@ -465,6 +508,14 @@ def _validate_positive_int(field_name: str, value: object) -> int:
         raise GameLifecycleError(f"{field_name} must be an integer.")
     if value < 1:
         raise GameLifecycleError(f"{field_name} must be at least 1.")
+    return value
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise GameLifecycleError(f"{field_name} must not be negative.")
     return value
 
 

@@ -13,6 +13,7 @@ from warhammer40k_core.core.army_catalog import (
     ArmyCatalogPayload,
 )
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.content_scope import CatalogContentScope
 from warhammer40k_core.core.datasheet import (
     AttachmentRole,
     BaseSizeDefinition,
@@ -164,6 +165,9 @@ def test_army_catalog_round_trips_canonical_phase9a_content_pack() -> None:
 
     assert len(catalog.datasheets) == 7
     assert catalog.faction_by_id("core-marine-force").faction_keywords == ("CORE Marines",)
+    assert catalog.detachments[0].detachment_point_cost == 1
+    assert catalog.detachments[0].force_disposition_ids == ("purge-the-foe",)
+    assert "core-intercessor-like-infantry" in catalog.detachments[0].unit_datasheet_ids
     assert infantry_profile.characteristic(Characteristic.MOVEMENT).final == 6
     assert deep_strike.abilities[0].support is CatalogAbilitySupport.UNSUPPORTED
     assert deep_strike.abilities[0].source_id == (
@@ -242,6 +246,9 @@ def test_detachment_catalog_objects_are_data_not_behavior() -> None:
         detachment_id="core-detachment",
         name="Core Detachment",
         faction_id="core-marine-force",
+        detachment_point_cost=2,
+        unit_datasheet_ids=("core-intercessor-like-infantry",),
+        force_disposition_ids=("take-and-hold",),
         enhancement_ids=(enhancement.enhancement_id,),
         stratagem_ids=(stratagem.stratagem_id,),
     )
@@ -252,6 +259,9 @@ def test_detachment_catalog_objects_are_data_not_behavior() -> None:
     assert enhancement.stable_identity() == "enhancement:core-enhancement"
     assert stratagem.stable_identity() == "stratagem:core-stratagem"
     assert detachment.stable_identity() == "detachment:core-detachment"
+    assert detachment.detachment_point_cost == 2
+    assert detachment.unit_datasheet_ids == ("core-intercessor-like-infantry",)
+    assert detachment.force_disposition_ids == ("take-and-hold",)
 
     with pytest.raises(DetachmentCatalogError):
         EnhancementDefinition(
@@ -267,6 +277,8 @@ def test_detachment_catalog_objects_are_data_not_behavior() -> None:
             source_id="stratagem:bad",
             command_point_cost=-1,
         )
+    with pytest.raises(DetachmentCatalogError, match="between 1 and 3"):
+        replace(detachment, detachment_point_cost=4)
 
 
 def test_army_catalog_rejects_ambiguous_or_missing_catalog_links() -> None:
@@ -304,6 +316,42 @@ def test_army_catalog_rejects_ambiguous_or_missing_catalog_links() -> None:
             datasheets=(datasheet, datasheet),
             wargear=catalog.wargear,
             factions=catalog.factions,
+        )
+
+
+def test_army_catalog_rejects_unsupported_active_content_scopes() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+
+    with pytest.raises(ArmyCatalogError, match="unsupported datasheet content scope"):
+        ArmyCatalog(
+            catalog_id="legends-datasheet",
+            ruleset_id=catalog.ruleset_id,
+            source_package_id=catalog.source_package_id,
+            datasheets=(
+                replace(catalog.datasheets[0], content_scope=CatalogContentScope.LEGENDS),
+                *catalog.datasheets[1:],
+            ),
+            wargear=catalog.wargear,
+            factions=catalog.factions,
+            army_rules=catalog.army_rules,
+            detachments=catalog.detachments,
+        )
+
+    with pytest.raises(ArmyCatalogError, match="unsupported detachment content scope"):
+        ArmyCatalog(
+            catalog_id="combat-patrol-detachment",
+            ruleset_id=catalog.ruleset_id,
+            source_package_id=catalog.source_package_id,
+            datasheets=catalog.datasheets,
+            wargear=catalog.wargear,
+            factions=catalog.factions,
+            army_rules=catalog.army_rules,
+            detachments=(
+                replace(
+                    catalog.detachments[0],
+                    content_scope=CatalogContentScope.COMBAT_PATROL,
+                ),
+            ),
         )
 
 

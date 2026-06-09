@@ -267,13 +267,13 @@ class ReserveDestructionTimingPolicy:
         )
 
     @classmethod
-    def chapter_approved_2025_26(cls) -> Self:
+    def chapter_approved_2026_27(cls) -> Self:
         return cls(
             timing_kind=ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N,
             battle_round=3,
             exclude_during_battle_strategic_reserves=True,
             only_declare_battle_formations=True,
-            source_id="chapter_approved_2025_26_reserves_restrictions",
+            source_id="chapter_approved_2026_27_reserves_restrictions",
         )
 
     @classmethod
@@ -283,7 +283,7 @@ class ReserveDestructionTimingPolicy:
                 "ReserveDestructionTimingPolicy requires a MissionPolicyDescriptor."
             )
         source_id = (
-            "chapter_approved_2025_26_reserves_restrictions"
+            "chapter_approved_2026_27_reserves_restrictions"
             if (
                 mission_policy.reserve_destruction_timing
                 is ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N

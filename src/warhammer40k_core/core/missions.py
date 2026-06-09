@@ -265,7 +265,7 @@ class ObjectiveMarkerDefinition:
     is_flat: bool = True
     blocks_movement: bool = False
     blocks_placement: bool = False
-    source_id: str = "chapter_approved_2025_26"
+    source_id: str = "chapter_approved_2026_27"
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -945,7 +945,9 @@ class MissionActionDefinition:
         object.__setattr__(
             self,
             "victory_points",
-            _validate_positive_int("MissionActionDefinition victory_points", self.victory_points),
+            _validate_non_negative_int(
+                "MissionActionDefinition victory_points", self.victory_points
+            ),
         )
         object.__setattr__(
             self,

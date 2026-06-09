@@ -70,7 +70,7 @@ from warhammer40k_core.geometry.pathing import (
     TerrainPathLegalityResult,
 )
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() -> None:
@@ -1526,7 +1526,7 @@ def _config() -> GameConfig:
 
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id="mission-a",
         terrain_layout_id="layout-1",
         attacker_player_id="player-a",
@@ -1549,7 +1549,7 @@ def _army_muster_request(
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=(
             UnitMusterSelection(
@@ -1793,7 +1793,7 @@ def _army_muster_request_for_units(
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=unit_selections,
     )

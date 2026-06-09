@@ -66,14 +66,14 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chapter_approved_2025_26 as source_data,
+    chapter_approved_2026_27 as source_data,
 )
 
 
 def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     payload = mission_pack.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
@@ -84,12 +84,12 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
     assert MissionPackDefinition.from_payload(decoded).to_payload() == payload
     assert mission_pack.sequence.steps[0] == "muster_armies"
     assert len(mission_pack.mission_pool_entries) == 20
-    assert len(mission_pack.secondary_missions) == 19
+    assert len(mission_pack.secondary_missions) == 20
     assert len(mission_pack.challenger_cards) == 9
 
 
 def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     source_package = mission_pack.source_package
 
     payload = source_package.to_payload()
@@ -100,19 +100,69 @@ def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None
     assert MissionSourcePackageDefinition.from_payload(payload).to_payload() == payload
     assert payload == {
         "edition_id": "warhammer_40000_11th",
-        "mission_pack_id": "11e-chapter-approved-2025-26",
-        "source_package_id": "gw-11e-chapter-approved-2025-26",
-        "source_title": "Warhammer 40,000 11th Edition Chapter Approved 2025-26",
-        "source_version": "2025-26",
+        "mission_pack_id": "11e-chapter-approved-2026-27",
+        "source_package_id": "gw-11e-chapter-approved-2026-27",
+        "source_title": "Warhammer 40,000 11th Edition Chapter Approved 2026-27",
+        "source_version": "2026-27",
         "source_commit_or_import_hash": source_package.source_commit_or_import_hash,
         "imported_at_schema_version": "core-v2-mission-source-v1",
     }
     assert len(source_package.source_commit_or_import_hash) == 64
-    assert mission_pack.mission_pack_id == "11e-chapter-approved-2025-26"
+    assert mission_pack.mission_pack_id == "11e-chapter-approved-2026-27"
 
 
 def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
+    expected_matrix = {
+        ("purge-the-foe", "take-and-hold"): ("Unstoppable Force", "primary-unstoppable-force"),
+        ("purge-the-foe", "purge-the-foe"): ("Meatgrinder", "primary-meatgrinder"),
+        ("purge-the-foe", "priority-assets"): ("Punishment", "primary-punishment"),
+        ("purge-the-foe", "reconnaissance"): ("Consecrate", "primary-consecrate"),
+        ("purge-the-foe", "disruption"): ("Destroyer's Wrath", "primary-destroyers-wrath"),
+        ("take-and-hold", "take-and-hold"): (
+            "Battlefield Dominance",
+            "primary-battlefield-dominance",
+        ),
+        ("take-and-hold", "purge-the-foe"): ("Immovable Object", "primary-immovable-object"),
+        ("take-and-hold", "priority-assets"): (
+            "Determined Acquisition",
+            "primary-determined-acquisition",
+        ),
+        ("take-and-hold", "reconnaissance"): ("Purge and Secure", "primary-purge-and-secure"),
+        ("take-and-hold", "disruption"): (
+            "Inescapable Dominion",
+            "primary-inescapable-dominion",
+        ),
+        ("priority-assets", "take-and-hold"): ("Secure Asset", "primary-secure-asset"),
+        ("priority-assets", "purge-the-foe"): ("Vital Link", "primary-vital-link"),
+        ("priority-assets", "priority-assets"): ("Extract Relic", "primary-extract-relic"),
+        ("priority-assets", "reconnaissance"): (
+            "Vanguard Operation",
+            "primary-vanguard-operation",
+        ),
+        ("priority-assets", "disruption"): ("Sabotage", "primary-sabotage"),
+        ("reconnaissance", "take-and-hold"): (
+            "Reconnaissance Sweep",
+            "primary-reconnaissance-sweep",
+        ),
+        ("reconnaissance", "purge-the-foe"): ("Triangulation", "primary-triangulation"),
+        ("reconnaissance", "priority-assets"): ("Surveil the Foe", "primary-surveil-the-foe"),
+        ("reconnaissance", "reconnaissance"): ("Gather Intel", "primary-gather-intel"),
+        ("reconnaissance", "disruption"): ("Search and Scour", "primary-search-and-scour"),
+        ("disruption", "take-and-hold"): ("Death Trap", "primary-death-trap"),
+        ("disruption", "purge-the-foe"): ("Delaying Action", "primary-delaying-action"),
+        ("disruption", "priority-assets"): ("Locate and Deny", "primary-locate-and-deny"),
+        ("disruption", "reconnaissance"): ("Outmaneuver", "primary-outmaneuver"),
+        ("disruption", "disruption"): ("Smoke and Mirrors", "primary-smoke-and-mirrors"),
+    }
+    source_matrix = {
+        (row.player_force_disposition_id, row.opponent_force_disposition_id): row
+        for row in source_data.primary_mission_matrix_rows()
+    }
+    imported_matrix = {
+        (cell.player_force_disposition_id, cell.opponent_force_disposition_id): cell
+        for cell in mission_pack.primary_mission_matrix_cells
+    }
 
     assert [
         disposition.force_disposition_id for disposition in mission_pack.force_dispositions
@@ -124,6 +174,15 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
         "take-and-hold",
     ]
     assert len(mission_pack.primary_mission_matrix_cells) == 25
+    assert len(source_matrix) == 25
+    assert len(imported_matrix) == 25
+    assert {cell_key: row.primary_mission_name for cell_key, row in source_matrix.items()} == {
+        cell_key: expected_name
+        for cell_key, (expected_name, _expected_id) in expected_matrix.items()
+    }
+    assert {cell_key: cell.primary_mission_id for cell_key, cell in imported_matrix.items()} == {
+        cell_key: expected_id for cell_key, (_expected_name, expected_id) in expected_matrix.items()
+    }
 
     purge_into_hold = mission_pack.primary_mission_matrix_cell(
         player_force_disposition_id="purge-the-foe",
@@ -138,11 +197,20 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
         opponent_force_disposition_id="reconnaissance",
     )
 
-    assert purge_into_hold.primary_mission_id == "primary-purge-the-foe-vs-take-and-hold"
-    assert hold_into_purge.primary_mission_id == "primary-take-and-hold-vs-purge-the-foe"
+    assert purge_into_hold.primary_mission_id == "primary-unstoppable-force"
+    assert hold_into_purge.primary_mission_id == "primary-immovable-object"
     assert purge_into_hold.primary_mission_id != hold_into_purge.primary_mission_id
-    assert mirror.primary_mission_id == "primary-reconnaissance-vs-reconnaissance"
-    assert purge_into_hold.source_status is MissionSourceStatus.AWAITING_SOURCE
+    assert mirror.primary_mission_id == "primary-gather-intel"
+    assert purge_into_hold.source_status is MissionSourceStatus.IMPLEMENTED
+    assert hold_into_purge.source_status is MissionSourceStatus.IMPLEMENTED
+    assert (
+        mission_pack.primary_mission_matrix_cell(
+            player_force_disposition_id="disruption",
+            opponent_force_disposition_id="take-and-hold",
+        ).source_status
+        is MissionSourceStatus.IMPLEMENTED
+    )
+    assert mirror.source_status is MissionSourceStatus.AWAITING_SOURCE
     assert len(purge_into_hold.battlefield_layout_ids) == 3
     assert all(
         layout_id.startswith(purge_into_hold.primary_mission_id)
@@ -168,7 +236,7 @@ def test_phase14j_mission_source_status_tokens_are_strict() -> None:
 
 
 def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     with pytest.raises(MissionPackError, match="force_disposition_id"):
         mission_pack.force_disposition("unknown-disposition")
@@ -187,6 +255,7 @@ def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
     implemented_without_primary = replace(
         mission_pack.primary_mission_matrix_cells[0],
         source_status=MissionSourceStatus.IMPLEMENTED,
+        primary_mission_id="missing-primary",
     )
     with pytest.raises(MissionPackError, match="must reference a primary mission"):
         replace(
@@ -199,14 +268,33 @@ def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
 
 
 def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     take_and_hold = next(
         mission
         for mission in mission_pack.primary_missions
         if mission.primary_mission_id == "take-and-hold"
     )
+    immovable_object = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "primary-immovable-object"
+    )
+    unstoppable_force = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "primary-unstoppable-force"
+    )
+    death_trap = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "primary-death-trap"
+    )
+    bring_it_down = mission_pack.secondary_mission("bring-it-down")
     cleanse = mission_pack.secondary_mission("cleanse")
+    plunder = mission_pack.secondary_mission("plunder")
     cleanse_action = mission_pack.mission_action("cleanse-objective")
+    plunder_action = mission_pack.mission_action("plunder-terrain")
+    booby_trap = mission_pack.mission_action("booby-trap-terrain")
 
     assert take_and_hold.scoring_kind == "control_objectives"
     assert take_and_hold.vp_per_controlled_objective == 5
@@ -219,18 +307,108 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
         "cap": 15,
         "condition": "each_controlled_objective_from_battle_round_two",
         "source_id": (
-            "gw-11e-chapter-approved-2025-26:primary:take-and-hold:"
+            "gw-11e-chapter-approved-2026-27:primary:take-and-hold:"
             "scoring-rule:take-and-hold-control"
         ),
     }
-    assert {(rule.source_kind, rule.victory_points) for rule in cleanse.scoring_rules} >= {
-        ("fixed_secondary", 4),
-        ("tactical_secondary", 5),
+    assert {rule.rule_id: rule.to_payload() for rule in bring_it_down.scoring_rules} == {
+        "bring-it-down-fixed": {
+            "rule_id": "bring-it-down-fixed",
+            "timing": "turn_end",
+            "source_kind": "fixed_secondary",
+            "victory_points": 4,
+            "cap": None,
+            "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
+                "scoring-rule:bring-it-down-fixed"
+            ),
+        },
+        "bring-it-down-tactical": {
+            "rule_id": "bring-it-down-tactical",
+            "timing": "turn_end",
+            "source_kind": "tactical_secondary",
+            "victory_points": 5,
+            "cap": 5,
+            "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
+                "scoring-rule:bring-it-down-tactical"
+            ),
+        },
     }
+    assert {rule.rule_id for rule in cleanse.scoring_rules} == {
+        "cleanse-fixed-one-objective",
+        "cleanse-fixed-two-objectives",
+        "cleanse-tactical-one-objective",
+        "cleanse-tactical-two-objectives",
+    }
+    assert {rule.rule_id for rule in plunder.scoring_rules} == {"plunder-tactical"}
     assert cleanse_action.start_phase == "shooting"
     assert cleanse_action.target_policy == "objective_marker"
+    assert cleanse_action.victory_points == 0
+    assert plunder_action.start_phase == "shooting"
+    assert plunder_action.completion_timing == "immediate"
+    assert plunder_action.target_policy == "plunderable_terrain_area"
+    assert plunder_action.victory_points == 0
+    immovable_rules = {rule.rule_id: rule.to_payload() for rule in immovable_object.scoring_rules}
+    assert immovable_rules == {
+        "immovable-object-central-turn-end": {
+            "rule_id": "immovable-object-central-turn-end",
+            "timing": "turn_end",
+            "source_kind": "primary",
+            "victory_points": 3,
+            "cap": None,
+            "condition": "control_one_or_more_central_objectives",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
+                "scoring-rule:immovable-object-central-turn-end"
+            ),
+        },
+        "immovable-object-rounds-two-to-four-command": {
+            "rule_id": "immovable-object-rounds-two-to-four-command",
+            "timing": "command_phase",
+            "source_kind": "primary",
+            "victory_points": 5,
+            "cap": None,
+            "condition": "each_non_home_objective_controlled_battle_rounds_two_to_four",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
+                "scoring-rule:immovable-object-rounds-two-to-four-command"
+            ),
+        },
+        "immovable-object-round-five-turn-end": {
+            "rule_id": "immovable-object-round-five-turn-end",
+            "timing": "turn_end",
+            "source_kind": "primary",
+            "victory_points": 5,
+            "cap": None,
+            "condition": "each_non_home_objective_controlled_round_five",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
+                "scoring-rule:immovable-object-round-five-turn-end"
+            ),
+        },
+    }
+    assert {rule.rule_id for rule in unstoppable_force.scoring_rules} == {
+        "unstoppable-force-enemy-destroyed-turn-end",
+        "unstoppable-force-objectives",
+        "unstoppable-force-new-objective-turn-end",
+        "unstoppable-force-central-end-battle",
+    }
+    assert {rule.rule_id for rule in death_trap.scoring_rules} == {
+        "death-trap-terrain-trapped-turn-end",
+        "death-trap-objective-terrain-bonus-turn-end",
+        "death-trap-destroyed-in-trapped-terrain-turn-end",
+        "death-trap-objective-control",
+    }
+    assert booby_trap.mission_id == "primary-death-trap"
+    assert booby_trap.mission_kind == "primary"
+    assert booby_trap.start_phase == "shooting"
+    assert booby_trap.completion_timing == "immediate"
+    assert booby_trap.target_policy == "trappable_terrain_area"
+    assert booby_trap.victory_points == 0
     assert "unit_left_battlefield" in cleanse_action.interruption_conditions
-    assert cleanse_action.victory_points == 5
     assert mission_pack.scoring.end_of_game_scoring_windows == (
         "turn_end_round_five_going_second",
         "end_of_battle",
@@ -256,7 +434,7 @@ def test_future_edition_source_identity_cannot_collide_with_eleventh_edition() -
 
 
 def test_deployment_map_and_objective_marker_policy_round_trip() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     deployment_map = mission_pack.deployment_map("tipping-point")
     payload = deployment_map.to_payload()
     round_tripped = type(deployment_map).from_payload(payload)
@@ -270,7 +448,7 @@ def test_deployment_map_and_objective_marker_policy_round_trip() -> None:
 
 
 def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     assert _objective_coordinate_snapshot(mission_pack) == {
         "crucible-of-battle": {
@@ -319,7 +497,7 @@ def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> 
 
 
 def test_terrain_layout_template_instantiates_deterministic_features() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     template = mission_pack.terrain_layout_template("layout-1")
 
     first = instantiate_terrain_layout_template(template)
@@ -334,13 +512,13 @@ def test_terrain_layout_template_instantiates_deterministic_features() -> None:
 
 
 def test_terrain_layout_templates_match_source_slot_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     assert _terrain_slot_source_snapshot(mission_pack) == _EXPECTED_TERRAIN_SLOT_SNAPSHOT
 
 
 def test_mission_pool_selection_is_deterministic() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     first_order = mission_pack.deterministic_mission_pool_order(seed="event-round-1")
     second_order = mission_pack.deterministic_mission_pool_order(seed="event-round-1")
@@ -355,7 +533,7 @@ def test_mission_pool_selection_is_deterministic() -> None:
 
 
 def test_mission_setup_from_components_rejects_source_inconsistent_components() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     deployment_map = mission_pack.deployment_map("tipping-point")
     terrain_layout = mission_pack.terrain_layout_template("layout-1")
 
@@ -391,7 +569,7 @@ def test_mission_setup_from_components_rejects_source_inconsistent_components() 
 
 
 def test_mission_setup_from_components_rejects_illegal_pool_combination() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     with pytest.raises(MissionSetupError, match="not a legal Chapter Approved mission pool row"):
         MissionSetup.from_components(
@@ -405,7 +583,7 @@ def test_mission_setup_from_components_rejects_illegal_pool_combination() -> Non
 
 
 def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_components(
         mission_pack=mission_pack,
         primary_mission_id="take-and-hold",
@@ -420,7 +598,7 @@ def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
 
 
 def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-a",
@@ -437,7 +615,7 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
 
 def test_game_state_round_trips_populated_mission_setup() -> None:
     mission_setup = MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id="mission-a",
         terrain_layout_id="layout-1",
         attacker_player_id="player-a",
@@ -449,7 +627,7 @@ def test_game_state_round_trips_populated_mission_setup() -> None:
 
 
 def test_hidden_secondary_and_challenger_cards_do_not_leak_to_opponent_payload() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     secondary = mission_pack.secondary_mission("bring-it-down")
     challenger = mission_pack.challenger_card("strategic-retreat")
 
@@ -629,7 +807,7 @@ def _battle_state_with_mission_setup(
     reserve_base_diameter_mm: float = 32.0,
 ) -> tuple[GameState, ReserveState]:
     mission_setup = MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id=mission_pool_entry_id,
         terrain_layout_id=terrain_layout_id,
         attacker_player_id=attacker_player_id,
@@ -1068,7 +1246,7 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
         descriptor_version="core-v2-phase11a-test"
     )
 
@@ -1088,7 +1266,7 @@ def _army_muster_request(
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=tuple(
             UnitMusterSelection(

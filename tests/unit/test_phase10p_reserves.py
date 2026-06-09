@@ -97,7 +97,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_movement_phase_requests_reserve_arrivals_inside_move_units() -> None:
@@ -781,7 +781,7 @@ def test_phase10p_reserve_payloads_round_trip_without_object_repr() -> None:
         end_of_battle=True,
     )
 
-    policy_payload = ReserveDestructionTimingPolicy.chapter_approved_2025_26().to_payload()
+    policy_payload = ReserveDestructionTimingPolicy.chapter_approved_2026_27().to_payload()
     assert (
         ReserveDestructionTimingPolicy.from_payload(policy_payload).to_payload() == policy_payload
     )
@@ -2123,7 +2123,7 @@ def _ruleset() -> RulesetDescriptor:
 
 
 def _chapter_approved_ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
         descriptor_version="core-v2-phase10p-ca-test"
     )
 
@@ -2159,7 +2159,7 @@ def _config(*, ruleset_descriptor: RulesetDescriptor) -> GameConfig:
             "cleanse",
         ),
         mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2025_26_mission_pack(),
+            mission_pack=chapter_approved_2026_27_mission_pack(),
             mission_pool_entry_id="mission-a",
             terrain_layout_id="layout-1",
             attacker_player_id="player-a",
@@ -2183,7 +2183,7 @@ def _army_muster_request(
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=unit_selections,
     )

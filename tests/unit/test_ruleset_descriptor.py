@@ -31,7 +31,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 def test_ruleset_descriptor_payload_round_trips_with_eleventh_edition_identity() -> None:
     descriptors = (
         RulesetDescriptor.warhammer_40000_eleventh(source_date=date(2026, 6, 1)),
-        RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(),
+        RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(),
     )
 
     for descriptor in descriptors:
