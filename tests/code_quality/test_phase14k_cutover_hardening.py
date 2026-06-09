@@ -160,7 +160,7 @@ def test_phase14k_ruleset_descriptor_uses_11th_only_shared_primitives() -> None:
     )
     assert core_mission_policy.reserve_destruction_battle_round is None
 
-    chapter_approved = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26()
+    chapter_approved = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()
     assert (
         chapter_approved.mission_policy.reserve_destruction_timing
         is ReserveDestructionTimingKind.END_OF_BATTLE_ROUND_N

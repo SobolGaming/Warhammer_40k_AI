@@ -6,7 +6,7 @@ from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.rules.source_catalog import SourceCatalog
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chapter_approved_2025_26,
+    chapter_approved_2026_27,
     core_abilities,
     core_rules,
     core_stratagems,
@@ -29,7 +29,7 @@ def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() ->
 
 
 def test_eleventh_source_package_identity_payloads_are_json_safe() -> None:
-    mission_package = chapter_approved_2025_26.source_package_definition()
+    mission_package = chapter_approved_2026_27.source_package_definition()
     mission_payload = mission_package.to_payload()
     ability_identity = core_abilities.source_package_identity_payload()
     stratagem_identity = core_stratagems.source_package_identity_payload()

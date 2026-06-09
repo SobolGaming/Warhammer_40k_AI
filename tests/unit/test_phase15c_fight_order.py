@@ -96,7 +96,7 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 _ATTACK_SEQUENCE_DECISION_TYPES = frozenset(
     (*ATTACK_RESOLUTION_SELECTION_DECISION_TYPES, *ATTACK_ALLOCATION_DECISION_TYPES)
@@ -2108,7 +2108,7 @@ def _config(
 
 
 def _mission_setup() -> MissionSetup:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     return MissionSetup(
         mission_pack_id=mission_pack.mission_pack_id,
         source_version=mission_pack.source_version,

@@ -103,7 +103,7 @@ from warhammer40k_core.engine.unit_state import (
     starting_strength_records_for_units,
 )
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_command_step_grants_both_players_cp_once_before_tactical_draw() -> None:
@@ -495,7 +495,7 @@ def test_setup_declarations_keep_reserve_and_embarked_units_off_battlefield() ->
                 points_limit=100,
             ),
         ),
-        destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2025_26(),
+        destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2026_27(),
     )
     cargo_state = state.declare_battle_formation_embarkation(
         player_id="player-a",
@@ -568,7 +568,7 @@ def test_setup_declarations_reject_points_and_transport_capacity_drift() -> None
                     points_limit=100,
                 ),
             ),
-            destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2025_26(),
+            destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2026_27(),
         )
     with pytest.raises(GameLifecycleError, match="exceeds Transport capacity"):
         state.declare_battle_formation_embarkation(
@@ -611,7 +611,7 @@ def test_setup_declarations_reject_duplicate_and_drift_contexts() -> None:
     reserve_unit = _unit_by_id(state, "army-alpha:reserve-unit")
     passenger = _unit_by_id(state, "army-alpha:passenger-unit")
     transport = _unit_by_id(state, "army-alpha:transport-unit")
-    policy = ReserveDestructionTimingPolicy.chapter_approved_2025_26()
+    policy = ReserveDestructionTimingPolicy.chapter_approved_2026_27()
 
     assert (
         state.apply_strategic_reserve_declarations(
@@ -2116,7 +2116,7 @@ def _config(*, player_a_units: tuple[UnitMusterSelection, ...] | None = None) ->
 
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id="mission-a",
         terrain_layout_id="layout-1",
         attacker_player_id="player-a",
@@ -2125,7 +2125,7 @@ def _mission_setup() -> MissionSetup:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
         descriptor_version="core-v2-phase11c-test"
     )
 

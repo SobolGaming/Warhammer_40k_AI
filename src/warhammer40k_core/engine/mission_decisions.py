@@ -35,7 +35,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 TACTICAL_SECONDARY_SCORE_DECISION_TYPE = "score_tactical_secondary_mission"
 TACTICAL_SECONDARY_DISCARD_DECISION_TYPE = "discard_tactical_secondary_mission"
@@ -770,7 +770,7 @@ def _mission_action_for_state(
 ) -> MissionActionDefinition:
     if state.mission_setup is None:
         raise GameLifecycleError("Mission Action start requires MissionSetup.")
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     if state.mission_setup.mission_pack_id != mission_pack.mission_pack_id:
         raise GameLifecycleError("Unsupported mission pack for Mission Action start.")
     return mission_pack.mission_action(mission_action_id)
@@ -946,7 +946,7 @@ def _apply_tactical_secondary_discard_cp_reward(
         player_id=player_id,
         amount=1,
         source_id=(
-            f"chapter-approved-2025-26:tactical-secondary-discard:{result.result_id}:cp-reward"
+            f"chapter-approved-2026-27:tactical-secondary-discard:{result.result_id}:cp-reward"
         ),
         source_kind=CommandPointSourceKind.OTHER,
     )

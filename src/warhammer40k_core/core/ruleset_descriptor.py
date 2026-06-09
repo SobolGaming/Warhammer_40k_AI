@@ -1732,7 +1732,7 @@ class MissionPolicyDescriptor:
         )
 
     @classmethod
-    def chapter_approved_2025_26(cls) -> Self:
+    def chapter_approved_2026_27(cls) -> Self:
         return cls(
             fixed_objective_missions_supported=True,
             terrain_objective_missions_supported=True,
@@ -1950,10 +1950,10 @@ class RulesetDescriptor:
         )
 
     @classmethod
-    def warhammer_40000_eleventh_chapter_approved_2025_26(
+    def warhammer_40000_eleventh_chapter_approved_2026_27(
         cls,
-        source_date: str | date = "2025-06-01",
-        descriptor_version: str = "core-v2-phase14a-ca2025-26",
+        source_date: str | date = "2026-06-01",
+        descriptor_version: str = "core-v2-phase14a-ca2026-27",
     ) -> Self:
         core = cls.warhammer_40000_eleventh(
             source_date=source_date,
@@ -1972,7 +1972,7 @@ class RulesetDescriptor:
             objective_policy=core.objective_policy,
             coherency_policy=core.coherency_policy,
             fly_policy=core.fly_policy,
-            mission_policy=MissionPolicyDescriptor.chapter_approved_2025_26(),
+            mission_policy=MissionPolicyDescriptor.chapter_approved_2026_27(),
             setup_sequence=core.setup_sequence,
             battle_phase_sequence=core.battle_phase_sequence,
         )

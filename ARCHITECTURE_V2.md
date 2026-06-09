@@ -134,7 +134,7 @@ Completed / implemented foundation:
 | 10T | Complete | Movement phase completion gate |
 | 10U | Complete | Movement/pathing/terrain profiling and hotspot budget gate |
 | 10V | Complete | Movement audit hardening and deferred-wiring contracts |
-| 11A | Complete | Chapter Approved 2025-26 mission pack data |
+| 11A | Complete | Chapter Approved 2026-27 mission pack data |
 | 11B | Complete | Objective control geometry and mission objective model |
 | 11C | Complete | Command phase body: Command step, CP, Battle-shock, and OC updates |
 | 11D | Complete | Adapter scaffold and parameterized movement/placement proposal requests |
@@ -245,7 +245,7 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection for implemented families, `[ANTI]` including duplicate Shooting selection, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]` movement-evidence slice, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative default 12" targeting gate, `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17F, 14I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17F, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
-| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2025-26 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
+| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2026-27 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 16A, 16C, 16E |
 
 # Build order details
@@ -1009,18 +1009,18 @@ Required tests:
 
 # Mission pack, objectives, Command phase, and scoring
 
-## Phase 11A: Chapter Approved 2025-26 mission pack data
+## Phase 11A: Chapter Approved 2026-27 mission pack data
 
 Status: Complete.
 
-This phase brings in Chapter Approved 2025-26 mission data: mission sequence,
+This phase brings in Chapter Approved 2026-27 mission data: mission sequence,
 deployment maps, objective marker positions, mission pool, mission decks,
 secondary mission cards, Challenger cards, terrain layout templates, and
 tournament scoring caps.
 
 Phase 11A terrain layout import has two layers. `core/terrain_layouts.py`
 defines pure geometry domain templates, while `rules/mission_pack_import.py`
-transcribes the Chapter Approved 2025-26 layout slot table into `layout-1`
+transcribes the Chapter Approved 2026-27 layout slot table into `layout-1`
 through `layout-8`. Each slot preserves the source preset, rotation, and world
 origin in terrain feature `source_id` metadata for audit/replay provenance.
 Runtime `TerrainFeatureTemplate` geometry intentionally instantiates the
@@ -1059,7 +1059,7 @@ Objects:
 
 Invariants:
 
-- Chapter Approved 2025-26 is source-linked and versioned;
+- Chapter Approved 2026-27 is source-linked and versioned;
 - mission setup order is data, not driver-local enum arithmetic;
 - deployment zones are geometry objects tied to deployment maps;
 - objective marker positions are source-defined and use center-point measurement;
@@ -1321,7 +1321,7 @@ Modules:
 - `engine/actions.py`
 - `engine/turn_cleanup.py`
 - `engine/unit_coherency.py`
-- `rules/source_packages/warhammer_40000_11th/chapter_approved_2025_26.py`
+- `rules/source_packages/warhammer_40000_11th/chapter_approved_2026_27.py`
 
 Objects:
 
@@ -1351,7 +1351,7 @@ Invariants:
   immediately;
 - retained Secondary Missions do not have a two-card hand-size cap;
 - Tactical discard can discard one or more retained Secondary Missions, records
-  no replacement draw, and grants the Chapter Approved 2025-26 1 CP ordinary
+  no replacement draw, and grants the Chapter Approved 2026-27 1 CP ordinary
   discard reward only when the discarding player is the active player;
 - New Orders is a separate 1 CP Stratagem path that discards one retained
   Secondary Mission, immediately draws a replacement Secondary Mission, and is
@@ -1369,7 +1369,7 @@ Required tests:
 - primary scoring at correct timing and source-backed battle-round gates;
 - secondary scoring uses source-backed Fixed/Tactical card VP values;
 - Secondary Mission draw, score, retain, and discard flow is public or hidden according to source-backed viewer rules;
-- Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions, grants the Chapter Approved 2025-26 1 CP ordinary discard reward only on the discarding player's own turn, and does not replace discarded cards;
+- Tactical secondary discard emits deterministic decision/event records through the lifecycle path, can discard one or more retained Secondary Missions, grants the Chapter Approved 2026-27 1 CP ordinary discard reward only on the discarding player's own turn, and does not replace discarded cards;
 - New Orders emits deterministic Stratagem, CP, discard, and replacement-draw
   records, rejects second use in the same game, and cannot be confused with
   ordinary Tactical discard;
@@ -2605,7 +2605,7 @@ Invariants:
   Tactical-discarded Secondary Missions immediately;
 - retained Secondary Missions have no two-card hand-size cap, ordinary Tactical
   discard can happen in either player's turn but grants the Chapter Approved
-  2025-26 1 CP reward only when the discarding player is the active player, and
+  2026-27 1 CP reward only when the discarding player is the active player, and
   New Orders is the explicit once-per-game 1 CP replacement-draw exception;
 - when a Tactical Secondary Mission Card's requirements are achieved, the engine
   records a source-backed achievement context before emitting the finite scoring
@@ -2615,7 +2615,7 @@ Invariants:
 - Future PR note: when the 11th Edition mission-card source is available,
   replace the provisional Secondary Mission card source rows with the confirmed
   18-card list and re-check ordinary Tactical discard CP reward timing against
-  that source instead of assuming the Chapter Approved 2025-26 own-turn-only
+  that source instead of assuming the Chapter Approved 2026-27 own-turn-only
   rule carries forward;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, Battle Ready at
   10 VP, total score at 100 VP, and Primary and Secondary scoring at 15 VP per

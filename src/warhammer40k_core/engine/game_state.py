@@ -151,7 +151,7 @@ from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecordPayload,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chapter_approved_2025_26 as eleventh_ca_2025_26_source,
+    chapter_approved_2026_27 as eleventh_ca_2026_27_source,
 )
 
 
@@ -3109,9 +3109,9 @@ class GameState:
 
     def _ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
         if self.mission_setup is not None and (
-            self.mission_setup.mission_pack_id == eleventh_ca_2025_26_source.MISSION_PACK_ID
+            self.mission_setup.mission_pack_id == eleventh_ca_2026_27_source.MISSION_PACK_ID
         ):
-            return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26()
+            return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()
         return RulesetDescriptor.warhammer_40000_eleventh()
 
     def _active_player_is_last_in_round(self, player_id: str) -> bool:

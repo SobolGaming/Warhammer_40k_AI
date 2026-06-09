@@ -251,7 +251,7 @@ from warhammer40k_core.geometry.visibility import (
     CoverSourceRecord,
     VisibilityBlockerKind,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_shooting_unit_selection_and_declaration_use_lifecycle_records() -> None:
@@ -14592,7 +14592,7 @@ def _alpha_unit_spec(
 
 
 def _mission_setup() -> MissionSetup:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     return MissionSetup(
         mission_pack_id=mission_pack.mission_pack_id,
         source_version=mission_pack.source_version,

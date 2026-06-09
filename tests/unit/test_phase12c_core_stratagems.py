@@ -149,7 +149,7 @@ from warhammer40k_core.engine.weapon_declaration import (
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_command_reroll_source_handler_resolves_via_restored_lifecycle() -> None:
@@ -2464,7 +2464,7 @@ def test_phase15e_counteroffensive_selects_next_fight_activation() -> None:
         unit_instance_id="army-beta:enemy-unit",
         poses=tuple(Pose.at(x=2.0 + index * 2.0, y=0.0) for index in range(5)),
     )
-    policy = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+    policy = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
         descriptor_version="phase15e-counteroffensive-test"
     ).fight_policy
     state.fight_phase_state = FightPhaseState.start(
@@ -4629,7 +4629,7 @@ def _move_unit_to_reserves(
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         reserve_kind=ReserveKind.RESERVES,
-        destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2025_26(),
+        destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2026_27(),
     )
     state.record_reserve_state(reserve_state)
     army = state.army_definition_for_player(player_id)
@@ -4858,7 +4858,7 @@ def _config(
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id="phase12c-game",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-phase12c-test"
         ),
         army_catalog=resolved_catalog,
@@ -4880,7 +4880,7 @@ def _config(
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
         mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2025_26_mission_pack(),
+            mission_pack=chapter_approved_2026_27_mission_pack(),
             mission_pool_entry_id="mission-a",
             terrain_layout_id="layout-1",
             attacker_player_id="player-a",

@@ -66,14 +66,14 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chapter_approved_2025_26 as source_data,
+    chapter_approved_2026_27 as source_data,
 )
 
 
 def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     payload = mission_pack.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
@@ -89,7 +89,7 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
 
 
 def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     source_package = mission_pack.source_package
 
     payload = source_package.to_payload()
@@ -100,19 +100,19 @@ def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None
     assert MissionSourcePackageDefinition.from_payload(payload).to_payload() == payload
     assert payload == {
         "edition_id": "warhammer_40000_11th",
-        "mission_pack_id": "11e-chapter-approved-2025-26",
-        "source_package_id": "gw-11e-chapter-approved-2025-26",
-        "source_title": "Warhammer 40,000 11th Edition Chapter Approved 2025-26",
-        "source_version": "2025-26",
+        "mission_pack_id": "11e-chapter-approved-2026-27",
+        "source_package_id": "gw-11e-chapter-approved-2026-27",
+        "source_title": "Warhammer 40,000 11th Edition Chapter Approved 2026-27",
+        "source_version": "2026-27",
         "source_commit_or_import_hash": source_package.source_commit_or_import_hash,
         "imported_at_schema_version": "core-v2-mission-source-v1",
     }
     assert len(source_package.source_commit_or_import_hash) == 64
-    assert mission_pack.mission_pack_id == "11e-chapter-approved-2025-26"
+    assert mission_pack.mission_pack_id == "11e-chapter-approved-2026-27"
 
 
 def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     expected_matrix = {
         ("purge-the-foe", "take-and-hold"): ("Unstoppable Force", "primary-unstoppable-force"),
         ("purge-the-foe", "purge-the-foe"): ("Meatgrinder", "primary-meatgrinder"),
@@ -227,7 +227,7 @@ def test_phase14j_mission_source_status_tokens_are_strict() -> None:
 
 
 def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     with pytest.raises(MissionPackError, match="force_disposition_id"):
         mission_pack.force_disposition("unknown-disposition")
@@ -258,7 +258,7 @@ def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
 
 
 def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     take_and_hold = next(
         mission
         for mission in mission_pack.primary_missions
@@ -278,7 +278,7 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
         "cap": 15,
         "condition": "each_controlled_objective_from_battle_round_two",
         "source_id": (
-            "gw-11e-chapter-approved-2025-26:primary:take-and-hold:"
+            "gw-11e-chapter-approved-2026-27:primary:take-and-hold:"
             "scoring-rule:take-and-hold-control"
         ),
     }
@@ -315,7 +315,7 @@ def test_future_edition_source_identity_cannot_collide_with_eleventh_edition() -
 
 
 def test_deployment_map_and_objective_marker_policy_round_trip() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     deployment_map = mission_pack.deployment_map("tipping-point")
     payload = deployment_map.to_payload()
     round_tripped = type(deployment_map).from_payload(payload)
@@ -329,7 +329,7 @@ def test_deployment_map_and_objective_marker_policy_round_trip() -> None:
 
 
 def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     assert _objective_coordinate_snapshot(mission_pack) == {
         "crucible-of-battle": {
@@ -378,7 +378,7 @@ def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> 
 
 
 def test_terrain_layout_template_instantiates_deterministic_features() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     template = mission_pack.terrain_layout_template("layout-1")
 
     first = instantiate_terrain_layout_template(template)
@@ -393,13 +393,13 @@ def test_terrain_layout_template_instantiates_deterministic_features() -> None:
 
 
 def test_terrain_layout_templates_match_source_slot_snapshot() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     assert _terrain_slot_source_snapshot(mission_pack) == _EXPECTED_TERRAIN_SLOT_SNAPSHOT
 
 
 def test_mission_pool_selection_is_deterministic() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     first_order = mission_pack.deterministic_mission_pool_order(seed="event-round-1")
     second_order = mission_pack.deterministic_mission_pool_order(seed="event-round-1")
@@ -414,7 +414,7 @@ def test_mission_pool_selection_is_deterministic() -> None:
 
 
 def test_mission_setup_from_components_rejects_source_inconsistent_components() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     deployment_map = mission_pack.deployment_map("tipping-point")
     terrain_layout = mission_pack.terrain_layout_template("layout-1")
 
@@ -450,7 +450,7 @@ def test_mission_setup_from_components_rejects_source_inconsistent_components() 
 
 
 def test_mission_setup_from_components_rejects_illegal_pool_combination() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
 
     with pytest.raises(MissionSetupError, match="not a legal Chapter Approved mission pool row"):
         MissionSetup.from_components(
@@ -464,7 +464,7 @@ def test_mission_setup_from_components_rejects_illegal_pool_combination() -> Non
 
 
 def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_components(
         mission_pack=mission_pack,
         primary_mission_id="take-and-hold",
@@ -479,7 +479,7 @@ def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
 
 
 def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-a",
@@ -496,7 +496,7 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
 
 def test_game_state_round_trips_populated_mission_setup() -> None:
     mission_setup = MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id="mission-a",
         terrain_layout_id="layout-1",
         attacker_player_id="player-a",
@@ -508,7 +508,7 @@ def test_game_state_round_trips_populated_mission_setup() -> None:
 
 
 def test_hidden_secondary_and_challenger_cards_do_not_leak_to_opponent_payload() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     secondary = mission_pack.secondary_mission("bring-it-down")
     challenger = mission_pack.challenger_card("strategic-retreat")
 
@@ -688,7 +688,7 @@ def _battle_state_with_mission_setup(
     reserve_base_diameter_mm: float = 32.0,
 ) -> tuple[GameState, ReserveState]:
     mission_setup = MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id=mission_pool_entry_id,
         terrain_layout_id=terrain_layout_id,
         attacker_player_id=attacker_player_id,
@@ -1127,7 +1127,7 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
         descriptor_version="core-v2-phase11a-test"
     )
 

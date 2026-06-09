@@ -111,7 +111,7 @@ from warhammer40k_core.engine.turn_cleanup import (
     resolve_end_turn_cleanup,
 )
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
 SEEDED_TACTICAL_DRAW_RESULT_ID = "phase11e-seeded-tactical-draw"
@@ -190,7 +190,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
             "scoring_rule_id": "assassination-fixed",
             "scoring_rule_condition": "fixed_secondary_condition",
             "scoring_rule_source_id": (
-                "gw-11e-chapter-approved-2025-26:secondary:assassination:"
+                "gw-11e-chapter-approved-2026-27:secondary:assassination:"
                 "scoring-rule:assassination-fixed"
             ),
         },
@@ -241,7 +241,7 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         "scoring_rule_id": "bring-it-down-fixed",
         "scoring_rule_condition": "fixed_secondary_condition",
         "scoring_rule_source_id": (
-            "gw-11e-chapter-approved-2025-26:secondary:bring-it-down:"
+            "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
             "scoring-rule:bring-it-down-fixed"
         ),
     }
@@ -250,7 +250,7 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         "scoring_rule_id": "bring-it-down-tactical",
         "scoring_rule_condition": "tactical_secondary_condition",
         "scoring_rule_source_id": (
-            "gw-11e-chapter-approved-2025-26:secondary:bring-it-down:"
+            "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
             "scoring-rule:bring-it-down-tactical"
         ),
     }
@@ -583,7 +583,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
         "scoring_rule_condition": "tactical_secondary_condition",
         "scoring_rule_source_id": (
-            f"gw-11e-chapter-approved-2025-26:secondary:"
+            f"gw-11e-chapter-approved-2026-27:secondary:"
             f"{active_cards[0].secondary_mission_id}:scoring-rule:"
             f"{active_cards[0].secondary_mission_id}-tactical"
         ),
@@ -704,7 +704,7 @@ def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -
     assert retain_payload["victory_points"] == 5
     assert retain_payload["scoring_rule_id"] == f"{retain_card.secondary_mission_id}-tactical"
     assert retain_payload["scoring_rule_source_id"] == (
-        f"gw-11e-chapter-approved-2025-26:secondary:{retain_card.secondary_mission_id}:"
+        f"gw-11e-chapter-approved-2026-27:secondary:{retain_card.secondary_mission_id}:"
         f"scoring-rule:{retain_card.secondary_mission_id}-tactical"
     )
 
@@ -1083,7 +1083,7 @@ def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> 
     lifecycle.submit_decision(discard_result)
 
     expected_source_id = (
-        f"chapter-approved-2025-26:tactical-secondary-discard:{result_id}:cp-reward"
+        f"chapter-approved-2026-27:tactical-secondary-discard:{result_id}:cp-reward"
     )
     ledger = state.command_point_ledger_for_player("player-a")
     reward_transactions = [
@@ -1149,7 +1149,7 @@ def test_tactical_secondary_discard_in_opponents_turn_has_no_chapter_approved_cp
 
     assert state.command_point_total("player-b") == 0
     assert all(
-        not transaction.source_id.startswith("chapter-approved-2025-26:tactical-secondary-discard:")
+        not transaction.source_id.startswith("chapter-approved-2026-27:tactical-secondary-discard:")
         for transaction in state.command_point_ledger_for_player("player-b").transactions
     )
     discard_payload = cast(
@@ -1558,7 +1558,7 @@ def test_game_ends_after_configured_battle_rounds_with_draw_result() -> None:
 
 
 def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     primary = next(
         mission
         for mission in mission_pack.primary_missions
@@ -2499,7 +2499,7 @@ def _config_with_player_a_vehicle() -> GameConfig:
 
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2025_26_mission_pack(),
+        mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id="mission-a",
         terrain_layout_id="layout-1",
         attacker_player_id="player-a",
@@ -2508,7 +2508,7 @@ def _mission_setup() -> MissionSetup:
 
 
 def _ruleset() -> RulesetDescriptor:
-    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2025_26(
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
         descriptor_version="core-v2-phase11e-test"
     )
 

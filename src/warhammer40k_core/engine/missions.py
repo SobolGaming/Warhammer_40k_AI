@@ -22,7 +22,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     objective_control_timing_from_token,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 _CONTROL_OBJECTIVES_PRIMARY_SCORING_KIND = "control_objectives"
 _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS = frozenset(
@@ -36,7 +36,7 @@ _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS = frozenset(
 def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionScoringPolicy:
     if type(mission_setup) is not MissionSetup:
         raise GameLifecycleError("Mission scoring policy requires MissionSetup.")
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     if mission_setup.mission_pack_id != mission_pack.mission_pack_id:
         raise GameLifecycleError("Unsupported mission pack for scoring policy.")
     primary = None
@@ -213,7 +213,7 @@ def deterministic_tactical_secondary_draw(
         "excluded_secondary_mission_ids",
         excluded_secondary_mission_ids,
     )
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     if mission_setup.mission_pack_id != mission_pack.mission_pack_id:
         raise GameLifecycleError("Unsupported mission pack for tactical secondary draw.")
     candidates = tuple(

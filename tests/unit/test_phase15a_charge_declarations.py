@@ -88,7 +88,7 @@ from warhammer40k_core.geometry.pathing import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model, ModelVolume
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2025_26_mission_pack
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() -> None:
@@ -1534,7 +1534,7 @@ def _config(
 
 
 def _mission_setup() -> MissionSetup:
-    mission_pack = chapter_approved_2025_26_mission_pack()
+    mission_pack = chapter_approved_2026_27_mission_pack()
     return MissionSetup(
         mission_pack_id=mission_pack.mission_pack_id,
         source_version=mission_pack.source_version,
