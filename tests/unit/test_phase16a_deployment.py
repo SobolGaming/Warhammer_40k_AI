@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import (
+    DeploymentPoseFactory,
     deployment_proposal_for_state,
     submit_all_deployments_if_pending,
     submit_deployment_placement,
@@ -13,6 +15,7 @@ from tests.deployment_submission_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind, PlacementError
@@ -67,6 +70,9 @@ def test_phase16a_deploy_armies_uses_lifecycle_decisions_not_deterministic_bridg
     assert request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
     assert request.actor_id == "player-b"
     assert _option_ids(request) == ("deploy:army-beta:intercessor-unit-2",)
+    option_payload = request.options[0].payload
+    assert isinstance(option_payload, dict)
+    assert option_payload["submission_kind"] == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
 
     battle_status = submit_all_deployments_if_pending(
         lifecycle,
@@ -98,8 +104,13 @@ def test_phase16a_deploy_armies_uses_lifecycle_decisions_not_deterministic_bridg
         event.event_type for event in lifecycle.decision_controller.event_log.records
     )
     assert event_types.count("battlefield_created") == 1
+    assert event_types.count("deployment_unit_selected") == 2
     assert event_types.count("deployment_unit_placed") == 2
     assert event_types.count("battlefield_models_placed") == 2
+    assert _deployment_transition_source_event_ids(lifecycle) == {
+        "phase16a-deploy-000002",
+        "phase16a-deploy-000004",
+    }
 
     payload_blob = json.dumps(lifecycle.to_payload(), sort_keys=True)
     assert "phase10a_deterministic_bridge" not in payload_blob
@@ -110,26 +121,91 @@ def test_phase16a_deploy_armies_uses_lifecycle_decisions_not_deterministic_bridg
 
 def test_phase16a_invalid_deployment_rejects_before_queue_pop_without_mutation() -> None:
     lifecycle, placement_request = _advance_to_first_deployment_placement()
-    assert lifecycle.state is not None
-    before_record_count = len(lifecycle.decision_controller.records)
     before_request_id = placement_request.request_id
 
-    status = submit_deployment_placement(
+    _assert_invalid_deployment_without_mutation(
         lifecycle,
-        request=placement_request,
+        placement_request=placement_request,
         result_id="phase16a-invalid-placement",
+        expected_codes={DeploymentPlacementViolationCode.DEPLOYMENT_ZONE_VIOLATION.value},
         pose_factory=_midfield_outside_deployment_zone_pose,
     )
 
-    assert status.status_kind is LifecycleStatusKind.INVALID
-    assert _invalid_reason(status) == "deployment_placement_invalid"
-    assert DeploymentPlacementViolationCode.DEPLOYMENT_ZONE_VIOLATION.value in _violation_codes(
-        status
-    )
     assert lifecycle.decision_controller.queue.peek_next().request_id == before_request_id
-    assert len(lifecycle.decision_controller.records) == before_record_count
-    assert lifecycle.state.battlefield_state is not None
-    assert lifecycle.state.battlefield_state.placed_model_ids() == ()
+
+
+def test_phase16a_rejects_out_of_bounds_pose_without_mutation() -> None:
+    lifecycle, placement_request = _advance_to_first_deployment_placement()
+
+    _assert_invalid_deployment_without_mutation(
+        lifecycle,
+        placement_request=placement_request,
+        result_id="phase16a-out-of-bounds-placement",
+        expected_codes={DeploymentPlacementViolationCode.BATTLEFIELD_EDGE_CROSSED.value},
+        pose_factory=_out_of_bounds_pose,
+    )
+
+
+def test_phase16a_rejects_illegal_terrain_endpoint_without_mutation() -> None:
+    lifecycle, placement_request = _advance_to_first_deployment_placement()
+
+    _assert_invalid_deployment_without_mutation(
+        lifecycle,
+        placement_request=placement_request,
+        result_id="phase16a-terrain-endpoint-placement",
+        expected_codes={DeploymentPlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL.value},
+        pose_factory=_terrain_endpoint_pose,
+    )
+
+
+def test_phase16a_rejects_blocking_objective_marker_endpoint_without_mutation() -> None:
+    lifecycle, placement_request = _advance_to_first_deployment_placement(
+        _config_with_blocking_objective_marker()
+    )
+
+    _assert_invalid_deployment_without_mutation(
+        lifecycle,
+        placement_request=placement_request,
+        result_id="phase16a-objective-endpoint-placement",
+        expected_codes={DeploymentPlacementViolationCode.OBJECTIVE_MARKER_ENDPOINT_OVERLAP.value},
+        pose_factory=_blocking_objective_marker_endpoint_pose,
+    )
+
+
+def test_phase16a_rejects_model_overlap_without_mutation() -> None:
+    lifecycle, placement_request = _advance_to_first_deployment_placement()
+
+    _assert_invalid_deployment_without_mutation(
+        lifecycle,
+        placement_request=placement_request,
+        result_id="phase16a-model-overlap-placement",
+        expected_codes={DeploymentPlacementViolationCode.MODEL_OVERLAP.value},
+        pose_factory=_overlapping_models_pose,
+    )
+
+
+def test_phase16a_rejects_broken_coherency_without_mutation() -> None:
+    lifecycle, placement_request = _advance_to_first_deployment_placement()
+
+    _assert_invalid_deployment_without_mutation(
+        lifecycle,
+        placement_request=placement_request,
+        result_id="phase16a-broken-coherency-placement",
+        expected_codes={DeploymentPlacementViolationCode.UNIT_COHERENCY_BROKEN.value},
+        pose_factory=_broken_coherency_pose,
+    )
+
+
+def test_phase16a_rejects_enemy_engagement_range_without_mutation() -> None:
+    lifecycle, placement_request = _advance_to_second_deployment_placement()
+
+    _assert_invalid_deployment_without_mutation(
+        lifecycle,
+        placement_request=placement_request,
+        result_id="phase16a-enemy-engagement-placement",
+        expected_codes={DeploymentPlacementViolationCode.ENEMY_ENGAGEMENT_RANGE.value},
+        pose_factory=_enemy_engagement_range_pose,
+    )
 
 
 def test_phase16a_stale_drift_and_malformed_proposals_reject_before_queue_pop() -> None:
@@ -344,6 +420,9 @@ def test_phase16a_replay_restore_preserves_pending_deployment_request() -> None:
 def test_phase16a_deployment_payload_round_trips_and_reports_request_drift() -> None:
     lifecycle, placement_request = _advance_to_first_deployment_placement()
     assert lifecycle.state is not None
+    assert isinstance(placement_request.payload, dict)
+    assert "proposal_request" in placement_request.payload
+    assert "deployment_request" not in placement_request.payload
     request = DeploymentPlacementRequest.from_decision_request_payload(placement_request.payload)
     proposal = deployment_proposal_for_state(lifecycle.state, request=placement_request)
 
@@ -479,12 +558,33 @@ def _advance_to_first_deployment_selection(
     return lifecycle, deployment_status
 
 
-def _advance_to_first_deployment_placement() -> tuple[GameLifecycle, DecisionRequest]:
-    lifecycle, deployment_status = _advance_to_first_deployment_selection()
+def _advance_to_first_deployment_placement(
+    config: GameConfig | None = None,
+) -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle, deployment_status = _advance_to_first_deployment_selection(config)
     placement_status = submit_deployment_unit_selection(
         lifecycle,
         request=_decision_request(deployment_status),
         result_id="phase16a-first-deployment-selection",
+    )
+    placement_request = _decision_request(placement_status)
+    assert placement_request.decision_type == SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE
+    return lifecycle, placement_request
+
+
+def _advance_to_second_deployment_placement() -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle, first_request = _advance_to_first_deployment_placement()
+    next_selection_status = submit_deployment_placement(
+        lifecycle,
+        request=first_request,
+        result_id="phase16a-first-valid-placement",
+    )
+    next_selection_request = _decision_request(next_selection_status)
+    assert next_selection_request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
+    placement_status = submit_deployment_unit_selection(
+        lifecycle,
+        request=next_selection_request,
+        result_id="phase16a-second-deployment-selection",
     )
     placement_request = _decision_request(placement_status)
     assert placement_request.decision_type == SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE
@@ -544,6 +644,58 @@ def _midfield_outside_deployment_zone_pose(
     return Pose.at(24.0, 20.0 + (index * 1.8), 0.0, facing_degrees=180.0)
 
 
+def _out_of_bounds_pose(
+    index: int,
+    _player_id: str,
+    _model_instance_id: str,
+) -> Pose:
+    return Pose.at(61.0, 3.0 + (index * 1.8), 0.0, facing_degrees=180.0)
+
+
+def _terrain_endpoint_pose(
+    index: int,
+    _player_id: str,
+    _model_instance_id: str,
+) -> Pose:
+    return Pose.at(44.5, 5.0 + (index * 1.8), 0.5, facing_degrees=180.0)
+
+
+def _blocking_objective_marker_endpoint_pose(
+    index: int,
+    _player_id: str,
+    _model_instance_id: str,
+) -> Pose:
+    if index == 0:
+        return Pose.at(57.0, 20.0, 0.0, facing_degrees=180.0)
+    return Pose.at(57.0, 24.0 + (index * 1.8), 0.0, facing_degrees=180.0)
+
+
+def _overlapping_models_pose(
+    _index: int,
+    _player_id: str,
+    _model_instance_id: str,
+) -> Pose:
+    return Pose.at(57.0, 3.0, 0.0, facing_degrees=180.0)
+
+
+def _broken_coherency_pose(
+    index: int,
+    _player_id: str,
+    _model_instance_id: str,
+) -> Pose:
+    if index == 4:
+        return Pose.at(57.0, 40.0, 0.0, facing_degrees=180.0)
+    return Pose.at(57.0, 3.0 + (index * 1.8), 0.0, facing_degrees=180.0)
+
+
+def _enemy_engagement_range_pose(
+    index: int,
+    _player_id: str,
+    _model_instance_id: str,
+) -> Pose:
+    return Pose.at(54.0, 3.0 + (index * 1.8), 0.0, facing_degrees=0.0)
+
+
 def _infiltrators_valid_midfield_pose(
     index: int,
     _player_id: str,
@@ -578,6 +730,40 @@ def _drift_first_model_and_append_wrong_unit_model(payload: dict[str, JsonValue]
     extra["unit_instance_id"] = "army-alpha:intercessor-unit-1"
     extra["model_instance_id"] = "army-alpha:intercessor-unit-1:core-intercessor-like:001"
     placements.append(extra)
+
+
+def _assert_invalid_deployment_without_mutation(
+    lifecycle: GameLifecycle,
+    *,
+    placement_request: DecisionRequest,
+    result_id: str,
+    expected_codes: set[str],
+    pose_factory: DeploymentPoseFactory | None = None,
+    payload_mutation: Callable[[dict[str, JsonValue]], None] | None = None,
+) -> LifecycleStatus:
+    assert lifecycle.state is not None
+    assert lifecycle.state.battlefield_state is not None
+    before_record_count = len(lifecycle.decision_controller.records)
+    before_battlefield_payload = lifecycle.state.battlefield_state.to_payload()
+
+    status = submit_deployment_placement(
+        lifecycle,
+        request=placement_request,
+        result_id=result_id,
+        pose_factory=pose_factory,
+        payload_mutation=payload_mutation,
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert _invalid_reason(status) == "deployment_placement_invalid"
+    assert expected_codes <= _violation_codes(status)
+    assert lifecycle.decision_controller.queue.peek_next().request_id == (
+        placement_request.request_id
+    )
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert lifecycle.state.battlefield_state is not None
+    assert lifecycle.state.battlefield_state.to_payload() == before_battlefield_payload
+    return status
 
 
 def _submit_result(
@@ -622,6 +808,24 @@ def _violation_codes(status: LifecycleStatus) -> set[str]:
     return codes
 
 
+def _deployment_transition_source_event_ids(lifecycle: GameLifecycle) -> set[str]:
+    source_event_ids: set[str] = set()
+    for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type != "battlefield_models_placed":
+            continue
+        assert isinstance(event.payload, dict)
+        transition_batch = event.payload["transition_batch"]
+        assert isinstance(transition_batch, dict)
+        placements = transition_batch["placements"]
+        assert isinstance(placements, list)
+        for placement in placements:
+            assert isinstance(placement, dict)
+            source_event_id = placement["source_event_id"]
+            assert type(source_event_id) is str
+            source_event_ids.add(source_event_id)
+    return source_event_ids
+
+
 def _option_ids(request: DecisionRequest) -> tuple[str, ...]:
     return tuple(option.option_id for option in request.options)
 
@@ -647,6 +851,24 @@ def _config(
         ),
         mission_setup=_mission_setup(),
     )
+
+
+def _config_with_blocking_objective_marker() -> GameConfig:
+    base = _config()
+    assert base.mission_setup is not None
+    blocking_marker = ObjectiveMarkerDefinition(
+        objective_marker_id="phase16a-blocking-objective",
+        name="Phase 16A Blocking Objective",
+        x_inches=57.0,
+        y_inches=20.0,
+        blocks_placement=True,
+        source_id="phase16a-test:objective-marker",
+    )
+    mission_setup = replace(
+        base.mission_setup,
+        objective_markers=(*base.mission_setup.objective_markers, blocking_marker),
+    )
+    return replace(base, mission_setup=mission_setup)
 
 
 def _ruleset() -> RulesetDescriptor:

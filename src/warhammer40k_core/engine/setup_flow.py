@@ -295,6 +295,13 @@ class SetupFlow:
             raise GameLifecycleError("Deployment unit selection can be applied only in setup.")
         if state.current_setup_step is not SetupStep.DEPLOY_ARMIES:
             raise GameLifecycleError("Deployment unit selection requires DEPLOY_ARMIES.")
+        if result.actor_id is None:
+            raise GameLifecycleError("Deployment unit selection requires actor_id.")
+        if not isinstance(result.payload, dict):
+            raise GameLifecycleError("Deployment unit selection payload must be an object.")
+        selected_unit_id = result.payload.get("unit_instance_id")
+        if type(selected_unit_id) is not str:
+            raise GameLifecycleError("Deployment unit selection payload missing unit_instance_id.")
         selection_record = decisions.record_for_result(result)
         placement_request = deployment_placement_request_from_selection(
             state=state,
@@ -302,6 +309,21 @@ class SetupFlow:
             selection_request=selection_record.request,
             result=result,
         ).to_decision_request()
+        decisions.event_log.append(
+            "deployment_unit_selected",
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.DEPLOY_ARMIES.value,
+                "deployment_order_policy": "defender_first_alternating",
+                "player_id": result.actor_id,
+                "unit_instance_id": selected_unit_id,
+                "selected_option_id": result.selected_option_id,
+                "source_decision_record_id": selection_record.record_id,
+                "source_decision_request_id": selection_record.request.request_id,
+                "source_decision_result_id": result.result_id,
+                "placement_request_id": placement_request.request_id,
+            },
+        )
         decisions.request_decision(placement_request)
 
     def _apply_deployment_placement(

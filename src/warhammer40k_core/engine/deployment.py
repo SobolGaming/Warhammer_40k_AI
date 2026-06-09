@@ -105,6 +105,7 @@ class DeploymentSetupStatePayload(TypedDict):
 
 
 class DeploymentUnitSelectionPayload(TypedDict):
+    submission_kind: str
     game_id: str
     player_id: str
     setup_step: str
@@ -145,7 +146,7 @@ class DeploymentPlacementRequestPayload(TypedDict):
 
 
 class DeploymentPlacementDecisionRequestPayload(TypedDict):
-    deployment_request: DeploymentPlacementRequestPayload
+    proposal_request: DeploymentPlacementRequestPayload
 
 
 class DeploymentPlacementProposalPayload(TypedDict):
@@ -391,7 +392,7 @@ class DeploymentPlacementRequest:
             request_id=self.request_id,
             decision_type=SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
             actor_id=self.actor_id,
-            payload={"deployment_request": validate_json_value(self.to_payload())},
+            payload={"proposal_request": validate_json_value(self.to_payload())},
             options=(parameterized_decision_option(),),
         )
 
@@ -448,7 +449,7 @@ class DeploymentPlacementRequest:
         json_payload = validate_json_value(payload)
         if not isinstance(json_payload, dict):
             raise GameLifecycleError("Deployment DecisionRequest payload must be an object.")
-        request_payload = json_payload.get("deployment_request")
+        request_payload = json_payload.get("proposal_request")
         if not isinstance(request_payload, dict):
             raise GameLifecycleError("Deployment DecisionRequest payload missing request.")
         typed_payload = cast(DeploymentPlacementRequestPayload, request_payload)
@@ -1015,6 +1016,7 @@ def apply_deployment_placement(
         ruleset_descriptor=ruleset_descriptor,
         request=request_context,
         proposal=proposal,
+        source_event_id=result.result_id,
     )
     if not resolution.is_valid:
         raise GameLifecycleError("Invalid deployment placement cannot mutate state.")
@@ -1033,9 +1035,15 @@ def resolve_deployment_placement(
     ruleset_descriptor: RulesetDescriptor,
     request: DeploymentPlacementRequest,
     proposal: DeploymentPlacementProposal,
+    source_event_id: str | None = None,
 ) -> DeploymentPlacementResolution:
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Deployment placement requires RulesetDescriptor.")
+    placement_source_event_id = (
+        request.source_decision_result_id
+        if source_event_id is None
+        else _validate_identifier("source_event_id", source_event_id)
+    )
     _validate_deployment_state(state)
     scenario = BattlefieldScenario(
         armies=tuple(state.army_definitions),
@@ -1135,7 +1143,7 @@ def resolve_deployment_placement(
                     source_phase=None,
                     source_step=SetupStep.DEPLOY_ARMIES.value,
                     source_rule_id=DEPLOY_ARMIES_SOURCE_RULE_ID,
-                    source_event_id=request.source_decision_result_id,
+                    source_event_id=placement_source_event_id,
                 )
                 for placement in proposal.model_placements
             )
@@ -1163,6 +1171,7 @@ def _deployment_unit_selection_payload(
     view: RulesUnitView,
 ) -> JsonValue:
     payload: DeploymentUnitSelectionPayload = {
+        "submission_kind": SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
         "game_id": state.game_id,
         "player_id": view.owner_player_id,
         "setup_step": SetupStep.DEPLOY_ARMIES.value,

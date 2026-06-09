@@ -232,8 +232,11 @@ def test_deploy_armies_emits_deployment_placement_records() -> None:
         assert record.source_phase is None
         assert record.source_step == "deploy_armies"
         assert record.source_rule_id == "core_rules_deploy_armies"
-        assert record.source_event_id is not None
-        assert record.source_event_id.startswith("phase10d-deploy-")
+        assert record.source_event_id in {
+            "phase10d-deploy-000002",
+            "phase10d-deploy-000004",
+            "phase10d-deploy-000006",
+        }
         assert record.pose == battlefield_state.model_placement_by_id(record.model_instance_id).pose
 
 
