@@ -2585,9 +2585,13 @@ Invariants:
 - mustering source data follows the 11th Edition order: select Battle Size,
   start Army Roster, choose Faction, select Detachment Rules, select Units, then
   promote Warlord;
-- Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit
-  Limit 2 doubled for `BATTLELINE`; Strike Force is 2000 points, 4 Detachment
-  Points, Enhancement Limit 4, and Unit Limit 3 doubled for `BATTLELINE`;
+- CORE V2 currently supports only Strike Force army construction: 2000 points,
+  a 60" x 44" battlefield expectation, 4 Detachment Points, Enhancement Limit
+  4, and Unit Limit 3 doubled for `BATTLELINE`; smaller battle sizes are
+  explicit unsupported inputs, not fallback modes;
+- active army catalogs must exclude Combat Patrol, Legends, Forge World, Kill
+  Team, and other non-matched-play content scopes instead of filtering them by
+  names or tolerating them during mustering;
 - detachment point costs are source data, and missing values remain
   awaiting-source rows rather than defaults;
 - Leader and Support Attached Units are declared on the army list, Enhancements
@@ -2625,9 +2629,9 @@ Required tests:
 - Force Disposition rows and all 25 Primary Mission matrix cells load,
   round-trip, preserve `awaiting_source` status, and expose exactly three layout
   identifiers per cell;
-- battle-size mustering rows enforce point, Detachment Point, Enhancement Limit,
-  Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
-  faction-keyword rules;
+- Strike Force mustering policy enforces point, Detachment Point, Enhancement
+  Limit, Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
+  faction-keyword rules, and rejects unsupported battle-size inputs;
 - Secondary Mission draw/retain/no-hand-size-cap/discard, New Orders
   replacement draw, and 45/45/10/100 plus 15-per-round VP caps load from source
   data and round-trip through mission scoring fixtures;
@@ -3412,10 +3416,16 @@ Invariants:
 
 - mustering order is Battle Size, Army Roster, Faction, Detachment Rules, Units, then Warlord promotion;
 - battle size defines points limit, detachment points, enhancement limit, unit limit, and mission-compatible battlefield expectations;
-- Incursion is 1000 points, 2 Detachment Points, Enhancement Limit 2, and Unit Limit 2, doubled for `BATTLELINE` units;
-- Strike Force is 2000 points, 4 Detachment Points, Enhancement Limit 4, and Unit Limit 3, doubled for `BATTLELINE` units;
+- CORE V2 currently supports only Strike Force: 2000 points, 60" x 44" battlefield expectations, 4 Detachment Points, Enhancement Limit 4, and Unit Limit 3, doubled for `BATTLELINE` units;
+- Incursion, Combat Patrol, Onslaught, and other battle sizes are explicit unsupported inputs until repository policy adds them;
+- active army catalogs reject Combat Patrol, Legends, Forge World, Kill Team,
+  and other non-matched-play content scopes instead of letting those units,
+  rules, Enhancements, Stratagems, or detachments reach mustering;
 - army faction is a selected Faction keyword and every included unit must be legal for that faction or an allowed exception;
-- detachment selection spends Detachment Points and grants access to detachment rules, units, Stratagems, and Enhancements; missing detachment point values are explicit awaiting-source data, not defaults;
+- detachment selection spends Detachment Points and grants access to detachment
+  rules, units, Stratagems, Enhancements, and Force Dispositions; missing
+  detachment point values, unit grants, or Force Disposition grants are explicit
+  awaiting-source data, not defaults;
 - the army must include at least one eligible `CHARACTER` model to be Warlord;
 - the Warlord must have the same Faction keyword as the rest of the army;
 - selected Warlord gains the `WARLORD` keyword;
@@ -3459,7 +3469,14 @@ Invariants:
 
 Required tests:
 
-- Incursion and Strike Force points, detachment points, enhancement limits, and unit limits;
+- Strike Force points, battlefield dimensions, detachment points, enhancement
+  limits, unit limits, and unsupported battle-size rejection;
+- active catalog rejection for Combat Patrol, Legends, Forge World, Kill Team,
+  and other non-matched-play content scopes;
+- multi-detachment Strike Force combinations whose total Detachment Point cost
+  is less than or equal to 4, plus rejection above 4;
+- selected detachment Force Disposition union and selected-detachment unit
+  grants;
 - Epic Hero uniqueness and Enhancement denial;
 - Enhancement count, uniqueness, Character-only, and one-per-attached-squad restrictions;
 - source-awaiting detachment point, enhancement eligibility, base-size,

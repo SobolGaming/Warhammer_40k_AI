@@ -3,6 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.content_scope import (
+    CatalogContentScope,
+    CatalogContentScopeError,
+    catalog_content_scope_from_token,
+)
+
 
 class FactionCatalogError(ValueError):
     """Raised when faction catalog data violates CORE V2 invariants."""
@@ -12,12 +18,14 @@ class ArmyRuleDefinitionPayload(TypedDict):
     rule_id: str
     name: str
     source_id: str
+    content_scope: str
     ability_descriptor_ids: list[str]
 
 
 class FactionDefinitionPayload(TypedDict):
     faction_id: str
     name: str
+    content_scope: str
     faction_keywords: list[str]
     army_rule_ids: list[str]
     source_ids: list[str]
@@ -28,6 +36,7 @@ class ArmyRuleDefinition:
     rule_id: str
     name: str
     source_id: str
+    content_scope: CatalogContentScope = CatalogContentScope.MATCHED_PLAY
     ability_descriptor_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -48,6 +57,14 @@ class ArmyRuleDefinition:
         )
         object.__setattr__(
             self,
+            "content_scope",
+            _catalog_content_scope_from_token(
+                "ArmyRuleDefinition content_scope",
+                self.content_scope,
+            ),
+        )
+        object.__setattr__(
+            self,
             "ability_descriptor_ids",
             _validate_identifier_tuple(
                 "ArmyRuleDefinition ability_descriptor_ids",
@@ -63,6 +80,7 @@ class ArmyRuleDefinition:
             "rule_id": self.rule_id,
             "name": self.name,
             "source_id": self.source_id,
+            "content_scope": self.content_scope.value,
             "ability_descriptor_ids": list(self.ability_descriptor_ids),
         }
 
@@ -72,6 +90,7 @@ class ArmyRuleDefinition:
             rule_id=payload["rule_id"],
             name=payload["name"],
             source_id=payload["source_id"],
+            content_scope=catalog_content_scope_from_token(payload["content_scope"]),
             ability_descriptor_ids=tuple(payload["ability_descriptor_ids"]),
         )
 
@@ -81,6 +100,7 @@ class FactionDefinition:
     faction_id: str
     name: str
     faction_keywords: tuple[str, ...]
+    content_scope: CatalogContentScope = CatalogContentScope.MATCHED_PLAY
     army_rule_ids: tuple[str, ...] = ()
     source_ids: tuple[str, ...] = ()
 
@@ -95,6 +115,14 @@ class FactionDefinition:
             ),
         )
         object.__setattr__(self, "name", _validate_identifier("FactionDefinition name", self.name))
+        object.__setattr__(
+            self,
+            "content_scope",
+            _catalog_content_scope_from_token(
+                "FactionDefinition content_scope",
+                self.content_scope,
+            ),
+        )
         faction_keywords = _validate_identifier_tuple(
             "FactionDefinition faction_keywords",
             self.faction_keywords,
@@ -120,6 +148,7 @@ class FactionDefinition:
         return {
             "faction_id": self.faction_id,
             "name": self.name,
+            "content_scope": self.content_scope.value,
             "faction_keywords": list(self.faction_keywords),
             "army_rule_ids": list(self.army_rule_ids),
             "source_ids": list(self.source_ids),
@@ -130,10 +159,18 @@ class FactionDefinition:
         return cls(
             faction_id=payload["faction_id"],
             name=payload["name"],
+            content_scope=catalog_content_scope_from_token(payload["content_scope"]),
             faction_keywords=tuple(payload["faction_keywords"]),
             army_rule_ids=tuple(payload["army_rule_ids"]),
             source_ids=tuple(payload["source_ids"]),
         )
+
+
+def _catalog_content_scope_from_token(field_name: str, token: object) -> CatalogContentScope:
+    try:
+        return catalog_content_scope_from_token(token)
+    except CatalogContentScopeError as exc:
+        raise FactionCatalogError(f"{field_name} is invalid.") from exc
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

@@ -13,13 +13,15 @@ from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPay
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     AttachmentDeclarationPayload,
+    BattleSize,
     DetachmentSelection,
     DetachmentSelectionPayload,
     ListValidationError,
     UnitMusterSelection,
     UnitMusterSelectionPayload,
+    battle_size_from_token,
     validate_detachment_selection,
-    validate_unit_selection_for_faction,
+    validate_unit_selection_for_army,
 )
 from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
@@ -42,6 +44,7 @@ class ArmyMusterRequestPayload(TypedDict):
     detachment_selection: DetachmentSelectionPayload
     unit_selections: list[UnitMusterSelectionPayload]
     attachment_declarations: list[AttachmentDeclarationPayload]
+    battle_size: str
 
 
 class AttachedUnitFormationPayload(TypedDict):
@@ -62,6 +65,7 @@ class ArmyDefinitionPayload(TypedDict):
     detachment_selection: DetachmentSelectionPayload
     units: list[UnitInstancePayload]
     attached_units: list[AttachedUnitFormationPayload]
+    battle_size: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -74,6 +78,7 @@ class ArmyMusterRequest:
     detachment_selection: DetachmentSelection
     unit_selections: tuple[UnitMusterSelection, ...]
     attachment_declarations: tuple[AttachmentDeclaration, ...] = ()
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -121,6 +126,7 @@ class ArmyMusterRequest:
         )
         _validate_unique_attachment_source_ids(attachment_declarations)
         object.__setattr__(self, "attachment_declarations", attachment_declarations)
+        object.__setattr__(self, "battle_size", _battle_size_from_token(self.battle_size))
 
     def to_payload(self) -> ArmyMusterRequestPayload:
         return {
@@ -134,6 +140,7 @@ class ArmyMusterRequest:
             "attachment_declarations": [
                 declaration.to_payload() for declaration in self.attachment_declarations
             ],
+            "battle_size": self.battle_size.value,
         }
 
     @classmethod
@@ -153,6 +160,7 @@ class ArmyMusterRequest:
                 AttachmentDeclaration.from_payload(declaration)
                 for declaration in payload["attachment_declarations"]
             ),
+            battle_size=_battle_size_from_token(payload["battle_size"]),
         )
 
 
@@ -247,6 +255,7 @@ class ArmyDefinition:
     detachment_selection: DetachmentSelection
     units: tuple[UnitInstance, ...]
     attached_units: tuple[AttachedUnitFormation, ...] = ()
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -293,6 +302,7 @@ class ArmyDefinition:
             attached_units=attached_units,
         )
         object.__setattr__(self, "attached_units", attached_units)
+        object.__setattr__(self, "battle_size", _battle_size_from_token(self.battle_size))
 
     def stable_identity(self) -> str:
         return f"army:{self.army_id}"
@@ -318,6 +328,7 @@ class ArmyDefinition:
             "detachment_selection": self.detachment_selection.to_payload(),
             "units": [unit.to_payload() for unit in self.units],
             "attached_units": [attached.to_payload() for attached in self.attached_units],
+            "battle_size": self.battle_size.value,
         }
 
     @classmethod
@@ -334,6 +345,7 @@ class ArmyDefinition:
                 AttachedUnitFormation.from_payload(attached)
                 for attached in payload["attached_units"]
             ),
+            battle_size=_battle_size_from_token(payload["battle_size"]),
         )
 
 
@@ -344,9 +356,10 @@ def muster_army(*, catalog: ArmyCatalog, request: ArmyMusterRequest) -> ArmyDefi
         raise ArmyMusteringError("request must be an ArmyMusterRequest.")
     _validate_request_matches_catalog(catalog=catalog, request=request)
     try:
-        faction, _detachment = validate_detachment_selection(
+        faction, _detachments = validate_detachment_selection(
             catalog=catalog,
             selection=request.detachment_selection,
+            battle_size=request.battle_size,
         )
     except ListValidationError as exc:
         raise ArmyMusteringError("ArmyMusterRequest detachment selection is invalid.") from exc
@@ -356,10 +369,11 @@ def muster_army(*, catalog: ArmyCatalog, request: ArmyMusterRequest) -> ArmyDefi
     datasheets_by_selection_id: dict[str, DatasheetDefinition] = {}
     for selection in request.unit_selections:
         try:
-            datasheet = validate_unit_selection_for_faction(
+            datasheet = validate_unit_selection_for_army(
                 catalog=catalog,
                 selection=selection,
                 faction=faction,
+                detachment_selection=request.detachment_selection,
             )
             datasheets_by_selection_id[selection.unit_selection_id] = datasheet
             units.append(
@@ -385,6 +399,7 @@ def muster_army(*, catalog: ArmyCatalog, request: ArmyMusterRequest) -> ArmyDefi
         detachment_selection=request.detachment_selection,
         units=resolved_units,
         attached_units=attached_units,
+        battle_size=request.battle_size,
     )
 
 
@@ -540,6 +555,13 @@ def _ruleset_id_from_payload(payload: RulesetIdPayload) -> RulesetId:
         return RulesetId.from_payload(payload)
     except RulesetError as exc:
         raise ArmyMusteringError("ruleset_id payload is invalid.") from exc
+
+
+def _battle_size_from_token(token: object) -> BattleSize:
+    try:
+        return battle_size_from_token(token)
+    except ListValidationError as exc:
+        raise ArmyMusteringError("battle_size token is invalid.") from exc
 
 
 def _unit_instance_from_payload(payload: UnitInstancePayload) -> UnitInstance:

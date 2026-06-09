@@ -8,7 +8,11 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetDefinition
-from warhammer40k_core.core.detachment import EnhancementDefinition, StratagemDefinition
+from warhammer40k_core.core.detachment import (
+    DetachmentDefinition,
+    EnhancementDefinition,
+    StratagemDefinition,
+)
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.engine.army_mustering import (
@@ -22,13 +26,17 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
+    BattleSize,
+    BattleSizeMusteringPolicy,
     DetachmentSelection,
     ListValidationError,
     ModelProfileSelection,
     UnitMusterSelection,
     WargearSelection,
+    battle_size_from_token,
     resolve_model_profile_selections,
     resolve_wargear_selections,
+    selected_force_disposition_ids,
     validate_detachment_selection,
     validate_unit_selection_for_faction,
 )
@@ -88,10 +96,256 @@ def _muster_request(
         if detachment_selection is not None
         else DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=unit_selections if unit_selections is not None else (_unit_selection(),),
         attachment_declarations=attachment_declarations,
+    )
+
+
+def _phase16_partial_space_marine_detachment(
+    *,
+    faction_id: str,
+    detachment_point_cost: int,
+    detachment_id: str,
+    name: str,
+    unit_datasheet_ids: tuple[str, ...],
+    force_disposition_ids: tuple[str, ...],
+) -> DetachmentDefinition:
+    return DetachmentDefinition(
+        detachment_id=detachment_id,
+        name=name,
+        faction_id=faction_id,
+        detachment_point_cost=detachment_point_cost,
+        unit_datasheet_ids=unit_datasheet_ids,
+        force_disposition_ids=force_disposition_ids,
+        source_ids=(f"detachment:{faction_id}:{detachment_id}",),
+    )
+
+
+def _phase16_partial_space_marine_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    unit_datasheet_ids = tuple(datasheet.datasheet_id for datasheet in base_catalog.datasheets)
+    factions = (
+        base_catalog.faction_by_id("core-marine-force"),
+        FactionDefinition(
+            faction_id="black-templars",
+            name="Black Templars",
+            faction_keywords=("BLACK TEMPLARS",),
+        ),
+        FactionDefinition(
+            faction_id="blood-angels",
+            name="Blood Angels",
+            faction_keywords=("BLOOD ANGELS",),
+        ),
+        FactionDefinition(
+            faction_id="dark-angels",
+            name="Dark Angels",
+            faction_keywords=("DARK ANGELS",),
+        ),
+        FactionDefinition(
+            faction_id="deathwatch",
+            name="Deathwatch",
+            faction_keywords=("DEATHWATCH",),
+        ),
+        FactionDefinition(
+            faction_id="grey-knights",
+            name="Grey Knights",
+            faction_keywords=("GREY KNIGHTS",),
+        ),
+        FactionDefinition(
+            faction_id="space-wolves",
+            name="Space Wolves",
+            faction_keywords=("SPACE WOLVES",),
+        ),
+    )
+    detachment_rows = (
+        ("core-marine-force", 1, "fulguris-task-force", "Fulguris Task Force", ("disruption",)),
+        ("core-marine-force", 1, "librarius-conclave", "Librarius Conclave", ("disruption",)),
+        ("core-marine-force", 1, "subversion-assets", "Subversion Assets", ("disruption",)),
+        (
+            "core-marine-force",
+            2,
+            "first-company-task-force",
+            "1st Company Task Force",
+            ("priority-assets",),
+        ),
+        ("core-marine-force", 2, "anvil-siege-force", "Anvil Siege Force", ()),
+        ("core-marine-force", 2, "bastion-task-force", "Bastion Task Force", ("take-and-hold",)),
+        ("core-marine-force", 2, "emperor-shield", "Emperor's Shield", ("priority-assets",)),
+        (
+            "core-marine-force",
+            2,
+            "firestorm-assault-force",
+            "Firestorm Assault Force",
+            ("purge-the-foe",),
+        ),
+        (
+            "core-marine-force",
+            2,
+            "forgefather-seekers",
+            "Forgefather's Seekers",
+            ("purge-the-foe",),
+        ),
+        ("core-marine-force", 2, "hammer-of-avernii", "Hammer of Avernii", ("priority-assets",)),
+        (
+            "core-marine-force",
+            2,
+            "headhunter-task-force",
+            "Headhunter Task Force",
+            ("priority-assets",),
+        ),
+        (
+            "core-marine-force",
+            2,
+            "ironstorm-spearhead",
+            "Ironstorm Spearhead",
+            ("purge-the-foe",),
+        ),
+        (
+            "core-marine-force",
+            2,
+            "orbital-assault-force",
+            "Orbital Assault Force",
+            ("take-and-hold",),
+        ),
+        ("core-marine-force", 2, "reclamation-force", "Reclamation Force", ("take-and-hold",)),
+        ("core-marine-force", 2, "shadowmark-talon", "Shadowmark Talon", ("disruption",)),
+        (
+            "core-marine-force",
+            2,
+            "spearpoint-task-force",
+            "Spearpoint Task Force",
+            ("disruption",),
+        ),
+        ("core-marine-force", 2, "vanguard-spearhead", "Vanguard Spearhead", ("disruption",)),
+        ("core-marine-force", 3, "armoured-speartip", "Armoured Speartip", ()),
+        ("core-marine-force", 3, "blade-of-ultramar", "Blade of Ultramar", ("priority-assets",)),
+        (
+            "core-marine-force",
+            3,
+            "ceramite-sentinels",
+            "Ceramite Sentinels",
+            ("take-and-hold",),
+        ),
+        ("core-marine-force", 3, "gladius-task-force", "Gladius Task Force", ("priority-assets",)),
+        ("core-marine-force", 3, "stormlance-task-force", "Stormlance Task Force", ("disruption",)),
+        ("black-templars", 1, "marshals-household", "Marshal's Household", ("priority-assets",)),
+        ("black-templars", 1, "the-living-miracle", "The Living Miracle", ("purge-the-foe",)),
+        ("black-templars", 1, "wrathful-procession", "Wrathful Procession", ("take-and-hold",)),
+        (
+            "black-templars",
+            2,
+            "companions-of-vehemence",
+            "Companions of Vehemence",
+            ("purge-the-foe",),
+        ),
+        (
+            "black-templars",
+            2,
+            "godhammer-assault-force",
+            "Godhammer Assault Force",
+            ("disruption",),
+        ),
+        (
+            "black-templars",
+            2,
+            "vindication-task-force",
+            "Vindication Task Force",
+            ("priority-assets",),
+        ),
+        ("blood-angels", 1, "encarmine-speartip", "Encarmine Speartip", ()),
+        ("blood-angels", 1, "legacy-of-grace", "Legacy of Grace", ()),
+        ("blood-angels", 1, "wrath-of-the-doomed", "Wrath of the Doomed", ("purge-the-foe",)),
+        ("blood-angels", 2, "the-angelic-host", "The Angelic Host", ()),
+        ("blood-angels", 2, "the-lost-brethren", "The Lost Brethren", ()),
+        ("blood-angels", 3, "angelic-inheritors", "Angelic Inheritors", ("priority-assets",)),
+        (
+            "blood-angels",
+            3,
+            "liberator-assault-group",
+            "Liberator Assault Group",
+            ("take-and-hold",),
+        ),
+        ("blood-angels", 3, "rage-cursed-onslaught", "Rage-cursed Onslaught", ("purge-the-foe",)),
+        ("dark-angels", 1, "dark-age-arsenal", "Dark Age Arsenal", ("priority-assets",)),
+        ("dark-angels", 1, "darkflight-pursuit", "Darkflight Pursuit", ()),
+        ("dark-angels", 1, "interrogation-conclave", "Interrogation Conclave", ("purge-the-foe",)),
+        ("dark-angels", 2, "company-of-hunters", "Company of Hunters", ("disruption",)),
+        (
+            "dark-angels",
+            2,
+            "inner-circle-task-force",
+            "Inner Circle Task Force",
+            ("priority-assets",),
+        ),
+        (
+            "dark-angels",
+            2,
+            "lions-blade-task-force",
+            "Lion's Blade Task Force",
+            ("purge-the-foe",),
+        ),
+        ("dark-angels", 2, "unforgiven-task-force", "Unforgiven Task Force", ()),
+        ("dark-angels", 3, "wrath-of-the-rock", "Wrath of the Rock", ("priority-assets",)),
+        ("deathwatch", 3, "black-spear-task-force", "Black Spear Task Force", ()),
+        ("grey-knights", 1, "argent-assault", "Argent Assault", ()),
+        ("grey-knights", 1, "fires-of-purgation", "Fires of Purgation", ()),
+        ("grey-knights", 1, "immaterial-interdiction", "Immaterial Interdiction", ()),
+        ("grey-knights", 2, "augurium-task-force", "Augurium Task Force", ()),
+        ("grey-knights", 2, "banishers", "Banishers", ()),
+        ("grey-knights", 2, "brotherhood-strike", "Brotherhood Strike", ()),
+        ("grey-knights", 2, "hallowed-conclave", "Hallowed Conclave", ()),
+        ("grey-knights", 2, "sanctic-spearhead", "Sanctic Spearhead", ()),
+        ("grey-knights", 3, "warpbane-task-force", "Warpbane Task Force", ()),
+        ("space-wolves", 1, "champions-of-fenris", "Champions of Fenris", ()),
+        (
+            "space-wolves",
+            1,
+            "legends-of-saga-and-song",
+            "Legends of Saga and Song",
+            ("take-and-hold",),
+        ),
+        ("space-wolves", 1, "veterans-of-the-fang", "Veterans of the Fang", ("disruption",)),
+        (
+            "space-wolves",
+            2,
+            "saga-of-the-beastslayer",
+            "Saga of the Beastslayer",
+            ("purge-the-foe",),
+        ),
+        ("space-wolves", 2, "saga-of-the-bold", "Saga of the Bold", ()),
+        ("space-wolves", 2, "saga-of-the-great-wolf", "Saga of the Great Wolf", ("take-and-hold",)),
+        ("space-wolves", 2, "saga-of-the-hunter", "Saga of the Hunter", ()),
+    )
+    detachments = tuple(
+        _phase16_partial_space_marine_detachment(
+            faction_id=faction_id,
+            detachment_point_cost=detachment_point_cost,
+            detachment_id=detachment_id,
+            name=name,
+            unit_datasheet_ids=unit_datasheet_ids,
+            force_disposition_ids=force_disposition_ids,
+        )
+        for (
+            faction_id,
+            detachment_point_cost,
+            detachment_id,
+            name,
+            force_disposition_ids,
+        ) in detachment_rows
+    )
+
+    return ArmyCatalog(
+        catalog_id="phase16-partial-space-marine-detachments",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id=base_catalog.source_package_id,
+        datasheets=base_catalog.datasheets,
+        wargear=base_catalog.wargear,
+        factions=factions,
+        army_rules=base_catalog.army_rules,
+        detachments=detachments,
+        source_ids=base_catalog.source_ids,
     )
 
 
@@ -575,7 +829,7 @@ def test_detachment_enhancement_and_stratagem_selections_are_validated_as_data()
         catalog_with_content,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
             enhancement_ids=(enhancement.enhancement_id,),
             stratagem_ids=(stratagem.stratagem_id,),
         ),
@@ -584,7 +838,7 @@ def test_detachment_enhancement_and_stratagem_selections_are_validated_as_data()
         catalog_with_content,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
             enhancement_ids=("not-allowed",),
         ),
     )
@@ -593,6 +847,205 @@ def test_detachment_enhancement_and_stratagem_selections_are_validated_as_data()
     assert army.detachment_selection == valid_request.detachment_selection
     with pytest.raises(ArmyMusteringError, match="detachment selection"):
         muster_army(catalog=catalog_with_content, request=invalid_request)
+
+
+def test_strike_force_is_the_only_supported_battle_size_policy() -> None:
+    policy = BattleSizeMusteringPolicy.strike_force()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    request = _muster_request(catalog)
+
+    assert policy.points_limit == 2000
+    assert policy.battlefield_width_inches == 60.0
+    assert policy.battlefield_depth_inches == 44.0
+    assert policy.detachment_point_limit == 4
+    assert policy.enhancement_limit == 4
+    assert policy.unit_limit == 3
+    assert policy.battleline_unit_limit == 6
+    assert muster_army(catalog=catalog, request=request).battle_size.value == "strike_force"
+
+    with pytest.raises(ListValidationError, match="Unsupported BattleSize"):
+        battle_size_from_token("incursion")
+    with pytest.raises(ArmyMusteringError, match="battle_size"):
+        replace(request, battle_size=cast(BattleSize, "incursion"))
+
+
+def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_detachment = catalog.detachments[0]
+    vanguard_detachment = replace(
+        base_detachment,
+        detachment_id="core-vanguard",
+        name="CORE Vanguard",
+        detachment_point_cost=3,
+        unit_datasheet_ids=("core-intercessor-like-infantry",),
+        force_disposition_ids=("reconnaissance",),
+        source_ids=("detachment:core-vanguard",),
+    )
+    support_detachment = replace(
+        base_detachment,
+        detachment_id="core-support",
+        name="CORE Support",
+        detachment_point_cost=1,
+        unit_datasheet_ids=("core-character-leader", "core-intercessor-like-infantry"),
+        force_disposition_ids=("take-and-hold",),
+        source_ids=("detachment:core-support",),
+    )
+    multi_detachment_catalog = ArmyCatalog(
+        catalog_id="phase16d-multi-detachment",
+        ruleset_id=catalog.ruleset_id,
+        source_package_id=catalog.source_package_id,
+        datasheets=catalog.datasheets,
+        wargear=catalog.wargear,
+        factions=catalog.factions,
+        army_rules=catalog.army_rules,
+        detachments=(base_detachment, support_detachment, vanguard_detachment),
+        source_ids=catalog.source_ids,
+    )
+    legal_selection = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=("core-support", "core-vanguard"),
+    )
+    over_limit_selection = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=("core-combined-arms", "core-support", "core-vanguard"),
+    )
+    unsupported_unit_request = _muster_request(
+        multi_detachment_catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-vanguard",),
+        ),
+        unit_selections=(
+            _unit_selection(
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        ),
+    )
+
+    faction, detachments = validate_detachment_selection(
+        catalog=multi_detachment_catalog,
+        selection=legal_selection,
+    )
+    army = muster_army(
+        catalog=multi_detachment_catalog,
+        request=_muster_request(multi_detachment_catalog, detachment_selection=legal_selection),
+    )
+
+    assert faction.faction_id == "core-marine-force"
+    assert tuple(detachment.detachment_id for detachment in detachments) == (
+        "core-support",
+        "core-vanguard",
+    )
+    assert army.detachment_selection.detachment_ids == ("core-support", "core-vanguard")
+    assert selected_force_disposition_ids(
+        catalog=multi_detachment_catalog,
+        selection=legal_selection,
+    ) == ("reconnaissance", "take-and-hold")
+    with pytest.raises(ListValidationError, match="Detachment Points"):
+        validate_detachment_selection(
+            catalog=multi_detachment_catalog,
+            selection=over_limit_selection,
+        )
+    with pytest.raises(ArmyMusteringError, match="unit selection"):
+        muster_army(catalog=multi_detachment_catalog, request=unsupported_unit_request)
+
+
+def test_partial_space_marine_detachment_matrix_supports_strike_force_combinations() -> None:
+    catalog = _phase16_partial_space_marine_catalog()
+    gladius_plus_fulguris = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=("gladius-task-force", "fulguris-task-force"),
+    )
+    firestorm_plus_ironstorm = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=("firestorm-assault-force", "ironstorm-spearhead"),
+    )
+    black_templar_force = DetachmentSelection(
+        faction_id="black-templars",
+        detachment_ids=(
+            "companions-of-vehemence",
+            "marshals-household",
+            "the-living-miracle",
+        ),
+    )
+
+    _space_marines, space_marine_detachments = validate_detachment_selection(
+        catalog=catalog,
+        selection=gladius_plus_fulguris,
+    )
+    assert tuple(detachment.detachment_id for detachment in space_marine_detachments) == (
+        "fulguris-task-force",
+        "gladius-task-force",
+    )
+    assert selected_force_disposition_ids(
+        catalog=catalog,
+        selection=gladius_plus_fulguris,
+    ) == ("disruption", "priority-assets")
+    assert selected_force_disposition_ids(
+        catalog=catalog,
+        selection=firestorm_plus_ironstorm,
+    ) == ("purge-the-foe",)
+    assert selected_force_disposition_ids(
+        catalog=catalog,
+        selection=black_templar_force,
+    ) == ("priority-assets", "purge-the-foe")
+
+
+def test_partial_space_marine_detachment_matrix_fails_closed_on_invalid_rows() -> None:
+    catalog = _phase16_partial_space_marine_catalog()
+    over_strike_force_limit = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=("gladius-task-force", "bastion-task-force"),
+    )
+    cross_faction_selection = DetachmentSelection(
+        faction_id="core-marine-force",
+        detachment_ids=("marshals-household",),
+    )
+    incomplete_force_disposition = DetachmentSelection(
+        faction_id="grey-knights",
+        detachment_ids=("warpbane-task-force",),
+    )
+
+    with pytest.raises(ListValidationError, match="Detachment Points"):
+        validate_detachment_selection(catalog=catalog, selection=over_strike_force_limit)
+    with pytest.raises(ListValidationError, match="does not belong to faction"):
+        validate_detachment_selection(catalog=catalog, selection=cross_faction_selection)
+    with pytest.raises(ListValidationError, match="force disposition"):
+        validate_detachment_selection(catalog=catalog, selection=incomplete_force_disposition)
+
+
+def test_detachment_selection_fails_closed_on_awaiting_source_grants() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    missing_cost_catalog = ArmyCatalog(
+        catalog_id="missing-detachment-cost",
+        ruleset_id=catalog.ruleset_id,
+        source_package_id=catalog.source_package_id,
+        datasheets=catalog.datasheets,
+        wargear=catalog.wargear,
+        factions=catalog.factions,
+        army_rules=catalog.army_rules,
+        detachments=(replace(catalog.detachments[0], detachment_point_cost=None),),
+    )
+    missing_force_disposition_catalog = ArmyCatalog(
+        catalog_id="missing-force-disposition",
+        ruleset_id=catalog.ruleset_id,
+        source_package_id=catalog.source_package_id,
+        datasheets=catalog.datasheets,
+        wargear=catalog.wargear,
+        factions=catalog.factions,
+        army_rules=catalog.army_rules,
+        detachments=(replace(catalog.detachments[0], force_disposition_ids=()),),
+    )
+
+    with pytest.raises(ArmyMusteringError, match="detachment selection"):
+        muster_army(catalog=missing_cost_catalog, request=_muster_request(missing_cost_catalog))
+    with pytest.raises(ArmyMusteringError, match="detachment selection"):
+        muster_army(
+            catalog=missing_force_disposition_catalog,
+            request=_muster_request(missing_force_disposition_catalog),
+        )
 
 
 def test_mustering_rejects_request_catalog_identity_drift() -> None:
@@ -618,7 +1071,7 @@ def test_mustering_rejects_unknown_datasheets_and_missing_detachments() -> None:
         catalog,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="missing-detachment",
+            detachment_ids=("missing-detachment",),
         ),
     )
 
@@ -669,7 +1122,7 @@ def test_list_validation_fails_fast_on_invalid_selection_shapes() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     detachment_selection = DetachmentSelection(
         faction_id="core-marine-force",
-        detachment_id="core-combined-arms",
+        detachment_ids=("core-combined-arms",),
     )
     unit_selection = _unit_selection()
     faction = catalog.faction_by_id("core-marine-force")
@@ -690,7 +1143,7 @@ def test_list_validation_fails_fast_on_invalid_selection_shapes() -> None:
             catalog=catalog,
             selection=DetachmentSelection(
                 faction_id="missing-faction",
-                detachment_id="core-combined-arms",
+                detachment_ids=("core-combined-arms",),
             ),
         )
     with pytest.raises(ListValidationError, match="catalog"):
@@ -763,7 +1216,7 @@ def test_list_validation_fails_fast_on_invalid_selection_shapes() -> None:
             ),
         )
     with pytest.raises(ListValidationError, match="must not include"):
-        DetachmentSelection(faction_id="faction:bad", detachment_id="core-combined-arms")
+        DetachmentSelection(faction_id="faction:bad", detachment_ids=("core-combined-arms",))
     with pytest.raises(ListValidationError, match="at least 1"):
         ModelProfileSelection(model_profile_id="core-intercessor-like", model_count=0)
 

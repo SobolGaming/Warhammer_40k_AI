@@ -137,10 +137,10 @@ def _record_source_matches_player(
     if source_kind is AbilitySourceKind.FACTION:
         return record.faction_id == army.detachment_selection.faction_id
     if source_kind is AbilitySourceKind.DETACHMENT:
-        return record.detachment_id == army.detachment_selection.detachment_id
+        return record.detachment_id in army.detachment_selection.detachment_ids
     if source_kind is AbilitySourceKind.ENHANCEMENT:
         return (
-            record.detachment_id == army.detachment_selection.detachment_id
+            record.detachment_id in army.detachment_selection.detachment_ids
             and record.definition.ability_id in army.detachment_selection.enhancement_ids
         )
     if source_kind is AbilitySourceKind.DATASHEET:

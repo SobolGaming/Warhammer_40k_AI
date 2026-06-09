@@ -169,7 +169,7 @@ def _army_muster_request(
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
-            detachment_id="core-combined-arms",
+            detachment_ids=("core-combined-arms",),
         ),
         unit_selections=(
             UnitMusterSelection(
@@ -245,7 +245,7 @@ def _assert_datasheet_backed_infantry(army: ArmyDefinition) -> None:
     assert army.catalog_id == "phase9a-canonical"
     assert army.ruleset_id.version == "core-v2-phase9a"
     assert army.detachment_selection.faction_id == "core-marine-force"
-    assert army.detachment_selection.detachment_id == "core-combined-arms"
+    assert army.detachment_selection.detachment_ids == ("core-combined-arms",)
 
     unit = army.units[0]
     model = unit.own_models[0]

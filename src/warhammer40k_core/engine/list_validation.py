@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
@@ -18,6 +19,21 @@ class ListValidationError(ValueError):
     """Raised when army list data violates CORE V2 mustering invariants."""
 
 
+class BattleSize(StrEnum):
+    STRIKE_FORCE = "strike_force"
+
+
+class BattleSizeMusteringPolicyPayload(TypedDict):
+    battle_size: str
+    points_limit: int
+    battlefield_width_inches: float
+    battlefield_depth_inches: float
+    detachment_point_limit: int
+    enhancement_limit: int
+    unit_limit: int
+    battleline_unit_limit: int
+
+
 class ModelProfileSelectionPayload(TypedDict):
     model_profile_id: str
     model_count: int
@@ -31,7 +47,7 @@ class WargearSelectionPayload(TypedDict):
 
 class DetachmentSelectionPayload(TypedDict):
     faction_id: str
-    detachment_id: str
+    detachment_ids: list[str]
     enhancement_ids: list[str]
     stratagem_ids: list[str]
 
@@ -46,6 +62,100 @@ class UnitMusterSelectionPayload(TypedDict):
 class AttachmentDeclarationPayload(TypedDict):
     source_unit_selection_id: str
     bodyguard_unit_selection_id: str
+
+
+@dataclass(frozen=True, slots=True)
+class BattleSizeMusteringPolicy:
+    battle_size: BattleSize
+    points_limit: int
+    battlefield_width_inches: float
+    battlefield_depth_inches: float
+    detachment_point_limit: int
+    enhancement_limit: int
+    unit_limit: int
+    battleline_unit_limit: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "battle_size", battle_size_from_token(self.battle_size))
+        object.__setattr__(
+            self,
+            "points_limit",
+            _validate_positive_int("BattleSizeMusteringPolicy points_limit", self.points_limit),
+        )
+        object.__setattr__(
+            self,
+            "battlefield_width_inches",
+            _validate_positive_number(
+                "BattleSizeMusteringPolicy battlefield_width_inches",
+                self.battlefield_width_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battlefield_depth_inches",
+            _validate_positive_number(
+                "BattleSizeMusteringPolicy battlefield_depth_inches",
+                self.battlefield_depth_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "detachment_point_limit",
+            _validate_positive_int(
+                "BattleSizeMusteringPolicy detachment_point_limit",
+                self.detachment_point_limit,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "enhancement_limit",
+            _validate_positive_int(
+                "BattleSizeMusteringPolicy enhancement_limit",
+                self.enhancement_limit,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "unit_limit",
+            _validate_positive_int("BattleSizeMusteringPolicy unit_limit", self.unit_limit),
+        )
+        object.__setattr__(
+            self,
+            "battleline_unit_limit",
+            _validate_positive_int(
+                "BattleSizeMusteringPolicy battleline_unit_limit",
+                self.battleline_unit_limit,
+            ),
+        )
+        if self.battleline_unit_limit < self.unit_limit:
+            raise ListValidationError(
+                "BattleSizeMusteringPolicy battleline_unit_limit must be at least unit_limit."
+            )
+
+    @classmethod
+    def strike_force(cls) -> Self:
+        return cls(
+            battle_size=BattleSize.STRIKE_FORCE,
+            points_limit=2000,
+            battlefield_width_inches=60.0,
+            battlefield_depth_inches=44.0,
+            detachment_point_limit=4,
+            enhancement_limit=4,
+            unit_limit=3,
+            battleline_unit_limit=6,
+        )
+
+    def to_payload(self) -> BattleSizeMusteringPolicyPayload:
+        return {
+            "battle_size": self.battle_size.value,
+            "points_limit": self.points_limit,
+            "battlefield_width_inches": self.battlefield_width_inches,
+            "battlefield_depth_inches": self.battlefield_depth_inches,
+            "detachment_point_limit": self.detachment_point_limit,
+            "enhancement_limit": self.enhancement_limit,
+            "unit_limit": self.unit_limit,
+            "battleline_unit_limit": self.battleline_unit_limit,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -129,7 +239,7 @@ class WargearSelection:
 @dataclass(frozen=True, slots=True)
 class DetachmentSelection:
     faction_id: str
-    detachment_id: str
+    detachment_ids: tuple[str, ...]
     enhancement_ids: tuple[str, ...] = ()
     stratagem_ids: tuple[str, ...] = ()
 
@@ -145,11 +255,12 @@ class DetachmentSelection:
         )
         object.__setattr__(
             self,
-            "detachment_id",
-            _validate_unprefixed_identifier(
-                "DetachmentSelection detachment_id",
-                self.detachment_id,
+            "detachment_ids",
+            _validate_unprefixed_identifier_tuple(
+                "DetachmentSelection detachment_ids",
+                self.detachment_ids,
                 "detachment:",
+                min_length=1,
             ),
         )
         object.__setattr__(
@@ -174,7 +285,7 @@ class DetachmentSelection:
     def to_payload(self) -> DetachmentSelectionPayload:
         return {
             "faction_id": self.faction_id,
-            "detachment_id": self.detachment_id,
+            "detachment_ids": list(self.detachment_ids),
             "enhancement_ids": list(self.enhancement_ids),
             "stratagem_ids": list(self.stratagem_ids),
         }
@@ -183,7 +294,7 @@ class DetachmentSelection:
     def from_payload(cls, payload: DetachmentSelectionPayload) -> Self:
         return cls(
             faction_id=payload["faction_id"],
-            detachment_id=payload["detachment_id"],
+            detachment_ids=tuple(payload["detachment_ids"]),
             enhancement_ids=tuple(payload["enhancement_ids"]),
             stratagem_ids=tuple(payload["stratagem_ids"]),
         )
@@ -299,28 +410,78 @@ def validate_detachment_selection(
     *,
     catalog: ArmyCatalog,
     selection: DetachmentSelection,
-) -> tuple[FactionDefinition, DetachmentDefinition]:
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE,
+) -> tuple[FactionDefinition, tuple[DetachmentDefinition, ...]]:
     if type(catalog) is not ArmyCatalog:
         raise ListValidationError("catalog must be an ArmyCatalog.")
     if type(selection) is not DetachmentSelection:
         raise ListValidationError("selection must be a DetachmentSelection.")
+    policy = battle_size_mustering_policy(battle_size)
     faction = _catalog_faction_by_id(catalog, selection.faction_id)
-    detachment = _catalog_detachment_by_id(catalog, selection.detachment_id)
-    if detachment.faction_id != faction.faction_id:
-        raise ListValidationError("DetachmentSelection detachment does not belong to faction.")
+    detachments = tuple(
+        _catalog_detachment_by_id(catalog, detachment_id)
+        for detachment_id in selection.detachment_ids
+    )
+    detachment_point_costs: list[int] = []
+    for detachment in detachments:
+        if detachment.faction_id != faction.faction_id:
+            raise ListValidationError("DetachmentSelection detachment does not belong to faction.")
+        if detachment.detachment_point_cost is None:
+            raise ListValidationError(
+                "DetachmentSelection detachment point cost is awaiting source."
+            )
+        detachment_point_costs.append(detachment.detachment_point_cost)
+        if not detachment.unit_datasheet_ids:
+            raise ListValidationError(
+                "DetachmentSelection detachment unit grants are awaiting source."
+            )
+        if not detachment.force_disposition_ids:
+            raise ListValidationError(
+                "DetachmentSelection detachment force disposition is awaiting source."
+            )
+    total_detachment_points = sum(detachment_point_costs)
+    if total_detachment_points > policy.detachment_point_limit:
+        raise ListValidationError("DetachmentSelection exceeds battle size Detachment Points.")
+    allowed_enhancement_ids = tuple(
+        enhancement_id
+        for detachment in detachments
+        for enhancement_id in detachment.enhancement_ids
+    )
+    allowed_stratagem_ids = tuple(
+        stratagem_id for detachment in detachments for stratagem_id in detachment.stratagem_ids
+    )
     _validate_selected_ids_are_allowed(
         field_name="DetachmentSelection enhancement_ids",
         selected_ids=selection.enhancement_ids,
-        allowed_ids=detachment.enhancement_ids,
+        allowed_ids=allowed_enhancement_ids,
     )
     _validate_selected_ids_are_allowed(
         field_name="DetachmentSelection stratagem_ids",
         selected_ids=selection.stratagem_ids,
-        allowed_ids=detachment.stratagem_ids,
+        allowed_ids=allowed_stratagem_ids,
     )
     _validate_catalog_contains_enhancements(catalog, selection.enhancement_ids)
     _validate_catalog_contains_stratagems(catalog, selection.stratagem_ids)
-    return faction, detachment
+    return faction, tuple(sorted(detachments, key=lambda detachment: detachment.detachment_id))
+
+
+def selected_force_disposition_ids(
+    *,
+    catalog: ArmyCatalog,
+    selection: DetachmentSelection,
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE,
+) -> tuple[str, ...]:
+    _faction, detachments = validate_detachment_selection(
+        catalog=catalog,
+        selection=selection,
+        battle_size=battle_size,
+    )
+    force_disposition_ids = {
+        force_disposition_id
+        for detachment in detachments
+        for force_disposition_id in detachment.force_disposition_ids
+    }
+    return tuple(sorted(force_disposition_ids))
 
 
 def validate_unit_selection_for_faction(
@@ -338,6 +499,32 @@ def validate_unit_selection_for_faction(
     datasheet = _catalog_datasheet_by_id(catalog, selection.datasheet_id)
     if not set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords):
         raise ListValidationError("UnitMusterSelection datasheet is not legal for faction.")
+    return datasheet
+
+
+def validate_unit_selection_for_army(
+    *,
+    catalog: ArmyCatalog,
+    selection: UnitMusterSelection,
+    faction: FactionDefinition,
+    detachment_selection: DetachmentSelection,
+) -> DatasheetDefinition:
+    datasheet = validate_unit_selection_for_faction(
+        catalog=catalog,
+        selection=selection,
+        faction=faction,
+    )
+    _selected_faction, detachments = validate_detachment_selection(
+        catalog=catalog,
+        selection=detachment_selection,
+    )
+    allowed_datasheet_ids = {
+        datasheet_id for detachment in detachments for datasheet_id in detachment.unit_datasheet_ids
+    }
+    if datasheet.datasheet_id not in allowed_datasheet_ids:
+        raise ListValidationError(
+            "UnitMusterSelection datasheet is not provided by selected detachments."
+        )
     return datasheet
 
 
@@ -568,6 +755,29 @@ def _validate_identifier_tuple(
     return tuple(sorted(validated))
 
 
+def _validate_unprefixed_identifier_tuple(
+    field_name: str,
+    values: object,
+    prefix: str,
+    *,
+    min_length: int,
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise ListValidationError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        identifier = _validate_unprefixed_identifier(f"{field_name} value", value, prefix)
+        if identifier in seen:
+            raise ListValidationError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        validated.append(identifier)
+    if len(validated) < min_length:
+        raise ListValidationError(f"{field_name} must contain at least {min_length} values.")
+    return tuple(sorted(validated))
+
+
 def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:
     identifier = _validate_identifier(field_name, value)
     if identifier.startswith(prefix):
@@ -582,6 +792,33 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise ListValidationError(f"{field_name} must not be empty.")
     return stripped
+
+
+def battle_size_from_token(token: object) -> BattleSize:
+    if type(token) is BattleSize:
+        return token
+    if type(token) is not str:
+        raise ListValidationError("BattleSize token must be a string.")
+    try:
+        return BattleSize(token)
+    except ValueError as exc:
+        raise ListValidationError(f"Unsupported BattleSize token: {token}.") from exc
+
+
+def battle_size_mustering_policy(battle_size: BattleSize) -> BattleSizeMusteringPolicy:
+    resolved_battle_size = battle_size_from_token(battle_size)
+    if resolved_battle_size is BattleSize.STRIKE_FORCE:
+        return BattleSizeMusteringPolicy.strike_force()
+    raise ListValidationError(f"Unsupported BattleSize: {resolved_battle_size.value}.")
+
+
+def _validate_positive_number(field_name: str, value: object) -> float:
+    if not isinstance(value, int | float) or type(value) is bool:
+        raise ListValidationError(f"{field_name} must be a number.")
+    number = float(value)
+    if number <= 0.0:
+        raise ListValidationError(f"{field_name} must be greater than 0.")
+    return number
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

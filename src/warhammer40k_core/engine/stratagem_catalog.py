@@ -47,13 +47,15 @@ def eleventh_edition_stratagem_index() -> StratagemCatalogIndex:
 def build_player_stratagem_index(
     records: tuple[StratagemCatalogRecord, ...],
     *,
-    detachment_id: str | None,
+    detachment_ids: tuple[str, ...],
     stratagem_ids: tuple[str, ...],
 ) -> StratagemCatalogIndex:
     validated_records = StratagemCatalogIndex.from_records(records).all_records()
-    selected_detachment_id = _validate_optional_identifier(
-        "Player Stratagem index detachment_id",
-        detachment_id,
+    selected_detachment_ids = frozenset(
+        _validate_identifier_tuple(
+            "Player Stratagem index detachment_ids",
+            detachment_ids,
+        )
     )
     selected_stratagem_ids = frozenset(
         _validate_identifier_tuple("Player Stratagem index stratagem_ids", stratagem_ids)
@@ -64,8 +66,7 @@ def build_player_stratagem_index(
             player_records.append(record)
             continue
         if (
-            selected_detachment_id is not None
-            and record.detachment_id == selected_detachment_id
+            record.detachment_id in selected_detachment_ids
             and record.definition.stratagem_id in selected_stratagem_ids
         ):
             player_records.append(record)
@@ -109,12 +110,6 @@ def _record_from_source_row(row: source_data.SourceStratagemRow) -> StratagemCat
         detachment_id=row.detachment_id,
         disabled=row.disabled,
     )
-
-
-def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
-    if value is None:
-        return None
-    return _validate_identifier(field_name, value)
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

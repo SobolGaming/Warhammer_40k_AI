@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.content_scope import (
+    SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES,
+    CatalogContentScope,
+)
 from warhammer40k_core.core.datasheet import (
     AttachmentEligibility,
     AttachmentRole,
@@ -102,7 +106,15 @@ class ArmyCatalog:
         _validate_datasheet_faction_keywords(datasheets, factions)
         _validate_datasheet_wargear_links(datasheets, wargear)
         _validate_faction_rule_links(factions, army_rules)
-        _validate_detachment_links(detachments, factions, enhancements, stratagems)
+        _validate_supported_content_scopes(
+            datasheets=datasheets,
+            factions=factions,
+            army_rules=army_rules,
+            detachments=detachments,
+            enhancements=enhancements,
+            stratagems=stratagems,
+        )
+        _validate_detachment_links(detachments, datasheets, factions, enhancements, stratagems)
 
         object.__setattr__(
             self,
@@ -230,6 +242,7 @@ class ArmyCatalog:
         faction = FactionDefinition(
             faction_id="core-marine-force",
             name="CORE Marine Force",
+            content_scope=CatalogContentScope.MATCHED_PLAY,
             faction_keywords=("CORE Marines",),
             army_rule_ids=(army_rule.rule_id,),
             source_ids=("faction:core-marine-force",),
@@ -238,6 +251,18 @@ class ArmyCatalog:
             detachment_id="core-combined-arms",
             name="CORE Combined Arms",
             faction_id=faction.faction_id,
+            content_scope=CatalogContentScope.MATCHED_PLAY,
+            detachment_point_cost=1,
+            unit_datasheet_ids=(
+                "core-boyz-like-infantry",
+                "core-character-leader",
+                "core-character-support",
+                "core-deep-strike-unit",
+                "core-intercessor-like-infantry",
+                "core-transport",
+                "core-vehicle-monster",
+            ),
+            force_disposition_ids=("purge-the-foe",),
             source_ids=("detachment:core-combined-arms",),
         )
         return cls(
@@ -472,6 +497,7 @@ def _datasheet(
     return DatasheetDefinition(
         datasheet_id=datasheet_id,
         name=name,
+        content_scope=CatalogContentScope.MATCHED_PLAY,
         keywords=DatasheetKeywordSet(keywords=keywords, faction_keywords=faction_keywords),
         model_profiles=(
             ModelProfileDefinition(
@@ -526,6 +552,7 @@ def _deep_strike_datasheet(wargear_id: str) -> DatasheetDefinition:
     return DatasheetDefinition(
         datasheet_id=datasheet_id,
         name="CORE Deep Strike Unit",
+        content_scope=CatalogContentScope.MATCHED_PLAY,
         keywords=DatasheetKeywordSet(
             keywords=("Infantry", "Deep Strike"),
             faction_keywords=("CORE Marines",),
@@ -861,22 +888,56 @@ def _validate_faction_rule_links(
 
 def _validate_detachment_links(
     detachments: tuple[DetachmentDefinition, ...],
+    datasheets: tuple[DatasheetDefinition, ...],
     factions: tuple[FactionDefinition, ...],
     enhancements: tuple[EnhancementDefinition, ...],
     stratagems: tuple[StratagemDefinition, ...],
 ) -> None:
+    datasheet_ids = {datasheet.datasheet_id for datasheet in datasheets}
     faction_ids = {faction.faction_id for faction in factions}
     enhancement_ids = {enhancement.enhancement_id for enhancement in enhancements}
     stratagem_ids = {stratagem.stratagem_id for stratagem in stratagems}
     for detachment in detachments:
         if detachment.faction_id not in faction_ids:
             raise ArmyCatalogError("ArmyCatalog detachment references an unknown faction.")
+        for datasheet_id in detachment.unit_datasheet_ids:
+            if datasheet_id not in datasheet_ids:
+                raise ArmyCatalogError("ArmyCatalog detachment references an unknown datasheet.")
         for enhancement_id in detachment.enhancement_ids:
             if enhancement_id not in enhancement_ids:
                 raise ArmyCatalogError("ArmyCatalog detachment references an unknown enhancement.")
         for stratagem_id in detachment.stratagem_ids:
             if stratagem_id not in stratagem_ids:
                 raise ArmyCatalogError("ArmyCatalog detachment references an unknown stratagem.")
+
+
+def _validate_supported_content_scopes(
+    *,
+    datasheets: tuple[DatasheetDefinition, ...],
+    factions: tuple[FactionDefinition, ...],
+    army_rules: tuple[ArmyRuleDefinition, ...],
+    detachments: tuple[DetachmentDefinition, ...],
+    enhancements: tuple[EnhancementDefinition, ...],
+    stratagems: tuple[StratagemDefinition, ...],
+) -> None:
+    for datasheet in datasheets:
+        if datasheet.content_scope not in SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES:
+            raise ArmyCatalogError("ArmyCatalog contains unsupported datasheet content scope.")
+    for faction in factions:
+        if faction.content_scope not in SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES:
+            raise ArmyCatalogError("ArmyCatalog contains unsupported faction content scope.")
+    for army_rule in army_rules:
+        if army_rule.content_scope not in SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES:
+            raise ArmyCatalogError("ArmyCatalog contains unsupported army rule content scope.")
+    for detachment in detachments:
+        if detachment.content_scope not in SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES:
+            raise ArmyCatalogError("ArmyCatalog contains unsupported detachment content scope.")
+    for enhancement in enhancements:
+        if enhancement.content_scope not in SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES:
+            raise ArmyCatalogError("ArmyCatalog contains unsupported enhancement content scope.")
+    for stratagem in stratagems:
+        if stratagem.content_scope not in SUPPORTED_ARMY_CATALOG_CONTENT_SCOPES:
+            raise ArmyCatalogError("ArmyCatalog contains unsupported stratagem content scope.")
 
 
 def _ruleset_id_from_payload(payload: RulesetIdPayload) -> RulesetId:

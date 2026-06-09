@@ -12,6 +12,11 @@ from warhammer40k_core.core.attributes import (
     CharacteristicValuePayload,
     characteristic_from_token,
 )
+from warhammer40k_core.core.content_scope import (
+    CatalogContentScope,
+    CatalogContentScopeError,
+    catalog_content_scope_from_token,
+)
 
 
 class DatasheetCatalogError(ValueError):
@@ -103,6 +108,7 @@ class AttachmentEligibilityPayload(TypedDict):
 class DatasheetDefinitionPayload(TypedDict):
     datasheet_id: str
     name: str
+    content_scope: str
     keywords: DatasheetKeywordSetPayload
     model_profiles: list[ModelProfileDefinitionPayload]
     composition: list[UnitCompositionDefinitionPayload]
@@ -513,6 +519,7 @@ class AttachmentEligibility:
 class DatasheetDefinition:
     datasheet_id: str
     name: str
+    content_scope: CatalogContentScope
     keywords: DatasheetKeywordSet
     model_profiles: tuple[ModelProfileDefinition, ...]
     composition: tuple[UnitCompositionDefinition, ...]
@@ -535,6 +542,14 @@ class DatasheetDefinition:
             self,
             "name",
             _validate_identifier("DatasheetDefinition name", self.name),
+        )
+        object.__setattr__(
+            self,
+            "content_scope",
+            _catalog_content_scope_from_token(
+                "DatasheetDefinition content_scope",
+                self.content_scope,
+            ),
         )
         if type(self.keywords) is not DatasheetKeywordSet:
             raise DatasheetCatalogError("DatasheetDefinition keywords must be a keyword set.")
@@ -619,6 +634,7 @@ class DatasheetDefinition:
         return {
             "datasheet_id": self.datasheet_id,
             "name": self.name,
+            "content_scope": self.content_scope.value,
             "keywords": self.keywords.to_payload(),
             "model_profiles": [profile.to_payload() for profile in self.model_profiles],
             "composition": [part.to_payload() for part in self.composition],
@@ -635,6 +651,7 @@ class DatasheetDefinition:
         return cls(
             datasheet_id=payload["datasheet_id"],
             name=payload["name"],
+            content_scope=catalog_content_scope_from_token(payload["content_scope"]),
             keywords=DatasheetKeywordSet.from_payload(payload["keywords"]),
             model_profiles=tuple(
                 ModelProfileDefinition.from_payload(profile)
@@ -688,6 +705,16 @@ def attachment_role_from_token(token: object) -> AttachmentRole:
         return AttachmentRole(token)
     except ValueError as exc:
         raise DatasheetCatalogError(f"Unsupported AttachmentRole token: {token}.") from exc
+
+
+def _catalog_content_scope_from_token(
+    field_name: str,
+    token: object,
+) -> CatalogContentScope:
+    try:
+        return catalog_content_scope_from_token(token)
+    except CatalogContentScopeError as exc:
+        raise DatasheetCatalogError(f"{field_name} is invalid.") from exc
 
 
 def _characteristic_from_token(token: object) -> Characteristic:
