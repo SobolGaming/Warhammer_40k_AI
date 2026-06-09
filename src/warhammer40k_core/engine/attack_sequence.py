@@ -7284,8 +7284,16 @@ def _hazardous_mortal_wounds_for_attacker(
     state: GameState,
     attacking_unit_instance_id: str,
 ) -> int:
-    unit = unit_by_id(state=state, unit_instance_id=attacking_unit_instance_id)
-    return hazard_mortal_wounds_per_failed_roll(unit)
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=attacking_unit_instance_id,
+    )
+    component_wound_values = tuple(
+        hazard_mortal_wounds_per_failed_roll(component.unit) for component in rules_unit.components
+    )
+    if not component_wound_values:
+        raise GameLifecycleError("Hazardous attacker requires at least one component.")
+    return min(component_wound_values)
 
 
 def _cover_for_allocated_model(

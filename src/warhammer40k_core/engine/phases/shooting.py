@@ -43,6 +43,7 @@ from warhammer40k_core.engine.attack_sequence import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
+    UnitPlacement,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.damage_allocation import (
@@ -214,7 +215,7 @@ class _AvailableWeapon(TypedDict):
     firing_deck_source_model_instance_id: NotRequired[str]
 
 
-type _ShootingUnitCandidateCacheKey = tuple[str, str, str]
+type _ShootingUnitCandidateCacheKey = tuple[str, str, str, str]
 type _ShootingModelCandidateCacheKey = tuple[
     str,
     str,
@@ -1088,10 +1089,10 @@ class ShootingPhaseHandler:
                 payload={"invalid_reason": "shooting_type_unit_drift"},
             )
         shooting_type = shooting_type_from_token(_payload_string(payload, key="shooting_type"))
-        unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
-        legal_types = _legal_shooting_types_for_unit(
+        rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+        legal_types = _legal_shooting_types_for_rules_unit(
             state=state,
-            unit=unit,
+            rules_unit=rules_unit,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             army_catalog=_army_catalog_for_handler(self),
         )
@@ -1261,10 +1262,13 @@ def _request_shooting_type_selection(
     active_selection = shooting_state.active_selection
     if active_selection is None:
         raise GameLifecycleError("Shooting type request requires active_selection.")
-    unit = _unit_by_id(state=state, unit_instance_id=active_selection.unit_instance_id)
-    legal_types = _legal_shooting_types_for_unit(
+    rules_unit = rules_unit_view_by_id(
         state=state,
-        unit=unit,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
+    legal_types = _legal_shooting_types_for_rules_unit(
+        state=state,
+        rules_unit=rules_unit,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
@@ -1337,10 +1341,13 @@ def _request_shooting_declaration(
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
-    unit = _unit_by_id(state=state, unit_instance_id=active_selection.unit_instance_id)
-    available_weapons = _available_weapons_for_unit(
+    rules_unit = rules_unit_view_by_id(
         state=state,
-        unit=unit,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
+    available_weapons = _available_weapons_for_rules_unit(
+        state=state,
+        rules_unit=rules_unit,
         army_catalog=army_catalog,
         player_id=active_selection.player_id,
         selected_shooting_type=selected_shooting_type,
@@ -1360,12 +1367,19 @@ def _request_shooting_declaration(
     ] = {}
     for weapon in available_weapons:
         profile = weapon["weapon_profile"]
-        candidate_cache_key = _shooting_unit_candidate_cache_key(weapon)
+        attacker_unit = _component_unit_for_available_weapon(
+            rules_unit=rules_unit,
+            weapon=weapon,
+        )
+        candidate_cache_key = _shooting_unit_candidate_cache_key(
+            weapon=weapon,
+            attacker_unit=attacker_unit,
+        )
         if candidate_cache_key not in target_candidate_cache:
             target_candidate_cache[candidate_cache_key] = shooting_target_candidates_for_unit(
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
-                attacker_unit=unit,
+                attacker_unit=attacker_unit,
                 weapon_profile=profile,
                 target_unit_ids=candidate_target_unit_ids,
                 terrain_features=terrain_features,
@@ -1376,7 +1390,8 @@ def _request_shooting_declaration(
                 state=state,
                 scenario=scenario,
                 candidate=cast(dict[str, JsonValue], candidate.to_payload()),
-                unit=unit,
+                unit=attacker_unit,
+                rules_unit=rules_unit,
                 weapon_profile=profile,
                 player_id=active_selection.player_id,
                 army_catalog=army_catalog,
@@ -1407,8 +1422,8 @@ def _request_shooting_declaration(
         ),
         "ruleset_descriptor_hash": state.ruleset_descriptor_hash,
         "visibility_cache_key": visibility_cache_key,
-        "firing_deck_value": _firing_deck_value_for_unit(
-            unit=unit,
+        "firing_deck_value": _firing_deck_value_for_rules_unit(
+            rules_unit=rules_unit,
             army_catalog=army_catalog,
         ),
         "available_weapons": [_available_weapon_to_payload(weapon) for weapon in available_weapons],
@@ -1478,10 +1493,14 @@ def request_out_of_phase_shooting_declaration(
 ) -> LifecycleStatus:
     if state.out_of_phase_shooting_state is not None:
         raise GameLifecycleError("Out-of-phase shooting state is already active.")
+    selected_rules_unit_id = rules_unit_id_for_unit_id(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    )
     selection = ShootingUnitSelection(
         player_id=player_id,
         battle_round=state.battle_round,
-        unit_instance_id=unit_instance_id,
+        unit_instance_id=selected_rules_unit_id,
         request_id=source_decision_request_id,
         result_id=source_decision_result_id,
     )
@@ -1493,7 +1512,7 @@ def request_out_of_phase_shooting_declaration(
         source_decision_request_id=source_decision_request_id,
         source_decision_result_id=source_decision_result_id,
         source_context=source_context,
-        selected_unit_instance_id=unit_instance_id,
+        selected_unit_instance_id=selected_rules_unit_id,
     )
     return _request_shooting_declaration(
         state=state,
@@ -1522,6 +1541,7 @@ def _target_candidate_payload_for_request(
     scenario: BattlefieldScenario,
     candidate: dict[str, JsonValue],
     unit: UnitInstance,
+    rules_unit: RulesUnitView,
     weapon_profile: WeaponProfile,
     player_id: str,
     army_catalog: ArmyCatalog,
@@ -1533,7 +1553,7 @@ def _target_candidate_payload_for_request(
         state=state,
         proposal_request_id=_embedded_weapon_ability_request_prefix(
             state=state,
-            attacker_unit_id=unit.unit_instance_id,
+            attacker_unit_id=rules_unit.unit_instance_id,
             weapon_profile=weapon_profile,
         ),
         weapon_profile=weapon_profile,
@@ -1549,6 +1569,7 @@ def _target_candidate_payload_for_request(
             scenario=scenario,
             candidate=candidate,
             unit=unit,
+            rules_unit=rules_unit,
             weapon_profile=weapon_profile,
             player_id=player_id,
             army_catalog=army_catalog,
@@ -1599,6 +1620,7 @@ def _shooting_types_for_candidate_payload(
     scenario: BattlefieldScenario,
     candidate: dict[str, JsonValue],
     unit: UnitInstance,
+    rules_unit: RulesUnitView,
     weapon_profile: WeaponProfile,
     player_id: str,
     army_catalog: ArmyCatalog,
@@ -1627,18 +1649,18 @@ def _shooting_types_for_candidate_payload(
             return (ShootingType.SNAP,)
         return ()
     if selected_shooting_type is not None:
-        return _shooting_types_for_selected_type(
+        return _shooting_types_for_selected_type_for_rules_unit(
             state=state,
             base_types=base_types,
-            unit=unit,
+            rules_unit=rules_unit,
             weapon_profile=weapon_profile,
             selected_shooting_type=selected_shooting_type,
             player_id=player_id,
             army_catalog=army_catalog,
         )
-    if _advanced_unit_is_restricted_to_assault_weapons(
+    if _rules_unit_advanced_is_restricted_to_assault_weapons(
         state=state,
-        unit=unit,
+        rules_unit=rules_unit,
         player_id=player_id,
     ):
         if ShootingType.NORMAL in base_types and has_weapon_keyword(
@@ -1660,8 +1682,33 @@ def _shooting_types_for_selected_type(
     player_id: str,
     army_catalog: ArmyCatalog,
 ) -> tuple[ShootingType, ...]:
+    return _shooting_types_for_selected_type_for_rules_unit(
+        state=state,
+        base_types=base_types,
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id),
+        weapon_profile=weapon_profile,
+        selected_shooting_type=selected_shooting_type,
+        player_id=player_id,
+        army_catalog=army_catalog,
+    )
+
+
+def _shooting_types_for_selected_type_for_rules_unit(
+    *,
+    state: GameState,
+    base_types: tuple[ShootingType, ...],
+    rules_unit: RulesUnitView,
+    weapon_profile: WeaponProfile,
+    selected_shooting_type: ShootingType,
+    player_id: str,
+    army_catalog: ArmyCatalog,
+) -> tuple[ShootingType, ...]:
     shooting_type = shooting_type_from_token(selected_shooting_type)
-    advanced = _unit_advanced_this_turn(state=state, unit=unit, player_id=player_id)
+    advanced = _rules_unit_advanced_this_turn(
+        state=state,
+        rules_unit=rules_unit,
+        player_id=player_id,
+    )
     if shooting_type is ShootingType.NORMAL:
         if advanced:
             return ()
@@ -1680,14 +1727,14 @@ def _shooting_types_for_selected_type(
     if shooting_type is ShootingType.CLOSE_QUARTERS:
         if advanced or ShootingType.CLOSE_QUARTERS not in base_types:
             return ()
-        if _unit_has_vehicle_or_monster_keyword(unit) or has_close_quarters_weapon_keyword(
-            weapon_profile
-        ):
+        if _rules_unit_has_vehicle_or_monster_keyword(
+            rules_unit
+        ) or has_close_quarters_weapon_keyword(weapon_profile):
             return (ShootingType.CLOSE_QUARTERS,)
         return ()
     if shooting_type is ShootingType.INDIRECT:
-        if advanced or not _unit_has_indirect_ranged_weapon(
-            unit=unit,
+        if advanced or not _rules_unit_has_indirect_ranged_weapon(
+            rules_unit=rules_unit,
             army_catalog=army_catalog,
         ):
             return ()
@@ -1791,10 +1838,10 @@ def _apply_shooting_type_selection_decision(
     if unit_instance_id != shooting_state.active_selection.unit_instance_id:
         raise GameLifecycleError("Shooting type selection unit drift.")
     shooting_type = shooting_type_from_token(_payload_string(payload, key="shooting_type"))
-    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
-    legal_types = _legal_shooting_types_for_unit(
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    legal_types = _legal_shooting_types_for_rules_unit(
         state=state,
-        unit=unit,
+        rules_unit=rules_unit,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
@@ -2157,8 +2204,12 @@ def _validate_declaration_submission(
             message="Shooting declaration requires a selected shooting type.",
             field="declarations",
         )
-    unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
-    if not _unit_can_select_to_shoot(state=state, unit=unit, army_catalog=army_catalog):
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
+    if not _rules_unit_can_select_to_shoot(
+        state=state,
+        rules_unit=rules_unit,
+        army_catalog=army_catalog,
+    ):
         return ShootingProposalValidationResult.invalid(
             proposal_request_id=proposal.proposal_request_id,
             violation_code="shooting_unit_ineligible",
@@ -2198,10 +2249,10 @@ def _validate_out_of_phase_declaration_submission(
             message="Out-of-phase shooting declaration unit drift.",
             field="unit_instance_id",
         )
-    unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
-    if not _unit_can_select_to_shoot(
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
+    if not _rules_unit_can_select_to_shoot(
         state=state,
-        unit=unit,
+        rules_unit=rules_unit,
         army_catalog=army_catalog,
         player_id=out_of_phase_state.player_id,
     ):
@@ -2267,16 +2318,16 @@ def _attack_pools_or_validation(
     out_of_phase_state: OutOfPhaseShootingState | None = None,
 ) -> _AttackPoolValidationResult:
     player_id = proposal.player_id if shooting_player_id is None else shooting_player_id
-    unit = _unit_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
     selected_shooting_type = _selected_shooting_type_for_declaration(
         state=state,
         out_of_phase_state=out_of_phase_state,
     )
-    available_weapon_by_key = _available_weapon_by_declaration_key(
+    available_weapon_by_key = _available_weapon_by_declaration_key_for_rules_unit(
         state=state,
-        unit=unit,
+        rules_unit=rules_unit,
         army_catalog=army_catalog,
         player_id=player_id,
         selected_shooting_type=selected_shooting_type,
@@ -2289,7 +2340,10 @@ def _attack_pools_or_validation(
     if isinstance(firing_deck_validation, ShootingProposalValidationResult):
         return firing_deck_validation
     ineligible_unit_ids = firing_deck_validation
-    allowed_out_of_phase_target_ids = _out_of_phase_allowed_target_unit_ids(out_of_phase_state)
+    allowed_out_of_phase_target_ids = _out_of_phase_allowed_target_unit_ids(
+        state,
+        out_of_phase_state,
+    )
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
@@ -2333,9 +2387,13 @@ def _attack_pools_or_validation(
                 message="Out-of-phase shooting declaration target is not allowed by its source.",
                 field="declarations",
             )
+        source_unit = _component_unit_for_declaration(
+            rules_unit=rules_unit,
+            declaration=declaration,
+        )
         pistol_validation = _validate_model_pistol_exclusivity(
             state=state,
-            selected_unit=unit,
+            selected_unit=source_unit,
             declaration=declaration,
             weapon_profile=weapon_profile,
             model_pistol_declaration_kind=model_pistol_declaration_kind,
@@ -2346,7 +2404,7 @@ def _attack_pools_or_validation(
         candidate = shooting_target_candidate_for_model(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
-            attacker_unit=unit,
+            attacker_unit=source_unit,
             attacker_model_instance_id=declaration.attacker_model_instance_id,
             weapon_profile=weapon_profile,
             target_unit_id=declaration.target_unit_instance_id,
@@ -2381,7 +2439,8 @@ def _attack_pools_or_validation(
             scenario=scenario,
             candidate=candidate,
             declaration=declaration,
-            unit=unit,
+            unit=source_unit,
+            rules_unit=rules_unit,
             weapon_profile=weapon_profile,
             player_id=player_id,
             out_of_phase_state=out_of_phase_state,
@@ -2423,7 +2482,7 @@ def _attack_pools_or_validation(
             state=state,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
-            unit=unit,
+            rules_unit=rules_unit,
             target_rules_unit=target_rules_unit,
             weapon_profile=weapon_profile,
             shooting_type=declaration.shooting_type,
@@ -2541,6 +2600,7 @@ def _validate_duplicate_weapon_ability_selection(
 
 
 def _out_of_phase_allowed_target_unit_ids(
+    state: GameState,
     out_of_phase_state: OutOfPhaseShootingState | None,
 ) -> tuple[str, ...] | None:
     if not _out_of_phase_uses_fire_overwatch(out_of_phase_state):
@@ -2553,7 +2613,15 @@ def _out_of_phase_allowed_target_unit_ids(
     triggering_unit_id = source_context.get("triggering_enemy_unit_instance_id")
     if type(triggering_unit_id) is not str:
         raise GameLifecycleError("Fire Overwatch source context is missing triggering unit id.")
-    return (_validate_identifier("Fire Overwatch triggering unit id", triggering_unit_id),)
+    return (
+        rules_unit_id_for_unit_id(
+            armies=tuple(state.army_definitions),
+            unit_instance_id=_validate_identifier(
+                "Fire Overwatch triggering unit id",
+                triggering_unit_id,
+            ),
+        ),
+    )
 
 
 def _out_of_phase_uses_fire_overwatch(
@@ -2596,6 +2664,7 @@ def _shooting_types_for_declaration_candidate(
     candidate: ShootingTargetCandidate,
     declaration: WeaponDeclaration,
     unit: UnitInstance,
+    rules_unit: RulesUnitView,
     weapon_profile: WeaponProfile,
     player_id: str,
     out_of_phase_state: OutOfPhaseShootingState | None,
@@ -2615,18 +2684,18 @@ def _shooting_types_for_declaration_candidate(
             return (ShootingType.SNAP,)
         return ()
     if selected_shooting_type is not None:
-        return _shooting_types_for_selected_type(
+        return _shooting_types_for_selected_type_for_rules_unit(
             state=state,
             base_types=candidate.shooting_types,
-            unit=unit,
+            rules_unit=rules_unit,
             weapon_profile=weapon_profile,
             selected_shooting_type=selected_shooting_type,
             player_id=player_id,
             army_catalog=army_catalog,
         )
-    if _advanced_unit_is_restricted_to_assault_weapons(
+    if _rules_unit_advanced_is_restricted_to_assault_weapons(
         state=state,
-        unit=unit,
+        rules_unit=rules_unit,
         player_id=player_id,
     ):
         if ShootingType.NORMAL in candidate.shooting_types and has_weapon_keyword(
@@ -2696,7 +2765,7 @@ def _apply_phase13d_weapon_modifiers(
     state: GameState,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     target_rules_unit: RulesUnitView,
     weapon_profile: WeaponProfile,
     shooting_type: ShootingType,
@@ -2732,9 +2801,9 @@ def _apply_phase13d_weapon_modifiers(
     if melta_bonus > 0:
         targeting_rule_ids.append(melta_rule_id(melta_bonus))
 
-    if has_weapon_keyword(weapon_profile, WeaponKeyword.HEAVY) and _unit_remained_stationary(
+    if has_weapon_keyword(weapon_profile, WeaponKeyword.HEAVY) and _rules_unit_remained_stationary(
         state=state,
-        unit=unit,
+        rules_unit=rules_unit,
         player_id=player_id,
     ):
         hit_roll_modifier += 1
@@ -2746,7 +2815,11 @@ def _apply_phase13d_weapon_modifiers(
         if INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID not in targeting_rule_ids:
             targeting_rule_ids.append(INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID)
         targeting_rule_ids.append(INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID)
-        if _unit_remained_stationary(state=state, unit=unit, player_id=player_id) and (
+        if _rules_unit_remained_stationary(
+            state=state,
+            rules_unit=rules_unit,
+            player_id=player_id,
+        ) and (
             _target_visible_to_friendly_unit(
                 state=state,
                 scenario=scenario,
@@ -2855,10 +2928,12 @@ def _unit_target_within_max_range(
         armies=scenario.armies,
         unit_instance_id=target_unit_id,
     )
-    target_placements = tuple(
-        battlefield.unit_placement_by_id(component_unit_id)
-        for component_unit_id in target_rules_unit.component_unit_instance_ids
+    target_placements = _unit_placements_for_rules_unit_or_none(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
     )
+    if target_placements is None:
+        return False
     for attacker_model_placement in unit_placement.model_placements:
         attacker_model = geometry_model_for_placement(
             model=scenario.model_instance_for_placement(attacker_model_placement),
@@ -2878,34 +2953,56 @@ def _unit_target_within_max_range(
     return False
 
 
-def _unit_remained_stationary(
+def _unit_placements_for_rules_unit_or_none(
+    *,
+    scenario: BattlefieldScenario,
+    rules_unit: RulesUnitView,
+) -> tuple[UnitPlacement, ...] | None:
+    placements: list[UnitPlacement] = []
+    for component in rules_unit.components:
+        try:
+            placements.append(
+                scenario.battlefield_state.unit_placement_by_id(component.unit.unit_instance_id)
+            )
+        except PlacementError as exc:
+            if not any(model.is_alive for model in component.unit.own_models):
+                continue
+            raise GameLifecycleError("Shooting rules-unit component is not placed.") from exc
+    if not placements:
+        return None
+    return tuple(sorted(placements, key=lambda placement: placement.unit_instance_id))
+
+
+def _rules_unit_remained_stationary(
     *,
     state: GameState,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     player_id: str | None = None,
 ) -> bool:
     actor_id = _active_player_id(state) if player_id is None else player_id
-    advanced_state = state.advanced_unit_state_for_unit(
-        player_id=actor_id,
-        battle_round=state.battle_round,
-        unit_instance_id=unit.unit_instance_id,
-    )
-    if advanced_state is not None:
-        return False
-    fell_back_state = state.fell_back_unit_state_for_unit(
-        player_id=actor_id,
-        battle_round=state.battle_round,
-        unit_instance_id=unit.unit_instance_id,
-    )
-    if fell_back_state is not None:
-        return False
+    for unit_id in _rules_unit_state_unit_ids(rules_unit):
+        advanced_state = state.advanced_unit_state_for_unit(
+            player_id=actor_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        if advanced_state is not None:
+            return False
+        fell_back_state = state.fell_back_unit_state_for_unit(
+            player_id=actor_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        if fell_back_state is not None:
+            return False
     movement_state = state.movement_phase_state
     if movement_state is None:
         return True
-    if unit.unit_instance_id not in movement_state.moved_unit_ids:
+    movement_unit_ids = set(movement_state.moved_unit_ids)
+    if not movement_unit_ids.intersection(_rules_unit_state_unit_ids(rules_unit)):
         return True
     for record in movement_state.movement_distance_records:
-        if record.unit_instance_id == unit.unit_instance_id:
+        if record.unit_instance_id in _rules_unit_state_unit_ids(rules_unit):
             return record.maximum_model_distance_inches <= 3.0
     return False
 
@@ -3140,19 +3237,19 @@ def _validate_firing_deck_weapon_against_catalog(
     return None
 
 
-def _available_weapon_by_declaration_key(
+def _available_weapon_by_declaration_key_for_rules_unit(
     *,
     state: GameState,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
     selected_shooting_type: ShootingType | None = None,
 ) -> dict[tuple[str, str, str, str | None, str | None], _AvailableWeapon]:
     return {
         _available_weapon_key(weapon): weapon
-        for weapon in _available_weapons_for_unit(
+        for weapon in _available_weapons_for_rules_unit(
             state=state,
-            unit=unit,
+            rules_unit=rules_unit,
             army_catalog=army_catalog,
             player_id=player_id,
             selected_shooting_type=selected_shooting_type,
@@ -3170,6 +3267,38 @@ def _available_weapon_key(
         weapon.get("firing_deck_source_unit_instance_id"),
         weapon.get("firing_deck_source_model_instance_id"),
     )
+
+
+def _component_unit_for_available_weapon(
+    *,
+    rules_unit: RulesUnitView,
+    weapon: _AvailableWeapon,
+) -> UnitInstance:
+    return _component_unit_by_id(
+        rules_unit=rules_unit,
+        unit_instance_id=rules_unit.component_unit_id_for_model(weapon["model_instance_id"]),
+    )
+
+
+def _component_unit_for_declaration(
+    *,
+    rules_unit: RulesUnitView,
+    declaration: WeaponDeclaration,
+) -> UnitInstance:
+    return _component_unit_by_id(
+        rules_unit=rules_unit,
+        unit_instance_id=rules_unit.component_unit_id_for_model(
+            declaration.attacker_model_instance_id
+        ),
+    )
+
+
+def _component_unit_by_id(*, rules_unit: RulesUnitView, unit_instance_id: str) -> UnitInstance:
+    requested_id = _validate_identifier("component unit_instance_id", unit_instance_id)
+    for component in rules_unit.components:
+        if component.unit.unit_instance_id == requested_id:
+            return component.unit
+    raise GameLifecycleError("Rules-unit component unit_instance_id is unknown.")
 
 
 def _declaration_available_weapon_key(
@@ -3251,6 +3380,89 @@ def _available_weapons_for_unit(
     if selected_shooting_type is None and _advanced_unit_is_restricted_to_assault_weapons(
         state=state,
         unit=unit,
+        player_id=player_id,
+    ):
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT)
+        ]
+    return tuple(
+        sorted(
+            weapons,
+            key=lambda weapon: (
+                weapon.get("firing_deck_source_unit_instance_id") or "",
+                weapon.get("firing_deck_source_model_instance_id") or "",
+                weapon["model_instance_id"],
+                weapon["wargear_id"],
+                weapon["weapon_profile"].profile_id,
+            ),
+        )
+    )
+
+
+def _available_weapons_for_rules_unit(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    army_catalog: ArmyCatalog,
+    player_id: str | None = None,
+    selected_shooting_type: ShootingType | None = None,
+) -> tuple[_AvailableWeapon, ...]:
+    weapons: list[_AvailableWeapon] = []
+    for component in rules_unit.components:
+        weapons.extend(
+            _available_weapons_for_unit(
+                state=state,
+                unit=component.unit,
+                army_catalog=army_catalog,
+                player_id=player_id,
+                selected_shooting_type=selected_shooting_type,
+            )
+        )
+    if (
+        selected_shooting_type is ShootingType.ASSAULT
+        or _rules_unit_advanced_is_restricted_to_assault_weapons(
+            state=state,
+            rules_unit=rules_unit,
+            player_id=player_id,
+        )
+    ):
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT)
+        ]
+    if (
+        selected_shooting_type is ShootingType.CLOSE_QUARTERS
+        and not _rules_unit_has_vehicle_or_monster_keyword(rules_unit)
+    ):
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_close_quarters_weapon_keyword(weapon["weapon_profile"])
+        ]
+    if selected_shooting_type is ShootingType.INDIRECT:
+        weapons = [
+            weapon
+            for weapon in weapons
+            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE)
+        ]
+    if selected_shooting_type is ShootingType.NORMAL and _rules_unit_advanced_this_turn(
+        state=state,
+        rules_unit=rules_unit,
+        player_id=player_id,
+    ):
+        weapons = []
+    if selected_shooting_type is ShootingType.INDIRECT and _rules_unit_advanced_this_turn(
+        state=state,
+        rules_unit=rules_unit,
+        player_id=player_id,
+    ):
+        weapons = []
+    if selected_shooting_type is None and _rules_unit_advanced_is_restricted_to_assault_weapons(
+        state=state,
+        rules_unit=rules_unit,
         player_id=player_id,
     ):
         weapons = [
@@ -3375,18 +3587,79 @@ def _legal_shooting_unit_ids(
             or unit_id in shooting_state.skipped_unit_ids
         ):
             continue
-        unit = _unit_by_id(state=state, unit_instance_id=unit_id)
-        if not _unit_can_select_to_shoot(state=state, unit=unit, army_catalog=army_catalog):
+        rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
+        if not _rules_unit_can_select_to_shoot(
+            state=state,
+            rules_unit=rules_unit,
+            army_catalog=army_catalog,
+        ):
             continue
-        if _unit_has_legal_shooting_declaration(
+        if _rules_unit_has_legal_shooting_declaration(
             state=state,
             scenario=scenario,
-            unit=unit,
+            rules_unit=rules_unit,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
         ):
-            legal.append(unit_id)
+            legal.append(rules_unit.unit_instance_id)
     return tuple(sorted(legal))
+
+
+def _rules_unit_has_legal_shooting_declaration(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    rules_unit: RulesUnitView,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    player_id: str | None = None,
+    target_unit_ids: tuple[str, ...] | None = None,
+    selected_shooting_type: ShootingType | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    resolved_target_unit_ids = (
+        _enemy_placed_unit_ids(state=state, player_id=actor_id)
+        if target_unit_ids is None
+        else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
+    )
+    terrain_features = _terrain_features_for_state(state)
+    candidate_cache: _ShootingModelCandidateCache = {}
+    for weapon in _available_weapons_for_rules_unit(
+        state=state,
+        rules_unit=rules_unit,
+        army_catalog=army_catalog,
+        player_id=actor_id,
+        selected_shooting_type=selected_shooting_type,
+    ):
+        attacker_unit = _component_unit_for_available_weapon(
+            rules_unit=rules_unit,
+            weapon=weapon,
+        )
+        for target_unit_id in resolved_target_unit_ids:
+            candidate = _cached_shooting_target_candidate_for_model(
+                cache=candidate_cache,
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                attacker_unit=attacker_unit,
+                weapon=weapon,
+                target_unit_id=target_unit_id,
+                terrain_features=terrain_features,
+            )
+            if not candidate.is_legal:
+                continue
+            if selected_shooting_type is None:
+                return True
+            if _shooting_types_for_selected_type_for_rules_unit(
+                state=state,
+                base_types=candidate.shooting_types,
+                rules_unit=rules_unit,
+                weapon_profile=weapon["weapon_profile"],
+                selected_shooting_type=selected_shooting_type,
+                player_id=actor_id,
+                army_catalog=army_catalog,
+            ):
+                return True
+    return False
 
 
 def _unit_has_legal_shooting_declaration(
@@ -3442,10 +3715,10 @@ def _unit_has_legal_shooting_declaration(
     return False
 
 
-def _legal_shooting_types_for_unit(
+def _legal_shooting_types_for_rules_unit(
     *,
     state: GameState,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
@@ -3467,29 +3740,33 @@ def _legal_shooting_types_for_unit(
         ShootingType.CLOSE_QUARTERS,
         ShootingType.INDIRECT,
     ):
-        for weapon in _available_weapons_for_unit(
+        for weapon in _available_weapons_for_rules_unit(
             state=state,
-            unit=unit,
+            rules_unit=rules_unit,
             army_catalog=army_catalog,
             player_id=actor_id,
             selected_shooting_type=shooting_type,
         ):
+            attacker_unit = _component_unit_for_available_weapon(
+                rules_unit=rules_unit,
+                weapon=weapon,
+            )
             for target_unit_id in resolved_target_unit_ids:
                 candidate = _cached_shooting_target_candidate_for_model(
                     cache=candidate_cache,
                     scenario=scenario,
                     ruleset_descriptor=ruleset_descriptor,
-                    attacker_unit=unit,
+                    attacker_unit=attacker_unit,
                     weapon=weapon,
                     target_unit_id=target_unit_id,
                     terrain_features=terrain_features,
                 )
                 if not candidate.is_legal:
                     continue
-                if _shooting_types_for_selected_type(
+                if _shooting_types_for_selected_type_for_rules_unit(
                     state=state,
                     base_types=candidate.shooting_types,
-                    unit=unit,
+                    rules_unit=rules_unit,
                     weapon_profile=weapon["weapon_profile"],
                     selected_shooting_type=shooting_type,
                     player_id=actor_id,
@@ -3537,9 +3814,11 @@ def _cached_shooting_target_candidate_for_model(
 
 def _shooting_unit_candidate_cache_key(
     weapon: _AvailableWeapon,
+    attacker_unit: UnitInstance,
 ) -> _ShootingUnitCandidateCacheKey:
     profile = weapon["weapon_profile"]
     return (
+        attacker_unit.unit_instance_id,
         weapon["wargear_id"],
         profile.profile_id,
         _weapon_profile_cache_fingerprint(profile),
@@ -3602,6 +3881,12 @@ def shooting_unit_has_legal_declaration_against_targets(
     )
 
 
+def _rules_unit_state_unit_ids(rules_unit: RulesUnitView) -> tuple[str, ...]:
+    return tuple(
+        dict.fromkeys((rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids))
+    )
+
+
 def _unit_can_select_to_shoot(
     *,
     state: GameState,
@@ -3629,6 +3914,34 @@ def _unit_can_select_to_shoot(
     return not (fell_back_state is not None and not fell_back_state.can_shoot)
 
 
+def _rules_unit_can_select_to_shoot(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    army_catalog: ArmyCatalog,
+    player_id: str | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    if _rules_unit_advanced_is_restricted_to_assault_weapons(
+        state=state,
+        rules_unit=rules_unit,
+        player_id=actor_id,
+    ) and not _rules_unit_has_assault_ranged_weapon(
+        rules_unit=rules_unit,
+        army_catalog=army_catalog,
+    ):
+        return False
+    for unit_id in _rules_unit_state_unit_ids(rules_unit):
+        fell_back_state = state.fell_back_unit_state_for_unit(
+            player_id=actor_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        if fell_back_state is not None and not fell_back_state.can_shoot:
+            return False
+    return True
+
+
 def _advanced_unit_is_restricted_to_assault_weapons(
     *,
     state: GameState,
@@ -3642,6 +3955,27 @@ def _advanced_unit_is_restricted_to_assault_weapons(
         unit_instance_id=unit.unit_instance_id,
     )
     return advanced_state is not None and not advanced_state.can_shoot
+
+
+def _rules_unit_advanced_is_restricted_to_assault_weapons(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    player_id: str | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    return any(
+        (
+            advanced_state := state.advanced_unit_state_for_unit(
+                player_id=actor_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_id,
+            )
+        )
+        is not None
+        and not advanced_state.can_shoot
+        for unit_id in _rules_unit_state_unit_ids(rules_unit)
+    )
 
 
 def _unit_advanced_this_turn(
@@ -3661,6 +3995,24 @@ def _unit_advanced_this_turn(
     )
 
 
+def _rules_unit_advanced_this_turn(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    player_id: str | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    return any(
+        state.advanced_unit_state_for_unit(
+            player_id=actor_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        is not None
+        for unit_id in _rules_unit_state_unit_ids(rules_unit)
+    )
+
+
 def _unit_has_assault_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCatalog) -> bool:
     for model in unit.own_models:
         for weapon in _available_weapons_for_model(
@@ -3673,6 +4025,17 @@ def _unit_has_assault_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCat
     return False
 
 
+def _rules_unit_has_assault_ranged_weapon(
+    *,
+    rules_unit: RulesUnitView,
+    army_catalog: ArmyCatalog,
+) -> bool:
+    return any(
+        _unit_has_assault_ranged_weapon(unit=component.unit, army_catalog=army_catalog)
+        for component in rules_unit.components
+    )
+
+
 def _unit_has_indirect_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCatalog) -> bool:
     for model in unit.own_models:
         for weapon in _available_weapons_for_model(
@@ -3683,6 +4046,17 @@ def _unit_has_indirect_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCa
             if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE):
                 return True
     return False
+
+
+def _rules_unit_has_indirect_ranged_weapon(
+    *,
+    rules_unit: RulesUnitView,
+    army_catalog: ArmyCatalog,
+) -> bool:
+    return any(
+        _unit_has_indirect_ranged_weapon(unit=component.unit, army_catalog=army_catalog)
+        for component in rules_unit.components
+    )
 
 
 def _unit_has_already_shot(*, state: GameState, unit_instance_id: str) -> bool:
@@ -3846,7 +4220,19 @@ def _active_player_placed_unit_ids(*, state: GameState, player_id: str) -> tuple
         placed_army = battlefield_state.placed_army_for_player(player_id)
     except PlacementError:
         return ()
-    return tuple(sorted(placement.unit_instance_id for placement in placed_army.unit_placements))
+    unit_ids: list[str] = []
+    seen: set[str] = set()
+    armies = tuple(state.army_definitions)
+    for placement in placed_army.unit_placements:
+        rules_unit_id = rules_unit_id_for_unit_id(
+            armies=armies,
+            unit_instance_id=placement.unit_instance_id,
+        )
+        if rules_unit_id in seen:
+            continue
+        seen.add(rules_unit_id)
+        unit_ids.append(rules_unit_id)
+    return tuple(sorted(unit_ids))
 
 
 def _enemy_placed_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
@@ -3926,12 +4312,12 @@ def _shooting_unit_options(
 ) -> tuple[DecisionOption, ...]:
     options: list[DecisionOption] = []
     for unit_id in unit_ids:
-        unit = _unit_by_id(state=state, unit_instance_id=unit_id)
+        rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
         options.append(
             DecisionOption(
-                option_id=unit_id,
-                label=unit.name,
-                payload={"unit_instance_id": unit_id},
+                option_id=rules_unit.unit_instance_id,
+                label=_rules_unit_label(rules_unit),
+                payload={"unit_instance_id": rules_unit.unit_instance_id},
             )
         )
     if include_complete:
@@ -4058,8 +4444,43 @@ def _firing_deck_value_for_unit(
     return _validate_positive_int("Firing Deck descriptor value", value)
 
 
+def _firing_deck_value_for_rules_unit(
+    *,
+    rules_unit: RulesUnitView,
+    army_catalog: ArmyCatalog,
+) -> int | None:
+    values: list[int] = []
+    for component in rules_unit.components:
+        value = _firing_deck_value_for_unit(
+            unit=component.unit,
+            army_catalog=army_catalog,
+        )
+        if value is not None:
+            values.append(value)
+    if not values:
+        return None
+    if len(values) > 1:
+        raise GameLifecycleError("Attached rules unit cannot expose multiple Firing Deck values.")
+    return values[0]
+
+
 def _unit_has_vehicle_or_monster_keyword(unit: UnitInstance) -> bool:
     return _unit_has_keyword(unit, "VEHICLE") or _unit_has_keyword(unit, "MONSTER")
+
+
+def _rules_unit_has_vehicle_or_monster_keyword(rules_unit: RulesUnitView) -> bool:
+    return any(
+        _canonical_keyword(keyword) in {"VEHICLE", "MONSTER"} for keyword in rules_unit.keywords
+    )
+
+
+def _rules_unit_label(rules_unit: RulesUnitView) -> str:
+    if not rules_unit.is_attached_rules_unit:
+        component = next(iter(rules_unit.components))
+        return component.unit.name
+    return "Attached Unit: " + " / ".join(
+        component.unit.name for component in rules_unit.components
+    )
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
