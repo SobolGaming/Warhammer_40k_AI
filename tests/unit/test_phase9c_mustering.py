@@ -857,7 +857,7 @@ def test_strike_force_is_the_only_supported_battle_size_policy() -> None:
     assert policy.points_limit == 2000
     assert policy.battlefield_width_inches == 60.0
     assert policy.battlefield_depth_inches == 44.0
-    assert policy.detachment_point_limit == 4
+    assert policy.detachment_point_limit == 3
     assert policy.enhancement_limit == 4
     assert policy.unit_limit == 3
     assert policy.battleline_unit_limit == 6
@@ -876,7 +876,7 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
         base_detachment,
         detachment_id="core-vanguard",
         name="CORE Vanguard",
-        detachment_point_cost=3,
+        detachment_point_cost=2,
         unit_datasheet_ids=("core-intercessor-like-infantry",),
         force_disposition_ids=("reconnaissance",),
         source_ids=("detachment:core-vanguard",),
@@ -954,39 +954,37 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
 
 def test_partial_space_marine_detachment_matrix_supports_strike_force_combinations() -> None:
     catalog = _phase16_partial_space_marine_catalog()
-    gladius_plus_fulguris = DetachmentSelection(
+    gladius_task_force = DetachmentSelection(
         faction_id="core-marine-force",
-        detachment_ids=("gladius-task-force", "fulguris-task-force"),
+        detachment_ids=("gladius-task-force",),
     )
-    firestorm_plus_ironstorm = DetachmentSelection(
+    firestorm_plus_fulguris = DetachmentSelection(
         faction_id="core-marine-force",
-        detachment_ids=("firestorm-assault-force", "ironstorm-spearhead"),
+        detachment_ids=("firestorm-assault-force", "fulguris-task-force"),
     )
     black_templar_force = DetachmentSelection(
         faction_id="black-templars",
         detachment_ids=(
             "companions-of-vehemence",
             "marshals-household",
-            "the-living-miracle",
         ),
     )
 
     _space_marines, space_marine_detachments = validate_detachment_selection(
         catalog=catalog,
-        selection=gladius_plus_fulguris,
+        selection=gladius_task_force,
     )
     assert tuple(detachment.detachment_id for detachment in space_marine_detachments) == (
-        "fulguris-task-force",
         "gladius-task-force",
     )
     assert selected_force_disposition_ids(
         catalog=catalog,
-        selection=gladius_plus_fulguris,
-    ) == ("disruption", "priority-assets")
+        selection=gladius_task_force,
+    ) == ("priority-assets",)
     assert selected_force_disposition_ids(
         catalog=catalog,
-        selection=firestorm_plus_ironstorm,
-    ) == ("purge-the-foe",)
+        selection=firestorm_plus_fulguris,
+    ) == ("disruption", "purge-the-foe")
     assert selected_force_disposition_ids(
         catalog=catalog,
         selection=black_templar_force,

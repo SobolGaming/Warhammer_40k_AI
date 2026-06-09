@@ -2589,7 +2589,7 @@ Invariants:
   start Army Roster, choose Faction, select Detachment Rules, select Units, then
   promote Warlord;
 - CORE V2 currently supports only Strike Force army construction: 2000 points,
-  a 60" x 44" battlefield expectation, 4 Detachment Points, Enhancement Limit
+  a 60" x 44" battlefield expectation, 3 Detachment Points, Enhancement Limit
   4, and Unit Limit 3 doubled for `BATTLELINE`; smaller battle sizes are
   explicit unsupported inputs, not fallback modes;
 - active army catalogs must exclude Combat Patrol, Legends, Forge World, Kill
@@ -3419,7 +3419,7 @@ Invariants:
 
 - mustering order is Battle Size, Army Roster, Faction, Detachment Rules, Units, then Warlord promotion;
 - battle size defines points limit, detachment points, enhancement limit, unit limit, and mission-compatible battlefield expectations;
-- CORE V2 currently supports only Strike Force: 2000 points, 60" x 44" battlefield expectations, 4 Detachment Points, Enhancement Limit 4, and Unit Limit 3, doubled for `BATTLELINE` units;
+- CORE V2 currently supports only Strike Force: 2000 points, 60" x 44" battlefield expectations, 3 Detachment Points, Enhancement Limit 4, and Unit Limit 3, doubled for `BATTLELINE` units;
 - Incursion, Combat Patrol, Onslaught, and other battle sizes are explicit unsupported inputs until repository policy adds them;
 - active army catalogs reject Combat Patrol, Legends, Forge World, Kill Team,
   and other non-matched-play content scopes instead of letting those units,
@@ -3477,7 +3477,7 @@ Required tests:
 - active catalog rejection for Combat Patrol, Legends, Forge World, Kill Team,
   and other non-matched-play content scopes;
 - multi-detachment Strike Force combinations whose total Detachment Point cost
-  is less than or equal to 4, plus rejection above 4;
+  is less than or equal to 3, plus rejection above 3;
 - selected detachment Force Disposition union and selected-detachment unit
   grants;
 - Epic Hero uniqueness and Enhancement denial;
