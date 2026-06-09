@@ -5,6 +5,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import (
+    default_deployment_pose,
+    submit_all_deployments_if_pending,
+)
 from tests.movement_submission_helpers import submit_default_movement_proposal_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -743,11 +747,17 @@ def _advance_to_movement_unit_selection(
         result_id="phase10n-result-000001",
     )
     assert _decision_request(second_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
-    movement_status = _submit_result(
+    deployment_status = _submit_result(
         lifecycle,
         request=_decision_request(second_status),
         option_id="fixed:assassination:bring_it_down",
         result_id="phase10n-result-000002",
+    )
+    movement_status = submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase10n-deploy",
+        pose_factory=_shooting_reachable_deployment_pose,
     )
     assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return lifecycle, movement_status
@@ -891,6 +901,22 @@ def _config() -> GameConfig:
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
         mission_setup=_mission_setup(),
     )
+
+
+def _shooting_reachable_deployment_pose(
+    index: int,
+    player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    unit_instance_id = model_instance_id.rsplit(":", 2)[0]
+    if unit_instance_id in {
+        "army-alpha:intercessor-unit-1",
+        "army-beta:intercessor-unit-3",
+    }:
+        x = 15.5 if player_id == "player-a" else 43.5
+        facing = 0.0 if player_id == "player-a" else 180.0
+        return Pose.at(x, 17.0 + (index * 1.8), 0.0, facing_degrees=facing)
+    return default_deployment_pose(index, player_id, model_instance_id)
 
 
 def _mission_setup() -> MissionSetup:

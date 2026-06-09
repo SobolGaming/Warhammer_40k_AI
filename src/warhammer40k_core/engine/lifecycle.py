@@ -30,6 +30,12 @@ from warhammer40k_core.engine.decision_controller import (
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.deployment import (
+    SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
+    SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
+    invalid_deployment_placement_status,
+    is_deployment_placement_request,
+)
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
@@ -227,6 +233,13 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_HEALING_MODEL_DECISION_TYPE,
     )
 )
+_SETUP_DECISION_TYPES = frozenset(
+    (
+        SECONDARY_MISSION_DECISION_TYPE,
+        SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
+        SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
+    )
+)
 
 
 def _new_decision_controller() -> DecisionController:
@@ -401,6 +414,20 @@ class GameLifecycle:
                 result=result,
                 decisions=self.decision_controller,
                 attack_sequence=attack_sequence,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and is_deployment_placement_request(pending_request)
+        ):
+            result.validate_for_request(pending_request)
+            invalid_status = invalid_deployment_placement_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -706,11 +733,12 @@ class GameLifecycle:
                 result=result,
             )
         record = self.decision_controller.submit_result(result)
-        if record.request.decision_type == SECONDARY_MISSION_DECISION_TYPE:
+        if record.request.decision_type in _SETUP_DECISION_TYPES:
             self._setup_flow.apply_decision(
                 state=state,
                 result=result,
                 decisions=self.decision_controller,
+                config=self._require_config(),
             )
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
@@ -1853,14 +1881,21 @@ def _validate_battlefield_state_consistency(
         raise GameLifecycleError(
             "Lifecycle state battlefield_state must be absent before DEPLOY_ARMIES."
         )
+    if _state_is_before_deploy_armies(state) and (
+        state.battlefield_state.placed_armies or state.battlefield_state.removed_model_ids
+    ):
+        raise GameLifecycleError(
+            "Lifecycle state battlefield_state must not contain placed or removed models "
+            "before DEPLOY_ARMIES."
+        )
     try:
         scenario = BattlefieldScenario(
             armies=tuple(state.army_definitions),
             battlefield_state=state.battlefield_state,
         )
-        if _state_requires_battlefield_state(state):
+        if _state_requires_deployed_battlefield_state(state):
             scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
-        if config is not None:
+        if config is not None and _state_requires_deployed_battlefield_state(state):
             assert_battlefield_units_in_coherency(
                 scenario=scenario,
                 ruleset_descriptor=config.ruleset_descriptor,
@@ -2385,6 +2420,18 @@ def _state_requires_battlefield_state(state: GameState) -> bool:
     if state.setup_step_index is None:
         return True
     try:
+        create_step_index = state.setup_sequence.index(SetupStep.CREATE_BATTLEFIELD)
+    except ValueError:
+        return False
+    return state.setup_step_index > create_step_index
+
+
+def _state_requires_deployed_battlefield_state(state: GameState) -> bool:
+    if state.stage is not GameLifecycleStage.SETUP:
+        return True
+    if state.setup_step_index is None:
+        return True
+    try:
         deploy_step_index = state.setup_sequence.index(SetupStep.DEPLOY_ARMIES)
     except ValueError:
         return False
@@ -2397,7 +2444,19 @@ def _state_allows_battlefield_state(state: GameState) -> bool:
     if state.setup_step_index is None:
         return True
     try:
+        create_step_index = state.setup_sequence.index(SetupStep.CREATE_BATTLEFIELD)
+    except ValueError:
+        return False
+    return state.setup_step_index >= create_step_index
+
+
+def _state_is_before_deploy_armies(state: GameState) -> bool:
+    if state.stage is not GameLifecycleStage.SETUP:
+        return False
+    if state.setup_step_index is None:
+        return False
+    try:
         deploy_step_index = state.setup_sequence.index(SetupStep.DEPLOY_ARMIES)
     except ValueError:
         return False
-    return state.setup_step_index > deploy_step_index
+    return state.setup_step_index < deploy_step_index

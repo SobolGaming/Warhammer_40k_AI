@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
@@ -94,7 +95,9 @@ def test_lifecycle_enters_movement_with_real_handler_and_placed_unit_options() -
     event_types = tuple(
         event.event_type for event in lifecycle.decision_controller.event_log.records
     )
-    assert event_types.count("battlefield_placement_created") == 1
+    assert event_types.count("battlefield_created") == 1
+    assert event_types.count("deployment_unit_placed") == 3
+    assert event_types.count("battlefield_models_placed") == 3
     assert event_types.count("movement_phase_entered") == 1
     assert "phase_body_placeholder_noop" not in event_types
 
@@ -378,7 +381,8 @@ def test_lifecycle_from_payload_rejects_battlefield_state_before_deploy_armies()
     lifecycle.start(_config())
     lifecycle.advance_until_decision_or_terminal()
     assert lifecycle.state is not None
-    assert lifecycle.state.battlefield_state is None
+    assert lifecycle.state.battlefield_state is not None
+    assert lifecycle.state.battlefield_state.placed_armies == ()
     assert tuple(lifecycle.state.army_definitions)
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase10b-early-placement",
@@ -387,7 +391,7 @@ def test_lifecycle_from_payload_rejects_battlefield_state_before_deploy_armies()
     payload = _payload_copy(lifecycle)
     payload["state"]["battlefield_state"] = scenario.battlefield_state.to_payload()
 
-    with pytest.raises(GameLifecycleError, match="absent before DEPLOY_ARMIES"):
+    with pytest.raises(GameLifecycleError, match="before DEPLOY_ARMIES"):
         GameLifecycle.from_payload(payload)
 
 
@@ -676,11 +680,16 @@ def _advance_to_movement_unit_selection(
         result_id="phase10b-result-000001",
     )
     assert _decision_request(second_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
-    movement_status = _submit_result(
+    deployment_status = _submit_result(
         lifecycle,
         request=_decision_request(second_status),
         option_id="fixed:assassination:bring_it_down",
         result_id="phase10b-result-000002",
+    )
+    movement_status = submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase10b-deploy",
     )
     return lifecycle, movement_status
 

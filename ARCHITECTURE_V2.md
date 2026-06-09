@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -88,7 +88,14 @@ path. **Phase 15F is complete** for Charge/Fight completion gates, full
 both-player phase completion coverage, Fight damage/removal draining before
 completion, and deterministic replay-safe fight-order hardening. Exact 11th
 Edition Secondary card identities beyond current source rows, Primary Mission
-scoring text, and layout geometry remain pending source work.
+scoring text, and layout geometry remain pending source work. **Phase 16A is
+complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
+source-backed battlefield at Create Battlefield, deploys units through
+`select_deployment_unit` and `submit_deployment_placement`, validates deployment
+zones, `INFILTRATORS`, terrain/objective/engagement/coherency endpoints,
+attached rules-unit model sets, reserves exclusion, stale/malformed submissions,
+and deterministic replay-safe placement events without using the Phase 10A
+deterministic bridge.
 
 Completed / implemented foundation:
 
@@ -168,12 +175,13 @@ Completed / implemented foundation:
 | 15D | Complete | Pile In/Consolidate proposals, fight movement validation, melee declarations, split melee attack pools, and shared attack-sequence reuse |
 | 15E | Complete | Source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge through shared Stratagem/Charge/Fight decisions |
 | 15F | Complete | Charge/Fight completion gates, full phase completion coverage, Fight damage/removal draining, and deterministic fight-order hardening |
+| 16A | Complete | Source-backed Deploy Armies, deployment-zone placement proposals, `INFILTRATORS`, attached rules-unit deployment, reserves exclusion, and replay-safe setup placement |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
+| 16B-16E | Planned | Redeployments, Scouts/Infiltrators pre-battle abilities, reserves declarations, setup completion, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
@@ -3019,7 +3027,7 @@ Required tests:
 
 ## Phase 16A: deployment rules and deployment-zone placement
 
-Status: Planned.
+Status: Complete.
 
 Phase 16A replaces the Phase 10A deterministic placement bridge with real
 source-backed Deploy Armies setup. Deployment is a setup placement operation:

@@ -4,6 +4,7 @@ import json
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
@@ -64,6 +65,11 @@ def test_minimal_catalog_game_reaches_battle_round_one_with_mustered_armies() ->
         status=second_status,
         option_id="fixed:assassination:bring_it_down",
         result_id="phase9d-result-000002",
+    )
+    command_status = submit_all_deployments_if_pending(
+        lifecycle,
+        command_status,
+        result_id_prefix="phase9d-deploy",
     )
 
     state = _require_state(lifecycle)
@@ -299,7 +305,9 @@ def _assert_smoke_event_log(lifecycle: GameLifecycle) -> None:
     assert event_types.count("secondary_mission_choice_recorded") == 2
     assert event_types.count("secondary_missions_revealed") == 1
     assert event_types.count("tactical_secondary_missions_drawn") == 1
-    assert event_types.count("battlefield_placement_created") == 1
+    assert event_types.count("battlefield_created") == 1
+    assert event_types.count("deployment_unit_placed") == 2
+    assert event_types.count("battlefield_models_placed") == 2
     assert event_types.count("movement_phase_entered") == 1
     assert event_types.count("decision_requested") >= 4
     assert _first_event_index(event_types, "army_mustered") < _first_event_index(

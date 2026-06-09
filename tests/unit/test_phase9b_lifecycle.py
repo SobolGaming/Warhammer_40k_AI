@@ -5,6 +5,7 @@ import json
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -215,14 +216,19 @@ def _state_battle_phase(state: GameState) -> BattlePhaseKind | None:
     return state.current_battle_phase
 
 
-def _submit_pending(lifecycle: GameLifecycle, *, option_id: str, result_number: int) -> None:
+def _submit_pending(
+    lifecycle: GameLifecycle,
+    *,
+    option_id: str,
+    result_number: int,
+) -> LifecycleStatus:
     request = _pending_request(lifecycle)
     result = DecisionResult.for_request(
         result_id=f"decision-result-{result_number:06d}",
         request=request,
         selected_option_id=option_id,
     )
-    lifecycle.submit_decision(result)
+    return lifecycle.submit_decision(result)
 
 
 def _decline_stratagem_window_if_pending(
@@ -274,8 +280,20 @@ def _choose_secondaries(
 
 def _advance_to_battle(lifecycle: GameLifecycle) -> None:
     _choose_secondaries(lifecycle)
+    status = lifecycle.advance_until_decision_or_terminal()
     while lifecycle.state is not None and lifecycle.state.stage is not GameLifecycleStage.BATTLE:
-        lifecycle.advance_until_decision_or_terminal()
+        status = submit_all_deployments_if_pending(
+            lifecycle,
+            status,
+            result_id_prefix="phase9b-deploy",
+        )
+        if _lifecycle_is_in_battle(lifecycle):
+            return
+        status = lifecycle.advance_until_decision_or_terminal()
+
+
+def _lifecycle_is_in_battle(lifecycle: GameLifecycle) -> bool:
+    return lifecycle.state is not None and lifecycle.state.stage is GameLifecycleStage.BATTLE
 
 
 def _battle_flow() -> BattleRoundFlow:
@@ -335,7 +353,16 @@ def test_setup_steps_advance_in_ruleset_descriptor_order() -> None:
     status = lifecycle.advance_until_decision_or_terminal()
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     _submit_pending(lifecycle, option_id="tactical", result_number=1)
-    _submit_pending(lifecycle, option_id="fixed:assassination:bring_it_down", result_number=2)
+    status = _submit_pending(
+        lifecycle,
+        option_id="fixed:assassination:bring_it_down",
+        result_number=2,
+    )
+    submit_all_deployments_if_pending(
+        lifecycle,
+        status,
+        result_id_prefix="phase9b-setup-order-deploy",
+    )
 
     observed_steps = [
         event.payload["step"]
@@ -667,9 +694,16 @@ def test_tactical_secondary_draws_occur_in_command_phase_not_setup() -> None:
         record.request.decision_type for record in lifecycle.decision_controller.records
     ]
 
+    status = lifecycle.advance_until_decision_or_terminal()
     while lifecycle.state is not None and lifecycle.state.stage is not GameLifecycleStage.BATTLE:
+        status = submit_all_deployments_if_pending(
+            lifecycle,
+            status,
+            result_id_prefix="phase9b-tactical-setup-deploy",
+        )
+        if _lifecycle_is_in_battle(lifecycle):
+            break
         status = lifecycle.advance_until_decision_or_terminal()
-        assert status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION
 
     status = lifecycle.advance_until_decision_or_terminal()
 
@@ -691,8 +725,16 @@ def test_tactical_secondary_draw_decision_records_command_draw_and_enters_moveme
         player_a_option="tactical",
         player_b_option="fixed:assassination:bring_it_down",
     )
+    status = lifecycle.advance_until_decision_or_terminal()
     while lifecycle.state is not None and lifecycle.state.stage is not GameLifecycleStage.BATTLE:
-        lifecycle.advance_until_decision_or_terminal()
+        status = submit_all_deployments_if_pending(
+            lifecycle,
+            status,
+            result_id_prefix="phase9b-tactical-draw-deploy",
+        )
+        if _lifecycle_is_in_battle(lifecycle):
+            break
+        status = lifecycle.advance_until_decision_or_terminal()
 
     status = lifecycle.advance_until_decision_or_terminal()
     assert status.decision_request is not None
@@ -846,7 +888,7 @@ def test_lifecycle_from_payload_rejects_mustered_army_state_drift() -> None:
     missing_armies = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
     missing_armies["state"]["army_definitions"] = []
     missing_armies["state"]["starting_strength_records"] = []
-    with pytest.raises(GameLifecycleError, match="mustered army definitions"):
+    with pytest.raises(GameLifecycleError, match=r"mustered army definitions|battlefield_state"):
         GameLifecycle.from_payload(missing_armies)
 
     army_mismatch = cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
