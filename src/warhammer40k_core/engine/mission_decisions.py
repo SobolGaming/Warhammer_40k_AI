@@ -47,7 +47,7 @@ TACTICAL_SECONDARY_SCORE_DECISION_TYPE = "score_tactical_secondary_mission"
 TACTICAL_SECONDARY_DISCARD_DECISION_TYPE = "discard_tactical_secondary_mission"
 START_MISSION_ACTION_DECISION_TYPE = "start_mission_action"
 _SUPPORTED_MISSION_ACTION_TARGET_POLICIES = frozenset(
-    ("objective_marker", "trappable_terrain_area")
+    ("objective_marker", "trappable_terrain_area", "plunderable_terrain_area")
 )
 MISSION_DECISION_TYPES = frozenset(
     (
@@ -664,6 +664,7 @@ def _apply_start_mission_action(
     if completed_state is None:
         return
     trap_state_payload: JsonValue | None = None
+    plunder_state_payload: JsonValue | None = None
     if mission_action.target_policy == "trappable_terrain_area":
         trap_state = state.record_primary_terrain_trap(
             player_id=player_id,
@@ -685,6 +686,27 @@ def _apply_start_mission_action(
                 "primary_terrain_trap_state": trap_state_payload,
             },
         )
+    if mission_action.target_policy == "plunderable_terrain_area":
+        plunder_state = state.record_secondary_terrain_plunder(
+            player_id=player_id,
+            terrain_feature_id=completed_state.target_id,
+            action_id=completed_state.action_id,
+            phase=_current_phase(state),
+            source_id=mission_action.source_id,
+        )
+        plunder_state_payload = validate_json_value(plunder_state.to_payload())
+        decisions.event_log.append(
+            "secondary_terrain_area_plundered",
+            {
+                "game_id": state.game_id,
+                "player_id": player_id,
+                "battle_round": state.battle_round,
+                "phase": _current_phase(state).value,
+                "mission_action_id": mission_action.mission_action_id,
+                "terrain_feature_id": plunder_state.terrain_feature_id,
+                "secondary_terrain_plunder_state": plunder_state_payload,
+            },
+        )
     decisions.event_log.append(
         "mission_action_completed",
         {
@@ -697,6 +719,7 @@ def _apply_start_mission_action(
             "target_policy": mission_action.target_policy,
             "mission_action_state": validate_json_value(completed_state.to_payload()),
             "primary_terrain_trap_state": trap_state_payload,
+            "secondary_terrain_plunder_state": plunder_state_payload,
         },
     )
 
@@ -784,9 +807,17 @@ def _target_ids_by_unit_for_action(
         return _objective_marker_target_ids_by_unit(
             state=state,
             player_id=player_id,
+            action=action,
         )
     if action.target_policy == "trappable_terrain_area":
         return _trappable_terrain_target_ids_by_unit(
+            state=state,
+            player_id=player_id,
+            scenario=scenario,
+            placed_unit_ids=placed_unit_ids,
+        )
+    if action.target_policy == "plunderable_terrain_area":
+        return _plunderable_terrain_target_ids_by_unit(
             state=state,
             player_id=player_id,
             scenario=scenario,
@@ -812,6 +843,7 @@ def _objective_marker_target_ids_by_unit(
     *,
     state: GameState,
     player_id: str,
+    action: MissionActionDefinition,
 ) -> dict[str, tuple[str, ...]]:
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
@@ -821,8 +853,26 @@ def _objective_marker_target_ids_by_unit(
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
         )
     )
+    home_objective_ids: frozenset[str]
+    already_actioned_objective_ids: set[str]
+    if action.mission_action_id == "cleanse-objective":
+        home_objective_ids = _home_objective_ids_for_player(state=state, player_id=player_id)
+        already_actioned_objective_ids = {
+            action_state.target_id
+            for action_state in state.mission_action_states
+            if action_state.player_id == player_id
+            and action_state.mission_id == action.mission_id
+            and action_state.battle_round_started == state.battle_round
+        }
+    else:
+        home_objective_ids = frozenset()
+        already_actioned_objective_ids = set()
     targets_by_unit: dict[str, set[str]] = {}
     for result in record.results:
+        if result.objective_id in home_objective_ids:
+            continue
+        if result.objective_id in already_actioned_objective_ids:
+            continue
         for contribution in result.contributors:
             if contribution.player_id != player_id:
                 continue
@@ -897,6 +947,113 @@ def _trappable_terrain_target_ids_by_unit(
     }
 
 
+def _plunderable_terrain_target_ids_by_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    scenario: BattlefieldScenario,
+    placed_unit_ids: tuple[str, ...],
+) -> dict[str, tuple[str, ...]]:
+    if any(
+        plunder.player_id == player_id
+        and plunder.battle_round == state.battle_round
+        and plunder.active_player_id == _active_player_id(state)
+        for plunder in state.secondary_terrain_plunder_states
+    ):
+        return {}
+    return _terrain_area_target_ids_by_unit(
+        state=state,
+        player_id=player_id,
+        scenario=scenario,
+        placed_unit_ids=placed_unit_ids,
+        excluded_feature_ids=(),
+    )
+
+
+def _terrain_area_target_ids_by_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    scenario: BattlefieldScenario,
+    placed_unit_ids: tuple[str, ...],
+    excluded_feature_ids: tuple[str, ...],
+) -> dict[str, tuple[str, ...]]:
+    if state.mission_setup is None:
+        raise GameLifecycleError("Terrain area Mission Action requires MissionSetup.")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Terrain area Mission Action requires battlefield_state.")
+    requested_player = _validate_player_id(state=state, player_id=player_id)
+    eligible_unit_ids = set(
+        _validate_identifier_tuple(
+            "placed_unit_ids",
+            placed_unit_ids,
+            min_length=0,
+            sort_values=True,
+        )
+    )
+    excluded_ids = set(
+        _validate_identifier_tuple(
+            "excluded_feature_ids",
+            excluded_feature_ids,
+            min_length=0,
+            sort_values=True,
+        )
+    )
+    candidate_features = tuple(
+        feature
+        for feature in state.mission_setup.terrain_features
+        if feature.feature_id not in excluded_ids
+        and not _terrain_feature_within_player_deployment_zone(
+            feature,
+            state=state,
+            player_id=requested_player,
+        )
+    )
+    if not candidate_features:
+        return {}
+    try:
+        placed_army = battlefield_state.placed_army_for_player(requested_player)
+    except PlacementError:
+        return {}
+    targets_by_unit: dict[str, set[str]] = {}
+    for unit_placement in placed_army.unit_placements:
+        if unit_placement.unit_instance_id not in eligible_unit_ids:
+            continue
+        for model_placement in unit_placement.model_placements:
+            model = geometry_model_for_placement(
+                model=scenario.model_instance_for_placement(model_placement),
+                placement=model_placement,
+            )
+            for feature in candidate_features:
+                if _model_is_within_terrain_area(model=model, feature=feature):
+                    targets_by_unit.setdefault(unit_placement.unit_instance_id, set()).add(
+                        feature.feature_id
+                    )
+    return {
+        unit_id: tuple(sorted(target_ids))
+        for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
+    }
+
+
+def _home_objective_ids_for_player(
+    *,
+    state: GameState,
+    player_id: str,
+) -> frozenset[str]:
+    if state.mission_setup is None:
+        raise GameLifecycleError("Home objective lookup requires MissionSetup.")
+    requested_player = _validate_player_id(state=state, player_id=player_id)
+    zones = tuple(
+        zone for zone in state.mission_setup.deployment_zones if zone.player_id == requested_player
+    )
+    return frozenset(
+        marker.objective_marker_id
+        for marker in state.mission_setup.objective_markers
+        if any(zone.contains_point(marker.x_inches, marker.y_inches) for zone in zones)
+    )
+
+
 def _terrain_feature_within_player_deployment_zone(
     feature: TerrainFeatureDefinition,
     *,
@@ -948,7 +1105,7 @@ def _target_kind_for_policy(target_policy: str) -> str:
     policy = _validate_identifier("target_policy", target_policy)
     if policy == "objective_marker":
         return "objective_marker"
-    if policy == "trappable_terrain_area":
+    if policy in {"trappable_terrain_area", "plunderable_terrain_area"}:
         return "terrain_feature"
     raise GameLifecycleError("Unsupported Mission Action target policy.")
 

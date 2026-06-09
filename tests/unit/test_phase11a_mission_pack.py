@@ -84,7 +84,7 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
     assert MissionPackDefinition.from_payload(decoded).to_payload() == payload
     assert mission_pack.sequence.steps[0] == "muster_armies"
     assert len(mission_pack.mission_pool_entries) == 20
-    assert len(mission_pack.secondary_missions) == 19
+    assert len(mission_pack.secondary_missions) == 20
     assert len(mission_pack.challenger_cards) == 9
 
 
@@ -289,8 +289,11 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
         for mission in mission_pack.primary_missions
         if mission.primary_mission_id == "primary-death-trap"
     )
+    bring_it_down = mission_pack.secondary_mission("bring-it-down")
     cleanse = mission_pack.secondary_mission("cleanse")
+    plunder = mission_pack.secondary_mission("plunder")
     cleanse_action = mission_pack.mission_action("cleanse-objective")
+    plunder_action = mission_pack.mission_action("plunder-terrain")
     booby_trap = mission_pack.mission_action("booby-trap-terrain")
 
     assert take_and_hold.scoring_kind == "control_objectives"
@@ -308,12 +311,46 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "scoring-rule:take-and-hold-control"
         ),
     }
-    assert {(rule.source_kind, rule.victory_points) for rule in cleanse.scoring_rules} >= {
-        ("fixed_secondary", 4),
-        ("tactical_secondary", 5),
+    assert {rule.rule_id: rule.to_payload() for rule in bring_it_down.scoring_rules} == {
+        "bring-it-down-fixed": {
+            "rule_id": "bring-it-down-fixed",
+            "timing": "turn_end",
+            "source_kind": "fixed_secondary",
+            "victory_points": 4,
+            "cap": None,
+            "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
+                "scoring-rule:bring-it-down-fixed"
+            ),
+        },
+        "bring-it-down-tactical": {
+            "rule_id": "bring-it-down-tactical",
+            "timing": "turn_end",
+            "source_kind": "tactical_secondary",
+            "victory_points": 5,
+            "cap": 5,
+            "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
+                "scoring-rule:bring-it-down-tactical"
+            ),
+        },
     }
+    assert {rule.rule_id for rule in cleanse.scoring_rules} == {
+        "cleanse-fixed-one-objective",
+        "cleanse-fixed-two-objectives",
+        "cleanse-tactical-one-objective",
+        "cleanse-tactical-two-objectives",
+    }
+    assert {rule.rule_id for rule in plunder.scoring_rules} == {"plunder-tactical"}
     assert cleanse_action.start_phase == "shooting"
     assert cleanse_action.target_policy == "objective_marker"
+    assert cleanse_action.victory_points == 0
+    assert plunder_action.start_phase == "shooting"
+    assert plunder_action.completion_timing == "immediate"
+    assert plunder_action.target_policy == "plunderable_terrain_area"
+    assert plunder_action.victory_points == 0
     immovable_rules = {rule.rule_id: rule.to_payload() for rule in immovable_object.scoring_rules}
     assert immovable_rules == {
         "immovable-object-central-turn-end": {
@@ -372,7 +409,6 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
     assert booby_trap.target_policy == "trappable_terrain_area"
     assert booby_trap.victory_points == 0
     assert "unit_left_battlefield" in cleanse_action.interruption_conditions
-    assert cleanse_action.victory_points == 5
     assert mission_pack.scoring.end_of_game_scoring_windows == (
         "turn_end_round_five_going_second",
         "end_of_battle",

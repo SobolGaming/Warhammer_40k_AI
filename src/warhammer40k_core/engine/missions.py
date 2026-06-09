@@ -176,7 +176,9 @@ def _secondary_scoring_rules_from_mission_pack(
                 SecondaryMissionScoringRule(
                     secondary_mission_id=mission.secondary_mission_id,
                     source_kind=source_kind,
+                    timing=rule.timing,
                     victory_points=rule.victory_points,
+                    cap=rule.cap,
                     condition=rule.condition,
                     rule_id=rule.rule_id,
                     source_id=rule.source_id,

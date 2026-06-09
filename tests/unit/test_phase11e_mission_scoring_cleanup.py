@@ -74,6 +74,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+    LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -96,9 +97,14 @@ from warhammer40k_core.engine.scoring import (
     PrimaryObjectiveTurnStartState,
     PrimaryTerrainTrapState,
     PrimaryUnitDestructionState,
+    SecondaryDestroyedModelState,
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
+    SecondaryMissionScoringRule,
+    SecondaryObjectiveCleanseState,
+    SecondaryTerrainPlunderState,
+    SecondaryUnitDestructionState,
     TacticalSecondaryAchievementContext,
     VictoryPointAward,
     VictoryPointLedger,
@@ -121,6 +127,7 @@ from warhammer40k_core.engine.turn_cleanup import (
     resolve_end_turn_cleanup,
 )
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
@@ -596,8 +603,8 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         phase=BattlePhase.COMMAND,
     )
 
-    assert fixed_state.victory_point_total("player-a") == 2
-    assert tactical_state.victory_point_total("player-a") == 4
+    assert fixed_state.victory_point_total("player-a") == 4
+    assert tactical_state.victory_point_total("player-a") == 5
     fixed_transaction = fixed_state.victory_point_ledger_for_player("player-a").transactions[0]
     tactical_transaction = tactical_state.victory_point_ledger_for_player("player-a").transactions[
         0
@@ -605,7 +612,7 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
     assert fixed_transaction.metadata == {
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-fixed",
-        "scoring_rule_condition": "fixed_secondary_condition",
+        "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
         "scoring_rule_source_id": (
             "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
             "scoring-rule:bring-it-down-fixed"
@@ -614,12 +621,555 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
     assert tactical_transaction.metadata == {
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-tactical",
-        "scoring_rule_condition": "tactical_secondary_condition",
+        "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
         "scoring_rule_source_id": (
             "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
             "scoring-rule:bring-it-down-tactical"
         ),
     }
+
+
+def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> None:
+    fixed_state = _battle_state_from_config(
+        _config_with_player_b_vehicles(("vehicle-unit-3", "vehicle-unit-4"))
+    )
+    fixed_state.battle_phase_index = fixed_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _record_secondary_vehicle_destruction(fixed_state, "army-beta:vehicle-unit-3")
+    _record_secondary_vehicle_destruction(fixed_state, "army-beta:vehicle-unit-4")
+
+    fixed_state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+    )
+
+    tactical_state = _battle_state_from_config(
+        _config_with_player_b_vehicles(("vehicle-unit-3", "vehicle-unit-4")),
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
+    tactical_state.battle_phase_index = tactical_state.battle_phase_sequence.index(
+        BattlePhase.FIGHT
+    )
+    tactical_state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            battle_round=1,
+            source_result_id="phase16-bring-it-down-draw",
+        )
+    )
+    _record_secondary_vehicle_destruction(tactical_state, "army-beta:vehicle-unit-3")
+    _record_secondary_vehicle_destruction(tactical_state, "army-beta:vehicle-unit-4")
+
+    tactical_state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert fixed_state.victory_point_total("player-a") == 8
+    assert tactical_state.victory_point_total("player-a") == 5
+    fixed_metadata = _transaction_metadata(
+        fixed_state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    tactical_metadata = _transaction_metadata(
+        tactical_state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    assert fixed_metadata["score_count_by_rule"] == {"bring-it-down-fixed": 2}
+    assert fixed_metadata["victory_points_by_rule"] == {"bring-it-down-fixed": 8}
+    assert tactical_metadata["score_count_by_rule"] == {"bring-it-down-tactical": 2}
+    assert tactical_metadata["victory_points_by_rule"] == {"bring-it-down-tactical": 5}
+
+
+def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_with_cap() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_b_vehicles(("vehicle-unit-3", "vehicle-unit-4")),
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="overwhelming-force",
+            battle_round=1,
+            source_result_id="phase16-overwhelming-force-draw",
+        )
+    )
+    _record_secondary_vehicle_destruction(
+        state,
+        "army-beta:vehicle-unit-3",
+        started_turn_objective_marker_ids=("tipping-point-center",),
+    )
+    _record_secondary_vehicle_destruction(
+        state,
+        "army-beta:vehicle-unit-4",
+        started_turn_objective_marker_ids=("tipping-point-northwest",),
+    )
+
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="overwhelming-force",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+    )
+
+    metadata = _transaction_metadata(
+        state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    assert state.victory_point_total("player-a") == 5
+    assert metadata["score_count_by_rule"] == {"overwhelming-force-tactical": 2}
+    assert metadata["victory_points_by_rule"] == {"overwhelming-force-tactical": 5}
+
+
+def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
+    cleanse_state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    cleanse_state.battle_phase_index = cleanse_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    cleanse_state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="cleanse",
+            battle_round=1,
+            source_result_id="phase16-cleanse-draw",
+        )
+    )
+    cleanse_state.record_secondary_objective_cleanse(
+        player_id="player-a",
+        objective_marker_id="tipping-point-center",
+        action_id="phase16-cleanse-center",
+        phase=BattlePhase.FIGHT,
+        source_id="cleanse",
+    )
+    cleanse_state.record_secondary_objective_cleanse(
+        player_id="player-a",
+        objective_marker_id="tipping-point-northwest",
+        action_id="phase16-cleanse-northwest",
+        phase=BattlePhase.FIGHT,
+        source_id="cleanse",
+    )
+
+    cleanse_state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="cleanse",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+    )
+
+    plunder_state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    plunder_state.battle_phase_index = plunder_state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    plunder_state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="plunder",
+            battle_round=1,
+            source_result_id="phase16-plunder-draw",
+        )
+    )
+    assert plunder_state.mission_setup is not None
+    plunder_state.record_secondary_terrain_plunder(
+        player_id="player-a",
+        terrain_feature_id=plunder_state.mission_setup.terrain_features[0].feature_id,
+        action_id="phase16-plunder-terrain",
+        phase=BattlePhase.SHOOTING,
+        source_id="plunder",
+    )
+
+    plunder_state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="plunder",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+    )
+
+    cleanse_metadata = _transaction_metadata(
+        cleanse_state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    plunder_metadata = _transaction_metadata(
+        plunder_state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    assert cleanse_state.victory_point_total("player-a") == 5
+    assert cleanse_metadata["victory_points_by_rule"] == {
+        "cleanse-tactical-one-objective": 2,
+        "cleanse-tactical-two-objectives": 3,
+    }
+    assert plunder_state.victory_point_total("player-a") == 5
+    assert plunder_metadata["victory_points_by_rule"] == {"plunder-tactical": 5}
+
+
+def test_defend_stronghold_scores_at_opponent_turn_end_with_deployment_zone_bonus() -> None:
+    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state.battle_round = 2
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="defend-stronghold",
+            battle_round=2,
+            source_result_id="phase16-defend-stronghold-draw",
+        )
+    )
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="northeast",
+    )
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-beta:intercessor-unit-3",
+        target_suffix="southwest",
+    )
+
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+    )
+
+    metadata = _transaction_metadata(
+        state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    assert state.victory_point_total("player-a") == 5
+    assert metadata["victory_points_by_rule"] == {
+        "defend-stronghold-home-objective": 3,
+        "defend-stronghold-no-enemy-in-deployment-zone": 2,
+    }
+
+
+def test_secondary_scoring_evidence_payloads_round_trip_and_fail_fast() -> None:
+    model = SecondaryDestroyedModelState(
+        model_instance_id="army-beta:vehicle-unit-3:model-1",
+        starting_wounds=10,
+    )
+    destruction = SecondaryUnitDestructionState(
+        destruction_id="secondary-unit-destruction:phase11e-game:round-01:vehicle-unit-3",
+        game_id="phase11e-game",
+        destroying_player_id="player-a",
+        destroyed_player_id="player-b",
+        active_player_id="player-a",
+        battle_round=1,
+        phase=BattlePhase.FIGHT.value,
+        destroyed_unit_instance_id="army-beta:vehicle-unit-3",
+        destroyed_models=(model,),
+        started_turn_objective_marker_ids=("tipping-point-center",),
+        source_id="phase16:test-destruction",
+    )
+    cleanse = SecondaryObjectiveCleanseState(
+        cleanse_id="secondary-objective-cleanse:phase11e-game:round-01:player-a:center",
+        game_id="phase11e-game",
+        player_id="player-a",
+        active_player_id="player-a",
+        battle_round=1,
+        phase=BattlePhase.SHOOTING.value,
+        objective_marker_id="tipping-point-center",
+        action_id="mission-action:phase16-cleanse-center",
+        source_id="cleanse",
+    )
+    plunder = SecondaryTerrainPlunderState(
+        plunder_id="secondary-terrain-plunder:phase11e-game:round-01:player-a:ruin-1",
+        game_id="phase11e-game",
+        player_id="player-a",
+        active_player_id="player-a",
+        battle_round=1,
+        phase=BattlePhase.SHOOTING.value,
+        terrain_feature_id="ruin-1",
+        action_id="mission-action:phase16-plunder-ruin-1",
+        source_id="plunder",
+    )
+    rule = SecondaryMissionScoringRule(
+        secondary_mission_id="plunder",
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        timing="your_turn_end",
+        victory_points=5,
+        cap=None,
+        condition="one_or_more_terrain_areas_plundered_this_turn",
+        rule_id="plunder-tactical",
+        source_id="phase16:plunder-rule",
+    )
+
+    assert SecondaryDestroyedModelState.from_payload(model.to_payload()) == model
+    assert SecondaryUnitDestructionState.from_payload(destruction.to_payload()) == destruction
+    assert SecondaryObjectiveCleanseState.from_payload(cleanse.to_payload()) == cleanse
+    assert SecondaryTerrainPlunderState.from_payload(plunder.to_payload()) == plunder
+    assert SecondaryMissionScoringRule.from_payload(rule.to_payload()) == rule
+    with pytest.raises(GameLifecycleError, match="enemy unit"):
+        SecondaryUnitDestructionState(
+            destruction_id="secondary-unit-destruction:phase11e-game:round-01:friendly",
+            game_id="phase11e-game",
+            destroying_player_id="player-a",
+            destroyed_player_id="player-a",
+            active_player_id="player-a",
+            battle_round=1,
+            phase=BattlePhase.FIGHT.value,
+            destroyed_unit_instance_id="army-alpha:intercessor-unit-1",
+            destroyed_models=(model,),
+            started_turn_objective_marker_ids=(),
+            source_id="phase16:test-friendly-destruction",
+        )
+    with pytest.raises(GameLifecycleError, match="owner's turn"):
+        SecondaryObjectiveCleanseState(
+            cleanse_id="secondary-objective-cleanse:phase11e-game:round-01:player-a:bad",
+            game_id="phase11e-game",
+            player_id="player-a",
+            active_player_id="player-b",
+            battle_round=1,
+            phase=BattlePhase.SHOOTING.value,
+            objective_marker_id="tipping-point-center",
+            action_id="mission-action:phase16-cleanse-bad",
+            source_id="cleanse",
+        )
+    with pytest.raises(GameLifecycleError, match="owner's turn"):
+        SecondaryTerrainPlunderState(
+            plunder_id="secondary-terrain-plunder:phase11e-game:round-01:player-a:bad",
+            game_id="phase11e-game",
+            player_id="player-a",
+            active_player_id="player-b",
+            battle_round=1,
+            phase=BattlePhase.SHOOTING.value,
+            terrain_feature_id="ruin-1",
+            action_id="mission-action:phase16-plunder-bad",
+            source_id="plunder",
+        )
+    with pytest.raises(GameLifecycleError, match="secondary source kind"):
+        SecondaryMissionScoringRule(
+            secondary_mission_id="plunder",
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            timing="your_turn_end",
+            victory_points=5,
+            cap=None,
+            condition="terrain_area_plundered_this_turn",
+            rule_id="plunder-primary-invalid",
+            source_id="phase16:plunder-rule-invalid",
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported secondary scoring rule condition"):
+        SecondaryMissionScoringRule(
+            secondary_mission_id="plunder",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            timing="your_turn_end",
+            victory_points=5,
+            cap=None,
+            condition="unsupported_condition",
+            rule_id="plunder-condition-invalid",
+            source_id="phase16:plunder-rule-invalid",
+        )
+
+
+def test_state_backed_secondary_scoring_rejects_invalid_contexts_and_zero_evidence() -> None:
+    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    assert state.mission_setup is not None
+    record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.TURN_END,
+            phase=BattlePhase.FIGHT,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        )
+    )
+    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    empty_destructions: tuple[SecondaryUnitDestructionState, ...] = ()
+    empty_cleanses: tuple[SecondaryObjectiveCleanseState, ...] = ()
+    empty_plunders: tuple[SecondaryTerrainPlunderState, ...] = ()
+    empty_enemy_zone_units: tuple[str, ...] = ()
+
+    assert (
+        policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="bring-it-down",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+            record=record,
+            mission_setup=state.mission_setup,
+            unit_destruction_states=empty_destructions,
+            objective_cleanse_states=empty_cleanses,
+            terrain_plunder_states=empty_plunders,
+            enemy_unit_ids_in_player_deployment_zone=empty_enemy_zone_units,
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="requires objective record"):
+        policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="bring-it-down",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+            record=cast(ObjectiveControlRecord, object()),
+            mission_setup=state.mission_setup,
+            unit_destruction_states=empty_destructions,
+            objective_cleanse_states=empty_cleanses,
+            terrain_plunder_states=empty_plunders,
+            enemy_unit_ids_in_player_deployment_zone=empty_enemy_zone_units,
+        )
+    with pytest.raises(GameLifecycleError, match="requires MissionSetup"):
+        policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="bring-it-down",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+            record=record,
+            mission_setup=cast(MissionSetup, object()),
+            unit_destruction_states=empty_destructions,
+            objective_cleanse_states=empty_cleanses,
+            terrain_plunder_states=empty_plunders,
+            enemy_unit_ids_in_player_deployment_zone=empty_enemy_zone_units,
+        )
+    with pytest.raises(GameLifecycleError, match="requires secondary kind"):
+        policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="bring-it-down",
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            hidden=False,
+            record=record,
+            mission_setup=state.mission_setup,
+            unit_destruction_states=empty_destructions,
+            objective_cleanse_states=empty_cleanses,
+            terrain_plunder_states=empty_plunders,
+            enemy_unit_ids_in_player_deployment_zone=empty_enemy_zone_units,
+        )
+    with pytest.raises(GameLifecycleError, match="record timing drift"):
+        policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round + 1,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="bring-it-down",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+            record=record,
+            mission_setup=state.mission_setup,
+            unit_destruction_states=empty_destructions,
+            objective_cleanse_states=empty_cleanses,
+            terrain_plunder_states=empty_plunders,
+            enemy_unit_ids_in_player_deployment_zone=empty_enemy_zone_units,
+        )
+    with pytest.raises(GameLifecycleError, match="not source-backed"):
+        policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="not-source-backed",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+            record=record,
+            mission_setup=state.mission_setup,
+            unit_destruction_states=empty_destructions,
+            objective_cleanse_states=empty_cleanses,
+            terrain_plunder_states=empty_plunders,
+            enemy_unit_ids_in_player_deployment_zone=empty_enemy_zone_units,
+        )
+
+    unsupported_timing_policy = replace(
+        policy,
+        secondary_scoring_rules=(
+            SecondaryMissionScoringRule(
+                secondary_mission_id="phase16-test-secondary",
+                source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+                timing="unsupported-timing",
+                victory_points=1,
+                cap=None,
+                condition="one_or_more_terrain_areas_plundered_this_turn",
+                rule_id="phase16-test-secondary-unsupported-timing",
+                source_id="phase16:test-secondary-unsupported-timing",
+            ),
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="Unsupported secondary scoring rule timing"):
+        unsupported_timing_policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="phase16-test-secondary",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+            record=record,
+            mission_setup=state.mission_setup,
+            unit_destruction_states=empty_destructions,
+            objective_cleanse_states=empty_cleanses,
+            terrain_plunder_states=empty_plunders,
+            enemy_unit_ids_in_player_deployment_zone=empty_enemy_zone_units,
+        )
+
+
+def test_game_state_secondary_scoring_evidence_round_trips_and_rejects_duplicates() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_b_vehicles(("vehicle-unit-3",)),
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _record_secondary_vehicle_destruction(
+        state,
+        "army-beta:vehicle-unit-3",
+        started_turn_objective_marker_ids=("tipping-point-center",),
+    )
+    state.record_secondary_objective_cleanse(
+        player_id="player-a",
+        objective_marker_id="tipping-point-center",
+        action_id="phase16-cleanse-center",
+        phase=BattlePhase.FIGHT,
+        source_id="cleanse",
+    )
+    assert state.mission_setup is not None
+    state.record_secondary_terrain_plunder(
+        player_id="player-a",
+        terrain_feature_id=state.mission_setup.terrain_features[0].feature_id,
+        action_id="phase16-plunder-terrain",
+        phase=BattlePhase.FIGHT,
+        source_id="plunder",
+    )
+
+    payload = state.to_payload()
+    restored = GameState.from_payload(payload)
+
+    assert restored.secondary_unit_destruction_states == state.secondary_unit_destruction_states
+    assert restored.secondary_objective_cleanse_states == state.secondary_objective_cleanse_states
+    assert restored.secondary_terrain_plunder_states == state.secondary_terrain_plunder_states
+    duplicate_unit_state = replace(
+        state.secondary_unit_destruction_states[0],
+        destruction_id=f"{state.secondary_unit_destruction_states[0].destruction_id}:duplicate",
+    )
+    duplicate_cleanse_state = replace(
+        state.secondary_objective_cleanse_states[0],
+        cleanse_id=f"{state.secondary_objective_cleanse_states[0].cleanse_id}:duplicate",
+        action_id="phase16-cleanse-center-duplicate",
+    )
+    duplicate_plunder_state = replace(
+        state.secondary_terrain_plunder_states[0],
+        plunder_id=f"{state.secondary_terrain_plunder_states[0].plunder_id}:duplicate",
+        action_id="phase16-plunder-terrain-duplicate",
+    )
+    with pytest.raises(GameLifecycleError, match="unique per destroyed unit"):
+        replace(
+            state,
+            secondary_unit_destruction_states=[
+                *state.secondary_unit_destruction_states,
+                duplicate_unit_state,
+            ],
+        )
+    with pytest.raises(GameLifecycleError, match="unique per objective turn"):
+        replace(
+            state,
+            secondary_objective_cleanse_states=[
+                *state.secondary_objective_cleanse_states,
+                duplicate_cleanse_state,
+            ],
+        )
+    with pytest.raises(GameLifecycleError, match="unique per player turn"):
+        replace(
+            state,
+            secondary_terrain_plunder_states=[
+                *state.secondary_terrain_plunder_states,
+                duplicate_plunder_state,
+            ],
+        )
 
 
 def test_secondary_choices_remain_secret_until_all_players_select() -> None:
@@ -1548,6 +2098,11 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
         target_suffix="northwest",
         result_id="phase11e-start-cleanse-northwest",
     )
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="center",
+    )
 
     completed = state.complete_mission_action(
         action_id=completed_action.action_id,
@@ -1559,12 +2114,15 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
     )
 
     assert completed.status is MissionActionStatus.COMPLETED
-    assert completed.score_transaction_id == "victory-point:player-a:round-01:000001"
+    assert completed.score_transaction_id is None
     assert completed.target_id.endswith("center")
     assert interrupted.status is MissionActionStatus.INTERRUPTED
     assert interrupted.target_id.endswith("northwest")
     assert interrupted.interrupted_reason == "unit_moved"
-    assert state.victory_point_total("player-a") == 5
+    assert state.victory_point_total("player-a") == 0
+    assert [
+        cleanse.objective_marker_id for cleanse in state.secondary_objective_cleanse_states
+    ] == [completed.target_id]
     assert lifecycle.decision_controller.records[-2].request.decision_type == (
         START_MISSION_ACTION_DECISION_TYPE
     )
@@ -1591,6 +2149,98 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
         round_tripped_state.mission_action_state_by_id(completed.action_id).target_id
         == completed.target_id
     )
+
+
+def test_plunder_mission_action_completes_immediately_and_records_secondary_evidence() -> None:
+    lifecycle = _battle_lifecycle(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state = lifecycle.state
+    assert state is not None
+    assert state.mission_setup is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    terrain_feature = _first_non_player_deployment_terrain_feature(state, player_id="player-a")
+    min_x, min_y, max_x, max_y = terrain_feature.bounds()
+    _place_unit_near_point(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        x_inches=(min_x + max_x) / 2.0,
+        y_inches=(min_y + max_y) / 2.0,
+    )
+
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="plunder-terrain",
+    )
+    request = waiting.decision_request
+    assert request is not None
+    option = next(
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["target_id"] == terrain_feature.feature_id
+    )
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=option.option_id,
+        result_id="phase16-start-plunder",
+    ).to_result(request)
+
+    lifecycle.submit_decision(result)
+
+    action = state.mission_action_state_by_id("mission-action:phase16-start-plunder")
+    assert action.status is MissionActionStatus.COMPLETED
+    assert action.score_transaction_id is None
+    assert state.victory_point_total("player-a") == 0
+    assert [plunder.terrain_feature_id for plunder in state.secondary_terrain_plunder_states] == [
+        terrain_feature.feature_id
+    ]
+    assert (
+        request_mission_action_start(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            player_id="player-a",
+            mission_action_id="plunder-terrain",
+        ).status_kind
+        is LifecycleStatusKind.UNSUPPORTED
+    )
+    assert any(
+        record.event_type == "secondary_terrain_area_plundered"
+        for record in lifecycle.decision_controller.event_log.records
+    )
+
+
+def test_public_payload_redacts_hidden_secondary_scoring_evidence() -> None:
+    state = _battle_state_from_config(_config_with_player_b_vehicles(("vehicle-unit-3",)))
+    state.secondary_mission_choices = [
+        choice for choice in state.secondary_mission_choices if choice.player_id == "player-a"
+    ]
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
+    state.record_secondary_objective_cleanse(
+        player_id="player-a",
+        objective_marker_id="tipping-point-center",
+        action_id="phase16-public-cleanse",
+        phase=BattlePhase.FIGHT,
+        source_id="cleanse",
+    )
+    terrain_feature = _first_non_player_deployment_terrain_feature(state, player_id="player-a")
+    state.record_secondary_terrain_plunder(
+        player_id="player-a",
+        terrain_feature_id=terrain_feature.feature_id,
+        action_id="phase16-public-plunder",
+        phase=BattlePhase.SHOOTING,
+        source_id="plunder",
+    )
+
+    player_payload = state.to_public_payload(viewer_player_id="player-a")
+    opponent_payload = state.to_public_payload(viewer_player_id="player-b")
+
+    assert len(cast(list[JsonValue], player_payload["secondary_unit_destruction_states"])) == 1
+    assert len(cast(list[JsonValue], player_payload["secondary_objective_cleanse_states"])) == 1
+    assert len(cast(list[JsonValue], player_payload["secondary_terrain_plunder_states"])) == 1
+    assert opponent_payload["secondary_unit_destruction_states"] == []
+    assert opponent_payload["secondary_objective_cleanse_states"] == []
+    assert opponent_payload["secondary_terrain_plunder_states"] == []
 
 
 def test_mission_action_cancellation_maps_displacements_and_battlefield_departure() -> None:
@@ -1938,8 +2588,8 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         player_id="player-a",
         battle_round=1,
         phase=BattlePhase.COMMAND.value,
-        action_id="cleanse:center:player-a",
-        source_id="cleanse",
+        action_id="establish-locus:center:player-a",
+        source_id="establish-locus",
     )
 
     ledger, transaction = VictoryPointLedger.initial(player_id="player-a").award(award)
@@ -1963,7 +2613,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     assert policy.total_vp_cap == mission_pack.scoring.total_vp_cap
     assert award.to_payload()["source_kind"] == "mission_action"
     assert VictoryPointTransaction.from_payload(transaction.to_payload()) == transaction
-    assert ledger.points_from_source_kind(VictoryPointSourceKind.MISSION_ACTION) == 5
+    assert ledger.points_from_source_kind(VictoryPointSourceKind.MISSION_ACTION) == 4
     assert SecondaryMissionCardState.from_payload(scored_card.to_payload()) == scored_card
     assert fixed_card.to_public_payload(
         viewer_player_id="player-b",
@@ -2681,6 +3331,29 @@ def _with_model_offsets(
     return unit_placement.with_model_placements(tuple(placements))
 
 
+def _first_non_player_deployment_terrain_feature(
+    state: GameState,
+    *,
+    player_id: str,
+) -> TerrainFeatureDefinition:
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    zones = tuple(
+        zone for zone in state.mission_setup.deployment_zones if zone.player_id == player_id
+    )
+    for feature in state.mission_setup.terrain_features:
+        min_x, min_y, max_x, max_y = feature.bounds()
+        corners = (
+            (min_x, min_y),
+            (min_x, max_y),
+            (max_x, min_y),
+            (max_x, max_y),
+        )
+        if not all(any(zone.contains_point(x, y) for zone in zones) for x, y in corners):
+            return feature
+    raise AssertionError("test mission setup requires terrain outside player deployment zone")
+
+
 def _battle_state_with_unarrived_reserve_at_round_three_deadline() -> tuple[GameState, str]:
     state = _battle_state()
     assert state.battlefield_state is not None
@@ -3187,6 +3860,68 @@ def _config_with_player_a_vehicle() -> GameConfig:
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
         mission_setup=_mission_setup(),
+    )
+
+
+def _config_with_player_b_vehicles(vehicle_unit_ids: tuple[str, ...]) -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase11e-game",
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_ids=("intercessor-unit-1",),
+            ),
+            ArmyMusterRequest(
+                army_id="army-beta",
+                player_id="player-b",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_ids=("core-combined-arms",),
+                ),
+                unit_selections=tuple(
+                    _unit_muster_selection(
+                        unit_selection_id=unit_id,
+                        datasheet_id="core-vehicle-monster",
+                        model_profile_id="core-vehicle-monster",
+                        model_count=1,
+                    )
+                    for unit_id in vehicle_unit_ids
+                ),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _record_secondary_vehicle_destruction(
+    state: GameState,
+    destroyed_unit_instance_id: str,
+    *,
+    started_turn_objective_marker_ids: tuple[str, ...] = (),
+) -> None:
+    unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == destroyed_unit_instance_id
+    )
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=destroyed_unit_instance_id,
+        destroyed_model_instance_ids=tuple(model.model_instance_id for model in unit.own_models),
+        started_turn_objective_marker_ids=started_turn_objective_marker_ids,
+        source_id=f"phase16:{destroyed_unit_instance_id}:destroyed",
     )
 
 
