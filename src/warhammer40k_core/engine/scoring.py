@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlStatus,
@@ -80,11 +81,12 @@ class MissionScoringPolicyPayload(TypedDict):
     game_length_battle_rounds: int
     primary_scoring_phase: str
     primary_scoring_timing: str
-    primary_scoring_rule_id: str
-    primary_scoring_rule_condition: str
-    primary_scoring_rule_source_id: str
-    primary_vp_per_controlled_objective: int
-    primary_max_vp_per_turn: int
+    primary_scoring_rule_id: str | None
+    primary_scoring_rule_condition: str | None
+    primary_scoring_rule_source_id: str | None
+    primary_vp_per_controlled_objective: int | None
+    primary_max_vp_per_turn: int | None
+    primary_scoring_rules: list[PrimaryMissionScoringRulePayload]
     secondary_vp_per_score: int
     secondary_scoring_rules: list[SecondaryMissionScoringRulePayload]
     mission_action_scoring_rules: list[MissionActionScoringRulePayload]
@@ -99,6 +101,16 @@ class MissionScoringPolicyPayload(TypedDict):
     total_vp_cap: int
     end_of_round_scoring_windows: list[str]
     end_of_game_scoring_windows: list[str]
+    source_id: str
+
+
+class PrimaryMissionScoringRulePayload(TypedDict):
+    rule_id: str
+    timing: str
+    source_kind: str
+    victory_points: int
+    cap: int | None
+    condition: str
     source_id: str
 
 
@@ -118,6 +130,42 @@ class MissionActionScoringRulePayload(TypedDict):
     scoring_source_id: str
     victory_points: int
     cap_bucket: str
+    source_id: str
+
+
+class PrimaryObjectiveTurnStartStatePayload(TypedDict):
+    state_id: str
+    game_id: str
+    player_id: str
+    active_player_id: str
+    battle_round: int
+    controlled_objective_ids: list[str]
+    source_id: str
+
+
+class PrimaryTerrainTrapStatePayload(TypedDict):
+    trap_id: str
+    game_id: str
+    player_id: str
+    active_player_id: str
+    battle_round: int
+    phase: str
+    terrain_feature_id: str
+    is_objective: bool
+    action_id: str
+    source_id: str
+
+
+class PrimaryUnitDestructionStatePayload(TypedDict):
+    destruction_id: str
+    game_id: str
+    destroying_player_id: str
+    destroyed_player_id: str
+    active_player_id: str
+    battle_round: int
+    phase: str
+    destroyed_unit_instance_id: str
+    started_turn_terrain_feature_ids: list[str]
     source_id: str
 
 
@@ -516,6 +564,372 @@ class VictoryPointLedger:
 
 
 @dataclass(frozen=True, slots=True)
+class PrimaryMissionScoringRule:
+    rule_id: str
+    timing: str
+    source_kind: VictoryPointSourceKind
+    victory_points: int
+    cap: int | None
+    condition: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "rule_id",
+            _validate_identifier("PrimaryMissionScoringRule rule_id", self.rule_id),
+        )
+        object.__setattr__(
+            self,
+            "timing",
+            _validate_identifier("PrimaryMissionScoringRule timing", self.timing),
+        )
+        source_kind = victory_point_source_kind_from_token(self.source_kind)
+        if source_kind is not VictoryPointSourceKind.PRIMARY:
+            raise GameLifecycleError("PrimaryMissionScoringRule source_kind must be primary.")
+        object.__setattr__(self, "source_kind", source_kind)
+        object.__setattr__(
+            self,
+            "victory_points",
+            _validate_positive_int(
+                "PrimaryMissionScoringRule victory_points",
+                self.victory_points,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "cap",
+            _validate_optional_positive_int("PrimaryMissionScoringRule cap", self.cap),
+        )
+        object.__setattr__(
+            self,
+            "condition",
+            _validate_identifier("PrimaryMissionScoringRule condition", self.condition),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("PrimaryMissionScoringRule source_id", self.source_id),
+        )
+
+    def to_payload(self) -> PrimaryMissionScoringRulePayload:
+        return {
+            "rule_id": self.rule_id,
+            "timing": self.timing,
+            "source_kind": self.source_kind.value,
+            "victory_points": self.victory_points,
+            "cap": self.cap,
+            "condition": self.condition,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PrimaryMissionScoringRulePayload) -> Self:
+        return cls(
+            rule_id=payload["rule_id"],
+            timing=payload["timing"],
+            source_kind=victory_point_source_kind_from_token(payload["source_kind"]),
+            victory_points=payload["victory_points"],
+            cap=payload["cap"],
+            condition=payload["condition"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PrimaryObjectiveTurnStartState:
+    state_id: str
+    game_id: str
+    player_id: str
+    active_player_id: str
+    battle_round: int
+    controlled_objective_ids: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "state_id",
+            _validate_identifier("PrimaryObjectiveTurnStartState state_id", self.state_id),
+        )
+        object.__setattr__(
+            self,
+            "game_id",
+            _validate_identifier("PrimaryObjectiveTurnStartState game_id", self.game_id),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("PrimaryObjectiveTurnStartState player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier(
+                "PrimaryObjectiveTurnStartState active_player_id",
+                self.active_player_id,
+            ),
+        )
+        if self.player_id != self.active_player_id:
+            raise GameLifecycleError("Primary turn-start state must belong to active player.")
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int(
+                "PrimaryObjectiveTurnStartState battle_round", self.battle_round
+            ),
+        )
+        object.__setattr__(
+            self,
+            "controlled_objective_ids",
+            _validate_identifier_tuple(
+                "PrimaryObjectiveTurnStartState controlled_objective_ids",
+                self.controlled_objective_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("PrimaryObjectiveTurnStartState source_id", self.source_id),
+        )
+
+    def to_payload(self) -> PrimaryObjectiveTurnStartStatePayload:
+        return {
+            "state_id": self.state_id,
+            "game_id": self.game_id,
+            "player_id": self.player_id,
+            "active_player_id": self.active_player_id,
+            "battle_round": self.battle_round,
+            "controlled_objective_ids": list(self.controlled_objective_ids),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PrimaryObjectiveTurnStartStatePayload) -> Self:
+        return cls(
+            state_id=payload["state_id"],
+            game_id=payload["game_id"],
+            player_id=payload["player_id"],
+            active_player_id=payload["active_player_id"],
+            battle_round=payload["battle_round"],
+            controlled_objective_ids=tuple(payload["controlled_objective_ids"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PrimaryTerrainTrapState:
+    trap_id: str
+    game_id: str
+    player_id: str
+    active_player_id: str
+    battle_round: int
+    phase: str
+    terrain_feature_id: str
+    is_objective: bool
+    action_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "trap_id",
+            _validate_identifier("PrimaryTerrainTrapState trap_id", self.trap_id),
+        )
+        object.__setattr__(
+            self,
+            "game_id",
+            _validate_identifier("PrimaryTerrainTrapState game_id", self.game_id),
+        )
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("PrimaryTerrainTrapState player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier("PrimaryTerrainTrapState active_player_id", self.active_player_id),
+        )
+        if self.player_id != self.active_player_id:
+            raise GameLifecycleError("Primary terrain trap must be recorded during owner's turn.")
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("PrimaryTerrainTrapState battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "phase",
+            _validate_identifier("PrimaryTerrainTrapState phase", self.phase),
+        )
+        object.__setattr__(
+            self,
+            "terrain_feature_id",
+            _validate_identifier(
+                "PrimaryTerrainTrapState terrain_feature_id",
+                self.terrain_feature_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "is_objective",
+            _validate_bool("PrimaryTerrainTrapState is_objective", self.is_objective),
+        )
+        object.__setattr__(
+            self,
+            "action_id",
+            _validate_identifier("PrimaryTerrainTrapState action_id", self.action_id),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("PrimaryTerrainTrapState source_id", self.source_id),
+        )
+
+    def to_payload(self) -> PrimaryTerrainTrapStatePayload:
+        return {
+            "trap_id": self.trap_id,
+            "game_id": self.game_id,
+            "player_id": self.player_id,
+            "active_player_id": self.active_player_id,
+            "battle_round": self.battle_round,
+            "phase": self.phase,
+            "terrain_feature_id": self.terrain_feature_id,
+            "is_objective": self.is_objective,
+            "action_id": self.action_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PrimaryTerrainTrapStatePayload) -> Self:
+        return cls(
+            trap_id=payload["trap_id"],
+            game_id=payload["game_id"],
+            player_id=payload["player_id"],
+            active_player_id=payload["active_player_id"],
+            battle_round=payload["battle_round"],
+            phase=payload["phase"],
+            terrain_feature_id=payload["terrain_feature_id"],
+            is_objective=payload["is_objective"],
+            action_id=payload["action_id"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PrimaryUnitDestructionState:
+    destruction_id: str
+    game_id: str
+    destroying_player_id: str
+    destroyed_player_id: str
+    active_player_id: str
+    battle_round: int
+    phase: str
+    destroyed_unit_instance_id: str
+    started_turn_terrain_feature_ids: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "destruction_id",
+            _validate_identifier("PrimaryUnitDestructionState destruction_id", self.destruction_id),
+        )
+        object.__setattr__(
+            self,
+            "game_id",
+            _validate_identifier("PrimaryUnitDestructionState game_id", self.game_id),
+        )
+        object.__setattr__(
+            self,
+            "destroying_player_id",
+            _validate_identifier(
+                "PrimaryUnitDestructionState destroying_player_id",
+                self.destroying_player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "destroyed_player_id",
+            _validate_identifier(
+                "PrimaryUnitDestructionState destroyed_player_id",
+                self.destroyed_player_id,
+            ),
+        )
+        if self.destroying_player_id == self.destroyed_player_id:
+            raise GameLifecycleError("Primary unit destruction must target an enemy unit.")
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier(
+                "PrimaryUnitDestructionState active_player_id",
+                self.active_player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("PrimaryUnitDestructionState battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "phase",
+            _validate_identifier("PrimaryUnitDestructionState phase", self.phase),
+        )
+        object.__setattr__(
+            self,
+            "destroyed_unit_instance_id",
+            _validate_identifier(
+                "PrimaryUnitDestructionState destroyed_unit_instance_id",
+                self.destroyed_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "started_turn_terrain_feature_ids",
+            _validate_identifier_tuple(
+                "PrimaryUnitDestructionState started_turn_terrain_feature_ids",
+                self.started_turn_terrain_feature_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("PrimaryUnitDestructionState source_id", self.source_id),
+        )
+
+    def to_payload(self) -> PrimaryUnitDestructionStatePayload:
+        return {
+            "destruction_id": self.destruction_id,
+            "game_id": self.game_id,
+            "destroying_player_id": self.destroying_player_id,
+            "destroyed_player_id": self.destroyed_player_id,
+            "active_player_id": self.active_player_id,
+            "battle_round": self.battle_round,
+            "phase": self.phase,
+            "destroyed_unit_instance_id": self.destroyed_unit_instance_id,
+            "started_turn_terrain_feature_ids": list(self.started_turn_terrain_feature_ids),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PrimaryUnitDestructionStatePayload) -> Self:
+        return cls(
+            destruction_id=payload["destruction_id"],
+            game_id=payload["game_id"],
+            destroying_player_id=payload["destroying_player_id"],
+            destroyed_player_id=payload["destroyed_player_id"],
+            active_player_id=payload["active_player_id"],
+            battle_round=payload["battle_round"],
+            phase=payload["phase"],
+            destroyed_unit_instance_id=payload["destroyed_unit_instance_id"],
+            started_turn_terrain_feature_ids=tuple(payload["started_turn_terrain_feature_ids"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class SecondaryMissionScoringRule:
     secondary_mission_id: str
     source_kind: VictoryPointSourceKind
@@ -639,7 +1053,7 @@ class MissionActionScoringRule:
         object.__setattr__(
             self,
             "victory_points",
-            _validate_positive_int(
+            _validate_non_negative_int(
                 "MissionActionScoringRule victory_points",
                 self.victory_points,
             ),
@@ -1141,11 +1555,12 @@ class MissionScoringPolicy:
     game_length_battle_rounds: int
     primary_scoring_phase: str
     primary_scoring_timing: ObjectiveControlTiming
-    primary_scoring_rule_id: str
-    primary_scoring_rule_condition: str
-    primary_scoring_rule_source_id: str
-    primary_vp_per_controlled_objective: int
-    primary_max_vp_per_turn: int
+    primary_scoring_rule_id: str | None
+    primary_scoring_rule_condition: str | None
+    primary_scoring_rule_source_id: str | None
+    primary_vp_per_controlled_objective: int | None
+    primary_max_vp_per_turn: int | None
+    primary_scoring_rules: tuple[PrimaryMissionScoringRule, ...]
     secondary_vp_per_score: int
     secondary_scoring_rules: tuple[SecondaryMissionScoringRule, ...]
     mission_action_scoring_rules: tuple[MissionActionScoringRule, ...]
@@ -1200,7 +1615,7 @@ class MissionScoringPolicy:
         object.__setattr__(
             self,
             "primary_scoring_rule_id",
-            _validate_identifier(
+            _validate_optional_identifier(
                 "MissionScoringPolicy primary_scoring_rule_id",
                 self.primary_scoring_rule_id,
             ),
@@ -1208,7 +1623,7 @@ class MissionScoringPolicy:
         object.__setattr__(
             self,
             "primary_scoring_rule_condition",
-            _validate_identifier(
+            _validate_optional_identifier(
                 "MissionScoringPolicy primary_scoring_rule_condition",
                 self.primary_scoring_rule_condition,
             ),
@@ -1216,7 +1631,7 @@ class MissionScoringPolicy:
         object.__setattr__(
             self,
             "primary_scoring_rule_source_id",
-            _validate_identifier(
+            _validate_optional_identifier(
                 "MissionScoringPolicy primary_scoring_rule_source_id",
                 self.primary_scoring_rule_source_id,
             ),
@@ -1224,7 +1639,7 @@ class MissionScoringPolicy:
         object.__setattr__(
             self,
             "primary_vp_per_controlled_objective",
-            _validate_positive_int(
+            _validate_optional_positive_int(
                 "MissionScoringPolicy primary_vp_per_controlled_objective",
                 self.primary_vp_per_controlled_objective,
             ),
@@ -1232,10 +1647,15 @@ class MissionScoringPolicy:
         object.__setattr__(
             self,
             "primary_max_vp_per_turn",
-            _validate_positive_int(
+            _validate_optional_positive_int(
                 "MissionScoringPolicy primary_max_vp_per_turn",
                 self.primary_max_vp_per_turn,
             ),
+        )
+        object.__setattr__(
+            self,
+            "primary_scoring_rules",
+            _validate_primary_scoring_rule_tuple(self.primary_scoring_rules),
         )
         object.__setattr__(
             self,
@@ -1345,51 +1765,296 @@ class MissionScoringPolicy:
             _validate_identifier("MissionScoringPolicy source_id", self.source_id),
         )
 
-    def primary_award_from_objective_control(
+    def primary_awards_from_objective_control(
         self,
+        *,
         record: ObjectiveControlRecord,
-    ) -> VictoryPointAward | None:
+        mission_setup: MissionSetup,
+        turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
+        terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
+        unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
+        scoring_player_ids: tuple[str, ...] = (),
+        end_of_battle: bool = False,
+    ) -> tuple[VictoryPointAward, ...]:
         if type(record) is not ObjectiveControlRecord:
             raise GameLifecycleError("Primary scoring requires an ObjectiveControlRecord.")
-        if record.phase != self.primary_scoring_phase:
-            return None
-        if record.timing is not self.primary_scoring_timing:
-            return None
-        if self.primary_scoring_rule_condition == (
-            "each_controlled_objective_from_battle_round_two"
-        ):
-            if record.battle_round < 2:
-                return None
-        elif self.primary_scoring_rule_condition != "each_controlled_objective":
-            raise GameLifecycleError("Unsupported primary scoring rule condition.")
-        controlled_objective_ids = tuple(
-            result.objective_id
-            for result in record.results
-            if result.status is ObjectiveControlStatus.CONTROLLED
-            and result.controlled_by_player_id == record.active_player_id
+        if type(mission_setup) is not MissionSetup:
+            raise GameLifecycleError("Primary scoring requires MissionSetup.")
+        starts = _validate_primary_turn_start_state_tuple(turn_start_states)
+        traps = _validate_primary_terrain_trap_state_tuple(terrain_trap_states)
+        destructions = _validate_primary_unit_destruction_state_tuple(unit_destruction_states)
+        player_ids = (
+            _validate_identifier_tuple("scoring_player_ids", scoring_player_ids)
+            if scoring_player_ids
+            else (record.active_player_id,)
         )
-        if not controlled_objective_ids:
-            return None
-        amount = min(
-            len(controlled_objective_ids) * self.primary_vp_per_controlled_objective,
-            self.primary_max_vp_per_turn,
+        awards: list[VictoryPointAward] = []
+        for rule in self.primary_scoring_rules:
+            if not self._primary_rule_applies_at_record(
+                rule=rule,
+                record=record,
+                end_of_battle=end_of_battle,
+            ):
+                continue
+            for player_id in player_ids:
+                award = self._primary_award_for_rule(
+                    rule=rule,
+                    record=record,
+                    mission_setup=mission_setup,
+                    player_id=player_id,
+                    turn_start_states=starts,
+                    terrain_trap_states=traps,
+                    unit_destruction_states=destructions,
+                    end_of_battle=end_of_battle,
+                )
+                if award is not None:
+                    awards.append(award)
+        return tuple(awards)
+
+    def _primary_rule_applies_at_record(
+        self,
+        *,
+        rule: PrimaryMissionScoringRule,
+        record: ObjectiveControlRecord,
+        end_of_battle: bool,
+    ) -> bool:
+        if end_of_battle:
+            return rule.timing == "end_of_battle"
+        if rule.timing == "end_of_battle":
+            return False
+        if rule.timing == "command_phase":
+            return record.phase == self.primary_scoring_phase and (
+                record.timing is self.primary_scoring_timing
+            )
+        if rule.timing == "turn_end":
+            return record.timing is ObjectiveControlTiming.TURN_END
+        if rule.timing == "command_phase_or_round_five_turn_end":
+            return (
+                record.phase == self.primary_scoring_phase
+                and record.timing is self.primary_scoring_timing
+            ) or (
+                record.battle_round == self.game_length_battle_rounds
+                and record.timing is ObjectiveControlTiming.TURN_END
+            )
+        raise GameLifecycleError("Unsupported primary scoring rule timing.")
+
+    def _primary_award_for_rule(
+        self,
+        *,
+        rule: PrimaryMissionScoringRule,
+        record: ObjectiveControlRecord,
+        mission_setup: MissionSetup,
+        player_id: str,
+        turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
+        terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
+        unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
+        end_of_battle: bool,
+    ) -> VictoryPointAward | None:
+        evidence = self._primary_rule_evidence(
+            rule=rule,
+            record=record,
+            mission_setup=mission_setup,
+            player_id=player_id,
+            turn_start_states=turn_start_states,
+            terrain_trap_states=terrain_trap_states,
+            unit_destruction_states=unit_destruction_states,
+            end_of_battle=end_of_battle,
         )
+        score_count = _metadata_score_count(evidence)
+        if score_count == 0:
+            return None
+        amount = score_count * rule.victory_points
+        if rule.cap is not None:
+            amount = min(amount, rule.cap)
         return VictoryPointAward(
-            player_id=record.active_player_id,
+            player_id=player_id,
             battle_round=record.battle_round,
             phase=record.phase,
             amount=amount,
             source_kind=VictoryPointSourceKind.PRIMARY,
             source_id=self.primary_mission_id,
-            scoring_timing=record.timing.value,
+            scoring_timing="end_of_battle" if end_of_battle else record.timing.value,
             hidden=False,
             metadata={
+                **evidence,
                 "objective_control_record_id": record.record_id,
-                "controlled_objective_ids": list(controlled_objective_ids),
-                "scoring_rule_id": self.primary_scoring_rule_id,
-                "scoring_rule_condition": self.primary_scoring_rule_condition,
+                "scoring_rule_id": rule.rule_id,
+                "scoring_rule_condition": rule.condition,
+                "scoring_rule_source_id": rule.source_id,
+                "victory_points_per_count": rule.victory_points,
             },
         )
+
+    def _primary_rule_evidence(
+        self,
+        *,
+        rule: PrimaryMissionScoringRule,
+        record: ObjectiveControlRecord,
+        mission_setup: MissionSetup,
+        player_id: str,
+        turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
+        terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
+        unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
+        end_of_battle: bool,
+    ) -> dict[str, JsonValue]:
+        requested_player = _validate_identifier("player_id", player_id)
+        controlled_objective_ids = _controlled_objective_ids(record, player_id=requested_player)
+        home_objective_ids = _home_objective_ids(mission_setup, player_id=requested_player)
+        central_objective_ids = _central_objective_ids(mission_setup)
+        non_home_objective_ids = tuple(
+            objective_id
+            for objective_id in controlled_objective_ids
+            if objective_id not in home_objective_ids
+        )
+        if rule.condition == "each_controlled_objective":
+            return _score_count_evidence(
+                score_count=len(controlled_objective_ids),
+                controlled_objective_ids=controlled_objective_ids,
+            )
+        if rule.condition == "each_controlled_objective_from_battle_round_two":
+            if record.battle_round < 2:
+                return _score_count_evidence(score_count=0)
+            return _score_count_evidence(
+                score_count=len(controlled_objective_ids),
+                controlled_objective_ids=controlled_objective_ids,
+            )
+        if rule.condition == "control_one_or_more_central_objectives":
+            central_ids = tuple(
+                objective_id
+                for objective_id in controlled_objective_ids
+                if objective_id in central_objective_ids
+            )
+            return _score_count_evidence(
+                score_count=1 if central_ids else 0,
+                controlled_objective_ids=central_ids,
+            )
+        if rule.condition == "each_non_home_objective_controlled_battle_rounds_two_to_four":
+            if record.battle_round < 2 or record.battle_round > 4:
+                return _score_count_evidence(score_count=0)
+            return _score_count_evidence(
+                score_count=len(non_home_objective_ids),
+                controlled_objective_ids=non_home_objective_ids,
+                home_objective_ids=home_objective_ids,
+            )
+        if rule.condition == "each_non_home_objective_controlled_round_five":
+            if record.battle_round != self.game_length_battle_rounds:
+                return _score_count_evidence(score_count=0)
+            return _score_count_evidence(
+                score_count=len(non_home_objective_ids),
+                controlled_objective_ids=non_home_objective_ids,
+                home_objective_ids=home_objective_ids,
+            )
+        if rule.condition == "one_or_more_enemy_units_destroyed_this_turn":
+            matching = _enemy_unit_destructions_this_turn(
+                unit_destruction_states,
+                player_id=requested_player,
+                battle_round=record.battle_round,
+                active_player_id=record.active_player_id,
+            )
+            return _score_count_evidence(
+                score_count=1 if matching else 0,
+                destroyed_unit_instance_ids=tuple(
+                    state.destroyed_unit_instance_id for state in matching
+                ),
+            )
+        if rule.condition == "each_non_home_objective_controlled_from_battle_round_two":
+            if record.battle_round < 2:
+                return _score_count_evidence(score_count=0)
+            return _score_count_evidence(
+                score_count=len(non_home_objective_ids),
+                controlled_objective_ids=non_home_objective_ids,
+                home_objective_ids=home_objective_ids,
+            )
+        if rule.condition == "control_one_or_more_new_non_home_objectives":
+            start_state = _turn_start_state_for_player(
+                turn_start_states,
+                game_id=record.game_id,
+                player_id=requested_player,
+                battle_round=record.battle_round,
+            )
+            new_ids = tuple(
+                objective_id
+                for objective_id in non_home_objective_ids
+                if objective_id not in start_state.controlled_objective_ids
+            )
+            return _score_count_evidence(
+                score_count=1 if new_ids else 0,
+                controlled_objective_ids=new_ids,
+                turn_start_controlled_objective_ids=start_state.controlled_objective_ids,
+            )
+        if rule.condition == "control_one_or_more_central_objectives_end_of_battle":
+            if not end_of_battle:
+                return _score_count_evidence(score_count=0)
+            central_ids = tuple(
+                objective_id
+                for objective_id in controlled_objective_ids
+                if objective_id in central_objective_ids
+            )
+            return _score_count_evidence(
+                score_count=1 if central_ids else 0,
+                controlled_objective_ids=central_ids,
+            )
+        if rule.condition == "each_terrain_area_trapped_this_turn":
+            traps = _terrain_traps_this_turn(
+                terrain_trap_states,
+                player_id=requested_player,
+                battle_round=record.battle_round,
+                active_player_id=record.active_player_id,
+            )
+            return _score_count_evidence(
+                score_count=len(traps),
+                trapped_terrain_feature_ids=tuple(trap.terrain_feature_id for trap in traps),
+            )
+        if rule.condition == "each_trapped_objective_terrain_area_this_turn":
+            traps = tuple(
+                trap
+                for trap in _terrain_traps_this_turn(
+                    terrain_trap_states,
+                    player_id=requested_player,
+                    battle_round=record.battle_round,
+                    active_player_id=record.active_player_id,
+                )
+                if trap.is_objective
+            )
+            return _score_count_evidence(
+                score_count=len(traps),
+                trapped_terrain_feature_ids=tuple(trap.terrain_feature_id for trap in traps),
+            )
+        if (
+            rule.condition
+            == "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain"
+        ):
+            trap_ids = {
+                trap.terrain_feature_id
+                for trap in terrain_trap_states
+                if trap.player_id == requested_player
+            }
+            matching = tuple(
+                destruction
+                for destruction in _enemy_unit_destructions_this_turn(
+                    unit_destruction_states,
+                    player_id=requested_player,
+                    battle_round=record.battle_round,
+                    active_player_id=record.active_player_id,
+                )
+                if trap_ids.intersection(destruction.started_turn_terrain_feature_ids)
+            )
+            return _score_count_evidence(
+                score_count=1 if matching else 0,
+                destroyed_unit_instance_ids=tuple(
+                    state.destroyed_unit_instance_id for state in matching
+                ),
+                trapped_terrain_feature_ids=tuple(sorted(trap_ids)),
+            )
+        if rule.condition == "control_one_or_more_non_home_objectives_from_battle_round_two":
+            if record.battle_round < 2:
+                return _score_count_evidence(score_count=0)
+            return _score_count_evidence(
+                score_count=1 if non_home_objective_ids else 0,
+                controlled_objective_ids=non_home_objective_ids,
+                home_objective_ids=home_objective_ids,
+            )
+        raise GameLifecycleError("Unsupported primary scoring rule condition.")
 
     def secondary_award(
         self,
@@ -1518,6 +2183,7 @@ class MissionScoringPolicy:
             "primary_scoring_rule_source_id": self.primary_scoring_rule_source_id,
             "primary_vp_per_controlled_objective": self.primary_vp_per_controlled_objective,
             "primary_max_vp_per_turn": self.primary_max_vp_per_turn,
+            "primary_scoring_rules": [rule.to_payload() for rule in self.primary_scoring_rules],
             "secondary_vp_per_score": self.secondary_vp_per_score,
             "secondary_scoring_rules": [rule.to_payload() for rule in self.secondary_scoring_rules],
             "mission_action_scoring_rules": [
@@ -1556,6 +2222,10 @@ class MissionScoringPolicy:
             primary_scoring_rule_source_id=payload["primary_scoring_rule_source_id"],
             primary_vp_per_controlled_objective=payload["primary_vp_per_controlled_objective"],
             primary_max_vp_per_turn=payload["primary_max_vp_per_turn"],
+            primary_scoring_rules=tuple(
+                PrimaryMissionScoringRule.from_payload(rule)
+                for rule in payload["primary_scoring_rules"]
+            ),
             secondary_vp_per_score=payload["secondary_vp_per_score"],
             secondary_scoring_rules=tuple(
                 SecondaryMissionScoringRule.from_payload(rule)
@@ -2093,6 +2763,149 @@ def objective_control_timing_from_token(token: object) -> ObjectiveControlTiming
         raise GameLifecycleError(f"Unsupported ObjectiveControlTiming token: {token}.") from exc
 
 
+def _controlled_objective_ids(
+    record: ObjectiveControlRecord,
+    *,
+    player_id: str,
+) -> tuple[str, ...]:
+    requested_player = _validate_identifier("player_id", player_id)
+    return tuple(
+        result.objective_id
+        for result in record.results
+        if result.status is ObjectiveControlStatus.CONTROLLED
+        and result.controlled_by_player_id == requested_player
+    )
+
+
+def _home_objective_ids(
+    mission_setup: MissionSetup,
+    *,
+    player_id: str,
+) -> tuple[str, ...]:
+    requested_player = _validate_identifier("player_id", player_id)
+    home_zones = tuple(
+        zone for zone in mission_setup.deployment_zones if zone.player_id == requested_player
+    )
+    return tuple(
+        sorted(
+            marker.objective_marker_id
+            for marker in mission_setup.objective_markers
+            if any(zone.contains_point(marker.x_inches, marker.y_inches) for zone in home_zones)
+        )
+    )
+
+
+def _central_objective_ids(mission_setup: MissionSetup) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            marker.objective_marker_id
+            for marker in mission_setup.objective_markers
+            if not any(
+                zone.contains_point(marker.x_inches, marker.y_inches)
+                for zone in mission_setup.deployment_zones
+            )
+        )
+    )
+
+
+def _turn_start_state_for_player(
+    states: tuple[PrimaryObjectiveTurnStartState, ...],
+    *,
+    game_id: str,
+    player_id: str,
+    battle_round: int,
+) -> PrimaryObjectiveTurnStartState:
+    requested_game_id = _validate_identifier("game_id", game_id)
+    requested_player = _validate_identifier("player_id", player_id)
+    requested_round = _validate_positive_int("battle_round", battle_round)
+    matches = tuple(
+        state
+        for state in states
+        if state.game_id == requested_game_id
+        and state.player_id == requested_player
+        and state.battle_round == requested_round
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError("Primary scoring requires exactly one turn-start snapshot.")
+    return matches[0]
+
+
+def _enemy_unit_destructions_this_turn(
+    states: tuple[PrimaryUnitDestructionState, ...],
+    *,
+    player_id: str,
+    battle_round: int,
+    active_player_id: str,
+) -> tuple[PrimaryUnitDestructionState, ...]:
+    requested_player = _validate_identifier("player_id", player_id)
+    requested_round = _validate_positive_int("battle_round", battle_round)
+    requested_active = _validate_identifier("active_player_id", active_player_id)
+    return tuple(
+        state
+        for state in states
+        if state.destroying_player_id == requested_player
+        and state.destroyed_player_id != requested_player
+        and state.active_player_id == requested_active
+        and state.battle_round == requested_round
+    )
+
+
+def _terrain_traps_this_turn(
+    states: tuple[PrimaryTerrainTrapState, ...],
+    *,
+    player_id: str,
+    battle_round: int,
+    active_player_id: str,
+) -> tuple[PrimaryTerrainTrapState, ...]:
+    requested_player = _validate_identifier("player_id", player_id)
+    requested_round = _validate_positive_int("battle_round", battle_round)
+    requested_active = _validate_identifier("active_player_id", active_player_id)
+    return tuple(
+        state
+        for state in states
+        if state.player_id == requested_player
+        and state.active_player_id == requested_active
+        and state.battle_round == requested_round
+    )
+
+
+def _score_count_evidence(
+    *,
+    score_count: int,
+    controlled_objective_ids: tuple[str, ...] = (),
+    home_objective_ids: tuple[str, ...] = (),
+    turn_start_controlled_objective_ids: tuple[str, ...] = (),
+    trapped_terrain_feature_ids: tuple[str, ...] = (),
+    destroyed_unit_instance_ids: tuple[str, ...] = (),
+) -> dict[str, JsonValue]:
+    return {
+        "score_count": _validate_non_negative_int("score_count", score_count),
+        "controlled_objective_ids": list(
+            _validate_identifier_tuple("controlled_objective_ids", controlled_objective_ids)
+        ),
+        "home_objective_ids": list(
+            _validate_identifier_tuple("home_objective_ids", home_objective_ids)
+        ),
+        "turn_start_controlled_objective_ids": list(
+            _validate_identifier_tuple(
+                "turn_start_controlled_objective_ids",
+                turn_start_controlled_objective_ids,
+            )
+        ),
+        "trapped_terrain_feature_ids": list(
+            _validate_identifier_tuple("trapped_terrain_feature_ids", trapped_terrain_feature_ids)
+        ),
+        "destroyed_unit_instance_ids": list(
+            _validate_identifier_tuple("destroyed_unit_instance_ids", destroyed_unit_instance_ids)
+        ),
+    }
+
+
+def _metadata_score_count(metadata: dict[str, JsonValue]) -> int:
+    score_count = metadata.get("score_count")
+    return _validate_non_negative_int("score_count", score_count)
+
+
 def _validate_victory_point_transaction_tuple(
     field_name: str,
     values: object,
@@ -2113,6 +2926,80 @@ def _validate_victory_point_transaction_tuple(
         seen.add(value.transaction_id)
         validated.append(value)
     return tuple(validated)
+
+
+def _validate_primary_scoring_rule_tuple(
+    values: object,
+) -> tuple[PrimaryMissionScoringRule, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("MissionScoringPolicy primary_scoring_rules must be a tuple.")
+    validated: list[PrimaryMissionScoringRule] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PrimaryMissionScoringRule:
+            raise GameLifecycleError(
+                "MissionScoringPolicy primary_scoring_rules must contain scoring rules."
+            )
+        if value.rule_id in seen:
+            raise GameLifecycleError(
+                "MissionScoringPolicy primary_scoring_rules must not contain duplicates."
+            )
+        seen.add(value.rule_id)
+        validated.append(value)
+    if not validated:
+        raise GameLifecycleError("MissionScoringPolicy primary_scoring_rules must not be empty.")
+    return tuple(sorted(validated, key=lambda rule: rule.rule_id))
+
+
+def _validate_primary_turn_start_state_tuple(
+    values: object,
+) -> tuple[PrimaryObjectiveTurnStartState, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("primary turn-start states must be a tuple.")
+    states: list[PrimaryObjectiveTurnStartState] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PrimaryObjectiveTurnStartState:
+            raise GameLifecycleError("primary turn-start states must contain state values.")
+        if value.state_id in seen:
+            raise GameLifecycleError("primary turn-start states must not duplicate IDs.")
+        seen.add(value.state_id)
+        states.append(value)
+    return tuple(sorted(states, key=lambda state: state.state_id))
+
+
+def _validate_primary_terrain_trap_state_tuple(
+    values: object,
+) -> tuple[PrimaryTerrainTrapState, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("primary terrain trap states must be a tuple.")
+    states: list[PrimaryTerrainTrapState] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PrimaryTerrainTrapState:
+            raise GameLifecycleError("primary terrain trap states must contain state values.")
+        if value.trap_id in seen:
+            raise GameLifecycleError("primary terrain trap states must not duplicate IDs.")
+        seen.add(value.trap_id)
+        states.append(value)
+    return tuple(sorted(states, key=lambda state: state.trap_id))
+
+
+def _validate_primary_unit_destruction_state_tuple(
+    values: object,
+) -> tuple[PrimaryUnitDestructionState, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("primary unit destruction states must be a tuple.")
+    states: list[PrimaryUnitDestructionState] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PrimaryUnitDestructionState:
+            raise GameLifecycleError("primary unit destruction states must contain state values.")
+        if value.destruction_id in seen:
+            raise GameLifecycleError("primary unit destruction states must not duplicate IDs.")
+        seen.add(value.destruction_id)
+        states.append(value)
+    return tuple(sorted(states, key=lambda state: state.destruction_id))
 
 
 def _validate_secondary_scoring_rule_tuple(
@@ -2326,6 +3213,30 @@ def _validate_identifier_tuple_ordered(
         identifiers.append(identifier)
     if len(identifiers) < min_length:
         raise GameLifecycleError(f"{field_name} must contain at least {min_length} values.")
+    return tuple(identifiers)
+
+
+def _validate_identifier_tuple(
+    field_name: str,
+    values: object,
+    *,
+    min_length: int = 0,
+    sort_values: bool = True,
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    if len(identifiers) < min_length:
+        raise GameLifecycleError(f"{field_name} must contain at least {min_length} values.")
+    if sort_values:
+        return tuple(sorted(identifiers))
     return tuple(identifiers)
 
 

@@ -945,7 +945,9 @@ class MissionActionDefinition:
         object.__setattr__(
             self,
             "victory_points",
-            _validate_positive_int("MissionActionDefinition victory_points", self.victory_points),
+            _validate_non_negative_int(
+                "MissionActionDefinition victory_points", self.victory_points
+            ),
         )
         object.__setattr__(
             self,

@@ -191,6 +191,121 @@ def source_package_definition() -> MissionSourcePackageDefinition:
 def primary_mission_rows() -> tuple[SourcePrimaryMissionRow, ...]:
     return (
         SourcePrimaryMissionRow(
+            primary_mission_id="primary-immovable-object",
+            name="Immovable Object",
+            max_vp_per_turn=None,
+            scoring_kind="immovable_object",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _rule(
+                    "immovable-object-central-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "control_one_or_more_central_objectives",
+                ),
+                _rule(
+                    "immovable-object-rounds-two-to-four-command",
+                    "command_phase",
+                    "primary",
+                    5,
+                    None,
+                    "each_non_home_objective_controlled_battle_rounds_two_to_four",
+                ),
+                _rule(
+                    "immovable-object-round-five-turn-end",
+                    "turn_end",
+                    "primary",
+                    5,
+                    None,
+                    "each_non_home_objective_controlled_round_five",
+                ),
+            ),
+        ),
+        SourcePrimaryMissionRow(
+            primary_mission_id="primary-unstoppable-force",
+            name="Unstoppable Force",
+            max_vp_per_turn=None,
+            scoring_kind="unstoppable_force",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _rule(
+                    "unstoppable-force-enemy-destroyed-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "one_or_more_enemy_units_destroyed_this_turn",
+                ),
+                _rule(
+                    "unstoppable-force-objectives",
+                    "command_phase_or_round_five_turn_end",
+                    "primary",
+                    4,
+                    None,
+                    "each_non_home_objective_controlled_from_battle_round_two",
+                ),
+                _rule(
+                    "unstoppable-force-new-objective-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "control_one_or_more_new_non_home_objectives",
+                ),
+                _rule(
+                    "unstoppable-force-central-end-battle",
+                    "end_of_battle",
+                    "primary",
+                    5,
+                    None,
+                    "control_one_or_more_central_objectives_end_of_battle",
+                ),
+            ),
+        ),
+        SourcePrimaryMissionRow(
+            primary_mission_id="primary-death-trap",
+            name="Death Trap",
+            max_vp_per_turn=None,
+            scoring_kind="death_trap",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _rule(
+                    "death-trap-terrain-trapped-turn-end",
+                    "turn_end",
+                    "primary",
+                    2,
+                    None,
+                    "each_terrain_area_trapped_this_turn",
+                ),
+                _rule(
+                    "death-trap-objective-terrain-bonus-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "each_trapped_objective_terrain_area_this_turn",
+                ),
+                _rule(
+                    "death-trap-destroyed-in-trapped-terrain-turn-end",
+                    "turn_end",
+                    "primary",
+                    3,
+                    None,
+                    "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
+                ),
+                _rule(
+                    "death-trap-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    "primary",
+                    4,
+                    None,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+            ),
+        ),
+        SourcePrimaryMissionRow(
             primary_mission_id="burden-of-trust",
             name="Burden of Trust",
             max_vp_per_turn=15,
@@ -551,6 +666,13 @@ def force_disposition_rows() -> tuple[SourceForceDispositionRow, ...]:
 
 
 def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ...]:
+    implemented_mission_ids = frozenset(
+        {
+            "primary-death-trap",
+            "primary-immovable-object",
+            "primary-unstoppable-force",
+        }
+    )
     primary_mission_names = {
         "purge-the-foe": {
             "take-and-hold": "Unstoppable Force",
@@ -595,6 +717,11 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
                 opponent_disposition.force_disposition_id
             ]
             primary_mission_id = f"primary-{_mission_name_slug(primary_mission_name)}"
+            source_status = (
+                "implemented"
+                if primary_mission_id in implemented_mission_ids
+                else "awaiting_source"
+            )
             rows.append(
                 SourcePrimaryMissionMatrixCellRow(
                     player_force_disposition_id=player_disposition.force_disposition_id,
@@ -606,7 +733,7 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
                         f"{primary_mission_id}-layout-2",
                         f"{primary_mission_id}-layout-3",
                     ),
-                    source_status="awaiting_source",
+                    source_status=source_status,
                 )
             )
     return tuple(rows)
@@ -614,6 +741,20 @@ def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ..
 
 def mission_action_rows() -> tuple[SourceMissionActionRow, ...]:
     return (
+        SourceMissionActionRow(
+            mission_action_id="booby-trap-terrain",
+            mission_id="primary-death-trap",
+            mission_kind="primary",
+            name="Booby Trap",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="immediate",
+            eligible_unit_policy="active_player_unit",
+            target_policy="trappable_terrain_area",
+            interruption_conditions=(),
+            victory_points=0,
+            scoring_source_id="primary-death-trap",
+        ),
         SourceMissionActionRow(
             mission_action_id="cleanse-objective",
             mission_id="cleanse",

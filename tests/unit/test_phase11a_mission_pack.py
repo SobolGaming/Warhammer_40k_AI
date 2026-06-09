@@ -201,7 +201,16 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
     assert hold_into_purge.primary_mission_id == "primary-immovable-object"
     assert purge_into_hold.primary_mission_id != hold_into_purge.primary_mission_id
     assert mirror.primary_mission_id == "primary-gather-intel"
-    assert purge_into_hold.source_status is MissionSourceStatus.AWAITING_SOURCE
+    assert purge_into_hold.source_status is MissionSourceStatus.IMPLEMENTED
+    assert hold_into_purge.source_status is MissionSourceStatus.IMPLEMENTED
+    assert (
+        mission_pack.primary_mission_matrix_cell(
+            player_force_disposition_id="disruption",
+            opponent_force_disposition_id="take-and-hold",
+        ).source_status
+        is MissionSourceStatus.IMPLEMENTED
+    )
+    assert mirror.source_status is MissionSourceStatus.AWAITING_SOURCE
     assert len(purge_into_hold.battlefield_layout_ids) == 3
     assert all(
         layout_id.startswith(purge_into_hold.primary_mission_id)
@@ -246,6 +255,7 @@ def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
     implemented_without_primary = replace(
         mission_pack.primary_mission_matrix_cells[0],
         source_status=MissionSourceStatus.IMPLEMENTED,
+        primary_mission_id="missing-primary",
     )
     with pytest.raises(MissionPackError, match="must reference a primary mission"):
         replace(
@@ -264,8 +274,24 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
         for mission in mission_pack.primary_missions
         if mission.primary_mission_id == "take-and-hold"
     )
+    immovable_object = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "primary-immovable-object"
+    )
+    unstoppable_force = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "primary-unstoppable-force"
+    )
+    death_trap = next(
+        mission
+        for mission in mission_pack.primary_missions
+        if mission.primary_mission_id == "primary-death-trap"
+    )
     cleanse = mission_pack.secondary_mission("cleanse")
     cleanse_action = mission_pack.mission_action("cleanse-objective")
+    booby_trap = mission_pack.mission_action("booby-trap-terrain")
 
     assert take_and_hold.scoring_kind == "control_objectives"
     assert take_and_hold.vp_per_controlled_objective == 5
@@ -288,6 +314,63 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
     }
     assert cleanse_action.start_phase == "shooting"
     assert cleanse_action.target_policy == "objective_marker"
+    immovable_rules = {rule.rule_id: rule.to_payload() for rule in immovable_object.scoring_rules}
+    assert immovable_rules == {
+        "immovable-object-central-turn-end": {
+            "rule_id": "immovable-object-central-turn-end",
+            "timing": "turn_end",
+            "source_kind": "primary",
+            "victory_points": 3,
+            "cap": None,
+            "condition": "control_one_or_more_central_objectives",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
+                "scoring-rule:immovable-object-central-turn-end"
+            ),
+        },
+        "immovable-object-rounds-two-to-four-command": {
+            "rule_id": "immovable-object-rounds-two-to-four-command",
+            "timing": "command_phase",
+            "source_kind": "primary",
+            "victory_points": 5,
+            "cap": None,
+            "condition": "each_non_home_objective_controlled_battle_rounds_two_to_four",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
+                "scoring-rule:immovable-object-rounds-two-to-four-command"
+            ),
+        },
+        "immovable-object-round-five-turn-end": {
+            "rule_id": "immovable-object-round-five-turn-end",
+            "timing": "turn_end",
+            "source_kind": "primary",
+            "victory_points": 5,
+            "cap": None,
+            "condition": "each_non_home_objective_controlled_round_five",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
+                "scoring-rule:immovable-object-round-five-turn-end"
+            ),
+        },
+    }
+    assert {rule.rule_id for rule in unstoppable_force.scoring_rules} == {
+        "unstoppable-force-enemy-destroyed-turn-end",
+        "unstoppable-force-objectives",
+        "unstoppable-force-new-objective-turn-end",
+        "unstoppable-force-central-end-battle",
+    }
+    assert {rule.rule_id for rule in death_trap.scoring_rules} == {
+        "death-trap-terrain-trapped-turn-end",
+        "death-trap-objective-terrain-bonus-turn-end",
+        "death-trap-destroyed-in-trapped-terrain-turn-end",
+        "death-trap-objective-control",
+    }
+    assert booby_trap.mission_id == "primary-death-trap"
+    assert booby_trap.mission_kind == "primary"
+    assert booby_trap.start_phase == "shooting"
+    assert booby_trap.completion_timing == "immediate"
+    assert booby_trap.target_policy == "trappable_terrain_area"
+    assert booby_trap.victory_points == 0
     assert "unit_left_battlefield" in cleanse_action.interruption_conditions
     assert cleanse_action.victory_points == 5
     assert mission_pack.scoring.end_of_game_scoring_windows == (
