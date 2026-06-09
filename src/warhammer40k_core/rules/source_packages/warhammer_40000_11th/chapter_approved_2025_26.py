@@ -89,6 +89,7 @@ class SourcePrimaryMissionMatrixCellRow:
     player_force_disposition_id: str
     opponent_force_disposition_id: str
     primary_mission_id: str
+    primary_mission_name: str
     battlefield_layout_ids: tuple[str, str, str]
     source_status: str
 
@@ -97,6 +98,7 @@ class SourcePrimaryMissionMatrixCellRow:
             "player_force_disposition_id": self.player_force_disposition_id,
             "opponent_force_disposition_id": self.opponent_force_disposition_id,
             "primary_mission_id": self.primary_mission_id,
+            "primary_mission_name": self.primary_mission_name,
             "battlefield_layout_ids": list(self.battlefield_layout_ids),
             "source_status": self.source_status,
         }
@@ -549,19 +551,56 @@ def force_disposition_rows() -> tuple[SourceForceDispositionRow, ...]:
 
 
 def primary_mission_matrix_rows() -> tuple[SourcePrimaryMissionMatrixCellRow, ...]:
+    primary_mission_names = {
+        "purge-the-foe": {
+            "take-and-hold": "Unstoppable Force",
+            "purge-the-foe": "Meatgrinder",
+            "priority-assets": "Punishment",
+            "reconnaissance": "Consecrate",
+            "disruption": "Destroyer's Wrath",
+        },
+        "take-and-hold": {
+            "take-and-hold": "Battlefield Dominance",
+            "purge-the-foe": "Immovable Object",
+            "priority-assets": "Determined Acquisition",
+            "reconnaissance": "Purge and Secure",
+            "disruption": "Inescapable Dominion",
+        },
+        "priority-assets": {
+            "take-and-hold": "Secure Asset",
+            "purge-the-foe": "Vital Link",
+            "priority-assets": "Extract Relic",
+            "reconnaissance": "Vanguard Operation",
+            "disruption": "Sabotage",
+        },
+        "reconnaissance": {
+            "take-and-hold": "Reconnaissance Sweep",
+            "purge-the-foe": "Triangulation",
+            "priority-assets": "Surveil the Foe",
+            "reconnaissance": "Gather Intel",
+            "disruption": "Search and Scour",
+        },
+        "disruption": {
+            "take-and-hold": "Death Trap",
+            "purge-the-foe": "Delaying Action",
+            "priority-assets": "Locate and Deny",
+            "reconnaissance": "Outmaneuver",
+            "disruption": "Smoke and Mirrors",
+        },
+    }
     rows: list[SourcePrimaryMissionMatrixCellRow] = []
     for player_disposition in force_disposition_rows():
         for opponent_disposition in force_disposition_rows():
-            primary_mission_id = (
-                "primary-"
-                f"{player_disposition.force_disposition_id}-vs-"
-                f"{opponent_disposition.force_disposition_id}"
-            )
+            primary_mission_name = primary_mission_names[player_disposition.force_disposition_id][
+                opponent_disposition.force_disposition_id
+            ]
+            primary_mission_id = f"primary-{_mission_name_slug(primary_mission_name)}"
             rows.append(
                 SourcePrimaryMissionMatrixCellRow(
                     player_force_disposition_id=player_disposition.force_disposition_id,
                     opponent_force_disposition_id=opponent_disposition.force_disposition_id,
                     primary_mission_id=primary_mission_id,
+                    primary_mission_name=primary_mission_name,
                     battlefield_layout_ids=(
                         f"{primary_mission_id}-layout-1",
                         f"{primary_mission_id}-layout-2",
@@ -718,6 +757,10 @@ def _secondary(
         tournament_fixed_allowed=tournament_fixed_allowed,
         scoring_rules=tuple(rules),
     )
+
+
+def _mission_name_slug(name: str) -> str:
+    return name.lower().replace("'", "").replace(" ", "-")
 
 
 def _rule(

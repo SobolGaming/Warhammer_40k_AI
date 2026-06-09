@@ -113,6 +113,56 @@ def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None
 
 def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
     mission_pack = chapter_approved_2025_26_mission_pack()
+    expected_matrix = {
+        ("purge-the-foe", "take-and-hold"): ("Unstoppable Force", "primary-unstoppable-force"),
+        ("purge-the-foe", "purge-the-foe"): ("Meatgrinder", "primary-meatgrinder"),
+        ("purge-the-foe", "priority-assets"): ("Punishment", "primary-punishment"),
+        ("purge-the-foe", "reconnaissance"): ("Consecrate", "primary-consecrate"),
+        ("purge-the-foe", "disruption"): ("Destroyer's Wrath", "primary-destroyers-wrath"),
+        ("take-and-hold", "take-and-hold"): (
+            "Battlefield Dominance",
+            "primary-battlefield-dominance",
+        ),
+        ("take-and-hold", "purge-the-foe"): ("Immovable Object", "primary-immovable-object"),
+        ("take-and-hold", "priority-assets"): (
+            "Determined Acquisition",
+            "primary-determined-acquisition",
+        ),
+        ("take-and-hold", "reconnaissance"): ("Purge and Secure", "primary-purge-and-secure"),
+        ("take-and-hold", "disruption"): (
+            "Inescapable Dominion",
+            "primary-inescapable-dominion",
+        ),
+        ("priority-assets", "take-and-hold"): ("Secure Asset", "primary-secure-asset"),
+        ("priority-assets", "purge-the-foe"): ("Vital Link", "primary-vital-link"),
+        ("priority-assets", "priority-assets"): ("Extract Relic", "primary-extract-relic"),
+        ("priority-assets", "reconnaissance"): (
+            "Vanguard Operation",
+            "primary-vanguard-operation",
+        ),
+        ("priority-assets", "disruption"): ("Sabotage", "primary-sabotage"),
+        ("reconnaissance", "take-and-hold"): (
+            "Reconnaissance Sweep",
+            "primary-reconnaissance-sweep",
+        ),
+        ("reconnaissance", "purge-the-foe"): ("Triangulation", "primary-triangulation"),
+        ("reconnaissance", "priority-assets"): ("Surveil the Foe", "primary-surveil-the-foe"),
+        ("reconnaissance", "reconnaissance"): ("Gather Intel", "primary-gather-intel"),
+        ("reconnaissance", "disruption"): ("Search and Scour", "primary-search-and-scour"),
+        ("disruption", "take-and-hold"): ("Death Trap", "primary-death-trap"),
+        ("disruption", "purge-the-foe"): ("Delaying Action", "primary-delaying-action"),
+        ("disruption", "priority-assets"): ("Locate and Deny", "primary-locate-and-deny"),
+        ("disruption", "reconnaissance"): ("Outmaneuver", "primary-outmaneuver"),
+        ("disruption", "disruption"): ("Smoke and Mirrors", "primary-smoke-and-mirrors"),
+    }
+    source_matrix = {
+        (row.player_force_disposition_id, row.opponent_force_disposition_id): row
+        for row in source_data.primary_mission_matrix_rows()
+    }
+    imported_matrix = {
+        (cell.player_force_disposition_id, cell.opponent_force_disposition_id): cell
+        for cell in mission_pack.primary_mission_matrix_cells
+    }
 
     assert [
         disposition.force_disposition_id for disposition in mission_pack.force_dispositions
@@ -124,6 +174,15 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
         "take-and-hold",
     ]
     assert len(mission_pack.primary_mission_matrix_cells) == 25
+    assert len(source_matrix) == 25
+    assert len(imported_matrix) == 25
+    assert {cell_key: row.primary_mission_name for cell_key, row in source_matrix.items()} == {
+        cell_key: expected_name
+        for cell_key, (expected_name, _expected_id) in expected_matrix.items()
+    }
+    assert {cell_key: cell.primary_mission_id for cell_key, cell in imported_matrix.items()} == {
+        cell_key: expected_id for cell_key, (_expected_name, expected_id) in expected_matrix.items()
+    }
 
     purge_into_hold = mission_pack.primary_mission_matrix_cell(
         player_force_disposition_id="purge-the-foe",
@@ -138,10 +197,10 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
         opponent_force_disposition_id="reconnaissance",
     )
 
-    assert purge_into_hold.primary_mission_id == "primary-purge-the-foe-vs-take-and-hold"
-    assert hold_into_purge.primary_mission_id == "primary-take-and-hold-vs-purge-the-foe"
+    assert purge_into_hold.primary_mission_id == "primary-unstoppable-force"
+    assert hold_into_purge.primary_mission_id == "primary-immovable-object"
     assert purge_into_hold.primary_mission_id != hold_into_purge.primary_mission_id
-    assert mirror.primary_mission_id == "primary-reconnaissance-vs-reconnaissance"
+    assert mirror.primary_mission_id == "primary-gather-intel"
     assert purge_into_hold.source_status is MissionSourceStatus.AWAITING_SOURCE
     assert len(purge_into_hold.battlefield_layout_ids) == 3
     assert all(

@@ -59,8 +59,9 @@ duplicate weapon ability selection is adapter-visible and replay-safe, and
 unimplemented Core ability families are fail-closed as explicit unsupported
 descriptors with future owning phase IDs. **Phase 14J's mission/catalog
 replacement slice is implemented** for source-tracked 11th Edition Force
-Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per
-matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**:
+Dispositions, the named 25-cell Primary Mission matrix, three layout identifiers
+per matrix cell, and finite Tactical Secondary score/retain decisions.
+**Phase 14K is complete**:
 cutover hardening now rejects retired save/allocation choice
 surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve
 arrival enemy-distance policy, separate Reinforcements-step placement records,
@@ -2567,18 +2568,20 @@ Required tests:
 
 Status: Complete for the current source-backed slice. The engine now records the
 five 11th Edition Force Dispositions, the 25-cell player-vs-opponent Primary
-Mission matrix, three layout identifiers per cell, and engine-achievement-gated
-Tactical Secondary score/retain as an adapter-visible finite decision. Exact
-Primary Mission scoring rules, layout geometry, and confirmed 18-card Secondary
-Mission identities remain pending source work rather than guessed content.
+Mission matrix with source-tracked mission names, three layout identifiers per
+cell, and engine-achievement-gated Tactical Secondary score/retain as an
+adapter-visible finite decision. Exact Primary Mission scoring rules, layout
+geometry, and confirmed 18-card Secondary Mission identities remain pending
+source work rather than guessed content.
 
 Invariants:
 
 - mission packs, deployment maps, terrain layouts, actions, scoring, datasheets, keywords, detachments, enhancements, and faction rules are imported as 11th Edition source packages;
 - 11th Edition Primary Mission source data records the five Force Dispositions
   (`Purge The Foe`, `Take And Hold`, `Disruption`, `Reconnaissance`, and
-  `Priority Assets`), the deterministic 5x5 player-vs-opponent matrix, and
-  three source-tracked battlefield layout identifiers per matrix cell;
+  `Priority Assets`), the deterministic 5x5 player-vs-opponent matrix, the
+  source-tracked Primary Mission name for each matrix cell, and three
+  source-tracked battlefield layout identifiers per matrix cell;
 - matrix cells whose Primary Mission rules or layout geometry are not yet known
   remain `awaiting_source`, never substituted with retired-edition missions or
   invented scoring text;
@@ -2627,8 +2630,8 @@ Required tests:
 - retired source packages cannot be selected for a new game;
 - representative mission/action/scoring rows load from 11th Edition source identity;
 - Force Disposition rows and all 25 Primary Mission matrix cells load,
-  round-trip, preserve `awaiting_source` status, and expose exactly three layout
-  identifiers per cell;
+  round-trip, preserve source names, preserve `awaiting_source` status, and
+  expose exactly three layout identifiers per cell;
 - Strike Force mustering policy enforces point, Detachment Point, Enhancement
   Limit, Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
   faction-keyword rules, and rejects unsupported battle-size inputs;
