@@ -23,7 +23,71 @@ CORE V2 is now 11th Edition-only. Previous-edition source package names, descrip
 
 ## Roadmap status
 
-Everything through **Phase 14G** is treated as implemented at the time this file was updated. **Phase 14E is complete**: the allocation-group foundation and grouped-host weapon-ability revalidation are implemented for supported fixed-damage attack pools, including save-before-allocation batching, defender ordered allocation decisions, current allocation group transitions, low-to-high failed-save damage resolution, normal-damage-before-routed-mortal ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits, Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, no illegal Devastating Wounds spillover, melee Cleave dice gathering, and Lance charge-gated Wound-roll modifiers. **Phase 14F's shooting-type cutover is implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting, including finite shooting-type selection, supported grouped attack resolution, Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock. **Phase 14G's Charge/Fight source contract is implemented** as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14H remains deferred** because runtime attached-unit formation still needs source-backed implementation work; attached-unit mixed-Toughness attack handling now uses source-backed Bodyguard/Leader/Support role evidence, Healing Wounds iterates wound healing before REVIVED model return with opposing-player model selection for ambiguous attached-unit cases, Movement-phase Combat Disembark fallback now requires engine-owned Tactical-invalid evidence, Combat/Emergency hazard rolls share the official 1-2 Hazard Roll threshold, direct transport hazard damage routes through the shared mortal-wound and Feel No Pain service, destroyed-Transport Emergency Disembark is orchestrated from actual destruction timing before Transport removal and Deadly Demise, setup-time Strategic Reserve declarations and battle-formation Transport embarkation are source-backed, repositioned units preserve Advance/Fall Back/Disembark history and persisting effects, exact At Half-strength is replay payload state, and runtime added units record Starting Strength when added to the army. **Phase 14I is complete** for the current Core Stratagem and core-ability source cutover: all 11th Edition Core Stratagem source rows have supported handlers, implemented duplicate weapon ability selection is adapter-visible and replay-safe, and unimplemented Core ability families are fail-closed as explicit unsupported descriptors with future owning phase IDs. **Phase 14J's mission/catalog replacement slice is implemented** for source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**: cutover hardening now rejects retired save/allocation choice surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve-arrival enemy-distance policy, separate Reinforcements-step placement records, retired Core Stratagem source names, and stale grouped Inflict Damage model selections before queue pop. **Phase 14L is complete for ranged attacks**: Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by deterministic identical-attack signature, the existing Resolve Attack Dice subgraph, and the Other Attacks loop. **Phase 15A is complete** for charge eligibility, charging-unit selection, deterministic Charge rolls, and reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move proposals, PathWitness validation, shared pathing/terrain/coherency checks, endpoint constraints, displacements, and Fights First effects. **Phase 15C is complete** for the Fight phase envelope, first-class `FightOrderState`, Fights First/Remaining Combats ordering loop, finite activation/pass decisions, legal Normal/Overrun fight-type filtering, and reaction-queue fight interrupts with source-scoped consumption. **Phase 15D is complete** for Pile In and Consolidate proposal routing, PathWitness-based fight movement validation, Overrun's additional Pile In hook, melee declaration requests, one-primary-melee-weapon selection with optional `[EXTRA ATTACKS]`, model-engaged target validation, split melee attack counts, and reuse of the shared attack sequence. **Phase 15E is complete** for source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge through the shared Stratagem/Charge/Fight decision path. **Phase 15F is complete** for Charge/Fight completion gates, full both-player phase completion coverage, Fight damage/removal draining before completion, and deterministic replay-safe fight-order hardening. Exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work.
+Everything through **Phase 14H** is treated as implemented at the time this file
+was updated. **Phase 14E is complete**: the allocation-group foundation and
+grouped-host weapon-ability revalidation are implemented for supported
+fixed-damage attack pools, including save-before-allocation batching, defender
+ordered allocation decisions, current allocation group transitions,
+low-to-high failed-save damage resolution, normal-damage-before-routed-mortal
+ordering, Precision group priority, Devastating Wounds cap/order, Lethal Hits,
+Sustained Hits, Anti, Twin-linked, Melta, Torrent, critical timing, no illegal
+Devastating Wounds spillover, melee Cleave dice gathering, and Lance
+charge-gated Wound-roll modifiers. **Phase 14F's shooting-type cutover is
+implemented** for Normal, Assault, Close-quarters, Indirect, and Snap shooting,
+including finite shooting-type selection, supported grouped attack resolution,
+Indirect/Snap Hit-roll reroll bans, and the Shooting-phase action-start lock.
+**Phase 14G's Charge/Fight source contract is implemented** as typed ruleset
+descriptor payloads and deferred unsupported Core Stratagem hooks. **Phase 14H
+is complete for the current transport/reserve plus attached-unit attack/healing
+projection slice**: runtime Attached Unit formation now uses structured army-list Leader/Support declarations
+against catalog attachment eligibility,
+emits first-class attached rules-unit formation records, derives attached-unit
+Starting Strength until split, and feeds source-backed Bodyguard/Leader/Support
+evidence used by Shooting acting-unit selection, mixed-Toughness attacks,
+healing, revival, persisting effects, and stratagem target canonicalization.
+Group-aware Movement/Fight physical acting-unit selection, movement, coherency,
+event, and replay payload cutover remains owned by Phase 16D. Phase 14H also
+covers Combat/Emergency Hazard Roll routing through shared mortal wounds and
+Feel No Pain, destroyed-Transport Emergency Disembark orchestration from actual
+destruction timing before Transport removal and Deadly Demise, setup-time
+Strategic Reserve declarations and battle-formation Transport embarkation,
+repositioned-unit move-history/effect persistence, exact At Half-strength
+payload state, and runtime added-unit Starting Strength records. **Phase 14I is
+complete** for the current Core Stratagem and core-ability source cutover: all
+11th Edition Core Stratagem source rows have supported handlers, implemented
+duplicate weapon ability selection is adapter-visible and replay-safe, and
+unimplemented Core ability families are fail-closed as explicit unsupported
+descriptors with future owning phase IDs. **Phase 14J's mission/catalog
+replacement slice is implemented** for source-tracked 11th Edition Force
+Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per
+matrix cell, and finite Tactical Secondary score/retain decisions. **Phase 14K is complete**:
+cutover hardening now rejects retired save/allocation choice
+surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve
+arrival enemy-distance policy, separate Reinforcements-step placement records,
+retired Core Stratagem source names, and stale grouped Inflict Damage model
+selections before queue pop. **Phase 14L is complete for ranged attacks**:
+Shooting attack resolution now follows Select Enemy Unit, Gather Attack Dice by
+deterministic identical-attack signature, the existing Resolve Attack Dice
+subgraph, and the Other Attacks loop. **Phase 15A is complete** for charge
+eligibility, charging-unit selection, deterministic Charge rolls, and
+reachable-target snapshots. **Phase 15B is complete** for post-roll Charge Move
+proposals, PathWitness validation, shared pathing/terrain/coherency checks,
+endpoint constraints, displacements, and Fights First effects. **Phase 15C is
+complete** for the Fight phase envelope, first-class `FightOrderState`, Fights
+First/Remaining Combats ordering loop, finite activation/pass decisions, legal
+Normal/Overrun fight-type filtering, and reaction-queue fight interrupts with
+source-scoped consumption. **Phase 15D is complete** for Pile In and Consolidate
+proposal routing, PathWitness-based fight movement validation, Overrun's
+additional Pile In hook, melee declaration requests, one-primary-melee-weapon
+selection with optional `[EXTRA ATTACKS]`, model-engaged target validation, split
+melee attack counts, and reuse of the shared attack sequence. **Phase 15E is
+complete** for source-backed Heroic Intervention, Counteroffensive, Crushing
+Impact, and Epic Challenge through the shared Stratagem/Charge/Fight decision
+path. **Phase 15F is complete** for Charge/Fight completion gates, full
+both-player phase completion coverage, Fight damage/removal draining before
+completion, and deterministic replay-safe fight-order hardening. Exact 11th
+Edition Secondary card identities beyond current source rows, Primary Mission
+scoring text, and layout geometry remain pending source work.
 
 Completed / implemented foundation:
 
@@ -92,6 +156,7 @@ Completed / implemented foundation:
 | 14E | Complete | Attack sequence and allocation cutover, including grouped-host weapon abilities plus melee Cleave/Lance execution |
 | 14F | Complete | Shooting-type cutover with finite shooting-type selection and supported grouped attack resolution |
 | 14G | Complete | Charge/Fight source contract for Phase 15 implementation |
+| 14H | Complete | Advanced transport, attached-unit attack/healing projection, reserve/repositioning, and aircraft cutover |
 | 14I | Complete | Core Stratagem and core ability source-contract closeout with explicit unsupported descriptors |
 | 14J | Complete | Mission/catalog replacement slice with Force Dispositions, Primary Mission matrix source tracking, and Tactical Secondary score/retain decisions |
 | 14K | Complete | Cutover hardening/static audits, damage model allocation choice hardening, aircraft minimum-move retirement, and reserve-arrival policy cutover |
@@ -107,7 +172,6 @@ Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 14H | Deferred | Remaining advanced transport, attached-unit formation, reserve/repositioning, and aircraft cutover |
 | 16A-16E | Planned | Setup, deployment, reserves declarations, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
@@ -2316,8 +2380,19 @@ Required Phase 15 tests:
 
 ## Phase 14H: advanced rules cutover
 
-Status: Deferred. Phase 14H remains deferred after this closeout because the
-remaining work is gameplay implementation, not documentation or audit cleanup.
+Status: Complete. Phase 14H is complete for the current source-backed advanced
+rules cutover. Runtime army-list Attached Unit formation is implemented from
+structured army-list Leader/Support declarations and catalog attachment eligibility; it
+emits first-class attached rules-unit formation records, derives attached-unit
+Starting Strength until split, restores component Starting Strength records when
+the formation splits, and feeds the existing Bodyguard/Leader/Support role
+evidence used by Shooting acting-unit selection, attacks, healing, revival,
+persisting effects, and stratagem target canonicalization. Group-aware
+Movement/Fight physical acting-unit selection, movement, coherency, event, and
+replay payload cutover remains Phase 16D work because those hosts still need
+explicit group-placement APIs rather than a single component `UnitPlacement`.
+Broader real-faction Leader/Support eligibility data ingestion remains future
+source/catalog work, not a Phase 14H runtime blocker.
 Completed source-backed slices from Phases 10P-10S, 11C, 13E, 14D, 14K, 15B,
 and 15D cover Strategic Reserves arrival, Deep Strike placement, Tactical/Rapid
 and destroyed-Transport Disembark payloads, Emergency Disembark resolver
@@ -2326,8 +2401,8 @@ destroyed-Transport Emergency Disembark orchestration from actual destruction
 timing before Transport removal and Deadly Demise resolution, surge movement
 restrictions, Aircraft/Hover movement and reserve transitions, reserve-arrival
 policy hardening, Aircraft charge/fight exclusions, exact At Half-strength
-payload state, runtime added-unit Starting Strength records, setup-time
-Strategic Reserve declarations, battle-formation Transport embarkation,
+payload state, runtime added-unit Starting Strength records, setup-time Strategic Reserve declarations,
+battle-formation Transport embarkation,
 repositioned-unit Advance/Fall Back/Disembark history preservation, and attack
 destruction timing. Attached-unit mixed-Toughness attack handling now uses the
 source-backed Bodyguard/Leader/Support rule: attacks use the highest alive
@@ -2341,12 +2416,10 @@ Healing Wounds primitive now iterates each healing amount in order, heals
 wounded models before REVIVED returns, uses opposing-player finite model
 selection for ambiguous attached-unit wounded/revival choices, and validates
 REVIVED placement against Starting Strength, phase-start coherency, removed
-model identity, and engagement restrictions. The open blocker is still runtime
-army-list Attached Unit formation.
+model identity, and engagement restrictions.
 
 Phase 14D follow-up findings for movement-mode exposure, Fall Back mode
-payloads, and runtime Mission Action interruption are complete in Phase 14D; the
-remaining attached-unit formation items below stay Phase 14H scope.
+payloads, and runtime Mission Action interruption are complete in Phase 14D.
 
 Invariants:
 
@@ -2385,6 +2458,10 @@ Required tests:
 - attached-unit mixed-Toughness attack tests prove Bodyguard Toughness is used
   while any Bodyguard model remains, and Leader/Support Toughness is used once
   no Bodyguard model remains;
+- attached-unit Shooting selection tests prove a mustered formation is offered
+  once under the attached rules-unit ID, cannot shoot again through Leader or
+  Support component IDs, and range checks ignore fully destroyed unplaced
+  components;
 - attached-unit formation is instantiated at runtime from valid army-list
   declarations and emits replay-safe component role metadata;
 - attached-unit ability persistence ends when the relevant source model/unit is destroyed and resumes if revived;

@@ -139,7 +139,54 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
-Current roadmap implementation status: phases 1-14G are complete. Phase 14E is complete: its allocation-group host includes Benefit of Cover and Plunging Fire BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter choice, automatic allocation groups, defender ordered allocation decisions only for legal same-tier group choices, grouped fixed-damage save-before-damage resolution, current group transitions, low-to-high failed-save damage ordering, normal-damage-before-routed-mortal ordering, grouped-host Precision/Lethal Hits/Sustained Hits/Devastating Wounds revalidation, derived terrain objectives that require terrain-area containment rather than marker-radius contribution, melee Cleave dice gathering, and Lance charge-gated Wound-roll modifiers through the Phase 15 Charge/Fight host. Phase 14F completes the shooting-type cutover with finite shooting-type selection, supported grouped attack resolution, Normal/Assault/Close-quarters/Indirect/Snap routing, Indirect and Snap Hit-roll reroll bans, and the Shooting-phase Mission Action start lock. Phase 14G completes the Charge/Fight source contract as typed ruleset descriptor payloads and deferred unsupported Core Stratagem hooks. Phase 14H remains deferred for runtime attached-unit formation; attached-unit mixed-Toughness attack handling now uses source-backed Bodyguard/Leader/Support role evidence, Healing Wounds iterates wound healing before REVIVED model return with opposing-player model selection for ambiguous attached-unit cases, Movement-phase Combat Disembark fallback now requires engine-owned Tactical-invalid evidence, Combat/Emergency hazard rolls share the official 1-2 Hazard Roll threshold, direct transport hazard damage routes through the shared mortal-wound and Feel No Pain service, destroyed-Transport Emergency Disembark is orchestrated from actual destruction timing before Transport removal and Deadly Demise, setup-time Strategic Reserve declarations and battle-formation Transport embarkation are source-backed, repositioned units preserve Advance/Fall Back/Disembark history and persisting effects, exact At Half-strength is replay payload state, and runtime added units record Starting Strength when added to the army. Phase 14I is complete for the current Core Stratagem and core ability source cutover: all 11th Edition Core Stratagem source rows have supported handlers, implemented duplicate weapon ability selection is adapter-visible and replay-safe, and unimplemented Core ability families are fail-closed as explicit unsupported descriptors. Phase 14J completes the current mission/catalog replacement slice with source-tracked 11th Edition Force Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per matrix cell, and engine-achievement-gated finite Tactical Secondary score/retain decisions; exact 11th Edition Secondary card identities beyond current source rows, Primary Mission scoring text, and layout geometry remain pending source work. Phase 14K is complete: attack/save cutover hardening rejects retired save/allocation decision surfaces, grouped Inflict Damage uses defender `select_damage_allocation_model` decisions with pre-pop stale-legality rejection, old Aircraft minimum-move/pivot runtime policy is removed, reserve arrivals use Move Units records and more-than-8" enemy spacing, and source/audit coverage rejects retired Core Stratagem names.
+Current roadmap implementation status: phases 1-14H are complete. Phase 14E is
+complete: its allocation-group host includes Benefit of Cover and Plunging Fire
+BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
+choice, automatic allocation groups, defender ordered allocation decisions only
+for legal same-tier group choices, grouped fixed-damage save-before-damage
+resolution, current group transitions, low-to-high failed-save damage ordering,
+normal-damage-before-routed-mortal ordering, grouped-host Precision/Lethal
+Hits/Sustained Hits/Devastating Wounds revalidation, derived terrain objectives
+that require terrain-area containment rather than marker-radius contribution,
+melee Cleave dice gathering, and Lance charge-gated Wound-roll modifiers through
+the Phase 15 Charge/Fight host. Phase 14F completes the shooting-type cutover
+with finite shooting-type selection, supported grouped attack resolution,
+Normal/Assault/Close-quarters/Indirect/Snap routing, Indirect and Snap Hit-roll
+reroll bans, and the Shooting-phase Mission Action start lock. Phase 14G
+completes the Charge/Fight source contract as typed ruleset descriptor payloads
+and deferred unsupported Core Stratagem hooks. Phase 14H is complete for the
+current transport/reserve plus attached-unit attack/healing projection slice:
+runtime Attached Unit formation uses structured army-list Leader/Support declarations
+against catalog attachment eligibility, emits first-class attached rules-unit formation records,
+derives attached-unit Starting Strength until
+split, and feeds source-backed Bodyguard/Leader/Support evidence used by
+Shooting acting-unit selection, mixed-Toughness attacks, healing, revival, persisting effects,
+and stratagem target canonicalization. Group-aware
+Movement/Fight physical acting-unit selection, movement, coherency, event, and
+replay payload cutover remains owned by Phase 16D. Phase 14H also covers
+Movement-phase Combat Disembark fallback with engine-owned Tactical-invalid
+evidence, Combat/Emergency hazard rolls through the official 1-2 Hazard Roll
+threshold and shared mortal-wound/Feel No Pain service, destroyed-Transport
+Emergency Disembark from actual destruction timing before Transport removal and
+Deadly Demise, setup-time Strategic Reserve declarations and battle-formation
+Transport embarkation, repositioned-unit Advance/Fall Back/Disembark history and
+persisting effects, exact At Half-strength replay payload state, and runtime
+added-unit Starting Strength records. Phase 14I is complete for the current Core
+Stratagem and core ability source cutover: all 11th Edition Core Stratagem source
+rows have supported handlers, implemented duplicate weapon ability selection is
+adapter-visible and replay-safe, and unimplemented Core ability families are
+fail-closed as explicit unsupported descriptors. Phase 14J completes the current
+mission/catalog replacement slice with source-tracked 11th Edition Force
+Dispositions, the 25-cell Primary Mission matrix, three layout identifiers per
+matrix cell, and engine-achievement-gated finite Tactical Secondary score/retain
+decisions; exact 11th Edition Secondary card identities beyond current source
+rows, Primary Mission scoring text, and layout geometry remain pending source
+work. Phase 14K is complete: attack/save cutover hardening rejects retired
+save/allocation decision surfaces, grouped Inflict Damage uses defender
+`select_damage_allocation_model` decisions with pre-pop stale-legality rejection,
+old Aircraft minimum-move/pivot runtime policy is removed, reserve arrivals use
+Move Units records and more-than-8" enemy spacing, and source/audit coverage
+rejects retired Core Stratagem names.
 
 Phase 14L and Phase 15A-F are complete for ranged attack grouping, charge declaration/roll/movement, Fight phase activation/pass/interrupt ordering, Pile In/Consolidate proposal routing, melee declarations that reuse the shared Making Attacks sequence, source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge Stratagem handling, and Charge/Fight completion gates that drain pending phase work before completion.
 

@@ -8,12 +8,18 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+    AttachedUnitFormation,
+    muster_army,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldTransitionBatch,
     ModelPlacement,
     ModelPlacementRecord,
+    PlacementError,
 )
 from warhammer40k_core.engine.damage_allocation import model_by_id
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -42,6 +48,7 @@ from warhammer40k_core.engine.healing import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
@@ -200,6 +207,178 @@ def test_healing_selection_drift_rejects_before_queue_pop() -> None:
     assert decisions.queue.pending_requests == (request,)
     assert decisions.records == ()
     assert model_by_id(state=state, model_instance_id=leader_id).wounds_remaining == 1
+
+
+def test_mustered_attached_unit_heals_then_revives_destroyed_bodyguard_component() -> None:
+    state = _battle_state(config=_config(attached_alpha=True))
+    decisions = DecisionController()
+    formation = state.army_definitions[0].attached_units[0]
+    attached_id = formation.attached_unit_instance_id
+    bodyguard = _unit_by_id(state, formation.bodyguard_unit_instance_id)
+    leader = _unit_by_id(state, formation.leader_unit_instance_ids[0])
+    support = _unit_by_id(state, formation.support_unit_instance_ids[0])
+    leader_model = leader.own_models[0]
+    support_model = support.own_models[0]
+    _set_model_wounds(
+        state,
+        model_instance_id=leader_model.model_instance_id,
+        wounds_remaining=leader_model.starting_wounds - 1,
+    )
+    for model in bodyguard.own_models:
+        _remove_model(state, model_instance_id=model.model_instance_id)
+    assert state.battlefield_state is not None
+    with pytest.raises(GameLifecycleError, match="StartingStrengthRecord"):
+        state.starting_strength_record_for_unit(bodyguard.unit_instance_id)
+    state.battlefield_state.unit_placement_by_id(leader.unit_instance_id)
+    state.battlefield_state.unit_placement_by_id(support.unit_instance_id)
+    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
+        state.battlefield_state.unit_placement_by_id(bodyguard.unit_instance_id)
+    leader_placement = state.battlefield_state.model_placement_by_id(leader_model.model_instance_id)
+    revived_model = bodyguard.own_models[0]
+    revival_placements = tuple(
+        ModelPlacement(
+            army_id="army-alpha",
+            player_id="player-a",
+            unit_instance_id=bodyguard.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            pose=Pose.at(
+                leader_placement.pose.position.x + 0.5 + (index * 0.1),
+                leader_placement.pose.position.y,
+                leader_placement.pose.position.z,
+            ),
+        )
+        for index, model in enumerate(bodyguard.own_models)
+    )
+    effect = HealingEffect(
+        effect_id="phase14h-real-attached-heal-revive",
+        target_unit_instance_id=attached_id,
+        amount=2,
+        opposing_player_id="player-b",
+        phase_start_model_ids=(leader_model.model_instance_id, support_model.model_instance_id),
+        revival_placements=revival_placements,
+    )
+
+    blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+
+    assert request is not None
+    assert blocked.resolved_steps[0].step_kind is HealingStepKind.HEAL_WOUND
+    assert blocked.resolved_steps[0].model_instance_id == leader_model.model_instance_id
+    assert _option_model_ids(request) == tuple(
+        sorted(model.model_instance_id for model in bodyguard.own_models)
+    )
+
+    resolved, follow_up = apply_healing_model_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=blocked,
+        result=DecisionResult.for_request(
+            result_id="phase14h-real-attached-heal-revive-result",
+            request=request,
+            selected_option_id=_option_for_model(
+                request,
+                revived_model.model_instance_id,
+            ).option_id,
+        ),
+    )
+
+    assert follow_up is None
+    assert resolved.is_complete()
+    assert [step.step_kind for step in resolved.resolved_steps] == [
+        HealingStepKind.HEAL_WOUND,
+        HealingStepKind.REVIVE_MODEL,
+    ]
+    assert (
+        model_by_id(state=state, model_instance_id=revived_model.model_instance_id).wounds_remaining
+        == 1
+    )
+    bodyguard_placement = state.battlefield_state.unit_placement_by_id(bodyguard.unit_instance_id)
+    assert bodyguard_placement.model_placements[0].model_instance_id == (
+        revived_model.model_instance_id
+    )
+    assert bodyguard_placement.model_placements[0].unit_instance_id == bodyguard.unit_instance_id
+    assert state.starting_strength_record_for_unit(attached_id).starting_model_count == 7
+    with pytest.raises(GameLifecycleError, match="attached-unit identity"):
+        resolve_healing_until_blocked(
+            state=state,
+            decisions=DecisionController(),
+            ruleset_descriptor=_ruleset(),
+            effect=replace(effect, target_unit_instance_id=bodyguard.unit_instance_id),
+        )
+
+
+def test_mustered_attached_unit_healing_stale_candidates_reject_before_queue_pop() -> None:
+    state = _battle_state(config=_config(attached_alpha=True))
+    decisions = DecisionController()
+    formation = state.army_definitions[0].attached_units[0]
+    leader = _unit_by_id(state, formation.leader_unit_instance_ids[0])
+    support = _unit_by_id(state, formation.support_unit_instance_ids[0])
+    leader_model = leader.own_models[0]
+    support_model = support.own_models[0]
+    _set_model_wounds(
+        state,
+        model_instance_id=leader_model.model_instance_id,
+        wounds_remaining=leader_model.starting_wounds - 1,
+    )
+    _set_model_wounds(
+        state,
+        model_instance_id=support_model.model_instance_id,
+        wounds_remaining=support_model.starting_wounds - 1,
+    )
+    effect = HealingEffect(
+        effect_id="phase14h-real-attached-heal-stale",
+        target_unit_instance_id=formation.attached_unit_instance_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_attached_rules_unit_placed_model_ids(state, formation),
+    )
+    blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    assert _option_model_ids(request) == (
+        leader_model.model_instance_id,
+        support_model.model_instance_id,
+    )
+    _set_model_wounds(
+        state,
+        model_instance_id=leader_model.model_instance_id,
+        wounds_remaining=leader_model.starting_wounds,
+    )
+
+    with pytest.raises(GameLifecycleError, match="stale"):
+        apply_healing_model_decision(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=_ruleset(),
+            effect=blocked,
+            result=DecisionResult.for_request(
+                result_id="phase14h-real-attached-heal-stale-result",
+                request=request,
+                selected_option_id=_option_for_model(
+                    request,
+                    support_model.model_instance_id,
+                ).option_id,
+            ),
+        )
+
+    assert decisions.queue.pending_requests == (request,)
+    assert decisions.records == ()
+    assert (
+        model_by_id(
+            state=state,
+            model_instance_id=support_model.model_instance_id,
+        ).wounds_remaining
+        == support_model.starting_wounds - 1
+    )
 
 
 def test_lifecycle_submit_healing_model_decision_routes_through_submit_decision() -> None:
@@ -1304,6 +1483,20 @@ def _placed_model_ids(state: GameState, unit_id: str) -> tuple[str, ...]:
     )
 
 
+def _attached_rules_unit_placed_model_ids(
+    state: GameState,
+    formation: AttachedUnitFormation,
+) -> tuple[str, ...]:
+    assert state.battlefield_state is not None
+    return tuple(
+        sorted(
+            placement.model_instance_id
+            for unit_id in formation.component_unit_instance_ids
+            for placement in state.battlefield_state.unit_placement_by_id(unit_id).model_placements
+        )
+    )
+
+
 def _option_model_ids(request: DecisionRequest) -> tuple[str, ...]:
     return tuple(
         sorted(
@@ -1335,8 +1528,8 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
     raise AssertionError(f"missing unit {unit_instance_id}")
 
 
-def _battle_state() -> GameState:
-    config = _config()
+def _battle_state(*, config: GameConfig | None = None) -> GameState:
+    config = _config() if config is None else config
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
         state.record_army_definition(army)
@@ -1378,19 +1571,24 @@ def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondar
     )
 
 
-def _config() -> GameConfig:
+def _config(*, attached_alpha: bool = False) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    alpha_request = (
+        _attached_alpha_army_muster_request(catalog=catalog)
+        if attached_alpha
+        else _army_muster_request(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-alpha",
+            unit_selection_id="intercessor-unit-1",
+        )
+    )
     return GameConfig(
         game_id="phase14h-healing-game",
         ruleset_descriptor=_ruleset(),
         army_catalog=catalog,
         army_muster_requests=(
-            _army_muster_request(
-                catalog=catalog,
-                player_id="player-a",
-                army_id="army-alpha",
-                unit_selection_id="intercessor-unit-1",
-            ),
+            alpha_request,
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
@@ -1407,6 +1605,62 @@ def _config() -> GameConfig:
             terrain_layout_id="layout-1",
             attacker_player_id="player-a",
             defender_player_id="player-b",
+        ),
+    )
+
+
+def _attached_alpha_army_muster_request(*, catalog: ArmyCatalog) -> ArmyMusterRequest:
+    return ArmyMusterRequest(
+        army_id="army-alpha",
+        player_id="player-a",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_id="core-combined-arms",
+        ),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id="bodyguard-unit",
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="support-unit",
+                datasheet_id="core-character-support",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-support",
+                        model_count=1,
+                    ),
+                ),
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+            AttachmentDeclaration(
+                source_unit_selection_id="support-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
         ),
     )
 
