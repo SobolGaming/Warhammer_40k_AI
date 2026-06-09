@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_abilities import (
@@ -23,7 +24,18 @@ DATASHEET_PATH = ROOT / "src" / "warhammer40k_core" / "core" / "datasheet.py"
 LIST_VALIDATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "list_validation.py"
 ARMY_MUSTERING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "army_mustering.py"
 STRATAGEMS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
+SHOOTING_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting.py"
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
+
+
+def _module_function_source(module_source: str, function_name: str) -> str:
+    module = ast.parse(module_source)
+    for node in module.body:
+        if isinstance(node, ast.FunctionDef) and node.name == function_name:
+            source = ast.get_source_segment(module_source, node)
+            assert source is not None
+            return source
+    raise AssertionError(f"Function {function_name} not found.")
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -134,6 +146,39 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "def _starting_strength_record_for_attached_unit(" in game_state_source
     assert "def _remove_attached_unit_formation(" in game_state_source
     assert "attached_unit.component_unit_instance_ids" in stratagems_source
+
+
+def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> None:
+    shooting_source = SHOOTING_PHASE_PATH.read_text(encoding="utf-8")
+    active_selector_source = _module_function_source(
+        shooting_source,
+        "_active_player_placed_unit_ids",
+    )
+    legal_selector_source = _module_function_source(shooting_source, "_legal_shooting_unit_ids")
+    options_source = _module_function_source(shooting_source, "_shooting_unit_options")
+    available_weapons_source = _module_function_source(
+        shooting_source,
+        "_available_weapons_for_rules_unit",
+    )
+    range_source = _module_function_source(shooting_source, "_unit_target_within_max_range")
+
+    assert "rules_unit_id_for_unit_id" in active_selector_source
+    assert "unit_ids.append(placement.unit_instance_id)" not in active_selector_source
+    assert "seen: set[str]" in active_selector_source
+
+    assert "rules_unit_view_by_id" in legal_selector_source
+    assert "_unit_by_id" not in legal_selector_source
+    assert "_rules_unit_has_legal_shooting_declaration" in legal_selector_source
+    assert "legal.append(rules_unit.unit_instance_id)" in legal_selector_source
+
+    assert "option_id=rules_unit.unit_instance_id" in options_source
+    assert '"unit_instance_id": rules_unit.unit_instance_id' in options_source
+    assert "_available_weapons_for_unit" in available_weapons_source
+    assert "for component in rules_unit.components" in available_weapons_source
+
+    assert "rules_unit_view_from_armies" in range_source
+    assert "_unit_placements_for_rules_unit_or_none" in range_source
+    assert "unit_placement_by_id(component" not in range_source
 
 
 def test_phase14h_docs_mark_complete_after_attached_formation_cutover() -> None:
