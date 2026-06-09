@@ -6,6 +6,14 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.core.deployment_zones import (
+    DeploymentZone,
+    DeploymentZoneCircleCutout,
+    DeploymentZonePoint,
+    DeploymentZonePolygon,
+    DeploymentZoneShape,
+)
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import (
     BaseShape,
     BaseShapePayload,
@@ -46,6 +54,54 @@ def test_base_overlap_and_distance_are_deterministic() -> None:
     assert bases_overlap(first, first_pose, second, overlapping_pose)
     assert math.isclose(base_distance(first, first_pose, second, separated_pose), 1.0)
     assert not bases_overlap(first, first_pose, second, separated_pose)
+
+
+def test_deployment_zone_footprint_intersection_uses_shape_not_bounds() -> None:
+    triangular_zone = DeploymentZone(
+        deployment_zone_id="triangle",
+        player_id="player-a",
+        shape=DeploymentZoneShape(
+            polygons=(
+                DeploymentZonePolygon(
+                    vertices=(
+                        DeploymentZonePoint(0.0, 0.0),
+                        DeploymentZonePoint(10.0, 0.0),
+                        DeploymentZonePoint(0.0, 10.0),
+                    )
+                ),
+            )
+        ),
+    )
+    cutout_zone = DeploymentZone(
+        deployment_zone_id="cutout",
+        player_id="player-a",
+        shape=DeploymentZoneShape(
+            polygons=DeploymentZoneShape.rectangle(
+                min_x=0.0,
+                min_y=0.0,
+                max_x=12.0,
+                max_y=12.0,
+            ).polygons,
+            cutouts=(DeploymentZoneCircleCutout(center_x=12.0, center_y=12.0, radius=4.0),),
+        ),
+    )
+    base = CircularBase(radius=0.25)
+
+    assert not shapely_backend.base_footprint_intersects_deployment_zone(
+        base,
+        Pose.at(9.0, 9.0),
+        triangular_zone,
+    )
+    assert shapely_backend.base_footprint_intersects_deployment_zone(
+        base,
+        Pose.at(2.0, 2.0),
+        triangular_zone,
+    )
+    assert not shapely_backend.base_footprint_intersects_deployment_zone(
+        base,
+        Pose.at(10.0, 10.0),
+        cutout_zone,
+    )
 
 
 def test_circular_base_edge_contact_has_zero_distance_and_overlaps() -> None:

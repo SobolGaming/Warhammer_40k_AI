@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from typing import cast
 
 import pytest
 
@@ -11,7 +12,15 @@ from warhammer40k_core.core.battlefield import (
     SpatialState,
     TerrainLayout,
 )
-from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZoneError
+from warhammer40k_core.core.deployment_zones import (
+    DeploymentZone,
+    DeploymentZoneCircleCutout,
+    DeploymentZoneError,
+    DeploymentZonePoint,
+    DeploymentZonePolygon,
+    DeploymentZoneShape,
+    DeploymentZoneShapePayload,
+)
 from warhammer40k_core.core.objectives import Objective, ObjectiveAnchorKind, ObjectiveError
 from warhammer40k_core.core.ruleset import RulesetEdition, RulesetId
 
@@ -187,10 +196,38 @@ def test_battlefield_rejects_spatial_state_without_battlefield_bounds() -> None:
 @pytest.mark.parametrize(
     "deployment_zone",
     [
-        DeploymentZone("bad-zone", "player-a", min_x=-1.0, min_y=0.0, max_x=10.0, max_y=20.0),
-        DeploymentZone("bad-zone", "player-a", min_x=0.0, min_y=0.0, max_x=45.0, max_y=20.0),
-        DeploymentZone("bad-zone", "player-a", min_x=0.0, min_y=-1.0, max_x=10.0, max_y=20.0),
-        DeploymentZone("bad-zone", "player-a", min_x=0.0, min_y=0.0, max_x=10.0, max_y=61.0),
+        DeploymentZone.rectangle(
+            "bad-zone",
+            "player-a",
+            min_x=-1.0,
+            min_y=0.0,
+            max_x=10.0,
+            max_y=20.0,
+        ),
+        DeploymentZone.rectangle(
+            "bad-zone",
+            "player-a",
+            min_x=0.0,
+            min_y=0.0,
+            max_x=45.0,
+            max_y=20.0,
+        ),
+        DeploymentZone.rectangle(
+            "bad-zone",
+            "player-a",
+            min_x=0.0,
+            min_y=-1.0,
+            max_x=10.0,
+            max_y=20.0,
+        ),
+        DeploymentZone.rectangle(
+            "bad-zone",
+            "player-a",
+            min_x=0.0,
+            min_y=0.0,
+            max_x=10.0,
+            max_y=61.0,
+        ),
     ],
 )
 def test_battlefield_rejects_deployment_zones_outside_bounds(
@@ -223,9 +260,9 @@ def test_terrain_layout_generation_increments_and_rejects_duplicate_ids() -> Non
 
 
 def test_deployment_zone_contains_points_and_validates_bounds() -> None:
-    zone = DeploymentZone(
-        deployment_zone_id="player-a-zone",
-        player_id="player-a",
+    zone = DeploymentZone.rectangle(
+        "player-a-zone",
+        "player-a",
         min_x=0.0,
         min_y=0.0,
         max_x=10.0,
@@ -237,7 +274,146 @@ def test_deployment_zone_contains_points_and_validates_bounds() -> None:
     assert not zone.contains_point(11.0, 10.0)
 
     with pytest.raises(DeploymentZoneError):
-        DeploymentZone("bad", "player-a", min_x=10.0, min_y=0.0, max_x=10.0, max_y=20.0)
+        DeploymentZone.rectangle("bad", "player-a", min_x=10.0, min_y=0.0, max_x=10.0, max_y=20.0)
+
+
+def test_deployment_zone_supports_non_rectangular_shapes_and_cutouts() -> None:
+    triangular_zone = DeploymentZone(
+        deployment_zone_id="triangle",
+        player_id="player-a",
+        shape=DeploymentZoneShape(
+            polygons=(
+                DeploymentZonePolygon(
+                    vertices=(
+                        DeploymentZonePoint(0.0, 0.0),
+                        DeploymentZonePoint(12.0, 0.0),
+                        DeploymentZonePoint(0.0, 12.0),
+                    )
+                ),
+            )
+        ),
+    )
+    composite_zone = DeploymentZone(
+        deployment_zone_id="stepped",
+        player_id="player-a",
+        shape=DeploymentZoneShape(
+            polygons=(
+                DeploymentZoneShape.rectangle(
+                    min_x=0.0,
+                    min_y=0.0,
+                    max_x=6.0,
+                    max_y=6.0,
+                ).polygons[0],
+                DeploymentZoneShape.rectangle(
+                    min_x=6.0,
+                    min_y=6.0,
+                    max_x=12.0,
+                    max_y=12.0,
+                ).polygons[0],
+            )
+        ),
+    )
+    cutout_zone = DeploymentZone(
+        deployment_zone_id="circle-cutout",
+        player_id="player-a",
+        shape=DeploymentZoneShape(
+            polygons=DeploymentZoneShape.rectangle(
+                min_x=0.0,
+                min_y=0.0,
+                max_x=12.0,
+                max_y=12.0,
+            ).polygons,
+            cutouts=(DeploymentZoneCircleCutout(center_x=12.0, center_y=12.0, radius=4.0),),
+        ),
+    )
+
+    assert triangular_zone.contains_point(2.0, 2.0)
+    assert not triangular_zone.contains_point(10.0, 10.0)
+    assert (
+        triangular_zone.min_x,
+        triangular_zone.min_y,
+        triangular_zone.max_x,
+        triangular_zone.max_y,
+    ) == (0.0, 0.0, 12.0, 12.0)
+    assert composite_zone.contains_point(3.0, 3.0)
+    assert composite_zone.contains_point(9.0, 9.0)
+    assert not composite_zone.contains_point(3.0, 9.0)
+    assert cutout_zone.contains_point(6.0, 10.0)
+    assert cutout_zone.contains_point(8.0, 12.0)
+    assert not cutout_zone.contains_point(10.0, 10.0)
+
+    payload = cutout_zone.to_payload()
+    assert DeploymentZone.from_payload(payload).to_payload() == payload
+
+
+def test_deployment_zone_shapes_reject_malformed_geometry() -> None:
+    valid_triangle = (
+        DeploymentZonePoint(0.0, 0.0),
+        DeploymentZonePoint(6.0, 0.0),
+        DeploymentZonePoint(0.0, 6.0),
+    )
+
+    with pytest.raises(DeploymentZoneError, match="vertices must be a tuple"):
+        DeploymentZonePolygon(vertices=cast(tuple[DeploymentZonePoint, ...], list(valid_triangle)))
+    with pytest.raises(DeploymentZoneError, match="at least three vertices"):
+        DeploymentZonePolygon(vertices=valid_triangle[:2])
+    with pytest.raises(DeploymentZoneError, match="DeploymentZonePoint values"):
+        DeploymentZonePolygon(
+            vertices=cast(
+                tuple[DeploymentZonePoint, ...],
+                (valid_triangle[0], object(), valid_triangle[2]),
+            )
+        )
+    with pytest.raises(DeploymentZoneError, match="area must be greater than zero"):
+        DeploymentZonePolygon(
+            vertices=(
+                DeploymentZonePoint(0.0, 0.0),
+                DeploymentZonePoint(1.0, 1.0),
+                DeploymentZonePoint(2.0, 2.0),
+            )
+        )
+    with pytest.raises(DeploymentZoneError, match="radius must be greater than zero"):
+        DeploymentZoneCircleCutout(center_x=0.0, center_y=0.0, radius=0.0)
+    with pytest.raises(DeploymentZoneError, match="polygons must be a tuple"):
+        DeploymentZoneShape(polygons=cast(tuple[DeploymentZonePolygon, ...], []))
+    with pytest.raises(DeploymentZoneError, match="must include at least one polygon"):
+        DeploymentZoneShape(polygons=())
+    with pytest.raises(DeploymentZoneError, match="polygons must be DeploymentZonePolygon"):
+        DeploymentZoneShape(polygons=cast(tuple[DeploymentZonePolygon, ...], (object(),)))
+    with pytest.raises(DeploymentZoneError, match="cutouts must be a tuple"):
+        DeploymentZoneShape(
+            polygons=(DeploymentZonePolygon(vertices=valid_triangle),),
+            cutouts=cast(tuple[DeploymentZoneCircleCutout, ...], []),
+        )
+    with pytest.raises(DeploymentZoneError, match="cutouts must be deployment-zone cutout"):
+        DeploymentZoneShape(
+            polygons=(DeploymentZonePolygon(vertices=valid_triangle),),
+            cutouts=cast(tuple[DeploymentZoneCircleCutout, ...], (object(),)),
+        )
+    with pytest.raises(DeploymentZoneError, match="shape must be a DeploymentZoneShape"):
+        DeploymentZone(
+            deployment_zone_id="bad-shape",
+            player_id="player-a",
+            shape=cast(DeploymentZoneShape, object()),
+        )
+    with pytest.raises(DeploymentZoneError, match="Unsupported deployment-zone cutout kind"):
+        DeploymentZoneShape.from_payload(
+            cast(
+                DeploymentZoneShapePayload,
+                {
+                    "polygons": [
+                        {
+                            "vertices": [
+                                {"x": 0.0, "y": 0.0},
+                                {"x": 6.0, "y": 0.0},
+                                {"x": 0.0, "y": 6.0},
+                            ]
+                        }
+                    ],
+                    "cutouts": [{"kind": "ellipse"}],
+                },
+            )
+        )
 
 
 def test_phase_8_payloads_round_trip_without_object_reprs() -> None:
@@ -252,9 +428,9 @@ def test_phase_8_payloads_round_trip_without_object_reprs() -> None:
             Objective.terrain("ruin-objective", "Ruin", terrain_id="ruin"),
         ),
         deployment_zones=(
-            DeploymentZone(
-                deployment_zone_id="player-a-zone",
-                player_id="player-a",
+            DeploymentZone.rectangle(
+                "player-a-zone",
+                "player-a",
                 min_x=0.0,
                 min_y=0.0,
                 max_x=44.0,
@@ -291,7 +467,14 @@ def test_stable_identity_prefixes_are_rejected_for_phase_8_ids() -> None:
     with pytest.raises(ObjectiveError):
         Objective.terrain("ruin-objective", "Ruin", terrain_id="terrain:ruin")
     with pytest.raises(DeploymentZoneError):
-        DeploymentZone("deployment-zone:a", "player-a", 0.0, 0.0, 1.0, 1.0)
+        DeploymentZone.rectangle(
+            "deployment-zone:a",
+            "player-a",
+            min_x=0.0,
+            min_y=0.0,
+            max_x=1.0,
+            max_y=1.0,
+        )
     with pytest.raises(BattlefieldError):
         SpatialModelState("model:alpha", "player-a", x=1.0, y=1.0)
     with pytest.raises(BattlefieldError):

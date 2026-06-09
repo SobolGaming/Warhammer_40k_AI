@@ -1825,10 +1825,10 @@ def _append_enemy_deployment_zone_violations(
 ) -> None:
     for model in models:
         for zone in enemy_deployment_zones:
-            if shapely_backend.base_footprint_intersects_bounds(
+            if shapely_backend.base_footprint_intersects_deployment_zone(
                 model.base,
                 model.pose,
-                (zone.min_x, zone.min_y, zone.max_x, zone.max_y),
+                zone,
             ):
                 violations.append(
                     ReservePlacementViolation(

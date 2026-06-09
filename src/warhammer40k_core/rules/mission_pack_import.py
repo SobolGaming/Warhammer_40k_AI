@@ -154,10 +154,7 @@ def _deployment_map_from_battlefield_layout(
             DeploymentZone(
                 deployment_zone_id=zone.deployment_zone_id,
                 player_id=zone.player_role,
-                min_x=zone.min_x_inches,
-                min_y=zone.min_y_inches,
-                max_x=zone.max_x_inches,
-                max_y=zone.max_y_inches,
+                shape=zone.shape,
             )
             for zone in row.deployment_zones
         ),

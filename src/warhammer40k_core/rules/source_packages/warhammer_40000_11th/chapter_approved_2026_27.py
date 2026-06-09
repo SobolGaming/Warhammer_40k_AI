@@ -4,6 +4,7 @@ import hashlib
 import json
 from dataclasses import dataclass
 
+from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
 from warhammer40k_core.core.missions import MissionPackError, MissionSourcePackageDefinition
 
 EDITION_ID = "warhammer_40000_11th"
@@ -198,19 +199,13 @@ class SourceBattlefieldObjectiveRow:
 class SourceBattlefieldDeploymentZoneRow:
     deployment_zone_id: str
     player_role: str
-    min_x_inches: float
-    min_y_inches: float
-    max_x_inches: float
-    max_y_inches: float
+    shape: DeploymentZoneShape
 
     def to_payload(self) -> dict[str, object]:
         return {
             "deployment_zone_id": self.deployment_zone_id,
             "player_role": self.player_role,
-            "min_x_inches": self.min_x_inches,
-            "min_y_inches": self.min_y_inches,
-            "max_x_inches": self.max_x_inches,
-            "max_y_inches": self.max_y_inches,
+            "shape": self.shape.to_payload(),
         }
 
 
@@ -920,18 +915,22 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                 SourceBattlefieldDeploymentZoneRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-attacker",
                     "attacker",
-                    0.0,
-                    0.0,
-                    18.0,
-                    44.0,
+                    DeploymentZoneShape.rectangle(
+                        min_x=0.0,
+                        min_y=0.0,
+                        max_x=18.0,
+                        max_y=44.0,
+                    ),
                 ),
                 SourceBattlefieldDeploymentZoneRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-defender",
                     "defender",
-                    42.0,
-                    0.0,
-                    60.0,
-                    44.0,
+                    DeploymentZoneShape.rectangle(
+                        min_x=42.0,
+                        min_y=0.0,
+                        max_x=60.0,
+                        max_y=44.0,
+                    ),
                 ),
             ),
             terrain_features=(

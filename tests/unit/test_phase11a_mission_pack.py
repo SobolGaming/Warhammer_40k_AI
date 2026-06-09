@@ -530,6 +530,19 @@ def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
     assert defender_zone.min_x == 42.0
     assert defender_zone.max_x == 60.0
     assert defender_zone.min_x - attacker_zone.max_x == 24.0
+    assert layout_row.deployment_zones[0].to_payload()["shape"] == {
+        "polygons": [
+            {
+                "vertices": [
+                    {"x": 0.0, "y": 0.0},
+                    {"x": 18.0, "y": 0.0},
+                    {"x": 18.0, "y": 44.0},
+                    {"x": 0.0, "y": 44.0},
+                ],
+            },
+        ],
+        "cutouts": [],
+    }
     assert tuple(sorted(objective_kinds.values())) == (
         "central",
         "central",

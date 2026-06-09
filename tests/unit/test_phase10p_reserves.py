@@ -513,9 +513,9 @@ def test_oversized_exception_preserves_other_placement_limits() -> None:
         battle_round=2,
         placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
         enemy_deployment_zones=(
-            DeploymentZone(
-                deployment_zone_id="enemy-south-zone",
-                player_id="player-b",
+            DeploymentZone.rectangle(
+                "enemy-south-zone",
+                "player-b",
                 min_x=0.0,
                 min_y=0.0,
                 max_x=60.0,
