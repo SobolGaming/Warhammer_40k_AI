@@ -53,6 +53,9 @@ from warhammer40k_core.engine.unit_factory import (
     UnitFactoryError,
     UnitInstance,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_detachments_2026_27 as faction_detachment_source,
+)
 
 
 def _unit_selection(
@@ -103,250 +106,64 @@ def _muster_request(
     )
 
 
-def _phase16_partial_space_marine_detachment(
+def _phase16_source_detachment(
     *,
-    faction_id: str,
-    detachment_point_cost: int,
-    detachment_id: str,
-    name: str,
+    row: faction_detachment_source.SourceDetachmentRow,
     unit_datasheet_ids: tuple[str, ...],
-    force_disposition_ids: tuple[str, ...],
 ) -> DetachmentDefinition:
     return DetachmentDefinition(
-        detachment_id=detachment_id,
-        name=name,
-        faction_id=faction_id,
-        detachment_point_cost=detachment_point_cost,
+        detachment_id=row.detachment_id,
+        name=row.name,
+        faction_id=row.faction_id,
+        detachment_point_cost=row.detachment_point_cost,
         unit_datasheet_ids=unit_datasheet_ids,
-        force_disposition_ids=force_disposition_ids,
-        source_ids=(f"detachment:{faction_id}:{detachment_id}",),
+        force_disposition_ids=(row.force_disposition_id,),
+        source_ids=row.source_ids,
     )
 
 
-def _phase16_partial_space_marine_catalog() -> ArmyCatalog:
+def _phase16_source_detachment_catalog() -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     unit_datasheet_ids = tuple(datasheet.datasheet_id for datasheet in base_catalog.datasheets)
-    factions = (
-        base_catalog.faction_by_id("core-marine-force"),
+    source_factions = tuple(
         FactionDefinition(
-            faction_id="black-templars",
-            name="Black Templars",
-            faction_keywords=("BLACK TEMPLARS",),
-        ),
-        FactionDefinition(
-            faction_id="blood-angels",
-            name="Blood Angels",
-            faction_keywords=("BLOOD ANGELS",),
-        ),
-        FactionDefinition(
-            faction_id="dark-angels",
-            name="Dark Angels",
-            faction_keywords=("DARK ANGELS",),
-        ),
-        FactionDefinition(
-            faction_id="deathwatch",
-            name="Deathwatch",
-            faction_keywords=("DEATHWATCH",),
-        ),
-        FactionDefinition(
-            faction_id="grey-knights",
-            name="Grey Knights",
-            faction_keywords=("GREY KNIGHTS",),
-        ),
-        FactionDefinition(
-            faction_id="space-wolves",
-            name="Space Wolves",
-            faction_keywords=("SPACE WOLVES",),
-        ),
-    )
-    detachment_rows = (
-        ("core-marine-force", 1, "fulguris-task-force", "Fulguris Task Force", ("disruption",)),
-        ("core-marine-force", 1, "librarius-conclave", "Librarius Conclave", ("disruption",)),
-        ("core-marine-force", 1, "subversion-assets", "Subversion Assets", ("disruption",)),
-        (
-            "core-marine-force",
-            2,
-            "first-company-task-force",
-            "1st Company Task Force",
-            ("priority-assets",),
-        ),
-        ("core-marine-force", 2, "anvil-siege-force", "Anvil Siege Force", ()),
-        ("core-marine-force", 2, "bastion-task-force", "Bastion Task Force", ("take-and-hold",)),
-        ("core-marine-force", 2, "emperor-shield", "Emperor's Shield", ("priority-assets",)),
-        (
-            "core-marine-force",
-            2,
-            "firestorm-assault-force",
-            "Firestorm Assault Force",
-            ("purge-the-foe",),
-        ),
-        (
-            "core-marine-force",
-            2,
-            "forgefather-seekers",
-            "Forgefather's Seekers",
-            ("purge-the-foe",),
-        ),
-        ("core-marine-force", 2, "hammer-of-avernii", "Hammer of Avernii", ("priority-assets",)),
-        (
-            "core-marine-force",
-            2,
-            "headhunter-task-force",
-            "Headhunter Task Force",
-            ("priority-assets",),
-        ),
-        (
-            "core-marine-force",
-            2,
-            "ironstorm-spearhead",
-            "Ironstorm Spearhead",
-            ("purge-the-foe",),
-        ),
-        (
-            "core-marine-force",
-            2,
-            "orbital-assault-force",
-            "Orbital Assault Force",
-            ("take-and-hold",),
-        ),
-        ("core-marine-force", 2, "reclamation-force", "Reclamation Force", ("take-and-hold",)),
-        ("core-marine-force", 2, "shadowmark-talon", "Shadowmark Talon", ("disruption",)),
-        (
-            "core-marine-force",
-            2,
-            "spearpoint-task-force",
-            "Spearpoint Task Force",
-            ("disruption",),
-        ),
-        ("core-marine-force", 2, "vanguard-spearhead", "Vanguard Spearhead", ("disruption",)),
-        ("core-marine-force", 3, "armoured-speartip", "Armoured Speartip", ()),
-        ("core-marine-force", 3, "blade-of-ultramar", "Blade of Ultramar", ("priority-assets",)),
-        (
-            "core-marine-force",
-            3,
-            "ceramite-sentinels",
-            "Ceramite Sentinels",
-            ("take-and-hold",),
-        ),
-        ("core-marine-force", 3, "gladius-task-force", "Gladius Task Force", ("priority-assets",)),
-        ("core-marine-force", 3, "stormlance-task-force", "Stormlance Task Force", ("disruption",)),
-        ("black-templars", 1, "marshals-household", "Marshal's Household", ("priority-assets",)),
-        ("black-templars", 1, "the-living-miracle", "The Living Miracle", ("purge-the-foe",)),
-        ("black-templars", 1, "wrathful-procession", "Wrathful Procession", ("take-and-hold",)),
-        (
-            "black-templars",
-            2,
-            "companions-of-vehemence",
-            "Companions of Vehemence",
-            ("purge-the-foe",),
-        ),
-        (
-            "black-templars",
-            2,
-            "godhammer-assault-force",
-            "Godhammer Assault Force",
-            ("disruption",),
-        ),
-        (
-            "black-templars",
-            2,
-            "vindication-task-force",
-            "Vindication Task Force",
-            ("priority-assets",),
-        ),
-        ("blood-angels", 1, "encarmine-speartip", "Encarmine Speartip", ()),
-        ("blood-angels", 1, "legacy-of-grace", "Legacy of Grace", ()),
-        ("blood-angels", 1, "wrath-of-the-doomed", "Wrath of the Doomed", ("purge-the-foe",)),
-        ("blood-angels", 2, "the-angelic-host", "The Angelic Host", ()),
-        ("blood-angels", 2, "the-lost-brethren", "The Lost Brethren", ()),
-        ("blood-angels", 3, "angelic-inheritors", "Angelic Inheritors", ("priority-assets",)),
-        (
-            "blood-angels",
-            3,
-            "liberator-assault-group",
-            "Liberator Assault Group",
-            ("take-and-hold",),
-        ),
-        ("blood-angels", 3, "rage-cursed-onslaught", "Rage-cursed Onslaught", ("purge-the-foe",)),
-        ("dark-angels", 1, "dark-age-arsenal", "Dark Age Arsenal", ("priority-assets",)),
-        ("dark-angels", 1, "darkflight-pursuit", "Darkflight Pursuit", ()),
-        ("dark-angels", 1, "interrogation-conclave", "Interrogation Conclave", ("purge-the-foe",)),
-        ("dark-angels", 2, "company-of-hunters", "Company of Hunters", ("disruption",)),
-        (
-            "dark-angels",
-            2,
-            "inner-circle-task-force",
-            "Inner Circle Task Force",
-            ("priority-assets",),
-        ),
-        (
-            "dark-angels",
-            2,
-            "lions-blade-task-force",
-            "Lion's Blade Task Force",
-            ("purge-the-foe",),
-        ),
-        ("dark-angels", 2, "unforgiven-task-force", "Unforgiven Task Force", ()),
-        ("dark-angels", 3, "wrath-of-the-rock", "Wrath of the Rock", ("priority-assets",)),
-        ("deathwatch", 3, "black-spear-task-force", "Black Spear Task Force", ()),
-        ("grey-knights", 1, "argent-assault", "Argent Assault", ()),
-        ("grey-knights", 1, "fires-of-purgation", "Fires of Purgation", ()),
-        ("grey-knights", 1, "immaterial-interdiction", "Immaterial Interdiction", ()),
-        ("grey-knights", 2, "augurium-task-force", "Augurium Task Force", ()),
-        ("grey-knights", 2, "banishers", "Banishers", ()),
-        ("grey-knights", 2, "brotherhood-strike", "Brotherhood Strike", ()),
-        ("grey-knights", 2, "hallowed-conclave", "Hallowed Conclave", ()),
-        ("grey-knights", 2, "sanctic-spearhead", "Sanctic Spearhead", ()),
-        ("grey-knights", 3, "warpbane-task-force", "Warpbane Task Force", ()),
-        ("space-wolves", 1, "champions-of-fenris", "Champions of Fenris", ()),
-        (
-            "space-wolves",
-            1,
-            "legends-of-saga-and-song",
-            "Legends of Saga and Song",
-            ("take-and-hold",),
-        ),
-        ("space-wolves", 1, "veterans-of-the-fang", "Veterans of the Fang", ("disruption",)),
-        (
-            "space-wolves",
-            2,
-            "saga-of-the-beastslayer",
-            "Saga of the Beastslayer",
-            ("purge-the-foe",),
-        ),
-        ("space-wolves", 2, "saga-of-the-bold", "Saga of the Bold", ()),
-        ("space-wolves", 2, "saga-of-the-great-wolf", "Saga of the Great Wolf", ("take-and-hold",)),
-        ("space-wolves", 2, "saga-of-the-hunter", "Saga of the Hunter", ()),
-    )
-    detachments = tuple(
-        _phase16_partial_space_marine_detachment(
-            faction_id=faction_id,
-            detachment_point_cost=detachment_point_cost,
-            detachment_id=detachment_id,
-            name=name,
-            unit_datasheet_ids=unit_datasheet_ids,
-            force_disposition_ids=force_disposition_ids,
+            faction_id=row.faction_id,
+            name=row.name,
+            faction_keywords=row.faction_keywords,
+            source_ids=row.source_ids,
         )
-        for (
-            faction_id,
-            detachment_point_cost,
-            detachment_id,
-            name,
-            force_disposition_ids,
-        ) in detachment_rows
+        for row in faction_detachment_source.faction_rows()
+    )
+    factions = (base_catalog.faction_by_id("core-marine-force"), *source_factions)
+    detachments = tuple(
+        _phase16_source_detachment(
+            row=row,
+            unit_datasheet_ids=unit_datasheet_ids,
+        )
+        for row in faction_detachment_source.detachment_rows()
     )
 
     return ArmyCatalog(
-        catalog_id="phase16-partial-space-marine-detachments",
+        catalog_id="phase16-faction-detachments-2026-27",
         ruleset_id=base_catalog.ruleset_id,
-        source_package_id=base_catalog.source_package_id,
+        source_package_id=faction_detachment_source.SOURCE_PACKAGE_ID,
         datasheets=base_catalog.datasheets,
         wargear=base_catalog.wargear,
         factions=factions,
         army_rules=base_catalog.army_rules,
         detachments=detachments,
-        source_ids=base_catalog.source_ids,
+        source_ids=(faction_detachment_source.SOURCE_PACKAGE_ID,),
     )
+
+
+def _detachment_by_id(catalog: ArmyCatalog, detachment_id: str) -> DetachmentDefinition:
+    matches = tuple(
+        detachment
+        for detachment in catalog.detachments
+        if detachment.detachment_id == detachment_id
+    )
+    assert len(matches) == 1
+    return matches[0]
 
 
 def test_army_mustering_consumes_catalog_and_produces_runtime_instances() -> None:
@@ -952,14 +769,101 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
         muster_army(catalog=multi_detachment_catalog, request=unsupported_unit_request)
 
 
-def test_partial_space_marine_detachment_matrix_supports_strike_force_combinations() -> None:
-    catalog = _phase16_partial_space_marine_catalog()
+def test_phase16_faction_detachment_source_rows_are_normalized() -> None:
+    faction_rows = faction_detachment_source.faction_rows()
+    detachment_rows = faction_detachment_source.detachment_rows()
+    payload = faction_detachment_source.source_payload()
+    detachment_names = {row.detachment_id: row.name for row in detachment_rows}
+    new_detachment_ids = {row.detachment_id for row in detachment_rows if row.is_new_for_eleventh}
+
+    assert len(faction_rows) == 15
+    assert len(detachment_rows) == 145
+    assert payload["source_package_id"] == faction_detachment_source.SOURCE_PACKAGE_ID
+    assert {row.faction_id for row in faction_rows} >= {
+        "leagues-of-votann",
+        "space-marines",
+        "tau-empire",
+    }
+    assert next(row for row in faction_rows if row.faction_id == "tau-empire").name == (
+        "T'au Empire"
+    )
+    assert detachment_names["delve-assault-shift"] == "Delve Assault Shift"
+    assert detachment_names["needgaard-oathband"] == "Needgaard Oathband"
+    assert "advanced-acquisition-cadre" in new_detachment_ids
+    assert all("New - " not in row.name for row in detachment_rows)
+    assert all(ord(character) < 128 for row in faction_rows for character in row.name)
+    assert all(ord(character) < 128 for row in detachment_rows for character in row.name)
+
+
+def test_phase16_faction_detachment_source_rows_fail_fast_on_bad_data() -> None:
+    with pytest.raises(faction_detachment_source.FactionDetachmentSourceError, match="slug"):
+        faction_detachment_source.SourceFactionRow(
+            faction_id="Bad Faction",
+            raw_name="Bad Faction",
+        )
+    with pytest.raises(faction_detachment_source.FactionDetachmentSourceError, match="raw_name"):
+        faction_detachment_source.SourceFactionRow(
+            faction_id="bad-faction",
+            raw_name=cast(str, 1),
+        )
+    with pytest.raises(
+        faction_detachment_source.FactionDetachmentSourceError,
+        match="detachment_id",
+    ):
+        faction_detachment_source.SourceDetachmentRow(
+            faction_id="space-marines",
+            detachment_id="wrong-id",
+            raw_name="Gladius Task Force",
+            force_disposition_id="priority-assets",
+            detachment_point_cost=3,
+            is_new_for_eleventh=False,
+        )
+    with pytest.raises(
+        faction_detachment_source.FactionDetachmentSourceError,
+        match="force_disposition_id",
+    ):
+        faction_detachment_source.SourceDetachmentRow(
+            faction_id="space-marines",
+            detachment_id="gladius-task-force",
+            raw_name="Gladius Task Force",
+            force_disposition_id="unknown-disposition",
+            detachment_point_cost=3,
+            is_new_for_eleventh=False,
+        )
+    with pytest.raises(
+        faction_detachment_source.FactionDetachmentSourceError,
+        match="detachment_point_cost",
+    ):
+        faction_detachment_source.SourceDetachmentRow(
+            faction_id="space-marines",
+            detachment_id="gladius-task-force",
+            raw_name="Gladius Task Force",
+            force_disposition_id="priority-assets",
+            detachment_point_cost=4,
+            is_new_for_eleventh=False,
+        )
+    with pytest.raises(
+        faction_detachment_source.FactionDetachmentSourceError,
+        match="is_new_for_eleventh",
+    ):
+        faction_detachment_source.SourceDetachmentRow(
+            faction_id="space-marines",
+            detachment_id="gladius-task-force",
+            raw_name="Gladius Task Force",
+            force_disposition_id="priority-assets",
+            detachment_point_cost=3,
+            is_new_for_eleventh=cast(bool, "yes"),
+        )
+
+
+def test_phase16_faction_detachment_matrix_supports_strike_force_combinations() -> None:
+    catalog = _phase16_source_detachment_catalog()
     gladius_task_force = DetachmentSelection(
-        faction_id="core-marine-force",
+        faction_id="space-marines",
         detachment_ids=("gladius-task-force",),
     )
     firestorm_plus_fulguris = DetachmentSelection(
-        faction_id="core-marine-force",
+        faction_id="space-marines",
         detachment_ids=("firestorm-assault-force", "fulguris-task-force"),
     )
     black_templar_force = DetachmentSelection(
@@ -991,27 +895,50 @@ def test_partial_space_marine_detachment_matrix_supports_strike_force_combinatio
     ) == ("priority-assets", "purge-the-foe")
 
 
-def test_partial_space_marine_detachment_matrix_fails_closed_on_invalid_rows() -> None:
-    catalog = _phase16_partial_space_marine_catalog()
+def test_phase16_faction_detachment_matrix_applies_source_corrections() -> None:
+    catalog = _phase16_source_detachment_catalog()
+
+    assert _detachment_by_id(catalog, "librarius-conclave").force_disposition_ids == (
+        "reconnaissance",
+    )
+    assert _detachment_by_id(catalog, "subversion-assets").force_disposition_ids == (
+        "reconnaissance",
+    )
+    assert _detachment_by_id(catalog, "anvil-siege-force").force_disposition_ids == (
+        "take-and-hold",
+    )
+    assert _detachment_by_id(catalog, "armoured-speartip").force_disposition_ids == (
+        "take-and-hold",
+    )
+    assert _detachment_by_id(catalog, "vanguard-spearhead").force_disposition_ids == (
+        "reconnaissance",
+    )
+    assert _detachment_by_id(catalog, "black-spear-task-force").force_disposition_ids == (
+        "priority-assets",
+    )
+    assert _detachment_by_id(catalog, "warpbane-task-force").force_disposition_ids == (
+        "purge-the-foe",
+    )
+    assert _detachment_by_id(catalog, "saga-of-the-bold").force_disposition_ids == (
+        "priority-assets",
+    )
+
+
+def test_phase16_faction_detachment_matrix_fails_closed_on_invalid_rows() -> None:
+    catalog = _phase16_source_detachment_catalog()
     over_strike_force_limit = DetachmentSelection(
-        faction_id="core-marine-force",
+        faction_id="space-marines",
         detachment_ids=("gladius-task-force", "bastion-task-force"),
     )
     cross_faction_selection = DetachmentSelection(
-        faction_id="core-marine-force",
+        faction_id="space-marines",
         detachment_ids=("marshals-household",),
-    )
-    incomplete_force_disposition = DetachmentSelection(
-        faction_id="grey-knights",
-        detachment_ids=("warpbane-task-force",),
     )
 
     with pytest.raises(ListValidationError, match="Detachment Points"):
         validate_detachment_selection(catalog=catalog, selection=over_strike_force_limit)
     with pytest.raises(ListValidationError, match="does not belong to faction"):
         validate_detachment_selection(catalog=catalog, selection=cross_faction_selection)
-    with pytest.raises(ListValidationError, match="force disposition"):
-        validate_detachment_selection(catalog=catalog, selection=incomplete_force_disposition)
 
 
 def test_detachment_selection_fails_closed_on_awaiting_source_grants() -> None:
