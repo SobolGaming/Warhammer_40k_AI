@@ -75,8 +75,8 @@ from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
-_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-new-0004"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0005"
+_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-01-0002"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0272"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"

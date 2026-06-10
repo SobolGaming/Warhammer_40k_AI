@@ -10,6 +10,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.battlefield_state import SpatialIndexState
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose
@@ -68,6 +69,12 @@ def _visibility_ruin() -> TerrainFeatureDefinition:
         footprint_center_y_inches=0.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        display_geometry=_display_geometry(
+            center_x_inches=0.0,
+            center_y_inches=0.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="off-axis-wall",
@@ -91,6 +98,22 @@ def _visibility_ruin() -> TerrainFeatureDefinition:
             ),
         ),
         source_id="phase13a_visibility_ruin",
+    )
+
+
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
     )
 
 

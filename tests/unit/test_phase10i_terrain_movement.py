@@ -4,6 +4,7 @@ import json
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
@@ -380,6 +381,12 @@ def test_model_cannot_end_on_elevated_feature_without_support_surface() -> None:
         footprint_center_y_inches=1.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        display_geometry=_display_geometry(
+            center_x_inches=3.0,
+            center_y_inches=1.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
     )
 
     result = _terrain_context(
@@ -469,6 +476,22 @@ def _ruins_wall(terrain_id: str) -> ObstacleVolume:
     )
 
 
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
+    )
+
+
 def _support_feature(
     *,
     feature_id: str,
@@ -484,6 +507,12 @@ def _support_feature(
         footprint_center_y_inches=1.0,
         footprint_width_inches=width_inches,
         footprint_depth_inches=depth_inches,
+        display_geometry=_display_geometry(
+            center_x_inches=3.0,
+            center_y_inches=1.0,
+            width_inches=width_inches,
+            depth_inches=depth_inches,
+        ),
         floors=(
             TerrainFloorDefinition(
                 floor_id="top",
@@ -510,6 +539,12 @@ def _ruins_feature(
         footprint_center_y_inches=1.0,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=3.0,
+            center_y_inches=1.0,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="north-wall",
@@ -552,6 +587,12 @@ def _ruins_blocking_wall_feature() -> TerrainFeatureDefinition:
         footprint_center_y_inches=1.0,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=3.0,
+            center_y_inches=1.0,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="center-wall",

@@ -11,6 +11,7 @@ from tests.deployment_submission_helpers import submit_all_deployments_if_pendin
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -832,6 +833,22 @@ def _unit_vertical_witness_to_z(
     return PathWitness.for_paths(tuple(model_paths))
 
 
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
+    )
+
+
 def _ruins_wall_feature(
     *,
     center_x_inches: float,
@@ -844,6 +861,12 @@ def _ruins_wall_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=8.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=8.0,
+            depth_inches=6.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="center-wall",
@@ -882,6 +905,12 @@ def _multilevel_ruins_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=12.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="north-wall",

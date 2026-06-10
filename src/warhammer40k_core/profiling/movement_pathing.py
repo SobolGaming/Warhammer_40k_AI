@@ -20,6 +20,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.unit import Unit, UnitMember
 from warhammer40k_core.core.unit_group import UnitGroup
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
@@ -1084,6 +1085,13 @@ def _ruins_features(count: int) -> tuple[TerrainFeatureDefinition, ...]:
             footprint_center_y_inches=1.0 + (index * 8.0),
             footprint_width_inches=6.0,
             footprint_depth_inches=6.0,
+            display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+                center_x_inches=3.0,
+                center_y_inches=1.0 + (index * 8.0),
+                width_inches=6.0,
+                depth_inches=6.0,
+                display_template_id="profiling_ruins_rect_6x6",
+            ),
             walls=(
                 TerrainWallDefinition(
                     wall_id="center-wall",

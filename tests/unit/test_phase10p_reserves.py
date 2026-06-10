@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -2098,6 +2099,12 @@ def _blocking_wall_feature(*, x: float, y: float) -> TerrainFeatureDefinition:
         footprint_center_y_inches=y,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        display_geometry=_display_geometry(
+            center_x_inches=x,
+            center_y_inches=y,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="center-wall",
@@ -2109,6 +2116,22 @@ def _blocking_wall_feature(*, x: float, y: float) -> TerrainFeatureDefinition:
                 height_inches=3.0,
             ),
         ),
+    )
+
+
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
     )
 
 

@@ -319,6 +319,7 @@ def _terrain_feature_from_template(
         footprint_center_y_inches=feature.footprint_center_y_inches,
         footprint_width_inches=feature.footprint_width_inches,
         footprint_depth_inches=feature.footprint_depth_inches,
+        display_geometry=feature.display_geometry,
         walls=tuple(_terrain_wall_from_template(wall) for wall in feature.walls),
         floors=tuple(_terrain_floor_from_template(floor) for floor in feature.floors),
         source_id=feature.source_id,

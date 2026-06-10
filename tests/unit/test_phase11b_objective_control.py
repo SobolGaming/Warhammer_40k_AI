@@ -20,6 +20,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
     TerrainObjectiveControlPolicy,
 )
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -248,6 +249,12 @@ def test_terrain_objectives_derive_from_coincident_marker_and_control_area() -> 
         footprint_center_y_inches=marker.y_inches,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=marker.x_inches,
+            center_y_inches=marker.y_inches,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ),
     )
     if state.mission_setup is None:
         raise AssertionError("test state requires mission setup")
@@ -296,6 +303,12 @@ def test_terrain_objective_control_requires_terrain_area_containment_not_marker_
         footprint_center_y_inches=marker.y_inches,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=marker.x_inches,
+            center_y_inches=marker.y_inches,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ),
     )
     if state.mission_setup is None:
         raise AssertionError("test state requires mission setup")
@@ -761,6 +774,22 @@ def _center_result(record: ObjectiveControlRecord) -> ObjectiveControlResult:
 
 def _is_center_objective_id(objective_id: str) -> bool:
     return objective_id.endswith(("-center", "-center-central"))
+
+
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
+    )
 
 
 def _scenario_from_state(state: GameState) -> BattlefieldScenario:

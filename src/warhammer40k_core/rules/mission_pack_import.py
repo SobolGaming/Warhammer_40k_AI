@@ -21,6 +21,7 @@ from warhammer40k_core.core.missions import (
     TournamentScoringCaps,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureTemplate,
     TerrainFloorTemplate,
@@ -211,6 +212,7 @@ def _terrain_feature_from_battlefield_layout(
             y=feature.footprint_center_y_inches,
             width=feature.footprint_width_inches,
             depth=feature.footprint_depth_inches,
+            display_geometry=feature.display_geometry,
             source_id=source_id,
         )
     return TerrainFeatureTemplate(
@@ -220,6 +222,7 @@ def _terrain_feature_from_battlefield_layout(
         footprint_center_y_inches=feature.footprint_center_y_inches,
         footprint_width_inches=feature.footprint_width_inches,
         footprint_depth_inches=feature.footprint_depth_inches,
+        display_geometry=feature.display_geometry,
         walls=(),
         floors=(),
         source_id=source_id,
@@ -233,6 +236,7 @@ def _ruins_feature(
     y: float,
     width: float,
     depth: float,
+    display_geometry: TerrainDisplayGeometry,
     source_id: str,
 ) -> TerrainFeatureTemplate:
     half_width = width / 2.0
@@ -245,6 +249,7 @@ def _ruins_feature(
         footprint_center_y_inches=y,
         footprint_width_inches=width,
         footprint_depth_inches=depth,
+        display_geometry=display_geometry,
         walls=(
             TerrainWallTemplate(
                 wall_id="east-wall",
