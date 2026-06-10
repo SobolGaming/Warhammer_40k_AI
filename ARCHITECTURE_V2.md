@@ -3729,9 +3729,21 @@ Required tests:
 
 ---
 
-# Wahapedia data ingestion, language parsing, and content coverage
+# Wahapedia bridge data ingestion, language parsing, and content coverage
 
-## Phase 17A: Wahapedia source mirror and CSV-to-JSON ETL
+Phase 17 imports faction content before Wahapedia publishes native 11th Edition
+tables. The active engine remains 11th Edition-only: prior-edition Wahapedia
+rows are treated as upstream bridge source material, not as a runtime
+compatibility mode. Official 11th Edition faction update instructions are
+modeled as ordered, source-linked transition patches over the normalized bridge
+source rows. The only catalog emitted for play is the patched 11th Edition
+catalog.
+
+The faction rollout order, per-faction phase structure, and naming convention for
+detachment and datasheet subphases are tracked in
+[FACTION_INTEGRATION.md](FACTION_INTEGRATION.md).
+
+## Phase 17A: bridge Wahapedia source mirror and CSV-to-JSON ETL
 
 CORE V1 already has generated `wahapedia_data` JSON such as `Abilities.json`, `Datasheets.json`, `Datasheets_models.json`, `Datasheets_wargear.json`, `Factions.json`, `Detachments.json`, `Enhancements.json`, and `Stratagems.json`. CORE V2 must rebuild this pipeline from the downloaded CSV/source exports, but with stricter normalization and provenance.
 
@@ -3755,13 +3767,16 @@ Objects:
 
 Invariants:
 
-- downloaded CSV/source files are stored with checksum, source date, and upstream identity;
+- downloaded CSV/source files are stored with checksum, source date, upstream
+  identity, and source edition identity;
 - generated JSON is deterministic from source inputs;
 - HTML tags are stripped or converted to explicit structured markup before catalog ingestion;
 - normalized text preserves source spans, paragraph/list boundaries, dice expressions, keywords, and distance expressions;
 - smart quotes, dashes, non-breaking spaces, HTML entities, and embedded links are normalized once;
 - raw HTML is never consumed by runtime engine code;
 - generated JSON includes `raw_text`, `normalized_text`, and source-row provenance where needed;
+- generated JSON is a source mirror only and must not be imported directly by
+  runtime engine code as an active prior-edition catalog;
 - invalid rows fail with actionable diagnostics rather than being silently skipped.
 
 Required tests:
@@ -3780,11 +3795,91 @@ CORE V1 relevant areas:
 - content import scripts, if present;
 - datasheet/wargear/faction/stratagem tests.
 
-## Phase 17B: canonical catalog generation from Wahapedia data
+## Phase 17A.1: official 11th Edition transition patch packages
+
+This is an inserted bridge subphase between the source mirror and canonical
+catalog generation. It exists to avoid renumbering the later Phase 17 work while
+making the pre-native-Wahapedia transition patch layer explicit.
+
+Until native 11th Edition faction source rows are available, official faction
+update instructions are represented as structured patch packages applied to the
+normalized bridge source mirror. These packages preserve official source text,
+target selectors, ordering, diagnostics, and generated payload hashes.
+
+Modules:
+
+- `tools/build_transition_patch.py`
+- `tools/apply_transition_patches.py`
+- `rules/source_patch.py`
+- `rules/source_catalog.py`
+- `rules/text_normalization.py`
+
+Objects:
+
+- `SourceTransitionPatchPackage`
+- `SourceTransitionPatchOperation`
+- `SourcePatchTarget`
+- `SourcePatchDiagnostic`
+- `SourceFaqClassification`
+- `PatchedSourceArtifact`
+
+Initial operation families:
+
+- `append_rule_text`
+- `replace_rule_text`
+- `add_keyword`
+- `remove_keyword`
+- `replace_weapon_characteristic`
+- `replace_datasheet_ability`
+- `replace_enhancement_text`
+- `replace_stratagem_text`
+- `record_faq_answer`
+- `mark_unsupported`
+
+FAQ classifications:
+
+- `advisory_only`
+- `executable_patch`
+- `unsupported_executable_change`
+
+Invariants:
+
+- transition patches cite official source package ID, source date, faction ID,
+  normalized instruction text, and stable source IDs;
+- patch application is deterministic and ordered;
+- every patch target resolves to exactly one source row or to an explicit
+  multi-row target set declared by the operation;
+- target drift is a hard import error unless the operation is explicitly marked
+  as an unsupported diagnostic;
+- text replacement and append operations re-run the normalization and parsed-token
+  boundary before catalog generation;
+- official 11th Edition patches produce 11th Edition package IDs and hashes;
+- patch packages do not introduce runtime old-vs-new edition switches;
+- every FAQ answer is classified before catalog emission;
+- FAQs classified as `advisory_only` are stored as source-linked advisory
+  records until a later rule descriptor consumes them;
+- FAQs that change executable behavior must be represented as
+  `executable_patch` operations or `unsupported_executable_change` diagnostics,
+  never as advisory-only records.
+
+Required tests:
+
+- Death Guard transition examples apply in a stable order;
+- keyword-add patches update all declared datasheet targets and reject missing targets;
+- weapon-characteristic replacement changes only the named profile and records provenance;
+- rule-text replacement and append operations normalize Unicode, quotes, dashes,
+  distances, and HTML-free text;
+- package hash changes on either upstream source drift or transition patch drift;
+- unresolved, ambiguous, stale, or malformed patch targets produce actionable diagnostics;
+- FAQ classification rejects executable changes stored as advisory-only records;
+- patched source artifacts contain no raw HTML in runtime-bound fields.
+
+## Phase 17B: canonical 11th Edition catalog generation from patched source data
 
 Modules:
 
 - `tools/build_catalog.py`
+- `tools/apply_transition_patches.py`
 - `core/datasheet.py`
 - `core/army_catalog.py`
 - `core/faction.py`
@@ -3808,6 +3903,8 @@ Invariants:
 - all datasheets, model profiles, unit composition, wargear options, base sizes, keywords, and faction keywords come from source-linked catalog records;
 - all factions and detachments are catalog records, not hand-authored fixture-only data;
 - all stratagems and enhancements are source-linked descriptors;
+- the catalog consumes patched 11th Edition source artifacts, never raw
+  prior-edition mirror rows directly;
 - generated catalog package hash is deterministic;
 - catalog generation is idempotent and diffable;
 - missing geometry/height/base overrides are explicit import blockers or unsupported descriptors, not silent defaults.
