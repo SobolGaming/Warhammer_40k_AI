@@ -20,6 +20,45 @@ instructions, and then compiled into 11th Edition catalog records.
 - Do not mark a faction phase complete while unapproved unsupported descriptors
   remain for matched-play content in that phase.
 
+## Queue Source
+
+The seeded detachment queue is derived from:
+
+- package ID: `gw-11e-faction-detachments-2026-27`
+- path:
+  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_detachments_2026_27.py`
+- source title: `Warhammer 40,000 11th Edition Faction Detachments 2026-27`
+- source version: `2026-27`
+- source date: `2026-27` source season; the current package does not yet expose
+  a separate ISO source date field
+- upstream identity: official 11th Edition faction-detachment source package
+  imported into CORE V2
+- source edition: `11th`
+- schema version: `core-v2-faction-detachment-source-v1`
+- SHA-256 checksum:
+  `45749271d6dc504737133aa6fda8666378a99231e2617d1af865ab677083a4cf`
+
+Queue refreshes must be generated from this package, not hand-edited, except for
+explicitly reviewed corrections recorded in the patch package manifest. Until a
+dedicated generator lands in Phase 17A, queue verification uses the package API:
+
+```bash
+uv run python - <<'PY'
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_detachments_2026_27 as source,
+)
+
+for row in source.detachment_rows():
+    print(f"{row.faction_id}\t{row.name}")
+PY
+```
+
+Names in this queue preserve upstream source-row spelling exactly, including any
+official misspellings. Corrections must be represented as source-linked patch
+operations, not silent edits. The current source package intentionally preserves
+`Auxillary Cadre` and `Brood Brothers Auxillia` because those are the exact
+source-row names in the seeded package.
+
 ## Faction Phase Shape
 
 Large phases are faction names. Lettered subphases inside a faction are named
@@ -59,7 +98,8 @@ characteristics, and FAQ advisory records.
   Predator Annihilator, Chaos Predator Destructor, Chaos Rhino, Miasmic
   Malignifier, and Plagueburst Crawler.
 - Phase Death Guard G: Plagueburst Crawler FAQ advisory record for Spore-laced
-  Shock Waves.
+  Shock Waves, classified as `advisory_only` unless source review determines it
+  changes executable behavior.
 - Phase Death Guard H+: Remaining Death Guard datasheets, one exact datasheet or
   source-coupled kit group per lettered subphase after source import.
 
@@ -297,6 +337,8 @@ Each lettered subphase must include:
 - normalized source rows and official patch records for the named content;
 - catalog records with stable IDs and source IDs;
 - explicit unsupported descriptors for unimplemented rule shapes;
+- FAQ classification as `advisory_only`, `executable_patch`, or
+  `unsupported_executable_change` whenever FAQ rows are in scope;
 - deterministic package or catalog hash tests when source data is generated;
 - engine behavior tests for any executable rule path;
 - replay-safe payload tests for any state-changing rule path;

@@ -3797,6 +3797,10 @@ CORE V1 relevant areas:
 
 ## Phase 17A.1: official 11th Edition transition patch packages
 
+This is an inserted bridge subphase between the source mirror and canonical
+catalog generation. It exists to avoid renumbering the later Phase 17 work while
+making the pre-native-Wahapedia transition patch layer explicit.
+
 Until native 11th Edition faction source rows are available, official faction
 update instructions are represented as structured patch packages applied to the
 normalized bridge source mirror. These packages preserve official source text,
@@ -3816,6 +3820,7 @@ Objects:
 - `SourceTransitionPatchOperation`
 - `SourcePatchTarget`
 - `SourcePatchDiagnostic`
+- `SourceFaqClassification`
 - `PatchedSourceArtifact`
 
 Initial operation families:
@@ -3831,6 +3836,12 @@ Initial operation families:
 - `record_faq_answer`
 - `mark_unsupported`
 
+FAQ classifications:
+
+- `advisory_only`
+- `executable_patch`
+- `unsupported_executable_change`
+
 Invariants:
 
 - transition patches cite official source package ID, source date, faction ID,
@@ -3844,8 +3855,12 @@ Invariants:
   boundary before catalog generation;
 - official 11th Edition patches produce 11th Edition package IDs and hashes;
 - patch packages do not introduce runtime old-vs-new edition switches;
-- FAQs that do not change executable behavior are stored as source-linked
-  advisory records until a later rule descriptor consumes them.
+- every FAQ answer is classified before catalog emission;
+- FAQs classified as `advisory_only` are stored as source-linked advisory
+  records until a later rule descriptor consumes them;
+- FAQs that change executable behavior must be represented as
+  `executable_patch` operations or `unsupported_executable_change` diagnostics,
+  never as advisory-only records.
 
 Required tests:
 
@@ -3856,6 +3871,7 @@ Required tests:
   distances, and HTML-free text;
 - package hash changes on either upstream source drift or transition patch drift;
 - unresolved, ambiguous, stale, or malformed patch targets produce actionable diagnostics;
+- FAQ classification rejects executable changes stored as advisory-only records;
 - patched source artifacts contain no raw HTML in runtime-bound fields.
 
 ## Phase 17B: canonical 11th Edition catalog generation from patched source data
