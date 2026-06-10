@@ -123,15 +123,18 @@ excludes declared reserves from Deploy Armies options.
 instantiation: strict roster requests validate Strike Force unit points plus
 selected Enhancement points, unit limits, Warlord selection, Enhancement
 assignment rules, attached-squad Enhancement limits, Epic Hero restrictions,
-and Dedicated Transport starting cargo manifests through deterministic
-`RosterLegalityReport` diagnostics. Production `GameConfig` values require
-strict mustering requests by default; legacy smoke fixtures must opt into
+required Dedicated Transport manifest source data, and provided Dedicated
+Transport cargo legality through deterministic `RosterLegalityReport`
+diagnostics. Production `GameConfig` values require strict mustering requests
+by default; legacy smoke fixtures must opt into
 `allow_legacy_non_strict_rosters`. Mustered armies preserve Warlord,
 Enhancement, unit-point, Dedicated Transport, and legality provenance in
 JSON-safe payloads, promote the selected Warlord with a `WARLORD` keyword, and
 setup records source-backed starting embarked cargo before Deploy Armies while
-`GameState.record_army_definition(...)` derives the `StartingStrengthRecord`
-set consumed by later phases.
+explicit empty Dedicated Transport manifests become deterministic setup
+consequences that exclude the transport from deployment and mark it destroyed
+in battle round 1. `GameState.record_army_definition(...)` derives the
+`StartingStrengthRecord` set consumed by later phases.
 
 Completed / implemented foundation:
 
@@ -3448,11 +3451,13 @@ Phase 16D finishes source-backed army construction and runtime instantiation.
 The mustering output is not a loose list of component units: it is a
 deterministic `ArmyDefinition` containing runtime unit instances, attached
 rules units, enhancement records, Dedicated Transport manifests, and legality
-reports that later phases consume without guessing. `StartingStrengthRecord`
-remains the authoritative game-state artifact owned by `GameState`; setup calls
-`GameState.record_army_definition(...)`, which derives records from the
-mustered units and attached formations before later command, damage, healing,
-and split logic can consume them.
+reports that later phases consume without guessing. Setup consumes those
+manifests to record `TransportCargoState` values or
+`DedicatedTransportSetupConsequence` values on `GameState`.
+`StartingStrengthRecord` remains the authoritative game-state artifact owned by
+`GameState`; setup calls `GameState.record_army_definition(...)`, which derives
+records from the mustered units and attached formations before later command,
+damage, healing, and split logic can consume them.
 
 Implemented coverage:
 
@@ -3463,7 +3468,8 @@ Implemented coverage:
   `RosterLegalityReport` diagnostics for Strike Force unit points plus selected
   Enhancement points, unit limits, missing source data, Warlord legality,
   Enhancement legality, Epic Hero restrictions, attached-squad Enhancement
-  limits, and Dedicated Transport capacity/cargo restrictions;
+  limits, missing Dedicated Transport manifests, and Dedicated Transport
+  capacity/cargo restrictions when cargo is provided;
 - strict roster requests fail before mutation, while `GameConfig` rejects
   non-strict mustering requests by default; legacy smoke fixtures must opt into
   `allow_legacy_non_strict_rosters` explicitly;
@@ -3473,6 +3479,10 @@ Implemented coverage:
 - setup records Dedicated Transport manifest cargo as first-class
   `TransportCargoState` before Deploy Armies and emits deterministic setup
   events.
+- setup records explicit empty Dedicated Transport manifests as
+  `DedicatedTransportSetupConsequence` values instead of roster-legality
+  failures; those transports cannot be selected in Deploy Armies and are
+  accounted as destroyed in battle round 1.
 - setup records `StartingStrengthRecord` entries from `ArmyDefinition` through
   `GameState.record_army_definition(...)`; attached formations receive one
   attached-unit starting-strength record until split, and component records are
@@ -3506,6 +3516,7 @@ Objects:
 - `EnhancementAssignment`
 - `WarlordSelection`
 - `DedicatedTransportManifest`
+- `DedicatedTransportSetupConsequence`
 - `RosterLegalityReport`
 - `StartingStrengthRecord`
 
@@ -3548,6 +3559,9 @@ Invariants:
 - Dedicated Transport starting cargo is a source-backed setup manifest and must
   be consistent with transport capacity, datasheet restrictions, component
   attached-unit state, and Deploy Armies option filtering;
+- missing Dedicated Transport manifest source data is a strict construction
+  violation; an explicit empty manifest is a setup consequence, not a roster
+  legality failure;
 - Leader attachment restrictions are validated before battle;
 - each Bodyguard unit can have at most one Leader and one Support attached unless a rule says otherwise;
 - while attached, the runtime-instantiated Attached unit is treated as one unit
@@ -3580,7 +3594,8 @@ Required tests:
 - source-awaiting detachment point, enhancement eligibility, base-size,
   transport-capacity, or attachment-rule data blocks the affected roster path
   with typed diagnostics;
-- Dedicated Transport starting cargo legality and empty-at-start consequence;
+- Dedicated Transport starting cargo legality, missing-manifest roster
+  diagnostics, and explicit empty-manifest setup consequences;
 - Leader/Support/Bodyguard legal attachment, army-list attachment timing, and
   runtime instantiation of the attached rules unit with deterministic component
   role metadata;
@@ -3592,6 +3607,9 @@ Required tests:
   legacy smoke fixture explicitly opts out;
 - setup-derived `StartingStrengthRecord` values cover mustered attached units
   and single-model transports before later phases consume them;
+- empty Dedicated Transport setup consequences are replay-safe, account their
+  transport models for deployment completion, and exclude those transports from
+  Deploy Armies choices;
 - Attached-unit coherency uses `UnitGroup.alive_models()`/group-aware placement data across Leader and Bodyguard models;
 - Attached-unit Toughness and Character allocation protection;
 - Attached-unit split timing after attacks resolve;

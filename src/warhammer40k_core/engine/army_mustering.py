@@ -1363,15 +1363,6 @@ def _append_dedicated_transport_manifest_violations(
                     source_id=manifest.source_id,
                 )
             )
-        if not manifest.embarked_unit_selection_ids:
-            violations.append(
-                RosterLegalityViolation(
-                    violation_code="dedicated_transport_empty_starting_cargo",
-                    message="Dedicated Transport manifest requires at least one cargo unit.",
-                    unit_selection_id=manifest.transport_unit_selection_id,
-                    source_id=manifest.source_id,
-                )
-            )
         if manifest.capacity_profile.transport_datasheet_id != transport_datasheet.datasheet_id:
             violations.append(
                 RosterLegalityViolation(

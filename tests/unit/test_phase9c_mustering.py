@@ -37,7 +37,8 @@ from warhammer40k_core.engine.army_mustering import (
     validate_roster_legality,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.deployment import deployment_unit_selection_request
+from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     BattleSize,
@@ -54,6 +55,7 @@ from warhammer40k_core.engine.list_validation import (
     validate_detachment_selection,
     validate_unit_selection_for_faction,
 )
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import (
     RulesUnitComponent,
@@ -68,6 +70,7 @@ from warhammer40k_core.engine.unit_factory import (
     UnitFactoryError,
     UnitInstance,
 )
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
@@ -359,6 +362,16 @@ def _transport_capacity(*, max_model_count: int) -> DedicatedTransportCapacityPr
         allowed_keywords=("Infantry",),
         excluded_keywords=(),
         source_id=f"transport-capacity:core-transport:{max_model_count}",
+    )
+
+
+def _phase16d_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
     )
 
 
@@ -1190,6 +1203,10 @@ def test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads() -> N
 
 def test_phase16d_transport_manifest_validates_capacity_and_attached_group_completeness() -> None:
     catalog = _phase16d_catalog()
+    missing_manifest = _phase16d_transport_roster_request(
+        catalog,
+        dedicated_transport_manifests=(),
+    )
     incomplete_group = _phase16d_transport_roster_request(
         catalog,
         dedicated_transport_manifests=(
@@ -1245,10 +1262,19 @@ def test_phase16d_transport_manifest_validates_capacity_and_attached_group_compl
             request=empty_cargo,
         ).violations
     }
+    missing_manifest_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=missing_manifest,
+        ).violations
+    }
 
+    assert "dedicated_transport_missing_starting_cargo" in missing_manifest_codes
     assert "transport_manifest_attached_unit_incomplete" in incomplete_codes
     assert "transport_manifest_capacity_exceeded" in over_capacity_codes
-    assert "dedicated_transport_empty_starting_cargo" in empty_cargo_codes
+    assert "dedicated_transport_empty_starting_cargo" not in empty_cargo_codes
+    assert validate_roster_legality(catalog=catalog, request=empty_cargo).is_legal
 
 
 def test_phase16d_roster_payload_value_objects_fail_fast() -> None:
@@ -1448,6 +1474,7 @@ def test_phase16d_setup_records_starting_transport_cargo_from_manifest() -> None
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("area-denial", "assassination"),
+        mission_setup=_phase16d_mission_setup(),
     )
     state = GameState.from_config(config)
     while state.current_setup_step is not SetupStep.MUSTER_ARMIES:
@@ -1482,6 +1509,73 @@ def test_phase16d_setup_records_starting_transport_cargo_from_manifest() -> None
         state.starting_strength_record_for_unit("army-alpha:bodyguard-unit")
     event_types = tuple(event.event_type for event in decisions.event_log.records)
     assert "battle_formation_transport_manifest_recorded" in event_types
+
+
+def test_phase16d_empty_dedicated_transport_manifest_records_setup_consequence() -> None:
+    catalog = _phase16d_catalog()
+    empty_transport_request = _phase16d_transport_roster_request(
+        catalog,
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=(),
+                capacity_profile=_transport_capacity(max_model_count=6),
+                source_id="manifest:empty",
+            ),
+        ),
+    )
+    config = GameConfig(
+        game_id="phase16d-empty-transport",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            empty_transport_request,
+            _phase16d_transport_roster_request(
+                catalog,
+                army_id="army-beta",
+                player_id="player-b",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+        mission_setup=_phase16d_mission_setup(),
+    )
+    state = GameState.from_config(config)
+    while state.current_setup_step is not SetupStep.MUSTER_ARMIES:
+        state.complete_current_setup_step()
+    decisions = DecisionController()
+
+    setup_flow = SetupFlow()
+    setup_flow.advance(state=state, decisions=decisions, config=config)
+    setup_flow.advance(state=state, decisions=decisions, config=config)
+
+    consequence = state.dedicated_transport_setup_consequence_for_transport(
+        "army-alpha:transport-unit"
+    )
+    assert consequence is not None
+    assert consequence.destroyed_battle_round == 1
+    assert consequence.source_id == "manifest:empty"
+    assert state.transport_cargo_state_for_transport("army-alpha:transport-unit") is None
+    assert "army-alpha:transport-unit:core-transport:001" in state.unavailable_model_ids()
+
+    deployment_request = deployment_unit_selection_request(
+        state=state,
+        ruleset_descriptor=config.ruleset_descriptor,
+        player_id="player-a",
+    )
+    option_ids = tuple(option.option_id for option in deployment_request.options)
+    payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+
+    assert "deploy:army-alpha:transport-unit" not in option_ids
+    assert "deploy:attached-unit:army-alpha:bodyguard-unit" in option_ids
+    assert "dedicated_transport_setup_consequence_recorded" in tuple(
+        event.event_type for event in decisions.event_log.records
+    )
+    assert GameState.from_payload(payload).to_payload() == state.to_payload()
 
 
 def test_phase16d_game_config_requires_strict_roster_legality_for_production() -> None:

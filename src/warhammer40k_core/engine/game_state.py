@@ -208,6 +208,19 @@ class TacticalSecondaryDrawPayload(TypedDict):
     draw_count: int
 
 
+DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE = (
+    "empty_starting_cargo_destroyed_first_battle_round"
+)
+
+
+class DedicatedTransportSetupConsequencePayload(TypedDict):
+    player_id: str
+    transport_unit_instance_id: str
+    consequence_kind: str
+    destroyed_battle_round: int
+    source_id: str
+
+
 class GameStatePayload(TypedDict):
     game_id: str
     ruleset_descriptor_hash: str
@@ -241,6 +254,7 @@ class GameStatePayload(TypedDict):
     reserve_states: list[ReserveStatePayload]
     hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
+    dedicated_transport_setup_consequences: list[DedicatedTransportSetupConsequencePayload]
     disembarked_unit_states: list[DisembarkedUnitStatePayload]
     advanced_unit_states: list[AdvancedUnitStatePayload]
     fell_back_unit_states: list[FellBackUnitStatePayload]
@@ -314,6 +328,10 @@ def _new_hover_mode_states() -> list[HoverModeState]:
 
 
 def _new_transport_cargo_states() -> list[TransportCargoState]:
+    return []
+
+
+def _new_dedicated_transport_setup_consequences() -> list[DedicatedTransportSetupConsequence]:
     return []
 
 
@@ -657,6 +675,88 @@ class TacticalSecondaryDraw:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class DedicatedTransportSetupConsequence:
+    player_id: str
+    transport_unit_instance_id: str
+    consequence_kind: str
+    destroyed_battle_round: int
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("DedicatedTransportSetupConsequence player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "transport_unit_instance_id",
+            _validate_identifier(
+                "DedicatedTransportSetupConsequence transport_unit_instance_id",
+                self.transport_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "consequence_kind",
+            _validate_identifier(
+                "DedicatedTransportSetupConsequence consequence_kind",
+                self.consequence_kind,
+            ),
+        )
+        if self.consequence_kind != DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE:
+            raise GameLifecycleError("DedicatedTransportSetupConsequence kind is unsupported.")
+        object.__setattr__(
+            self,
+            "destroyed_battle_round",
+            _validate_positive_int(
+                "DedicatedTransportSetupConsequence destroyed_battle_round",
+                self.destroyed_battle_round,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("DedicatedTransportSetupConsequence source_id", self.source_id),
+        )
+
+    @classmethod
+    def empty_dedicated_transport(
+        cls,
+        *,
+        player_id: str,
+        transport_unit_instance_id: str,
+        source_id: str,
+    ) -> Self:
+        return cls(
+            player_id=player_id,
+            transport_unit_instance_id=transport_unit_instance_id,
+            consequence_kind=DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE,
+            destroyed_battle_round=1,
+            source_id=source_id,
+        )
+
+    def to_payload(self) -> DedicatedTransportSetupConsequencePayload:
+        return {
+            "player_id": self.player_id,
+            "transport_unit_instance_id": self.transport_unit_instance_id,
+            "consequence_kind": self.consequence_kind,
+            "destroyed_battle_round": self.destroyed_battle_round,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DedicatedTransportSetupConsequencePayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            transport_unit_instance_id=payload["transport_unit_instance_id"],
+            consequence_kind=payload["consequence_kind"],
+            destroyed_battle_round=payload["destroyed_battle_round"],
+            source_id=payload["source_id"],
+        )
+
+
 @dataclass(slots=True)
 class GameState:
     game_id: str
@@ -707,6 +807,9 @@ class GameState:
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
     transport_cargo_states: list[TransportCargoState] = field(
         default_factory=_new_transport_cargo_states
+    )
+    dedicated_transport_setup_consequences: list[DedicatedTransportSetupConsequence] = field(
+        default_factory=_new_dedicated_transport_setup_consequences
     )
     disembarked_unit_states: list[DisembarkedUnitState] = field(
         default_factory=_new_disembarked_unit_states
@@ -875,6 +978,13 @@ class GameState:
         self.transport_cargo_states = _validate_transport_cargo_states(
             self.transport_cargo_states,
             player_ids=self.player_ids,
+        )
+        self.dedicated_transport_setup_consequences = (
+            _validate_dedicated_transport_setup_consequences(
+                self.dedicated_transport_setup_consequences,
+                army_definitions=self.army_definitions,
+                player_ids=self.player_ids,
+            )
         )
         self.disembarked_unit_states = _validate_disembarked_unit_states(
             self.disembarked_unit_states,
@@ -1501,6 +1611,13 @@ class GameState:
             )
         if self.transport_cargo_state_for_transport(requested_transport_id) is not None:
             raise GameLifecycleError("Battle formation embarkation Transport already has cargo.")
+        if (
+            self.dedicated_transport_setup_consequence_for_transport(requested_transport_id)
+            is not None
+        ):
+            raise GameLifecycleError(
+                "Battle formation embarkation Transport already has a setup consequence."
+            )
         unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
         transport_owner = unit_owner_by_id.get(requested_transport_id)
         if transport_owner is None:
@@ -3026,7 +3143,83 @@ class GameState:
         return tuple(sorted(model_ids))
 
     def unavailable_model_ids(self) -> tuple[str, ...]:
-        return tuple(sorted((*self.unarrived_reserve_model_ids(), *self.embarked_model_ids())))
+        return tuple(
+            sorted(
+                (
+                    *self.unarrived_reserve_model_ids(),
+                    *self.embarked_model_ids(),
+                    *self.dedicated_transport_setup_consequence_model_ids(),
+                )
+            )
+        )
+
+    def dedicated_transport_setup_consequence_model_ids(self) -> tuple[str, ...]:
+        if not self.dedicated_transport_setup_consequences:
+            return ()
+        unit_by_id = {
+            unit.unit_instance_id: unit for army in self.army_definitions for unit in army.units
+        }
+        model_ids: list[str] = []
+        for consequence in self.dedicated_transport_setup_consequences:
+            unit = unit_by_id.get(consequence.transport_unit_instance_id)
+            if unit is None:
+                raise GameLifecycleError(
+                    "DedicatedTransportSetupConsequence references an unknown Transport."
+                )
+            model_ids.extend(model.model_instance_id for model in unit.own_models)
+        return tuple(sorted(model_ids))
+
+    def record_dedicated_transport_setup_consequence(
+        self,
+        consequence: DedicatedTransportSetupConsequence,
+    ) -> None:
+        if type(consequence) is not DedicatedTransportSetupConsequence:
+            raise GameLifecycleError("consequence must be a DedicatedTransportSetupConsequence.")
+        if consequence.player_id not in self.player_ids:
+            raise GameLifecycleError(
+                "DedicatedTransportSetupConsequence player_id is not in this game."
+            )
+        if (
+            self.dedicated_transport_setup_consequence_for_transport(
+                consequence.transport_unit_instance_id
+            )
+            is not None
+        ):
+            raise GameLifecycleError(
+                "DedicatedTransportSetupConsequence already exists for Transport."
+            )
+        if self.transport_cargo_state_for_transport(consequence.transport_unit_instance_id):
+            raise GameLifecycleError(
+                "DedicatedTransportSetupConsequence Transport already has cargo."
+            )
+        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        owner = unit_owner_by_id.get(consequence.transport_unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("DedicatedTransportSetupConsequence Transport is unknown.")
+        if owner != consequence.player_id:
+            raise GameLifecycleError("DedicatedTransportSetupConsequence player_id drift.")
+        transport = self._unit_by_id(consequence.transport_unit_instance_id)
+        if not _unit_has_keyword(transport, "DEDICATED TRANSPORT"):
+            raise GameLifecycleError(
+                "DedicatedTransportSetupConsequence requires a DEDICATED TRANSPORT unit."
+            )
+        self.dedicated_transport_setup_consequences.append(consequence)
+        self.dedicated_transport_setup_consequences.sort(
+            key=lambda record: record.transport_unit_instance_id
+        )
+
+    def dedicated_transport_setup_consequence_for_transport(
+        self,
+        transport_unit_instance_id: str,
+    ) -> DedicatedTransportSetupConsequence | None:
+        requested_transport_id = _validate_identifier(
+            "transport_unit_instance_id",
+            transport_unit_instance_id,
+        )
+        for consequence in self.dedicated_transport_setup_consequences:
+            if consequence.transport_unit_instance_id == requested_transport_id:
+                return consequence
+        return None
 
     def record_transport_cargo_state(self, cargo_state: TransportCargoState) -> None:
         if type(cargo_state) is not TransportCargoState:
@@ -3038,6 +3231,13 @@ class GameState:
             is not None
         ):
             raise GameLifecycleError("TransportCargoState already exists for transport.")
+        if (
+            self.dedicated_transport_setup_consequence_for_transport(
+                cargo_state.transport_unit_instance_id
+            )
+            is not None
+        ):
+            raise GameLifecycleError("TransportCargoState Transport already has a consequence.")
         self.transport_cargo_states.append(cargo_state)
         self.transport_cargo_states.sort(key=lambda state: state.transport_unit_instance_id)
 
@@ -3309,6 +3509,10 @@ class GameState:
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
+            "dedicated_transport_setup_consequences": [
+                consequence.to_payload()
+                for consequence in self.dedicated_transport_setup_consequences
+            ],
             "disembarked_unit_states": [
                 state.to_payload() for state in self.disembarked_unit_states
             ],
@@ -3585,6 +3789,10 @@ class GameState:
             transport_cargo_states=[
                 TransportCargoState.from_payload(state)
                 for state in payload["transport_cargo_states"]
+            ],
+            dedicated_transport_setup_consequences=[
+                DedicatedTransportSetupConsequence.from_payload(consequence)
+                for consequence in payload["dedicated_transport_setup_consequences"]
             ],
             disembarked_unit_states=[
                 DisembarkedUnitState.from_payload(state)
@@ -4685,6 +4893,47 @@ def _validate_transport_cargo_states(
         seen.add(value.transport_unit_instance_id)
         validated.append(value)
     return sorted(validated, key=lambda state: state.transport_unit_instance_id)
+
+
+def _validate_dedicated_transport_setup_consequences(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    player_ids: tuple[str, ...],
+) -> list[DedicatedTransportSetupConsequence]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState dedicated_transport_setup_consequences must be a list.")
+    unit_owner_by_id = _unit_owner_by_id(army_definitions)
+    unit_by_id = {unit.unit_instance_id: unit for army in army_definitions for unit in army.units}
+    validated: list[DedicatedTransportSetupConsequence] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not DedicatedTransportSetupConsequence:
+            raise GameLifecycleError(
+                "GameState dedicated_transport_setup_consequences must contain "
+                "DedicatedTransportSetupConsequence values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError(
+                "DedicatedTransportSetupConsequence player_id is not in this game."
+            )
+        if value.transport_unit_instance_id in seen:
+            raise GameLifecycleError(
+                "GameState dedicated_transport_setup_consequences must be unique."
+            )
+        owner = unit_owner_by_id.get(value.transport_unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("DedicatedTransportSetupConsequence Transport is unknown.")
+        if owner != value.player_id:
+            raise GameLifecycleError("DedicatedTransportSetupConsequence player_id drift.")
+        transport = unit_by_id[value.transport_unit_instance_id]
+        if not _unit_has_keyword(transport, "DEDICATED TRANSPORT"):
+            raise GameLifecycleError(
+                "DedicatedTransportSetupConsequence requires a DEDICATED TRANSPORT unit."
+            )
+        seen.add(value.transport_unit_instance_id)
+        validated.append(value)
+    return sorted(validated, key=lambda consequence: consequence.transport_unit_instance_id)
 
 
 def _validate_disembarked_unit_states(
