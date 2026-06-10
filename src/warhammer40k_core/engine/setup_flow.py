@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from itertools import combinations
 from typing import cast
 
@@ -44,7 +45,9 @@ from warhammer40k_core.engine.prebattle import (
     apply_scout_move,
     apply_scout_reserve_setup,
     prebattle_action_selection_request,
+    prebattle_next_player_id_for_timing_state,
     prebattle_proposal_request_from_selection,
+    prebattle_sequencing_request_for_timing_state,
     prebattle_timing_state_for_state,
     redeploy_placement_request_from_selection,
     redeploy_timing_state_for_state,
@@ -185,6 +188,7 @@ class SetupFlow:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=config.ruleset_descriptor,
+                army_catalog=config.army_catalog,
             )
             return
         if result.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE:
@@ -202,6 +206,7 @@ class SetupFlow:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=config.ruleset_descriptor,
+                army_catalog=config.army_catalog,
             )
             return
         if result.decision_type == SUBMIT_SCOUT_MOVE_DECISION_TYPE:
@@ -211,6 +216,7 @@ class SetupFlow:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=config.ruleset_descriptor,
+                army_catalog=config.army_catalog,
             )
             return
         if result.decision_type != SECONDARY_MISSION_DECISION_TYPE:
@@ -369,12 +375,33 @@ class SetupFlow:
         config: GameConfig,
     ) -> LifecycleStatus | None:
         setup_state = redeploy_timing_state_for_state(state)
-        if setup_state.next_player_id is None:
+        sequencing_request = prebattle_sequencing_request_for_timing_state(
+            state=state,
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if sequencing_request is not None:
+            decisions.request_decision(sequencing_request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.SETUP,
+                decision_request=sequencing_request,
+                payload={
+                    "setup_step": SetupStep.REDEPLOY_UNITS.value,
+                    "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
+                },
+            )
+        next_player_id = prebattle_next_player_id_for_timing_state(
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if next_player_id is None:
             return None
+        effective_setup_state = replace(setup_state, next_player_id=next_player_id)
         request = redeploy_unit_selection_request(
             state=state,
             ruleset_descriptor=config.ruleset_descriptor,
-            player_id=setup_state.next_player_id,
+            army_catalog=config.army_catalog,
+            player_id=next_player_id,
         )
         decisions.request_decision(request)
         return LifecycleStatus.waiting_for_decision(
@@ -382,7 +409,7 @@ class SetupFlow:
             decision_request=request,
             payload={
                 "setup_step": SetupStep.REDEPLOY_UNITS.value,
-                "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
+                "prebattle_timing_state": cast(JsonValue, effective_setup_state.to_payload()),
             },
         )
 
@@ -393,13 +420,37 @@ class SetupFlow:
         decisions: DecisionController,
         config: GameConfig,
     ) -> LifecycleStatus | None:
-        setup_state = prebattle_timing_state_for_state(state)
-        if setup_state.next_player_id is None:
+        setup_state = prebattle_timing_state_for_state(
+            state,
+            army_catalog=config.army_catalog,
+        )
+        sequencing_request = prebattle_sequencing_request_for_timing_state(
+            state=state,
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if sequencing_request is not None:
+            decisions.request_decision(sequencing_request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.SETUP,
+                decision_request=sequencing_request,
+                payload={
+                    "setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
+                    "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
+                },
+            )
+        next_player_id = prebattle_next_player_id_for_timing_state(
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if next_player_id is None:
             return None
+        effective_setup_state = replace(setup_state, next_player_id=next_player_id)
         request = prebattle_action_selection_request(
             state=state,
             ruleset_descriptor=config.ruleset_descriptor,
-            player_id=setup_state.next_player_id,
+            army_catalog=config.army_catalog,
+            player_id=next_player_id,
         )
         decisions.request_decision(request)
         return LifecycleStatus.waiting_for_decision(
@@ -407,7 +458,7 @@ class SetupFlow:
             decision_request=request,
             payload={
                 "setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
-                "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
+                "prebattle_timing_state": cast(JsonValue, effective_setup_state.to_payload()),
             },
         )
 
@@ -533,6 +584,7 @@ class SetupFlow:
         placement_request = redeploy_placement_request_from_selection(
             state=state,
             ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
             selection_request=selection_record.request,
             result=result,
         ).to_decision_request()
@@ -583,6 +635,7 @@ class SetupFlow:
         proposal_request = prebattle_proposal_request_from_selection(
             state=state,
             ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
             selection_request=selection_record.request,
             result=result,
         ).to_decision_request()

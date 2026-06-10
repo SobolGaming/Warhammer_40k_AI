@@ -631,13 +631,15 @@ Phase 16B exposes these finite setup decisions:
 - `select_redeploy_unit`: finite player choice during setup step `redeploy_units`. The engine emits one deterministic `redeploy:<rules_unit_id>` option for each currently legal redeploy candidate and always includes `complete_redeploys`. Option payloads include submission kind, game ID, player ID, setup step, selected rules-unit ID when applicable, component/model IDs, owning deployment-zone IDs, source rule ID, action kind, proposal kind, Scout metadata when present, mission/deployment/terrain source IDs, and ruleset descriptor hash. Adapters must select one pending option ID and must not synthesize redeploy targets from visible battlefield state.
 - `select_prebattle_action`: finite player choice during setup step `resolve_prebattle_actions`. The engine emits deterministic `scout_reserve_setup:<rules_unit_id>`, `scout_move:<rules_unit_id>`, and `dedicated_transport_scout_move:<transport_unit_id>` options when those branches are legal, plus `complete_prebattle_actions`. Adapters must not invent Scout options, promote an embarked unit outside the Dedicated Transport branch, or mutate cargo/reserve/battlefield state from option payloads.
 
+When both players have unresolved effects in the same Phase 16B setup step, the engine emits the Phase 12A finite `resolve_sequencing_order` request before `select_redeploy_unit` or `select_prebattle_action`. That sequencing request uses a before-battle timing window and a deterministic roll-off to choose the deciding player. Adapters must answer by selecting one emitted ordering option; they must not sort pre-battle participants locally or skip the sequencing request.
+
 Selecting a redeploy or Scout action records the finite `DecisionRecord`, emits the corresponding selection event, and emits one of these parameterized requests:
 
 - `submit_redeploy_placement` with proposal kind `redeploy_placement`;
 - `submit_scout_reserve_setup` with proposal kind `scout_reserve_setup`;
 - `submit_scout_move` with proposal kind `scout_move`.
 
-All three request types embed a `PreBattleProposalRequest` in `payload.proposal_request` and expose the fixed `submit_parameterized_payload` option. The request context includes game ID, actor/player ID, setup step, selected rules-unit ID, component unit IDs, exact model IDs, action kind, source rule ID, source selection request/result IDs, ruleset hash, source-backed `MissionSetup`, and owning deployment-zone payloads. Scout Move requests also include the selected `scout_distance_inches`; that value is engine-derived from structured Scouts ability instances using the official duplicate-distance rule.
+All three request types embed a `PreBattleProposalRequest` in `payload.proposal_request` and expose the fixed `submit_parameterized_payload` option. The request context includes game ID, actor/player ID, setup step, selected rules-unit ID, component unit IDs, exact model IDs, action kind, source rule ID, source selection request/result IDs, ruleset hash, source-backed `MissionSetup`, and owning deployment-zone payloads. Scout Move requests also include the selected `scout_distance_inches`; that value is engine-derived from structured Scouts ability instances using the official duplicate-distance rule. Current catalog ability ownership is datasheet/component-granular, so every alive model in a component receives that component's structured Scouts descriptors. A `SCOUTS` keyword without a structured Scouts descriptor is source-data invalid and fails fast rather than producing a default distance.
 
 Adapters answer redeploy and Scout reserve setup with `PreBattlePlacementProposal` through `ParameterizedSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. The payload must include:
 
@@ -681,6 +683,7 @@ Required Phase 16B adapter-contract tests:
 
 - valid redeploy unit selection and placement through the shared lifecycle path;
 - valid Scout reserve setup and Scout Move submissions through the shared lifecycle path;
+- simultaneous pre-battle effects emit and consume a Phase 12A sequencing request before player selection;
 - stale, malformed, wrong-context, drifted, endpoint-only, and rule-invalid pre-battle proposals reject before queue pop and before mutation;
 - redeploy emits removal plus placement records and no displacement records;
 - Scout duplicate-distance examples produce the official selected distance;

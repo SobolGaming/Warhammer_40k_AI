@@ -99,11 +99,15 @@ deterministic bridge.
 
 **Phase 16B is complete** for redeployments, Scouts, and Resolve Pre-battle
 Abilities: redeploy finite selections and placement proposals resolve as
-temporary removal plus setup placement, Scout reserve setup resolves as setup
-placement from Strategic Reserves, Scout Moves require per-model `PathWitness`
-evidence and shared movement validators, Dedicated Transport Scout Move
-eligibility is cargo-aware, and deterministic `PreBattleActionRecord` payloads
-preserve replay-safe setup action history.
+temporary removal plus setup placement, simultaneous pre-battle effects use the
+Phase 12A sequencing path, Scout reserve setup resolves as setup placement from
+Strategic Reserves, Scout Moves require per-model `PathWitness` evidence and
+shared movement validators, Dedicated Transport Scout Move eligibility is
+cargo-aware, structured datasheet ability descriptors provide `Scouts X"`
+distances, and deterministic `PreBattleActionRecord` payloads preserve
+replay-safe setup action history. Current source catalog ability ownership is
+datasheet/component-granular; future per-model catalog ownership can refine
+mixed-model Scouts eligibility without changing the adapter proposal path.
 
 Completed / implemented foundation:
 
@@ -3160,6 +3164,11 @@ Implementation notes: `SetupFlow` now runs `redeploy_units` and
 `submit_scout_move`. Lifecycle validation rejects stale, malformed, drifted, or
 rule-invalid pre-battle proposal payloads before queue pop and before mutation.
 Accepted actions emit deterministic `PreBattleActionRecord` payloads.
+When more than one player has unresolved effects in the same pre-battle setup
+step, `SetupFlow` first emits the Phase 12A `resolve_sequencing_order` decision
+using a before-battle timing window and a deterministic roll-off; the resolved
+participant order then controls which player receives the next redeploy or
+pre-battle action selection request.
 
 Modules:
 
@@ -3204,6 +3213,10 @@ Invariants:
 - Scouts always takes the source-backed form `Scouts X"`; X is the maximum
   Scout Move distance and must come from the structured ability descriptor, not
   parsed at runtime from raw text;
+- current catalog data attaches Scouts descriptors at datasheet/component
+  granularity; every alive model in a component receives the component's
+  structured Scouts descriptors, and a `SCOUTS` keyword without a structured
+  descriptor fails fast instead of falling back to a default distance;
 - duplicated `Scouts X"` instances use the official numbered-core-ability
   duplicate rule with the Scouts exception: if every model shares a Scouts
   value, that shared value is a legal selected instance, but when Scouts values

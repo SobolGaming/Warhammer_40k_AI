@@ -5,6 +5,11 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.deployment_zones import (
     DeploymentZone,
     DeploymentZoneError,
@@ -35,6 +40,7 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
     terrain_endpoint_placement_violation,
@@ -62,6 +68,16 @@ from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_from_armies,
 )
+from warhammer40k_core.engine.sequencing import (
+    SequencingConflictContext,
+    SequencingParticipant,
+    create_sequencing_decision_request,
+)
+from warhammer40k_core.engine.timing_windows import (
+    TimingTriggerKind,
+    TimingWindow,
+    TimingWindowDescriptor,
+)
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
     UnitCoherencyResult,
@@ -85,8 +101,10 @@ SCOUT_RESERVE_SETUP_PROPOSAL_KIND = "scout_reserve_setup"
 
 CORE_REDEPLOY_SOURCE_RULE_ID = "core_rules:redeploy"
 CORE_SCOUTS_SOURCE_RULE_ID = "core_rules:scouts"
-DEFAULT_SCOUT_DISTANCE_INCHES = 6.0
+CORE_SCOUTS_TIMING_TAG = "scouts"
+CORE_SCOUTS_BEFORE_BATTLE_TAG = "before_battle"
 SCOUT_ENEMY_DISTANCE_INCHES = 8.0
+PREBATTLE_SEQUENCING_EVENT_TYPE = "sequencing_order_resolved"
 _EPSILON = 1e-9
 
 
@@ -953,14 +971,87 @@ def redeploy_timing_state_for_state(state: GameState) -> PreBattleTimingWindowSt
     return _timing_state_for_step(state=state, setup_step=SetupStep.REDEPLOY_UNITS)
 
 
-def prebattle_timing_state_for_state(state: GameState) -> PreBattleTimingWindowState:
-    return _timing_state_for_step(state=state, setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS)
+def prebattle_timing_state_for_state(
+    state: GameState,
+    *,
+    army_catalog: ArmyCatalog,
+) -> PreBattleTimingWindowState:
+    return _timing_state_for_step(
+        state=state,
+        setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS,
+        army_catalog=army_catalog,
+    )
+
+
+def prebattle_sequencing_request_for_timing_state(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    timing_state: PreBattleTimingWindowState,
+) -> DecisionRequest | None:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Pre-battle sequencing requires a DecisionController.")
+    participants = _prebattle_sequencing_participants(timing_state)
+    if len(participants) < 2:
+        return None
+    conflict_id = _prebattle_sequencing_conflict_id(timing_state.setup_step)
+    if (
+        _resolved_prebattle_sequencing_order(
+            decisions=decisions,
+            conflict_id=conflict_id,
+        )
+        is not None
+    ):
+        return None
+    return create_sequencing_decision_request(
+        request_id=state.next_decision_request_id(),
+        context=SequencingConflictContext(
+            conflict_id=conflict_id,
+            game_id=state.game_id,
+            timing_window=_prebattle_timing_window(state=state, setup_step=timing_state.setup_step),
+            player_ids=tuple(participant.player_id for participant in participants),
+            active_player_id=None,
+        ),
+        participants=participants,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+    )
+
+
+def prebattle_next_player_id_for_timing_state(
+    *,
+    decisions: DecisionController,
+    timing_state: PreBattleTimingWindowState,
+) -> str | None:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Pre-battle sequencing requires a DecisionController.")
+    resolved_order = _resolved_prebattle_sequencing_order(
+        decisions=decisions,
+        conflict_id=_prebattle_sequencing_conflict_id(timing_state.setup_step),
+    )
+    if resolved_order is None:
+        return timing_state.next_player_id
+    participants_by_id = {
+        participant.participant_id: participant
+        for participant in _prebattle_sequencing_participants(timing_state)
+    }
+    if not set(participants_by_id).issubset(set(resolved_order)):
+        raise GameLifecycleError("Pre-battle sequencing order drift.")
+    for participant_id in resolved_order:
+        participant = participants_by_id.get(participant_id)
+        if participant is None:
+            continue
+        if participant.player_id in timing_state.completed_player_ids:
+            continue
+        if timing_state.available_action_count_by_player[participant.player_id] > 0:
+            return participant.player_id
+    return None
 
 
 def redeploy_unit_selection_request(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     player_id: str,
 ) -> DecisionRequest:
     if type(ruleset_descriptor) is not RulesetDescriptor:
@@ -975,6 +1066,7 @@ def redeploy_unit_selection_request(
             payload=_prebattle_selection_payload(
                 state=state,
                 ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
                 mission_setup=mission_setup,
                 view=view,
                 setup_step=SetupStep.REDEPLOY_UNITS,
@@ -1017,6 +1109,7 @@ def prebattle_action_selection_request(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     player_id: str,
 ) -> DecisionRequest:
     if type(ruleset_descriptor) is not RulesetDescriptor:
@@ -1026,6 +1119,7 @@ def prebattle_action_selection_request(
     options: list[DecisionOption] = []
     for candidate in scout_reserve_setup_candidates_for_player(
         state=state,
+        army_catalog=army_catalog,
         player_id=requested_player_id,
     ):
         options.append(
@@ -1035,6 +1129,7 @@ def prebattle_action_selection_request(
                 payload=_prebattle_selection_payload(
                     state=state,
                     ruleset_descriptor=ruleset_descriptor,
+                    army_catalog=army_catalog,
                     mission_setup=mission_setup,
                     view=candidate,
                     setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS,
@@ -1046,6 +1141,7 @@ def prebattle_action_selection_request(
         )
     for candidate in scout_move_candidates_for_player(
         state=state,
+        army_catalog=army_catalog,
         player_id=requested_player_id,
     ):
         options.append(
@@ -1055,6 +1151,7 @@ def prebattle_action_selection_request(
                 payload=_prebattle_selection_payload(
                     state=state,
                     ruleset_descriptor=ruleset_descriptor,
+                    army_catalog=army_catalog,
                     mission_setup=mission_setup,
                     view=candidate,
                     setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS,
@@ -1066,6 +1163,7 @@ def prebattle_action_selection_request(
         )
     for candidate in dedicated_transport_scout_move_candidates_for_player(
         state=state,
+        army_catalog=army_catalog,
         player_id=requested_player_id,
     ):
         options.append(
@@ -1075,6 +1173,7 @@ def prebattle_action_selection_request(
                 payload=_prebattle_selection_payload(
                     state=state,
                     ruleset_descriptor=ruleset_descriptor,
+                    army_catalog=army_catalog,
                     mission_setup=mission_setup,
                     view=candidate,
                     setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS,
@@ -1116,12 +1215,14 @@ def redeploy_placement_request_from_selection(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     selection_request: DecisionRequest,
     result: DecisionResult,
 ) -> PreBattleProposalRequest:
     return _proposal_request_from_selection(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
         selection_request=selection_request,
         result=result,
         setup_step=SetupStep.REDEPLOY_UNITS,
@@ -1134,6 +1235,7 @@ def prebattle_proposal_request_from_selection(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     selection_request: DecisionRequest,
     result: DecisionResult,
 ) -> PreBattleProposalRequest:
@@ -1154,6 +1256,7 @@ def prebattle_proposal_request_from_selection(
     return _proposal_request_from_selection(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
         selection_request=selection_request,
         result=result,
         setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS,
@@ -1178,6 +1281,7 @@ def invalid_prebattle_proposal_status(
     request: DecisionRequest,
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> LifecycleStatus | None:
     if not is_prebattle_proposal_request(request):
         return None
@@ -1222,6 +1326,7 @@ def invalid_prebattle_proposal_status(
     resolution = resolve_prebattle_proposal(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
         request=request_context,
         proposal=proposal,
     )
@@ -1243,6 +1348,7 @@ def apply_redeploy_placement(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> PreBattleResolution:
     request_context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
     proposal = PreBattlePlacementProposal.from_payload(
@@ -1251,6 +1357,7 @@ def apply_redeploy_placement(
     resolution = resolve_prebattle_proposal(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
         request=request_context,
         proposal=proposal,
         source_event_id=result.result_id,
@@ -1294,6 +1401,7 @@ def apply_scout_reserve_setup(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> PreBattleResolution:
     request_context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
     proposal = PreBattlePlacementProposal.from_payload(
@@ -1302,6 +1410,7 @@ def apply_scout_reserve_setup(
     resolution = resolve_prebattle_proposal(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
         request=request_context,
         proposal=proposal,
         source_event_id=result.result_id,
@@ -1355,12 +1464,14 @@ def apply_scout_move(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
 ) -> PreBattleResolution:
     request_context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
     proposal = ScoutMoveProposal.from_payload(cast(ScoutMoveProposalPayload, result.payload))
     resolution = resolve_prebattle_proposal(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
         request=request_context,
         proposal=proposal,
         source_event_id=result.result_id,
@@ -1405,6 +1516,7 @@ def resolve_prebattle_proposal(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     request: PreBattleProposalRequest,
     proposal: PreBattlePlacementProposal | ScoutMoveProposal,
     source_event_id: str | None = None,
@@ -1417,6 +1529,7 @@ def resolve_prebattle_proposal(
         return _resolve_scout_move(
             state=state,
             ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
             request=request,
             proposal=proposal,
             source_event_id=source_event_id,
@@ -1426,6 +1539,7 @@ def resolve_prebattle_proposal(
     return _resolve_prebattle_placement(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
         request=request,
         proposal=proposal,
         source_event_id=source_event_id,
@@ -1524,6 +1638,7 @@ def redeploy_unit_views_for_player(
 def scout_reserve_setup_candidates_for_player(
     *,
     state: GameState,
+    army_catalog: ArmyCatalog,
     player_id: str,
 ) -> tuple[RulesUnitView, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
@@ -1542,7 +1657,7 @@ def scout_reserve_setup_candidates_for_player(
             armies=tuple(state.army_definitions),
             unit_instance_id=reserve_state.unit_instance_id,
         )
-        if not _rules_unit_all_components_have_keyword(view, "SCOUTS"):
+        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
             continue
         if _unit_action_record_exists(
             state=state,
@@ -1557,6 +1672,7 @@ def scout_reserve_setup_candidates_for_player(
 def scout_move_candidates_for_player(
     *,
     state: GameState,
+    army_catalog: ArmyCatalog,
     player_id: str,
 ) -> tuple[RulesUnitView, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
@@ -1573,7 +1689,7 @@ def scout_move_candidates_for_player(
     unavailable_ids = set(state.unarrived_reserve_model_ids()) | set(state.embarked_model_ids())
     candidates: list[RulesUnitView] = []
     for view in _rules_unit_views_for_player(state=state, player_id=requested_player_id):
-        if not _rules_unit_all_components_have_keyword(view, "SCOUTS"):
+        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
             continue
         if _unit_action_record_exists(
             state=state,
@@ -1598,6 +1714,7 @@ def scout_move_candidates_for_player(
 def dedicated_transport_scout_move_candidates_for_player(
     *,
     state: GameState,
+    army_catalog: ArmyCatalog,
     player_id: str,
 ) -> tuple[RulesUnitView, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
@@ -1618,7 +1735,11 @@ def dedicated_transport_scout_move_candidates_for_player(
         cargo_state = state.transport_cargo_state_for_transport(view.unit_instance_id)
         if cargo_state is None or not cargo_state.embarked_unit_instance_ids:
             continue
-        if not _transport_cargo_all_scouts(state=state, cargo_state=cargo_state):
+        if not _transport_cargo_all_scouts(
+            state=state,
+            army_catalog=army_catalog,
+            cargo_state=cargo_state,
+        ):
             continue
         if _unit_action_record_exists(
             state=state,
@@ -1642,6 +1763,7 @@ def _timing_state_for_step(
     *,
     state: GameState,
     setup_step: SetupStep,
+    army_catalog: ArmyCatalog | None = None,
 ) -> PreBattleTimingWindowState:
     counts = {
         player_id: len(
@@ -1649,6 +1771,7 @@ def _timing_state_for_step(
                 state=state,
                 setup_step=setup_step,
                 player_id=player_id,
+                army_catalog=army_catalog,
             )
         )
         for player_id in state.player_ids
@@ -1674,20 +1797,120 @@ def _timing_state_for_step(
     )
 
 
+def _prebattle_sequencing_participants(
+    timing_state: PreBattleTimingWindowState,
+) -> tuple[SequencingParticipant, ...]:
+    source_rule_id = (
+        CORE_REDEPLOY_SOURCE_RULE_ID
+        if timing_state.setup_step is SetupStep.REDEPLOY_UNITS
+        else CORE_SCOUTS_SOURCE_RULE_ID
+    )
+    participants: list[SequencingParticipant] = []
+    for player_id, action_count in timing_state.available_action_count_by_player.items():
+        if player_id in timing_state.completed_player_ids:
+            continue
+        if action_count <= 0:
+            continue
+        participants.append(
+            SequencingParticipant(
+                participant_id=_prebattle_sequencing_participant_id(
+                    setup_step=timing_state.setup_step,
+                    player_id=player_id,
+                ),
+                player_id=player_id,
+                source_rule_id=source_rule_id,
+                payload={
+                    "setup_step": timing_state.setup_step.value,
+                    "available_action_count": action_count,
+                },
+            )
+        )
+    return tuple(participants)
+
+
+def _prebattle_sequencing_participant_id(
+    *,
+    setup_step: SetupStep,
+    player_id: str,
+) -> str:
+    return f"prebattle:{setup_step.value}:{_validate_identifier('player_id', player_id)}"
+
+
+def _prebattle_sequencing_conflict_id(setup_step: SetupStep) -> str:
+    resolved_step = _setup_step_from_token(setup_step)
+    if resolved_step not in {SetupStep.REDEPLOY_UNITS, SetupStep.RESOLVE_PREBATTLE_ACTIONS}:
+        raise GameLifecycleError("Pre-battle sequencing requires a pre-battle setup step.")
+    return f"prebattle-sequencing:{resolved_step.value}"
+
+
+def _prebattle_timing_window(*, state: GameState, setup_step: SetupStep) -> TimingWindow:
+    resolved_step = _setup_step_from_token(setup_step)
+    return TimingWindow(
+        window_id=f"prebattle-window:{state.game_id}:{resolved_step.value}",
+        descriptor=TimingWindowDescriptor(
+            descriptor_id=f"prebattle-window-descriptor:{resolved_step.value}",
+            trigger_kind=TimingTriggerKind.BEFORE_BATTLE,
+            source_rule_id="core_rules:prebattle",
+            source_step=resolved_step.value,
+            metadata={"setup_step": resolved_step.value},
+        ),
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id=None,
+        phase=None,
+        trigger_event_id=None,
+    )
+
+
+def _resolved_prebattle_sequencing_order(
+    *,
+    decisions: DecisionController,
+    conflict_id: str,
+) -> tuple[str, ...] | None:
+    requested_conflict_id = _validate_identifier("conflict_id", conflict_id)
+    for event in reversed(decisions.event_log.records):
+        if event.event_type != PREBATTLE_SEQUENCING_EVENT_TYPE:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Sequencing event payload must be an object.")
+        if event.payload.get("conflict_id") != requested_conflict_id:
+            continue
+        raw_order = event.payload.get("ordered_participant_ids")
+        if not isinstance(raw_order, list):
+            raise GameLifecycleError("Sequencing event ordered_participant_ids must be a list.")
+        ordered: list[str] = []
+        for participant_id in raw_order:
+            ordered.append(_validate_identifier("ordered_participant_id", participant_id))
+        return tuple(ordered)
+    return None
+
+
 def _available_action_views_for_step(
     *,
     state: GameState,
     setup_step: SetupStep,
     player_id: str,
+    army_catalog: ArmyCatalog | None,
 ) -> tuple[RulesUnitView, ...]:
     if setup_step is SetupStep.REDEPLOY_UNITS:
         return redeploy_unit_views_for_player(state=state, player_id=player_id)
     if setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+        if type(army_catalog) is not ArmyCatalog:
+            raise GameLifecycleError("Pre-battle Scout actions require an ArmyCatalog.")
         return (
-            *scout_reserve_setup_candidates_for_player(state=state, player_id=player_id),
-            *scout_move_candidates_for_player(state=state, player_id=player_id),
+            *scout_reserve_setup_candidates_for_player(
+                state=state,
+                army_catalog=army_catalog,
+                player_id=player_id,
+            ),
+            *scout_move_candidates_for_player(
+                state=state,
+                army_catalog=army_catalog,
+                player_id=player_id,
+            ),
             *dedicated_transport_scout_move_candidates_for_player(
                 state=state,
+                army_catalog=army_catalog,
                 player_id=player_id,
             ),
         )
@@ -1698,6 +1921,7 @@ def _resolve_prebattle_placement(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     request: PreBattleProposalRequest,
     proposal: PreBattlePlacementProposal,
     source_event_id: str | None,
@@ -1720,6 +1944,7 @@ def _resolve_prebattle_placement(
     _append_action_eligibility_violations(
         violations=violations,
         state=state,
+        army_catalog=army_catalog,
         request=request,
         view=view,
     )
@@ -1807,6 +2032,7 @@ def _resolve_scout_move(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     request: PreBattleProposalRequest,
     proposal: ScoutMoveProposal,
     source_event_id: str | None,
@@ -1825,6 +2051,7 @@ def _resolve_scout_move(
     _append_action_eligibility_violations(
         violations=violations,
         state=state,
+        army_catalog=army_catalog,
         request=request,
         view=view,
     )
@@ -1961,6 +2188,7 @@ def _append_action_eligibility_violations(
     *,
     violations: list[PreBattleViolation],
     state: GameState,
+    army_catalog: ArmyCatalog,
     request: PreBattleProposalRequest,
     view: RulesUnitView,
 ) -> None:
@@ -2020,7 +2248,7 @@ def _append_action_eligibility_violations(
                     field="unit_instance_id",
                 )
             )
-        if not _rules_unit_all_components_have_keyword(view, "SCOUTS"):
+        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
             violations.append(
                 PreBattleViolation(
                     violation_code=PreBattleViolationCode.UNIT_NOT_ELIGIBLE,
@@ -2029,7 +2257,7 @@ def _append_action_eligibility_violations(
                 )
             )
     elif request.action_kind is PreBattleActionKind.SCOUT_MOVE:
-        if not _rules_unit_all_components_have_keyword(view, "SCOUTS"):
+        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
             violations.append(
                 PreBattleViolation(
                     violation_code=PreBattleViolationCode.UNIT_NOT_ELIGIBLE,
@@ -2049,6 +2277,7 @@ def _append_action_eligibility_violations(
         cargo_state = state.transport_cargo_state_for_transport(request.unit_instance_id)
         if cargo_state is None or not _transport_cargo_all_scouts(
             state=state,
+            army_catalog=army_catalog,
             cargo_state=cargo_state,
         ):
             violations.append(
@@ -2404,6 +2633,7 @@ def _prebattle_selection_payload(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     mission_setup: MissionSetup,
     view: RulesUnitView,
     setup_step: SetupStep,
@@ -2411,7 +2641,21 @@ def _prebattle_selection_payload(
     source_rule_id: str,
     proposal_kind: str,
 ) -> JsonValue:
-    scout_instances = scout_ability_instances_for_rules_unit(view)
+    if action_kind is PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE:
+        cargo_instances = _dedicated_transport_cargo_scout_instances(
+            state=state,
+            army_catalog=army_catalog,
+            transport_view=view,
+        )
+        scout_instances = _dedicated_transport_move_scout_instances_for_transport(
+            transport_view=view,
+            cargo_instances=cargo_instances,
+        )
+    else:
+        scout_instances = scout_ability_instances_for_rules_unit(
+            view=view,
+            army_catalog=army_catalog,
+        )
     scout_distance_inches = (
         None
         if not scout_instances
@@ -2449,19 +2693,44 @@ def _prebattle_selection_payload(
 
 
 def scout_ability_instances_for_rules_unit(
+    *,
     view: RulesUnitView,
+    army_catalog: ArmyCatalog,
 ) -> tuple[ScoutAbilityInstance, ...]:
     if type(view) is not RulesUnitView:
         raise GameLifecycleError("Scouts ability lookup requires a RulesUnitView.")
-    if not _rules_unit_all_components_have_keyword(view, "SCOUTS"):
-        return ()
-    return tuple(
-        ScoutAbilityInstance(
-            model_instance_id=model.model_instance_id,
-            distance_inches=DEFAULT_SCOUT_DISTANCE_INCHES,
-            source_id=CORE_SCOUTS_SOURCE_RULE_ID,
+    if type(army_catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Scouts ability lookup requires an ArmyCatalog.")
+    instances: list[ScoutAbilityInstance] = []
+    for component in view.components:
+        descriptors = _scouts_descriptors_for_unit(
+            unit=component.unit,
+            army_catalog=army_catalog,
         )
-        for model in view.alive_models()
+        if not descriptors:
+            if _unit_has_keyword(component.unit, "SCOUTS"):
+                raise GameLifecycleError(
+                    "Scouts keyword requires a structured datasheet ability descriptor."
+                )
+            return ()
+        for model in component.unit.alive_own_models():
+            for descriptor in descriptors:
+                instances.append(
+                    ScoutAbilityInstance(
+                        model_instance_id=model.model_instance_id,
+                        distance_inches=_scouts_distance_inches_from_descriptor(descriptor),
+                        source_id=descriptor.source_id,
+                    )
+                )
+    return tuple(
+        sorted(
+            instances,
+            key=lambda instance: (
+                instance.model_instance_id,
+                instance.distance_inches,
+                instance.source_id,
+            ),
+        )
     )
 
 
@@ -2469,6 +2738,7 @@ def _proposal_request_from_selection(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
     selection_request: DecisionRequest,
     result: DecisionResult,
     setup_step: SetupStep,
@@ -2495,21 +2765,27 @@ def _proposal_request_from_selection(
         PreBattleActionKind.SCOUT_MOVE,
         PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE,
     }:
-        instances = scout_ability_instances_for_rules_unit(view)
+        instances = scout_ability_instances_for_rules_unit(
+            view=view,
+            army_catalog=army_catalog,
+        )
         if action_kind is PreBattleActionKind.DEDICATED_TRANSPORT_SCOUT_MOVE:
-            instances = _dedicated_transport_cargo_scout_instances(state=state, transport_view=view)
+            instances = _dedicated_transport_cargo_scout_instances(
+                state=state,
+                army_catalog=army_catalog,
+                transport_view=view,
+            )
         scout_distance_inches = scout_distance_inches_for_model_ids(
             model_instance_ids=tuple(model.model_instance_id for model in view.alive_models()),
             ability_instances=(
-                scout_ability_instances_for_rules_unit(view)
+                scout_ability_instances_for_rules_unit(
+                    view=view,
+                    army_catalog=army_catalog,
+                )
                 if action_kind is PreBattleActionKind.SCOUT_MOVE
-                else tuple(
-                    ScoutAbilityInstance(
-                        model_instance_id=model.model_instance_id,
-                        distance_inches=DEFAULT_SCOUT_DISTANCE_INCHES,
-                        source_id=CORE_SCOUTS_SOURCE_RULE_ID,
-                    )
-                    for model in view.alive_models()
+                else _dedicated_transport_move_scout_instances_for_transport(
+                    transport_view=view,
+                    cargo_instances=instances,
                 )
             ),
         )
@@ -2821,11 +3097,18 @@ def _start_is_eligible_for_scout_move(*, state: GameState, view: RulesUnitView) 
     )
 
 
-def _transport_cargo_all_scouts(*, state: GameState, cargo_state: object) -> bool:
+def _transport_cargo_all_scouts(
+    *,
+    state: GameState,
+    army_catalog: ArmyCatalog,
+    cargo_state: object,
+) -> bool:
     from warhammer40k_core.engine.transports import TransportCargoState
 
     if type(cargo_state) is not TransportCargoState:
         raise GameLifecycleError("Dedicated Transport Scouts check requires cargo state.")
+    if type(army_catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Dedicated Transport Scouts check requires an ArmyCatalog.")
     if not cargo_state.embarked_unit_instance_ids:
         return False
     for unit_id in cargo_state.embarked_unit_instance_ids:
@@ -2833,7 +3116,7 @@ def _transport_cargo_all_scouts(*, state: GameState, cargo_state: object) -> boo
             armies=tuple(state.army_definitions),
             unit_instance_id=unit_id,
         )
-        if not _rules_unit_all_components_have_keyword(view, "SCOUTS"):
+        if not _rules_unit_all_components_have_scouts(view=view, army_catalog=army_catalog):
             return False
     return True
 
@@ -2841,21 +3124,42 @@ def _transport_cargo_all_scouts(*, state: GameState, cargo_state: object) -> boo
 def _dedicated_transport_cargo_scout_instances(
     *,
     state: GameState,
+    army_catalog: ArmyCatalog,
     transport_view: RulesUnitView,
 ) -> tuple[ScoutAbilityInstance, ...]:
     cargo_state = state.transport_cargo_state_for_transport(transport_view.unit_instance_id)
     if cargo_state is None:
         raise GameLifecycleError("Dedicated Transport Scout Move requires cargo.")
+    if type(army_catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Dedicated Transport Scout Move requires an ArmyCatalog.")
     instances: list[ScoutAbilityInstance] = []
     for unit_id in cargo_state.embarked_unit_instance_ids:
         view = rules_unit_view_from_armies(
             armies=tuple(state.army_definitions),
             unit_instance_id=unit_id,
         )
-        instances.extend(scout_ability_instances_for_rules_unit(view))
+        instances.extend(
+            scout_ability_instances_for_rules_unit(view=view, army_catalog=army_catalog)
+        )
     if not instances:
         raise GameLifecycleError("Dedicated Transport Scout Move requires Scouts cargo.")
     return tuple(instances)
+
+
+def _dedicated_transport_move_scout_instances_for_transport(
+    *,
+    transport_view: RulesUnitView,
+    cargo_instances: tuple[ScoutAbilityInstance, ...],
+) -> tuple[ScoutAbilityInstance, ...]:
+    cargo_distance = min(instance.distance_inches for instance in cargo_instances)
+    return tuple(
+        ScoutAbilityInstance(
+            model_instance_id=model.model_instance_id,
+            distance_inches=cargo_distance,
+            source_id=CORE_SCOUTS_SOURCE_RULE_ID,
+        )
+        for model in transport_view.alive_models()
+    )
 
 
 def _friendly_geometry_models_for_path(
@@ -2972,6 +3276,14 @@ def _rules_unit_all_components_have_keyword(view: RulesUnitView, keyword: str) -
     return all(_unit_has_keyword(component.unit, keyword) for component in view.components)
 
 
+def _rules_unit_all_components_have_scouts(
+    *,
+    view: RulesUnitView,
+    army_catalog: ArmyCatalog,
+) -> bool:
+    return bool(scout_ability_instances_for_rules_unit(view=view, army_catalog=army_catalog))
+
+
 def _rules_unit_any_component_has_keyword(view: RulesUnitView, keyword: str) -> bool:
     return any(_unit_has_keyword(component.unit, keyword) for component in view.components)
 
@@ -2979,6 +3291,51 @@ def _rules_unit_any_component_has_keyword(view: RulesUnitView, keyword: str) -> 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     requested = _canonical_keyword(keyword)
     return requested in {_canonical_keyword(value) for value in unit.keywords}
+
+
+def _scouts_descriptors_for_unit(
+    *,
+    unit: UnitInstance,
+    army_catalog: ArmyCatalog,
+) -> tuple[DatasheetAbilityDescriptor, ...]:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Scouts descriptor lookup requires a UnitInstance.")
+    if type(army_catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Scouts descriptor lookup requires an ArmyCatalog.")
+    try:
+        datasheet = army_catalog.datasheet_by_id(unit.datasheet_id)
+    except ArmyCatalogError as exc:
+        raise GameLifecycleError("Scouts descriptor lookup requires a catalog datasheet.") from exc
+    descriptors = tuple(
+        ability
+        for ability in datasheet.abilities
+        if CORE_SCOUTS_TIMING_TAG
+        in {_canonical_keyword(tag).lower() for tag in ability.timing_tags}
+    )
+    return tuple(sorted(descriptors, key=lambda ability: ability.ability_id))
+
+
+def _scouts_distance_inches_from_descriptor(
+    descriptor: DatasheetAbilityDescriptor,
+) -> float:
+    if type(descriptor) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Scouts distance requires a DatasheetAbilityDescriptor.")
+    if descriptor.support is not CatalogAbilitySupport.DESCRIPTOR_ONLY:
+        raise GameLifecycleError("Scouts descriptor must be descriptor-only catalog data.")
+    timing_tags = {_canonical_keyword(tag).lower() for tag in descriptor.timing_tags}
+    if (
+        CORE_SCOUTS_BEFORE_BATTLE_TAG not in timing_tags
+        or CORE_SCOUTS_TIMING_TAG not in timing_tags
+    ):
+        raise GameLifecycleError("Scouts descriptor requires before-battle Scouts timing tags.")
+    if len(descriptor.parameter_tokens) != 1:
+        raise GameLifecycleError("Scouts descriptor requires exactly one distance token.")
+    token = descriptor.parameter_tokens[0]
+    try:
+        distance_inches = float(token)
+    except ValueError as exc:
+        raise GameLifecycleError("Scouts descriptor distance token must be numeric.") from exc
+    return _validate_positive_number("Scouts descriptor distance_inches", distance_inches)
 
 
 def _canonical_keyword(keyword: str) -> str:

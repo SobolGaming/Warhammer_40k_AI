@@ -9,7 +9,12 @@ import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+    DatasheetKeywordSet,
+)
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
@@ -20,6 +25,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionError,
     DecisionOption,
     DecisionRequest,
 )
@@ -74,6 +80,7 @@ from warhammer40k_core.engine.prebattle_records import (
     prebattle_action_kind_from_token,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
+from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -186,6 +193,309 @@ def test_phase16b_redeploy_records_removal_and_placement_batches() -> None:
     assert "object at 0x" not in payload_blob
 
 
+def test_phase16b_simultaneous_redeploys_use_phase12a_sequencing_order() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
+    )
+    lifecycle, status = _advance_after_deployments(_config(catalog=catalog))
+    sequencing_request = _decision_request(status)
+
+    assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
+    assert isinstance(sequencing_request.payload, dict)
+    assert sequencing_request.payload["requires_roll_off"] is True
+    assert sequencing_request.payload["roll_off_result"] is not None
+    assert {
+        "prebattle:redeploy_units:player-a",
+        "prebattle:redeploy_units:player-b",
+    } == set(_sequencing_participant_ids(sequencing_request))
+
+    follow_up = _submit_option(
+        lifecycle,
+        request=sequencing_request,
+        option_id=("order:prebattle:redeploy_units:player-b,prebattle:redeploy_units:player-a"),
+        result_id="phase16b-redeploy-sequencing",
+    )
+    request = _decision_request(follow_up)
+
+    assert request.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE
+    assert request.actor_id == "player-b"
+    assert _event_types(lifecycle).count("sequencing_order_resolved") == 1
+
+
+def test_phase16b_simultaneous_scouts_use_phase12a_sequencing_order() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
+    )
+    lifecycle, status = _advance_after_deployments(_config(catalog=catalog))
+    sequencing_request = _decision_request(status)
+
+    assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
+    assert {
+        "prebattle:resolve_prebattle_actions:player-a",
+        "prebattle:resolve_prebattle_actions:player-b",
+    } == set(_sequencing_participant_ids(sequencing_request))
+
+    follow_up = _submit_option(
+        lifecycle,
+        request=sequencing_request,
+        option_id=(
+            "order:prebattle:resolve_prebattle_actions:player-b,"
+            "prebattle:resolve_prebattle_actions:player-a"
+        ),
+        result_id="phase16b-scout-sequencing",
+    )
+    request = _decision_request(follow_up)
+
+    assert request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
+    assert request.actor_id == "player-b"
+
+
+def test_phase16b_scout_distance_is_sourced_from_datasheet_ability_descriptors() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")},
+        scouts_distances_by_datasheet={"core-intercessor-like-infantry": (6.0, 8.0)},
+    )
+    lifecycle, status = _advance_after_deployments(
+        _config(
+            catalog=catalog,
+            player_a_unit_selections=(_vehicle_unit_selection(unit_selection_id="enemy-unit-1"),),
+        )
+    )
+    request = _decision_request(status)
+
+    assert request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
+    option = _option_for_prefix(request, "scout_move:")
+    assert isinstance(option.payload, dict)
+    assert option.payload["scout_distance_inches"] == 8.0
+    scout_instances = option.payload["scout_ability_instances"]
+    assert isinstance(scout_instances, list)
+    assert len(scout_instances) == 10
+    source_ids: set[str] = set()
+    for instance in scout_instances:
+        assert isinstance(instance, dict)
+        source_id = instance["source_id"]
+        assert type(source_id) is str
+        source_ids.add(source_id)
+    assert source_ids == {
+        "datasheet:core-intercessor-like-infantry:ability:scouts:1",
+        "datasheet:core-intercessor-like-infantry:ability:scouts:2",
+    }
+
+    proposal_request = _select_scout_move(lifecycle, request)
+    request_context = PreBattleProposalRequest.from_decision_request_payload(
+        proposal_request.payload
+    )
+    assert request_context.scout_distance_inches == 8.0
+
+
+def test_phase16b_scout_keyword_without_descriptor_fails_fast() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")},
+        scouts_distances_by_datasheet={"core-intercessor-like-infantry": ()},
+    )
+
+    with pytest.raises(GameLifecycleError, match="structured datasheet ability descriptor"):
+        _advance_after_deployments(
+            _config(
+                catalog=catalog,
+                player_a_unit_selections=(
+                    _vehicle_unit_selection(unit_selection_id="enemy-unit-1"),
+                ),
+            )
+        )
+
+
+def test_phase16b_redeploy_rejects_request_drift_and_wrong_actor_without_mutation() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
+    )
+    lifecycle, request = _redeploy_placement_request(catalog)
+    assert lifecycle.state is not None
+    assert lifecycle.state.battlefield_state is not None
+    before_battlefield = lifecycle.state.battlefield_state.to_payload()
+    before_record_count = len(lifecycle.decision_controller.records)
+    payload = _prebattle_placement_payload_for_request(
+        lifecycle,
+        request=request,
+        pose_factory=lambda index: Pose.at(
+            56.0 - ((index // 3) * 1.8),
+            34.0 + ((index % 3) * 1.8),
+            0.0,
+            facing_degrees=180.0,
+        ),
+    )
+    drifted_payload = dict(payload)
+    drifted_payload["setup_step"] = SetupStep.RESOLVE_PREBATTLE_ACTIONS.value
+
+    invalid_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase16b-redeploy-wrong-step",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=drifted_payload,
+        )
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert _invalid_reason(invalid_status) == "prebattle_request_drift"
+    assert PreBattleViolationCode.SETUP_STEP_DRIFT.value in _violation_codes(invalid_status)
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert lifecycle.state.battlefield_state.to_payload() == before_battlefield
+
+    with pytest.raises(DecisionError, match="actor"):
+        lifecycle.submit_decision(
+            DecisionResult(
+                result_id="phase16b-redeploy-wrong-actor",
+                request_id=request.request_id,
+                decision_type=request.decision_type,
+                actor_id="player-a",
+                selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+                payload=payload,
+            )
+        )
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert lifecycle.state.battlefield_state.to_payload() == before_battlefield
+
+
+@pytest.mark.parametrize(
+    ("case_id", "expected_violation"),
+    [
+        (
+            "illegal-zone",
+            PreBattleViolationCode.DEPLOYMENT_ZONE_VIOLATION,
+        ),
+        (
+            "overlap",
+            PreBattleViolationCode.MODEL_OVERLAP,
+        ),
+        (
+            "broken-coherency",
+            PreBattleViolationCode.UNIT_COHERENCY_BROKEN,
+        ),
+    ],
+)
+def test_phase16b_redeploy_invalid_geometry_rejects_without_mutation(
+    case_id: str,
+    expected_violation: PreBattleViolationCode,
+) -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
+    )
+    lifecycle, request = _redeploy_placement_request(catalog)
+
+    invalid_status = _submit_redeploy_placement_payload(
+        lifecycle,
+        request=request,
+        result_id=f"phase16b-redeploy-{case_id}",
+        payload=_prebattle_placement_payload_for_request(
+            lifecycle,
+            request=request,
+            pose_factory=_redeploy_invalid_pose_factory(case_id),
+        ),
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert _invalid_reason(invalid_status) == "prebattle_proposal_invalid"
+    assert expected_violation.value in _violation_codes(invalid_status)
+
+
+def test_phase16b_redeploy_rejects_stale_unit_state_and_engagement_without_mutation() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
+    )
+    lifecycle, request = _redeploy_placement_request(catalog)
+    assert lifecycle.state is not None
+    assert lifecycle.state.battlefield_state is not None
+    stale_payload = _prebattle_placement_payload_for_request(
+        lifecycle,
+        request=request,
+        pose_factory=lambda index: Pose.at(
+            56.0 - ((index // 3) * 1.8),
+            34.0 + ((index % 3) * 1.8),
+            0.0,
+            facing_degrees=180.0,
+        ),
+    )
+    lifecycle.state.replace_battlefield_state(
+        lifecycle.state.battlefield_state.without_unit_placement("army-beta:intercessor-unit-2")
+    )
+
+    stale_status = _submit_redeploy_placement_payload(
+        lifecycle,
+        request=request,
+        result_id="phase16b-redeploy-stale-unit",
+        payload=stale_payload,
+    )
+
+    assert stale_status.status_kind is LifecycleStatusKind.INVALID
+    assert PreBattleViolationCode.UNIT_NOT_PLACED.value in _violation_codes(stale_status)
+
+    lifecycle, request = _redeploy_placement_request(catalog)
+    assert lifecycle.state is not None
+    assert lifecycle.state.battlefield_state is not None
+    enemy_placement = lifecycle.state.battlefield_state.unit_placement_by_id(
+        "army-alpha:enemy-unit-1"
+    )
+    enemy_pose = enemy_placement.model_placements[0].pose
+    _move_unit_placement(
+        lifecycle.state,
+        unit_instance_id="army-alpha:enemy-unit-1",
+        dx=48.0 - enemy_pose.position.x,
+        dy=20.0 - enemy_pose.position.y,
+    )
+    engagement_status = _submit_redeploy_placement_payload(
+        lifecycle,
+        request=request,
+        result_id="phase16b-redeploy-engagement",
+        payload=_prebattle_placement_payload_for_request(
+            lifecycle,
+            request=request,
+            pose_factory=lambda index: Pose.at(
+                51.5 + ((index // 3) * 1.8),
+                20.0 + ((index % 3) * 1.8),
+                0.0,
+                facing_degrees=180.0,
+            ),
+        ),
+    )
+
+    assert engagement_status.status_kind is LifecycleStatusKind.INVALID
+    assert PreBattleViolationCode.ENEMY_ENGAGEMENT_RANGE.value in _violation_codes(
+        engagement_status
+    )
+
+
+def test_phase16b_redeploy_rejects_illegal_terrain_endpoint_without_mutation() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-vehicle-monster": ("Monster", "Vehicle", "REDEPLOY")}
+    )
+    lifecycle, request = _redeploy_placement_request(
+        catalog,
+        player_a_unit_selections=(_unit_selection(unit_selection_id="non-redeploy-enemy"),),
+        player_b_unit_selections=(
+            _vehicle_unit_selection(unit_selection_id="vehicle-redeploy-unit"),
+        ),
+    )
+
+    invalid_status = _submit_redeploy_placement_payload(
+        lifecycle,
+        request=request,
+        result_id="phase16b-redeploy-terrain-endpoint",
+        payload=_prebattle_placement_payload_for_request(
+            lifecycle,
+            request=request,
+            pose_factory=lambda _index: Pose.at(49.0, 17.0, 3.0, facing_degrees=180.0),
+        ),
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert PreBattleViolationCode.TERRAIN_ENDPOINT_ILLEGAL.value in _violation_codes(invalid_status)
+
+
 def test_phase16b_scout_move_rejects_endpoint_only_before_queue_pop() -> None:
     lifecycle, status = _advance_after_deployments(_scouts_config())
     request = _select_scout_move(lifecycle, _decision_request(status))
@@ -207,6 +517,51 @@ def test_phase16b_scout_move_rejects_endpoint_only_before_queue_pop() -> None:
     assert PreBattleViolationCode.ENDPOINT_ONLY_PATH.value in _violation_codes(invalid_status)
     assert lifecycle.decision_controller.queue.peek_next().request_id == before_request_id
     assert len(lifecycle.decision_controller.records) == before_record_count
+    assert lifecycle.state.battlefield_state.to_payload() == before_battlefield_payload
+
+
+def test_phase16b_scout_move_rejects_witness_start_drift_before_queue_pop() -> None:
+    lifecycle, status = _advance_after_deployments(_scouts_config())
+    request = _select_scout_move(lifecycle, _decision_request(status))
+    assert lifecycle.state is not None
+    assert lifecycle.state.battlefield_state is not None
+    before_battlefield_payload = lifecycle.state.battlefield_state.to_payload()
+    before_record_count = len(lifecycle.decision_controller.records)
+
+    invalid_status = _submit_scout_move(
+        lifecycle,
+        request=request,
+        result_id="phase16b-start-drift-scout",
+        witness=_witness_with_first_start_drift(
+            _scout_move_witness(lifecycle.state, request=request, dx=-3.0)
+        ),
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert _invalid_reason(invalid_status) == "prebattle_proposal_invalid"
+    assert PreBattleViolationCode.WITNESS_START_DRIFT.value in _violation_codes(invalid_status)
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert lifecycle.state.battlefield_state.to_payload() == before_battlefield_payload
+
+
+def test_phase16b_scout_move_rejects_over_distance_path_without_mutation() -> None:
+    lifecycle, status = _advance_after_deployments(_scouts_config())
+    request = _select_scout_move(lifecycle, _decision_request(status))
+    assert lifecycle.state is not None
+    assert lifecycle.state.battlefield_state is not None
+    before_battlefield_payload = lifecycle.state.battlefield_state.to_payload()
+
+    invalid_status = _submit_scout_move(
+        lifecycle,
+        request=request,
+        result_id="phase16b-over-distance-scout",
+        witness=_scout_move_witness(lifecycle.state, request=request, dx=-7.0),
+    )
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert _invalid_reason(invalid_status) == "prebattle_proposal_invalid"
+    assert PreBattleViolationCode.PATH_VALIDATION_FAILED.value in _violation_codes(invalid_status)
     assert lifecycle.state.battlefield_state.to_payload() == before_battlefield_payload
 
 
@@ -360,11 +715,10 @@ def test_phase16b_completion_options_record_prebattle_action_records() -> None:
 
 
 def test_phase16b_scout_reserve_setup_uses_structured_proposal_and_validation() -> None:
-    state = _manual_prebattle_state(
-        catalog=_catalog_with_datasheet_keywords(
-            {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
-        )
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
     )
+    state = _manual_prebattle_state(catalog=catalog)
     state.record_reserve_state(
         ReserveState.declared_before_battle(
             player_id="player-b",
@@ -375,6 +729,7 @@ def test_phase16b_scout_reserve_setup_uses_structured_proposal_and_validation() 
     request = prebattle_action_selection_request(
         state=state,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
         player_id="player-b",
     )
     option = _option_for_prefix(request, "scout_reserve_setup:")
@@ -385,6 +740,7 @@ def test_phase16b_scout_reserve_setup_uses_structured_proposal_and_validation() 
     )
     proposal_request = _proposal_request_from_selection_payload(
         state=state,
+        catalog=catalog,
         selection_request=request,
         result=selection_result,
     )
@@ -407,6 +763,7 @@ def test_phase16b_scout_reserve_setup_uses_structured_proposal_and_validation() 
     resolution = resolve_prebattle_proposal(
         state=state,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
         request=proposal_request,
         proposal=proposal,
     )
@@ -424,6 +781,7 @@ def test_phase16b_scout_reserve_setup_uses_structured_proposal_and_validation() 
     invalid_resolution = resolve_prebattle_proposal(
         state=state,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
         request=proposal_request,
         proposal=invalid_proposal,
     )
@@ -434,11 +792,10 @@ def test_phase16b_scout_reserve_setup_uses_structured_proposal_and_validation() 
 
 
 def test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event() -> None:
-    state = _manual_prebattle_state(
-        catalog=_catalog_with_datasheet_keywords(
-            {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
-        )
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
     )
+    state = _manual_prebattle_state(catalog=catalog)
     state.record_reserve_state(
         ReserveState.declared_before_battle(
             player_id="player-b",
@@ -449,6 +806,7 @@ def test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event() -
     selection_request = prebattle_action_selection_request(
         state=state,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
         player_id="player-b",
     )
     option = _option_for_prefix(selection_request, "scout_reserve_setup:")
@@ -459,6 +817,7 @@ def test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event() -
     )
     proposal_request = _proposal_request_from_selection_payload(
         state=state,
+        catalog=catalog,
         selection_request=selection_request,
         result=selection_result,
     )
@@ -488,6 +847,7 @@ def test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event() -
         result=result,
         decisions=decisions,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
     )
 
     assert resolution.is_valid
@@ -513,11 +873,10 @@ def test_phase16b_scout_reserve_setup_apply_records_arrival_action_and_event() -
 
 
 def test_phase16b_prebattle_timing_and_proposal_payloads_are_replay_safe() -> None:
-    state = _manual_prebattle_state(
-        catalog=_catalog_with_datasheet_keywords(
-            {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
-        )
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
     )
+    state = _manual_prebattle_state(catalog=catalog)
     state.record_reserve_state(
         ReserveState.declared_before_battle(
             player_id="player-b",
@@ -526,7 +885,7 @@ def test_phase16b_prebattle_timing_and_proposal_payloads_are_replay_safe() -> No
         )
     )
 
-    timing = prebattle_timing_state_for_state(state)
+    timing = prebattle_timing_state_for_state(state, army_catalog=catalog)
     assert timing.next_player_id == "player-b"
     assert timing.to_payload()["available_action_count_by_player"] == {
         "player-a": 0,
@@ -543,6 +902,7 @@ def test_phase16b_prebattle_timing_and_proposal_payloads_are_replay_safe() -> No
     selection_request = prebattle_action_selection_request(
         state=state,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
         player_id="player-b",
     )
     selection_result = DecisionResult.for_request(
@@ -555,6 +915,7 @@ def test_phase16b_prebattle_timing_and_proposal_payloads_are_replay_safe() -> No
     )
     proposal_request = _proposal_request_from_selection_payload(
         state=state,
+        catalog=catalog,
         selection_request=selection_request,
         result=selection_result,
     )
@@ -579,7 +940,8 @@ def test_phase16b_prebattle_timing_and_proposal_payloads_are_replay_safe() -> No
 
 
 def test_phase16b_scout_move_request_drift_rejects_before_queue_pop() -> None:
-    lifecycle, status = _advance_after_deployments(_scouts_config())
+    config = _scouts_config()
+    lifecycle, status = _advance_after_deployments(config)
     request = _select_scout_move(lifecycle, _decision_request(status))
     assert lifecycle.state is not None
     request_context = PreBattleProposalRequest.from_decision_request_payload(request.payload)
@@ -613,6 +975,7 @@ def test_phase16b_scout_move_request_drift_rejects_before_queue_pop() -> None:
         request=request,
         result=result,
         ruleset_descriptor=_ruleset(),
+        army_catalog=config.army_catalog,
     )
 
     assert invalid_status is not None
@@ -747,6 +1110,7 @@ def test_phase16b_dedicated_transport_with_non_scout_cargo_is_ineligible() -> No
     assert (
         dedicated_transport_scout_move_candidates_for_player(
             state=state,
+            army_catalog=catalog,
             player_id="player-b",
         )
         == ()
@@ -795,6 +1159,7 @@ def test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_a
     selection_request = prebattle_action_selection_request(
         state=state,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
         player_id="player-b",
     )
     option = _option_for_prefix(selection_request, "dedicated_transport_scout_move:")
@@ -805,6 +1170,7 @@ def test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_a
     )
     proposal_request = _proposal_request_from_selection_payload(
         state=state,
+        catalog=catalog,
         selection_request=selection_request,
         result=selection_result,
     )
@@ -844,6 +1210,7 @@ def test_phase16b_dedicated_transport_scout_move_uses_cargo_scouts_and_records_a
         result=result,
         decisions=decisions,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
     )
 
     assert resolution.is_valid
@@ -910,6 +1277,86 @@ def _select_scout_move(
     proposal_request = _decision_request(status)
     assert proposal_request.decision_type == SUBMIT_SCOUT_MOVE_DECISION_TYPE
     return proposal_request
+
+
+def _redeploy_placement_request(
+    catalog: ArmyCatalog,
+    *,
+    player_a_unit_selections: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_unit_selections: tuple[UnitMusterSelection, ...] | None = None,
+) -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle, status = _advance_after_deployments(
+        _config(
+            catalog=catalog,
+            player_a_unit_selections=(
+                (_vehicle_unit_selection(unit_selection_id="enemy-unit-1"),)
+                if player_a_unit_selections is None
+                else player_a_unit_selections
+            ),
+            player_b_unit_selections=player_b_unit_selections,
+        )
+    )
+    selection_request = _decision_request(status)
+    assert selection_request.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE
+    option = _option_for_prefix(selection_request, "redeploy:")
+    proposal_status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=option.option_id,
+        result_id="phase16b-redeploy-select",
+    )
+    request = _decision_request(proposal_status)
+    assert request.decision_type == SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE
+    return lifecycle, request
+
+
+def _redeploy_invalid_pose_factory(case_id: str) -> _PoseFactory:
+    if case_id == "illegal-zone":
+        return _redeploy_illegal_zone_pose
+    if case_id == "overlap":
+        return _redeploy_overlap_pose
+    if case_id == "broken-coherency":
+        return _redeploy_broken_coherency_pose
+    raise GameLifecycleError("Unsupported redeploy invalid geometry case.")
+
+
+def _redeploy_illegal_zone_pose(index: int) -> Pose:
+    return Pose.at(12.0, 10.0 + (index * 1.8), 0.0)
+
+
+def _redeploy_overlap_pose(_index: int) -> Pose:
+    return Pose.at(56.0, 34.0, 0.0, facing_degrees=180.0)
+
+
+def _redeploy_broken_coherency_pose(index: int) -> Pose:
+    return Pose.at(56.0, 4.0 + (index * 8.0), 0.0, facing_degrees=180.0)
+
+
+def _submit_redeploy_placement_payload(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    result_id: str,
+    payload: dict[str, JsonValue],
+) -> LifecycleStatus:
+    if lifecycle.state is None or lifecycle.state.battlefield_state is None:
+        raise GameLifecycleError("Redeploy test requires placed battlefield state.")
+    before_battlefield = lifecycle.state.battlefield_state.to_payload()
+    before_record_count = len(lifecycle.decision_controller.records)
+    invalid_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=payload,
+        )
+    )
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert lifecycle.state.battlefield_state.to_payload() == before_battlefield
+    return invalid_status
 
 
 def _submit_scout_move(
@@ -990,6 +1437,25 @@ def _scout_move_witness(
     return PathWitness.for_paths(tuple(model_paths))
 
 
+def _witness_with_first_start_drift(witness: PathWitness) -> PathWitness:
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for index, model_id in enumerate(witness.model_ids()):
+        poses = witness.poses_for_model(model_id)
+        if index == 0:
+            start = poses[0]
+            poses = (
+                Pose.at(
+                    start.position.x + 0.25,
+                    start.position.y,
+                    start.position.z,
+                    facing_degrees=start.facing.degrees,
+                ),
+                *poses[1:],
+            )
+        model_paths.append((model_id, poses))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
 def _prebattle_placement_payload_for_request(
     lifecycle: GameLifecycle,
     *,
@@ -1055,6 +1521,7 @@ def _prebattle_placement_payload(
 def _proposal_request_from_selection_payload(
     *,
     state: GameState,
+    catalog: ArmyCatalog,
     selection_request: DecisionRequest,
     result: DecisionResult,
 ) -> PreBattleProposalRequest:
@@ -1063,6 +1530,7 @@ def _proposal_request_from_selection_payload(
     return prebattle_proposal_request_from_selection(
         state=state,
         ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
         selection_request=selection_request,
         result=result,
     )
@@ -1198,6 +1666,19 @@ def _event_types(lifecycle: GameLifecycle) -> list[str]:
     return [event.event_type for event in lifecycle.decision_controller.event_log.records]
 
 
+def _sequencing_participant_ids(request: DecisionRequest) -> tuple[str, ...]:
+    assert isinstance(request.payload, dict)
+    participants = request.payload["participants"]
+    assert isinstance(participants, list)
+    participant_ids: list[str] = []
+    for participant in participants:
+        assert isinstance(participant, dict)
+        participant_id = participant["participant_id"]
+        assert type(participant_id) is str
+        participant_ids.append(participant_id)
+    return tuple(participant_ids)
+
+
 def _scouts_config() -> GameConfig:
     return _config(
         catalog=_catalog_with_datasheet_keywords(
@@ -1327,21 +1808,69 @@ def _vehicle_unit_selection(*, unit_selection_id: str) -> UnitMusterSelection:
     )
 
 
-def _catalog_with_datasheet_keywords(mapping: dict[str, tuple[str, ...]]) -> ArmyCatalog:
+def _catalog_with_datasheet_keywords(
+    mapping: dict[str, tuple[str, ...]],
+    *,
+    scouts_distances_by_datasheet: dict[str, tuple[float, ...]] | None = None,
+    add_default_scouts_abilities: bool = True,
+) -> ArmyCatalog:
     base = ArmyCatalog.phase9a_canonical_content_pack()
     datasheets: list[DatasheetDefinition] = []
+    scouts_distances = (
+        {} if scouts_distances_by_datasheet is None else scouts_distances_by_datasheet
+    )
     for datasheet in base.datasheets:
         keywords = mapping.get(datasheet.datasheet_id)
+        resolved_keywords = datasheet.keywords.keywords if keywords is None else keywords
+        abilities = tuple(
+            ability
+            for ability in datasheet.abilities
+            if "scouts" not in {tag.lower() for tag in ability.timing_tags}
+        )
+        requested_scout_distances = scouts_distances.get(datasheet.datasheet_id)
+        if (
+            requested_scout_distances is None
+            and add_default_scouts_abilities
+            and "SCOUTS" in {keyword.upper().replace(" ", "_") for keyword in resolved_keywords}
+        ):
+            requested_scout_distances = (6.0,)
+        if requested_scout_distances is not None:
+            abilities = (
+                *abilities,
+                *_scouts_ability_descriptors(
+                    datasheet_id=datasheet.datasheet_id,
+                    distances=requested_scout_distances,
+                ),
+            )
         datasheets.append(
             replace(
                 datasheet,
                 keywords=DatasheetKeywordSet(
-                    keywords=datasheet.keywords.keywords if keywords is None else keywords,
+                    keywords=resolved_keywords,
                     faction_keywords=datasheet.keywords.faction_keywords,
                 ),
+                abilities=abilities,
             )
         )
     return replace(base, datasheets=tuple(datasheets))
+
+
+def _scouts_ability_descriptors(
+    *,
+    datasheet_id: str,
+    distances: tuple[float, ...],
+) -> tuple[DatasheetAbilityDescriptor, ...]:
+    return tuple(
+        DatasheetAbilityDescriptor(
+            ability_id=f"core-scouts-{index + 1}",
+            name=f"CORE Scouts {distance:g}",
+            source_id=f"datasheet:{datasheet_id}:ability:scouts:{index + 1}",
+            support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            timing_tags=("before_battle", "scouts"),
+            parameter_tokens=(f"{distance:g}",),
+        )
+        for index, distance in enumerate(distances)
+    )
 
 
 def _model_source_for_id(
