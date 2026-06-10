@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -274,8 +275,7 @@ def _battle_state(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID
             fixed_mission_ids=("assassination", "bring-it-down"),
         )
     )
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    enter_battle_for_fixture(state)
     assert state.stage is GameLifecycleStage.BATTLE
     return GameState.from_payload(state.to_payload())
 

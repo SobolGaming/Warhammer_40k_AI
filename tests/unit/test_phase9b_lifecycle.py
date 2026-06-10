@@ -17,6 +17,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
@@ -52,6 +53,7 @@ from warhammer40k_core.engine.phases.command import (
 )
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
@@ -322,8 +324,6 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
             armies=tuple(state.army_definitions),
         ).battlefield_state
     )
-    while state.stage is GameLifecycleStage.SETUP:
-        state.complete_current_setup_step()
     for player_id in state.player_ids:
         state.record_secondary_mission_choice(
             SecondaryMissionChoice(
@@ -332,7 +332,19 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
+    _complete_setup_through_gate(state=state, config=resolved_config)
     return state
+
+
+def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> None:
+    final_setup_step = state.setup_sequence[-1]
+    while state.current_setup_step is not final_setup_step:
+        state.complete_current_setup_step()
+    SetupCompletionGate().complete_setup_and_enter_battle(
+        state=state,
+        decisions=DecisionController(),
+        config=config,
+    )
 
 
 def test_new_game_starts_at_muster_armies_and_records_descriptor_hash() -> None:

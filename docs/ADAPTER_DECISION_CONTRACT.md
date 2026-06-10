@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, and Phase 16C reserve declaration decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, and Phase 16E setup completion gate requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, and Phase 16C reserve declaration decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, and Phase 16E setup completion gate requirements, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -62,6 +62,10 @@ The shared contract uses these objects and payloads:
 - `PreBattlePlacementProposal`: redeploy or Scout reserve setup placement answer containing the complete selected rules-unit model placement set, placement kind, action kind, source rule ID, and replay-safe source context.
 - `ScoutMoveProposal`: Scout Move answer containing action kind `scout_move` or `dedicated_transport_scout_move`, source rule ID, selected Scout distance, and a per-model `PathWitness`.
 - `PreBattleActionRecord`: deterministic replay-safe setup action record for redeploy completion, redeploy placement, pre-battle completion, Scout reserve setup, Scout Move, and Dedicated Transport Scout Move.
+- `SetupCompletionGate`: engine-owned setup-to-battle audit invoked only by lifecycle advancement at the final setup step.
+- `SetupLegalityReport`: deterministic readiness report containing typed setup completion violations, decision-drain state, and pre-battle readiness snapshot.
+- `SetupReplayCheckpoint`: deterministic state checkpoint emitted before and after battle start.
+- `BattleStartRecord`: deterministic battle-start payload emitted when setup completion succeeds.
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
 - `EventRecord`: deterministic event-log payload.
 - `GameViewPayload`: read-only viewer projection for adapters.
@@ -86,6 +90,7 @@ Relevant modules:
 - `src/warhammer40k_core/engine/deployment.py`
 - `src/warhammer40k_core/engine/prebattle.py`
 - `src/warhammer40k_core/engine/prebattle_records.py`
+- `src/warhammer40k_core/engine/setup_completion.py`
 - `src/warhammer40k_core/engine/charge_declaration.py`
 - `src/warhammer40k_core/engine/phases/charge.py`
 - `src/warhammer40k_core/engine/fight_order.py`
@@ -724,6 +729,24 @@ Required Phase 16C adapter-contract tests:
 - declared reserve units are absent from Deploy Armies options and later use the shared Move Units reserve-arrival path;
 - deterministic JSON-safe decision, reserve-state, event, lifecycle, and replay payload round-trip;
 - viewer-scoped projection/event redaction for any future hidden reserve declaration information.
+
+## Phase 16E Setup Completion Gate
+
+Phase 16E does not add a new adapter-submitted decision type. Setup completion is an engine-owned lifecycle gate that runs only after setup decisions and proposal requests have drained and the ruleset setup sequence reaches its final step. Adapters must not submit a synthetic "start battle" result, force `GameState.enter_battle()`, mutate `setup_step_index`, or bypass `GameLifecycle.advance(...)`.
+
+The gate audits the pending decision queue, reaction queue, final setup-step position, mustered armies, source-backed mission setup, Secondary Mission choices, Attacker/Defender state, battle formation declarations, reserve legality, deployment completion, battlefield coherency, redeploy state, and pre-battle actions. If any check fails, lifecycle advancement returns a typed invalid status with `invalid_reason: "setup_completion_gate_failed"` and a `setup_legality_report`; the pending queue is not popped, no `DecisionRecord` is created for battle start, and authoritative state remains in setup.
+
+When setup is legal, lifecycle advancement emits `setup_completion_gate_passed` and `battle_started` events. The `battle_started` event payload is a `BattleStartRecord` containing the completed setup step, source ID, readiness snapshot, setup legality report, pre-battle checkpoint, post-battle-start checkpoint, battle round, active player, first battle phase, turn order, and ruleset descriptor hash. These payloads are JSON-safe replay data; they must not include Python object reprs, memory addresses, or adapter-local state.
+
+Setup completion data is public table setup information in the current Phase 16E rules scope. If a future mission, deployment, reserve, or pre-battle rule hides setup information, invalid diagnostics, event deltas, projections, setup legality reports, replay checkpoints, and battle-start records must remain viewer-scoped and must not leak hidden opponent information through counts, option lists, source context, model IDs, reserve state, or derived readiness fields.
+
+Required Phase 16E adapter-contract tests:
+
+- full setup-to-battle advancement occurs only through lifecycle advancement after the pending setup decisions drain;
+- direct setup-step bypass, pending decision queue entries, unresolved setup work, and bridge-only placement paths return typed invalid diagnostics and leave state in setup;
+- legal setup emits deterministic `setup_completion_gate_passed` and `battle_started` event payloads with JSON-safe `SetupLegalityReport`, `SetupReplayCheckpoint`, and `BattleStartRecord` data;
+- lifecycle/replay payload round-trip preserves the battle-start record;
+- viewer-scoped projection/event redaction for any future hidden setup completion information.
 
 ## Parameterized Proposals
 

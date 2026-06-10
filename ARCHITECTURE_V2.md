@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -136,6 +136,18 @@ consequences that exclude the transport from deployment and mark it destroyed
 in battle round 1. `GameState.record_army_definition(...)` derives the
 `StartingStrengthRecord` set consumed by later phases.
 
+**Phase 16E is complete** for the engine-owned setup completion gate:
+setup-to-battle transition now requires a drained decision queue, drained
+reaction queue, final setup step, mustered armies, source-backed mission setup,
+secondary mission choices, attacker/defender assignments, declared reserves,
+completed deployment, battlefield coherency, and resolved redeploy/pre-battle
+actions. Legal completion emits deterministic `SetupLegalityReport`,
+`SetupReplayCheckpoint`, and `BattleStartRecord` payloads, records
+`setup_completion_gate_passed` and `battle_started` events, and enters battle
+round one without the Phase 10A deterministic placement bridge. Invalid setup
+returns typed `setup_completion_gate_failed` diagnostics and leaves the game in
+setup.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -217,13 +229,13 @@ Completed / implemented foundation:
 | 16A | Complete | Source-backed Deploy Armies, deployment-zone placement proposals, `INFILTRATORS`, attached rules-unit deployment, reserves exclusion, and replay-safe setup placement |
 | 16B | Complete | Redeployments, Scouts duplicate-distance resolution, Scout reserve setup, Scout Move proposals, Dedicated Transport Scout Move eligibility, and replay-safe pre-battle action records |
 | 16C | Complete | Reserve declaration decisions, Strategic Reserves cap enforcement, Deep Strike setup declarations, AIRCRAFT mandatory reserves, and source-backed reserve payloads |
+| 16D | Complete | Army construction completion and runtime instantiation |
+| 16E | Complete | Setup completion gate, readiness diagnostics, battle-start checkpoints, and bridge-free battle entry |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 16D | Complete | Army construction completion and runtime instantiation |
-| 16E | Planned | Setup completion gates |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
@@ -3622,7 +3634,7 @@ Required tests:
 
 ## Phase 16E: pre-battle/setup completion gate
 
-Status: Planned.
+Status: Complete.
 
 Phase 16E is the hard gate between setup and battle. It drains setup decisions,
 pre-battle timing windows, pending placement/redeploy/reserve/transport work,
@@ -3630,8 +3642,25 @@ and legality audits before battle round one can start. It also removes the
 temporary assumption that a deterministic placement bridge can stand in for
 real setup.
 
+Implemented coverage:
+
+- `SetupCompletionGate` audits readiness at the final setup step and returns a
+  typed invalid lifecycle status instead of mutating when setup is incomplete;
+- legal setup completion emits deterministic `SetupLegalityReport`,
+  `SetupReplayCheckpoint`, and `BattleStartRecord` payloads, records
+  `setup_completion_gate_passed` and `battle_started` events, and enters battle
+  round one through engine-owned mutation;
+- reserve-declaration auditing can run at the final gate without reopening
+  Declare Battle Formations, and already deployed units are not treated as
+  undeclared reserves;
+- regression tests cover full setup-to-battle entry, direct setup-step bypass
+  rejection, pending decision queue rejection without queue pop, lifecycle
+  payload round-trip, and a static audit that the gate path does not call the
+  Phase 10A deterministic placement bridge.
+
 Modules:
 
+- `engine/setup_completion.py`
 - `engine/setup_flow.py`
 - `engine/lifecycle.py`
 - `engine/game_state.py`

@@ -11,6 +11,7 @@ from tests.movement_submission_helpers import (
     submit_action_and_movement_proposal,
     submit_default_movement_proposal_if_pending,
 )
+from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
@@ -43,7 +44,6 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
-    GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
 )
@@ -926,8 +926,7 @@ def _movement_state_with_partial_placement() -> GameState:
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
-    while state.stage is GameLifecycleStage.SETUP:
-        state.complete_current_setup_step()
+    enter_battle_for_fixture(state)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     return state
 

@@ -636,8 +636,9 @@ def reserve_declaration_state_for_state(
     state: GameState,
     config: GameConfig,
     decisions: DecisionController,
+    require_current_step: bool = True,
 ) -> BattleFormationDeclarationState:
-    _validate_declaration_state(state)
+    _validate_declaration_state(state, require_current_step=require_current_step)
     completed = _completed_player_ids(decisions)
     counts = {
         player_id: len(
@@ -646,6 +647,7 @@ def reserve_declaration_state_for_state(
                 config=config,
                 player_id=player_id,
                 include_completion=False,
+                require_current_step=require_current_step,
             )
         )
         for player_id in state.player_ids
@@ -723,8 +725,9 @@ def reserve_declaration_options_for_player(
     config: GameConfig,
     player_id: str,
     include_completion: bool,
+    require_current_step: bool = True,
 ) -> tuple[DecisionOption, ...]:
-    _validate_declaration_state(state)
+    _validate_declaration_state(state, require_current_step=require_current_step)
     requested_player_id = _validate_player_id(player_id, state=state)
     context = reserve_legality_context_for_player(
         state=state,
@@ -1160,6 +1163,12 @@ def _declarable_units_for_player(*, state: GameState, player_id: str) -> tuple[U
     army = state.army_definition_for_player(player_id)
     if army is None:
         raise GameLifecycleError("Reserve declarations require a mustered army.")
+    placed_armies = () if state.battlefield_state is None else state.battlefield_state.placed_armies
+    placed_unit_ids = {
+        unit_placement.unit_instance_id
+        for placed_army in placed_armies
+        for unit_placement in placed_army.unit_placements
+    }
     embarked_ids = {
         unit_id
         for cargo_state in state.transport_cargo_states
@@ -1167,6 +1176,8 @@ def _declarable_units_for_player(*, state: GameState, player_id: str) -> tuple[U
     }
     units: list[UnitInstance] = []
     for unit in army.units:
+        if unit.unit_instance_id in placed_unit_ids:
+            continue
         if unit.unit_instance_id in embarked_ids:
             continue
         reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
@@ -1261,10 +1272,12 @@ def _require_source_rule_id(selection: ReserveDeclarationSelection) -> str:
     return selection.source_rule_id
 
 
-def _validate_declaration_state(state: GameState) -> None:
+def _validate_declaration_state(state: GameState, *, require_current_step: bool = True) -> None:
+    if type(require_current_step) is not bool:
+        raise GameLifecycleError("Reserve declaration current-step requirement must be a bool.")
     if state.stage is not GameLifecycleStage.SETUP:
         raise GameLifecycleError("Reserve declarations require setup stage.")
-    if state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
+    if require_current_step and state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
         raise GameLifecycleError("Reserve declarations require DECLARE_BATTLE_FORMATIONS.")
     if state.missing_army_player_ids():
         raise GameLifecycleError("Reserve declarations require mustered armies.")

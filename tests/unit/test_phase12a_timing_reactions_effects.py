@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult, RollOffRequest
@@ -962,8 +963,7 @@ def _battle_state(*, unit_selection_ids: tuple[str, ...]) -> GameState:
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    enter_battle_for_fixture(state)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 

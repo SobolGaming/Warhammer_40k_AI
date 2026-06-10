@@ -90,6 +90,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveOrigin,
     StrategicReserveDeclaration,
 )
+from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SetupFlow
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.transports import (
@@ -2092,9 +2093,19 @@ def _battle_state(
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    _complete_setup_through_gate(state=state, config=config)
     return state
+
+
+def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> None:
+    final_setup_step = state.setup_sequence[-1]
+    while state.current_setup_step is not final_setup_step:
+        state.complete_current_setup_step()
+    SetupCompletionGate().complete_setup_and_enter_battle(
+        state=state,
+        decisions=DecisionController(),
+        config=config,
+    )
 
 
 def _setup_state_at_declare_battle_formations(config: GameConfig) -> GameState:

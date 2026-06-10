@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from typing import TypedDict, cast
 
+from tests.setup_completion_helpers import enter_battle_for_fixture
+
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -331,8 +333,7 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
             armies=armies,
         ).battlefield_state
     )
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    enter_battle_for_fixture(state)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 
