@@ -36,7 +36,7 @@ from warhammer40k_core.engine.deployment import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
@@ -303,6 +303,34 @@ def test_phase16b_scout_keyword_without_descriptor_fails_fast() -> None:
                 ),
             )
         )
+
+
+def test_phase16b_replay_restore_preserves_pending_redeploy_request() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
+    )
+    lifecycle, request = _redeploy_placement_request(catalog)
+
+    assert request.decision_type == SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE
+    restored_request = _restored_pending_request(lifecycle, request)
+
+    assert restored_request.to_payload() == request.to_payload()
+    assert PreBattleProposalRequest.from_decision_request_payload(
+        restored_request.payload
+    ) == PreBattleProposalRequest.from_decision_request_payload(request.payload)
+
+
+def test_phase16b_replay_restore_preserves_pending_scout_move_request() -> None:
+    lifecycle, status = _advance_after_deployments(_scouts_config())
+    request = _select_scout_move(lifecycle, _decision_request(status))
+
+    assert request.decision_type == SUBMIT_SCOUT_MOVE_DECISION_TYPE
+    restored_request = _restored_pending_request(lifecycle, request)
+
+    assert restored_request.to_payload() == request.to_payload()
+    assert PreBattleProposalRequest.from_decision_request_payload(
+        restored_request.payload
+    ) == PreBattleProposalRequest.from_decision_request_payload(request.payload)
 
 
 def test_phase16b_redeploy_rejects_request_drift_and_wrong_actor_without_mutation() -> None:
@@ -1629,6 +1657,22 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _restored_pending_request(
+    lifecycle: GameLifecycle,
+    expected_request: DecisionRequest,
+) -> DecisionRequest:
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(payload)
+    restored_status = restored.advance_until_decision_or_terminal()
+
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
+    assert restored.decision_controller.queue.peek_next().request_id == expected_request.request_id
+    return _decision_request(restored_status)
 
 
 def _invalid_reason(status: LifecycleStatus) -> str:
