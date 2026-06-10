@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -45,8 +45,9 @@ emits first-class attached rules-unit formation records, derives attached-unit
 Starting Strength until split, and feeds source-backed Bodyguard/Leader/Support
 evidence used by Shooting acting-unit selection, mixed-Toughness attacks,
 healing, revival, persisting effects, and stratagem target canonicalization.
-Group-aware Movement/Fight physical acting-unit selection, movement, coherency,
-event, and replay payload cutover remains owned by Phase 16D. Phase 14H also
+Phase 16D now supplies the strict army-construction records consumed by those
+runtime hosts: Warlord, Enhancement, roster-legality, and Dedicated Transport
+manifest provenance. Phase 14H also
 covers Combat/Emergency Hazard Roll routing through shared mortal wounds and
 Feel No Pain, destroyed-Transport Emergency Disembark orchestration from actual
 destruction timing before Transport removal and Deadly Demise, setup-time
@@ -116,6 +117,16 @@ Strategic Reserves points cap and FORTIFICATION exclusion, records AIRCRAFT
 mandatory reserves as ordinary `ReserveState` payloads, preserves source rule
 IDs and points contribution, rejects stale submissions before queue pop, and
 excludes declared reserves from Deploy Armies options.
+
+**Phase 16D is complete** for source-backed army construction and runtime
+instantiation: strict roster requests validate Strike Force points, unit
+limits, Warlord selection, Enhancement assignment rules, attached-squad
+Enhancement limits, Epic Hero restrictions, and Dedicated Transport starting
+cargo manifests through deterministic `RosterLegalityReport` diagnostics.
+Mustered armies preserve Warlord, Enhancement, unit-point, Dedicated
+Transport, and legality provenance in JSON-safe payloads, promote the selected
+Warlord with a `WARLORD` keyword, and setup records source-backed starting
+embarked cargo before Deploy Armies.
 
 Completed / implemented foundation:
 
@@ -203,7 +214,8 @@ Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 16D-16E | Planned | Army construction completion and setup completion gates |
+| 16D | Complete | Army construction completion and runtime instantiation |
+| 16E | Planned | Setup completion gates |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
@@ -1022,7 +1034,9 @@ Deferred wiring contracts:
 - Phase 11E/11F must call unarrived-reserve destruction at the appropriate game-end or mission-pack deadline;
 - Phase 13B must consume Firing Deck selections during Shooting and validate selected weapons against the embarked model's wargear;
 - Phase 13E/15D must orchestrate destroyed Transport disembark from real destruction events before removing the Transport model;
-- Phase 16D must make attached-unit coherency group-aware by validating the attached rules unit, not a single `UnitPlacement`;
+- setup placement validates attached-unit coherency over the attached rules
+  unit's model set, and future movement-host broadening must preserve that
+  group-aware contract;
 - before Charge/Fight movement consumes terrain pathing broadly, FLY air-path distance budgeting and climb counted-distance budgeting must either feed the movement budget or return typed unsupported/invalid results;
 - non-`WALKER` `VEHICLE` gap/squeeze restrictions must be represented explicitly before vehicle movement coverage is claimed complete.
 
@@ -2418,10 +2432,10 @@ emits first-class attached rules-unit formation records, derives attached-unit
 Starting Strength until split, restores component Starting Strength records when
 the formation splits, and feeds the existing Bodyguard/Leader/Support role
 evidence used by Shooting acting-unit selection, attacks, healing, revival,
-persisting effects, and stratagem target canonicalization. Group-aware
-Movement/Fight physical acting-unit selection, movement, coherency, event, and
-replay payload cutover remains Phase 16D work because those hosts still need
-explicit group-placement APIs rather than a single component `UnitPlacement`.
+persisting effects, and stratagem target canonicalization. Phase 16D now
+supplies the strict roster/runtime provenance layer for Warlord, Enhancement,
+legality, and Dedicated Transport manifest records that attached-unit and
+transport hosts consume.
 Broader real-faction Leader/Support eligibility data ingestion remains future
 source/catalog work, not a Phase 14H runtime blocker.
 Completed source-backed slices from Phases 10P-10S, 11C, 13E, 14D, 14K, 15B,
@@ -3422,13 +3436,32 @@ Required tests:
 
 ## Phase 16D: leader attachment, enhancements, army construction, and roster legality completion
 
-Status: Planned.
+Status: Complete.
 
 Phase 16D finishes source-backed army construction and runtime instantiation.
 The output is not a loose list of component units: it is a deterministic set of
 army definitions, runtime unit instances, attached rules units, starting
 strength records, enhancement records, Dedicated Transport manifests, and
 legality reports that later phases consume without guessing.
+
+Implemented coverage:
+
+- `ArmyMusterRequest` accepts strict roster metadata for source-backed unit
+  points, Warlord selection, Enhancement assignment, and Dedicated Transport
+  starting-cargo manifests;
+- `validate_roster_legality(...)` emits deterministic JSON-safe
+  `RosterLegalityReport` diagnostics for Strike Force points/unit limits,
+  missing source data, Warlord legality, Enhancement legality, Epic Hero
+  restrictions, attached-squad Enhancement limits, and Dedicated Transport
+  capacity/cargo restrictions;
+- strict roster requests fail before mutation, while non-strict legacy smoke
+  fixtures still carry legality reports without weakening production checks;
+- mustered `ArmyDefinition` payloads preserve Warlord, Enhancement, unit-point,
+  Dedicated Transport, and legality provenance and promote the selected
+  Warlord with the `WARLORD` keyword;
+- setup records Dedicated Transport manifest cargo as first-class
+  `TransportCargoState` before Deploy Armies and emits deterministic setup
+  events.
 
 Modules:
 

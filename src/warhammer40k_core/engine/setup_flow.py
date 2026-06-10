@@ -61,6 +61,7 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_request_for_next_player,
     reserve_declaration_state_for_state,
 )
+from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
@@ -311,6 +312,10 @@ class SetupFlow:
                 raise GameLifecycleError("MUSTER_ARMIES failed during army mustering.") from exc
         for army_definition in army_definitions:
             state.record_army_definition(army_definition)
+            cargo_states = _record_dedicated_transport_manifests(
+                state=state,
+                army_definition=army_definition,
+            )
             decisions.event_log.append(
                 "army_mustered",
                 {
@@ -319,8 +324,21 @@ class SetupFlow:
                     "player_id": army_definition.player_id,
                     "army_id": army_definition.army_id,
                     "unit_count": len(army_definition.units),
+                    "roster_legality_report": army_definition.roster_legality_report.to_payload(),
                 },
             )
+            for cargo_state in cargo_states:
+                decisions.event_log.append(
+                    "battle_formation_transport_manifest_recorded",
+                    {
+                        "game_id": state.game_id,
+                        "setup_step": SetupStep.MUSTER_ARMIES.value,
+                        "player_id": army_definition.player_id,
+                        "army_id": army_definition.army_id,
+                        "transport_unit_instance_id": cargo_state.transport_unit_instance_id,
+                        "transport_cargo_state": cargo_state.to_payload(),
+                    },
+                )
         if state.missing_army_player_ids():
             raise GameLifecycleError("MUSTER_ARMIES requires an army for every player.")
 
@@ -769,6 +787,34 @@ def _secondary_mission_options(
             )
         )
     return tuple(options)
+
+
+def _record_dedicated_transport_manifests(
+    *,
+    state: GameState,
+    army_definition: ArmyDefinition,
+) -> tuple[TransportCargoState, ...]:
+    cargo_states: list[TransportCargoState] = []
+    for manifest in army_definition.dedicated_transport_manifests:
+        cargo_states.append(
+            state.declare_battle_formation_embarkation(
+                player_id=army_definition.player_id,
+                transport_unit_instance_id=manifest.transport_unit_instance_id(
+                    army_id=army_definition.army_id,
+                ),
+                embarked_unit_instance_ids=manifest.embarked_unit_instance_ids(
+                    army_id=army_definition.army_id,
+                ),
+                capacity_profile=TransportCapacityProfile(
+                    transport_datasheet_id=manifest.capacity_profile.transport_datasheet_id,
+                    max_model_count=manifest.capacity_profile.max_model_count,
+                    allowed_keywords=manifest.capacity_profile.allowed_keywords,
+                    excluded_keywords=manifest.capacity_profile.excluded_keywords,
+                    source_id=manifest.capacity_profile.source_id,
+                ),
+            )
+        )
+    return tuple(cargo_states)
 
 
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:
