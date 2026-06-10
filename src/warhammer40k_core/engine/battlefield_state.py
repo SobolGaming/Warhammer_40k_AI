@@ -1437,8 +1437,6 @@ def _validate_placed_armies(
     if type(values) is not tuple:
         raise PlacementError(f"{field_name} must be a tuple.")
     raw_values = cast(tuple[object, ...], values)
-    if not raw_values:
-        raise PlacementError(f"{field_name} must not be empty.")
     placed_armies: list[PlacedArmy] = []
     for value in raw_values:
         if type(value) is not PlacedArmy:

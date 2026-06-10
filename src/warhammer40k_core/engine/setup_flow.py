@@ -1,18 +1,23 @@
 from __future__ import annotations
 
 from itertools import combinations
+from typing import cast
 
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError, muster_army
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldPlacementKind,
-    BattlefieldScenario,
-    BattlefieldTransitionBatch,
-    ModelPlacementRecord,
-    PlacementError,
-)
+from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.deployment import (
+    SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
+    SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
+    apply_deployment_placement,
+    create_empty_deployment_battlefield_state,
+    deployment_completion_accounted_model_ids,
+    deployment_placement_request_from_selection,
+    deployment_setup_state_for_state,
+    deployment_unit_selection_request,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -27,8 +32,6 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     SetupStep,
 )
-from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
@@ -67,8 +70,16 @@ class SetupFlow:
                 )
         elif current_step is SetupStep.MUSTER_ARMIES:
             self._muster_armies(state=state, decisions=decisions, config=config)
+        elif current_step is SetupStep.CREATE_BATTLEFIELD:
+            self._create_battlefield(state=state, decisions=decisions)
         elif current_step is SetupStep.DEPLOY_ARMIES:
-            self._place_mustered_armies(state=state, decisions=decisions, config=config)
+            deployment_status = self._advance_deploy_armies(
+                state=state,
+                decisions=decisions,
+                config=config,
+            )
+            if deployment_status is not None:
+                return deployment_status
 
         completed_step = state.complete_current_setup_step()
         decisions.event_log.append(
@@ -106,7 +117,24 @@ class SetupFlow:
         state: GameState,
         result: DecisionResult,
         decisions: DecisionController,
+        config: GameConfig,
     ) -> None:
+        if result.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE:
+            self._apply_deployment_unit_selection(
+                state=state,
+                result=result,
+                decisions=decisions,
+                config=config,
+            )
+            return
+        if result.decision_type == SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE:
+            self._apply_deployment_placement(
+                state=state,
+                result=result,
+                decisions=decisions,
+                config=config,
+            )
+            return
         if result.decision_type != SECONDARY_MISSION_DECISION_TYPE:
             raise GameLifecycleError("SetupFlow received an unsupported decision_type.")
         if state.stage is not GameLifecycleStage.SETUP:
@@ -188,63 +216,152 @@ class SetupFlow:
         if state.missing_army_player_ids():
             raise GameLifecycleError("MUSTER_ARMIES requires an army for every player.")
 
-    def _place_mustered_armies(
+    def _create_battlefield(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+    ) -> None:
+        if state.battlefield_state is not None:
+            return
+        if state.mission_setup is None:
+            raise GameLifecycleError("CREATE_BATTLEFIELD requires source-backed MissionSetup.")
+        battlefield_state = create_empty_deployment_battlefield_state(state=state)
+        state.record_battlefield_state(battlefield_state)
+        decisions.event_log.append(
+            "battlefield_created",
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.CREATE_BATTLEFIELD.value,
+                "battlefield_id": battlefield_state.battlefield_id,
+                "mission_pack_id": state.mission_setup.mission_pack_id,
+                "deployment_map_id": state.mission_setup.deployment_map_id,
+                "terrain_layout_id": state.mission_setup.terrain_layout_id,
+                "objective_marker_count": len(state.mission_setup.objective_markers),
+                "terrain_feature_count": len(state.mission_setup.terrain_features),
+                "placed_model_count": 0,
+            },
+        )
+
+    def _advance_deploy_armies(
         self,
         *,
         state: GameState,
         decisions: DecisionController,
         config: GameConfig,
-    ) -> None:
-        if state.battlefield_state is not None:
-            return
+    ) -> LifecycleStatus | None:
+        if state.battlefield_state is None:
+            raise GameLifecycleError("DEPLOY_ARMIES requires CREATE_BATTLEFIELD first.")
         if state.missing_army_player_ids():
             raise GameLifecycleError("DEPLOY_ARMIES requires mustered armies for every player.")
-        scenario = create_deterministic_battlefield_scenario(
-            battlefield_id=f"{state.game_id}:phase10a-battlefield",
-            armies=tuple(state.army_definitions),
-        )
-        battlefield_state = scenario.battlefield_state
-        for unit_id in _setup_declared_unplaced_unit_ids(state):
-            try:
-                battlefield_state = battlefield_state.without_unit_placement(unit_id)
-            except PlacementError as exc:
-                raise GameLifecycleError(
-                    "Declared setup unit was not placed by deployment."
-                ) from exc
+        setup_state = deployment_setup_state_for_state(state)
+        if setup_state.next_player_id is not None:
+            request = deployment_unit_selection_request(
+                state=state,
+                ruleset_descriptor=config.ruleset_descriptor,
+                player_id=setup_state.next_player_id,
+            )
+            decisions.request_decision(request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.SETUP,
+                decision_request=request,
+                payload={
+                    "setup_step": SetupStep.DEPLOY_ARMIES.value,
+                    "deployment_setup_state": cast(JsonValue, setup_state.to_payload()),
+                },
+            )
         scenario = BattlefieldScenario(
-            armies=scenario.armies,
-            battlefield_state=battlefield_state,
+            armies=tuple(state.army_definitions),
+            battlefield_state=state.battlefield_state,
+        )
+        scenario.assert_all_mustered_models_placed_or_accounted(
+            deployment_completion_accounted_model_ids(state)
         )
         assert_battlefield_units_in_coherency(
             scenario=scenario,
             ruleset_descriptor=config.ruleset_descriptor,
         )
-        state.record_battlefield_state(scenario.battlefield_state)
-        transition_batch = BattlefieldTransitionBatch(
-            placements=tuple(
-                ModelPlacementRecord(
-                    model_instance_id=model_placement.model_instance_id,
-                    placement_kind=BattlefieldPlacementKind.DEPLOYMENT,
-                    pose=model_placement.pose,
-                    source_phase=None,
-                    source_step=SetupStep.DEPLOY_ARMIES.value,
-                    source_rule_id="phase10a_deterministic_bridge",
-                    source_event_id=None,
-                )
-                for placed_army in scenario.battlefield_state.placed_armies
-                for unit_placement in placed_army.unit_placements
-                for model_placement in unit_placement.model_placements
-            )
-        )
+        return None
+
+    def _apply_deployment_unit_selection(
+        self,
+        *,
+        state: GameState,
+        result: DecisionResult,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> None:
+        if state.stage is not GameLifecycleStage.SETUP:
+            raise GameLifecycleError("Deployment unit selection can be applied only in setup.")
+        if state.current_setup_step is not SetupStep.DEPLOY_ARMIES:
+            raise GameLifecycleError("Deployment unit selection requires DEPLOY_ARMIES.")
+        if result.actor_id is None:
+            raise GameLifecycleError("Deployment unit selection requires actor_id.")
+        if not isinstance(result.payload, dict):
+            raise GameLifecycleError("Deployment unit selection payload must be an object.")
+        selected_unit_id = result.payload.get("unit_instance_id")
+        if type(selected_unit_id) is not str:
+            raise GameLifecycleError("Deployment unit selection payload missing unit_instance_id.")
+        selection_record = decisions.record_for_result(result)
+        placement_request = deployment_placement_request_from_selection(
+            state=state,
+            ruleset_descriptor=config.ruleset_descriptor,
+            selection_request=selection_record.request,
+            result=result,
+        ).to_decision_request()
         decisions.event_log.append(
-            "battlefield_placement_created",
+            "deployment_unit_selected",
             {
                 "game_id": state.game_id,
                 "setup_step": SetupStep.DEPLOY_ARMIES.value,
-                "battlefield_id": scenario.battlefield_state.battlefield_id,
-                "placed_army_count": len(scenario.battlefield_state.placed_armies),
-                "placed_model_count": len(scenario.battlefield_state.placed_model_ids()),
-                "placement_source": "phase10a_deterministic_bridge",
+                "deployment_order_policy": "defender_first_alternating",
+                "player_id": result.actor_id,
+                "unit_instance_id": selected_unit_id,
+                "selected_option_id": result.selected_option_id,
+                "source_decision_record_id": selection_record.record_id,
+                "source_decision_request_id": selection_record.request.request_id,
+                "source_decision_result_id": result.result_id,
+                "placement_request_id": placement_request.request_id,
+            },
+        )
+        decisions.request_decision(placement_request)
+
+    def _apply_deployment_placement(
+        self,
+        *,
+        state: GameState,
+        result: DecisionResult,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> None:
+        if state.stage is not GameLifecycleStage.SETUP:
+            raise GameLifecycleError("Deployment placement can be applied only in setup.")
+        if state.current_setup_step is not SetupStep.DEPLOY_ARMIES:
+            raise GameLifecycleError("Deployment placement requires DEPLOY_ARMIES.")
+        placement_record = decisions.record_for_result(result)
+        resolution = apply_deployment_placement(
+            state=state,
+            request=placement_record.request,
+            result=result,
+            ruleset_descriptor=config.ruleset_descriptor,
+        )
+        if resolution.transition_batch is None:
+            raise GameLifecycleError("Deployment placement requires a transition batch.")
+        if state.battlefield_state is None:
+            raise GameLifecycleError("Deployment placement requires battlefield_state.")
+        decisions.event_log.append(
+            "deployment_unit_placed",
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.DEPLOY_ARMIES.value,
+                "battlefield_id": state.battlefield_state.battlefield_id,
+                "deployment_order_policy": "defender_first_alternating",
+                "player_id": result.actor_id,
+                "unit_instance_id": resolution.proposal.unit_instance_id,
+                "placement_kind": resolution.proposal.placement_kind.value,
+                "placed_model_count": len(resolution.proposal.model_placements),
+                "source_decision_record_id": placement_record.record_id,
+                "resolution": resolution.to_payload(),
             },
         )
         decisions.event_log.append(
@@ -252,10 +369,10 @@ class SetupFlow:
             {
                 "game_id": state.game_id,
                 "setup_step": SetupStep.DEPLOY_ARMIES.value,
-                "battlefield_id": scenario.battlefield_state.battlefield_id,
-                "placement_kind": BattlefieldPlacementKind.DEPLOYMENT.value,
-                "placed_model_count": len(scenario.battlefield_state.placed_model_ids()),
-                "transition_batch": transition_batch.to_payload(),
+                "battlefield_id": state.battlefield_state.battlefield_id,
+                "placement_kind": resolution.proposal.placement_kind.value,
+                "placed_model_count": len(resolution.proposal.model_placements),
+                "transition_batch": resolution.transition_batch.to_payload(),
             },
         )
 
@@ -305,20 +422,6 @@ def _secondary_mission_options(
             )
         )
     return tuple(options)
-
-
-def _setup_declared_unplaced_unit_ids(state: GameState) -> tuple[str, ...]:
-    reserve_unit_ids = {
-        reserve_state.unit_instance_id
-        for reserve_state in state.reserve_states
-        if reserve_state.status is ReserveStatus.IN_RESERVES
-    }
-    embarked_unit_ids = {
-        unit_id
-        for cargo_state in state.transport_cargo_states
-        for unit_id in cargo_state.embarked_unit_instance_ids
-    }
-    return tuple(sorted(reserve_unit_ids | embarked_unit_ids))
 
 
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:

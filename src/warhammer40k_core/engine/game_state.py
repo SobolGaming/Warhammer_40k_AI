@@ -1435,7 +1435,9 @@ class GameState:
             raise GameLifecycleError(
                 "battle formation embarkation capacity_profile must be TransportCapacityProfile."
             )
-        if self.battlefield_state is not None:
+        if self.battlefield_state is not None and (
+            self.battlefield_state.placed_armies or self.battlefield_state.removed_model_ids
+        ):
             raise GameLifecycleError(
                 "Battle formation embarkation must be declared before deployment."
             )

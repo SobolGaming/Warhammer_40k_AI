@@ -175,6 +175,22 @@ def base_footprint_intersects_deployment_zone(
     return footprint_for_deployment_zone(deployment_zone).intersects(footprint_for_base(base, pose))
 
 
+def base_footprint_within_deployment_zone(
+    base: BaseShape,
+    pose: Pose,
+    deployment_zone: DeploymentZone,
+) -> bool:
+    return footprint_for_deployment_zone(deployment_zone).covers(footprint_for_base(base, pose))
+
+
+def base_footprint_distance_to_deployment_zone(
+    base: BaseShape,
+    pose: Pose,
+    deployment_zone: DeploymentZone,
+) -> float:
+    return footprint_for_deployment_zone(deployment_zone).distance(footprint_for_base(base, pose))
+
+
 def base_footprint_distance_to_bounds(
     base: BaseShape,
     pose: Pose,

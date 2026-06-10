@@ -4,6 +4,7 @@ import json
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
@@ -203,24 +204,39 @@ def test_deploy_armies_emits_deployment_placement_records() -> None:
     assert battlefield_state is not None
     placed_model_ids = set(battlefield_state.placed_model_ids())
 
-    payload = _last_event_payload(lifecycle, "battlefield_models_placed")
-    batch = _transition_batch_from_event_payload(payload)
+    payloads = _event_payloads(lifecycle, "battlefield_models_placed")
+    batches = tuple(_transition_batch_from_event_payload(payload) for payload in payloads)
+    placed_records = tuple(record for batch in batches for record in batch.placements)
 
-    assert payload["game_id"] == "phase10d-game"
-    assert payload["setup_step"] == "deploy_armies"
-    assert payload["battlefield_id"] == "phase10d-game:phase10a-battlefield"
-    assert payload["placement_kind"] == BattlefieldPlacementKind.DEPLOYMENT.value
-    assert payload["placed_model_count"] == len(placed_model_ids)
-    assert len(batch.placements) == len(placed_model_ids)
-    assert batch.removals == ()
-    assert batch.displacements == ()
-    assert {record.model_instance_id for record in batch.placements} == placed_model_ids
-    for record in batch.placements:
+    assert len(payloads) == 3
+    assert all(payload["game_id"] == "phase10d-game" for payload in payloads)
+    assert all(payload["setup_step"] == "deploy_armies" for payload in payloads)
+    assert all(
+        payload["battlefield_id"]
+        == "phase10d-game:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield"
+        for payload in payloads
+    )
+    assert all(
+        payload["placement_kind"] == BattlefieldPlacementKind.DEPLOYMENT.value
+        for payload in payloads
+    )
+    assert sum(cast(int, payload["placed_model_count"]) for payload in payloads) == len(
+        placed_model_ids
+    )
+    assert len(placed_records) == len(placed_model_ids)
+    assert all(batch.removals == () for batch in batches)
+    assert all(batch.displacements == () for batch in batches)
+    assert {record.model_instance_id for record in placed_records} == placed_model_ids
+    for record in placed_records:
         assert record.placement_kind is BattlefieldPlacementKind.DEPLOYMENT
         assert record.source_phase is None
         assert record.source_step == "deploy_armies"
-        assert record.source_rule_id == "phase10a_deterministic_bridge"
-        assert record.source_event_id is None
+        assert record.source_rule_id == "core_rules_deploy_armies"
+        assert record.source_event_id in {
+            "phase10d-deploy-000002",
+            "phase10d-deploy-000004",
+            "phase10d-deploy-000006",
+        }
         assert record.pose == battlefield_state.model_placement_by_id(record.model_instance_id).pose
 
 
@@ -408,11 +424,16 @@ def _advance_to_movement_unit_selection(
         result_id="phase10d-result-000001",
     )
     assert _decision_request(second_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
-    movement_status = _submit_result(
+    deployment_status = _submit_result(
         lifecycle,
         request=_decision_request(second_status),
         option_id="fixed:assassination:bring_it_down",
         result_id="phase10d-result-000002",
+    )
+    movement_status = submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase10d-deploy",
     )
     return lifecycle, movement_status
 
@@ -464,6 +485,14 @@ def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, 
             assert isinstance(event.payload, dict)
             return cast(dict[str, object], event.payload)
     raise AssertionError(f"Missing event type: {event_type}")
+
+
+def _event_payloads(lifecycle: GameLifecycle, event_type: str) -> tuple[dict[str, object], ...]:
+    return tuple(
+        cast(dict[str, object], event.payload)
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == event_type
+    )
 
 
 def _transition_batch_from_event_payload(

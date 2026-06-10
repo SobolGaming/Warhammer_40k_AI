@@ -4,6 +4,7 @@ import json
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
@@ -131,11 +132,16 @@ def _advance_to_movement_unit_selection(
         result_id="phase10l-integration-result-000001",
     )
     assert _decision_request(second_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
-    movement_status = _submit_result(
+    deployment_status = _submit_result(
         lifecycle,
         request=_decision_request(second_status),
         option_id="fixed:assassination:bring_it_down",
         result_id="phase10l-integration-result-000002",
+    )
+    movement_status = submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase10l-integration-deploy",
     )
     assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return lifecycle, movement_status

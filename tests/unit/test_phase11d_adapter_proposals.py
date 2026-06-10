@@ -6,6 +6,11 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import (
+    DeploymentPoseFactory,
+    default_deployment_pose,
+    submit_all_deployments_if_pending,
+)
 
 from warhammer40k_core.adapters.contracts import (
     FiniteOptionSubmission,
@@ -471,7 +476,8 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
 
 def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
     session, movement_status = _local_session_at_movement_unit_selection(
-        game_id="phase10o-one-v2-new-0000"
+        game_id="phase10o-one-v2-new-0000",
+        pose_factory=_fall_back_deployment_pose,
     )
     state = _session_state(session)
     _mark_first_unit_battle_shocked(state)
@@ -517,7 +523,9 @@ def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
 
 
 def test_fall_back_mode_drift_and_malformed_payload_keep_pending_request() -> None:
-    session, _movement_status = _local_session_at_movement_unit_selection()
+    session, _movement_status = _local_session_at_movement_unit_selection(
+        pose_factory=_fall_back_deployment_pose,
+    )
     state = _session_state(session)
     _mark_first_unit_battle_shocked(state)
     _move_first_enemy_model_into_overflight_engagement(state)
@@ -1472,7 +1480,9 @@ def _local_session_at_first_movement_action() -> tuple[LocalGameSession, Decisio
 
 
 def _local_session_at_movement_unit_selection(
-    *, game_id: str = "phase11d-game"
+    *,
+    game_id: str = "phase11d-game",
+    pose_factory: DeploymentPoseFactory | None = None,
 ) -> tuple[LocalGameSession, LifecycleStatus]:
     session = LocalGameSession()
     session.start(_config(game_id=game_id))
@@ -1486,6 +1496,12 @@ def _local_session_at_movement_unit_selection(
     movement_status = session.submit_option(
         option_id="fixed:assassination:bring_it_down",
         result_id="phase11d-secondary-b",
+    )
+    movement_status = submit_all_deployments_if_pending(
+        session.lifecycle,
+        movement_status,
+        result_id_prefix="phase11d-deploy",
+        pose_factory=pose_factory,
     )
     assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return session, movement_status
@@ -1697,6 +1713,19 @@ def _move_first_enemy_model_into_overflight_engagement(state: GameState) -> None
             )
         )
     )
+
+
+def _fall_back_deployment_pose(
+    index: int,
+    player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    unit_instance_id = model_instance_id.rsplit(":", 2)[0]
+    if unit_instance_id == "army-alpha:intercessor-unit-1":
+        return Pose.at(3.0 + (index * 1.8), 24.0, 0.0, facing_degrees=0.0)
+    if unit_instance_id == "army-beta:intercessor-unit-3":
+        return Pose.at(43.5 + (index * 1.8), 24.0, 0.0, facing_degrees=180.0)
+    return default_deployment_pose(index, player_id, model_instance_id)
 
 
 def _battle_state_with_reserve() -> tuple[GameState, ReserveState, UnitInstance]:

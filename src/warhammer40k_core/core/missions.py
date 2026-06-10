@@ -324,7 +324,9 @@ class ObjectiveMarkerDefinition:
         )
         if self.marker_diameter_mm != 40.0:
             raise MissionPackError("Chapter Approved objective markers must be 40mm.")
-        if not self.is_flat or self.blocks_movement or self.blocks_placement:
+        if self.source_id.startswith("chapter_approved_2026_27") and (
+            not self.is_flat or self.blocks_movement or self.blocks_placement
+        ):
             raise MissionPackError("Chapter Approved objective markers must be flat/non-blocking.")
 
     def to_objective(self) -> Objective:

@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -48,6 +49,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
@@ -480,6 +482,9 @@ def test_setup_declarations_keep_reserve_and_embarked_units_off_battlefield() ->
     flow = SetupFlow()
     flow.advance(state=state, decisions=decisions, config=config)
     while state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
+        if state.current_setup_step is SetupStep.CREATE_BATTLEFIELD:
+            flow.advance(state=state, decisions=decisions, config=config)
+            continue
         state.complete_current_setup_step()
     reserve_unit = _unit_by_id(state, "army-alpha:reserve-unit")
     passenger = _unit_by_id(state, "army-alpha:passenger-unit")
@@ -507,13 +512,38 @@ def test_setup_declarations_keep_reserve_and_embarked_units_off_battlefield() ->
             allowed_keywords=("INFANTRY",),
         ),
     )
+    state.record_secondary_mission_choice(
+        _secondary_choice(player_id="player-a", mode=SecondaryMissionMode.FIXED)
+    )
+    state.record_secondary_mission_choice(
+        _secondary_choice(player_id="player-b", mode=SecondaryMissionMode.FIXED)
+    )
 
     state.complete_current_setup_step()
-    flow.advance(state=state, decisions=decisions, config=config)
+    deployment_status = flow.advance(state=state, decisions=decisions, config=config)
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = state
+    lifecycle.decision_controller = decisions
+    submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase11c-setup-deploy",
+    )
 
     assert state.battlefield_state is not None
     assert reserve_states == (state.reserve_state_for_unit(reserve_unit.unit_instance_id),)
-    assert cargo_state == state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    stored_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert stored_cargo is not None
+    assert stored_cargo.player_id == cargo_state.player_id
+    assert stored_cargo.transport_unit_instance_id == cargo_state.transport_unit_instance_id
+    assert stored_cargo.capacity_profile == cargo_state.capacity_profile
+    assert stored_cargo.embarked_unit_instance_ids == cargo_state.embarked_unit_instance_ids
+    assert stored_cargo.phase_battle_round == 1
+    assert (
+        stored_cargo.started_phase_embarked_unit_instance_ids
+        == cargo_state.embarked_unit_instance_ids
+    )
     assert state.battlefield_state.unit_placement_by_id(transport.unit_instance_id)
     with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
         state.battlefield_state.unit_placement_by_id(reserve_unit.unit_instance_id)

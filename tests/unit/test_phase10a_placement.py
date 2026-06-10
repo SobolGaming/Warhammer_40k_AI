@@ -333,8 +333,7 @@ def test_battlefield_state_and_scenario_fail_fast_on_invalid_shapes() -> None:
         )
     with pytest.raises(PlacementError, match="placed_armies must be a tuple"):
         replace(placement_state, placed_armies=cast(tuple[PlacedArmy, ...], []))
-    with pytest.raises(PlacementError, match="placed_armies must not be empty"):
-        replace(placement_state, placed_armies=())
+    assert replace(placement_state, placed_armies=()).placed_model_ids() == ()
     with pytest.raises(PlacementError, match="PlacedArmy values"):
         replace(placement_state, placed_armies=cast(tuple[PlacedArmy, ...], ("bad-army",)))
     with pytest.raises(PlacementError, match="army_id must not be placed twice"):

@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, and Phase 15C fight activation/pass/interrupt decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, and Phase 16A deployment setup decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, and Phase 15C fight activation/pass/interrupt decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, and Phase 16A deployment setup decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -53,6 +53,8 @@ The shared contract uses these objects and payloads:
 - `MeleeDeclarationProposalRequest`: Fight phase parameterized request exposing current melee weapon options, model-engaged target snapshots, the source activation decision context, and ruleset descriptor hash.
 - `MeleeDeclarationProposal`: Fight phase parameterized answer selecting each fighting model's primary melee weapon, optional `[EXTRA ATTACKS]` weapons, and target allocations for those melee weapons.
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
+- `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
+- `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
 - `EventRecord`: deterministic event-log payload.
 - `GameViewPayload`: read-only viewer projection for adapters.
@@ -74,6 +76,7 @@ Relevant modules:
 - `src/warhammer40k_core/engine/decision_result.py`
 - `src/warhammer40k_core/engine/decision_record.py`
 - `src/warhammer40k_core/engine/movement_proposals.py`
+- `src/warhammer40k_core/engine/deployment.py`
 - `src/warhammer40k_core/engine/charge_declaration.py`
 - `src/warhammer40k_core/engine/phases/charge.py`
 - `src/warhammer40k_core/engine/fight_order.py`
@@ -573,6 +576,46 @@ Required Phase 15A adapter-contract tests:
 - no-move Charge Move proposals record `charge_move_declined` without displacements or Fights First;
 - viewer-scoped projection/event redaction for any future hidden Charge eligibility or target information.
 
+## Phase 16A Deployment Setup Decisions
+
+Phase 16A replaces the setup deterministic placement bridge with source-backed Deploy Armies decisions. Deployment remains a setup placement operation: adapters choose a pending unit option, then submit explicit final model poses for that selected rules unit. Adapters must not mutate battlefield state, infer deployment order, invent deployment zones, or place units from option payloads.
+
+Phase 16A exposes this finite setup decision:
+
+- `select_deployment_unit`: finite player choice during setup step `deploy_armies`. The engine emits one option for each currently legal undeployed rules unit owned by the actor. Option IDs are deterministic `deploy:<rules_unit_id>` tokens. Option payloads include `submission_kind: "select_deployment_unit"`, game ID, player ID, setup step, selected rules-unit ID, attached-unit/component IDs, complete model IDs, owning deployment-zone IDs, mission/deployment/terrain source IDs, and ruleset descriptor hash. Adapters must select one pending option ID and must not synthesize option IDs for reserved, embarked, already deployed, destroyed, or otherwise unavailable units.
+
+Selecting a deployment unit records the finite `DecisionRecord`, emits `deployment_unit_selected`, and immediately emits the parameterized placement request:
+
+- `submit_deployment_placement` with proposal kind `deployment_placement`. The request has the fixed `submit_parameterized_payload` option and embeds a `DeploymentPlacementRequest` in `payload.proposal_request`. The request context includes game ID, ruleset descriptor hash, setup step `deploy_armies`, actor/player ID, selected rules-unit ID, attached/component unit IDs, the exact model IDs that must be placed, owning deployment-zone IDs, source-backed `MissionSetup` payload, terrain/objective/deployment map IDs, and deployment placement context.
+
+Adapters answer with `DeploymentPlacementProposal` through `ParameterizedSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. The payload must include:
+
+- `proposal_request_id`;
+- `proposal_kind: "deployment_placement"`;
+- `game_id`;
+- `ruleset_descriptor_hash`;
+- `setup_step: "deploy_armies"`;
+- `player_id`;
+- `unit_instance_id`;
+- `placement_kind: "deployment"`;
+- one `ModelPlacement` for every required model ID, including attached rules-unit component models when applicable;
+- the replay-safe request context from the pending request.
+
+Malformed, stale, wrong-actor, wrong-step, wrong-kind, wrong-ruleset-hash, wrong-unit, omitted-model, extra-model, wrong-owner, wrong-component, wrong-placement-kind, stale-mission-setup, or model-set drift submissions reject before the pending queue is popped and before a `DecisionRecord` is created. Rule-invalid deployment placements, including out-of-bounds endpoints, ordinary placements outside the owning deployment zone, invalid `INFILTRATORS` distance, illegal terrain endpoints, model overlap, Engagement Range violations, objective endpoint violations, Fortification unsupported paths, and coherency failures, return typed invalid diagnostics and do not mutate authoritative battlefield state.
+
+Accepted deployment proposals mutate only through engine-owned validators. They update the authoritative battlefield state with deployment placements, emit `deployment_unit_placed`, emit `battlefield_models_placed`, and preserve deterministic replay-safe placement payloads. When all deployable model IDs are placed or explicitly accounted for by reserves, embarked state, destroyed state, or other typed setup accounting, Deploy Armies completes and battle entry proceeds through the normal lifecycle.
+
+Deployment choices are public table setup information in the current Phase 16A rules scope. If a future mission, reserve, hidden deployment, or secret pre-battle mechanic hides setup information, pending requests, option lists, proposal diagnostics, placement events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through counts, model IDs, source context, or derived fields.
+
+Required Phase 16A adapter-contract tests:
+
+- valid deployment unit selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid deployment placement through `ParameterizedSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- stale, malformed, wrong-context, and drifted placement submissions reject before queue pop and before mutation;
+- ordinary deployment-zone validation, `INFILTRATORS` validation, model-set completeness, attached rules-unit grouping, reserves exclusion, terrain/objective/engagement/coherency invalid diagnostics, and no deterministic placement bridge;
+- deterministic JSON-safe decision/event/lifecycle replay payload round-trip;
+- viewer-scoped projection/event redaction for any future hidden deployment or setup information.
+
 ## Parameterized Proposals
 
 Parameterized proposals are used when the exact physical result cannot be safely enumerated as finite options.
@@ -586,13 +629,14 @@ The contract currently covers these proposal families:
 - Deep Strike placement;
 - Strategic Reserves placement;
 - Disembark placement;
+- Deployment placement;
 - Charge Move, including charge-target selection, no-move choice, and PathWitness movement evidence;
 - Pile In and Consolidate movement, including no-move choices, fight movement target or objective context, and PathWitness movement evidence;
 - ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - melee declaration, including one primary melee weapon per fighting model, optional `[EXTRA ATTACKS]` weapons, model-engaged target binding, and split melee attack counts;
 - Stratagem target or placement proposals introduced by Phase 12 and later phase gates.
 
-Later phases must reuse the same contract for deployment placement, redeployment, Scout moves, Stratagem target binding, and mission movement or placement effects where applicable.
+Later phases must reuse the same contract for redeployment, Scout moves, Stratagem target binding, and mission movement or placement effects where applicable.
 
 Parameterized requests are still `DecisionRequest`s. They contain a single `submit_parameterized_payload` option and embed a neutral `ProposalRequestPayload` inside `DecisionRequest.payload`.
 

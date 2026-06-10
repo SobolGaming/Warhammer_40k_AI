@@ -5,6 +5,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import (
+    default_deployment_pose,
+    submit_all_deployments_if_pending,
+)
 from tests.movement_submission_helpers import (
     submit_action_and_movement_proposal,
     submit_default_movement_proposal_if_pending,
@@ -72,7 +76,7 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-one-v2-new-0004"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-phase15d-0001"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-two-fixed-0005"
 _ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0272"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
@@ -239,7 +243,10 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         movement_mode=MovementMode.FALL_BACK,
         fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
-        witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
     )
     removal_request = _decision_request(fall_back_status)
 
@@ -379,7 +386,10 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         movement_mode=MovementMode.FALL_BACK,
         fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
-        witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
     )
     removal_request = _decision_request(fall_back_status)
     destroyed_model_ids = (
@@ -849,11 +859,17 @@ def _advance_to_movement_unit_selection(
         result_id="phase10o-result-000001",
     )
     assert _decision_request(second_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
-    movement_status = _submit_result(
+    deployment_status = _submit_result(
         lifecycle,
         request=_decision_request(second_status),
         option_id="fixed:assassination:bring_it_down",
         result_id="phase10o-result-000002",
+    )
+    movement_status = submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase10o-deploy",
+        pose_factory=_fall_back_deployment_pose,
     )
     assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return lifecycle, movement_status
@@ -990,6 +1006,19 @@ def _config(*, game_id: str = "phase10o-desperate") -> GameConfig:
     )
 
 
+def _fall_back_deployment_pose(
+    index: int,
+    player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    unit_instance_id = model_instance_id.rsplit(":", 2)[0]
+    if unit_instance_id == "army-alpha:intercessor-unit-1":
+        return Pose.at(3.0 + (index * 1.8), 24.0, 0.0, facing_degrees=0.0)
+    if unit_instance_id == "army-beta:intercessor-unit-2":
+        return Pose.at(43.5 + (index * 1.8), 24.0, 0.0, facing_degrees=180.0)
+    return default_deployment_pose(index, player_id, model_instance_id)
+
+
 def _mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2026_27_mission_pack(),
@@ -1122,6 +1151,16 @@ def _fall_back_witness(
         )
         model_paths.append((placement.model_instance_id, (start, midpoint, end)))
     return PathWitness.for_paths(tuple(model_paths))
+
+
+def _fall_back_forward_pose(unit_placement: UnitPlacement) -> Pose:
+    first_pose = unit_placement.model_placements[0].pose
+    return Pose.at(
+        first_pose.position.x,
+        first_pose.position.y + 6.0,
+        first_pose.position.z,
+        facing_degrees=first_pose.facing.degrees,
+    )
 
 
 def _fall_back_witness_with_end_poses(
