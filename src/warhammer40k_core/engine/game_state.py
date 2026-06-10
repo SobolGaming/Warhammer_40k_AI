@@ -100,6 +100,10 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
     ShootingPhaseStatePayload,
 )
+from warhammer40k_core.engine.prebattle_records import (
+    PreBattleActionRecord,
+    PreBattleActionRecordPayload,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveDestructionTimingPolicy,
     ReserveKind,
@@ -252,6 +256,7 @@ class GameStatePayload(TypedDict):
     persisting_effects: list[PersistingEffectPayload]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
+    prebattle_action_records: list[PreBattleActionRecordPayload]
     secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
     tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContextPayload]
 
@@ -261,6 +266,10 @@ def _new_secondary_mission_choices() -> list[SecondaryMissionChoice]:
 
 
 def _new_tactical_secondary_draws() -> list[TacticalSecondaryDraw]:
+    return []
+
+
+def _new_prebattle_action_records() -> list[PreBattleActionRecord]:
     return []
 
 
@@ -717,6 +726,9 @@ class GameState:
     tactical_secondary_draws: list[TacticalSecondaryDraw] = field(
         default_factory=_new_tactical_secondary_draws
     )
+    prebattle_action_records: list[PreBattleActionRecord] = field(
+        default_factory=_new_prebattle_action_records
+    )
     secondary_mission_card_states: list[SecondaryMissionCardState] = field(
         default_factory=_new_secondary_mission_card_states
     )
@@ -923,6 +935,11 @@ class GameState:
         )
         self.tactical_secondary_draws = _validate_tactical_draws(
             self.tactical_secondary_draws,
+            player_ids=self.player_ids,
+        )
+        self.prebattle_action_records = _validate_prebattle_action_records(
+            self.prebattle_action_records,
+            game_id=self.game_id,
             player_ids=self.player_ids,
         )
         self.secondary_mission_card_states = _validate_secondary_mission_card_states(
@@ -2350,6 +2367,35 @@ class GameState:
             key=lambda stored: (stored.battle_round, stored.player_id)
         )
 
+    def record_prebattle_action(self, record: PreBattleActionRecord) -> None:
+        if type(record) is not PreBattleActionRecord:
+            raise GameLifecycleError("prebattle action record must be a PreBattleActionRecord.")
+        if record.game_id != self.game_id:
+            raise GameLifecycleError("PreBattleActionRecord game_id drift.")
+        if record.player_id not in self.player_ids:
+            raise GameLifecycleError("PreBattleActionRecord player_id is not in this game.")
+        if record.setup_step not in self.setup_sequence:
+            raise GameLifecycleError("PreBattleActionRecord setup_step is not in this game.")
+        if any(stored.action_id == record.action_id for stored in self.prebattle_action_records):
+            raise GameLifecycleError("PreBattleActionRecord action_id already exists.")
+        self.prebattle_action_records.append(record)
+        self.prebattle_action_records.sort(key=lambda stored: stored.action_id)
+
+    def prebattle_action_records_for_step(
+        self,
+        *,
+        player_id: str,
+        setup_step: SetupStep,
+    ) -> tuple[PreBattleActionRecord, ...]:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        if type(setup_step) is not SetupStep:
+            raise GameLifecycleError("setup_step must be a SetupStep.")
+        return tuple(
+            record
+            for record in self.prebattle_action_records
+            if record.player_id == requested_player_id and record.setup_step is setup_step
+        )
+
     def has_tactical_secondary_draw(self, *, player_id: str, battle_round: int) -> bool:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         requested_round = _validate_positive_int("battle_round", battle_round)
@@ -3265,6 +3311,9 @@ class GameState:
             "tactical_secondary_draws": [
                 draw.to_payload() for draw in self.tactical_secondary_draws
             ],
+            "prebattle_action_records": [
+                record.to_payload() for record in self.prebattle_action_records
+            ],
             "secondary_mission_card_states": [
                 state.to_payload() for state in self.secondary_mission_card_states
             ],
@@ -3321,6 +3370,10 @@ class GameState:
         payload["mission_action_states"] = cast(
             JsonValue,
             self.public_mission_action_states(viewer_player_id=viewer),
+        )
+        payload["prebattle_action_records"] = cast(
+            JsonValue,
+            [cast(JsonValue, record.to_payload()) for record in self.prebattle_action_records],
         )
         payload["secondary_unit_destruction_states"] = cast(
             JsonValue,
@@ -3558,6 +3611,10 @@ class GameState:
             tactical_secondary_draws=[
                 TacticalSecondaryDraw.from_payload(draw)
                 for draw in payload["tactical_secondary_draws"]
+            ],
+            prebattle_action_records=[
+                PreBattleActionRecord.from_payload(record)
+                for record in payload["prebattle_action_records"]
             ],
             secondary_mission_card_states=[
                 SecondaryMissionCardState.from_payload(state)
@@ -4846,6 +4903,33 @@ def _validate_tactical_draws(
         seen.add(key)
         validated.append(draw)
     return sorted(validated, key=lambda stored: (stored.battle_round, stored.player_id))
+
+
+def _validate_prebattle_action_records(
+    records: object,
+    *,
+    game_id: str,
+    player_ids: tuple[str, ...],
+) -> list[PreBattleActionRecord]:
+    if not isinstance(records, list):
+        raise GameLifecycleError("GameState prebattle_action_records must be a list.")
+    validated_game_id = _validate_identifier("game_id", game_id)
+    validated: list[PreBattleActionRecord] = []
+    seen: set[str] = set()
+    for record in cast(list[object], records):
+        if type(record) is not PreBattleActionRecord:
+            raise GameLifecycleError(
+                "GameState prebattle_action_records must contain PreBattleActionRecord values."
+            )
+        if record.game_id != validated_game_id:
+            raise GameLifecycleError("PreBattleActionRecord game_id drift.")
+        if record.player_id not in player_ids:
+            raise GameLifecycleError("PreBattleActionRecord player_id is not in this game.")
+        if record.action_id in seen:
+            raise GameLifecycleError("GameState prebattle_action_records must be unique.")
+        seen.add(record.action_id)
+        validated.append(record)
+    return sorted(validated, key=lambda stored: stored.action_id)
 
 
 def _unit_owner_by_id(army_definitions: list[ArmyDefinition]) -> dict[str, str]:

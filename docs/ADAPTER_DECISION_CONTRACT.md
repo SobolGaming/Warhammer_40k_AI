@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, and Phase 16A deployment setup decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, and Phase 16B redeploy/Scout pre-battle decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, and Phase 16A deployment setup decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, and Phase 16B redeploy/Scout pre-battle decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -55,6 +55,10 @@ The shared contract uses these objects and payloads:
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
+- `PreBattleProposalRequest`: redeploy and Scout pre-battle parameterized request context containing setup step, source decision context, selected rules-unit/component/model IDs, owning deployment-zone payloads, source rule ID, action kind, proposal kind, and ruleset hash.
+- `PreBattlePlacementProposal`: redeploy or Scout reserve setup placement answer containing the complete selected rules-unit model placement set, placement kind, action kind, source rule ID, and replay-safe source context.
+- `ScoutMoveProposal`: Scout Move answer containing action kind `scout_move` or `dedicated_transport_scout_move`, source rule ID, selected Scout distance, and a per-model `PathWitness`.
+- `PreBattleActionRecord`: deterministic replay-safe setup action record for redeploy completion, redeploy placement, pre-battle completion, Scout reserve setup, Scout Move, and Dedicated Transport Scout Move.
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
 - `EventRecord`: deterministic event-log payload.
 - `GameViewPayload`: read-only viewer projection for adapters.
@@ -77,6 +81,8 @@ Relevant modules:
 - `src/warhammer40k_core/engine/decision_record.py`
 - `src/warhammer40k_core/engine/movement_proposals.py`
 - `src/warhammer40k_core/engine/deployment.py`
+- `src/warhammer40k_core/engine/prebattle.py`
+- `src/warhammer40k_core/engine/prebattle_records.py`
 - `src/warhammer40k_core/engine/charge_declaration.py`
 - `src/warhammer40k_core/engine/phases/charge.py`
 - `src/warhammer40k_core/engine/fight_order.py`
@@ -616,6 +622,74 @@ Required Phase 16A adapter-contract tests:
 - deterministic JSON-safe decision/event/lifecycle replay payload round-trip;
 - viewer-scoped projection/event redaction for any future hidden deployment or setup information.
 
+## Phase 16B Redeploy And Scout Pre-Battle Decisions
+
+Phase 16B adds setup decisions after ordinary deployment and before the first battle round. Redeploy is a remove-and-set-up operation, not movement. Scout reserve setup is setup placement from Strategic Reserves. Scout Move and Dedicated Transport Scout Move are physical movement and require path evidence, but they are not Movement phase actions.
+
+Phase 16B exposes these finite setup decisions:
+
+- `select_redeploy_unit`: finite player choice during setup step `redeploy_units`. The engine emits one deterministic `redeploy:<rules_unit_id>` option for each currently legal redeploy candidate and always includes `complete_redeploys`. Option payloads include submission kind, game ID, player ID, setup step, selected rules-unit ID when applicable, component/model IDs, owning deployment-zone IDs, source rule ID, action kind, proposal kind, Scout metadata when present, mission/deployment/terrain source IDs, and ruleset descriptor hash. Adapters must select one pending option ID and must not synthesize redeploy targets from visible battlefield state.
+- `select_prebattle_action`: finite player choice during setup step `resolve_prebattle_actions`. The engine emits deterministic `scout_reserve_setup:<rules_unit_id>`, `scout_move:<rules_unit_id>`, and `dedicated_transport_scout_move:<transport_unit_id>` options when those branches are legal, plus `complete_prebattle_actions`. Adapters must not invent Scout options, promote an embarked unit outside the Dedicated Transport branch, or mutate cargo/reserve/battlefield state from option payloads.
+
+Selecting a redeploy or Scout action records the finite `DecisionRecord`, emits the corresponding selection event, and emits one of these parameterized requests:
+
+- `submit_redeploy_placement` with proposal kind `redeploy_placement`;
+- `submit_scout_reserve_setup` with proposal kind `scout_reserve_setup`;
+- `submit_scout_move` with proposal kind `scout_move`.
+
+All three request types embed a `PreBattleProposalRequest` in `payload.proposal_request` and expose the fixed `submit_parameterized_payload` option. The request context includes game ID, actor/player ID, setup step, selected rules-unit ID, component unit IDs, exact model IDs, action kind, source rule ID, source selection request/result IDs, ruleset hash, source-backed `MissionSetup`, and owning deployment-zone payloads. Scout Move requests also include the selected `scout_distance_inches`; that value is engine-derived from structured Scouts ability instances using the official duplicate-distance rule.
+
+Adapters answer redeploy and Scout reserve setup with `PreBattlePlacementProposal` through `ParameterizedSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. The payload must include:
+
+- `proposal_request_id`;
+- `proposal_kind: "redeploy_placement"` or `"scout_reserve_setup"`;
+- `game_id`;
+- `ruleset_descriptor_hash`;
+- setup step `redeploy_units` or `resolve_prebattle_actions`;
+- `player_id`;
+- `unit_instance_id`;
+- `action_kind`;
+- `source_rule_id`;
+- `placement_kind: "redeploy"` or `"strategic_reserves"`;
+- one `ModelPlacement` for every required model ID;
+- the replay-safe request context from the pending request.
+
+Accepted redeploy proposals remove the selected rules unit temporarily and then set it up with placement records. They emit deterministic removal and placement batches, not displacement records, and record `PreBattleActionRecord(action_kind="redeploy")`. Accepted Scout reserve setup proposals place the selected Strategic Reserves unit wholly within the controlling player's deployment zone, transition its reserve state to arrived at setup timing, and record `PreBattleActionRecord(action_kind="scout_reserve_setup")`.
+
+Adapters answer Scout Move and Dedicated Transport Scout Move with `ScoutMoveProposal` through `ParameterizedSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`. The payload must include:
+
+- `proposal_request_id`;
+- `proposal_kind: "scout_move"`;
+- `game_id`;
+- `ruleset_descriptor_hash`;
+- setup step `resolve_prebattle_actions`;
+- `player_id`;
+- `unit_instance_id`;
+- `action_kind: "scout_move"` or `"dedicated_transport_scout_move"`;
+- `source_rule_id`;
+- `scout_distance_inches` exactly matching the pending request;
+- `witness`, a `PathWitness` covering every alive placed model in the selected unit or transport;
+- the replay-safe request context from the pending request.
+
+Malformed, stale, wrong-actor, wrong-step, wrong-kind, wrong-ruleset-hash, wrong-unit, wrong-source-rule, omitted-model, extra-model, wrong-owner, wrong-component, wrong-placement-kind, missing-witness, witness-model drift, witness-start drift, Scout-distance drift, or stale reserve/cargo submissions reject before the pending queue is popped and before a `DecisionRecord` is created. Rule-invalid pre-battle proposals, including out-of-zone setup, terrain/objective endpoint failures, model overlap, Engagement Range violations, coherency failures, endpoint-only Scout paths, pathing/terrain failures, and Scout final positions not more than 8" horizontally from every enemy unit, return typed invalid diagnostics and do not mutate authoritative state.
+
+Accepted Scout Move proposals consume the shared movement/pathing/terrain/coherency validators. A valid Scout Move emits `prebattle_scout_move_completed`, updates authoritative model placements through engine-owned mutation only, records `BattlefieldTransitionBatch.displacements` with `displacement_kind: "scout_move"` and `source_step: "resolve_prebattle_actions"`, and records `PreBattleActionRecord(action_kind="scout_move")` or `PreBattleActionRecord(action_kind="dedicated_transport_scout_move")`. It must not mark the unit as having Advanced, Fallen Back, Remained Stationary, shot, started a Mission Action, or moved in the Movement phase. Dedicated Transport Scout Move keeps cargo state intact.
+
+Redeploy and Scout choices are public table setup information in the current Phase 16B rules scope. If a future mission, reserve, hidden deployment, or secret pre-battle mechanic hides setup information, pending requests, option lists, proposal diagnostics, placement/movement events, action records, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through counts, model IDs, source context, reserve/cargo state, or derived fields.
+
+Required Phase 16B adapter-contract tests:
+
+- valid redeploy unit selection and placement through the shared lifecycle path;
+- valid Scout reserve setup and Scout Move submissions through the shared lifecycle path;
+- stale, malformed, wrong-context, drifted, endpoint-only, and rule-invalid pre-battle proposals reject before queue pop and before mutation;
+- redeploy emits removal plus placement records and no displacement records;
+- Scout duplicate-distance examples produce the official selected distance;
+- Scout Move requires a per-model `PathWitness`, uses shared validators, records Scout displacements, and does not mark Movement phase action state;
+- Scout Move final positions must be more than 8" horizontally from every enemy unit;
+- Dedicated Transport Scout Move is available only for a `DEDICATED_TRANSPORT` wholly within its deployment zone with all embarked models having Scouts, and mixed non-Scouts cargo is ineligible;
+- deterministic JSON-safe decision, action-record, event, lifecycle, and replay payload round-trip;
+- viewer-scoped projection/event redaction for any future hidden redeploy or pre-battle information.
+
 ## Parameterized Proposals
 
 Parameterized proposals are used when the exact physical result cannot be safely enumerated as finite options.
@@ -630,13 +704,16 @@ The contract currently covers these proposal families:
 - Strategic Reserves placement;
 - Disembark placement;
 - Deployment placement;
+- Redeploy placement;
+- Scout reserve setup;
+- Scout Move and Dedicated Transport Scout Move;
 - Charge Move, including charge-target selection, no-move choice, and PathWitness movement evidence;
 - Pile In and Consolidate movement, including no-move choices, fight movement target or objective context, and PathWitness movement evidence;
 - ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - melee declaration, including one primary melee weapon per fighting model, optional `[EXTRA ATTACKS]` weapons, model-engaged target binding, and split melee attack counts;
 - Stratagem target or placement proposals introduced by Phase 12 and later phase gates.
 
-Later phases must reuse the same contract for redeployment, Scout moves, Stratagem target binding, and mission movement or placement effects where applicable.
+Later phases must reuse the same contract for Stratagem target binding and mission movement or placement effects where applicable.
 
 Parameterized requests are still `DecisionRequest`s. They contain a single `submit_parameterized_payload` option and embed a neutral `ProposalRequestPayload` inside `DecisionRequest.payload`.
 

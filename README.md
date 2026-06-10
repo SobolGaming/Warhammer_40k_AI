@@ -139,7 +139,7 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
-Current roadmap implementation status: phases 1-15F and Phase 16A are complete. Phase 14E is
+Current roadmap implementation status: phases 1-15F and phases 16A-16B are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -191,6 +191,8 @@ rejects retired Core Stratagem names.
 Phase 14L and Phase 15A-F are complete for ranged attack grouping, charge declaration/roll/movement, Fight phase activation/pass/interrupt ordering, Pile In/Consolidate proposal routing, melee declarations that reuse the shared Making Attacks sequence, source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge Stratagem handling, and Charge/Fight completion gates that drain pending phase work before completion.
 
 Phase 16A is complete for source-backed Deploy Armies. The lifecycle now creates an empty source-backed battlefield at Create Battlefield, deploys units through `select_deployment_unit` and `submit_deployment_placement`, validates deployment zones, `INFILTRATORS`, terrain/objective/engagement/coherency endpoints, attached rules-unit model sets, reserves exclusion, stale/malformed submissions, and deterministic replay-safe placement events without using the Phase 10A deterministic bridge.
+
+Phase 16B is complete for redeployments, Scouts, and pre-battle ability resolution. Setup now exposes redeploy and pre-battle finite decisions, validates redeploy and Scout reserve setup as typed placement proposals, validates Scout Move proposals with per-model `PathWitness` evidence and shared pathing/terrain/coherency checks, applies the official Scouts duplicate-distance rule, records deterministic `PreBattleActionRecord` payloads, and keeps Scout moves out of Movement phase action state.
 
 Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus Phase 11E viewer-scoped scoring projection/event rules.
 
