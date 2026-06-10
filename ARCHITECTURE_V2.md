@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -109,6 +109,14 @@ replay-safe setup action history. Current source catalog ability ownership is
 datasheet/component-granular; future per-model catalog ownership can refine
 mixed-model Scouts eligibility without changing the adapter proposal path.
 
+**Phase 16C is complete** for reserve declarations during Declare Battle
+Formations: setup now emits `select_reserve_declaration` finite requests for
+Strategic Reserves and Deep Strike choices, enforces the source-backed
+Strategic Reserves points cap and FORTIFICATION exclusion, records AIRCRAFT
+mandatory reserves as ordinary `ReserveState` payloads, preserves source rule
+IDs and points contribution, rejects stale submissions before queue pop, and
+excludes declared reserves from Deploy Armies options.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -189,12 +197,13 @@ Completed / implemented foundation:
 | 15F | Complete | Charge/Fight completion gates, full phase completion coverage, Fight damage/removal draining, and deterministic fight-order hardening |
 | 16A | Complete | Source-backed Deploy Armies, deployment-zone placement proposals, `INFILTRATORS`, attached rules-unit deployment, reserves exclusion, and replay-safe setup placement |
 | 16B | Complete | Redeployments, Scouts duplicate-distance resolution, Scout reserve setup, Scout Move proposals, Dedicated Transport Scout Move eligibility, and replay-safe pre-battle action records |
+| 16C | Complete | Reserve declaration decisions, Strategic Reserves cap enforcement, Deep Strike setup declarations, AIRCRAFT mandatory reserves, and source-backed reserve payloads |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 16C-16E | Planned | Reserves declarations, setup completion, and army construction completion |
+| 16D-16E | Planned | Army construction completion and setup completion gates |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
@@ -3319,7 +3328,7 @@ Required tests:
 
 ## Phase 16C: reserves declarations, Strategic Reserves limits, and Deep Strike setup
 
-Status: Planned.
+Status: Complete.
 
 Phase 16C completes Declare Battle Formations for reserves-related setup. Phase
 10P/14D/14K already own supported arrival validation during Move Units; this
@@ -3330,6 +3339,7 @@ or embarked.
 Modules:
 
 - `engine/setup_flow.py`
+- `engine/reserve_declarations.py`
 - `engine/reserves.py`
 - `engine/transports.py`
 - `engine/aircraft.py`
