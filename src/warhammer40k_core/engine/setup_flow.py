@@ -62,6 +62,7 @@ from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_request_for_next_player,
     reserve_declaration_state_for_state,
 )
+from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
@@ -75,6 +76,7 @@ class SetupFlow:
         state: GameState,
         decisions: DecisionController,
         config: GameConfig,
+        reaction_frame_count: int = 0,
     ) -> LifecycleStatus:
         if state.stage is not GameLifecycleStage.SETUP:
             raise GameLifecycleError("SetupFlow can advance only during setup.")
@@ -136,7 +138,41 @@ class SetupFlow:
             if prebattle_status is not None:
                 return prebattle_status
 
-        completed_step = state.complete_current_setup_step()
+        setup_completion_gate: SetupCompletionGate | None = None
+        battle_start_payload: dict[str, JsonValue] | None = None
+        final_setup_step = state.setup_step_index is not None and state.setup_step_index + 1 == len(
+            state.setup_sequence
+        )
+        if final_setup_step:
+            setup_completion_gate = SetupCompletionGate()
+            invalid_status = setup_completion_gate.invalid_status_if_not_ready(
+                state=state,
+                decisions=decisions,
+                config=config,
+                reaction_frame_count=reaction_frame_count,
+            )
+            if invalid_status is not None:
+                return invalid_status
+            battle_start = setup_completion_gate.complete_setup_and_enter_battle(
+                state=state,
+                decisions=decisions,
+                config=config,
+                reaction_frame_count=reaction_frame_count,
+            )
+            battle_start_payload = cast(dict[str, JsonValue], battle_start.to_payload())
+            completed_step = battle_start.completed_setup_step
+            decisions.event_log.append(
+                "setup_completion_gate_passed",
+                {
+                    "game_id": state.game_id,
+                    "setup_step": completed_step.value,
+                    "setup_legality_report": battle_start.setup_legality_report.to_payload(),
+                    "pre_battle_checkpoint": battle_start.pre_battle_checkpoint.to_payload(),
+                },
+            )
+            decisions.event_log.append("battle_started", battle_start_payload)
+        else:
+            completed_step = state.complete_current_setup_step()
         decisions.event_log.append(
             "setup_step_completed",
             {
@@ -163,6 +199,7 @@ class SetupFlow:
                 "battle_phase": (
                     None if state.current_battle_phase is None else state.current_battle_phase.value
                 ),
+                "battle_start_record": battle_start_payload,
             },
         )
 

@@ -1285,6 +1285,17 @@ class GameState:
         self.enter_battle()
         return current
 
+    def complete_final_setup_step_before_battle(self) -> SetupStep:
+        if self.stage is not GameLifecycleStage.SETUP:
+            raise GameLifecycleError("GameState can complete setup steps only during setup.")
+        current = self.current_setup_step
+        if current is None or self.setup_step_index is None:
+            raise GameLifecycleError("GameState has no current setup step.")
+        if self.setup_step_index + 1 < len(self.setup_sequence):
+            raise GameLifecycleError("GameState final setup gate requires the final setup step.")
+        self.setup_step_index = None
+        return current
+
     def enter_battle(self) -> None:
         if self.stage is not GameLifecycleStage.SETUP:
             raise GameLifecycleError("GameState can enter battle only from setup.")

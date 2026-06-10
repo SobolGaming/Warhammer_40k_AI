@@ -381,6 +381,7 @@ class GameLifecycle:
                 state=state,
                 decisions=self.decision_controller,
                 config=self._require_config(),
+                reaction_frame_count=len(self.reaction_queue.frames),
             )
         return self._require_battle_round_flow().advance(
             state=state,
