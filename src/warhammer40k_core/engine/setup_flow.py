@@ -54,6 +54,13 @@ from warhammer40k_core.engine.prebattle import (
     redeploy_unit_selection_request,
 )
 from warhammer40k_core.engine.prebattle_records import PreBattleActionKind
+from warhammer40k_core.engine.reserve_declarations import (
+    SELECT_RESERVE_DECLARATION_DECISION_TYPE,
+    apply_mandatory_aircraft_reserve_declarations,
+    apply_reserve_declaration_decision,
+    reserve_declaration_request_for_next_player,
+    reserve_declaration_state_for_state,
+)
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
@@ -94,6 +101,14 @@ class SetupFlow:
             self._muster_armies(state=state, decisions=decisions, config=config)
         elif current_step is SetupStep.CREATE_BATTLEFIELD:
             self._create_battlefield(state=state, decisions=decisions)
+        elif current_step is SetupStep.DECLARE_BATTLE_FORMATIONS:
+            reserve_status = self._advance_declare_battle_formations(
+                state=state,
+                decisions=decisions,
+                config=config,
+            )
+            if reserve_status is not None:
+                return reserve_status
         elif current_step is SetupStep.DEPLOY_ARMIES:
             deployment_status = self._advance_deploy_armies(
                 state=state,
@@ -157,6 +172,15 @@ class SetupFlow:
         decisions: DecisionController,
         config: GameConfig,
     ) -> None:
+        if result.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE:
+            apply_reserve_declaration_decision(
+                state=state,
+                config=config,
+                request=decisions.record_for_result(result).request,
+                result=result,
+                decisions=decisions,
+            )
+            return
         if result.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE:
             self._apply_deployment_unit_selection(
                 state=state,
@@ -324,6 +348,49 @@ class SetupFlow:
                 "objective_marker_count": len(state.mission_setup.objective_markers),
                 "terrain_feature_count": len(state.mission_setup.terrain_features),
                 "placed_model_count": 0,
+            },
+        )
+
+    def _advance_declare_battle_formations(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> LifecycleStatus | None:
+        if state.battlefield_state is None:
+            raise GameLifecycleError("DECLARE_BATTLE_FORMATIONS requires CREATE_BATTLEFIELD first.")
+        if state.missing_army_player_ids():
+            raise GameLifecycleError(
+                "DECLARE_BATTLE_FORMATIONS requires mustered armies for every player."
+            )
+        apply_mandatory_aircraft_reserve_declarations(
+            state=state,
+            config=config,
+            decisions=decisions,
+        )
+        setup_state = reserve_declaration_state_for_state(
+            state=state,
+            config=config,
+            decisions=decisions,
+        )
+        request = reserve_declaration_request_for_next_player(
+            state=state,
+            config=config,
+            decisions=decisions,
+        )
+        if request is None:
+            return None
+        decisions.request_decision(request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.SETUP,
+            decision_request=request,
+            payload={
+                "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+                "battle_formation_declaration_state": cast(
+                    JsonValue,
+                    setup_state.to_payload(),
+                ),
             },
         )
 

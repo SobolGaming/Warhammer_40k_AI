@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, and Phase 16B redeploy/Scout pre-battle decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, and Phase 16C reserve declaration decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, and Phase 16B redeploy/Scout pre-battle decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, and Phase 16C reserve declaration decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -55,6 +55,9 @@ The shared contract uses these objects and payloads:
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
+- `BattleFormationDeclarationState`: Declare Battle Formations reserve declaration state containing the next player, completed players, and per-player available reserve declaration counts.
+- `ReserveDeclarationRequest`: finite setup request context for declaring Strategic Reserves or Deep Strike units during `declare_battle_formations`.
+- `ReserveDeclarationSelection`: finite reserve declaration answer selecting one emitted reserve declaration option or `complete_reserve_declarations`.
 - `PreBattleProposalRequest`: redeploy and Scout pre-battle parameterized request context containing setup step, source decision context, selected rules-unit/component/model IDs, owning deployment-zone payloads, source rule ID, action kind, proposal kind, and ruleset hash.
 - `PreBattlePlacementProposal`: redeploy or Scout reserve setup placement answer containing the complete selected rules-unit model placement set, placement kind, action kind, source rule ID, and replay-safe source context.
 - `ScoutMoveProposal`: Scout Move answer containing action kind `scout_move` or `dedicated_transport_scout_move`, source rule ID, selected Scout distance, and a per-model `PathWitness`.
@@ -692,6 +695,35 @@ Required Phase 16B adapter-contract tests:
 - Dedicated Transport Scout Move is available only for a `DEDICATED_TRANSPORT` wholly within its deployment zone with all embarked models having Scouts, and mixed non-Scouts cargo is ineligible;
 - deterministic JSON-safe decision, action-record, event, lifecycle, and replay payload round-trip;
 - viewer-scoped projection/event redaction for any future hidden redeploy or pre-battle information.
+
+## Phase 16C Reserve Declaration Decisions
+
+Phase 16C adds setup reserve choices during Declare Battle Formations, after battlefield creation and before Deploy Armies. These choices decide whether units start on the battlefield, in Strategic Reserves, or in a source-backed Deep Strike reserve state. AIRCRAFT mandatory reserve declarations are engine-owned consequences in the same setup step and are recorded as ordinary `ReserveState` payloads.
+
+Phase 16C exposes the finite decision type `select_reserve_declaration`. The pending request payload contains `payload.reserve_declaration_request` with request ID, game ID, actor/player ID, setup step `declare_battle_formations`, ruleset descriptor hash, Strategic Reserves points limit, current Strategic Reserves points, and available declaration count. Adapters answer by selecting one emitted option ID:
+
+- `declare_strategic_reserves:<unit_instance_id>` for a legal actor-owned unit with source-backed points that does not have `FORTIFICATION` and whose unit plus embarked-unit points fit the Strategic Reserves cap;
+- `declare_deep_strike:<unit_instance_id>` for a legal actor-owned unit whose current source-backed unit keywords include Deep Strike;
+- `complete_reserve_declarations` to record that the player is done choosing optional reserve declarations.
+
+Option payloads are complete `ReserveDeclarationSelection` payloads. They include submission kind, action kind, game ID, player ID, setup step, ruleset descriptor hash, reserve origin/kind, source rule ID, selected unit ID, unit points, embarked unit points, Strategic Reserves points limit, current points, points after declaration, points contribution, embarked unit IDs, and source IDs. Adapters must not invent reserve option IDs, infer points from roster display data, mutate reserve state from payloads, or silently deploy a unit whose reserve declaration is illegal.
+
+Accepted Strategic Reserves selections create deterministic `StrategicReserveDeclaration` and `ReserveState` payloads, enforce the battle-size 50% Strategic Reserves cap including embarked units, reject FORTIFICATIONS, preserve source rule IDs and points contribution, and exclude the unit from Deploy Armies options. Accepted Deep Strike selections create a Deep Strike `ReserveState` consumed later by the existing reserve-arrival placement proposal path. Accepted completion selections emit a replay-safe completion event and do not mutate reserve state.
+
+Malformed, stale, wrong-actor, wrong-step, wrong-ruleset-hash, wrong-current-points, wrong-option, option-payload drift, duplicate, wrong-player, unknown-unit, over-cap, missing source-points, or forbidden-unit submissions reject before the pending queue is popped and before a `DecisionRecord` or reserve mutation is created. Rule-invalid reserve declarations must not be repaired by changing reserve kind, deploying the unit, or dropping it.
+
+Reserve declaration choices are public table setup information in the current Phase 16C rules scope. If a future mission or hidden deployment rule hides reserve or battle-formation information, pending requests, option lists, completion counts, decision records, reserve states, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through unit IDs, points, option counts, source context, reserve kind, or derived deployment availability.
+
+Required Phase 16C adapter-contract tests:
+
+- valid Strategic Reserves selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid Deep Strike selection through the same lifecycle path;
+- AIRCRAFT mandatory reserve state is source-backed and serialized as ordinary reserve state;
+- Strategic Reserves points cap, missing points, FORTIFICATION filtering, duplicate declarations, wrong-owner units, and unknown units reject or remain absent before battle start;
+- stale, malformed, wrong-context, and drifted submissions reject before queue pop and before mutation;
+- declared reserve units are absent from Deploy Armies options and later use the shared Move Units reserve-arrival path;
+- deterministic JSON-safe decision, reserve-state, event, lifecycle, and replay payload round-trip;
+- viewer-scoped projection/event redaction for any future hidden reserve declaration information.
 
 ## Parameterized Proposals
 

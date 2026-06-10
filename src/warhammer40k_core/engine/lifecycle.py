@@ -124,6 +124,10 @@ from warhammer40k_core.engine.reaction_queue import (
     ReactionQueue,
     ReactionQueuePayload,
 )
+from warhammer40k_core.engine.reserve_declarations import (
+    SELECT_RESERVE_DECLARATION_DECISION_TYPE,
+    invalid_reserve_declaration_status,
+)
 from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
@@ -245,6 +249,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
 _SETUP_DECISION_TYPES = frozenset(
     (
         SECONDARY_MISSION_DECISION_TYPE,
+        SELECT_RESERVE_DECLARATION_DECISION_TYPE,
         SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
         SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
         SELECT_REDEPLOY_UNIT_DECISION_TYPE,
@@ -674,6 +679,19 @@ class GameLifecycle:
         ):
             invalid_status = _invalid_destruction_reaction_status(
                 state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
+        ):
+            invalid_status = invalid_reserve_declaration_status(
+                state=state,
+                config=self._require_config(),
                 request=pending_request,
                 result=result,
             )

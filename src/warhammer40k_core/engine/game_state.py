@@ -111,6 +111,8 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatePayload,
     ReserveStatus,
+    ReserveUnitPointValue,
+    ReserveUnitPointValuePayload,
     StrategicReserveDeclaration,
     apply_reserve_destruction_to_battlefield,
     reserve_origin_from_token,
@@ -188,6 +190,7 @@ class GameConfigPayload(TypedDict):
     fixed_secondary_mission_ids: list[str]
     tactical_secondary_draw_count: int
     mission_setup: MissionSetupPayload | None
+    reserve_unit_points: list[ReserveUnitPointValuePayload]
 
 
 class SecondaryMissionChoicePayload(TypedDict):
@@ -407,6 +410,7 @@ class GameConfig:
     fixed_secondary_mission_ids: tuple[str, ...]
     tactical_secondary_draw_count: int = 2
     mission_setup: MissionSetup | None = None
+    reserve_unit_points: tuple[ReserveUnitPointValue, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -467,6 +471,14 @@ class GameConfig:
                 player_ids=self.player_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "reserve_unit_points",
+            _validate_reserve_unit_points(
+                self.reserve_unit_points,
+                army_muster_requests=self.army_muster_requests,
+            ),
+        )
         _validate_lifecycle_sequences(self.ruleset_descriptor)
 
     def to_payload(self) -> GameConfigPayload:
@@ -482,6 +494,7 @@ class GameConfig:
             "mission_setup": (
                 None if self.mission_setup is None else self.mission_setup.to_payload()
             ),
+            "reserve_unit_points": [entry.to_payload() for entry in self.reserve_unit_points],
         }
 
     @classmethod
@@ -502,6 +515,10 @@ class GameConfig:
                 None
                 if payload["mission_setup"] is None
                 else MissionSetup.from_payload(payload["mission_setup"])
+            ),
+            reserve_unit_points=tuple(
+                ReserveUnitPointValue.from_payload(entry)
+                for entry in payload["reserve_unit_points"]
             ),
         )
 
@@ -1407,7 +1424,17 @@ class GameState:
                     "Strategic Reserve declarations must use one points limit per player."
                 )
             cap_by_player[requested_player_id] = declaration.points_limit
-            points_by_player[requested_player_id] = points_by_player.get(requested_player_id, 0) + (
+            points_by_player.setdefault(
+                requested_player_id,
+                sum(
+                    state.points_contribution
+                    for state in self.reserve_states
+                    if state.player_id == requested_player_id
+                    and state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
+                    and state.status is ReserveStatus.IN_RESERVES
+                ),
+            )
+            points_by_player[requested_player_id] += (
                 declaration.unit_points + declaration.embarked_unit_points
             )
             reserve_states.append(
@@ -4095,6 +4122,34 @@ def _validate_army_muster_requests(
             "GameConfig army_muster_requests must include every player exactly once."
         )
     return tuple(sorted(validated, key=lambda request: request.player_id))
+
+
+def _validate_reserve_unit_points(
+    values: object,
+    *,
+    army_muster_requests: tuple[ArmyMusterRequest, ...],
+) -> tuple[ReserveUnitPointValue, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("GameConfig reserve_unit_points must be a tuple.")
+    known_unit_ids = {
+        f"{request.army_id}:{selection.unit_selection_id}"
+        for request in army_muster_requests
+        for selection in request.unit_selections
+    }
+    validated: list[ReserveUnitPointValue] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ReserveUnitPointValue:
+            raise GameLifecycleError(
+                "GameConfig reserve_unit_points must contain ReserveUnitPointValue values."
+            )
+        if value.unit_instance_id not in known_unit_ids:
+            raise GameLifecycleError("ReserveUnitPointValue unit_instance_id is not mustered.")
+        if value.unit_instance_id in seen:
+            raise GameLifecycleError("GameConfig reserve_unit_points must be unique by unit.")
+        seen.add(value.unit_instance_id)
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda entry: entry.unit_instance_id))
 
 
 def _validate_army_definitions(

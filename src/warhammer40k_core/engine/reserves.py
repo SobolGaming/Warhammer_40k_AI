@@ -135,6 +135,8 @@ class ReserveStatePayload(TypedDict):
     unit_instance_id: str
     reserve_origin: str
     reserve_kind: str
+    source_rule_ids: list[str]
+    points_contribution: int
     declared_during_step: str | None
     entered_reserves_battle_round: int | None
     entered_reserves_phase: str | None
@@ -157,11 +159,39 @@ class StrategicReserveDeclarationPayload(TypedDict):
     unit_instance_id: str
     reserve_origin: str
     declared_during_step: str
+    source_rule_id: str
     unit_points: int
     embarked_unit_points: int
     points_limit: int
     has_fortification_keyword: bool
     embarked_unit_instance_ids: list[str]
+
+
+class DeepStrikeSetupDeclarationPayload(TypedDict):
+    player_id: str
+    unit_instance_id: str
+    reserve_origin: str
+    declared_during_step: str
+    source_rule_id: str
+    has_deep_strike_keyword: bool
+    points_contribution: int
+
+
+class AircraftReserveDeclarationPayload(TypedDict):
+    player_id: str
+    unit_instance_id: str
+    reserve_origin: str
+    declared_during_step: str
+    source_rule_id: str
+    unit_points: int
+    points_limit: int
+    has_aircraft_keyword: bool
+
+
+class ReserveUnitPointValuePayload(TypedDict):
+    unit_instance_id: str
+    points: int
+    source_id: str
 
 
 class LargeModelReservePlacementExceptionPayload(TypedDict):
@@ -366,6 +396,8 @@ class ReserveState:
     entered_reserves_battle_round: int | None
     entered_reserves_phase: str | None
     destruction_deadline_policy: ReserveDestructionTimingPolicy
+    source_rule_ids: tuple[str, ...] = ()
+    points_contribution: int = 0
     required_arrival_battle_round: int | None = None
     required_arrival_phase: str | None = None
     required_arrival_source_rule_id: str | None = None
@@ -391,6 +423,28 @@ class ReserveState:
         )
         object.__setattr__(self, "reserve_origin", reserve_origin_from_token(self.reserve_origin))
         object.__setattr__(self, "reserve_kind", reserve_kind_from_token(self.reserve_kind))
+        source_rule_ids = (
+            _default_source_rule_ids_for_reserve_kind(self.reserve_kind)
+            if not self.source_rule_ids
+            else self.source_rule_ids
+        )
+        object.__setattr__(
+            self,
+            "source_rule_ids",
+            _validate_identifier_tuple(
+                "ReserveState source_rule_ids",
+                source_rule_ids,
+                min_length=1,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "points_contribution",
+            _validate_non_negative_int(
+                "ReserveState points_contribution",
+                self.points_contribution,
+            ),
+        )
         object.__setattr__(
             self,
             "declared_during_step",
@@ -503,12 +557,21 @@ class ReserveState:
         reserve_kind: ReserveKind,
         destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
         embarked_unit_instance_ids: tuple[str, ...] = (),
+        source_rule_ids: tuple[str, ...] | None = None,
+        points_contribution: int = 0,
     ) -> Self:
+        resolved_reserve_kind = reserve_kind_from_token(reserve_kind)
         return cls(
             player_id=player_id,
             unit_instance_id=unit_instance_id,
             reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
-            reserve_kind=reserve_kind,
+            reserve_kind=resolved_reserve_kind,
+            source_rule_ids=(
+                _default_source_rule_ids_for_reserve_kind(resolved_reserve_kind)
+                if source_rule_ids is None
+                else source_rule_ids
+            ),
+            points_contribution=points_contribution,
             declared_during_step=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
             entered_reserves_battle_round=None,
             entered_reserves_phase=None,
@@ -533,15 +596,24 @@ class ReserveState:
         reserve_origin: ReserveOrigin = ReserveOrigin.DURING_BATTLE_OTHER,
         destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
         embarked_unit_instance_ids: tuple[str, ...] = (),
+        source_rule_ids: tuple[str, ...] | None = None,
+        points_contribution: int = 0,
         required_arrival_battle_round: int | None = None,
         required_arrival_phase: BattlePhase | str | None = None,
         required_arrival_source_rule_id: str | None = None,
     ) -> Self:
+        resolved_reserve_kind = reserve_kind_from_token(reserve_kind)
         return cls(
             player_id=player_id,
             unit_instance_id=unit_instance_id,
             reserve_origin=reserve_origin,
-            reserve_kind=reserve_kind,
+            reserve_kind=resolved_reserve_kind,
+            source_rule_ids=(
+                _default_source_rule_ids_for_reserve_kind(resolved_reserve_kind)
+                if source_rule_ids is None
+                else source_rule_ids
+            ),
+            points_contribution=points_contribution,
             declared_during_step=None,
             entered_reserves_battle_round=_validate_positive_int("battle_round", battle_round),
             entered_reserves_phase=battle_phase_token(phase),
@@ -647,6 +719,8 @@ class ReserveState:
             "unit_instance_id": self.unit_instance_id,
             "reserve_origin": self.reserve_origin.value,
             "reserve_kind": self.reserve_kind.value,
+            "source_rule_ids": list(self.source_rule_ids),
+            "points_contribution": self.points_contribution,
             "declared_during_step": self.declared_during_step,
             "entered_reserves_battle_round": self.entered_reserves_battle_round,
             "entered_reserves_phase": self.entered_reserves_phase,
@@ -673,6 +747,8 @@ class ReserveState:
             unit_instance_id=payload["unit_instance_id"],
             reserve_origin=reserve_origin_from_token(payload["reserve_origin"]),
             reserve_kind=reserve_kind_from_token(payload["reserve_kind"]),
+            source_rule_ids=tuple(payload["source_rule_ids"]),
+            points_contribution=payload["points_contribution"],
             declared_during_step=payload["declared_during_step"],
             entered_reserves_battle_round=payload["entered_reserves_battle_round"],
             entered_reserves_phase=payload["entered_reserves_phase"],
@@ -747,6 +823,7 @@ class StrategicReserveDeclaration:
     unit_points: int
     embarked_unit_points: int
     points_limit: int
+    source_rule_id: str = _STRATEGIC_RESERVES_RULE_ID
     has_fortification_keyword: bool = False
     embarked_unit_instance_ids: tuple[str, ...] = ()
 
@@ -771,6 +848,14 @@ class StrategicReserveDeclaration:
             _validate_identifier(
                 "StrategicReserveDeclaration declared_during_step",
                 self.declared_during_step,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier(
+                "StrategicReserveDeclaration source_rule_id",
+                self.source_rule_id,
             ),
         )
         object.__setattr__(
@@ -826,6 +911,7 @@ class StrategicReserveDeclaration:
         points_limit: int,
         reserve_origin: ReserveOrigin = ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
         declared_during_step: str = "declare_battle_formations",
+        source_rule_id: str = _STRATEGIC_RESERVES_RULE_ID,
         embarked_unit_instance_ids: tuple[str, ...] = (),
     ) -> Self:
         if type(unit) is not UnitInstance:
@@ -835,6 +921,7 @@ class StrategicReserveDeclaration:
             unit_instance_id=unit.unit_instance_id,
             reserve_origin=reserve_origin,
             declared_during_step=declared_during_step,
+            source_rule_id=source_rule_id,
             unit_points=unit_points,
             embarked_unit_points=embarked_unit_points,
             points_limit=points_limit,
@@ -852,6 +939,8 @@ class StrategicReserveDeclaration:
             unit_instance_id=self.unit_instance_id,
             reserve_origin=self.reserve_origin,
             reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+            source_rule_ids=(self.source_rule_id,),
+            points_contribution=self.unit_points + self.embarked_unit_points,
             declared_during_step=self.declared_during_step,
             entered_reserves_battle_round=None,
             entered_reserves_phase=None,
@@ -865,6 +954,7 @@ class StrategicReserveDeclaration:
             "unit_instance_id": self.unit_instance_id,
             "reserve_origin": self.reserve_origin.value,
             "declared_during_step": self.declared_during_step,
+            "source_rule_id": self.source_rule_id,
             "unit_points": self.unit_points,
             "embarked_unit_points": self.embarked_unit_points,
             "points_limit": self.points_limit,
@@ -879,11 +969,309 @@ class StrategicReserveDeclaration:
             unit_instance_id=payload["unit_instance_id"],
             reserve_origin=reserve_origin_from_token(payload["reserve_origin"]),
             declared_during_step=payload["declared_during_step"],
+            source_rule_id=payload["source_rule_id"],
             unit_points=payload["unit_points"],
             embarked_unit_points=payload["embarked_unit_points"],
             points_limit=payload["points_limit"],
             has_fortification_keyword=payload["has_fortification_keyword"],
             embarked_unit_instance_ids=tuple(payload["embarked_unit_instance_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DeepStrikeSetupDeclaration:
+    player_id: str
+    unit_instance_id: str
+    reserve_origin: ReserveOrigin
+    declared_during_step: str
+    source_rule_id: str
+    has_deep_strike_keyword: bool
+    points_contribution: int = 0
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("DeepStrikeSetupDeclaration player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "DeepStrikeSetupDeclaration unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(self, "reserve_origin", reserve_origin_from_token(self.reserve_origin))
+        object.__setattr__(
+            self,
+            "declared_during_step",
+            _validate_identifier(
+                "DeepStrikeSetupDeclaration declared_during_step",
+                self.declared_during_step,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("DeepStrikeSetupDeclaration source_rule_id", self.source_rule_id),
+        )
+        object.__setattr__(
+            self,
+            "has_deep_strike_keyword",
+            _validate_bool(
+                "DeepStrikeSetupDeclaration has_deep_strike_keyword",
+                self.has_deep_strike_keyword,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "points_contribution",
+            _validate_non_negative_int(
+                "DeepStrikeSetupDeclaration points_contribution",
+                self.points_contribution,
+            ),
+        )
+        if not self.has_deep_strike_keyword:
+            raise GameLifecycleError(
+                "Deep Strike declaration requires every model to have Deep Strike."
+            )
+
+    @classmethod
+    def for_unit(
+        cls,
+        *,
+        unit: UnitInstance,
+        player_id: str,
+        points_contribution: int = 0,
+        reserve_origin: ReserveOrigin = ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+        declared_during_step: str = "declare_battle_formations",
+        source_rule_id: str = _DEEP_STRIKE_RULE_ID,
+    ) -> Self:
+        if type(unit) is not UnitInstance:
+            raise GameLifecycleError("DeepStrikeSetupDeclaration requires a UnitInstance.")
+        return cls(
+            player_id=player_id,
+            unit_instance_id=unit.unit_instance_id,
+            reserve_origin=reserve_origin,
+            declared_during_step=declared_during_step,
+            source_rule_id=source_rule_id,
+            has_deep_strike_keyword=_unit_has_deep_strike(unit),
+            points_contribution=points_contribution,
+        )
+
+    def to_reserve_state(
+        self,
+        *,
+        destruction_deadline_policy: ReserveDestructionTimingPolicy,
+    ) -> ReserveState:
+        return ReserveState(
+            player_id=self.player_id,
+            unit_instance_id=self.unit_instance_id,
+            reserve_origin=self.reserve_origin,
+            reserve_kind=ReserveKind.DEEP_STRIKE,
+            source_rule_ids=(self.source_rule_id,),
+            points_contribution=self.points_contribution,
+            declared_during_step=self.declared_during_step,
+            entered_reserves_battle_round=None,
+            entered_reserves_phase=None,
+            destruction_deadline_policy=destruction_deadline_policy,
+        )
+
+    def to_payload(self) -> DeepStrikeSetupDeclarationPayload:
+        return {
+            "player_id": self.player_id,
+            "unit_instance_id": self.unit_instance_id,
+            "reserve_origin": self.reserve_origin.value,
+            "declared_during_step": self.declared_during_step,
+            "source_rule_id": self.source_rule_id,
+            "has_deep_strike_keyword": self.has_deep_strike_keyword,
+            "points_contribution": self.points_contribution,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DeepStrikeSetupDeclarationPayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            unit_instance_id=payload["unit_instance_id"],
+            reserve_origin=reserve_origin_from_token(payload["reserve_origin"]),
+            declared_during_step=payload["declared_during_step"],
+            source_rule_id=payload["source_rule_id"],
+            has_deep_strike_keyword=payload["has_deep_strike_keyword"],
+            points_contribution=payload["points_contribution"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AircraftReserveDeclaration:
+    player_id: str
+    unit_instance_id: str
+    reserve_origin: ReserveOrigin
+    declared_during_step: str
+    source_rule_id: str
+    unit_points: int
+    points_limit: int
+    has_aircraft_keyword: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("AircraftReserveDeclaration player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "AircraftReserveDeclaration unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(self, "reserve_origin", reserve_origin_from_token(self.reserve_origin))
+        object.__setattr__(
+            self,
+            "declared_during_step",
+            _validate_identifier(
+                "AircraftReserveDeclaration declared_during_step",
+                self.declared_during_step,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("AircraftReserveDeclaration source_rule_id", self.source_rule_id),
+        )
+        object.__setattr__(
+            self,
+            "unit_points",
+            _validate_non_negative_int("AircraftReserveDeclaration unit_points", self.unit_points),
+        )
+        object.__setattr__(
+            self,
+            "points_limit",
+            _validate_non_negative_int(
+                "AircraftReserveDeclaration points_limit",
+                self.points_limit,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "has_aircraft_keyword",
+            _validate_bool(
+                "AircraftReserveDeclaration has_aircraft_keyword",
+                self.has_aircraft_keyword,
+            ),
+        )
+        if not self.has_aircraft_keyword:
+            raise GameLifecycleError("Aircraft reserve declaration requires AIRCRAFT.")
+        if self.unit_points > self.points_limit:
+            raise GameLifecycleError("Aircraft reserve declaration exceeds points limit.")
+
+    @classmethod
+    def for_unit(
+        cls,
+        *,
+        unit: UnitInstance,
+        player_id: str,
+        unit_points: int,
+        points_limit: int,
+        reserve_origin: ReserveOrigin = ReserveOrigin.AIRCRAFT_MANDATORY_RESERVE,
+        declared_during_step: str = "declare_battle_formations",
+        source_rule_id: str = "aircraft_mandatory_reserve",
+    ) -> Self:
+        if type(unit) is not UnitInstance:
+            raise GameLifecycleError("AircraftReserveDeclaration requires a UnitInstance.")
+        return cls(
+            player_id=player_id,
+            unit_instance_id=unit.unit_instance_id,
+            reserve_origin=reserve_origin,
+            declared_during_step=declared_during_step,
+            source_rule_id=source_rule_id,
+            unit_points=unit_points,
+            points_limit=points_limit,
+            has_aircraft_keyword=_unit_has_keyword(unit, "AIRCRAFT"),
+        )
+
+    def to_reserve_state(
+        self,
+        *,
+        destruction_deadline_policy: ReserveDestructionTimingPolicy,
+    ) -> ReserveState:
+        return ReserveState(
+            player_id=self.player_id,
+            unit_instance_id=self.unit_instance_id,
+            reserve_origin=self.reserve_origin,
+            reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+            source_rule_ids=(self.source_rule_id,),
+            points_contribution=self.unit_points,
+            declared_during_step=self.declared_during_step,
+            entered_reserves_battle_round=None,
+            entered_reserves_phase=None,
+            destruction_deadline_policy=destruction_deadline_policy,
+        )
+
+    def to_payload(self) -> AircraftReserveDeclarationPayload:
+        return {
+            "player_id": self.player_id,
+            "unit_instance_id": self.unit_instance_id,
+            "reserve_origin": self.reserve_origin.value,
+            "declared_during_step": self.declared_during_step,
+            "source_rule_id": self.source_rule_id,
+            "unit_points": self.unit_points,
+            "points_limit": self.points_limit,
+            "has_aircraft_keyword": self.has_aircraft_keyword,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: AircraftReserveDeclarationPayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            unit_instance_id=payload["unit_instance_id"],
+            reserve_origin=reserve_origin_from_token(payload["reserve_origin"]),
+            declared_during_step=payload["declared_during_step"],
+            source_rule_id=payload["source_rule_id"],
+            unit_points=payload["unit_points"],
+            points_limit=payload["points_limit"],
+            has_aircraft_keyword=payload["has_aircraft_keyword"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class ReserveUnitPointValue:
+    unit_instance_id: str
+    points: int
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("ReserveUnitPointValue unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "points",
+            _validate_non_negative_int("ReserveUnitPointValue points", self.points),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("ReserveUnitPointValue source_id", self.source_id),
+        )
+
+    def to_payload(self) -> ReserveUnitPointValuePayload:
+        return {
+            "unit_instance_id": self.unit_instance_id,
+            "points": self.points,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ReserveUnitPointValuePayload) -> Self:
+        return cls(
+            unit_instance_id=payload["unit_instance_id"],
+            points=payload["points"],
+            source_id=payload["source_id"],
         )
 
 
@@ -1583,6 +1971,15 @@ def battle_phase_token(token: object) -> str:
     if type(token) is BattlePhase:
         return token.value
     return _validate_identifier("battle_phase", token)
+
+
+def _default_source_rule_ids_for_reserve_kind(reserve_kind: ReserveKind) -> tuple[str, ...]:
+    resolved_kind = reserve_kind_from_token(reserve_kind)
+    if resolved_kind is ReserveKind.STRATEGIC_RESERVES:
+        return (_STRATEGIC_RESERVES_RULE_ID,)
+    if resolved_kind is ReserveKind.DEEP_STRIKE:
+        return (_DEEP_STRIKE_RULE_ID,)
+    return (_RESERVES_RULE_ID,)
 
 
 def _append_reserve_state_violations(
@@ -2343,9 +2740,15 @@ def _validate_deployment_zone_tuple(
     return tuple(sorted(zones, key=lambda zone: zone.deployment_zone_id))
 
 
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+def _validate_identifier_tuple(
+    field_name: str,
+    values: object,
+    *,
+    min_length: int = 0,
+) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError(f"{field_name} must be a tuple.")
+    minimum = _validate_non_negative_int(f"{field_name} min_length", min_length)
     identifiers: list[str] = []
     seen: set[str] = set()
     for value in cast(tuple[object, ...], values):
@@ -2354,6 +2757,8 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
             raise GameLifecycleError(f"{field_name} must not contain duplicates.")
         seen.add(identifier)
         identifiers.append(identifier)
+    if len(identifiers) < minimum:
+        raise GameLifecycleError(f"{field_name} must contain at least {minimum} value(s).")
     return tuple(sorted(identifiers))
 
 
