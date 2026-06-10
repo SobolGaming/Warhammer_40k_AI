@@ -6,13 +6,17 @@ from dataclasses import dataclass
 
 from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
 from warhammer40k_core.core.missions import MissionPackError, MissionSourcePackageDefinition
+from warhammer40k_core.core.terrain_display import (
+    TerrainDisplayGeometry,
+    TerrainDisplayPoint,
+)
 
 EDITION_ID = "warhammer_40000_11th"
 MISSION_PACK_ID = "11e-chapter-approved-2026-27"
 SOURCE_PACKAGE_ID = "gw-11e-chapter-approved-2026-27"
 SOURCE_TITLE = "Warhammer 40,000 11th Edition Chapter Approved 2026-27"
 SOURCE_VERSION = "2026-27"
-IMPORTED_AT_SCHEMA_VERSION = "core-v2-mission-source-v1"
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-mission-source-v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -218,6 +222,7 @@ class SourceBattlefieldTerrainFeatureRow:
     footprint_width_inches: float
     footprint_depth_inches: float
     source_note: str
+    display_geometry: TerrainDisplayGeometry
 
     def to_payload(self) -> dict[str, object]:
         return {
@@ -228,6 +233,7 @@ class SourceBattlefieldTerrainFeatureRow:
             "footprint_width_inches": self.footprint_width_inches,
             "footprint_depth_inches": self.footprint_depth_inches,
             "source_note": self.source_note,
+            "display_geometry": self.display_geometry.to_payload(),
         }
 
 
@@ -269,6 +275,59 @@ class SourceBattlefieldLayoutRow:
             "deployment_zones": [zone.to_payload() for zone in self.deployment_zones],
             "terrain_features": [feature.to_payload() for feature in self.terrain_features],
         }
+
+
+def _axis_aligned_display(
+    *,
+    x: float,
+    y: float,
+    width: float,
+    depth: float,
+    display_template_id: str,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=x,
+        center_y_inches=y,
+        width_inches=width,
+        depth_inches=depth,
+        display_template_id=display_template_id,
+    )
+
+
+def _diagonal_display(
+    *,
+    x: float,
+    y: float,
+    width: float,
+    depth: float,
+    display_template_id: str,
+    slope: str,
+) -> TerrainDisplayGeometry:
+    min_x = x - (width / 2.0)
+    max_x = x + (width / 2.0)
+    min_y = y - (depth / 2.0)
+    max_y = y + (depth / 2.0)
+    inset = min(width, depth) / 4.0
+    if slope == "down_right":
+        polygon = (
+            TerrainDisplayPoint(min_x, min_y + inset),
+            TerrainDisplayPoint(min_x + inset, min_y),
+            TerrainDisplayPoint(max_x, max_y - inset),
+            TerrainDisplayPoint(max_x - inset, max_y),
+        )
+    elif slope == "up_right":
+        polygon = (
+            TerrainDisplayPoint(min_x + inset, min_y),
+            TerrainDisplayPoint(max_x, min_y + inset),
+            TerrainDisplayPoint(max_x - inset, max_y),
+            TerrainDisplayPoint(min_x, max_y - inset),
+        )
+    else:
+        raise MissionPackError("Unsupported diagonal terrain display slope.")
+    return TerrainDisplayGeometry(
+        display_template_id=display_template_id,
+        footprint_polygon=polygon,
+    )
 
 
 def source_package_definition() -> MissionSourcePackageDefinition:
@@ -942,6 +1001,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     7.0,
                     12.0,
                     "left home objective ruin footprint",
+                    _axis_aligned_display(
+                        x=10.5,
+                        y=11.0,
+                        width=7.0,
+                        depth=12.0,
+                        display_template_id="ruins_rect_7x12",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-right-home-ruin",
@@ -951,6 +1017,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     7.0,
                     13.0,
                     "right home objective ruin footprint",
+                    _axis_aligned_display(
+                        x=52.5,
+                        y=36.5,
+                        width=7.0,
+                        depth=13.0,
+                        display_template_id="ruins_rect_7x13",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-center-ruin",
@@ -960,6 +1033,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     8.0,
                     13.0,
                     "central ruin footprint",
+                    _axis_aligned_display(
+                        x=31.0,
+                        y=23.5,
+                        width=8.0,
+                        depth=13.0,
+                        display_template_id="ruins_rect_8x13",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-upper-flank-ruin",
@@ -969,6 +1049,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     6.5,
                     11.0,
                     "upper flank central objective ruin footprint",
+                    _axis_aligned_display(
+                        x=22.0,
+                        y=36.5,
+                        width=6.5,
+                        depth=11.0,
+                        display_template_id="ruins_rect_6_5x11",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-lower-flank-ruin",
@@ -978,6 +1065,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     8.0,
                     15.0,
                     "lower flank central objective ruin footprint",
+                    _axis_aligned_display(
+                        x=38.0,
+                        y=7.5,
+                        width=8.0,
+                        depth=15.0,
+                        display_template_id="ruins_rect_8x15",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-left-midfield-debris",
@@ -987,6 +1081,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     6.0,
                     5.0,
                     "left midfield debris footprint",
+                    _axis_aligned_display(
+                        x=24.0,
+                        y=10.5,
+                        width=6.0,
+                        depth=5.0,
+                        display_template_id="debris_rect_6x5",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-right-midfield-debris",
@@ -996,6 +1097,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     6.0,
                     5.0,
                     "right midfield debris footprint",
+                    _axis_aligned_display(
+                        x=37.0,
+                        y=35.5,
+                        width=6.0,
+                        depth=5.0,
+                        display_template_id="debris_rect_6x5",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-left-no-mans-barricade",
@@ -1005,6 +1113,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     1.5,
                     8.0,
                     "left no man's land barricade footprint",
+                    _axis_aligned_display(
+                        x=28.0,
+                        y=7.5,
+                        width=1.5,
+                        depth=8.0,
+                        display_template_id="barricade_rect_1_5x8",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-right-no-mans-barricade",
@@ -1014,6 +1129,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     1.5,
                     8.0,
                     "right no man's land barricade footprint",
+                    _axis_aligned_display(
+                        x=30.5,
+                        y=38.0,
+                        width=1.5,
+                        depth=8.0,
+                        display_template_id="barricade_rect_1_5x8",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-left-midline-wall",
@@ -1023,6 +1145,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     1.0,
                     12.0,
                     "left deployment edge wall footprint",
+                    _axis_aligned_display(
+                        x=18.0,
+                        y=22.0,
+                        width=1.0,
+                        depth=12.0,
+                        display_template_id="barricade_rect_1x12",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-right-midline-wall",
@@ -1032,6 +1161,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     1.0,
                     12.0,
                     "right deployment edge wall footprint",
+                    _axis_aligned_display(
+                        x=42.0,
+                        y=22.0,
+                        width=1.0,
+                        depth=12.0,
+                        display_template_id="barricade_rect_1x12",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-left-pipe-field",
@@ -1041,6 +1177,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     8.0,
                     12.0,
                     "left deployment pipe and rubble footprint",
+                    _axis_aligned_display(
+                        x=49.0,
+                        y=8.0,
+                        width=8.0,
+                        depth=12.0,
+                        display_template_id="barricade_rect_8x12",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-right-pipe-field",
@@ -1050,6 +1193,13 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     8.0,
                     10.0,
                     "right deployment pipe and rubble footprint",
+                    _axis_aligned_display(
+                        x=11.0,
+                        y=37.0,
+                        width=8.0,
+                        depth=10.0,
+                        display_template_id="barricade_rect_8x10",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin",
@@ -1059,6 +1209,14 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     8.0,
                     9.0,
                     "left deployment diagonal ruin footprint",
+                    _diagonal_display(
+                        x=49.0,
+                        y=17.0,
+                        width=8.0,
+                        depth=9.0,
+                        display_template_id="ruins_diagonal_down_right_estimate_v1",
+                        slope="down_right",
+                    ),
                 ),
                 SourceBattlefieldTerrainFeatureRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin",
@@ -1068,6 +1226,14 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                     7.0,
                     8.0,
                     "right deployment diagonal ruin footprint",
+                    _diagonal_display(
+                        x=12.5,
+                        y=29.0,
+                        width=7.0,
+                        depth=8.0,
+                        display_template_id="ruins_diagonal_up_right_estimate_v1",
+                        slope="up_right",
+                    ),
                 ),
             ),
         ),

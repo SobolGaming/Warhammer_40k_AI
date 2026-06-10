@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.geometry.pose import GeometryError
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -80,6 +81,13 @@ class TerrainFactory:
                 footprint_center_y_inches=center_y_inches,
                 footprint_width_inches=half_width * 2.0,
                 footprint_depth_inches=half_depth * 2.0,
+                display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+                    center_x_inches=center_x_inches,
+                    center_y_inches=center_y_inches,
+                    width_inches=half_width * 2.0,
+                    depth_inches=half_depth * 2.0,
+                    display_template_id="ruins_rect_12x6",
+                ),
                 walls=walls,
                 floors=floors,
                 source_id="phase10f_deterministic_ruins_fixture",
@@ -101,6 +109,13 @@ class TerrainFactory:
                 footprint_center_y_inches=center_y_inches,
                 footprint_width_inches=7.0,
                 footprint_depth_inches=5.0,
+                display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+                    center_x_inches=center_x_inches,
+                    center_y_inches=center_y_inches,
+                    width_inches=7.0,
+                    depth_inches=5.0,
+                    display_template_id="woods_rect_7x5",
+                ),
                 walls=(),
                 floors=(),
                 source_id="phase13a_deterministic_woods_fixture",

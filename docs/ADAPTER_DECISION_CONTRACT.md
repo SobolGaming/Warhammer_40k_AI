@@ -1056,6 +1056,15 @@ Important behavior:
 
 The submission contract is shared. The information available to a producer is not always identical.
 
+Mission setup terrain projections expose first-class display geometry under
+`GameViewPayload.mission_setup.terrain_features[*].display_geometry`.
+The display geometry payload uses schema `terrain-display-v1`, coordinate space
+`battlefield_inches`, footprint kind `polygon`, optional `display_template_id`,
+and an unclosed `footprint_polygon` list of `{x_inches, y_inches}` vertices.
+Adapters should render terrain footprints from this typed display geometry.
+`source_id` remains provenance only; adapters must not parse it to recover
+terrain preset, origin, rotation, or footprint details.
+
 Phase 11E adds scoring state to the viewer projection:
 
 - `public_secondary_mission_card_states`: Fixed and Tactical card state payloads scoped

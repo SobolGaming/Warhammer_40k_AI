@@ -17,7 +17,7 @@ from warhammer40k_core.geometry.pose import Pose, PosePayload
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
-    TerrainFeatureDefinitionPayload,
+    TerrainFeatureRulesGeometryPayload,
 )
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.geometry.volume import ModelVolume
@@ -1534,8 +1534,8 @@ def _validate_terrain_feature_tuple(
 def _terrain_revision_for_features(features: tuple[TerrainFeatureDefinition, ...]) -> int:
     if not features:
         return 0
-    payloads: list[TerrainFeatureDefinitionPayload] = [
-        feature.to_payload()
+    payloads: list[TerrainFeatureRulesGeometryPayload] = [
+        feature.to_rules_geometry_payload()
         for feature in _validate_terrain_feature_tuple(
             "SpatialIndexState features",
             features,

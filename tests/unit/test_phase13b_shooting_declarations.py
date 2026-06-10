@@ -20,6 +20,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
@@ -5873,6 +5874,12 @@ def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_rol
         footprint_center_y_inches=35.0,
         footprint_width_inches=12.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=12.0,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="south-wall",
@@ -13097,6 +13104,12 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
         footprint_center_y_inches=35.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        display_geometry=_display_geometry(
+            center_x_inches=20.0,
+            center_y_inches=35.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="wall",
@@ -13865,6 +13878,12 @@ def test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers
         footprint_center_y_inches=10.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        display_geometry=_display_geometry(
+            center_x_inches=80.0,
+            center_y_inches=10.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="wall",
@@ -15993,6 +16012,22 @@ def _precision_request_for_fixture(
     return _decision_request(cast(LifecycleStatus, status)), remaining_sequence, allocated_ids
 
 
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
+    )
+
+
 def _blocking_ruin() -> TerrainFeatureDefinition:
     return TerrainFeatureDefinition(
         feature_id="phase13b-blocking-ruin",
@@ -16001,6 +16036,12 @@ def _blocking_ruin() -> TerrainFeatureDefinition:
         footprint_center_y_inches=35.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        display_geometry=_display_geometry(
+            center_x_inches=20.0,
+            center_y_inches=35.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="wall",

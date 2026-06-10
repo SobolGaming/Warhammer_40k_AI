@@ -9,6 +9,10 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
     terrain_feature_kind_from_token,
 )
+from warhammer40k_core.core.terrain_display import (
+    TerrainDisplayGeometry,
+    TerrainDisplayGeometryPayload,
+)
 
 
 class TerrainLayoutError(ValueError):
@@ -42,6 +46,7 @@ class TerrainFeatureTemplatePayload(TypedDict):
     footprint_center_y_inches: float
     footprint_width_inches: float
     footprint_depth_inches: float
+    display_geometry: TerrainDisplayGeometryPayload
     walls: list[TerrainWallTemplatePayload]
     floors: list[TerrainFloorTemplatePayload]
     source_id: str
@@ -249,6 +254,7 @@ class TerrainFeatureTemplate:
     footprint_center_y_inches: float
     footprint_width_inches: float
     footprint_depth_inches: float
+    display_geometry: TerrainDisplayGeometry
     walls: tuple[TerrainWallTemplate, ...] = ()
     floors: tuple[TerrainFloorTemplate, ...] = ()
     source_id: str = "chapter_approved_2026_27"
@@ -302,6 +308,15 @@ class TerrainFeatureTemplate:
         )
         object.__setattr__(
             self,
+            "display_geometry",
+            _validate_display_geometry(
+                "TerrainFeatureTemplate display_geometry",
+                self.display_geometry,
+                feature_bounds=self.bounds(),
+            ),
+        )
+        object.__setattr__(
+            self,
             "walls",
             _validate_wall_templates("TerrainFeatureTemplate walls", self.walls),
         )
@@ -335,6 +350,7 @@ class TerrainFeatureTemplate:
             "footprint_center_y_inches": self.footprint_center_y_inches,
             "footprint_width_inches": self.footprint_width_inches,
             "footprint_depth_inches": self.footprint_depth_inches,
+            "display_geometry": self.display_geometry.to_payload(),
             "walls": [wall.to_payload() for wall in self.walls],
             "floors": [floor.to_payload() for floor in self.floors],
             "source_id": self.source_id,
@@ -352,6 +368,7 @@ class TerrainFeatureTemplate:
             footprint_center_y_inches=raw_payload["footprint_center_y_inches"],
             footprint_width_inches=raw_payload["footprint_width_inches"],
             footprint_depth_inches=raw_payload["footprint_depth_inches"],
+            display_geometry=TerrainDisplayGeometry.from_payload(raw_payload["display_geometry"]),
             walls=tuple(
                 TerrainWallTemplate.from_payload(wall_payload)
                 for wall_payload in raw_payload["walls"]
@@ -522,6 +539,19 @@ def _validate_floor_templates(
         seen.add(value.floor_id)
         floors.append(value)
     return tuple(sorted(floors, key=lambda floor: floor.floor_id))
+
+
+def _validate_display_geometry(
+    field_name: str,
+    value: object,
+    *,
+    feature_bounds: tuple[float, float, float, float],
+) -> TerrainDisplayGeometry:
+    if type(value) is not TerrainDisplayGeometry:
+        raise TerrainLayoutError(f"{field_name} must be a TerrainDisplayGeometry.")
+    if not value.is_within_bounds(feature_bounds):
+        raise TerrainLayoutError(f"{field_name} polygon must fit its footprint.")
+    return value
 
 
 def _validate_features_within_battlefield(

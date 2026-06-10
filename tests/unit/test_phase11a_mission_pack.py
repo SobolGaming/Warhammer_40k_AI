@@ -17,6 +17,7 @@ from warhammer40k_core.core.missions import (
     mission_source_status_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.terrain_layouts import TerrainLayoutTemplate
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
@@ -112,7 +113,7 @@ def test_chapter_approved_source_package_payload_and_identity_snapshot() -> None
         "source_title": "Warhammer 40,000 11th Edition Chapter Approved 2026-27",
         "source_version": "2026-27",
         "source_commit_or_import_hash": source_package.source_commit_or_import_hash,
-        "imported_at_schema_version": "core-v2-mission-source-v1",
+        "imported_at_schema_version": "core-v2-mission-source-v2",
     }
     assert len(source_package.source_commit_or_import_hash) == 64
     assert mission_pack.mission_pack_id == "11e-chapter-approved-2026-27"
@@ -651,6 +652,21 @@ def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
             11.0,
         ),
     }
+    display_snapshot = _terrain_display_snapshot(terrain_layout)
+    assert display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin"] == (
+        "ruins_diagonal_down_right_estimate_v1",
+        ((45.0, 14.5), (47.0, 12.5), (53.0, 19.5), (51.0, 21.5)),
+    )
+    assert display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin"] == (
+        "ruins_diagonal_up_right_estimate_v1",
+        ((10.75, 25.0), (16.0, 26.75), (14.25, 33.0), (9.0, 31.25)),
+    )
+    assert _has_non_axis_aligned_edge(
+        display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin"][1]
+    )
+    assert _has_non_axis_aligned_edge(
+        display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin"][1]
+    )
 
 
 def test_phase16a_battlefield_layout_identifiers_are_cross_platform_file_safe() -> None:
@@ -1205,6 +1221,12 @@ def _blocking_terrain_feature(*, x: float, y: float) -> TerrainFeatureDefinition
         footprint_center_y_inches=y,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        display_geometry=_display_geometry(
+            center_x_inches=x,
+            center_y_inches=y,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="center-wall",
@@ -1217,6 +1239,22 @@ def _blocking_terrain_feature(*, x: float, y: float) -> TerrainFeatureDefinition
             ),
         ),
         source_id="phase11a-live-blocking-terrain",
+    )
+
+
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
     )
 
 
@@ -1262,6 +1300,32 @@ def _terrain_feature_snapshot(
         )
         for feature in terrain_layout.terrain_features
     }
+
+
+def _terrain_display_snapshot(
+    terrain_layout: TerrainLayoutTemplate,
+) -> dict[str, tuple[str | None, tuple[tuple[float, float], ...]]]:
+    return {
+        feature.feature_id: (
+            feature.display_geometry.display_template_id,
+            tuple(
+                (point.x_inches, point.y_inches)
+                for point in feature.display_geometry.footprint_polygon
+            ),
+        )
+        for feature in terrain_layout.terrain_features
+    }
+
+
+def _has_non_axis_aligned_edge(vertices: tuple[tuple[float, float], ...]) -> bool:
+    return any(
+        x != next_x and y != next_y
+        for (x, y), (next_x, next_y) in zip(
+            vertices,
+            (*vertices[1:], vertices[0]),
+            strict=True,
+        )
+    )
 
 
 def _config(*, mission_setup: MissionSetup | None) -> GameConfig:

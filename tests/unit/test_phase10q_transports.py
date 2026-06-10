@@ -13,6 +13,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
@@ -3605,6 +3606,22 @@ def _left_side_disembark_poses(*, z_inches: float = 0.0) -> tuple[Pose, ...]:
     )
 
 
+def _display_geometry(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainDisplayGeometry:
+    return TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        display_template_id="test_axis_aligned_terrain",
+    )
+
+
 def _support_feature(
     *,
     feature_id: str,
@@ -3622,6 +3639,12 @@ def _support_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=width_inches,
         footprint_depth_inches=depth_inches,
+        display_geometry=_display_geometry(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=width_inches,
+            depth_inches=depth_inches,
+        ),
         floors=(
             TerrainFloorDefinition(
                 floor_id="top",
@@ -3651,6 +3674,12 @@ def _ruins_floor_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ),
         walls=(
             TerrainWallDefinition(
                 wall_id="north-wall",

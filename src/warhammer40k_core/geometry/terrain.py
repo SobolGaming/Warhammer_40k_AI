@@ -12,6 +12,10 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.ruleset_descriptor import (
     terrain_feature_kind_from_token as core_terrain_feature_kind_from_token,
 )
+from warhammer40k_core.core.terrain_display import (
+    TerrainDisplayGeometry,
+    TerrainDisplayGeometryPayload,
+)
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pose import (
     GeometryError,
@@ -71,9 +75,21 @@ class TerrainFeatureDefinitionPayload(TypedDict):
     footprint_center_y_inches: float
     footprint_width_inches: float
     footprint_depth_inches: float
+    display_geometry: TerrainDisplayGeometryPayload
     walls: list[TerrainWallDefinitionPayload]
     floors: list[TerrainFloorDefinitionPayload]
     source_id: str | None
+
+
+class TerrainFeatureRulesGeometryPayload(TypedDict):
+    feature_id: str
+    feature_kind: str
+    footprint_center_x_inches: float
+    footprint_center_y_inches: float
+    footprint_width_inches: float
+    footprint_depth_inches: float
+    walls: list[TerrainWallDefinitionPayload]
+    floors: list[TerrainFloorDefinitionPayload]
 
 
 @dataclass(frozen=True, slots=True)
@@ -540,6 +556,7 @@ class TerrainFeatureDefinition:
     footprint_center_y_inches: float
     footprint_width_inches: float
     footprint_depth_inches: float
+    display_geometry: TerrainDisplayGeometry
     walls: tuple[TerrainWallDefinition, ...] = ()
     floors: tuple[TerrainFloorDefinition, ...] = ()
     source_id: str | None = None
@@ -589,6 +606,15 @@ class TerrainFeatureDefinition:
             _validate_positive_number(
                 "TerrainFeatureDefinition footprint_depth_inches",
                 self.footprint_depth_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "display_geometry",
+            _validate_display_geometry(
+                "TerrainFeatureDefinition display_geometry",
+                self.display_geometry,
+                feature_bounds=self.bounds(),
             ),
         )
         object.__setattr__(self, "walls", _validate_wall_tuple(self.walls))
@@ -642,9 +668,22 @@ class TerrainFeatureDefinition:
             "footprint_center_y_inches": self.footprint_center_y_inches,
             "footprint_width_inches": self.footprint_width_inches,
             "footprint_depth_inches": self.footprint_depth_inches,
+            "display_geometry": self.display_geometry.to_payload(),
             "walls": [wall.to_payload() for wall in self.walls],
             "floors": [floor.to_payload() for floor in self.floors],
             "source_id": self.source_id,
+        }
+
+    def to_rules_geometry_payload(self) -> TerrainFeatureRulesGeometryPayload:
+        return {
+            "feature_id": self.feature_id,
+            "feature_kind": self.feature_kind.value,
+            "footprint_center_x_inches": self.footprint_center_x_inches,
+            "footprint_center_y_inches": self.footprint_center_y_inches,
+            "footprint_width_inches": self.footprint_width_inches,
+            "footprint_depth_inches": self.footprint_depth_inches,
+            "walls": [wall.to_payload() for wall in self.walls],
+            "floors": [floor.to_payload() for floor in self.floors],
         }
 
     @classmethod
@@ -667,6 +706,7 @@ class TerrainFeatureDefinition:
             footprint_center_y_inches=raw_payload["footprint_center_y_inches"],
             footprint_width_inches=raw_payload["footprint_width_inches"],
             footprint_depth_inches=raw_payload["footprint_depth_inches"],
+            display_geometry=TerrainDisplayGeometry.from_payload(raw_payload["display_geometry"]),
             walls=walls,
             floors=floors,
             source_id=raw_payload["source_id"],
@@ -755,6 +795,19 @@ def _validate_optional_source_id(value: object) -> str | None:
         value,
         reserved_prefix="source:",
     )
+
+
+def _validate_display_geometry(
+    field_name: str,
+    value: object,
+    *,
+    feature_bounds: tuple[float, float, float, float],
+) -> TerrainDisplayGeometry:
+    if type(value) is not TerrainDisplayGeometry:
+        raise GeometryError(f"{field_name} must be a TerrainDisplayGeometry.")
+    if not value.is_within_bounds(feature_bounds):
+        raise GeometryError(f"{field_name} polygon must fit feature footprint.")
+    return value
 
 
 def _validate_finite_coordinate(field_name: str, value: object) -> float:
