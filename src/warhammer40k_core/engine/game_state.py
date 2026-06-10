@@ -185,6 +185,7 @@ class GameConfigPayload(TypedDict):
     ruleset_descriptor: RulesetDescriptorPayload
     army_catalog: ArmyCatalogPayload
     army_muster_requests: list[ArmyMusterRequestPayload]
+    allow_legacy_non_strict_rosters: bool
     player_ids: list[str]
     turn_order: list[str]
     fixed_secondary_mission_ids: list[str]
@@ -411,6 +412,7 @@ class GameConfig:
     tactical_secondary_draw_count: int = 2
     mission_setup: MissionSetup | None = None
     reserve_unit_points: tuple[ReserveUnitPointValue, ...] = ()
+    allow_legacy_non_strict_rosters: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -440,6 +442,16 @@ class GameConfig:
                 player_ids=self.player_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "allow_legacy_non_strict_rosters",
+            _validate_bool(
+                "GameConfig allow_legacy_non_strict_rosters",
+                self.allow_legacy_non_strict_rosters,
+            ),
+        )
+        if not self.allow_legacy_non_strict_rosters:
+            _validate_strict_roster_legality_requests(self.army_muster_requests)
         object.__setattr__(
             self,
             "turn_order",
@@ -487,6 +499,7 @@ class GameConfig:
             "ruleset_descriptor": self.ruleset_descriptor.to_payload(),
             "army_catalog": self.army_catalog.to_payload(),
             "army_muster_requests": [request.to_payload() for request in self.army_muster_requests],
+            "allow_legacy_non_strict_rosters": self.allow_legacy_non_strict_rosters,
             "player_ids": list(self.player_ids),
             "turn_order": list(self.turn_order),
             "fixed_secondary_mission_ids": list(self.fixed_secondary_mission_ids),
@@ -507,6 +520,7 @@ class GameConfig:
                 _army_muster_request_from_payload(request)
                 for request in payload["army_muster_requests"]
             ),
+            allow_legacy_non_strict_rosters=payload["allow_legacy_non_strict_rosters"],
             player_ids=tuple(payload["player_ids"]),
             turn_order=tuple(payload["turn_order"]),
             fixed_secondary_mission_ids=tuple(payload["fixed_secondary_mission_ids"]),
@@ -4124,6 +4138,20 @@ def _validate_army_muster_requests(
     return tuple(sorted(validated, key=lambda request: request.player_id))
 
 
+def _validate_strict_roster_legality_requests(
+    values: tuple[ArmyMusterRequest, ...],
+) -> None:
+    non_strict_player_ids = tuple(
+        request.player_id for request in values if not request.roster_legality_required
+    )
+    if non_strict_player_ids:
+        raise GameLifecycleError(
+            "GameConfig production path requires roster_legality_required for every "
+            "ArmyMusterRequest. Legacy smoke fixtures must set "
+            "allow_legacy_non_strict_rosters explicitly."
+        )
+
+
 def _validate_reserve_unit_points(
     values: object,
     *,
@@ -5539,6 +5567,12 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
         raise GameLifecycleError(f"{field_name} must be an integer.")
     if value < 0:
         raise GameLifecycleError(f"{field_name} must not be negative.")
+    return value
+
+
+def _validate_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise GameLifecycleError(f"{field_name} must be a boolean.")
     return value
 
 

@@ -46,8 +46,9 @@ Starting Strength until split, and feeds source-backed Bodyguard/Leader/Support
 evidence used by Shooting acting-unit selection, mixed-Toughness attacks,
 healing, revival, persisting effects, and stratagem target canonicalization.
 Phase 16D now supplies the strict army-construction records consumed by those
-runtime hosts: Warlord, Enhancement, roster-legality, and Dedicated Transport
-manifest provenance. Phase 14H also
+runtime hosts: Warlord, Enhancement, roster-legality, Dedicated Transport
+manifest provenance, and the source army-definition data from which `GameState`
+derives `StartingStrengthRecord` entries. Phase 14H also
 covers Combat/Emergency Hazard Roll routing through shared mortal wounds and
 Feel No Pain, destroyed-Transport Emergency Disembark orchestration from actual
 destruction timing before Transport removal and Deadly Demise, setup-time
@@ -119,14 +120,18 @@ IDs and points contribution, rejects stale submissions before queue pop, and
 excludes declared reserves from Deploy Armies options.
 
 **Phase 16D is complete** for source-backed army construction and runtime
-instantiation: strict roster requests validate Strike Force points, unit
-limits, Warlord selection, Enhancement assignment rules, attached-squad
-Enhancement limits, Epic Hero restrictions, and Dedicated Transport starting
-cargo manifests through deterministic `RosterLegalityReport` diagnostics.
-Mustered armies preserve Warlord, Enhancement, unit-point, Dedicated
-Transport, and legality provenance in JSON-safe payloads, promote the selected
-Warlord with a `WARLORD` keyword, and setup records source-backed starting
-embarked cargo before Deploy Armies.
+instantiation: strict roster requests validate Strike Force unit points plus
+selected Enhancement points, unit limits, Warlord selection, Enhancement
+assignment rules, attached-squad Enhancement limits, Epic Hero restrictions,
+and Dedicated Transport starting cargo manifests through deterministic
+`RosterLegalityReport` diagnostics. Production `GameConfig` values require
+strict mustering requests by default; legacy smoke fixtures must opt into
+`allow_legacy_non_strict_rosters`. Mustered armies preserve Warlord,
+Enhancement, unit-point, Dedicated Transport, and legality provenance in
+JSON-safe payloads, promote the selected Warlord with a `WARLORD` keyword, and
+setup records source-backed starting embarked cargo before Deploy Armies while
+`GameState.record_army_definition(...)` derives the `StartingStrengthRecord`
+set consumed by later phases.
 
 Completed / implemented foundation:
 
@@ -2434,8 +2439,9 @@ the formation splits, and feeds the existing Bodyguard/Leader/Support role
 evidence used by Shooting acting-unit selection, attacks, healing, revival,
 persisting effects, and stratagem target canonicalization. Phase 16D now
 supplies the strict roster/runtime provenance layer for Warlord, Enhancement,
-legality, and Dedicated Transport manifest records that attached-unit and
-transport hosts consume.
+legality, Dedicated Transport manifest records, and army definitions that
+`GameState` reconciles into Starting Strength records for attached-unit and
+transport hosts.
 Broader real-faction Leader/Support eligibility data ingestion remains future
 source/catalog work, not a Phase 14H runtime blocker.
 Completed source-backed slices from Phases 10P-10S, 11C, 13E, 14D, 14K, 15B,
@@ -3439,10 +3445,14 @@ Required tests:
 Status: Complete.
 
 Phase 16D finishes source-backed army construction and runtime instantiation.
-The output is not a loose list of component units: it is a deterministic set of
-army definitions, runtime unit instances, attached rules units, starting
-strength records, enhancement records, Dedicated Transport manifests, and
-legality reports that later phases consume without guessing.
+The mustering output is not a loose list of component units: it is a
+deterministic `ArmyDefinition` containing runtime unit instances, attached
+rules units, enhancement records, Dedicated Transport manifests, and legality
+reports that later phases consume without guessing. `StartingStrengthRecord`
+remains the authoritative game-state artifact owned by `GameState`; setup calls
+`GameState.record_army_definition(...)`, which derives records from the
+mustered units and attached formations before later command, damage, healing,
+and split logic can consume them.
 
 Implemented coverage:
 
@@ -3450,18 +3460,23 @@ Implemented coverage:
   points, Warlord selection, Enhancement assignment, and Dedicated Transport
   starting-cargo manifests;
 - `validate_roster_legality(...)` emits deterministic JSON-safe
-  `RosterLegalityReport` diagnostics for Strike Force points/unit limits,
-  missing source data, Warlord legality, Enhancement legality, Epic Hero
-  restrictions, attached-squad Enhancement limits, and Dedicated Transport
-  capacity/cargo restrictions;
-- strict roster requests fail before mutation, while non-strict legacy smoke
-  fixtures still carry legality reports without weakening production checks;
+  `RosterLegalityReport` diagnostics for Strike Force unit points plus selected
+  Enhancement points, unit limits, missing source data, Warlord legality,
+  Enhancement legality, Epic Hero restrictions, attached-squad Enhancement
+  limits, and Dedicated Transport capacity/cargo restrictions;
+- strict roster requests fail before mutation, while `GameConfig` rejects
+  non-strict mustering requests by default; legacy smoke fixtures must opt into
+  `allow_legacy_non_strict_rosters` explicitly;
 - mustered `ArmyDefinition` payloads preserve Warlord, Enhancement, unit-point,
   Dedicated Transport, and legality provenance and promote the selected
   Warlord with the `WARLORD` keyword;
 - setup records Dedicated Transport manifest cargo as first-class
   `TransportCargoState` before Deploy Armies and emits deterministic setup
   events.
+- setup records `StartingStrengthRecord` entries from `ArmyDefinition` through
+  `GameState.record_army_definition(...)`; attached formations receive one
+  attached-unit starting-strength record until split, and component records are
+  restored only by split recovery.
 
 Modules:
 
@@ -3551,8 +3566,9 @@ Invariants:
 
 Required tests:
 
-- Strike Force points, battlefield dimensions, detachment points, enhancement
-  limits, unit limits, and unsupported battle-size rejection;
+- Strike Force unit points plus selected Enhancement points, battlefield
+  dimensions, detachment points, enhancement limits, unit limits, and
+  unsupported battle-size rejection;
 - active catalog rejection for Combat Patrol, Legends, Forge World, Kill Team,
   and other non-matched-play content scopes;
 - multi-detachment Strike Force combinations whose total Detachment Point cost
@@ -3572,6 +3588,10 @@ Required tests:
 - deterministic runtime IDs and source provenance for unit instances, model
   instances, attached units, Warlord, Enhancement, Dedicated Transport, and
   starting cargo records;
+- production `GameConfig` values reject non-strict mustering requests unless a
+  legacy smoke fixture explicitly opts out;
+- setup-derived `StartingStrengthRecord` values cover mustered attached units
+  and single-model transports before later phases consume them;
 - Attached-unit coherency uses `UnitGroup.alive_models()`/group-aware placement data across Leader and Bodyguard models;
 - Attached-unit Toughness and Character allocation protection;
 - Attached-unit split timing after attacks resolve;

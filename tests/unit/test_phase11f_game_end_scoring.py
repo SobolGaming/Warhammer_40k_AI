@@ -284,6 +284,7 @@ def _config(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID) -> G
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11f-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
         army_catalog=catalog,
         army_muster_requests=(

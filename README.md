@@ -163,7 +163,9 @@ split, and feeds source-backed Bodyguard/Leader/Support evidence used by
 Shooting acting-unit selection, mixed-Toughness attacks, healing, revival, persisting effects,
 and stratagem target canonicalization. Phase 16D now completes the strict
 army-construction records that those runtime hosts consume: Warlord,
-Enhancement, roster-legality, and Dedicated Transport manifest provenance. Phase 14H also covers
+Enhancement, roster-legality, Dedicated Transport manifest provenance, and
+the source army-definition data from which `GameState` derives
+`StartingStrengthRecord` entries. Phase 14H also covers
 Movement-phase Combat Disembark fallback with engine-owned Tactical-invalid
 evidence, Combat/Emergency hazard rolls through the official 1-2 Hazard Roll
 threshold and shared mortal-wound/Feel No Pain service, destroyed-Transport
@@ -196,7 +198,7 @@ Phase 16B is complete for redeployments, Scouts, and pre-battle ability resoluti
 
 Phase 16C is complete for reserve declarations during Declare Battle Formations. Setup now exposes `select_reserve_declaration`, records Strategic Reserves and Deep Strike setup choices through lifecycle decisions, enforces source-backed Strategic Reserves points caps and FORTIFICATION exclusions, records AIRCRAFT mandatory reserves as ordinary `ReserveState` payloads, rejects stale reserve submissions before queue pop, and excludes declared reserves from Deploy Armies options.
 
-Phase 16D is complete for source-backed army construction and runtime instantiation. Strict roster requests now validate Strike Force points, unit limits, Warlord selection, Enhancement assignment rules, attached-squad Enhancement limits, Epic Hero restrictions, and Dedicated Transport starting-cargo manifests with deterministic `RosterLegalityReport` diagnostics. Mustered armies preserve Warlord, Enhancement, unit-point, Dedicated Transport, and legality provenance in JSON-safe payloads, promote the selected Warlord with a `WARLORD` keyword, and setup records starting embarked cargo from source-backed manifests before Deploy Armies.
+Phase 16D is complete for source-backed army construction and runtime instantiation. Strict roster requests now validate Strike Force unit points plus selected Enhancement points, unit limits, Warlord selection, Enhancement assignment rules, attached-squad Enhancement limits, Epic Hero restrictions, and Dedicated Transport starting-cargo manifests with deterministic `RosterLegalityReport` diagnostics. Production `GameConfig` values require strict mustering requests by default; legacy smoke fixtures must opt into `allow_legacy_non_strict_rosters`. Mustered armies preserve Warlord, Enhancement, unit-point, Dedicated Transport, and legality provenance in JSON-safe payloads, promote the selected Warlord with a `WARLORD` keyword, and setup records starting embarked cargo from source-backed manifests before Deploy Armies while `GameState.record_army_definition(...)` derives the `StartingStrengthRecord` set consumed by later phases.
 
 Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus Phase 11E viewer-scoped scoring projection/event rules.
 

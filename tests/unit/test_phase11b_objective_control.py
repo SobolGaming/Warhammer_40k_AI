@@ -805,6 +805,7 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11b-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
         army_catalog=catalog,
         army_muster_requests=(

@@ -307,6 +307,7 @@ def _placement_payload_copy(scenario: BattlefieldScenario) -> BattlefieldRuntime
 def _minimal_two_player_game_config(catalog: ArmyCatalog) -> GameConfig:
     return GameConfig(
         game_id="phase10a-smoke-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase10a-smoke"
         ),

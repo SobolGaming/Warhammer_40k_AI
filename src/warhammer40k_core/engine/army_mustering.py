@@ -1019,6 +1019,7 @@ def validate_roster_legality(
             )
 
     _append_unit_point_violations(
+        catalog=catalog,
         request=request,
         policy_points_limit=policy.points_limit,
         violations=violations,
@@ -1062,6 +1063,7 @@ def validate_roster_legality(
 
 def _append_unit_point_violations(
     *,
+    catalog: ArmyCatalog,
     request: ArmyMusterRequest,
     policy_points_limit: int,
     violations: list[RosterLegalityViolation],
@@ -1088,7 +1090,16 @@ def _append_unit_point_violations(
                     source_id=point.source_id,
                 )
             )
-    total_points = sum(point.points for point in request.unit_points)
+    enhancement_points_by_id = {
+        enhancement.enhancement_id: enhancement.points
+        for enhancement in catalog.enhancements
+        if enhancement.points is not None
+    }
+    total_points = sum(point.points for point in request.unit_points) + sum(
+        enhancement_points_by_id[assignment.enhancement_id]
+        for assignment in request.enhancement_assignments
+        if assignment.enhancement_id in enhancement_points_by_id
+    )
     if total_points > policy_points_limit:
         violations.append(
             RosterLegalityViolation(

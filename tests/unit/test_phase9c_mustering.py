@@ -250,6 +250,8 @@ def _phase16d_catalog(
 def _phase16d_transport_roster_request(
     catalog: ArmyCatalog,
     *,
+    army_id: str = "army-alpha",
+    player_id: str = "player-a",
     enhancement_assignments: tuple[EnhancementAssignment, ...] | None = None,
     dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] | None = None,
     include_support: bool = False,
@@ -323,6 +325,8 @@ def _phase16d_transport_roster_request(
     )
     return _muster_request(
         catalog,
+        army_id=army_id,
+        player_id=player_id,
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
@@ -1062,6 +1066,39 @@ def test_phase16d_strict_roster_reports_missing_source_data_and_unit_limits() ->
         muster_army(catalog=catalog, request=request)
 
 
+def test_phase16d_enhancement_points_count_toward_strike_force_limit() -> None:
+    catalog = _phase16d_catalog()
+    request = replace(
+        _phase16d_transport_roster_request(catalog),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="bodyguard-unit",
+                points=1800,
+                source_id="points:bodyguard-unit",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-unit",
+                points=100,
+                source_id="points:leader-unit",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="transport-unit",
+                points=90,
+                source_id="points:transport-unit",
+            ),
+        ),
+    )
+
+    codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(catalog=catalog, request=request).violations
+    }
+
+    assert "points_limit_exceeded" in codes
+    with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
+        muster_army(catalog=catalog, request=request)
+
+
 def test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads() -> None:
     epic_catalog = _phase16d_catalog(epic_leader=True)
     epic_request = _muster_request(
@@ -1402,11 +1439,10 @@ def test_phase16d_setup_records_starting_transport_cargo_from_manifest() -> None
         army_catalog=catalog,
         army_muster_requests=(
             _phase16d_transport_roster_request(catalog),
-            _muster_request(
+            _phase16d_transport_roster_request(
                 catalog,
                 army_id="army-beta",
                 player_id="player-b",
-                unit_selections=(_unit_selection(unit_selection_id="beta-unit"),),
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1426,16 +1462,66 @@ def test_phase16d_setup_records_starting_transport_cargo_from_manifest() -> None
         "army-alpha:bodyguard-unit",
         "army-alpha:leader-unit",
     )
-    assert set(state.embarked_model_ids()) == {
+    assert {
         "army-alpha:bodyguard-unit:core-intercessor-like:001",
         "army-alpha:bodyguard-unit:core-intercessor-like:002",
         "army-alpha:bodyguard-unit:core-intercessor-like:003",
         "army-alpha:bodyguard-unit:core-intercessor-like:004",
         "army-alpha:bodyguard-unit:core-intercessor-like:005",
         "army-alpha:leader-unit:core-character-leader:001",
-    }
+    } <= set(state.embarked_model_ids())
+    attached_record = state.starting_strength_record_for_unit(
+        "attached-unit:army-alpha:bodyguard-unit"
+    )
+    transport_record = state.starting_strength_record_for_unit("army-alpha:transport-unit")
+    assert attached_record.starting_model_count == 6
+    assert attached_record.single_model_starting_wounds is None
+    assert transport_record.starting_model_count == 1
+    assert transport_record.single_model_starting_wounds == 10
+    with pytest.raises(GameLifecycleError, match="StartingStrengthRecord"):
+        state.starting_strength_record_for_unit("army-alpha:bodyguard-unit")
     event_types = tuple(event.event_type for event in decisions.event_log.records)
     assert "battle_formation_transport_manifest_recorded" in event_types
+
+
+def test_phase16d_game_config_requires_strict_roster_legality_for_production() -> None:
+    catalog = _phase16d_catalog()
+    strict_config = GameConfig(
+        game_id="phase16d-strict-config",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _phase16d_transport_roster_request(catalog),
+            _phase16d_transport_roster_request(
+                catalog,
+                army_id="army-beta",
+                player_id="player-b",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+    )
+
+    assert not strict_config.allow_legacy_non_strict_rosters
+    with pytest.raises(GameLifecycleError, match="production path requires"):
+        GameConfig(
+            game_id="phase16d-non-strict-config",
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=catalog,
+            army_muster_requests=(
+                _muster_request(catalog),
+                _muster_request(
+                    catalog,
+                    army_id="army-beta",
+                    player_id="player-b",
+                    unit_selections=(_unit_selection(unit_selection_id="beta-unit"),),
+                ),
+            ),
+            player_ids=("player-a", "player-b"),
+            turn_order=("player-a", "player-b"),
+            fixed_secondary_mission_ids=("area-denial", "assassination"),
+        )
 
 
 def test_phase16_faction_detachment_source_rows_are_normalized() -> None:

@@ -14574,6 +14574,7 @@ def _config(
     )
     return GameConfig(
         game_id=game_id,
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
         army_catalog=resolved_catalog,
         army_muster_requests=(

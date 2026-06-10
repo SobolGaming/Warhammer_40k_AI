@@ -2155,6 +2155,7 @@ def _config(*, ruleset_descriptor: RulesetDescriptor) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase10p-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=catalog,
         army_muster_requests=(
