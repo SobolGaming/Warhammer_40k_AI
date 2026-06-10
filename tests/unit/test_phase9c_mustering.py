@@ -289,6 +289,40 @@ def test_attachment_declarations_form_runtime_attached_unit_from_structured_cata
     assert ArmyDefinition.from_payload(payload).to_payload() == army.to_payload()
 
 
+def test_support_units_must_be_declared_attached_but_leaders_can_muster_solo() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    support_request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="support-unit",
+                datasheet_id="core-character-support",
+                model_profile_id="core-character-support",
+                model_count=1,
+            ),
+        ),
+    )
+    leader_request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+    )
+
+    with pytest.raises(ArmyMusteringError, match="Support units must be declared"):
+        muster_army(catalog=catalog, request=support_request)
+
+    leader_army = muster_army(catalog=catalog, request=leader_request)
+    leader = leader_army.unit_by_id("army-alpha:leader-unit")
+    assert leader_army.attached_units == ()
+    assert "ATTACHED_UNIT" not in leader.keywords
+
+
 def test_rules_unit_view_resolves_physical_and_mustered_attached_units() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     request = _muster_request(

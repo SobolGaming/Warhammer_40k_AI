@@ -410,6 +410,11 @@ def _resolve_attached_unit_formations(
     datasheets_by_selection_id: dict[str, DatasheetDefinition],
 ) -> tuple[tuple[UnitInstance, ...], tuple[AttachedUnitFormation, ...]]:
     if not request.attachment_declarations:
+        _validate_required_support_attachments(
+            request=request,
+            datasheets_by_selection_id=datasheets_by_selection_id,
+            attached_source_selection_ids=set(),
+        )
         return units, ()
     units_by_selection_id = {
         unit.unit_instance_id.removeprefix(f"{request.army_id}:"): unit for unit in units
@@ -435,6 +440,14 @@ def _resolve_attached_unit_formations(
                 "AttachmentDeclaration exceeds one Leader or one Support per bodyguard."
             )
         role_group[eligibility.role] = source_unit
+
+    _validate_required_support_attachments(
+        request=request,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        attached_source_selection_ids={
+            declaration.source_unit_selection_id for declaration in request.attachment_declarations
+        },
+    )
 
     formations: list[AttachedUnitFormation] = []
     roles_by_unit_id: dict[str, str] = {}
@@ -491,6 +504,35 @@ def _resolve_attached_unit_formations(
         ),
         tuple(sorted(formations, key=lambda formation: formation.attached_unit_instance_id)),
     )
+
+
+def _validate_required_support_attachments(
+    *,
+    request: ArmyMusterRequest,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    attached_source_selection_ids: set[str],
+) -> None:
+    for selection in request.unit_selections:
+        datasheet = datasheets_by_selection_id[selection.unit_selection_id]
+        if (
+            _datasheet_has_attachment_role(datasheet=datasheet, role=AttachmentRole.SUPPORT)
+            and selection.unit_selection_id not in attached_source_selection_ids
+        ):
+            raise ArmyMusteringError(
+                "Support units must be declared as part of an attached unit during mustering."
+            )
+
+
+def _datasheet_has_attachment_role(
+    *,
+    datasheet: DatasheetDefinition,
+    role: AttachmentRole,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ArmyMusteringError("Attachment role lookup requires a DatasheetDefinition.")
+    if type(role) is not AttachmentRole:
+        raise ArmyMusteringError("Attachment role lookup requires an AttachmentRole.")
+    return any(eligibility.role is role for eligibility in datasheet.attachment_eligibilities)
 
 
 def _attachment_eligibility_for_datasheet(

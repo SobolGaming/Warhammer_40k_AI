@@ -139,6 +139,11 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "class AttachmentDeclaration" in list_validation_source
     assert "class AttachedUnitFormation" in army_mustering_source
     assert "def _resolve_attached_unit_formations(" in army_mustering_source
+    assert "def _validate_required_support_attachments(" in army_mustering_source
+    assert (
+        "Support units must be declared as part of an attached unit during mustering."
+        in army_mustering_source
+    )
     assert "AttachmentRole.LEADER" in army_mustering_source
     assert "AttachmentRole.SUPPORT" in army_mustering_source
     assert '"runtime-attached-unit:{role}"' in army_mustering_source
