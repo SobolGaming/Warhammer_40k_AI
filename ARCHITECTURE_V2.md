@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -97,6 +97,18 @@ attached rules-unit model sets, reserves exclusion, stale/malformed submissions,
 and deterministic replay-safe placement events without using the Phase 10A
 deterministic bridge.
 
+**Phase 16B is complete** for redeployments, Scouts, and Resolve Pre-battle
+Abilities: redeploy finite selections and placement proposals resolve as
+temporary removal plus setup placement, simultaneous pre-battle effects use the
+Phase 12A sequencing path, Scout reserve setup resolves as setup placement from
+Strategic Reserves, Scout Moves require per-model `PathWitness` evidence and
+shared movement validators, Dedicated Transport Scout Move eligibility is
+cargo-aware, structured datasheet ability descriptors provide `Scouts X"`
+distances, and deterministic `PreBattleActionRecord` payloads preserve
+replay-safe setup action history. Current source catalog ability ownership is
+datasheet/component-granular; future per-model catalog ownership can refine
+mixed-model Scouts eligibility without changing the adapter proposal path.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -176,12 +188,13 @@ Completed / implemented foundation:
 | 15E | Complete | Source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge through shared Stratagem/Charge/Fight decisions |
 | 15F | Complete | Charge/Fight completion gates, full phase completion coverage, Fight damage/removal draining, and deterministic fight-order hardening |
 | 16A | Complete | Source-backed Deploy Armies, deployment-zone placement proposals, `INFILTRATORS`, attached rules-unit deployment, reserves exclusion, and replay-safe setup placement |
+| 16B | Complete | Redeployments, Scouts duplicate-distance resolution, Scout reserve setup, Scout Move proposals, Dedicated Transport Scout Move eligibility, and replay-safe pre-battle action records |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 16B-16E | Planned | Redeployments, Scouts/Infiltrators pre-battle abilities, reserves declarations, setup completion, and army construction completion |
+| 16C-16E | Planned | Reserves declarations, setup completion, and army construction completion |
 | 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
@@ -3134,7 +3147,7 @@ Required tests:
 
 ## Phase 16B: redeployments, Scouts, Infiltrators, and pre-battle abilities
 
-Status: Planned.
+Status: Complete.
 
 Phase 16B owns source-backed setup rules that occur after ordinary deployment
 or otherwise modify setup legality before the first battle round. Infiltrators
@@ -3144,10 +3157,25 @@ physical movement and require movement evidence. Scouts are resolved from the
 official `Scouts X"` shape during Resolve Pre-battle Abilities, including the
 Strategic Reserves set-up branch and the Dedicated Transport branch.
 
+Implementation notes: `SetupFlow` now runs `redeploy_units` and
+`resolve_prebattle_actions` decision windows after Deploy Armies. Redeploy uses
+`select_redeploy_unit -> submit_redeploy_placement`; Scouts use
+`select_prebattle_action` followed by either `submit_scout_reserve_setup` or
+`submit_scout_move`. Lifecycle validation rejects stale, malformed, drifted, or
+rule-invalid pre-battle proposal payloads before queue pop and before mutation.
+Accepted actions emit deterministic `PreBattleActionRecord` payloads.
+When more than one player has unresolved effects in the same pre-battle setup
+step, `SetupFlow` first emits the Phase 12A `resolve_sequencing_order` decision
+using a before-battle timing window and a deterministic roll-off; the resolved
+participant order then controls which player receives the next redeploy or
+pre-battle action selection request.
+
 Modules:
 
 - `engine/setup_flow.py`
+- `engine/lifecycle.py`
 - `engine/prebattle.py`
+- `engine/prebattle_records.py`
 - `engine/timing_windows.py`
 - `engine/reaction_queue.py`
 - `engine/movement_proposals.py`
@@ -3161,15 +3189,11 @@ Modules:
 Objects:
 
 - `PreBattleTimingWindowState`
-- `PreBattleAbilityDescriptor`
-- `RedeploySelection`
-- `RedeployPlacementProposal`
-- `RedeployResolution`
+- `PreBattleProposalRequest`
+- `PreBattlePlacementProposal`
+- `PreBattleResolution`
 - `ScoutAbilityInstance`
-- `ScoutReserveSetupProposal`
 - `ScoutMoveProposal`
-- `ScoutMoveResolution`
-- `DedicatedTransportScoutMoveCandidate`
 - `InfiltratorSetupPermission`
 - `InfiltratorDeploymentLegalityContext`
 - `PreBattleActionRecord`
@@ -3189,6 +3213,10 @@ Invariants:
 - Scouts always takes the source-backed form `Scouts X"`; X is the maximum
   Scout Move distance and must come from the structured ability descriptor, not
   parsed at runtime from raw text;
+- current catalog data attaches Scouts descriptors at datasheet/component
+  granularity; every alive model in a component receives the component's
+  structured Scouts descriptors, and a `SCOUTS` keyword without a structured
+  descriptor fails fast instead of falling back to a default distance;
 - duplicated `Scouts X"` instances use the official numbered-core-ability
   duplicate rule with the Scouts exception: if every model shares a Scouts
   value, that shared value is a legal selected instance, but when Scouts values

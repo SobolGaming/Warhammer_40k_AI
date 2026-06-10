@@ -110,6 +110,15 @@ from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
 )
+from warhammer40k_core.engine.prebattle import (
+    SELECT_PREBATTLE_ACTION_DECISION_TYPE,
+    SELECT_REDEPLOY_UNIT_DECISION_TYPE,
+    SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
+    SUBMIT_SCOUT_MOVE_DECISION_TYPE,
+    SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
+    invalid_prebattle_proposal_status,
+    is_prebattle_proposal_request,
+)
 from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
     ReactionQueue,
@@ -238,6 +247,11 @@ _SETUP_DECISION_TYPES = frozenset(
         SECONDARY_MISSION_DECISION_TYPE,
         SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
         SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
+        SELECT_REDEPLOY_UNIT_DECISION_TYPE,
+        SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
+        SELECT_PREBATTLE_ACTION_DECISION_TYPE,
+        SUBMIT_SCOUT_MOVE_DECISION_TYPE,
+        SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
     )
 )
 
@@ -428,6 +442,21 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and is_prebattle_proposal_request(pending_request)
+        ):
+            result.validate_for_request(pending_request)
+            invalid_status = invalid_prebattle_proposal_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
             )
             if invalid_status is not None:
                 return invalid_status

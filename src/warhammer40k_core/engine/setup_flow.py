@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from itertools import combinations
 from typing import cast
 
@@ -32,6 +33,27 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     SetupStep,
 )
+from warhammer40k_core.engine.prebattle import (
+    SELECT_PREBATTLE_ACTION_DECISION_TYPE,
+    SELECT_REDEPLOY_UNIT_DECISION_TYPE,
+    SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
+    SUBMIT_SCOUT_MOVE_DECISION_TYPE,
+    SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
+    apply_prebattle_completion,
+    apply_redeploy_completion,
+    apply_redeploy_placement,
+    apply_scout_move,
+    apply_scout_reserve_setup,
+    prebattle_action_selection_request,
+    prebattle_next_player_id_for_timing_state,
+    prebattle_proposal_request_from_selection,
+    prebattle_sequencing_request_for_timing_state,
+    prebattle_timing_state_for_state,
+    redeploy_placement_request_from_selection,
+    redeploy_timing_state_for_state,
+    redeploy_unit_selection_request,
+)
+from warhammer40k_core.engine.prebattle_records import PreBattleActionKind
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
@@ -80,6 +102,22 @@ class SetupFlow:
             )
             if deployment_status is not None:
                 return deployment_status
+        elif current_step is SetupStep.REDEPLOY_UNITS:
+            redeploy_status = self._advance_redeploy_units(
+                state=state,
+                decisions=decisions,
+                config=config,
+            )
+            if redeploy_status is not None:
+                return redeploy_status
+        elif current_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+            prebattle_status = self._advance_resolve_prebattle_actions(
+                state=state,
+                decisions=decisions,
+                config=config,
+            )
+            if prebattle_status is not None:
+                return prebattle_status
 
         completed_step = state.complete_current_setup_step()
         decisions.event_log.append(
@@ -133,6 +171,52 @@ class SetupFlow:
                 result=result,
                 decisions=decisions,
                 config=config,
+            )
+            return
+        if result.decision_type == SELECT_REDEPLOY_UNIT_DECISION_TYPE:
+            self._apply_redeploy_selection(
+                state=state,
+                result=result,
+                decisions=decisions,
+                config=config,
+            )
+            return
+        if result.decision_type == SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE:
+            apply_redeploy_placement(
+                state=state,
+                request=decisions.record_for_result(result).request,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=config.ruleset_descriptor,
+                army_catalog=config.army_catalog,
+            )
+            return
+        if result.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE:
+            self._apply_prebattle_action_selection(
+                state=state,
+                result=result,
+                decisions=decisions,
+                config=config,
+            )
+            return
+        if result.decision_type == SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE:
+            apply_scout_reserve_setup(
+                state=state,
+                request=decisions.record_for_result(result).request,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=config.ruleset_descriptor,
+                army_catalog=config.army_catalog,
+            )
+            return
+        if result.decision_type == SUBMIT_SCOUT_MOVE_DECISION_TYPE:
+            apply_scout_move(
+                state=state,
+                request=decisions.record_for_result(result).request,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=config.ruleset_descriptor,
+                army_catalog=config.army_catalog,
             )
             return
         if result.decision_type != SECONDARY_MISSION_DECISION_TYPE:
@@ -283,6 +367,101 @@ class SetupFlow:
         )
         return None
 
+    def _advance_redeploy_units(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> LifecycleStatus | None:
+        setup_state = redeploy_timing_state_for_state(state)
+        sequencing_request = prebattle_sequencing_request_for_timing_state(
+            state=state,
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if sequencing_request is not None:
+            decisions.request_decision(sequencing_request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.SETUP,
+                decision_request=sequencing_request,
+                payload={
+                    "setup_step": SetupStep.REDEPLOY_UNITS.value,
+                    "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
+                },
+            )
+        next_player_id = prebattle_next_player_id_for_timing_state(
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if next_player_id is None:
+            return None
+        effective_setup_state = replace(setup_state, next_player_id=next_player_id)
+        request = redeploy_unit_selection_request(
+            state=state,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+            player_id=next_player_id,
+        )
+        decisions.request_decision(request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.SETUP,
+            decision_request=request,
+            payload={
+                "setup_step": SetupStep.REDEPLOY_UNITS.value,
+                "prebattle_timing_state": cast(JsonValue, effective_setup_state.to_payload()),
+            },
+        )
+
+    def _advance_resolve_prebattle_actions(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> LifecycleStatus | None:
+        setup_state = prebattle_timing_state_for_state(
+            state,
+            army_catalog=config.army_catalog,
+        )
+        sequencing_request = prebattle_sequencing_request_for_timing_state(
+            state=state,
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if sequencing_request is not None:
+            decisions.request_decision(sequencing_request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.SETUP,
+                decision_request=sequencing_request,
+                payload={
+                    "setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
+                    "prebattle_timing_state": cast(JsonValue, setup_state.to_payload()),
+                },
+            )
+        next_player_id = prebattle_next_player_id_for_timing_state(
+            decisions=decisions,
+            timing_state=setup_state,
+        )
+        if next_player_id is None:
+            return None
+        effective_setup_state = replace(setup_state, next_player_id=next_player_id)
+        request = prebattle_action_selection_request(
+            state=state,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+            player_id=next_player_id,
+        )
+        decisions.request_decision(request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.SETUP,
+            decision_request=request,
+            payload={
+                "setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
+                "prebattle_timing_state": cast(JsonValue, effective_setup_state.to_payload()),
+            },
+        )
+
     def _apply_deployment_unit_selection(
         self,
         *,
@@ -376,6 +555,107 @@ class SetupFlow:
             },
         )
 
+    def _apply_redeploy_selection(
+        self,
+        *,
+        state: GameState,
+        result: DecisionResult,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> None:
+        if state.stage is not GameLifecycleStage.SETUP:
+            raise GameLifecycleError("Redeploy selection can be applied only in setup.")
+        if state.current_setup_step is not SetupStep.REDEPLOY_UNITS:
+            raise GameLifecycleError("Redeploy selection requires REDEPLOY_UNITS.")
+        if result.actor_id is None:
+            raise GameLifecycleError("Redeploy selection requires actor_id.")
+        if not isinstance(result.payload, dict):
+            raise GameLifecycleError("Redeploy selection payload must be an object.")
+        selection_record = decisions.record_for_result(result)
+        action_kind = _prebattle_action_kind_from_payload(result.payload)
+        if action_kind is PreBattleActionKind.COMPLETE_REDEPLOYS:
+            apply_redeploy_completion(
+                state=state,
+                result=result,
+                request=selection_record.request,
+                decisions=decisions,
+            )
+            return
+        placement_request = redeploy_placement_request_from_selection(
+            state=state,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+            selection_request=selection_record.request,
+            result=result,
+        ).to_decision_request()
+        decisions.event_log.append(
+            "prebattle_redeploy_unit_selected",
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.REDEPLOY_UNITS.value,
+                "player_id": result.actor_id,
+                "unit_instance_id": _payload_string(result.payload, key="unit_instance_id"),
+                "selected_option_id": result.selected_option_id,
+                "source_decision_record_id": selection_record.record_id,
+                "source_decision_request_id": selection_record.request.request_id,
+                "source_decision_result_id": result.result_id,
+                "placement_request_id": placement_request.request_id,
+            },
+        )
+        decisions.request_decision(placement_request)
+
+    def _apply_prebattle_action_selection(
+        self,
+        *,
+        state: GameState,
+        result: DecisionResult,
+        decisions: DecisionController,
+        config: GameConfig,
+    ) -> None:
+        if state.stage is not GameLifecycleStage.SETUP:
+            raise GameLifecycleError("Pre-battle action selection can be applied only in setup.")
+        if state.current_setup_step is not SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+            raise GameLifecycleError(
+                "Pre-battle action selection requires RESOLVE_PREBATTLE_ACTIONS."
+            )
+        if result.actor_id is None:
+            raise GameLifecycleError("Pre-battle action selection requires actor_id.")
+        if not isinstance(result.payload, dict):
+            raise GameLifecycleError("Pre-battle action selection payload must be an object.")
+        selection_record = decisions.record_for_result(result)
+        action_kind = _prebattle_action_kind_from_payload(result.payload)
+        if action_kind is PreBattleActionKind.COMPLETE_PREBATTLE_ACTIONS:
+            apply_prebattle_completion(
+                state=state,
+                result=result,
+                request=selection_record.request,
+                decisions=decisions,
+            )
+            return
+        proposal_request = prebattle_proposal_request_from_selection(
+            state=state,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+            selection_request=selection_record.request,
+            result=result,
+        ).to_decision_request()
+        decisions.event_log.append(
+            "prebattle_action_selected",
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value,
+                "player_id": result.actor_id,
+                "unit_instance_id": _payload_string(result.payload, key="unit_instance_id"),
+                "action_kind": action_kind.value,
+                "selected_option_id": result.selected_option_id,
+                "source_decision_record_id": selection_record.record_id,
+                "source_decision_request_id": selection_record.request.request_id,
+                "source_decision_result_id": result.result_id,
+                "proposal_request_id": proposal_request.request_id,
+            },
+        )
+        decisions.request_decision(proposal_request)
+
     def _secondary_mission_request(
         self,
         *,
@@ -437,6 +717,14 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Decision payload key must be a string: {key}.")
     return value
+
+
+def _prebattle_action_kind_from_payload(payload: dict[str, JsonValue]) -> PreBattleActionKind:
+    value = _payload_string(payload, key="action_kind")
+    try:
+        return PreBattleActionKind(value)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported pre-battle action kind: {value}.") from exc
 
 
 def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
