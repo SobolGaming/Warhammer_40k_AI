@@ -49,6 +49,7 @@ class SetupCompletionViolationCode(StrEnum):
     UNRESOLVED_DEPLOYMENT = "unresolved_deployment"
     ILLEGAL_BATTLEFIELD_STATE = "illegal_battlefield_state"
     ILLEGAL_RESERVE_DECLARATION = "illegal_reserve_declaration"
+    ILLEGAL_DEDICATED_TRANSPORT_SETUP = "illegal_dedicated_transport_setup"
     UNRESOLVED_REDEPLOY = "unresolved_redeploy"
     UNRESOLVED_PREBATTLE_ACTIONS = "unresolved_prebattle_actions"
 
@@ -965,6 +966,10 @@ def _setup_completion_violations(
         decisions=decisions,
         config=config,
     )
+    _append_dedicated_transport_setup_violations(
+        violations=violations,
+        state=state,
+    )
     _append_deployment_violations(
         violations=violations,
         state=state,
@@ -1026,6 +1031,140 @@ def _append_reserve_declaration_violations(
                     },
                 )
             )
+
+
+def _append_dedicated_transport_setup_violations(
+    *,
+    violations: list[SetupCompletionViolation],
+    state: GameState,
+) -> None:
+    deployed_unit_ids = _deployed_unit_ids(state)
+    for army_definition in state.army_definitions:
+        for manifest in army_definition.dedicated_transport_manifests:
+            transport_unit_id = manifest.transport_unit_instance_id(army_id=army_definition.army_id)
+            cargo_state = state.transport_cargo_state_for_transport(transport_unit_id)
+            consequence = state.dedicated_transport_setup_consequence_for_transport(
+                transport_unit_id
+            )
+            if not manifest.embarked_unit_selection_ids:
+                _append_empty_transport_manifest_violations(
+                    violations=violations,
+                    player_id=army_definition.player_id,
+                    transport_unit_id=transport_unit_id,
+                    source_id=manifest.source_id,
+                    cargo_state_present=cargo_state is not None,
+                    consequence_present=consequence is not None,
+                    transport_deployed=transport_unit_id in deployed_unit_ids,
+                )
+                continue
+            expected_embarked_ids = manifest.embarked_unit_instance_ids(
+                army_id=army_definition.army_id
+            )
+            if cargo_state is None:
+                violations.append(
+                    SetupCompletionViolation(
+                        SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP,
+                        "Dedicated Transport manifest requires starting cargo state.",
+                        field="transport_cargo_states",
+                        player_id=army_definition.player_id,
+                        unit_instance_id=transport_unit_id,
+                        detail={
+                            "source_id": manifest.source_id,
+                            "expected_embarked_unit_instance_ids": list(expected_embarked_ids),
+                        },
+                    )
+                )
+                continue
+            if cargo_state.embarked_unit_instance_ids != expected_embarked_ids:
+                violations.append(
+                    SetupCompletionViolation(
+                        SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP,
+                        "Dedicated Transport starting cargo state does not match manifest.",
+                        field="transport_cargo_states",
+                        player_id=army_definition.player_id,
+                        unit_instance_id=transport_unit_id,
+                        detail={
+                            "source_id": manifest.source_id,
+                            "expected_embarked_unit_instance_ids": list(expected_embarked_ids),
+                            "actual_embarked_unit_instance_ids": list(
+                                cargo_state.embarked_unit_instance_ids
+                            ),
+                        },
+                    )
+                )
+            if consequence is not None:
+                violations.append(
+                    SetupCompletionViolation(
+                        SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP,
+                        (
+                            "Dedicated Transport cannot have both starting cargo and setup "
+                            "consequence."
+                        ),
+                        field="dedicated_transport_setup_consequences",
+                        player_id=army_definition.player_id,
+                        unit_instance_id=transport_unit_id,
+                        detail={
+                            "source_id": manifest.source_id,
+                            "consequence": cast(JsonValue, consequence.to_payload()),
+                        },
+                    )
+                )
+
+
+def _append_empty_transport_manifest_violations(
+    *,
+    violations: list[SetupCompletionViolation],
+    player_id: str,
+    transport_unit_id: str,
+    source_id: str,
+    cargo_state_present: bool,
+    consequence_present: bool,
+    transport_deployed: bool,
+) -> None:
+    if not consequence_present:
+        violations.append(
+            SetupCompletionViolation(
+                SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP,
+                "Empty Dedicated Transport manifest requires a setup consequence.",
+                field="dedicated_transport_setup_consequences",
+                player_id=player_id,
+                unit_instance_id=transport_unit_id,
+                detail={"source_id": source_id},
+            )
+        )
+    if cargo_state_present:
+        violations.append(
+            SetupCompletionViolation(
+                SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP,
+                "Empty Dedicated Transport manifest must not create starting cargo state.",
+                field="transport_cargo_states",
+                player_id=player_id,
+                unit_instance_id=transport_unit_id,
+                detail={"source_id": source_id},
+            )
+        )
+    if transport_deployed:
+        violations.append(
+            SetupCompletionViolation(
+                SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP,
+                "Empty Dedicated Transport manifest transport must not be deployed.",
+                field="battlefield_state",
+                player_id=player_id,
+                unit_instance_id=transport_unit_id,
+                detail={"source_id": source_id},
+            )
+        )
+
+
+def _deployed_unit_ids(state: GameState) -> set[str]:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        return set()
+    return {
+        unit_placement.unit_instance_id
+        for placed_army in battlefield.placed_armies
+        for unit_placement in placed_army.unit_placements
+    }
 
 
 def _append_deployment_violations(

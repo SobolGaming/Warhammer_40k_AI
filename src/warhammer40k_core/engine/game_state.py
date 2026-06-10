@@ -1281,9 +1281,7 @@ class GameState:
         if self.setup_step_index + 1 < len(self.setup_sequence):
             self.setup_step_index += 1
             return current
-        self.setup_step_index = None
-        self.enter_battle()
-        return current
+        raise GameLifecycleError("Final setup step completion requires the setup completion gate.")
 
     def complete_final_setup_step_before_battle(self) -> SetupStep:
         if self.stage is not GameLifecycleStage.SETUP:

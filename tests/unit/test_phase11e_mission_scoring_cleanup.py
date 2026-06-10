@@ -9,6 +9,7 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
 )
+from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -3777,8 +3778,7 @@ def _battle_state_from_config(
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    enter_battle_for_fixture(state)
     assert state.stage is GameLifecycleStage.BATTLE
     assert state.current_battle_phase is BattlePhase.COMMAND
     return state

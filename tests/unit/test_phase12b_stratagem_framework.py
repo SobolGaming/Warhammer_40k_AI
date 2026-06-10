@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -2085,8 +2086,7 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    enter_battle_for_fixture(state)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 

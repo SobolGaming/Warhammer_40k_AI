@@ -698,10 +698,17 @@ def _battle_state_with_center_objective_positions(
             _with_model_offsets(player_b, marker, offsets=player_b_offsets)
         )
     state.record_battlefield_state(battlefield_state)
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    _force_battle_for_objective_fixture(state)
     state.battle_shocked_unit_ids = list(battle_shocked_unit_ids)
     return state
+
+
+def _force_battle_for_objective_fixture(state: GameState) -> None:
+    final_setup_step = state.setup_sequence[-1]
+    while state.current_setup_step is not final_setup_step:
+        state.complete_current_setup_step()
+    state.complete_final_setup_step_before_battle()
+    state.enter_battle()
 
 
 def _with_model_offsets(

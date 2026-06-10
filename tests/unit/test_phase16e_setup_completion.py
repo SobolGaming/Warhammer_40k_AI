@@ -4,12 +4,22 @@ import json
 from pathlib import Path
 from typing import cast
 
-from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+import pytest
+from tests.deployment_submission_helpers import (
+    default_deployment_pose,
+    submit_all_deployments_if_pending,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyMusterRequest,
+    DedicatedTransportCapacityProfile,
+    DedicatedTransportManifest,
+    muster_army,
+)
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -17,6 +27,7 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.deployment import create_empty_deployment_battlefield_state
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import (
+    DedicatedTransportSetupConsequence,
     GameConfig,
     GameState,
     SecondaryMissionChoice,
@@ -30,6 +41,7 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
@@ -41,6 +53,7 @@ from warhammer40k_core.engine.setup_completion import (
     SetupLegalityReport,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -100,6 +113,20 @@ def test_phase16e_gate_rejects_direct_setup_step_bypass_with_unplaced_units() ->
     assert report.is_legal is False
     assert SetupCompletionViolationCode.UNRESOLVED_DEPLOYMENT.value in _violation_codes(report)
     assert state.stage is GameLifecycleStage.SETUP
+    assert state.battle_round == 0
+
+
+def test_phase16e_game_state_final_setup_step_requires_completion_gate() -> None:
+    state = _state_at_final_setup_step_without_deployments(_config())
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Final setup step completion requires the setup completion gate",
+    ):
+        state.complete_current_setup_step()
+
+    assert state.stage is GameLifecycleStage.SETUP
+    assert state.current_setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS
     assert state.battle_round == 0
 
 
@@ -171,6 +198,126 @@ def test_phase16e_gate_rejects_incomplete_setup_with_reaction_queue() -> None:
     assert SetupCompletionViolationCode.MISSING_ARMY.value in codes
     assert SetupCompletionViolationCode.UNRESOLVED_SECONDARY_MISSIONS.value in codes
     assert SetupCompletionViolationCode.MISSING_BATTLEFIELD.value in codes
+    assert state.stage is GameLifecycleStage.SETUP
+    assert state.battle_round == 0
+
+
+def test_phase16e_gate_rejects_empty_dedicated_transport_manifest_without_consequence() -> None:
+    config = _empty_dedicated_transport_config()
+    state = _dedicated_transport_state_without_transport_reconciliation(config)
+
+    report = SetupCompletionGate().evaluate(
+        state=state,
+        decisions=DecisionController(),
+        config=config,
+    )
+
+    assert report.is_legal is False
+    assert SetupCompletionViolationCode.ILLEGAL_DEDICATED_TRANSPORT_SETUP.value in (
+        _violation_codes(report)
+    )
+    transport_violations = [
+        violation
+        for violation in report.violations
+        if violation.unit_instance_id == "army-alpha:transport-unit"
+    ]
+    assert [violation.field for violation in transport_violations] == [
+        "dedicated_transport_setup_consequences"
+    ]
+    assert state.stage is GameLifecycleStage.SETUP
+    assert state.battle_round == 0
+
+
+def test_phase16e_gate_rejects_empty_manifest_with_cargo_or_deployment() -> None:
+    config = _empty_dedicated_transport_config()
+    state = _dedicated_transport_state_without_transport_reconciliation(config)
+    state.transport_cargo_states.append(
+        _transport_cargo_state(
+            transport_unit_instance_id="army-alpha:transport-unit",
+            embarked_unit_instance_ids=(),
+        )
+    )
+    _place_transport(state)
+
+    report = SetupCompletionGate().evaluate(
+        state=state,
+        decisions=DecisionController(),
+        config=config,
+    )
+
+    assert report.is_legal is False
+    transport_violations = [
+        violation
+        for violation in report.violations
+        if violation.unit_instance_id == "army-alpha:transport-unit"
+    ]
+    assert [violation.field for violation in transport_violations] == [
+        "dedicated_transport_setup_consequences",
+        "transport_cargo_states",
+        "battlefield_state",
+    ]
+    assert state.stage is GameLifecycleStage.SETUP
+    assert state.battle_round == 0
+
+
+def test_phase16e_gate_rejects_non_empty_dedicated_transport_manifest_without_cargo() -> None:
+    config = _cargo_dedicated_transport_config()
+    state = _dedicated_transport_state_without_transport_reconciliation(config)
+
+    report = SetupCompletionGate().evaluate(
+        state=state,
+        decisions=DecisionController(),
+        config=config,
+    )
+
+    assert report.is_legal is False
+    transport_violations = [
+        violation
+        for violation in report.violations
+        if violation.unit_instance_id == "army-alpha:transport-unit"
+    ]
+    assert [violation.field for violation in transport_violations] == ["transport_cargo_states"]
+    assert transport_violations[0].detail == {
+        "source_id": "manifest:transport-unit",
+        "expected_embarked_unit_instance_ids": ["army-alpha:passenger-unit"],
+    }
+    assert state.stage is GameLifecycleStage.SETUP
+    assert state.battle_round == 0
+
+
+def test_phase16e_gate_rejects_non_empty_manifest_with_mismatched_cargo_or_consequence() -> None:
+    config = _cargo_dedicated_transport_config()
+    state = _dedicated_transport_state_without_transport_reconciliation(config)
+    state.transport_cargo_states.append(
+        _transport_cargo_state(
+            transport_unit_instance_id="army-alpha:transport-unit",
+            embarked_unit_instance_ids=(),
+        )
+    )
+    state.dedicated_transport_setup_consequences.append(
+        DedicatedTransportSetupConsequence.empty_dedicated_transport(
+            player_id="player-a",
+            transport_unit_instance_id="army-alpha:transport-unit",
+            source_id="manifest:transport-unit",
+        )
+    )
+
+    report = SetupCompletionGate().evaluate(
+        state=state,
+        decisions=DecisionController(),
+        config=config,
+    )
+
+    assert report.is_legal is False
+    transport_violations = [
+        violation
+        for violation in report.violations
+        if violation.unit_instance_id == "army-alpha:transport-unit"
+    ]
+    assert [violation.field for violation in transport_violations] == [
+        "transport_cargo_states",
+        "dedicated_transport_setup_consequences",
+    ]
     assert state.stage is GameLifecycleStage.SETUP
     assert state.battle_round == 0
 
@@ -305,6 +452,76 @@ def _state_at_final_setup_step_without_deployments(config: GameConfig) -> GameSt
     return state
 
 
+def _dedicated_transport_state_without_transport_reconciliation(config: GameConfig) -> GameState:
+    state = GameState.from_config(config)
+    for request in config.army_muster_requests:
+        state.record_army_definition(muster_army(catalog=config.army_catalog, request=request))
+    state.record_secondary_mission_choice(
+        SecondaryMissionChoice(
+            player_id="player-a",
+            mode=SecondaryMissionMode.FIXED,
+            fixed_mission_ids=("area-denial", "assassination"),
+        )
+    )
+    state.record_secondary_mission_choice(
+        SecondaryMissionChoice(
+            player_id="player-b",
+            mode=SecondaryMissionMode.FIXED,
+            fixed_mission_ids=("area-denial", "assassination"),
+        )
+    )
+    _advance_setup_state_to_step(state, SetupStep.CREATE_BATTLEFIELD)
+    state.record_battlefield_state(create_empty_deployment_battlefield_state(state=state))
+    _advance_setup_state_to_step(state, SetupStep.RESOLVE_PREBATTLE_ACTIONS)
+    assert not state.dedicated_transport_setup_consequences
+    assert not state.transport_cargo_states
+    return state
+
+
+def _transport_cargo_state(
+    *,
+    transport_unit_instance_id: str,
+    embarked_unit_instance_ids: tuple[str, ...],
+) -> TransportCargoState:
+    return TransportCargoState(
+        player_id="player-a",
+        transport_unit_instance_id=transport_unit_instance_id,
+        capacity_profile=TransportCapacityProfile(
+            transport_datasheet_id="core-transport",
+            max_model_count=6,
+            allowed_keywords=("Infantry",),
+            excluded_keywords=(),
+            source_id="transport-capacity:core-transport:6",
+        ),
+        embarked_unit_instance_ids=embarked_unit_instance_ids,
+        phase_battle_round=None,
+        started_phase_embarked_unit_instance_ids=embarked_unit_instance_ids,
+        disembarked_this_phase_unit_instance_ids=(),
+    )
+
+
+def _place_transport(state: GameState) -> None:
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    transport_model_id = "army-alpha:transport-unit:core-transport:001"
+    state.battlefield_state = battlefield.with_added_unit_placement(
+        UnitPlacement(
+            army_id="army-alpha",
+            player_id="player-a",
+            unit_instance_id="army-alpha:transport-unit",
+            model_placements=(
+                ModelPlacement(
+                    army_id="army-alpha",
+                    player_id="player-a",
+                    unit_instance_id="army-alpha:transport-unit",
+                    model_instance_id=transport_model_id,
+                    pose=default_deployment_pose(20, "player-a", transport_model_id),
+                ),
+            ),
+        )
+    )
+
+
 def _advance_setup_state_to_step(state: GameState, target_step: SetupStep) -> None:
     while state.current_setup_step is not target_step:
         state.complete_current_setup_step()
@@ -370,6 +587,109 @@ def _config() -> GameConfig:
             "cleanse",
         ),
         mission_setup=_mission_setup(),
+    )
+
+
+def _empty_dedicated_transport_config() -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase16e-empty-dedicated-transport",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _transport_roster_request(catalog, embarked_unit_selection_ids=()),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=(
+            "area-denial",
+            "assassination",
+            "bring_it_down",
+        ),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _cargo_dedicated_transport_config() -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase16e-cargo-dedicated-transport",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _transport_roster_request(catalog, embarked_unit_selection_ids=("passenger-unit",)),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=(
+            "area-denial",
+            "assassination",
+            "bring_it_down",
+        ),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _transport_roster_request(
+    catalog: ArmyCatalog,
+    *,
+    embarked_unit_selection_ids: tuple[str, ...],
+) -> ArmyMusterRequest:
+    passenger_selections = tuple(
+        _unit_selection(unit_selection_id=selection_id)
+        for selection_id in embarked_unit_selection_ids
+    )
+    return ArmyMusterRequest(
+        army_id="army-alpha",
+        player_id="player-a",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+        ),
+        unit_selections=(
+            *passenger_selections,
+            _unit_selection(
+                unit_selection_id="transport-unit",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        ),
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=embarked_unit_selection_ids,
+                capacity_profile=DedicatedTransportCapacityProfile(
+                    transport_datasheet_id="core-transport",
+                    max_model_count=6,
+                    allowed_keywords=("Infantry",),
+                    excluded_keywords=(),
+                    source_id="transport-capacity:core-transport:6",
+                ),
+                source_id=(
+                    "manifest:empty"
+                    if not embarked_unit_selection_ids
+                    else "manifest:transport-unit"
+                ),
+            ),
+        ),
     )
 
 

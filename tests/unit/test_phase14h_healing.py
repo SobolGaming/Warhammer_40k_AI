@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -1544,8 +1545,7 @@ def _battle_state(*, config: GameConfig | None = None) -> GameState:
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=SecondaryMissionMode.FIXED)
     )
-    while state.current_setup_step is not None:
-        state.complete_current_setup_step()
+    enter_battle_for_fixture(state)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 
