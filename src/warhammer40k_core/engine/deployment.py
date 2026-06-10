@@ -1507,6 +1507,10 @@ def _unavailable_component_unit_ids(state: GameState) -> set[str]:
             unavailable.update(reserve_state.embarked_unit_instance_ids)
     for cargo_state in state.transport_cargo_states:
         unavailable.update(cargo_state.embarked_unit_instance_ids)
+    unavailable.update(
+        consequence.transport_unit_instance_id
+        for consequence in state.dedicated_transport_setup_consequences
+    )
     return unavailable
 
 

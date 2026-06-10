@@ -2121,6 +2121,7 @@ def _config(*, player_a_units: tuple[UnitMusterSelection, ...] | None = None) ->
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11c-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
         army_catalog=catalog,
         army_muster_requests=(

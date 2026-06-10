@@ -344,6 +344,7 @@ def _config(
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase14b-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-phase14b-test"
         ),

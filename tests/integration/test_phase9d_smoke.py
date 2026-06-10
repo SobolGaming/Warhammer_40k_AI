@@ -121,6 +121,7 @@ def test_minimal_catalog_game_reaches_battle_round_one_with_mustered_armies() ->
 def _minimal_two_player_game_config(catalog: ArmyCatalog) -> GameConfig:
     return GameConfig(
         game_id="phase9d-smoke-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase9d-smoke"
         ),

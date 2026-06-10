@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -20,6 +20,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
     UnitMusterSelectionPayload,
     battle_size_from_token,
+    battle_size_mustering_policy,
     validate_detachment_selection,
     validate_unit_selection_for_army,
 )
@@ -44,6 +45,11 @@ class ArmyMusterRequestPayload(TypedDict):
     detachment_selection: DetachmentSelectionPayload
     unit_selections: list[UnitMusterSelectionPayload]
     attachment_declarations: list[AttachmentDeclarationPayload]
+    unit_points: list[RosterUnitPointValuePayload]
+    enhancement_assignments: list[EnhancementAssignmentPayload]
+    warlord_selection: WarlordSelectionPayload | None
+    dedicated_transport_manifests: list[DedicatedTransportManifestPayload]
+    roster_legality_required: bool
     battle_size: str
 
 
@@ -65,7 +71,419 @@ class ArmyDefinitionPayload(TypedDict):
     detachment_selection: DetachmentSelectionPayload
     units: list[UnitInstancePayload]
     attached_units: list[AttachedUnitFormationPayload]
+    unit_points: list[RosterUnitPointValuePayload]
+    enhancement_assignments: list[EnhancementAssignmentPayload]
+    warlord_selection: WarlordSelectionPayload | None
+    dedicated_transport_manifests: list[DedicatedTransportManifestPayload]
+    roster_legality_report: RosterLegalityReportPayload
     battle_size: str
+
+
+class RosterUnitPointValuePayload(TypedDict):
+    unit_selection_id: str
+    points: int
+    source_id: str
+
+
+class EnhancementAssignmentPayload(TypedDict):
+    enhancement_id: str
+    target_unit_selection_id: str
+    source_id: str
+
+
+class WarlordSelectionPayload(TypedDict):
+    unit_selection_id: str
+    source_id: str
+
+
+class DedicatedTransportManifestPayload(TypedDict):
+    transport_unit_selection_id: str
+    embarked_unit_selection_ids: list[str]
+    capacity_profile: DedicatedTransportCapacityProfilePayload
+    source_id: str
+
+
+class DedicatedTransportCapacityProfilePayload(TypedDict):
+    transport_datasheet_id: str
+    max_model_count: int
+    allowed_keywords: list[str]
+    excluded_keywords: list[str]
+    source_id: str
+
+
+class RosterLegalityViolationPayload(TypedDict):
+    violation_code: str
+    message: str
+    unit_selection_id: str | None
+    source_id: str | None
+
+
+class RosterLegalityReportPayload(TypedDict):
+    battle_size: str
+    is_legal: bool
+    violations: list[RosterLegalityViolationPayload]
+
+
+@dataclass(frozen=True, slots=True)
+class RosterUnitPointValue:
+    unit_selection_id: str
+    points: int
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_selection_id",
+            _validate_unprefixed_identifier(
+                "RosterUnitPointValue unit_selection_id",
+                self.unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "points",
+            _validate_non_negative_int("RosterUnitPointValue points", self.points),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("RosterUnitPointValue source_id", self.source_id),
+        )
+
+    def to_payload(self) -> RosterUnitPointValuePayload:
+        return {
+            "unit_selection_id": self.unit_selection_id,
+            "points": self.points,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: RosterUnitPointValuePayload) -> Self:
+        return cls(
+            unit_selection_id=payload["unit_selection_id"],
+            points=payload["points"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class EnhancementAssignment:
+    enhancement_id: str
+    target_unit_selection_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_unprefixed_identifier(
+                "EnhancementAssignment enhancement_id",
+                self.enhancement_id,
+                "enhancement:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_selection_id",
+            _validate_unprefixed_identifier(
+                "EnhancementAssignment target_unit_selection_id",
+                self.target_unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("EnhancementAssignment source_id", self.source_id),
+        )
+
+    def to_payload(self) -> EnhancementAssignmentPayload:
+        return {
+            "enhancement_id": self.enhancement_id,
+            "target_unit_selection_id": self.target_unit_selection_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: EnhancementAssignmentPayload) -> Self:
+        return cls(
+            enhancement_id=payload["enhancement_id"],
+            target_unit_selection_id=payload["target_unit_selection_id"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class WarlordSelection:
+    unit_selection_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_selection_id",
+            _validate_unprefixed_identifier(
+                "WarlordSelection unit_selection_id",
+                self.unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("WarlordSelection source_id", self.source_id),
+        )
+
+    def to_payload(self) -> WarlordSelectionPayload:
+        return {
+            "unit_selection_id": self.unit_selection_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: WarlordSelectionPayload) -> Self:
+        return cls(
+            unit_selection_id=payload["unit_selection_id"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DedicatedTransportCapacityProfile:
+    transport_datasheet_id: str
+    max_model_count: int
+    allowed_keywords: tuple[str, ...] = ()
+    excluded_keywords: tuple[str, ...] = ()
+    source_id: str = "phase16d:dedicated-transport-capacity"
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "transport_datasheet_id",
+            _validate_unprefixed_identifier(
+                "DedicatedTransportCapacityProfile transport_datasheet_id",
+                self.transport_datasheet_id,
+                "datasheet:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "max_model_count",
+            _validate_positive_int(
+                "DedicatedTransportCapacityProfile max_model_count",
+                self.max_model_count,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "allowed_keywords",
+            _validate_identifier_tuple(
+                "DedicatedTransportCapacityProfile allowed_keywords",
+                self.allowed_keywords,
+                min_length=0,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "excluded_keywords",
+            _validate_identifier_tuple(
+                "DedicatedTransportCapacityProfile excluded_keywords",
+                self.excluded_keywords,
+                min_length=0,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("DedicatedTransportCapacityProfile source_id", self.source_id),
+        )
+
+    def to_payload(self) -> DedicatedTransportCapacityProfilePayload:
+        return {
+            "transport_datasheet_id": self.transport_datasheet_id,
+            "max_model_count": self.max_model_count,
+            "allowed_keywords": list(self.allowed_keywords),
+            "excluded_keywords": list(self.excluded_keywords),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DedicatedTransportCapacityProfilePayload) -> Self:
+        return cls(
+            transport_datasheet_id=payload["transport_datasheet_id"],
+            max_model_count=payload["max_model_count"],
+            allowed_keywords=tuple(payload["allowed_keywords"]),
+            excluded_keywords=tuple(payload["excluded_keywords"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DedicatedTransportManifest:
+    transport_unit_selection_id: str
+    embarked_unit_selection_ids: tuple[str, ...]
+    capacity_profile: DedicatedTransportCapacityProfile
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "transport_unit_selection_id",
+            _validate_unprefixed_identifier(
+                "DedicatedTransportManifest transport_unit_selection_id",
+                self.transport_unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        embarked_ids = _validate_unprefixed_identifier_tuple(
+            "DedicatedTransportManifest embarked_unit_selection_ids",
+            self.embarked_unit_selection_ids,
+            "unit-selection:",
+            min_length=0,
+        )
+        if self.transport_unit_selection_id in embarked_ids:
+            raise ArmyMusteringError("DedicatedTransportManifest cannot embark itself.")
+        object.__setattr__(self, "embarked_unit_selection_ids", embarked_ids)
+        if type(self.capacity_profile) is not DedicatedTransportCapacityProfile:
+            raise ArmyMusteringError(
+                "DedicatedTransportManifest capacity_profile must be a "
+                "DedicatedTransportCapacityProfile."
+            )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("DedicatedTransportManifest source_id", self.source_id),
+        )
+
+    def transport_unit_instance_id(self, *, army_id: str) -> str:
+        requested_army_id = _validate_unprefixed_identifier("army_id", army_id, "army:")
+        return f"{requested_army_id}:{self.transport_unit_selection_id}"
+
+    def embarked_unit_instance_ids(self, *, army_id: str) -> tuple[str, ...]:
+        requested_army_id = _validate_unprefixed_identifier("army_id", army_id, "army:")
+        return tuple(
+            sorted(f"{requested_army_id}:{unit_id}" for unit_id in self.embarked_unit_selection_ids)
+        )
+
+    def to_payload(self) -> DedicatedTransportManifestPayload:
+        return {
+            "transport_unit_selection_id": self.transport_unit_selection_id,
+            "embarked_unit_selection_ids": list(self.embarked_unit_selection_ids),
+            "capacity_profile": self.capacity_profile.to_payload(),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DedicatedTransportManifestPayload) -> Self:
+        return cls(
+            transport_unit_selection_id=payload["transport_unit_selection_id"],
+            embarked_unit_selection_ids=tuple(payload["embarked_unit_selection_ids"]),
+            capacity_profile=DedicatedTransportCapacityProfile.from_payload(
+                payload["capacity_profile"]
+            ),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class RosterLegalityViolation:
+    violation_code: str
+    message: str
+    unit_selection_id: str | None = None
+    source_id: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "violation_code",
+            _validate_identifier("RosterLegalityViolation violation_code", self.violation_code),
+        )
+        object.__setattr__(
+            self,
+            "message",
+            _validate_identifier("RosterLegalityViolation message", self.message),
+        )
+        object.__setattr__(
+            self,
+            "unit_selection_id",
+            _validate_optional_unprefixed_identifier(
+                "RosterLegalityViolation unit_selection_id",
+                self.unit_selection_id,
+                "unit-selection:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_optional_identifier("RosterLegalityViolation source_id", self.source_id),
+        )
+
+    def to_payload(self) -> RosterLegalityViolationPayload:
+        return {
+            "violation_code": self.violation_code,
+            "message": self.message,
+            "unit_selection_id": self.unit_selection_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: RosterLegalityViolationPayload) -> Self:
+        return cls(
+            violation_code=payload["violation_code"],
+            message=payload["message"],
+            unit_selection_id=payload["unit_selection_id"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class RosterLegalityReport:
+    battle_size: BattleSize
+    violations: tuple[RosterLegalityViolation, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "battle_size", _battle_size_from_token(self.battle_size))
+        object.__setattr__(
+            self,
+            "violations",
+            _validate_roster_legality_violation_tuple(
+                "RosterLegalityReport violations",
+                self.violations,
+            ),
+        )
+
+    @property
+    def is_legal(self) -> bool:
+        return not self.violations
+
+    def assert_legal(self) -> None:
+        if self.is_legal:
+            return
+        first = self.violations[0]
+        raise ArmyMusteringError(
+            f"RosterLegalityReport is invalid: {first.violation_code}: {first.message}"
+        )
+
+    def to_payload(self) -> RosterLegalityReportPayload:
+        return {
+            "battle_size": self.battle_size.value,
+            "is_legal": self.is_legal,
+            "violations": [violation.to_payload() for violation in self.violations],
+        }
+
+    @classmethod
+    def from_payload(cls, payload: RosterLegalityReportPayload) -> Self:
+        report = cls(
+            battle_size=_battle_size_from_token(payload["battle_size"]),
+            violations=tuple(
+                RosterLegalityViolation.from_payload(violation)
+                for violation in payload["violations"]
+            ),
+        )
+        if report.is_legal != payload["is_legal"]:
+            raise ArmyMusteringError("RosterLegalityReport is_legal payload drift.")
+        return report
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,6 +496,11 @@ class ArmyMusterRequest:
     detachment_selection: DetachmentSelection
     unit_selections: tuple[UnitMusterSelection, ...]
     attachment_declarations: tuple[AttachmentDeclaration, ...] = ()
+    unit_points: tuple[RosterUnitPointValue, ...] = ()
+    enhancement_assignments: tuple[EnhancementAssignment, ...] = ()
+    warlord_selection: WarlordSelection | None = None
+    dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] = ()
+    roster_legality_required: bool = False
     battle_size: BattleSize = BattleSize.STRIKE_FORCE
 
     def __post_init__(self) -> None:
@@ -126,6 +549,36 @@ class ArmyMusterRequest:
         )
         _validate_unique_attachment_source_ids(attachment_declarations)
         object.__setattr__(self, "attachment_declarations", attachment_declarations)
+        unit_points = _validate_roster_unit_point_tuple(
+            "ArmyMusterRequest unit_points",
+            self.unit_points,
+        )
+        _validate_unique_roster_unit_points(unit_points)
+        object.__setattr__(self, "unit_points", unit_points)
+        enhancement_assignments = _validate_enhancement_assignment_tuple(
+            "ArmyMusterRequest enhancement_assignments",
+            self.enhancement_assignments,
+        )
+        _validate_unique_enhancement_assignments(enhancement_assignments)
+        object.__setattr__(self, "enhancement_assignments", enhancement_assignments)
+        object.__setattr__(
+            self,
+            "warlord_selection",
+            _validate_optional_warlord_selection(self.warlord_selection),
+        )
+        manifests = _validate_dedicated_transport_manifest_tuple(
+            "ArmyMusterRequest dedicated_transport_manifests",
+            self.dedicated_transport_manifests,
+        )
+        _validate_unique_dedicated_transport_manifests(manifests)
+        object.__setattr__(self, "dedicated_transport_manifests", manifests)
+        object.__setattr__(
+            self,
+            "roster_legality_required",
+            _validate_bool(
+                "ArmyMusterRequest roster_legality_required", self.roster_legality_required
+            ),
+        )
         object.__setattr__(self, "battle_size", _battle_size_from_token(self.battle_size))
 
     def to_payload(self) -> ArmyMusterRequestPayload:
@@ -140,6 +593,17 @@ class ArmyMusterRequest:
             "attachment_declarations": [
                 declaration.to_payload() for declaration in self.attachment_declarations
             ],
+            "unit_points": [point.to_payload() for point in self.unit_points],
+            "enhancement_assignments": [
+                assignment.to_payload() for assignment in self.enhancement_assignments
+            ],
+            "warlord_selection": (
+                None if self.warlord_selection is None else self.warlord_selection.to_payload()
+            ),
+            "dedicated_transport_manifests": [
+                manifest.to_payload() for manifest in self.dedicated_transport_manifests
+            ],
+            "roster_legality_required": self.roster_legality_required,
             "battle_size": self.battle_size.value,
         }
 
@@ -160,6 +624,23 @@ class ArmyMusterRequest:
                 AttachmentDeclaration.from_payload(declaration)
                 for declaration in payload["attachment_declarations"]
             ),
+            unit_points=tuple(
+                RosterUnitPointValue.from_payload(point) for point in payload["unit_points"]
+            ),
+            enhancement_assignments=tuple(
+                EnhancementAssignment.from_payload(assignment)
+                for assignment in payload["enhancement_assignments"]
+            ),
+            warlord_selection=(
+                None
+                if payload["warlord_selection"] is None
+                else WarlordSelection.from_payload(payload["warlord_selection"])
+            ),
+            dedicated_transport_manifests=tuple(
+                DedicatedTransportManifest.from_payload(manifest)
+                for manifest in payload["dedicated_transport_manifests"]
+            ),
+            roster_legality_required=payload["roster_legality_required"],
             battle_size=_battle_size_from_token(payload["battle_size"]),
         )
 
@@ -255,6 +736,13 @@ class ArmyDefinition:
     detachment_selection: DetachmentSelection
     units: tuple[UnitInstance, ...]
     attached_units: tuple[AttachedUnitFormation, ...] = ()
+    unit_points: tuple[RosterUnitPointValue, ...] = ()
+    enhancement_assignments: tuple[EnhancementAssignment, ...] = ()
+    warlord_selection: WarlordSelection | None = None
+    dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] = ()
+    roster_legality_report: RosterLegalityReport = field(
+        default_factory=lambda: RosterLegalityReport(battle_size=BattleSize.STRIKE_FORCE)
+    )
     battle_size: BattleSize = BattleSize.STRIKE_FORCE
 
     def __post_init__(self) -> None:
@@ -302,7 +790,37 @@ class ArmyDefinition:
             attached_units=attached_units,
         )
         object.__setattr__(self, "attached_units", attached_units)
+        unit_points = _validate_roster_unit_point_tuple(
+            "ArmyDefinition unit_points",
+            self.unit_points,
+        )
+        _validate_unique_roster_unit_points(unit_points)
+        object.__setattr__(self, "unit_points", unit_points)
+        enhancement_assignments = _validate_enhancement_assignment_tuple(
+            "ArmyDefinition enhancement_assignments",
+            self.enhancement_assignments,
+        )
+        _validate_unique_enhancement_assignments(enhancement_assignments)
+        object.__setattr__(self, "enhancement_assignments", enhancement_assignments)
+        object.__setattr__(
+            self,
+            "warlord_selection",
+            _validate_optional_warlord_selection(self.warlord_selection),
+        )
+        manifests = _validate_dedicated_transport_manifest_tuple(
+            "ArmyDefinition dedicated_transport_manifests",
+            self.dedicated_transport_manifests,
+        )
+        _validate_unique_dedicated_transport_manifests(manifests)
+        object.__setattr__(self, "dedicated_transport_manifests", manifests)
+        if type(self.roster_legality_report) is not RosterLegalityReport:
+            raise ArmyMusteringError(
+                "ArmyDefinition roster_legality_report must be a RosterLegalityReport."
+            )
+        object.__setattr__(self, "roster_legality_report", self.roster_legality_report)
         object.__setattr__(self, "battle_size", _battle_size_from_token(self.battle_size))
+        if self.roster_legality_report.battle_size is not self.battle_size:
+            raise ArmyMusteringError("ArmyDefinition roster_legality_report battle_size drift.")
 
     def stable_identity(self) -> str:
         return f"army:{self.army_id}"
@@ -328,6 +846,17 @@ class ArmyDefinition:
             "detachment_selection": self.detachment_selection.to_payload(),
             "units": [unit.to_payload() for unit in self.units],
             "attached_units": [attached.to_payload() for attached in self.attached_units],
+            "unit_points": [point.to_payload() for point in self.unit_points],
+            "enhancement_assignments": [
+                assignment.to_payload() for assignment in self.enhancement_assignments
+            ],
+            "warlord_selection": (
+                None if self.warlord_selection is None else self.warlord_selection.to_payload()
+            ),
+            "dedicated_transport_manifests": [
+                manifest.to_payload() for manifest in self.dedicated_transport_manifests
+            ],
+            "roster_legality_report": self.roster_legality_report.to_payload(),
             "battle_size": self.battle_size.value,
         }
 
@@ -344,6 +873,25 @@ class ArmyDefinition:
             attached_units=tuple(
                 AttachedUnitFormation.from_payload(attached)
                 for attached in payload["attached_units"]
+            ),
+            unit_points=tuple(
+                RosterUnitPointValue.from_payload(point) for point in payload["unit_points"]
+            ),
+            enhancement_assignments=tuple(
+                EnhancementAssignment.from_payload(assignment)
+                for assignment in payload["enhancement_assignments"]
+            ),
+            warlord_selection=(
+                None
+                if payload["warlord_selection"] is None
+                else WarlordSelection.from_payload(payload["warlord_selection"])
+            ),
+            dedicated_transport_manifests=tuple(
+                DedicatedTransportManifest.from_payload(manifest)
+                for manifest in payload["dedicated_transport_manifests"]
+            ),
+            roster_legality_report=RosterLegalityReport.from_payload(
+                payload["roster_legality_report"]
             ),
             battle_size=_battle_size_from_token(payload["battle_size"]),
         )
@@ -390,6 +938,14 @@ def muster_army(*, catalog: ArmyCatalog, request: ArmyMusterRequest) -> ArmyDefi
         units=tuple(units),
         datasheets_by_selection_id=datasheets_by_selection_id,
     )
+    roster_legality_report = validate_roster_legality(catalog=catalog, request=request)
+    if request.roster_legality_required:
+        roster_legality_report.assert_legal()
+    resolved_units = _apply_warlord_keyword_if_selected(
+        request=request,
+        units=resolved_units,
+        roster_legality_report=roster_legality_report,
+    )
     return ArmyDefinition(
         army_id=request.army_id,
         player_id=request.player_id,
@@ -399,7 +955,582 @@ def muster_army(*, catalog: ArmyCatalog, request: ArmyMusterRequest) -> ArmyDefi
         detachment_selection=request.detachment_selection,
         units=resolved_units,
         attached_units=attached_units,
+        unit_points=request.unit_points,
+        enhancement_assignments=request.enhancement_assignments,
+        warlord_selection=request.warlord_selection,
+        dedicated_transport_manifests=request.dedicated_transport_manifests,
+        roster_legality_report=roster_legality_report,
         battle_size=request.battle_size,
+    )
+
+
+def validate_roster_legality(
+    *,
+    catalog: ArmyCatalog,
+    request: ArmyMusterRequest,
+) -> RosterLegalityReport:
+    if type(catalog) is not ArmyCatalog:
+        raise ArmyMusteringError("catalog must be an ArmyCatalog.")
+    if type(request) is not ArmyMusterRequest:
+        raise ArmyMusteringError("request must be an ArmyMusterRequest.")
+    _validate_request_matches_catalog(catalog=catalog, request=request)
+    try:
+        policy = battle_size_mustering_policy(request.battle_size)
+        faction, detachments = validate_detachment_selection(
+            catalog=catalog,
+            selection=request.detachment_selection,
+            battle_size=request.battle_size,
+        )
+    except ListValidationError as exc:
+        return RosterLegalityReport(
+            battle_size=request.battle_size,
+            violations=(
+                RosterLegalityViolation(
+                    violation_code="detachment_selection_invalid",
+                    message=str(exc),
+                    source_id="phase16d:detachment-selection",
+                ),
+            ),
+        )
+
+    violations: list[RosterLegalityViolation] = []
+    datasheets_by_selection_id: dict[str, DatasheetDefinition] = {}
+    selection_by_id = {
+        selection.unit_selection_id: selection for selection in request.unit_selections
+    }
+    for selection in request.unit_selections:
+        try:
+            datasheets_by_selection_id[selection.unit_selection_id] = (
+                validate_unit_selection_for_army(
+                    catalog=catalog,
+                    selection=selection,
+                    faction=faction,
+                    detachment_selection=request.detachment_selection,
+                )
+            )
+        except ListValidationError as exc:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="unit_selection_invalid",
+                    message=str(exc),
+                    unit_selection_id=selection.unit_selection_id,
+                    source_id="phase16d:unit-selection",
+                )
+            )
+
+    _append_unit_point_violations(
+        catalog=catalog,
+        request=request,
+        policy_points_limit=policy.points_limit,
+        violations=violations,
+    )
+    _append_unit_limit_violations(
+        request=request,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        unit_limit=policy.unit_limit,
+        battleline_unit_limit=policy.battleline_unit_limit,
+        violations=violations,
+    )
+    _append_warlord_violations(
+        request=request,
+        faction_keywords=faction.faction_keywords,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    _append_enhancement_violations(
+        catalog=catalog,
+        request=request,
+        selected_detachment_enhancement_ids=tuple(
+            enhancement_id
+            for detachment in detachments
+            for enhancement_id in detachment.enhancement_ids
+        ),
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        enhancement_limit=policy.enhancement_limit,
+        violations=violations,
+    )
+    _append_dedicated_transport_manifest_violations(
+        request=request,
+        selection_by_id=selection_by_id,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    return RosterLegalityReport(
+        battle_size=request.battle_size,
+        violations=tuple(sorted(violations, key=_roster_violation_sort_key)),
+    )
+
+
+def _append_unit_point_violations(
+    *,
+    catalog: ArmyCatalog,
+    request: ArmyMusterRequest,
+    policy_points_limit: int,
+    violations: list[RosterLegalityViolation],
+) -> None:
+    points_by_selection_id = {point.unit_selection_id: point for point in request.unit_points}
+    for selection in request.unit_selections:
+        if selection.unit_selection_id not in points_by_selection_id:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="source_awaiting_unit_points",
+                    message="Roster path requires source-backed unit points.",
+                    unit_selection_id=selection.unit_selection_id,
+                    source_id="phase16d:unit-points",
+                )
+            )
+    known_selection_ids = {selection.unit_selection_id for selection in request.unit_selections}
+    for point in request.unit_points:
+        if point.unit_selection_id not in known_selection_ids:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="unit_points_unknown_unit",
+                    message="RosterUnitPointValue references an unknown unit selection.",
+                    unit_selection_id=point.unit_selection_id,
+                    source_id=point.source_id,
+                )
+            )
+    enhancement_points_by_id = {
+        enhancement.enhancement_id: enhancement.points
+        for enhancement in catalog.enhancements
+        if enhancement.points is not None
+    }
+    total_points = sum(point.points for point in request.unit_points) + sum(
+        enhancement_points_by_id[assignment.enhancement_id]
+        for assignment in request.enhancement_assignments
+        if assignment.enhancement_id in enhancement_points_by_id
+    )
+    if total_points > policy_points_limit:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="points_limit_exceeded",
+                message="Roster exceeds Strike Force points limit.",
+                source_id="phase16d:points-limit",
+            )
+        )
+
+
+def _append_unit_limit_violations(
+    *,
+    request: ArmyMusterRequest,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    unit_limit: int,
+    battleline_unit_limit: int,
+    violations: list[RosterLegalityViolation],
+) -> None:
+    selections_by_datasheet_id: dict[str, list[str]] = {}
+    for selection in request.unit_selections:
+        selections_by_datasheet_id.setdefault(selection.datasheet_id, []).append(
+            selection.unit_selection_id
+        )
+    for datasheet_id, selection_ids in selections_by_datasheet_id.items():
+        first_selection_id = sorted(selection_ids)[0]
+        datasheet = datasheets_by_selection_id.get(first_selection_id)
+        if datasheet is None:
+            continue
+        limit = (
+            battleline_unit_limit if _datasheet_has_keyword(datasheet, "BATTLELINE") else unit_limit
+        )
+        if len(selection_ids) > limit:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="unit_limit_exceeded",
+                    message="Roster exceeds battle-size unit limit for a datasheet.",
+                    unit_selection_id=first_selection_id,
+                    source_id=f"phase16d:unit-limit:{datasheet_id}",
+                )
+            )
+        if _datasheet_has_keyword(datasheet, "EPIC HERO") and len(selection_ids) > 1:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="epic_hero_not_unique",
+                    message="EPIC HERO units are unique in a roster.",
+                    unit_selection_id=first_selection_id,
+                    source_id=f"phase16d:epic-hero:{datasheet_id}",
+                )
+            )
+
+
+def _append_warlord_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction_keywords: tuple[str, ...],
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    if request.warlord_selection is None:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="missing_warlord_selection",
+                message="Roster requires one selected Warlord.",
+                source_id="phase16d:warlord",
+            )
+        )
+        return
+    datasheet = datasheets_by_selection_id.get(request.warlord_selection.unit_selection_id)
+    if datasheet is None:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="warlord_unknown_unit",
+                message="WarlordSelection references an unknown unit selection.",
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=request.warlord_selection.source_id,
+            )
+        )
+        return
+    if not _datasheet_has_keyword(datasheet, "CHARACTER"):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="warlord_character_required",
+                message="WarlordSelection requires a CHARACTER unit.",
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=request.warlord_selection.source_id,
+            )
+        )
+    if not set(datasheet.keywords.faction_keywords).intersection(faction_keywords):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="warlord_faction_keyword_required",
+                message="WarlordSelection must share the army faction keyword.",
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=request.warlord_selection.source_id,
+            )
+        )
+
+
+def _append_enhancement_violations(
+    *,
+    catalog: ArmyCatalog,
+    request: ArmyMusterRequest,
+    selected_detachment_enhancement_ids: tuple[str, ...],
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    enhancement_limit: int,
+    violations: list[RosterLegalityViolation],
+) -> None:
+    if len(request.enhancement_assignments) > enhancement_limit:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="enhancement_limit_exceeded",
+                message="Roster exceeds the battle-size Enhancement limit.",
+                source_id="phase16d:enhancement-limit",
+            )
+        )
+    selected_ids = set(request.detachment_selection.enhancement_ids)
+    detachment_allowed_ids = set(selected_detachment_enhancement_ids)
+    catalog_enhancement_by_id = {
+        enhancement.enhancement_id: enhancement for enhancement in catalog.enhancements
+    }
+    attached_group_by_selection_id = _attached_group_by_selection_id(request)
+    enhancement_count_by_attached_group: dict[tuple[str, ...], int] = {}
+    for assignment in request.enhancement_assignments:
+        if assignment.enhancement_id not in selected_ids:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="enhancement_not_selected",
+                    message="EnhancementAssignment must use a selected Enhancement.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=assignment.source_id,
+                )
+            )
+        if assignment.enhancement_id not in detachment_allowed_ids:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="enhancement_not_allowed_by_detachment",
+                    message="EnhancementAssignment is not granted by the selected detachment.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=assignment.source_id,
+                )
+            )
+        enhancement = catalog_enhancement_by_id.get(assignment.enhancement_id)
+        if enhancement is None:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="enhancement_unknown",
+                    message="EnhancementAssignment references an unknown Enhancement.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=assignment.source_id,
+                )
+            )
+        elif enhancement.points is None:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="source_awaiting_enhancement_points",
+                    message="EnhancementAssignment requires source-backed Enhancement points.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=enhancement.source_id,
+                )
+            )
+        datasheet = datasheets_by_selection_id.get(assignment.target_unit_selection_id)
+        if datasheet is None:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="enhancement_unknown_target",
+                    message="EnhancementAssignment target unit selection is unknown.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=assignment.source_id,
+                )
+            )
+            continue
+        if not _datasheet_has_keyword(datasheet, "CHARACTER"):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="enhancement_character_required",
+                    message="Enhancements can be assigned only to CHARACTER units.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=assignment.source_id,
+                )
+            )
+        if _datasheet_has_keyword(datasheet, "EPIC HERO"):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="epic_hero_enhancement_forbidden",
+                    message="EPIC HERO units cannot receive Enhancements.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=assignment.source_id,
+                )
+            )
+        attached_group = attached_group_by_selection_id.get(assignment.target_unit_selection_id)
+        if attached_group is not None:
+            enhancement_count_by_attached_group[attached_group] = (
+                enhancement_count_by_attached_group.get(attached_group, 0) + 1
+            )
+    for attached_group, count in enhancement_count_by_attached_group.items():
+        if count > 1:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="attached_squad_enhancement_limit_exceeded",
+                    message="An attached squad can have at most one Enhancement.",
+                    unit_selection_id=attached_group[0],
+                    source_id="phase16d:attached-squad-enhancement-limit",
+                )
+            )
+
+
+def _append_dedicated_transport_manifest_violations(
+    *,
+    request: ArmyMusterRequest,
+    selection_by_id: dict[str, UnitMusterSelection],
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    manifest_by_transport_id = {
+        manifest.transport_unit_selection_id: manifest
+        for manifest in request.dedicated_transport_manifests
+    }
+    for selection_id, datasheet in datasheets_by_selection_id.items():
+        if (
+            _datasheet_has_keyword(datasheet, "DEDICATED TRANSPORT")
+            and selection_id not in manifest_by_transport_id
+        ):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="dedicated_transport_missing_starting_cargo",
+                    message="Dedicated Transport requires a starting cargo manifest.",
+                    unit_selection_id=selection_id,
+                    source_id="phase16d:dedicated-transport-manifest",
+                )
+            )
+
+    cargo_claims: set[str] = set()
+    attached_group_by_selection_id = _attached_group_by_selection_id(request)
+    for manifest in request.dedicated_transport_manifests:
+        transport_datasheet = datasheets_by_selection_id.get(manifest.transport_unit_selection_id)
+        if transport_datasheet is None:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="transport_manifest_unknown_transport",
+                    message="DedicatedTransportManifest references an unknown Transport.",
+                    unit_selection_id=manifest.transport_unit_selection_id,
+                    source_id=manifest.source_id,
+                )
+            )
+            continue
+        if not _datasheet_has_keyword(transport_datasheet, "TRANSPORT"):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="transport_manifest_transport_required",
+                    message="DedicatedTransportManifest requires a TRANSPORT unit.",
+                    unit_selection_id=manifest.transport_unit_selection_id,
+                    source_id=manifest.source_id,
+                )
+            )
+        if not _datasheet_has_keyword(transport_datasheet, "DEDICATED TRANSPORT"):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="transport_manifest_dedicated_transport_required",
+                    message="DedicatedTransportManifest requires a DEDICATED TRANSPORT unit.",
+                    unit_selection_id=manifest.transport_unit_selection_id,
+                    source_id=manifest.source_id,
+                )
+            )
+        if manifest.capacity_profile.transport_datasheet_id != transport_datasheet.datasheet_id:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="transport_manifest_capacity_datasheet_drift",
+                    message="DedicatedTransportManifest capacity profile datasheet drift.",
+                    unit_selection_id=manifest.transport_unit_selection_id,
+                    source_id=manifest.capacity_profile.source_id,
+                )
+            )
+        embarked_model_count = 0
+        for cargo_selection_id in manifest.embarked_unit_selection_ids:
+            cargo_selection = selection_by_id.get(cargo_selection_id)
+            cargo_datasheet = datasheets_by_selection_id.get(cargo_selection_id)
+            if cargo_selection is None or cargo_datasheet is None:
+                violations.append(
+                    RosterLegalityViolation(
+                        violation_code="transport_manifest_unknown_cargo",
+                        message="DedicatedTransportManifest references unknown cargo.",
+                        unit_selection_id=cargo_selection_id,
+                        source_id=manifest.source_id,
+                    )
+                )
+                continue
+            if cargo_selection_id in cargo_claims:
+                violations.append(
+                    RosterLegalityViolation(
+                        violation_code="transport_manifest_duplicate_cargo",
+                        message="A unit cannot start embarked in multiple Transports.",
+                        unit_selection_id=cargo_selection_id,
+                        source_id=manifest.source_id,
+                    )
+                )
+            cargo_claims.add(cargo_selection_id)
+            if not _transport_capacity_allows_datasheet(
+                manifest.capacity_profile,
+                cargo_datasheet,
+            ):
+                violations.append(
+                    RosterLegalityViolation(
+                        violation_code="transport_manifest_cargo_ineligible",
+                        message="Cargo unit is not eligible for this Transport.",
+                        unit_selection_id=cargo_selection_id,
+                        source_id=manifest.capacity_profile.source_id,
+                    )
+                )
+            embarked_model_count += _unit_selection_model_count(cargo_selection)
+        _append_attached_group_manifest_violations(
+            manifest=manifest,
+            attached_group_by_selection_id=attached_group_by_selection_id,
+            violations=violations,
+        )
+        if embarked_model_count > manifest.capacity_profile.max_model_count:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="transport_manifest_capacity_exceeded",
+                    message="DedicatedTransportManifest exceeds Transport model capacity.",
+                    unit_selection_id=manifest.transport_unit_selection_id,
+                    source_id=manifest.capacity_profile.source_id,
+                )
+            )
+
+
+def _append_attached_group_manifest_violations(
+    *,
+    manifest: DedicatedTransportManifest,
+    attached_group_by_selection_id: dict[str, tuple[str, ...]],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    manifest_cargo = set(manifest.embarked_unit_selection_ids)
+    checked_groups: set[tuple[str, ...]] = set()
+    for cargo_selection_id in manifest.embarked_unit_selection_ids:
+        group = attached_group_by_selection_id.get(cargo_selection_id)
+        if group is None or group in checked_groups:
+            continue
+        checked_groups.add(group)
+        if not set(group) <= manifest_cargo:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="transport_manifest_attached_unit_incomplete",
+                    message="Attached rules units must embark as a complete component group.",
+                    unit_selection_id=group[0],
+                    source_id=manifest.source_id,
+                )
+            )
+
+
+def _apply_warlord_keyword_if_selected(
+    *,
+    request: ArmyMusterRequest,
+    units: tuple[UnitInstance, ...],
+    roster_legality_report: RosterLegalityReport,
+) -> tuple[UnitInstance, ...]:
+    if request.warlord_selection is None:
+        return units
+    if any(
+        violation.violation_code.startswith("warlord_")
+        or violation.violation_code == "missing_warlord_selection"
+        for violation in roster_legality_report.violations
+    ):
+        return units
+    target_unit_id = f"{request.army_id}:{request.warlord_selection.unit_selection_id}"
+    return tuple(
+        replace(unit, keywords=tuple(sorted({*unit.keywords, "WARLORD"})))
+        if unit.unit_instance_id == target_unit_id
+        else unit
+        for unit in units
+    )
+
+
+def _attached_group_by_selection_id(
+    request: ArmyMusterRequest,
+) -> dict[str, tuple[str, ...]]:
+    grouped: dict[str, set[str]] = {}
+    for declaration in request.attachment_declarations:
+        group = grouped.setdefault(declaration.bodyguard_unit_selection_id, set())
+        group.add(declaration.bodyguard_unit_selection_id)
+        group.add(declaration.source_unit_selection_id)
+    by_selection_id: dict[str, tuple[str, ...]] = {}
+    for group in grouped.values():
+        group_tuple = tuple(sorted(group))
+        for selection_id in group_tuple:
+            by_selection_id[selection_id] = group_tuple
+    return by_selection_id
+
+
+def _transport_capacity_allows_datasheet(
+    capacity_profile: DedicatedTransportCapacityProfile,
+    datasheet: DatasheetDefinition,
+) -> bool:
+    if type(capacity_profile) is not DedicatedTransportCapacityProfile:
+        raise ArmyMusteringError(
+            "Transport capacity check requires DedicatedTransportCapacityProfile."
+        )
+    if type(datasheet) is not DatasheetDefinition:
+        raise ArmyMusteringError("Transport capacity check requires DatasheetDefinition.")
+    unit_keywords = {_canonical_keyword(keyword) for keyword in datasheet.keywords.keywords}
+    allowed = {_canonical_keyword(keyword) for keyword in capacity_profile.allowed_keywords}
+    excluded = {_canonical_keyword(keyword) for keyword in capacity_profile.excluded_keywords}
+    if allowed and not unit_keywords.intersection(allowed):
+        return False
+    return not unit_keywords.intersection(excluded)
+
+
+def _unit_selection_model_count(selection: UnitMusterSelection) -> int:
+    if type(selection) is not UnitMusterSelection:
+        raise ArmyMusteringError("Model-count lookup requires UnitMusterSelection.")
+    return sum(part.model_count for part in selection.model_profile_selections)
+
+
+def _datasheet_has_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool:
+    requested_keyword = _canonical_keyword(keyword)
+    return requested_keyword in {
+        _canonical_keyword(stored_keyword) for stored_keyword in datasheet.keywords.keywords
+    }
+
+
+def _canonical_keyword(keyword: str) -> str:
+    return _validate_identifier("keyword", keyword).upper().replace("_", " ")
+
+
+def _roster_violation_sort_key(
+    violation: RosterLegalityViolation,
+) -> tuple[str, str, str, str]:
+    return (
+        violation.violation_code,
+        "" if violation.unit_selection_id is None else violation.unit_selection_id,
+        "" if violation.source_id is None else violation.source_id,
+        violation.message,
     )
 
 
@@ -653,6 +1784,80 @@ def _validate_attachment_declaration_tuple(
     )
 
 
+def _validate_roster_unit_point_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[RosterUnitPointValue, ...]:
+    if type(values) is not tuple:
+        raise ArmyMusteringError(f"{field_name} must be a tuple.")
+    validated: list[RosterUnitPointValue] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not RosterUnitPointValue:
+            raise ArmyMusteringError(f"{field_name} must contain RosterUnitPointValue values.")
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda point: point.unit_selection_id))
+
+
+def _validate_enhancement_assignment_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[EnhancementAssignment, ...]:
+    if type(values) is not tuple:
+        raise ArmyMusteringError(f"{field_name} must be a tuple.")
+    validated: list[EnhancementAssignment] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not EnhancementAssignment:
+            raise ArmyMusteringError(f"{field_name} must contain EnhancementAssignment values.")
+        validated.append(value)
+    return tuple(
+        sorted(
+            validated,
+            key=lambda assignment: (
+                assignment.target_unit_selection_id,
+                assignment.enhancement_id,
+            ),
+        )
+    )
+
+
+def _validate_optional_warlord_selection(value: object | None) -> WarlordSelection | None:
+    if value is None:
+        return None
+    if type(value) is not WarlordSelection:
+        raise ArmyMusteringError("warlord_selection must be a WarlordSelection.")
+    return value
+
+
+def _validate_dedicated_transport_manifest_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DedicatedTransportManifest, ...]:
+    if type(values) is not tuple:
+        raise ArmyMusteringError(f"{field_name} must be a tuple.")
+    validated: list[DedicatedTransportManifest] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not DedicatedTransportManifest:
+            raise ArmyMusteringError(
+                f"{field_name} must contain DedicatedTransportManifest values."
+            )
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda manifest: manifest.transport_unit_selection_id))
+
+
+def _validate_roster_legality_violation_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[RosterLegalityViolation, ...]:
+    if type(values) is not tuple:
+        raise ArmyMusteringError(f"{field_name} must be a tuple.")
+    validated: list[RosterLegalityViolation] = []
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not RosterLegalityViolation:
+            raise ArmyMusteringError(f"{field_name} must contain RosterLegalityViolation values.")
+        validated.append(value)
+    return tuple(sorted(validated, key=_roster_violation_sort_key))
+
+
 def _validate_unique_unit_selection_ids(selections: tuple[UnitMusterSelection, ...]) -> None:
     seen: set[str] = set()
     for selection in selections:
@@ -671,6 +1876,49 @@ def _validate_unique_attachment_source_ids(
                 "ArmyMusterRequest attachment_declarations must have unique source unit IDs."
             )
         seen.add(declaration.source_unit_selection_id)
+
+
+def _validate_unique_roster_unit_points(points: tuple[RosterUnitPointValue, ...]) -> None:
+    seen: set[str] = set()
+    for point in points:
+        if point.unit_selection_id in seen:
+            raise ArmyMusteringError("RosterUnitPointValue values must be unique by unit.")
+        seen.add(point.unit_selection_id)
+
+
+def _validate_unique_enhancement_assignments(
+    assignments: tuple[EnhancementAssignment, ...],
+) -> None:
+    seen_enhancements: set[str] = set()
+    seen_targets: set[str] = set()
+    for assignment in assignments:
+        if assignment.enhancement_id in seen_enhancements:
+            raise ArmyMusteringError("EnhancementAssignment enhancement IDs must be unique.")
+        if assignment.target_unit_selection_id in seen_targets:
+            raise ArmyMusteringError(
+                "EnhancementAssignment target units must not receive multiple Enhancements."
+            )
+        seen_enhancements.add(assignment.enhancement_id)
+        seen_targets.add(assignment.target_unit_selection_id)
+
+
+def _validate_unique_dedicated_transport_manifests(
+    manifests: tuple[DedicatedTransportManifest, ...],
+) -> None:
+    seen_transports: set[str] = set()
+    seen_cargo: set[str] = set()
+    for manifest in manifests:
+        if manifest.transport_unit_selection_id in seen_transports:
+            raise ArmyMusteringError(
+                "DedicatedTransportManifest values must be unique by Transport."
+            )
+        seen_transports.add(manifest.transport_unit_selection_id)
+        for cargo_unit_selection_id in manifest.embarked_unit_selection_ids:
+            if cargo_unit_selection_id in seen_cargo:
+                raise ArmyMusteringError(
+                    "DedicatedTransportManifest cargo units must not be duplicated."
+                )
+            seen_cargo.add(cargo_unit_selection_id)
 
 
 def _validate_unit_instance_tuple(
@@ -772,6 +2020,28 @@ def _validate_identifier_tuple(
     return tuple(sorted(validated))
 
 
+def _validate_unprefixed_identifier_tuple(
+    field_name: str,
+    values: object,
+    prefix: str,
+    *,
+    min_length: int,
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise ArmyMusteringError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_unprefixed_identifier(f"{field_name} value", value, prefix)
+        if identifier in seen:
+            raise ArmyMusteringError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        validated.append(identifier)
+    if len(validated) < min_length:
+        raise ArmyMusteringError(f"{field_name} must contain at least {min_length} values.")
+    return tuple(sorted(validated))
+
+
 def _validate_attached_unit_instance_id(field_name: str, value: object) -> str:
     identifier = _validate_identifier(field_name, value)
     if not identifier.startswith("attached-unit:"):
@@ -786,6 +2056,22 @@ def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str)
     return identifier
 
 
+def _validate_optional_unprefixed_identifier(
+    field_name: str,
+    value: object | None,
+    prefix: str,
+) -> str | None:
+    if value is None:
+        return None
+    return _validate_unprefixed_identifier(field_name, value, prefix)
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
+
+
 def _validate_identifier(field_name: str, value: object) -> str:
     if type(value) is not str:
         raise ArmyMusteringError(f"{field_name} must be a string.")
@@ -793,3 +2079,25 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise ArmyMusteringError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_bool(field_name: str, value: object) -> bool:
+    if type(value) is not bool:
+        raise ArmyMusteringError(f"{field_name} must be a bool.")
+    return value
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise ArmyMusteringError(f"{field_name} must be an integer.")
+    if value < 1:
+        raise ArmyMusteringError(f"{field_name} must be at least 1.")
+    return value
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise ArmyMusteringError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise ArmyMusteringError(f"{field_name} must not be negative.")
+    return value

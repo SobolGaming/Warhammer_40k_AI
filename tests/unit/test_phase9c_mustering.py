@@ -7,7 +7,11 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetDefinition
+from warhammer40k_core.core.datasheet import (
+    BaseSizeDefinition,
+    DatasheetDefinition,
+    DatasheetKeywordSet,
+)
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
     EnhancementDefinition,
@@ -15,6 +19,7 @@ from warhammer40k_core.core.detachment import (
 )
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyDefinitionPayload,
@@ -22,8 +27,18 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     ArmyMusterRequestPayload,
     AttachedUnitFormation,
+    DedicatedTransportCapacityProfile,
+    DedicatedTransportManifest,
+    EnhancementAssignment,
+    RosterLegalityReport,
+    RosterUnitPointValue,
+    WarlordSelection,
     muster_army,
+    validate_roster_legality,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.deployment import deployment_unit_selection_request
+from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     BattleSize,
@@ -40,7 +55,8 @@ from warhammer40k_core.engine.list_validation import (
     validate_detachment_selection,
     validate_unit_selection_for_faction,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import (
     RulesUnitComponent,
     RulesUnitComponentRole,
@@ -48,11 +64,13 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_id_for_unit_id,
     rules_unit_view_from_armies,
 )
+from warhammer40k_core.engine.setup_flow import SetupFlow
 from warhammer40k_core.engine.unit_factory import (
     UnitFactory,
     UnitFactoryError,
     UnitInstance,
 )
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
@@ -87,6 +105,11 @@ def _muster_request(
     detachment_selection: DetachmentSelection | None = None,
     unit_selections: tuple[UnitMusterSelection, ...] | None = None,
     attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    unit_points: tuple[RosterUnitPointValue, ...] = (),
+    enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
+    warlord_selection: WarlordSelection | None = None,
+    dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] = (),
+    roster_legality_required: bool = False,
     catalog_id: str | None = None,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
@@ -103,6 +126,11 @@ def _muster_request(
         ),
         unit_selections=unit_selections if unit_selections is not None else (_unit_selection(),),
         attachment_declarations=attachment_declarations,
+        unit_points=unit_points,
+        enhancement_assignments=enhancement_assignments,
+        warlord_selection=warlord_selection,
+        dedicated_transport_manifests=dedicated_transport_manifests,
+        roster_legality_required=roster_legality_required,
     )
 
 
@@ -153,6 +181,197 @@ def _phase16_source_detachment_catalog() -> ArmyCatalog:
         army_rules=base_catalog.army_rules,
         detachments=detachments,
         source_ids=(faction_detachment_source.SOURCE_PACKAGE_ID,),
+    )
+
+
+def _phase16d_catalog(
+    *,
+    second_enhancement: bool = False,
+    epic_leader: bool = False,
+) -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    enhancements: tuple[EnhancementDefinition, ...] = (
+        EnhancementDefinition(
+            enhancement_id="core-enhancement-a",
+            name="Core Enhancement A",
+            source_id="enhancement:core-enhancement-a",
+            points=25,
+        ),
+    )
+    if second_enhancement:
+        enhancements = (
+            *enhancements,
+            EnhancementDefinition(
+                enhancement_id="core-enhancement-b",
+                name="Core Enhancement B",
+                source_id="enhancement:core-enhancement-b",
+                points=30,
+            ),
+        )
+    enhancement_ids = tuple(enhancement.enhancement_id for enhancement in enhancements)
+    datasheets: list[DatasheetDefinition] = []
+    for datasheet in base_catalog.datasheets:
+        if datasheet.datasheet_id == "core-transport":
+            datasheets.append(
+                replace(
+                    datasheet,
+                    keywords=DatasheetKeywordSet(
+                        keywords=("Dedicated Transport", "Transport", "Vehicle"),
+                        faction_keywords=datasheet.keywords.faction_keywords,
+                    ),
+                )
+            )
+            continue
+        if epic_leader and datasheet.datasheet_id == "core-character-leader":
+            datasheets.append(
+                replace(
+                    datasheet,
+                    keywords=DatasheetKeywordSet(
+                        keywords=("Character", "Epic Hero", "Infantry", "Leader"),
+                        faction_keywords=datasheet.keywords.faction_keywords,
+                    ),
+                )
+            )
+            continue
+        datasheets.append(datasheet)
+    detachment = replace(base_catalog.detachments[0], enhancement_ids=enhancement_ids)
+    return ArmyCatalog(
+        catalog_id="phase16d-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id=base_catalog.source_package_id,
+        datasheets=tuple(datasheets),
+        wargear=base_catalog.wargear,
+        factions=base_catalog.factions,
+        army_rules=base_catalog.army_rules,
+        detachments=(detachment,),
+        enhancements=enhancements,
+        stratagems=base_catalog.stratagems,
+        source_ids=base_catalog.source_ids,
+    )
+
+
+def _phase16d_transport_roster_request(
+    catalog: ArmyCatalog,
+    *,
+    army_id: str = "army-alpha",
+    player_id: str = "player-a",
+    enhancement_assignments: tuple[EnhancementAssignment, ...] | None = None,
+    dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] | None = None,
+    include_support: bool = False,
+) -> ArmyMusterRequest:
+    units = [
+        _unit_selection(unit_selection_id="bodyguard-unit"),
+        _unit_selection(
+            unit_selection_id="leader-unit",
+            datasheet_id="core-character-leader",
+            model_profile_id="core-character-leader",
+            model_count=1,
+        ),
+        _unit_selection(
+            unit_selection_id="transport-unit",
+            datasheet_id="core-transport",
+            model_profile_id="core-transport",
+            model_count=1,
+        ),
+    ]
+    attachment_declarations = [
+        AttachmentDeclaration(
+            source_unit_selection_id="leader-unit",
+            bodyguard_unit_selection_id="bodyguard-unit",
+        )
+    ]
+    if include_support:
+        units.append(
+            _unit_selection(
+                unit_selection_id="support-unit",
+                datasheet_id="core-character-support",
+                model_profile_id="core-character-support",
+                model_count=1,
+            )
+        )
+        attachment_declarations.append(
+            AttachmentDeclaration(
+                source_unit_selection_id="support-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            )
+        )
+    assignments = (
+        (
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-a",
+                target_unit_selection_id="leader-unit",
+                source_id="assignment:leader",
+            ),
+        )
+        if enhancement_assignments is None
+        else enhancement_assignments
+    )
+    cargo_ids = (
+        ("bodyguard-unit", "leader-unit", "support-unit")
+        if include_support
+        else (
+            "bodyguard-unit",
+            "leader-unit",
+        )
+    )
+    manifests = (
+        (
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=cargo_ids,
+                capacity_profile=_transport_capacity(max_model_count=7 if include_support else 6),
+                source_id="manifest:transport-unit",
+            ),
+        )
+        if dedicated_transport_manifests is None
+        else dedicated_transport_manifests
+    )
+    return _muster_request(
+        catalog,
+        army_id=army_id,
+        player_id=player_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+            enhancement_ids=tuple(sorted(assignment.enhancement_id for assignment in assignments)),
+        ),
+        unit_selections=tuple(units),
+        attachment_declarations=tuple(attachment_declarations),
+        unit_points=tuple(
+            RosterUnitPointValue(
+                unit_selection_id=selection.unit_selection_id,
+                points=100,
+                source_id=f"points:{selection.unit_selection_id}",
+            )
+            for selection in units
+        ),
+        enhancement_assignments=assignments,
+        warlord_selection=WarlordSelection(
+            unit_selection_id="leader-unit",
+            source_id="warlord:leader-unit",
+        ),
+        dedicated_transport_manifests=manifests,
+        roster_legality_required=True,
+    )
+
+
+def _transport_capacity(*, max_model_count: int) -> DedicatedTransportCapacityProfile:
+    return DedicatedTransportCapacityProfile(
+        transport_datasheet_id="core-transport",
+        max_model_count=max_model_count,
+        allowed_keywords=("Infantry",),
+        excluded_keywords=(),
+        source_id=f"transport-capacity:core-transport:{max_model_count}",
+    )
+
+
+def _phase16d_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
     )
 
 
@@ -801,6 +1020,602 @@ def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> 
         )
     with pytest.raises(ArmyMusteringError, match="unit selection"):
         muster_army(catalog=multi_detachment_catalog, request=unsupported_unit_request)
+
+
+def test_phase16d_strict_roster_records_warlord_enhancement_and_transport_manifest() -> None:
+    catalog = _phase16d_catalog()
+    request = _phase16d_transport_roster_request(catalog)
+
+    army = muster_army(catalog=catalog, request=request)
+    payload = cast(
+        ArmyDefinitionPayload,
+        json.loads(json.dumps(army.to_payload(), sort_keys=True)),
+    )
+    leader = army.unit_by_id("army-alpha:leader-unit")
+    manifest = army.dedicated_transport_manifests[0]
+
+    assert army.roster_legality_report.is_legal
+    assert army.warlord_selection == request.warlord_selection
+    assert "WARLORD" in leader.keywords
+    assert army.enhancement_assignments == request.enhancement_assignments
+    assert manifest.transport_unit_instance_id(army_id=army.army_id) == (
+        "army-alpha:transport-unit"
+    )
+    assert manifest.embarked_unit_instance_ids(army_id=army.army_id) == (
+        "army-alpha:bodyguard-unit",
+        "army-alpha:leader-unit",
+    )
+    assert "<" not in json.dumps(payload, sort_keys=True)
+    assert "object at 0x" not in json.dumps(payload, sort_keys=True)
+    assert ArmyDefinition.from_payload(payload).to_payload() == army.to_payload()
+
+
+def test_phase16d_strict_roster_reports_missing_source_data_and_unit_limits() -> None:
+    catalog = _phase16d_catalog()
+    request = _muster_request(
+        catalog,
+        unit_selections=tuple(
+            _unit_selection(
+                unit_selection_id=f"mob-{index}",
+                datasheet_id="core-boyz-like-infantry",
+                model_profile_id="core-boyz-like",
+                model_count=10,
+            )
+            for index in range(1, 5)
+        ),
+        roster_legality_required=True,
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+    violation_codes = {violation.violation_code for violation in report.violations}
+
+    assert not report.is_legal
+    assert {
+        "missing_warlord_selection",
+        "source_awaiting_unit_points",
+        "unit_limit_exceeded",
+    } <= violation_codes
+    with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
+        muster_army(catalog=catalog, request=request)
+
+
+def test_phase16d_enhancement_points_count_toward_strike_force_limit() -> None:
+    catalog = _phase16d_catalog()
+    request = replace(
+        _phase16d_transport_roster_request(catalog),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="bodyguard-unit",
+                points=1800,
+                source_id="points:bodyguard-unit",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-unit",
+                points=100,
+                source_id="points:leader-unit",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="transport-unit",
+                points=90,
+                source_id="points:transport-unit",
+            ),
+        ),
+    )
+
+    codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(catalog=catalog, request=request).violations
+    }
+
+    assert "points_limit_exceeded" in codes
+    with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
+        muster_army(catalog=catalog, request=request)
+
+
+def test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads() -> None:
+    epic_catalog = _phase16d_catalog(epic_leader=True)
+    epic_request = _muster_request(
+        epic_catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+            enhancement_ids=("core-enhancement-a",),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="epic-one",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="epic-two",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="epic-one",
+                points=100,
+                source_id="points:epic-one",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="epic-two",
+                points=100,
+                source_id="points:epic-two",
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-a",
+                target_unit_selection_id="epic-one",
+                source_id="assignment:epic-one",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="epic-one",
+            source_id="warlord:epic-one",
+        ),
+        roster_legality_required=True,
+    )
+    attached_catalog = _phase16d_catalog(second_enhancement=True)
+    attached_request = _phase16d_transport_roster_request(
+        attached_catalog,
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-a",
+                target_unit_selection_id="leader-unit",
+                source_id="assignment:leader",
+            ),
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-b",
+                target_unit_selection_id="support-unit",
+                source_id="assignment:support",
+            ),
+        ),
+        include_support=True,
+    )
+
+    epic_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=epic_catalog,
+            request=epic_request,
+        ).violations
+    }
+    attached_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=attached_catalog,
+            request=attached_request,
+        ).violations
+    }
+
+    assert {"epic_hero_not_unique", "epic_hero_enhancement_forbidden"} <= epic_codes
+    assert "attached_squad_enhancement_limit_exceeded" in attached_codes
+    with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
+        muster_army(catalog=epic_catalog, request=epic_request)
+    with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
+        muster_army(catalog=attached_catalog, request=attached_request)
+
+
+def test_phase16d_transport_manifest_validates_capacity_and_attached_group_completeness() -> None:
+    catalog = _phase16d_catalog()
+    missing_manifest = _phase16d_transport_roster_request(
+        catalog,
+        dedicated_transport_manifests=(),
+    )
+    incomplete_group = _phase16d_transport_roster_request(
+        catalog,
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=("bodyguard-unit",),
+                capacity_profile=_transport_capacity(max_model_count=6),
+                source_id="manifest:incomplete",
+            ),
+        ),
+    )
+    over_capacity = _phase16d_transport_roster_request(
+        catalog,
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=("bodyguard-unit", "leader-unit"),
+                capacity_profile=_transport_capacity(max_model_count=5),
+                source_id="manifest:over-capacity",
+            ),
+        ),
+    )
+    empty_cargo = _phase16d_transport_roster_request(
+        catalog,
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=(),
+                capacity_profile=_transport_capacity(max_model_count=6),
+                source_id="manifest:empty",
+            ),
+        ),
+    )
+
+    incomplete_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=incomplete_group,
+        ).violations
+    }
+    over_capacity_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=over_capacity,
+        ).violations
+    }
+    empty_cargo_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=empty_cargo,
+        ).violations
+    }
+    missing_manifest_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=missing_manifest,
+        ).violations
+    }
+
+    assert "dedicated_transport_missing_starting_cargo" in missing_manifest_codes
+    assert "transport_manifest_attached_unit_incomplete" in incomplete_codes
+    assert "transport_manifest_capacity_exceeded" in over_capacity_codes
+    assert "dedicated_transport_empty_starting_cargo" not in empty_cargo_codes
+    assert validate_roster_legality(catalog=catalog, request=empty_cargo).is_legal
+
+
+def test_phase16d_roster_payload_value_objects_fail_fast() -> None:
+    catalog = _phase16d_catalog()
+    army = muster_army(catalog=catalog, request=_phase16d_transport_roster_request(catalog))
+
+    with pytest.raises(ArmyMusteringError, match="cannot embark itself"):
+        DedicatedTransportManifest(
+            transport_unit_selection_id="transport-unit",
+            embarked_unit_selection_ids=("transport-unit",),
+            capacity_profile=_transport_capacity(max_model_count=1),
+            source_id="manifest:self",
+        )
+    with pytest.raises(ArmyMusteringError, match="capacity_profile"):
+        DedicatedTransportManifest(
+            transport_unit_selection_id="transport-unit",
+            embarked_unit_selection_ids=("bodyguard-unit",),
+            capacity_profile=cast(DedicatedTransportCapacityProfile, "bad-capacity"),
+            source_id="manifest:bad-capacity",
+        )
+    with pytest.raises(ArmyMusteringError, match="is_legal payload drift"):
+        RosterLegalityReport.from_payload(
+            {
+                "battle_size": "strike_force",
+                "is_legal": False,
+                "violations": [],
+            }
+        )
+    with pytest.raises(ArmyMusteringError, match="requires a leader or support"):
+        AttachedUnitFormation(
+            attached_unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
+            bodyguard_unit_instance_id="army-alpha:bodyguard-unit",
+            component_unit_instance_ids=(
+                "army-alpha:bodyguard-unit",
+                "army-alpha:leader-unit",
+            ),
+            source_id="attached-unit:missing-role",
+        )
+    with pytest.raises(ArmyMusteringError, match="component_unit_instance_ids"):
+        AttachedUnitFormation(
+            attached_unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
+            bodyguard_unit_instance_id="army-alpha:bodyguard-unit",
+            leader_unit_instance_ids=("army-alpha:leader-unit",),
+            component_unit_instance_ids=(
+                "army-alpha:bodyguard-unit",
+                "army-alpha:wrong-unit",
+            ),
+            source_id="attached-unit:bad-components",
+        )
+    with pytest.raises(ArmyMusteringError, match="roster_legality_report"):
+        replace(army, roster_legality_report=cast(RosterLegalityReport, "bad-report"))
+
+
+def test_phase16d_roster_reports_source_reference_diagnostics() -> None:
+    catalog = _phase16d_catalog()
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(unit_selection_id="bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="transport-unit",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="bodyguard-unit",
+                points=1000,
+                source_id="points:bodyguard",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-unit",
+                points=1000,
+                source_id="points:leader",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="transport-unit",
+                points=1000,
+                source_id="points:transport",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="missing-unit",
+                points=10,
+                source_id="points:missing",
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="missing-enhancement",
+                target_unit_selection_id="leader-unit",
+                source_id="assignment:missing",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="bodyguard-unit",
+            source_id="warlord:bodyguard",
+        ),
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=("missing-cargo",),
+                capacity_profile=_transport_capacity(max_model_count=1),
+                source_id="manifest:unknown-cargo",
+            ),
+            DedicatedTransportManifest(
+                transport_unit_selection_id="leader-unit",
+                embarked_unit_selection_ids=("bodyguard-unit",),
+                capacity_profile=DedicatedTransportCapacityProfile(
+                    transport_datasheet_id="core-transport",
+                    max_model_count=10,
+                    allowed_keywords=("Terminator",),
+                    excluded_keywords=(),
+                    source_id="transport-capacity:leader-drift",
+                ),
+                source_id="manifest:leader-as-transport",
+            ),
+        ),
+        roster_legality_required=True,
+    )
+    invalid_unit_request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="missing-datasheet",
+                datasheet_id="missing-datasheet",
+                model_profile_id="core-intercessor-like",
+                model_count=5,
+            ),
+        ),
+    )
+    invalid_detachment_request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="missing-faction",
+            detachment_ids=("core-combined-arms",),
+        ),
+    )
+
+    codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(catalog=catalog, request=request).violations
+    }
+    invalid_unit_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=invalid_unit_request,
+        ).violations
+    }
+    invalid_detachment_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=invalid_detachment_request,
+        ).violations
+    }
+
+    assert {
+        "unit_points_unknown_unit",
+        "points_limit_exceeded",
+        "warlord_character_required",
+        "enhancement_not_selected",
+        "enhancement_not_allowed_by_detachment",
+        "enhancement_unknown",
+        "transport_manifest_unknown_cargo",
+        "transport_manifest_transport_required",
+        "transport_manifest_dedicated_transport_required",
+        "transport_manifest_capacity_datasheet_drift",
+        "transport_manifest_cargo_ineligible",
+    } <= codes
+    assert "unit_selection_invalid" in invalid_unit_codes
+    assert "detachment_selection_invalid" in invalid_detachment_codes
+
+
+def test_phase16d_setup_records_starting_transport_cargo_from_manifest() -> None:
+    catalog = _phase16d_catalog()
+    config = GameConfig(
+        game_id="phase16d-setup-cargo",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _phase16d_transport_roster_request(catalog),
+            _phase16d_transport_roster_request(
+                catalog,
+                army_id="army-beta",
+                player_id="player-b",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+        mission_setup=_phase16d_mission_setup(),
+    )
+    state = GameState.from_config(config)
+    while state.current_setup_step is not SetupStep.MUSTER_ARMIES:
+        state.complete_current_setup_step()
+    decisions = DecisionController()
+
+    SetupFlow().advance(state=state, decisions=decisions, config=config)
+
+    cargo = state.transport_cargo_state_for_transport("army-alpha:transport-unit")
+    assert cargo is not None
+    assert cargo.embarked_unit_instance_ids == (
+        "army-alpha:bodyguard-unit",
+        "army-alpha:leader-unit",
+    )
+    assert {
+        "army-alpha:bodyguard-unit:core-intercessor-like:001",
+        "army-alpha:bodyguard-unit:core-intercessor-like:002",
+        "army-alpha:bodyguard-unit:core-intercessor-like:003",
+        "army-alpha:bodyguard-unit:core-intercessor-like:004",
+        "army-alpha:bodyguard-unit:core-intercessor-like:005",
+        "army-alpha:leader-unit:core-character-leader:001",
+    } <= set(state.embarked_model_ids())
+    attached_record = state.starting_strength_record_for_unit(
+        "attached-unit:army-alpha:bodyguard-unit"
+    )
+    transport_record = state.starting_strength_record_for_unit("army-alpha:transport-unit")
+    assert attached_record.starting_model_count == 6
+    assert attached_record.single_model_starting_wounds is None
+    assert transport_record.starting_model_count == 1
+    assert transport_record.single_model_starting_wounds == 10
+    with pytest.raises(GameLifecycleError, match="StartingStrengthRecord"):
+        state.starting_strength_record_for_unit("army-alpha:bodyguard-unit")
+    event_types = tuple(event.event_type for event in decisions.event_log.records)
+    assert "battle_formation_transport_manifest_recorded" in event_types
+
+
+def test_phase16d_empty_dedicated_transport_manifest_records_setup_consequence() -> None:
+    catalog = _phase16d_catalog()
+    empty_transport_request = _phase16d_transport_roster_request(
+        catalog,
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="transport-unit",
+                embarked_unit_selection_ids=(),
+                capacity_profile=_transport_capacity(max_model_count=6),
+                source_id="manifest:empty",
+            ),
+        ),
+    )
+    config = GameConfig(
+        game_id="phase16d-empty-transport",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            empty_transport_request,
+            _phase16d_transport_roster_request(
+                catalog,
+                army_id="army-beta",
+                player_id="player-b",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+        mission_setup=_phase16d_mission_setup(),
+    )
+    state = GameState.from_config(config)
+    while state.current_setup_step is not SetupStep.MUSTER_ARMIES:
+        state.complete_current_setup_step()
+    decisions = DecisionController()
+
+    setup_flow = SetupFlow()
+    setup_flow.advance(state=state, decisions=decisions, config=config)
+    setup_flow.advance(state=state, decisions=decisions, config=config)
+
+    consequence = state.dedicated_transport_setup_consequence_for_transport(
+        "army-alpha:transport-unit"
+    )
+    assert consequence is not None
+    assert consequence.destroyed_battle_round == 1
+    assert consequence.source_id == "manifest:empty"
+    assert state.transport_cargo_state_for_transport("army-alpha:transport-unit") is None
+    assert "army-alpha:transport-unit:core-transport:001" in state.unavailable_model_ids()
+
+    deployment_request = deployment_unit_selection_request(
+        state=state,
+        ruleset_descriptor=config.ruleset_descriptor,
+        player_id="player-a",
+    )
+    option_ids = tuple(option.option_id for option in deployment_request.options)
+    payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+
+    assert "deploy:army-alpha:transport-unit" not in option_ids
+    assert "deploy:attached-unit:army-alpha:bodyguard-unit" in option_ids
+    assert "dedicated_transport_setup_consequence_recorded" in tuple(
+        event.event_type for event in decisions.event_log.records
+    )
+    assert GameState.from_payload(payload).to_payload() == state.to_payload()
+
+
+def test_phase16d_game_config_requires_strict_roster_legality_for_production() -> None:
+    catalog = _phase16d_catalog()
+    strict_config = GameConfig(
+        game_id="phase16d-strict-config",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _phase16d_transport_roster_request(catalog),
+            _phase16d_transport_roster_request(
+                catalog,
+                army_id="army-beta",
+                player_id="player-b",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("area-denial", "assassination"),
+    )
+
+    assert not strict_config.allow_legacy_non_strict_rosters
+    with pytest.raises(GameLifecycleError, match="production path requires"):
+        GameConfig(
+            game_id="phase16d-non-strict-config",
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=catalog,
+            army_muster_requests=(
+                _muster_request(catalog),
+                _muster_request(
+                    catalog,
+                    army_id="army-beta",
+                    player_id="player-b",
+                    unit_selections=(_unit_selection(unit_selection_id="beta-unit"),),
+                ),
+            ),
+            player_ids=("player-a", "player-b"),
+            turn_order=("player-a", "player-b"),
+            fixed_secondary_mission_ids=("area-denial", "assassination"),
+        )
 
 
 def test_phase16_faction_detachment_source_rows_are_normalized() -> None:

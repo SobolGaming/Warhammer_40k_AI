@@ -981,6 +981,7 @@ def _config(*, game_id: str = "phase10o-desperate") -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id=game_id,
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase10o-test"
         ),

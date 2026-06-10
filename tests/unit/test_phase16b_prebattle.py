@@ -1741,6 +1741,7 @@ def _config(
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id="phase16b-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
         army_catalog=resolved_catalog,
         army_muster_requests=_army_muster_requests(

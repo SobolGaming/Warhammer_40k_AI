@@ -1585,6 +1585,7 @@ def _config(*, attached_alpha: bool = False) -> GameConfig:
     )
     return GameConfig(
         game_id="phase14h-healing-game",
+        allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
         army_catalog=catalog,
         army_muster_requests=(
