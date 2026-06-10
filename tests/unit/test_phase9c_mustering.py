@@ -1622,13 +1622,16 @@ def test_phase16_faction_detachment_source_rows_are_normalized() -> None:
     faction_rows = faction_detachment_source.faction_rows()
     detachment_rows = faction_detachment_source.detachment_rows()
     payload = faction_detachment_source.source_payload()
+    faction_names = {row.faction_id: row.name for row in faction_rows}
     detachment_names = {row.detachment_id: row.name for row in detachment_rows}
     new_detachment_ids = {row.detachment_id for row in detachment_rows if row.is_new_for_eleventh}
 
-    assert len(faction_rows) == 15
-    assert len(detachment_rows) == 145
+    assert len(faction_rows) == 22
+    assert len(detachment_rows) == 215
     assert payload["source_package_id"] == faction_detachment_source.SOURCE_PACKAGE_ID
     assert {row.faction_id for row in faction_rows} >= {
+        "chaos-daemons",
+        "chaos-space-marines",
         "leagues-of-votann",
         "space-marines",
         "tau-empire",
@@ -1639,9 +1642,123 @@ def test_phase16_faction_detachment_source_rows_are_normalized() -> None:
     assert detachment_names["delve-assault-shift"] == "Delve Assault Shift"
     assert detachment_names["needgaard-oathband"] == "Needgaard Oathband"
     assert "advanced-acquisition-cadre" in new_detachment_ids
+    assert "cabal-of-chaos" in new_detachment_ids
+    assert faction_names["emperors-children"] == "Emperor's Children"
     assert all("New - " not in row.name for row in detachment_rows)
     assert all(ord(character) < 128 for row in faction_rows for character in row.name)
     assert all(ord(character) < 128 for row in detachment_rows for character in row.name)
+
+
+def test_phase16_chaos_faction_detachment_source_rows_match_requested_matrix() -> None:
+    chaos_faction_ids = {
+        "chaos-daemons",
+        "chaos-knights",
+        "chaos-space-marines",
+        "death-guard",
+        "emperors-children",
+        "thousand-sons",
+        "world-eaters",
+    }
+    rows_by_faction = {
+        faction_id: tuple(
+            (
+                row.raw_name,
+                row.force_disposition_id,
+                row.detachment_point_cost,
+                row.is_new_for_eleventh,
+            )
+            for row in faction_detachment_source.detachment_rows()
+            if row.faction_id == faction_id
+        )
+        for faction_id in chaos_faction_ids
+    }
+
+    assert rows_by_faction == {
+        "chaos-space-marines": (
+            ("Cabal of Chaos", "disruption", 1, True),
+            ("Devotees of Destruction", "priority-assets", 1, True),
+            ("Murdertalon Raiders", "purge-the-foe", 1, True),
+            ("Chaos Cult", "priority-assets", 2, False),
+            ("Creations of Bile", "purge-the-foe", 3, False),
+            ("Cult of the Arkifane", "priority-assets", 2, False),
+            ("Deceptors", "disruption", 2, False),
+            ("Dread Talons", "disruption", 2, False),
+            ("Fellhammer Siege-host", "take-and-hold", 2, False),
+            ("Huron's Marauders", "disruption", 3, False),
+            ("Nightmare Hunt", "disruption", 2, False),
+            ("Pactbound Zealots", "priority-assets", 3, False),
+            ("Renegade Raiders", "reconnaissance", 3, False),
+            ("Renegade Warband", "priority-assets", 2, False),
+            ("Soulforged Warpack", "purge-the-foe", 2, False),
+            ("Veterans of the Long War", "take-and-hold", 2, False),
+            ("Warpstrike Champions", "disruption", 2, False),
+        ),
+        "world-eaters": (
+            ("Butchers of Khorne", "disruption", 1, True),
+            ("Brazen Engines", "purge-the-foe", 1, True),
+            ("Vessels of Wrath", "priority-assets", 1, True),
+            ("Berzerker Warband", "purge-the-foe", 3, False),
+            ("Cult of Blood", "priority-assets", 2, False),
+            ("Goretrack Onslaught", "take-and-hold", 2, False),
+            ("Khorne Daemonkin", "reconnaissance", 2, False),
+            ("Possessed Slaughterband", "purge-the-foe", 2, False),
+        ),
+        "emperors-children": (
+            ("Elegant Brutes", "take-and-hold", 1, True),
+            ("Frenzied Host", "disruption", 1, True),
+            ("Spectacle of Slaughter", "purge-the-foe", 1, True),
+            ("Carnival of Excess", "priority-assets", 2, False),
+            ("Coterie of the Conceited", "purge-the-foe", 3, False),
+            ("Court of the Phoenician", "purge-the-foe", 2, False),
+            ("Mercurial Host", "reconnaissance", 2, False),
+            ("Peerless Bladesmen", "priority-assets", 2, False),
+            ("Rapid Evisceration", "disruption", 2, False),
+            ("Slaanesh's Chosen", "purge-the-foe", 2, False),
+        ),
+        "death-guard": (
+            ("Paragons of Putrescence", "priority-assets", 1, True),
+            ("Contagion Engines", "purge-the-foe", 1, True),
+            ("Flyblown Host", "reconnaissance", 1, True),
+            ("Champions of Contagion", "take-and-hold", 2, False),
+            ("Death Lord's Chosen", "priority-assets", 2, False),
+            ("Mortarion's Hammer", "purge-the-foe", 2, False),
+            ("Shamblerot Vectorium", "disruption", 2, False),
+            ("Tallyband Summoners", "disruption", 2, False),
+            ("Virulent Vectorium", "take-and-hold", 3, False),
+        ),
+        "thousand-sons": (
+            ("Ritual of Regeneration", "purge-the-foe", 1, True),
+            ("Sekhetar Cohort", "priority-assets", 1, True),
+            ("Servants of Change", "reconnaissance", 1, True),
+            ("Changehost of Deceit", "reconnaissance", 2, False),
+            ("Grand Coven", "priority-assets", 3, False),
+            ("Hexwarp Thrallband", "take-and-hold", 2, False),
+            ("Rubricae Phalanx", "take-and-hold", 3, False),
+            ("Warpforged Cabal", "disruption", 2, False),
+            ("Warpmeld Pact", "purge-the-foe", 2, False),
+        ),
+        "chaos-knights": (
+            ("Bastions of Tyranny", "disruption", 1, True),
+            ("Hunting Warpack", "reconnaissance", 1, True),
+            ("Iconoclast Fiefdom", "take-and-hold", 1, True),
+            ("Helhunt Lance", "disruption", 2, False),
+            ("Houndpack Lance", "reconnaissance", 2, False),
+            ("Infernal Lance", "purge-the-foe", 3, False),
+            ("Lords of Dread", "priority-assets", 2, False),
+            ("Traitoris Lance", "purge-the-foe", 2, False),
+        ),
+        "chaos-daemons": (
+            ("Cavalcade of Chaos", "disruption", 1, True),
+            ("Lords of the Warp", "purge-the-foe", 1, True),
+            ("Warptide", "reconnaissance", 1, True),
+            ("Blood Legion", "purge-the-foe", 2, False),
+            ("Daemonic Incursion", "disruption", 3, False),
+            ("Legion of Excess", "priority-assets", 2, False),
+            ("Plague Legion", "take-and-hold", 2, False),
+            ("Scintillating Legion", "priority-assets", 2, False),
+            ("Shadow Legion", "purge-the-foe", 2, False),
+        ),
+    }
 
 
 def test_phase16_faction_detachment_source_rows_fail_fast_on_bad_data() -> None:
@@ -1742,6 +1859,63 @@ def test_phase16_faction_detachment_matrix_supports_strike_force_combinations() 
         catalog=catalog,
         selection=black_templar_force,
     ) == ("priority-assets", "purge-the-foe")
+
+
+def test_phase16_faction_detachment_matrix_supports_chaos_strike_force_combinations() -> None:
+    catalog = _phase16_source_detachment_catalog()
+    chaos_space_marine_new_detachments = DetachmentSelection(
+        faction_id="chaos-space-marines",
+        detachment_ids=(
+            "cabal-of-chaos",
+            "devotees-of-destruction",
+            "murdertalon-raiders",
+        ),
+    )
+    daemon_combined_force = DetachmentSelection(
+        faction_id="chaos-daemons",
+        detachment_ids=(
+            "cavalcade-of-chaos",
+            "legion-of-excess",
+        ),
+    )
+    death_guard_virulent_vectorium = DetachmentSelection(
+        faction_id="death-guard",
+        detachment_ids=("virulent-vectorium",),
+    )
+    over_limit_daemon_force = DetachmentSelection(
+        faction_id="chaos-daemons",
+        detachment_ids=(
+            "daemonic-incursion",
+            "warptide",
+        ),
+    )
+
+    faction, detachments = validate_detachment_selection(
+        catalog=catalog,
+        selection=chaos_space_marine_new_detachments,
+    )
+
+    assert faction.faction_id == "chaos-space-marines"
+    assert tuple(detachment.detachment_id for detachment in detachments) == (
+        "cabal-of-chaos",
+        "devotees-of-destruction",
+        "murdertalon-raiders",
+    )
+    assert tuple(detachment.detachment_point_cost for detachment in detachments) == (1, 1, 1)
+    assert selected_force_disposition_ids(
+        catalog=catalog,
+        selection=chaos_space_marine_new_detachments,
+    ) == ("disruption", "priority-assets", "purge-the-foe")
+    assert selected_force_disposition_ids(
+        catalog=catalog,
+        selection=daemon_combined_force,
+    ) == ("disruption", "priority-assets")
+    assert selected_force_disposition_ids(
+        catalog=catalog,
+        selection=death_guard_virulent_vectorium,
+    ) == ("take-and-hold",)
+    with pytest.raises(ListValidationError, match="Detachment Points"):
+        validate_detachment_selection(catalog=catalog, selection=over_limit_daemon_force)
 
 
 def test_phase16_faction_detachment_matrix_applies_source_corrections() -> None:
