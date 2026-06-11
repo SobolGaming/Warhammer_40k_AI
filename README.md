@@ -140,7 +140,7 @@ adapters -> may import engine, never the reverse
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
 Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
-Phases 17A-17C are complete. Phase 14E is
+Phases 17A-17D are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -228,6 +228,14 @@ Normalized source text now compiles into deterministic, source-spanned, versione
 `RuleIR` payloads with reusable template IDs, typed trigger/condition/target/effect/duration
 components, explicit unsupported diagnostics, stable IR hashes, and a static
 runtime boundary that keeps engine code from importing parser/compiler tooling.
+
+Phase 17D is complete for generic rule execution handlers. Compiled `RuleIR`
+clauses now execute through registered generic handlers for modifiers, reroll
+permissions, VP and CP resource changes, Stratagem target binding, and Aura
+recomputation from current battlefield positions. Unsupported IR fails closed as
+typed unsupported results, source-linked execution events are deterministic and
+JSON-safe, and ability/Stratagem bridges can execute replay-safe compiled IR
+payloads without importing parser/compiler/template tooling.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

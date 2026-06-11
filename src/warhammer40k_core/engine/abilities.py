@@ -20,6 +20,7 @@ from warhammer40k_core.engine.timing_windows import (
 
 CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID = "core:movement-keyword-gate"
 CORE_HAZARDOUS_HANDLER_ID = "core:hazardous"
+GENERIC_RULE_IR_ABILITY_HANDLER_ID = "generic:rule-ir"
 MOVEMENT_CAPABILITY_FLAGS_PAYLOAD_KEY = "movement_capability_flags"
 
 
@@ -751,6 +752,8 @@ class AbilityHandlerRegistry:
             return AbilityResolutionResult.invalid(record, reason="keyword_gate_closed")
         if record.definition.handler_id.startswith("unsupported:"):
             return AbilityResolutionResult.unsupported(record, reason="unsupported_handler")
+        if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+            return _generic_rule_ir_ability_handler(record, context)
         binding = self._handlers.get(record.definition.handler_id)
         if binding is None:
             return AbilityResolutionResult.unsupported(record, reason="missing_handler")
@@ -927,6 +930,52 @@ def _hazardous_keyword_handler(
             },
         },
     )
+
+
+def _generic_rule_ir_ability_handler(
+    record: AbilityCatalogRecord,
+    context: AbilityExecutionContext,
+) -> AbilityResolutionResult:
+    from warhammer40k_core.engine.rule_execution import (
+        RuleExecutionContext,
+        RuleExecutionStatus,
+        execute_rule_ir,
+        rule_ir_from_execution_payload,
+    )
+
+    rule_ir = rule_ir_from_execution_payload(record.definition.replay_payload)
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=RuleExecutionContext(
+            game_id=context.game_id,
+            player_id=context.player_id,
+            battle_round=context.battle_round,
+            phase=context.phase,
+            active_player_id=context.active_player_id,
+            timing_window_id=context.timing_window_id,
+            source_unit_instance_id=context.source_unit_instance_id,
+            source_model_instance_id=context.source_model_instance_id,
+            target_unit_instance_ids=(
+                ()
+                if context.target_unit_instance_id is None
+                else (context.target_unit_instance_id,)
+            ),
+            source_keywords=context.source_keywords,
+            trigger_payload=context.trigger_payload,
+        ),
+    )
+    if result.status is RuleExecutionStatus.APPLIED:
+        return AbilityResolutionResult.applied(
+            record,
+            replay_payload=validate_json_value({"rule_execution": result.to_payload()}),
+        )
+    if result.status is RuleExecutionStatus.INVALID:
+        if result.reason is None:
+            raise GameLifecycleError("Invalid generic ability execution is missing reason.")
+        return AbilityResolutionResult.invalid(record, reason=result.reason)
+    if result.reason is None:
+        raise GameLifecycleError("Unsupported generic ability execution is missing reason.")
+    return AbilityResolutionResult.unsupported(record, reason=result.reason)
 
 
 def _ability_records_for_context(

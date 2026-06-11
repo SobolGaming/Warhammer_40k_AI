@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -189,6 +189,16 @@ modifiers, CP/VP changes, ability and weapon-ability grants, placement
 permission/restriction clauses, Aura clauses, destruction triggers, and
 once-per-scope restrictions.
 
+**Phase 17D is complete** for generic rule execution handlers. Compiled
+`RuleIR` clauses now execute through `RuleExecutionRegistry` bindings for
+generic modifiers, reroll permissions, VP and CP resource changes, Stratagem
+target binding, and Aura evaluation. Runtime execution is fail-closed for
+unsupported IR, emits deterministic source-linked events, mutates VP/CP ledgers
+through existing engine-owned primitives, records representable persisting
+effects through the Phase 12A effect model, and provides generic compiled-IR
+bridges for ability and Stratagem handlers without importing Phase 17C
+parser/compiler/template tooling.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -276,12 +286,13 @@ Completed / implemented foundation:
 | 17A.1 | Complete | Official 11th Edition transition patch packages, deterministic patched artifacts, target diagnostics, and FAQ classification |
 | 17B | Complete | Canonical 11th Edition catalog generation, geometry evidence, model-height records, and deterministic package hashes |
 | 17C | Complete | Rule-language IR, reusable templates, source-spanned unsupported diagnostics, and runtime parser/compiler boundary |
+| 17D | Complete | Generic RuleIR execution handlers, source-linked events, Aura recomputation, and ability/Stratagem IR bridges |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17D-17G | Planned | Generic handlers and content coverage |
+| 17E-17G | Planned | Faction, detachment, enhancement, weapon, wargear, datasheet, and unsupported-descriptor coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -4119,6 +4130,19 @@ Required tests:
 - runtime cannot execute uncompiled raw text.
 
 ## Phase 17D: generic rule execution handlers
+
+Status: Complete.
+
+Phase 17D provides the runtime execution host for compiled Phase 17C `RuleIR`.
+`RuleExecutionContext`, `RuleRuntimeBinding`, `RuleExecutionRegistry`, and
+`RuleExecutionResult` execute supported clauses through registered generic
+handlers while preserving source IDs, IR hashes, deterministic event payloads,
+and typed unsupported/invalid results. The default registry supports generic
+modifier effects, reroll permissions, VP and CP resource changes, Stratagem
+target binding, and Aura recomputation from current battlefield positions.
+Abilities and Stratagems can bind `handler_id="generic:rule-ir"` to a replay-safe
+compiled `rule_ir` payload; normal ability timing/keyword gates and Stratagem
+target/CP/use-record paths still run before generic execution.
 
 Modules:
 
