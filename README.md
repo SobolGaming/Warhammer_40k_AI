@@ -217,6 +217,13 @@ engine runtime is statically blocked from importing transition patch tooling.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 
+Phase 17B catalog generation must also source-link physical model geometry.
+`Use model`, blank, `No official base size`, bare `Hull`, flying-base, and
+other non-circular/non-oval model footprints require reviewed geometry override
+records before runtime instantiation. Each unique model profile must carry a
+representative model height with provenance so LoS, vertical distance, and
+multi-floor terrain collision do not depend on runtime heuristics.
+
 Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus Phase 11E viewer-scoped scoring projection/event rules.
 
 ## 5. Test policy
