@@ -157,6 +157,7 @@ CORE_HEROIC_INTERVENTION_HANDLER_ID = "core:heroic-intervention"
 CORE_COUNTEROFFENSIVE_HANDLER_ID = "core:counteroffensive"
 CORE_CRUSHING_IMPACT_HANDLER_ID = "core:crushing-impact"
 CORE_EPIC_CHALLENGE_HANDLER_ID = "core:epic-challenge"
+GENERIC_RULE_IR_STRATAGEM_HANDLER_ID = "generic:rule-ir"
 COMMAND_REROLL_DICE_CONTEXT_KEY = "dice_roll_state"
 COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY = "affected_unit_instance_id"
 INSANE_BRAVERY_TARGET_POLICY_ID = "battle_shock_test_unit"
@@ -2666,6 +2667,9 @@ def _handler_unavailable_reason(
             target_binding=target_binding,
             effect_selection=effect_selection,
         )
+    if definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
+        _generic_rule_ir_from_stratagem_payload(definition.effect_payload)
+        return None
     return None
 
 
@@ -4438,7 +4442,66 @@ def _apply_supported_stratagem_handler(
             use_record=use_record,
         )
         return
+    if definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
+        _apply_generic_rule_ir_stratagem_handler(
+            state=state,
+            decisions=decisions,
+            context=context,
+            target_binding=target_binding,
+            definition=definition,
+            use_record=use_record,
+        )
+        return
     raise GameLifecycleError("Stratagem handler is not supported.")
+
+
+def _generic_rule_ir_from_stratagem_payload(effect_payload: JsonValue) -> object:
+    from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
+
+    return rule_ir_from_execution_payload(effect_payload)
+
+
+def _apply_generic_rule_ir_stratagem_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    definition: StratagemDefinition,
+    use_record: StratagemUseRecord,
+) -> None:
+    from warhammer40k_core.engine.rule_execution import (
+        RuleExecutionContext,
+        RuleExecutionStatus,
+        execute_rule_ir,
+        rule_ir_from_execution_payload,
+    )
+
+    rule_ir = rule_ir_from_execution_payload(definition.effect_payload)
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=RuleExecutionContext(
+            game_id=context.game_id,
+            player_id=context.player_id,
+            battle_round=context.battle_round,
+            phase=context.phase,
+            active_player_id=context.active_player_id,
+            timing_window_id=context.timing_window_id,
+            target_unit_instance_ids=use_record.targeted_unit_instance_ids,
+            target_player_id=target_binding.target_player_id,
+            trigger_payload={
+                "stratagem_id": definition.stratagem_id,
+                "stratagem_use_id": use_record.use_id,
+                "effect_selection": use_record.effect_selection,
+            },
+            state=state,
+            event_log=decisions.event_log,
+        ),
+    )
+    if result.status is not RuleExecutionStatus.APPLIED:
+        if result.reason is None:
+            raise GameLifecycleError("Generic Stratagem rule execution failed without reason.")
+        raise GameLifecycleError(f"Generic Stratagem rule execution failed: {result.reason}.")
 
 
 def _apply_command_reroll_handler(

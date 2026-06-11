@@ -50,6 +50,9 @@ class PersistingEffectPayload(TypedDict):
     effect_payload: JsonValue
 
 
+GENERIC_RULE_EFFECT_KIND = "generic_rule_execution"
+
+
 @dataclass(frozen=True, slots=True)
 class EffectExpiration:
     expiration_kind: EffectExpirationKind
@@ -411,6 +414,34 @@ class PersistingEffect:
             expiration=EffectExpiration.from_payload(payload["expiration"]),
             effect_payload=payload["effect_payload"],
         )
+
+
+def generic_rule_persisting_effect(
+    *,
+    effect_id: str,
+    source_rule_id: str,
+    owner_player_id: str,
+    target_unit_instance_ids: tuple[str, ...],
+    started_battle_round: int,
+    expiration: EffectExpiration,
+    effect_payload: JsonValue,
+    started_phase: BattlePhaseKind | None = None,
+) -> PersistingEffect:
+    payload = validate_json_value(effect_payload)
+    if not isinstance(payload, dict):
+        raise EffectError("Generic rule effect payload must be a JSON object.")
+    if payload.get("effect_kind") != GENERIC_RULE_EFFECT_KIND:
+        raise EffectError("Generic rule effect payload kind is invalid.")
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id=source_rule_id,
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=target_unit_instance_ids,
+        started_battle_round=started_battle_round,
+        started_phase=started_phase,
+        expiration=expiration,
+        effect_payload=payload,
+    )
 
 
 def effect_expiration_kind_from_token(token: object) -> EffectExpirationKind:
