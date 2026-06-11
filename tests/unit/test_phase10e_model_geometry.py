@@ -9,6 +9,18 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
+from warhammer40k_core.core.model_geometry_catalog import (
+    GeometryEvidenceKind,
+    GeometryMeasurementKind,
+    GeometryRulesFootprintPolicy,
+    GeometrySourceUnits,
+    ModelFootprintDefinition,
+    ModelFootprintKind,
+    ModelFootprintPartDefinition,
+    ModelGeometryCatalogRecord,
+    ModelGeometrySourceEvidence,
+    ModelHeightDefinition,
+)
 from warhammer40k_core.engine.list_validation import ModelProfileSelection, UnitMusterSelection
 from warhammer40k_core.engine.unit_factory import (
     ModelInstance,
@@ -201,6 +213,35 @@ def test_unit_factory_requires_resolved_model_geometry() -> None:
         replace(model, geometry=cast(ModelGeometry, "bad-geometry"))
 
 
+def test_unit_factory_rejects_partial_catalog_geometry_for_selected_profile() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheet = catalog.datasheet_by_id("core-boyz-like-infantry")
+    partial_catalog_geometry = (_catalog_geometry_record("core-intercessor-like"),)
+
+    with pytest.raises(
+        UnitFactoryError,
+        match="Catalog model geometry is incomplete for selected profile",
+    ):
+        UnitFactory(
+            catalog=catalog,
+            model_geometries=partial_catalog_geometry,
+        ).instantiate_unit(
+            army_id="army-alpha",
+            selection=UnitMusterSelection(
+                unit_selection_id="boyz-unit-1",
+                datasheet_id="core-boyz-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-boyz-like",
+                        model_count=10,
+                    ),
+                ),
+                wargear_selections=(),
+            ),
+            datasheet=datasheet,
+        )
+
+
 def test_model_instance_from_payload_rejects_geometry_footprint_kind_drift() -> None:
     payload = _runtime_model_payload()
     payload["geometry"] = ModelGeometry.from_base_size(
@@ -250,6 +291,47 @@ def _runtime_model_payload() -> ModelInstancePayload:
     return cast(
         ModelInstancePayload,
         json.loads(json.dumps(_runtime_model().to_payload(), sort_keys=True)),
+    )
+
+
+def _catalog_geometry_record(model_profile_id: str) -> ModelGeometryCatalogRecord:
+    footprint_evidence = ModelGeometrySourceEvidence.from_source_dimensions(
+        evidence_id=f"{model_profile_id}:footprint",
+        evidence_kind=GeometryEvidenceKind.OFFICIAL_BASE_SIZE,
+        measurement_kind=GeometryMeasurementKind.FOOTPRINT,
+        source_id=f"{model_profile_id}:source-footprint",
+        source_units=GeometrySourceUnits.MILLIMETERS,
+        source_dimensions=(("diameter", 32.0),),
+        document_reference="Phase 10E geometry fixture",
+    )
+    height_evidence = ModelGeometrySourceEvidence.from_source_dimensions(
+        evidence_id=f"{model_profile_id}:height",
+        evidence_kind=GeometryEvidenceKind.MANUAL_MEASUREMENT,
+        measurement_kind=GeometryMeasurementKind.HEIGHT,
+        source_id=f"{model_profile_id}:source-height",
+        source_units=GeometrySourceUnits.INCHES,
+        source_dimensions=(("height", 1.55),),
+        document_reference="Phase 10E geometry fixture",
+    )
+    footprint_part = ModelFootprintPartDefinition.from_evidence(
+        part_id="base",
+        footprint_kind=ModelFootprintKind.CIRCULAR,
+        evidence=footprint_evidence,
+    )
+    return ModelGeometryCatalogRecord(
+        model_geometry_id=model_profile_id,
+        model_profile_id=model_profile_id,
+        rules_footprint_policy=GeometryRulesFootprintPolicy.USE_FOOTPRINT,
+        footprint=ModelFootprintDefinition.single_part(
+            footprint_id=f"{model_profile_id}:footprint",
+            footprint_kind=ModelFootprintKind.CIRCULAR,
+            part=footprint_part,
+        ),
+        support_base=None,
+        z_offset=None,
+        height=ModelHeightDefinition.from_evidence(height_evidence),
+        evidence=(footprint_evidence, height_evidence),
+        source_ids=(f"{model_profile_id}:fixture",),
     )
 
 

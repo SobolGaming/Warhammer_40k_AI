@@ -16,6 +16,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     ModelProfileDefinition,
 )
+from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.engine.list_validation import (
     ListValidationError,
     UnitMusterSelection,
@@ -29,6 +30,7 @@ from warhammer40k_core.geometry.model_geometry import (
     ModelGeometry,
     ModelGeometryPayload,
 )
+from warhammer40k_core.geometry.pose import GeometryError
 
 
 class UnitFactoryError(ValueError):
@@ -276,10 +278,20 @@ class UnitInstance:
 @dataclass(frozen=True, slots=True)
 class UnitFactory:
     catalog: ArmyCatalog
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] = ()
 
     def __post_init__(self) -> None:
         if type(self.catalog) is not ArmyCatalog:
             raise UnitFactoryError("UnitFactory catalog must be an ArmyCatalog.")
+        model_geometries = _validate_model_geometry_catalog_records(
+            "UnitFactory model_geometries",
+            self.model_geometries,
+        )
+        _validate_model_geometry_records_reference_catalog(
+            catalog=self.catalog,
+            model_geometries=model_geometries,
+        )
+        object.__setattr__(self, "model_geometries", model_geometries)
 
     def instantiate_unit(
         self,
@@ -318,6 +330,7 @@ class UnitFactory:
                     datasheet=datasheet,
                     profile=profile,
                     model_count=profile_selection.model_count,
+                    geometry_record=self._catalog_model_geometry(profile.model_profile_id),
                 )
             )
         return UnitInstance(
@@ -340,6 +353,19 @@ class UnitFactory:
             raise UnitFactoryError("datasheet must match the factory catalog definition.")
         return catalog_datasheet
 
+    def _catalog_model_geometry(self, model_profile_id: str) -> ModelGeometryCatalogRecord | None:
+        requested_model_profile_id = _validate_unprefixed_identifier(
+            "model_profile_id",
+            model_profile_id,
+            "model-profile:",
+        )
+        for record in self.model_geometries:
+            if record.model_profile_id == requested_model_profile_id:
+                return record
+        if self.model_geometries:
+            raise UnitFactoryError("Catalog model geometry is incomplete for selected profile.")
+        return None
+
 
 def _instantiate_models_for_profile(
     *,
@@ -348,13 +374,14 @@ def _instantiate_models_for_profile(
     datasheet: DatasheetDefinition,
     profile: ModelProfileDefinition,
     model_count: int,
+    geometry_record: ModelGeometryCatalogRecord | None,
 ) -> tuple[ModelInstance, ...]:
     starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
     source_ids = _merge_source_ids(datasheet.source_ids, profile.source_ids)
-    geometry = ModelGeometry.from_base_size(
-        profile.base_size,
-        keywords=datasheet.keywords.keywords,
-        geometry_source_id=profile.model_profile_id,
+    geometry = _model_geometry_for_profile(
+        datasheet=datasheet,
+        profile=profile,
+        geometry_record=geometry_record,
     )
     return tuple(
         ModelInstance(
@@ -375,11 +402,72 @@ def _instantiate_models_for_profile(
     )
 
 
+def _model_geometry_for_profile(
+    *,
+    datasheet: DatasheetDefinition,
+    profile: ModelProfileDefinition,
+    geometry_record: ModelGeometryCatalogRecord | None,
+) -> ModelGeometry:
+    try:
+        if geometry_record is not None:
+            if geometry_record.model_profile_id != profile.model_profile_id:
+                raise UnitFactoryError("Model geometry record model_profile_id drift.")
+            return ModelGeometry.from_catalog_record(geometry_record)
+        return ModelGeometry.from_base_size(
+            profile.base_size,
+            keywords=datasheet.keywords.keywords,
+            geometry_source_id=profile.model_profile_id,
+        )
+    except GeometryError as exc:
+        raise UnitFactoryError("Model profile geometry is invalid.") from exc
+
+
 def _merge_source_ids(
     datasheet_source_ids: tuple[str, ...],
     model_profile_source_ids: tuple[str, ...],
 ) -> tuple[str, ...]:
     return tuple(sorted({*datasheet_source_ids, *model_profile_source_ids}))
+
+
+def _validate_model_geometry_catalog_records(
+    field_name: str,
+    values: object,
+) -> tuple[ModelGeometryCatalogRecord, ...]:
+    if type(values) is not tuple:
+        raise UnitFactoryError(f"{field_name} must be a tuple.")
+    validated: list[ModelGeometryCatalogRecord] = []
+    seen: set[str] = set()
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        if type(value) is not ModelGeometryCatalogRecord:
+            raise UnitFactoryError(f"{field_name} must contain ModelGeometryCatalogRecord values.")
+        if value.model_profile_id in seen:
+            raise UnitFactoryError(f"{field_name} must not duplicate model_profile_id values.")
+        seen.add(value.model_profile_id)
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda record: record.model_profile_id))
+
+
+def _validate_model_geometry_records_reference_catalog(
+    *,
+    catalog: ArmyCatalog,
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...],
+) -> None:
+    catalog_model_profile_ids = {
+        profile.model_profile_id
+        for datasheet in catalog.datasheets
+        for profile in datasheet.model_profiles
+    }
+    extra_profile_ids = sorted(
+        record.model_profile_id
+        for record in model_geometries
+        if record.model_profile_id not in catalog_model_profile_ids
+    )
+    if extra_profile_ids:
+        raise UnitFactoryError(
+            "UnitFactory model_geometries reference unknown model profiles: "
+            + ", ".join(extra_profile_ids)
+        )
 
 
 def _validate_geometry_matches_base_size(
