@@ -62,6 +62,7 @@ class SourcePatchDiagnosticReason(StrEnum):
     FAQ_CLASSIFICATION_ERROR = "faq_classification_error"
     MALFORMED_OPERATION = "malformed_operation"
     MALFORMED_TARGET = "malformed_target"
+    MISSING_SOURCE_TABLE = "missing_source_table"
     TARGET_DRIFT = "target_drift"
     UNSUPPORTED_EXECUTABLE_CHANGE = "unsupported_executable_change"
     UNRESOLVED_TARGET = "unresolved_target"
@@ -107,6 +108,17 @@ class SourceTransitionPatchPackagePayload(TypedDict):
     operations: list[SourceTransitionPatchOperationPayload]
     schema_version: str
     package_hash: str
+
+
+class SourceTransitionPatchPackageDraftPayload(TypedDict):
+    package_id: DataPackageIdPayload
+    catalog_version: CatalogVersionPayload
+    official_source_package_id: DataPackageIdPayload
+    source_date: str
+    source_edition: str
+    faction_id: str
+    operations: list[SourceTransitionPatchOperationPayload]
+    schema_version: str
 
 
 class PatchedSourceArtifactPayload(TypedDict):
@@ -505,7 +517,17 @@ class SourceTransitionPatchPackage:
 
     @classmethod
     def from_payload(cls, payload: SourceTransitionPatchPackagePayload) -> Self:
-        package = cls(
+        package = cls.from_unhashed_payload(payload)
+        if payload["package_hash"] != package.package_hash():
+            raise SourcePatchError("SourceTransitionPatchPackage package_hash is stale.")
+        return package
+
+    @classmethod
+    def from_unhashed_payload(
+        cls,
+        payload: SourceTransitionPatchPackageDraftPayload,
+    ) -> Self:
+        return cls(
             package_id=_data_package_id_from_payload(payload["package_id"]),
             catalog_version=_catalog_version_from_payload(payload["catalog_version"]),
             official_source_package_id=_data_package_id_from_payload(
@@ -520,9 +542,6 @@ class SourceTransitionPatchPackage:
             ),
             schema_version=payload["schema_version"],
         )
-        if payload["package_hash"] != package.package_hash():
-            raise SourcePatchError("SourceTransitionPatchPackage package_hash is stale.")
-        return package
 
     def _payload_without_hash(self) -> SourceTransitionPatchPackagePayload:
         return {

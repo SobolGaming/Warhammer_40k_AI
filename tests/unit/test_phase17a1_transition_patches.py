@@ -442,6 +442,99 @@ def test_phase17a1_tools_write_canonical_package_and_patched_artifacts(tmp_path:
     )
 
 
+def test_phase17a1_apply_cli_rejects_patch_package_with_missing_target_table(
+    tmp_path: Path,
+) -> None:
+    abilities_artifact = _abilities_artifact(
+        'id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n'
+    )
+    datasheets_artifact = _datasheets_artifact(
+        'id,name,keywords\ndg-pm,Plague Marines,"INFANTRY"\n'
+    )
+    package = _patch_package(
+        operations=(
+            _operation(
+                operation_id="dg-add-datasheet-keyword",
+                order_index=1,
+                family=SourceTransitionPatchOperationFamily.ADD_KEYWORD,
+                target=SourcePatchTarget.from_rows(
+                    source_table="Datasheets",
+                    rows=(_row_by_id(datasheets_artifact, "dg-pm"),),
+                ),
+                instruction_text="Add DEATH GUARD to Plague Marines.",
+                payload=(("column_name", "keywords"), ("keyword", "DEATH GUARD")),
+            ),
+        )
+    )
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    diagnostic_dir = tmp_path / "diagnostics"
+    input_dir.mkdir()
+    (input_dir / "Abilities.json").write_bytes(abilities_artifact.to_json_bytes())
+
+    with pytest.raises(SourcePatchError, match="Datasheets"):
+        apply_transition_patches(
+            input_dir=input_dir,
+            output_dir=output_dir,
+            patch_package=package,
+        )
+    assert not output_dir.exists()
+
+    patched = apply_transition_patches(
+        input_dir=input_dir,
+        output_dir=diagnostic_dir,
+        patch_package=package,
+        raise_on_blocking=False,
+    )
+    diagnostics_payload = json.loads(
+        (diagnostic_dir / "transition_patch_diagnostics.json").read_text(encoding="utf-8")
+    )
+
+    assert patched == ()
+    assert not (diagnostic_dir / "Abilities.patched.json").exists()
+    assert not (diagnostic_dir / "transition_patch_package.json").exists()
+    assert diagnostics_payload["missing_tables"] == ["Datasheets"]
+    assert diagnostics_payload["diagnostics"][0]["reason"] == "missing_source_table"
+    assert diagnostics_payload["diagnostics"][0]["operation_id"] == "dg-add-datasheet-keyword"
+
+
+def test_phase17a1_build_tool_accepts_unhashed_draft_patch_packages(tmp_path: Path) -> None:
+    artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n')
+    package = _text_replace_package(artifact=artifact, text="Roll D6 within 12 inches.")
+    missing_hash_input = tmp_path / "missing_hash_package.json"
+    empty_hash_input = tmp_path / "empty_hash_package.json"
+    missing_hash_output = tmp_path / "missing_hash" / "transition_patch_package.json"
+    empty_hash_output = tmp_path / "empty_hash" / "transition_patch_package.json"
+    missing_hash_payload = dict(package.to_payload())
+    missing_hash_payload.pop("package_hash")
+    empty_hash_payload = dict(package.to_payload())
+    empty_hash_payload["package_hash"] = ""
+    missing_hash_input.write_text(
+        json.dumps(missing_hash_payload, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    empty_hash_input.write_text(
+        json.dumps(empty_hash_payload, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+
+    missing_hash_package = build_transition_patch_package(
+        input_path=missing_hash_input,
+        output_path=missing_hash_output,
+    )
+    empty_hash_package = build_transition_patch_package(
+        input_path=empty_hash_input,
+        output_path=empty_hash_output,
+    )
+    missing_hash_canonical = json.loads(missing_hash_output.read_text(encoding="utf-8"))
+    empty_hash_canonical = json.loads(empty_hash_output.read_text(encoding="utf-8"))
+
+    assert missing_hash_package.package_hash() == package.package_hash()
+    assert empty_hash_package.package_hash() == package.package_hash()
+    assert missing_hash_canonical["package_hash"] == package.package_hash()
+    assert empty_hash_canonical["package_hash"] == package.package_hash()
+
+
 def test_phase17a1_patch_type_validation_is_fail_fast() -> None:
     artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n')
     row = _row_by_id(artifact, "dg-aura")

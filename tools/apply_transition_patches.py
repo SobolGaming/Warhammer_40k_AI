@@ -7,6 +7,9 @@ from typing import cast
 
 from warhammer40k_core.rules.source_patch import (
     PatchedSourceArtifact,
+    SourcePatchDiagnostic,
+    SourcePatchDiagnosticReason,
+    SourcePatchError,
     SourceTransitionPatchPackage,
     SourceTransitionPatchPackagePayload,
     apply_transition_patch_package,
@@ -32,15 +35,31 @@ def apply_transition_patches(
     if not artifact_paths:
         raise ValueError("input_dir must contain at least one source artifact JSON file.")
 
+    artifacts = tuple(_load_source_artifact(path) for path in artifact_paths)
+    missing_table_diagnostics = _missing_source_table_diagnostics(
+        artifacts=artifacts,
+        patch_package=patch_package,
+    )
+    if missing_table_diagnostics:
+        if raise_on_blocking:
+            missing_tables = ", ".join(
+                sorted({diagnostic.source_table for diagnostic in missing_table_diagnostics})
+            )
+            raise SourcePatchError(
+                "Transition patch package references missing source artifact tables: "
+                f"{missing_tables}."
+            )
+        output_dir.mkdir(parents=True, exist_ok=True)
+        _write_diagnostics_artifact(
+            output_dir=output_dir,
+            patch_package=patch_package,
+            diagnostics=missing_table_diagnostics,
+        )
+        return ()
+
     output_dir.mkdir(parents=True, exist_ok=True)
     patched_artifacts: list[PatchedSourceArtifact] = []
-    for artifact_path in artifact_paths:
-        artifact = WahapediaJsonArtifact.from_payload(
-            cast(
-                WahapediaJsonArtifactPayload,
-                json.loads(artifact_path.read_text(encoding="utf-8")),
-            )
-        )
+    for artifact in artifacts:
         patched = apply_transition_patch_package(
             artifact=artifact,
             patch_package=patch_package,
@@ -54,6 +73,69 @@ def apply_transition_patches(
         encoding="utf-8",
     )
     return tuple(patched_artifacts)
+
+
+def _load_source_artifact(path: Path) -> WahapediaJsonArtifact:
+    return WahapediaJsonArtifact.from_payload(
+        cast(
+            WahapediaJsonArtifactPayload,
+            json.loads(path.read_text(encoding="utf-8")),
+        )
+    )
+
+
+def _missing_source_table_diagnostics(
+    *,
+    artifacts: tuple[WahapediaJsonArtifact, ...],
+    patch_package: SourceTransitionPatchPackage,
+) -> tuple[SourcePatchDiagnostic, ...]:
+    artifact_tables = {artifact.source_table for artifact in artifacts}
+    missing_tables = {
+        operation.target.source_table
+        for operation in patch_package.operations
+        if operation.target.source_table not in artifact_tables
+    }
+    diagnostics = [
+        SourcePatchDiagnostic(
+            operation_id=operation.operation_id,
+            source_table=operation.target.source_table,
+            source_row_id=None,
+            reason=SourcePatchDiagnosticReason.MISSING_SOURCE_TABLE,
+            message=(
+                "Patch target source table has no matching source artifact in the input directory."
+            ),
+            blocking=True,
+        )
+        for operation in patch_package.operations
+        if operation.target.source_table in missing_tables
+    ]
+    return tuple(
+        sorted(
+            diagnostics,
+            key=lambda diagnostic: (diagnostic.source_table, diagnostic.operation_id),
+        )
+    )
+
+
+def _write_diagnostics_artifact(
+    *,
+    output_dir: Path,
+    patch_package: SourceTransitionPatchPackage,
+    diagnostics: tuple[SourcePatchDiagnostic, ...],
+) -> None:
+    output_dir.joinpath("transition_patch_diagnostics.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "phase17a1-transition-patch-diagnostics-v1",
+                "patch_package_hash": patch_package.package_hash(),
+                "missing_tables": sorted({diagnostic.source_table for diagnostic in diagnostics}),
+                "diagnostics": [diagnostic.to_payload() for diagnostic in diagnostics],
+            },
+            sort_keys=True,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
 
 def main() -> None:
