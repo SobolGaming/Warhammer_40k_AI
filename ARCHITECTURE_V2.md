@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, the Phase 17E faction coverage implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -199,6 +199,18 @@ effects through the Phase 12A effect model, and provides generic compiled-IR
 bridges for ability and Stratagem handlers without importing Phase 17C
 parser/compiler/template tooling.
 
+**Phase 17E is complete** for source-backed faction, detachment, enhancement,
+Stratagem, army-rule, and unit-intake coverage. The
+`gw-11e-phase17e-faction-coverage-2026-27` package validates all 28 official
+faction-pack PDF manifest records, source-links every seeded faction and
+detachment row, emits deterministic JSON-safe coverage rows, and groups the
+report into implemented, generic-supported, named-handler-required, and
+unsupported buckets. Army and detachment rules are represented as source-linked
+named-handler-required rows; exact datasheet-intake rows, enhancement subrows,
+and Stratagem subrows missing from the update PDFs are blocked as approved
+unsupported diagnostics until native generated source rows land in later Phase
+17 work. Runtime code does not parse raw PDFs or raw rule text.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -287,12 +299,13 @@ Completed / implemented foundation:
 | 17B | Complete | Canonical 11th Edition catalog generation, geometry evidence, model-height records, and deterministic package hashes |
 | 17C | Complete | Rule-language IR, reusable templates, source-spanned unsupported diagnostics, and runtime parser/compiler boundary |
 | 17D | Complete | Generic RuleIR execution handlers, source-linked events, Aura recomputation, and ability/Stratagem IR bridges |
+| 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17E-17G | Planned | Faction, detachment, enhancement, weapon, wargear, datasheet, and unsupported-descriptor coverage |
+| 17F-17G | Planned | Weapon, wargear, datasheet ability, generated source-row, and unsupported-descriptor coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -4179,6 +4192,8 @@ Required tests:
 
 ## Phase 17E: faction, detachment, enhancement, and army-rule coverage
 
+Status: complete.
+
 Invariants:
 
 - every faction has a source-linked army rule descriptor;
@@ -4186,6 +4201,18 @@ Invariants:
 - language parser produces generic IR where possible;
 - unique imperative rules are isolated behind source-linked named handlers;
 - coverage report groups implemented, generic-supported, named-handler-required, and unsupported rules.
+
+Phase 17E is implemented by
+`src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_coverage_2026_27.py`.
+That package links every seeded faction and detachment row from
+`faction_detachments_2026_27.py` to the official faction-pack PDF manifest,
+validates the PDF filenames, byte counts, and SHA-256 digests, and emits
+deterministic coverage rows. Army rules and detachment rules are
+source-linked named-handler-required descriptors. Datasheet intake,
+enhancement descriptor subrows, and Stratagem descriptor subrows that are not
+present in the update PDFs are represented as approved unsupported diagnostics;
+they cannot execute by fallback and must be replaced by native generated source
+rows in later Phase 17 work.
 
 Required tests:
 

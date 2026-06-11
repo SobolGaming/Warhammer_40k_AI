@@ -3,6 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_coverage_2026_27 as faction_coverage_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
 
@@ -80,6 +83,29 @@ def test_faction_integration_phase17e_scope_keeps_datasheet_execution_in_phase17
     assert "Broad datasheet, wargear" in document
     assert "weapon ability execution belongs to Phase 17F" in document
     assert "Do not hand-author an exhaustive unit-name list" in document
+
+
+def test_faction_integration_records_phase17e_completion_gate() -> None:
+    document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+    normalized_document = " ".join(document.split())
+    identity = faction_coverage_source.source_package_identity_payload()
+
+    assert "## Phase 17E Completion Gate" in document
+    assert identity["source_package_id"] in document
+    assert (
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "faction_coverage_2026_27.py"
+    ) in document
+    assert identity["source_title"] in document
+    assert identity["source_version"] in document
+    assert identity["source_date"] in document
+    assert identity["upstream_identity"] in document
+    assert f"source edition: `{identity['source_edition']}`" in document
+    assert identity["imported_at_schema_version"] in document
+    assert identity["source_payload_checksum_sha256"] in document
+    assert "all 28 faction-pack PDF manifest records" in document
+    assert "no unapproved unsupported descriptor remains" in normalized_document
+    assert "not runtime fallbacks" in document
 
 
 def test_faction_integration_requires_explicit_faq_classification_gate() -> None:
