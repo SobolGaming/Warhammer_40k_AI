@@ -5,6 +5,49 @@ This document defines the Phase 17 faction-content rollout. CORE V2 remains an
 material: it is normalized, patched by official 11th Edition transition
 instructions, and then compiled into 11th Edition catalog records.
 
+## Table of Contents
+
+- [Integration Contract](#integration-contract)
+- [Phase 17E Scope Boundary](#phase-17e-scope-boundary)
+- [Phase 17E Completion Gate](#phase-17e-completion-gate)
+- [Phase 17F Execution Gate](#phase-17f-execution-gate)
+- [Faction Execution Status Matrix](#faction-execution-status-matrix)
+  - [Death Guard Execution Status](#death-guard-execution-status)
+  - [Orks Execution Status](#orks-execution-status)
+  - [Aeldari Execution Status](#aeldari-execution-status)
+  - [Drukhari Execution Status](#drukhari-execution-status)
+  - [Tyranids Execution Status](#tyranids-execution-status)
+  - [Genestealer Cults Execution Status](#genestealer-cults-execution-status)
+  - [Necrons Execution Status](#necrons-execution-status)
+  - [Leagues of Votann Execution Status](#leagues-of-votann-execution-status)
+  - [T'au Empire Execution Status](#tau-empire-execution-status)
+  - [Space Marines Execution Status](#space-marines-execution-status)
+  - [Dark Angels Execution Status](#dark-angels-execution-status)
+  - [Blood Angels Execution Status](#blood-angels-execution-status)
+  - [Space Wolves Execution Status](#space-wolves-execution-status)
+  - [Black Templars Execution Status](#black-templars-execution-status)
+  - [Deathwatch Execution Status](#deathwatch-execution-status)
+  - [Grey Knights Execution Status](#grey-knights-execution-status)
+  - [Chaos Space Marines Execution Status](#chaos-space-marines-execution-status)
+  - [World Eaters Execution Status](#world-eaters-execution-status)
+  - [Emperor's Children Execution Status](#emperors-children-execution-status)
+  - [Thousand Sons Execution Status](#thousand-sons-execution-status)
+  - [Chaos Knights Execution Status](#chaos-knights-execution-status)
+  - [Chaos Daemons Execution Status](#chaos-daemons-execution-status)
+  - [Adepta Sororitas Execution Status](#adepta-sororitas-execution-status)
+  - [Adeptus Custodes Execution Status](#adeptus-custodes-execution-status)
+  - [Adeptus Mechanicus Execution Status](#adeptus-mechanicus-execution-status)
+  - [Astra Militarum Execution Status](#astra-militarum-execution-status)
+  - [Imperial Agents Execution Status](#imperial-agents-execution-status)
+  - [Imperial Knights Execution Status](#imperial-knights-execution-status)
+- [Queue Source](#queue-source)
+- [Faction Phase Shape](#faction-phase-shape)
+- [Pilot Phase: Death Guard](#pilot-phase-death-guard)
+- [FAQ Classification Gate](#faq-classification-gate)
+- [Faction Phase Queue](#faction-phase-queue)
+- [Per-Subphase Completion Gate](#per-subphase-completion-gate)
+- [Deferral Rules](#deferral-rules)
+
 ## Integration Contract
 
 - Do not import a prior-edition catalog into runtime engine code.
@@ -40,7 +83,7 @@ Phase 17E must also intake unit rows far enough to make faction and detachment
 coverage reviewable: datasheet identity, composition, wargear-option, base-size,
 geometry, representative-height, keyword, and faction-keyword rows must be
 source-linked or explicitly blocked by diagnostics. Broad datasheet, wargear,
-and weapon ability execution belongs to Phase 17F unless a unit rule is
+and weapon ability execution belongs to Phase 17G unless a unit rule is
 inseparable from a Phase 17E army rule, detachment rule, enhancement, or
 Stratagem.
 
@@ -75,6 +118,321 @@ from the update PDFs are fail-closed as approved unsupported diagnostics, so no
 unapproved unsupported descriptor remains for Phase 17E matched-play coverage.
 Those approved diagnostics are the source-row generation queue for later Phase
 17 work; they are not runtime fallbacks.
+
+## Phase 17F Execution Gate
+
+Phase 17F is complete as deterministic execution dispatch and status for every
+Phase 17E coverage row. The execution package is:
+
+- package ID: `gw-11e-phase17f-faction-execution-2026-27`
+- path:
+  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_execution_2026_27.py`
+- engine path:
+  `src/warhammer40k_core/engine/faction_rule_execution.py`
+- source title: `Warhammer 40,000 11th Edition Phase 17F Faction Execution`
+- source version: `2026-27`
+- source date: `2026-06-11`
+- upstream identity: `gw-11e-phase17e-faction-coverage-2026-27`
+- source edition: `11th`
+- schema version: `core-v2-phase17f-faction-execution-v1`
+- source-payload SHA-256 checksum:
+  `7ec4269baff98ca2ea6b97de6a7305d502b00cf8a4fdb3ce4fb47aea4d1c90bf`
+- upstream Phase 17E checksum:
+  `6810281a9eacd4e4178c4ce2996a50b8bab4d184cc76dedf69c1615726de794a`
+
+The package emits 854 execution records, one for every Phase 17E coverage row:
+294 rows are blocked as `structured_rule_semantics_required`, and 560 rows are
+blocked as `approved_phase17e_source_gap`. The engine dispatcher can execute
+every record and returns typed `unsupported` results with those reasons. No
+Phase 17E row remains a missing handler, runtime no-op, raw-PDF parse, or silent
+fallback.
+
+## Faction Execution Status Matrix
+
+This matrix is generated from the Phase 17F execution package. It records
+execution status, not semantic support. Rows marked `unsupported` are deliberately
+blocked until native structured rule semantics or generated source rows replace
+the approved blocker.
+
+### Death Guard Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Orks Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Aeldari Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 15 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 15 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 15 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Drukhari Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Tyranids Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Genestealer Cults Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Necrons Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Leagues of Votann Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### T'au Empire Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 7 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Space Marines Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 22 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 22 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Dark Angels Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Blood Angels Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Space Wolves Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 7 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Black Templars Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 6 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 6 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 6 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Deathwatch Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Grey Knights Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Chaos Space Marines Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 17 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 17 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 17 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### World Eaters Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Emperor's Children Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Thousand Sons Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Chaos Knights Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Chaos Daemons Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Adepta Sororitas Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Adeptus Custodes Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Adeptus Mechanicus Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Astra Militarum Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 11 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 11 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 11 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Imperial Agents Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 5 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 5 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 5 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Imperial Knights Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ## Queue Source
 
@@ -193,7 +551,7 @@ For every faction phase below, datasheet intake letters cover exact datasheet
 identity, composition, wargear-option, base-size, geometry,
 representative-height, keyword, and faction-keyword rows from the patched source
 mirror, one datasheet or source-coupled kit group per letter. Datasheet,
-wargear, and weapon ability execution is deferred to Phase 17F unless the rule
+wargear, and weapon ability execution is deferred to Phase 17G unless the rule
 is inseparable from a Phase 17E army rule, detachment rule, enhancement, or
 Stratagem.
 

@@ -140,7 +140,7 @@ adapters -> may import engine, never the reverse
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
 Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
-Phases 17A-17E are complete. Phase 14E is
+Phases 17A-17F are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -246,7 +246,17 @@ totals grouped as implemented, generic-supported, named-handler-required, and
 unsupported. Exact datasheet-intake rows, enhancement subrows, and Stratagem
 subrows that are absent from the update PDFs are fail-closed as approved
 unsupported diagnostics, keeping broad datasheet, wargear, and weapon execution
-in Phase 17F.
+in Phase 17G.
+
+Phase 17F is complete for faction execution dispatch and status over every
+Phase 17E coverage row. The
+`gw-11e-phase17f-faction-execution-2026-27` package maps every Phase 17E
+coverage descriptor to an execution record, and
+`engine/faction_rule_execution.py` provides one deterministic engine path that
+returns replay-safe applied or unsupported results. Current faction army-rule,
+detachment-rule, enhancement, Stratagem, and datasheet-intake rows are blocked
+by explicit approved execution reasons until native structured rule semantics
+exist; no covered row falls through as a missing handler or silent fallback.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 
