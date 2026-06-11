@@ -520,7 +520,7 @@ def _geometry_diagnostic(
 
 
 def _base_size_from_geometry_record(record: ModelGeometryCatalogRecord) -> BaseSizeDefinition:
-    footprint = record.rules_footprint()
+    footprint = record.support_base if record.support_base is not None else record.footprint
     part = footprint.parts[0]
     length_mm = part.radius_x_inches * 2.0 * 25.4
     width_mm = part.radius_y_inches * 2.0 * 25.4

@@ -213,6 +213,11 @@ class ModelGeometrySourceEvidence:
                 allow_zero=False,
             ),
         )
+        _validate_canonical_dimensions_match_source(
+            source_units=self.source_units,
+            source_dimensions=self.source_dimensions,
+            canonical_dimensions=self.canonical_dimensions,
+        )
         object.__setattr__(
             self,
             "coordinate_frame",
@@ -1069,17 +1074,66 @@ def _validate_record_evidence_links(
     height: ModelHeightDefinition,
     evidence: tuple[ModelGeometrySourceEvidence, ...],
 ) -> None:
-    evidence_ids = {item.evidence_id for item in evidence}
-    linked_ids = {footprint.evidence_id, height.evidence_id}
+    evidence_by_id = {item.evidence_id: item for item in evidence}
+    _validate_footprint_evidence_links(
+        footprint=footprint,
+        measurement_kind=GeometryMeasurementKind.FOOTPRINT,
+        evidence_by_id=evidence_by_id,
+    )
     if support_base is not None:
-        linked_ids.add(support_base.evidence_id)
+        _validate_footprint_evidence_links(
+            footprint=support_base,
+            measurement_kind=GeometryMeasurementKind.SUPPORT_BASE,
+            evidence_by_id=evidence_by_id,
+        )
     if z_offset is not None:
-        linked_ids.add(z_offset.evidence_id)
-    missing = linked_ids.difference(evidence_ids)
-    if missing:
+        _validate_linked_evidence(
+            evidence_id=z_offset.evidence_id,
+            measurement_kind=GeometryMeasurementKind.Z_OFFSET,
+            evidence_by_id=evidence_by_id,
+        )
+    _validate_linked_evidence(
+        evidence_id=height.evidence_id,
+        measurement_kind=GeometryMeasurementKind.HEIGHT,
+        evidence_by_id=evidence_by_id,
+    )
+
+
+def _validate_footprint_evidence_links(
+    *,
+    footprint: ModelFootprintDefinition,
+    measurement_kind: GeometryMeasurementKind,
+    evidence_by_id: dict[str, ModelGeometrySourceEvidence],
+) -> None:
+    _validate_linked_evidence(
+        evidence_id=footprint.evidence_id,
+        measurement_kind=measurement_kind,
+        evidence_by_id=evidence_by_id,
+    )
+    for part in footprint.parts:
+        _validate_linked_evidence(
+            evidence_id=part.evidence_id,
+            measurement_kind=measurement_kind,
+            evidence_by_id=evidence_by_id,
+        )
+
+
+def _validate_linked_evidence(
+    *,
+    evidence_id: str,
+    measurement_kind: GeometryMeasurementKind,
+    evidence_by_id: dict[str, ModelGeometrySourceEvidence],
+) -> None:
+    linked_evidence = evidence_by_id.get(evidence_id)
+    if linked_evidence is None:
         raise ModelGeometryCatalogError(
             "ModelGeometryCatalogRecord references unknown geometry evidence."
         )
+    if linked_evidence.measurement_kind is not measurement_kind:
+        raise ModelGeometryCatalogError(
+            "ModelGeometryCatalogRecord references geometry evidence with wrong measurement kind."
+        )
+    linked_evidence.require_accepted()
 
 
 def _validate_evidence_tuple(
@@ -1152,6 +1206,28 @@ def _validate_dimensions(
         )
         validated.append((dimension_name, number))
     return tuple(sorted(validated))
+
+
+def _validate_canonical_dimensions_match_source(
+    *,
+    source_units: GeometrySourceUnits,
+    source_dimensions: tuple[tuple[str, float], ...],
+    canonical_dimensions: tuple[tuple[str, float], ...],
+) -> None:
+    expected = tuple(
+        (name, convert_dimension_to_inches(value=value, source_units=source_units))
+        for name, value in source_dimensions
+    )
+    expected_by_name = dict(expected)
+    canonical_by_name = dict(canonical_dimensions)
+    if expected_by_name.keys() != canonical_by_name.keys() or any(
+        not math.isclose(canonical_by_name[name], expected_value)
+        for name, expected_value in expected_by_name.items()
+    ):
+        raise ModelGeometryCatalogError(
+            "ModelGeometrySourceEvidence canonical_dimensions must match source "
+            "dimensions converted to canonical units."
+        )
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

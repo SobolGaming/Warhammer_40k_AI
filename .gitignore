@@ -203,13 +203,15 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# OS/editor metadata
+.DS_Store
+
 # Ruff stuff:
 .ruff_cache/
 
 # Official GW source artifacts are local-only validation inputs.
 # Commit manifests, hashes, page/section references, structured patches, and generated catalogs;
 # do not commit downloaded PDFs, extracted text, or extracted page markdown.
-.DS_Store
 .cache/
 data/raw/faction_packs/*.pdf
 data/raw/faction_packs/*.txt

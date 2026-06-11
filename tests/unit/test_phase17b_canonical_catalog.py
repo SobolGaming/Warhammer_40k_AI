@@ -10,6 +10,7 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.core.datasheet import BaseSizeKind
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryCoordinateFrame,
     GeometryEvidenceKind,
@@ -126,9 +127,13 @@ def test_phase17b_missing_representative_height_blocks_catalog_emission() -> Non
 def test_phase17b_flying_base_override_round_trips_support_hull_and_z_offset() -> None:
     override = _flying_hull_override()
     package = _catalog_package(model_base_size="Use model", geometry_overrides=(override,))
+    datasheet = package.army_catalog.datasheet_by_id("dg-plague-marines")
+    profile = datasheet.model_profiles[0]
     record = package.model_geometries[0]
     runtime_geometry = ModelGeometry.from_catalog_record(record)
 
+    assert profile.base_size.kind is BaseSizeKind.CIRCULAR
+    assert math.isclose(profile.base_size.diameter_mm or 0.0, 60.0)
     assert record.support_base is not None
     assert record.support_base.footprint_kind is ModelFootprintKind.CIRCULAR
     assert record.footprint.footprint_kind is ModelFootprintKind.HULL
@@ -484,6 +489,48 @@ def test_phase17b_geometry_catalog_validation_covers_unsupported_links_and_parts
         )
     with pytest.raises(ValueError, match="evidence must not contain duplicates"):
         replace(override, evidence=(*override.evidence, override.evidence[0]))
+
+
+def test_phase17b_payload_geometry_evidence_rejects_stale_canonical_conversion() -> None:
+    override = _flying_hull_override()
+    height_evidence = next(
+        evidence
+        for evidence in override.evidence
+        if evidence.measurement_kind is GeometryMeasurementKind.HEIGHT
+    )
+    payload = height_evidence.to_payload()
+    payload["source_units"] = "millimeters"
+    payload["source_dimensions"] = {"height": 40.0}
+    payload["canonical_dimensions"] = {"height": 40.0}
+
+    with pytest.raises(ValueError, match="canonical_dimensions"):
+        ModelGeometrySourceEvidence.from_payload(payload)
+
+
+def test_phase17b_payload_record_rejects_unreviewed_or_wrong_kind_evidence_links() -> None:
+    override = _flying_hull_override()
+    unreviewed_payload = override.to_payload()
+    height_evidence_payload = next(
+        evidence
+        for evidence in unreviewed_payload["evidence"]
+        if evidence["measurement_kind"] == "height"
+    )
+    height_evidence_payload["reviewer_status"] = "needs_review"
+
+    with pytest.raises(ValueError, match="accepted"):
+        ModelGeometryCatalogRecord.from_payload(unreviewed_payload)
+
+    wrong_kind_payload = override.to_payload()
+    wrong_kind_payload["footprint"]["parts"][0]["evidence_id"] = "dg-bloat-drone:height"
+    with pytest.raises(ValueError, match="wrong measurement kind"):
+        ModelGeometryCatalogRecord.from_payload(wrong_kind_payload)
+
+    unknown_part_payload = override.to_payload()
+    support_base_payload = unknown_part_payload["support_base"]
+    assert support_base_payload is not None
+    support_base_payload["parts"][0]["evidence_id"] = "missing-support-link"
+    with pytest.raises(ValueError, match="unknown geometry evidence"):
+        ModelGeometryCatalogRecord.from_payload(unknown_part_payload)
 
 
 def _catalog_package(

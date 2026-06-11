@@ -54,6 +54,7 @@ def main() -> None:
         source_artifacts=tuple(load_source_artifact(path) for path in args.artifact),
         geometry_overrides=geometry_overrides,
     )
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(package.to_payload(), sort_keys=True, indent=2) + "\n",
         encoding="utf-8",
