@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -148,6 +148,14 @@ round one without the Phase 10A deterministic placement bridge. Invalid setup
 returns typed `setup_completion_gate_failed` diagnostics and leaves the game in
 setup.
 
+**Phase 17A is complete** for the bridge Wahapedia source mirror and CSV-to-JSON
+ETL. The source mirror now records source snapshots and package manifests with
+checksums, upstream identity, source date, source-edition identity, deterministic
+artifact hashes, HTML sanitization reports, structured source-text
+normalization, source-row provenance, runtime-field HTML exclusion, grouped
+malformed-row diagnostics, and a static boundary check that prevents engine
+runtime from importing raw source mirror or sanitizer modules.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -231,12 +239,13 @@ Completed / implemented foundation:
 | 16C | Complete | Reserve declaration decisions, Strategic Reserves cap enforcement, Deep Strike setup declarations, AIRCRAFT mandatory reserves, and source-backed reserve payloads |
 | 16D | Complete | Army construction completion and runtime instantiation |
 | 16E | Complete | Setup completion gate, readiness diagnostics, battle-start checkpoints, and bridge-free battle entry |
+| 17A | Complete | Bridge Wahapedia source mirror, HTML sanitization, deterministic CSV-to-JSON ETL, source manifests, and grouped import diagnostics |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17A-17G | Planned | Source ingestion, rule-language IR, generic handlers, and content coverage |
+| 17A.1-17G | Planned | Transition patch packages, canonical catalog generation, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -3744,6 +3753,31 @@ detachment and datasheet subphases are tracked in
 [FACTION_INTEGRATION.md](FACTION_INTEGRATION.md).
 
 ## Phase 17A: bridge Wahapedia source mirror and CSV-to-JSON ETL
+
+Status: Complete.
+
+Phase 17A provides the bridge source mirror only. It does not make prior-edition
+Wahapedia rows an active runtime catalog. CSV/source inputs are represented by
+`WahapediaSourceSnapshot`, `WahapediaCsvTable`, `NormalizedSourceRow`,
+`SourceHtmlSanitizationReport`, `WahapediaJsonArtifact`, and
+`SourcePackageManifest`; `tools/wahapedia_fetch.py` records fetched source
+checksums, and `tools/wahapedia_csv_to_json.py` emits deterministic JSON source
+artifacts plus package manifests. Runtime engine modules remain blocked from
+importing raw source-normalization or source-mirror modules.
+
+Official GW faction-pack PDFs and extracted whole-source text/page files are
+local-only validation inputs, not repository artifacts. Do not commit
+`data/raw/faction_packs/*.pdf`, `data/raw/faction_packs/*.txt`,
+`data/raw/faction_packs/extracted_pages/*.md`, `data/raw/gw/**/*.pdf`,
+`data/raw/gw/**/*.txt`, or `data/raw/gw/**/extracted_pages/*.md`, and do not
+put them in Git LFS. Phase 17 should commit source manifests, official URLs,
+retrieval metadata, SHA-256 hashes, byte counts, page/section references,
+structured patch operations, diagnostics, and generated catalog artifacts. CI,
+packaging, Docker images, wheels, npm packages, and release artifacts must not
+redistribute the PDFs unless a future explicit policy grants that right.
+The current faction-pack source manifest uses the official Warhammer 40,000
+downloads page as its shared source page:
+`https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/`.
 
 CORE V1 already has generated `wahapedia_data` JSON such as `Abilities.json`, `Datasheets.json`, `Datasheets_models.json`, `Datasheets_wargear.json`, `Factions.json`, `Detachments.json`, `Enhancements.json`, and `Stratagems.json`. CORE V2 must rebuild this pipeline from the downloaded CSV/source exports, but with stricter normalization and provenance.
 

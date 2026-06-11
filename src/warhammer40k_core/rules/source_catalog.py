@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Self, TypedDict
 
 from warhammer40k_core.rules.data_package import (
@@ -29,6 +32,28 @@ class SourceDocumentPayload(TypedDict):
     document_id: SourceDocumentIdPayload
     title: str
     source_texts: list[RuleSourceTextPayload]
+
+
+class SourceFileChecksumPayload(TypedDict):
+    path: str
+    checksum_sha256: str
+    size_bytes: int
+
+
+class SourceArtifactHashPayload(TypedDict):
+    artifact_name: str
+    artifact_hash: str
+
+
+class SourcePackageManifestPayload(TypedDict):
+    package_id: DataPackageIdPayload
+    catalog_version: CatalogVersionPayload
+    upstream_identity: str
+    source_edition: str
+    source_files: list[SourceFileChecksumPayload]
+    artifacts: list[SourceArtifactHashPayload]
+    schema_version: str
+    package_hash: str
 
 
 class SourceCatalogPayload(TypedDict):
@@ -86,6 +111,182 @@ class SourceDocument:
                 for source_text in payload["source_texts"]
             ),
         )
+
+
+@dataclass(frozen=True, slots=True)
+class SourceFileChecksum:
+    path: str
+    checksum_sha256: str
+    size_bytes: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "path",
+            _validate_identifier("SourceFileChecksum path", self.path),
+        )
+        object.__setattr__(
+            self,
+            "checksum_sha256",
+            _validate_sha256("SourceFileChecksum checksum_sha256", self.checksum_sha256),
+        )
+        if type(self.size_bytes) is not int:
+            raise SourceCatalogError("SourceFileChecksum size_bytes must be an integer.")
+        if self.size_bytes < 0:
+            raise SourceCatalogError("SourceFileChecksum size_bytes must not be negative.")
+
+    @classmethod
+    def from_path(cls, *, root: object, path: object) -> Self:
+        if not isinstance(root, Path):
+            raise SourceCatalogError("SourceFileChecksum root must be a Path.")
+        if not isinstance(path, Path):
+            raise SourceCatalogError("SourceFileChecksum path must be a Path.")
+        resolved_root = root.resolve()
+        resolved_path = path.resolve()
+        if resolved_path != resolved_root and resolved_root not in resolved_path.parents:
+            raise SourceCatalogError("SourceFileChecksum path must be inside root.")
+        data = resolved_path.read_bytes()
+        return cls(
+            path=resolved_path.relative_to(resolved_root).as_posix(),
+            checksum_sha256=hashlib.sha256(data).hexdigest(),
+            size_bytes=len(data),
+        )
+
+    def stable_identity(self) -> str:
+        return f"source-file:{self.path}:{self.checksum_sha256}:{self.size_bytes}"
+
+    def to_payload(self) -> SourceFileChecksumPayload:
+        return {
+            "path": self.path,
+            "checksum_sha256": self.checksum_sha256,
+            "size_bytes": self.size_bytes,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SourceFileChecksumPayload) -> Self:
+        return cls(
+            path=payload["path"],
+            checksum_sha256=payload["checksum_sha256"],
+            size_bytes=payload["size_bytes"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class SourceArtifactHash:
+    artifact_name: str
+    artifact_hash: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "artifact_name",
+            _validate_identifier("SourceArtifactHash artifact_name", self.artifact_name),
+        )
+        object.__setattr__(
+            self,
+            "artifact_hash",
+            _validate_sha256("SourceArtifactHash artifact_hash", self.artifact_hash),
+        )
+
+    def stable_identity(self) -> str:
+        return f"source-artifact:{self.artifact_name}:{self.artifact_hash}"
+
+    def to_payload(self) -> SourceArtifactHashPayload:
+        return {
+            "artifact_name": self.artifact_name,
+            "artifact_hash": self.artifact_hash,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SourceArtifactHashPayload) -> Self:
+        return cls(
+            artifact_name=payload["artifact_name"],
+            artifact_hash=payload["artifact_hash"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class SourcePackageManifest:
+    package_id: DataPackageId
+    catalog_version: CatalogVersion
+    upstream_identity: str
+    source_edition: str
+    source_files: tuple[SourceFileChecksum, ...]
+    artifacts: tuple[SourceArtifactHash, ...] = ()
+    schema_version: str = "phase17a-source-mirror-v1"
+
+    def __post_init__(self) -> None:
+        if type(self.package_id) is not DataPackageId:
+            raise SourceCatalogError("SourcePackageManifest package_id must be a DataPackageId.")
+        if type(self.catalog_version) is not CatalogVersion:
+            raise SourceCatalogError(
+                "SourcePackageManifest catalog_version must be a CatalogVersion."
+            )
+        object.__setattr__(
+            self,
+            "upstream_identity",
+            _validate_identifier("SourcePackageManifest upstream_identity", self.upstream_identity),
+        )
+        object.__setattr__(
+            self,
+            "source_edition",
+            _validate_identifier("SourcePackageManifest source_edition", self.source_edition),
+        )
+        object.__setattr__(
+            self,
+            "source_files",
+            _validate_source_file_checksums(self.source_files),
+        )
+        object.__setattr__(
+            self,
+            "artifacts",
+            _validate_source_artifact_hashes(self.artifacts),
+        )
+        object.__setattr__(
+            self,
+            "schema_version",
+            _validate_identifier("SourcePackageManifest schema_version", self.schema_version),
+        )
+
+    def package_hash(self) -> str:
+        return _sha256_payload(self._payload_without_hash())
+
+    def to_payload(self) -> SourcePackageManifestPayload:
+        payload = self._payload_without_hash()
+        payload["package_hash"] = self.package_hash()
+        return payload
+
+    @classmethod
+    def from_payload(cls, payload: SourcePackageManifestPayload) -> Self:
+        manifest = cls(
+            package_id=_data_package_id_from_payload(payload["package_id"]),
+            catalog_version=_catalog_version_from_payload(payload["catalog_version"]),
+            upstream_identity=payload["upstream_identity"],
+            source_edition=payload["source_edition"],
+            source_files=tuple(
+                SourceFileChecksum.from_payload(source_file)
+                for source_file in payload["source_files"]
+            ),
+            artifacts=tuple(
+                SourceArtifactHash.from_payload(artifact) for artifact in payload["artifacts"]
+            ),
+            schema_version=payload["schema_version"],
+        )
+        if payload["package_hash"] != manifest.package_hash():
+            raise SourceCatalogError("SourcePackageManifest package_hash is stale.")
+        return manifest
+
+    def _payload_without_hash(self) -> SourcePackageManifestPayload:
+        return {
+            "package_id": self.package_id.to_payload(),
+            "catalog_version": self.catalog_version.to_payload(),
+            "upstream_identity": self.upstream_identity,
+            "source_edition": self.source_edition,
+            "source_files": [source_file.to_payload() for source_file in self.source_files],
+            "artifacts": [artifact.to_payload() for artifact in self.artifacts],
+            "schema_version": self.schema_version,
+            "package_hash": "",
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -171,6 +372,60 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise SourceCatalogError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_sha256(field_name: str, value: object) -> str:
+    digest = _validate_identifier(field_name, value)
+    if len(digest) != 64:
+        raise SourceCatalogError(f"{field_name} must be a SHA-256 hex digest.")
+    if any(character not in "0123456789abcdef" for character in digest):
+        raise SourceCatalogError(f"{field_name} must be a lowercase SHA-256 hex digest.")
+    return digest
+
+
+def _validate_source_file_checksums(
+    values: tuple[SourceFileChecksum, ...],
+) -> tuple[SourceFileChecksum, ...]:
+    if type(values) is not tuple:
+        raise SourceCatalogError("SourcePackageManifest source_files must be a tuple.")
+    if not values:
+        raise SourceCatalogError("SourcePackageManifest source_files must not be empty.")
+    seen: set[str] = set()
+    validated: list[SourceFileChecksum] = []
+    for value in values:
+        if type(value) is not SourceFileChecksum:
+            raise SourceCatalogError(
+                "SourcePackageManifest source_files must contain SourceFileChecksum values."
+            )
+        if value.path in seen:
+            raise SourceCatalogError("SourcePackageManifest source_files must be unique.")
+        seen.add(value.path)
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda source_file: source_file.path))
+
+
+def _validate_source_artifact_hashes(
+    values: tuple[SourceArtifactHash, ...],
+) -> tuple[SourceArtifactHash, ...]:
+    if type(values) is not tuple:
+        raise SourceCatalogError("SourcePackageManifest artifacts must be a tuple.")
+    seen: set[str] = set()
+    validated: list[SourceArtifactHash] = []
+    for value in values:
+        if type(value) is not SourceArtifactHash:
+            raise SourceCatalogError(
+                "SourcePackageManifest artifacts must contain SourceArtifactHash values."
+            )
+        if value.artifact_name in seen:
+            raise SourceCatalogError("SourcePackageManifest artifacts must be unique.")
+        seen.add(value.artifact_name)
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda artifact: artifact.artifact_name))
+
+
+def _sha256_payload(payload: object) -> str:
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def _validate_rule_source_text_tuple(

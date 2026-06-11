@@ -72,6 +72,7 @@ _RANGE_WORD_RE = re.compile(
 )
 _RANGE_QUOTE_RE = re.compile(r'(?<![A-Za-z0-9_])(?P<distance>\d+)\s*"')
 _WHITESPACE_RE = re.compile(r"\s+")
+_LINEBREAK_RE = re.compile(r"\r\n?|\n")
 
 _CANONICAL_KEYWORDS = (*canonical_weapon_keyword_tokens(), *canonical_rule_keyword_tokens())
 _KEYWORD_PATTERNS = tuple(
@@ -125,6 +126,24 @@ def normalize_rule_text(raw_text: object) -> str:
     text = _canonicalize_range_expressions(text)
     text = _canonicalize_keywords(text)
     return _collapse_whitespace(text)
+
+
+def normalize_structured_source_text(raw_text: object) -> str:
+    text = _validate_raw_text(raw_text)
+    text = _normalize_unicode(text)
+    blocks: list[str] = []
+    for line in _LINEBREAK_RE.split(text):
+        collapsed_line = _collapse_whitespace(line)
+        if not collapsed_line:
+            continue
+        if collapsed_line.startswith("- "):
+            normalized_line = f"- {normalize_rule_text(collapsed_line[2:])}"
+        else:
+            normalized_line = normalize_rule_text(collapsed_line)
+        blocks.append(normalized_line)
+    if not blocks:
+        raise TextNormalizationError("Structured source text must contain normalized text.")
+    return "\n".join(blocks)
 
 
 def canonical_keyword_forms() -> tuple[str, ...]:
