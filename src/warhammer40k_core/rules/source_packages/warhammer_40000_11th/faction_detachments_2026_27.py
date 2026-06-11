@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 import unicodedata
 from dataclasses import dataclass
@@ -9,9 +11,13 @@ from warhammer40k_core.rules.text_normalization import (
     normalize_rule_text,
 )
 
+EDITION_ID = "warhammer_40000_11th"
+SOURCE_EDITION = "11th"
 SOURCE_PACKAGE_ID = "gw-11e-faction-detachments-2026-27"
 SOURCE_TITLE = "Warhammer 40,000 11th Edition Faction Detachments 2026-27"
 SOURCE_VERSION = "2026-27"
+SOURCE_DATE = "2026-06-10"
+UPSTREAM_IDENTITY = "official-11th-edition-faction-detachment-source-package"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-faction-detachment-source-v1"
 
 
@@ -149,10 +155,43 @@ def detachment_rows() -> tuple[SourceDetachmentRow, ...]:
 
 
 def source_payload() -> dict[str, object]:
+    payload = _source_payload_for_hash()
+    payload["source_payload_checksum_sha256"] = source_payload_checksum_sha256()
+    return payload
+
+
+def source_package_identity_payload() -> dict[str, str]:
     return {
+        "edition_id": EDITION_ID,
+        "source_edition": SOURCE_EDITION,
         "source_package_id": SOURCE_PACKAGE_ID,
         "source_title": SOURCE_TITLE,
         "source_version": SOURCE_VERSION,
+        "source_date": SOURCE_DATE,
+        "upstream_identity": UPSTREAM_IDENTITY,
+        "source_payload_checksum_sha256": source_payload_checksum_sha256(),
+        "imported_at_schema_version": IMPORTED_AT_SCHEMA_VERSION,
+    }
+
+
+def source_payload_checksum_sha256() -> str:
+    encoded = json.dumps(
+        _source_payload_for_hash(),
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _source_payload_for_hash() -> dict[str, object]:
+    return {
+        "edition_id": EDITION_ID,
+        "source_edition": SOURCE_EDITION,
+        "source_package_id": SOURCE_PACKAGE_ID,
+        "source_title": SOURCE_TITLE,
+        "source_version": SOURCE_VERSION,
+        "source_date": SOURCE_DATE,
+        "upstream_identity": UPSTREAM_IDENTITY,
         "imported_at_schema_version": IMPORTED_AT_SCHEMA_VERSION,
         "factions": [row.to_payload() for row in _FACTION_ROWS],
         "detachments": [row.to_payload() for row in _DETACHMENT_ROWS],

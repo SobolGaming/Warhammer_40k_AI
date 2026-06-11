@@ -29,18 +29,17 @@ The seeded detachment queue is derived from:
   `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_detachments_2026_27.py`
 - source title: `Warhammer 40,000 11th Edition Faction Detachments 2026-27`
 - source version: `2026-27`
-- source date: `2026-27` source season; the current package does not yet expose
-  a separate ISO source date field
-- upstream identity: official 11th Edition faction-detachment source package
-  imported into CORE V2
+- source date: `2026-06-10`
+- upstream identity: `official-11th-edition-faction-detachment-source-package`
 - source edition: `11th`
 - schema version: `core-v2-faction-detachment-source-v1`
-- SHA-256 checksum:
-  `45749271d6dc504737133aa6fda8666378a99231e2617d1af865ab677083a4cf`
+- source-payload SHA-256 checksum:
+  `deba1ec55ac614fcd7bc86c15bf086e77497b6fd637aa6a798bc2ed725fe704b`
 
 Queue refreshes must be generated from this package, not hand-edited, except for
 explicitly reviewed corrections recorded in the patch package manifest. Until a
-dedicated generator lands in Phase 17A, queue verification uses the package API:
+dedicated generator lands in Phase 17A, queue verification and checksum
+refreshes use the package API:
 
 ```bash
 uv run python - <<'PY'
@@ -48,16 +47,19 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as source,
 )
 
+print(source.source_package_identity_payload())
 for row in source.detachment_rows():
     print(f"{row.faction_id}\t{row.name}")
 PY
 ```
 
 Names in this queue preserve upstream source-row spelling exactly, including any
-official misspellings. Corrections must be represented as source-linked patch
-operations, not silent edits. The current source package intentionally preserves
+official misspellings. Corrections must be represented as source-linked patch operations,
+not silent edits. The current source package intentionally preserves
 `Auxillary Cadre` and `Brood Brothers Auxillia` because those are the exact
-source-row names in the seeded package.
+source-row names in the seeded package at source IDs
+`gw-11e-faction-detachments-2026-27:detachment:tau-empire:auxillary-cadre` and
+`gw-11e-faction-detachments-2026-27:detachment:genestealer-cults:brood-brothers-auxillia`.
 
 ## Faction Phase Shape
 
@@ -102,6 +104,20 @@ characteristics, and FAQ advisory records.
   changes executable behavior.
 - Phase Death Guard H+: Remaining Death Guard datasheets, one exact datasheet or
   source-coupled kit group per lettered subphase after source import.
+
+## FAQ Classification Gate
+
+Every FAQ row in a faction intake or lettered subphase must be classified before
+catalog emission as exactly one of:
+
+- `advisory_only`: source-linked note that does not change executable behavior.
+- `executable_patch`: source-linked patch operation represented by supported
+  descriptors or catalog records in the same phase.
+- `unsupported_executable_change`: source-linked executable behavior change that
+  remains blocked behind an explicit unsupported diagnostic until implemented.
+
+FAQs that change gameplay semantics must not be stored as `advisory_only`.
+Reclassification requires a source-linked patch operation or diagnostic update.
 
 ## Faction Phase Queue
 
