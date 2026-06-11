@@ -42,6 +42,7 @@ class SourceTransitionPatchOperationFamily(StrEnum):
     REPLACE_RULE_TEXT = "replace_rule_text"
     ADD_KEYWORD = "add_keyword"
     REMOVE_KEYWORD = "remove_keyword"
+    REPLACE_PROFILE_CHARACTERISTIC = "replace_profile_characteristic"
     REPLACE_WEAPON_CHARACTERISTIC = "replace_weapon_characteristic"
     REPLACE_DATASHEET_ABILITY = "replace_datasheet_ability"
     REPLACE_ENHANCEMENT_TEXT = "replace_enhancement_text"
@@ -928,7 +929,10 @@ def _apply_operation_to_row(
             column_name=operation.payload_value("column_name"),
             keyword=operation.payload_value("keyword"),
         )
-    if family is SourceTransitionPatchOperationFamily.REPLACE_WEAPON_CHARACTERISTIC:
+    if family in {
+        SourceTransitionPatchOperationFamily.REPLACE_PROFILE_CHARACTERISTIC,
+        SourceTransitionPatchOperationFamily.REPLACE_WEAPON_CHARACTERISTIC,
+    }:
         return _replace_runtime_field(
             row=row,
             column_name=operation.payload_value("column_name"),
@@ -1128,6 +1132,8 @@ def _required_payload_keys(
             return ("column_name", "keyword")
         case SourceTransitionPatchOperationFamily.REMOVE_KEYWORD:
             return ("column_name", "keyword")
+        case SourceTransitionPatchOperationFamily.REPLACE_PROFILE_CHARACTERISTIC:
+            return ("column_name", "value")
         case SourceTransitionPatchOperationFamily.REPLACE_WEAPON_CHARACTERISTIC:
             return ("column_name", "value")
         case SourceTransitionPatchOperationFamily.REPLACE_DATASHEET_ABILITY:

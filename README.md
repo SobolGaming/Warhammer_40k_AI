@@ -212,8 +212,8 @@ operation ordering, exact or explicit multi-row source targets, target-drift
 diagnostics, FAQ classification, unsupported executable-change diagnostics, and
 patched source artifact hashes. Rule-text replacement and append operations
 rerun HTML sanitization, structured normalization, and parsed-token generation,
-and engine runtime is statically blocked from importing transition patch
-tooling.
+profile and weapon characteristic replacements update exact source fields, and
+engine runtime is statically blocked from importing transition patch tooling.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

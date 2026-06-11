@@ -173,6 +173,49 @@ def test_phase17a1_weapon_characteristic_replacement_is_exact_and_source_linked(
     assert patched.patch_package_hash == package.package_hash()
 
 
+def test_phase17a1_profile_characteristic_replacement_is_not_weapon_specific() -> None:
+    artifact = _datasheets_artifact(
+        'id,name,m,oc,keywords\nwe-heldrake,Heldrake,20",0,"AIRCRAFT, VEHICLE"\n'
+    )
+    heldrake = _row_by_id(artifact, "we-heldrake")
+    package = _patch_package(
+        operations=(
+            _operation(
+                operation_id="we-heldrake-move",
+                order_index=1,
+                family=SourceTransitionPatchOperationFamily.REPLACE_PROFILE_CHARACTERISTIC,
+                target=SourcePatchTarget.from_rows(
+                    source_table="Datasheets",
+                    rows=(heldrake,),
+                ),
+                instruction_text='Change Heldrake M to 12".',
+                payload=(("column_name", "m"), ("value", '12"')),
+            ),
+            _operation(
+                operation_id="we-heldrake-oc",
+                order_index=2,
+                family=SourceTransitionPatchOperationFamily.REPLACE_PROFILE_CHARACTERISTIC,
+                target=SourcePatchTarget.from_rows(
+                    source_table="Datasheets",
+                    rows=(heldrake,),
+                ),
+                instruction_text="Change Heldrake OC to '-'.",
+                payload=(("column_name", "oc"), ("value", "-")),
+            ),
+        )
+    )
+
+    patched = apply_transition_patch_package(artifact=artifact, patch_package=package)
+    patched_heldrake = _patched_row_by_id(patched, "we-heldrake")
+    operation_payloads = package.to_payload()["operations"]
+
+    assert operation_payloads[0]["operation_family"] == "replace_profile_characteristic"
+    assert patched_heldrake.runtime_fields_payload()["m"] == '12"'
+    assert patched_heldrake.runtime_fields_payload()["oc"] == "-"
+    assert patched.source_artifact_hash == artifact.artifact_hash()
+    assert patched.patch_package_hash == package.package_hash()
+
+
 def test_phase17a1_rule_text_patch_operations_rerun_normalization_and_strip_html() -> None:
     artifact = _abilities_artifact(
         'id,name,description\ndg-aura,Nurgle Gift,"<p>roll d3 attacks.</p>"\n'

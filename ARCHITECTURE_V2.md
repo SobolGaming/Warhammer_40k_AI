@@ -3880,6 +3880,7 @@ Initial operation families:
 - `replace_rule_text`
 - `add_keyword`
 - `remove_keyword`
+- `replace_profile_characteristic`
 - `replace_weapon_characteristic`
 - `replace_datasheet_ability`
 - `replace_enhancement_text`
@@ -3917,6 +3918,8 @@ Required tests:
 
 - Death Guard transition examples apply in a stable order;
 - keyword-add patches update all declared datasheet targets and reject missing targets;
+- profile-characteristic replacement changes only the named source profile field
+  and records provenance;
 - weapon-characteristic replacement changes only the named profile and records provenance;
 - rule-text replacement and append operations normalize Unicode, quotes, dashes,
   distances, and HTML-free text;
