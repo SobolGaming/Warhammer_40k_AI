@@ -1256,16 +1256,14 @@ def _target_unit_instance_ids_for_clause(
     context: RuleExecutionContext,
     target_unit_instance_ids: tuple[str, ...] | None,
 ) -> tuple[str, ...]:
+    if clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT:
+        if context.source_unit_instance_id is None:
+            return ()
+        return (context.source_unit_instance_id,)
     if target_unit_instance_ids is not None:
         return target_unit_instance_ids
     if context.target_unit_instance_ids:
         return context.target_unit_instance_ids
-    if (
-        clause.target is not None
-        and clause.target.kind is RuleTargetKind.THIS_UNIT
-        and context.source_unit_instance_id is not None
-    ):
-        return (context.source_unit_instance_id,)
     return ()
 
 
@@ -1276,6 +1274,12 @@ def _duration_unavailable_reason(
 ) -> str | None:
     if clause.duration is None:
         return None
+    if (
+        clause.duration.kind is not RuleDurationKind.IMMEDIATE
+        and _clause_requires_unit_target(clause)
+        and context.state is None
+    ):
+        return "missing_input:game_state"
     if clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT:
         return None
     parameters = parameter_payload(clause.duration.parameters)

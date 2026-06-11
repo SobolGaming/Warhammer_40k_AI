@@ -106,6 +106,7 @@ def test_phase17d_target_scoped_effect_requires_target_binding() -> None:
 
 def test_phase17d_this_unit_effect_uses_source_unit_binding() -> None:
     source_unit_id = "army-alpha:intercessor-unit-1"
+    unrelated_target_unit_id = "army-beta:intercessor-unit-2"
     compiled = _compiled("This unit can be set up more than 9 inches away from enemy units.")
 
     missing_source = execute_rule_ir(
@@ -113,14 +114,24 @@ def test_phase17d_this_unit_effect_uses_source_unit_binding() -> None:
         context=_execution_context(),
         registry=default_rule_execution_registry(),
     )
+    explicit_target_without_source = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(target_unit_instance_ids=(unrelated_target_unit_id,)),
+        registry=default_rule_execution_registry(),
+    )
     applied = execute_rule_ir(
         rule_ir=compiled.rule_ir,
-        context=_execution_context(source_unit_instance_id=source_unit_id),
+        context=_execution_context(
+            source_unit_instance_id=source_unit_id,
+            target_unit_instance_ids=(unrelated_target_unit_id,),
+        ),
         registry=default_rule_execution_registry(),
     )
 
     assert missing_source.status is RuleExecutionStatus.INVALID
     assert missing_source.reason == "missing_input:source_unit_instance_id"
+    assert explicit_target_without_source.status is RuleExecutionStatus.INVALID
+    assert explicit_target_without_source.reason == "missing_input:source_unit_instance_id"
     assert applied.status is RuleExecutionStatus.APPLIED
     assert applied.effect_payloads[0]["target_unit_instance_ids"] == [source_unit_id]
 
@@ -285,6 +296,26 @@ def test_phase17d_phase_duration_requires_phase_before_mutation() -> None:
     assert result.reason == "missing_phase"
     assert state.persisting_effects_for_unit(target_unit_id) == ()
     assert event_log.records == ()
+
+
+def test_phase17d_duration_effect_requires_state_before_applying() -> None:
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled("That unit gains Stealth until the end of the phase.")
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            target_unit_instance_ids=(target_unit_id,),
+            phase=BattlePhaseKind.COMMAND,
+            state=None,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.INVALID
+    assert result.reason == "missing_input:game_state"
+    assert result.effect_payloads == ()
+    assert result.created_persisting_effects == ()
 
 
 def test_phase17d_preflight_rejects_missing_state_before_vp_mutation() -> None:
