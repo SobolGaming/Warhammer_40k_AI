@@ -516,7 +516,7 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
         return RuleTargetSpec(
             kind=RuleTargetKind.AURA_UNITS,
             source_span=clause_text.span,
-            parameters=parameters_from_pairs((("eligible_target", "aura_units"),)),
+            parameters=parameters_from_pairs(_aura_target_parameter_pairs(clause_text)),
         )
     match = _TARGET_RE.search(clause_text.text)
     if match is not None:
@@ -555,6 +555,21 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
             kind=RuleTargetKind.PLAYER, source_span=_span_from_match(clause_text, match)
         )
     return None
+
+
+def _aura_target_parameter_pairs(
+    clause_text: _ClauseText,
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    pairs: list[tuple[str, RuleParameterValue]] = [("eligible_target", "aura_units")]
+    match = _TARGET_RE.search(clause_text.text)
+    if match is None:
+        pairs.append(("allegiance", "any"))
+        return tuple(pairs)
+    pairs.append(("allegiance", _lower_group(match, "allegiance")))
+    keyword_text = match.group("keyword")
+    if keyword_text is not None:
+        pairs.append(("required_keyword", _keyword_token(keyword_text)))
+    return tuple(pairs)
 
 
 def _parse_duration(clause_text: _ClauseText) -> RuleDuration | None:

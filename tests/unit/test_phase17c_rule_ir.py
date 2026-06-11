@@ -257,6 +257,34 @@ def test_phase17c_equivalent_roll_modifier_forms_compile_to_same_semantics() -> 
     assert parameter_payload(add_effect.parameters) == parameter_payload(signed_effect.parameters)
 
 
+@pytest.mark.parametrize(
+    ("raw_text", "expected_allegiance"),
+    [
+        (
+            "Aura: while a friendly unit is within 6 inches, subtract 1 from wound rolls.",
+            "friendly",
+        ),
+        (
+            "Aura: while an enemy unit is within 6 inches, subtract 1 from wound rolls.",
+            "enemy",
+        ),
+        (
+            "Aura: while a unit is within 6 inches, subtract 1 from wound rolls.",
+            "any",
+        ),
+    ],
+)
+def test_phase17c_aura_targets_preserve_structured_allegiance(
+    raw_text: str,
+    expected_allegiance: str,
+) -> None:
+    target = _compiled(raw_text).rule_ir.clauses[0].target
+
+    assert target is not None
+    assert target.kind is RuleTargetKind.AURA_UNITS
+    assert parameter_payload(target.parameters)["allegiance"] == expected_allegiance
+
+
 def test_phase17c_compiler_rejects_stale_or_duplicate_source_inputs() -> None:
     source = RuleSourceText.from_raw(source_id="phase17c:rule:stale", raw_text="Gain 1CP.")
 

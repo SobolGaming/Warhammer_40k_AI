@@ -89,6 +89,42 @@ def test_phase17d_generic_modifier_rule_executes_as_source_linked_effect() -> No
     assert result.to_payload()["source_id"] == compiled.rule_ir.source_id
 
 
+def test_phase17d_target_scoped_effect_requires_target_binding() -> None:
+    compiled = _compiled("Add 1 to hit rolls for that unit.")
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.INVALID
+    assert result.reason == "missing_target:unit_instance_ids"
+    assert result.effect_payloads == ()
+    assert result.event_records == ()
+
+
+def test_phase17d_this_unit_effect_uses_source_unit_binding() -> None:
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled("This unit can be set up more than 9 inches away from enemy units.")
+
+    missing_source = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(),
+        registry=default_rule_execution_registry(),
+    )
+    applied = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(source_unit_instance_id=source_unit_id),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert missing_source.status is RuleExecutionStatus.INVALID
+    assert missing_source.reason == "missing_input:source_unit_instance_id"
+    assert applied.status is RuleExecutionStatus.APPLIED
+    assert applied.effect_payloads[0]["target_unit_instance_ids"] == [source_unit_id]
+
+
 def test_phase17d_generic_reroll_permission_executes() -> None:
     compiled = _compiled("After a hit roll, re-roll hit rolls.")
 
@@ -154,6 +190,24 @@ def test_phase17d_generic_cp_rule_mutates_command_point_ledger_and_reports_cap()
     assert len(event_log.records) == event_count_after_first
 
 
+def test_phase17d_later_invalid_effect_does_not_leave_prior_mutation() -> None:
+    state = _battle_state()
+    event_log = EventLog()
+    compiled = _compiled("Gain 1CP and score 3VP.")
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(state=state, event_log=event_log, phase=None),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.INVALID
+    assert result.reason == "missing_phase"
+    assert state.command_point_total("player-a") == 0
+    assert state.victory_point_total("player-a") == 0
+    assert event_log.records == ()
+
+
 def test_phase17d_generic_cp_spend_rule_uses_command_point_ledger() -> None:
     spend_rule_ir = _command_point_spend_rule_ir()
     insufficient_state = _battle_state()
@@ -208,6 +262,29 @@ def test_phase17d_duration_effect_records_generic_persisting_effect() -> None:
     assert payload["started_phase"] == "command"
     assert payload["expiration"]["expiration_kind"] == "end_phase"
     assert effect_payload["effect_kind"] == "generic_rule_execution"
+
+
+def test_phase17d_phase_duration_requires_phase_before_mutation() -> None:
+    state = _battle_state_with_scenario()
+    event_log = EventLog()
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled("That unit gains Stealth until the end of the phase.")
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            event_log=event_log,
+            target_unit_instance_ids=(target_unit_id,),
+            phase=None,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.INVALID
+    assert result.reason == "missing_phase"
+    assert state.persisting_effects_for_unit(target_unit_id) == ()
+    assert event_log.records == ()
 
 
 def test_phase17d_preflight_rejects_missing_state_before_vp_mutation() -> None:
@@ -280,36 +357,94 @@ def test_phase17d_preflight_rejects_missing_target_binding() -> None:
     assert result.target_bindings == ()
 
 
-def test_phase17d_aura_evaluation_recomputes_from_current_model_positions() -> None:
-    state = _battle_state_with_scenario()
+def test_phase17d_friendly_aura_evaluation_ignores_enemy_units_in_range() -> None:
+    state = _battle_state_with_extra_friendly_unit()
     source_unit_id = "army-alpha:intercessor-unit-1"
-    target_unit_id = "army-beta:intercessor-unit-2"
+    friendly_unit_id = "army-alpha:intercessor-unit-3"
+    enemy_unit_id = "army-beta:intercessor-unit-2"
     compiled = _compiled(
         "Aura: while a friendly unit is within 6 inches, subtract 1 from wound rolls."
     )
 
-    initial = execute_rule_ir(
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=friendly_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=enemy_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    result = execute_rule_ir(
         rule_ir=compiled.rule_ir,
         context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
         registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [friendly_unit_id]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [friendly_unit_id]
+
+
+def test_phase17d_enemy_aura_evaluation_ignores_friendly_units_in_range() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    friendly_unit_id = "army-alpha:intercessor-unit-3"
+    enemy_unit_id = "army-beta:intercessor-unit-2"
+    compiled = _compiled(
+        "Aura: while an enemy unit is within 6 inches, subtract 1 from wound rolls."
     )
 
     state.battlefield_state = _with_unit_pose(
         state.battlefield_state,
-        unit_instance_id=target_unit_id,
+        unit_instance_id=friendly_unit_id,
         pose=Pose.at(8.0, 6.0),
     )
-    moved = execute_rule_ir(
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=enemy_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    result = execute_rule_ir(
         rule_ir=compiled.rule_ir,
         context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
         registry=default_rule_execution_registry(),
     )
 
-    assert initial.status is RuleExecutionStatus.APPLIED
-    assert initial.aura_evaluations[0]["affected_unit_instance_ids"] == []
-    assert moved.status is RuleExecutionStatus.APPLIED
-    assert moved.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
-    assert moved.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [enemy_unit_id]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [enemy_unit_id]
+
+
+def test_phase17d_any_aura_evaluation_affects_all_allegiances_in_range() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    friendly_unit_id = "army-alpha:intercessor-unit-3"
+    enemy_unit_id = "army-beta:intercessor-unit-2"
+    compiled = _compiled("Aura: while a unit is within 6 inches, subtract 1 from wound rolls.")
+
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=friendly_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=enemy_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [
+        friendly_unit_id,
+        enemy_unit_id,
+    ]
 
 
 def test_phase17d_unsupported_rule_ir_produces_typed_unsupported_status() -> None:
@@ -365,7 +500,9 @@ def test_phase17d_rule_ir_payload_round_trips_through_execution_result() -> None
 
     result = execute_rule_ir(
         rule_ir=compiled.rule_ir,
-        context=_execution_context(),
+        context=_execution_context(
+            target_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+        ),
         registry=default_rule_execution_registry(),
     )
 
@@ -452,7 +589,16 @@ def test_phase17d_ability_bridge_executes_compiled_rule_ir_payload() -> None:
 
     result = default_ability_handler_registry().execute(
         record=record,
-        context=AbilityExecutionContext.passive_keyword_gate(source_keywords=()),
+        context=AbilityExecutionContext(
+            game_id="phase17d-game",
+            player_id="player-a",
+            battle_round=1,
+            phase=BattlePhaseKind.COMMAND,
+            active_player_id="player-a",
+            trigger_kind=TimingTriggerKind.ANY_PHASE,
+            target_unit_instance_id="army-alpha:intercessor-unit-1",
+            source_keywords=(),
+        ),
     )
     replay_payload = _json_object(result.replay_payload)
     rule_execution = _json_object(replay_payload["rule_execution"])
@@ -535,10 +681,26 @@ def _battle_state_with_scenario() -> GameState:
     return state
 
 
+def _battle_state_with_extra_friendly_unit() -> GameState:
+    scenario = _scenario_with_extra_friendly_unit()
+    state = _battle_state()
+    for army_definition in scenario.armies:
+        state.record_army_definition(army_definition)
+    state.battlefield_state = scenario.battlefield_state
+    return state
+
+
 def _scenario() -> BattlefieldScenario:
     return create_deterministic_battlefield_scenario(
         battlefield_id="phase17d-battlefield",
         armies=_mustered_armies(),
+    )
+
+
+def _scenario_with_extra_friendly_unit() -> BattlefieldScenario:
+    return create_deterministic_battlefield_scenario(
+        battlefield_id="phase17d-battlefield-extra-friendly",
+        armies=_mustered_armies_with_extra_friendly_unit(),
     )
 
 
@@ -566,12 +728,54 @@ def _mustered_armies() -> tuple[ArmyDefinition, ...]:
     )
 
 
+def _mustered_armies_with_extra_friendly_unit() -> tuple[ArmyDefinition, ...]:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return (
+        muster_army(
+            catalog=catalog,
+            request=_muster_request_with_unit_ids(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_ids=(
+                    "intercessor-unit-1",
+                    "intercessor-unit-3",
+                ),
+            ),
+        ),
+        muster_army(
+            catalog=catalog,
+            request=_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+            ),
+        ),
+    )
+
+
 def _muster_request(
     *,
     catalog: ArmyCatalog,
     player_id: str,
     army_id: str,
     unit_selection_id: str,
+) -> ArmyMusterRequest:
+    return _muster_request_with_unit_ids(
+        catalog=catalog,
+        player_id=player_id,
+        army_id=army_id,
+        unit_selection_ids=(unit_selection_id,),
+    )
+
+
+def _muster_request_with_unit_ids(
+    *,
+    catalog: ArmyCatalog,
+    player_id: str,
+    army_id: str,
+    unit_selection_ids: tuple[str, ...],
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -583,7 +787,7 @@ def _muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        unit_selections=(
+        unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
                 datasheet_id="core-intercessor-like-infantry",
@@ -593,7 +797,8 @@ def _muster_request(
                         model_count=5,
                     ),
                 ),
-            ),
+            )
+            for unit_selection_id in unit_selection_ids
         ),
     )
 

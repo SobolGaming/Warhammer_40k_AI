@@ -17,6 +17,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
+    CommandPointLedger,
     CommandPointSourceKind,
     CommandPointSpendStatus,
 )
@@ -52,6 +53,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleIR,
     RuleIRPayload,
     RuleParameterValue,
+    RuleTargetKind,
     RuleTriggerKind,
     parameter_payload,
 )
@@ -65,6 +67,26 @@ STATE_INPUT_BATTLEFIELD_STATE = "battlefield_state"
 STATE_INPUT_SOURCE_UNIT = "source_unit"
 STATE_INPUT_EVENT_LOG = "event_log"
 TARGET_BINDING_UNIT_IDS = "target_unit_instance_ids"
+UNIT_EFFECT_TARGET_KINDS = (
+    RuleTargetKind.ENEMY_UNIT,
+    RuleTargetKind.FRIENDLY_UNIT,
+    RuleTargetKind.SELECTED_TARGET,
+    RuleTargetKind.SELECTED_UNIT,
+    RuleTargetKind.THIS_UNIT,
+)
+TARGET_SCOPED_EFFECT_KINDS = (
+    RuleEffectKind.GRANT_ABILITY,
+    RuleEffectKind.GRANT_WEAPON_ABILITY,
+    RuleEffectKind.MODIFY_CHARACTERISTIC,
+    RuleEffectKind.MODIFY_DICE_ROLL,
+    RuleEffectKind.MODIFY_MOVE_DISTANCE,
+    RuleEffectKind.PLACEMENT_PERMISSION,
+    RuleEffectKind.PLACEMENT_RESTRICTION,
+    RuleEffectKind.REROLL_PERMISSION,
+)
+AURA_ALLEGIANCE_ANY = "any"
+AURA_ALLEGIANCE_ENEMY = "enemy"
+AURA_ALLEGIANCE_FRIENDLY = "friendly"
 
 
 class RuleExecutionStatus(StrEnum):
@@ -667,12 +689,21 @@ def _preflight_rule_ir(
     context: RuleExecutionContext,
     registry: RuleExecutionRegistry,
 ) -> RuleExecutionResult | None:
+    simulated_command_ledgers: dict[str, CommandPointLedger] = {}
     for clause in rule_ir.clauses:
         if _is_aura_clause(clause):
             binding = registry.binding_for_clause(clause)
             if binding is None:
                 return RuleExecutionResult.unsupported(rule_ir, reason="missing_aura_handler")
             unavailable = _binding_unavailable_reason(binding=binding, context=context)
+            if unavailable is not None:
+                return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
+            unavailable = _clause_semantic_unavailable_reason(
+                rule_ir=rule_ir,
+                clause=clause,
+                context=context,
+                simulated_command_ledgers=simulated_command_ledgers,
+            )
             if unavailable is not None:
                 return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
             continue
@@ -687,6 +718,14 @@ def _preflight_rule_ir(
                 unavailable = _binding_unavailable_reason(binding=binding, context=context)
                 if unavailable is not None:
                     return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
+            unavailable = _clause_semantic_unavailable_reason(
+                rule_ir=rule_ir,
+                clause=clause,
+                context=context,
+                simulated_command_ledgers=simulated_command_ledgers,
+            )
+            if unavailable is not None:
+                return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
             continue
         if clause.target is not None:
             binding = registry.binding_for_clause(clause)
@@ -753,17 +792,17 @@ def _generic_effect_handler(
         effect=resolved_effect,
         context=context,
     )
-    event = _emit_event(
-        context=context,
-        event_type="rule_execution_effect_applied",
-        payload=effect_payload,
-        fallback_id=_fallback_event_id(rule_ir, clause, resolved_effect, "effect"),
-    )
     created_effect = _persisting_effect_or_none(
         rule_ir=rule_ir,
         clause=clause,
         effect_payload=effect_payload,
         context=context,
+    )
+    event = _emit_event(
+        context=context,
+        event_type="rule_execution_effect_applied",
+        payload=effect_payload,
+        fallback_id=_fallback_event_id(rule_ir, clause, resolved_effect, "effect"),
     )
     return RuleExecutionResult.applied(
         rule_ir,
@@ -961,10 +1000,10 @@ def _effect_payload(
     context: RuleExecutionContext,
     target_unit_instance_ids: tuple[str, ...] | None = None,
 ) -> dict[str, JsonValue]:
-    target_ids = (
-        context.target_unit_instance_ids
-        if target_unit_instance_ids is None
-        else target_unit_instance_ids
+    target_ids = _target_unit_instance_ids_for_clause(
+        clause=clause,
+        context=context,
+        target_unit_instance_ids=target_unit_instance_ids,
     )
     return _json_object(
         {
@@ -990,7 +1029,12 @@ def _persisting_effect_or_none(
     effect_payload: dict[str, JsonValue],
     context: RuleExecutionContext,
 ) -> PersistingEffect | None:
-    if context.state is None or not context.target_unit_instance_ids or clause.duration is None:
+    target_unit_instance_ids = _target_unit_instance_ids_for_clause(
+        clause=clause,
+        context=context,
+        target_unit_instance_ids=None,
+    )
+    if context.state is None or not target_unit_instance_ids or clause.duration is None:
         return None
     expiration = _expiration_for_duration(duration=clause.duration, context=context)
     if expiration is None:
@@ -999,7 +1043,7 @@ def _persisting_effect_or_none(
         effect_id=_effect_id(rule_ir=rule_ir, clause=clause),
         source_rule_id=rule_ir.source_id,
         owner_player_id=context.player_id,
-        target_unit_instance_ids=context.target_unit_instance_ids,
+        target_unit_instance_ids=target_unit_instance_ids,
         started_battle_round=context.battle_round,
         started_phase=context.phase,
         expiration=expiration,
@@ -1061,11 +1105,22 @@ def _aura_affected_unit_ids(
     )
     source_placement = state.battlefield_state.unit_placement_by_id(source_unit_id)
     distance_inches = _aura_distance_inches(clause)
+    allegiance = _aura_allegiance(clause)
     required_keywords = _required_keywords(clause.conditions)
     affected: list[str] = []
     for placed_army in state.battlefield_state.placed_armies:
         for unit_placement in placed_army.unit_placements:
             if unit_placement.unit_instance_id == source_unit_id:
+                continue
+            if (
+                allegiance == AURA_ALLEGIANCE_FRIENDLY
+                and unit_placement.player_id != source_placement.player_id
+            ):
+                continue
+            if (
+                allegiance == AURA_ALLEGIANCE_ENEMY
+                and unit_placement.player_id == source_placement.player_id
+            ):
                 continue
             unit = scenario.unit_instance_for_placement(unit_placement)
             if required_keywords and not set(required_keywords).issubset(set(unit.keywords)):
@@ -1116,6 +1171,22 @@ def _aura_distance_inches(clause: RuleClause) -> float:
     raise GameLifecycleError("Aura clause requires a structured distance predicate.")
 
 
+def _aura_allegiance(clause: RuleClause) -> str:
+    if clause.target is None or clause.target.kind is not RuleTargetKind.AURA_UNITS:
+        raise GameLifecycleError("Aura clause requires an aura_units target.")
+    parameters = parameter_payload(clause.target.parameters)
+    allegiance = parameters.get("allegiance")
+    if type(allegiance) is not str:
+        raise GameLifecycleError("Aura target requires structured allegiance.")
+    if allegiance not in {
+        AURA_ALLEGIANCE_ANY,
+        AURA_ALLEGIANCE_ENEMY,
+        AURA_ALLEGIANCE_FRIENDLY,
+    }:
+        raise GameLifecycleError("Aura target allegiance is unsupported.")
+    return allegiance
+
+
 def _required_keywords(conditions: tuple[RuleCondition, ...]) -> tuple[str, ...]:
     keywords: list[str] = []
     for condition in conditions:
@@ -1126,6 +1197,149 @@ def _required_keywords(conditions: tuple[RuleCondition, ...]) -> tuple[str, ...]
         if type(keyword) is str:
             keywords.append(keyword)
     return tuple(sorted(keywords))
+
+
+def _clause_semantic_unavailable_reason(
+    *,
+    rule_ir: RuleIR,
+    clause: RuleClause,
+    context: RuleExecutionContext,
+    simulated_command_ledgers: dict[str, CommandPointLedger],
+) -> str | None:
+    target_reason = _effect_clause_target_unavailable_reason(clause=clause, context=context)
+    if target_reason is not None:
+        return target_reason
+    duration_reason = _duration_unavailable_reason(clause=clause, context=context)
+    if duration_reason is not None:
+        return duration_reason
+    for effect in clause.effects:
+        effect_reason = _effect_semantic_unavailable_reason(
+            rule_ir=rule_ir,
+            effect=effect,
+            context=context,
+            simulated_command_ledgers=simulated_command_ledgers,
+        )
+        if effect_reason is not None:
+            return effect_reason
+    return None
+
+
+def _effect_clause_target_unavailable_reason(
+    *,
+    clause: RuleClause,
+    context: RuleExecutionContext,
+) -> str | None:
+    if not _clause_requires_unit_target(clause):
+        return None
+    if _target_unit_instance_ids_for_clause(
+        clause=clause,
+        context=context,
+        target_unit_instance_ids=None,
+    ):
+        return None
+    if clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT:
+        return "missing_input:source_unit_instance_id"
+    return "missing_target:unit_instance_ids"
+
+
+def _clause_requires_unit_target(clause: RuleClause) -> bool:
+    return (
+        clause.target is not None
+        and clause.target.kind in UNIT_EFFECT_TARGET_KINDS
+        and any(effect.kind in TARGET_SCOPED_EFFECT_KINDS for effect in clause.effects)
+    )
+
+
+def _target_unit_instance_ids_for_clause(
+    *,
+    clause: RuleClause,
+    context: RuleExecutionContext,
+    target_unit_instance_ids: tuple[str, ...] | None,
+) -> tuple[str, ...]:
+    if target_unit_instance_ids is not None:
+        return target_unit_instance_ids
+    if context.target_unit_instance_ids:
+        return context.target_unit_instance_ids
+    if (
+        clause.target is not None
+        and clause.target.kind is RuleTargetKind.THIS_UNIT
+        and context.source_unit_instance_id is not None
+    ):
+        return (context.source_unit_instance_id,)
+    return ()
+
+
+def _duration_unavailable_reason(
+    *,
+    clause: RuleClause,
+    context: RuleExecutionContext,
+) -> str | None:
+    if clause.duration is None:
+        return None
+    if clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT:
+        return None
+    parameters = parameter_payload(clause.duration.parameters)
+    if parameters.get("endpoint") == "phase" and context.phase is None:
+        return "missing_phase"
+    return None
+
+
+def _effect_semantic_unavailable_reason(
+    *,
+    rule_ir: RuleIR,
+    effect: RuleEffectSpec,
+    context: RuleExecutionContext,
+    simulated_command_ledgers: dict[str, CommandPointLedger],
+) -> str | None:
+    if effect.kind is RuleEffectKind.ADD_VICTORY_POINTS and context.phase is None:
+        return "missing_phase"
+    if effect.kind is RuleEffectKind.MODIFY_COMMAND_POINTS:
+        return _command_point_unavailable_reason(
+            rule_ir=rule_ir,
+            effect=effect,
+            context=context,
+            simulated_command_ledgers=simulated_command_ledgers,
+        )
+    return None
+
+
+def _command_point_unavailable_reason(
+    *,
+    rule_ir: RuleIR,
+    effect: RuleEffectSpec,
+    context: RuleExecutionContext,
+    simulated_command_ledgers: dict[str, CommandPointLedger],
+) -> str | None:
+    state = context.state
+    if state is None:
+        return "missing_input:game_state"
+    delta = _int_parameter(effect, "delta")
+    if delta == 0:
+        return "zero_command_point_delta"
+    ledger = simulated_command_ledgers.get(context.player_id)
+    if ledger is None:
+        ledger = state.command_point_ledger_for_player(context.player_id)
+    if delta > 0:
+        updated, gain_result = ledger.gain(
+            battle_round=state.battle_round,
+            amount=delta,
+            source_id=rule_ir.source_id,
+            source_kind=CommandPointSourceKind.OTHER,
+            cap_exempt=False,
+        )
+        if gain_result.status is not CommandPointGainStatus.APPLIED:
+            return "command_point_gain_capped"
+        simulated_command_ledgers[context.player_id] = updated
+        return None
+    updated, spend_result = ledger.spend(
+        battle_round=state.battle_round,
+        amount=abs(delta),
+        source_id=rule_ir.source_id,
+    )
+    if spend_result.status is not CommandPointSpendStatus.APPLIED:
+        return "insufficient_command_points"
+    simulated_command_ledgers[context.player_id] = updated
+    return None
 
 
 def _binding_unavailable_reason(
