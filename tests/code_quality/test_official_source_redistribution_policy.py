@@ -38,7 +38,7 @@ def test_official_gw_faction_pack_manifest_uses_local_cache_policy() -> None:
     manifest_path = _ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
     entries = load_official_source_manifest(manifest_path)
 
-    assert len(entries) == 22
+    assert len(entries) == 28
     assert all(
         entry.source_page_url == _OFFICIAL_WARHAMMER_40000_DOWNLOADS_PAGE for entry in entries
     )
