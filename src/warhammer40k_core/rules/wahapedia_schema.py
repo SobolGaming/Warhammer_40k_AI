@@ -656,6 +656,7 @@ class WahapediaJsonArtifact:
         *,
         source_package_id: DataPackageId,
         table: WahapediaCsvTable,
+        source_checksum_sha256: str | None = None,
         schema: WahapediaTableSchema | None = None,
     ) -> Self:
         selected_schema = schema_for_table(table.table_name) if schema is None else schema
@@ -668,7 +669,14 @@ class WahapediaJsonArtifact:
         return cls(
             source_package_id=source_package_id,
             source_table=selected_schema.table_name,
-            source_checksum_sha256=table.checksum_sha256,
+            source_checksum_sha256=(
+                table.checksum_sha256
+                if source_checksum_sha256 is None
+                else _validate_sha256(
+                    "WahapediaJsonArtifact source_checksum_sha256",
+                    source_checksum_sha256,
+                )
+            ),
             rows=report.rows,
         )
 

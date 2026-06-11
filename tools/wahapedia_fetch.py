@@ -5,7 +5,7 @@ import json
 import urllib.request
 from dataclasses import dataclass
 from datetime import date
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_catalog import SourceFileChecksum
@@ -16,6 +16,18 @@ from warhammer40k_core.rules.wahapedia_schema import WahapediaSourceSnapshot
 class WahapediaFetchSource:
     url: str
     relative_path: str
+
+    def __post_init__(self) -> None:
+        if type(self.url) is not str:
+            raise ValueError("WahapediaFetchSource URL must be a string.")
+        if type(self.relative_path) is not str:
+            raise ValueError("WahapediaFetchSource relative path must be a string.")
+        url = self.url.strip()
+        relative_path = _validate_source_relative_path(self.relative_path)
+        if not url:
+            raise ValueError("WahapediaFetchSource URL must not be empty.")
+        object.__setattr__(self, "url", url)
+        object.__setattr__(self, "relative_path", relative_path)
 
 
 def fetch_wahapedia_sources(
@@ -32,7 +44,7 @@ def fetch_wahapedia_sources(
     output_dir.mkdir(parents=True, exist_ok=True)
     written_paths: list[Path] = []
     for source in sources:
-        target_path = output_dir / source.relative_path
+        target_path = _target_path_inside_output_dir(output_dir, source.relative_path)
         target_path.parent.mkdir(parents=True, exist_ok=True)
         with urllib.request.urlopen(source.url) as response:
             target_path.write_bytes(response.read())
@@ -95,9 +107,34 @@ def _source_from_argument(value: str) -> WahapediaFetchSource:
     if "=" not in value:
         raise ValueError("--source must use URL=relative/path.csv form.")
     url, relative_path = value.split("=", 1)
-    if not url.strip() or not relative_path.strip():
-        raise ValueError("--source URL and relative path must not be empty.")
-    return WahapediaFetchSource(url=url.strip(), relative_path=relative_path.strip())
+    return WahapediaFetchSource(url=url, relative_path=relative_path)
+
+
+def _target_path_inside_output_dir(output_dir: Path, relative_path: str) -> Path:
+    rel = Path(_validate_source_relative_path(relative_path))
+    resolved_output_dir = output_dir.resolve()
+    resolved_target = (resolved_output_dir / rel).resolve()
+    if (
+        resolved_target != resolved_output_dir
+        and resolved_output_dir not in resolved_target.parents
+    ):
+        raise ValueError("--source target path must be inside output-dir.")
+    return resolved_target
+
+
+def _validate_source_relative_path(relative_path: str) -> str:
+    path = relative_path.strip()
+    if not path:
+        raise ValueError("--source relative path must not be empty.")
+    windows_path = PureWindowsPath(path)
+    path_views = (Path(path), PurePosixPath(path), windows_path)
+    if any(path_view.is_absolute() for path_view in path_views) or any(
+        part == ".." for path_view in path_views for part in path_view.parts
+    ):
+        raise ValueError("--source relative path must be relative and must not contain '..'.")
+    if windows_path.drive or windows_path.root:
+        raise ValueError("--source relative path must be relative and must not contain '..'.")
+    return path
 
 
 if __name__ == "__main__":

@@ -40,7 +40,7 @@ def build_wahapedia_json_artifacts(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     artifacts: list[WahapediaJsonArtifact] = []
-    for csv_path in csv_paths:
+    for csv_path, source_file in zip(csv_paths, source_files, strict=True):
         table = WahapediaCsvTable.from_csv_text(
             table_name=csv_path.stem,
             csv_text=csv_path.read_text(encoding="utf-8-sig"),
@@ -48,6 +48,7 @@ def build_wahapedia_json_artifacts(
         artifact = WahapediaJsonArtifact.from_csv_table(
             source_package_id=package_id,
             table=table,
+            source_checksum_sha256=source_file.checksum_sha256,
         )
         (output_dir / f"{artifact.source_table}.json").write_bytes(artifact.to_json_bytes())
         artifacts.append(artifact)

@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.wahapedia_csv_to_json import build_wahapedia_json_artifacts
+from tools.wahapedia_fetch import WahapediaFetchSource, fetch_wahapedia_sources
 
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.html_sanitizer import (
@@ -305,6 +307,74 @@ def test_phase17a_source_file_checksums_use_checked_paths(tmp_path: Path) -> Non
             source_files=(checksum,),
             artifacts=(artifact_hash, artifact_hash),
         )
+
+
+def test_phase17a_wahapedia_fetch_rejects_escape_paths_before_download(tmp_path: Path) -> None:
+    output_dir = tmp_path / "downloads"
+    traversal_target = tmp_path / "outside.csv"
+    absolute_target = tmp_path / "absolute.csv"
+
+    with pytest.raises(ValueError, match="relative and must not contain"):
+        fetch_wahapedia_sources(
+            sources=(
+                WahapediaFetchSource(
+                    url="https://example.invalid/Abilities.csv",
+                    relative_path="../outside.csv",
+                ),
+            ),
+            output_dir=output_dir,
+            package_id=_package_id(),
+            catalog_version=_catalog_version(),
+            upstream_identity="wahapedia-export",
+            source_edition="warhammer-40000-11th",
+        )
+    assert not traversal_target.exists()
+
+    with pytest.raises(ValueError, match="relative"):
+        fetch_wahapedia_sources(
+            sources=(
+                WahapediaFetchSource(
+                    url="https://example.invalid/Abilities.csv",
+                    relative_path=str(absolute_target),
+                ),
+            ),
+            output_dir=output_dir,
+            package_id=_package_id(),
+            catalog_version=_catalog_version(),
+            upstream_identity="wahapedia-export",
+            source_edition="warhammer-40000-11th",
+        )
+    assert not absolute_target.exists()
+
+
+def test_phase17a_generated_artifact_uses_raw_source_file_checksum(tmp_path: Path) -> None:
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+    raw_csv = b'\xef\xbb\xbfid,name,description\r\nability-1,Angels Fury,"Roll D6."\r\n'
+    (input_dir / "Abilities.csv").write_bytes(raw_csv)
+
+    manifest = build_wahapedia_json_artifacts(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        package_id=_package_id(),
+        catalog_version=_catalog_version(),
+        upstream_identity="wahapedia-export",
+        source_edition="warhammer-40000-11th",
+    )
+    artifact_payload = cast(
+        WahapediaJsonArtifactPayload,
+        json.loads((output_dir / "Abilities.json").read_bytes()),
+    )
+    raw_checksum = hashlib.sha256(raw_csv).hexdigest()
+    decoded_csv_text = (input_dir / "Abilities.csv").read_text(encoding="utf-8-sig")
+
+    assert hashlib.sha256(decoded_csv_text.encode()).hexdigest() != raw_checksum
+    assert manifest.source_files[0].checksum_sha256 == raw_checksum
+    assert artifact_payload["source_checksum_sha256"] == raw_checksum
+    assert WahapediaJsonArtifact.from_payload(artifact_payload).source_checksum_sha256 == (
+        raw_checksum
+    )
 
 
 def test_phase17a_wahapedia_payloads_reject_drift_and_invalid_links() -> None:
