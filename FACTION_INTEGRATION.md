@@ -20,6 +20,35 @@ instructions, and then compiled into 11th Edition catalog records.
 - Do not mark a faction phase complete while unapproved unsupported descriptors
   remain for matched-play content in that phase.
 
+## Phase 17E Scope Boundary
+
+Phase 17E is complete only when faction-level matched-play content is covered
+for every faction in the current source package:
+
+- every faction has a source-linked army rule descriptor;
+- every detachment has a source-linked detachment rule descriptor;
+- every detachment enhancement and detachment Stratagem has source-linked
+  descriptors, target/timing/eligibility metadata, generic IR where possible, or
+  approved unsupported diagnostics;
+- the coverage report groups implemented, generic-supported,
+  named-handler-required, and unsupported faction, detachment, enhancement, and
+  Stratagem rules;
+- tests prove every faction and detachment row loads from source-backed catalog
+  records.
+
+Phase 17E must also intake unit rows far enough to make faction and detachment
+coverage reviewable: datasheet identity, composition, wargear-option, base-size,
+geometry, representative-height, keyword, and faction-keyword rows must be
+source-linked or explicitly blocked by diagnostics. Broad datasheet, wargear,
+and weapon ability execution belongs to Phase 17F unless a unit rule is
+inseparable from a Phase 17E army rule, detachment rule, enhancement, or
+Stratagem.
+
+Do not hand-author an exhaustive unit-name list in this Markdown file. Unit
+subphases must be expanded from generated source coverage reports so names,
+source IDs, geometry blockers, and unsupported descriptors stay synchronized
+with the patched source mirror.
+
 ## Queue Source
 
 The seeded detachment queue is derived from:
@@ -53,9 +82,10 @@ for row in source.detachment_rows():
 PY
 ```
 
-Names in this queue preserve upstream source-row spelling exactly, including any
-official misspellings. Corrections must be represented as source-linked patch operations,
-not silent edits. The current source package intentionally preserves
+Names in this queue preserve the package's normalized source-row spelling exactly,
+including any official misspellings. Corrections must be represented as
+source-linked patch operations, not silent edits. The current source package
+intentionally preserves
 `Auxillary Cadre` and `Brood Brothers Auxillia` because those are the exact
 source-row names in the seeded package at source IDs
 `gw-11e-faction-detachments-2026-27:detachment:tau-empire:auxillary-cadre` and
@@ -74,7 +104,8 @@ Each faction has an unlettered intake gate before lettered work starts:
 2. Add official 11th Edition transition patch records for the faction.
 3. Generate a source coverage report for army rules, detachments, enhancements,
    Stratagems, datasheets, wargear, weapon profiles, base sizes, and FAQs.
-4. Expand the faction's lettered subphases from exact source row names.
+4. Expand the faction's detachment, enhancement, Stratagem, and datasheet-intake
+   subphases from exact source row names and source IDs.
 
 Lettered subphases should be small enough for review. Prefer one detachment or
 one datasheet per subphase unless several datasheets share one inseparable kit,
@@ -126,22 +157,32 @@ Reclassification requires a source-linked patch operation or diagnostic update.
 
 ## Faction Phase Queue
 
-The queue starts with the pilot, then proceeds through factions already seeded in
-the current 11th Edition faction-detachment source package, then fills missing
-Imperial factions from the patched Wahapedia bridge source.
+The queue starts with the pilot, then proceeds through every faction seeded in
+the current 11th Edition faction-detachment source package. Detachment names
+below are exact normalized source-row names from that package and must be
+refreshed from the package API, not hand-edited.
+
+For every faction phase below, datasheet intake letters cover exact datasheet
+identity, composition, wargear-option, base-size, geometry,
+representative-height, keyword, and faction-keyword rows from the patched source
+mirror, one datasheet or source-coupled kit group per letter. Datasheet,
+wargear, and weapon ability execution is deferred to Phase 17F unless the rule
+is inseparable from a Phase 17E army rule, detachment rule, enhancement, or
+Stratagem.
 
 ### Phase Death Guard
 
-Initial letters are defined in the pilot phase. Remaining letters cover exact
-Death Guard datasheet rows from the patched source mirror.
+Initial letters are defined in the pilot phase.
+
+- Detachment letters: Paragons of Putrescence, Contagion Engines, Flyblown
+  Host, Champions of Contagion, Death Lord's Chosen, Mortarion's Hammer,
+  Shamblerot Vectorium, Tallyband Summoners, Virulent Vectorium.
 
 ### Phase Orks
 
 - Detachment letters: More Dakka!, Rollin' Deff, Taktikal Brigade, Blitz
   Brigade, Bully Boyz, Da Big Hunt, Dread Mob, Freebooter Krew, Green Tide, Kult
   of Speed, Speedwaaagh!, War Horde.
-- Datasheet letters: exact Orks datasheet rows from the patched source mirror,
-  one datasheet or source-coupled kit group per letter.
 
 ### Phase Aeldari
 
@@ -149,32 +190,24 @@ Death Guard datasheet rows from the patched source mirror.
   Outcast, Twilight Flickers, Aspect Host, Corsair Coterie, Devoted of Ynnead,
   Eldritch Raiders, Ghosts of the Webway, Guardian Battlehost, Seer Council,
   Serpent's Brood, Spirit Conclave, Warhost, Windrider Host.
-- Datasheet letters: exact Aeldari datasheet rows from the patched source mirror,
-  one datasheet or source-coupled kit group per letter.
 
 ### Phase Drukhari
 
 - Detachment letters: Exhibition of Slaughter, Kabalite Agonysts, Tools of
   Torment, Covenite Coterie, Kabalite Cartel, Realspace Raiders, Reaper's Wager,
   Skysplinter Assault, Spectacle of Spite.
-- Datasheet letters: exact Drukhari datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Tyranids
 
 - Detachment letters: Ambush Predators, Talons of the Norn Queen, Warrior
   Bioform Onslaught, Assimilation Swarm, Crusher Stampede, Invasion Fleet,
   Subterranean Assault, Synaptic Nexus, Unending Swarm, Vanguard Onslaught.
-- Datasheet letters: exact Tyranids datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Genestealer Cults
 
 - Detachment letters: Heroes of the Uprising, Purestrain Broodswarm, Xenocult
   Masses, Biosanctic Broodsurge, Brood Brothers Auxillia, Final Day, Host of
   Ascension, Outlander Claw, Xenocreed Congregation.
-- Datasheet letters: exact Genestealer Cults datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Necrons
 
@@ -182,23 +215,17 @@ Death Guard datasheet rows from the patched source mirror.
   Armoury, Annihilation Legion, Awakened Dynasty, Canoptek Court, Cryptek
   Conclave, Cursed Legion, Hypercrypt Legion, Obeisance Phalanx, Pantheon of
   Woe, Starshatter Arsenal.
-- Datasheet letters: exact Necrons datasheet rows from the patched source mirror,
-  one datasheet or source-coupled kit group per letter.
 
 ### Phase Leagues of Votann
 
 - Detachment letters: Armoured Trailblazers, Farseekers, Hearthguard Covenant,
-  Brandfast Oathband, Dalve Assault Shift, Hearthband, Hearthfyre Arsenal,
+  Brandfast Oathband, Delve Assault Shift, Hearthband, Hearthfyre Arsenal,
   Mercenary Oathband, Needgaard Oathband, Persecution Prospect.
-- Datasheet letters: exact Leagues of Votann datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
 
-### Phase Tau Empire
+### Phase T'au Empire
 
 - Detachment letters: Advanced Acquisition Cadre, Auxillary Cadre, Experimental
   Prototype Cadre, Kauyon, Kroot Hunting Pack, Mont'ka, Retaliation Cadre.
-- Datasheet letters: exact Tau Empire datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Space Marines
 
@@ -209,55 +236,40 @@ Death Guard datasheet rows from the patched source mirror.
   Headhunter Task Force, Ironstorm Spearhead, Orbital Assault Force, Reclamation
   Force, Shadowmark Talon, Spearpoint Task Force, Stormlance Task Force,
   Vanguard Spearhead.
-- Datasheet letters: exact Space Marines datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Dark Angels
 
 - Detachment letters: Dark Age Arsenal, Darkflight Pursuit, Interrogation
   Conclave, Company of Hunters, Inner Circle Task Force, Lion's Blade Task
   Force, Unforgiven Task Force, Wrath of the Rock.
-- Datasheet letters: exact Dark Angels datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Blood Angels
 
 - Detachment letters: Encarmine Speartip, Legacy of Grace, Wrath of the Doomed,
   Angelic Inheritors, Liberator Assault Group, Rage-cursed Onslaught, The
   Angelic Host, The Lost Brethren.
-- Datasheet letters: exact Blood Angels datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Space Wolves
 
 - Detachment letters: Champions of Fenris, Legends of Saga and Song, Veterans of
   the Fang, Saga of the Beastslayer, Saga of the Bold, Saga of the Great Wolf,
   Saga of the Hunter.
-- Datasheet letters: exact Space Wolves datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Black Templars
 
 - Detachment letters: Marshal's Household, The Living Miracle, Wrathful
   Procession, Companions of Vehemence, Godhammer Assault Force, Vindication Task
   Force.
-- Datasheet letters: exact Black Templars datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Deathwatch
 
-- Detachment letters: Black Spear Task Force, plus any official 11th Edition
-  transition detachments imported from source rows.
-- Datasheet letters: exact Deathwatch datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
+- Detachment letters: Black Spear Task Force.
 
 ### Phase Grey Knights
 
 - Detachment letters: Argent Assault, Fires of Purgation, Immaterial
   Interdiction, Augurium Task Force, Banishers, Brotherhood Strike, Hallowed
   Conclave, Sanctic Spearhead, Warpbane Task Force.
-- Datasheet letters: exact Grey Knights datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Chaos Space Marines
 
@@ -266,90 +278,72 @@ Death Guard datasheet rows from the patched source mirror.
   Talons, Fellhammer Siege-host, Huron's Marauders, Nightmare Hunt, Pactbound
   Zealots, Renegade Raiders, Renegade Warband, Soulforged Warpack, Veterans of
   the Long War, Warpstrike Champions.
-- Datasheet letters: exact Chaos Space Marines datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase World Eaters
 
 - Detachment letters: Butchers of Khorne, Brazen Engines, Vessels of Wrath,
   Berzerker Warband, Cult of Blood, Goretrack Onslaught, Khorne Daemonkin,
   Possessed Slaughterband.
-- Datasheet letters: exact World Eaters datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Emperor's Children
 
 - Detachment letters: Elegant Brutes, Frenzied Host, Spectacle of Slaughter,
   Carnival of Excess, Coterie of the Conceited, Court of the Phoenician,
   Mercurial Host, Peerless Bladesmen, Rapid Evisceration, Slaanesh's Chosen.
-- Datasheet letters: exact Emperor's Children datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Thousand Sons
 
 - Detachment letters: Ritual of Regeneration, Sekhetar Cohort, Servants of
   Change, Changehost of Deceit, Grand Coven, Hexwarp Thrallband, Rubricae
   Phalanx, Warpforged Cabal, Warpmeld Pact.
-- Datasheet letters: exact Thousand Sons datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Chaos Knights
 
 - Detachment letters: Bastions of Tyranny, Hunting Warpack, Iconoclast Fiefdom,
   Helhunt Lance, Houndpack Lance, Infernal Lance, Lords of Dread, Traitoris
   Lance.
-- Datasheet letters: exact Chaos Knights datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Chaos Daemons
 
 - Detachment letters: Cavalcade of Chaos, Lords of the Warp, Warptide, Blood
   Legion, Daemonic Incursion, Legion of Excess, Plague Legion, Scintillating
   Legion, Shadow Legion.
-- Datasheet letters: exact Chaos Daemons datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
 
 ### Phase Adepta Sororitas
 
-- Detachment letters: exact Adepta Sororitas detachments from the patched source
-  mirror and official transition package.
-- Datasheet letters: exact Adepta Sororitas datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
+- Detachment letters: Chorus of Condemnation, Sacred Champions, Sanctified
+  Orators, Army of Faith, Bringers of Flame, Champions of Faith, Hallowed
+  Martyrs, Penitent Host.
 
 ### Phase Adeptus Custodes
 
-- Detachment letters: exact Adeptus Custodes detachments from the patched source
-  mirror and official transition package.
-- Datasheet letters: exact Adeptus Custodes datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
+- Detachment letters: Might of the Moritoi, Silent Hunters, Tharanatoi
+  Hammerblow, Auric Champions, Lions of the Emperor, Null Maiden Vigil, Shield
+  Host, Solar Spearhead, Talons of the Emperor.
 
 ### Phase Adeptus Mechanicus
 
-- Detachment letters: exact Adeptus Mechanicus detachments from the patched
-  source mirror and official transition package.
-- Datasheet letters: exact Adeptus Mechanicus datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
+- Detachment letters: Cohort Acquisitus, Lords of the Forge, Luminen Auto-Choir,
+  Cohort Cybernetica, Data-psalm Conclave, Eradication Cohort, Explorator
+  Maniple, Haloscreed Battle Clade, Rad-zone Corps, Skitarii Hunter Cohort.
 
 ### Phase Astra Militarum
 
-- Detachment letters: exact Astra Militarum detachments from the patched source
-  mirror and official transition package.
-- Datasheet letters: exact Astra Militarum datasheet rows from the patched source
-  mirror, one datasheet or source-coupled kit group per letter.
+- Detachment letters: Abhuman Auxiliaries, Bridgehead Strike, Designation Force,
+  Armoured Infantry, Combined Arms, Grizzled Company, Hammer of the Emperor,
+  Mechanised Assault, Recon Element, Siege Regiment, Steel Hammer.
 
 ### Phase Imperial Agents
 
-- Detachment letters: exact Imperial Agents detachments from the patched source
-  mirror and official transition package.
-- Datasheet letters: exact Imperial Agents datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
+- Detachment letters: Imperialis Fleet; Ordo Hereticus, Purgation Force; Ordo
+  Malleus, Daemon Hunters; Ordo Xenos, Alien Hunters; Veiled Blade Elimination
+  Force.
 
 ### Phase Imperial Knights
 
-- Detachment letters: exact Imperial Knights detachments from the patched source
-  mirror and official transition package.
-- Datasheet letters: exact Imperial Knights datasheet rows from the patched
-  source mirror, one datasheet or source-coupled kit group per letter.
+- Detachment letters: Dominus Foebreakers, Questor Forgepact, Throne-bonded
+  Outriders, Freeblade Company, Gate Warden Lance, Questoris Companions,
+  Spearhead-at-arms, Valourstrike Lance.
 
 ## Per-Subphase Completion Gate
 
