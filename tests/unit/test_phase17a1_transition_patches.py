@@ -442,6 +442,58 @@ def test_phase17a1_tools_write_canonical_package_and_patched_artifacts(tmp_path:
     )
 
 
+def test_phase17a1_apply_cli_stages_outputs_until_all_artifacts_succeed(
+    tmp_path: Path,
+) -> None:
+    abilities_artifact = _abilities_artifact(
+        'id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n'
+    )
+    datasheets_source = _datasheets_artifact('id,name,keywords\ndg-pm,Plague Marines,"INFANTRY"\n')
+    datasheets_drifted = _datasheets_artifact(
+        'id,name,keywords\ndg-pm,Plague Marines,"INFANTRY, CHAOS"\n'
+    )
+    package = _patch_package(
+        operations=(
+            _operation(
+                operation_id="dg-replace-ability-text",
+                order_index=1,
+                family=SourceTransitionPatchOperationFamily.REPLACE_RULE_TEXT,
+                target=SourcePatchTarget.from_rows(
+                    source_table="Abilities",
+                    rows=(_row_by_id(abilities_artifact, "dg-aura"),),
+                ),
+                instruction_text="Replace the source rule text.",
+                payload=(("column_name", "description"), ("text", "Roll D6 within 12 inches.")),
+            ),
+            _operation(
+                operation_id="dg-add-datasheet-keyword",
+                order_index=2,
+                family=SourceTransitionPatchOperationFamily.ADD_KEYWORD,
+                target=SourcePatchTarget.from_rows(
+                    source_table="Datasheets",
+                    rows=(_row_by_id(datasheets_source, "dg-pm"),),
+                ),
+                instruction_text="Add DEATH GUARD to Plague Marines.",
+                payload=(("column_name", "keywords"), ("keyword", "DEATH GUARD")),
+            ),
+        )
+    )
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+    (input_dir / "Abilities.json").write_bytes(abilities_artifact.to_json_bytes())
+    (input_dir / "Datasheets.json").write_bytes(datasheets_drifted.to_json_bytes())
+
+    with pytest.raises(SourcePatchError, match="target_drift"):
+        apply_transition_patches(
+            input_dir=input_dir,
+            output_dir=output_dir,
+            patch_package=package,
+        )
+
+    assert not output_dir.exists()
+
+
 def test_phase17a1_apply_cli_rejects_patch_package_with_missing_target_table(
     tmp_path: Path,
 ) -> None:

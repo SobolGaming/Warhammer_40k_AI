@@ -57,22 +57,24 @@ def apply_transition_patches(
         )
         return ()
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-    patched_artifacts: list[PatchedSourceArtifact] = []
-    for artifact in artifacts:
-        patched = apply_transition_patch_package(
+    patched_artifacts = tuple(
+        apply_transition_patch_package(
             artifact=artifact,
             patch_package=patch_package,
             raise_on_blocking=raise_on_blocking,
         )
+        for artifact in artifacts
+    )
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for patched in patched_artifacts:
         (output_dir / f"{patched.source_table}.patched.json").write_bytes(patched.to_json_bytes())
-        patched_artifacts.append(patched)
 
     (output_dir / "transition_patch_package.json").write_text(
         json.dumps(patch_package.to_payload(), sort_keys=True, indent=2),
         encoding="utf-8",
     )
-    return tuple(patched_artifacts)
+    return patched_artifacts
 
 
 def _load_source_artifact(path: Path) -> WahapediaJsonArtifact:
