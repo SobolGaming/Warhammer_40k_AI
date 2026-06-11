@@ -220,6 +220,8 @@ without native structured semantics return typed unsupported results with
 approved reasons instead of missing handlers, silent no-ops, or runtime PDF/text
 parsing; future native descriptors can replace those blocked execution statuses
 with generic IR or named handlers without changing the dispatch contract.
+Executable statuses still fail closed unless a registered generic IR executor or
+named handler actually runs, so APPLIED is never produced by status alone.
 
 Completed / implemented foundation:
 
@@ -4244,6 +4246,8 @@ Invariants:
 - every execution record dispatches through a single engine path;
 - execution attempts return deterministic JSON-safe applied, invalid, or unsupported results;
 - blocked execution uses approved source-linked reasons, never missing handlers or silent no-ops;
+- executable execution statuses require a registered generic IR executor or
+  named handler before they can return applied;
 - runtime execution consumes structured descriptors and never parses PDFs or raw rule text.
 
 Phase 17F is implemented by
@@ -4254,7 +4258,8 @@ Stratagem descriptor, and datasheet-intake coverage rows into execution records.
 The engine dispatcher resolves every record through a typed execution result.
 Rows that still lack native structured semantics are explicitly unsupported with
 approved reasons; they do not execute by fallback and do not disappear as
-missing handlers.
+missing handlers. Executable statuses without registered executors return typed
+unsupported diagnostics instead of APPLIED.
 
 Required tests:
 
@@ -4262,6 +4267,7 @@ Required tests:
 - execution package payloads are deterministic, JSON-safe, and checksum-guarded;
 - execution status counts match Phase 17E coverage status counts;
 - execution registry dispatches every record without missing handlers;
+- executable records without registered executors return typed unsupported results;
 - blocked execution records reject unapproved or inconsistent block shapes.
 
 ## Phase 17G: broad weapon/wargear/datasheet ability coverage and execution

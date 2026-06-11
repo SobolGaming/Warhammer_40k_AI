@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+from collections.abc import Mapping
 from dataclasses import replace
 from typing import cast
 
@@ -12,6 +14,8 @@ from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionRegistry,
     FactionRuleExecutionResult,
     FactionRuleExecutionStatus,
+    FactionRuleGenericIrExecutor,
+    FactionRuleNamedHandler,
     default_faction_rule_execution_registry,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -27,6 +31,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionBlockReason,
     Phase17FExecutionPackage,
+    Phase17FExecutionPackagePayload,
     Phase17FExecutionRecord,
     Phase17FExecutionStatus,
     Phase17FFactionExecutionError,
@@ -85,6 +90,12 @@ def test_phase17f_execution_payload_is_deterministic_json_safe_and_round_trips()
     stale_upstream_payload["upstream_payload_checksum_sha256"] = "0" * 64
     with pytest.raises(Phase17FFactionExecutionError, match="upstream payload checksum"):
         Phase17FExecutionPackage.from_payload(stale_upstream_payload)
+
+    drifted_payload = package.to_payload()
+    drifted_payload["execution_records"][0]["faction_name"] = "Drifted Faction Name"
+    drifted_payload["source_payload_checksum_sha256"] = _payload_checksum(drifted_payload)
+    with pytest.raises(Phase17FFactionExecutionError, match="does not match Phase17E"):
+        Phase17FExecutionPackage.from_payload(drifted_payload)
 
 
 def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> None:
@@ -149,6 +160,27 @@ def test_phase17f_registry_rejects_invalid_registry_inputs_and_contexts() -> Non
     with pytest.raises(GameLifecycleError, match="record IDs must be unique"):
         FactionRuleExecutionRegistry.from_records((record, record))
 
+    with pytest.raises(GameLifecycleError, match="named_handlers must be a mapping"):
+        FactionRuleExecutionRegistry.from_records(
+            (record,),
+            named_handlers=cast(Mapping[str, FactionRuleNamedHandler], object()),
+        )
+
+    with pytest.raises(GameLifecycleError, match="named handlers must be callable"):
+        FactionRuleExecutionRegistry.from_records(
+            (record,),
+            named_handlers=cast(
+                Mapping[str, FactionRuleNamedHandler],
+                {"handler": object()},
+            ),
+        )
+
+    with pytest.raises(GameLifecycleError, match="generic_ir_executor must be callable"):
+        FactionRuleExecutionRegistry.from_records(
+            (record,),
+            generic_ir_executor=cast(FactionRuleGenericIrExecutor, object()),
+        )
+
     registry = FactionRuleExecutionRegistry.from_records((record,))
     with pytest.raises(GameLifecycleError, match="requires a context"):
         registry.execute(
@@ -157,7 +189,86 @@ def test_phase17f_registry_rejects_invalid_registry_inputs_and_contexts() -> Non
         )
 
 
-def test_phase17f_registry_applies_executable_records_through_same_dispatch_path() -> None:
+def test_phase17f_registry_rejects_executable_records_without_registered_executor() -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    named_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+        block_reason=None,
+    )
+    generic_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        block_reason=None,
+        rule_ir_hash="0" * 64,
+        execution_id=f"{blocked_record.execution_id}:generic",
+    )
+    registry = FactionRuleExecutionRegistry.from_records((named_record, generic_record))
+
+    named_result = registry.execute(execution_id=named_record.execution_id, context=_context())
+    generic_result = registry.execute(execution_id=generic_record.execution_id, context=_context())
+
+    assert named_result.status is FactionRuleExecutionStatus.UNSUPPORTED
+    assert named_result.reason == "named_handler_not_registered"
+    assert generic_result.status is FactionRuleExecutionStatus.UNSUPPORTED
+    assert generic_result.reason == "generic_ir_executor_not_registered"
+
+
+def test_phase17f_registry_applies_executable_records_only_after_registered_executor_runs() -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    named_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+        block_reason=None,
+    )
+    generic_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        block_reason=None,
+        rule_ir_hash="0" * 64,
+        execution_id=f"{blocked_record.execution_id}:generic",
+    )
+    calls: list[str] = []
+    handler_id = _require_handler_id(named_record)
+
+    def named_handler(
+        record: Phase17FExecutionRecord,
+        context: FactionRuleExecutionContext,
+    ) -> FactionRuleExecutionResult:
+        calls.append(f"named:{record.execution_id}")
+        return FactionRuleExecutionResult.applied(record=record, context=context)
+
+    def generic_executor(
+        record: Phase17FExecutionRecord,
+        context: FactionRuleExecutionContext,
+    ) -> FactionRuleExecutionResult:
+        calls.append(f"generic:{record.execution_id}")
+        return FactionRuleExecutionResult.applied(record=record, context=context)
+
+    registry = FactionRuleExecutionRegistry.from_records(
+        (named_record, generic_record),
+        named_handlers={handler_id: named_handler},
+        generic_ir_executor=generic_executor,
+    )
+
+    named_result = registry.execute(execution_id=named_record.execution_id, context=_context())
+    generic_result = registry.execute(execution_id=generic_record.execution_id, context=_context())
+
+    assert calls == [
+        f"named:{named_record.execution_id}",
+        f"generic:{generic_record.execution_id}",
+    ]
+    assert named_result.status is FactionRuleExecutionStatus.APPLIED
+    assert generic_result.status is FactionRuleExecutionStatus.APPLIED
+    assert FactionRuleExecutionResult.from_payload(named_result.to_payload()) == named_result
+    assert FactionRuleExecutionResult.from_payload(generic_result.to_payload()) == generic_result
+
+
+def test_phase17f_registry_rejects_mismatched_executor_result() -> None:
     blocked_record = _first_execution_record(
         Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
     )
@@ -166,13 +277,25 @@ def test_phase17f_registry_applies_executable_records_through_same_dispatch_path
         execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
         block_reason=None,
     )
-    registry = FactionRuleExecutionRegistry.from_records((executable_record,))
+    mismatched_result = FactionRuleExecutionResult.applied(
+        record=replace(executable_record, execution_id=f"{executable_record.execution_id}:wrong"),
+        context=_context(),
+    )
+    handler_id = _require_handler_id(executable_record)
 
-    result = registry.execute(execution_id=executable_record.execution_id, context=_context())
+    def mismatched_handler(
+        record: Phase17FExecutionRecord,
+        context: FactionRuleExecutionContext,
+    ) -> FactionRuleExecutionResult:
+        return mismatched_result
 
-    assert result.status is FactionRuleExecutionStatus.APPLIED
-    assert result.reason is None
-    assert FactionRuleExecutionResult.from_payload(result.to_payload()) == result
+    registry = FactionRuleExecutionRegistry.from_records(
+        (executable_record,),
+        named_handlers={handler_id: mismatched_handler},
+    )
+
+    with pytest.raises(GameLifecycleError, match="mismatched execution_id"):
+        registry.execute(execution_id=executable_record.execution_id, context=_context())
 
 
 def test_phase17f_context_payload_round_trips() -> None:
@@ -228,6 +351,14 @@ def test_phase17f_execution_records_reject_inconsistent_block_shapes() -> None:
             rule_ir_hash=None,
         )
 
+    with pytest.raises(Phase17FFactionExecutionError, match="require handler_id"):
+        replace(
+            blocked_record,
+            execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+            block_reason=None,
+            handler_id=None,
+        )
+
     with pytest.raises(Phase17FFactionExecutionError, match="require phase17e"):
         replace(source_gap_record, phase17e_unsupported_reason=None)
 
@@ -281,3 +412,18 @@ def _first_execution_record(status: Phase17FExecutionStatus) -> Phase17FExecutio
         if record.execution_status is status:
             return record
     raise AssertionError(f"Missing Phase17F execution status: {status.value}.")
+
+
+def _require_handler_id(record: Phase17FExecutionRecord) -> str:
+    if record.handler_id is None:
+        raise AssertionError("Expected Phase17F execution record to include handler_id.")
+    return record.handler_id
+
+
+def _payload_checksum(payload: Phase17FExecutionPackagePayload) -> str:
+    payload_without_checksum: dict[str, object] = dict(payload)
+    payload_without_checksum["source_payload_checksum_sha256"] = ""
+    encoded = json.dumps(payload_without_checksum, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
+    return hashlib.sha256(encoded).hexdigest()

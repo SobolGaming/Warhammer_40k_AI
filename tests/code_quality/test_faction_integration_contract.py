@@ -150,6 +150,8 @@ def test_faction_integration_records_phase17f_execution_gate() -> None:
         "rows are blocked as `approved_phase17e_source_gap`"
     ) in normalized_document
     assert "No Phase 17E row remains a missing handler" in normalized_document
+    assert "unregistered executable statuses return typed `unsupported`" in normalized_document
+    assert "cannot emit `applied` by status alone" in normalized_document
 
 
 def test_faction_integration_table_of_contents_links_every_execution_section() -> None:

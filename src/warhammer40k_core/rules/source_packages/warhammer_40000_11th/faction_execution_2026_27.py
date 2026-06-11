@@ -201,6 +201,11 @@ class Phase17FExecutionRecord:
         ):
             raise Phase17FFactionExecutionError("Generic executable rows require rule_ir_hash.")
         if (
+            execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+            and self.handler_id is None
+        ):
+            raise Phase17FFactionExecutionError("Named-handler executable rows require handler_id.")
+        if (
             execution_status is Phase17FExecutionStatus.BLOCKED_APPROVED_UNSUPPORTED_SOURCE_GAP
             and self.phase17e_unsupported_reason is None
         ):
@@ -409,7 +414,8 @@ def _validate_execution_records(
 ) -> tuple[Phase17FExecutionRecord, ...]:
     if type(records) is not tuple:
         raise Phase17FFactionExecutionError("Phase17F execution_records must be a tuple.")
-    coverage_descriptor_ids = {row.descriptor_id for row in _coverage_rows()}
+    coverage_rows_by_descriptor_id = {row.descriptor_id: row for row in _coverage_rows()}
+    coverage_descriptor_ids = set(coverage_rows_by_descriptor_id)
     seen: set[str] = set()
     covered: set[str] = set()
     validated: list[Phase17FExecutionRecord] = []
@@ -423,6 +429,12 @@ def _validate_execution_records(
         if record.coverage_descriptor_id not in coverage_descriptor_ids:
             raise Phase17FFactionExecutionError(
                 "Phase17F execution record references unknown Phase17E coverage row."
+            )
+        coverage_row = coverage_rows_by_descriptor_id[record.coverage_descriptor_id]
+        expected_record = _execution_record(coverage_row)
+        if record.to_payload() != expected_record.to_payload():
+            raise Phase17FFactionExecutionError(
+                "Phase17F execution record does not match Phase17E coverage row."
             )
         seen.add(record.execution_id)
         covered.add(record.coverage_descriptor_id)

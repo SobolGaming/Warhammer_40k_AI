@@ -145,7 +145,9 @@ The package emits 854 execution records, one for every Phase 17E coverage row:
 blocked as `approved_phase17e_source_gap`. The engine dispatcher can execute
 every record and returns typed `unsupported` results with those reasons. No
 Phase 17E row remains a missing handler, runtime no-op, raw-PDF parse, or silent
-fallback.
+fallback. Future executable rows require a registered generic IR executor or
+named handler; unregistered executable statuses return typed `unsupported`
+diagnostics and cannot emit `applied` by status alone.
 
 ## Faction Execution Status Matrix
 

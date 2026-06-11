@@ -253,10 +253,12 @@ Phase 17E coverage row. The
 `gw-11e-phase17f-faction-execution-2026-27` package maps every Phase 17E
 coverage descriptor to an execution record, and
 `engine/faction_rule_execution.py` provides one deterministic engine path that
-returns replay-safe applied or unsupported results. Current faction army-rule,
-detachment-rule, enhancement, Stratagem, and datasheet-intake rows are blocked
-by explicit approved execution reasons until native structured rule semantics
-exist; no covered row falls through as a missing handler or silent fallback.
+returns replay-safe results. Current faction army-rule, detachment-rule,
+enhancement, Stratagem, and datasheet-intake rows are blocked by explicit
+approved execution reasons until native structured rule semantics exist.
+Executable statuses also fail closed unless a registered generic IR executor or
+named handler runs; APPLIED is not emitted by status alone, and no covered row
+falls through as a missing handler or silent fallback.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

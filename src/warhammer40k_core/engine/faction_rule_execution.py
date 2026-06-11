@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Self, TypedDict
+from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -272,12 +272,30 @@ class FactionRuleExecutionResult:
         )
 
 
+FactionRuleNamedHandler = Callable[
+    [Phase17FExecutionRecord, FactionRuleExecutionContext],
+    FactionRuleExecutionResult,
+]
+FactionRuleGenericIrExecutor = Callable[
+    [Phase17FExecutionRecord, FactionRuleExecutionContext],
+    FactionRuleExecutionResult,
+]
+
+
 @dataclass(frozen=True, slots=True)
 class FactionRuleExecutionRegistry:
     _records_by_execution_id: Mapping[str, Phase17FExecutionRecord]
+    _named_handlers: Mapping[str, FactionRuleNamedHandler]
+    _generic_ir_executor: FactionRuleGenericIrExecutor | None = None
 
     @classmethod
-    def from_records(cls, records: tuple[Phase17FExecutionRecord, ...]) -> Self:
+    def from_records(
+        cls,
+        records: tuple[Phase17FExecutionRecord, ...],
+        *,
+        named_handlers: Mapping[str, FactionRuleNamedHandler] | None = None,
+        generic_ir_executor: FactionRuleGenericIrExecutor | None = None,
+    ) -> Self:
         if type(records) is not tuple:
             raise GameLifecycleError("FactionRuleExecutionRegistry records must be a tuple.")
         mapped: dict[str, Phase17FExecutionRecord] = {}
@@ -289,7 +307,11 @@ class FactionRuleExecutionRegistry:
             if record.execution_id in mapped:
                 raise GameLifecycleError("FactionRuleExecutionRegistry record IDs must be unique.")
             mapped[record.execution_id] = record
-        return cls(_records_by_execution_id=MappingProxyType(mapped))
+        return cls(
+            _records_by_execution_id=MappingProxyType(mapped),
+            _named_handlers=_validate_named_handlers(named_handlers),
+            _generic_ir_executor=_validate_generic_ir_executor(generic_ir_executor),
+        )
 
     def all_records(self) -> tuple[Phase17FExecutionRecord, ...]:
         return tuple(
@@ -329,7 +351,29 @@ class FactionRuleExecutionRegistry:
                 reason=f"approved_phase17e_source_gap:{record.phase17e_unsupported_reason}",
                 context=context,
             )
-        return FactionRuleExecutionResult.applied(record=record, context=context)
+        if record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR:
+            if self._generic_ir_executor is None:
+                return FactionRuleExecutionResult.unsupported(
+                    record=record,
+                    reason="generic_ir_executor_not_registered",
+                    context=context,
+                )
+            return _validate_executor_result(
+                record=record,
+                result=self._generic_ir_executor(record, context),
+            )
+        if record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER:
+            if record.handler_id is None:
+                raise GameLifecycleError("Executable named-handler record lacks handler_id.")
+            handler = self._named_handlers.get(record.handler_id)
+            if handler is None:
+                return FactionRuleExecutionResult.unsupported(
+                    record=record,
+                    reason="named_handler_not_registered",
+                    context=context,
+                )
+            return _validate_executor_result(record=record, result=handler(record, context))
+        raise GameLifecycleError("Unsupported Phase17F execution status.")
 
 
 def default_faction_rule_execution_registry() -> FactionRuleExecutionRegistry:
@@ -359,6 +403,59 @@ def _execution_status_from_token(token: object) -> FactionRuleExecutionStatus:
         return FactionRuleExecutionStatus(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported FactionRuleExecutionStatus token: {token}.") from exc
+
+
+def _validate_named_handlers(
+    named_handlers: object | None,
+) -> Mapping[str, FactionRuleNamedHandler]:
+    if named_handlers is None:
+        return MappingProxyType({})
+    if not isinstance(named_handlers, Mapping):
+        raise GameLifecycleError("FactionRuleExecutionRegistry named_handlers must be a mapping.")
+    validated: dict[str, FactionRuleNamedHandler] = {}
+    raw_handlers = cast(Mapping[object, object], named_handlers)
+    for handler_id, handler in raw_handlers.items():
+        validated_id = _validate_identifier("named handler id", handler_id)
+        if not callable(handler):
+            raise GameLifecycleError(
+                "FactionRuleExecutionRegistry named handlers must be callable."
+            )
+        validated[validated_id] = cast(FactionRuleNamedHandler, handler)
+    return MappingProxyType(validated)
+
+
+def _validate_generic_ir_executor(
+    generic_ir_executor: FactionRuleGenericIrExecutor | None,
+) -> FactionRuleGenericIrExecutor | None:
+    if generic_ir_executor is None:
+        return None
+    if not callable(generic_ir_executor):
+        raise GameLifecycleError(
+            "FactionRuleExecutionRegistry generic_ir_executor must be callable."
+        )
+    return generic_ir_executor
+
+
+def _validate_executor_result(
+    *,
+    record: Phase17FExecutionRecord,
+    result: FactionRuleExecutionResult,
+) -> FactionRuleExecutionResult:
+    if type(result) is not FactionRuleExecutionResult:
+        raise GameLifecycleError("Faction-rule executor must return FactionRuleExecutionResult.")
+    if result.execution_id != record.execution_id:
+        raise GameLifecycleError("Faction-rule executor returned mismatched execution_id.")
+    if result.coverage_descriptor_id != record.coverage_descriptor_id:
+        raise GameLifecycleError(
+            "Faction-rule executor returned mismatched coverage_descriptor_id."
+        )
+    if result.coverage_kind != record.coverage_kind.value:
+        raise GameLifecycleError("Faction-rule executor returned mismatched coverage_kind.")
+    if result.faction_id != record.faction_id:
+        raise GameLifecycleError("Faction-rule executor returned mismatched faction_id.")
+    if result.source_ids != record.source_ids:
+        raise GameLifecycleError("Faction-rule executor returned mismatched source_ids.")
+    return result
 
 
 def _validate_optional_phase(field_name: str, value: object) -> BattlePhaseKind | None:
