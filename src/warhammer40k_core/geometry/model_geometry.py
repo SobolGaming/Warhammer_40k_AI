@@ -5,6 +5,11 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.datasheet import BaseSizeDefinition, BaseSizeKind
+from warhammer40k_core.core.model_geometry_catalog import (
+    ModelFootprintKind,
+    ModelGeometryCatalogError,
+    ModelGeometryCatalogRecord,
+)
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.measurement import millimeters_to_inches
 from warhammer40k_core.geometry.pose import GeometryError, validate_finite_number
@@ -19,11 +24,13 @@ class BaseFootprintKind(StrEnum):
 
 class GeometrySourceKind(StrEnum):
     CATALOG_BASE_SIZE = "catalog_base_size"
+    CATALOG_GEOMETRY_RECORD = "catalog_geometry_record"
     MANUAL_OVERRIDE = "manual_override"
     MANUAL_OVERRIDE_REQUIRED = "manual_override_required"
 
 
 class HeightSourceKind(StrEnum):
+    CATALOG_GEOMETRY_RECORD = "catalog_geometry_record"
     KEYWORD_HEURISTIC = "keyword_heuristic"
     FALLBACK_BASE_MINOR_DIAMETER = "fallback_base_minor_diameter"
     MANUAL_OVERRIDE = "manual_override"
@@ -149,7 +156,11 @@ class ModelGeometry:
             self.geometry_source_id,
         )
         if (
-            geometry_source_kind is GeometrySourceKind.CATALOG_BASE_SIZE
+            geometry_source_kind
+            in {
+                GeometrySourceKind.CATALOG_BASE_SIZE,
+                GeometrySourceKind.CATALOG_GEOMETRY_RECORD,
+            }
             and geometry_source_id is None
         ):
             raise GeometryError("Catalog-derived geometry requires geometry_source_id.")
@@ -167,6 +178,7 @@ class ModelGeometry:
         if (
             height_source_kind
             in {
+                HeightSourceKind.CATALOG_GEOMETRY_RECORD,
                 HeightSourceKind.KEYWORD_HEURISTIC,
                 HeightSourceKind.FALLBACK_BASE_MINOR_DIAMETER,
             }
@@ -204,6 +216,35 @@ class ModelGeometry:
             height_source_kind=height_source_kind,
             height_source_id=height_source_id,
         )
+
+    @classmethod
+    def from_catalog_record(cls, record: ModelGeometryCatalogRecord) -> Self:
+        if type(record) is not ModelGeometryCatalogRecord:
+            raise GeometryError("catalog record must be a ModelGeometryCatalogRecord.")
+        try:
+            footprint = record.rules_footprint()
+            parts = tuple(
+                FootprintPart(
+                    part_id=part.part_id,
+                    footprint_kind=_base_footprint_kind_from_catalog_kind(part.footprint_kind),
+                    radius_x_inches=part.radius_x_inches,
+                    radius_y_inches=part.radius_y_inches,
+                    offset_x_inches=part.offset_x_inches,
+                    offset_y_inches=part.offset_y_inches,
+                )
+                for part in footprint.parts
+            )
+            return cls(
+                footprint_kind=_base_footprint_kind_from_catalog_kind(footprint.footprint_kind),
+                parts=parts,
+                height_inches=record.height.height_inches,
+                geometry_source_kind=GeometrySourceKind.CATALOG_GEOMETRY_RECORD,
+                geometry_source_id=record.stable_identity(),
+                height_source_kind=HeightSourceKind.CATALOG_GEOMETRY_RECORD,
+                height_source_id=record.height.evidence_id,
+            )
+        except ModelGeometryCatalogError as exc:
+            raise GeometryError("catalog model geometry record is invalid.") from exc
 
     def primary_part(self) -> FootprintPart:
         return self.parts[0]
@@ -303,6 +344,18 @@ def _footprint_part_from_base_size(base_size: BaseSizeDefinition) -> FootprintPa
         radius_x_inches=radius_x_inches,
         radius_y_inches=radius_y_inches,
     )
+
+
+def _base_footprint_kind_from_catalog_kind(token: ModelFootprintKind) -> BaseFootprintKind:
+    if token is ModelFootprintKind.CIRCULAR:
+        return BaseFootprintKind.CIRCULAR
+    if token is ModelFootprintKind.OVAL:
+        return BaseFootprintKind.OVAL
+    if token is ModelFootprintKind.RECTANGULAR:
+        return BaseFootprintKind.RECTANGULAR
+    if token is ModelFootprintKind.HULL:
+        return BaseFootprintKind.HULL
+    raise GeometryError("Unsupported catalog footprint kind.")
 
 
 def _resolve_height_from_keywords(

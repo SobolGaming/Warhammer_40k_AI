@@ -140,7 +140,7 @@ adapters -> may import engine, never the reverse
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
 Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
-Phases 17A-17A.1 are complete. Phase 14E is
+Phases 17A-17B are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -215,9 +215,17 @@ rerun HTML sanitization, structured normalization, and parsed-token generation,
 profile and weapon characteristic replacements update exact source fields, and
 engine runtime is statically blocked from importing transition patch tooling.
 
+Phase 17B is complete for canonical 11th Edition catalog generation from patched
+source data. Catalog packages now preserve deterministic datasheet, model,
+wargear, weapon, faction, detachment, enhancement, Stratagem, physical geometry,
+support-base, z-offset, representative-height, source-unit, canonical-unit,
+coordinate-frame, origin, and source-evidence records, and unresolved geometry or
+height evidence blocks package emission instead of falling back to runtime
+heuristics.
+
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 
-Phase 17B catalog generation must also source-link physical model geometry.
+Phase 17B catalog generation source-links physical model geometry.
 `Use model`, blank, `No official base size`, bare `Hull`, flying-base, and
 other non-circular/non-oval model footprints require reviewed geometry override
 records before runtime instantiation. Each unique model profile must carry a

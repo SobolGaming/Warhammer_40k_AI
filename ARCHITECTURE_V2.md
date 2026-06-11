@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -166,6 +166,17 @@ structured source-text normalization, and parsed-token generation before later
 catalog work consumes patched artifacts, and engine runtime is statically
 blocked from importing the patch tooling module.
 
+**Phase 17B is complete** for canonical 11th Edition catalog generation from
+patched source data. The catalog builder consumes normalized source artifacts,
+emits deterministic `CanonicalCatalogPackage` payloads, preserves stable
+datasheet/model/wargear/faction/detachment/enhancement/stratagem records,
+requires accepted physical model geometry and representative height evidence for
+every unique model profile, blocks `Use model`, blank, `No official base size`,
+bare `Hull`, Base Size Guide `hull`/`unique`, and unresolved non-circular or
+non-oval rows without explicit overrides, and records canonical geometry units,
+source units, coordinate frames, origins, support bases, z-offsets, and evidence
+inside package hashes.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -251,12 +262,13 @@ Completed / implemented foundation:
 | 16E | Complete | Setup completion gate, readiness diagnostics, battle-start checkpoints, and bridge-free battle entry |
 | 17A | Complete | Bridge Wahapedia source mirror, HTML sanitization, deterministic CSV-to-JSON ETL, source manifests, and grouped import diagnostics |
 | 17A.1 | Complete | Official 11th Edition transition patch packages, deterministic patched artifacts, target diagnostics, and FAQ classification |
+| 17B | Complete | Canonical 11th Edition catalog generation, geometry evidence, model-height records, and deterministic package hashes |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17B-17G | Planned | Canonical catalog generation, rule-language IR, generic handlers, and content coverage |
+| 17C-17G | Planned | Rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -3983,6 +3995,9 @@ Invariants:
   records with URL or document/page reference, measurement kind, dimensions,
   reviewer status, and deterministic source IDs; changing measurement evidence
   changes the catalog package hash;
+- footprint, support-base, z-offset, and height records must declare source
+  units and emit canonical runtime units plus coordinate frame/origin metadata;
+  unit conversion changes must affect package hashes;
 - flying-base models preserve the published support base separately from the
   model or hull footprint used for rules measurement/collision. A flying-base
   override must record support-base shape, body/hull footprint, optional
