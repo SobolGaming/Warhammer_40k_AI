@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -177,6 +177,18 @@ non-oval rows without explicit overrides, and records canonical geometry units,
 source units, coordinate frames, origins, support bases, z-offsets, and evidence
 inside package hashes.
 
+**Phase 17C is complete** for the rule-language intermediate representation.
+Normalized `RuleSourceText` now compiles through deterministic source/tooling
+entrypoints into versioned `RuleIR` payloads with source spans, reusable language
+template IDs, typed trigger/condition/target/effect/duration components, stable
+IR hashes, explicit unsupported diagnostics, and a static runtime boundary that
+blocks engine imports of the parser/compiler/template tooling. The initial
+language templates cover keyword gates, timing windows, distance predicates,
+selected targets, dice-roll modifiers, rerolls, characteristic and movement
+modifiers, CP/VP changes, ability and weapon-ability grants, placement
+permission/restriction clauses, Aura clauses, destruction triggers, and
+once-per-scope restrictions.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -263,12 +275,13 @@ Completed / implemented foundation:
 | 17A | Complete | Bridge Wahapedia source mirror, HTML sanitization, deterministic CSV-to-JSON ETL, source manifests, and grouped import diagnostics |
 | 17A.1 | Complete | Official 11th Edition transition patch packages, deterministic patched artifacts, target diagnostics, and FAQ classification |
 | 17B | Complete | Canonical 11th Edition catalog generation, geometry evidence, model-height records, and deterministic package hashes |
+| 17C | Complete | Rule-language IR, reusable templates, source-spanned unsupported diagnostics, and runtime parser/compiler boundary |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17C-17G | Planned | Rule-language IR, generic handlers, and content coverage |
+| 17D-17G | Planned | Generic handlers and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -4041,7 +4054,13 @@ CORE V1 relevant areas:
 
 ## Phase 17C: rule language intermediate representation
 
+Status: Complete.
+
 This is the foundation for handling army rules, detachment rules, stratagems, enhancements, datasheet abilities, and wargear abilities via language parsing rather than hard-coding named items.
+
+Phase 17C implements the source/tooling side of that foundation. Runtime
+execution remains Phase 17D: unsupported IR cannot execute because no generic
+execution host is introduced here.
 
 Modules:
 

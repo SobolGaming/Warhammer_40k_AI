@@ -140,7 +140,7 @@ adapters -> may import engine, never the reverse
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
 Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
-Phases 17A-17B are complete. Phase 14E is
+Phases 17A-17C are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -222,6 +222,12 @@ support-base, z-offset, representative-height, source-unit, canonical-unit,
 coordinate-frame, origin, and source-evidence records, and unresolved geometry or
 height evidence blocks package emission instead of falling back to runtime
 heuristics.
+
+Phase 17C is complete for the rule-language intermediate representation.
+Normalized source text now compiles into deterministic, source-spanned, versioned
+`RuleIR` payloads with reusable template IDs, typed trigger/condition/target/effect/duration
+components, explicit unsupported diagnostics, stable IR hashes, and a static
+runtime boundary that keeps engine code from importing parser/compiler tooling.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

@@ -1,0 +1,216 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import Self, TypedDict
+
+
+class RuleTemplateError(ValueError):
+    """Raised when Phase 17C language template metadata is invalid."""
+
+
+class RuleTemplateFamily(StrEnum):
+    AURA = "aura"
+    CHARACTERISTIC_MODIFICATION = "characteristic_modification"
+    CONDITIONAL_WEAPON_ABILITY_GRANT = "conditional_weapon_ability_grant"
+    DICE_ROLL_MODIFICATION = "dice_roll_modification"
+    DISTANCE_PREDICATE = "distance_predicate"
+    GRANT_ABILITY = "grant_ability"
+    KEYWORD_GATE = "keyword_gate"
+    MOVEMENT_DISTANCE_MODIFICATION = "movement_distance_modification"
+    PLACEMENT_PERMISSION_RESTRICTION = "placement_permission_restriction"
+    REROLL_PERMISSION = "reroll_permission"
+    RESOURCE_MODIFICATION = "resource_modification"
+    SELECTED_TARGET_CONSTRAINT = "selected_target_constraint"
+    TIMING_WINDOW = "timing_window"
+
+
+class RuleTemplatePayload(TypedDict):
+    template_id: str
+    family: str
+    description: str
+    canonical_patterns: list[str]
+
+
+@dataclass(frozen=True, slots=True)
+class RuleTemplate:
+    template_id: str
+    family: RuleTemplateFamily
+    description: str
+    canonical_patterns: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "template_id", _validate_identifier("template_id", self.template_id)
+        )
+        if type(self.family) is not RuleTemplateFamily:
+            raise RuleTemplateError("RuleTemplate family must be RuleTemplateFamily.")
+        object.__setattr__(
+            self, "description", _validate_identifier("description", self.description)
+        )
+        object.__setattr__(
+            self,
+            "canonical_patterns",
+            _validate_identifier_tuple("canonical_patterns", self.canonical_patterns),
+        )
+
+    def stable_identity(self) -> str:
+        return f"rule-template:{self.family.value}:{self.template_id}"
+
+    def to_payload(self) -> RuleTemplatePayload:
+        return {
+            "template_id": self.template_id,
+            "family": self.family.value,
+            "description": self.description,
+            "canonical_patterns": list(self.canonical_patterns),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: RuleTemplatePayload) -> Self:
+        return cls(
+            template_id=payload["template_id"],
+            family=rule_template_family_from_token(payload["family"]),
+            description=payload["description"],
+            canonical_patterns=tuple(payload["canonical_patterns"]),
+        )
+
+
+KEYWORD_GATE_TEMPLATE_ID = "phase17c:keyword-gate"
+TIMING_WINDOW_TEMPLATE_ID = "phase17c:timing-window"
+DISTANCE_PREDICATE_TEMPLATE_ID = "phase17c:distance-predicate"
+SELECTED_TARGET_TEMPLATE_ID = "phase17c:selected-target-constraint"
+DICE_ROLL_MODIFIER_TEMPLATE_ID = "phase17c:dice-roll-modifier"
+REROLL_PERMISSION_TEMPLATE_ID = "phase17c:reroll-permission"
+CHARACTERISTIC_MODIFIER_TEMPLATE_ID = "phase17c:characteristic-modifier"
+RESOURCE_MODIFIER_TEMPLATE_ID = "phase17c:resource-modifier"
+GRANT_ABILITY_TEMPLATE_ID = "phase17c:grant-ability"
+WEAPON_ABILITY_GRANT_TEMPLATE_ID = "phase17c:weapon-ability-grant"
+MOVEMENT_DISTANCE_TEMPLATE_ID = "phase17c:movement-distance-modifier"
+PLACEMENT_TEMPLATE_ID = "phase17c:placement-permission-restriction"
+AURA_TEMPLATE_ID = "phase17c:aura"
+
+
+def initial_rule_templates() -> tuple[RuleTemplate, ...]:
+    return INITIAL_RULE_TEMPLATES
+
+
+def rule_template_by_id(template_id: str) -> RuleTemplate:
+    requested = _validate_identifier("template_id", template_id)
+    for template in INITIAL_RULE_TEMPLATES:
+        if template.template_id == requested:
+            return template
+    raise RuleTemplateError(f"Unsupported RuleTemplate id: {requested}.")
+
+
+def rule_template_family_from_token(token: object) -> RuleTemplateFamily:
+    if type(token) is RuleTemplateFamily:
+        return token
+    if type(token) is not str:
+        raise RuleTemplateError("RuleTemplateFamily token must be a string.")
+    try:
+        return RuleTemplateFamily(token)
+    except ValueError as exc:
+        raise RuleTemplateError(f"Unsupported RuleTemplateFamily token: {token}.") from exc
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise RuleTemplateError(f"RuleTemplate {field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise RuleTemplateError(f"RuleTemplate {field_name} must not be empty.")
+    return stripped
+
+
+def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise RuleTemplateError(f"RuleTemplate {field_name} must be a tuple.")
+    if not values:
+        raise RuleTemplateError(f"RuleTemplate {field_name} must not be empty.")
+    return tuple(_validate_identifier(field_name, value) for value in values)
+
+
+INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
+    RuleTemplate(
+        template_id=KEYWORD_GATE_TEMPLATE_ID,
+        family=RuleTemplateFamily.KEYWORD_GATE,
+        description="Keyword-gated source, target, or eligible-unit clause.",
+        canonical_patterns=("if this unit has the <keyword> keyword", "one <keyword> unit"),
+    ),
+    RuleTemplate(
+        template_id=TIMING_WINDOW_TEMPLATE_ID,
+        family=RuleTemplateFamily.TIMING_WINDOW,
+        description="Start, end, phase, setup, dice-roll, and destruction timing clauses.",
+        canonical_patterns=(
+            "at the start of <phase>",
+            "at the end of <phase>",
+            "when this unit is destroyed",
+        ),
+    ),
+    RuleTemplate(
+        template_id=DISTANCE_PREDICATE_TEMPLATE_ID,
+        family=RuleTemplateFamily.DISTANCE_PREDICATE,
+        description="Within, wholly within, more-than, and related distance predicates.",
+        canonical_patterns=("within <distance>", "more than <distance>"),
+    ),
+    RuleTemplate(
+        template_id=SELECTED_TARGET_TEMPLATE_ID,
+        family=RuleTemplateFamily.SELECTED_TARGET_CONSTRAINT,
+        description="Selected friendly, enemy, this-unit, selected-unit, or player target clauses.",
+        canonical_patterns=("select one friendly unit", "select one enemy unit", "that unit"),
+    ),
+    RuleTemplate(
+        template_id=DICE_ROLL_MODIFIER_TEMPLATE_ID,
+        family=RuleTemplateFamily.DICE_ROLL_MODIFICATION,
+        description="Additive or subtractive dice-roll modifier clauses.",
+        canonical_patterns=("add <n> to <roll> rolls", "-<n> to <roll> rolls"),
+    ),
+    RuleTemplate(
+        template_id=REROLL_PERMISSION_TEMPLATE_ID,
+        family=RuleTemplateFamily.REROLL_PERMISSION,
+        description="Roll-specific reroll permission clauses.",
+        canonical_patterns=("re-roll <roll> rolls", "reroll <roll> rolls"),
+    ),
+    RuleTemplate(
+        template_id=CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
+        family=RuleTemplateFamily.CHARACTERISTIC_MODIFICATION,
+        description="Characteristic modifier clauses.",
+        canonical_patterns=("add <n> to the <characteristic> characteristic",),
+    ),
+    RuleTemplate(
+        template_id=RESOURCE_MODIFIER_TEMPLATE_ID,
+        family=RuleTemplateFamily.RESOURCE_MODIFICATION,
+        description="Command Point and Victory Point resource modification clauses.",
+        canonical_patterns=("gain <n>CP", "score <n>VP"),
+    ),
+    RuleTemplate(
+        template_id=GRANT_ABILITY_TEMPLATE_ID,
+        family=RuleTemplateFamily.GRANT_ABILITY,
+        description="Unit or model ability grants, usually with an explicit duration.",
+        canonical_patterns=("that unit gains <ability> until <endpoint>",),
+    ),
+    RuleTemplate(
+        template_id=WEAPON_ABILITY_GRANT_TEMPLATE_ID,
+        family=RuleTemplateFamily.CONDITIONAL_WEAPON_ABILITY_GRANT,
+        description="Weapon ability grants attached to a selected unit or weapon scope.",
+        canonical_patterns=("weapons equipped by models in that unit gain <weapon ability>",),
+    ),
+    RuleTemplate(
+        template_id=MOVEMENT_DISTANCE_TEMPLATE_ID,
+        family=RuleTemplateFamily.MOVEMENT_DISTANCE_MODIFICATION,
+        description="Move characteristic and additional movement distance modifier clauses.",
+        canonical_patterns=("add <n> to the Move characteristic", "move an additional <n>"),
+    ),
+    RuleTemplate(
+        template_id=PLACEMENT_TEMPLATE_ID,
+        family=RuleTemplateFamily.PLACEMENT_PERMISSION_RESTRICTION,
+        description="Set-up placement permissions and restrictions.",
+        canonical_patterns=("can be set up", "cannot be set up"),
+    ),
+    RuleTemplate(
+        template_id=AURA_TEMPLATE_ID,
+        family=RuleTemplateFamily.AURA,
+        description="Aura source, range, eligible target, and effect clauses.",
+        canonical_patterns=("Aura: while a friendly unit is within <distance>",),
+    ),
+)
