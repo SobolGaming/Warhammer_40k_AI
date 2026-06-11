@@ -139,7 +139,8 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
-Current roadmap implementation status: phases 1-15F, phases 16A-16E, and Phase 17A are complete. Phase 14E is
+Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
+Phases 17A-17A.1 are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -203,6 +204,16 @@ Phase 16D is complete for source-backed army construction and runtime instantiat
 Phase 16E is complete for setup completion gates. Setup-to-battle transition is now engine-owned: the lifecycle audits drained decision and reaction queues, final setup-step position, source-backed mission and army readiness, Secondary Mission choices, attacker/defender state, reserve declarations, deployment completion, battlefield coherency, and unresolved redeploy/pre-battle actions before battle round one can start. Legal completion emits deterministic setup legality, replay checkpoint, and battle-start payloads; invalid setup returns typed `setup_completion_gate_failed` diagnostics and remains in setup without using the Phase 10A deterministic placement bridge.
 
 Phase 17A is complete for the bridge Wahapedia source mirror and CSV-to-JSON ETL. Source snapshots and package manifests now preserve checksums, upstream identity, source date, source-edition identity, deterministic artifact hashes, source-row provenance, HTML sanitization reports, structured source-text normalization, runtime-field HTML exclusion, and grouped malformed-row diagnostics. The source mirror remains ingest/catalog tooling only; engine runtime is statically blocked from importing raw source mirror or sanitizer modules.
+
+Phase 17A.1 is complete for official 11th Edition transition patch packages.
+Transition patches now preserve official source package identity, source date,
+faction ID, normalized instruction text, stable source IDs, deterministic
+operation ordering, exact or explicit multi-row source targets, target-drift
+diagnostics, FAQ classification, unsupported executable-change diagnostics, and
+patched source artifact hashes. Rule-text replacement and append operations
+rerun HTML sanitization, structured normalization, and parsed-token generation,
+and engine runtime is statically blocked from importing transition patch
+tooling.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

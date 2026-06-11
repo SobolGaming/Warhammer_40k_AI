@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, and the 11th Edition Core Rules source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -156,6 +156,16 @@ normalization, source-row provenance, runtime-field HTML exclusion, grouped
 malformed-row diagnostics, and a static boundary check that prevents engine
 runtime from importing raw source mirror or sanitizer modules.
 
+**Phase 17A.1 is complete** for official 11th Edition transition patch
+packages. The patch layer now models source-linked operations, exact and
+explicit multi-row targets, deterministic ordering, target-drift diagnostics,
+FAQ classifications, unsupported executable-change diagnostics, patched source
+artifact hashes, and CLI tooling for canonicalizing and applying transition
+patches. Text replacement and append operations rerun HTML sanitization,
+structured source-text normalization, and parsed-token generation before later
+catalog work consumes patched artifacts, and engine runtime is statically
+blocked from importing the patch tooling module.
+
 Completed / implemented foundation:
 
 | Phase | Status | Purpose |
@@ -240,12 +250,13 @@ Completed / implemented foundation:
 | 16D | Complete | Army construction completion and runtime instantiation |
 | 16E | Complete | Setup completion gate, readiness diagnostics, battle-start checkpoints, and bridge-free battle entry |
 | 17A | Complete | Bridge Wahapedia source mirror, HTML sanitization, deterministic CSV-to-JSON ETL, source manifests, and grouped import diagnostics |
+| 17A.1 | Complete | Official 11th Edition transition patch packages, deterministic patched artifacts, target diagnostics, and FAQ classification |
 
 Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17A.1-17G | Planned | Transition patch packages, canonical catalog generation, rule-language IR, generic handlers, and content coverage |
+| 17B-17G | Planned | Canonical catalog generation, rule-language IR, generic handlers, and content coverage |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -3831,6 +3842,8 @@ CORE V1 relevant areas:
 
 ## Phase 17A.1: official 11th Edition transition patch packages
 
+Status: Complete.
+
 This is an inserted bridge subphase between the source mirror and canonical
 catalog generation. It exists to avoid renumbering the later Phase 17 work while
 making the pre-native-Wahapedia transition patch layer explicit.
@@ -3839,6 +3852,10 @@ Until native 11th Edition faction source rows are available, official faction
 update instructions are represented as structured patch packages applied to the
 normalized bridge source mirror. These packages preserve official source text,
 target selectors, ordering, diagnostics, and generated payload hashes.
+The implemented layer emits `PatchedSourceArtifact` payloads with the source
+artifact hash, transition package hash, deterministic row payloads, and typed
+target-drift diagnostics for unresolved, ambiguous, stale, malformed,
+advisory-only, and unsupported executable FAQ paths.
 
 Modules:
 
