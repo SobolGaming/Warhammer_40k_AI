@@ -140,7 +140,7 @@ adapters -> may import engine, never the reverse
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
 Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
-Phases 17A-17D are complete. Phase 14E is
+Phases 17A-17E are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -236,6 +236,17 @@ recomputation from current battlefield positions. Unsupported IR fails closed as
 typed unsupported results, source-linked execution events are deterministic and
 JSON-safe, and ability/Stratagem bridges can execute replay-safe compiled IR
 payloads without importing parser/compiler/template tooling.
+
+Phase 17E is complete for source-backed faction coverage. The
+`gw-11e-phase17e-faction-coverage-2026-27` package validates every official
+faction-pack PDF manifest record, links every seeded faction to an army-rule
+coverage descriptor, links every seeded detachment to detachment rule,
+enhancement, and Stratagem descriptor coverage, and emits deterministic coverage
+totals grouped as implemented, generic-supported, named-handler-required, and
+unsupported. Exact datasheet-intake rows, enhancement subrows, and Stratagem
+subrows that are absent from the update PDFs are fail-closed as approved
+unsupported diagnostics, keeping broad datasheet, wargear, and weapon execution
+in Phase 17F.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

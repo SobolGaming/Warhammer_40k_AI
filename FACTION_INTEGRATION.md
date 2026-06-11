@@ -49,6 +49,33 @@ subphases must be expanded from generated source coverage reports so names,
 source IDs, geometry blockers, and unsupported descriptors stay synchronized
 with the patched source mirror.
 
+## Phase 17E Completion Gate
+
+Phase 17E is complete as source-backed coverage, not broad execution. The
+coverage package is:
+
+- package ID: `gw-11e-phase17e-faction-coverage-2026-27`
+- path:
+  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_coverage_2026_27.py`
+- source title: `Warhammer 40,000 11th Edition Phase 17E Faction Coverage`
+- source version: `2026-27`
+- source date: `2026-06-11`
+- upstream identity:
+  `official-11th-edition-faction-packs-and-detachment-source-package`
+- source edition: `11th`
+- schema version: `core-v2-phase17e-faction-coverage-v1`
+- source-payload SHA-256 checksum:
+  `6810281a9eacd4e4178c4ce2996a50b8bab4d184cc76dedf69c1615726de794a`
+
+The package validates all 28 faction-pack PDF manifest records and emits
+coverage rows for every seeded faction and detachment. Faction army rules and
+detachment rules are source-linked named-handler-required rows. Datasheet intake,
+enhancement descriptor subrows, and Stratagem descriptor subrows that are absent
+from the update PDFs are fail-closed as approved unsupported diagnostics, so no
+unapproved unsupported descriptor remains for Phase 17E matched-play coverage.
+Those approved diagnostics are the source-row generation queue for later Phase
+17 work; they are not runtime fallbacks.
+
 ## Queue Source
 
 The seeded detachment queue is derived from:
