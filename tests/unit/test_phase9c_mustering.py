@@ -1626,12 +1626,14 @@ def test_phase16_faction_detachment_source_rows_are_normalized() -> None:
     detachment_names = {row.detachment_id: row.name for row in detachment_rows}
     new_detachment_ids = {row.detachment_id for row in detachment_rows if row.is_new_for_eleventh}
 
-    assert len(faction_rows) == 22
-    assert len(detachment_rows) == 215
+    assert len(faction_rows) == 28
+    assert len(detachment_rows) == 266
     assert payload["source_package_id"] == faction_detachment_source.SOURCE_PACKAGE_ID
     assert {row.faction_id for row in faction_rows} >= {
         "chaos-daemons",
         "chaos-space-marines",
+        "imperial-agents",
+        "imperial-knights",
         "leagues-of-votann",
         "space-marines",
         "tau-empire",
@@ -1642,7 +1644,9 @@ def test_phase16_faction_detachment_source_rows_are_normalized() -> None:
     assert detachment_names["delve-assault-shift"] == "Delve Assault Shift"
     assert detachment_names["needgaard-oathband"] == "Needgaard Oathband"
     assert "advanced-acquisition-cadre" in new_detachment_ids
+    assert "abhuman-auxiliaries" in new_detachment_ids
     assert "cabal-of-chaos" in new_detachment_ids
+    assert "throne-bonded-outriders" in new_detachment_ids
     assert faction_names["emperors-children"] == "Emperor's Children"
     assert all("New - " not in row.name for row in detachment_rows)
     assert all(ord(character) < 128 for row in faction_rows for character in row.name)
@@ -1757,6 +1761,96 @@ def test_phase16_chaos_faction_detachment_source_rows_match_requested_matrix() -
             ("Plague Legion", "take-and-hold", 2, False),
             ("Scintillating Legion", "priority-assets", 2, False),
             ("Shadow Legion", "purge-the-foe", 2, False),
+        ),
+    }
+
+
+def test_phase16_imperial_faction_detachment_source_rows_match_requested_matrix() -> None:
+    imperial_faction_ids = {
+        "adepta-sororitas",
+        "adeptus-custodes",
+        "adeptus-mechanicus",
+        "astra-militarum",
+        "imperial-agents",
+        "imperial-knights",
+    }
+    rows_by_faction = {
+        faction_id: tuple(
+            (
+                row.raw_name,
+                row.force_disposition_id,
+                row.detachment_point_cost,
+                row.is_new_for_eleventh,
+            )
+            for row in faction_detachment_source.detachment_rows()
+            if row.faction_id == faction_id
+        )
+        for faction_id in imperial_faction_ids
+    }
+
+    assert rows_by_faction == {
+        "astra-militarum": (
+            ("Abhuman Auxiliaries", "take-and-hold", 1, True),
+            ("Bridgehead Strike", "priority-assets", 1, True),
+            ("Designation Force", "reconnaissance", 1, True),
+            ("Armoured Infantry", "take-and-hold", 2, False),
+            ("Combined Arms", "take-and-hold", 3, False),
+            ("Grizzled Company", "priority-assets", 3, False),
+            ("Hammer of the Emperor", "purge-the-foe", 2, False),
+            ("Mechanised Assault", "purge-the-foe", 2, False),
+            ("Recon Element", "reconnaissance", 3, False),
+            ("Siege Regiment", "disruption", 2, False),
+            ("Steel Hammer", "purge-the-foe", 2, False),
+        ),
+        "adepta-sororitas": (
+            ("Chorus of Condemnation", "reconnaissance", 1, True),
+            ("Sacred Champions", "take-and-hold", 1, True),
+            ("Sanctified Orators", "purge-the-foe", 1, True),
+            ("Army of Faith", "take-and-hold", 2, False),
+            ("Bringers of Flame", "purge-the-foe", 3, False),
+            ("Champions of Faith", "disruption", 2, False),
+            ("Hallowed Martyrs", "priority-assets", 3, False),
+            ("Penitent Host", "take-and-hold", 2, False),
+        ),
+        "adeptus-mechanicus": (
+            ("Cohort Acquisitus", "reconnaissance", 1, True),
+            ("Lords of the Forge", "priority-assets", 1, True),
+            ("Luminen Auto-Choir", "disruption", 1, True),
+            ("Cohort Cybernetica", "take-and-hold", 2, False),
+            ("Data-psalm Conclave", "disruption", 2, False),
+            ("Eradication Cohort", "purge-the-foe", 3, False),
+            ("Explorator Maniple", "priority-assets", 2, False),
+            ("Haloscreed Battle Clade", "purge-the-foe", 3, False),
+            ("Rad-zone Corps", "take-and-hold", 2, False),
+            ("Skitarii Hunter Cohort", "reconnaissance", 2, False),
+        ),
+        "imperial-knights": (
+            ("Dominus Foebreakers", "purge-the-foe", 1, True),
+            ("Questor Forgepact", "disruption", 1, True),
+            ("Throne-bonded Outriders", "reconnaissance", 1, True),
+            ("Freeblade Company", "purge-the-foe", 3, False),
+            ("Gate Warden Lance", "priority-assets", 2, False),
+            ("Questoris Companions", "take-and-hold", 3, False),
+            ("Spearhead-at-arms", "reconnaissance", 2, False),
+            ("Valourstrike Lance", "purge-the-foe", 2, False),
+        ),
+        "adeptus-custodes": (
+            ("Might of the Moritoi", "purge-the-foe", 1, True),
+            ("Silent Hunters", "reconnaissance", 1, True),
+            ("Tharanatoi Hammerblow", "priority-assets", 1, True),
+            ("Auric Champions", "priority-assets", 2, False),
+            ("Lions of the Emperor", "disruption", 2, False),
+            ("Null Maiden Vigil", "reconnaissance", 2, False),
+            ("Shield Host", "purge-the-foe", 2, False),
+            ("Solar Spearhead", "take-and-hold", 2, False),
+            ("Talons of the Emperor", "take-and-hold", 3, False),
+        ),
+        "imperial-agents": (
+            ("Imperialis Fleet", "disruption", 3, False),
+            ("Ordo Hereticus, Purgation Force", "priority-assets", 3, False),
+            ("Ordo Malleus, Daemon Hunters", "reconnaissance", 3, False),
+            ("Ordo Xenos, Alien Hunters", "purge-the-foe", 3, False),
+            ("Veiled Blade Elimination Force", "purge-the-foe", 3, False),
         ),
     }
 

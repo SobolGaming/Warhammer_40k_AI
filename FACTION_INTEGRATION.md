@@ -29,12 +29,12 @@ The seeded detachment queue is derived from:
   `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_detachments_2026_27.py`
 - source title: `Warhammer 40,000 11th Edition Faction Detachments 2026-27`
 - source version: `2026-27`
-- source date: `2026-06-10`
+- source date: `2026-06-11`
 - upstream identity: `official-11th-edition-faction-detachment-source-package`
 - source edition: `11th`
 - schema version: `core-v2-faction-detachment-source-v1`
 - source-payload SHA-256 checksum:
-  `deba1ec55ac614fcd7bc86c15bf086e77497b6fd637aa6a798bc2ed725fe704b`
+  `5e48d00f5d670b60a9ef78902772e6cd6fed95f5f6ab8ad3e27bea4e5bd5ff89`
 
 Queue refreshes must be generated from this package, not hand-edited, except for
 explicitly reviewed corrections recorded in the patch package manifest. Until a
