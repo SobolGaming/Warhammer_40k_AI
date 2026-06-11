@@ -139,7 +139,7 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
-Current roadmap implementation status: phases 1-15F and phases 16A-16E are complete. Phase 14E is
+Current roadmap implementation status: phases 1-15F, phases 16A-16E, and Phase 17A are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -201,6 +201,10 @@ Phase 16C is complete for reserve declarations during Declare Battle Formations.
 Phase 16D is complete for source-backed army construction and runtime instantiation. Strict roster requests now validate Strike Force unit points plus selected Enhancement points, unit limits, Warlord selection, Enhancement assignment rules, attached-squad Enhancement limits, Epic Hero restrictions, required Dedicated Transport manifest source data, and provided Dedicated Transport cargo legality with deterministic `RosterLegalityReport` diagnostics. Production `GameConfig` values require strict mustering requests by default; legacy smoke fixtures must opt into `allow_legacy_non_strict_rosters`. Mustered armies preserve Warlord, Enhancement, unit-point, Dedicated Transport, and legality provenance in JSON-safe payloads, promote the selected Warlord with a `WARLORD` keyword, and setup records starting embarked cargo from source-backed manifests before Deploy Armies while explicit empty Dedicated Transport manifests become deterministic setup consequences that exclude the transport from deployment and mark it destroyed in battle round 1. `GameState.record_army_definition(...)` derives the `StartingStrengthRecord` set consumed by later phases.
 
 Phase 16E is complete for setup completion gates. Setup-to-battle transition is now engine-owned: the lifecycle audits drained decision and reaction queues, final setup-step position, source-backed mission and army readiness, Secondary Mission choices, attacker/defender state, reserve declarations, deployment completion, battlefield coherency, and unresolved redeploy/pre-battle actions before battle round one can start. Legal completion emits deterministic setup legality, replay checkpoint, and battle-start payloads; invalid setup returns typed `setup_completion_gate_failed` diagnostics and remains in setup without using the Phase 10A deterministic placement bridge.
+
+Phase 17A is complete for the bridge Wahapedia source mirror and CSV-to-JSON ETL. Source snapshots and package manifests now preserve checksums, upstream identity, source date, source-edition identity, deterministic artifact hashes, source-row provenance, HTML sanitization reports, structured source-text normalization, runtime-field HTML exclusion, and grouped malformed-row diagnostics. The source mirror remains ingest/catalog tooling only; engine runtime is statically blocked from importing raw source mirror or sanitizer modules.
+
+Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 
 Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus Phase 11E viewer-scoped scoring projection/event rules.
 

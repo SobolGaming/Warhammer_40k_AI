@@ -7,12 +7,15 @@ ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "src" / "warhammer40k_core" / "engine"
 
 _FORBIDDEN_IMPORT_MODULES = {
+    "warhammer40k_core.rules.html_sanitizer",
     "warhammer40k_core.rules.text_normalization",
     "warhammer40k_core.rules.source_data",
+    "warhammer40k_core.rules.wahapedia_schema",
 }
 _FORBIDDEN_IMPORT_NAMES = {
     "NormalizedRuleText",
     "RuleSourceText",
+    "WahapediaJsonArtifact",
     "normalize_rule_text",
     "parse_normalized_tokens",
 }
