@@ -266,7 +266,7 @@ Next / planned sequence:
 1. **No runtime raw text parsing.** Raw rule text is normalized, parsed, and compiled at ingest/authoring time into typed descriptors or explicit unsupported descriptors.
 2. **No silent fallbacks.** If a rule, terrain shape, ability, or decision cannot be represented safely, emit typed unsupported state.
 3. **No UI-owned state mutation.** CLI, local UI, network UI, and AI policies answer `DecisionRequest`s; the engine validates and mutates authoritative state.
-4. **No ad hoc content facts.** Datasheet stats, keywords, wargear, base sizes, factions, detachments, enhancements, Stratagems, missions, deployment maps, and terrain layouts come from catalog/source packages.
+4. **No ad hoc content facts.** Datasheet stats, keywords, wargear, base sizes, model footprint geometry, representative model heights, factions, detachments, enhancements, Stratagems, missions, deployment maps, and terrain layouts come from catalog/source packages.
 5. **No broad imports from CORE V1.** CORE V1 is a reference for invariants, algorithms, edge cases, and tests. Port only the smallest needed behavior.
 6. **Every state change is replay-facing.** Dice, decisions, placement/removal/displacement, scoring, CP changes, Battle-shock, Stratagem use, attack resolution, model destruction, and mission actions must serialize deterministically.
 7. **Headless performance is a product requirement.** The engine must support fast large-corpus self-play for hierarchical AI orchestration.
@@ -3934,17 +3934,26 @@ Modules:
 
 - `tools/build_catalog.py`
 - `tools/apply_transition_patches.py`
+- `tools/build_model_geometry_overrides.py`
 - `core/datasheet.py`
 - `core/army_catalog.py`
+- `core/model_geometry_catalog.py`
 - `core/faction.py`
 - `core/detachment.py`
 - `core/enhancement.py`
 - `core/stratagem.py`
+- `geometry/model_geometry.py`
 
 Objects:
 
 - `CanonicalCatalogPackage`
 - `DatasheetCatalogRecord`
+- `ModelGeometryCatalogRecord`
+- `ModelFootprintDefinition`
+- `ModelFootprintPartDefinition`
+- `ModelHeightDefinition`
+- `ModelGeometrySourceEvidence`
+- `ModelGeometryImportDiagnostic`
 - `WargearCatalogRecord`
 - `WeaponProfileCatalogRecord`
 - `FactionCatalogRecord`
@@ -3954,23 +3963,66 @@ Objects:
 
 Invariants:
 
-- all datasheets, model profiles, unit composition, wargear options, base sizes, keywords, and faction keywords come from source-linked catalog records;
+- all datasheets, model profiles, unit composition, wargear options, base sizes, model footprint geometry, representative model heights, keywords, and faction keywords come from source-linked catalog records;
 - all factions and detachments are catalog records, not hand-authored fixture-only data;
 - all stratagems and enhancements are source-linked descriptors;
 - the catalog consumes patched 11th Edition source artifacts, never raw
   prior-edition mirror rows directly;
 - generated catalog package hash is deterministic;
 - catalog generation is idempotent and diffable;
-- missing geometry/height/base overrides are explicit import blockers or unsupported descriptors, not silent defaults.
+- missing geometry/height/base overrides are explicit import blockers or unsupported descriptors, not silent defaults;
+- CORE V1's `data/model_geometry_overrides.json` and
+  `docs/MODEL_GEOMETRY_OVERRIDES.md` are reference material for the override
+  data shape, but the Phase 17B implementation must not port V1's runtime
+  fallback resolver wholesale;
+- datasheet/model rows with `Use model`, blank base size, `No official base
+  size`, bare `Hull`, Base Size Guide `hull`/`unique` classifications, or any
+  non-circular/non-oval footprint that cannot be derived from source data require
+  source-linked geometry override records before catalog package emission;
+- manual and crowd-sourced measurements must be represented as source evidence
+  records with URL or document/page reference, measurement kind, dimensions,
+  reviewer status, and deterministic source IDs; changing measurement evidence
+  changes the catalog package hash;
+- flying-base models preserve the published support base separately from the
+  model or hull footprint used for rules measurement/collision. A flying-base
+  override must record support-base shape, body/hull footprint, optional
+  stem/z-offset, representative height, rules-footprint policy, and provenance;
+- automatic flying-hull proxy generation is tooling-only and may emit review
+  diagnostics, but runtime engine code consumes only accepted catalog geometry
+  records and must not infer hull dimensions from base size at instantiation;
+- every unique model profile has a representative model height in catalog data,
+  with provenance. Runtime LoS, vertical engagement/distance, and multi-floor
+  terrain collision consume this height through `ModelGeometry`; keyword or
+  base-minor-diameter height heuristics are migration diagnostics, not accepted
+  Phase 17B runtime defaults.
 
 Required tests:
 
 - representative datasheets generate deterministic catalog records;
-- model profiles preserve base-size/source information;
+- model profiles preserve base-size, geometry-source, and height-source information;
+- `Use model`, blank, `No official base size`, bare `Hull`, Base Size Guide
+  `hull`/`unique`, and unresolved non-circular/non-oval rows fail catalog
+  generation without explicit geometry override records;
+- flying-base overrides round-trip as support-base plus hull/body footprint,
+  preserve z-offset provenance, and never derive z-offset from an overridden
+  hull footprint instead of the support base;
+- representative model heights round-trip for every unique model profile and
+  missing heights are reported as import blockers or unsupported descriptors;
+- manual/crowd-sourced measurement evidence is deterministic, reviewable, and
+  included in package hash drift;
 - wargear options and weapon profiles preserve stable IDs;
 - faction/detachment/enhancement/stratagem records round-trip;
 - package hash changes on source-data drift;
 - unsupported rows are reported and cannot be instantiated accidentally.
+
+CORE V1 relevant areas:
+
+- `data/model_geometry_overrides.json`
+- `docs/MODEL_GEOMETRY_OVERRIDES.md`
+- `src/warhammer40k_ai/utility/model_geometry.py`
+- `src/warhammer40k_ai/utility/model_base.py`
+- `src/warhammer40k_ai/units/unit_mixins/datasheet_wargear_mixin.py`
+- `tests/units/test_model_geometry_resolver.py`
 
 ## Phase 17C: rule language intermediate representation
 
