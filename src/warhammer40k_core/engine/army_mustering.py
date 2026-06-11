@@ -9,6 +9,7 @@ from warhammer40k_core.core.datasheet import (
     AttachmentRole,
     DatasheetDefinition,
 )
+from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
@@ -897,7 +898,12 @@ class ArmyDefinition:
         )
 
 
-def muster_army(*, catalog: ArmyCatalog, request: ArmyMusterRequest) -> ArmyDefinition:
+def muster_army(
+    *,
+    catalog: ArmyCatalog,
+    request: ArmyMusterRequest,
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] = (),
+) -> ArmyDefinition:
     if type(catalog) is not ArmyCatalog:
         raise ArmyMusteringError("catalog must be an ArmyCatalog.")
     if type(request) is not ArmyMusterRequest:
@@ -912,7 +918,10 @@ def muster_army(*, catalog: ArmyCatalog, request: ArmyMusterRequest) -> ArmyDefi
     except ListValidationError as exc:
         raise ArmyMusteringError("ArmyMusterRequest detachment selection is invalid.") from exc
 
-    factory = UnitFactory(catalog)
+    try:
+        factory = UnitFactory(catalog=catalog, model_geometries=model_geometries)
+    except UnitFactoryError as exc:
+        raise ArmyMusteringError("ArmyMusterRequest model geometries are invalid.") from exc
     units: list[UnitInstance] = []
     datasheets_by_selection_id: dict[str, DatasheetDefinition] = {}
     for selection in request.unit_selections:

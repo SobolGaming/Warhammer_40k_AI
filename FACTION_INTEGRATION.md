@@ -90,6 +90,11 @@ characteristics, and FAQ advisory records.
   Contagion Range cap and Skullsquirm Blight replacement.
 - Phase Death Guard B: Tallyband Summoners detachment support, including
   Beckoning Blight enhancement replacement.
+- Phase Death Guard C0: Plague Marines end-to-end catalog/mustering smoke,
+  proving patched source rows generate a canonical catalog package that can
+  manifest Plague Marines with selected real wargear, canonical model geometry,
+  and replay-safe army/state payloads. Rules not covered by the smoke remain
+  explicit unsupported descriptors or future phase work, not runtime fallbacks.
 - Phase Death Guard C: Typhus datasheet support, including Eater Plague
   replacement.
 - Phase Death Guard D: Deathshroud Terminators datasheet support, including
