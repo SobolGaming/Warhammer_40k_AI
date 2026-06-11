@@ -44,13 +44,42 @@ def test_faction_integration_preserves_verified_upstream_spelling_drift() -> Non
 
     assert tau_row.name == "Auxillary Cadre"
     assert cult_row.name == "Brood Brothers Auxillia"
-    assert "Names in this queue preserve upstream source-row spelling exactly" in document
+    assert "Names in this queue preserve the package's normalized source-row spelling exactly" in (
+        document
+    )
     assert tau_row.name in document
     assert cult_row.name in document
     assert tau_row.source_id in document
     assert cult_row.source_id in document
     assert "source-linked patch operations" in document
     assert "not silent edits" in document
+
+
+def test_faction_integration_queue_lists_every_seeded_faction_and_detachment() -> None:
+    document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+    normalized_document = " ".join(document.split())
+
+    for faction_row in faction_detachment_source.faction_rows():
+        assert f"### Phase {faction_row.name}" in document
+
+    for detachment_row in faction_detachment_source.detachment_rows():
+        assert detachment_row.name in normalized_document
+
+    assert "exact Adepta Sororitas detachments" not in document
+    assert "exact Astra Militarum detachments" not in document
+    assert "plus any official 11th Edition transition detachments" not in document
+
+
+def test_faction_integration_phase17e_scope_keeps_datasheet_execution_in_phase17f() -> None:
+    document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+
+    assert "## Phase 17E Scope Boundary" in document
+    assert "every faction has a source-linked army rule descriptor" in document
+    assert "every detachment has a source-linked detachment rule descriptor" in document
+    assert "Phase 17E must also intake unit rows" in document
+    assert "Broad datasheet, wargear" in document
+    assert "weapon ability execution belongs to Phase 17F" in document
+    assert "Do not hand-author an exhaustive unit-name list" in document
 
 
 def test_faction_integration_requires_explicit_faq_classification_gate() -> None:
