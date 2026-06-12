@@ -160,6 +160,79 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         assert setup.terrain_features
 
 
+def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_order() -> None:
+    source_rows = event_source.event_primary_mission_matrix_source_rows()
+    matrix = {
+        (row.player_force_disposition_id, row.opponent_force_disposition_id): row
+        for row in event_source.primary_mission_matrix_rows()
+    }
+
+    assert len(source_rows) == 15
+    assert len(matrix) == 25
+    assert (
+        source_rows[10].source_left_force_disposition_id,
+        source_rows[10].source_right_force_disposition_id,
+        source_rows[10].layout_source_page_start,
+    ) == ("disruption", "reconnaissance", 39)
+    assert (
+        source_rows[11].source_left_force_disposition_id,
+        source_rows[11].source_right_force_disposition_id,
+        source_rows[11].layout_source_page_start,
+    ) == ("disruption", "priority-assets", 42)
+    assert (
+        source_rows[13].source_left_force_disposition_id,
+        source_rows[13].source_right_force_disposition_id,
+        source_rows[13].layout_source_page_start,
+    ) == ("reconnaissance", "priority-assets", 48)
+
+    assert matrix[("take-and-hold", "disruption")].primary_mission_id == (
+        "primary-determined-acquisition"
+    )
+    assert matrix[("disruption", "take-and-hold")].primary_mission_id == "primary-death-trap"
+    assert matrix[("take-and-hold", "priority-assets")].primary_mission_id == (
+        "primary-inescapable-dominion"
+    )
+    assert matrix[("priority-assets", "take-and-hold")].primary_mission_id == (
+        "primary-secure-asset"
+    )
+    assert matrix[("purge-the-foe", "disruption")].primary_mission_id == "primary-punishment"
+    assert matrix[("disruption", "purge-the-foe")].primary_mission_id == ("primary-delaying-action")
+    assert matrix[("purge-the-foe", "priority-assets")].primary_mission_id == (
+        "primary-destroyers-wrath"
+    )
+    assert matrix[("priority-assets", "purge-the-foe")].primary_mission_id == ("primary-vital-link")
+    assert matrix[("disruption", "disruption")].primary_mission_id == "primary-outmaneuver"
+    assert matrix[("disruption", "disruption")].primary_mission_name == "Outmanoeuvre"
+    assert matrix[("disruption", "reconnaissance")].primary_mission_id == (
+        "primary-smoke-and-mirrors"
+    )
+    assert matrix[("reconnaissance", "disruption")].primary_mission_id == (
+        "primary-surveil-the-foe"
+    )
+    assert matrix[("reconnaissance", "priority-assets")].primary_mission_id == (
+        "primary-search-and-scour"
+    )
+    assert matrix[("priority-assets", "reconnaissance")].primary_mission_id == (
+        "primary-vanguard-operation"
+    )
+    assert matrix[("priority-assets", "priority-assets")].primary_mission_id == ("primary-sabotage")
+    assert matrix[("reconnaissance", "disruption")].battlefield_layout_ids == (
+        "disruption-vs-reconnaissance-layout-1",
+        "disruption-vs-reconnaissance-layout-2",
+        "disruption-vs-reconnaissance-layout-3",
+    )
+    assert matrix[("priority-assets", "disruption")].battlefield_layout_ids == (
+        "disruption-vs-priority-assets-layout-1",
+        "disruption-vs-priority-assets-layout-2",
+        "disruption-vs-priority-assets-layout-3",
+    )
+    assert matrix[("priority-assets", "reconnaissance")].battlefield_layout_ids == (
+        "reconnaissance-vs-priority-assets-layout-1",
+        "reconnaissance-vs-priority-assets-layout-2",
+        "reconnaissance-vs-priority-assets-layout-3",
+    )
+
+
 def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> None:
     descriptors = event_source.layout_descriptor_rows()
 
@@ -188,6 +261,9 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
     assert _layout_descriptor("take-and-hold", "disruption", "a").source_page == 15
     assert _layout_descriptor("take-and-hold", "reconnaissance", "a").source_page == 18
     assert _layout_descriptor("take-and-hold", "priority-assets", "a").source_page == 21
+    assert _layout_descriptor("disruption", "reconnaissance", "a").source_page == 39
+    assert _layout_descriptor("disruption", "priority-assets", "a").source_page == 42
+    assert _layout_descriptor("reconnaissance", "priority-assets", "a").source_page == 48
     assert all(
         row.source_status.endswith("layout_identity_coordinate_extraction_pending")
         for row in event_source.battlefield_layout_rows()

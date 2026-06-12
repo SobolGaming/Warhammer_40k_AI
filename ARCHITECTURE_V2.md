@@ -4395,6 +4395,7 @@ Implemented modules:
 - `rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py`
 - `rules/source_packages/warhammer_40000_11th/event_companion_patches.py`
 - `rules/mission_pack_import.py`
+- `engine/phases/command.py`
 - `engine/missions.py`
 - `engine/mission_decisions.py`
 - `engine/deployment.py`
@@ -4418,6 +4419,9 @@ Implemented coverage:
 - Mission scoring and deterministic Tactical Secondary draw resolve through a
   strict mission-pack lookup for both Chapter Approved and Event Companion pack
   IDs.
+- Warhammer Event Companion Tactical Secondary end-of-Command replacement is a
+  finite lifecycle decision with exact one-card discard, exact one-card draw,
+  1CP spend, and a per-player once-per-battle ledger.
 - Deployment queue behavior has regression coverage for the Event Companion
   remainder-drain rule after one player has no undeployed non-reserve units.
 - Runtime core, engine, and geometry modules are statically audited to prevent

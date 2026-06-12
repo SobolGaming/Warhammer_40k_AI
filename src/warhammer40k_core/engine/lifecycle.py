@@ -98,7 +98,9 @@ from warhammer40k_core.engine.phases.charge import (
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
+    TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE,
     CommandPhaseHandler,
+    invalid_command_phase_decision_status,
 )
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
@@ -227,6 +229,12 @@ _SHOOTING_DECISION_TYPES = frozenset(
     )
 )
 _CHARGE_DECISION_TYPES = frozenset((SELECT_CHARGING_UNIT_DECISION_TYPE,))
+_COMMAND_DECISION_TYPES = frozenset(
+    (
+        TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
+        TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE,
+    )
+)
 _FIGHT_DECISION_TYPES = frozenset(
     (
         FIGHT_ACTIVATION_DECISION_TYPE,
@@ -761,6 +769,26 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and pending_request.decision_type in _COMMAND_DECISION_TYPES
+        ):
+            invalid_status = _invalid_finite_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                invalid_reason="invalid_command_phase_decision_result",
+            )
+            if invalid_status is not None:
+                return invalid_status
+            invalid_status = invalid_command_phase_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type in MISSION_DECISION_TYPES
         ):
             result.validate_for_request(pending_request)
@@ -849,7 +877,7 @@ class GameLifecycle:
                 config=self._require_config(),
             )
             return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
+        if record.request.decision_type in _COMMAND_DECISION_TYPES:
             self._command_phase_handler.apply_decision(
                 state=state,
                 result=result,

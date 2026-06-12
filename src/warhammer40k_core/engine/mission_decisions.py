@@ -1422,9 +1422,8 @@ def _apply_tactical_secondary_discard_cp_reward(
     gain = state.gain_command_points(
         player_id=player_id,
         amount=1,
-        source_id=(
-            f"chapter-approved-2026-27:tactical-secondary-discard:{result.result_id}:cp-reward"
-        ),
+        source_id=f"{_tactical_secondary_procedure_source_id(state)}:discard:"
+        f"{result.result_id}:cp-reward",
         source_kind=CommandPointSourceKind.OTHER,
     )
     gain_payload = validate_json_value(gain.to_payload())
@@ -1435,6 +1434,13 @@ def _apply_tactical_secondary_discard_cp_reward(
         gain_payload,
     )
     return gain_payload
+
+
+def _tactical_secondary_procedure_source_id(state: GameState) -> str:
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise GameLifecycleError("Tactical secondary procedure requires MissionSetup.")
+    return f"{mission_setup.source_id}:secondary:tactical-procedure"
 
 
 def _tactical_secondary_discard_cp_reward_window_id(

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
@@ -157,6 +157,32 @@ class MissionCardScoringGrammar:
         return {
             "grammar_id": self.grammar_id,
             "supported_tokens": list(self.supported_tokens),
+            "source_id": self.source_id,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class EventPrimaryMissionMatrixSourceRow:
+    source_left_force_disposition_id: str
+    source_right_force_disposition_id: str
+    source_left_primary_mission_id: str
+    source_left_primary_mission_name: str
+    source_right_primary_mission_id: str
+    source_right_primary_mission_name: str
+    layout_pair_id: str
+    layout_source_page_start: int
+    source_id: str
+
+    def to_payload(self) -> dict[str, object]:
+        return {
+            "source_left_force_disposition_id": self.source_left_force_disposition_id,
+            "source_right_force_disposition_id": self.source_right_force_disposition_id,
+            "source_left_primary_mission_id": self.source_left_primary_mission_id,
+            "source_left_primary_mission_name": self.source_left_primary_mission_name,
+            "source_right_primary_mission_id": self.source_right_primary_mission_id,
+            "source_right_primary_mission_name": self.source_right_primary_mission_name,
+            "layout_pair_id": self.layout_pair_id,
+            "layout_source_page_start": self.layout_source_page_start,
             "source_id": self.source_id,
         }
 
@@ -418,6 +444,165 @@ def card_amendment_set() -> CardAmendmentSet:
     )
 
 
+def event_primary_mission_matrix_source_rows() -> tuple[EventPrimaryMissionMatrixSourceRow, ...]:
+    return tuple(
+        _event_matrix_source_row(
+            source_left_force_disposition_id=left_force_disposition_id,
+            source_right_force_disposition_id=right_force_disposition_id,
+            source_left_primary_mission_id=left_primary_mission_id,
+            source_left_primary_mission_name=left_primary_mission_name,
+            source_right_primary_mission_id=right_primary_mission_id,
+            source_right_primary_mission_name=right_primary_mission_name,
+            layout_source_page_start=layout_source_page_start,
+        )
+        for (
+            left_force_disposition_id,
+            right_force_disposition_id,
+            left_primary_mission_id,
+            left_primary_mission_name,
+            right_primary_mission_id,
+            right_primary_mission_name,
+            layout_source_page_start,
+        ) in (
+            (
+                "take-and-hold",
+                "take-and-hold",
+                "primary-battlefield-dominance",
+                "Battlefield Dominance",
+                "primary-battlefield-dominance",
+                "Battlefield Dominance",
+                9,
+            ),
+            (
+                "take-and-hold",
+                "purge-the-foe",
+                "primary-immovable-object",
+                "Immovable Object",
+                "primary-unstoppable-force",
+                "Unstoppable Force",
+                12,
+            ),
+            (
+                "take-and-hold",
+                "disruption",
+                "primary-determined-acquisition",
+                "Determined Acquisition",
+                "primary-death-trap",
+                "Death Trap",
+                15,
+            ),
+            (
+                "take-and-hold",
+                "reconnaissance",
+                "primary-purge-and-secure",
+                "Purge and Secure",
+                "primary-reconnaissance-sweep",
+                "Reconnaissance Sweep",
+                18,
+            ),
+            (
+                "take-and-hold",
+                "priority-assets",
+                "primary-inescapable-dominion",
+                "Inescapable Dominion",
+                "primary-secure-asset",
+                "Secure Asset",
+                21,
+            ),
+            (
+                "purge-the-foe",
+                "purge-the-foe",
+                "primary-meatgrinder",
+                "Meatgrinder",
+                "primary-meatgrinder",
+                "Meatgrinder",
+                24,
+            ),
+            (
+                "purge-the-foe",
+                "disruption",
+                "primary-punishment",
+                "Punishment",
+                "primary-delaying-action",
+                "Delaying Action",
+                27,
+            ),
+            (
+                "purge-the-foe",
+                "reconnaissance",
+                "primary-consecrate",
+                "Consecrate",
+                "primary-triangulation",
+                "Triangulation",
+                30,
+            ),
+            (
+                "purge-the-foe",
+                "priority-assets",
+                "primary-destroyers-wrath",
+                "Destroyer's Wrath",
+                "primary-vital-link",
+                "Vital Link",
+                33,
+            ),
+            (
+                "disruption",
+                "disruption",
+                "primary-outmaneuver",
+                "Outmanoeuvre",
+                "primary-outmaneuver",
+                "Outmanoeuvre",
+                36,
+            ),
+            (
+                "disruption",
+                "reconnaissance",
+                "primary-smoke-and-mirrors",
+                "Smoke and Mirrors",
+                "primary-surveil-the-foe",
+                "Surveil the Foe",
+                39,
+            ),
+            (
+                "disruption",
+                "priority-assets",
+                "primary-locate-and-deny",
+                "Locate and Deny",
+                "primary-extract-relic",
+                "Extract Relic",
+                42,
+            ),
+            (
+                "reconnaissance",
+                "reconnaissance",
+                "primary-gather-intel",
+                "Gather Intel",
+                "primary-gather-intel",
+                "Gather Intel",
+                45,
+            ),
+            (
+                "reconnaissance",
+                "priority-assets",
+                "primary-search-and-scour",
+                "Search and Scour",
+                "primary-vanguard-operation",
+                "Vanguard Operation",
+                48,
+            ),
+            (
+                "priority-assets",
+                "priority-assets",
+                "primary-sabotage",
+                "Sabotage",
+                "primary-sabotage",
+                "Sabotage",
+                51,
+            ),
+        )
+    )
+
+
 def primary_mission_rows() -> tuple[chapter_approved.SourcePrimaryMissionRow, ...]:
     implemented_rows = {
         row.primary_mission_id: row for row in chapter_approved.primary_mission_rows()
@@ -426,7 +611,7 @@ def primary_mission_rows() -> tuple[chapter_approved.SourcePrimaryMissionRow, ..
     for mission_id, mission_name in _event_primary_mission_names():
         existing_row = implemented_rows.get(mission_id)
         if existing_row is not None:
-            rows.append(existing_row)
+            rows.append(replace(existing_row, name=mission_name))
             continue
         rows.append(
             chapter_approved.SourcePrimaryMissionRow(
@@ -450,17 +635,15 @@ def force_disposition_rows() -> tuple[chapter_approved.SourceForceDispositionRow
 
 
 def primary_mission_matrix_rows() -> tuple[chapter_approved.SourcePrimaryMissionMatrixCellRow, ...]:
-    return tuple(
-        chapter_approved.SourcePrimaryMissionMatrixCellRow(
-            player_force_disposition_id=row.player_force_disposition_id,
-            opponent_force_disposition_id=row.opponent_force_disposition_id,
-            primary_mission_id=row.primary_mission_id,
-            primary_mission_name=row.primary_mission_name,
-            battlefield_layout_ids=row.battlefield_layout_ids,
-            source_status="implemented",
-        )
-        for row in chapter_approved.primary_mission_matrix_rows()
-    )
+    rows: list[chapter_approved.SourcePrimaryMissionMatrixCellRow] = []
+    for source_row in event_primary_mission_matrix_source_rows():
+        rows.append(_matrix_cell_from_event_source_row(source_row, use_left=True))
+        if (
+            source_row.source_left_force_disposition_id
+            != source_row.source_right_force_disposition_id
+        ):
+            rows.append(_matrix_cell_from_event_source_row(source_row, use_left=False))
+    return tuple(rows)
 
 
 def mission_action_rows() -> tuple[chapter_approved.SourceMissionActionRow, ...]:
@@ -981,29 +1164,74 @@ def _base_source_kind_and_geometry(
     )
 
 
+def _event_matrix_source_row(
+    *,
+    source_left_force_disposition_id: str,
+    source_right_force_disposition_id: str,
+    source_left_primary_mission_id: str,
+    source_left_primary_mission_name: str,
+    source_right_primary_mission_id: str,
+    source_right_primary_mission_name: str,
+    layout_source_page_start: int,
+) -> EventPrimaryMissionMatrixSourceRow:
+    layout_pair_id = f"{source_left_force_disposition_id}-vs-{source_right_force_disposition_id}"
+    return EventPrimaryMissionMatrixSourceRow(
+        source_left_force_disposition_id=source_left_force_disposition_id,
+        source_right_force_disposition_id=source_right_force_disposition_id,
+        source_left_primary_mission_id=source_left_primary_mission_id,
+        source_left_primary_mission_name=source_left_primary_mission_name,
+        source_right_primary_mission_id=source_right_primary_mission_id,
+        source_right_primary_mission_name=source_right_primary_mission_name,
+        layout_pair_id=layout_pair_id,
+        layout_source_page_start=layout_source_page_start,
+        source_id=f"{SOURCE_PACKAGE_ID}:primary-mission-matrix-source:{layout_pair_id}",
+    )
+
+
+def _matrix_cell_from_event_source_row(
+    source_row: EventPrimaryMissionMatrixSourceRow,
+    *,
+    use_left: bool,
+) -> chapter_approved.SourcePrimaryMissionMatrixCellRow:
+    if use_left:
+        player_force_disposition_id = source_row.source_left_force_disposition_id
+        opponent_force_disposition_id = source_row.source_right_force_disposition_id
+        primary_mission_id = source_row.source_left_primary_mission_id
+        primary_mission_name = source_row.source_left_primary_mission_name
+    else:
+        player_force_disposition_id = source_row.source_right_force_disposition_id
+        opponent_force_disposition_id = source_row.source_left_force_disposition_id
+        primary_mission_id = source_row.source_right_primary_mission_id
+        primary_mission_name = source_row.source_right_primary_mission_name
+    return chapter_approved.SourcePrimaryMissionMatrixCellRow(
+        player_force_disposition_id=player_force_disposition_id,
+        opponent_force_disposition_id=opponent_force_disposition_id,
+        primary_mission_id=primary_mission_id,
+        primary_mission_name=primary_mission_name,
+        battlefield_layout_ids=(
+            f"{source_row.layout_pair_id}-layout-1",
+            f"{source_row.layout_pair_id}-layout-2",
+            f"{source_row.layout_pair_id}-layout-3",
+        ),
+        source_status="implemented",
+    )
+
+
 def _event_primary_mission_names() -> tuple[tuple[str, str], ...]:
     seen: dict[str, str] = {}
-    for row in chapter_approved.primary_mission_matrix_rows():
-        seen[row.primary_mission_id] = row.primary_mission_name
+    for row in event_primary_mission_matrix_source_rows():
+        seen[row.source_left_primary_mission_id] = row.source_left_primary_mission_name
+        seen[row.source_right_primary_mission_id] = row.source_right_primary_mission_name
     return tuple(sorted(seen.items()))
 
 
-_LAYOUT_SOURCE_PAGES: tuple[tuple[str, str, int], ...] = (
-    ("take-and-hold", "take-and-hold", 9),
-    ("take-and-hold", "purge-the-foe", 12),
-    ("take-and-hold", "disruption", 15),
-    ("take-and-hold", "reconnaissance", 18),
-    ("take-and-hold", "priority-assets", 21),
-    ("purge-the-foe", "purge-the-foe", 24),
-    ("purge-the-foe", "disruption", 27),
-    ("purge-the-foe", "reconnaissance", 30),
-    ("purge-the-foe", "priority-assets", 33),
-    ("disruption", "disruption", 36),
-    ("reconnaissance", "disruption", 39),
-    ("priority-assets", "disruption", 42),
-    ("reconnaissance", "reconnaissance", 45),
-    ("priority-assets", "reconnaissance", 48),
-    ("priority-assets", "priority-assets", 51),
+_LAYOUT_SOURCE_PAGES: tuple[tuple[str, str, int], ...] = tuple(
+    (
+        row.source_left_force_disposition_id,
+        row.source_right_force_disposition_id,
+        row.layout_source_page_start,
+    )
+    for row in event_primary_mission_matrix_source_rows()
 )
 
 
