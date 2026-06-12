@@ -26,6 +26,7 @@ from warhammer40k_core.core.detachment import (
     DetachmentCatalogError,
     DetachmentDefinition,
     EnhancementDefinition,
+    EnhancementSubtype,
     StratagemDefinition,
 )
 from warhammer40k_core.core.ruleset import RulesetId
@@ -231,6 +232,7 @@ def test_detachment_catalog_objects_are_data_not_behavior() -> None:
         enhancement_id="core-enhancement",
         name="Core Enhancement",
         source_id="enhancement:core-enhancement",
+        subtypes=(EnhancementSubtype.UPGRADE,),
         points=10,
         ability_descriptor_ids=("ability:core-enhancement",),
     )
@@ -254,6 +256,7 @@ def test_detachment_catalog_objects_are_data_not_behavior() -> None:
     )
 
     assert EnhancementDefinition.from_payload(enhancement.to_payload()) == enhancement
+    assert enhancement.to_payload()["subtypes"] == ["upgrade"]
     assert StratagemDefinition.from_payload(stratagem.to_payload()) == stratagem
     assert DetachmentDefinition.from_payload(detachment.to_payload()) == detachment
     assert enhancement.stable_identity() == "enhancement:core-enhancement"
@@ -268,7 +271,16 @@ def test_detachment_catalog_objects_are_data_not_behavior() -> None:
             enhancement_id="enhancement:prefixed",
             name="Bad",
             source_id="enhancement:bad",
+            subtypes=cast(tuple[EnhancementSubtype, ...], ("upgrade", "upgrade")),
             points=-1,
+        )
+    with pytest.raises(DetachmentCatalogError, match="Subtype"):
+        EnhancementDefinition(
+            enhancement_id="bad-subtype",
+            name="Bad Subtype",
+            source_id="enhancement:bad-subtype",
+            subtypes=cast(tuple[EnhancementSubtype, ...], ("not-a-subtype",)),
+            points=0,
         )
     with pytest.raises(DetachmentCatalogError):
         StratagemDefinition(

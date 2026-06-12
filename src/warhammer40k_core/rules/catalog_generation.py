@@ -20,6 +20,7 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
     EnhancementDefinition,
+    EnhancementSubtype,
     StratagemDefinition,
 )
 from warhammer40k_core.core.faction import ArmyRuleDefinition, FactionDefinition
@@ -70,6 +71,7 @@ _BASE_SIZE_BLOCKERS = frozenset(
         "unique",
     }
 )
+_ENHANCEMENT_UPGRADE_NAME_SUFFIX = re.compile(r"\s+upgrade\s*\Z", re.IGNORECASE)
 _CIRCULAR_BASE_RE = re.compile(r"^(?P<diameter>\d+(?:\.\d+)?)\s*mm$", re.IGNORECASE)
 _OVAL_BASE_RE = re.compile(
     r"^(?P<length>\d+(?:\.\d+)?)\s*x\s*(?P<width>\d+(?:\.\d+)?)\s*mm(?:\s*oval)?$",
@@ -382,11 +384,13 @@ def _detachment_from_row(row: NormalizedSourceRow) -> DetachmentDefinition:
 
 
 def _enhancement_from_row(row: NormalizedSourceRow) -> EnhancementDefinition:
+    name = _required_field(row=row, column_name="name")
     return EnhancementDefinition(
         enhancement_id=row.source_row_id,
-        name=_required_field(row=row, column_name="name"),
+        name=name,
         source_id=row.stable_source_id(),
         content_scope=_content_scope_from_row(row),
+        subtypes=_enhancement_subtypes_from_row(row=row, name=name),
         points=_required_non_negative_int(row=row, column_name="points"),
     )
 
@@ -696,6 +700,13 @@ def _required_split_field(row: NormalizedSourceRow, column_name: str) -> tuple[s
     return _split_field_value(value)
 
 
+def _optional_split_field(row: NormalizedSourceRow, column_name: str) -> tuple[str, ...]:
+    value = row.runtime_fields_payload().get(column_name)
+    if value is None or not value.strip():
+        return ()
+    return _split_field_value(value)
+
+
 def _split_field_value(value: str) -> tuple[str, ...]:
     items = tuple(item.strip() for item in value.split(",") if item.strip())
     if not items:
@@ -708,6 +719,35 @@ def _split_field_value(value: str) -> tuple[str, ...]:
         seen.add(item)
         unique.append(item)
     return tuple(unique)
+
+
+def _enhancement_subtypes_from_row(
+    *,
+    row: NormalizedSourceRow,
+    name: str,
+) -> tuple[EnhancementSubtype, ...]:
+    subtypes = _enhancement_subtypes_from_tokens(_optional_split_field(row, "subtypes"))
+    if _ENHANCEMENT_UPGRADE_NAME_SUFFIX.search(name) is None:
+        return subtypes
+    if EnhancementSubtype.UPGRADE in subtypes:
+        return subtypes
+    return tuple(sorted((*subtypes, EnhancementSubtype.UPGRADE), key=lambda subtype: subtype.value))
+
+
+def _enhancement_subtypes_from_tokens(tokens: tuple[str, ...]) -> tuple[EnhancementSubtype, ...]:
+    seen: set[EnhancementSubtype] = set()
+    subtypes: list[EnhancementSubtype] = []
+    for token in tokens:
+        normalized = token.strip().casefold().replace(" ", "_")
+        try:
+            subtype = EnhancementSubtype(normalized)
+        except ValueError as exc:
+            raise CatalogGenerationError("Enhancement subtype source token is invalid.") from exc
+        if subtype in seen:
+            raise CatalogGenerationError("Enhancement subtype source tokens must not duplicate.")
+        seen.add(subtype)
+        subtypes.append(subtype)
+    return tuple(sorted(subtypes, key=lambda subtype: subtype.value))
 
 
 def _required_positive_int(row: NormalizedSourceRow, column_name: str) -> int:

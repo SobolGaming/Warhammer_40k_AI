@@ -11,6 +11,7 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.datasheet import BaseSizeKind
+from warhammer40k_core.core.detachment import EnhancementSubtype
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryCoordinateFrame,
     GeometryEvidenceKind,
@@ -205,6 +206,25 @@ def test_phase17b_wargear_faction_detachment_enhancement_and_stratagem_records_r
         CanonicalCatalogPackage.from_payload(package.to_payload()).to_payload()
         == package.to_payload()
     )
+
+
+@pytest.mark.parametrize(
+    ("enhancement_name", "enhancement_subtypes"),
+    [
+        ("Apocalyptic Steeds Upgrade", ""),
+        ("Deadly Pathogen", "upgrade"),
+    ],
+)
+def test_phase17b_enhancement_upgrade_subtype_is_source_backed(
+    enhancement_name: str,
+    enhancement_subtypes: str,
+) -> None:
+    package = _catalog_package(
+        enhancement_name=enhancement_name,
+        enhancement_subtypes=enhancement_subtypes,
+    )
+
+    assert package.army_catalog.enhancements[0].subtypes == (EnhancementSubtype.UPGRADE,)
 
 
 def test_phase17b_death_guard_pdf_local_cache_matches_manifest_hash_when_present() -> None:
@@ -550,6 +570,8 @@ def _catalog_package(
     skill: str = "3+",
     weapon_keywords: str = "Lethal Hits",
     detachment_point_cost: str = "1",
+    enhancement_name: str = "Deadly Pathogen",
+    enhancement_subtypes: str = "",
     geometry_overrides: tuple[ModelGeometryCatalogRecord, ...] = (),
 ) -> CanonicalCatalogPackage:
     return build_canonical_catalog_package(
@@ -571,6 +593,8 @@ def _catalog_package(
             skill=skill,
             weapon_keywords=weapon_keywords,
             detachment_point_cost=detachment_point_cost,
+            enhancement_name=enhancement_name,
+            enhancement_subtypes=enhancement_subtypes,
         ),
         geometry_overrides=geometry_overrides,
     )
@@ -608,6 +632,8 @@ def _source_artifacts_from_text_overrides(
         skill=overrides.get("skill", "3+"),
         weapon_keywords=overrides.get("weapon_keywords", "Lethal Hits"),
         detachment_point_cost=overrides.get("detachment_point_cost", "1"),
+        enhancement_name=overrides.get("enhancement_name", "Deadly Pathogen"),
+        enhancement_subtypes=overrides.get("enhancement_subtypes", ""),
     )
 
 
@@ -628,6 +654,8 @@ def _source_artifacts(
     skill: str = "3+",
     weapon_keywords: str = "Lethal Hits",
     detachment_point_cost: str = "1",
+    enhancement_name: str = "Deadly Pathogen",
+    enhancement_subtypes: str = "",
     include_height: bool = True,
 ) -> tuple[WahapediaJsonArtifact, ...]:
     height_columns = (
@@ -677,8 +705,9 @@ def _source_artifacts(
         _artifact(
             table_name="Enhancements",
             csv_text=(
-                "id,name,description,content_scope,points\n"
-                'deadly-pathogen,Deadly Pathogen,"Add 1 to Attacks.",matched_play,15\n'
+                "id,name,description,content_scope,points,subtypes\n"
+                f'deadly-pathogen,{enhancement_name},"Add 1 to Attacks.",matched_play,15,'
+                f"{enhancement_subtypes}\n"
             ),
         ),
         _artifact(
