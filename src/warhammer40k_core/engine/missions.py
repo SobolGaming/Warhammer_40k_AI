@@ -146,6 +146,10 @@ def _primary_scoring_rules_from_primary(
 ) -> tuple[PrimaryMissionScoringRule, ...]:
     if type(primary) is not PrimaryMissionDefinition:
         raise GameLifecycleError("Primary scoring rules require PrimaryMissionDefinition.")
+    if primary.scoring_kind == "event_companion_primary_source_known_engine_pending":
+        raise GameLifecycleError(
+            "Primary mission scoring source is known but engine implementation is pending."
+        )
     rules: list[PrimaryMissionScoringRule] = []
     for rule in primary.scoring_rules:
         if rule.source_kind != VictoryPointSourceKind.PRIMARY.value:

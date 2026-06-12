@@ -183,8 +183,9 @@ mission/catalog replacement slice with source-tracked 11th Edition Force
 Dispositions, the named 25-cell Primary Mission matrix, three layout identifiers
 per matrix cell, and engine-achievement-gated finite Tactical Secondary
 score/retain decisions; exact 11th Edition Secondary card identities beyond
-current source rows, Primary Mission scoring text, and layout geometry remain
-pending source work. Phase 14K is complete: attack/save cutover hardening
+current source rows and layout geometry remain pending source work, while Event
+Companion Primary Mission scoring coverage tracks source-known, engine-pending,
+and awaiting-source missions. Phase 14K is complete: attack/save cutover hardening
 rejects retired save/allocation decision surfaces, grouped Inflict Damage uses defender
 `select_damage_allocation_model` decisions with pre-pop stale-legality rejection,
 old Aircraft minimum-move/pivot runtime policy is removed, reserve arrivals use
@@ -240,12 +241,14 @@ payloads without importing parser/compiler/template tooling.
 Phase 17J is complete for Warhammer Event Companion v1.0 mission-pack
 compliance and source geometry inventory. The source package now records Event
 Mission Sequence ordering, Tactical/Fixed Secondary procedures, all 25
-implemented Primary Mission matrix cells, all 45 source-page layout identities
-with pending coordinate-extraction status, no Deployment/Twist card usage,
-separate empty card-amendment and FAQ patch records, Base Size Guide source rows
-with geometry-resolution statuses, Event Companion mission-pack import,
-setup/scoring pack lookup, deployment remainder-drain coverage, and a static
-audit that runtime code does not parse Event Companion PDF text or images.
+implemented Primary Mission matrix cells, Primary Mission scoring coverage rows
+grouped as engine-implemented, source-known engine-pending, or awaiting-source,
+all 45 source-page layout identities with pending coordinate-extraction status,
+no Deployment/Twist card usage, separate empty card-amendment and FAQ patch
+records, Base Size Guide source rows with geometry-resolution statuses, Event
+Companion mission-pack import, setup/scoring pack lookup, deployment
+remainder-drain coverage, and a static audit that runtime code does not parse
+Event Companion PDF text or images.
 
 Phase 17E is complete for source-backed faction coverage. The
 `gw-11e-phase17e-faction-coverage-2026-27` package validates every official
