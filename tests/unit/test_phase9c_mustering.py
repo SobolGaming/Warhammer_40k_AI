@@ -15,6 +15,7 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
     EnhancementDefinition,
+    EnhancementSubtype,
     StratagemDefinition,
 )
 from warhammer40k_core.core.faction import FactionDefinition
@@ -187,6 +188,7 @@ def _phase16_source_detachment_catalog() -> ArmyCatalog:
 def _phase16d_catalog(
     *,
     second_enhancement: bool = False,
+    upgrade_enhancement: bool = False,
     epic_leader: bool = False,
 ) -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
@@ -206,6 +208,17 @@ def _phase16d_catalog(
                 name="Core Enhancement B",
                 source_id="enhancement:core-enhancement-b",
                 points=30,
+            ),
+        )
+    if upgrade_enhancement:
+        enhancements = (
+            *enhancements,
+            EnhancementDefinition(
+                enhancement_id="core-upgrade",
+                name="Core Upgrade",
+                source_id="enhancement:core-upgrade",
+                subtypes=(EnhancementSubtype.UPGRADE,),
+                points=20,
             ),
         )
     enhancement_ids = tuple(enhancement.enhancement_id for enhancement in enhancements)
@@ -333,7 +346,9 @@ def _phase16d_transport_roster_request(
         detachment_selection=DetachmentSelection(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
-            enhancement_ids=tuple(sorted(assignment.enhancement_id for assignment in assignments)),
+            enhancement_ids=tuple(
+                sorted({assignment.enhancement_id for assignment in assignments})
+            ),
         ),
         unit_selections=tuple(units),
         attachment_declarations=tuple(attachment_declarations),
@@ -1112,6 +1127,281 @@ def test_phase16d_enhancement_points_count_toward_strike_force_limit() -> None:
         muster_army(catalog=catalog, request=request)
 
 
+def test_phase16d_upgrade_assignments_share_one_selection_and_pay_per_unit() -> None:
+    catalog = _phase16d_catalog(upgrade_enhancement=True)
+    assignments = tuple(
+        EnhancementAssignment(
+            enhancement_id="core-upgrade",
+            target_unit_selection_id=selection_id,
+            source_id=f"assignment:{selection_id}",
+        )
+        for selection_id in ("squad-one", "squad-two", "squad-three")
+    )
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+            enhancement_ids=("core-upgrade",),
+        ),
+        unit_selections=(
+            _unit_selection(unit_selection_id="squad-one"),
+            _unit_selection(unit_selection_id="squad-two"),
+            _unit_selection(unit_selection_id="squad-three"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="squad-one",
+                points=100,
+                source_id="points:squad-one",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="squad-two",
+                points=100,
+                source_id="points:squad-two",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="squad-three",
+                points=100,
+                source_id="points:squad-three",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-unit",
+                points=100,
+                source_id="points:leader-unit",
+            ),
+        ),
+        enhancement_assignments=assignments,
+        warlord_selection=WarlordSelection(
+            unit_selection_id="leader-unit",
+            source_id="warlord:leader-unit",
+        ),
+        roster_legality_required=True,
+    )
+    over_points_request = replace(
+        request,
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="squad-one",
+                points=1650,
+                source_id="points:squad-one",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="squad-two",
+                points=100,
+                source_id="points:squad-two",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="squad-three",
+                points=100,
+                source_id="points:squad-three",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-unit",
+                points=100,
+                source_id="points:leader-unit",
+            ),
+        ),
+    )
+
+    assert validate_roster_legality(catalog=catalog, request=request).violations == ()
+    army = muster_army(catalog=catalog, request=request)
+    over_points_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=over_points_request,
+        ).violations
+    }
+
+    assert army.detachment_selection.enhancement_ids == ("core-upgrade",)
+    assert {
+        (assignment.enhancement_id, assignment.target_unit_selection_id, assignment.source_id)
+        for assignment in army.enhancement_assignments
+    } == {
+        (assignment.enhancement_id, assignment.target_unit_selection_id, assignment.source_id)
+        for assignment in assignments
+    }
+    assert "points_limit_exceeded" in over_points_codes
+
+
+def test_phase16d_upgrade_assignment_limits_and_targets_are_validated() -> None:
+    catalog = _phase16d_catalog(upgrade_enhancement=True)
+    too_many_assignments = tuple(
+        EnhancementAssignment(
+            enhancement_id="core-upgrade",
+            target_unit_selection_id=selection_id,
+            source_id=f"assignment:{selection_id}",
+        )
+        for selection_id in ("squad-one", "squad-two", "squad-three", "squad-four")
+    )
+    too_many_request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+            enhancement_ids=("core-upgrade",),
+        ),
+        unit_selections=(
+            _unit_selection(unit_selection_id="squad-one"),
+            _unit_selection(unit_selection_id="squad-two"),
+            _unit_selection(unit_selection_id="squad-three"),
+            _unit_selection(unit_selection_id="squad-four"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="squad-one",
+                points=100,
+                source_id="points:squad-one",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="squad-two",
+                points=100,
+                source_id="points:squad-two",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="squad-three",
+                points=100,
+                source_id="points:squad-three",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="squad-four",
+                points=100,
+                source_id="points:squad-four",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-unit",
+                points=100,
+                source_id="points:leader-unit",
+            ),
+        ),
+        enhancement_assignments=too_many_assignments,
+        warlord_selection=WarlordSelection(
+            unit_selection_id="leader-unit",
+            source_id="warlord:leader-unit",
+        ),
+        roster_legality_required=True,
+    )
+    character_request = replace(
+        too_many_request,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="leader-unit",
+                points=100,
+                source_id="points:leader-unit",
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-upgrade",
+                target_unit_selection_id="leader-unit",
+                source_id="assignment:leader-unit",
+            ),
+        ),
+    )
+
+    too_many_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=too_many_request,
+        ).violations
+    }
+    character_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=character_request,
+        ).violations
+    }
+
+    assert "upgrade_assignment_limit_exceeded" in too_many_codes
+    assert "enhancement_limit_exceeded" not in too_many_codes
+    assert "upgrade_character_forbidden" in character_codes
+
+
+def test_phase16d_standard_enhancements_remain_single_assignment() -> None:
+    catalog = _phase16d_catalog()
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+            enhancement_ids=("core-enhancement-a",),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="leader-one",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="leader-two",
+                datasheet_id="core-character-support",
+                model_profile_id="core-character-support",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="leader-one",
+                points=100,
+                source_id="points:leader-one",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-two",
+                points=100,
+                source_id="points:leader-two",
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-a",
+                target_unit_selection_id="leader-one",
+                source_id="assignment:leader-one",
+            ),
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-a",
+                target_unit_selection_id="leader-two",
+                source_id="assignment:leader-two",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="leader-one",
+            source_id="warlord:leader-one",
+        ),
+        roster_legality_required=True,
+    )
+
+    codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(catalog=catalog, request=request).violations
+    }
+
+    assert "enhancement_repeated_assignment_forbidden" in codes
+
+
 def test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads() -> None:
     epic_catalog = _phase16d_catalog(epic_leader=True)
     epic_request = _muster_request(
@@ -1199,6 +1489,32 @@ def test_phase16d_enhancement_restrictions_cover_epic_and_attached_squads() -> N
         muster_army(catalog=epic_catalog, request=epic_request)
     with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
         muster_army(catalog=attached_catalog, request=attached_request)
+
+
+def test_phase16d_upgrade_and_leader_enhancement_cannot_stack_on_attached_squad() -> None:
+    catalog = _phase16d_catalog(upgrade_enhancement=True)
+    request = _phase16d_transport_roster_request(
+        catalog,
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="core-upgrade",
+                target_unit_selection_id="bodyguard-unit",
+                source_id="assignment:bodyguard",
+            ),
+            EnhancementAssignment(
+                enhancement_id="core-enhancement-a",
+                target_unit_selection_id="leader-unit",
+                source_id="assignment:leader",
+            ),
+        ),
+    )
+
+    codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(catalog=catalog, request=request).violations
+    }
+
+    assert "attached_squad_enhancement_limit_exceeded" in codes
 
 
 def test_phase16d_transport_manifest_validates_capacity_and_attached_group_completeness() -> None:

@@ -9,6 +9,7 @@ from warhammer40k_core.core.datasheet import (
     AttachmentRole,
     DatasheetDefinition,
 )
+from warhammer40k_core.core.detachment import EnhancementDefinition, EnhancementSubtype
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.engine.list_validation import (
@@ -1216,7 +1217,7 @@ def _append_enhancement_violations(
     enhancement_limit: int,
     violations: list[RosterLegalityViolation],
 ) -> None:
-    if len(request.enhancement_assignments) > enhancement_limit:
+    if len(request.detachment_selection.enhancement_ids) > enhancement_limit:
         violations.append(
             RosterLegalityViolation(
                 violation_code="enhancement_limit_exceeded",
@@ -1231,7 +1232,11 @@ def _append_enhancement_violations(
     }
     attached_group_by_selection_id = _attached_group_by_selection_id(request)
     enhancement_count_by_attached_group: dict[tuple[str, ...], int] = {}
+    assignment_count_by_enhancement_id: dict[str, int] = {}
     for assignment in request.enhancement_assignments:
+        assignment_count_by_enhancement_id[assignment.enhancement_id] = (
+            assignment_count_by_enhancement_id.get(assignment.enhancement_id, 0) + 1
+        )
         if assignment.enhancement_id not in selected_ids:
             violations.append(
                 RosterLegalityViolation(
@@ -1280,7 +1285,17 @@ def _append_enhancement_violations(
                 )
             )
             continue
-        if not _datasheet_has_keyword(datasheet, "CHARACTER"):
+        is_upgrade = enhancement is not None and _enhancement_is_upgrade(enhancement)
+        if is_upgrade and _datasheet_has_keyword(datasheet, "CHARACTER"):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="upgrade_character_forbidden",
+                    message="Upgrades can be assigned only to non-CHARACTER units.",
+                    unit_selection_id=assignment.target_unit_selection_id,
+                    source_id=assignment.source_id,
+                )
+            )
+        if not is_upgrade and not _datasheet_has_keyword(datasheet, "CHARACTER"):
             violations.append(
                 RosterLegalityViolation(
                     violation_code="enhancement_character_required",
@@ -1303,12 +1318,34 @@ def _append_enhancement_violations(
             enhancement_count_by_attached_group[attached_group] = (
                 enhancement_count_by_attached_group.get(attached_group, 0) + 1
             )
+    for enhancement_id, assignment_count in assignment_count_by_enhancement_id.items():
+        enhancement = catalog_enhancement_by_id.get(enhancement_id)
+        if enhancement is None:
+            continue
+        if _enhancement_is_upgrade(enhancement):
+            if assignment_count > 3:
+                violations.append(
+                    RosterLegalityViolation(
+                        violation_code="upgrade_assignment_limit_exceeded",
+                        message="A selected Upgrade can be assigned to at most three units.",
+                        source_id=enhancement.source_id,
+                    )
+                )
+            continue
+        if assignment_count > 1:
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="enhancement_repeated_assignment_forbidden",
+                    message="A standard Enhancement can be assigned to only one unit.",
+                    source_id=enhancement.source_id,
+                )
+            )
     for attached_group, count in enhancement_count_by_attached_group.items():
         if count > 1:
             violations.append(
                 RosterLegalityViolation(
                     violation_code="attached_squad_enhancement_limit_exceeded",
-                    message="An attached squad can have at most one Enhancement.",
+                    message="An attached squad can have at most one Enhancement or Upgrade.",
                     unit_selection_id=attached_group[0],
                     source_id="phase16d:attached-squad-enhancement-limit",
                 )
@@ -1526,6 +1563,10 @@ def _datasheet_has_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool
     return requested_keyword in {
         _canonical_keyword(stored_keyword) for stored_keyword in datasheet.keywords.keywords
     }
+
+
+def _enhancement_is_upgrade(enhancement: EnhancementDefinition) -> bool:
+    return EnhancementSubtype.UPGRADE in enhancement.subtypes
 
 
 def _canonical_keyword(keyword: str) -> str:
@@ -1898,16 +1939,13 @@ def _validate_unique_roster_unit_points(points: tuple[RosterUnitPointValue, ...]
 def _validate_unique_enhancement_assignments(
     assignments: tuple[EnhancementAssignment, ...],
 ) -> None:
-    seen_enhancements: set[str] = set()
     seen_targets: set[str] = set()
     for assignment in assignments:
-        if assignment.enhancement_id in seen_enhancements:
-            raise ArmyMusteringError("EnhancementAssignment enhancement IDs must be unique.")
         if assignment.target_unit_selection_id in seen_targets:
             raise ArmyMusteringError(
-                "EnhancementAssignment target units must not receive multiple Enhancements."
+                "EnhancementAssignment target units must not receive multiple Enhancements "
+                "or Upgrades."
             )
-        seen_enhancements.add(assignment.enhancement_id)
         seen_targets.add(assignment.target_unit_selection_id)
 
 

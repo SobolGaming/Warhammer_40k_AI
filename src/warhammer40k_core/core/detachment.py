@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Self, TypedDict
 
 from warhammer40k_core.core.content_scope import (
@@ -14,11 +15,16 @@ class DetachmentCatalogError(ValueError):
     """Raised when detachment catalog data violates CORE V2 invariants."""
 
 
+class EnhancementSubtype(StrEnum):
+    UPGRADE = "upgrade"
+
+
 class EnhancementDefinitionPayload(TypedDict):
     enhancement_id: str
     name: str
     source_id: str
     content_scope: str
+    subtypes: list[str]
     points: int | None
     ability_descriptor_ids: list[str]
 
@@ -53,6 +59,7 @@ class EnhancementDefinition:
     name: str
     source_id: str
     content_scope: CatalogContentScope = CatalogContentScope.MATCHED_PLAY
+    subtypes: tuple[EnhancementSubtype, ...] = ()
     points: int | None = None
     ability_descriptor_ids: tuple[str, ...] = ()
 
@@ -91,6 +98,14 @@ class EnhancementDefinition:
         )
         object.__setattr__(
             self,
+            "subtypes",
+            _validate_enhancement_subtype_tuple(
+                "EnhancementDefinition subtypes",
+                self.subtypes,
+            ),
+        )
+        object.__setattr__(
+            self,
             "ability_descriptor_ids",
             _validate_identifier_tuple(
                 "EnhancementDefinition ability_descriptor_ids",
@@ -107,6 +122,7 @@ class EnhancementDefinition:
             "name": self.name,
             "source_id": self.source_id,
             "content_scope": self.content_scope.value,
+            "subtypes": [subtype.value for subtype in self.subtypes],
             "points": self.points,
             "ability_descriptor_ids": list(self.ability_descriptor_ids),
         }
@@ -118,6 +134,9 @@ class EnhancementDefinition:
             name=payload["name"],
             source_id=payload["source_id"],
             content_scope=catalog_content_scope_from_token(payload["content_scope"]),
+            subtypes=tuple(
+                enhancement_subtype_from_token(subtype) for subtype in payload["subtypes"]
+            ),
             points=payload["points"],
             ability_descriptor_ids=tuple(payload["ability_descriptor_ids"]),
         )
@@ -359,6 +378,34 @@ def _catalog_content_scope_from_token(field_name: str, token: object) -> Catalog
         return catalog_content_scope_from_token(token)
     except CatalogContentScopeError as exc:
         raise DetachmentCatalogError(f"{field_name} is invalid.") from exc
+
+
+def enhancement_subtype_from_token(token: object) -> EnhancementSubtype:
+    if type(token) is EnhancementSubtype:
+        return token
+    if type(token) is not str:
+        raise DetachmentCatalogError("EnhancementSubtype token must be a string.")
+    try:
+        return EnhancementSubtype(token)
+    except ValueError as exc:
+        raise DetachmentCatalogError(f"Unsupported EnhancementSubtype token: {token}.") from exc
+
+
+def _validate_enhancement_subtype_tuple(
+    field_name: str,
+    values: tuple[EnhancementSubtype, ...],
+) -> tuple[EnhancementSubtype, ...]:
+    if type(values) is not tuple:
+        raise DetachmentCatalogError(f"{field_name} must be a tuple.")
+    seen: set[EnhancementSubtype] = set()
+    validated: list[EnhancementSubtype] = []
+    for value in values:
+        subtype = enhancement_subtype_from_token(value)
+        if subtype in seen:
+            raise DetachmentCatalogError(f"{field_name} must not contain duplicates.")
+        seen.add(subtype)
+        validated.append(subtype)
+    return tuple(sorted(validated, key=lambda subtype: subtype.value))
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
