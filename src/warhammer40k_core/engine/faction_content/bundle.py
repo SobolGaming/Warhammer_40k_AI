@@ -1,0 +1,610 @@
+from __future__ import annotations
+
+import hashlib
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from types import MappingProxyType
+from typing import TypedDict, cast
+
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.engine.abilities import (
+    AbilityCatalogIndex,
+    AbilityCatalogRecord,
+    AbilityHandlerBinding,
+    AbilityHandlerRegistry,
+    default_ability_handler_registry,
+)
+from warhammer40k_core.engine.ability_catalog import build_player_ability_index
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.events import (
+    RuntimeContentEventHandlerBinding,
+    RuntimeContentEventHandlerRegistry,
+    RuntimeContentEventIndex,
+    RuntimeContentEventSubscription,
+)
+from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+    StratagemHandlerBinding,
+    StratagemHandlerRegistry,
+)
+from warhammer40k_core.engine.faction_rule_execution import (
+    FactionRuleExecutionRegistry,
+    FactionRuleNamedHandler,
+)
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_execution import (
+    RuleExecutionRegistry,
+    RuleRuntimeBinding,
+)
+from warhammer40k_core.engine.stratagem_catalog import build_player_stratagem_index
+from warhammer40k_core.engine.stratagems import StratagemCatalogIndex, StratagemCatalogRecord
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_execution_2026_27,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
+    Phase17FExecutionRecord,
+)
+
+
+class RuntimeContentBundleSummaryPayload(TypedDict):
+    activation: dict[str, JsonValue]
+    selected_module_paths: list[str]
+    source_package_ids: list[str]
+    source_package_hashes: list[str]
+    contribution_ids: list[str]
+    ability_index_record_ids_by_player_id: dict[str, list[str]]
+    stratagem_index_record_ids_by_player_id: dict[str, list[str]]
+    ability_handler_ids: list[str]
+    stratagem_handler_ids: list[str]
+    rule_runtime_binding_ids: list[str]
+    event_subscriptions: list[dict[str, JsonValue]]
+    faction_execution_record_ids: list[str]
+    selected_execution_record_ids: list[str]
+    bundle_summary_hash: str
+
+
+DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID = "runtime-content:module-default"
+
+
+def _empty_named_handlers() -> Mapping[str, FactionRuleNamedHandler]:
+    return MappingProxyType({})
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContentContribution:
+    contribution_id: str = DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID
+    ability_records: tuple[AbilityCatalogRecord, ...] = ()
+    stratagem_records: tuple[StratagemCatalogRecord, ...] = ()
+    ability_handler_bindings: tuple[AbilityHandlerBinding, ...] = ()
+    stratagem_handler_bindings: tuple[StratagemHandlerBinding, ...] = ()
+    rule_runtime_bindings: tuple[RuleRuntimeBinding, ...] = ()
+    event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
+    event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
+    faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
+        default_factory=_empty_named_handlers
+    )
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "contribution_id",
+            _validate_identifier("contribution_id", self.contribution_id),
+        )
+        object.__setattr__(
+            self,
+            "ability_records",
+            _validate_tuple(
+                "RuntimeContentContribution ability_records",
+                self.ability_records,
+                AbilityCatalogRecord,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_records",
+            _validate_tuple(
+                "RuntimeContentContribution stratagem_records",
+                self.stratagem_records,
+                StratagemCatalogRecord,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "ability_handler_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution ability_handler_bindings",
+                self.ability_handler_bindings,
+                AbilityHandlerBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_handler_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution stratagem_handler_bindings",
+                self.stratagem_handler_bindings,
+                StratagemHandlerBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "rule_runtime_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution rule_runtime_bindings",
+                self.rule_runtime_bindings,
+                RuleRuntimeBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "event_subscriptions",
+            _validate_tuple(
+                "RuntimeContentContribution event_subscriptions",
+                self.event_subscriptions,
+                RuntimeContentEventSubscription,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "event_handler_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution event_handler_bindings",
+                self.event_handler_bindings,
+                RuntimeContentEventHandlerBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "faction_named_handlers",
+            _validate_named_handlers(self.faction_named_handlers),
+        )
+
+    def with_contribution_id(self, contribution_id: str) -> RuntimeContentContribution:
+        return RuntimeContentContribution(
+            contribution_id=contribution_id,
+            ability_records=self.ability_records,
+            stratagem_records=self.stratagem_records,
+            ability_handler_bindings=self.ability_handler_bindings,
+            stratagem_handler_bindings=self.stratagem_handler_bindings,
+            rule_runtime_bindings=self.rule_runtime_bindings,
+            event_subscriptions=self.event_subscriptions,
+            event_handler_bindings=self.event_handler_bindings,
+            faction_named_handlers=self.faction_named_handlers,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContentBundle:
+    activation: RuntimeContentActivation
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    stratagem_indexes_by_player_id: Mapping[str, StratagemCatalogIndex]
+    ability_handler_registry: AbilityHandlerRegistry
+    stratagem_handler_registry: StratagemHandlerRegistry
+    rule_execution_registry: RuleExecutionRegistry
+    faction_rule_execution_registry: FactionRuleExecutionRegistry
+    event_index: RuntimeContentEventIndex
+    contribution_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if type(self.activation) is not RuntimeContentActivation:
+            raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentActivation.")
+        object.__setattr__(
+            self,
+            "ability_indexes_by_player_id",
+            _validate_index_mapping(
+                "ability_indexes_by_player_id",
+                self.ability_indexes_by_player_id,
+                AbilityCatalogIndex,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_indexes_by_player_id",
+            _validate_index_mapping(
+                "stratagem_indexes_by_player_id",
+                self.stratagem_indexes_by_player_id,
+                StratagemCatalogIndex,
+            ),
+        )
+        if type(self.ability_handler_registry) is not AbilityHandlerRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires AbilityHandlerRegistry.")
+        if type(self.stratagem_handler_registry) is not StratagemHandlerRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires StratagemHandlerRegistry.")
+        if type(self.rule_execution_registry) is not RuleExecutionRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires RuleExecutionRegistry.")
+        if type(self.faction_rule_execution_registry) is not FactionRuleExecutionRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires FactionRuleExecutionRegistry.")
+        if type(self.event_index) is not RuntimeContentEventIndex:
+            raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
+        object.__setattr__(
+            self,
+            "contribution_ids",
+            _validate_identifier_tuple("contribution_ids", self.contribution_ids),
+        )
+
+    @classmethod
+    def from_contributions(
+        cls,
+        *,
+        activation: RuntimeContentActivation,
+        armies: tuple[ArmyDefinition, ...],
+        catalog: ArmyCatalog,
+        contributions: tuple[RuntimeContentContribution, ...],
+        base_ability_records: tuple[AbilityCatalogRecord, ...] = (),
+        base_stratagem_records: tuple[StratagemCatalogRecord, ...] = (),
+        base_ability_handler_registry: AbilityHandlerRegistry | None = None,
+        base_stratagem_handler_registry: StratagemHandlerRegistry | None = None,
+        base_rule_execution_registry: RuleExecutionRegistry | None = None,
+        faction_execution_records: tuple[Phase17FExecutionRecord, ...] | None = None,
+        include_unselected_faction_execution_records: bool = False,
+    ) -> RuntimeContentBundle:
+        if type(activation) is not RuntimeContentActivation:
+            raise GameLifecycleError("Runtime content bundle requires activation.")
+        if type(include_unselected_faction_execution_records) is not bool:
+            raise GameLifecycleError("Runtime content faction execution scope flag is invalid.")
+        validated_armies = _validate_armies(armies)
+        if type(catalog) is not ArmyCatalog:
+            raise GameLifecycleError("Runtime content bundle requires ArmyCatalog.")
+        validated_contributions = _validate_contributions(contributions)
+        ability_records = _merge_records(
+            "ability_records",
+            base_ability_records,
+            tuple(
+                record
+                for contribution in validated_contributions
+                for record in contribution.ability_records
+            ),
+            AbilityCatalogRecord,
+        )
+        stratagem_records = _merge_records(
+            "stratagem_records",
+            base_stratagem_records,
+            tuple(
+                record
+                for contribution in validated_contributions
+                for record in contribution.stratagem_records
+            ),
+            StratagemCatalogRecord,
+        )
+        ability_registry = _merged_ability_registry(
+            base_ability_handler_registry,
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.ability_handler_bindings
+            ),
+        )
+        stratagem_registry = _merged_stratagem_registry(
+            base_stratagem_handler_registry,
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.stratagem_handler_bindings
+            ),
+        )
+        rule_registry = _merged_rule_registry(
+            base_rule_execution_registry,
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.rule_runtime_bindings
+            ),
+        )
+        named_handlers = _merged_named_handlers(validated_contributions)
+        available_records = (
+            faction_execution_2026_27.execution_records()
+            if faction_execution_records is None
+            else faction_execution_records
+        )
+        records = (
+            available_records
+            if include_unselected_faction_execution_records
+            else _selected_faction_execution_records(
+                available_records=available_records,
+                selected_execution_record_ids=activation.selected_execution_record_ids,
+            )
+        )
+        faction_registry = FactionRuleExecutionRegistry.from_records(
+            records,
+            named_handlers=named_handlers,
+        )
+        contribution_ids = _validate_identifier_tuple(
+            "contribution_ids",
+            tuple(contribution.contribution_id for contribution in validated_contributions),
+        )
+        event_handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.event_handler_bindings
+            )
+        )
+        event_index = RuntimeContentEventIndex.from_subscriptions(
+            tuple(
+                subscription
+                for contribution in validated_contributions
+                for subscription in contribution.event_subscriptions
+            ),
+            handler_registry=event_handler_registry,
+        )
+        return cls(
+            activation=activation,
+            ability_indexes_by_player_id=_ability_indexes_by_player_id(
+                armies=validated_armies,
+                catalog=catalog,
+                records=ability_records,
+            ),
+            stratagem_indexes_by_player_id=_stratagem_indexes_by_player_id(
+                armies=validated_armies,
+                records=stratagem_records,
+            ),
+            ability_handler_registry=ability_registry,
+            stratagem_handler_registry=stratagem_registry,
+            rule_execution_registry=rule_registry,
+            faction_rule_execution_registry=faction_registry,
+            event_index=event_index,
+            contribution_ids=contribution_ids,
+        )
+
+    def to_summary_payload(self) -> RuntimeContentBundleSummaryPayload:
+        payload = {
+            "activation": cast(
+                dict[str, JsonValue], validate_json_value(self.activation.to_payload())
+            ),
+            "selected_module_paths": list(self.activation.selected_module_paths),
+            "source_package_ids": list(self.activation.source_package_ids),
+            "source_package_hashes": list(self.activation.source_package_hashes),
+            "contribution_ids": list(self.contribution_ids),
+            "ability_index_record_ids_by_player_id": {
+                player_id: [record.record_id for record in index.all_records()]
+                for player_id, index in self.ability_indexes_by_player_id.items()
+            },
+            "stratagem_index_record_ids_by_player_id": {
+                player_id: [record.record_id for record in index.all_records()]
+                for player_id, index in self.stratagem_indexes_by_player_id.items()
+            },
+            "ability_handler_ids": [
+                binding.handler_id for binding in self.ability_handler_registry.all_bindings()
+            ],
+            "stratagem_handler_ids": [
+                binding.handler_id for binding in self.stratagem_handler_registry.all_bindings()
+            ],
+            "rule_runtime_binding_ids": [
+                binding.binding_id for binding in self.rule_execution_registry.all_bindings()
+            ],
+            "event_subscriptions": self.event_index.to_summary_payload(),
+            "faction_execution_record_ids": [
+                record.execution_id for record in self.faction_rule_execution_registry.all_records()
+            ],
+            "selected_execution_record_ids": list(self.activation.selected_execution_record_ids),
+            "bundle_summary_hash": "",
+        }
+        payload["bundle_summary_hash"] = _summary_hash(
+            cast(Mapping[str, JsonValue], validate_json_value(payload))
+        )
+        return cast(RuntimeContentBundleSummaryPayload, validate_json_value(payload))
+
+
+def _validate_contributions(
+    contributions: object,
+) -> tuple[RuntimeContentContribution, ...]:
+    if type(contributions) is not tuple:
+        raise GameLifecycleError("Runtime content contributions must be a tuple.")
+    validated: list[RuntimeContentContribution] = []
+    for contribution in cast(tuple[object, ...], contributions):
+        if type(contribution) is not RuntimeContentContribution:
+            raise GameLifecycleError(
+                "Runtime content contributions must contain RuntimeContentContribution values."
+            )
+        validated.append(contribution)
+    return tuple(validated)
+
+
+def _validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:
+    if type(armies) is not tuple:
+        raise GameLifecycleError("Runtime content bundle armies must be a tuple.")
+    validated: list[ArmyDefinition] = []
+    seen: set[str] = set()
+    for army in cast(tuple[object, ...], armies):
+        if type(army) is not ArmyDefinition:
+            raise GameLifecycleError("Runtime content bundle armies must contain ArmyDefinition.")
+        if army.player_id in seen:
+            raise GameLifecycleError("Runtime content bundle player IDs must be unique.")
+        seen.add(army.player_id)
+        validated.append(army)
+    return tuple(sorted(validated, key=lambda army: army.player_id))
+
+
+def _ability_indexes_by_player_id(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    catalog: ArmyCatalog,
+    records: tuple[AbilityCatalogRecord, ...],
+) -> Mapping[str, AbilityCatalogIndex]:
+    return MappingProxyType(
+        {
+            army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+            for army in armies
+        }
+    )
+
+
+def _stratagem_indexes_by_player_id(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    records: tuple[StratagemCatalogRecord, ...],
+) -> Mapping[str, StratagemCatalogIndex]:
+    return MappingProxyType(
+        {
+            army.player_id: build_player_stratagem_index(
+                records,
+                detachment_ids=army.detachment_selection.detachment_ids,
+                stratagem_ids=army.detachment_selection.stratagem_ids,
+            )
+            for army in armies
+        }
+    )
+
+
+def _merged_ability_registry(
+    base: AbilityHandlerRegistry | None,
+    contribution_bindings: tuple[AbilityHandlerBinding, ...],
+) -> AbilityHandlerRegistry:
+    resolved_base = default_ability_handler_registry() if base is None else base
+    if type(resolved_base) is not AbilityHandlerRegistry:
+        raise GameLifecycleError("Runtime content base ability registry is invalid.")
+    return AbilityHandlerRegistry.from_bindings(
+        (*resolved_base.all_bindings(), *contribution_bindings)
+    )
+
+
+def _merged_stratagem_registry(
+    base: StratagemHandlerRegistry | None,
+    contribution_bindings: tuple[StratagemHandlerBinding, ...],
+) -> StratagemHandlerRegistry:
+    resolved_base = StratagemHandlerRegistry.empty() if base is None else base
+    if type(resolved_base) is not StratagemHandlerRegistry:
+        raise GameLifecycleError("Runtime content base Stratagem registry is invalid.")
+    return StratagemHandlerRegistry.from_bindings(
+        (*resolved_base.all_bindings(), *contribution_bindings)
+    )
+
+
+def _merged_rule_registry(
+    base: RuleExecutionRegistry | None,
+    contribution_bindings: tuple[RuleRuntimeBinding, ...],
+) -> RuleExecutionRegistry:
+    resolved_base = RuleExecutionRegistry.empty() if base is None else base
+    if type(resolved_base) is not RuleExecutionRegistry:
+        raise GameLifecycleError("Runtime content base rule registry is invalid.")
+    return RuleExecutionRegistry.from_bindings(
+        (*resolved_base.all_bindings(), *contribution_bindings)
+    )
+
+
+def _merged_named_handlers(
+    contributions: tuple[RuntimeContentContribution, ...],
+) -> Mapping[str, FactionRuleNamedHandler]:
+    handlers: dict[str, FactionRuleNamedHandler] = {}
+    for contribution in contributions:
+        for handler_id, handler in contribution.faction_named_handlers.items():
+            if handler_id in handlers:
+                raise GameLifecycleError("Runtime content faction handler IDs must be unique.")
+            handlers[handler_id] = handler
+    return MappingProxyType(handlers)
+
+
+def _selected_faction_execution_records(
+    *,
+    available_records: tuple[Phase17FExecutionRecord, ...],
+    selected_execution_record_ids: tuple[str, ...],
+) -> tuple[Phase17FExecutionRecord, ...]:
+    selected_ids = set(
+        _validate_identifier_tuple(
+            "selected_execution_record_ids",
+            selected_execution_record_ids,
+        )
+    )
+    if not selected_ids:
+        return ()
+    records_by_id: dict[str, Phase17FExecutionRecord] = {}
+    for record in _validate_tuple(
+        "faction_execution_records",
+        available_records,
+        Phase17FExecutionRecord,
+    ):
+        if record.execution_id in records_by_id:
+            raise GameLifecycleError("Runtime content faction execution record IDs must be unique.")
+        records_by_id[record.execution_id] = record
+    missing_ids = tuple(sorted(selected_ids.difference(records_by_id)))
+    if missing_ids:
+        raise GameLifecycleError(
+            f"Runtime content selected unknown faction execution records: {', '.join(missing_ids)}."
+        )
+    return tuple(records_by_id[execution_id] for execution_id in sorted(selected_ids))
+
+
+def _validate_named_handlers(value: object) -> Mapping[str, FactionRuleNamedHandler]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("Runtime content named handlers must be a mapping.")
+    validated: dict[str, FactionRuleNamedHandler] = {}
+    for raw_handler_id, raw_handler in cast(Mapping[object, object], value).items():
+        handler_id = _validate_identifier("faction handler id", raw_handler_id)
+        if not callable(raw_handler):
+            raise GameLifecycleError("Runtime content named handlers must be callable.")
+        if handler_id in validated:
+            raise GameLifecycleError("Runtime content named handler IDs must be unique.")
+        validated[handler_id] = cast(FactionRuleNamedHandler, raw_handler)
+    return MappingProxyType(validated)
+
+
+def _validate_index_mapping[T](
+    field_name: str,
+    value: object,
+    expected_type: type[T],
+) -> Mapping[str, T]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError(f"Runtime content {field_name} must be a mapping.")
+    validated: dict[str, T] = {}
+    for raw_player_id, index in cast(Mapping[object, object], value).items():
+        player_id = _validate_identifier("player_id", raw_player_id)
+        if type(index) is not expected_type:
+            raise GameLifecycleError(f"Runtime content {field_name} contains invalid index.")
+        validated[player_id] = index
+    return MappingProxyType(dict(sorted(validated.items())))
+
+
+def _merge_records[T](
+    field_name: str,
+    base_records: object,
+    contribution_records: tuple[T, ...],
+    expected_type: type[T],
+) -> tuple[T, ...]:
+    return (
+        *_validate_tuple(f"base {field_name}", base_records, expected_type),
+        *_validate_tuple(f"contribution {field_name}", contribution_records, expected_type),
+    )
+
+
+def _validate_tuple[T](
+    field_name: str,
+    value: object,
+    expected_type: type[T],
+) -> tuple[T, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    validated: list[T] = []
+    for item in cast(tuple[object, ...], value):
+        if type(item) is not expected_type:
+            raise GameLifecycleError(f"{field_name} contains invalid values.")
+        validated.append(item)
+    return tuple(validated)
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"Runtime content {field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"Runtime content {field_name} must not be empty.")
+    return stripped
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"Runtime content {field_name} must be a tuple.")
+    seen: set[str] = set()
+    identifiers: list[str] = []
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GameLifecycleError(f"Runtime content {field_name} must not contain duplicates.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    return tuple(sorted(identifiers))
+
+
+def _summary_hash(payload: Mapping[str, JsonValue]) -> str:
+    serialized = canonical_json(validate_json_value(dict(payload)))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()

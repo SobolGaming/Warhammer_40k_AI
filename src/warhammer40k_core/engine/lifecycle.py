@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Self, TypedDict
+from typing import NotRequired, Self, TypedDict, cast
 
-from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusteringError,
+    muster_army,
+)
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -37,6 +42,14 @@ from warhammer40k_core.engine.deployment import (
     is_deployment_placement_request,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.faction_content.bundle import (
+    RuntimeContentBundle,
+)
+from warhammer40k_core.engine.faction_content.runtime import (
+    build_runtime_content_bundle_for_armies,
+    runtime_content_activation_for_armies,
+)
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_INTERRUPT_DECISION_TYPE,
@@ -174,6 +187,7 @@ class GameLifecyclePayload(TypedDict):
     state: GameStatePayload
     decisions: DecisionControllerPayload
     reaction_queue: ReactionQueuePayload
+    runtime_content_audit: NotRequired[dict[str, JsonValue]]
 
 
 MAX_LIFECYCLE_TRANSITIONS = 128
@@ -265,6 +279,47 @@ def _new_decision_controller() -> DecisionController:
     return DecisionController()
 
 
+def _runtime_content_activation_input_hash(
+    *,
+    config: GameConfig,
+    armies: tuple[ArmyDefinition, ...],
+) -> str:
+    if type(config) is not GameConfig:
+        raise GameLifecycleError("Runtime content cache key requires GameConfig.")
+    if type(armies) is not tuple:
+        raise GameLifecycleError("Runtime content cache key requires army tuple.")
+    payload = validate_json_value(
+        {
+            "ruleset_descriptor": config.ruleset_descriptor.to_payload(),
+            "catalog_id": config.army_catalog.catalog_id,
+            "source_package_id": config.army_catalog.source_package_id,
+            "army_definitions": [
+                army.to_payload()
+                for army in sorted(
+                    _validate_runtime_content_armies(armies),
+                    key=lambda item: item.army_id,
+                )
+            ],
+        }
+    )
+    return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+
+
+def _validate_runtime_content_armies(
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[ArmyDefinition, ...]:
+    validated: list[ArmyDefinition] = []
+    seen: set[str] = set()
+    for army in armies:
+        if type(army) is not ArmyDefinition:
+            raise GameLifecycleError("Runtime content cache key requires ArmyDefinition values.")
+        if army.army_id in seen:
+            raise GameLifecycleError("Runtime content cache key army IDs must be unique.")
+        seen.add(army.army_id)
+        validated.append(army)
+    return tuple(validated)
+
+
 @dataclass(slots=True)
 class GameLifecycle:
     decision_controller: DecisionController = field(default_factory=_new_decision_controller)
@@ -282,6 +337,9 @@ class GameLifecycle:
         default_factory=TriggeredMovementHandler
     )
     _battle_round_flow: BattleRoundFlow | None = None
+    _runtime_content_bundle: RuntimeContentBundle | None = None
+    _runtime_content_audit: Mapping[str, JsonValue] | None = None
+    _runtime_content_activation_input_hash: str | None = None
 
     def __post_init__(self) -> None:
         if type(self.parameterized_movement_proposals) is not bool:
@@ -377,12 +435,14 @@ class GameLifecycle:
                 payload=state.game_result_payload(),
             )
         if state.stage is GameLifecycleStage.SETUP:
-            return self._setup_flow.advance(
+            status = self._setup_flow.advance(
                 state=state,
                 decisions=self.decision_controller,
                 config=self._require_config(),
                 reaction_frame_count=len(self.reaction_queue.frames),
             )
+            self._refresh_runtime_content_bundle_if_armies_mustered()
+            return status
         return self._require_battle_round_flow().advance(
             state=state,
             decisions=self.decision_controller,
@@ -1217,6 +1277,7 @@ class GameLifecycle:
                 decisions=self.decision_controller,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
+                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
             )
             if self._result_resolves_active_reaction_frame(result):
                 follow_up_request = self._pending_decision_request()
@@ -1257,6 +1318,7 @@ class GameLifecycle:
                 decisions=self.decision_controller,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
+                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
             )
             advanced_status = self.advance_until_decision_or_terminal()
             if resolves_reaction_frame:
@@ -1292,13 +1354,16 @@ class GameLifecycle:
 
     def to_payload(self) -> GameLifecyclePayload:
         state = self._require_state()
-        return {
+        payload: GameLifecyclePayload = {
             "config": None if self._config is None else self._config.to_payload(),
             "parameterized_movement_proposals": self.parameterized_movement_proposals,
             "state": state.to_payload(),
             "decisions": self.decision_controller.to_payload(),
             "reaction_queue": self.reaction_queue.to_payload(),
         }
+        if self._runtime_content_audit is not None:
+            payload["runtime_content_audit"] = dict(self._runtime_content_audit)
+        return payload
 
     @classmethod
     def from_payload(cls, payload: GameLifecyclePayload) -> Self:
@@ -1314,6 +1379,9 @@ class GameLifecycle:
             state=GameState.from_payload(payload["state"]),
             parameterized_movement_proposals=parameterized_movement_proposals,
             _config=config,
+            _runtime_content_audit=_runtime_content_audit_from_payload(
+                payload.get("runtime_content_audit")
+            ),
             _movement_phase_handler=MovementPhaseHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor,
                 parameterized_proposals=parameterized_movement_proposals,
@@ -1339,6 +1407,7 @@ class GameLifecycle:
             reaction_queue=lifecycle.reaction_queue,
             pending_request=lifecycle._pending_decision_request(),
         )
+        lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
         lifecycle._battle_round_flow = BattleRoundFlow(phase_handlers=lifecycle._phase_handlers())
         return lifecycle
 
@@ -1371,6 +1440,50 @@ class GameLifecycle:
         if self._battle_round_flow is None:
             raise GameLifecycleError("GameLifecycle battle round flow is unavailable.")
         return self._battle_round_flow
+
+    def _require_runtime_content_bundle(self) -> RuntimeContentBundle:
+        self._refresh_runtime_content_bundle_if_armies_mustered()
+        if self._runtime_content_bundle is None:
+            raise GameLifecycleError("GameLifecycle runtime content bundle is unavailable.")
+        return self._runtime_content_bundle
+
+    def _refresh_runtime_content_bundle_if_armies_mustered(self) -> None:
+        if self._config is None:
+            return
+        state = self._require_state()
+        if not state.army_definitions:
+            return
+        armies = tuple(state.army_definitions)
+        activation_input_hash = _runtime_content_activation_input_hash(
+            config=self._config,
+            armies=armies,
+        )
+        if (
+            self._runtime_content_bundle is not None
+            and self._runtime_content_activation_input_hash == activation_input_hash
+        ):
+            return
+        activation = runtime_content_activation_for_armies(
+            config=self._config,
+            armies=armies,
+        )
+        if (
+            self._runtime_content_bundle is not None
+            and self._runtime_content_bundle.activation.activation_hash
+            == activation.activation_hash
+        ):
+            self._runtime_content_activation_input_hash = activation_input_hash
+            return
+        self._runtime_content_bundle = build_runtime_content_bundle_for_armies(
+            config=self._config,
+            armies=armies,
+        )
+        self._runtime_content_activation_input_hash = activation_input_hash
+        summary = self._runtime_content_bundle.to_summary_payload()
+        self._runtime_content_audit = cast(
+            Mapping[str, JsonValue],
+            validate_json_value(summary),
+        )
 
     def _result_resolves_active_reaction_frame(self, result: DecisionResult) -> bool:
         if type(result) is not DecisionResult:
@@ -1469,6 +1582,15 @@ def _payload_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+def _runtime_content_audit_from_payload(value: object) -> Mapping[str, JsonValue] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise GameLifecycleError("GameLifecycle runtime content audit must be a mapping.")
+    payload = cast(dict[object, object], value)
+    return cast(Mapping[str, JsonValue], validate_json_value(payload))
 
 
 def _destroyed_transport_attack_sequence_for_request(

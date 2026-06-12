@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
@@ -135,6 +135,9 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+        StratagemHandlerRegistry,
+    )
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -1682,6 +1685,7 @@ def apply_stratagem_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None = None,
 ) -> StratagemUseRecord:
     if type(result) is not DecisionResult:
         raise GameLifecycleError("Stratagem application requires a DecisionResult.")
@@ -1699,6 +1703,7 @@ def apply_stratagem_decision(
         effect_selection=effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        stratagem_handler_registry=stratagem_handler_registry,
     )
 
 
@@ -1713,6 +1718,7 @@ def _apply_stratagem_use(
     effect_selection: JsonValue,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None,
 ) -> StratagemUseRecord:
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
@@ -1733,20 +1739,6 @@ def _apply_stratagem_use(
         definition=definition,
         effect_selection=effect_selection,
     )
-    spend_result: CommandPointSpendResult | None = None
-    transaction_id: str | None = None
-    if command_point_cost > 0:
-        spend_result = state.spend_command_points(
-            player_id=context.player_id,
-            amount=command_point_cost,
-            source_id=use_id,
-        )
-        if spend_result.status is not CommandPointSpendStatus.APPLIED:
-            raise GameLifecycleError("Prevalidated stratagem spend failed.")
-        if spend_result.transaction is None:
-            raise GameLifecycleError("Applied stratagem spend is missing transaction.")
-        transaction_id = spend_result.transaction.transaction_id
-        decisions.event_log.append("command_points_spent", spend_result.to_payload())
     try:
         targeted_unit_ids = _stratagem_targeted_unit_ids(
             state=state,
@@ -1781,11 +1773,38 @@ def _apply_stratagem_use(
         targeted_unit_instance_ids=targeted_unit_ids,
         affected_unit_instance_ids=affected_unit_ids,
         command_point_cost=command_point_cost,
-        command_point_transaction_id=transaction_id,
+        command_point_transaction_id=None,
         handler_id=definition.handler_id,
         effect_selection=effect_selection,
         effect_payload=definition.effect_payload,
     )
+    _validate_supported_stratagem_handler_preflight(
+        state=state,
+        decisions=decisions,
+        result=result,
+        context=context,
+        definition=definition,
+        target_binding=target_binding,
+        use_record=use_record,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        stratagem_handler_registry=stratagem_handler_registry,
+    )
+    spend_result: CommandPointSpendResult | None = None
+    transaction_id: str | None = None
+    if command_point_cost > 0:
+        spend_result = state.spend_command_points(
+            player_id=context.player_id,
+            amount=command_point_cost,
+            source_id=use_id,
+        )
+        if spend_result.status is not CommandPointSpendStatus.APPLIED:
+            raise GameLifecycleError("Prevalidated stratagem spend failed.")
+        if spend_result.transaction is None:
+            raise GameLifecycleError("Applied stratagem spend is missing transaction.")
+        transaction_id = spend_result.transaction.transaction_id
+        decisions.event_log.append("command_points_spent", spend_result.to_payload())
+        use_record = replace(use_record, command_point_transaction_id=transaction_id)
     state.record_stratagem_use(use_record)
     decisions.event_log.append("stratagem_used", use_record.to_payload())
     _apply_command_point_effects(
@@ -1805,6 +1824,7 @@ def _apply_stratagem_use(
         use_record=use_record,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        stratagem_handler_registry=stratagem_handler_registry,
     )
     return use_record
 
@@ -1855,6 +1875,7 @@ def apply_stratagem_target_proposal(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None = None,
 ) -> StratagemUseRecord:
     proposal = _proposal_from_result_payload(result.payload)
     if proposal is None or proposal.target_binding is None:
@@ -1877,6 +1898,7 @@ def apply_stratagem_target_proposal(
         effect_selection=proposal.effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        stratagem_handler_registry=stratagem_handler_registry,
     )
 
 
@@ -4327,9 +4349,40 @@ def _apply_supported_stratagem_handler(
     use_record: StratagemUseRecord,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None,
 ) -> None:
     if definition.handler_id == "record_only":
         return
+    if stratagem_handler_registry is not None:
+        from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+            StratagemHandlerContext,
+            StratagemHandlerExecutionStatus,
+            StratagemHandlerRegistry,
+        )
+
+        if type(stratagem_handler_registry) is not StratagemHandlerRegistry:
+            raise GameLifecycleError("Stratagem handler registry is invalid.")
+        if stratagem_handler_registry.has_handler(definition.handler_id):
+            handler_result = stratagem_handler_registry.execute(
+                handler_id=definition.handler_id,
+                context=StratagemHandlerContext(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                    eligibility_context=context,
+                    definition=definition,
+                    target_binding=target_binding,
+                    use_record=use_record,
+                    ruleset_descriptor=ruleset_descriptor,
+                    army_catalog=army_catalog,
+                ),
+            )
+            if handler_result.status is not StratagemHandlerExecutionStatus.APPLIED:
+                if handler_result.reason is None:
+                    raise GameLifecycleError("Stratagem handler failed without reason.")
+                raise GameLifecycleError(f"Stratagem handler failed: {handler_result.reason}.")
+            decisions.event_log.append("stratagem_handler_applied", handler_result.to_payload())
+            return
     if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
         _apply_command_reroll_handler(
             state=state,
@@ -4453,6 +4506,92 @@ def _apply_supported_stratagem_handler(
         )
         return
     raise GameLifecycleError("Stratagem handler is not supported.")
+
+
+def _validate_supported_stratagem_handler_available(
+    *,
+    definition: StratagemDefinition,
+    stratagem_handler_registry: StratagemHandlerRegistry | None,
+) -> None:
+    if definition.handler_id == "record_only":
+        return
+    if stratagem_handler_registry is not None:
+        from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+            StratagemHandlerRegistry,
+        )
+
+        if type(stratagem_handler_registry) is not StratagemHandlerRegistry:
+            raise GameLifecycleError("Stratagem handler registry is invalid.")
+        if stratagem_handler_registry.has_handler(definition.handler_id):
+            return
+    if definition.handler_id in {
+        CORE_COMMAND_REROLL_HANDLER_ID,
+        CORE_INSANE_BRAVERY_HANDLER_ID,
+        CORE_RAPID_INGRESS_HANDLER_ID,
+        CORE_NEW_ORDERS_HANDLER_ID,
+        CORE_FIRE_OVERWATCH_HANDLER_ID,
+        CORE_GO_TO_GROUND_HANDLER_ID,
+        CORE_EXPLOSIVES_HANDLER_ID,
+        CORE_SMOKESCREEN_HANDLER_ID,
+        CORE_COUNTEROFFENSIVE_HANDLER_ID,
+        CORE_CRUSHING_IMPACT_HANDLER_ID,
+        CORE_EPIC_CHALLENGE_HANDLER_ID,
+        CORE_HEROIC_INTERVENTION_HANDLER_ID,
+        GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+    }:
+        return
+    raise GameLifecycleError("Stratagem handler is not supported.")
+
+
+def _validate_supported_stratagem_handler_preflight(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None,
+) -> None:
+    _validate_supported_stratagem_handler_available(
+        definition=definition,
+        stratagem_handler_registry=stratagem_handler_registry,
+    )
+    if definition.handler_id == "record_only" or stratagem_handler_registry is None:
+        return
+    from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+        StratagemHandlerContext,
+        StratagemHandlerExecutionStatus,
+        StratagemHandlerRegistry,
+    )
+
+    if type(stratagem_handler_registry) is not StratagemHandlerRegistry:
+        raise GameLifecycleError("Stratagem handler registry is invalid.")
+    if not stratagem_handler_registry.has_handler(definition.handler_id):
+        return
+    validation_result = stratagem_handler_registry.validate(
+        handler_id=definition.handler_id,
+        context=StratagemHandlerContext(
+            state=state,
+            decisions=decisions,
+            result=result,
+            eligibility_context=context,
+            definition=definition,
+            target_binding=target_binding,
+            use_record=use_record,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+        ),
+    )
+    if validation_result.status is not StratagemHandlerExecutionStatus.APPLIED:
+        if validation_result.reason is None:
+            raise GameLifecycleError("Stratagem handler validation failed without reason.")
+        raise GameLifecycleError(
+            f"Stratagem handler validation failed: {validation_result.reason}."
+        )
 
 
 def _generic_rule_ir_from_stratagem_payload(effect_payload: JsonValue) -> object:

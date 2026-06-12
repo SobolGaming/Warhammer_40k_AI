@@ -517,6 +517,9 @@ class RuleExecutionRegistry:
             raise GameLifecycleError("RuleExecutionRegistry binding must be RuleRuntimeBinding.")
         return self.from_bindings((*tuple(self._bindings.values()), binding))
 
+    def all_bindings(self) -> tuple[RuleRuntimeBinding, ...]:
+        return tuple(sorted(self._bindings.values(), key=lambda binding: binding.binding_id))
+
     def binding_for_clause(self, clause: RuleClause) -> RuleRuntimeBinding | None:
         if _is_aura_clause(clause):
             for binding in self._bindings.values():
