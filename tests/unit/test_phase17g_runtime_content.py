@@ -978,9 +978,15 @@ def test_real_edition_index_loads_only_selected_pilot_faction_modules() -> None:
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.units.typhus",
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.wargear.plague_weapons",
     )
-    assert {contribution.contribution_id for contribution in contributions} == set(
-        resolved_activation.selected_module_paths
-    )
+    assert {contribution.contribution_id for contribution in contributions} == {
+        "warhammer40k_core.engine.faction_content.warhammer_40000_11th."
+        "death_guard.units.plague_marines",
+        "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.units.typhus",
+        "warhammer40k_core.engine.faction_content.warhammer_40000_11th."
+        "death_guard.wargear.plague_weapons",
+        "warhammer_40000_11th:death_guard:detachment:tallyband_summoners:manifest:scaffold",
+        "warhammer_40000_11th:death_guard:faction_manifest:scaffold",
+    }
     assert "phase17f:phase17e:death-guard:army-rule" in (
         resolved_activation.selected_execution_record_ids
     )
