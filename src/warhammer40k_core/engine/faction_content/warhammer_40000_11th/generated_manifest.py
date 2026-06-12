@@ -10,9 +10,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _BASE = "warhammer40k_core.engine.faction_content.warhammer_40000_11th"
-_SOURCE_HASH = faction_execution_2026_27.source_package_identity_payload()[
-    "source_payload_checksum_sha256"
-]
+_SOURCE_IDENTITY = faction_execution_2026_27.source_package_identity_payload()
+_SOURCE_PACKAGE_ID = _SOURCE_IDENTITY["source_package_id"]
+_SOURCE_PACKAGE_HASH = _SOURCE_IDENTITY["source_payload_checksum_sha256"]
 _EXECUTION_RECORDS = faction_execution_2026_27.execution_records()
 
 
@@ -111,7 +111,8 @@ def _row(
         source_ids=source_ids,
         owner_faction_id=owner_faction_id,
         owner_detachment_id=owner_detachment_id,
-        source_package_hash=_SOURCE_HASH,
+        source_package_id=_SOURCE_PACKAGE_ID,
+        source_package_hash=_SOURCE_PACKAGE_HASH,
         execution_record_ids=execution_record_ids,
         module_path=module_path,
         support_status=RuntimeContentSupportStatus.SUPPORTED,

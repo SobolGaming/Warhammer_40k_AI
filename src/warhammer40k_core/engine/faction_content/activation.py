@@ -23,8 +23,11 @@ class RuntimeContentActivationPayload(TypedDict):
     loaded_unit_instance_ids: list[str]
     reachable_content_ids: list[str]
     selected_module_paths: list[str]
+    source_package_ids: list[str]
     source_package_hashes: list[str]
     selected_execution_record_ids: list[str]
+    unsupported_content_ids: list[str]
+    unsupported_reasons_by_content_id: dict[str, str]
     activation_hash: str
 
 
@@ -41,8 +44,11 @@ class RuntimeContentActivation:
     loaded_unit_instance_ids: tuple[str, ...]
     reachable_content_ids: tuple[str, ...] = ()
     selected_module_paths: tuple[str, ...] = ()
+    source_package_ids: tuple[str, ...] = ()
     source_package_hashes: tuple[str, ...] = ()
     selected_execution_record_ids: tuple[str, ...] = ()
+    unsupported_content_ids: tuple[str, ...] = ()
+    unsupported_reasons_by_content_id: dict[str, str] | None = None
     activation_hash: str = ""
 
     def __post_init__(self) -> None:
@@ -106,6 +112,11 @@ class RuntimeContentActivation:
         )
         object.__setattr__(
             self,
+            "source_package_ids",
+            _validate_identifier_tuple("source_package_ids", self.source_package_ids),
+        )
+        object.__setattr__(
+            self,
             "source_package_hashes",
             _validate_identifier_tuple("source_package_hashes", self.source_package_hashes),
         )
@@ -115,6 +126,19 @@ class RuntimeContentActivation:
             _validate_identifier_tuple(
                 "selected_execution_record_ids",
                 self.selected_execution_record_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "unsupported_content_ids",
+            _validate_identifier_tuple("unsupported_content_ids", self.unsupported_content_ids),
+        )
+        object.__setattr__(
+            self,
+            "unsupported_reasons_by_content_id",
+            _validate_reason_mapping(
+                "unsupported_reasons_by_content_id",
+                self.unsupported_reasons_by_content_id,
             ),
         )
         object.__setattr__(
@@ -204,8 +228,11 @@ class RuntimeContentActivation:
             "loaded_unit_instance_ids": list(self.loaded_unit_instance_ids),
             "reachable_content_ids": list(self.reachable_content_ids),
             "selected_module_paths": list(self.selected_module_paths),
+            "source_package_ids": list(self.source_package_ids),
             "source_package_hashes": list(self.source_package_hashes),
             "selected_execution_record_ids": list(self.selected_execution_record_ids),
+            "unsupported_content_ids": list(self.unsupported_content_ids),
+            "unsupported_reasons_by_content_id": dict(self.unsupported_reasons_by_content_id or {}),
             "activation_hash": self.activation_hash,
         }
 
@@ -223,8 +250,11 @@ class RuntimeContentActivation:
             loaded_unit_instance_ids=tuple(payload["loaded_unit_instance_ids"]),
             reachable_content_ids=tuple(payload["reachable_content_ids"]),
             selected_module_paths=tuple(payload["selected_module_paths"]),
+            source_package_ids=tuple(payload["source_package_ids"]),
             source_package_hashes=tuple(payload["source_package_hashes"]),
             selected_execution_record_ids=tuple(payload["selected_execution_record_ids"]),
+            unsupported_content_ids=tuple(payload["unsupported_content_ids"]),
+            unsupported_reasons_by_content_id=dict(payload["unsupported_reasons_by_content_id"]),
             activation_hash=payload["activation_hash"],
         )
 
@@ -247,8 +277,11 @@ class RuntimeContentActivation:
         *,
         reachable_content_ids: tuple[str, ...],
         selected_module_paths: tuple[str, ...],
+        source_package_ids: tuple[str, ...],
         source_package_hashes: tuple[str, ...],
         selected_execution_record_ids: tuple[str, ...],
+        unsupported_content_ids: tuple[str, ...],
+        unsupported_reasons_by_content_id: dict[str, str],
     ) -> Self:
         resolved = type(self)(
             selected_faction_ids=self.selected_faction_ids,
@@ -262,8 +295,11 @@ class RuntimeContentActivation:
             loaded_unit_instance_ids=self.loaded_unit_instance_ids,
             reachable_content_ids=reachable_content_ids,
             selected_module_paths=selected_module_paths,
+            source_package_ids=source_package_ids,
             source_package_hashes=source_package_hashes,
             selected_execution_record_ids=selected_execution_record_ids,
+            unsupported_content_ids=unsupported_content_ids,
+            unsupported_reasons_by_content_id=unsupported_reasons_by_content_id,
             activation_hash="",
         )
         return type(self)(
@@ -278,8 +314,13 @@ class RuntimeContentActivation:
             loaded_unit_instance_ids=resolved.loaded_unit_instance_ids,
             reachable_content_ids=resolved.reachable_content_ids,
             selected_module_paths=resolved.selected_module_paths,
+            source_package_ids=resolved.source_package_ids,
             source_package_hashes=resolved.source_package_hashes,
             selected_execution_record_ids=resolved.selected_execution_record_ids,
+            unsupported_content_ids=resolved.unsupported_content_ids,
+            unsupported_reasons_by_content_id=dict(
+                resolved.unsupported_reasons_by_content_id or {}
+            ),
             activation_hash=_activation_hash(resolved),
         )
 
@@ -349,6 +390,24 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
         seen.add(identifier)
         identifiers.append(identifier)
     return tuple(sorted(identifiers))
+
+
+def _validate_reason_mapping(
+    field_name: str,
+    value: object | None,
+) -> dict[str, str]:
+    if value is None:
+        return {}
+    if type(value) is not dict:
+        raise GameLifecycleError(f"Runtime content {field_name} must be a dict.")
+    reasons: dict[str, str] = {}
+    for raw_key, raw_reason in cast(dict[object, object], value).items():
+        content_id = _validate_identifier(f"{field_name} key", raw_key)
+        reason = _validate_identifier(f"{field_name} value", raw_reason)
+        if content_id in reasons:
+            raise GameLifecycleError(f"Runtime content {field_name} keys must be unique.")
+        reasons[content_id] = reason
+    return dict(sorted(reasons.items()))
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

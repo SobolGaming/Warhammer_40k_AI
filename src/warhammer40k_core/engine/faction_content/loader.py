@@ -161,6 +161,7 @@ def load_runtime_content_contributions(
         raise GameLifecycleError("Runtime content loading requires activation.")
     if type(manifest) is not RuntimeContentManifest:
         raise GameLifecycleError("Runtime content loading requires a manifest.")
+    _validate_resolved_activation_matches_manifest(activation=activation, manifest=manifest)
     contributions: list[RuntimeContentContribution] = []
     for module_path in activation.selected_module_paths:
         module = importlib.import_module(module_path)
@@ -185,6 +186,33 @@ def _runtime_contribution_from_module(module: ModuleType) -> RuntimeContentContr
     if contribution.contribution_id == DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID:
         contribution = contribution.with_contribution_id(module.__name__)
     return contribution
+
+
+def _validate_resolved_activation_matches_manifest(
+    *,
+    activation: RuntimeContentActivation,
+    manifest: RuntimeContentManifest,
+) -> None:
+    if not activation.activation_hash:
+        raise GameLifecycleError("Runtime content loading requires resolved activation.")
+    expected = manifest.resolve_activation(
+        RuntimeContentActivation(
+            selected_faction_ids=activation.selected_faction_ids,
+            selected_detachment_ids=activation.selected_detachment_ids,
+            selected_enhancement_ids=activation.selected_enhancement_ids,
+            selected_stratagem_ids=activation.selected_stratagem_ids,
+            selected_datasheet_ids=activation.selected_datasheet_ids,
+            selected_wargear_ids=activation.selected_wargear_ids,
+            selected_weapon_profile_ids=activation.selected_weapon_profile_ids,
+            selected_weapon_keywords=activation.selected_weapon_keywords,
+            loaded_unit_instance_ids=activation.loaded_unit_instance_ids,
+        ),
+        fail_on_required_unsupported=False,
+    )
+    if activation != expected:
+        raise GameLifecycleError(
+            "Runtime content loading activation does not match manifest closure."
+        )
 
 
 def _refs_for_ids(

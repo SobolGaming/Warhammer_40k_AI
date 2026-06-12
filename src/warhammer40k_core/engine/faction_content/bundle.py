@@ -50,6 +50,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 class RuntimeContentBundleSummaryPayload(TypedDict):
     activation: dict[str, JsonValue]
     selected_module_paths: list[str]
+    source_package_ids: list[str]
     source_package_hashes: list[str]
     contribution_ids: list[str]
     ability_index_record_ids_by_player_id: dict[str, list[str]]
@@ -236,9 +237,12 @@ class RuntimeContentBundle:
         base_stratagem_handler_registry: StratagemHandlerRegistry | None = None,
         base_rule_execution_registry: RuleExecutionRegistry | None = None,
         faction_execution_records: tuple[Phase17FExecutionRecord, ...] | None = None,
+        include_unselected_faction_execution_records: bool = False,
     ) -> RuntimeContentBundle:
         if type(activation) is not RuntimeContentActivation:
             raise GameLifecycleError("Runtime content bundle requires activation.")
+        if type(include_unselected_faction_execution_records) is not bool:
+            raise GameLifecycleError("Runtime content faction execution scope flag is invalid.")
         validated_armies = _validate_armies(armies)
         if type(catalog) is not ArmyCatalog:
             raise GameLifecycleError("Runtime content bundle requires ArmyCatalog.")
@@ -288,10 +292,18 @@ class RuntimeContentBundle:
             ),
         )
         named_handlers = _merged_named_handlers(validated_contributions)
-        records = (
+        available_records = (
             faction_execution_2026_27.execution_records()
             if faction_execution_records is None
             else faction_execution_records
+        )
+        records = (
+            available_records
+            if include_unselected_faction_execution_records
+            else _selected_faction_execution_records(
+                available_records=available_records,
+                selected_execution_record_ids=activation.selected_execution_record_ids,
+            )
         )
         faction_registry = FactionRuleExecutionRegistry.from_records(
             records,
@@ -341,6 +353,7 @@ class RuntimeContentBundle:
                 dict[str, JsonValue], validate_json_value(self.activation.to_payload())
             ),
             "selected_module_paths": list(self.activation.selected_module_paths),
+            "source_package_ids": list(self.activation.source_package_ids),
             "source_package_hashes": list(self.activation.source_package_hashes),
             "contribution_ids": list(self.contribution_ids),
             "ability_index_record_ids_by_player_id": {
@@ -480,6 +493,36 @@ def _merged_named_handlers(
                 raise GameLifecycleError("Runtime content faction handler IDs must be unique.")
             handlers[handler_id] = handler
     return MappingProxyType(handlers)
+
+
+def _selected_faction_execution_records(
+    *,
+    available_records: tuple[Phase17FExecutionRecord, ...],
+    selected_execution_record_ids: tuple[str, ...],
+) -> tuple[Phase17FExecutionRecord, ...]:
+    selected_ids = set(
+        _validate_identifier_tuple(
+            "selected_execution_record_ids",
+            selected_execution_record_ids,
+        )
+    )
+    if not selected_ids:
+        return ()
+    records_by_id: dict[str, Phase17FExecutionRecord] = {}
+    for record in _validate_tuple(
+        "faction_execution_records",
+        available_records,
+        Phase17FExecutionRecord,
+    ):
+        if record.execution_id in records_by_id:
+            raise GameLifecycleError("Runtime content faction execution record IDs must be unique.")
+        records_by_id[record.execution_id] = record
+    missing_ids = tuple(sorted(selected_ids.difference(records_by_id)))
+    if missing_ids:
+        raise GameLifecycleError(
+            f"Runtime content selected unknown faction execution records: {', '.join(missing_ids)}."
+        )
+    return tuple(records_by_id[execution_id] for execution_id in sorted(selected_ids))
 
 
 def _validate_named_handlers(value: object) -> Mapping[str, FactionRuleNamedHandler]:

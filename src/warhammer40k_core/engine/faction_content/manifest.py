@@ -34,11 +34,15 @@ class RuntimeContentManifestRow:
     source_ids: tuple[str, ...]
     owner_faction_id: str | None
     owner_detachment_id: str | None
-    source_package_hash: str
+    source_package_id: str
+    source_package_hash: str | None
     execution_record_ids: tuple[str, ...]
     module_path: str | None
     support_status: RuntimeContentSupportStatus
     dependency_ids: tuple[str, ...] = ()
+    support_reason: str | None = None
+    unsupported_reason: str | None = None
+    required_for_matched_play: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "content_id", _validate_identifier("content_id", self.content_id))
@@ -60,8 +64,13 @@ class RuntimeContentManifestRow:
         )
         object.__setattr__(
             self,
+            "source_package_id",
+            _validate_identifier("source_package_id", self.source_package_id),
+        )
+        object.__setattr__(
+            self,
             "source_package_hash",
-            _validate_identifier("source_package_hash", self.source_package_hash),
+            _validate_optional_identifier("source_package_hash", self.source_package_hash),
         )
         object.__setattr__(
             self,
@@ -83,6 +92,20 @@ class RuntimeContentManifestRow:
             "dependency_ids",
             _validate_identifier_tuple("dependency_ids", self.dependency_ids),
         )
+        object.__setattr__(
+            self,
+            "support_reason",
+            _validate_optional_identifier("support_reason", self.support_reason),
+        )
+        object.__setattr__(
+            self,
+            "unsupported_reason",
+            _validate_optional_identifier("unsupported_reason", self.unsupported_reason),
+        )
+        if type(self.required_for_matched_play) is not bool:
+            raise GameLifecycleError(
+                "Runtime content manifest required_for_matched_play must be a bool."
+            )
         if (
             self.support_status is RuntimeContentSupportStatus.SUPPORTED
             and self.module_path is None
@@ -93,6 +116,20 @@ class RuntimeContentManifestRow:
             and self.module_path is not None
         ):
             raise GameLifecycleError("Non-supported runtime manifest rows must not import code.")
+        if (
+            self.support_status is RuntimeContentSupportStatus.UNSUPPORTED
+            and self.unsupported_reason is None
+        ):
+            raise GameLifecycleError(
+                "Unsupported runtime manifest rows require unsupported_reason."
+            )
+        if (
+            self.support_status is not RuntimeContentSupportStatus.UNSUPPORTED
+            and self.unsupported_reason is not None
+        ):
+            raise GameLifecycleError(
+                "Supported and source-only runtime manifest rows cannot include unsupported_reason."
+            )
 
     def to_summary_payload(self) -> dict[str, JsonValue]:
         return cast(
@@ -104,11 +141,15 @@ class RuntimeContentManifestRow:
                     "source_ids": list(self.source_ids),
                     "owner_faction_id": self.owner_faction_id,
                     "owner_detachment_id": self.owner_detachment_id,
+                    "source_package_id": self.source_package_id,
                     "source_package_hash": self.source_package_hash,
                     "execution_record_ids": list(self.execution_record_ids),
                     "module_path": self.module_path,
                     "support_status": self.support_status.value,
                     "dependency_ids": list(self.dependency_ids),
+                    "support_reason": self.support_reason,
+                    "unsupported_reason": self.unsupported_reason,
+                    "required_for_matched_play": self.required_for_matched_play,
                 }
             ),
         )
@@ -170,10 +211,33 @@ class RuntimeContentManifest:
                     pending.append(dependency_id)
         return tuple(sorted(reachable, key=lambda row: row.content_id))
 
-    def resolve_activation(self, activation: RuntimeContentActivation) -> RuntimeContentActivation:
+    def resolve_activation(
+        self,
+        activation: RuntimeContentActivation,
+        *,
+        fail_on_required_unsupported: bool = True,
+    ) -> RuntimeContentActivation:
         if type(activation) is not RuntimeContentActivation:
             raise GameLifecycleError("Runtime content manifest resolution requires activation.")
+        if type(fail_on_required_unsupported) is not bool:
+            raise GameLifecycleError("Runtime content manifest unsupported policy must be a bool.")
         reachable_rows = self.reachable_rows_for_content_ids(activation.roster_content_ids())
+        unsupported_rows = tuple(
+            row
+            for row in reachable_rows
+            if row.support_status is RuntimeContentSupportStatus.UNSUPPORTED
+        )
+        if fail_on_required_unsupported:
+            required_unsupported = tuple(
+                row for row in unsupported_rows if row.required_for_matched_play
+            )
+            if required_unsupported:
+                details = ", ".join(
+                    f"{row.content_id}:{row.unsupported_reason}" for row in required_unsupported
+                )
+                raise GameLifecycleError(
+                    f"Runtime content activation includes unsupported required content: {details}."
+                )
         selected_module_paths = tuple(
             sorted(
                 {
@@ -187,8 +251,15 @@ class RuntimeContentManifest:
         return activation.with_reachable_content(
             reachable_content_ids=tuple(row.content_id for row in reachable_rows),
             selected_module_paths=selected_module_paths,
+            source_package_ids=tuple(sorted({row.source_package_id for row in reachable_rows})),
             source_package_hashes=tuple(
-                sorted({row.source_package_hash for row in reachable_rows})
+                sorted(
+                    {
+                        row.source_package_hash
+                        for row in reachable_rows
+                        if row.source_package_hash is not None
+                    }
+                )
             ),
             selected_execution_record_ids=tuple(
                 sorted(
@@ -199,6 +270,10 @@ class RuntimeContentManifest:
                     }
                 )
             ),
+            unsupported_content_ids=tuple(row.content_id for row in unsupported_rows),
+            unsupported_reasons_by_content_id={
+                row.content_id: _unsupported_reason(row) for row in unsupported_rows
+            },
         )
 
     def to_module_index(self) -> RuntimeContentModuleIndexPayload:
@@ -233,7 +308,7 @@ class RuntimeContentModuleIndexPayload:
 
 
 def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifestRow, ...]:
-    source_hash = catalog.source_package_id
+    source_package_id = catalog.source_package_id
     rows: list[RuntimeContentManifestRow] = []
     rows.extend(
         RuntimeContentManifestRow(
@@ -242,7 +317,8 @@ def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifest
             source_ids=faction.source_ids or (faction.stable_identity(),),
             owner_faction_id=faction.faction_id,
             owner_detachment_id=None,
-            source_package_hash=source_hash,
+            source_package_id=source_package_id,
+            source_package_hash=None,
             execution_record_ids=(),
             module_path=None,
             support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
@@ -259,7 +335,8 @@ def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifest
             or (detachment.stable_identity(),),
             owner_faction_id=detachment.faction_id,
             owner_detachment_id=detachment.detachment_id,
-            source_package_hash=source_hash,
+            source_package_id=source_package_id,
+            source_package_hash=None,
             execution_record_ids=(),
             module_path=None,
             support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
@@ -280,7 +357,8 @@ def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifest
                     for detachment in catalog.detachments
                 },
             ),
-            source_package_hash=source_hash,
+            source_package_id=source_package_id,
+            source_package_hash=None,
             execution_record_ids=(),
             module_path=None,
             support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
@@ -300,7 +378,8 @@ def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifest
                     for detachment in catalog.detachments
                 },
             ),
-            source_package_hash=source_hash,
+            source_package_id=source_package_id,
+            source_package_hash=None,
             execution_record_ids=(),
             module_path=None,
             support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
@@ -314,7 +393,8 @@ def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifest
             source_ids=datasheet.source_ids or (datasheet.stable_identity(),),
             owner_faction_id=None,
             owner_detachment_id=None,
-            source_package_hash=source_hash,
+            source_package_id=source_package_id,
+            source_package_hash=None,
             execution_record_ids=(),
             module_path=None,
             support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
@@ -329,7 +409,8 @@ def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifest
                 source_ids=(wargear.stable_identity(),),
                 owner_faction_id=None,
                 owner_detachment_id=None,
-                source_package_hash=source_hash,
+                source_package_id=source_package_id,
+                source_package_hash=None,
                 execution_record_ids=(),
                 module_path=None,
                 support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
@@ -343,7 +424,8 @@ def _catalog_manifest_rows(catalog: ArmyCatalog) -> tuple[RuntimeContentManifest
                 source_ids=(f"{wargear.stable_identity()}:weapon-profile:{profile.profile_id}",),
                 owner_faction_id=None,
                 owner_detachment_id=None,
-                source_package_hash=source_hash,
+                source_package_id=source_package_id,
+                source_package_hash=None,
                 execution_record_ids=(),
                 module_path=None,
                 support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
@@ -362,11 +444,15 @@ def _merge_generated_row(
         source_ids=generated_row.source_ids or catalog_row.source_ids,
         owner_faction_id=generated_row.owner_faction_id or catalog_row.owner_faction_id,
         owner_detachment_id=generated_row.owner_detachment_id or catalog_row.owner_detachment_id,
+        source_package_id=generated_row.source_package_id,
         source_package_hash=generated_row.source_package_hash,
         execution_record_ids=generated_row.execution_record_ids,
         module_path=generated_row.module_path,
         support_status=generated_row.support_status,
         dependency_ids=tuple(sorted({*catalog_row.dependency_ids, *generated_row.dependency_ids})),
+        support_reason=generated_row.support_reason,
+        unsupported_reason=generated_row.unsupported_reason,
+        required_for_matched_play=generated_row.required_for_matched_play,
     )
 
 
@@ -465,3 +551,9 @@ def _validate_optional_module_path(field_name: str, value: object | None) -> str
     if module_path.startswith(".") or module_path.endswith(".") or ".." in module_path:
         raise GameLifecycleError("Runtime content module path must be absolute and normalized.")
     return module_path
+
+
+def _unsupported_reason(row: RuntimeContentManifestRow) -> str:
+    if row.unsupported_reason is None:
+        raise GameLifecycleError("Unsupported runtime manifest row lacks unsupported_reason.")
+    return row.unsupported_reason

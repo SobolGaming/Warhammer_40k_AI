@@ -153,6 +153,7 @@ class StratagemHandlerExecutionResult:
 class StratagemHandlerBinding:
     handler_id: str
     handler: StratagemHandler
+    validator: StratagemHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "handler_id", _validate_identifier("handler_id", self.handler_id))
@@ -162,6 +163,8 @@ class StratagemHandlerBinding:
             )
         if not callable(self.handler):
             raise GameLifecycleError("StratagemHandlerBinding handler must be callable.")
+        if self.validator is not None and not callable(self.validator):
+            raise GameLifecycleError("StratagemHandlerBinding validator must be callable.")
 
     def to_summary_payload(self) -> dict[str, JsonValue]:
         return {"handler_id": self.handler_id}
@@ -190,8 +193,18 @@ class StratagemHandlerRegistry:
     def empty(cls) -> Self:
         return cls.from_bindings(())
 
-    def with_handler(self, *, handler_id: str, handler: StratagemHandler) -> Self:
-        binding = StratagemHandlerBinding(handler_id=handler_id, handler=handler)
+    def with_handler(
+        self,
+        *,
+        handler_id: str,
+        handler: StratagemHandler,
+        validator: StratagemHandler | None = None,
+    ) -> Self:
+        binding = StratagemHandlerBinding(
+            handler_id=handler_id,
+            handler=handler,
+            validator=validator,
+        )
         return self.from_bindings((*tuple(self._handlers.values()), binding))
 
     def has_handler(self, handler_id: str) -> bool:
@@ -219,6 +232,32 @@ class StratagemHandlerRegistry:
             )
         if result.handler_id != requested_id:
             raise GameLifecycleError("Stratagem handler returned handler_id drift.")
+        return result
+
+    def validate(
+        self,
+        *,
+        handler_id: str,
+        context: StratagemHandlerContext,
+    ) -> StratagemHandlerExecutionResult:
+        requested_id = _validate_identifier("handler_id", handler_id)
+        if type(context) is not StratagemHandlerContext:
+            raise GameLifecycleError("Stratagem handler validation requires a context.")
+        binding = self._handlers.get(requested_id)
+        if binding is None:
+            return StratagemHandlerExecutionResult.unsupported(
+                handler_id=requested_id,
+                reason="missing_handler",
+            )
+        if binding.validator is None:
+            return StratagemHandlerExecutionResult.applied(handler_id=requested_id)
+        result = binding.validator(context)
+        if type(result) is not StratagemHandlerExecutionResult:
+            raise GameLifecycleError(
+                "Stratagem handler validator must return StratagemHandlerExecutionResult."
+            )
+        if result.handler_id != requested_id:
+            raise GameLifecycleError("Stratagem handler validator returned handler_id drift.")
         return result
 
     def all_bindings(self) -> tuple[StratagemHandlerBinding, ...]:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import replace
 from importlib import import_module
 from types import ModuleType
@@ -10,6 +10,7 @@ from typing import cast
 
 import pytest
 
+import warhammer40k_core.engine.lifecycle as lifecycle_module
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition as CatalogDetachmentDefinition,
@@ -67,6 +68,7 @@ from warhammer40k_core.engine.faction_content.runtime import (
     runtime_content_module_index_for_ruleset,
 )
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+    StratagemHandler,
     StratagemHandlerBinding,
     StratagemHandlerContext,
     StratagemHandlerExecutionResult,
@@ -95,6 +97,9 @@ from warhammer40k_core.engine.stratagems import (
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_execution_2026_27,
+)
 
 
 def test_runtime_content_activation_derives_selected_sources_from_real_armies() -> None:
@@ -219,6 +224,7 @@ def test_runtime_manifest_generation_merges_catalog_rows_and_generated_support()
         source_ids=(),
         owner_faction_id=None,
         owner_detachment_id=None,
+        source_package_id="source-package-id:generated",
         source_package_hash="source-package-hash:generated",
         execution_record_ids=("execution:detachment",),
         module_path="tests.runtime_content_generated_detachment",
@@ -245,6 +251,7 @@ def test_runtime_manifest_generation_merges_catalog_rows_and_generated_support()
     summary_row = generated_dependency_row.to_summary_payload()
 
     assert detachment_row.source_ids != ()
+    assert detachment_row.source_package_id == "source-package-id:generated"
     assert detachment_row.source_package_hash == "source-package-hash:generated"
     assert detachment_row.dependency_ids == (
         "generated-weapon-ability",
@@ -300,6 +307,7 @@ def test_runtime_manifest_validation_is_fail_fast() -> None:
             source_ids=("source:bad-family-type",),
             owner_faction_id=None,
             owner_detachment_id=None,
+            source_package_id="source-package-id:test",
             source_package_hash="source-package-hash:test",
             execution_record_ids=(),
             module_path=None,
@@ -312,6 +320,7 @@ def test_runtime_manifest_validation_is_fail_fast() -> None:
             source_ids=("source:bad-family-token",),
             owner_faction_id=None,
             owner_detachment_id=None,
+            source_package_id="source-package-id:test",
             source_package_hash="source-package-hash:test",
             execution_record_ids=(),
             module_path=None,
@@ -324,6 +333,7 @@ def test_runtime_manifest_validation_is_fail_fast() -> None:
             source_ids=("source:bad-status-type",),
             owner_faction_id=None,
             owner_detachment_id=None,
+            source_package_id="source-package-id:test",
             source_package_hash="source-package-hash:test",
             execution_record_ids=(),
             module_path=None,
@@ -336,6 +346,7 @@ def test_runtime_manifest_validation_is_fail_fast() -> None:
             source_ids=("source:bad-status-token",),
             owner_faction_id=None,
             owner_detachment_id=None,
+            source_package_id="source-package-id:test",
             source_package_hash="source-package-hash:test",
             execution_record_ids=(),
             module_path=None,
@@ -355,6 +366,7 @@ def test_runtime_manifest_validation_is_fail_fast() -> None:
             source_ids=("source:blank",),
             owner_faction_id=None,
             owner_detachment_id=None,
+            source_package_id="source-package-id:test",
             source_package_hash="source-package-hash:test",
             execution_record_ids=(),
             module_path=None,
@@ -372,6 +384,51 @@ def test_runtime_manifest_validation_is_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="requires activation"):
         RuntimeContentManifest(rows=(valid_row,)).resolve_activation(
             cast(RuntimeContentActivation, object())
+        )
+
+
+def test_runtime_manifest_records_unsupported_content_and_fails_closed_by_default() -> None:
+    activation = _manual_activation(selected_detachment_ids=("detachment-alpha",))
+    manifest = RuntimeContentManifest(
+        rows=(
+            _manifest_row(
+                content_id="detachment-alpha",
+                family=RuntimeContentModuleFamily.DETACHMENT,
+                support_status=RuntimeContentSupportStatus.UNSUPPORTED,
+                unsupported_reason="structured_semantics_pending",
+            ),
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="unsupported required content"):
+        manifest.resolve_activation(activation)
+
+    resolved = manifest.resolve_activation(
+        activation,
+        fail_on_required_unsupported=False,
+    )
+
+    assert resolved.selected_module_paths == ()
+    assert resolved.unsupported_content_ids == ("detachment-alpha",)
+    assert resolved.unsupported_reasons_by_content_id == {
+        "detachment-alpha": "structured_semantics_pending"
+    }
+    assert resolved.source_package_ids == ("source-package-id:test",)
+    assert resolved.source_package_hashes == ("source-package-hash:test",)
+    assert RuntimeContentActivation.from_payload(resolved.to_payload()) == resolved
+
+    with pytest.raises(GameLifecycleError, match="require unsupported_reason"):
+        _manifest_row(
+            content_id="unsupported-without-reason",
+            family=RuntimeContentModuleFamily.DETACHMENT,
+            support_status=RuntimeContentSupportStatus.UNSUPPORTED,
+        )
+    with pytest.raises(GameLifecycleError, match="cannot include unsupported_reason"):
+        _manifest_row(
+            content_id="supported-with-unsupported-reason",
+            family=RuntimeContentModuleFamily.DETACHMENT,
+            module_path="tests.runtime_content_supported",
+            unsupported_reason="invalid_reason",
         )
 
 
@@ -517,6 +574,37 @@ def test_stratagem_handler_registry_is_explicit_and_fail_closed() -> None:
     assert applied.replay_payload == {"use_id": "stratagem-use:runtime"}
     assert StratagemHandlerExecutionResult.from_payload(applied.to_payload()) == applied
 
+    validator_calls: list[str] = []
+
+    def validator(
+        handler_context: StratagemHandlerContext,
+    ) -> StratagemHandlerExecutionResult:
+        validator_calls.append(handler_context.definition.handler_id)
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=handler_context.definition.handler_id,
+            reason="target_state_invalid",
+        )
+
+    validating_registry = StratagemHandlerRegistry.empty().with_handler(
+        handler_id="faction:validated-handler",
+        handler=handler,
+        validator=validator,
+    )
+    validation_result = validating_registry.validate(
+        handler_id="faction:validated-handler",
+        context=_stratagem_handler_context(handler_id="faction:validated-handler"),
+    )
+
+    assert validation_result.status is StratagemHandlerExecutionStatus.INVALID
+    assert validation_result.reason == "target_state_invalid"
+    assert validator_calls == ["faction:validated-handler"]
+
+    with pytest.raises(GameLifecycleError, match="validator must be callable"):
+        StratagemHandlerBinding(
+            handler_id="faction:bad-validator",
+            handler=handler,
+            validator=cast(StratagemHandler, object()),
+        )
     with pytest.raises(GameLifecycleError, match="handler IDs must be unique"):
         StratagemHandlerRegistry.from_bindings(
             (
@@ -572,6 +660,68 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert "<" not in encoded
 
 
+def test_runtime_content_bundle_scopes_faction_execution_registry_to_selected_ids() -> None:
+    catalog = _catalog_with_runtime_detachment_selection(
+        ArmyCatalog.phase9a_canonical_content_pack()
+    )
+    army = muster_army(catalog=catalog, request=_muster_request(catalog))
+    selected_record, unselected_record = faction_execution_2026_27.execution_records()[:2]
+    activation = RuntimeContentActivation.from_armies(
+        armies=(army,),
+        catalog=catalog,
+    ).with_reachable_content(
+        reachable_content_ids=("core-combined-arms",),
+        selected_module_paths=(),
+        source_package_ids=("source-package-id:test",),
+        source_package_hashes=("source-package-hash:test",),
+        selected_execution_record_ids=(selected_record.execution_id,),
+        unsupported_content_ids=(),
+        unsupported_reasons_by_content_id={},
+    )
+
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=activation,
+        armies=(army,),
+        catalog=catalog,
+        contributions=(),
+        faction_execution_records=(selected_record, unselected_record),
+    )
+    diagnostic_bundle = RuntimeContentBundle.from_contributions(
+        activation=activation,
+        armies=(army,),
+        catalog=catalog,
+        contributions=(),
+        faction_execution_records=(selected_record, unselected_record),
+        include_unselected_faction_execution_records=True,
+    )
+
+    assert [
+        record.execution_id for record in bundle.faction_rule_execution_registry.all_records()
+    ] == [selected_record.execution_id]
+    assert {
+        record.execution_id
+        for record in diagnostic_bundle.faction_rule_execution_registry.all_records()
+    } == {selected_record.execution_id, unselected_record.execution_id}
+
+    missing_activation = activation.with_reachable_content(
+        reachable_content_ids=activation.reachable_content_ids,
+        selected_module_paths=(),
+        source_package_ids=activation.source_package_ids,
+        source_package_hashes=activation.source_package_hashes,
+        selected_execution_record_ids=("execution:missing",),
+        unsupported_content_ids=(),
+        unsupported_reasons_by_content_id={},
+    )
+    with pytest.raises(GameLifecycleError, match="selected unknown faction execution records"):
+        RuntimeContentBundle.from_contributions(
+            activation=missing_activation,
+            armies=(army,),
+            catalog=catalog,
+            contributions=(),
+            faction_execution_records=(selected_record,),
+        )
+
+
 def test_lifecycle_rebuilds_runtime_content_bundle_without_serializing_callables() -> None:
     lifecycle = GameLifecycle()
     lifecycle.start(_canonical_lifecycle_config())
@@ -590,6 +740,31 @@ def test_lifecycle_rebuilds_runtime_content_bundle_without_serializing_callables
     assert "object at 0x" not in json.dumps(payload, sort_keys=True)
 
 
+def test_lifecycle_runtime_content_refresh_uses_input_cache(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    lifecycle = GameLifecycle()
+    lifecycle.start(_canonical_lifecycle_config())
+    lifecycle.advance_until_decision_or_terminal()
+    bundle = _runtime_content_bundle(lifecycle)
+
+    def fail_activation_refresh(*_args: object, **_kwargs: object) -> RuntimeContentActivation:
+        raise AssertionError("runtime content activation should be cached")
+
+    monkeypatch.setattr(
+        lifecycle_module,
+        "runtime_content_activation_for_armies",
+        fail_activation_refresh,
+    )
+
+    require_runtime_content_bundle = cast(
+        Callable[[], RuntimeContentBundle],
+        object.__getattribute__(lifecycle, "_require_runtime_content_bundle"),
+    )
+
+    assert require_runtime_content_bundle() is bundle
+
+
 def test_runtime_builder_loads_core_source_only_content_and_validates_ruleset() -> None:
     config = _canonical_lifecycle_config()
     bundle = build_runtime_content_bundle(config)
@@ -597,6 +772,8 @@ def test_runtime_builder_loads_core_source_only_content_and_validates_ruleset() 
 
     assert summary["activation"]["selected_faction_ids"] == ["core-marine-force"]
     assert summary["selected_module_paths"] == []
+    assert summary["source_package_ids"] == [config.army_catalog.source_package_id]
+    assert summary["source_package_hashes"] == []
     assert "core:hazardous" in summary["ability_handler_ids"]
     manifest_row = runtime_content_manifest_for_ruleset(
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
@@ -669,6 +846,8 @@ def test_runtime_loader_validates_module_contract_and_skips_unmapped_wargear_ref
     resolved_activation = manifest.resolve_activation(activation)
 
     assert resolved_activation.selected_module_paths == ("tests.runtime_content_contract_module",)
+    with pytest.raises(GameLifecycleError, match="requires resolved activation"):
+        load_runtime_content_contributions(activation=activation, manifest=manifest)
     with pytest.raises(GameLifecycleError, match="must expose runtime_contribution"):
         load_runtime_content_contributions(activation=resolved_activation, manifest=manifest)
 
@@ -1190,6 +1369,9 @@ def _manifest_row(
     support_status: RuntimeContentSupportStatus = RuntimeContentSupportStatus.SUPPORTED,
     dependency_ids: tuple[str, ...] = (),
     execution_record_ids: tuple[str, ...] = (),
+    support_reason: str | None = None,
+    unsupported_reason: str | None = None,
+    required_for_matched_play: bool = True,
 ) -> RuntimeContentManifestRow:
     return RuntimeContentManifestRow(
         content_id=content_id,
@@ -1197,11 +1379,15 @@ def _manifest_row(
         source_ids=(f"source:{content_id}",),
         owner_faction_id=None,
         owner_detachment_id=None,
+        source_package_id="source-package-id:test",
         source_package_hash="source-package-hash:test",
         execution_record_ids=execution_record_ids,
         module_path=module_path,
         support_status=support_status,
         dependency_ids=dependency_ids,
+        support_reason=support_reason,
+        unsupported_reason=unsupported_reason,
+        required_for_matched_play=required_for_matched_play,
     )
 
 
