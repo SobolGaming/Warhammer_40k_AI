@@ -83,7 +83,7 @@ def test_faction_integration_queue_lists_every_seeded_faction_and_detachment() -
     assert "plus any official 11th Edition transition detachments" not in document
 
 
-def test_faction_integration_phase17e_scope_keeps_datasheet_execution_in_phase17g() -> None:
+def test_faction_integration_phase17e_scope_defers_datasheet_execution_to_phase17h() -> None:
     document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
 
     assert "## Phase 17E Scope Boundary" in document
@@ -91,7 +91,8 @@ def test_faction_integration_phase17e_scope_keeps_datasheet_execution_in_phase17
     assert "every detachment has a source-linked detachment rule descriptor" in document
     assert "Phase 17E must also intake unit rows" in document
     assert "Broad datasheet, wargear" in document
-    assert "weapon ability execution belongs to Phase 17G" in document
+    assert "weapon ability execution belongs to Phase 17H" in document
+    assert "Phase 17G semantic execution" in document
     assert "Do not hand-author an exhaustive unit-name list" in document
 
 
@@ -152,12 +153,45 @@ def test_faction_integration_records_phase17f_execution_gate() -> None:
     assert "No Phase 17E row remains a missing handler" in normalized_document
     assert "unregistered executable statuses return typed `unsupported`" in normalized_document
     assert "cannot emit `applied` by status alone" in normalized_document
+    assert "not semantic execution" in normalized_document
+
+
+def test_faction_integration_records_phase17g_17h_17i_roadmap_split() -> None:
+    document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+    normalized_document = " ".join(document.split())
+
+    assert "## Phase 17G Semantic Execution Gate" in document
+    assert "army rules" in document
+    assert "detachment rules" in document
+    assert "enhancement effects" in document
+    assert "Stratagem timing, targeting, validation, and effects" in document
+    assert "faction army rules load and execute for every faction" in normalized_document
+    assert "detachment rules load and execute for every detachment" in normalized_document
+
+    assert "## Phase 17H Datasheet, Wargear, and Weapon Execution Gate" in document
+    assert (
+        "datasheet abilities, selected wargear abilities, weapon abilities" in normalized_document
+    )
+    assert "wargear abilities apply only when that wargear is selected" in document
+
+    assert "## Phase 17I Coverage and Unsupported Audit Gate" in document
+    assert "execution-status report for every covered item" in document
+    assert "unsupported descriptors grouped by reason" in document
 
 
 def test_faction_integration_table_of_contents_links_every_execution_section() -> None:
     document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
 
     assert "## Table of Contents" in document
+    assert "- [Phase 17G Semantic Execution Gate](#phase-17g-semantic-execution-gate)" in document
+    assert (
+        "- [Phase 17H Datasheet, Wargear, and Weapon Execution Gate]"
+        "(#phase-17h-datasheet-wargear-and-weapon-execution-gate)"
+    ) in document
+    assert (
+        "- [Phase 17I Coverage and Unsupported Audit Gate]"
+        "(#phase-17i-coverage-and-unsupported-audit-gate)"
+    ) in document
     assert "- [Faction Execution Status Matrix](#faction-execution-status-matrix)" in document
     for faction_row in faction_detachment_source.faction_rows():
         assert f"- [{faction_row.name} Execution Status](" in document

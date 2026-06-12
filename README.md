@@ -246,7 +246,7 @@ totals grouped as implemented, generic-supported, named-handler-required, and
 unsupported. Exact datasheet-intake rows, enhancement subrows, and Stratagem
 subrows that are absent from the update PDFs are fail-closed as approved
 unsupported diagnostics, keeping broad datasheet, wargear, and weapon execution
-in Phase 17G.
+in Phase 17H.
 
 Phase 17F is complete for faction execution dispatch and status over every
 Phase 17E coverage row. The
@@ -259,6 +259,12 @@ approved execution reasons until native structured rule semantics exist.
 Executable statuses also fail closed unless a registered generic IR executor or
 named handler runs; APPLIED is not emitted by status alone, and no covered row
 falls through as a missing handler or silent fallback.
+
+Phase 17G is planned for actual faction-level semantic execution: army rules,
+detachment rules, enhancement effects, and faction/detachment Stratagem timing,
+targeting, validation, and effects. Phase 17H is planned for datasheet, wargear,
+and weapon ability execution. Phase 17I is planned for source-content coverage,
+execution-status, and unsupported-descriptor audits.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

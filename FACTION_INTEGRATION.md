@@ -11,6 +11,9 @@ instructions, and then compiled into 11th Edition catalog records.
 - [Phase 17E Scope Boundary](#phase-17e-scope-boundary)
 - [Phase 17E Completion Gate](#phase-17e-completion-gate)
 - [Phase 17F Execution Gate](#phase-17f-execution-gate)
+- [Phase 17G Semantic Execution Gate](#phase-17g-semantic-execution-gate)
+- [Phase 17H Datasheet, Wargear, and Weapon Execution Gate](#phase-17h-datasheet-wargear-and-weapon-execution-gate)
+- [Phase 17I Coverage and Unsupported Audit Gate](#phase-17i-coverage-and-unsupported-audit-gate)
 - [Faction Execution Status Matrix](#faction-execution-status-matrix)
   - [Death Guard Execution Status](#death-guard-execution-status)
   - [Orks Execution Status](#orks-execution-status)
@@ -83,9 +86,9 @@ Phase 17E must also intake unit rows far enough to make faction and detachment
 coverage reviewable: datasheet identity, composition, wargear-option, base-size,
 geometry, representative-height, keyword, and faction-keyword rows must be
 source-linked or explicitly blocked by diagnostics. Broad datasheet, wargear,
-and weapon ability execution belongs to Phase 17G unless a unit rule is
+and weapon ability execution belongs to Phase 17H unless a unit rule is
 inseparable from a Phase 17E army rule, detachment rule, enhancement, or
-Stratagem.
+Stratagem that lands in Phase 17G semantic execution.
 
 Do not hand-author an exhaustive unit-name list in this Markdown file. Unit
 subphases must be expanded from generated source coverage reports so names,
@@ -148,6 +151,78 @@ Phase 17E row remains a missing handler, runtime no-op, raw-PDF parse, or silent
 fallback. Future executable rows require a registered generic IR executor or
 named handler; unregistered executable statuses return typed `unsupported`
 diagnostics and cannot emit `applied` by status alone.
+Phase 17F is an execution dispatch gate, not semantic execution. It proves that
+every Phase 17E coverage row has a deterministic fail-closed engine route. It
+does not implement the game effects of army rules, detachment rules,
+enhancements, or Stratagems.
+
+## Phase 17G Semantic Execution Gate
+
+Phase 17G is the first faction-content phase that implements actual engine
+support for the Phase 17E faction-level items:
+
+- army rules;
+- detachment rules;
+- enhancement effects;
+- faction and detachment Stratagem timing, targeting, validation, and effects.
+
+Phase 17G must replace `blocked_structured_semantics_required` rows for
+faction-level content with registered generic IR executors or source-linked
+named handlers. The handlers must mutate authoritative game state only through
+engine-owned services, use the shared `DecisionRequest` / `DecisionResult`
+path for player choices, and emit deterministic replay-safe execution results.
+
+Phase 17G does not cover broad datasheet, wargear, or weapon ability execution.
+Those rows move to Phase 17H unless they are inseparable from a faction army
+rule, detachment rule, enhancement, or Stratagem implemented in Phase 17G.
+
+Required tests:
+
+- faction army rules load and execute for every faction through the registered
+  engine path;
+- detachment rules load and execute for every detachment through registered
+  lifecycle hooks;
+- enhancements validate eligibility from Phase 16D army-construction records
+  and execute their effects through generic IR or named handlers;
+- faction and detachment Stratagems validate timing, targeting, CP ledgers,
+  repeat-use constraints, and effects through the shared Stratagem path;
+- registered executors cannot return mismatched execution identity payloads;
+- unsupported semantic behavior returns typed unsupported diagnostics with
+  approved source-linked reasons.
+
+## Phase 17H Datasheet, Wargear, and Weapon Execution Gate
+
+Phase 17H is the broad unit-content execution phase. It expands generated
+source rows and implements execution for covered datasheet abilities, selected
+wargear abilities, weapon abilities, and source-coupled unit rules that are not
+part of Phase 17G faction-level semantics.
+
+Required tests:
+
+- datasheet, wargear, and weapon ability rows are generated from source-backed
+  descriptors, not hand-authored Markdown lists;
+- wargear abilities apply only when that wargear is selected in the army list;
+- selected wargear payload drift is rejected before runtime effects apply;
+- covered datasheet, wargear, and weapon ability items execute through generic
+  IR or source-linked named handlers where supported;
+- unsupported covered items return typed unsupported execution results with
+  approved reasons.
+
+## Phase 17I Coverage and Unsupported Audit Gate
+
+Phase 17I is the source-content coverage and unsupported-descriptor audit phase.
+It consolidates coverage and execution-status reporting after Phase 17G and
+Phase 17H have implemented their semantic execution slices.
+
+Required outputs:
+
+- coverage report for datasheets, abilities, wargear, detachments,
+  enhancements, Stratagems, and army rules;
+- execution-status report for every covered item, grouped by applied,
+  generic-supported, named-handler-supported, invalid, and unsupported status;
+- unsupported descriptors grouped by reason;
+- static audit proving runtime code does not parse raw source text;
+- package hashes and coverage totals suitable for CI artifacts.
 
 ## Faction Execution Status Matrix
 
@@ -553,9 +628,9 @@ For every faction phase below, datasheet intake letters cover exact datasheet
 identity, composition, wargear-option, base-size, geometry,
 representative-height, keyword, and faction-keyword rows from the patched source
 mirror, one datasheet or source-coupled kit group per letter. Datasheet,
-wargear, and weapon ability execution is deferred to Phase 17G unless the rule
+wargear, and weapon ability execution is deferred to Phase 17H unless the rule
 is inseparable from a Phase 17E army rule, detachment rule, enhancement, or
-Stratagem.
+Stratagem implemented in Phase 17G.
 
 ### Phase Death Guard
 

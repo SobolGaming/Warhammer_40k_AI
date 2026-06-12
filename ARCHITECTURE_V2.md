@@ -222,6 +222,8 @@ parsing; future native descriptors can replace those blocked execution statuses
 with generic IR or named handlers without changing the dispatch contract.
 Executable statuses still fail closed unless a registered generic IR executor or
 named handler actually runs, so APPLIED is never produced by status alone.
+Phase 17F is not semantic execution for those faction rules; that engine support
+is planned explicitly in Phase 17G.
 
 Completed / implemented foundation:
 
@@ -318,8 +320,9 @@ Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17G | Planned | Weapon, wargear, datasheet ability, generated source-row coverage, and execution for covered ability items |
-| 17H | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
+| 17G | Planned | Faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
+| 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
+| 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -384,11 +387,11 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Core Stratagems: Command Re-roll partial-die semantics and no Leadership/Battle-shock coverage, Epic Challenge, Insane Bravery, New Orders, Explosives, Crushing Impact, Rapid Ingress, Fire Overwatch via Snap Shooting at end of opponent's Movement phase, Smokescreen, Heroic Intervention modes, and Counteroffensive | Phase 12B, 12C, 13D, 15E, 14I |
 | Monsters/Vehicles and `FRAME`: normal/advance-only movement through non-MONSTER/non-VEHICLE friendly/enemy models, frame measurement/rotation, shooting at engaged MONSTER/VEHICLE units, and close-quarters exceptions | Phase 10G, 10I, 13B, 14C, 14F |
 | Transports: capacity by models, multiple embarked units, battle-formation embark, post-move Embark with setup-this-turn and datasheet-capacity gates, Rapid/Tactical/Combat Disembark modes including ingress restriction inheritance and Combat hazards/engagement permissions, Emergency Disembark closest-possible setup, and destroyed-transport timing with Deadly Demise | Phase 10Q, 13E, 16C, 14H |
-| Attached units: Leader and Support components, one Leader and one Support per bodyguard unless stated, bodyguard Toughness for attacks, destroyed-unit trigger identity, keyword union without model keyword inheritance, source-scoped ability persistence, and revive into attached unit | Phase 6, 13C, 13E, 16D, 17G, 14H |
+| Attached units: Leader and Support components, one Leader and one Support per bodyguard unless stated, bodyguard Toughness for attacks, destroyed-unit trigger identity, keyword union without model keyword inheritance, source-scoped ability persistence, and revive into attached unit | Phase 6, 13C, 13E, 16D, 17H, 14H |
 | Strategic Reserves and repositioned units: 50% points cap, no Fortifications, second-round ingress, 6" battlefield-edge setup, more-than-8" enemy distance, pre-third-round opponent-deployment-zone ban, third-round destruction exceptions, and move-history/effect persistence for repositioned units | Phase 10P, 11F, 16C, 14H |
 | Flying, Surge, and Aircraft: surge target selection and no-repeat-move restriction, optional `take to the skies` declaration with `-2"` budget unless Hover, FLY through all models/terrain and ignores vertical distance, Aircraft-only ingress, end-of-opponent-turn reserve transition, Aircraft engagement exceptions, and aircraft charge/fight restrictions | Phase 10R, 10S, 15B, 15D, 14D, 14H |
-| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection for implemented families, `[ANTI]` including duplicate Shooting selection, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]` movement-evidence slice, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative default 12" targeting gate, `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17G, 14I |
-| Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17G, 14H |
+| Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection for implemented families, `[ANTI]` including duplicate Shooting selection, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]` movement-evidence slice, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative default 12" targeting gate, `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17H, 14I |
+| Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17H, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
 | Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2026-27 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
 | Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 16A, 16C, 16E |
@@ -4230,10 +4233,10 @@ rows in later Phase 17 work.
 
 Required tests:
 
-- faction army rules load for every faction;
-- detachment rules load for every detachment;
-- enhancements validate eligibility and execute generic effects where supported;
-- detachment Stratagems validate timing and target bindings;
+- faction army-rule coverage descriptors load for every faction;
+- detachment-rule coverage descriptors load for every detachment;
+- enhancement and detachment Stratagem descriptors are source-linked or blocked
+  by approved diagnostics;
 - unsupported rule report is generated and non-empty only with approved reasons.
 
 ## Phase 17F: faction coverage execution dispatch and status
@@ -4260,6 +4263,10 @@ Rows that still lack native structured semantics are explicitly unsupported with
 approved reasons; they do not execute by fallback and do not disappear as
 missing handlers. Executable statuses without registered executors return typed
 unsupported diagnostics instead of APPLIED.
+Phase 17F does not implement faction-rule semantics. Its completion means every
+Phase 17E row is routable through one fail-closed engine dispatch path, not that
+army rules, detachment rules, enhancements, or Stratagems have executable game
+effects.
 
 Required tests:
 
@@ -4270,7 +4277,42 @@ Required tests:
 - executable records without registered executors return typed unsupported results;
 - blocked execution records reject unapproved or inconsistent block shapes.
 
-## Phase 17G: broad weapon/wargear/datasheet ability coverage and execution
+## Phase 17G: faction army/detachment/enhancement/Stratagem semantic execution
+
+Phase 17G implements actual engine support for the Phase 17E faction-level
+items. It does not cover broad datasheet, wargear, or weapon ability execution;
+that moves to Phase 17H.
+
+Invariants:
+
+- faction army rules execute through structured descriptors, generic IR, or
+  source-linked named handlers;
+- detachment rules execute through lifecycle hooks at their official timing
+  points;
+- enhancements validate eligibility from the Phase 16D army-construction
+  provenance and apply their effects through engine-owned mutation;
+- faction and detachment Stratagems validate CP cost, timing, target legality,
+  repeat-use limits, and effect application through the shared Stratagem
+  decision/ledger path;
+- all semantic handlers consume structured descriptors and never parse PDFs or
+  raw rule text at runtime;
+- unsupported faction-level behavior returns typed unsupported execution results
+  with approved source-linked reasons.
+
+Required tests:
+
+- faction army rules load and execute for every faction through the registered
+  engine path;
+- detachment rules load and execute for every detachment through registered
+  lifecycle hooks;
+- enhancements validate eligibility and execute generic or named effects where
+  supported;
+- faction and detachment Stratagems validate timing, targeting, CP ledgers,
+  repeat-use constraints, and effects;
+- UI, headless, network, replay, and tests use the same execution dispatch and
+  decision path.
+
+## Phase 17H: datasheet, wargear, and weapon ability execution
 
 Invariants:
 
@@ -4284,7 +4326,7 @@ Invariants:
   approved reasons;
 - all imported behavior has tests or explicit unsupported status.
 
-## Phase 17H: source-content coverage and unsupported-descriptor audit
+## Phase 17I: source-content coverage and unsupported-descriptor audit
 
 Required outputs:
 
@@ -4550,7 +4592,7 @@ Exit criteria:
 | Rules area | Planned phase(s) |
 |---|---|
 | Dice, rerolls, roll-offs | 1, 10J, 10N, 12C, 13C, 15A, 14C, 14I |
-| Datasheets and keywords | 9A, 9C, 17A-17H, 14A, 14J |
+| Datasheets and keywords | 9A, 9C, 17A-17I, 14A, 14J |
 | Army mustering | 9C, 16D, 17B, 14J |
 | Setup sequence | 9B, 11A, 16A-16E, 14B, 14J |
 | Deployment zones | 11A, 16A, 14J |
@@ -4566,14 +4608,14 @@ Exit criteria:
 | Command phase | 11C, 14B, 14C |
 | Battle-shock | 11C, 12B, 14C |
 | Mission scoring | 11A-11C, 11E-11F, 14J |
-| Stratagems | 12B, 12C, 13D, 15E, 17E, 14I |
+| Stratagems | 12B, 12C, 13D, 15E, 17E-17G, 14I |
 | Shooting phase | 13A-13F, 14E, 14F |
-| Weapon abilities | 8D, 13D, 17G, 14I |
-| Aura abilities | 17C, 17D, 17G |
+| Weapon abilities | 8D, 13D, 17H, 14I |
+| Aura abilities | 17C, 17D, 17G-17H |
 | Charge phase | 15A, 15B, 14G |
 | Fight phase | 15C, 15D, 15E, 15F, 14G |
 | Leader/attached units | 6, 16D, 17A, 14H |
-| Faction/detachment/enhancement rules | 17C-17F, 14J |
+| Faction/detachment/enhancement rules | 17C-17G, 14J |
 | Mission packs | 11A, 11E, 11F, 16A, 20A, 14J |
 | Adapter/UI contract | 11D, 12B, 14D-14I |
 | Human CLI/UI | 18A, 18C |
