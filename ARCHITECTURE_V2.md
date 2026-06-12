@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, the Phase 17E faction coverage implementation, the Phase 17F faction execution dispatch implementation, and the 11th Edition Core Rules source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, the Phase 17E faction coverage implementation, the Phase 17F faction execution dispatch implementation, the 11th Edition Core Rules source drop, and the Warhammer Event Companion v1.0 source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -13,6 +13,7 @@ The roadmap is intentionally rules-engine first:
 Primary references for roadmap coverage:
 
 - Warhammer 40,000 11th Edition Core Rules source PDF: [docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf](docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf)
+- Warhammer Event Companion v1.0 source PDF, used as a local-only validation input for Phase 17J source-package planning; do not commit raw event PDFs.
 - 11th Edition app/codex/mission-pack source imports as they are added to CORE V2 source packages.
 - 11th Edition Digital App/community clarification supplement provided by project owner for this cutover plan.
 - CORE V1 reference implementation: <https://github.com/SobolGaming/Warhammer40k_AI>
@@ -63,6 +64,10 @@ descriptors with future owning phase IDs. **Phase 14J's mission/catalog
 replacement slice is implemented** for source-tracked 11th Edition Force
 Dispositions, the named 25-cell Primary Mission matrix, three layout identifiers
 per matrix cell, and finite Tactical Secondary score/retain decisions.
+Exact 11th Edition Secondary card identities beyond current source rows,
+Primary Mission scoring text, Event Companion terrain/deployment layout
+geometry, and Base Size Guide source-row status are now owned by planned
+Phase 17J rather than deferred to Phase 20.
 **Phase 14K is complete**:
 cutover hardening now rejects retired save/allocation choice
 surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve
@@ -90,7 +95,8 @@ path. **Phase 15F is complete** for Charge/Fight completion gates, full
 both-player phase completion coverage, Fight damage/removal draining before
 completion, and deterministic replay-safe fight-order hardening. Exact 11th
 Edition Secondary card identities beyond current source rows, Primary Mission
-scoring text, and layout geometry remain pending source work. **Phase 16A is
+scoring text, Event Companion layout geometry, and Base Size Guide source-row
+status remain pending Phase 17J source work. **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
 `select_deployment_unit` and `submit_deployment_placement`, validates deployment
@@ -171,11 +177,15 @@ patched source data. The catalog builder consumes normalized source artifacts,
 emits deterministic `CanonicalCatalogPackage` payloads, preserves stable
 datasheet/model/wargear/faction/detachment/enhancement/stratagem records,
 requires accepted physical model geometry and representative height evidence for
-every unique model profile, blocks `Use model`, blank, `No official base size`,
-bare `Hull`, Base Size Guide `hull`/`unique`, and unresolved non-circular or
-non-oval rows without explicit overrides, and records canonical geometry units,
-source units, coordinate frames, origins, support bases, z-offsets, and evidence
-inside package hashes.
+every unique model profile, blocks physical geometry consumption for `Use
+model`, blank, `No official base size`, bare `Hull`, Base Size Guide
+`hull`/`unique`, and unresolved non-circular or non-oval rows without explicit
+overrides, and records canonical geometry units, source units, coordinate
+frames, origins, support bases, z-offsets, and evidence inside package hashes.
+Phase 17J adds Event Companion Base Size Guide source import so these rows are
+available for roster/event legality while remaining unresolved for movement,
+line of sight, engagement, deployment, and collision until accepted project
+geometry evidence exists.
 
 **Phase 17C is complete** for the rule-language intermediate representation.
 Normalized `RuleSourceText` now compiles through deterministic source/tooling
@@ -323,6 +333,7 @@ Next / planned sequence:
 | 17G | Planned | Faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
+| 17J | Planned | Warhammer Event Companion v1.0 mission sequence, secondary mission procedure, Primary Mission scoring descriptors, terrain/deployment layout geometry, base-size source import, and setup/scoring compliance hardening |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -393,8 +404,8 @@ Rules audited against the 11th Edition PDF are assigned to explicit roadmap owne
 | Core abilities and weapon abilities: conditional keyword gates, duplicate ability instance selection for implemented families, `[ANTI]` including duplicate Shooting selection, `[ASSAULT]`, `[BLAST]`, `[CLEAVE]`, `[CLOSE-QUARTERS]`/`[PISTOL]`, Deadly Demise, Deep Strike, `[EXTRA ATTACKS]`, Feel No Pain, Fights First, Firing Deck, `[HAZARDOUS]`, `[HEAVY]` movement-evidence slice, Hover, `[HUNTER X]`, `[IGNORES COVER]`, `[INDIRECT FIRE]`, Infiltrators, `[LANCE]`, Leader, `[LETHAL HITS]` optional auto-wound, Lone Operative default 12" targeting gate, `[MELTA]`, `[ONE SHOT]`, `[PRECISION]`, `[PSYCHIC]`, `[RAPID FIRE]`, Scouts, Stealth, Support, Super-heavy Walker, `[SUSTAINED HITS]`, `[TORRENT]`, and `[TWIN-LINKED]` | Phase 13D, 17C-17H, 14I |
 | Appendix and digital rules: adding a new unit, destroyed-model timing, destroyed models unable to use abilities, different Move characteristics, eligible-to-fight pass, mixed keywords, marker fallback objectives, healing/revived models including fully destroyed Bodyguard revival in attached units, and FAQs covering no-ranged-weapon shooting eligibility, engaged `[BLAST]` bans, overrun-fight eligibility, and scout-move embark ban | Phase 9C, 10K, 11B, 13E, 15C, 16B-16D, 17H, 14H |
 | Muster army restrictions: battle size, roster order, faction, detachment points, detachment rules, unit/enhancement limits, Leader/Support attachment declarations on the army list, Enhancement assignment after attached units, Warlord faction-keyword requirement, Epic Heroes, and Dedicated Transport occupancy | Phase 16D, 14J |
-| Mission deck and scoring: two Secondary Missions per turn, retained Secondaries until achieved, no two-card hand-size cap, ordinary Tactical discard with Chapter Approved 2026-27 own-turn-only 1 CP reward and no replacement, New Orders 1 CP once-per-game discard-and-draw Stratagem, 15 VP per-round Primary and Secondary caps, 45 VP Primary / 45 VP Secondary / 10 VP Battle Ready caps, and 100 VP total cap | Phase 11A, 11E, 11F, 12C, 14J |
-| Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps | Phase 11A, 16A, 16C, 16E |
+| Mission deck and scoring: Event Companion Secondary mode selection, Fixed card binding, Tactical draw/discard/CP procedure, mission-card scoring grammar, Primary/Secondary/Battle Ready VP caps, five-round game end, tabled-player continuation, and final victor audit | Phase 11A, 11E, 11F, 12C, 14J, 17J |
+| Mission setup order, attacker/defender, battle formations secrecy/public reveal, terrain/objective/deployment maps, first-turn-conditioned pre-battle rules, and Event Companion A/B/C layout selection | Phase 11A, 16A, 16C, 16E, 17J |
 
 # Build order details
 
@@ -2722,8 +2733,9 @@ five 11th Edition Force Dispositions, the 25-cell player-vs-opponent Primary
 Mission matrix with source-tracked mission names, three layout identifiers per
 cell, and engine-achievement-gated Tactical Secondary score/retain as an
 adapter-visible finite decision. Exact Primary Mission scoring rules, layout
-geometry, and confirmed 18-card Secondary Mission identities remain pending
-source work rather than guessed content.
+geometry, confirmed Secondary Mission identities, and Event Companion Tactical
+Secondary procedure details remain pending Phase 17J source work rather than
+guessed content.
 
 Invariants:
 
@@ -2734,7 +2746,8 @@ Invariants:
   source-tracked Primary Mission name for each matrix cell, and three
   source-tracked battlefield layout identifiers per matrix cell;
 - matrix cells whose Primary Mission rules or layout geometry are not yet known
-  remain `awaiting_source`, never substituted with retired-edition missions or
+  remain `awaiting_source` until Phase 17J replaces them with Event Companion
+  source descriptors, never substituted with retired-edition missions or
   invented scoring text;
 - mustering source data follows the 11th Edition order: select Battle Size,
   start Army Roster, choose Faction, select Detachment Rules, select Units, then
@@ -2751,23 +2764,21 @@ Invariants:
 - Leader and Support Attached Units are declared on the army list, Enhancements
   are selected after Attached Units are created, no attached squad can have more
   than one Enhancement, and the Warlord must share the army Faction keyword;
-- mission deck source data grants two Secondary Missions per player turn, keeps
-  Secondary Missions until scored or discarded, and does not replace ordinary
-  Tactical-discarded Secondary Missions immediately;
-- retained Secondary Missions have no two-card hand-size cap, ordinary Tactical
-  discard can happen in either player's turn but grants the Chapter Approved
-  2026-27 1 CP reward only when the discarding player is the active player, and
-  New Orders is the explicit once-per-game 1 CP replacement-draw exception;
+- current Phase 14J mission deck source data grants two Secondary Missions per
+  player turn, keeps Secondary Missions until scored or discarded, and does not
+  replace ordinary Tactical-discarded Secondary Missions immediately outside
+  Warhammer Event mode;
+- Warhammer Event mode Tactical Secondary draw, once-per-battle 1CP
+  discard-and-draw, achievement discard, and own-turn discard-for-CP behavior
+  are owned by Phase 17J as part of the Tactical Secondary procedure itself;
 - when a Tactical Secondary Mission Card's requirements are achieved, the engine
   records a source-backed achievement context before emitting the finite scoring
   decision: scoring awards the source-backed VP, consumes the context, and
   discards the card, while declining to score consumes that finite context,
   awards no VP, and keeps the card retained;
-- Future PR note: when the 11th Edition mission-card source is available,
-  replace the provisional Secondary Mission card source rows with the confirmed
-  18-card list and re-check ordinary Tactical discard CP reward timing against
-  that source instead of assuming the Chapter Approved 2026-27 own-turn-only
-  rule carries forward;
+- Future PR note: Phase 17J replaces the provisional Secondary Mission card
+  source rows with Event Companion source rows and re-checks Tactical discard,
+  replacement draw, and CP reward timing against that source;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, Battle Ready at
   10 VP, total score at 100 VP, and Primary and Secondary scoring at 15 VP per
   battle round;
@@ -2786,9 +2797,10 @@ Required tests:
 - Strike Force mustering policy enforces point, Detachment Point, Enhancement
   Limit, Unit Limit, doubled `BATTLELINE`, attachment, Enhancement, and Warlord
   faction-keyword rules, and rejects unsupported battle-size inputs;
-- Secondary Mission draw/retain/no-hand-size-cap/discard, New Orders
-  replacement draw, and 45/45/10/100 plus 15-per-round VP caps load from source
-  data and round-trip through mission scoring fixtures;
+- Secondary Mission draw/retain/no-hand-size-cap/discard for the Phase 14J
+  source slice, plus 45/45/10/100 and 15-per-round VP caps, load from source
+  data and round-trip through mission scoring fixtures; Event Companion Tactical
+  replacement-draw procedure coverage is owned by Phase 17J;
 - Tactical Secondary score/retain decisions require a recorded engine-owned
   achievement context, use deterministic option IDs, reject drift before queue
   pop, award/discard only when the player chooses to score, and keep the card
@@ -2801,7 +2813,7 @@ Status: Complete.
 
 Invariants:
 
-- CI fails on active retired edition IDs, pivot-cost policies, old terrain kinds, old cover save/AP exceptions, optional armour-versus-invulnerable save choice, 1" engagement, old coherency thresholds, Battle-shock auto-expiry, separate Reinforcements phase steps, 9" reserve-arrival enemy-distance policies, replacement draws outside New Orders, retired Core Stratagem names, and old Aircraft minimum-move policy;
+- CI fails on active retired edition IDs, pivot-cost policies, old terrain kinds, old cover save/AP exceptions, optional armour-versus-invulnerable save choice, 1" engagement, old coherency thresholds, Battle-shock auto-expiry, separate Reinforcements phase steps, 9" reserve-arrival enemy-distance policies, replacement draws outside authorized source-backed procedures, retired Core Stratagem names, and old Aircraft minimum-move policy;
 - grouped Inflict Damage never auto-selects among multiple legal models inside the current allocation group; the defending player selects a legal model through `select_damage_allocation_model`, while wounded-model priority and single-model forced choices remain engine-owned validation;
 - replay fixtures and canonical JSON payloads are regenerated for 11th Edition-only identifiers;
 - no adapter, headless, UI, network, AI, or test path can choose a retired ruleset;
@@ -4044,7 +4056,9 @@ Invariants:
 - datasheet/model rows with `Use model`, blank base size, `No official base
   size`, bare `Hull`, Base Size Guide `hull`/`unique` classifications, or any
   non-circular/non-oval footprint that cannot be derived from source data require
-  source-linked geometry override records before catalog package emission;
+  source-linked geometry override records before physical geometry package
+  emission; Phase 17J Event Companion imports may still preserve the source row
+  for roster/event legality with an unresolved geometry status;
 - manual and crowd-sourced measurements must be represented as source evidence
   records with URL or document/page reference, measurement kind, dimensions,
   reviewer status, and deterministic source IDs; changing measurement evidence
@@ -4070,8 +4084,9 @@ Required tests:
 - representative datasheets generate deterministic catalog records;
 - model profiles preserve base-size, geometry-source, and height-source information;
 - `Use model`, blank, `No official base size`, bare `Hull`, Base Size Guide
-  `hull`/`unique`, and unresolved non-circular/non-oval rows fail catalog
-  generation without explicit geometry override records;
+  `hull`/`unique`, and unresolved non-circular/non-oval rows fail physical
+  geometry generation without explicit geometry override records, while source
+  import can preserve them as unresolved event/base-size facts;
 - flying-base overrides round-trip as support-base plus hull/body footprint,
   preserve z-offset provenance, and never derive z-offset from an overridden
   hull footprint instead of the support base;
@@ -4281,7 +4296,9 @@ Required tests:
 
 Phase 17G implements actual engine support for the Phase 17E faction-level
 items. It does not cover broad datasheet, wargear, or weapon ability execution;
-that moves to Phase 17H.
+that moves to Phase 17H. Faction and detachment rules with pre-battle timing
+must bind to the Event Companion setup sequence from Phase 17J when Warhammer
+Event mode is active. They may not introduce ad hoc pre-battle ordering.
 
 Invariants:
 
@@ -4320,6 +4337,10 @@ Invariants:
 - unselected wargear never grants rules;
 - selected wargear payload drift is rejected;
 - datasheet abilities and weapon abilities use source-linked descriptors and handlers;
+- datasheet abilities with setup, redeploy, Scout, or pre-battle timing declare
+  an exact Event Companion timing hook: `declare_battle_formations`,
+  `deploy_armies`, `redeploy_units`, `resolve_pre_battle_rules`, or
+  `begin_battle`;
 - covered datasheet, wargear, and weapon ability items execute through generic IR
   or source-linked named handlers when supported;
 - unsupported covered items return typed unsupported execution results with
@@ -4331,11 +4352,149 @@ Invariants:
 Required outputs:
 
 - coverage report for datasheets, abilities, wargear, detachments, enhancements, Stratagems, and army rules;
+- Event Companion mission-sequence coverage report;
+- Primary Mission matrix and scoring coverage report;
+- Secondary Mission procedure and card coverage report;
+- FAQ/errata patch coverage report;
+- terrain, deployment, objective, and layout coverage report;
+- Base Size Guide coverage report, including unresolved `Hull`, Small Flying
+  Base, Large Flying Base, and `Unique` geometry counts;
 - execution-status report for every covered item, grouped by applied,
   generic-supported, named-handler-supported, invalid, and unsupported status;
 - list of unsupported descriptors grouped by reason;
 - static audit that runtime code does not parse raw source text;
+- static audit that runtime code does not parse Event Companion PDF text,
+  layout images, or raw mission-card prose;
 - CI artifact with package hashes and coverage totals.
+
+## Phase 17J: Warhammer Event Companion mission-pack and geometry compliance
+
+Phase 17J turns the Warhammer Event Companion v1.0 into a source-backed CORE V2
+package. It owns Event Mission Sequence ordering, Force Disposition roster
+binding, per-player Primary Mission selection, layout A/B/C selection,
+battlefield creation from layout descriptors, Attacker/Defender assignment,
+Secondary Mission mode selection, Tactical/Fixed Secondary lifecycle,
+Primary/Secondary/Battle Ready VP caps, mission-card scoring grammar, Event
+Companion FAQs, terrain/deployment/objective layout geometry, and Base Size
+Guide import.
+
+Modules:
+
+- `rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py`
+- `rules/source_packages/warhammer_40000_11th/event_companion_patches.py`
+- `engine/mission_sequence.py`
+- `engine/mission_scoring.py`
+- `engine/layouts.py`
+- `core/base_size.py`
+
+Package identity:
+
+- `source_kind = "warhammer_event_companion"`
+- `document_version = "1.0"`
+- `event_mode = "warhammer_event"`
+- `battlefield_size = "44x60_inches"`
+- `excludes_deployment_cards = true`
+- `excludes_twist_cards = true`
+
+Objects:
+
+- `WarhammerEventMissionSequenceDescriptor`
+- `WarhammerEventLayoutDescriptor`
+- `SecondaryMissionModeState`
+- `FixedSecondarySelection`
+- `TacticalSecondaryState`
+- `MissionScoringDescriptor`
+- `MissionCardScoringGrammar`
+- `EventCompanionFaqPatch`
+- `BaseSizeSourceRecord`
+- `GeometryResolutionStatus`
+
+Invariants:
+
+- Warhammer Event mode does not consume Deployment or Twist cards.
+- Force Disposition is selected during mustering and recorded on the roster.
+- Each player's Primary Mission is derived from that player's Force Disposition
+  card using the opponent's Force Disposition symbol.
+- Layout selection is source-backed and resolves to one of the three A/B/C
+  layout variants for the Primary Mission combination.
+- Layout selection records whether the event organizer specified the variant or
+  the players randomly determined it.
+- Create Battlefield instantiates a 44" x 60" battlefield with source-backed
+  terrain areas, terrain features, objective points, deployment zones,
+  territories, and Attacker/Defender battlefield edges.
+- Attacker/Defender is determined after battlefield orientation and before
+  Secondary Mission selection.
+- Secondary Mission mode selection is hidden until reveal.
+- Fixed Secondaries are selected secretly, revealed, face-up, non-discardable,
+  and active for the whole battle.
+- Tactical Secondary draw-two, once-per-battle 1CP discard-and-draw,
+  achievement discard, own-turn discard-for-CP, and active-player-first
+  end-of-turn scoring are engine-owned decisions and events.
+- Declare Battle Formations records embarked units before Strategic Reserves,
+  then reveals both players' battle formations.
+- Deploy Armies alternates from the Defender and enforces the TITANIC
+  skip-next-deployment-turn rule.
+- Redeploy alternates from the Attacker and records redeploy-to-reserves cap
+  exemption.
+- Determine First Turn is a roll-off whose winner takes the first turn.
+- Resolve Pre-battle Rules alternates from the first-turn player.
+- The battle lasts five battle rounds, including games where one player has no
+  models remaining.
+- Primary, Secondary, Fixed-card, Battle Ready, and total VP caps are
+  source-backed and enforced by the scoring ledger.
+- Mission-card scoring supports `cumulative_condition`,
+  `exclusive_or_condition`, `exactly_one_condition`, `vp_up_to_limit`,
+  `when_drawn_tactical_only`, and `leaves_battlefield_event`.
+- Event Companion FAQ behavior for operation marker removal, Death Trap,
+  Surveil the Foe, and Vital Link is represented as source-linked patch
+  operations, not runtime string checks.
+- `WarhammerEventLayoutDescriptor` records layout ID, Force Disposition pair,
+  player Primary Missions, layout variant, 44" x 60" battlefield size,
+  Attacker/Defender edges, deployment-zone polygons, No Man's Land polygon,
+  player territory polygons, typed objective points, terrain areas, dense/light
+  terrain features, and source page.
+- All Event Companion layout records from the source pages become coordinate
+  source records, not screenshots consumed by runtime.
+- Base Size Guide rows import with `base_source_kind` values for round, oval,
+  Small Flying Base, Large Flying Base, Hull, Unique, and unresolved source
+  shapes.
+- Base Size Guide rows carry `geometry_resolution_status` values for canonical
+  geometry available, requires project geometry override, requires event
+  organizer override, or unsupported for physical geometry.
+- Hull, Small Flying Base, Large Flying Base, and Unique base-size rows are
+  imported as source facts but require explicit geometry overrides before
+  movement, line of sight, engagement, deployment, or collision consumers may
+  use them.
+- Any new Event Companion decision type, option family, proposal shape, or
+  viewer-visibility behavior updates `docs/ADAPTER_DECISION_CONTRACT.md` in the
+  same implementation PR.
+- No runtime path parses raw PDF text, layout images, or mission-card prose.
+
+Required tests:
+
+- complete Event Mission Sequence replay from mustering through battle start;
+- hidden Tactical/Fixed and Fixed-card choices reveal correctly;
+- Tactical draw-two, once-per-battle discard/draw, achieved discard, and
+  discard-for-CP behavior;
+- both-player end-of-turn Secondary scoring starts with the active player;
+- Primary, Secondary, Battle Ready, and total caps reject excess VP;
+- pre-battle abilities cannot resolve before first-turn determination;
+- Defender-first deployment and TITANIC skip;
+- Attacker-first redeploy and redeploy-reserve cap exemption;
+- all Event Companion layout descriptors load and instantiate;
+- all objective-point types and deployment-zone polygons validate;
+- all terrain areas/features validate dense/light status and footprint
+  inventory;
+- all Base Size Guide rows import with geometry resolution status;
+- Hull, Flying Base, and Unique rows fail closed for movement/LoS without a
+  geometry override;
+- replay hashes are stable for setup, layout selection, scoring, and game end.
+
+Tournament pairings and rankings from the Event Companion are event-operations
+guidance, not battle-engine rules. Future support belongs outside
+`engine/game_state.py`, for example in `event_ops/pairings.py` and
+`event_ops/rankings.py`, consuming completed game results and VP ledgers without
+affecting in-game legality, scoring, or replay state.
 
 ---
 
@@ -4391,6 +4550,20 @@ Invariants:
 - clients render public state and submit decisions;
 - hidden information remains hidden from opponent clients;
 - network resync preserves replay hash/state hash.
+
+Event Companion adapter/replay/UI requirements:
+
+- hidden Tactical/Fixed selection and Fixed Mission choices remain viewer-scoped
+  until reveal;
+- hidden battle formation declarations remain viewer-scoped before reveal;
+- TO-specified and randomly selected layout variants are both represented as
+  source-backed decisions/events;
+- Attacker/Defender assignment preserves physical edge orientation;
+- Tactical Secondary active cards, discards, achieved cards, and
+  once-per-battle discard/draw usage are inspectable from replay-safe state;
+- VP source caps and final scoring audit are displayed without adapter-side
+  recalculation;
+- layout visualizers consume source descriptors, not page images.
 
 ---
 
@@ -4513,6 +4686,19 @@ Invariants:
 - evaluation can compare policies on fixed seed/matchup batches;
 - training data schema is stable and validated.
 
+Event Companion scenario coverage:
+
+- candidate generation includes setup decisions for Force Disposition,
+  Tactical/Fixed choice, Fixed cards, deployment order, redeploy, and
+  first-turn-conditioned pre-battle rules;
+- AI policies account for per-player Primary Missions derived from Force
+  Disposition pairing;
+- self-play corpora record layout ID, mission pair, Secondary mode, active
+  Secondaries, scoring opportunities, VP caps, and final win/draw/loss;
+- reward annotation must not treat tournament VP as the primary event-ranking
+  proxy, because Event Companion event rankings prioritize record and opponent
+  win records before total VP.
+
 ---
 
 # Full-game gates
@@ -4540,13 +4726,21 @@ Required coverage areas:
 - Charge phase;
 - Fight phase;
 - Stratagems;
-- missions;
+- full Warhammer Event Mission Sequence;
+- Force Disposition roster binding and per-player Primary Mission resolution;
+- Event Companion Secondary procedure;
+- Primary, Secondary, Battle Ready, and total VP caps;
+- five-round game end and tabled-player continuation;
+- all Event Companion FAQ entries;
+- all Event Companion layout descriptors from the source pages;
+- terrain footprint inventory and dense/light feature status;
+- Base Size Guide import, including Hull/Flying Base/Unique unresolved-geometry
+  accounting;
+- no Deployment/Twist cards in Warhammer Event mode;
 - objective control;
-- scoring;
 - terrain visibility and cover;
 - deployment and pre-battle abilities;
-- faction/detachment/enhancement rules;
-- Chapter Approved mission pack.
+- faction/detachment/enhancement rules.
 
 ## Phase 20B: end-to-end full-game regression suite
 
@@ -4556,7 +4750,8 @@ Required tests:
 - replay round-trip at multiple battle rounds;
 - no hidden information leaks;
 - deterministic same-seed replay;
-- multiple terrain layouts;
+- all Event Companion layout variants for the supported Force
+  Disposition/Primary Mission combinations;
 - multiple army archetypes;
 - multiple mission packs.
 
@@ -4575,7 +4770,10 @@ Required runs:
 Exit criteria:
 
 - all Core Rules coverage rows are either implemented or explicitly unsupported with reason;
-- all source-backed mission-pack setup/scoring/terrain/deployment layout rows are implemented or explicitly unsupported with reason;
+- zero unresolved Warhammer Event Mission Sequence, scoring, and layout rows;
+- Hull, Flying Base, and Unique geometry rows may remain explicitly unsupported
+  only when the unsupported reason is source-linked and the row is blocked from
+  physical geometry consumers;
 - full-game regression suite passes;
 - headless throughput budget passes;
 - replay determinism passes;
@@ -4592,22 +4790,22 @@ Exit criteria:
 | Rules area | Planned phase(s) |
 |---|---|
 | Dice, rerolls, roll-offs | 1, 10J, 10N, 12C, 13C, 15A, 14C, 14I |
-| Datasheets and keywords | 9A, 9C, 17A-17I, 14A, 14J |
+| Datasheets and keywords | 9A, 9C, 17A-17J, 14A, 14J |
 | Army mustering | 9C, 16D, 17B, 14J |
-| Setup sequence | 9B, 11A, 16A-16E, 14B, 14J |
-| Deployment zones | 11A, 16A, 14J |
+| Setup sequence | 9B, 11A, 16A-16E, 14B, 14J, 17J |
+| Deployment zones | 11A, 16A, 14J, 17J |
 | Redeployments | 10D, 16B, 14H |
 | Engagement Range | 10G, 10M, 10N, 10O, 15B, 14C, 14G |
 | Unit Coherency | 10G/10H descriptors, 10L runtime, 11E cleanup, 14C |
 | Terrain movement | 10F, 10H, 10I, 14D |
-| Terrain visibility/cover, including Hidden, Obscuring, Solid, Benefit of Cover, and Plunging Fire | 13A, 13C, 14D, 14E |
+| Terrain visibility/cover, including Hidden, Obscuring, Solid, Benefit of Cover, Plunging Fire, and Event Companion layout geometry | 13A, 13C, 14D, 14E, 17J |
 | Movement phase Move Units | 10B-10T, 14D |
 | Movement phase reserve arrivals and Ingress Moves | 10P, 14D, 14H |
 | Transports | 10Q, 14H |
 | Aircraft | 10R, 14H |
 | Command phase | 11C, 14B, 14C |
 | Battle-shock | 11C, 12B, 14C |
-| Mission scoring | 11A-11C, 11E-11F, 14J |
+| Mission scoring | 11A-11C, 11E-11F, 14J, 17J |
 | Stratagems | 12B, 12C, 13D, 15E, 17E-17G, 14I |
 | Shooting phase | 13A-13F, 14E, 14F |
 | Weapon abilities | 8D, 13D, 17H, 14I |
@@ -4616,11 +4814,11 @@ Exit criteria:
 | Fight phase | 15C, 15D, 15E, 15F, 14G |
 | Leader/attached units | 6, 16D, 17A, 14H |
 | Faction/detachment/enhancement rules | 17C-17G, 14J |
-| Mission packs | 11A, 11E, 11F, 16A, 20A, 14J |
-| Adapter/UI contract | 11D, 12B, 14D-14I |
+| Mission packs | 11A, 11E, 11F, 16A, 17J, 20A, 14J |
+| Adapter/UI contract | 11D, 12B, 14D-14I, 17J |
 | Human CLI/UI | 18A, 18C |
 | Network play | 18D |
 | Replay | 18B, all state-changing phases |
 | AI/headless self-play | 19B-19E |
 | Performance budgets | 10U, 19A |
-| 11th Edition migration/revalidation | 14A-14K |
+| 11th Edition migration/revalidation | 14A-14K, 17J |
