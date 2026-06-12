@@ -16,6 +16,10 @@ from warhammer40k_core.engine.abilities import (
 )
 from warhammer40k_core.engine.ability_catalog import build_player_ability_index
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockHookBinding,
+    BattleShockHookRegistry,
+)
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
@@ -59,6 +63,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     stratagem_handler_ids: list[str]
     rule_runtime_binding_ids: list[str]
     event_subscriptions: list[dict[str, JsonValue]]
+    battle_shock_hook_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -81,6 +86,7 @@ class RuntimeContentContribution:
     rule_runtime_bindings: tuple[RuleRuntimeBinding, ...] = ()
     event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
+    battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
         default_factory=_empty_named_handlers
     )
@@ -156,6 +162,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "battle_shock_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution battle_shock_hook_bindings",
+                self.battle_shock_hook_bindings,
+                BattleShockHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "faction_named_handlers",
             _validate_named_handlers(self.faction_named_handlers),
         )
@@ -170,6 +185,7 @@ class RuntimeContentContribution:
             rule_runtime_bindings=self.rule_runtime_bindings,
             event_subscriptions=self.event_subscriptions,
             event_handler_bindings=self.event_handler_bindings,
+            battle_shock_hook_bindings=self.battle_shock_hook_bindings,
             faction_named_handlers=self.faction_named_handlers,
         )
 
@@ -245,6 +261,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.handler_id,
         ),
+        battle_shock_hook_bindings=_combine_unique_values(
+            "Battle-shock hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.battle_shock_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         faction_named_handlers=_merged_named_handlers(validated_contributions),
     )
 
@@ -259,6 +284,7 @@ class RuntimeContentBundle:
     rule_execution_registry: RuleExecutionRegistry
     faction_rule_execution_registry: FactionRuleExecutionRegistry
     event_index: RuntimeContentEventIndex
+    battle_shock_hook_registry: BattleShockHookRegistry
     contribution_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -292,6 +318,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires FactionRuleExecutionRegistry.")
         if type(self.event_index) is not RuntimeContentEventIndex:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
+        if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires BattleShockHookRegistry.")
         object.__setattr__(
             self,
             "contribution_ids",
@@ -403,6 +431,13 @@ class RuntimeContentBundle:
             ),
             handler_registry=event_handler_registry,
         )
+        battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.battle_shock_hook_bindings
+            )
+        )
         return cls(
             activation=activation,
             ability_indexes_by_player_id=_ability_indexes_by_player_id(
@@ -419,6 +454,7 @@ class RuntimeContentBundle:
             rule_execution_registry=rule_registry,
             faction_rule_execution_registry=faction_registry,
             event_index=event_index,
+            battle_shock_hook_registry=battle_shock_hook_registry,
             contribution_ids=contribution_ids,
         )
 
@@ -449,6 +485,9 @@ class RuntimeContentBundle:
                 binding.binding_id for binding in self.rule_execution_registry.all_bindings()
             ],
             "event_subscriptions": self.event_index.to_summary_payload(),
+            "battle_shock_hook_ids": [
+                binding.hook_id for binding in self.battle_shock_hook_registry.all_bindings()
+            ],
             "faction_execution_record_ids": [
                 record.execution_id for record in self.faction_rule_execution_registry.all_records()
             ],

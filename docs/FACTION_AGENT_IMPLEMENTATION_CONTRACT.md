@@ -49,12 +49,23 @@ Use existing `RuntimeContentContribution` surfaces:
 - ability handler bindings;
 - Stratagem handler bindings;
 - event subscriptions and event handler bindings;
+- Battle-shock hook bindings for rules whose trigger is Battle-shock modifier
+  or outcome resolution;
 - RuleIR runtime bindings;
 - faction named handlers.
 
 Semantic execution must run through registered engine paths. Leave unimplemented
 rule shapes as explicit unsupported diagnostics, not no-ops, defaults, or silent
 fallbacks.
+
+Battle-shock hook bindings are an approved runtime contribution surface only for
+source-backed rules that execute inside Battle-shock resolution. Each hook
+binding must use a `source_id` from the generated Phase 17F execution rows for
+the implemented rule, and tests must prove that the selected runtime manifest
+row loads the hook through `GameLifecycle` without manual handler injection.
+Hook handlers must mutate authoritative state only through engine-owned
+services and must emit deterministic replay-safe events or explicit unsupported
+diagnostics.
 
 ## Decision And Mutation
 
@@ -94,6 +105,8 @@ Required:
 - Use source IDs from generated manifest and execution rows.
 - Remove the generated placeholder marker from implemented files.
 - Register named handlers or RuleIR bindings only where semantics are supported.
+- Register Battle-shock hook bindings only for Battle-shock timing semantics,
+  and link them to generated Phase 17F execution row IDs.
 - Return typed unsupported results with source-linked reasons for unsupported semantics.
 - Add replay and audit assertions for state-changing behavior.
 - Do not edit runtime loader, lifecycle, bundle, or manifest machinery.

@@ -23,6 +23,10 @@ class BattleSize(StrEnum):
     STRIKE_FORCE = "strike_force"
 
 
+DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
+DAEMONIC_PACT_BASE_FACTION_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
+
+
 class BattleSizeMusteringPolicyPayload(TypedDict):
     battle_size: str
     points_limit: int
@@ -508,24 +512,52 @@ def validate_unit_selection_for_army(
     selection: UnitMusterSelection,
     faction: FactionDefinition,
     detachment_selection: DetachmentSelection,
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE,
 ) -> DatasheetDefinition:
-    datasheet = validate_unit_selection_for_faction(
-        catalog=catalog,
-        selection=selection,
+    if type(catalog) is not ArmyCatalog:
+        raise ListValidationError("catalog must be an ArmyCatalog.")
+    if type(selection) is not UnitMusterSelection:
+        raise ListValidationError("selection must be a UnitMusterSelection.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("faction must be a FactionDefinition.")
+    datasheet = _catalog_datasheet_by_id(catalog, selection.datasheet_id)
+    shares_selected_faction = bool(
+        set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords)
+    )
+    daemonic_pact_allowed = daemonic_pact_datasheet_allowed_for_faction(
+        datasheet=datasheet,
         faction=faction,
     )
+    if not shares_selected_faction and not daemonic_pact_allowed:
+        raise ListValidationError("UnitMusterSelection datasheet is not legal for faction.")
     _selected_faction, detachments = validate_detachment_selection(
         catalog=catalog,
         selection=detachment_selection,
+        battle_size=battle_size,
     )
     allowed_datasheet_ids = {
         datasheet_id for detachment in detachments for datasheet_id in detachment.unit_datasheet_ids
     }
-    if datasheet.datasheet_id not in allowed_datasheet_ids:
+    if datasheet.datasheet_id not in allowed_datasheet_ids and not daemonic_pact_allowed:
         raise ListValidationError(
             "UnitMusterSelection datasheet is not provided by selected detachments."
         )
     return datasheet
+
+
+def daemonic_pact_datasheet_allowed_for_faction(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("Daemonic Pact datasheet must be a DatasheetDefinition.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("Daemonic Pact faction must be a FactionDefinition.")
+    if not _datasheet_has_faction_keyword(datasheet, DAEMONIC_PACT_FACTION_KEYWORD):
+        return False
+    faction_keywords = {_canonical_keyword(keyword) for keyword in faction.faction_keywords}
+    return bool(faction_keywords & DAEMONIC_PACT_BASE_FACTION_KEYWORDS)
 
 
 def resolve_model_profile_selections(
@@ -592,6 +624,20 @@ def _catalog_datasheet_by_id(catalog: ArmyCatalog, datasheet_id: str) -> Datashe
         return catalog.datasheet_by_id(datasheet_id)
     except ArmyCatalogError as exc:
         raise ListValidationError("UnitMusterSelection datasheet_id was not found.") from exc
+
+
+def _datasheet_has_faction_keyword(
+    datasheet: DatasheetDefinition,
+    keyword: str,
+) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(
+        _canonical_keyword(stored) == canonical for stored in datasheet.keywords.faction_keywords
+    )
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
 def _catalog_faction_by_id(catalog: ArmyCatalog, faction_id: str) -> FactionDefinition:

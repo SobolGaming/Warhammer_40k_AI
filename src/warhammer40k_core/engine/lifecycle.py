@@ -1506,6 +1506,11 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
+        self._command_phase_handler = CommandPhaseHandler(
+            stratagem_index=self._command_phase_handler.stratagem_index,
+            battle_shock_hooks=self._runtime_content_bundle.battle_shock_hook_registry,
+        )
+        self._battle_round_flow = BattleRoundFlow(phase_handlers=self._phase_handlers())
         self._runtime_content_activation_input_hash = activation_input_hash
         summary = self._runtime_content_bundle.to_summary_payload()
         self._runtime_content_audit = cast(

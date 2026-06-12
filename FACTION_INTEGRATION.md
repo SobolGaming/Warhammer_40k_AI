@@ -243,12 +243,23 @@ support for the Phase 17E faction-level items:
 - faction and detachment Stratagem timing, targeting, validation, and effects.
 
 Phase 17G must replace `blocked_structured_semantics_required` rows for
-faction-level content with registered generic IR executors or source-linked
-named handlers. The handlers must mutate authoritative game state only through
-engine-owned services, use the shared `DecisionRequest` / `DecisionResult`
-path for player choices, and emit deterministic replay-safe execution results.
+faction-level content with registered generic IR executors, source-linked named
+handlers, or source-linked Battle-shock hook bindings for rules whose timing is
+Battle-shock modifier or outcome resolution. These execution surfaces must
+mutate authoritative game state only through engine-owned services, use the
+shared `DecisionRequest` / `DecisionResult` path for player choices, and emit
+deterministic replay-safe execution results.
 Implementation PRs must use the generated scaffold targets and the
 [Faction Agent Implementation Contract](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
+
+Battle-shock hook bindings map to Phase 17F through their `source_id`: the
+binding must use the generated execution row ID for the rule it implements, and
+the runtime manifest row selected from the mustered faction or detachment must
+carry that same execution row into the `RuntimeContentBundle` audit summary.
+The Phase 17F baseline execution matrix remains historical source status until
+a later execution-status overlay consolidates implemented hook coverage; Phase
+17G hook PRs must therefore add source-link and lifecycle tests that prove the
+hook is loaded and executed through the selected runtime bundle.
 
 Phase 17G does not cover broad datasheet, wargear, or weapon ability execution.
 Those rows move to Phase 17H unless they are inseparable from a faction army
@@ -257,14 +268,16 @@ rule, detachment rule, enhancement, or Stratagem implemented in Phase 17G.
 Required tests:
 
 - faction army rules load and execute for every faction through the registered
-  engine path;
+  engine path, including Battle-shock hooks when the rule timing is
+  Battle-shock resolution;
 - detachment rules load and execute for every detachment through registered
   lifecycle hooks;
 - enhancements validate eligibility from Phase 16D army-construction records
   and execute their effects through generic IR or named handlers;
 - faction and detachment Stratagems validate timing, targeting, CP ledgers,
   repeat-use constraints, and effects through the shared Stratagem path;
-- registered executors cannot return mismatched execution identity payloads;
+- registered executors and hook bindings cannot return or expose mismatched
+  execution identity payloads;
 - unsupported semantic behavior returns typed unsupported diagnostics with
   approved source-linked reasons.
 

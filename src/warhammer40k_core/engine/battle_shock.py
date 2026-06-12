@@ -11,7 +11,11 @@ from warhammer40k_core.core.dice import (
     DiceRollSpecPayload,
     DiceRollState,
     DiceRollStatePayload,
+    ModifiedRollResult,
+    ModifiedRollResultPayload,
+    UnmodifiedRollResult,
 )
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacementError
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -51,6 +55,7 @@ class BattleShockResultPayload(TypedDict):
     result_id: str
     request: BattleShockTestRequestPayload
     roll_state: DiceRollStatePayload
+    modified_roll: ModifiedRollResultPayload
     total: int
     leadership_target: int
     passed: bool
@@ -200,6 +205,7 @@ class BattleShockResult:
     result_id: str
     request: BattleShockTestRequest
     roll_state: DiceRollState
+    modified_roll: ModifiedRollResult
     total: int
     leadership_target: int
     passed: bool
@@ -216,12 +222,19 @@ class BattleShockResult:
             raise GameLifecycleError("BattleShockResult roll_state must be a DiceRollState.")
         if self.roll_state.original_result.spec != self.request.spec:
             raise GameLifecycleError("BattleShockResult roll_state spec drift.")
+        if type(self.modified_roll) is not ModifiedRollResult:
+            raise GameLifecycleError(
+                "BattleShockResult modified_roll must be a ModifiedRollResult."
+            )
+        expected_unmodified = UnmodifiedRollResult.from_state(self.roll_state)
+        if self.modified_roll.unmodified != expected_unmodified:
+            raise GameLifecycleError("BattleShockResult modified roll drift.")
         object.__setattr__(
             self,
             "total",
             _validate_positive_int("BattleShockResult total", self.total),
         )
-        if self.total != self.roll_state.current_total:
+        if self.total != self.modified_roll.final_value:
             raise GameLifecycleError("BattleShockResult total drift.")
         object.__setattr__(
             self,
@@ -242,14 +255,20 @@ class BattleShockResult:
         result_id: str,
         request: BattleShockTestRequest,
         roll_state: DiceRollState,
+        modifiers: tuple[RollModifier, ...] = (),
     ) -> Self:
+        modified_roll = ModifiedRollResult.from_unmodified(
+            UnmodifiedRollResult.from_state(roll_state),
+            modifiers=modifiers,
+        )
         return cls(
             result_id=result_id,
             request=request,
             roll_state=roll_state,
-            total=roll_state.current_total,
+            modified_roll=modified_roll,
+            total=modified_roll.final_value,
             leadership_target=request.leadership_target,
-            passed=roll_state.current_total >= request.leadership_target,
+            passed=modified_roll.final_value >= request.leadership_target,
         )
 
     def to_payload(self) -> BattleShockResultPayload:
@@ -257,6 +276,7 @@ class BattleShockResult:
             "result_id": self.result_id,
             "request": self.request.to_payload(),
             "roll_state": self.roll_state.to_payload(),
+            "modified_roll": self.modified_roll.to_payload(),
             "total": self.total,
             "leadership_target": self.leadership_target,
             "passed": self.passed,
@@ -268,6 +288,7 @@ class BattleShockResult:
             result_id=payload["result_id"],
             request=BattleShockTestRequest.from_payload(payload["request"]),
             roll_state=DiceRollState.from_payload(payload["roll_state"]),
+            modified_roll=ModifiedRollResult.from_payload(payload["modified_roll"]),
             total=payload["total"],
             leadership_target=payload["leadership_target"],
             passed=payload["passed"],

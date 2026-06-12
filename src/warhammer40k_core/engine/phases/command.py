@@ -6,6 +6,11 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
     collect_battle_shock_test_requests,
 )
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockHookRegistry,
+    BattleShockModifierContext,
+    BattleShockOutcomeContext,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
@@ -59,10 +64,15 @@ EVENT_COMPANION_MISSION_PACK_ID = "11e-warhammer-event-companion-2026-06"
 @dataclass(frozen=True, slots=True)
 class CommandPhaseHandler:
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
+    battle_shock_hooks: BattleShockHookRegistry = field(
+        default_factory=BattleShockHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
+        if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
+            raise GameLifecycleError("CommandPhaseHandler battle_shock_hooks must be a registry.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -120,7 +130,11 @@ class CommandPhaseHandler:
                 return stratagem_status
 
         if not command_state.battle_shock_step_resolved:
-            _resolve_battle_shock_step(state=state, decisions=decisions)
+            _resolve_battle_shock_step(
+                state=state,
+                decisions=decisions,
+                battle_shock_hooks=self.battle_shock_hooks,
+            )
             command_state = _command_step_state(state)
 
         if not command_state.tactical_secondary_replacement_resolved:
@@ -793,6 +807,7 @@ def _resolve_battle_shock_step(
     *,
     state: GameState,
     decisions: DecisionController,
+    battle_shock_hooks: BattleShockHookRegistry,
 ) -> None:
     active_player_id = _active_player_id(state)
     battlefield_state = state.battlefield_state
@@ -803,6 +818,7 @@ def _resolve_battle_shock_step(
         raise GameLifecycleError("Battle-shock step requires active player's army.")
 
     state.command_step_state = _command_step_state(state).enter_battle_shock_step()
+    phase_start_battle_shocked_unit_ids = tuple(state.battle_shocked_unit_ids)
     requests = collect_battle_shock_test_requests(
         game_id=state.game_id,
         battle_round=state.battle_round,
@@ -847,6 +863,15 @@ def _resolve_battle_shock_step(
             result_id=f"{request.request_id}:result",
             request=request,
             roll_state=roll_state,
+            modifiers=battle_shock_hooks.modifiers_for(
+                BattleShockModifierContext(
+                    state=state,
+                    request=request,
+                    active_player_id=active_player_id,
+                    phase=BattlePhase.COMMAND,
+                    phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+                )
+            ),
         )
         state.record_battle_shock_result(result)
         result_payload = validate_json_value(result.to_payload())
@@ -861,6 +886,18 @@ def _resolve_battle_shock_step(
                 "battle_shock_result": result_payload,
                 "auto_passed": auto_pass_effect is not None,
             },
+        )
+        battle_shock_hooks.resolve_outcomes(
+            BattleShockOutcomeContext(
+                state=state,
+                decisions=decisions,
+                dice_manager=manager,
+                result=result,
+                active_player_id=active_player_id,
+                phase=BattlePhase.COMMAND,
+                auto_passed=auto_pass_effect is not None,
+                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+            )
         )
     state.command_step_state = _command_step_state(state).with_battle_shock_step_resolved()
     decisions.event_log.append(
