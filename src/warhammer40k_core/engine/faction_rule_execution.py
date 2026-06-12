@@ -453,6 +453,14 @@ def _validate_executor_result(
         raise GameLifecycleError("Faction-rule executor returned mismatched coverage_kind.")
     if result.faction_id != record.faction_id:
         raise GameLifecycleError("Faction-rule executor returned mismatched faction_id.")
+    if result.faction_name != record.faction_name:
+        raise GameLifecycleError("Faction-rule executor returned mismatched faction_name.")
+    if result.detachment_id != record.detachment_id:
+        raise GameLifecycleError("Faction-rule executor returned mismatched detachment_id.")
+    if result.detachment_name != record.detachment_name:
+        raise GameLifecycleError("Faction-rule executor returned mismatched detachment_name.")
+    if result.handler_id != record.handler_id:
+        raise GameLifecycleError("Faction-rule executor returned mismatched handler_id.")
     if result.source_ids != record.source_ids:
         raise GameLifecycleError("Faction-rule executor returned mismatched source_ids.")
     return result

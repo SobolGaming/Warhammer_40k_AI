@@ -268,7 +268,21 @@ def test_phase17f_registry_applies_executable_records_only_after_registered_exec
     assert FactionRuleExecutionResult.from_payload(generic_result.to_payload()) == generic_result
 
 
-def test_phase17f_registry_rejects_mismatched_executor_result() -> None:
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "execution_id",
+        "coverage_descriptor_id",
+        "coverage_kind",
+        "faction_id",
+        "faction_name",
+        "detachment_id",
+        "detachment_name",
+        "handler_id",
+        "source_ids",
+    ],
+)
+def test_phase17f_registry_rejects_mismatched_executor_result(field_name: str) -> None:
     blocked_record = _first_execution_record(
         Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
     )
@@ -277,10 +291,11 @@ def test_phase17f_registry_rejects_mismatched_executor_result() -> None:
         execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
         block_reason=None,
     )
-    mismatched_result = FactionRuleExecutionResult.applied(
-        record=replace(executable_record, execution_id=f"{executable_record.execution_id}:wrong"),
+    baseline_result = FactionRuleExecutionResult.applied(
+        record=executable_record,
         context=_context(),
     )
+    mismatched_result = _mismatched_result_for_field(baseline_result, field_name)
     handler_id = _require_handler_id(executable_record)
 
     def mismatched_handler(
@@ -294,7 +309,7 @@ def test_phase17f_registry_rejects_mismatched_executor_result() -> None:
         named_handlers={handler_id: mismatched_handler},
     )
 
-    with pytest.raises(GameLifecycleError, match="mismatched execution_id"):
+    with pytest.raises(GameLifecycleError, match=f"mismatched {field_name}"):
         registry.execute(execution_id=executable_record.execution_id, context=_context())
 
 
@@ -418,6 +433,31 @@ def _require_handler_id(record: Phase17FExecutionRecord) -> str:
     if record.handler_id is None:
         raise AssertionError("Expected Phase17F execution record to include handler_id.")
     return record.handler_id
+
+
+def _mismatched_result_for_field(
+    result: FactionRuleExecutionResult,
+    field_name: str,
+) -> FactionRuleExecutionResult:
+    if field_name == "execution_id":
+        return replace(result, execution_id="phase17f:wrong-execution")
+    if field_name == "coverage_descriptor_id":
+        return replace(result, coverage_descriptor_id="phase17e:wrong-descriptor")
+    if field_name == "coverage_kind":
+        return replace(result, coverage_kind="wrong-coverage-kind")
+    if field_name == "faction_id":
+        return replace(result, faction_id="wrong-faction")
+    if field_name == "faction_name":
+        return replace(result, faction_name="Wrong Faction")
+    if field_name == "detachment_id":
+        return replace(result, detachment_id="wrong-detachment")
+    if field_name == "detachment_name":
+        return replace(result, detachment_name="Wrong Detachment")
+    if field_name == "handler_id":
+        return replace(result, handler_id="wrong-handler")
+    if field_name == "source_ids":
+        return replace(result, source_ids=("wrong-source",))
+    raise AssertionError(f"Unsupported mismatch field: {field_name}.")
 
 
 def _payload_checksum(payload: Phase17FExecutionPackagePayload) -> str:
