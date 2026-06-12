@@ -98,11 +98,13 @@ completion, and deterministic replay-safe fight-order hardening. **Phase 17J is
 complete** for the Warhammer Event Companion mission-pack source package:
 Event Mission Sequence descriptors, Tactical/Fixed Secondary procedure
 descriptors, all 25 implemented Primary Mission matrix cells, all 45
-source-page layout identities with pending coordinate-extraction status, Event
-Companion mission-pack import, scoring/draw pack resolution, separate empty
-card-amendment and FAQ patch records, Base Size Guide source rows with
-geometry-resolution statuses, deployment remainder-drain coverage, and a static
-audit preventing runtime Event Companion PDF parsing.
+source-page layout identities with pending coordinate-extraction status, Primary
+Mission scoring coverage rows grouped as engine-implemented, source-known
+engine-pending, or awaiting-source, Event Companion mission-pack import,
+scoring/draw pack resolution, separate empty card-amendment and FAQ patch
+records, Base Size Guide source rows with geometry-resolution statuses,
+deployment remainder-drain coverage, and a static audit preventing runtime Event
+Companion PDF parsing.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -4409,6 +4411,9 @@ Implemented coverage:
 - Event Companion mission-pack import builds 25 Primary Mission descriptors, 25
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
+- `primary_mission_scoring_coverage_rows()` tracks Primary Mission scoring
+  status: 3 missions are engine-implemented, 8 are source-known but require
+  engine implementation, and 14 still await source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
   with deterministic layout descriptors while exact per-page coordinate
   extraction remains explicitly marked pending.

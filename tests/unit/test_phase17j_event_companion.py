@@ -8,6 +8,7 @@ import pytest
 from warhammer40k_core.core.missions import (
     MissionPackDefinition,
     MissionPackDefinitionPayload,
+    MissionPackError,
     MissionSourcePackageDefinition,
     MissionSourceStatus,
 )
@@ -349,6 +350,108 @@ def test_phase17j_primary_source_descriptor_rows_do_not_create_placeholder_scori
         defender_player_id="player-beta",
     )
     with pytest.raises(GameLifecycleError, match="Unsupported primary mission scoring policy"):
+        mission_scoring_policy_from_setup(setup)
+
+
+def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows() -> None:
+    primary_rows = {row.primary_mission_id: row for row in event_source.primary_mission_rows()}
+    coverage_rows = {
+        row.primary_mission_id: row for row in event_source.primary_mission_scoring_coverage_rows()
+    }
+    status_counts = {
+        status: sum(1 for row in coverage_rows.values() if row.status is status)
+        for status in event_source.PrimaryMissionScoringCoverageStatus
+    }
+
+    assert len(coverage_rows) == 25
+    assert status_counts == {
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 3,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 8,
+        event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 14,
+    }
+    assert {
+        mission_id: len(primary_rows[mission_id].scoring_rules)
+        for mission_id in (
+            "primary-unstoppable-force",
+            "primary-meatgrinder",
+            "primary-punishment",
+            "primary-consecrate",
+            "primary-destroyers-wrath",
+            "primary-outmaneuver",
+            "primary-delaying-action",
+            "primary-smoke-and-mirrors",
+            "primary-triangulation",
+        )
+    } == {
+        "primary-unstoppable-force": 4,
+        "primary-meatgrinder": 4,
+        "primary-punishment": 4,
+        "primary-consecrate": 5,
+        "primary-destroyers-wrath": 4,
+        "primary-outmaneuver": 4,
+        "primary-delaying-action": 3,
+        "primary-smoke-and-mirrors": 4,
+        "primary-triangulation": 5,
+    }
+    assert primary_rows["primary-meatgrinder"].scoring_kind == (
+        "event_companion_primary_source_known_engine_pending"
+    )
+    assert coverage_rows["primary-unstoppable-force"].needed_work == ()
+    assert coverage_rows["primary-battlefield-dominance"].needed_work == (
+        "source_primary_scoring_text",
+    )
+    assert coverage_rows["primary-death-trap"].mission_action_count == 1
+    assert coverage_rows["primary-smoke-and-mirrors"].mission_action_count == 1
+    assert "engine_primary_action:decoy-objective" in (
+        coverage_rows["primary-smoke-and-mirrors"].needed_work
+    )
+    assert "source_objective_role:expansion_objective" in (
+        coverage_rows["primary-delaying-action"].needed_work
+    )
+
+
+def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions() -> None:
+    action_sources = {
+        row.mission_action_id: row for row in event_source.primary_mission_action_source_rows()
+    }
+    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+
+    assert set(action_sources) == {"decoy-objective", "triangulate-objective"}
+    assert action_sources["decoy-objective"].to_payload() == {
+        "mission_action_id": "decoy-objective",
+        "primary_mission_id": "primary-smoke-and-mirrors",
+        "name": "Decoy",
+        "start_phase": "shooting",
+        "start_timing": "shooting_phase_action_start",
+        "completion_timing": "turn_end",
+        "eligible_unit_policy": "active_player_unit",
+        "target_policy": "objective_marker_excluding_home_not_decoy",
+        "use_limit": "unlimited_different_objective_per_unit_this_phase",
+        "effect_descriptor": "objective_becomes_decoy_if_action_unit_controls_target_at_turn_end",
+        "engine_exposure_status": "source_known_engine_pending",
+        "source_id": (
+            "gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:decoy-objective"
+        ),
+    }
+    assert action_sources["triangulate-objective"].start_timing == (
+        "shooting_phase_action_start_from_battle_round_two"
+    )
+    with pytest.raises(MissionPackError, match="mission_action_id"):
+        mission_pack.mission_action("decoy-objective")
+    with pytest.raises(MissionPackError, match="mission_action_id"):
+        mission_pack.mission_action("triangulate-objective")
+
+
+def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> None:
+    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+
+    with pytest.raises(GameLifecycleError, match="Unsupported primary scoring rule condition"):
         mission_scoring_policy_from_setup(setup)
 
 
