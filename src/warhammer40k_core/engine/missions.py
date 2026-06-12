@@ -23,7 +23,10 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     objective_control_timing_from_token,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_06_mission_pack,
+)
 
 _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS = frozenset(
     (
@@ -54,9 +57,7 @@ _SUPPORTED_STRUCTURED_PRIMARY_CONDITIONS = (
 def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionScoringPolicy:
     if type(mission_setup) is not MissionSetup:
         raise GameLifecycleError("Mission scoring policy requires MissionSetup.")
-    mission_pack = chapter_approved_2026_27_mission_pack()
-    if mission_setup.mission_pack_id != mission_pack.mission_pack_id:
-        raise GameLifecycleError("Unsupported mission pack for scoring policy.")
+    mission_pack = mission_pack_for_id(mission_setup.mission_pack_id)
     primary = None
     for mission in mission_pack.primary_missions:
         if mission.primary_mission_id == mission_setup.primary_mission_id:
@@ -105,6 +106,21 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
         end_of_round_scoring_windows=scoring.end_of_round_scoring_windows,
         end_of_game_scoring_windows=scoring.end_of_game_scoring_windows,
         source_id=f"{mission_setup.source_id}:scoring:{mission_setup.primary_mission_id}",
+    )
+
+
+def mission_pack_for_id(mission_pack_id: str) -> MissionPackDefinition:
+    requested_pack_id = _validate_identifier("mission_pack_id", mission_pack_id)
+    for mission_pack in _supported_mission_packs():
+        if mission_pack.mission_pack_id == requested_pack_id:
+            return mission_pack
+    raise GameLifecycleError("Unsupported mission pack.")
+
+
+def _supported_mission_packs() -> tuple[MissionPackDefinition, ...]:
+    return (
+        chapter_approved_2026_27_mission_pack(),
+        warhammer_event_companion_2026_06_mission_pack(),
     )
 
 
@@ -247,9 +263,7 @@ def deterministic_tactical_secondary_draw(
         "excluded_secondary_mission_ids",
         excluded_secondary_mission_ids,
     )
-    mission_pack = chapter_approved_2026_27_mission_pack()
-    if mission_setup.mission_pack_id != mission_pack.mission_pack_id:
-        raise GameLifecycleError("Unsupported mission pack for tactical secondary draw.")
+    mission_pack = mission_pack_for_id(mission_setup.mission_pack_id)
     candidates = tuple(
         mission.secondary_mission_id
         for mission in mission_pack.secondary_missions

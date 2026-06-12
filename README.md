@@ -140,7 +140,7 @@ adapters -> may import engine, never the reverse
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
 Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
-Phases 17A-17F are complete. Phase 14E is
+Phases 17A-17F plus Phase 17J are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -236,6 +236,16 @@ recomputation from current battlefield positions. Unsupported IR fails closed as
 typed unsupported results, source-linked execution events are deterministic and
 JSON-safe, and ability/Stratagem bridges can execute replay-safe compiled IR
 payloads without importing parser/compiler/template tooling.
+
+Phase 17J is complete for Warhammer Event Companion v1.0 mission-pack
+compliance and source geometry inventory. The source package now records Event
+Mission Sequence ordering, Tactical/Fixed Secondary procedures, all 25
+implemented Primary Mission matrix cells, all 45 source-page layout identities
+with pending coordinate-extraction status, no Deployment/Twist card usage,
+separate empty card-amendment and FAQ patch records, Base Size Guide source rows
+with geometry-resolution statuses, Event Companion mission-pack import,
+setup/scoring pack lookup, deployment remainder-drain coverage, and a static
+audit that runtime code does not parse Event Companion PDF text or images.
 
 Phase 17E is complete for source-backed faction coverage. The
 `gw-11e-phase17e-faction-coverage-2026-27` package validates every official

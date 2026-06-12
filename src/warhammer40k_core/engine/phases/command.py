@@ -9,6 +9,7 @@ from warhammer40k_core.engine.battle_shock import (
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
+    CommandPointSpendStatus,
     CommandStepState,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -29,6 +30,11 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.scoring import (
+    SecondaryMissionCardMode,
+    SecondaryMissionCardState,
+    SecondaryMissionCardStatus,
+)
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
     CORE_INSANE_BRAVERY_HANDLER_ID,
@@ -45,6 +51,9 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
+TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE = "replace_tactical_secondary_mission"
+TACTICAL_SECONDARY_REPLACEMENT_DECLINE_OPTION_ID = "decline_tactical_secondary_replacement"
+EVENT_COMPANION_MISSION_PACK_ID = "11e-warhammer-event-companion-2026-06"
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,6 +121,17 @@ class CommandPhaseHandler:
 
         if not command_state.battle_shock_step_resolved:
             _resolve_battle_shock_step(state=state, decisions=decisions)
+            command_state = _command_step_state(state)
+
+        if not command_state.tactical_secondary_replacement_resolved:
+            replacement_status = _request_tactical_secondary_replacement_if_available(
+                state=state,
+                decisions=decisions,
+                active_player_id=active_player_id,
+            )
+            if replacement_status is not None:
+                return replacement_status
+            state.command_step_state = command_state.with_tactical_secondary_replacement_resolved()
 
         return LifecycleStatus.advanced(
             stage=GameLifecycleStage.BATTLE,
@@ -131,50 +151,200 @@ class CommandPhaseHandler:
         result: DecisionResult,
         decisions: DecisionController,
     ) -> None:
-        if result.decision_type != TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
-            raise GameLifecycleError("CommandPhaseHandler received an unsupported decision_type.")
-        if state.stage is not GameLifecycleStage.BATTLE:
-            raise GameLifecycleError("Tactical secondary draws can be applied only during battle.")
-        if state.current_battle_phase is not BattlePhase.COMMAND:
-            raise GameLifecycleError("Tactical secondary draws can be applied only in command.")
-        active_player_id = _active_player_id(state)
-        if result.actor_id != active_player_id:
-            raise GameLifecycleError("Tactical secondary draw actor must be the active player.")
-        payload = _decision_payload_object(result.payload)
-        battle_round = _payload_int(payload, key="battle_round")
-        draw_count = _payload_int(payload, key="draw_count")
-        if battle_round != state.battle_round:
-            raise GameLifecycleError("Tactical secondary draw battle_round does not match state.")
-        if draw_count != state.tactical_secondary_draw_count:
-            raise GameLifecycleError("Tactical secondary draw_count does not match state.")
-        state.record_tactical_secondary_draw(
-            TacticalSecondaryDraw(
-                player_id=active_player_id,
-                battle_round=battle_round,
-                request_id=result.request_id,
-                result_id=result.result_id,
-                draw_count=draw_count,
+        if result.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
+            _apply_tactical_secondary_draw(state=state, result=result, decisions=decisions)
+            return
+        if result.decision_type == TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE:
+            _apply_tactical_secondary_replacement(
+                state=state,
+                result=result,
+                decisions=decisions,
             )
-        )
-        card_states = state.draw_tactical_secondary_cards(
+            return
+        raise GameLifecycleError("CommandPhaseHandler received an unsupported decision_type.")
+
+
+def invalid_command_phase_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
+        return None
+    if request.decision_type != TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE:
+        raise GameLifecycleError("Command phase validator received unsupported decision_type.")
+    payload = _decision_payload_object(result.payload)
+    player_id = _payload_string(payload, key="player_id")
+    secondary_mission_id = (
+        None
+        if result.selected_option_id == TACTICAL_SECONDARY_REPLACEMENT_DECLINE_OPTION_ID
+        else _payload_string(payload, key="secondary_mission_id")
+    )
+    drift_reason = _tactical_secondary_replacement_drift_reason(
+        state=state,
+        payload=payload,
+        player_id=player_id,
+        secondary_mission_id=secondary_mission_id,
+        result=result,
+    )
+    if drift_reason is None:
+        return None
+    return LifecycleStatus.invalid(
+        stage=state.stage,
+        message="Tactical secondary replacement option drifted.",
+        payload={
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "secondary_mission_id": secondary_mission_id,
+            "invalid_reason": drift_reason,
+        },
+    )
+
+
+def _apply_tactical_secondary_draw(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> None:
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("Tactical secondary draws can be applied only during battle.")
+    if state.current_battle_phase is not BattlePhase.COMMAND:
+        raise GameLifecycleError("Tactical secondary draws can be applied only in command.")
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Tactical secondary draw actor must be the active player.")
+    payload = _decision_payload_object(result.payload)
+    battle_round = _payload_int(payload, key="battle_round")
+    draw_count = _payload_int(payload, key="draw_count")
+    if battle_round != state.battle_round:
+        raise GameLifecycleError("Tactical secondary draw battle_round does not match state.")
+    if draw_count != state.tactical_secondary_draw_count:
+        raise GameLifecycleError("Tactical secondary draw_count does not match state.")
+    state.record_tactical_secondary_draw(
+        TacticalSecondaryDraw(
             player_id=active_player_id,
-            source_result_id=result.result_id,
+            battle_round=battle_round,
+            request_id=result.request_id,
+            result_id=result.result_id,
+            draw_count=draw_count,
         )
+    )
+    card_states = state.draw_tactical_secondary_cards(
+        player_id=active_player_id,
+        source_result_id=result.result_id,
+    )
+    decisions.event_log.append(
+        "tactical_secondary_missions_drawn",
+        {
+            "game_id": state.game_id,
+            "player_id": active_player_id,
+            "battle_round": battle_round,
+            "draw_count": draw_count,
+            "phase": BattlePhase.COMMAND.value,
+            "secondary_mission_card_states": [
+                validate_json_value(card_state.to_payload()) for card_state in card_states
+            ],
+        },
+    )
+    command_state = _command_step_state(state)
+    state.command_step_state = command_state.with_tactical_secondary_resolved()
+
+
+def _apply_tactical_secondary_replacement(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> None:
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("Tactical secondary replacement can be applied only in battle.")
+    if state.current_battle_phase is not BattlePhase.COMMAND:
+        raise GameLifecycleError("Tactical secondary replacement can be applied only in command.")
+    active_player_id = _active_player_id(state)
+    payload = _decision_payload_object(result.payload)
+    player_id = _payload_string(payload, key="player_id")
+    if player_id != active_player_id:
+        raise GameLifecycleError("Tactical secondary replacement player must be active player.")
+    if result.selected_option_id == TACTICAL_SECONDARY_REPLACEMENT_DECLINE_OPTION_ID:
+        _validate_tactical_secondary_replacement_context(
+            state=state,
+            payload=payload,
+            player_id=player_id,
+            secondary_mission_id=None,
+            result=result,
+        )
+        state.command_step_state = _command_step_state(
+            state
+        ).with_tactical_secondary_replacement_resolved()
         decisions.event_log.append(
-            "tactical_secondary_missions_drawn",
+            "tactical_secondary_replacement_declined",
             {
                 "game_id": state.game_id,
-                "player_id": active_player_id,
-                "battle_round": battle_round,
-                "draw_count": draw_count,
+                "player_id": player_id,
+                "active_player_id": active_player_id,
+                "battle_round": state.battle_round,
                 "phase": BattlePhase.COMMAND.value,
-                "secondary_mission_card_states": [
-                    validate_json_value(card_state.to_payload()) for card_state in card_states
-                ],
+                "timing": "end_of_command_phase",
+                "source_id": _tactical_secondary_procedure_source_id(state),
             },
         )
-        command_state = _command_step_state(state)
-        state.command_step_state = command_state.with_tactical_secondary_resolved()
+        return
+
+    secondary_mission_id = _payload_string(payload, key="secondary_mission_id")
+    _validate_tactical_secondary_replacement_context(
+        state=state,
+        payload=payload,
+        player_id=player_id,
+        secondary_mission_id=secondary_mission_id,
+        result=result,
+    )
+    spend = state.spend_command_points(
+        player_id=player_id,
+        amount=1,
+        source_id=(
+            f"{_tactical_secondary_procedure_source_id(state)}:replacement:"
+            f"{result.result_id}:cp-spend"
+        ),
+    )
+    if spend.status is not CommandPointSpendStatus.APPLIED:
+        raise GameLifecycleError("Tactical secondary replacement CP spend failed.")
+    spend_payload = validate_json_value(spend.to_payload())
+    decisions.event_log.append("command_points_spent", spend_payload)
+    state.record_tactical_secondary_replacement_use(player_id)
+    discarded = state.discard_tactical_secondary(
+        player_id=player_id,
+        secondary_mission_id=secondary_mission_id,
+        result_id=result.result_id,
+    )
+    drawn = state.draw_tactical_secondary_cards(
+        player_id=player_id,
+        source_result_id=result.result_id,
+        draw_count=1,
+    )
+    state.command_step_state = _command_step_state(
+        state
+    ).with_tactical_secondary_replacement_resolved()
+    decisions.event_log.append(
+        "tactical_secondary_mission_replaced",
+        {
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "active_player_id": active_player_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.COMMAND.value,
+            "timing": "end_of_command_phase",
+            "replacement_cost_cp": 1,
+            "discarded_secondary_mission_id": secondary_mission_id,
+            "discarded_secondary_mission_card_state": validate_json_value(discarded.to_payload()),
+            "drawn_secondary_mission_card_states": [
+                validate_json_value(card.to_payload()) for card in drawn
+            ],
+            "command_point_spend": spend_payload,
+            "source_id": _tactical_secondary_procedure_source_id(state),
+        },
+    )
 
 
 def _active_player_id(state: GameState) -> str:
@@ -196,6 +366,136 @@ def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
     if type(value) is not int:
         raise GameLifecycleError(f"Decision payload key must be an integer: {key}.")
     return value
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if type(value) is not str:
+        raise GameLifecycleError(f"Decision payload key must be a string: {key}.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"Decision payload key must not be empty: {key}.")
+    return stripped
+
+
+def _active_tactical_secondary_cards(
+    *,
+    state: GameState,
+    player_id: str,
+) -> tuple[SecondaryMissionCardState, ...]:
+    return tuple(
+        sorted(
+            (
+                card
+                for card in state.secondary_mission_card_states
+                if card.player_id == player_id
+                and card.mode is SecondaryMissionCardMode.TACTICAL
+                and card.status is SecondaryMissionCardStatus.ACTIVE
+            ),
+            key=lambda card: card.secondary_mission_id,
+        )
+    )
+
+
+def _event_companion_tactical_replacement_enabled(state: GameState) -> bool:
+    mission_setup = state.mission_setup
+    return (
+        mission_setup is not None
+        and mission_setup.mission_pack_id == EVENT_COMPANION_MISSION_PACK_ID
+    )
+
+
+def _tactical_secondary_procedure_source_id(state: GameState) -> str:
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise GameLifecycleError("Tactical secondary procedure requires MissionSetup.")
+    return f"{mission_setup.source_id}:secondary:tactical-procedure"
+
+
+def _validate_tactical_secondary_replacement_context(
+    *,
+    state: GameState,
+    payload: dict[str, JsonValue],
+    player_id: str,
+    secondary_mission_id: str | None,
+    result: DecisionResult,
+) -> None:
+    drift_reason = _tactical_secondary_replacement_drift_reason(
+        state=state,
+        payload=payload,
+        player_id=player_id,
+        secondary_mission_id=secondary_mission_id,
+        result=result,
+    )
+    if drift_reason is not None:
+        raise GameLifecycleError(f"Tactical secondary replacement drift: {drift_reason}.")
+
+
+def _tactical_secondary_replacement_drift_reason(
+    *,
+    state: GameState,
+    payload: dict[str, JsonValue],
+    player_id: str,
+    secondary_mission_id: str | None,
+    result: DecisionResult,
+) -> str | None:
+    if result.actor_id != player_id:
+        return "actor_player_drift"
+    if _payload_string(payload, key="game_id") != state.game_id:
+        return "game_id_drift"
+    if _payload_string(payload, key="active_player_id") != _active_player_id(state):
+        return "active_player_id_drift"
+    if _payload_int(payload, key="battle_round") != state.battle_round:
+        return "battle_round_drift"
+    if _payload_string(payload, key="phase") != BattlePhase.COMMAND.value:
+        return "payload_phase_drift"
+    if state.current_battle_phase is not BattlePhase.COMMAND:
+        return "phase_drift"
+    if player_id != _active_player_id(state):
+        return "player_not_active"
+    if not _event_companion_tactical_replacement_enabled(state):
+        return "tactical_replacement_not_enabled"
+    choice = state.secondary_mission_choice_for_player(player_id)
+    if choice is None or choice.mode is not SecondaryMissionMode.TACTICAL:
+        return "player_not_using_tactical_secondaries"
+    command_state = state.command_step_state
+    if command_state is None:
+        return "command_step_state_missing"
+    if command_state.active_player_id != player_id:
+        return "command_step_active_player_drift"
+    if command_state.battle_round != state.battle_round:
+        return "command_step_battle_round_drift"
+    if not command_state.battle_shock_step_resolved:
+        return "battle_shock_not_resolved"
+    if command_state.tactical_secondary_replacement_resolved:
+        return "replacement_already_resolved_this_phase"
+    if state.has_tactical_secondary_replacement_use(player_id):
+        return "replacement_already_used"
+    if _payload_string(
+        payload, key="replacement_source_id"
+    ) != _tactical_secondary_procedure_source_id(state):
+        return "replacement_source_id_drift"
+    if _payload_int(payload, key="replacement_cost_cp") != 1:
+        return "replacement_cost_cp_drift"
+    if _payload_int(payload, key="replacement_discard_count") != 1:
+        return "replacement_discard_count_drift"
+    if _payload_int(payload, key="replacement_draw_count") != 1:
+        return "replacement_draw_count_drift"
+    if secondary_mission_id is None:
+        return None
+    if result.selected_option_id != f"replace:{secondary_mission_id}":
+        return "selected_option_id_drift"
+    if state.command_point_total(player_id) < 1:
+        return "insufficient_command_points"
+    active_ids = {
+        card.secondary_mission_id
+        for card in _active_tactical_secondary_cards(state=state, player_id=player_id)
+    }
+    if secondary_mission_id not in active_ids:
+        return "card_not_active"
+    return None
 
 
 def _ensure_command_step_state(
@@ -314,6 +614,78 @@ def _request_tactical_secondary_draw(
             "phase": BattlePhase.COMMAND.value,
             "active_player_id": active_player_id,
             "phase_body_status": "tactical_secondary_draw_pending",
+        },
+    )
+
+
+def _request_tactical_secondary_replacement_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    active_player_id: str,
+) -> LifecycleStatus | None:
+    if not _event_companion_tactical_replacement_enabled(state):
+        return None
+    choice = state.secondary_mission_choice_for_player(active_player_id)
+    if choice is None or choice.mode is not SecondaryMissionMode.TACTICAL:
+        return None
+    if state.has_tactical_secondary_replacement_use(active_player_id):
+        return None
+    if state.command_point_total(active_player_id) < 1:
+        return None
+    active_cards = _active_tactical_secondary_cards(state=state, player_id=active_player_id)
+    if not active_cards:
+        return None
+    source_id = _tactical_secondary_procedure_source_id(state)
+    common_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "player_id": active_player_id,
+        "active_player_id": active_player_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.COMMAND.value,
+        "timing": "end_of_command_phase",
+        "replacement_source_id": source_id,
+        "replacement_cost_cp": 1,
+        "replacement_discard_count": 1,
+        "replacement_draw_count": 1,
+    }
+    legal_secondary_ids = tuple(card.secondary_mission_id for card in active_cards)
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE,
+        actor_id=active_player_id,
+        payload={
+            **common_payload,
+            "legal_secondary_mission_ids": list(legal_secondary_ids),
+            "replacement_used": False,
+        },
+        options=(
+            *(
+                DecisionOption(
+                    option_id=f"replace:{card.secondary_mission_id}",
+                    label=f"Replace {card.secondary_mission_id}",
+                    payload={
+                        **common_payload,
+                        "secondary_mission_id": card.secondary_mission_id,
+                    },
+                )
+                for card in active_cards
+            ),
+            DecisionOption(
+                option_id=TACTICAL_SECONDARY_REPLACEMENT_DECLINE_OPTION_ID,
+                label="Decline tactical secondary replacement",
+                payload=common_payload,
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.COMMAND.value,
+            "active_player_id": active_player_id,
+            "phase_body_status": "tactical_secondary_replacement_pending",
         },
     )
 

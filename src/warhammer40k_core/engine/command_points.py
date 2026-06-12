@@ -41,6 +41,7 @@ class CommandStepStatePayload(TypedDict):
     command_points_granted: bool
     scoring_hooks_resolved: bool
     tactical_secondary_resolved: bool
+    tactical_secondary_replacement_resolved: bool
     battle_shock_step_resolved: bool
 
 
@@ -104,6 +105,7 @@ class CommandStepState:
     command_points_granted: bool = False
     scoring_hooks_resolved: bool = False
     tactical_secondary_resolved: bool = False
+    tactical_secondary_replacement_resolved: bool = False
     battle_shock_step_resolved: bool = False
 
     def __post_init__(self) -> None:
@@ -144,6 +146,14 @@ class CommandStepState:
                 self.battle_shock_step_resolved,
             ),
         )
+        object.__setattr__(
+            self,
+            "tactical_secondary_replacement_resolved",
+            _validate_bool(
+                "CommandStepState tactical_secondary_replacement_resolved",
+                self.tactical_secondary_replacement_resolved,
+            ),
+        )
         if self.current_step is CommandPhaseStep.BATTLE_SHOCK and not self.command_points_granted:
             raise GameLifecycleError(
                 "CommandStepState cannot enter Battle-shock before Command step CP gain."
@@ -168,6 +178,7 @@ class CommandStepState:
             command_points_granted=True,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
         )
 
@@ -179,6 +190,7 @@ class CommandStepState:
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=True,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
         )
 
@@ -190,6 +202,19 @@ class CommandStepState:
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=True,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+        )
+
+    def with_tactical_secondary_replacement_resolved(self) -> Self:
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=self.current_step,
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=True,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
         )
 
@@ -203,6 +228,7 @@ class CommandStepState:
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
         )
 
@@ -214,6 +240,7 @@ class CommandStepState:
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=True,
         )
 
@@ -225,6 +252,9 @@ class CommandStepState:
             "command_points_granted": self.command_points_granted,
             "scoring_hooks_resolved": self.scoring_hooks_resolved,
             "tactical_secondary_resolved": self.tactical_secondary_resolved,
+            "tactical_secondary_replacement_resolved": (
+                self.tactical_secondary_replacement_resolved
+            ),
             "battle_shock_step_resolved": self.battle_shock_step_resolved,
         }
 
@@ -237,6 +267,9 @@ class CommandStepState:
             command_points_granted=payload["command_points_granted"],
             scoring_hooks_resolved=payload["scoring_hooks_resolved"],
             tactical_secondary_resolved=payload["tactical_secondary_resolved"],
+            tactical_secondary_replacement_resolved=payload[
+                "tactical_secondary_replacement_resolved"
+            ],
             battle_shock_step_resolved=payload["battle_shock_step_resolved"],
         )
 

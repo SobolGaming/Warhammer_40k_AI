@@ -34,6 +34,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import (
@@ -79,6 +80,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
+    TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE,
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -129,7 +131,10 @@ from warhammer40k_core.engine.turn_cleanup import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_06_mission_pack,
+)
 
 SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
 SEEDED_TACTICAL_DRAW_RESULT_ID = "phase11e-seeded-tactical-draw"
@@ -1429,11 +1434,14 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     state = discard_lifecycle.state
     assert state is not None
     decisions = discard_lifecycle.decision_controller
-    active_cards = [
-        card
-        for card in state.secondary_mission_card_states
-        if card.player_id == "player-a" and card.mode is SecondaryMissionCardMode.TACTICAL
-    ]
+    active_cards = sorted(
+        (
+            card
+            for card in state.secondary_mission_card_states
+            if card.player_id == "player-a" and card.mode is SecondaryMissionCardMode.TACTICAL
+        ),
+        key=lambda card: card.secondary_mission_id,
+    )
     assert len(active_cards) == state.tactical_secondary_draw_count
     scored = state.score_secondary_mission(
         player_id="player-a",
@@ -1450,6 +1458,11 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     assert discard_request is not None
     assert discard_request.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE
     discard_option_id = f"discard:{active_cards[1].secondary_mission_id}"
+    discard_payload = cast(dict[str, JsonValue], discard_request.payload)
+    assert [active_cards[1].secondary_mission_id] in cast(
+        list[list[str]],
+        discard_payload["legal_secondary_mission_id_sets"],
+    )
     discard_result = FiniteOptionSubmission(
         request_id=discard_request.request_id,
         selected_option_id=discard_option_id,
@@ -1484,9 +1497,11 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     discard_event = next(
         event
         for event in discard_opponent_events["events"]
-        if event["event_type"] == "tactical_secondary_mission_discarded"
+        if event["event_type"] == "tactical_secondary_missions_discarded"
     )
-    assert cast(dict[str, JsonValue], discard_event["payload"])["player_id"] == "player-a"
+    public_discard_payload = cast(dict[str, JsonValue], discard_event["payload"])
+    assert public_discard_payload["player_id"] == "player-a"
+    assert public_discard_payload["secondary_mission_ids"] == [active_cards[1].secondary_mission_id]
     assert opponent_payload["tactical_secondary_draws"] == [
         {
             "player_id": "player-a",
@@ -1984,7 +1999,212 @@ def test_phase14j_tactical_secondary_achievement_context_rejects_non_tactical_mo
         replace(context, mode=SecondaryMissionCardMode.FIXED)
 
 
-def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> None:
+def test_event_companion_tactical_secondary_replacement_spends_cp_and_draws_one() -> None:
+    lifecycle = _event_companion_battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    active_cards = sorted(
+        (
+            card
+            for card in state.secondary_mission_card_states
+            if card.player_id == "player-a"
+            and card.mode is SecondaryMissionCardMode.TACTICAL
+            and card.status is SecondaryMissionCardStatus.ACTIVE
+        ),
+        key=lambda card: card.secondary_mission_id,
+    )
+    replaced_card = active_cards[0]
+    retained_card = active_cards[1]
+
+    status = lifecycle.advance_until_decision_or_terminal()
+    status = _decline_stratagem_window_if_pending(
+        lifecycle,
+        status,
+        result_id="phase17j-replacement-decline-new-orders",
+    )
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["timing"] == "end_of_command_phase"
+    assert request_payload["replacement_cost_cp"] == 1
+    assert request_payload["replacement_discard_count"] == 1
+    assert request_payload["replacement_draw_count"] == 1
+    assert request_payload["legal_secondary_mission_ids"] == [
+        card.secondary_mission_id for card in active_cards
+    ]
+    assert DecisionRequest.from_payload(request.to_payload()).to_payload() == request.to_payload()
+
+    result_id = "phase17j-replace-tactical-secondary"
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=f"replace:{replaced_card.secondary_mission_id}",
+        result_id=result_id,
+    ).to_result(request)
+    assert DecisionResult.from_payload(result.to_payload()).to_payload() == result.to_payload()
+    status = lifecycle.submit_decision(result)
+
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert state.command_point_total("player-a") == 0
+    assert state.tactical_secondary_replacement_player_ids == ["player-a"]
+    discarded = next(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a"
+        and card.secondary_mission_id == replaced_card.secondary_mission_id
+        and card.mode is SecondaryMissionCardMode.TACTICAL
+    )
+    active_after = sorted(
+        (
+            card
+            for card in state.secondary_mission_card_states
+            if card.player_id == "player-a"
+            and card.mode is SecondaryMissionCardMode.TACTICAL
+            and card.status is SecondaryMissionCardStatus.ACTIVE
+        ),
+        key=lambda card: card.secondary_mission_id,
+    )
+    replacement_events = [
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "tactical_secondary_mission_replaced"
+    ]
+    spend_events = [
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "command_points_spent"
+    ]
+    spend_payload = cast(dict[str, JsonValue], spend_events[-1].payload)
+
+    assert discarded.status is SecondaryMissionCardStatus.DISCARDED
+    assert discarded.discarded_result_id == result_id
+    assert len(active_after) == 2
+    assert retained_card.secondary_mission_id in {
+        card.secondary_mission_id for card in active_after
+    }
+    assert replaced_card.secondary_mission_id not in {
+        card.secondary_mission_id for card in active_after
+    }
+    assert any(card.source_result_id == result_id for card in active_after)
+    assert spend_payload["source_id"] == (
+        "gw-11e-warhammer-event-companion-v1-0-2026-06:secondary:"
+        f"tactical-procedure:replacement:{result_id}:cp-spend"
+    )
+    assert cast(dict[str, JsonValue], replacement_events[-1].payload)["source_id"] == (
+        "gw-11e-warhammer-event-companion-v1-0-2026-06:secondary:tactical-procedure"
+    )
+    payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    assert GameState.from_payload(payload).to_payload() == state.to_payload()
+
+
+def test_event_companion_tactical_secondary_replacement_rejects_malformed_submission() -> None:
+    lifecycle = _event_companion_battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    status = lifecycle.advance_until_decision_or_terminal()
+    status = _decline_stratagem_window_if_pending(
+        lifecycle,
+        status,
+        result_id="phase17j-replacement-malformed-decline-new-orders",
+    )
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE
+    replacement_option = next(
+        option for option in request.options if option.option_id.startswith("replace:")
+    )
+    malformed = DecisionResult(
+        result_id="phase17j-replacement-malformed",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=replacement_option.option_id,
+        payload={"malformed": True},
+    )
+    record_count = len(lifecycle.decision_controller.records)
+
+    invalid_status = lifecycle.submit_decision(malformed)
+
+    assert invalid_status.status_kind.value == "invalid"
+    invalid_payload = cast(dict[str, JsonValue], invalid_status.payload)
+    assert invalid_payload == {
+        "invalid_reason": "invalid_command_phase_decision_result",
+        "field": "payload",
+    }
+    assert len(lifecycle.decision_controller.records) == record_count
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+
+
+def test_event_companion_tactical_secondary_replacement_rejects_used_ledger_drift() -> None:
+    lifecycle = _event_companion_battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    status = lifecycle.advance_until_decision_or_terminal()
+    status = _decline_stratagem_window_if_pending(
+        lifecycle,
+        status,
+        result_id="phase17j-replacement-drift-decline-new-orders",
+    )
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE
+    active_card = _active_tactical_card(state)
+    result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=f"replace:{active_card.secondary_mission_id}",
+        result_id="phase17j-replacement-used-drift",
+    ).to_result(request)
+    record_count = len(lifecycle.decision_controller.records)
+    state.record_tactical_secondary_replacement_use("player-a")
+
+    invalid_status = lifecycle.submit_decision(result)
+
+    assert invalid_status.status_kind.value == "invalid"
+    invalid_payload = cast(dict[str, JsonValue], invalid_status.payload)
+    assert invalid_payload["invalid_reason"] == "replacement_already_used"
+    assert len(lifecycle.decision_controller.records) == record_count
+    assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+
+
+def test_event_companion_tactical_secondary_discard_cp_reward_uses_event_source_id() -> None:
+    lifecycle = _event_companion_battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    active_card = _active_tactical_card(state)
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    result_id = "phase17j-event-own-turn-discard"
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=f"discard:{active_card.secondary_mission_id}",
+        result_id=result_id,
+    ).to_result(discard_request)
+
+    lifecycle.submit_decision(discard_result)
+
+    command_point_events = [
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "command_points_gained"
+    ]
+    command_point_gain = cast(dict[str, JsonValue], command_point_events[-1].payload)
+    assert command_point_gain["source_id"] == (
+        "gw-11e-warhammer-event-companion-v1-0-2026-06:secondary:"
+        f"tactical-procedure:discard:{result_id}:cp-reward"
+    )
+
+
+def test_tactical_secondary_discard_awards_source_backed_cp_in_own_turn() -> None:
     lifecycle = _battle_lifecycle_with_active_tactical_cards()
     state = lifecycle.state
     assert state is not None
@@ -2013,7 +2233,8 @@ def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> 
     lifecycle.submit_decision(discard_result)
 
     expected_source_id = (
-        f"chapter-approved-2026-27:tactical-secondary-discard:{result_id}:cp-reward"
+        "gw-11e-chapter-approved-2026-27:secondary:"
+        f"tactical-procedure:discard:{result_id}:cp-reward"
     )
     ledger = state.command_point_ledger_for_player("player-a")
     reward_transactions = [
@@ -2030,18 +2251,108 @@ def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> 
         next(
             record.payload
             for record in lifecycle.decision_controller.event_log.records
-            if record.event_type == "tactical_secondary_mission_discarded"
+            if record.event_type == "tactical_secondary_missions_discarded"
         ),
     )
     command_point_gain = cast(dict[str, JsonValue], discard_payload["command_point_gain"])
     assert discard_payload["active_player_id"] == "player-a"
+    assert discard_payload["secondary_mission_ids"] == [active_card.secondary_mission_id]
     assert discard_payload["command_point_reward_eligible"] is True
     assert discard_payload["command_point_reward_reason"] == "discarding_players_turn"
     assert command_point_gain["source_id"] == expected_source_id
     assert command_point_gain["status"] == "applied"
 
+    second_discard_status = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+    )
+    assert second_discard_status.status_kind.value == "unsupported"
+    assert second_discard_status.decision_request is None
+    assert (
+        cast(
+            dict[str, JsonValue],
+            second_discard_status.payload,
+        )["discard_cp_reward_window_id"]
+        == state.tactical_secondary_discard_cp_reward_window_ids[0]
+    )
 
-def test_tactical_secondary_discard_in_opponents_turn_has_no_chapter_approved_cp_reward() -> None:
+
+def test_tactical_secondary_discard_set_awards_one_source_backed_cp_window() -> None:
+    lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    active_cards = sorted(
+        (
+            card
+            for card in state.secondary_mission_card_states
+            if card.player_id == "player-a"
+            and card.mode is SecondaryMissionCardMode.TACTICAL
+            and card.status is SecondaryMissionCardStatus.ACTIVE
+        ),
+        key=lambda card: card.secondary_mission_id,
+    )
+    active_card_ids = tuple(card.secondary_mission_id for card in active_cards)
+    assert len(active_card_ids) == state.tactical_secondary_draw_count
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    request_payload = cast(dict[str, JsonValue], discard_request.payload)
+    assert request_payload["legal_secondary_mission_id_sets"] == [
+        [active_card_ids[0]],
+        [active_card_ids[1]],
+        [active_card_ids[0], active_card_ids[1]],
+    ]
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=f"discard:{active_card_ids[0]}+{active_card_ids[1]}",
+        result_id="phase11e-own-turn-discard-set",
+    ).to_result(discard_request)
+
+    lifecycle.submit_decision(discard_result)
+
+    assert state.command_point_total("player-a") == 1
+    assert len(state.tactical_secondary_discard_cp_reward_window_ids) == 1
+    assert all(
+        state.secondary_mission_card_state(
+            player_id="player-a",
+            secondary_mission_id=secondary_mission_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+        )
+        is None
+        for secondary_mission_id in active_card_ids
+    )
+    command_point_events = [
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "command_points_gained"
+    ]
+    assert len(command_point_events) == 1
+    command_point_gain = cast(dict[str, JsonValue], command_point_events[0].payload)
+    assert command_point_gain["requested_amount"] == 1
+    assert command_point_gain["applied_amount"] == 1
+
+    discard_payload = cast(
+        dict[str, JsonValue],
+        next(
+            record.payload
+            for record in lifecycle.decision_controller.event_log.records
+            if record.event_type == "tactical_secondary_missions_discarded"
+        ),
+    )
+    assert discard_payload["secondary_mission_ids"] == list(active_card_ids)
+    assert len(cast(list[JsonValue], discard_payload["secondary_mission_card_states"])) == len(
+        active_card_ids
+    )
+    assert cast(dict[str, JsonValue], discard_payload["command_point_gain"]) == command_point_gain
+
+
+def test_tactical_secondary_discard_in_opponents_turn_has_no_source_backed_cp_reward() -> None:
     lifecycle = _battle_lifecycle(player_b_secondary=SecondaryMissionMode.TACTICAL)
     state = lifecycle.state
     assert state is not None
@@ -2079,7 +2390,7 @@ def test_tactical_secondary_discard_in_opponents_turn_has_no_chapter_approved_cp
 
     assert state.command_point_total("player-b") == 0
     assert all(
-        not transaction.source_id.startswith("chapter-approved-2026-27:tactical-secondary-discard:")
+        not transaction.source_id.endswith(":cp-reward")
         for transaction in state.command_point_ledger_for_player("player-b").transactions
     )
     discard_payload = cast(
@@ -2087,10 +2398,11 @@ def test_tactical_secondary_discard_in_opponents_turn_has_no_chapter_approved_cp
         next(
             record.payload
             for record in lifecycle.decision_controller.event_log.records
-            if record.event_type == "tactical_secondary_mission_discarded"
+            if record.event_type == "tactical_secondary_missions_discarded"
         ),
     )
     assert discard_payload["player_id"] == "player-b"
+    assert discard_payload["secondary_mission_ids"] == [active_cards[0].secondary_mission_id]
     assert discard_payload["active_player_id"] == "player-a"
     assert discard_payload["command_point_reward_eligible"] is False
     assert discard_payload["command_point_reward_reason"] == "not_discarding_players_turn"
@@ -3620,12 +3932,15 @@ def _battle_lifecycle(
     *,
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    mission_setup: MissionSetup | None = None,
 ) -> GameLifecycle:
+    config = _config(mission_setup=mission_setup)
     lifecycle = GameLifecycle()
-    lifecycle.start(_config())
+    lifecycle.start(config)
     lifecycle.state = _battle_state(
         player_a_secondary=player_a_secondary,
         player_b_secondary=player_b_secondary,
+        mission_setup=mission_setup,
     )
     return lifecycle
 
@@ -3647,6 +3962,29 @@ def _battle_lifecycle_for_primary(
 
 def _battle_lifecycle_with_active_tactical_cards() -> GameLifecycle:
     lifecycle = _battle_lifecycle(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state = lifecycle.state
+    assert state is not None
+    state.record_tactical_secondary_draw(
+        TacticalSecondaryDraw(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            request_id=SEEDED_TACTICAL_DRAW_REQUEST_ID,
+            result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
+            draw_count=state.tactical_secondary_draw_count,
+        )
+    )
+    state.draw_tactical_secondary_cards(
+        player_id="player-a",
+        source_result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
+    )
+    return lifecycle
+
+
+def _event_companion_battle_lifecycle_with_active_tactical_cards() -> GameLifecycle:
+    lifecycle = _battle_lifecycle(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=_event_companion_mission_setup(),
+    )
     state = lifecycle.state
     assert state is not None
     state.record_tactical_secondary_draw(
@@ -3745,8 +4083,9 @@ def _battle_state(
     *,
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    mission_setup: MissionSetup | None = None,
 ) -> GameState:
-    config = _config()
+    config = _config(mission_setup=mission_setup)
     return _battle_state_from_config(
         config,
         player_a_secondary=player_a_secondary,
@@ -3794,7 +4133,7 @@ def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondar
     )
 
 
-def _config() -> GameConfig:
+def _config(*, mission_setup: MissionSetup | None = None) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11e-game",
@@ -3818,7 +4157,7 @@ def _config() -> GameConfig:
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
-        mission_setup=_mission_setup(),
+        mission_setup=_mission_setup() if mission_setup is None else mission_setup,
     )
 
 
@@ -3951,6 +4290,16 @@ def _mission_setup() -> MissionSetup:
         mission_pack=chapter_approved_2026_27_mission_pack(),
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+
+
+def _event_companion_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_06_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-1",
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
