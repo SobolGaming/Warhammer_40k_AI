@@ -1,16 +1,20 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from types import MappingProxyType
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
+    RulesetDescriptor,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -45,7 +49,8 @@ class RuntimeContentEventResultPayload(TypedDict):
     replay_payload: JsonValue
 
 
-RuntimeEventHandler = Callable[["RuntimeContentEvent"], "RuntimeContentEventResult"]
+def _empty_filters() -> Mapping[str, JsonValue]:
+    return MappingProxyType({})
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,6 +131,30 @@ class RuntimeContentEvent:
             target_unit_instance_ids=tuple(payload["target_unit_instance_ids"]),
             event_payload=payload["event_payload"],
         )
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContentEventContext:
+    event: RuntimeContentEvent
+    state: GameState
+    decisions: DecisionController
+    ruleset_descriptor: RulesetDescriptor
+    army_catalog: ArmyCatalog
+
+    def __post_init__(self) -> None:
+        if type(self.event) is not RuntimeContentEvent:
+            raise GameLifecycleError("Runtime event context requires RuntimeContentEvent.")
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Runtime event context requires GameState.")
+        if type(self.decisions) is not DecisionController:
+            raise GameLifecycleError("Runtime event context requires DecisionController.")
+        if type(self.ruleset_descriptor) is not RulesetDescriptor:
+            raise GameLifecycleError("Runtime event context requires RulesetDescriptor.")
+        if type(self.army_catalog) is not ArmyCatalog:
+            raise GameLifecycleError("Runtime event context requires ArmyCatalog.")
+
+
+RuntimeEventHandler = Callable[[RuntimeContentEventContext], "RuntimeContentEventResult"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -233,7 +262,8 @@ class RuntimeContentEventSubscription:
     subscription_id: str
     source_rule_id: str
     trigger_kind: TimingTriggerKind
-    handler: RuntimeEventHandler
+    handler_id: str
+    filters: Mapping[str, JsonValue] = field(default_factory=_empty_filters)
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -251,15 +281,71 @@ class RuntimeContentEventSubscription:
             "trigger_kind",
             timing_trigger_kind_from_token(self.trigger_kind),
         )
-        if not callable(self.handler):
-            raise GameLifecycleError("Runtime content event subscription handler must be callable.")
+        object.__setattr__(
+            self,
+            "handler_id",
+            _validate_identifier("handler_id", self.handler_id),
+        )
+        object.__setattr__(self, "filters", _validate_filters(self.filters))
 
     def to_summary_payload(self) -> dict[str, JsonValue]:
         return {
             "subscription_id": self.subscription_id,
             "source_rule_id": self.source_rule_id,
             "trigger_kind": self.trigger_kind.value,
+            "handler_id": self.handler_id,
+            "filters": dict(self.filters),
         }
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContentEventHandlerBinding:
+    handler_id: str
+    handler: RuntimeEventHandler
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "handler_id", _validate_identifier("handler_id", self.handler_id))
+        if not callable(self.handler):
+            raise GameLifecycleError("Runtime event handler binding must be callable.")
+
+    def to_summary_payload(self) -> dict[str, JsonValue]:
+        return {"handler_id": self.handler_id}
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContentEventHandlerRegistry:
+    _bindings: Mapping[str, RuntimeContentEventHandlerBinding]
+
+    @classmethod
+    def from_bindings(cls, bindings: tuple[RuntimeContentEventHandlerBinding, ...]) -> Self:
+        if type(bindings) is not tuple:
+            raise GameLifecycleError("Runtime event handler bindings must be a tuple.")
+        seen: set[str] = set()
+        resolved: dict[str, RuntimeContentEventHandlerBinding] = {}
+        for binding in cast(tuple[object, ...], bindings):
+            if type(binding) is not RuntimeContentEventHandlerBinding:
+                raise GameLifecycleError(
+                    "Runtime event handler bindings must contain RuntimeContentEventHandlerBinding."
+                )
+            if binding.handler_id in seen:
+                raise GameLifecycleError("Runtime event handler IDs must be unique.")
+            seen.add(binding.handler_id)
+            resolved[binding.handler_id] = binding
+        return cls(_bindings=MappingProxyType(resolved))
+
+    @classmethod
+    def empty(cls) -> Self:
+        return cls.from_bindings(())
+
+    def handler_for(self, handler_id: str) -> RuntimeEventHandler:
+        requested_id = _validate_identifier("handler_id", handler_id)
+        binding = self._bindings.get(requested_id)
+        if binding is None:
+            raise GameLifecycleError("Runtime event subscription references missing handler.")
+        return binding.handler
+
+    def all_bindings(self) -> tuple[RuntimeContentEventHandlerBinding, ...]:
+        return tuple(sorted(self._bindings.values(), key=lambda binding: binding.handler_id))
 
 
 @dataclass(frozen=True, slots=True)
@@ -269,10 +355,20 @@ class RuntimeContentEventIndex:
         tuple[RuntimeContentEventSubscription, ...],
     ]
     _subscriptions: tuple[RuntimeContentEventSubscription, ...]
+    _handler_registry: RuntimeContentEventHandlerRegistry
 
     @classmethod
-    def from_subscriptions(cls, subscriptions: tuple[RuntimeContentEventSubscription, ...]) -> Self:
+    def from_subscriptions(
+        cls,
+        subscriptions: tuple[RuntimeContentEventSubscription, ...],
+        *,
+        handler_registry: RuntimeContentEventHandlerRegistry,
+    ) -> Self:
+        if type(handler_registry) is not RuntimeContentEventHandlerRegistry:
+            raise GameLifecycleError("Runtime event index requires handler registry.")
         validated = _validate_subscriptions(subscriptions)
+        for subscription in validated:
+            handler_registry.handler_for(subscription.handler_id)
         grouped: dict[TimingTriggerKind, list[RuntimeContentEventSubscription]] = {}
         for subscription in validated:
             grouped.setdefault(subscription.trigger_kind, []).append(subscription)
@@ -281,11 +377,15 @@ class RuntimeContentEventIndex:
                 {trigger_kind: tuple(records) for trigger_kind, records in grouped.items()}
             ),
             _subscriptions=validated,
+            _handler_registry=handler_registry,
         )
 
     @classmethod
     def empty(cls) -> Self:
-        return cls.from_subscriptions(())
+        return cls.from_subscriptions(
+            (),
+            handler_registry=RuntimeContentEventHandlerRegistry.empty(),
+        )
 
     def subscriptions_for(
         self,
@@ -298,12 +398,30 @@ class RuntimeContentEventIndex:
     def all_subscriptions(self) -> tuple[RuntimeContentEventSubscription, ...]:
         return self._subscriptions
 
-    def dispatch(self, event: RuntimeContentEvent) -> tuple[RuntimeContentEventResult, ...]:
+    def dispatch(
+        self,
+        event: RuntimeContentEvent,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        ruleset_descriptor: RulesetDescriptor,
+        army_catalog: ArmyCatalog,
+    ) -> tuple[RuntimeContentEventResult, ...]:
         if type(event) is not RuntimeContentEvent:
             raise GameLifecycleError("Runtime event dispatch requires a RuntimeContentEvent.")
+        context = RuntimeContentEventContext(
+            event=event,
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+        )
         results: list[RuntimeContentEventResult] = []
         for subscription in self.subscriptions_for(event.trigger_kind):
-            result = subscription.handler(event)
+            if not _event_matches_filters(event=event, subscription=subscription):
+                continue
+            handler = self._handler_registry.handler_for(subscription.handler_id)
+            result = handler(context)
             _validate_result_matches_subscription(result=result, subscription=subscription)
             results.append(result)
         return tuple(results)
@@ -347,6 +465,21 @@ def _validate_result_matches_subscription(
         raise GameLifecycleError("Runtime event handler returned subscription_id drift.")
     if result.source_rule_id != subscription.source_rule_id:
         raise GameLifecycleError("Runtime event handler returned source_rule_id drift.")
+
+
+def _event_matches_filters(
+    *,
+    event: RuntimeContentEvent,
+    subscription: RuntimeContentEventSubscription,
+) -> bool:
+    for key, value in subscription.filters.items():
+        if key == "player_id" and event.player_id != value:
+            return False
+        if key == "active_player_id" and event.active_player_id != value:
+            return False
+        if key == "source_unit_instance_id" and event.source_unit_instance_id != value:
+            return False
+    return True
 
 
 def _runtime_event_status_from_token(token: object) -> RuntimeEventStatus:
@@ -408,3 +541,13 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"Runtime event {field_name} must be positive.")
     return value
+
+
+def _validate_filters(value: object) -> Mapping[str, JsonValue]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("Runtime event filters must be a mapping.")
+    filters: dict[str, JsonValue] = {}
+    for raw_key, raw_value in cast(Mapping[object, object], value).items():
+        key = _validate_identifier("filter key", raw_key)
+        filters[key] = validate_json_value(raw_value)
+    return MappingProxyType(dict(sorted(filters.items())))

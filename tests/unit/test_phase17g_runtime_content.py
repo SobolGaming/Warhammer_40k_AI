@@ -32,6 +32,7 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
@@ -39,6 +40,9 @@ from warhammer40k_core.engine.faction_content.bundle import (
 )
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEvent,
+    RuntimeContentEventContext,
+    RuntimeContentEventHandlerBinding,
+    RuntimeContentEventHandlerRegistry,
     RuntimeContentEventIndex,
     RuntimeContentEventResult,
     RuntimeContentEventSubscription,
@@ -46,13 +50,20 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeEventStatus,
 )
 from warhammer40k_core.engine.faction_content.loader import (
-    RuntimeContentModuleFamily,
     RuntimeContentModuleIndex,
     RuntimeContentModuleRef,
     load_runtime_content_contributions,
 )
+from warhammer40k_core.engine.faction_content.manifest import (
+    RuntimeContentManifest,
+    RuntimeContentManifestRow,
+    RuntimeContentModuleFamily,
+    RuntimeContentSupportStatus,
+)
 from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle,
+    runtime_content_activation_for_armies,
+    runtime_content_manifest_for_ruleset,
     runtime_content_module_index_for_ruleset,
 )
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
@@ -123,56 +134,270 @@ def test_runtime_loader_imports_only_selected_module_refs(monkeypatch: pytest.Mo
         selected_faction_ids=("faction-alpha",),
         selected_detachment_ids=("detachment-alpha",),
     )
-    module_index = RuntimeContentModuleIndex(
-        faction_modules={"faction-alpha": module_name},
-        detachment_modules={"detachment-alpha": module_name},
-        enhancement_modules={},
-        stratagem_modules={},
-        datasheet_modules={},
-        wargear_modules={},
-        weapon_profile_modules={},
+    manifest = RuntimeContentManifest(
+        rows=(
+            _manifest_row(
+                content_id="faction-alpha",
+                family=RuntimeContentModuleFamily.FACTION,
+                module_path=module_name,
+            ),
+            _manifest_row(
+                content_id="detachment-alpha",
+                family=RuntimeContentModuleFamily.DETACHMENT,
+                module_path=module_name,
+            ),
+        )
     )
+    resolved_activation = manifest.resolve_activation(activation)
 
     contributions = load_runtime_content_contributions(
-        activation=activation,
-        module_index=module_index,
+        activation=resolved_activation,
+        manifest=manifest,
     )
 
-    assert contributions == (RuntimeContentContribution(),)
+    assert contributions == (RuntimeContentContribution(contribution_id=module_name),)
     assert calls == [module_name]
-    assert module_index.module_paths_for_activation(activation) == (module_name,)
+    assert resolved_activation.selected_module_paths == (module_name,)
+    assert resolved_activation.reachable_content_ids == ("detachment-alpha", "faction-alpha")
 
 
-def test_runtime_loader_rejects_selected_content_without_module_ref() -> None:
+def test_runtime_manifest_rejects_selected_content_without_row() -> None:
     activation = _manual_activation(selected_faction_ids=("faction-alpha",))
 
     with pytest.raises(GameLifecycleError, match="missing selected support"):
-        load_runtime_content_contributions(
-            activation=activation,
-            module_index=RuntimeContentModuleIndex.empty(),
+        RuntimeContentManifest(rows=()).resolve_activation(activation)
+
+
+def test_runtime_manifest_resolves_transitive_source_only_and_supported_dependencies(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module_name = "tests.runtime_content_dependency_module"
+    module = ModuleType(module_name)
+    monkeypatch.setitem(sys.modules, module_name, module)
+    module.__dict__["runtime_contribution"] = lambda: RuntimeContentContribution()
+    activation = _manual_activation(selected_detachment_ids=("detachment-alpha",))
+    manifest = RuntimeContentManifest(
+        rows=(
+            _manifest_row(
+                content_id="detachment-alpha",
+                family=RuntimeContentModuleFamily.DETACHMENT,
+                support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+                dependency_ids=("granted-weapon-ability",),
+            ),
+            _manifest_row(
+                content_id="granted-weapon-ability",
+                family=RuntimeContentModuleFamily.WEAPON_PROFILE,
+                module_path=module_name,
+                execution_record_ids=("execution:weapon-ability",),
+            ),
+        )
+    )
+
+    resolved_activation = manifest.resolve_activation(activation)
+    contributions = load_runtime_content_contributions(
+        activation=resolved_activation,
+        manifest=manifest,
+    )
+
+    assert resolved_activation.reachable_content_ids == (
+        "detachment-alpha",
+        "granted-weapon-ability",
+    )
+    assert resolved_activation.selected_module_paths == (module_name,)
+    assert resolved_activation.selected_execution_record_ids == ("execution:weapon-ability",)
+    assert len(resolved_activation.activation_hash) == 64
+    assert contributions == (RuntimeContentContribution(contribution_id=module_name),)
+
+
+def test_runtime_manifest_generation_merges_catalog_rows_and_generated_support() -> None:
+    catalog = _catalog_with_runtime_detachment_selection(
+        ArmyCatalog.phase9a_canonical_content_pack()
+    )
+    generated_detachment_row = RuntimeContentManifestRow(
+        content_id="core-combined-arms",
+        family=RuntimeContentModuleFamily.DETACHMENT,
+        source_ids=(),
+        owner_faction_id=None,
+        owner_detachment_id=None,
+        source_package_hash="source-package-hash:generated",
+        execution_record_ids=("execution:detachment",),
+        module_path="tests.runtime_content_generated_detachment",
+        support_status=RuntimeContentSupportStatus.SUPPORTED,
+        dependency_ids=("generated-weapon-ability",),
+    )
+    generated_dependency_row = _manifest_row(
+        content_id="generated-weapon-ability",
+        family=RuntimeContentModuleFamily.WEAPON_PROFILE,
+        module_path="tests.runtime_content_generated_weapon",
+        execution_record_ids=("execution:weapon",),
+    )
+
+    manifest = RuntimeContentManifest.from_catalog(
+        catalog=catalog,
+        generated_rows=(generated_detachment_row, generated_dependency_row),
+    )
+    activation = _manual_activation(selected_detachment_ids=("core-combined-arms",))
+    resolved = manifest.resolve_activation(activation)
+    detachment_row = manifest.row_for_content_id("core-combined-arms")
+    enhancement_row = manifest.row_for_content_id("runtime-enhancement")
+    stratagem_row = manifest.row_for_content_id("runtime-ambush")
+    wargear_row = manifest.row_for_content_id("core-bolt-rifle")
+    summary_row = generated_dependency_row.to_summary_payload()
+
+    assert detachment_row.source_ids != ()
+    assert detachment_row.source_package_hash == "source-package-hash:generated"
+    assert detachment_row.dependency_ids == (
+        "generated-weapon-ability",
+        "runtime-ambush",
+        "runtime-enhancement",
+    )
+    assert enhancement_row.owner_detachment_id == "core-combined-arms"
+    assert stratagem_row.owner_detachment_id == "core-combined-arms"
+    assert wargear_row.dependency_ids == ("core-bolt-rifle:standard",)
+    assert resolved.selected_module_paths == (
+        "tests.runtime_content_generated_detachment",
+        "tests.runtime_content_generated_weapon",
+    )
+    assert resolved.selected_execution_record_ids == (
+        "execution:detachment",
+        "execution:weapon",
+    )
+    assert summary_row["support_status"] == RuntimeContentSupportStatus.SUPPORTED.value
+
+    with pytest.raises(GameLifecycleError, match="requires ArmyCatalog"):
+        RuntimeContentManifest.from_catalog(
+            catalog=cast(ArmyCatalog, object()),
+            generated_rows=(),
+        )
+
+
+def test_runtime_manifest_validation_is_fail_fast() -> None:
+    valid_row = _manifest_row(
+        content_id="source-only",
+        family=RuntimeContentModuleFamily.WARGEAR,
+        support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+    )
+
+    with pytest.raises(GameLifecycleError, match="require module_path"):
+        _manifest_row(content_id="supported-missing", family=RuntimeContentModuleFamily.FACTION)
+    with pytest.raises(GameLifecycleError, match="must not import code"):
+        _manifest_row(
+            content_id="source-only-import",
+            family=RuntimeContentModuleFamily.WARGEAR,
+            module_path="tests.runtime_content_source_only",
+            support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+        )
+    with pytest.raises(GameLifecycleError, match="rows must be a tuple"):
+        RuntimeContentManifest(rows=cast(tuple[RuntimeContentManifestRow, ...], [valid_row]))
+    with pytest.raises(GameLifecycleError, match="must contain RuntimeContentManifestRow"):
+        RuntimeContentManifest(rows=cast(tuple[RuntimeContentManifestRow, ...], (object(),)))
+    with pytest.raises(GameLifecycleError, match="content IDs must be unique"):
+        RuntimeContentManifest(rows=(valid_row, valid_row))
+    with pytest.raises(GameLifecycleError, match="token must be a string"):
+        RuntimeContentManifestRow(
+            content_id="bad-family-type",
+            family=cast(RuntimeContentModuleFamily, 17),
+            source_ids=("source:bad-family-type",),
+            owner_faction_id=None,
+            owner_detachment_id=None,
+            source_package_hash="source-package-hash:test",
+            execution_record_ids=(),
+            module_path=None,
+            support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported RuntimeContentModuleFamily"):
+        RuntimeContentManifestRow(
+            content_id="bad-family-token",
+            family=cast(RuntimeContentModuleFamily, "bad-family"),
+            source_ids=("source:bad-family-token",),
+            owner_faction_id=None,
+            owner_detachment_id=None,
+            source_package_hash="source-package-hash:test",
+            execution_record_ids=(),
+            module_path=None,
+            support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+        )
+    with pytest.raises(GameLifecycleError, match="RuntimeContentSupportStatus token"):
+        RuntimeContentManifestRow(
+            content_id="bad-status-type",
+            family=RuntimeContentModuleFamily.FACTION,
+            source_ids=("source:bad-status-type",),
+            owner_faction_id=None,
+            owner_detachment_id=None,
+            source_package_hash="source-package-hash:test",
+            execution_record_ids=(),
+            module_path=None,
+            support_status=cast(RuntimeContentSupportStatus, 17),
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported RuntimeContentSupportStatus"):
+        RuntimeContentManifestRow(
+            content_id="bad-status-token",
+            family=RuntimeContentModuleFamily.FACTION,
+            source_ids=("source:bad-status-token",),
+            owner_faction_id=None,
+            owner_detachment_id=None,
+            source_package_hash="source-package-hash:test",
+            execution_record_ids=(),
+            module_path=None,
+            support_status=cast(RuntimeContentSupportStatus, "bad-status"),
+        )
+    with pytest.raises(GameLifecycleError, match="dependency_ids must not contain duplicates"):
+        _manifest_row(
+            content_id="duplicate-dependencies",
+            family=RuntimeContentModuleFamily.FACTION,
+            module_path="tests.runtime_content_duplicate_dependencies",
+            dependency_ids=("dependency-a", "dependency-a"),
+        )
+    with pytest.raises(GameLifecycleError, match="content_id must not be empty"):
+        RuntimeContentManifestRow(
+            content_id=" ",
+            family=RuntimeContentModuleFamily.FACTION,
+            source_ids=("source:blank",),
+            owner_faction_id=None,
+            owner_detachment_id=None,
+            source_package_hash="source-package-hash:test",
+            execution_record_ids=(),
+            module_path=None,
+            support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+        )
+    with pytest.raises(GameLifecycleError, match="absolute and normalized"):
+        _manifest_row(
+            content_id="bad-module-path",
+            family=RuntimeContentModuleFamily.FACTION,
+            module_path="tests..runtime_content",
+        )
+    duplicate_owner_catalog = _catalog_with_duplicate_runtime_enhancement_owner()
+    with pytest.raises(GameLifecycleError, match="multiple owners"):
+        RuntimeContentManifest.from_catalog(catalog=duplicate_owner_catalog, generated_rows=())
+    with pytest.raises(GameLifecycleError, match="requires activation"):
+        RuntimeContentManifest(rows=(valid_row,)).resolve_activation(
+            cast(RuntimeContentActivation, object())
         )
 
 
 def test_runtime_event_index_dispatches_matching_subscriptions_deterministically() -> None:
     seen: list[str] = []
+    config = _config()
+    state = GameState.from_config(config)
+    decisions = DecisionController()
 
-    def first_handler(event: RuntimeContentEvent) -> RuntimeContentEventResult:
-        seen.append(f"first:{event.event_id}")
+    def first_handler(context: RuntimeContentEventContext) -> RuntimeContentEventResult:
+        seen.append(f"first:{context.event.event_id}:{context.state.game_id}")
         return RuntimeContentEventResult(
             subscription_id="subscription-a",
             source_rule_id="source:first",
             status=RuntimeEventStatus.APPLIED,
-            replay_payload={"event_id": event.event_id},
+            replay_payload={"event_id": context.event.event_id},
         )
 
-    def second_handler(event: RuntimeContentEvent) -> RuntimeContentEventResult:
-        seen.append(f"second:{event.event_id}")
+    def second_handler(context: RuntimeContentEventContext) -> RuntimeContentEventResult:
+        seen.append(f"second:{context.event.event_id}:{context.army_catalog.catalog_id}")
         return RuntimeContentEventResult.applied(
             RuntimeContentEventSubscription(
                 subscription_id="subscription-b",
                 source_rule_id="source:second",
                 trigger_kind=TimingTriggerKind.START_PHASE,
-                handler=second_handler,
+                handler_id="handler:second",
             )
         )
 
@@ -182,21 +407,34 @@ def test_runtime_event_index_dispatches_matching_subscriptions_deterministically
                 subscription_id="subscription-b",
                 source_rule_id="source:second",
                 trigger_kind=TimingTriggerKind.START_PHASE,
-                handler=second_handler,
+                handler_id="handler:second",
             ),
             RuntimeContentEventSubscription(
                 subscription_id="subscription-a",
                 source_rule_id="source:first",
                 trigger_kind=TimingTriggerKind.START_PHASE,
-                handler=first_handler,
+                handler_id="handler:first",
             ),
             RuntimeContentEventSubscription(
                 subscription_id="subscription-c",
                 source_rule_id="source:wrong-trigger",
                 trigger_kind=TimingTriggerKind.END_PHASE,
-                handler=first_handler,
+                handler_id="handler:first",
+                filters={"player_id": "player-b"},
             ),
-        )
+        ),
+        handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+            (
+                RuntimeContentEventHandlerBinding(
+                    handler_id="handler:first",
+                    handler=first_handler,
+                ),
+                RuntimeContentEventHandlerBinding(
+                    handler_id="handler:second",
+                    handler=second_handler,
+                ),
+            )
+        ),
     )
 
     results = index.dispatch(
@@ -208,14 +446,21 @@ def test_runtime_event_index_dispatches_matching_subscriptions_deterministically
             phase=BattlePhase.MOVEMENT,
             active_player_id="player-a",
             trigger_kind=TimingTriggerKind.START_PHASE,
-        )
+        ),
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
     )
 
     assert [result.subscription_id for result in results] == [
         "subscription-a",
         "subscription-b",
     ]
-    assert seen == ["first:runtime-event-1", "second:runtime-event-1"]
+    assert seen == [
+        "first:runtime-event-1:runtime-content-game",
+        "second:runtime-event-1:phase9a-canonical",
+    ]
     assert RuntimeContentEventResult.from_payload(results[0].to_payload()) == results[0]
 
     with pytest.raises(GameLifecycleError, match="subscription IDs must be unique"):
@@ -225,15 +470,23 @@ def test_runtime_event_index_dispatches_matching_subscriptions_deterministically
                     subscription_id="subscription-a",
                     source_rule_id="source:first",
                     trigger_kind=TimingTriggerKind.START_PHASE,
-                    handler=first_handler,
+                    handler_id="handler:first",
                 ),
                 RuntimeContentEventSubscription(
                     subscription_id="subscription-a",
                     source_rule_id="source:duplicate",
                     trigger_kind=TimingTriggerKind.START_PHASE,
-                    handler=first_handler,
+                    handler_id="handler:first",
                 ),
-            )
+            ),
+            handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+                (
+                    RuntimeContentEventHandlerBinding(
+                        handler_id="handler:first",
+                        handler=first_handler,
+                    ),
+                )
+            ),
         )
 
 
@@ -313,6 +566,8 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
         "record:runtime-ambush"
     ]
     assert "core:hazardous" in summary["ability_handler_ids"]
+    assert summary["contribution_ids"] == ["runtime-content:module-default"]
+    assert len(summary["bundle_summary_hash"]) == 64
     assert "object at 0x" not in encoded
     assert "<" not in encoded
 
@@ -325,29 +580,54 @@ def test_lifecycle_rebuilds_runtime_content_bundle_without_serializing_callables
     summary = _runtime_content_bundle(lifecycle).to_summary_payload()
 
     rebuilt = GameLifecycle.from_payload(payload)
+    audit_payload = payload.get("runtime_content_audit")
 
     assert _runtime_content_bundle(rebuilt).to_summary_payload() == summary
     assert summary["activation"]["selected_faction_ids"] == ["core-marine-force"]
-    assert "runtime_content_bundle" not in json.dumps(payload, sort_keys=True)
+    assert isinstance(audit_payload, dict)
+    assert audit_payload["bundle_summary_hash"] == summary["bundle_summary_hash"]
     assert "object at 0x" not in json.dumps(summary, sort_keys=True)
+    assert "object at 0x" not in json.dumps(payload, sort_keys=True)
 
 
 def test_runtime_builder_loads_core_source_only_content_and_validates_ruleset() -> None:
-    bundle = build_runtime_content_bundle(_canonical_lifecycle_config())
+    config = _canonical_lifecycle_config()
+    bundle = build_runtime_content_bundle(config)
     summary = bundle.to_summary_payload()
 
     assert summary["activation"]["selected_faction_ids"] == ["core-marine-force"]
+    assert summary["selected_module_paths"] == []
     assert "core:hazardous" in summary["ability_handler_ids"]
+    manifest_row = runtime_content_manifest_for_ruleset(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        config=config,
+    ).row_for_content_id("core-marine-force")
+    assert manifest_row.support_status is RuntimeContentSupportStatus.SOURCE_ONLY
     assert (
         runtime_content_module_index_for_ruleset(RulesetDescriptor.warhammer_40000_eleventh())
-        .faction_modules["core-marine-force"]
-        .endswith(".common.empty")
+        .faction_modules["death-guard"]
+        .endswith(".death_guard.manifest")
+    )
+    assert (
+        runtime_content_activation_for_armies(
+            config=config,
+            armies=tuple(
+                muster_army(catalog=config.army_catalog, request=request)
+                for request in config.army_muster_requests
+            ),
+        ).activation_hash
+        == bundle.activation.activation_hash
     )
 
     with pytest.raises(GameLifecycleError, match="requires GameConfig"):
         build_runtime_content_bundle(cast(GameConfig, object()))
     with pytest.raises(GameLifecycleError, match="requires RulesetDescriptor"):
         runtime_content_module_index_for_ruleset(cast(RulesetDescriptor, object()))
+    with pytest.raises(GameLifecycleError, match="requires GameConfig"):
+        runtime_content_manifest_for_ruleset(
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            config=cast(GameConfig, object()),
+        )
 
 
 def test_runtime_loader_validates_module_contract_and_skips_unmapped_wargear_refs(
@@ -364,31 +644,41 @@ def test_runtime_loader_validates_module_contract_and_skips_unmapped_wargear_ref
         selected_weapon_keywords=(),
         loaded_unit_instance_ids=(),
     )
-    module_index = RuntimeContentModuleIndex(
-        faction_modules={"faction-alpha": "tests.runtime_content_contract_module"},
-        detachment_modules={},
-        enhancement_modules={},
-        stratagem_modules={},
-        datasheet_modules={},
-        wargear_modules={},
-        weapon_profile_modules={},
+    manifest = RuntimeContentManifest(
+        rows=(
+            _manifest_row(
+                content_id="faction-alpha",
+                family=RuntimeContentModuleFamily.FACTION,
+                module_path="tests.runtime_content_contract_module",
+            ),
+            _manifest_row(
+                content_id="source-only-wargear",
+                family=RuntimeContentModuleFamily.WARGEAR,
+                support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+                dependency_ids=("source-only-profile",),
+            ),
+            _manifest_row(
+                content_id="source-only-profile",
+                family=RuntimeContentModuleFamily.WEAPON_PROFILE,
+                support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+            ),
+        )
     )
     module = ModuleType("tests.runtime_content_contract_module")
     monkeypatch.setitem(sys.modules, "tests.runtime_content_contract_module", module)
+    resolved_activation = manifest.resolve_activation(activation)
 
-    assert module_index.module_paths_for_activation(activation) == (
-        "tests.runtime_content_contract_module",
-    )
+    assert resolved_activation.selected_module_paths == ("tests.runtime_content_contract_module",)
     with pytest.raises(GameLifecycleError, match="must expose runtime_contribution"):
-        load_runtime_content_contributions(activation=activation, module_index=module_index)
+        load_runtime_content_contributions(activation=resolved_activation, manifest=manifest)
 
     module.__dict__["runtime_contribution"] = "not-callable"
     with pytest.raises(GameLifecycleError, match="must be callable"):
-        load_runtime_content_contributions(activation=activation, module_index=module_index)
+        load_runtime_content_contributions(activation=resolved_activation, manifest=manifest)
 
     module.__dict__["runtime_contribution"] = lambda: object()
     with pytest.raises(GameLifecycleError, match="returned invalid"):
-        load_runtime_content_contributions(activation=activation, module_index=module_index)
+        load_runtime_content_contributions(activation=resolved_activation, manifest=manifest)
 
     with pytest.raises(GameLifecycleError, match="must be a mapping"):
         RuntimeContentModuleIndex(
@@ -475,6 +765,7 @@ def test_pilot_faction_content_modules_have_expected_export_shapes() -> None:
 
 
 def test_real_edition_index_loads_only_selected_pilot_faction_modules() -> None:
+    config = _canonical_lifecycle_config()
     activation = RuntimeContentActivation(
         selected_faction_ids=("death-guard",),
         selected_detachment_ids=("tallyband-summoners",),
@@ -486,17 +777,18 @@ def test_real_edition_index_loads_only_selected_pilot_faction_modules() -> None:
         selected_weapon_keywords=(),
         loaded_unit_instance_ids=("death-guard:unit-1",),
     )
-    module_index = runtime_content_module_index_for_ruleset(
-        RulesetDescriptor.warhammer_40000_eleventh()
+    manifest = runtime_content_manifest_for_ruleset(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        config=config,
     )
+    resolved_activation = manifest.resolve_activation(activation)
 
-    module_paths = module_index.module_paths_for_activation(activation)
     contributions = load_runtime_content_contributions(
-        activation=activation,
-        module_index=module_index,
+        activation=resolved_activation,
+        manifest=manifest,
     )
 
-    assert module_paths == (
+    assert resolved_activation.selected_module_paths == (
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th."
         "death_guard.detachments.tallyband_summoners.manifest",
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.manifest",
@@ -504,11 +796,25 @@ def test_real_edition_index_loads_only_selected_pilot_faction_modules() -> None:
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.units.typhus",
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.wargear.plague_weapons",
     )
-    assert contributions == (RuntimeContentContribution(),) * 5
+    assert {contribution.contribution_id for contribution in contributions} == set(
+        resolved_activation.selected_module_paths
+    )
+    assert "phase17f:phase17e:death-guard:army-rule" in (
+        resolved_activation.selected_execution_record_ids
+    )
+    assert (
+        runtime_content_module_index_for_ruleset(RulesetDescriptor.warhammer_40000_eleventh())
+        .wargear_modules["plague-weapons"]
+        .endswith(".death_guard.wargear.plague_weapons")
+    )
 
 
 def test_runtime_event_results_and_dispatch_fail_closed() -> None:
-    def handler(_event: RuntimeContentEvent) -> RuntimeContentEventResult:
+    config = _config()
+    state = GameState.from_config(config)
+    decisions = DecisionController()
+
+    def handler(_context: RuntimeContentEventContext) -> RuntimeContentEventResult:
         return RuntimeContentEventResult.invalid(
             subscription,
             reason="rule_invalid",
@@ -519,7 +825,7 @@ def test_runtime_event_results_and_dispatch_fail_closed() -> None:
         subscription_id="subscription-runtime",
         source_rule_id="source:runtime",
         trigger_kind=TimingTriggerKind.START_PHASE,
-        handler=handler,
+        handler_id="handler:runtime",
     )
     event = RuntimeContentEvent.from_payload(
         {
@@ -536,8 +842,24 @@ def test_runtime_event_results_and_dispatch_fail_closed() -> None:
         }
     )
 
-    index = RuntimeContentEventIndex.from_subscriptions((subscription,))
-    result = index.dispatch(event)[0]
+    index = RuntimeContentEventIndex.from_subscriptions(
+        (subscription,),
+        handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+            (
+                RuntimeContentEventHandlerBinding(
+                    handler_id="handler:runtime",
+                    handler=handler,
+                ),
+            )
+        ),
+    )
+    result = index.dispatch(
+        event,
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
+    )[0]
 
     assert event.target_unit_instance_ids == ("unit-a", "unit-b")
     assert result.status is RuntimeEventStatus.INVALID
@@ -564,23 +886,33 @@ def test_runtime_event_results_and_dispatch_fail_closed() -> None:
             status=RuntimeEventStatus.INVALID,
         )
     with pytest.raises(GameLifecycleError, match="must be callable"):
-        RuntimeContentEventSubscription(
-            subscription_id="subscription-bad",
-            source_rule_id="source:bad",
-            trigger_kind=TimingTriggerKind.START_PHASE,
+        RuntimeContentEventHandlerBinding(
+            handler_id="handler:bad",
             handler=cast(RuntimeEventHandler, None),
         )
     with pytest.raises(GameLifecycleError, match="requires a TimingTriggerKind"):
         index.subscriptions_for(cast(TimingTriggerKind, "start_phase"))
+    with pytest.raises(GameLifecycleError, match="references missing handler"):
+        RuntimeContentEventIndex.from_subscriptions(
+            (
+                RuntimeContentEventSubscription(
+                    subscription_id="subscription-missing",
+                    source_rule_id="source:missing",
+                    trigger_kind=TimingTriggerKind.START_PHASE,
+                    handler_id="handler:missing",
+                ),
+            ),
+            handler_registry=RuntimeContentEventHandlerRegistry.empty(),
+        )
 
     other_subscription = RuntimeContentEventSubscription(
         subscription_id="subscription-other",
         source_rule_id="source:runtime",
         trigger_kind=TimingTriggerKind.START_PHASE,
-        handler=handler,
+        handler_id="handler:other",
     )
 
-    def drifting_handler(_event: RuntimeContentEvent) -> RuntimeContentEventResult:
+    def drifting_handler(_context: RuntimeContentEventContext) -> RuntimeContentEventResult:
         return RuntimeContentEventResult.applied(other_subscription)
 
     drift_index = RuntimeContentEventIndex.from_subscriptions(
@@ -589,12 +921,247 @@ def test_runtime_event_results_and_dispatch_fail_closed() -> None:
                 subscription_id="subscription-runtime",
                 source_rule_id="source:runtime",
                 trigger_kind=TimingTriggerKind.START_PHASE,
-                handler=drifting_handler,
+                handler_id="handler:drift",
             ),
-        )
+        ),
+        handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+            (
+                RuntimeContentEventHandlerBinding(
+                    handler_id="handler:drift",
+                    handler=drifting_handler,
+                ),
+            )
+        ),
     )
     with pytest.raises(GameLifecycleError, match="subscription_id drift"):
-        drift_index.dispatch(event)
+        drift_index.dispatch(
+            event,
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+        )
+
+
+def test_runtime_event_filters_and_module_index_validation_are_fail_closed() -> None:
+    config = _config()
+    state = GameState.from_config(config)
+    decisions = DecisionController()
+
+    def unexpected_handler(_context: RuntimeContentEventContext) -> RuntimeContentEventResult:
+        raise AssertionError("filtered subscription should not dispatch")
+
+    filtered_index = RuntimeContentEventIndex.from_subscriptions(
+        (
+            RuntimeContentEventSubscription(
+                subscription_id="subscription-active-player",
+                source_rule_id="source:active-player",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                handler_id="handler:unexpected",
+                filters={"active_player_id": "player-b"},
+            ),
+            RuntimeContentEventSubscription(
+                subscription_id="subscription-player",
+                source_rule_id="source:player",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                handler_id="handler:unexpected",
+                filters={"player_id": "player-b"},
+            ),
+            RuntimeContentEventSubscription(
+                subscription_id="subscription-source-unit",
+                source_rule_id="source:source-unit",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                handler_id="handler:unexpected",
+                filters={"source_unit_instance_id": "unit-b"},
+            ),
+        ),
+        handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+            (
+                RuntimeContentEventHandlerBinding(
+                    handler_id="handler:unexpected",
+                    handler=unexpected_handler,
+                ),
+            )
+        ),
+    )
+    event = RuntimeContentEvent(
+        event_id="event-filtered",
+        game_id="game-filtered",
+        player_id="player-a",
+        battle_round=1,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        phase=None,
+        active_player_id="player-a",
+        source_unit_instance_id="unit-a",
+    )
+
+    assert (
+        filtered_index.dispatch(
+            event,
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+        )
+        == ()
+    )
+    assert filtered_index.to_summary_payload()[0]["subscription_id"] == (
+        "subscription-active-player"
+    )
+    assert (
+        RuntimeContentEventHandlerBinding(
+            handler_id="handler:summary",
+            handler=lambda context: RuntimeContentEventResult.applied(
+                RuntimeContentEventSubscription(
+                    subscription_id="subscription:summary",
+                    source_rule_id=context.event.event_id,
+                    trigger_kind=context.event.trigger_kind,
+                    handler_id="handler:summary",
+                )
+            ),
+        ).to_summary_payload()["handler_id"]
+        == "handler:summary"
+    )
+
+    with pytest.raises(GameLifecycleError, match="filters must be a mapping"):
+        RuntimeContentEventSubscription(
+            subscription_id="subscription-bad-filter",
+            source_rule_id="source:bad-filter",
+            trigger_kind=TimingTriggerKind.START_PHASE,
+            handler_id="handler:unexpected",
+            filters=cast(Mapping[str, JsonValue], ()),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="target_unit_instance_ids must not contain duplicates",
+    ):
+        RuntimeContentEvent(
+            event_id="event-duplicate-targets",
+            game_id="game-filtered",
+            player_id="player-a",
+            battle_round=1,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+            target_unit_instance_ids=("unit-a", "unit-a"),
+        )
+    with pytest.raises(GameLifecycleError, match="battle_round must be positive"):
+        RuntimeContentEvent(
+            event_id="event-invalid-round",
+            game_id="game-filtered",
+            player_id="player-a",
+            battle_round=0,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        )
+    with pytest.raises(GameLifecycleError, match="RuntimeEventStatus token"):
+        RuntimeContentEventResult(
+            subscription_id="subscription-bad-status",
+            source_rule_id="source:bad-status",
+            status=cast(RuntimeEventStatus, 17),
+            reason="bad_status",
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported RuntimeEventStatus"):
+        RuntimeContentEventResult(
+            subscription_id="subscription-bad-status-token",
+            source_rule_id="source:bad-status-token",
+            status=cast(RuntimeEventStatus, "bad-status"),
+            reason="bad_status",
+        )
+    with pytest.raises(GameLifecycleError, match="handler bindings must be a tuple"):
+        RuntimeContentEventHandlerRegistry.from_bindings(
+            cast(tuple[RuntimeContentEventHandlerBinding, ...], [])
+        )
+    with pytest.raises(GameLifecycleError, match="must contain RuntimeContentEventHandlerBinding"):
+        RuntimeContentEventHandlerRegistry.from_bindings(
+            cast(tuple[RuntimeContentEventHandlerBinding, ...], (object(),))
+        )
+    with pytest.raises(GameLifecycleError, match="handler IDs must be unique"):
+        RuntimeContentEventHandlerRegistry.from_bindings(
+            (
+                RuntimeContentEventHandlerBinding(
+                    handler_id="handler:duplicate",
+                    handler=unexpected_handler,
+                ),
+                RuntimeContentEventHandlerBinding(
+                    handler_id="handler:duplicate",
+                    handler=unexpected_handler,
+                ),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="requires handler registry"):
+        RuntimeContentEventIndex.from_subscriptions(
+            (),
+            handler_registry=cast(RuntimeContentEventHandlerRegistry, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="subscriptions must be a tuple"):
+        RuntimeContentEventIndex.from_subscriptions(
+            cast(tuple[RuntimeContentEventSubscription, ...], []),
+            handler_registry=RuntimeContentEventHandlerRegistry.empty(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires a RuntimeContentEvent"):
+        filtered_index.dispatch(
+            cast(RuntimeContentEvent, object()),
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
+        )
+
+    module_index = RuntimeContentModuleIndex(
+        faction_modules={"faction-alpha": "tests.runtime_content_alpha"},
+        detachment_modules={"detachment-alpha": "tests.runtime_content_detachment"},
+        enhancement_modules={},
+        stratagem_modules={},
+        datasheet_modules={},
+        wargear_modules={},
+        weapon_profile_modules={},
+    )
+    activation = RuntimeContentActivation(
+        selected_faction_ids=("faction-alpha",),
+        selected_detachment_ids=("detachment-alpha",),
+        selected_enhancement_ids=(),
+        selected_stratagem_ids=(),
+        selected_datasheet_ids=(),
+        selected_wargear_ids=("source-only-wargear",),
+        selected_weapon_profile_ids=("source-only-profile",),
+        selected_weapon_keywords=(),
+        loaded_unit_instance_ids=(),
+    )
+
+    assert module_index.module_paths_for_activation(activation) == (
+        "tests.runtime_content_alpha",
+        "tests.runtime_content_detachment",
+    )
+    assert (
+        RuntimeContentModuleIndex.empty().refs_for_activation(
+            RuntimeContentActivation(
+                selected_faction_ids=(),
+                selected_detachment_ids=(),
+                selected_enhancement_ids=(),
+                selected_stratagem_ids=(),
+                selected_datasheet_ids=(),
+                selected_wargear_ids=("source-only-wargear",),
+                selected_weapon_profile_ids=("source-only-profile",),
+                selected_weapon_keywords=(),
+                loaded_unit_instance_ids=(),
+            )
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="lookup requires activation"):
+        module_index.refs_for_activation(cast(RuntimeContentActivation, object()))
+    with pytest.raises(GameLifecycleError, match="missing selected support"):
+        RuntimeContentModuleIndex.empty().refs_for_activation(
+            RuntimeContentActivation(
+                selected_faction_ids=("missing-faction",),
+                selected_detachment_ids=(),
+                selected_enhancement_ids=(),
+                selected_stratagem_ids=(),
+                selected_datasheet_ids=(),
+                selected_wargear_ids=(),
+                selected_weapon_profile_ids=(),
+                selected_weapon_keywords=(),
+                loaded_unit_instance_ids=(),
+            )
+        )
 
 
 def _manual_activation(
@@ -612,6 +1179,29 @@ def _manual_activation(
         selected_weapon_profile_ids=(),
         selected_weapon_keywords=(),
         loaded_unit_instance_ids=(),
+    )
+
+
+def _manifest_row(
+    *,
+    content_id: str,
+    family: RuntimeContentModuleFamily,
+    module_path: str | None = None,
+    support_status: RuntimeContentSupportStatus = RuntimeContentSupportStatus.SUPPORTED,
+    dependency_ids: tuple[str, ...] = (),
+    execution_record_ids: tuple[str, ...] = (),
+) -> RuntimeContentManifestRow:
+    return RuntimeContentManifestRow(
+        content_id=content_id,
+        family=family,
+        source_ids=(f"source:{content_id}",),
+        owner_faction_id=None,
+        owner_detachment_id=None,
+        source_package_hash="source-package-hash:test",
+        execution_record_ids=execution_record_ids,
+        module_path=module_path,
+        support_status=support_status,
+        dependency_ids=dependency_ids,
     )
 
 
@@ -891,6 +1481,18 @@ def _catalog_with_hazardous_bolt_rifle(catalog: ArmyCatalog) -> ArmyCatalog:
             )
         )
     return replace(catalog, wargear=tuple(updated_wargear))
+
+
+def _catalog_with_duplicate_runtime_enhancement_owner() -> ArmyCatalog:
+    catalog = _catalog_with_runtime_detachment_selection(
+        ArmyCatalog.phase9a_canonical_content_pack()
+    )
+    primary_detachment = catalog.detachments[0]
+    duplicate_detachment = replace(
+        primary_detachment,
+        detachment_id="core-combined-arms-duplicate",
+    )
+    return replace(catalog, detachments=(primary_detachment, duplicate_detachment))
 
 
 def _catalog_with_runtime_detachment_selection(catalog: ArmyCatalog) -> ArmyCatalog:

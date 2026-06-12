@@ -3,23 +3,19 @@ from __future__ import annotations
 import importlib
 from collections.abc import Mapping
 from dataclasses import dataclass
-from enum import StrEnum
 from types import MappingProxyType, ModuleType
 from typing import Self, cast
 
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
-from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.bundle import (
+    DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
+    RuntimeContentContribution,
+)
+from warhammer40k_core.engine.faction_content.manifest import (
+    RuntimeContentManifest,
+    RuntimeContentModuleFamily,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
-
-
-class RuntimeContentModuleFamily(StrEnum):
-    FACTION = "faction"
-    DETACHMENT = "detachment"
-    ENHANCEMENT = "enhancement"
-    STRATAGEM = "stratagem"
-    DATASHEET = "datasheet"
-    WARGEAR = "wargear"
-    WEAPON_PROFILE = "weapon_profile"
 
 
 @dataclass(frozen=True, slots=True)
@@ -159,12 +155,14 @@ class RuntimeContentModuleIndex:
 def load_runtime_content_contributions(
     *,
     activation: RuntimeContentActivation,
-    module_index: RuntimeContentModuleIndex,
+    manifest: RuntimeContentManifest,
 ) -> tuple[RuntimeContentContribution, ...]:
-    if type(module_index) is not RuntimeContentModuleIndex:
-        raise GameLifecycleError("Runtime content loading requires a module index.")
+    if type(activation) is not RuntimeContentActivation:
+        raise GameLifecycleError("Runtime content loading requires activation.")
+    if type(manifest) is not RuntimeContentManifest:
+        raise GameLifecycleError("Runtime content loading requires a manifest.")
     contributions: list[RuntimeContentContribution] = []
-    for module_path in module_index.module_paths_for_activation(activation):
+    for module_path in activation.selected_module_paths:
         module = importlib.import_module(module_path)
         contribution = _runtime_contribution_from_module(module)
         contributions.append(contribution)
@@ -184,6 +182,8 @@ def _runtime_contribution_from_module(module: ModuleType) -> RuntimeContentContr
         raise GameLifecycleError(
             "Runtime content module returned invalid RuntimeContentContribution."
         )
+    if contribution.contribution_id == DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID:
+        contribution = contribution.with_contribution_id(module.__name__)
     return contribution
 
 

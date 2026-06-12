@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -15,9 +16,11 @@ from warhammer40k_core.engine.abilities import (
 )
 from warhammer40k_core.engine.ability_catalog import build_player_ability_index
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
+    RuntimeContentEventHandlerBinding,
+    RuntimeContentEventHandlerRegistry,
     RuntimeContentEventIndex,
     RuntimeContentEventSubscription,
 )
@@ -46,6 +49,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 
 class RuntimeContentBundleSummaryPayload(TypedDict):
     activation: dict[str, JsonValue]
+    selected_module_paths: list[str]
+    source_package_hashes: list[str]
+    contribution_ids: list[str]
     ability_index_record_ids_by_player_id: dict[str, list[str]]
     stratagem_index_record_ids_by_player_id: dict[str, list[str]]
     ability_handler_ids: list[str]
@@ -53,6 +59,11 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     rule_runtime_binding_ids: list[str]
     event_subscriptions: list[dict[str, JsonValue]]
     faction_execution_record_ids: list[str]
+    selected_execution_record_ids: list[str]
+    bundle_summary_hash: str
+
+
+DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID = "runtime-content:module-default"
 
 
 def _empty_named_handlers() -> Mapping[str, FactionRuleNamedHandler]:
@@ -61,17 +72,24 @@ def _empty_named_handlers() -> Mapping[str, FactionRuleNamedHandler]:
 
 @dataclass(frozen=True, slots=True)
 class RuntimeContentContribution:
+    contribution_id: str = DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID
     ability_records: tuple[AbilityCatalogRecord, ...] = ()
     stratagem_records: tuple[StratagemCatalogRecord, ...] = ()
     ability_handler_bindings: tuple[AbilityHandlerBinding, ...] = ()
     stratagem_handler_bindings: tuple[StratagemHandlerBinding, ...] = ()
     rule_runtime_bindings: tuple[RuleRuntimeBinding, ...] = ()
     event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
+    event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
         default_factory=_empty_named_handlers
     )
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "contribution_id",
+            _validate_identifier("contribution_id", self.contribution_id),
+        )
         object.__setattr__(
             self,
             "ability_records",
@@ -128,8 +146,30 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "event_handler_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution event_handler_bindings",
+                self.event_handler_bindings,
+                RuntimeContentEventHandlerBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "faction_named_handlers",
             _validate_named_handlers(self.faction_named_handlers),
+        )
+
+    def with_contribution_id(self, contribution_id: str) -> RuntimeContentContribution:
+        return RuntimeContentContribution(
+            contribution_id=contribution_id,
+            ability_records=self.ability_records,
+            stratagem_records=self.stratagem_records,
+            ability_handler_bindings=self.ability_handler_bindings,
+            stratagem_handler_bindings=self.stratagem_handler_bindings,
+            rule_runtime_bindings=self.rule_runtime_bindings,
+            event_subscriptions=self.event_subscriptions,
+            event_handler_bindings=self.event_handler_bindings,
+            faction_named_handlers=self.faction_named_handlers,
         )
 
 
@@ -143,6 +183,7 @@ class RuntimeContentBundle:
     rule_execution_registry: RuleExecutionRegistry
     faction_rule_execution_registry: FactionRuleExecutionRegistry
     event_index: RuntimeContentEventIndex
+    contribution_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if type(self.activation) is not RuntimeContentActivation:
@@ -175,6 +216,11 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires FactionRuleExecutionRegistry.")
         if type(self.event_index) is not RuntimeContentEventIndex:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
+        object.__setattr__(
+            self,
+            "contribution_ids",
+            _validate_identifier_tuple("contribution_ids", self.contribution_ids),
+        )
 
     @classmethod
     def from_contributions(
@@ -251,12 +297,24 @@ class RuntimeContentBundle:
             records,
             named_handlers=named_handlers,
         )
+        contribution_ids = _validate_identifier_tuple(
+            "contribution_ids",
+            tuple(contribution.contribution_id for contribution in validated_contributions),
+        )
+        event_handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.event_handler_bindings
+            )
+        )
         event_index = RuntimeContentEventIndex.from_subscriptions(
             tuple(
                 subscription
                 for contribution in validated_contributions
                 for subscription in contribution.event_subscriptions
-            )
+            ),
+            handler_registry=event_handler_registry,
         )
         return cls(
             activation=activation,
@@ -274,6 +332,7 @@ class RuntimeContentBundle:
             rule_execution_registry=rule_registry,
             faction_rule_execution_registry=faction_registry,
             event_index=event_index,
+            contribution_ids=contribution_ids,
         )
 
     def to_summary_payload(self) -> RuntimeContentBundleSummaryPayload:
@@ -281,6 +340,9 @@ class RuntimeContentBundle:
             "activation": cast(
                 dict[str, JsonValue], validate_json_value(self.activation.to_payload())
             ),
+            "selected_module_paths": list(self.activation.selected_module_paths),
+            "source_package_hashes": list(self.activation.source_package_hashes),
+            "contribution_ids": list(self.contribution_ids),
             "ability_index_record_ids_by_player_id": {
                 player_id: [record.record_id for record in index.all_records()]
                 for player_id, index in self.ability_indexes_by_player_id.items()
@@ -302,7 +364,12 @@ class RuntimeContentBundle:
             "faction_execution_record_ids": [
                 record.execution_id for record in self.faction_rule_execution_registry.all_records()
             ],
+            "selected_execution_record_ids": list(self.activation.selected_execution_record_ids),
+            "bundle_summary_hash": "",
         }
+        payload["bundle_summary_hash"] = _summary_hash(
+            cast(Mapping[str, JsonValue], validate_json_value(payload))
+        )
         return cast(RuntimeContentBundleSummaryPayload, validate_json_value(payload))
 
 
@@ -479,3 +546,22 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Runtime content {field_name} must not be empty.")
     return stripped
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"Runtime content {field_name} must be a tuple.")
+    seen: set[str] = set()
+    identifiers: list[str] = []
+    for value in cast(tuple[object, ...], values):
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise GameLifecycleError(f"Runtime content {field_name} must not contain duplicates.")
+        seen.add(identifier)
+        identifiers.append(identifier)
+    return tuple(sorted(identifiers))
+
+
+def _summary_hash(payload: Mapping[str, JsonValue]) -> str:
+    serialized = canonical_json(validate_json_value(dict(payload)))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()

@@ -1739,6 +1739,10 @@ def _apply_stratagem_use(
         definition=definition,
         effect_selection=effect_selection,
     )
+    _validate_supported_stratagem_handler_available(
+        definition=definition,
+        stratagem_handler_registry=stratagem_handler_registry,
+    )
     spend_result: CommandPointSpendResult | None = None
     transaction_id: str | None = None
     if command_point_cost > 0:
@@ -4491,6 +4495,41 @@ def _apply_supported_stratagem_handler(
             definition=definition,
             use_record=use_record,
         )
+        return
+    raise GameLifecycleError("Stratagem handler is not supported.")
+
+
+def _validate_supported_stratagem_handler_available(
+    *,
+    definition: StratagemDefinition,
+    stratagem_handler_registry: StratagemHandlerRegistry | None,
+) -> None:
+    if definition.handler_id == "record_only":
+        return
+    if stratagem_handler_registry is not None:
+        from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+            StratagemHandlerRegistry,
+        )
+
+        if type(stratagem_handler_registry) is not StratagemHandlerRegistry:
+            raise GameLifecycleError("Stratagem handler registry is invalid.")
+        if stratagem_handler_registry.has_handler(definition.handler_id):
+            return
+    if definition.handler_id in {
+        CORE_COMMAND_REROLL_HANDLER_ID,
+        CORE_INSANE_BRAVERY_HANDLER_ID,
+        CORE_RAPID_INGRESS_HANDLER_ID,
+        CORE_NEW_ORDERS_HANDLER_ID,
+        CORE_FIRE_OVERWATCH_HANDLER_ID,
+        CORE_GO_TO_GROUND_HANDLER_ID,
+        CORE_EXPLOSIVES_HANDLER_ID,
+        CORE_SMOKESCREEN_HANDLER_ID,
+        CORE_COUNTEROFFENSIVE_HANDLER_ID,
+        CORE_CRUSHING_IMPACT_HANDLER_ID,
+        CORE_EPIC_CHALLENGE_HANDLER_ID,
+        CORE_HEROIC_INTERVENTION_HANDLER_ID,
+        GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+    }:
         return
     raise GameLifecycleError("Stratagem handler is not supported.")
 

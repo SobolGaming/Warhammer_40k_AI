@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Self, TypedDict
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine.army_mustering import ArmyMusteringError, muster_army
 from warhammer40k_core.engine.attack_sequence import (
@@ -37,10 +37,14 @@ from warhammer40k_core.engine.deployment import (
     is_deployment_placement_request,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
 )
-from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle_for_armies
+from warhammer40k_core.engine.faction_content.runtime import (
+    build_runtime_content_bundle_for_armies,
+    runtime_content_activation_for_armies,
+)
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_INTERRUPT_DECISION_TYPE,
@@ -178,6 +182,7 @@ class GameLifecyclePayload(TypedDict):
     state: GameStatePayload
     decisions: DecisionControllerPayload
     reaction_queue: ReactionQueuePayload
+    runtime_content_audit: NotRequired[dict[str, JsonValue]]
 
 
 MAX_LIFECYCLE_TRANSITIONS = 128
@@ -287,6 +292,7 @@ class GameLifecycle:
     )
     _battle_round_flow: BattleRoundFlow | None = None
     _runtime_content_bundle: RuntimeContentBundle | None = None
+    _runtime_content_audit: Mapping[str, JsonValue] | None = None
 
     def __post_init__(self) -> None:
         if type(self.parameterized_movement_proposals) is not bool:
@@ -1301,13 +1307,16 @@ class GameLifecycle:
 
     def to_payload(self) -> GameLifecyclePayload:
         state = self._require_state()
-        return {
+        payload: GameLifecyclePayload = {
             "config": None if self._config is None else self._config.to_payload(),
             "parameterized_movement_proposals": self.parameterized_movement_proposals,
             "state": state.to_payload(),
             "decisions": self.decision_controller.to_payload(),
             "reaction_queue": self.reaction_queue.to_payload(),
         }
+        if self._runtime_content_audit is not None:
+            payload["runtime_content_audit"] = dict(self._runtime_content_audit)
+        return payload
 
     @classmethod
     def from_payload(cls, payload: GameLifecyclePayload) -> Self:
@@ -1323,6 +1332,9 @@ class GameLifecycle:
             state=GameState.from_payload(payload["state"]),
             parameterized_movement_proposals=parameterized_movement_proposals,
             _config=config,
+            _runtime_content_audit=_runtime_content_audit_from_payload(
+                payload.get("runtime_content_audit")
+            ),
             _movement_phase_handler=MovementPhaseHandler(
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor,
                 parameterized_proposals=parameterized_movement_proposals,
@@ -1389,16 +1401,29 @@ class GameLifecycle:
         return self._runtime_content_bundle
 
     def _refresh_runtime_content_bundle_if_armies_mustered(self) -> None:
-        if self._runtime_content_bundle is not None:
-            return
         if self._config is None:
             return
         state = self._require_state()
         if not state.army_definitions:
             return
+        activation = runtime_content_activation_for_armies(
+            config=self._config,
+            armies=tuple(state.army_definitions),
+        )
+        if (
+            self._runtime_content_bundle is not None
+            and self._runtime_content_bundle.activation.activation_hash
+            == activation.activation_hash
+        ):
+            return
         self._runtime_content_bundle = build_runtime_content_bundle_for_armies(
             config=self._config,
             armies=tuple(state.army_definitions),
+        )
+        summary = self._runtime_content_bundle.to_summary_payload()
+        self._runtime_content_audit = cast(
+            Mapping[str, JsonValue],
+            validate_json_value(summary),
         )
 
     def _result_resolves_active_reaction_frame(self, result: DecisionResult) -> bool:
@@ -1498,6 +1523,15 @@ def _payload_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+def _runtime_content_audit_from_payload(value: object) -> Mapping[str, JsonValue] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise GameLifecycleError("GameLifecycle runtime content audit must be a mapping.")
+    payload = cast(dict[object, object], value)
+    return cast(Mapping[str, JsonValue], validate_json_value(payload))
 
 
 def _destroyed_transport_attack_sequence_for_request(

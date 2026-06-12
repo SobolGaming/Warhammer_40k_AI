@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, muster_army
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 
@@ -19,6 +21,11 @@ class RuntimeContentActivationPayload(TypedDict):
     selected_weapon_profile_ids: list[str]
     selected_weapon_keywords: list[str]
     loaded_unit_instance_ids: list[str]
+    reachable_content_ids: list[str]
+    selected_module_paths: list[str]
+    source_package_hashes: list[str]
+    selected_execution_record_ids: list[str]
+    activation_hash: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +39,11 @@ class RuntimeContentActivation:
     selected_weapon_profile_ids: tuple[str, ...]
     selected_weapon_keywords: tuple[str, ...]
     loaded_unit_instance_ids: tuple[str, ...]
+    reachable_content_ids: tuple[str, ...] = ()
+    selected_module_paths: tuple[str, ...] = ()
+    source_package_hashes: tuple[str, ...] = ()
+    selected_execution_record_ids: tuple[str, ...] = ()
+    activation_hash: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -81,6 +93,34 @@ class RuntimeContentActivation:
             self,
             "loaded_unit_instance_ids",
             _validate_identifier_tuple("loaded_unit_instance_ids", self.loaded_unit_instance_ids),
+        )
+        object.__setattr__(
+            self,
+            "reachable_content_ids",
+            _validate_identifier_tuple("reachable_content_ids", self.reachable_content_ids),
+        )
+        object.__setattr__(
+            self,
+            "selected_module_paths",
+            _validate_identifier_tuple("selected_module_paths", self.selected_module_paths),
+        )
+        object.__setattr__(
+            self,
+            "source_package_hashes",
+            _validate_identifier_tuple("source_package_hashes", self.source_package_hashes),
+        )
+        object.__setattr__(
+            self,
+            "selected_execution_record_ids",
+            _validate_identifier_tuple(
+                "selected_execution_record_ids",
+                self.selected_execution_record_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "activation_hash",
+            _validate_optional_identifier("activation_hash", self.activation_hash),
         )
 
     @classmethod
@@ -162,6 +202,11 @@ class RuntimeContentActivation:
             "selected_weapon_profile_ids": list(self.selected_weapon_profile_ids),
             "selected_weapon_keywords": list(self.selected_weapon_keywords),
             "loaded_unit_instance_ids": list(self.loaded_unit_instance_ids),
+            "reachable_content_ids": list(self.reachable_content_ids),
+            "selected_module_paths": list(self.selected_module_paths),
+            "source_package_hashes": list(self.source_package_hashes),
+            "selected_execution_record_ids": list(self.selected_execution_record_ids),
+            "activation_hash": self.activation_hash,
         }
 
     @classmethod
@@ -176,6 +221,66 @@ class RuntimeContentActivation:
             selected_weapon_profile_ids=tuple(payload["selected_weapon_profile_ids"]),
             selected_weapon_keywords=tuple(payload["selected_weapon_keywords"]),
             loaded_unit_instance_ids=tuple(payload["loaded_unit_instance_ids"]),
+            reachable_content_ids=tuple(payload["reachable_content_ids"]),
+            selected_module_paths=tuple(payload["selected_module_paths"]),
+            source_package_hashes=tuple(payload["source_package_hashes"]),
+            selected_execution_record_ids=tuple(payload["selected_execution_record_ids"]),
+            activation_hash=payload["activation_hash"],
+        )
+
+    def roster_content_ids(self) -> tuple[str, ...]:
+        return _validate_identifier_tuple(
+            "roster_content_ids",
+            (
+                *self.selected_faction_ids,
+                *self.selected_detachment_ids,
+                *self.selected_enhancement_ids,
+                *self.selected_stratagem_ids,
+                *self.selected_datasheet_ids,
+                *self.selected_wargear_ids,
+                *self.selected_weapon_profile_ids,
+            ),
+        )
+
+    def with_reachable_content(
+        self,
+        *,
+        reachable_content_ids: tuple[str, ...],
+        selected_module_paths: tuple[str, ...],
+        source_package_hashes: tuple[str, ...],
+        selected_execution_record_ids: tuple[str, ...],
+    ) -> Self:
+        resolved = type(self)(
+            selected_faction_ids=self.selected_faction_ids,
+            selected_detachment_ids=self.selected_detachment_ids,
+            selected_enhancement_ids=self.selected_enhancement_ids,
+            selected_stratagem_ids=self.selected_stratagem_ids,
+            selected_datasheet_ids=self.selected_datasheet_ids,
+            selected_wargear_ids=self.selected_wargear_ids,
+            selected_weapon_profile_ids=self.selected_weapon_profile_ids,
+            selected_weapon_keywords=self.selected_weapon_keywords,
+            loaded_unit_instance_ids=self.loaded_unit_instance_ids,
+            reachable_content_ids=reachable_content_ids,
+            selected_module_paths=selected_module_paths,
+            source_package_hashes=source_package_hashes,
+            selected_execution_record_ids=selected_execution_record_ids,
+            activation_hash="",
+        )
+        return type(self)(
+            selected_faction_ids=resolved.selected_faction_ids,
+            selected_detachment_ids=resolved.selected_detachment_ids,
+            selected_enhancement_ids=resolved.selected_enhancement_ids,
+            selected_stratagem_ids=resolved.selected_stratagem_ids,
+            selected_datasheet_ids=resolved.selected_datasheet_ids,
+            selected_wargear_ids=resolved.selected_wargear_ids,
+            selected_weapon_profile_ids=resolved.selected_weapon_profile_ids,
+            selected_weapon_keywords=resolved.selected_weapon_keywords,
+            loaded_unit_instance_ids=resolved.loaded_unit_instance_ids,
+            reachable_content_ids=resolved.reachable_content_ids,
+            selected_module_paths=resolved.selected_module_paths,
+            source_package_hashes=resolved.source_package_hashes,
+            selected_execution_record_ids=resolved.selected_execution_record_ids,
+            activation_hash=_activation_hash(resolved),
         )
 
 
@@ -255,5 +360,18 @@ def _validate_identifier(field_name: str, value: object) -> str:
     return stripped
 
 
+def _validate_optional_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"Runtime content {field_name} must be a string.")
+    return value.strip()
+
+
 def _canonical_keyword(value: str) -> str:
     return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")
+
+
+def _activation_hash(activation: RuntimeContentActivation) -> str:
+    payload = activation.to_payload()
+    payload["activation_hash"] = ""
+    encoded = canonical_json(cast(JsonValue, payload)).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()

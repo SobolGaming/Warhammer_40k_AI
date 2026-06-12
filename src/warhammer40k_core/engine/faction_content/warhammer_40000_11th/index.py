@@ -1,52 +1,30 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.faction_content.loader import RuntimeContentModuleIndex
+from warhammer40k_core.engine.faction_content.manifest import RuntimeContentManifest
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.generated_manifest import (
+    generated_runtime_content_rows,
+)
 
-_BASE = "warhammer40k_core.engine.faction_content.warhammer_40000_11th"
-_EMPTY = f"{_BASE}.common.empty"
+
+def runtime_content_manifest(*, catalog: ArmyCatalog) -> RuntimeContentManifest:
+    return RuntimeContentManifest.from_catalog(
+        catalog=catalog,
+        generated_rows=generated_runtime_content_rows(),
+    )
 
 
 def runtime_content_module_index() -> RuntimeContentModuleIndex:
+    generated_index = RuntimeContentManifest(
+        rows=generated_runtime_content_rows()
+    ).to_module_index()
     return RuntimeContentModuleIndex(
-        faction_modules={
-            "core-marine-force": _EMPTY,
-            "death-guard": f"{_BASE}.death_guard.manifest",
-        },
-        detachment_modules={
-            "core-combined-arms": _EMPTY,
-            "flyblown-host": f"{_BASE}.death_guard.detachments.flyblown_host.manifest",
-            "tallyband-summoners": (
-                f"{_BASE}.death_guard.detachments.tallyband_summoners.manifest"
-            ),
-        },
-        enhancement_modules={},
-        stratagem_modules={},
-        datasheet_modules={
-            "core-boyz-like-infantry": _EMPTY,
-            "core-character-leader": _EMPTY,
-            "core-character-support": _EMPTY,
-            "core-deep-strike-unit": _EMPTY,
-            "core-intercessor-like-infantry": _EMPTY,
-            "core-transport": _EMPTY,
-            "core-vehicle-monster": _EMPTY,
-            "plague-marines": f"{_BASE}.death_guard.units.plague_marines",
-            "typhus": f"{_BASE}.death_guard.units.typhus",
-        },
-        wargear_modules={
-            "core-bolt-rifle": _EMPTY,
-            "core-drop-carbine": _EMPTY,
-            "core-heavy-cannon": _EMPTY,
-            "core-leader-blade": _EMPTY,
-            "core-mob-shoota": _EMPTY,
-            "core-transport-array": _EMPTY,
-            "plague-weapons": f"{_BASE}.death_guard.wargear.plague_weapons",
-        },
-        weapon_profile_modules={
-            "core-bolt-rifle:standard": _EMPTY,
-            "core-drop-carbine:standard": _EMPTY,
-            "core-heavy-cannon:standard": _EMPTY,
-            "core-leader-blade:standard": _EMPTY,
-            "core-mob-shoota:standard": _EMPTY,
-            "core-transport-array:standard": _EMPTY,
-        },
+        faction_modules=generated_index.faction_modules,
+        detachment_modules=generated_index.detachment_modules,
+        enhancement_modules=generated_index.enhancement_modules,
+        stratagem_modules=generated_index.stratagem_modules,
+        datasheet_modules=generated_index.datasheet_modules,
+        wargear_modules=generated_index.wargear_modules,
+        weapon_profile_modules=generated_index.weapon_profile_modules,
     )
