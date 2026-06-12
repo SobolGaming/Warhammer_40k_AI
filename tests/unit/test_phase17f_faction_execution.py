@@ -1,0 +1,469 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from collections.abc import Mapping
+from dataclasses import replace
+from typing import cast
+
+import pytest
+
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.engine.faction_rule_execution import (
+    FactionRuleExecutionContext,
+    FactionRuleExecutionRegistry,
+    FactionRuleExecutionResult,
+    FactionRuleExecutionStatus,
+    FactionRuleGenericIrExecutor,
+    FactionRuleNamedHandler,
+    default_faction_rule_execution_registry,
+)
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_coverage_2026_27 as faction_coverage_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_execution_2026_27 as faction_execution_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
+    Phase17ECoverageStatus,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
+    Phase17FExecutionBlockReason,
+    Phase17FExecutionPackage,
+    Phase17FExecutionPackagePayload,
+    Phase17FExecutionRecord,
+    Phase17FExecutionStatus,
+    Phase17FFactionExecutionError,
+)
+
+
+def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
+    coverage_package = faction_coverage_source.phase17e_coverage_package()
+    execution_package = faction_execution_source.phase17f_execution_package()
+    records_by_coverage_id = {
+        record.coverage_descriptor_id: record for record in execution_package.execution_records
+    }
+
+    assert set(records_by_coverage_id) == {
+        row.descriptor_id for row in coverage_package.coverage_rows
+    }
+    for coverage_row in coverage_package.coverage_rows:
+        execution_record = records_by_coverage_id[coverage_row.descriptor_id]
+        assert execution_record.coverage_kind is coverage_row.coverage_kind
+        assert execution_record.coverage_status is coverage_row.status
+        assert execution_record.faction_id == coverage_row.faction_id
+        assert execution_record.detachment_id == coverage_row.detachment_id
+        assert execution_record.source_ids == coverage_row.source_ids
+
+
+def test_phase17f_execution_payload_is_deterministic_json_safe_and_round_trips() -> None:
+    package = faction_execution_source.phase17f_execution_package()
+    payload = package.to_payload()
+
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    assert " object at 0x" not in encoded
+    assert (
+        payload["source_payload_checksum_sha256"]
+        == (
+            faction_execution_source.source_package_identity_payload()[
+                "source_payload_checksum_sha256"
+            ]
+        )
+    )
+    assert (
+        payload["upstream_payload_checksum_sha256"]
+        == (
+            faction_coverage_source.source_package_identity_payload()[
+                "source_payload_checksum_sha256"
+            ]
+        )
+    )
+    assert Phase17FExecutionPackage.from_payload(payload) == package
+
+    stale_payload = payload.copy()
+    stale_payload["source_payload_checksum_sha256"] = "0" * 64
+    with pytest.raises(Phase17FFactionExecutionError, match="checksum is stale"):
+        Phase17FExecutionPackage.from_payload(stale_payload)
+
+    stale_upstream_payload = payload.copy()
+    stale_upstream_payload["upstream_payload_checksum_sha256"] = "0" * 64
+    with pytest.raises(Phase17FFactionExecutionError, match="upstream payload checksum"):
+        Phase17FExecutionPackage.from_payload(stale_upstream_payload)
+
+    drifted_payload = package.to_payload()
+    drifted_payload["execution_records"][0]["faction_name"] = "Drifted Faction Name"
+    drifted_payload["source_payload_checksum_sha256"] = _payload_checksum(drifted_payload)
+    with pytest.raises(Phase17FFactionExecutionError, match="does not match Phase17E"):
+        Phase17FExecutionPackage.from_payload(drifted_payload)
+
+
+def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> None:
+    coverage_package = faction_coverage_source.phase17e_coverage_package()
+    execution_package = faction_execution_source.phase17f_execution_package()
+    coverage_status_counts = coverage_package.status_counts()
+    execution_status_counts = execution_package.status_counts()
+
+    assert execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR.value] == 0
+    assert execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER.value] == 0
+    assert (
+        execution_status_counts[Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED.value]
+        == coverage_status_counts[Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED.value]
+    )
+    assert (
+        execution_status_counts[
+            Phase17FExecutionStatus.BLOCKED_APPROVED_UNSUPPORTED_SOURCE_GAP.value
+        ]
+        == coverage_status_counts[Phase17ECoverageStatus.UNSUPPORTED.value]
+    )
+    assert len(execution_package.blocked_records()) == len(execution_package.execution_records)
+    assert execution_package.unapproved_blocked_records() == ()
+    assert all(record.is_approved_blocked for record in execution_package.blocked_records())
+
+
+def test_phase17f_registry_dispatches_every_record_without_missing_handlers() -> None:
+    registry = default_faction_rule_execution_registry()
+    context = _context()
+
+    for record in registry.all_records():
+        result = registry.execute(execution_id=record.execution_id, context=context)
+        assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
+        assert result.source_ids == record.source_ids
+        assert result.coverage_descriptor_id == record.coverage_descriptor_id
+        if record.execution_status is Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED:
+            assert result.reason == "structured_rule_semantics_required"
+        else:
+            assert result.reason == (
+                f"approved_phase17e_source_gap:{record.phase17e_unsupported_reason}"
+            )
+        assert FactionRuleExecutionResult.from_payload(result.to_payload()) == result
+
+
+def test_phase17f_registry_rejects_unknown_execution_id() -> None:
+    registry = default_faction_rule_execution_registry()
+
+    with pytest.raises(GameLifecycleError, match="missing execution record"):
+        registry.execute(execution_id="phase17f:missing", context=_context())
+
+
+def test_phase17f_registry_rejects_invalid_registry_inputs_and_contexts() -> None:
+    record = faction_execution_source.phase17f_execution_package().execution_records[0]
+
+    with pytest.raises(GameLifecycleError, match="records must be a tuple"):
+        FactionRuleExecutionRegistry.from_records(
+            cast(tuple[Phase17FExecutionRecord, ...], [record])
+        )
+
+    with pytest.raises(GameLifecycleError, match="records must contain"):
+        FactionRuleExecutionRegistry.from_records((cast(Phase17FExecutionRecord, object()),))
+
+    with pytest.raises(GameLifecycleError, match="record IDs must be unique"):
+        FactionRuleExecutionRegistry.from_records((record, record))
+
+    with pytest.raises(GameLifecycleError, match="named_handlers must be a mapping"):
+        FactionRuleExecutionRegistry.from_records(
+            (record,),
+            named_handlers=cast(Mapping[str, FactionRuleNamedHandler], object()),
+        )
+
+    with pytest.raises(GameLifecycleError, match="named handlers must be callable"):
+        FactionRuleExecutionRegistry.from_records(
+            (record,),
+            named_handlers=cast(
+                Mapping[str, FactionRuleNamedHandler],
+                {"handler": object()},
+            ),
+        )
+
+    with pytest.raises(GameLifecycleError, match="generic_ir_executor must be callable"):
+        FactionRuleExecutionRegistry.from_records(
+            (record,),
+            generic_ir_executor=cast(FactionRuleGenericIrExecutor, object()),
+        )
+
+    registry = FactionRuleExecutionRegistry.from_records((record,))
+    with pytest.raises(GameLifecycleError, match="requires a context"):
+        registry.execute(
+            execution_id=record.execution_id,
+            context=cast(FactionRuleExecutionContext, object()),
+        )
+
+
+def test_phase17f_registry_rejects_executable_records_without_registered_executor() -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    named_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+        block_reason=None,
+    )
+    generic_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        block_reason=None,
+        rule_ir_hash="0" * 64,
+        execution_id=f"{blocked_record.execution_id}:generic",
+    )
+    registry = FactionRuleExecutionRegistry.from_records((named_record, generic_record))
+
+    named_result = registry.execute(execution_id=named_record.execution_id, context=_context())
+    generic_result = registry.execute(execution_id=generic_record.execution_id, context=_context())
+
+    assert named_result.status is FactionRuleExecutionStatus.UNSUPPORTED
+    assert named_result.reason == "named_handler_not_registered"
+    assert generic_result.status is FactionRuleExecutionStatus.UNSUPPORTED
+    assert generic_result.reason == "generic_ir_executor_not_registered"
+
+
+def test_phase17f_registry_applies_executable_records_only_after_registered_executor_runs() -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    named_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+        block_reason=None,
+    )
+    generic_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        block_reason=None,
+        rule_ir_hash="0" * 64,
+        execution_id=f"{blocked_record.execution_id}:generic",
+    )
+    calls: list[str] = []
+    handler_id = _require_handler_id(named_record)
+
+    def named_handler(
+        record: Phase17FExecutionRecord,
+        context: FactionRuleExecutionContext,
+    ) -> FactionRuleExecutionResult:
+        calls.append(f"named:{record.execution_id}")
+        return FactionRuleExecutionResult.applied(record=record, context=context)
+
+    def generic_executor(
+        record: Phase17FExecutionRecord,
+        context: FactionRuleExecutionContext,
+    ) -> FactionRuleExecutionResult:
+        calls.append(f"generic:{record.execution_id}")
+        return FactionRuleExecutionResult.applied(record=record, context=context)
+
+    registry = FactionRuleExecutionRegistry.from_records(
+        (named_record, generic_record),
+        named_handlers={handler_id: named_handler},
+        generic_ir_executor=generic_executor,
+    )
+
+    named_result = registry.execute(execution_id=named_record.execution_id, context=_context())
+    generic_result = registry.execute(execution_id=generic_record.execution_id, context=_context())
+
+    assert calls == [
+        f"named:{named_record.execution_id}",
+        f"generic:{generic_record.execution_id}",
+    ]
+    assert named_result.status is FactionRuleExecutionStatus.APPLIED
+    assert generic_result.status is FactionRuleExecutionStatus.APPLIED
+    assert FactionRuleExecutionResult.from_payload(named_result.to_payload()) == named_result
+    assert FactionRuleExecutionResult.from_payload(generic_result.to_payload()) == generic_result
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "execution_id",
+        "coverage_descriptor_id",
+        "coverage_kind",
+        "faction_id",
+        "faction_name",
+        "detachment_id",
+        "detachment_name",
+        "handler_id",
+        "source_ids",
+    ],
+)
+def test_phase17f_registry_rejects_mismatched_executor_result(field_name: str) -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    executable_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+        block_reason=None,
+    )
+    baseline_result = FactionRuleExecutionResult.applied(
+        record=executable_record,
+        context=_context(),
+    )
+    mismatched_result = _mismatched_result_for_field(baseline_result, field_name)
+    handler_id = _require_handler_id(executable_record)
+
+    def mismatched_handler(
+        record: Phase17FExecutionRecord,
+        context: FactionRuleExecutionContext,
+    ) -> FactionRuleExecutionResult:
+        return mismatched_result
+
+    registry = FactionRuleExecutionRegistry.from_records(
+        (executable_record,),
+        named_handlers={handler_id: mismatched_handler},
+    )
+
+    with pytest.raises(GameLifecycleError, match=f"mismatched {field_name}"):
+        registry.execute(execution_id=executable_record.execution_id, context=_context())
+
+
+def test_phase17f_context_payload_round_trips() -> None:
+    context = _context()
+
+    assert FactionRuleExecutionContext.from_payload(context.to_payload()) == context
+
+
+def test_phase17f_execution_result_rejects_inconsistent_status_reason_shapes() -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    executable_record = replace(
+        blocked_record,
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+        block_reason=None,
+    )
+    result = FactionRuleExecutionResult.applied(record=executable_record, context=_context())
+
+    with pytest.raises(GameLifecycleError, match="cannot include reason"):
+        replace(result, reason="unexpected")
+
+    with pytest.raises(GameLifecycleError, match="requires reason"):
+        replace(result, status=FactionRuleExecutionStatus.UNSUPPORTED)
+
+
+def test_phase17f_execution_records_reject_inconsistent_block_shapes() -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    source_gap_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_APPROVED_UNSUPPORTED_SOURCE_GAP
+    )
+
+    with pytest.raises(Phase17FFactionExecutionError, match="require block_reason"):
+        replace(blocked_record, block_reason=None)
+
+    with pytest.raises(Phase17FFactionExecutionError, match="Only blocked"):
+        replace(
+            blocked_record,
+            execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+            block_reason=Phase17FExecutionBlockReason.STRUCTURED_RULE_SEMANTICS_REQUIRED,
+        )
+
+    with pytest.raises(Phase17FFactionExecutionError, match="require handler_id"):
+        replace(blocked_record, handler_id=None)
+
+    with pytest.raises(Phase17FFactionExecutionError, match="require rule_ir_hash"):
+        replace(
+            blocked_record,
+            execution_status=Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+            block_reason=None,
+            rule_ir_hash=None,
+        )
+
+    with pytest.raises(Phase17FFactionExecutionError, match="require handler_id"):
+        replace(
+            blocked_record,
+            execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+            block_reason=None,
+            handler_id=None,
+        )
+
+    with pytest.raises(Phase17FFactionExecutionError, match="require phase17e"):
+        replace(source_gap_record, phase17e_unsupported_reason=None)
+
+    with pytest.raises(Phase17FFactionExecutionError, match="SHA-256 digest"):
+        replace(
+            blocked_record,
+            execution_status=Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+            block_reason=None,
+            rule_ir_hash="bad",
+        )
+
+
+def test_phase17f_execution_package_rejects_invalid_record_sets() -> None:
+    record = faction_execution_source.phase17f_execution_package().execution_records[0]
+
+    with pytest.raises(Phase17FFactionExecutionError, match="must be a tuple"):
+        Phase17FExecutionPackage(
+            execution_records=cast(tuple[Phase17FExecutionRecord, ...], [record])
+        )
+
+    with pytest.raises(Phase17FFactionExecutionError, match="must contain"):
+        Phase17FExecutionPackage(execution_records=(cast(Phase17FExecutionRecord, object()),))
+
+    with pytest.raises(Phase17FFactionExecutionError, match="must be unique"):
+        Phase17FExecutionPackage(execution_records=(record, record))
+
+    with pytest.raises(Phase17FFactionExecutionError, match="unknown Phase17E"):
+        Phase17FExecutionPackage(
+            execution_records=(replace(record, coverage_descriptor_id="phase17e:missing"),)
+        )
+
+    with pytest.raises(Phase17FFactionExecutionError, match="cover every Phase17E"):
+        Phase17FExecutionPackage(execution_records=())
+
+
+def _context() -> FactionRuleExecutionContext:
+    return FactionRuleExecutionContext(
+        game_id="game-phase17f",
+        player_id="player-a",
+        battle_round=1,
+        phase=BattlePhaseKind.COMMAND,
+        active_player_id="player-a",
+        source_unit_instance_id="army-alpha:unit-1",
+        target_unit_instance_ids=("army-beta:unit-1",),
+        trigger_payload={"event": "phase17f-smoke"},
+    )
+
+
+def _first_execution_record(status: Phase17FExecutionStatus) -> Phase17FExecutionRecord:
+    for record in faction_execution_source.phase17f_execution_package().execution_records:
+        if record.execution_status is status:
+            return record
+    raise AssertionError(f"Missing Phase17F execution status: {status.value}.")
+
+
+def _require_handler_id(record: Phase17FExecutionRecord) -> str:
+    if record.handler_id is None:
+        raise AssertionError("Expected Phase17F execution record to include handler_id.")
+    return record.handler_id
+
+
+def _mismatched_result_for_field(
+    result: FactionRuleExecutionResult,
+    field_name: str,
+) -> FactionRuleExecutionResult:
+    if field_name == "execution_id":
+        return replace(result, execution_id="phase17f:wrong-execution")
+    if field_name == "coverage_descriptor_id":
+        return replace(result, coverage_descriptor_id="phase17e:wrong-descriptor")
+    if field_name == "coverage_kind":
+        return replace(result, coverage_kind="wrong-coverage-kind")
+    if field_name == "faction_id":
+        return replace(result, faction_id="wrong-faction")
+    if field_name == "faction_name":
+        return replace(result, faction_name="Wrong Faction")
+    if field_name == "detachment_id":
+        return replace(result, detachment_id="wrong-detachment")
+    if field_name == "detachment_name":
+        return replace(result, detachment_name="Wrong Detachment")
+    if field_name == "handler_id":
+        return replace(result, handler_id="wrong-handler")
+    if field_name == "source_ids":
+        return replace(result, source_ids=("wrong-source",))
+    raise AssertionError(f"Unsupported mismatch field: {field_name}.")
+
+
+def _payload_checksum(payload: Phase17FExecutionPackagePayload) -> str:
+    payload_without_checksum: dict[str, object] = dict(payload)
+    payload_without_checksum["source_payload_checksum_sha256"] = ""
+    encoded = json.dumps(payload_without_checksum, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
+    return hashlib.sha256(encoded).hexdigest()
