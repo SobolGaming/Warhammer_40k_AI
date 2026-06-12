@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 
+# Generated scaffold placeholder. Remove this marker when implementing semantics.
+
 CONTRIBUTION_ID = "warhammer_40000_11th:aeldari:detachment:corsair_coterie:stratagems:scaffold"
 
 

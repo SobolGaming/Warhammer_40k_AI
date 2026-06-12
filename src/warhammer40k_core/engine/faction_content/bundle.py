@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import TypedDict, cast
@@ -172,6 +172,81 @@ class RuntimeContentContribution:
             event_handler_bindings=self.event_handler_bindings,
             faction_named_handlers=self.faction_named_handlers,
         )
+
+
+def combine_runtime_content_contributions(
+    *,
+    contribution_id: str,
+    contributions: tuple[RuntimeContentContribution, ...],
+) -> RuntimeContentContribution:
+    validated_contributions = _validate_contributions(contributions)
+    return RuntimeContentContribution(
+        contribution_id=contribution_id,
+        ability_records=_combine_unique_values(
+            "ability record",
+            tuple(
+                record
+                for contribution in validated_contributions
+                for record in contribution.ability_records
+            ),
+            lambda record: record.record_id,
+        ),
+        stratagem_records=_combine_unique_values(
+            "Stratagem record",
+            tuple(
+                record
+                for contribution in validated_contributions
+                for record in contribution.stratagem_records
+            ),
+            lambda record: record.record_id,
+        ),
+        ability_handler_bindings=_combine_unique_values(
+            "ability handler binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.ability_handler_bindings
+            ),
+            lambda binding: binding.handler_id,
+        ),
+        stratagem_handler_bindings=_combine_unique_values(
+            "Stratagem handler binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.stratagem_handler_bindings
+            ),
+            lambda binding: binding.handler_id,
+        ),
+        rule_runtime_bindings=_combine_unique_values(
+            "RuleIR binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.rule_runtime_bindings
+            ),
+            lambda binding: binding.binding_id,
+        ),
+        event_subscriptions=_combine_unique_values(
+            "event subscription",
+            tuple(
+                subscription
+                for contribution in validated_contributions
+                for subscription in contribution.event_subscriptions
+            ),
+            lambda subscription: subscription.subscription_id,
+        ),
+        event_handler_bindings=_combine_unique_values(
+            "event handler binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.event_handler_bindings
+            ),
+            lambda binding: binding.handler_id,
+        ),
+        faction_named_handlers=_merged_named_handlers(validated_contributions),
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -399,6 +474,22 @@ def _validate_contributions(
             )
         validated.append(contribution)
     return tuple(validated)
+
+
+def _combine_unique_values[T](
+    field_name: str,
+    values: tuple[T, ...],
+    identifier_for: Callable[[T], str],
+) -> tuple[T, ...]:
+    seen: set[str] = set()
+    combined: list[T] = []
+    for value in values:
+        identifier = _validate_identifier(f"{field_name} id", identifier_for(value))
+        if identifier in seen:
+            raise GameLifecycleError(f"Runtime content {field_name} IDs must be unique.")
+        seen.add(identifier)
+        combined.append(value)
+    return tuple(combined)
 
 
 def _validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:

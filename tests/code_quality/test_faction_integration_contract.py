@@ -163,9 +163,13 @@ def test_faction_integration_records_phase17g_17h_17i_roadmap_split() -> None:
     assert "## Phase 17G Runtime Scaffold Gate" in document
     assert "tools/generate_faction_content_scaffold.py" in document
     assert "generated_manifest.py" in document
-    assert "Generated scaffold modules are load-safe and semantically inert" in document
+    assert "The generator owns `generated_manifest.py`" in document
+    assert "Generated faction `manifest.py` files aggregate" in document
+    assert "placeholder scaffold contributions are empty and use stable IDs" in document
+    assert "orphaned generated placeholder" in document
     assert "supported` in the runtime manifest means" in normalized_document
-    assert "CI fails when the generated scaffold is stale" in document
+    assert "CI fails when generator-owned files are stale" in document
+    assert "CI fails when agent-owned files are missing required exports" in document
     assert (
         "must not generate broad datasheet, wargear, or weapon-profile files" in normalized_document
     )
@@ -246,13 +250,17 @@ def test_faction_integration_requires_explicit_faq_classification_gate() -> None
 
 def test_faction_integration_links_agent_implementation_contract() -> None:
     document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+    normalized_document = " ".join(document.split())
     contract_path = ROOT / "docs" / "FACTION_AGENT_IMPLEMENTATION_CONTRACT.md"
     contract = contract_path.read_text(encoding="utf-8")
 
     assert "## Agent Implementation Contract" in document
     assert "docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md" in document
     assert "Task packets must name the faction or detachment" in document
+    assert "remove the generated placeholder marker from implemented files" in normalized_document
     assert "Use existing `RuntimeContentContribution` surfaces" in contract
+    assert "Generated `manifest.py` files are stable aggregators" in contract
+    assert "Remove the marker when the file implements source-backed semantics" in contract
     assert "Do not parse raw rule text" in contract
     assert "Return typed unsupported results with source-linked reasons" in contract
 

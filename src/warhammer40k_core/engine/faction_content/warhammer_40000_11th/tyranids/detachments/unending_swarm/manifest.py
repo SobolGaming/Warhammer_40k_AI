@@ -2,16 +2,24 @@
 # Regenerate with `uv run python tools/generate_faction_content_scaffold.py`.
 from __future__ import annotations
 
-from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.bundle import (
+    RuntimeContentContribution,
+    combine_runtime_content_contributions,
+)
+
+from .enhancements import runtime_contribution as enhancements_contribution
+from .rule import runtime_contribution as rule_contribution
+from .stratagems import runtime_contribution as stratagems_contribution
 
 CONTRIBUTION_ID = "warhammer_40000_11th:tyranids:detachment:unending_swarm:manifest:scaffold"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    """Runtime load scaffold only.
-
-    Semantic execution must be supplied by source-backed RuleIR,
-    named handlers, event subscriptions, ability records, or Stratagem
-    handler bindings in implementation PRs.
-    """
-    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
+    return combine_runtime_content_contributions(
+        contribution_id=CONTRIBUTION_ID,
+        contributions=(
+            rule_contribution(),
+            enhancements_contribution(),
+            stratagems_contribution(),
+        ),
+    )

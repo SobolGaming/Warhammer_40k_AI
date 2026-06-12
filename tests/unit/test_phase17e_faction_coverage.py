@@ -176,8 +176,20 @@ def test_phase17e_coverage_rows_reject_unapproved_or_incomplete_status_shapes() 
 
 
 def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
-    if not RAW_FACTION_PDF_DIR.exists() or not tuple(RAW_FACTION_PDF_DIR.glob("*.pdf")):
+    present_pdf_filenames: set[str]
+    present_pdf_filenames = (
+        {path.name for path in RAW_FACTION_PDF_DIR.glob("*.pdf")}
+        if RAW_FACTION_PDF_DIR.exists()
+        else set()
+    )
+    if not present_pdf_filenames:
         pytest.skip("Local raw faction PDFs are optional and are not redistributed in git.")
+    expected_pdf_filenames = {
+        record.pdf_filename for record in faction_coverage_source.faction_pdf_records()
+    }
+    missing_pdf_filenames = expected_pdf_filenames.difference(present_pdf_filenames)
+    if missing_pdf_filenames:
+        pytest.skip("Local raw faction PDF cache is incomplete and ignored by git.")
 
     for record in faction_coverage_source.faction_pdf_records():
         pdf_path = RAW_FACTION_PDF_DIR / record.pdf_filename

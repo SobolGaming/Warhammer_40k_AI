@@ -23,6 +23,20 @@ src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/
         stratagems.py
 ```
 
+Generated `manifest.py` files are stable aggregators. Faction manifests import
+the sibling `army_rule.py`; detachment manifests import sibling `rule.py`,
+`enhancements.py`, and `stratagems.py`. Do not edit manifest files in ordinary
+implementation PRs.
+
+Agent-owned scaffold files start with this marker:
+
+```text
+# Generated scaffold placeholder. Remove this marker when implementing semantics.
+```
+
+Remove the marker when the file implements source-backed semantics. The file
+must keep a stable `CONTRIBUTION_ID` and `runtime_contribution()` export.
+
 Do not parse raw rule text or import source-mirror, HTML sanitizer, parser, or
 compiler tooling from runtime faction-content modules.
 
@@ -78,6 +92,7 @@ Allowed files:
 
 Required:
 - Use source IDs from generated manifest and execution rows.
+- Remove the generated placeholder marker from implemented files.
 - Register named handlers or RuleIR bindings only where semantics are supported.
 - Return typed unsupported results with source-linked reasons for unsupported semantics.
 - Add replay and audit assertions for state-changing behavior.

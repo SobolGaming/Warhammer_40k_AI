@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import difflib
 import keyword
 from collections.abc import Sequence
@@ -18,7 +19,11 @@ EDITION_ROOT = (
 GENERATED_MANIFEST_PATH = EDITION_ROOT / "generated_manifest.py"
 BASE_IMPORT_PATH = "warhammer40k_core.engine.faction_content.warhammer_40000_11th"
 GENERATOR_RELATIVE_PATH = "tools/generate_faction_content_scaffold.py"
-SCAFFOLD_MODULE_FILENAMES = ("manifest.py", "rule.py", "enhancements.py", "stratagems.py")
+AGENT_OWNED_FACTION_FILENAMES = ("army_rule.py",)
+AGENT_OWNED_DETACHMENT_FILENAMES = ("rule.py", "enhancements.py", "stratagems.py")
+PLACEHOLDER_MARKER = (
+    "# Generated scaffold placeholder. Remove this marker when implementing semantics."
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,7 +32,7 @@ class GeneratedFile:
     content: str
 
 
-def expected_generated_files() -> tuple[GeneratedFile, ...]:
+def expected_generator_owned_files() -> tuple[GeneratedFile, ...]:
     files: list[GeneratedFile] = [
         GeneratedFile(path=GENERATED_MANIFEST_PATH, content=_generated_manifest_content())
     ]
@@ -39,18 +44,8 @@ def expected_generated_files() -> tuple[GeneratedFile, ...]:
                 GeneratedFile(path=faction_dir / "__init__.py", content=_package_init_content()),
                 GeneratedFile(
                     path=faction_dir / "manifest.py",
-                    content=_runtime_module_content(
-                        contribution_id=(
-                            f"warhammer_40000_11th:{faction_module}:faction_manifest:scaffold"
-                        )
-                    ),
-                ),
-                GeneratedFile(
-                    path=faction_dir / "army_rule.py",
-                    content=_runtime_module_content(
-                        contribution_id=(
-                            f"warhammer_40000_11th:{faction_module}:army_rule:scaffold"
-                        )
+                    content=_faction_manifest_content(
+                        faction_module=faction_module,
                     ),
                 ),
                 GeneratedFile(
@@ -63,15 +58,46 @@ def expected_generated_files() -> tuple[GeneratedFile, ...]:
         faction_module = module_name_for_id(detachment_row.faction_id)
         detachment_module = module_name_for_id(detachment_row.detachment_id)
         detachment_dir = EDITION_ROOT / faction_module / "detachments" / detachment_module
-        files.append(
-            GeneratedFile(path=detachment_dir / "__init__.py", content=_package_init_content())
+        files.extend(
+            (
+                GeneratedFile(path=detachment_dir / "__init__.py", content=_package_init_content()),
+                GeneratedFile(
+                    path=detachment_dir / "manifest.py",
+                    content=_detachment_manifest_content(
+                        faction_module=faction_module,
+                        detachment_module=detachment_module,
+                    ),
+                ),
+            )
         )
-        for filename in SCAFFOLD_MODULE_FILENAMES:
+    return tuple(sorted(files, key=lambda generated_file: generated_file.path.as_posix()))
+
+
+def expected_agent_owned_files() -> tuple[GeneratedFile, ...]:
+    files: list[GeneratedFile] = []
+    for faction_row in faction_detachments_2026_27.faction_rows():
+        faction_module = module_name_for_id(faction_row.faction_id)
+        faction_dir = EDITION_ROOT / faction_module
+        for filename in AGENT_OWNED_FACTION_FILENAMES:
+            role = filename.removesuffix(".py")
+            files.append(
+                GeneratedFile(
+                    path=faction_dir / filename,
+                    content=_agent_runtime_module_content(
+                        contribution_id=f"warhammer_40000_11th:{faction_module}:{role}:scaffold"
+                    ),
+                )
+            )
+    for detachment_row in faction_detachments_2026_27.detachment_rows():
+        faction_module = module_name_for_id(detachment_row.faction_id)
+        detachment_module = module_name_for_id(detachment_row.detachment_id)
+        detachment_dir = EDITION_ROOT / faction_module / "detachments" / detachment_module
+        for filename in AGENT_OWNED_DETACHMENT_FILENAMES:
             role = filename.removesuffix(".py")
             files.append(
                 GeneratedFile(
                     path=detachment_dir / filename,
-                    content=_runtime_module_content(
+                    content=_agent_runtime_module_content(
                         contribution_id=(
                             "warhammer_40000_11th:"
                             f"{faction_module}:detachment:{detachment_module}:{role}:scaffold"
@@ -80,6 +106,15 @@ def expected_generated_files() -> tuple[GeneratedFile, ...]:
                 )
             )
     return tuple(sorted(files, key=lambda generated_file: generated_file.path.as_posix()))
+
+
+def expected_generated_files() -> tuple[GeneratedFile, ...]:
+    return tuple(
+        sorted(
+            (*expected_generator_owned_files(), *expected_agent_owned_files()),
+            key=lambda generated_file: generated_file.path.as_posix(),
+        )
+    )
 
 
 def scaffold_runtime_module_paths() -> tuple[str, ...]:
@@ -133,26 +168,40 @@ def module_name_for_id(identifier: str) -> str:
     return f"content_{module_name}"
 
 
-def write_expected_files() -> None:
-    for generated_file in expected_generated_files():
+def write_expected_files(*, force: bool = False) -> None:
+    for generated_file in expected_generator_owned_files():
         generated_file.path.parent.mkdir(parents=True, exist_ok=True)
         generated_file.path.write_text(generated_file.content, encoding="utf-8", newline="\n")
+    for generated_file in expected_agent_owned_files():
+        generated_file.path.parent.mkdir(parents=True, exist_ok=True)
+        if (
+            force
+            or not generated_file.path.exists()
+            or PLACEHOLDER_MARKER in generated_file.path.read_text(encoding="utf-8")
+        ):
+            generated_file.path.write_text(generated_file.content, encoding="utf-8", newline="\n")
 
 
 def stale_generated_files() -> tuple[str, ...]:
     stale: list[str] = []
-    for generated_file in expected_generated_files():
+    for generated_file in expected_generator_owned_files():
         current = (
             generated_file.path.read_text(encoding="utf-8") if generated_file.path.exists() else ""
         )
         if current != generated_file.content:
             stale.append(generated_file.path.relative_to(ROOT).as_posix())
+    for generated_file in expected_agent_owned_files():
+        export_error = _agent_owned_file_export_error(generated_file.path)
+        if export_error is not None:
+            relative_path = generated_file.path.relative_to(ROOT).as_posix()
+            stale.append(f"{relative_path}: {export_error}")
+    stale.extend(orphaned_generated_placeholder_files())
     return tuple(stale)
 
 
 def diff_stale_files() -> str:
     chunks: list[str] = []
-    for generated_file in expected_generated_files():
+    for generated_file in expected_generator_owned_files():
         current = (
             generated_file.path.read_text(encoding="utf-8") if generated_file.path.exists() else ""
         )
@@ -171,6 +220,19 @@ def diff_stale_files() -> str:
     return "\n".join(chunks)
 
 
+def orphaned_generated_placeholder_files() -> tuple[str, ...]:
+    expected_paths = {generated_file.path for generated_file in expected_agent_owned_files()}
+    orphaned: list[str] = []
+    if not EDITION_ROOT.exists():
+        return ()
+    for path in sorted(EDITION_ROOT.rglob("*.py")):
+        if path in expected_paths:
+            continue
+        if PLACEHOLDER_MARKER in path.read_text(encoding="utf-8"):
+            orphaned.append(path.relative_to(ROOT).as_posix())
+    return tuple(orphaned)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Generate source-backed 11th Edition faction runtime scaffolds."
@@ -179,6 +241,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--check",
         action="store_true",
         help="Fail if generated scaffold files are stale without writing them.",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite agent-owned scaffold files even after the placeholder marker is removed.",
     )
     args = parser.parse_args(argv)
 
@@ -194,7 +261,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 1
         return 0
 
-    write_expected_files()
+    write_expected_files(force=args.force)
     return 0
 
 
@@ -202,11 +269,13 @@ def _package_init_content() -> str:
     return _generated_header()
 
 
-def _runtime_module_content(*, contribution_id: str) -> str:
+def _agent_runtime_module_content(*, contribution_id: str) -> str:
     return (
         f"{_generated_header()}\n"
         "from warhammer40k_core.engine.faction_content.bundle import "
         "RuntimeContentContribution\n"
+        "\n"
+        f"{PLACEHOLDER_MARKER}\n"
         "\n"
         f"{_contribution_id_assignment(contribution_id)}\n"
         "\n"
@@ -219,6 +288,58 @@ def _runtime_module_content(*, contribution_id: str) -> str:
         "    handler bindings in implementation PRs.\n"
         '    """\n'
         "    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)\n"
+    )
+
+
+def _faction_manifest_content(*, faction_module: str) -> str:
+    contribution_id = f"warhammer_40000_11th:{faction_module}:faction_manifest:scaffold"
+    return (
+        f"{_generated_header()}\n"
+        "from warhammer40k_core.engine.faction_content.bundle import (\n"
+        "    RuntimeContentContribution,\n"
+        "    combine_runtime_content_contributions,\n"
+        ")\n"
+        "\n"
+        "from .army_rule import runtime_contribution as army_rule_contribution\n"
+        "\n"
+        f"{_contribution_id_assignment(contribution_id)}\n"
+        "\n"
+        "\n"
+        "def runtime_contribution() -> RuntimeContentContribution:\n"
+        "    return combine_runtime_content_contributions(\n"
+        "        contribution_id=CONTRIBUTION_ID,\n"
+        "        contributions=(army_rule_contribution(),),\n"
+        "    )\n"
+    )
+
+
+def _detachment_manifest_content(*, faction_module: str, detachment_module: str) -> str:
+    contribution_id = (
+        f"warhammer_40000_11th:{faction_module}:detachment:{detachment_module}:manifest:scaffold"
+    )
+    return (
+        f"{_generated_header()}\n"
+        "from warhammer40k_core.engine.faction_content.bundle import (\n"
+        "    RuntimeContentContribution,\n"
+        "    combine_runtime_content_contributions,\n"
+        ")\n"
+        "\n"
+        "from .enhancements import runtime_contribution as enhancements_contribution\n"
+        "from .rule import runtime_contribution as rule_contribution\n"
+        "from .stratagems import runtime_contribution as stratagems_contribution\n"
+        "\n"
+        f"{_contribution_id_assignment(contribution_id)}\n"
+        "\n"
+        "\n"
+        "def runtime_contribution() -> RuntimeContentContribution:\n"
+        "    return combine_runtime_content_contributions(\n"
+        "        contribution_id=CONTRIBUTION_ID,\n"
+        "        contributions=(\n"
+        "            rule_contribution(),\n"
+        "            enhancements_contribution(),\n"
+        "            stratagems_contribution(),\n"
+        "        ),\n"
+        "    )\n"
     )
 
 
@@ -436,6 +557,38 @@ def _contribution_id_assignment(contribution_id: str) -> str:
         return single_line
     parts = "\n".join(f'        "{part}",' for part in contribution_id.split(":"))
     return f'CONTRIBUTION_ID = ":".join(\n    (\n{parts}\n    )\n)'
+
+
+def _agent_owned_file_export_error(path: Path) -> str | None:
+    if not path.exists():
+        return "missing"
+    text = path.read_text(encoding="utf-8")
+    try:
+        module_ast = ast.parse(text)
+    except SyntaxError as exc:
+        line_number = "unknown" if exc.lineno is None else str(exc.lineno)
+        return f"invalid Python syntax at line {line_number}"
+    if not any(_is_contribution_id_assignment(node) for node in module_ast.body):
+        return "missing CONTRIBUTION_ID export"
+    if not any(
+        isinstance(node, ast.FunctionDef) and node.name == "runtime_contribution"
+        for node in module_ast.body
+    ):
+        return "missing runtime_contribution() export"
+    return None
+
+
+def _is_contribution_id_assignment(node: ast.stmt) -> bool:
+    if isinstance(node, ast.Assign):
+        return any(
+            isinstance(target, ast.Name) and target.id == "CONTRIBUTION_ID"
+            for target in node.targets
+        )
+    return (
+        isinstance(node, ast.AnnAssign)
+        and isinstance(node.target, ast.Name)
+        and node.target.id == "CONTRIBUTION_ID"
+    )
 
 
 if __name__ == "__main__":

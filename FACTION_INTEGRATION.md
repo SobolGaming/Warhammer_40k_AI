@@ -193,12 +193,23 @@ detachment:
       stratagems.py
 ```
 
-Generated scaffold modules are load-safe and semantically inert. Each module
-exports a stable `CONTRIBUTION_ID` and `runtime_contribution()` that returns an
-empty `RuntimeContentContribution`. This is deliberate: `supported` in the
-runtime manifest means a selected content row has an importable runtime module
-path. It does not mean the faction, detachment, enhancement, or Stratagem
-semantics have gameplay support.
+The generator owns `generated_manifest.py`, package `__init__.py` files, and
+faction/detachment `manifest.py` aggregators byte-for-byte. The agent-owned
+semantic target files are `army_rule.py`, `rule.py`, `enhancements.py`, and
+`stratagems.py`. Those target files start as load-safe, semantically inert
+placeholders with the marker `Generated scaffold placeholder. Remove this marker
+when implementing semantics.` Implementation PRs remove that marker and keep the
+required `CONTRIBUTION_ID` plus `runtime_contribution()` export shape.
+
+Generated faction `manifest.py` files aggregate the sibling `army_rule.py`
+contribution. Generated detachment `manifest.py` files aggregate sibling
+`rule.py`, `enhancements.py`, and `stratagems.py` contributions through
+`combine_runtime_content_contributions(...)`. Runtime manifest rows point to the
+generated `manifest.py` aggregators, so ordinary implementation PRs do not edit
+manifest machinery. This is deliberate: `supported` in the runtime manifest
+means a selected content row has an importable runtime module path. It does not
+mean the faction, detachment, enhancement, or Stratagem semantics have gameplay
+support.
 
 The scaffold gate must not generate broad datasheet, wargear, or weapon-profile
 files. Those modules are generated only for assigned Phase 17H vertical slices.
@@ -211,11 +222,15 @@ Required tests:
 - every generated detachment has `manifest.py`, `rule.py`, `enhancements.py`,
   and `stratagems.py`;
 - generated scaffold modules export `runtime_contribution()`;
-- scaffold contributions are empty and use stable IDs;
+- placeholder scaffold contributions are empty and use stable IDs;
+- generated manifest aggregators include agent-owned sibling contributions;
 - generated manifest faction and detachment module paths match scaffold files;
 - runtime faction-content modules do not import raw source mirrors, parser
   tooling, compiler tooling, or HTML sanitizer tooling;
-- CI fails when the generated scaffold is stale.
+- CI fails when generator-owned files are stale;
+- CI fails when agent-owned files are missing required exports;
+- CI fails when an orphaned generated placeholder remains after source rows
+  change.
 
 ## Phase 17G Semantic Execution Gate
 
@@ -646,9 +661,10 @@ weapon profile set, or official patch operation.
 Agent-authored faction implementation PRs must follow
 [docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
 Task packets must name the faction or detachment, list allowed scaffold files,
-require source IDs from generated manifest and execution rows, and preserve the
-shared runtime loader, lifecycle, bundle, manifest, decision, replay, and
-engine-owned mutation contracts.
+require source IDs from generated manifest and execution rows, remove the
+generated placeholder marker from implemented files, and preserve the shared
+runtime loader, lifecycle, bundle, manifest, decision, replay, and engine-owned
+mutation contracts.
 
 Preferred batching is one army rule, one detachment rule, one detachment
 enhancement set, or one detachment Stratagem set per PR. A full detachment PR is
