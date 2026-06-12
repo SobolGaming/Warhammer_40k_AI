@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -48,7 +50,7 @@ class RuntimeContentActivation:
     source_package_hashes: tuple[str, ...] = ()
     selected_execution_record_ids: tuple[str, ...] = ()
     unsupported_content_ids: tuple[str, ...] = ()
-    unsupported_reasons_by_content_id: dict[str, str] | None = None
+    unsupported_reasons_by_content_id: Mapping[str, str] | None = None
     activation_hash: str = ""
 
     def __post_init__(self) -> None:
@@ -281,7 +283,7 @@ class RuntimeContentActivation:
         source_package_hashes: tuple[str, ...],
         selected_execution_record_ids: tuple[str, ...],
         unsupported_content_ids: tuple[str, ...],
-        unsupported_reasons_by_content_id: dict[str, str],
+        unsupported_reasons_by_content_id: Mapping[str, str],
     ) -> Self:
         resolved = type(self)(
             selected_faction_ids=self.selected_faction_ids,
@@ -318,9 +320,7 @@ class RuntimeContentActivation:
             source_package_hashes=resolved.source_package_hashes,
             selected_execution_record_ids=resolved.selected_execution_record_ids,
             unsupported_content_ids=resolved.unsupported_content_ids,
-            unsupported_reasons_by_content_id=dict(
-                resolved.unsupported_reasons_by_content_id or {}
-            ),
+            unsupported_reasons_by_content_id=resolved.unsupported_reasons_by_content_id,
             activation_hash=_activation_hash(resolved),
         )
 
@@ -395,19 +395,19 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
 def _validate_reason_mapping(
     field_name: str,
     value: object | None,
-) -> dict[str, str]:
+) -> Mapping[str, str]:
     if value is None:
-        return {}
-    if type(value) is not dict:
-        raise GameLifecycleError(f"Runtime content {field_name} must be a dict.")
+        return MappingProxyType({})
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError(f"Runtime content {field_name} must be a mapping.")
     reasons: dict[str, str] = {}
-    for raw_key, raw_reason in cast(dict[object, object], value).items():
+    for raw_key, raw_reason in cast(Mapping[object, object], value).items():
         content_id = _validate_identifier(f"{field_name} key", raw_key)
         reason = _validate_identifier(f"{field_name} value", raw_reason)
         if content_id in reasons:
             raise GameLifecycleError(f"Runtime content {field_name} keys must be unique.")
         reasons[content_id] = reason
-    return dict(sorted(reasons.items()))
+    return MappingProxyType(dict(sorted(reasons.items())))
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

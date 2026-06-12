@@ -413,6 +413,9 @@ def test_runtime_manifest_records_unsupported_content_and_fails_closed_by_defaul
     assert resolved.unsupported_reasons_by_content_id == {
         "detachment-alpha": "structured_semantics_pending"
     }
+    immutable_reasons = cast(dict[str, str], resolved.unsupported_reasons_by_content_id)
+    with pytest.raises(TypeError):
+        immutable_reasons["detachment-alpha"] = "mutated_reason"
     assert resolved.source_package_ids == ("source-package-id:test",)
     assert resolved.source_package_hashes == ("source-package-hash:test",)
     assert RuntimeContentActivation.from_payload(resolved.to_payload()) == resolved

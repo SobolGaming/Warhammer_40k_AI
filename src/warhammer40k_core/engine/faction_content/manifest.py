@@ -22,6 +22,14 @@ class RuntimeContentModuleFamily(StrEnum):
 
 
 class RuntimeContentSupportStatus(StrEnum):
+    """Manifest load-support status, not semantic gameplay execution coverage.
+
+    SUPPORTED means a selected content row has an importable runtime module path.
+    Semantic rule execution remains owned by source-backed execution records,
+    handler bindings, and contribution records. Scaffold modules can therefore
+    be load-supported while contributing no gameplay effects yet.
+    """
+
     SUPPORTED = "supported"
     SOURCE_ONLY = "source_only"
     UNSUPPORTED = "unsupported"
