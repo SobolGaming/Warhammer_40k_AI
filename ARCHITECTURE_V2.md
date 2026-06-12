@@ -2768,9 +2768,11 @@ Invariants:
   player turn, keeps Secondary Missions until scored or discarded, and does not
   replace ordinary Tactical-discarded Secondary Missions immediately outside
   Warhammer Event mode;
-- Warhammer Event mode Tactical Secondary draw, once-per-battle 1CP
-  discard-and-draw, achievement discard, and own-turn discard-for-CP behavior
-  are owned by Phase 17J as part of the Tactical Secondary procedure itself;
+- Warhammer Event mode Tactical Secondary start-of-Command draw-two,
+  end-of-Command once-per-battle 1CP discard-and-replacement draw,
+  end-of-turn achievement discard only when VP is gained, and own-turn
+  discard-one-or-more-for-1CP behavior are owned by Phase 17J as part of the
+  Tactical Secondary procedure itself;
 - when a Tactical Secondary Mission Card's requirements are achieved, the engine
   records a source-backed achievement context before emitting the finite scoring
   decision: scoring awards the source-backed VP, consumes the context, and
@@ -4427,13 +4429,24 @@ Invariants:
 - Secondary Mission mode selection is hidden until reveal.
 - Fixed Secondaries are selected secretly, revealed, face-up, non-discardable,
   and active for the whole battle.
-- Tactical Secondary draw-two, once-per-battle 1CP discard-and-draw,
-  achievement discard, own-turn discard-for-CP, and active-player-first
-  end-of-turn scoring are engine-owned decisions and events.
+- Tactical Secondary draw-two occurs at the start of the controlling player's
+  Command phase and makes the drawn cards active.
+- Once per battle, at the end of that player's Command phase, that player may
+  spend 1CP to discard exactly one active Tactical Secondary Mission and draw
+  exactly one replacement.
+- At the end of each player's turn, both players resolve Secondary achievement
+  checks starting with the active player; achieved Tactical Secondaries are
+  discarded only when VP is gained.
+- Then, if it is the active player's own turn and that player uses Tactical
+  Secondaries, that player may discard one or more active Tactical Secondaries
+  to gain 1CP.
 - Declare Battle Formations records embarked units before Strategic Reserves,
   then reveals both players' battle formations.
 - Deploy Armies alternates from the Defender and enforces the TITANIC
   skip-next-deployment-turn rule.
+- Once a player has finished setting up all non-Strategic-Reserve units, if the
+  opponent still has undeployed units, the opponent drains and sets up those
+  remaining units through source-backed deployment decisions.
 - Redeploy alternates from the Attacker and records redeploy-to-reserves cap
   exemption.
 - Determine First Turn is a roll-off whose winner takes the first turn.
@@ -4445,6 +4458,9 @@ Invariants:
 - Mission-card scoring supports `cumulative_condition`,
   `exclusive_or_condition`, `exactly_one_condition`, `vp_up_to_limit`,
   `when_drawn_tactical_only`, and `leaves_battlefield_event`.
+- Event Companion v1.0 has an empty Chapter Approved Mission Deck
+  card-amendment set; FAQ behavior is represented as source-linked patch
+  operations separately.
 - Event Companion FAQ behavior for operation marker removal, Death Trap,
   Surveil the Foe, and Vital Link is represented as source-linked patch
   operations, not runtime string checks.
@@ -4474,12 +4490,15 @@ Required tests:
 
 - complete Event Mission Sequence replay from mustering through battle start;
 - hidden Tactical/Fixed and Fixed-card choices reveal correctly;
-- Tactical draw-two, once-per-battle discard/draw, achieved discard, and
-  discard-for-CP behavior;
+- Tactical start-of-Command draw-two, end-of-Command once-per-battle
+  discard/draw, achieved-discard-only-when-VP-is-gained, and own-turn
+  discard-one-or-more-for-CP behavior;
 - both-player end-of-turn Secondary scoring starts with the active player;
 - Primary, Secondary, Battle Ready, and total caps reject excess VP;
 - pre-battle abilities cannot resolve before first-turn determination;
 - Defender-first deployment and TITANIC skip;
+- deployment queue drains opponent remaining units after one player has finished
+  deploying;
 - Attacker-first redeploy and redeploy-reserve cap exemption;
 - all Event Companion layout descriptors load and instantiate;
 - all objective-point types and deployment-zone polygons validate;
@@ -4560,7 +4579,8 @@ Event Companion adapter/replay/UI requirements:
   source-backed decisions/events;
 - Attacker/Defender assignment preserves physical edge orientation;
 - Tactical Secondary active cards, discards, achieved cards, and
-  once-per-battle discard/draw usage are inspectable from replay-safe state;
+  end-of-Command once-per-battle 1CP discard-and-draw usage are inspectable
+  from replay-safe state;
 - VP source caps and final scoring audit are displayed without adapter-side
   recalculation;
 - layout visualizers consume source descriptors, not page images.
@@ -4750,8 +4770,8 @@ Required tests:
 - replay round-trip at multiple battle rounds;
 - no hidden information leaks;
 - deterministic same-seed replay;
-- all Event Companion layout variants for the supported Force
-  Disposition/Primary Mission combinations;
+- all source-page Event Companion layout variants for each Force
+  Disposition/Primary Mission combination;
 - multiple army archetypes;
 - multiple mission packs.
 
