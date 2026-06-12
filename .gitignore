@@ -213,6 +213,7 @@ tempCodeRunnerFile.py
 # Commit manifests, hashes, page/section references, structured patches, and generated catalogs;
 # do not commit downloaded PDFs, extracted text, or extracted page markdown.
 .cache/
+data/raw/*
 data/raw/faction_packs/*.pdf
 data/raw/faction_packs/*.txt
 data/raw/faction_packs/extracted_pages/*.md
