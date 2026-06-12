@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, the Phase 17E faction coverage implementation, the Phase 17F faction execution dispatch implementation, the 11th Edition Core Rules source drop, and the Warhammer Event Companion v1.0 source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, the Phase 17E faction coverage implementation, the Phase 17F faction execution dispatch implementation, the Phase 17J Warhammer Event Companion mission-pack implementation, the 11th Edition Core Rules source drop, and the Warhammer Event Companion v1.0 source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -66,8 +66,9 @@ Dispositions, the named 25-cell Primary Mission matrix, three layout identifiers
 per matrix cell, and finite Tactical Secondary score/retain decisions.
 Exact 11th Edition Secondary card identities beyond current source rows,
 Primary Mission scoring text, Event Companion terrain/deployment layout
-geometry, and Base Size Guide source-row status are now owned by planned
-Phase 17J rather than deferred to Phase 20.
+geometry, and Base Size Guide source-row status are now represented by the
+Phase 17J Warhammer Event Companion source package rather than deferred to
+Phase 20.
 **Phase 14K is complete**:
 cutover hardening now rejects retired save/allocation choice
 surfaces, old aircraft minimum-move and pivot-limit runtime paths, 9" reserve
@@ -93,10 +94,15 @@ complete** for source-backed Heroic Intervention, Counteroffensive, Crushing
 Impact, and Epic Challenge through the shared Stratagem/Charge/Fight decision
 path. **Phase 15F is complete** for Charge/Fight completion gates, full
 both-player phase completion coverage, Fight damage/removal draining before
-completion, and deterministic replay-safe fight-order hardening. Exact 11th
-Edition Secondary card identities beyond current source rows, Primary Mission
-scoring text, Event Companion layout geometry, and Base Size Guide source-row
-status remain pending Phase 17J source work. **Phase 16A is
+completion, and deterministic replay-safe fight-order hardening. **Phase 17J is
+complete** for the Warhammer Event Companion mission-pack source package:
+Event Mission Sequence descriptors, Tactical/Fixed Secondary procedure
+descriptors, all 25 implemented Primary Mission matrix cells, all 45
+source-page layout variants, Event Companion mission-pack import, scoring/draw
+pack resolution, separate empty card-amendment and FAQ patch records, Base Size
+Guide source rows with geometry-resolution statuses, deployment remainder-drain
+coverage, and a static audit preventing runtime Event Companion PDF parsing.
+**Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
 `select_deployment_unit` and `submit_deployment_placement`, validates deployment
@@ -325,6 +331,7 @@ Completed / implemented foundation:
 | 17D | Complete | Generic RuleIR execution handlers, source-linked events, Aura recomputation, and ability/Stratagem IR bridges |
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
+| 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout variants, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
 
 Next / planned sequence:
 
@@ -333,7 +340,6 @@ Next / planned sequence:
 | 17G | Planned | Faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
-| 17J | Planned | Warhammer Event Companion v1.0 mission sequence, secondary mission procedure, Primary Mission scoring descriptors, terrain/deployment layout geometry, base-size source import, and setup/scoring compliance hardening |
 | 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
@@ -2732,10 +2738,10 @@ Status: Complete for the current source-backed slice. The engine now records the
 five 11th Edition Force Dispositions, the 25-cell player-vs-opponent Primary
 Mission matrix with source-tracked mission names, three layout identifiers per
 cell, and engine-achievement-gated Tactical Secondary score/retain as an
-adapter-visible finite decision. Exact Primary Mission scoring rules, layout
-geometry, confirmed Secondary Mission identities, and Event Companion Tactical
-Secondary procedure details remain pending Phase 17J source work rather than
-guessed content.
+adapter-visible finite decision. Phase 17J now layers the Warhammer Event
+Companion package over this slice with implemented matrix rows, concrete layout
+descriptors, and explicit Tactical/Fixed Secondary procedure descriptors rather
+than guessed runtime prose.
 
 Invariants:
 
@@ -2745,10 +2751,10 @@ Invariants:
   `Priority Assets`), the deterministic 5x5 player-vs-opponent matrix, the
   source-tracked Primary Mission name for each matrix cell, and three
   source-tracked battlefield layout identifiers per matrix cell;
-- matrix cells whose Primary Mission rules or layout geometry are not yet known
-  remain `awaiting_source` until Phase 17J replaces them with Event Companion
-  source descriptors, never substituted with retired-edition missions or
-  invented scoring text;
+- Chapter Approved matrix cells whose Primary Mission rules or layout geometry
+  are not yet known remain `awaiting_source`, while the Phase 17J Event
+  Companion package carries implemented source descriptors for all 25 matrix
+  cells and all 45 source-page layout variants;
 - mustering source data follows the 11th Edition order: select Battle Size,
   start Army Roster, choose Faction, select Detachment Rules, select Units, then
   promote Warlord;
@@ -2778,9 +2784,10 @@ Invariants:
   decision: scoring awards the source-backed VP, consumes the context, and
   discards the card, while declining to score consumes that finite context,
   awards no VP, and keeps the card retained;
-- Future PR note: Phase 17J replaces the provisional Secondary Mission card
-  source rows with Event Companion source rows and re-checks Tactical discard,
-  replacement draw, and CP reward timing against that source;
+- Phase 17J records the Event Companion Tactical discard, replacement draw, and
+  CP reward timing as source descriptors; future runtime expansion must consume
+  those descriptors through the existing decision path rather than adding a
+  parallel Secondary Mission adapter route;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, Battle Ready at
   10 VP, total score at 100 VP, and Primary and Secondary scoring at 15 VP per
   battle round;
@@ -4371,6 +4378,8 @@ Required outputs:
 
 ## Phase 17J: Warhammer Event Companion mission-pack and geometry compliance
 
+Status: Complete.
+
 Phase 17J turns the Warhammer Event Companion v1.0 into a source-backed CORE V2
 package. It owns Event Mission Sequence ordering, Force Disposition roster
 binding, per-player Primary Mission selection, layout A/B/C selection,
@@ -4380,14 +4389,38 @@ Primary/Secondary/Battle Ready VP caps, mission-card scoring grammar, Event
 Companion FAQs, terrain/deployment/objective layout geometry, and Base Size
 Guide import.
 
-Modules:
+Implemented modules:
 
 - `rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py`
 - `rules/source_packages/warhammer_40000_11th/event_companion_patches.py`
-- `engine/mission_sequence.py`
-- `engine/mission_scoring.py`
-- `engine/layouts.py`
-- `core/base_size.py`
+- `rules/mission_pack_import.py`
+- `engine/missions.py`
+- `engine/mission_decisions.py`
+- `engine/deployment.py`
+
+Implemented coverage:
+
+- Event Companion package identity, source package hash, no Deployment/Twist
+  card invariant, Event Mission Sequence descriptor, Tactical/Fixed Secondary
+  procedure descriptors, and mission-card scoring grammar are source-backed
+  deterministic payloads.
+- Event Companion mission-pack import builds 25 Primary Mission descriptors, 25
+  implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
+  45 mission-pool entries.
+- All 45 source-page layout variants instantiate as 44" x 60" mission setups
+  with deployment-zone polygons, No Man's Land, player territories, typed
+  objective points, and dense/light terrain feature descriptors.
+- Event Companion v1.0 card amendments are explicitly empty and distinct from
+  source-linked FAQ patch records.
+- Base Size Guide source rows record round, oval, Hull, Small Flying Base, Large
+  Flying Base, and Unique source kinds with geometry-resolution statuses.
+- Mission scoring and deterministic Tactical Secondary draw resolve through a
+  strict mission-pack lookup for both Chapter Approved and Event Companion pack
+  IDs.
+- Deployment queue behavior has regression coverage for the Event Companion
+  remainder-drain rule after one player has no undeployed non-reserve units.
+- Runtime core, engine, and geometry modules are statically audited to prevent
+  raw Event Companion PDF text/image parsing.
 
 Package identity:
 

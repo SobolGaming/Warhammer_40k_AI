@@ -31,21 +31,44 @@ from warhammer40k_core.core.terrain_layouts import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as source_data,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_2026_06 as event_source_data,
+)
 
 CHAPTER_APPROVED_2026_27_SOURCE_ID = source_data.SOURCE_PACKAGE_ID
 CHAPTER_APPROVED_2026_27_SOURCE_VERSION = source_data.SOURCE_VERSION
+EVENT_COMPANION_2026_06_SOURCE_ID = event_source_data.SOURCE_PACKAGE_ID
+EVENT_COMPANION_2026_06_SOURCE_VERSION = event_source_data.SOURCE_VERSION
 
 
 def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
     """Build the source-linked Chapter Approved 2026-27 mission pack descriptors."""
 
-    deployment_maps = _deployment_maps()
-    terrain_layouts = _terrain_layouts()
-    primary_missions = _primary_missions()
-    secondary_missions = _secondary_missions()
-    mission_actions = _mission_actions()
-    challenger_cards = _challenger_cards()
-    force_dispositions = _force_dispositions()
+    deployment_maps = _deployment_maps(
+        rows=source_data.battlefield_layout_rows(),
+        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    )
+    terrain_layouts = _terrain_layouts(
+        rows=source_data.battlefield_layout_rows(),
+        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    )
+    primary_missions = _primary_missions(
+        rows=source_data.primary_mission_rows(),
+        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    )
+    secondary_missions = _secondary_missions(
+        rows=source_data.secondary_mission_rows(),
+        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    )
+    mission_actions = _mission_actions(
+        rows=source_data.mission_action_rows(),
+        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    )
+    challenger_cards = _challenger_cards(source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID)
+    force_dispositions = _force_dispositions(
+        rows=source_data.force_disposition_rows(),
+        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    )
     scoring = source_data.mission_pack_scoring_row()
     return MissionPackDefinition(
         mission_pack_id=source_data.MISSION_PACK_ID,
@@ -90,8 +113,14 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
         mission_actions=mission_actions,
         challenger_cards=challenger_cards,
         force_dispositions=force_dispositions,
-        primary_mission_matrix_cells=_primary_mission_matrix_cells(),
-        mission_pool_entries=_mission_pool_entries(),
+        primary_mission_matrix_cells=_primary_mission_matrix_cells(
+            rows=source_data.primary_mission_matrix_rows(),
+            source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+        ),
+        mission_pool_entries=_mission_pool_entries(
+            rows=source_data.battlefield_layout_rows(),
+            source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+        ),
         scoring_caps=TournamentScoringCaps(
             primary_vp_cap=scoring.primary_vp_cap,
             secondary_vp_cap=scoring.secondary_vp_cap,
@@ -123,15 +152,118 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
     )
 
 
-def _deployment_maps() -> tuple[DeploymentMapDefinition, ...]:
-    return tuple(
-        _deployment_map_from_battlefield_layout(row)
-        for row in source_data.battlefield_layout_rows()
+def warhammer_event_companion_2026_06_mission_pack() -> MissionPackDefinition:
+    """Build the source-linked Warhammer Event Companion v1.0 mission pack descriptors."""
+
+    deployment_maps = _deployment_maps(
+        rows=event_source_data.battlefield_layout_rows(),
+        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
     )
+    terrain_layouts = _terrain_layouts(
+        rows=event_source_data.battlefield_layout_rows(),
+        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+    )
+    primary_missions = _primary_missions(
+        rows=event_source_data.primary_mission_rows(),
+        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+    )
+    secondary_missions = _secondary_missions(
+        rows=event_source_data.secondary_mission_rows(),
+        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+    )
+    mission_actions = _mission_actions(
+        rows=event_source_data.mission_action_rows(),
+        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+    )
+    challenger_cards = _challenger_cards(source_id=EVENT_COMPANION_2026_06_SOURCE_ID)
+    force_dispositions = _force_dispositions(
+        rows=event_source_data.force_disposition_rows(),
+        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+    )
+    scoring = event_source_data.mission_pack_scoring_row()
+    return MissionPackDefinition(
+        mission_pack_id=event_source_data.MISSION_PACK_ID,
+        name="Warhammer Event Companion v1.0",
+        source_version=EVENT_COMPANION_2026_06_SOURCE_VERSION,
+        source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        source_package=event_source_data.source_package_definition(),
+        sequence=ChapterApprovedMissionSequence(
+            sequence_id="warhammer-event-mission-sequence",
+            steps=tuple(
+                step.step_id for step in event_source_data.mission_sequence_descriptor().steps
+            ),
+            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        ),
+        deployment_maps=deployment_maps,
+        terrain_layout_templates=terrain_layouts,
+        mission_deck=MissionDeckDefinition(
+            mission_deck_id="warhammer-event-companion-v1-strike-force",
+            primary_mission_ids=tuple(mission.primary_mission_id for mission in primary_missions),
+            secondary_mission_ids=tuple(
+                mission.secondary_mission_id for mission in secondary_missions
+            ),
+            challenger_card_ids=tuple(card.challenger_card_id for card in challenger_cards),
+            deployment_map_ids=tuple(
+                deployment_map.deployment_map_id for deployment_map in deployment_maps
+            ),
+            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        ),
+        primary_missions=primary_missions,
+        secondary_missions=secondary_missions,
+        mission_actions=mission_actions,
+        challenger_cards=challenger_cards,
+        force_dispositions=force_dispositions,
+        primary_mission_matrix_cells=_primary_mission_matrix_cells(
+            rows=event_source_data.primary_mission_matrix_rows(),
+            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        ),
+        mission_pool_entries=_mission_pool_entries(
+            rows=event_source_data.battlefield_layout_rows(),
+            source_id=EVENT_COMPANION_2026_06_SOURCE_ID,
+        ),
+        scoring_caps=TournamentScoringCaps(
+            primary_vp_cap=scoring.primary_vp_cap,
+            secondary_vp_cap=scoring.secondary_vp_cap,
+            battle_ready_vp=10,
+            total_vp_cap=scoring.total_vp_cap,
+            source_id=f"{EVENT_COMPANION_2026_06_SOURCE_ID}:tournament-scoring",
+        ),
+        scoring=MissionPackScoringDefinition(
+            game_length_battle_rounds=scoring.game_length_battle_rounds,
+            primary_scoring_phase=scoring.primary_scoring_phase,
+            primary_scoring_timing=scoring.primary_scoring_timing,
+            secondary_vp_per_score=scoring.secondary_vp_per_score,
+            mission_action_vp=scoring.mission_action_vp,
+            primary_vp_cap=scoring.primary_vp_cap,
+            secondary_vp_cap=scoring.secondary_vp_cap,
+            total_vp_cap=scoring.total_vp_cap,
+            end_of_round_scoring_windows=scoring.end_of_round_scoring_windows,
+            end_of_game_scoring_windows=scoring.end_of_game_scoring_windows,
+            reserve_destruction_timing=scoring.reserve_destruction_timing,
+            reserve_destruction_battle_round=scoring.reserve_destruction_battle_round,
+            reserve_destruction_excludes_during_battle_strategic_reserves=(
+                scoring.reserve_destruction_excludes_during_battle_strategic_reserves
+            ),
+            reserve_destruction_only_declare_battle_formations=(
+                scoring.reserve_destruction_only_declare_battle_formations
+            ),
+            source_id=f"{EVENT_COMPANION_2026_06_SOURCE_ID}:scoring",
+        ),
+    )
+
+
+def _deployment_maps(
+    *,
+    rows: tuple[source_data.SourceBattlefieldLayoutRow, ...],
+    source_id: str,
+) -> tuple[DeploymentMapDefinition, ...]:
+    return tuple(_deployment_map_from_battlefield_layout(row, source_id=source_id) for row in rows)
 
 
 def _deployment_map_from_battlefield_layout(
     row: source_data.SourceBattlefieldLayoutRow,
+    *,
+    source_id: str,
 ) -> DeploymentMapDefinition:
     return DeploymentMapDefinition(
         deployment_map_id=row.deployment_map_id,
@@ -145,7 +277,7 @@ def _deployment_map_from_battlefield_layout(
                 x_inches=objective.x_inches,
                 y_inches=objective.y_inches,
                 source_id=(
-                    f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:battlefield-layout:"
+                    f"{source_id}:battlefield-layout:"
                     f"{row.battlefield_layout_id}:objective:{objective.objective_marker_id}"
                 ),
             )
@@ -159,27 +291,24 @@ def _deployment_map_from_battlefield_layout(
             )
             for zone in row.deployment_zones
         ),
-        source_id=(
-            f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:battlefield-layout:"
-            f"{row.battlefield_layout_id}:deployment-map"
-        ),
+        source_id=(f"{source_id}:battlefield-layout:{row.battlefield_layout_id}:deployment-map"),
     )
 
 
-def _terrain_layouts() -> tuple[TerrainLayoutTemplate, ...]:
-    return tuple(
-        _terrain_layout_from_battlefield_layout(row)
-        for row in source_data.battlefield_layout_rows()
-    )
+def _terrain_layouts(
+    *,
+    rows: tuple[source_data.SourceBattlefieldLayoutRow, ...],
+    source_id: str,
+) -> tuple[TerrainLayoutTemplate, ...]:
+    return tuple(_terrain_layout_from_battlefield_layout(row, source_id=source_id) for row in rows)
 
 
 def _terrain_layout_from_battlefield_layout(
     row: source_data.SourceBattlefieldLayoutRow,
+    *,
+    source_id: str,
 ) -> TerrainLayoutTemplate:
-    source_id = (
-        f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:battlefield-layout:"
-        f"{row.battlefield_layout_id}:terrain-layout"
-    )
+    layout_source_id = f"{source_id}:battlefield-layout:{row.battlefield_layout_id}:terrain-layout"
     return TerrainLayoutTemplate(
         terrain_layout_id=row.terrain_layout_id,
         name=row.name,
@@ -189,10 +318,11 @@ def _terrain_layout_from_battlefield_layout(
             _terrain_feature_from_battlefield_layout(
                 layout=row,
                 feature=feature,
+                source_id=source_id,
             )
             for feature in row.terrain_features
         ),
-        source_id=source_id,
+        source_id=layout_source_id,
     )
 
 
@@ -200,9 +330,10 @@ def _terrain_feature_from_battlefield_layout(
     *,
     layout: source_data.SourceBattlefieldLayoutRow,
     feature: source_data.SourceBattlefieldTerrainFeatureRow,
+    source_id: str,
 ) -> TerrainFeatureTemplate:
-    source_id = (
-        f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:battlefield-layout:"
+    feature_source_id = (
+        f"{source_id}:battlefield-layout:"
         f"{layout.battlefield_layout_id}:terrain:{feature.feature_id}"
     )
     if feature.feature_kind == TerrainFeatureKind.RUINS.value:
@@ -213,7 +344,7 @@ def _terrain_feature_from_battlefield_layout(
             width=feature.footprint_width_inches,
             depth=feature.footprint_depth_inches,
             display_geometry=feature.display_geometry,
-            source_id=source_id,
+            source_id=feature_source_id,
         )
     return TerrainFeatureTemplate(
         feature_id=feature.feature_id,
@@ -225,7 +356,7 @@ def _terrain_feature_from_battlefield_layout(
         display_geometry=feature.display_geometry,
         walls=(),
         floors=(),
-        source_id=source_id,
+        source_id=feature_source_id,
     )
 
 
@@ -294,7 +425,11 @@ def _ruins_feature(
     )
 
 
-def _primary_missions() -> tuple[PrimaryMissionDefinition, ...]:
+def _primary_missions(
+    *,
+    rows: tuple[source_data.SourcePrimaryMissionRow, ...],
+    source_id: str,
+) -> tuple[PrimaryMissionDefinition, ...]:
     return tuple(
         PrimaryMissionDefinition(
             primary_mission_id=row.primary_mission_id,
@@ -304,15 +439,19 @@ def _primary_missions() -> tuple[PrimaryMissionDefinition, ...]:
             vp_per_controlled_objective=row.vp_per_controlled_objective,
             scoring_rules=_scoring_rules(
                 row.scoring_rules,
-                source_prefix=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:primary:{row.primary_mission_id}",
+                source_prefix=f"{source_id}:primary:{row.primary_mission_id}",
             ),
-            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:primary:{row.primary_mission_id}",
+            source_id=f"{source_id}:primary:{row.primary_mission_id}",
         )
-        for row in source_data.primary_mission_rows()
+        for row in rows
     )
 
 
-def _secondary_missions() -> tuple[SecondaryMissionDefinition, ...]:
+def _secondary_missions(
+    *,
+    rows: tuple[source_data.SourceSecondaryMissionRow, ...],
+    source_id: str,
+) -> tuple[SecondaryMissionDefinition, ...]:
     return tuple(
         SecondaryMissionDefinition(
             secondary_mission_id=row.secondary_mission_id,
@@ -321,30 +460,34 @@ def _secondary_missions() -> tuple[SecondaryMissionDefinition, ...]:
             tournament_fixed_allowed=row.tournament_fixed_allowed,
             scoring_rules=_scoring_rules(
                 row.scoring_rules,
-                source_prefix=(
-                    f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:secondary:{row.secondary_mission_id}"
-                ),
+                source_prefix=f"{source_id}:secondary:{row.secondary_mission_id}",
             ),
-            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:secondary:{row.secondary_mission_id}",
+            source_id=f"{source_id}:secondary:{row.secondary_mission_id}",
         )
-        for row in source_data.secondary_mission_rows()
+        for row in rows
     )
 
 
-def _force_dispositions() -> tuple[ForceDispositionDefinition, ...]:
+def _force_dispositions(
+    *,
+    rows: tuple[source_data.SourceForceDispositionRow, ...],
+    source_id: str,
+) -> tuple[ForceDispositionDefinition, ...]:
     return tuple(
         ForceDispositionDefinition(
             force_disposition_id=row.force_disposition_id,
             name=row.name,
-            source_id=(
-                f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:force-disposition:{row.force_disposition_id}"
-            ),
+            source_id=f"{source_id}:force-disposition:{row.force_disposition_id}",
         )
-        for row in source_data.force_disposition_rows()
+        for row in rows
     )
 
 
-def _primary_mission_matrix_cells() -> tuple[PrimaryMissionMatrixCell, ...]:
+def _primary_mission_matrix_cells(
+    *,
+    rows: tuple[source_data.SourcePrimaryMissionMatrixCellRow, ...],
+    source_id: str,
+) -> tuple[PrimaryMissionMatrixCell, ...]:
     return tuple(
         PrimaryMissionMatrixCell(
             player_force_disposition_id=row.player_force_disposition_id,
@@ -353,16 +496,20 @@ def _primary_mission_matrix_cells() -> tuple[PrimaryMissionMatrixCell, ...]:
             battlefield_layout_ids=row.battlefield_layout_ids,
             source_status=MissionSourceStatus(row.source_status),
             source_id=(
-                f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:primary-mission-matrix:"
+                f"{source_id}:primary-mission-matrix:"
                 f"{row.player_force_disposition_id}:"
                 f"{row.opponent_force_disposition_id}"
             ),
         )
-        for row in source_data.primary_mission_matrix_rows()
+        for row in rows
     )
 
 
-def _mission_actions() -> tuple[MissionActionDefinition, ...]:
+def _mission_actions(
+    *,
+    rows: tuple[source_data.SourceMissionActionRow, ...],
+    source_id: str,
+) -> tuple[MissionActionDefinition, ...]:
     return tuple(
         MissionActionDefinition(
             mission_action_id=row.mission_action_id,
@@ -377,9 +524,9 @@ def _mission_actions() -> tuple[MissionActionDefinition, ...]:
             interruption_conditions=row.interruption_conditions,
             victory_points=row.victory_points,
             scoring_source_id=row.scoring_source_id,
-            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:action:{row.mission_action_id}",
+            source_id=f"{source_id}:action:{row.mission_action_id}",
         )
-        for row in source_data.mission_action_rows()
+        for row in rows
     )
 
 
@@ -402,7 +549,7 @@ def _scoring_rules(
     )
 
 
-def _challenger_cards() -> tuple[ChallengerCardDefinition, ...]:
+def _challenger_cards(*, source_id: str) -> tuple[ChallengerCardDefinition, ...]:
     cards = (
         ("all-in", "All In"),
         ("burst-of-speed", "Burst of Speed"),
@@ -418,23 +565,24 @@ def _challenger_cards() -> tuple[ChallengerCardDefinition, ...]:
         ChallengerCardDefinition(
             challenger_card_id=card_id,
             name=name,
-            source_id=f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:challenger:{card_id}",
+            source_id=f"{source_id}:challenger:{card_id}",
         )
         for card_id, name in cards
     )
 
 
-def _mission_pool_entries() -> tuple[MissionPoolEntry, ...]:
+def _mission_pool_entries(
+    *,
+    rows: tuple[source_data.SourceBattlefieldLayoutRow, ...],
+    source_id: str,
+) -> tuple[MissionPoolEntry, ...]:
     return tuple(
         MissionPoolEntry(
             mission_pool_entry_id=f"mission-{row.battlefield_layout_id}",
             primary_mission_id=row.primary_mission_id,
             deployment_map_id=row.deployment_map_id,
             terrain_layout_ids=(row.terrain_layout_id,),
-            source_id=(
-                f"{CHAPTER_APPROVED_2026_27_SOURCE_ID}:battlefield-layout:"
-                f"{row.battlefield_layout_id}:mission-pool"
-            ),
+            source_id=(f"{source_id}:battlefield-layout:{row.battlefield_layout_id}:mission-pool"),
         )
-        for row in source_data.battlefield_layout_rows()
+        for row in rows
     )

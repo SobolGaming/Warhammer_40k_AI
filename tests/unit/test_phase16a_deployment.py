@@ -119,6 +119,68 @@ def test_phase16a_deploy_armies_uses_lifecycle_decisions_not_deterministic_bridg
     assert "object at 0x" not in payload_blob
 
 
+def test_phase17j_deployment_queue_drains_opponent_remaining_units() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    config = _config(
+        army_muster_requests=(
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_id="intercessor-unit-1",
+            ),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_id="intercessor-unit-2",
+                unit_selections=(
+                    _unit_selection(unit_selection_id="intercessor-unit-2"),
+                    _unit_selection(unit_selection_id="intercessor-unit-3"),
+                ),
+            ),
+        )
+    )
+    lifecycle, first_status = _advance_to_first_deployment_selection(config)
+    first_request = _decision_request(first_status)
+
+    assert first_request.actor_id == "player-b"
+    assert _option_ids(first_request) == (
+        "deploy:army-beta:intercessor-unit-2",
+        "deploy:army-beta:intercessor-unit-3",
+    )
+
+    first_placement = submit_deployment_unit_selection(
+        lifecycle,
+        request=first_request,
+        result_id="phase17j-drain-select-b1",
+        option_id="deploy:army-beta:intercessor-unit-2",
+    )
+    second_selection = submit_deployment_placement(
+        lifecycle,
+        request=_decision_request(first_placement),
+        result_id="phase17j-drain-place-b1",
+    )
+    second_request = _decision_request(second_selection)
+    assert second_request.actor_id == "player-a"
+    assert _option_ids(second_request) == ("deploy:army-alpha:intercessor-unit-1",)
+
+    second_placement = submit_deployment_unit_selection(
+        lifecycle,
+        request=second_request,
+        result_id="phase17j-drain-select-a1",
+    )
+    drain_selection = submit_deployment_placement(
+        lifecycle,
+        request=_decision_request(second_placement),
+        result_id="phase17j-drain-place-a1",
+    )
+    drain_request = _decision_request(drain_selection)
+
+    assert drain_request.actor_id == "player-b"
+    assert _option_ids(drain_request) == ("deploy:army-beta:intercessor-unit-3",)
+
+
 def test_phase16a_invalid_deployment_rejects_before_queue_pop_without_mutation() -> None:
     lifecycle, placement_request = _advance_to_first_deployment_placement()
     before_request_id = placement_request.request_id
