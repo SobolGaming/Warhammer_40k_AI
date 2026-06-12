@@ -37,6 +37,10 @@ from warhammer40k_core.engine.deployment import (
     is_deployment_placement_request,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
+from warhammer40k_core.engine.faction_content.bundle import (
+    RuntimeContentBundle,
+)
+from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle_for_armies
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_INTERRUPT_DECISION_TYPE,
@@ -282,6 +286,7 @@ class GameLifecycle:
         default_factory=TriggeredMovementHandler
     )
     _battle_round_flow: BattleRoundFlow | None = None
+    _runtime_content_bundle: RuntimeContentBundle | None = None
 
     def __post_init__(self) -> None:
         if type(self.parameterized_movement_proposals) is not bool:
@@ -377,12 +382,14 @@ class GameLifecycle:
                 payload=state.game_result_payload(),
             )
         if state.stage is GameLifecycleStage.SETUP:
-            return self._setup_flow.advance(
+            status = self._setup_flow.advance(
                 state=state,
                 decisions=self.decision_controller,
                 config=self._require_config(),
                 reaction_frame_count=len(self.reaction_queue.frames),
             )
+            self._refresh_runtime_content_bundle_if_armies_mustered()
+            return status
         return self._require_battle_round_flow().advance(
             state=state,
             decisions=self.decision_controller,
@@ -1217,6 +1224,7 @@ class GameLifecycle:
                 decisions=self.decision_controller,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
+                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
             )
             if self._result_resolves_active_reaction_frame(result):
                 follow_up_request = self._pending_decision_request()
@@ -1257,6 +1265,7 @@ class GameLifecycle:
                 decisions=self.decision_controller,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
+                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
             )
             advanced_status = self.advance_until_decision_or_terminal()
             if resolves_reaction_frame:
@@ -1339,6 +1348,7 @@ class GameLifecycle:
             reaction_queue=lifecycle.reaction_queue,
             pending_request=lifecycle._pending_decision_request(),
         )
+        lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
         lifecycle._battle_round_flow = BattleRoundFlow(phase_handlers=lifecycle._phase_handlers())
         return lifecycle
 
@@ -1371,6 +1381,25 @@ class GameLifecycle:
         if self._battle_round_flow is None:
             raise GameLifecycleError("GameLifecycle battle round flow is unavailable.")
         return self._battle_round_flow
+
+    def _require_runtime_content_bundle(self) -> RuntimeContentBundle:
+        self._refresh_runtime_content_bundle_if_armies_mustered()
+        if self._runtime_content_bundle is None:
+            raise GameLifecycleError("GameLifecycle runtime content bundle is unavailable.")
+        return self._runtime_content_bundle
+
+    def _refresh_runtime_content_bundle_if_armies_mustered(self) -> None:
+        if self._runtime_content_bundle is not None:
+            return
+        if self._config is None:
+            return
+        state = self._require_state()
+        if not state.army_definitions:
+            return
+        self._runtime_content_bundle = build_runtime_content_bundle_for_armies(
+            config=self._config,
+            armies=tuple(state.army_definitions),
+        )
 
     def _result_resolves_active_reaction_frame(self, result: DecisionResult) -> bool:
         if type(result) is not DecisionResult:

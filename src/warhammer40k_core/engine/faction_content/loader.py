@@ -1,0 +1,269 @@
+from __future__ import annotations
+
+import importlib
+from collections.abc import Mapping
+from dataclasses import dataclass
+from enum import StrEnum
+from types import MappingProxyType, ModuleType
+from typing import Self, cast
+
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.phase import GameLifecycleError
+
+
+class RuntimeContentModuleFamily(StrEnum):
+    FACTION = "faction"
+    DETACHMENT = "detachment"
+    ENHANCEMENT = "enhancement"
+    STRATAGEM = "stratagem"
+    DATASHEET = "datasheet"
+    WARGEAR = "wargear"
+    WEAPON_PROFILE = "weapon_profile"
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContentModuleRef:
+    family: RuntimeContentModuleFamily
+    content_id: str
+    module_path: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "family",
+            _module_family_from_token(self.family),
+        )
+        object.__setattr__(
+            self,
+            "content_id",
+            _validate_identifier("content_id", self.content_id),
+        )
+        object.__setattr__(
+            self,
+            "module_path",
+            _validate_module_path("module_path", self.module_path),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeContentModuleIndex:
+    faction_modules: Mapping[str, str]
+    detachment_modules: Mapping[str, str]
+    enhancement_modules: Mapping[str, str]
+    stratagem_modules: Mapping[str, str]
+    datasheet_modules: Mapping[str, str]
+    wargear_modules: Mapping[str, str]
+    weapon_profile_modules: Mapping[str, str]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "faction_modules",
+            _validate_module_mapping("faction_modules", self.faction_modules),
+        )
+        object.__setattr__(
+            self,
+            "detachment_modules",
+            _validate_module_mapping("detachment_modules", self.detachment_modules),
+        )
+        object.__setattr__(
+            self,
+            "enhancement_modules",
+            _validate_module_mapping("enhancement_modules", self.enhancement_modules),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_modules",
+            _validate_module_mapping("stratagem_modules", self.stratagem_modules),
+        )
+        object.__setattr__(
+            self,
+            "datasheet_modules",
+            _validate_module_mapping("datasheet_modules", self.datasheet_modules),
+        )
+        object.__setattr__(
+            self,
+            "wargear_modules",
+            _validate_module_mapping("wargear_modules", self.wargear_modules),
+        )
+        object.__setattr__(
+            self,
+            "weapon_profile_modules",
+            _validate_module_mapping("weapon_profile_modules", self.weapon_profile_modules),
+        )
+
+    @classmethod
+    def empty(cls) -> Self:
+        return cls(
+            faction_modules={},
+            detachment_modules={},
+            enhancement_modules={},
+            stratagem_modules={},
+            datasheet_modules={},
+            wargear_modules={},
+            weapon_profile_modules={},
+        )
+
+    def refs_for_activation(
+        self,
+        activation: RuntimeContentActivation,
+    ) -> tuple[RuntimeContentModuleRef, ...]:
+        if type(activation) is not RuntimeContentActivation:
+            raise GameLifecycleError("Runtime content module lookup requires activation.")
+        refs = (
+            *_refs_for_ids(
+                family=RuntimeContentModuleFamily.FACTION,
+                values=activation.selected_faction_ids,
+                mapping=self.faction_modules,
+            ),
+            *_refs_for_ids(
+                family=RuntimeContentModuleFamily.DETACHMENT,
+                values=activation.selected_detachment_ids,
+                mapping=self.detachment_modules,
+            ),
+            *_refs_for_ids(
+                family=RuntimeContentModuleFamily.ENHANCEMENT,
+                values=activation.selected_enhancement_ids,
+                mapping=self.enhancement_modules,
+            ),
+            *_refs_for_ids(
+                family=RuntimeContentModuleFamily.STRATAGEM,
+                values=activation.selected_stratagem_ids,
+                mapping=self.stratagem_modules,
+            ),
+            *_refs_for_ids(
+                family=RuntimeContentModuleFamily.DATASHEET,
+                values=activation.selected_datasheet_ids,
+                mapping=self.datasheet_modules,
+            ),
+            *_optional_refs_for_ids(
+                family=RuntimeContentModuleFamily.WARGEAR,
+                values=activation.selected_wargear_ids,
+                mapping=self.wargear_modules,
+            ),
+            *_optional_refs_for_ids(
+                family=RuntimeContentModuleFamily.WEAPON_PROFILE,
+                values=activation.selected_weapon_profile_ids,
+                mapping=self.weapon_profile_modules,
+            ),
+        )
+        return tuple(
+            sorted(refs, key=lambda ref: (ref.module_path, ref.family.value, ref.content_id))
+        )
+
+    def module_paths_for_activation(self, activation: RuntimeContentActivation) -> tuple[str, ...]:
+        return tuple(sorted({ref.module_path for ref in self.refs_for_activation(activation)}))
+
+
+def load_runtime_content_contributions(
+    *,
+    activation: RuntimeContentActivation,
+    module_index: RuntimeContentModuleIndex,
+) -> tuple[RuntimeContentContribution, ...]:
+    if type(module_index) is not RuntimeContentModuleIndex:
+        raise GameLifecycleError("Runtime content loading requires a module index.")
+    contributions: list[RuntimeContentContribution] = []
+    for module_path in module_index.module_paths_for_activation(activation):
+        module = importlib.import_module(module_path)
+        contribution = _runtime_contribution_from_module(module)
+        contributions.append(contribution)
+    return tuple(contributions)
+
+
+def _runtime_contribution_from_module(module: ModuleType) -> RuntimeContentContribution:
+    if type(module) is not ModuleType:
+        raise GameLifecycleError("Runtime content loader requires a Python module.")
+    if "runtime_contribution" not in module.__dict__:
+        raise GameLifecycleError("Runtime content module must expose runtime_contribution().")
+    factory = module.__dict__["runtime_contribution"]
+    if not callable(factory):
+        raise GameLifecycleError("Runtime content module runtime_contribution must be callable.")
+    contribution = factory()
+    if type(contribution) is not RuntimeContentContribution:
+        raise GameLifecycleError(
+            "Runtime content module returned invalid RuntimeContentContribution."
+        )
+    return contribution
+
+
+def _refs_for_ids(
+    *,
+    family: RuntimeContentModuleFamily,
+    values: tuple[str, ...],
+    mapping: Mapping[str, str],
+) -> tuple[RuntimeContentModuleRef, ...]:
+    refs: list[RuntimeContentModuleRef] = []
+    for content_id in values:
+        module_path = mapping.get(content_id)
+        if module_path is None:
+            raise GameLifecycleError("Runtime content module index is missing selected support.")
+        refs.append(
+            RuntimeContentModuleRef(
+                family=family,
+                content_id=content_id,
+                module_path=module_path,
+            )
+        )
+    return tuple(refs)
+
+
+def _optional_refs_for_ids(
+    *,
+    family: RuntimeContentModuleFamily,
+    values: tuple[str, ...],
+    mapping: Mapping[str, str],
+) -> tuple[RuntimeContentModuleRef, ...]:
+    refs: list[RuntimeContentModuleRef] = []
+    for content_id in values:
+        module_path = mapping.get(content_id)
+        if module_path is None:
+            continue
+        refs.append(
+            RuntimeContentModuleRef(
+                family=family,
+                content_id=content_id,
+                module_path=module_path,
+            )
+        )
+    return tuple(refs)
+
+
+def _validate_module_mapping(field_name: str, value: object) -> Mapping[str, str]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError(f"Runtime content {field_name} must be a mapping.")
+    validated: dict[str, str] = {}
+    for raw_content_id, raw_module_path in cast(Mapping[object, object], value).items():
+        content_id = _validate_identifier("content_id", raw_content_id)
+        module_path = _validate_module_path("module_path", raw_module_path)
+        if content_id in validated:
+            raise GameLifecycleError(f"Runtime content {field_name} must not duplicate IDs.")
+        validated[content_id] = module_path
+    return MappingProxyType(dict(sorted(validated.items())))
+
+
+def _module_family_from_token(token: object) -> RuntimeContentModuleFamily:
+    if type(token) is RuntimeContentModuleFamily:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("RuntimeContentModuleFamily token must be a string.")
+    try:
+        return RuntimeContentModuleFamily(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported RuntimeContentModuleFamily token: {token}.") from exc
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"Runtime content {field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"Runtime content {field_name} must not be empty.")
+    return stripped
+
+
+def _validate_module_path(field_name: str, value: object) -> str:
+    module_path = _validate_identifier(field_name, value)
+    if module_path.startswith(".") or module_path.endswith(".") or ".." in module_path:
+        raise GameLifecycleError("Runtime content module path must be absolute and normalized.")
+    return module_path

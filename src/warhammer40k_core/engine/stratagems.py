@@ -135,6 +135,9 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+        StratagemHandlerRegistry,
+    )
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -1682,6 +1685,7 @@ def apply_stratagem_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None = None,
 ) -> StratagemUseRecord:
     if type(result) is not DecisionResult:
         raise GameLifecycleError("Stratagem application requires a DecisionResult.")
@@ -1699,6 +1703,7 @@ def apply_stratagem_decision(
         effect_selection=effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        stratagem_handler_registry=stratagem_handler_registry,
     )
 
 
@@ -1713,6 +1718,7 @@ def _apply_stratagem_use(
     effect_selection: JsonValue,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None,
 ) -> StratagemUseRecord:
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
@@ -1805,6 +1811,7 @@ def _apply_stratagem_use(
         use_record=use_record,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        stratagem_handler_registry=stratagem_handler_registry,
     )
     return use_record
 
@@ -1855,6 +1862,7 @@ def apply_stratagem_target_proposal(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None = None,
 ) -> StratagemUseRecord:
     proposal = _proposal_from_result_payload(result.payload)
     if proposal is None or proposal.target_binding is None:
@@ -1877,6 +1885,7 @@ def apply_stratagem_target_proposal(
         effect_selection=proposal.effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        stratagem_handler_registry=stratagem_handler_registry,
     )
 
 
@@ -4327,9 +4336,40 @@ def _apply_supported_stratagem_handler(
     use_record: StratagemUseRecord,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    stratagem_handler_registry: StratagemHandlerRegistry | None,
 ) -> None:
     if definition.handler_id == "record_only":
         return
+    if stratagem_handler_registry is not None:
+        from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+            StratagemHandlerContext,
+            StratagemHandlerExecutionStatus,
+            StratagemHandlerRegistry,
+        )
+
+        if type(stratagem_handler_registry) is not StratagemHandlerRegistry:
+            raise GameLifecycleError("Stratagem handler registry is invalid.")
+        if stratagem_handler_registry.has_handler(definition.handler_id):
+            handler_result = stratagem_handler_registry.execute(
+                handler_id=definition.handler_id,
+                context=StratagemHandlerContext(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                    eligibility_context=context,
+                    definition=definition,
+                    target_binding=target_binding,
+                    use_record=use_record,
+                    ruleset_descriptor=ruleset_descriptor,
+                    army_catalog=army_catalog,
+                ),
+            )
+            if handler_result.status is not StratagemHandlerExecutionStatus.APPLIED:
+                if handler_result.reason is None:
+                    raise GameLifecycleError("Stratagem handler failed without reason.")
+                raise GameLifecycleError(f"Stratagem handler failed: {handler_result.reason}.")
+            decisions.event_log.append("stratagem_handler_applied", handler_result.to_payload())
+            return
     if definition.handler_id == CORE_COMMAND_REROLL_HANDLER_ID:
         _apply_command_reroll_handler(
             state=state,

@@ -735,6 +735,9 @@ class AbilityHandlerRegistry:
         )
         return self.from_bindings((*tuple(self._handlers.values()), binding))
 
+    def all_bindings(self) -> tuple[AbilityHandlerBinding, ...]:
+        return tuple(sorted(self._handlers.values(), key=lambda binding: binding.handler_id))
+
     def execute(
         self,
         *,
