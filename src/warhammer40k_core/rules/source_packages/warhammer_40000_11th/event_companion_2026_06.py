@@ -148,15 +148,35 @@ class FixedSecondaryProcedureDescriptor:
 
 
 @dataclass(frozen=True, slots=True)
+class MissionCardScoringGrammarRule:
+    rule_id: str
+    token: str
+    semantics: str
+    engine_contract: str
+    source_id: str
+
+    def to_payload(self) -> dict[str, str]:
+        return {
+            "rule_id": self.rule_id,
+            "token": self.token,
+            "semantics": self.semantics,
+            "engine_contract": self.engine_contract,
+            "source_id": self.source_id,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class MissionCardScoringGrammar:
     grammar_id: str
     supported_tokens: tuple[str, ...]
+    rules: tuple[MissionCardScoringGrammarRule, ...]
     source_id: str
 
     def to_payload(self) -> dict[str, object]:
         return {
             "grammar_id": self.grammar_id,
             "supported_tokens": list(self.supported_tokens),
+            "rules": [rule.to_payload() for rule in self.rules],
             "source_id": self.source_id,
         }
 
@@ -491,6 +511,52 @@ def mission_card_scoring_grammar() -> MissionCardScoringGrammar:
             "vp_up_to_limit",
             "when_drawn_tactical_only",
         ),
+        rules=(
+            MissionCardScoringGrammarRule(
+                rule_id="cumulative-condition",
+                token="cumulative_condition",
+                semantics="score_normal_and_cumulative_vp_when_cumulative_condition_is_achieved",
+                engine_contract="sum_achieved_cumulative_rules_for_the_same_card",
+                source_id=f"{SOURCE_PACKAGE_ID}:mission-card-scoring-grammar:cumulative-condition",
+            ),
+            MissionCardScoringGrammarRule(
+                rule_id="exclusive-or-condition",
+                token="exclusive_or_condition",
+                semantics="score_only_one_of_the_normal_or_or_conditions",
+                engine_contract="do_not_sum_exclusive_or_branches_for_the_same_card",
+                source_id=f"{SOURCE_PACKAGE_ID}:mission-card-scoring-grammar:exclusive-or-condition",
+            ),
+            MissionCardScoringGrammarRule(
+                rule_id="exactly-one-condition",
+                token="exactly_one_condition",
+                semantics="underlined_one_means_exactly_one_not_one_or_more",
+                engine_contract="score_count_must_equal_one_for_exactly_one_conditions",
+                source_id=f"{SOURCE_PACKAGE_ID}:mission-card-scoring-grammar:exactly-one-condition",
+            ),
+            MissionCardScoringGrammarRule(
+                rule_id="leaves-battlefield-event",
+                token="leaves_battlefield_event",
+                semantics="unit_destroyed_embarks_or_is_removed_from_battlefield_by_rule",
+                engine_contract=(
+                    "leaves_battlefield_evidence_must_include_destroyed_embarked_and_rule_removed"
+                ),
+                source_id=f"{SOURCE_PACKAGE_ID}:mission-card-scoring-grammar:leaves-battlefield-event",
+            ),
+            MissionCardScoringGrammarRule(
+                rule_id="vp-up-to-limit",
+                token="vp_up_to_limit",
+                semantics="ignore_vp_scored_in_excess_of_the_stated_limit",
+                engine_contract="apply_rule_cap_before_adding_award_to_the_vp_ledger",
+                source_id=f"{SOURCE_PACKAGE_ID}:mission-card-scoring-grammar:vp-up-to-limit",
+            ),
+            MissionCardScoringGrammarRule(
+                rule_id="when-drawn-tactical-only",
+                token="when_drawn_tactical_only",
+                semantics="when_drawn_sections_apply_only_to_tactical_secondary_missions",
+                engine_contract="ignore_when_drawn_sections_for_fixed_secondary_mode",
+                source_id=f"{SOURCE_PACKAGE_ID}:mission-card-scoring-grammar:when-drawn-tactical-only",
+            ),
+        ),
         source_id=f"{SOURCE_PACKAGE_ID}:mission-card-scoring-grammar",
     )
 
@@ -695,6 +761,22 @@ def primary_mission_action_source_rows() -> tuple[EventPrimaryMissionActionSourc
             engine_exposure_status="source_known_engine_pending",
             source_id=f"{SOURCE_PACKAGE_ID}:primary-action:triangulate-objective",
         ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="extract-intelligence",
+            primary_mission_id="primary-gather-intel",
+            name="Extract Intelligence",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start_from_battle_round_two",
+            completion_timing="turn_end",
+            eligible_unit_policy="active_player_unit",
+            target_policy="objective_marker_excluding_home_without_friendly_operation_marker",
+            use_limit="unlimited_different_objective_per_unit_this_phase",
+            effect_descriptor=(
+                "objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end"
+            ),
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:extract-intelligence",
+        ),
     )
 
 
@@ -834,6 +916,13 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:each_enemy_unit_destroyed_this_turn",
         "engine_primary_condition:control_central_and_expansion_objectives",
         "source_objective_role:expansion_objective",
+    ),
+    "primary-gather-intel": (
+        "engine_primary_action:extract-intelligence",
+        "engine_primary_marker_state:gather_intel_operation_marker",
+        "engine_primary_condition:control_one_or_more_central_objectives_first_battle_round",
+        "engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn",
+        "engine_primary_condition:gather_intel_operation_marker_end_of_battle",
     ),
     "primary-destroyers-wrath": (
         "engine_primary_condition:control_more_objectives_than_opponent",
@@ -1140,6 +1229,45 @@ def _source_known_event_primary_mission_rows_by_id() -> dict[
                     "end_of_battle",
                     10,
                     "control_four_or_more_objectives_end_of_battle",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-gather-intel",
+            name="Gather Intel",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "gather-intel-central-first-round-turn-end",
+                    "first_battle_round_turn_end",
+                    6,
+                    "control_one_or_more_central_objectives_first_battle_round",
+                ),
+                _event_primary_rule(
+                    "gather-intel-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "gather-intel-extracted-intelligence-turn-end",
+                    "turn_end_from_battle_round_two",
+                    7,
+                    "each_friendly_unit_extracted_intelligence_this_turn",
+                ),
+                _event_primary_rule(
+                    "gather-intel-three-markers-end-battle",
+                    "end_of_battle",
+                    5,
+                    "three_or_more_friendly_operation_markers_on_battlefield_end_of_battle",
+                ),
+                _event_primary_rule(
+                    "gather-intel-opponent-home-marker-end-battle",
+                    "end_of_battle",
+                    5,
+                    "friendly_operation_marker_within_opponent_home_objective_range_end_of_battle",
                 ),
             ),
         ),

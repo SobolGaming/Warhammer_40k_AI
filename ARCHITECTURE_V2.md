@@ -4412,8 +4412,8 @@ Implemented coverage:
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
 - `primary_mission_scoring_coverage_rows()` tracks Primary Mission scoring
-  status: 3 missions are engine-implemented, 8 are source-known but require
-  engine implementation, and 14 still await source scoring text.
+  status: 3 missions are engine-implemented, 9 are source-known but require
+  engine implementation, and 13 still await source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
   with deterministic layout descriptors while exact per-page coordinate
   extraction remains explicitly marked pending.
@@ -4499,9 +4499,11 @@ Invariants:
   models remaining.
 - Primary, Secondary, Fixed-card, Battle Ready, and total VP caps are
   source-backed and enforced by the scoring ledger.
-- Mission-card scoring supports `cumulative_condition`,
+- Mission-card scoring grammar records `cumulative_condition`,
   `exclusive_or_condition`, `exactly_one_condition`, `vp_up_to_limit`,
-  `when_drawn_tactical_only`, and `leaves_battlefield_event`.
+  `when_drawn_tactical_only`, and `leaves_battlefield_event` semantics. Runtime
+  card-specific paths must either implement those semantics through structured
+  evidence or fail closed.
 - Event Companion v1.0 has an empty Chapter Approved Mission Deck
   card-amendment set; FAQ behavior is represented as source-linked patch
   operations separately.

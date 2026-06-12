@@ -12,6 +12,8 @@ Canonical data lives in code:
   [`primary_mission_matrix_rows()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py)
 - Primary scoring coverage:
   [`primary_mission_scoring_coverage_rows()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py)
+- Mission-card scoring grammar:
+  [`mission_card_scoring_grammar()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py)
 - Secondary mission source rows:
   [`secondary_mission_rows()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chapter_approved_2026_27.py),
   imported by the Event Companion mission pack
@@ -56,16 +58,27 @@ Secondary status:
 ## Summary
 
 - Primary matrix cells: 25 of 25 `implemented`.
-- Primary scoring coverage: 3 `engine_implemented`, 8
-  `source_known_engine_pending`, 14 `awaiting_source`.
-- Primary source-only actions: `decoy-objective` and `triangulate-objective` are
-  tracked as source descriptors only and are not exposed as runtime mission
-  actions.
+- Primary scoring coverage: 3 `engine_implemented`, 9
+  `source_known_engine_pending`, 13 `awaiting_source`.
+- Primary source-only actions: `decoy-objective`, `triangulate-objective`, and
+  `extract-intelligence` are tracked as source descriptors only and are not
+  exposed as runtime mission actions.
 - Secondary missions: 20 `source_tracked` and `policy_loaded`.
 - Secondary scoring rows: 6 fixed rows, 22 tactical rows, and 10 alternate or
   partial rows.
 - Tournament fixed secondaries: 4 cards are flagged as fixed-allowed
   (`Assassination`, `Bring It Down`, `Cleanse`, `Cull the Horde`).
+
+## Mission-Card Scoring Grammar
+
+| Official Rule Token | Source Status | Engine Contract |
+| --- | --- | --- |
+| `cumulative_condition` | `source_tracked` | Achieved cumulative branches score together with their normal condition. |
+| `exclusive_or_condition` | `source_tracked` | Exclusive OR branches must not be summed for the same card. |
+| `exactly_one_condition` | `source_tracked` | Underlined one means exactly one, not one or more. |
+| `leaves_battlefield_event` | `source_tracked` | Card-specific evidence must include destroyed, embarked, and rule-removed units before a leaves-battlefield condition can become `state_backed`. |
+| `vp_up_to_limit` | `source_tracked`, `engine_guarded` | Rule caps and ledger caps ignore VP above the stated limit. |
+| `when_drawn_tactical_only` | `source_tracked` | When Drawn sections apply only to Tactical Secondary Missions and must not affect Fixed Secondary mode. |
 
 ## Primary Mission Matrix
 
@@ -89,7 +102,7 @@ Secondary status:
 | `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:triangulate-objective`, `engine_primary_marker_state:triangulated_objective`, `engine_primary_condition:triangulated_objective_thresholds`, `engine_primary_condition:control_four_or_more_objectives` |
 | `reconnaissance` | `take-and-hold` | Reconnaissance Sweep | `primary-reconnaissance-sweep` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
 | `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:extract-intelligence`, `engine_primary_marker_state:gather_intel_operation_marker`, `engine_primary_condition:control_one_or_more_central_objectives_first_battle_round`, `engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn`, `engine_primary_condition:gather_intel_operation_marker_end_of_battle` |
 | `reconnaissance` | `priority-assets` | Search and Scour | `primary-search-and-scour` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
 | `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
 | `priority-assets` | `take-and-hold` | Secure Asset | `primary-secure-asset` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
@@ -130,10 +143,10 @@ Secondary status:
 - `source_known_engine_pending` primary missions must remain fail-closed until
   the listed conditions, markers, actions, or choices have engine-owned
   validation and mutation paths.
-- `decoy-objective` and `triangulate-objective` are source-only descriptors. Do
-  not expose them through `MissionPackDefinition.mission_action(...)` or
-  Shooting-phase mission action start until their validation, marker state, and
-  scoring semantics exist.
+- `decoy-objective`, `triangulate-objective`, and `extract-intelligence` are
+  source-only descriptors. Do not expose them through
+  `MissionPackDefinition.mission_action(...)` or Shooting-phase mission action
+  start until their validation, marker state, and scoring semantics exist.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
   tactical draw, scoring, retain/discard, and state-backed awards. Individual
   card achievement semantics still need card-specific tests before moving from

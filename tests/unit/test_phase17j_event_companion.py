@@ -120,6 +120,34 @@ def test_phase17j_event_sequence_and_secondary_procedure_are_explicit() -> None:
     assert fixed.active_duration == "whole_battle"
 
 
+def test_phase17j_mission_card_scoring_grammar_records_official_rules() -> None:
+    grammar = event_source.mission_card_scoring_grammar()
+    rules = {rule.token: rule for rule in grammar.rules}
+    payload = grammar.to_payload()
+
+    assert tuple(rules) == grammar.supported_tokens
+    assert rules["cumulative_condition"].semantics == (
+        "score_normal_and_cumulative_vp_when_cumulative_condition_is_achieved"
+    )
+    assert rules["exclusive_or_condition"].engine_contract == (
+        "do_not_sum_exclusive_or_branches_for_the_same_card"
+    )
+    assert rules["exactly_one_condition"].semantics == (
+        "underlined_one_means_exactly_one_not_one_or_more"
+    )
+    assert rules["leaves_battlefield_event"].semantics == (
+        "unit_destroyed_embarks_or_is_removed_from_battlefield_by_rule"
+    )
+    assert rules["vp_up_to_limit"].engine_contract == (
+        "apply_rule_cap_before_adding_award_to_the_vp_ledger"
+    )
+    assert rules["when_drawn_tactical_only"].engine_contract == (
+        "ignore_when_drawn_sections_for_fixed_secondary_mode"
+    )
+    assert payload["rules"] == [rule.to_payload() for rule in grammar.rules]
+    assert "<" not in json.dumps(payload, sort_keys=True)
+
+
 def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
     mission_pack = warhammer_event_companion_2026_06_mission_pack()
     layout_ids = {layout.terrain_layout_id for layout in mission_pack.terrain_layout_templates}
@@ -366,8 +394,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert len(coverage_rows) == 25
     assert status_counts == {
         event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 3,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 8,
-        event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 14,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 9,
+        event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 13,
     }
     assert {
         mission_id: len(primary_rows[mission_id].scoring_rules)
@@ -381,6 +409,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
             "primary-delaying-action",
             "primary-smoke-and-mirrors",
             "primary-triangulation",
+            "primary-gather-intel",
         )
     } == {
         "primary-unstoppable-force": 4,
@@ -392,6 +421,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-delaying-action": 3,
         "primary-smoke-and-mirrors": 4,
         "primary-triangulation": 5,
+        "primary-gather-intel": 5,
     }
     assert primary_rows["primary-meatgrinder"].scoring_kind == (
         "event_companion_primary_source_known_engine_pending"
@@ -402,8 +432,12 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     )
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
     assert coverage_rows["primary-smoke-and-mirrors"].mission_action_count == 1
+    assert coverage_rows["primary-gather-intel"].mission_action_count == 1
     assert "engine_primary_action:decoy-objective" in (
         coverage_rows["primary-smoke-and-mirrors"].needed_work
+    )
+    assert "engine_primary_action:extract-intelligence" in (
+        coverage_rows["primary-gather-intel"].needed_work
     )
     assert "source_objective_role:expansion_objective" in (
         coverage_rows["primary-delaying-action"].needed_work
@@ -416,7 +450,11 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
     }
     mission_pack = warhammer_event_companion_2026_06_mission_pack()
 
-    assert set(action_sources) == {"decoy-objective", "triangulate-objective"}
+    assert set(action_sources) == {
+        "decoy-objective",
+        "extract-intelligence",
+        "triangulate-objective",
+    }
     assert action_sources["decoy-objective"].to_payload() == {
         "mission_action_id": "decoy-objective",
         "primary_mission_id": "primary-smoke-and-mirrors",
@@ -436,10 +474,30 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
     assert action_sources["triangulate-objective"].start_timing == (
         "shooting_phase_action_start_from_battle_round_two"
     )
+    assert action_sources["extract-intelligence"].to_payload() == {
+        "mission_action_id": "extract-intelligence",
+        "primary_mission_id": "primary-gather-intel",
+        "name": "Extract Intelligence",
+        "start_phase": "shooting",
+        "start_timing": "shooting_phase_action_start_from_battle_round_two",
+        "completion_timing": "turn_end",
+        "eligible_unit_policy": "active_player_unit",
+        "target_policy": "objective_marker_excluding_home_without_friendly_operation_marker",
+        "use_limit": "unlimited_different_objective_per_unit_this_phase",
+        "effect_descriptor": (
+            "objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end"
+        ),
+        "engine_exposure_status": "source_known_engine_pending",
+        "source_id": (
+            "gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:extract-intelligence"
+        ),
+    }
     with pytest.raises(MissionPackError, match="mission_action_id"):
         mission_pack.mission_action("decoy-objective")
     with pytest.raises(MissionPackError, match="mission_action_id"):
         mission_pack.mission_action("triangulate-objective")
+    with pytest.raises(MissionPackError, match="mission_action_id"):
+        mission_pack.mission_action("extract-intelligence")
 
 
 def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> None:
@@ -451,7 +509,10 @@ def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> 
         defender_player_id="player-beta",
     )
 
-    with pytest.raises(GameLifecycleError, match="Unsupported primary scoring rule condition"):
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary mission scoring source is known but engine implementation is pending",
+    ):
         mission_scoring_policy_from_setup(setup)
 
 
