@@ -108,6 +108,11 @@ def _public_event_payload(
             payload,
             viewer_player_id=viewer_player_id,
         )
+    if event_type == "tactical_secondary_missions_discarded":
+        return _public_tactical_secondary_discarded_payload(
+            payload,
+            viewer_player_id=viewer_player_id,
+        )
     if event_type == "mission_action_started":
         return _public_hidden_player_event_payload(
             "mission_action_started",

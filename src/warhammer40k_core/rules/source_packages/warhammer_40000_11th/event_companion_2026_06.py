@@ -12,6 +12,9 @@ from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, Terra
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as chapter_approved,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_base_size_rows,
+)
 
 EDITION_ID = "warhammer_40000_11th"
 MISSION_PACK_ID = "11e-warhammer-event-companion-2026-06"
@@ -243,6 +246,7 @@ class WarhammerEventLayoutDescriptor:
     player_territory_polygons: tuple[EventPolygonSourceRecord, ...]
     objective_points: tuple[EventObjectivePointRecord, ...]
     terrain_features: tuple[EventTerrainSourceRecord, ...]
+    geometry_extraction_status: str
     source_page: int
     source_id: str
 
@@ -267,6 +271,7 @@ class WarhammerEventLayoutDescriptor:
             ],
             "objective_points": [objective.to_payload() for objective in self.objective_points],
             "terrain_features": [feature.to_payload() for feature in self.terrain_features],
+            "geometry_extraction_status": self.geometry_extraction_status,
             "source_page": self.source_page,
             "source_id": self.source_id,
         }
@@ -276,6 +281,7 @@ class WarhammerEventLayoutDescriptor:
 class BaseSizeSourceRecord:
     record_id: str
     faction_name: str
+    source_section_name: str | None
     unit_name: str
     source_base_text: str
     base_source_kind: str
@@ -288,6 +294,7 @@ class BaseSizeSourceRecord:
         return {
             "record_id": self.record_id,
             "faction_name": self.faction_name,
+            "source_section_name": self.source_section_name,
             "unit_name": self.unit_name,
             "source_base_text": self.source_base_text,
             "base_source_kind": self.base_source_kind,
@@ -338,6 +345,8 @@ def mission_sequence_descriptor() -> WarhammerEventMissionSequenceDescriptor:
         ("determine_first_turn", "roll_off_winner_takes_first", 2),
         ("resolve_prebattle_rules", "first_turn_player_first", 2),
         ("begin_battle", "battle_round_one", 2),
+        ("end_battle", "after_five_battle_rounds_continue_tabled_players", 2),
+        ("determine_victor", "battle_ready_then_vp_total_then_draw_if_tied", 2),
     )
     return WarhammerEventMissionSequenceDescriptor(
         sequence_id="warhammer-event-mission-sequence",
@@ -423,19 +432,10 @@ def primary_mission_rows() -> tuple[chapter_approved.SourcePrimaryMissionRow, ..
             chapter_approved.SourcePrimaryMissionRow(
                 primary_mission_id=mission_id,
                 name=mission_name,
-                max_vp_per_turn=15,
-                scoring_kind="event_companion_primary_descriptor",
+                max_vp_per_turn=None,
+                scoring_kind="event_companion_primary_source_descriptor_only",
                 vp_per_controlled_objective=None,
-                scoring_rules=(
-                    chapter_approved.SourceScoringRuleRow(
-                        rule_id=f"{mission_id}-event-primary",
-                        timing="command_phase",
-                        source_kind="event_primary_descriptor",
-                        victory_points=1,
-                        cap=15,
-                        condition=f"{mission_id}-source_condition",
-                    ),
-                ),
+                scoring_rules=(),
             )
         )
     return tuple(rows)
@@ -493,7 +493,7 @@ def mission_pack_scoring_row() -> chapter_approved.SourceMissionPackScoringRow:
 
 def battlefield_layout_rows() -> tuple[chapter_approved.SourceBattlefieldLayoutRow, ...]:
     rows: list[chapter_approved.SourceBattlefieldLayoutRow] = []
-    for pair_index, (first_id, second_id) in enumerate(_layout_disposition_pairs()):
+    for first_id, second_id, source_start_page in _LAYOUT_SOURCE_PAGES:
         matrix_row = _matrix_row(first_id, second_id)
         for layout_number in (1, 2, 3):
             layout_id = f"{first_id}-vs-{second_id}-layout-{layout_number}"
@@ -508,7 +508,7 @@ def battlefield_layout_rows() -> tuple[chapter_approved.SourceBattlefieldLayoutR
                     opponent_force_disposition_id=second_id,
                     primary_mission_id=matrix_row.primary_mission_id,
                     layout_number=layout_number,
-                    source_page=9 + (pair_index * 3) + layout_number - 1,
+                    source_page=source_start_page + layout_number - 1,
                 )
             )
     return tuple(rows)
@@ -516,12 +516,12 @@ def battlefield_layout_rows() -> tuple[chapter_approved.SourceBattlefieldLayoutR
 
 def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
     descriptors: list[WarhammerEventLayoutDescriptor] = []
-    for pair_index, (first_id, second_id) in enumerate(_layout_disposition_pairs()):
+    for first_id, second_id, source_start_page in _LAYOUT_SOURCE_PAGES:
         player_primary = _matrix_row(first_id, second_id).primary_mission_id
         opponent_primary = _matrix_row(second_id, first_id).primary_mission_id
         for layout_number in (1, 2, 3):
             layout_id = f"{first_id}-vs-{second_id}-layout-{layout_number}"
-            source_page = 9 + (pair_index * 3) + layout_number - 1
+            source_page = source_start_page + layout_number - 1
             descriptors.append(
                 WarhammerEventLayoutDescriptor(
                     layout_id=layout_id,
@@ -554,6 +554,9 @@ def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
+                    geometry_extraction_status=(
+                        "layout_identity_source_page_bound_coordinates_pending"
+                    ),
                     source_page=source_page,
                     source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_id}:descriptor",
                 )
@@ -562,39 +565,18 @@ def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
 
 
 def base_size_source_rows() -> tuple[BaseSizeSourceRecord, ...]:
-    rows = (
-        (
-            "adepta-sororitas-battle-sisters-squad",
-            "Adepta Sororitas",
-            "Battle Sisters Squad",
-            "32mm",
-            55,
-        ),
-        (
-            "adepta-sororitas-triumph-of-saint-katherine",
-            "Adepta Sororitas",
-            "Triumph of Saint Katherine",
-            "120x92mm Oval Base",
-            55,
-        ),
-        ("adepta-sororitas-castigator", "Adepta Sororitas", "Castigator", "Hull", 55),
-        ("aeldari-falcon", "Aeldari", "Falcon", "Large Flying Base", 59),
-        ("aeldari-farseer-skyrunner", "Aeldari", "Farseer Skyrunner", "Small Flying Base", 59),
-        ("space-marines-intercessor-squad", "Space Marines", "Intercessor Squad", "32mm", 85),
-        ("space-marines-land-speeder", "Space Marines", "Land Speeder", "105x70mm Oval Base", 85),
-        ("space-marines-vindicator", "Space Marines", "Vindicator", "Hull", 86),
-        ("space-marines-thunderhawk-gunship", "Space Marines", "Thunderhawk Gunship", "Unique", 86),
-        ("world-eaters-angron", "World Eaters", "Angron", "100mm", 93),
-    )
     return tuple(
         _base_size_source_record(
             record_id=record_id,
             faction_name=faction_name,
+            source_section_name=source_section_name,
             unit_name=unit_name,
             source_base_text=base_text,
             source_page=source_page,
         )
-        for record_id, faction_name, unit_name, base_text, source_page in rows
+        for record_id, source_page, faction_name, source_section_name, unit_name, base_text in (
+            event_companion_base_size_rows.BASE_SIZE_SOURCE_ROWS
+        )
     )
 
 
@@ -621,7 +603,9 @@ def _battlefield_layout_row(
         battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
         coordinate_origin="top_left",
         coordinate_orientation="x_right_along_60_inch_edge_y_down_along_44_inch_edge",
-        source_status=f"event_companion_page_{source_page}_coordinate_record",
+        source_status=(
+            f"event_companion_page_{source_page}_layout_identity_coordinate_extraction_pending"
+        ),
         objective_markers=_layout_objectives(layout_id=layout_id, layout_number=layout_number),
         deployment_zones=_layout_deployment_zones(
             layout_id=layout_id,
@@ -917,6 +901,7 @@ def _base_size_source_record(
     *,
     record_id: str,
     faction_name: str,
+    source_section_name: str | None,
     unit_name: str,
     source_base_text: str,
     source_page: int,
@@ -925,6 +910,7 @@ def _base_size_source_record(
     return BaseSizeSourceRecord(
         record_id=record_id,
         faction_name=faction_name,
+        source_section_name=source_section_name,
         unit_name=unit_name,
         source_base_text=source_base_text,
         base_source_kind=base_source_kind,
@@ -962,6 +948,18 @@ def _base_source_kind_and_geometry(
             GeometryResolutionStatus.REQUIRES_PROJECT_GEOMETRY_OVERRIDE,
             None,
         )
+    if base_text == "Use model":
+        return (
+            "use_model",
+            GeometryResolutionStatus.REQUIRES_PROJECT_GEOMETRY_OVERRIDE,
+            None,
+        )
+    if base_text == "No official base size":
+        return (
+            "no_official_base_size",
+            GeometryResolutionStatus.UNSUPPORTED_FOR_PHYSICAL_GEOMETRY,
+            None,
+        )
     if base_text.endswith(" Oval Base"):
         dimensions = base_text.removesuffix(" Oval Base").removesuffix("mm")
         length_text, width_text = dimensions.split("x")
@@ -990,6 +988,25 @@ def _event_primary_mission_names() -> tuple[tuple[str, str], ...]:
     return tuple(sorted(seen.items()))
 
 
+_LAYOUT_SOURCE_PAGES: tuple[tuple[str, str, int], ...] = (
+    ("take-and-hold", "take-and-hold", 9),
+    ("take-and-hold", "purge-the-foe", 12),
+    ("take-and-hold", "disruption", 15),
+    ("take-and-hold", "reconnaissance", 18),
+    ("take-and-hold", "priority-assets", 21),
+    ("purge-the-foe", "purge-the-foe", 24),
+    ("purge-the-foe", "disruption", 27),
+    ("purge-the-foe", "reconnaissance", 30),
+    ("purge-the-foe", "priority-assets", 33),
+    ("disruption", "disruption", 36),
+    ("reconnaissance", "disruption", 39),
+    ("priority-assets", "disruption", 42),
+    ("reconnaissance", "reconnaissance", 45),
+    ("priority-assets", "reconnaissance", 48),
+    ("priority-assets", "priority-assets", 51),
+)
+
+
 def _matrix_row(
     player_force_disposition_id: str,
     opponent_force_disposition_id: str,
@@ -1001,21 +1018,6 @@ def _matrix_row(
         ):
             return row
     raise MissionPackError("Event Companion matrix row was not found.")
-
-
-def _layout_disposition_pairs() -> tuple[tuple[str, str], ...]:
-    ordered = (
-        "take-and-hold",
-        "purge-the-foe",
-        "priority-assets",
-        "reconnaissance",
-        "disruption",
-    )
-    return tuple(
-        (first_id, second_id)
-        for first_index, first_id in enumerate(ordered)
-        for second_id in ordered[first_index:]
-    )
 
 
 def _force_disposition_name(force_disposition_id: str) -> str:

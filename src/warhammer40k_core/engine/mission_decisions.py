@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import combinations
 from typing import cast
 
 from warhammer40k_core.core.missions import MissionActionDefinition
@@ -116,6 +117,25 @@ def request_tactical_secondary_discard(
                 "decision_type": TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
             },
         )
+    discard_cp_reward_window_id = _tactical_secondary_discard_cp_reward_window_id(
+        state=state,
+        player_id=requested_player,
+    )
+    reward_window_used = state.has_tactical_secondary_discard_cp_reward_window(
+        discard_cp_reward_window_id
+    )
+    if requested_player == active_player_id and reward_window_used:
+        return LifecycleStatus.unsupported(
+            stage=state.stage,
+            message="Tactical secondary discard CP reward window was already used.",
+            payload={
+                "game_id": state.game_id,
+                "player_id": requested_player,
+                "decision_type": TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
+                "discard_cp_reward_window_id": discard_cp_reward_window_id,
+            },
+        )
+    discard_sets = _active_tactical_secondary_discard_sets(active_cards)
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
@@ -127,21 +147,25 @@ def request_tactical_secondary_discard(
             "battle_round": state.battle_round,
             "phase": phase.value,
             "legal_secondary_mission_ids": [card.secondary_mission_id for card in active_cards],
+            "legal_secondary_mission_id_sets": [list(card_ids) for card_ids in discard_sets],
+            "discard_cp_reward_window_id": discard_cp_reward_window_id,
+            "discard_cp_reward_window_used": reward_window_used,
         },
         options=tuple(
             DecisionOption(
-                option_id=f"discard:{card.secondary_mission_id}",
-                label=f"Discard {card.secondary_mission_id}",
+                option_id=_tactical_secondary_discard_option_id(card_ids),
+                label=f"Discard {', '.join(card_ids)}",
                 payload={
                     "game_id": state.game_id,
                     "player_id": requested_player,
                     "active_player_id": active_player_id,
                     "battle_round": state.battle_round,
                     "phase": phase.value,
-                    "secondary_mission_id": card.secondary_mission_id,
+                    "secondary_mission_ids": list(card_ids),
+                    "discard_cp_reward_window_id": discard_cp_reward_window_id,
                 },
             )
-            for card in active_cards
+            for card_ids in discard_sets
         ),
     )
     decisions.request_decision(request)
@@ -376,7 +400,10 @@ def invalid_mission_decision_status(
     if request.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE:
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
-        secondary_mission_id = _payload_string(payload, key="secondary_mission_id")
+        secondary_mission_ids = _payload_identifier_tuple_from_list(
+            payload,
+            key="secondary_mission_ids",
+        )
         drift_reason = _decision_context_drift_reason(
             state=state,
             payload=payload,
@@ -390,17 +417,17 @@ def invalid_mission_decision_status(
                 payload={
                     "game_id": state.game_id,
                     "player_id": player_id,
-                    "secondary_mission_id": secondary_mission_id,
+                    "secondary_mission_ids": list(secondary_mission_ids),
                     "invalid_reason": drift_reason,
                 },
             )
-        if (
-            state.secondary_mission_card_state(
+        discard_cp_reward_window_id = _payload_string(payload, key="discard_cp_reward_window_id")
+        if player_id == _active_player_id(state) and (
+            discard_cp_reward_window_id
+            != _tactical_secondary_discard_cp_reward_window_id(
+                state=state,
                 player_id=player_id,
-                secondary_mission_id=secondary_mission_id,
-                mode=SecondaryMissionCardMode.TACTICAL,
             )
-            is None
         ):
             return LifecycleStatus.invalid(
                 stage=state.stage,
@@ -408,7 +435,36 @@ def invalid_mission_decision_status(
                 payload={
                     "game_id": state.game_id,
                     "player_id": player_id,
-                    "secondary_mission_id": secondary_mission_id,
+                    "secondary_mission_ids": list(secondary_mission_ids),
+                    "invalid_reason": "discard_cp_reward_window_drift",
+                },
+            )
+        if player_id == _active_player_id(
+            state
+        ) and state.has_tactical_secondary_discard_cp_reward_window(discard_cp_reward_window_id):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Tactical secondary discard option drifted.",
+                payload={
+                    "game_id": state.game_id,
+                    "player_id": player_id,
+                    "secondary_mission_ids": list(secondary_mission_ids),
+                    "invalid_reason": "discard_cp_reward_window_used",
+                },
+            )
+        active_ids = {
+            card.secondary_mission_id
+            for card in _active_tactical_secondary_cards(state=state, player_id=player_id)
+        }
+        if any(card_id not in active_ids for card_id in secondary_mission_ids):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Tactical secondary discard option drifted.",
+                payload={
+                    "game_id": state.game_id,
+                    "player_id": player_id,
+                    "secondary_mission_ids": list(secondary_mission_ids),
+                    "invalid_reason": "card_not_active",
                 },
             )
         return None
@@ -572,29 +628,39 @@ def _apply_tactical_secondary_discard(
     _assert_battle_state(state)
     payload = _payload_object(result.payload)
     player_id = _payload_string(payload, key="player_id")
-    secondary_mission_id = _payload_string(payload, key="secondary_mission_id")
+    secondary_mission_ids = _payload_identifier_tuple_from_list(
+        payload,
+        key="secondary_mission_ids",
+    )
     _validate_decision_context(state=state, payload=payload, player_id=player_id, result=result)
-    discarded = state.discard_tactical_secondary(
-        player_id=player_id,
-        secondary_mission_id=secondary_mission_id,
-        result_id=result.result_id,
+    discarded = tuple(
+        state.discard_tactical_secondary(
+            player_id=player_id,
+            secondary_mission_id=secondary_mission_id,
+            result_id=result.result_id,
+        )
+        for secondary_mission_id in secondary_mission_ids
     )
     command_point_gain = _apply_tactical_secondary_discard_cp_reward(
         state=state,
         decisions=decisions,
         result=result,
         player_id=player_id,
+        discard_cp_reward_window_id=_payload_string(payload, key="discard_cp_reward_window_id"),
     )
     reward_eligible = player_id == _active_player_id(state)
     decisions.event_log.append(
-        "tactical_secondary_mission_discarded",
+        "tactical_secondary_missions_discarded",
         {
             "game_id": state.game_id,
             "player_id": player_id,
             "active_player_id": _active_player_id(state),
             "battle_round": state.battle_round,
             "phase": _current_phase(state).value,
-            "secondary_mission_card_state": validate_json_value(discarded.to_payload()),
+            "secondary_mission_ids": list(secondary_mission_ids),
+            "secondary_mission_card_states": [
+                validate_json_value(card.to_payload()) for card in discarded
+            ],
             "command_point_reward_eligible": reward_eligible,
             "command_point_reward_reason": (
                 "discarding_players_turn" if reward_eligible else "not_discarding_players_turn"
@@ -1141,6 +1207,27 @@ def _active_tactical_secondary_cards(
     )
 
 
+def _active_tactical_secondary_discard_sets(
+    active_cards: tuple[SecondaryMissionCardState, ...],
+) -> tuple[tuple[str, ...], ...]:
+    card_ids = tuple(card.secondary_mission_id for card in active_cards)
+    return tuple(
+        card_set
+        for set_size in range(1, len(card_ids) + 1)
+        for card_set in combinations(card_ids, set_size)
+    )
+
+
+def _tactical_secondary_discard_option_id(card_ids: tuple[str, ...]) -> str:
+    _validate_identifier_tuple(
+        "card_ids",
+        card_ids,
+        min_length=1,
+        sort_values=False,
+    )
+    return f"discard:{'+'.join(card_ids)}"
+
+
 def _mission_action_for_state(
     *,
     state: GameState,
@@ -1315,9 +1402,23 @@ def _apply_tactical_secondary_discard_cp_reward(
     decisions: DecisionController,
     result: DecisionResult,
     player_id: str,
+    discard_cp_reward_window_id: str,
 ) -> JsonValue | None:
     if player_id != _active_player_id(state):
         return None
+    expected_window_id = _tactical_secondary_discard_cp_reward_window_id(
+        state=state,
+        player_id=player_id,
+    )
+    requested_window_id = _validate_identifier(
+        "discard_cp_reward_window_id",
+        discard_cp_reward_window_id,
+    )
+    if requested_window_id != expected_window_id:
+        raise GameLifecycleError("Tactical secondary discard CP reward window drift.")
+    if state.has_tactical_secondary_discard_cp_reward_window(requested_window_id):
+        raise GameLifecycleError("Tactical secondary discard CP reward window already used.")
+    state.record_tactical_secondary_discard_cp_reward_window(requested_window_id)
     gain = state.gain_command_points(
         player_id=player_id,
         amount=1,
@@ -1334,6 +1435,18 @@ def _apply_tactical_secondary_discard_cp_reward(
         gain_payload,
     )
     return gain_payload
+
+
+def _tactical_secondary_discard_cp_reward_window_id(
+    *,
+    state: GameState,
+    player_id: str,
+) -> str:
+    requested_player = _validate_player_id(state=state, player_id=player_id)
+    return (
+        f"tactical-secondary-discard-cp:{state.game_id}:round-{state.battle_round:02d}:"
+        f"{_active_player_id(state)}:{_current_phase(state).value}:{requested_player}"
+    )
 
 
 def _assert_battle_state(state: GameState) -> None:
@@ -1387,6 +1500,19 @@ def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> list[str
     if not isinstance(value, list):
         raise GameLifecycleError(f"Mission decision payload key must be a list: {key}.")
     return [_validate_identifier(f"{key} value", item) for item in cast(list[object], value)]
+
+
+def _payload_identifier_tuple_from_list(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> tuple[str, ...]:
+    return _validate_identifier_tuple(
+        key,
+        tuple(_payload_string_list(payload, key=key)),
+        min_length=1,
+        sort_values=True,
+    )
 
 
 def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:

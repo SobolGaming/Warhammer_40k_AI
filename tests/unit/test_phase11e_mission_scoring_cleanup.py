@@ -1429,11 +1429,14 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     state = discard_lifecycle.state
     assert state is not None
     decisions = discard_lifecycle.decision_controller
-    active_cards = [
-        card
-        for card in state.secondary_mission_card_states
-        if card.player_id == "player-a" and card.mode is SecondaryMissionCardMode.TACTICAL
-    ]
+    active_cards = sorted(
+        (
+            card
+            for card in state.secondary_mission_card_states
+            if card.player_id == "player-a" and card.mode is SecondaryMissionCardMode.TACTICAL
+        ),
+        key=lambda card: card.secondary_mission_id,
+    )
     assert len(active_cards) == state.tactical_secondary_draw_count
     scored = state.score_secondary_mission(
         player_id="player-a",
@@ -1450,6 +1453,11 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     assert discard_request is not None
     assert discard_request.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE
     discard_option_id = f"discard:{active_cards[1].secondary_mission_id}"
+    discard_payload = cast(dict[str, JsonValue], discard_request.payload)
+    assert [active_cards[1].secondary_mission_id] in cast(
+        list[list[str]],
+        discard_payload["legal_secondary_mission_id_sets"],
+    )
     discard_result = FiniteOptionSubmission(
         request_id=discard_request.request_id,
         selected_option_id=discard_option_id,
@@ -1484,9 +1492,11 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     discard_event = next(
         event
         for event in discard_opponent_events["events"]
-        if event["event_type"] == "tactical_secondary_mission_discarded"
+        if event["event_type"] == "tactical_secondary_missions_discarded"
     )
-    assert cast(dict[str, JsonValue], discard_event["payload"])["player_id"] == "player-a"
+    public_discard_payload = cast(dict[str, JsonValue], discard_event["payload"])
+    assert public_discard_payload["player_id"] == "player-a"
+    assert public_discard_payload["secondary_mission_ids"] == [active_cards[1].secondary_mission_id]
     assert opponent_payload["tactical_secondary_draws"] == [
         {
             "player_id": "player-a",
@@ -2030,15 +2040,105 @@ def test_tactical_secondary_discard_awards_chapter_approved_cp_in_own_turn() -> 
         next(
             record.payload
             for record in lifecycle.decision_controller.event_log.records
-            if record.event_type == "tactical_secondary_mission_discarded"
+            if record.event_type == "tactical_secondary_missions_discarded"
         ),
     )
     command_point_gain = cast(dict[str, JsonValue], discard_payload["command_point_gain"])
     assert discard_payload["active_player_id"] == "player-a"
+    assert discard_payload["secondary_mission_ids"] == [active_card.secondary_mission_id]
     assert discard_payload["command_point_reward_eligible"] is True
     assert discard_payload["command_point_reward_reason"] == "discarding_players_turn"
     assert command_point_gain["source_id"] == expected_source_id
     assert command_point_gain["status"] == "applied"
+
+    second_discard_status = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+    )
+    assert second_discard_status.status_kind.value == "unsupported"
+    assert second_discard_status.decision_request is None
+    assert (
+        cast(
+            dict[str, JsonValue],
+            second_discard_status.payload,
+        )["discard_cp_reward_window_id"]
+        == state.tactical_secondary_discard_cp_reward_window_ids[0]
+    )
+
+
+def test_tactical_secondary_discard_set_awards_one_chapter_approved_cp_window() -> None:
+    lifecycle = _battle_lifecycle_with_active_tactical_cards()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    active_cards = sorted(
+        (
+            card
+            for card in state.secondary_mission_card_states
+            if card.player_id == "player-a"
+            and card.mode is SecondaryMissionCardMode.TACTICAL
+            and card.status is SecondaryMissionCardStatus.ACTIVE
+        ),
+        key=lambda card: card.secondary_mission_id,
+    )
+    active_card_ids = tuple(card.secondary_mission_id for card in active_cards)
+    assert len(active_card_ids) == state.tactical_secondary_draw_count
+    discard_waiting = request_tactical_secondary_discard(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+    )
+    discard_request = discard_waiting.decision_request
+    assert discard_request is not None
+    request_payload = cast(dict[str, JsonValue], discard_request.payload)
+    assert request_payload["legal_secondary_mission_id_sets"] == [
+        [active_card_ids[0]],
+        [active_card_ids[1]],
+        [active_card_ids[0], active_card_ids[1]],
+    ]
+    discard_result = FiniteOptionSubmission(
+        request_id=discard_request.request_id,
+        selected_option_id=f"discard:{active_card_ids[0]}+{active_card_ids[1]}",
+        result_id="phase11e-own-turn-discard-set",
+    ).to_result(discard_request)
+
+    lifecycle.submit_decision(discard_result)
+
+    assert state.command_point_total("player-a") == 1
+    assert len(state.tactical_secondary_discard_cp_reward_window_ids) == 1
+    assert all(
+        state.secondary_mission_card_state(
+            player_id="player-a",
+            secondary_mission_id=secondary_mission_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+        )
+        is None
+        for secondary_mission_id in active_card_ids
+    )
+    command_point_events = [
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "command_points_gained"
+    ]
+    assert len(command_point_events) == 1
+    command_point_gain = cast(dict[str, JsonValue], command_point_events[0].payload)
+    assert command_point_gain["requested_amount"] == 1
+    assert command_point_gain["applied_amount"] == 1
+
+    discard_payload = cast(
+        dict[str, JsonValue],
+        next(
+            record.payload
+            for record in lifecycle.decision_controller.event_log.records
+            if record.event_type == "tactical_secondary_missions_discarded"
+        ),
+    )
+    assert discard_payload["secondary_mission_ids"] == list(active_card_ids)
+    assert len(cast(list[JsonValue], discard_payload["secondary_mission_card_states"])) == len(
+        active_card_ids
+    )
+    assert cast(dict[str, JsonValue], discard_payload["command_point_gain"]) == command_point_gain
 
 
 def test_tactical_secondary_discard_in_opponents_turn_has_no_chapter_approved_cp_reward() -> None:
@@ -2087,10 +2187,11 @@ def test_tactical_secondary_discard_in_opponents_turn_has_no_chapter_approved_cp
         next(
             record.payload
             for record in lifecycle.decision_controller.event_log.records
-            if record.event_type == "tactical_secondary_mission_discarded"
+            if record.event_type == "tactical_secondary_missions_discarded"
         ),
     )
     assert discard_payload["player_id"] == "player-b"
+    assert discard_payload["secondary_mission_ids"] == [active_cards[0].secondary_mission_id]
     assert discard_payload["active_player_id"] == "player-a"
     assert discard_payload["command_point_reward_eligible"] is False
     assert discard_payload["command_point_reward_reason"] == "not_discarding_players_turn"

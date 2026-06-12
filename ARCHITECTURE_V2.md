@@ -98,10 +98,11 @@ completion, and deterministic replay-safe fight-order hardening. **Phase 17J is
 complete** for the Warhammer Event Companion mission-pack source package:
 Event Mission Sequence descriptors, Tactical/Fixed Secondary procedure
 descriptors, all 25 implemented Primary Mission matrix cells, all 45
-source-page layout variants, Event Companion mission-pack import, scoring/draw
-pack resolution, separate empty card-amendment and FAQ patch records, Base Size
-Guide source rows with geometry-resolution statuses, deployment remainder-drain
-coverage, and a static audit preventing runtime Event Companion PDF parsing.
+source-page layout identities with pending coordinate-extraction status, Event
+Companion mission-pack import, scoring/draw pack resolution, separate empty
+card-amendment and FAQ patch records, Base Size Guide source rows with
+geometry-resolution statuses, deployment remainder-drain coverage, and a static
+audit preventing runtime Event Companion PDF parsing.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -331,7 +332,7 @@ Completed / implemented foundation:
 | 17D | Complete | Generic RuleIR execution handlers, source-linked events, Aura recomputation, and ability/Stratagem IR bridges |
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
-| 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout variants, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
+| 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with pending coordinate extraction, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
 
 Next / planned sequence:
 
@@ -2754,7 +2755,7 @@ Invariants:
 - Chapter Approved matrix cells whose Primary Mission rules or layout geometry
   are not yet known remain `awaiting_source`, while the Phase 17J Event
   Companion package carries implemented source descriptors for all 25 matrix
-  cells and all 45 source-page layout variants;
+  cells and all 45 source-page layout identities;
 - mustering source data follows the 11th Edition order: select Battle Size,
   start Army Roster, choose Faction, select Detachment Rules, select Units, then
   promote Warlord;
@@ -4376,18 +4377,18 @@ Required outputs:
   layout images, or raw mission-card prose;
 - CI artifact with package hashes and coverage totals.
 
-## Phase 17J: Warhammer Event Companion mission-pack and geometry compliance
+## Phase 17J: Warhammer Event Companion mission-pack and geometry source inventory
 
 Status: Complete.
 
 Phase 17J turns the Warhammer Event Companion v1.0 into a source-backed CORE V2
 package. It owns Event Mission Sequence ordering, Force Disposition roster
-binding, per-player Primary Mission selection, layout A/B/C selection,
-battlefield creation from layout descriptors, Attacker/Defender assignment,
-Secondary Mission mode selection, Tactical/Fixed Secondary lifecycle,
-Primary/Secondary/Battle Ready VP caps, mission-card scoring grammar, Event
-Companion FAQs, terrain/deployment/objective layout geometry, and Base Size
-Guide import.
+binding, per-player Primary Mission selection, layout A/B/C source-page
+identity, deterministic battlefield creation from layout descriptors,
+Attacker/Defender assignment, Secondary Mission mode selection, Tactical/Fixed
+Secondary lifecycle, Primary/Secondary/Battle Ready VP caps, mission-card
+scoring grammar, Event Companion FAQs, terrain/deployment/objective layout
+coordinate-extraction status, and Base Size Guide import.
 
 Implemented modules:
 
@@ -4407,9 +4408,9 @@ Implemented coverage:
 - Event Companion mission-pack import builds 25 Primary Mission descriptors, 25
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
-- All 45 source-page layout variants instantiate as 44" x 60" mission setups
-  with deployment-zone polygons, No Man's Land, player territories, typed
-  objective points, and dense/light terrain feature descriptors.
+- All 45 source-page layout identities instantiate as 44" x 60" mission setups
+  with deterministic layout descriptors while exact per-page coordinate
+  extraction remains explicitly marked pending.
 - Event Companion v1.0 card amendments are explicitly empty and distinct from
   source-linked FAQ patch records.
 - Base Size Guide source rows record round, oval, Hull, Small Flying Base, Large
@@ -4454,9 +4455,10 @@ Invariants:
   layout variants for the Primary Mission combination.
 - Layout selection records whether the event organizer specified the variant or
   the players randomly determined it.
-- Create Battlefield instantiates a 44" x 60" battlefield with source-backed
+- Create Battlefield instantiates a 44" x 60" battlefield with deterministic
   terrain areas, terrain features, objective points, deployment zones,
-  territories, and Attacker/Defender battlefield edges.
+  territories, and Attacker/Defender battlefield edges from layout descriptors
+  whose Event Companion coordinate extraction status remains explicit.
 - Attacker/Defender is determined after battlefield orientation and before
   Secondary Mission selection.
 - Secondary Mission mode selection is hidden until reveal.
@@ -4501,9 +4503,9 @@ Invariants:
   player Primary Missions, layout variant, 44" x 60" battlefield size,
   Attacker/Defender edges, deployment-zone polygons, No Man's Land polygon,
   player territory polygons, typed objective points, terrain areas, dense/light
-  terrain features, and source page.
-- All Event Companion layout records from the source pages become coordinate
-  source records, not screenshots consumed by runtime.
+  terrain features, source page, and coordinate-extraction status.
+- All Event Companion layout records bind to source pages and expose pending
+  coordinate-extraction status rather than consuming screenshots at runtime.
 - Base Size Guide rows import with `base_source_kind` values for round, oval,
   Small Flying Base, Large Flying Base, Hull, Unique, and unresolved source
   shapes.
@@ -4609,7 +4611,7 @@ Event Companion adapter/replay/UI requirements:
   until reveal;
 - hidden battle formation declarations remain viewer-scoped before reveal;
 - TO-specified and randomly selected layout variants are both represented as
-  source-backed decisions/events;
+  source-page-bound decisions/events;
 - Attacker/Defender assignment preserves physical edge orientation;
 - Tactical Secondary active cards, discards, achieved cards, and
   end-of-Command once-per-battle 1CP discard-and-draw usage are inspectable
@@ -4803,8 +4805,8 @@ Required tests:
 - replay round-trip at multiple battle rounds;
 - no hidden information leaks;
 - deterministic same-seed replay;
-- all source-page Event Companion layout variants for each Force
-  Disposition/Primary Mission combination;
+- all source-page Event Companion layout identities and coordinate-extraction
+  coverage for each Force Disposition/Primary Mission combination;
 - multiple army archetypes;
 - multiple mission packs.
 
@@ -4851,7 +4853,7 @@ Exit criteria:
 | Engagement Range | 10G, 10M, 10N, 10O, 15B, 14C, 14G |
 | Unit Coherency | 10G/10H descriptors, 10L runtime, 11E cleanup, 14C |
 | Terrain movement | 10F, 10H, 10I, 14D |
-| Terrain visibility/cover, including Hidden, Obscuring, Solid, Benefit of Cover, Plunging Fire, and Event Companion layout geometry | 13A, 13C, 14D, 14E, 17J |
+| Terrain visibility/cover, including Hidden, Obscuring, Solid, Benefit of Cover, Plunging Fire, and Event Companion layout identity/geometry coverage | 13A, 13C, 14D, 14E, 17J |
 | Movement phase Move Units | 10B-10T, 14D |
 | Movement phase reserve arrivals and Ingress Moves | 10P, 14D, 14H |
 | Transports | 10Q, 14H |

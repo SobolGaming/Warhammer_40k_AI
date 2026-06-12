@@ -237,15 +237,15 @@ typed unsupported results, source-linked execution events are deterministic and
 JSON-safe, and ability/Stratagem bridges can execute replay-safe compiled IR
 payloads without importing parser/compiler/template tooling.
 
-Phase 17J is complete for Warhammer Event Companion v1.0 mission-pack and
-geometry compliance. The source package now records Event Mission Sequence
-ordering, Tactical/Fixed Secondary procedures, all 25 implemented Primary
-Mission matrix cells, all 45 source-page layout variants, no Deployment/Twist
-card usage, separate empty card-amendment and FAQ patch records, Base Size Guide
-source rows with geometry-resolution statuses, Event Companion mission-pack
-import, setup/scoring pack lookup, deployment remainder-drain coverage, and a
-static audit that runtime code does not parse Event Companion PDF text or
-images.
+Phase 17J is complete for Warhammer Event Companion v1.0 mission-pack
+compliance and source geometry inventory. The source package now records Event
+Mission Sequence ordering, Tactical/Fixed Secondary procedures, all 25
+implemented Primary Mission matrix cells, all 45 source-page layout identities
+with pending coordinate-extraction status, no Deployment/Twist card usage,
+separate empty card-amendment and FAQ patch records, Base Size Guide source rows
+with geometry-resolution statuses, Event Companion mission-pack import,
+setup/scoring pack lookup, deployment remainder-drain coverage, and a static
+audit that runtime code does not parse Event Companion PDF text or images.
 
 Phase 17E is complete for source-backed faction coverage. The
 `gw-11e-phase17e-faction-coverage-2026-27` package validates every official

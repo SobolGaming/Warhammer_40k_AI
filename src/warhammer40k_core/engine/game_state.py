@@ -277,6 +277,7 @@ class GameStatePayload(TypedDict):
     prebattle_action_records: list[PreBattleActionRecordPayload]
     secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
     tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContextPayload]
+    tactical_secondary_discard_cp_reward_window_ids: list[str]
 
 
 def _new_secondary_mission_choices() -> list[SecondaryMissionChoice]:
@@ -396,6 +397,10 @@ def _new_secondary_mission_card_states() -> list[SecondaryMissionCardState]:
 
 
 def _new_tactical_secondary_achievement_contexts() -> list[TacticalSecondaryAchievementContext]:
+    return []
+
+
+def _new_tactical_secondary_discard_cp_reward_window_ids() -> list[str]:
     return []
 
 
@@ -869,6 +874,9 @@ class GameState:
     tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContext] = field(
         default_factory=_new_tactical_secondary_achievement_contexts
     )
+    tactical_secondary_discard_cp_reward_window_ids: list[str] = field(
+        default_factory=_new_tactical_secondary_discard_cp_reward_window_ids
+    )
 
     def __post_init__(self) -> None:
         self.game_id = _validate_identifier("GameState game_id", self.game_id)
@@ -1092,6 +1100,14 @@ class GameState:
                 self.tactical_secondary_achievement_contexts,
                 game_id=self.game_id,
                 player_ids=self.player_ids,
+            )
+        )
+        self.tactical_secondary_discard_cp_reward_window_ids = list(
+            _validate_identifier_tuple(
+                "GameState tactical_secondary_discard_cp_reward_window_ids",
+                tuple(self.tactical_secondary_discard_cp_reward_window_ids),
+                min_length=0,
+                sort_values=True,
             )
         )
         _validate_hover_mode_state_references(self)
@@ -2924,6 +2940,17 @@ class GameState:
         self._replace_secondary_mission_card_state(discarded)
         return discarded
 
+    def has_tactical_secondary_discard_cp_reward_window(self, window_id: str) -> bool:
+        requested_window_id = _validate_identifier("window_id", window_id)
+        return requested_window_id in self.tactical_secondary_discard_cp_reward_window_ids
+
+    def record_tactical_secondary_discard_cp_reward_window(self, window_id: str) -> None:
+        requested_window_id = _validate_identifier("window_id", window_id)
+        if requested_window_id in self.tactical_secondary_discard_cp_reward_window_ids:
+            raise GameLifecycleError("Tactical secondary discard CP reward window already used.")
+        self.tactical_secondary_discard_cp_reward_window_ids.append(requested_window_id)
+        self.tactical_secondary_discard_cp_reward_window_ids.sort()
+
     def _replace_secondary_mission_card_state(
         self,
         card_state: SecondaryMissionCardState,
@@ -3574,6 +3601,9 @@ class GameState:
             "tactical_secondary_achievement_contexts": [
                 context.to_payload() for context in self.tactical_secondary_achievement_contexts
             ],
+            "tactical_secondary_discard_cp_reward_window_ids": list(
+                self.tactical_secondary_discard_cp_reward_window_ids
+            ),
         }
 
     def to_public_payload(self, *, viewer_player_id: str) -> dict[str, JsonValue]:
@@ -3882,6 +3912,9 @@ class GameState:
                 TacticalSecondaryAchievementContext.from_payload(context)
                 for context in payload["tactical_secondary_achievement_contexts"]
             ],
+            tactical_secondary_discard_cp_reward_window_ids=list(
+                payload["tactical_secondary_discard_cp_reward_window_ids"]
+            ),
         )
 
     def _advance_active_player_after_completed_turn(self) -> None:

@@ -18,6 +18,14 @@ from warhammer40k_core.engine.missions import (
     mission_scoring_policy_from_setup,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.scoring import (
+    FinalScoringResult,
+    ScoringWindowKind,
+    ScoringWindowState,
+    VictoryPointAward,
+    VictoryPointLedger,
+    VictoryPointSourceKind,
+)
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_06_mission_pack,
 )
@@ -82,11 +90,15 @@ def test_phase17j_event_sequence_and_secondary_procedure_are_explicit() -> None:
         "determine_first_turn",
         "resolve_prebattle_rules",
         "begin_battle",
+        "end_battle",
+        "determine_victor",
     )
     assert sequence.steps[7].actor_policy == "defender_first_alternating"
     assert sequence.steps[8].actor_policy == "attacker_first_alternating"
     assert sequence.steps[9].actor_policy == "roll_off_winner_takes_first"
     assert sequence.steps[10].actor_policy == "first_turn_player_first"
+    assert sequence.steps[12].actor_policy == "after_five_battle_rounds_continue_tabled_players"
+    assert sequence.steps[13].actor_policy == "battle_ready_then_vp_total_then_draw_if_tied"
 
     assert tactical.draw_timing == "start_of_command_phase"
     assert tactical.draw_count == 2
@@ -168,6 +180,18 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
         for descriptor in descriptors
         for objective in descriptor.objective_points
     )
+    assert all(
+        descriptor.geometry_extraction_status
+        == "layout_identity_source_page_bound_coordinates_pending"
+        for descriptor in descriptors
+    )
+    assert _layout_descriptor("take-and-hold", "disruption", "a").source_page == 15
+    assert _layout_descriptor("take-and-hold", "reconnaissance", "a").source_page == 18
+    assert _layout_descriptor("take-and-hold", "priority-assets", "a").source_page == 21
+    assert all(
+        row.source_status.endswith("layout_identity_coordinate_extraction_pending")
+        for row in event_source.battlefield_layout_rows()
+    )
 
 
 def test_phase17j_card_amendments_are_separate_from_faq_patch_rows() -> None:
@@ -177,10 +201,16 @@ def test_phase17j_card_amendments_are_separate_from_faq_patch_rows() -> None:
     assert amendment_set.amendments == ()
     assert amendment_set.source_page == 4
     assert {patch.patch_id for patch in faq_patches} == {
-        "faq-operation-markers-removed-when-action-interrupted",
-        "faq-death-trap-booby-trap-marker-removal",
-        "faq-surveil-the-foe-marker-control-window",
-        "faq-vital-link-vp-limit",
+        "faq-operation-marker-removal-requires-card-permission",
+        "faq-death-trap-trapped-area-scoring-window",
+        "faq-surveil-the-foe-same-turn-marker-removal",
+        "faq-vital-link-multiple-central-objectives",
+    }
+    assert {patch.behavior_descriptor for patch in faq_patches} == {
+        "operation_marker_removal_requires_primary_card_permission",
+        "death_trap_trapped_area_checked_at_scoring_not_destruction_time",
+        "surveil_the_foe_same_turn_marker_removal_allows_scoring",
+        "vital_link_multiple_central_objectives_marker_control_allows_cumulative_vp",
     }
     assert all(patch.source_page == 4 for patch in faq_patches)
     assert all(
@@ -193,6 +223,9 @@ def test_phase17j_base_size_source_rows_fail_closed_for_noncanonical_shapes() ->
     rows = event_source.base_size_source_rows()
     rows_by_kind = {row.base_source_kind: row for row in rows}
 
+    assert len(rows) == 1083
+    assert {row.source_page for row in rows} == set(range(55, 94))
+    assert len({row.record_id for row in rows}) == len(rows)
     assert {
         "round",
         "oval",
@@ -221,6 +254,28 @@ def test_phase17j_base_size_source_rows_fail_closed_for_noncanonical_shapes() ->
     )
 
 
+def test_phase17j_primary_source_descriptor_rows_do_not_create_placeholder_scoring() -> None:
+    descriptor_rows = tuple(
+        row
+        for row in event_source.primary_mission_rows()
+        if row.scoring_kind == "event_companion_primary_source_descriptor_only"
+    )
+
+    assert descriptor_rows
+    assert all(row.scoring_rules == () for row in descriptor_rows)
+    assert "primary-battlefield-dominance" in {row.primary_mission_id for row in descriptor_rows}
+
+    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    with pytest.raises(GameLifecycleError, match="Unsupported primary mission scoring policy"):
+        mission_scoring_policy_from_setup(setup)
+
+
 def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> None:
     mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
     setup = MissionSetup.from_mission_pack(
@@ -246,3 +301,133 @@ def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> 
 
     with pytest.raises(GameLifecycleError):
         mission_pack_for_id("unsupported-pack")
+
+
+def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() -> None:
+    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    policy = mission_scoring_policy_from_setup(setup)
+    player_alpha_ledger, _ = VictoryPointLedger.initial(player_id="player-alpha").award(
+        VictoryPointAward(
+            player_id="player-alpha",
+            battle_round=5,
+            phase="command",
+            amount=55,
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id=setup.primary_mission_id,
+            scoring_timing="phase_end",
+            metadata={"scoring_rule_id": "phase17j-primary-cap"},
+        )
+    )
+    player_alpha_ledger, _ = player_alpha_ledger.award(
+        VictoryPointAward(
+            player_id="player-alpha",
+            battle_round=5,
+            phase="command",
+            amount=12,
+            source_kind=VictoryPointSourceKind.BATTLE_READY,
+            source_id="battle-ready",
+            scoring_timing="game_end",
+            metadata={"scoring_rule_id": "phase17j-battle-ready-cap"},
+        )
+    )
+    player_beta_ledger, _ = VictoryPointLedger.initial(player_id="player-beta").award(
+        VictoryPointAward(
+            player_id="player-beta",
+            battle_round=5,
+            phase="command",
+            amount=45,
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id=setup.primary_mission_id,
+            scoring_timing="phase_end",
+            metadata={"scoring_rule_id": "phase17j-opponent-primary"},
+        )
+    )
+    player_beta_ledger, _ = player_beta_ledger.award(
+        VictoryPointAward(
+            player_id="player-beta",
+            battle_round=5,
+            phase="command",
+            amount=10,
+            source_kind=VictoryPointSourceKind.BATTLE_READY,
+            source_id="battle-ready",
+            scoring_timing="game_end",
+            metadata={"scoring_rule_id": "phase17j-opponent-battle-ready"},
+        )
+    )
+    result = FinalScoringResult.from_ledgers(
+        game_id="phase17j-event-final-scoring",
+        battle_round=5,
+        policy=policy,
+        ledgers=(player_alpha_ledger, player_beta_ledger),
+        scoring_windows=_event_final_scoring_windows(
+            game_id="phase17j-event-final-scoring",
+            battle_round=5,
+            policy_source_id=policy.source_id,
+        ),
+    )
+
+    payload = result.to_payload()
+    audit = cast(dict[str, object], payload["scoring_audit"])
+
+    assert payload["winner_player_ids"] == ["player-alpha", "player-beta"]
+    assert payload["is_draw"] is True
+    assert payload["final_scores"] == [
+        {"player_id": "player-alpha", "victory_points": 55},
+        {"player_id": "player-beta", "victory_points": 55},
+    ]
+    assert audit["battle_ready_vp_cap"] == 10
+
+
+def _layout_descriptor(
+    player_force_disposition_id: str,
+    opponent_force_disposition_id: str,
+    layout_variant: str,
+) -> event_source.WarhammerEventLayoutDescriptor:
+    for descriptor in event_source.layout_descriptor_rows():
+        if (
+            descriptor.player_force_disposition_id == player_force_disposition_id
+            and descriptor.opponent_force_disposition_id == opponent_force_disposition_id
+            and descriptor.layout_variant == layout_variant
+        ):
+            return descriptor
+    raise AssertionError("Layout descriptor was not found.")
+
+
+def _event_final_scoring_windows(
+    *,
+    game_id: str,
+    battle_round: int,
+    policy_source_id: str,
+) -> tuple[ScoringWindowState, ...]:
+    return (
+        ScoringWindowState(
+            window_id="phase17j-event-final-round",
+            game_id=game_id,
+            battle_round=battle_round,
+            window_kind=ScoringWindowKind.END_OF_ROUND,
+            window="battle_round_end",
+            source_id=f"{policy_source_id}:end-of-round",
+        ),
+        ScoringWindowState(
+            window_id="phase17j-event-final-turn-end",
+            game_id=game_id,
+            battle_round=battle_round,
+            window_kind=ScoringWindowKind.END_OF_GAME,
+            window="turn_end_round_five_going_second",
+            source_id=f"{policy_source_id}:turn-end-round-five",
+        ),
+        ScoringWindowState(
+            window_id="phase17j-event-final-end-battle",
+            game_id=game_id,
+            battle_round=battle_round,
+            window_kind=ScoringWindowKind.END_OF_GAME,
+            window="end_of_battle",
+            source_id=f"{policy_source_id}:end-of-battle",
+        ),
+    )
