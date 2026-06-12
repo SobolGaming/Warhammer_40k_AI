@@ -11,6 +11,7 @@ instructions, and then compiled into 11th Edition catalog records.
 - [Phase 17E Scope Boundary](#phase-17e-scope-boundary)
 - [Phase 17E Completion Gate](#phase-17e-completion-gate)
 - [Phase 17F Execution Gate](#phase-17f-execution-gate)
+- [Phase 17G Runtime Scaffold Gate](#phase-17g-runtime-scaffold-gate)
 - [Phase 17G Semantic Execution Gate](#phase-17g-semantic-execution-gate)
 - [Phase 17H Datasheet, Wargear, and Weapon Execution Gate](#phase-17h-datasheet-wargear-and-weapon-execution-gate)
 - [Phase 17I Coverage and Unsupported Audit Gate](#phase-17i-coverage-and-unsupported-audit-gate)
@@ -45,6 +46,7 @@ instructions, and then compiled into 11th Edition catalog records.
   - [Imperial Knights Execution Status](#imperial-knights-execution-status)
 - [Queue Source](#queue-source)
 - [Faction Phase Shape](#faction-phase-shape)
+- [Agent Implementation Contract](#agent-implementation-contract)
 - [Pilot Phase: Death Guard](#pilot-phase-death-guard)
 - [FAQ Classification Gate](#faq-classification-gate)
 - [Faction Phase Queue](#faction-phase-queue)
@@ -156,6 +158,80 @@ every Phase 17E coverage row has a deterministic fail-closed engine route. It
 does not implement the game effects of army rules, detachment rules,
 enhancements, or Stratagems.
 
+## Phase 17G Runtime Scaffold Gate
+
+Before faction semantic implementation PRs begin, Phase 17G must provide
+generated, source-backed runtime scaffold modules for every faction and
+detachment in the current 11th Edition faction-detachment package. The scaffold
+package is:
+
+- generator path: `tools/generate_faction_content_scaffold.py`
+- generated root:
+  `src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/`
+- generated manifest path:
+  `src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/generated_manifest.py`
+- source package:
+  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_detachments_2026_27.py`
+- execution package:
+  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_execution_2026_27.py`
+
+The generator creates this shape for every source-backed faction and
+detachment:
+
+```text
+<faction_slug>/
+  __init__.py
+  manifest.py
+  army_rule.py
+  detachments/
+    __init__.py
+    <detachment_slug>/
+      __init__.py
+      manifest.py
+      rule.py
+      enhancements.py
+      stratagems.py
+```
+
+The generator owns `generated_manifest.py`, package `__init__.py` files, and
+faction/detachment `manifest.py` aggregators byte-for-byte. The agent-owned
+semantic target files are `army_rule.py`, `rule.py`, `enhancements.py`, and
+`stratagems.py`. Those target files start as load-safe, semantically inert
+placeholders with the marker `Generated scaffold placeholder. Remove this marker
+when implementing semantics.` Implementation PRs remove that marker and keep the
+required `CONTRIBUTION_ID` plus `runtime_contribution()` export shape.
+
+Generated faction `manifest.py` files aggregate the sibling `army_rule.py`
+contribution. Generated detachment `manifest.py` files aggregate sibling
+`rule.py`, `enhancements.py`, and `stratagems.py` contributions through
+`combine_runtime_content_contributions(...)`. Runtime manifest rows point to the
+generated `manifest.py` aggregators, so ordinary implementation PRs do not edit
+manifest machinery. This is deliberate: `supported` in the runtime manifest
+means a selected content row has an importable runtime module path. It does not
+mean the faction, detachment, enhancement, or Stratagem semantics have gameplay
+support.
+
+The scaffold gate must not generate broad datasheet, wargear, or weapon-profile
+files. Those modules are generated only for assigned Phase 17H vertical slices.
+Existing pilot Death Guard unit and wargear modules remain as explicit pilot
+content, not a template for all datasheets.
+
+Required tests:
+
+- every generated faction has package roots, `manifest.py`, and `army_rule.py`;
+- every generated detachment has `manifest.py`, `rule.py`, `enhancements.py`,
+  and `stratagems.py`;
+- generated scaffold modules export `runtime_contribution()`;
+- placeholder scaffold contributions are empty and use stable IDs;
+- generated manifest aggregators include agent-owned sibling contributions;
+- generated manifest faction and detachment module paths match scaffold files;
+- runtime faction-content modules do not import raw source mirrors, parser
+  tooling, compiler tooling, or HTML sanitizer tooling;
+- CI fails when generator-owned files are stale;
+- CI fails when agent-owned files are missing required exports;
+- CI fails when an orphaned generated placeholder remains after source rows
+  change.
+
 ## Phase 17G Semantic Execution Gate
 
 Phase 17G is the first faction-content phase that implements actual engine
@@ -171,6 +247,8 @@ faction-level content with registered generic IR executors or source-linked
 named handlers. The handlers must mutate authoritative game state only through
 engine-owned services, use the shared `DecisionRequest` / `DecisionResult`
 path for player choices, and emit deterministic replay-safe execution results.
+Implementation PRs must use the generated scaffold targets and the
+[Faction Agent Implementation Contract](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
 
 Phase 17G does not cover broad datasheet, wargear, or weapon ability execution.
 Those rows move to Phase 17H unless they are inseparable from a faction army
@@ -560,6 +638,11 @@ content slices: exact detachment support, exact datasheet support, exact
 enhancement/Stratagem support when tied to a detachment, or a tightly coupled
 official patch batch such as a named FRAME keyword update.
 
+All faction and detachment runtime package roots are generated before lettered
+semantic implementation work. Agents must use those existing targets rather
+than inventing new runtime architecture or mixing unrelated faction work into a
+single PR.
+
 Each faction has an unlettered intake gate before lettered work starts:
 
 1. Mirror and normalize the faction's prior-edition Wahapedia source rows.
@@ -572,6 +655,21 @@ Each faction has an unlettered intake gate before lettered work starts:
 Lettered subphases should be small enough for review. Prefer one detachment or
 one datasheet per subphase unless several datasheets share one inseparable kit,
 weapon profile set, or official patch operation.
+
+## Agent Implementation Contract
+
+Agent-authored faction implementation PRs must follow
+[docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
+Task packets must name the faction or detachment, list allowed scaffold files,
+require source IDs from generated manifest and execution rows, remove the
+generated placeholder marker from implemented files, and preserve the shared
+runtime loader, lifecycle, bundle, manifest, decision, replay, and engine-owned
+mutation contracts.
+
+Preferred batching is one army rule, one detachment rule, one detachment
+enhancement set, or one detachment Stratagem set per PR. A full detachment PR is
+acceptable when its rules, enhancements, and Stratagems are tightly coupled. A
+whole-faction semantic PR is discouraged unless the faction is tiny.
 
 ## Pilot Phase: Death Guard
 

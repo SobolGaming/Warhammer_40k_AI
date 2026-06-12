@@ -27,6 +27,9 @@ from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
     AbilityDefinition,
+    AbilityExecutionContext,
+    AbilityHandlerBinding,
+    AbilityResolutionResult,
     AbilitySourceKind,
     AbilityTimingDescriptor,
 )
@@ -38,6 +41,7 @@ from warhammer40k_core.engine.faction_content.activation import RuntimeContentAc
 from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
     RuntimeContentContribution,
+    combine_runtime_content_contributions,
 )
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEvent,
@@ -75,6 +79,7 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerExecutionStatus,
     StratagemHandlerRegistry,
 )
+from warhammer40k_core.engine.faction_rule_execution import FactionRuleNamedHandler
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -663,6 +668,91 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert "<" not in encoded
 
 
+def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_duplicates() -> None:
+    ability_record = _ability_record(
+        ability_id="combined-ability",
+        source_kind=AbilitySourceKind.FACTION,
+        faction_id="core-marine-force",
+    )
+    stratagem_record = _stratagem_record(
+        stratagem_id="combined-stratagem",
+        detachment_id="core-combined-arms",
+    )
+
+    def ability_handler(
+        record: AbilityCatalogRecord,
+        context: AbilityExecutionContext,
+    ) -> AbilityResolutionResult:
+        return AbilityResolutionResult.applied(record)
+
+    ability_binding = AbilityHandlerBinding(
+        handler_id="combined:ability-handler",
+        timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_PHASE),
+        required_input_keys=(),
+        handler=ability_handler,
+    )
+
+    def named_handler(context: object) -> object:
+        return context
+
+    combined = combine_runtime_content_contributions(
+        contribution_id="combined:manifest",
+        contributions=(
+            RuntimeContentContribution(
+                contribution_id="combined:records",
+                ability_records=(ability_record,),
+                ability_handler_bindings=(ability_binding,),
+            ),
+            RuntimeContentContribution(
+                contribution_id="combined:stratagems",
+                stratagem_records=(stratagem_record,),
+                faction_named_handlers={
+                    "combined:named-handler": cast(FactionRuleNamedHandler, named_handler)
+                },
+            ),
+        ),
+    )
+
+    assert combined.contribution_id == "combined:manifest"
+    assert combined.ability_records == (ability_record,)
+    assert combined.stratagem_records == (stratagem_record,)
+    assert combined.ability_handler_bindings == (ability_binding,)
+    assert tuple(combined.faction_named_handlers) == ("combined:named-handler",)
+
+    with pytest.raises(GameLifecycleError, match="ability record IDs must be unique"):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-records",
+            contributions=(
+                RuntimeContentContribution(ability_records=(ability_record,)),
+                RuntimeContentContribution(ability_records=(ability_record,)),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="ability handler binding IDs must be unique"):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-handlers",
+            contributions=(
+                RuntimeContentContribution(ability_handler_bindings=(ability_binding,)),
+                RuntimeContentContribution(ability_handler_bindings=(ability_binding,)),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="faction handler IDs must be unique"):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-named-handlers",
+            contributions=(
+                RuntimeContentContribution(
+                    faction_named_handlers={
+                        "combined:named-handler": cast(FactionRuleNamedHandler, named_handler)
+                    },
+                ),
+                RuntimeContentContribution(
+                    faction_named_handlers={
+                        "combined:named-handler": cast(FactionRuleNamedHandler, named_handler)
+                    },
+                ),
+            ),
+        )
+
+
 def test_runtime_content_bundle_scopes_faction_execution_registry_to_selected_ids() -> None:
     catalog = _catalog_with_runtime_detachment_selection(
         ArmyCatalog.phase9a_canonical_content_pack()
@@ -978,9 +1068,15 @@ def test_real_edition_index_loads_only_selected_pilot_faction_modules() -> None:
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.units.typhus",
         "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.wargear.plague_weapons",
     )
-    assert {contribution.contribution_id for contribution in contributions} == set(
-        resolved_activation.selected_module_paths
-    )
+    assert {contribution.contribution_id for contribution in contributions} == {
+        "warhammer40k_core.engine.faction_content.warhammer_40000_11th."
+        "death_guard.units.plague_marines",
+        "warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard.units.typhus",
+        "warhammer40k_core.engine.faction_content.warhammer_40000_11th."
+        "death_guard.wargear.plague_weapons",
+        "warhammer_40000_11th:death_guard:detachment:tallyband_summoners:manifest:scaffold",
+        "warhammer_40000_11th:death_guard:faction_manifest:scaffold",
+    }
     assert "phase17f:phase17e:death-guard:army-rule" in (
         resolved_activation.selected_execution_record_ids
     )
