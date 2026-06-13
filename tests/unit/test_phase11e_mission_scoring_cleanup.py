@@ -551,7 +551,15 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
     own_payload = state.to_public_payload(viewer_player_id="player-a")
     opponent_payload = state.to_public_payload(viewer_player_id="player-b")
 
-    assert scored.status is SecondaryMissionCardStatus.SCORED
+    assert scored.status is SecondaryMissionCardStatus.ACTIVE
+    assert (
+        state.secondary_mission_card_state(
+            player_id="player-a",
+            secondary_mission_id="assassination",
+            mode=SecondaryMissionCardMode.FIXED,
+        )
+        is not None
+    )
     assert state.victory_point_total("player-a") == 4
     own_ledger = _public_ledger(own_payload, player_id="player-a")
     opponent_ledger = _public_ledger(opponent_payload, player_id="player-a")
@@ -583,9 +591,35 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
         card_payload["player_id"] == "player-a"
         and card_payload["secondary_mission_id"] == "assassination"
         and card_payload["mode"] == "fixed"
+        and card_payload["status"] == "active"
         and card_payload["hidden"] is False
         for card_payload in _public_card_states(opponent_payload)
     )
+
+
+def test_fixed_secondary_cards_remain_active_and_cap_at_twenty_vp_per_mission() -> None:
+    state = _battle_state()
+    scored_cards = [
+        state.score_secondary_mission(
+            player_id="player-a",
+            secondary_mission_id="assassination",
+            mode=SecondaryMissionCardMode.FIXED,
+            phase=BattlePhase.COMMAND,
+        )
+        for _index in range(6)
+    ]
+    transactions = state.victory_point_ledger_for_player("player-a").transactions
+    final_transaction_metadata = _transaction_metadata(transactions[-1])
+    cap_audit = final_transaction_metadata["vp_cap_audit"]
+    assert isinstance(cap_audit, dict)
+
+    assert {card.status for card in scored_cards} == {SecondaryMissionCardStatus.ACTIVE}
+    assert [transaction.amount for transaction in transactions] == [4, 4, 4, 4, 4, 0]
+    assert state.victory_point_total("player-a") == 20
+    assert cap_audit["capped_reasons"] == ["fixed_secondary_mission_vp_cap"]
+    assert cap_audit["fixed_secondary_mission_cap"] == 20
+    assert cap_audit["fixed_secondary_mission_points_before"] == 20
+    assert cap_audit["fixed_secondary_mission_points_after"] == 20
 
 
 def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -> None:
@@ -2911,8 +2945,9 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         player_id="player-a",
         battle_round=1,
         phase=BattlePhase.COMMAND.value,
-        action_id="establish-locus:center:player-a",
-        source_id="establish-locus",
+        action_id="cleanse:center:player-a",
+        source_id="cleanse",
+        amount=4,
     )
 
     ledger, transaction = VictoryPointLedger.initial(player_id="player-a").award(award)

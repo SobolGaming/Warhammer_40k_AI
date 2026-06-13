@@ -1132,7 +1132,10 @@ contract update that introduces them.
 Phase 11E scoring amounts and supported timing gates are source-backed. Primary
 mission scoring must honor the selected mission's source scoring-rule condition,
 and secondary scoring must use the selected card's Fixed or Tactical scoring
-rule instead of a flat adapter default.
+rule instead of a flat adapter default. Fixed secondary card states remain
+`active` after scoring because Fixed Missions stay active throughout the battle;
+Fixed secondary VP is capped at 20 VP per Fixed Mission card as well as by the
+normal Secondary VP cap.
 
 Adapters should consume a `GameViewPayload` for a viewer by default:
 
@@ -1254,7 +1257,7 @@ Example public Tactical secondary draw event:
     "secondary_mission_card_states": [
       {
         "player_id": "player-a",
-        "secondary_mission_id": "area-denial",
+        "secondary_mission_id": "a-tempting-target",
         "mode": "tactical",
         "battle_round": 1,
         "status": "active",

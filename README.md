@@ -181,11 +181,13 @@ adapter-visible and replay-safe, and unimplemented Core ability families are
 fail-closed as explicit unsupported descriptors. Phase 14J completes the current
 mission/catalog replacement slice with source-tracked 11th Edition Force
 Dispositions, the named 25-cell Primary Mission matrix, three layout identifiers
-per matrix cell, and engine-achievement-gated finite Tactical Secondary
-score/retain decisions; exact 11th Edition Secondary card identities beyond
-current source rows and layout geometry remain pending source work, while Event
-Companion Primary Mission scoring coverage tracks source-known, engine-pending,
-and awaiting-source missions. Phase 14K is complete: attack/save cutover hardening
+per matrix cell, the Armageddon 18-card Secondary Mission deck identity and
+Fixed/Tactical availability, and engine-achievement-gated finite Tactical
+Secondary score/retain decisions; individual secondary achievement semantics
+beyond current state-backed rows and layout geometry remain pending source work,
+while Event Companion Primary Mission scoring coverage tracks source-known,
+engine-pending, and awaiting-source missions. Phase 14K is complete:
+attack/save cutover hardening
 rejects retired save/allocation decision surfaces, grouped Inflict Damage uses defender
 `select_damage_allocation_model` decisions with pre-pop stale-legality rejection,
 old Aircraft minimum-move/pivot runtime policy is removed, reserve arrivals use
