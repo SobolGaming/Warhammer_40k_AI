@@ -541,6 +541,7 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
             lifecycle,
             unit_instance_id=before_placement.unit_instance_id,
             dx=6.0,
+            include_midpoint=False,
         ),
     )
 
@@ -575,7 +576,7 @@ def test_normal_move_consumes_movement_base_size_current_pose_and_updates_placem
         poses_raw = model_path["poses"]
         assert isinstance(poses_raw, list)
         poses = cast(list[object], poses_raw)
-        assert len(poses) == 3
+        assert len(poses) == 2
         final_pose = poses[-1]
         model_id = model_path["model_id"]
         assert type(model_id) is str

@@ -75,6 +75,32 @@ def test_terrain_path_legality_accepts_explicit_zero_displacement_no_op_witness(
     assert result.segments == ()
 
 
+def test_terrain_path_legality_accepts_two_pose_straight_segment() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    low_terrain = TerrainVolume(
+        terrain_id="low-crater",
+        bottom_center=Point3(3.0, 1.0, 0.0),
+        width=1.0,
+        depth=1.0,
+        height=2.0,
+    )
+    witness = PathWitness.for_paths(((mover.model_id, (mover.pose, Pose.at(5.0, 1.0))),))
+    context = _normal_legality_context().to_terrain_path_legality_context(
+        moving_model=mover,
+        witness=witness,
+        terrain=(low_terrain,),
+        terrain_features=(),
+        contact_footprint_available=True,
+        sample_interval_inches=0.5,
+    )
+
+    result = context.validate()
+
+    assert result.is_valid
+    assert result.sampled_pose_count == 9
+    assert result.segments[0].terrain_id == "low-crater"
+
+
 def test_model_cannot_pass_through_wall_without_traversal_permission() -> None:
     mover = _model("vehicle-mover", 1.0, 1.0)
     ruins = _ruins_blocking_wall_feature()
