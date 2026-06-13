@@ -777,6 +777,67 @@ def primary_mission_action_source_rows() -> tuple[EventPrimaryMissionActionSourc
             engine_exposure_status="source_known_engine_pending",
             source_id=f"{SOURCE_PACKAGE_ID}:primary-action:extract-intelligence",
         ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="surveil-enemy-unit",
+            primary_mission_id="primary-surveil-the-foe",
+            name="Surveil the Foe",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="immediate",
+            eligible_unit_policy="active_player_unit",
+            target_policy="visible_enemy_unit_within_18_not_surveilled_this_turn",
+            use_limit="unlimited",
+            effect_descriptor="enemy_unit_becomes_surveilled_until_turn_end",
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:surveil-enemy-unit",
+        ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="sensor-sweep-locate-and-deny",
+            primary_mission_id="primary-locate-and-deny",
+            name="Sensor Sweep",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="turn_end",
+            eligible_unit_policy="active_player_unit_within_range_of_central_objective",
+            target_policy="operation_marker_requires_more_than_one_marker_remaining",
+            use_limit="once_per_turn",
+            effect_descriptor=(
+                "remove_one_operation_marker_if_action_unit_controls_central_objective_at_turn_end"
+            ),
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:sensor-sweep-locate-and-deny",
+        ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="sensor-sweep-extract-relic",
+            primary_mission_id="primary-extract-relic",
+            name="Sensor Sweep",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="turn_end",
+            eligible_unit_policy="active_player_unit_within_range_of_central_objective",
+            target_policy="opponent_operation_marker_requires_more_than_one_marker_remaining",
+            use_limit="once_per_turn",
+            effect_descriptor=(
+                "remove_one_opponent_operation_marker_if_action_unit_controls_central_objective"
+                "_at_turn_end"
+            ),
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:sensor-sweep-extract-relic",
+        ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="commit-sabotage",
+            primary_mission_id="primary-sabotage",
+            name="Sabotage",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="turn_end",
+            eligible_unit_policy="active_player_unit_within_range_of_non_home_objective",
+            target_policy="objective_marker_excluding_home",
+            use_limit="unlimited_different_objective_per_unit_this_phase",
+            effect_descriptor="unit_commits_sabotage_if_action_unit_controls_target_at_turn_end",
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:commit-sabotage",
+        ),
     )
 
 
@@ -906,6 +967,12 @@ _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = frozenset(
 
 
 _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
+    "primary-battlefield-dominance": (
+        "engine_primary_condition:control_more_objectives_than_opponent_first_second_rounds",
+        "engine_primary_condition:each_objective_controlled_from_battle_round_two",
+        "engine_primary_condition:home_objective_controlled_non_home_objective_bonus",
+        "engine_primary_scoring_grammar:cumulative_condition",
+    ),
     "primary-consecrate": (
         "engine_primary_marker_state:consecrated_objective",
         "engine_primary_condition:consecrated_objective_thresholds",
@@ -917,6 +984,19 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:control_central_and_expansion_objectives",
         "source_objective_role:expansion_objective",
     ),
+    "primary-determined-acquisition": (
+        "engine_primary_condition:each_newly_controlled_non_home_objective_this_turn",
+        "engine_primary_condition:each_objective_controlled_from_battle_round_two",
+        "engine_primary_condition:controlled_objective_in_opponent_territory_bonus",
+        "engine_primary_scoring_grammar:cumulative_condition",
+    ),
+    "primary-extract-relic": (
+        "engine_primary_action:sensor-sweep-extract-relic",
+        "engine_primary_marker_state:opponent_operation_marker",
+        "engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn",
+        "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
+        "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
+    ),
     "primary-gather-intel": (
         "engine_primary_action:extract-intelligence",
         "engine_primary_marker_state:gather_intel_operation_marker",
@@ -927,6 +1007,19 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
     "primary-destroyers-wrath": (
         "engine_primary_condition:control_more_objectives_than_opponent",
         "engine_primary_condition:more_enemy_units_destroyed_than_friendly_previous_turn",
+    ),
+    "primary-inescapable-dominion": (
+        "engine_primary_condition:control_three_or_more_objectives",
+        "engine_primary_condition:control_two_or_more_objectives_from_battle_round_two",
+        "engine_primary_condition:control_more_objectives_than_opponent",
+        "engine_primary_condition:control_opponent_home_objective",
+    ),
+    "primary-locate-and-deny": (
+        "engine_primary_start_battle_setup:locate_and_deny_operation_markers",
+        "engine_primary_action:sensor-sweep-locate-and-deny",
+        "engine_primary_marker_state:operation_marker_terrain_area",
+        "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
+        "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
     ),
     "primary-meatgrinder": (
         "engine_primary_condition:more_enemy_units_destroyed_than_friendly_previous_turn",
@@ -943,11 +1036,43 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:control_more_objectives_than_opponent",
         "engine_primary_condition:control_opponent_home_objective",
     ),
+    "primary-purge-and-secure": (
+        "engine_primary_condition:enemy_destroyed_by_friendly_unit_on_objective",
+        "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
+        "engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two",
+        "engine_primary_condition:control_one_or_more_new_non_home_objectives",
+        "engine_primary_scoring_grammar:exclusive_or_condition",
+    ),
+    "primary-reconnaissance-sweep": (
+        "engine_primary_condition:table_quarter_unit_distribution",
+        "engine_primary_condition:each_enemy_unit_destroyed_this_turn",
+        "engine_primary_condition:control_one_or_more_non_home_objectives",
+        "engine_primary_scoring_grammar:exclusive_or_condition",
+    ),
+    "primary-sabotage": (
+        "engine_primary_action:commit-sabotage",
+        "engine_primary_condition:each_friendly_unit_committed_sabotage_this_turn",
+        "engine_primary_condition:sabotage_opponent_territory_objective_bonus",
+        "engine_primary_scoring_grammar:cumulative_condition",
+    ),
+    "primary-search-and-scour": (
+        "engine_primary_condition:control_one_or_more_central_objectives",
+        "engine_primary_condition:enemy_started_turn_in_terrain_destroyed",
+        "engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two",
+        "engine_primary_condition:no_enemy_units_wholly_within_own_territory",
+    ),
     "primary-smoke-and-mirrors": (
         "engine_primary_action:decoy-objective",
         "engine_primary_marker_state:decoy_objective",
         "engine_primary_condition:decoy_objective_scoring",
         "engine_primary_condition:opponent_territory_objective_bonus",
+    ),
+    "primary-surveil-the-foe": (
+        "engine_primary_action:surveil-enemy-unit",
+        "engine_primary_marker_state:enemy_operation_marker",
+        "engine_primary_movement_effect:remove_enemy_operation_markers_from_objective",
+        "engine_primary_condition:enemy_unit_surveilled_marker_exception",
+        "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
     ),
     "primary-triangulation": (
         "engine_primary_action:triangulate-objective",
@@ -1268,6 +1393,345 @@ def _source_known_event_primary_mission_rows_by_id() -> dict[
                     "end_of_battle",
                     5,
                     "friendly_operation_marker_within_opponent_home_objective_range_end_of_battle",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-surveil-the-foe",
+            name="Surveil the Foe",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "surveil-the-foe-enemy-units-surveilled-turn-end",
+                    "turn_end",
+                    4,
+                    (
+                        "one_or_more_enemy_units_surveilled_this_turn_unless_all_within_range"
+                        "_of_objectives_with_operation_markers"
+                    ),
+                ),
+                _event_primary_rule(
+                    "surveil-the-foe-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "surveil-the-foe-control-more-objectives",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_more_objectives_than_opponent_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "surveil-the-foe-no-enemy-operation-markers",
+                    "turn_end_from_battle_round_two",
+                    5,
+                    "no_enemy_operation_markers_on_battlefield",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-search-and-scour",
+            name="Search and Scour",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "search-and-scour-central-objective-turn-end",
+                    "turn_end",
+                    3,
+                    "control_one_or_more_central_objectives",
+                ),
+                _event_primary_rule(
+                    "search-and-scour-enemy-terrain-destroyed-turn-end",
+                    "turn_end",
+                    2,
+                    "one_or_more_enemy_units_started_turn_in_terrain_area_destroyed_this_turn",
+                ),
+                _event_primary_rule(
+                    "search-and-scour-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "each_non_home_objective_controlled_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "search-and-scour-no-enemy-in-territory-end-battle",
+                    "end_of_battle",
+                    5,
+                    "no_enemy_units_wholly_within_own_territory_end_of_battle",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-reconnaissance-sweep",
+            name="Reconnaissance Sweep",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "reconnaissance-sweep-three-quarters-turn-end",
+                    "turn_end",
+                    3,
+                    (
+                        "three_or_more_friendly_units_wholly_within_three_different_table"
+                        "_quarters_not_within_six_of_center"
+                    ),
+                ),
+                _event_primary_rule(
+                    "reconnaissance-sweep-four-quarters-turn-end",
+                    "turn_end",
+                    6,
+                    (
+                        "four_or_more_friendly_units_wholly_within_four_different_table"
+                        "_quarters_not_within_six_of_center"
+                    ),
+                ),
+                _event_primary_rule(
+                    "reconnaissance-sweep-enemy-destroyed-turn-end",
+                    "turn_end",
+                    1,
+                    "each_enemy_unit_destroyed_this_turn",
+                ),
+                _event_primary_rule(
+                    "reconnaissance-sweep-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    3,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-locate-and-deny",
+            name="Locate and Deny",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "locate-and-deny-enemy-started-objective-destroyed",
+                    "turn_end",
+                    4,
+                    "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
+                ),
+                _event_primary_rule(
+                    "locate-and-deny-one-marker-remains-terrain",
+                    "turn_end",
+                    4,
+                    (
+                        "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no"
+                        "_enemy_in_terrain_area"
+                    ),
+                ),
+                _event_primary_rule(
+                    "locate-and-deny-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "locate-and-deny-one-marker-end-battle",
+                    "end_of_battle",
+                    5,
+                    (
+                        "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no"
+                        "_enemy_in_terrain_area_end_of_battle"
+                    ),
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-battlefield-dominance",
+            name="Battlefield Dominance",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "battlefield-dominance-control-more-turn-end-rounds-one-two",
+                    "first_and_second_battle_round_turn_end",
+                    2,
+                    "control_more_objectives_than_opponent_first_and_second_battle_round",
+                ),
+                _event_primary_rule(
+                    "battlefield-dominance-each-objective",
+                    "command_phase_or_round_five_turn_end",
+                    3,
+                    "each_objective_controlled_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "battlefield-dominance-home-controlled-non-home-bonus",
+                    "command_phase_or_round_five_turn_end",
+                    2,
+                    "each_non_home_objective_controlled_if_home_objective_controlled",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-determined-acquisition",
+            name="Determined Acquisition",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "determined-acquisition-new-objectives-turn-end",
+                    "turn_end",
+                    2,
+                    "each_newly_controlled_non_home_objective_this_turn",
+                ),
+                _event_primary_rule(
+                    "determined-acquisition-each-objective",
+                    "command_phase_or_round_five_turn_end",
+                    3,
+                    "each_objective_controlled_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "determined-acquisition-opponent-territory-bonus",
+                    "command_phase_or_round_five_turn_end",
+                    3,
+                    "each_controlled_objective_in_opponent_territory",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-inescapable-dominion",
+            name="Inescapable Dominion",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "inescapable-dominion-three-objectives-turn-end",
+                    "turn_end",
+                    4,
+                    "control_three_or_more_objectives",
+                ),
+                _event_primary_rule(
+                    "inescapable-dominion-two-objectives",
+                    "command_phase_or_round_five_turn_end",
+                    5,
+                    "control_two_or_more_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "inescapable-dominion-control-more",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_more_objectives_than_opponent_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "inescapable-dominion-opponent-home-end-battle",
+                    "end_of_battle",
+                    5,
+                    "control_opponent_home_objective_end_of_battle",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-purge-and-secure",
+            name="Purge and Secure",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "purge-and-secure-destroyed-by-objective-unit-turn-end",
+                    "turn_end",
+                    3,
+                    "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn",
+                ),
+                _event_primary_rule(
+                    "purge-and-secure-started-objective-destroyed-turn-end",
+                    "turn_end",
+                    3,
+                    "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
+                ),
+                _event_primary_rule(
+                    "purge-and-secure-each-objective",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "each_non_home_objective_controlled_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "purge-and-secure-new-objective-turn-end",
+                    "turn_end_from_battle_round_two",
+                    3,
+                    "control_one_or_more_new_non_home_objectives",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-extract-relic",
+            name="Extract Relic",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "extract-relic-sensor-sweep-turn-end",
+                    "turn_end",
+                    4,
+                    "friendly_unit_performed_sensor_sweep_this_turn",
+                ),
+                _event_primary_rule(
+                    "extract-relic-started-objective-destroyed-turn-end",
+                    "turn_end",
+                    3,
+                    "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
+                ),
+                _event_primary_rule(
+                    "extract-relic-one-opponent-marker-turn-end",
+                    "turn_end",
+                    4,
+                    (
+                        "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no"
+                        "_enemy_in_terrain_area"
+                    ),
+                ),
+                _event_primary_rule(
+                    "extract-relic-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "extract-relic-one-opponent-marker-end-battle",
+                    "end_of_battle",
+                    5,
+                    (
+                        "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no"
+                        "_enemy_in_terrain_area_end_of_battle"
+                    ),
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-sabotage",
+            name="Sabotage",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "sabotage-each-unit-turn-end",
+                    "turn_end",
+                    3,
+                    "each_friendly_unit_committed_sabotage_this_turn",
+                ),
+                _event_primary_rule(
+                    "sabotage-opponent-territory-bonus-turn-end",
+                    "turn_end",
+                    2,
+                    "each_sabotage_unit_within_objective_range_in_opponent_territory_this_turn",
+                ),
+                _event_primary_rule(
+                    "sabotage-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
                 ),
             ),
         ),

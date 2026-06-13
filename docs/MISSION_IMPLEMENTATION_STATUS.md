@@ -58,11 +58,13 @@ Secondary status:
 ## Summary
 
 - Primary matrix cells: 25 of 25 `implemented`.
-- Primary scoring coverage: 3 `engine_implemented`, 9
-  `source_known_engine_pending`, 13 `awaiting_source`.
-- Primary source-only actions: `decoy-objective`, `triangulate-objective`, and
-  `extract-intelligence` are tracked as source descriptors only and are not
-  exposed as runtime mission actions.
+- Primary scoring coverage: 3 `engine_implemented`, 19
+  `source_known_engine_pending`, 3 `awaiting_source`.
+- Primary source-only actions: `decoy-objective`, `triangulate-objective`,
+  `extract-intelligence`, `surveil-enemy-unit`,
+  `sensor-sweep-locate-and-deny`, `sensor-sweep-extract-relic`, and
+  `commit-sabotage` are tracked as source descriptors only and are not exposed
+  as runtime mission actions.
 - Secondary missions: 20 `source_tracked` and `policy_loaded`.
 - Secondary scoring rows: 6 fixed rows, 22 tactical rows, and 10 alternate or
   partial rows.
@@ -90,25 +92,25 @@ Secondary status:
 | `purge-the-foe` | `reconnaissance` | Consecrate | `primary-consecrate` | `implemented` | `source_known_engine_pending` | 5 | 0 | `engine_primary_marker_state:consecrated_objective`, `engine_primary_condition:consecrated_objective_thresholds`, `engine_primary_condition:control_more_objectives_than_opponent`, `engine_primary_condition:enemy_home_objective_consecrated` |
 | `purge-the-foe` | `priority-assets` | Destroyer's Wrath | `primary-destroyers-wrath` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:control_more_objectives_than_opponent`, `engine_primary_condition:more_enemy_units_destroyed_than_friendly_previous_turn` |
 | `take-and-hold` | `purge-the-foe` | Immovable Object | `primary-immovable-object` | `implemented` | `engine_implemented` | 3 | 0 | None |
-| `take-and-hold` | `take-and-hold` | Battlefield Dominance | `primary-battlefield-dominance` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `take-and-hold` | `disruption` | Determined Acquisition | `primary-determined-acquisition` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `take-and-hold` | `reconnaissance` | Purge and Secure | `primary-purge-and-secure` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `take-and-hold` | `priority-assets` | Inescapable Dominion | `primary-inescapable-dominion` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `take-and-hold` | `take-and-hold` | Battlefield Dominance | `primary-battlefield-dominance` | `implemented` | `source_known_engine_pending` | 3 | 0 | `engine_primary_condition:control_more_objectives_than_opponent_first_second_rounds`, `engine_primary_condition:each_objective_controlled_from_battle_round_two`, `engine_primary_condition:home_objective_controlled_non_home_objective_bonus`, `engine_primary_scoring_grammar:cumulative_condition` |
+| `take-and-hold` | `disruption` | Determined Acquisition | `primary-determined-acquisition` | `implemented` | `source_known_engine_pending` | 3 | 0 | `engine_primary_condition:each_newly_controlled_non_home_objective_this_turn`, `engine_primary_condition:each_objective_controlled_from_battle_round_two`, `engine_primary_condition:controlled_objective_in_opponent_territory_bonus`, `engine_primary_scoring_grammar:cumulative_condition` |
+| `take-and-hold` | `reconnaissance` | Purge and Secure | `primary-purge-and-secure` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:enemy_destroyed_by_friendly_unit_on_objective`, `engine_primary_condition:enemy_started_turn_on_objective_destroyed`, `engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two`, `engine_primary_condition:control_one_or_more_new_non_home_objectives`, `engine_primary_scoring_grammar:exclusive_or_condition` |
+| `take-and-hold` | `priority-assets` | Inescapable Dominion | `primary-inescapable-dominion` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:control_three_or_more_objectives`, `engine_primary_condition:control_two_or_more_objectives_from_battle_round_two`, `engine_primary_condition:control_more_objectives_than_opponent`, `engine_primary_condition:control_opponent_home_objective` |
 | `disruption` | `purge-the-foe` | Delaying Action | `primary-delaying-action` | `implemented` | `source_known_engine_pending` | 3 | 0 | `engine_primary_condition:each_enemy_unit_destroyed_this_turn`, `engine_primary_condition:control_central_and_expansion_objectives`, `source_objective_role:expansion_objective` |
 | `disruption` | `take-and-hold` | Death Trap | `primary-death-trap` | `implemented` | `engine_implemented` | 4 | 1 | None |
 | `disruption` | `disruption` | Outmanoeuvre | `primary-outmaneuver` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:control_enemy_home_objective`, `engine_primary_condition:round_band_objective_control`, `engine_primary_name_alias:outmaneuver_outmanoeuvre` |
 | `disruption` | `reconnaissance` | Smoke and Mirrors | `primary-smoke-and-mirrors` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:decoy-objective`, `engine_primary_marker_state:decoy_objective`, `engine_primary_condition:decoy_objective_scoring`, `engine_primary_condition:opponent_territory_objective_bonus` |
-| `disruption` | `priority-assets` | Locate and Deny | `primary-locate-and-deny` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `disruption` | `priority-assets` | Locate and Deny | `primary-locate-and-deny` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_start_battle_setup:locate_and_deny_operation_markers`, `engine_primary_action:sensor-sweep-locate-and-deny`, `engine_primary_marker_state:operation_marker_terrain_area`, `engine_primary_condition:enemy_started_turn_on_objective_destroyed`, `engine_primary_condition:single_friendly_operation_marker_terrain_area_state` |
 | `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:triangulate-objective`, `engine_primary_marker_state:triangulated_objective`, `engine_primary_condition:triangulated_objective_thresholds`, `engine_primary_condition:control_four_or_more_objectives` |
-| `reconnaissance` | `take-and-hold` | Reconnaissance Sweep | `primary-reconnaissance-sweep` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `reconnaissance` | `take-and-hold` | Reconnaissance Sweep | `primary-reconnaissance-sweep` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:table_quarter_unit_distribution`, `engine_primary_condition:each_enemy_unit_destroyed_this_turn`, `engine_primary_condition:control_one_or_more_non_home_objectives`, `engine_primary_scoring_grammar:exclusive_or_condition` |
+| `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:surveil-enemy-unit`, `engine_primary_marker_state:enemy_operation_marker`, `engine_primary_movement_effect:remove_enemy_operation_markers_from_objective`, `engine_primary_condition:enemy_unit_surveilled_marker_exception`, `engine_primary_condition:no_enemy_operation_markers_on_battlefield` |
 | `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:extract-intelligence`, `engine_primary_marker_state:gather_intel_operation_marker`, `engine_primary_condition:control_one_or_more_central_objectives_first_battle_round`, `engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn`, `engine_primary_condition:gather_intel_operation_marker_end_of_battle` |
-| `reconnaissance` | `priority-assets` | Search and Scour | `primary-search-and-scour` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `reconnaissance` | `priority-assets` | Search and Scour | `primary-search-and-scour` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:control_one_or_more_central_objectives`, `engine_primary_condition:enemy_started_turn_in_terrain_destroyed`, `engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two`, `engine_primary_condition:no_enemy_units_wholly_within_own_territory` |
 | `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
 | `priority-assets` | `take-and-hold` | Secure Asset | `primary-secure-asset` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `priority-assets` | `disruption` | Extract Relic | `primary-extract-relic` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `priority-assets` | `disruption` | Extract Relic | `primary-extract-relic` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:sensor-sweep-extract-relic`, `engine_primary_marker_state:opponent_operation_marker`, `engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn`, `engine_primary_condition:enemy_started_turn_on_objective_destroyed`, `engine_primary_condition:single_opponent_operation_marker_terrain_area_state` |
 | `priority-assets` | `reconnaissance` | Vanguard Operation | `primary-vanguard-operation` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `priority-assets` | `priority-assets` | Sabotage | `primary-sabotage` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `priority-assets` | `priority-assets` | Sabotage | `primary-sabotage` | `implemented` | `source_known_engine_pending` | 3 | 1 | `engine_primary_action:commit-sabotage`, `engine_primary_condition:each_friendly_unit_committed_sabotage_this_turn`, `engine_primary_condition:sabotage_opponent_territory_objective_bonus`, `engine_primary_scoring_grammar:cumulative_condition` |
 
 ## Secondary Missions
 
@@ -143,8 +145,10 @@ Secondary status:
 - `source_known_engine_pending` primary missions must remain fail-closed until
   the listed conditions, markers, actions, or choices have engine-owned
   validation and mutation paths.
-- `decoy-objective`, `triangulate-objective`, and `extract-intelligence` are
-  source-only descriptors. Do not expose them through
+- `decoy-objective`, `triangulate-objective`, `extract-intelligence`,
+  `surveil-enemy-unit`, `sensor-sweep-locate-and-deny`,
+  `sensor-sweep-extract-relic`, and `commit-sabotage` are source-only
+  descriptors. Do not expose them through
   `MissionPackDefinition.mission_action(...)` or Shooting-phase mission action
   start until their validation, marker state, and scoring semantics exist.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,

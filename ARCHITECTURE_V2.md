@@ -4412,8 +4412,8 @@ Implemented coverage:
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
 - `primary_mission_scoring_coverage_rows()` tracks Primary Mission scoring
-  status: 3 missions are engine-implemented, 9 are source-known but require
-  engine implementation, and 13 still await source scoring text.
+  status: 3 missions are engine-implemented, 19 are source-known but require
+  engine implementation, and 3 still await source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
   with deterministic layout descriptors while exact per-page coordinate
   extraction remains explicitly marked pending.
