@@ -14,6 +14,7 @@ from warhammer40k_core.core.missions import (
     MissionPackError,
     MissionSourcePackageDefinition,
     MissionSourceStatus,
+    SecondaryMissionAvailability,
     mission_source_status_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
@@ -92,7 +93,37 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
     assert len(mission_pack.deployment_maps) == 1
     assert len(mission_pack.terrain_layout_templates) == 1
     assert len(mission_pack.mission_pool_entries) == 1
-    assert len(mission_pack.secondary_missions) == 20
+    assert len(mission_pack.secondary_missions) == 18
+    assert tuple(mission.secondary_mission_id for mission in mission_pack.secondary_missions) == (
+        "a-grievous-blow",
+        "a-tempting-target",
+        "assassination",
+        "beacon",
+        "behind-enemy-lines",
+        "bring-it-down",
+        "burden-of-trust",
+        "centre-ground",
+        "cleanse",
+        "defend-stronghold",
+        "display-of-might",
+        "engage-on-all-fronts",
+        "forward-position",
+        "no-prisoners",
+        "outflank",
+        "overwhelming-force",
+        "plunder",
+        "secure-no-mans-land",
+    )
+    assert {
+        mission.secondary_mission_id
+        for mission in mission_pack.secondary_missions
+        if mission.tournament_fixed_allowed
+    } == {
+        "a-grievous-blow",
+        "assassination",
+        "bring-it-down",
+        "engage-on-all-fronts",
+    }
     assert len(mission_pack.challenger_cards) == 9
 
 
@@ -364,9 +395,9 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             ),
         },
     }
+    assert cleanse.availability is SecondaryMissionAvailability.TACTICAL
+    assert cleanse.tournament_fixed_allowed is False
     assert {rule.rule_id for rule in cleanse.scoring_rules} == {
-        "cleanse-fixed-one-objective",
-        "cleanse-fixed-two-objectives",
         "cleanse-tactical-one-objective",
         "cleanse-tactical-two-objectives",
     }

@@ -2766,6 +2766,8 @@ class GameState:
                 hidden=False,
             )
         )
+        if requested_mode is SecondaryMissionCardMode.FIXED:
+            return card_state
         scored = card_state.score(transaction_id=transaction.transaction_id)
         self._replace_secondary_mission_card_state(scored)
         return scored
@@ -2824,6 +2826,8 @@ class GameState:
         if award is None:
             raise GameLifecycleError("State-backed secondary mission requirements are not met.")
         transaction = self.award_victory_points(award)
+        if requested_mode is SecondaryMissionCardMode.FIXED:
+            return card_state
         scored = card_state.score(transaction_id=transaction.transaction_id)
         self._replace_secondary_mission_card_state(scored)
         return scored

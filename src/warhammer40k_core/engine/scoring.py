@@ -28,6 +28,9 @@ class VictoryPointCapBucket(StrEnum):
     BATTLE_READY = "battle_ready"
 
 
+FIXED_SECONDARY_MISSION_VP_CAP = 20
+
+
 class ScoringWindowKind(StrEnum):
     END_OF_ROUND = "end_of_round"
     END_OF_GAME = "end_of_game"
@@ -2817,14 +2820,35 @@ class MissionScoringPolicy:
         )
         source_cap = self._source_cap_for_bucket(cap_bucket)
         source_remaining = max(source_cap - source_points_before, 0)
+        fixed_secondary_points_before = 0
+        fixed_secondary_remaining = award.amount
+        fixed_secondary_cap = None
+        if award.source_kind is VictoryPointSourceKind.FIXED_SECONDARY:
+            fixed_secondary_cap = FIXED_SECONDARY_MISSION_VP_CAP
+            fixed_secondary_points_before = _ledger_points_from_source(
+                ledger=ledger,
+                source_kind=award.source_kind,
+                source_id=award.source_id,
+            )
+            fixed_secondary_remaining = max(
+                fixed_secondary_cap - fixed_secondary_points_before,
+                0,
+            )
         total_remaining = max(self.total_vp_cap - ledger.victory_points, 0)
-        applied_amount = min(award.amount, source_remaining, total_remaining)
+        applied_amount = min(
+            award.amount,
+            source_remaining,
+            fixed_secondary_remaining,
+            total_remaining,
+        )
         if applied_amount == award.amount:
             return applied_amount, award.metadata
 
         capped_reasons: list[str] = []
         if source_remaining < award.amount:
             capped_reasons.append(self._source_cap_reason(cap_bucket))
+        if fixed_secondary_remaining < award.amount:
+            capped_reasons.append("fixed_secondary_mission_vp_cap")
         if total_remaining < award.amount:
             capped_reasons.append("total_vp_cap")
         return (
@@ -2840,6 +2864,11 @@ class MissionScoringPolicy:
                 total_points_before=ledger.victory_points,
                 total_points_after=ledger.victory_points + applied_amount,
                 capped_reasons=tuple(capped_reasons),
+                fixed_secondary_mission_cap=fixed_secondary_cap,
+                fixed_secondary_mission_points_before=fixed_secondary_points_before,
+                fixed_secondary_mission_points_after=(
+                    fixed_secondary_points_before + applied_amount
+                ),
             ),
         )
 
@@ -3994,6 +4023,9 @@ def _metadata_with_vp_cap_audit(
     total_points_before: int,
     total_points_after: int,
     capped_reasons: tuple[str, ...],
+    fixed_secondary_mission_cap: int | None = None,
+    fixed_secondary_mission_points_before: int = 0,
+    fixed_secondary_mission_points_after: int = 0,
 ) -> JsonValue:
     audit = {
         "requested_amount": _validate_positive_int("requested_amount", requested_amount),
@@ -4018,6 +4050,19 @@ def _metadata_with_vp_cap_audit(
             )
         ),
     }
+    if fixed_secondary_mission_cap is not None:
+        audit["fixed_secondary_mission_cap"] = _validate_positive_int(
+            "fixed_secondary_mission_cap",
+            fixed_secondary_mission_cap,
+        )
+        audit["fixed_secondary_mission_points_before"] = _validate_non_negative_int(
+            "fixed_secondary_mission_points_before",
+            fixed_secondary_mission_points_before,
+        )
+        audit["fixed_secondary_mission_points_after"] = _validate_non_negative_int(
+            "fixed_secondary_mission_points_after",
+            fixed_secondary_mission_points_after,
+        )
     validated_metadata = validate_json_value(metadata)
     if validated_metadata is None:
         return {"vp_cap_audit": validate_json_value(audit)}
@@ -4031,6 +4076,24 @@ def _metadata_with_vp_cap_audit(
         "original_metadata": validated_metadata,
         "vp_cap_audit": validate_json_value(audit),
     }
+
+
+def _ledger_points_from_source(
+    *,
+    ledger: VictoryPointLedger,
+    source_kind: VictoryPointSourceKind,
+    source_id: str,
+) -> int:
+    if type(ledger) is not VictoryPointLedger:
+        raise GameLifecycleError("VP source accounting requires a VictoryPointLedger.")
+    requested_kind = victory_point_source_kind_from_token(source_kind)
+    requested_source_id = _validate_identifier("source_id", source_id)
+    return sum(
+        transaction.amount
+        for transaction in ledger.transactions
+        if transaction.source_kind is requested_kind
+        and transaction.source_id == requested_source_id
+    )
 
 
 def _validate_identifier_tuple_ordered(

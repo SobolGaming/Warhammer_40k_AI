@@ -741,8 +741,16 @@ def primary_mission_rows() -> tuple[SourcePrimaryMissionRow, ...]:
 
 def secondary_mission_rows() -> tuple[SourceSecondaryMissionRow, ...]:
     return (
+        _secondary(
+            "a-grievous-blow",
+            "A Grievous Blow",
+            "both",
+            True,
+            fixed_vp=4,
+            tactical_vp=5,
+            cap=5,
+        ),
         _secondary("a-tempting-target", "A Tempting Target", "tactical", False, tactical_vp=5),
-        _secondary("area-denial", "Area Denial", "tactical", False, tactical_vp=5, alternate_vp=2),
         _secondary(
             "assassination",
             "Assassination",
@@ -750,60 +758,41 @@ def secondary_mission_rows() -> tuple[SourceSecondaryMissionRow, ...]:
             True,
             fixed_vp=4,
             tactical_vp=5,
-            alternate_vp=3,
         ),
+        _secondary("beacon", "Beacon", "tactical", False, tactical_vp=5),
         _secondary(
             "behind-enemy-lines",
             "Behind Enemy Lines",
             "tactical",
             False,
-            tactical_vp=4,
-            alternate_vp=3,
+            tactical_vp=3,
+            cap=5,
         ),
         _secondary_bring_it_down(),
+        _secondary("burden-of-trust", "Burden of Trust", "tactical", False, tactical_vp=2, cap=5),
+        _secondary("centre-ground", "Centre Ground", "tactical", False, tactical_vp=5),
         _secondary_cleanse(),
-        _secondary("cull-the-horde", "Cull the Horde", "both", True, fixed_vp=5, tactical_vp=5),
         _secondary_defend_stronghold(),
-        _secondary("display-of-might", "Display of Might", "tactical", False, tactical_vp=4),
+        _secondary("display-of-might", "Display of Might", "tactical", False, tactical_vp=5),
         _secondary(
             "engage-on-all-fronts",
             "Engage on All Fronts",
-            "tactical",
-            False,
-            tactical_vp=4,
-            alternate_vp=1,
+            "both",
+            True,
+            fixed_vp=4,
+            tactical_vp=5,
         ),
-        _secondary(
-            "establish-locus", "Establish Locus", "tactical", False, tactical_vp=4, alternate_vp=2
-        ),
-        _secondary(
-            "extend-battle-lines",
-            "Extend Battle Lines",
-            "tactical",
-            False,
-            tactical_vp=4,
-            alternate_vp=2,
-        ),
-        _secondary(
-            "marked-for-death", "Marked for Death", "tactical", False, tactical_vp=5, alternate_vp=2
-        ),
-        _secondary("no-prisoners", "No Prisoners", "both", False, fixed_vp=2, tactical_vp=2, cap=5),
+        _secondary("forward-position", "Forward Position", "tactical", False, tactical_vp=5),
+        _secondary("no-prisoners", "No Prisoners", "tactical", False, tactical_vp=2, cap=5),
+        _secondary("outflank", "Outflank", "tactical", False, tactical_vp=5),
         _secondary_overwhelming_force(),
         _secondary_plunder(),
-        _secondary(
-            "recover-assets", "Recover Assets", "tactical", False, tactical_vp=5, alternate_vp=3
-        ),
-        _secondary("sabotage", "Sabotage", "tactical", False, tactical_vp=6, alternate_vp=3),
         _secondary(
             "secure-no-mans-land",
             "Secure No Man's Land",
             "tactical",
             False,
             tactical_vp=5,
-            alternate_vp=2,
-        ),
-        _secondary(
-            "storm-hostile-objective", "Storm Hostile Objective", "tactical", False, tactical_vp=4
         ),
     )
 
@@ -1285,48 +1274,6 @@ def mission_action_rows() -> tuple[SourceMissionActionRow, ...]:
             scoring_source_id="plunder",
         ),
         SourceMissionActionRow(
-            mission_action_id="establish-locus-objective",
-            mission_id="establish-locus",
-            mission_kind="secondary",
-            name="Establish Locus",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit",
-            target_policy="center_or_enemy_deployment_zone",
-            interruption_conditions=("unit_moved", "unit_destroyed", "unit_left_battlefield"),
-            victory_points=4,
-            scoring_source_id="establish-locus",
-        ),
-        SourceMissionActionRow(
-            mission_action_id="recover-assets-objective",
-            mission_id="recover-assets",
-            mission_kind="secondary",
-            name="Recover Assets",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit",
-            target_policy="table_quarter",
-            interruption_conditions=("unit_moved", "unit_destroyed", "unit_left_battlefield"),
-            victory_points=5,
-            scoring_source_id="recover-assets",
-        ),
-        SourceMissionActionRow(
-            mission_action_id="sabotage-terrain",
-            mission_id="sabotage",
-            mission_kind="secondary",
-            name="Sabotage",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="opponent_next_turn_end_or_battle_end",
-            eligible_unit_policy="active_player_unit",
-            target_policy="terrain_feature",
-            interruption_conditions=("unit_moved", "unit_destroyed", "unit_left_battlefield"),
-            victory_points=6,
-            scoring_source_id="sabotage",
-        ),
-        SourceMissionActionRow(
             mission_action_id="terraform-objective",
             mission_id="terraform",
             mission_kind="primary",
@@ -1444,33 +1391,25 @@ def _secondary_bring_it_down() -> SourceSecondaryMissionRow:
 
 def _secondary_cleanse() -> SourceSecondaryMissionRow:
     rules: list[SourceScoringRuleRow] = []
-    for source_kind in ("fixed_secondary", "tactical_secondary"):
-        suffix = "fixed" if source_kind == "fixed_secondary" else "tactical"
-        rules.extend(
-            (
-                _rule(
-                    f"cleanse-{suffix}-one-objective",
-                    "your_turn_end",
-                    source_kind,
-                    2,
-                    None,
-                    "one_or_more_objectives_cleansed_this_turn",
-                ),
-                _rule(
-                    f"cleanse-{suffix}-two-objectives",
-                    "your_turn_end",
-                    source_kind,
-                    3,
-                    None,
-                    "two_or_more_objectives_cleansed_this_turn",
-                ),
+    for suffix, victory_points, condition in (
+        ("one-objective", 2, "one_or_more_objectives_cleansed_this_turn"),
+        ("two-objectives", 3, "two_or_more_objectives_cleansed_this_turn"),
+    ):
+        rules.append(
+            _rule(
+                f"cleanse-tactical-{suffix}",
+                "your_turn_end",
+                "tactical_secondary",
+                victory_points,
+                None,
+                condition,
             )
         )
     return SourceSecondaryMissionRow(
         secondary_mission_id="cleanse",
         name="Cleanse",
-        availability="both",
-        tournament_fixed_allowed=True,
+        availability="tactical",
+        tournament_fixed_allowed=False,
         scoring_rules=tuple(rules),
     )
 

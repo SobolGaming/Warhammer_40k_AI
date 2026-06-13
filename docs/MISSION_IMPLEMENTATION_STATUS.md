@@ -66,11 +66,12 @@ Secondary status:
   `commit-sabotage`, `secure-asset`, `vanguard-operation`, and
   `maintain-control` are tracked as source descriptors only and are not
   exposed as runtime mission actions.
-- Secondary missions: 20 `source_tracked` and `policy_loaded`.
-- Secondary scoring rows: 6 fixed rows, 22 tactical rows, and 10 alternate or
+- Secondary missions: 18 `source_tracked` and `policy_loaded`.
+- Secondary scoring rows: 4 fixed rows, 20 tactical rows, and 0 alternate or
   partial rows.
 - Tournament fixed secondaries: 4 cards are flagged as fixed-allowed
-  (`Assassination`, `Bring It Down`, `Cleanse`, `Cull the Horde`).
+  (`A Grievous Blow`, `Assassination`, `Bring It Down`,
+  `Engage on All Fronts`).
 
 ## Mission-Card Scoring Grammar
 
@@ -117,26 +118,24 @@ Secondary status:
 
 | Secondary Mission | Mission ID | Availability | Tournament Fixed | Fixed Rules | Tactical Rules | Other Rows | Status | Engine Notes |
 | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
+| A Grievous Blow | `a-grievous-blow` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
 | A Tempting Target | `a-tempting-target` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Area Denial | `area-denial` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; alternate or partial row present |
-| Assassination | `assassination` | `both` | Yes | 1 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; alternate or partial row present |
-| Behind Enemy Lines | `behind-enemy-lines` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; alternate or partial row present |
+| Assassination | `assassination` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Beacon | `beacon` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Behind Enemy Lines | `behind-enemy-lines` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
 | Bring It Down | `bring-it-down` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_model_w10_or_more_destroyed_this_turn` |
-| Cleanse | `cleanse` | `both` | Yes | 2 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks objective cleanse counts; runtime action `cleanse-objective` exists |
-| Cull the Horde | `cull-the-horde` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Burden of Trust | `burden-of-trust` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Centre Ground | `centre-ground` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Cleanse | `cleanse` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks objective cleanse counts; runtime action `cleanse-objective` exists |
 | Defend Stronghold | `defend-stronghold` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks home objective control and enemy absence from own deployment zone |
 | Display of Might | `display-of-might` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Engage on All Fronts | `engage-on-all-fronts` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; alternate or partial row present |
-| Establish Locus | `establish-locus` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; runtime action `establish-locus-objective` exists; alternate or partial row present |
-| Extend Battle Lines | `extend-battle-lines` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; alternate or partial row present |
-| Marked for Death | `marked-for-death` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; alternate or partial row present |
-| No Prisoners | `no-prisoners` | `both` | No | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition`; source has fixed and tactical rows but this card is not tournament fixed-allowed |
+| Engage on All Fronts | `engage-on-all-fronts` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Forward Position | `forward-position` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| No Prisoners | `no-prisoners` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Outflank | `outflank` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
 | Overwhelming Force | `overwhelming-force` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_started_turn_on_objective_destroyed` |
 | Plunder | `plunder` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks terrain plunder state; runtime action `plunder-terrain` exists |
-| Recover Assets | `recover-assets` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; runtime action `recover-assets-objective` exists; alternate or partial row present |
-| Sabotage | `sabotage` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; runtime action `sabotage-terrain` exists; alternate or partial row present |
-| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded` | `generic_condition`; alternate or partial row present |
-| Storm Hostile Objective | `storm-hostile-objective` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
 
 ## Runtime Caveats
 
@@ -154,6 +153,7 @@ Secondary status:
   `MissionPackDefinition.mission_action(...)` or Shooting-phase mission action
   start until their validation, marker state, and scoring semantics exist.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
-  tactical draw, scoring, retain/discard, and state-backed awards. Individual
-  card achievement semantics still need card-specific tests before moving from
-  `generic_condition` to `state_backed`.
+  tactical draw, scoring, retain/discard, Fixed card states that remain active
+  after scoring, the 20 VP per Fixed Mission card cap, and state-backed awards.
+  Individual card achievement semantics still need card-specific tests before
+  moving from `generic_condition` to `state_backed`.
