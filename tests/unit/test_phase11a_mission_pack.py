@@ -348,6 +348,11 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
         if mission.primary_mission_id == "primary-death-trap"
     )
     bring_it_down = mission_pack.secondary_mission("bring-it-down")
+    a_grievous_blow = mission_pack.secondary_mission("a-grievous-blow")
+    assassination = mission_pack.secondary_mission("assassination")
+    no_prisoners = mission_pack.secondary_mission("no-prisoners")
+    overwhelming_force = mission_pack.secondary_mission("overwhelming-force")
+    secure_no_mans_land = mission_pack.secondary_mission("secure-no-mans-land")
     cleanse = mission_pack.secondary_mission("cleanse")
     plunder = mission_pack.secondary_mission("plunder")
     cleanse_action = mission_pack.mission_action("cleanse-objective")
@@ -375,7 +380,7 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "timing": "turn_end",
             "source_kind": "fixed_secondary",
             "victory_points": 4,
-            "cap": None,
+            "cap": 5,
             "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
@@ -394,6 +399,50 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
                 "scoring-rule:bring-it-down-tactical"
             ),
         },
+        "bring-it-down-when-drawn": {
+            "rule_id": "bring-it-down-when-drawn",
+            "timing": "when_drawn",
+            "source_kind": "secondary",
+            "victory_points": None,
+            "cap": None,
+            "condition": "may_discard_if_no_enemy_models_w10_or_more_on_battlefield",
+            "source_id": (
+                "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
+                "scoring-rule:bring-it-down-when-drawn"
+            ),
+        },
+    }
+    assert {rule.rule_id: rule.condition for rule in a_grievous_blow.scoring_rules} == {
+        "a-grievous-blow-fixed": (
+            "each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn"
+        ),
+        "a-grievous-blow-tactical": (
+            "each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn"
+        ),
+        "a-grievous-blow-when-drawn": (
+            "may_discard_if_no_enemy_units_starting_strength_13_or_more_on_battlefield"
+        ),
+    }
+    assert {rule.rule_id: rule.condition for rule in no_prisoners.scoring_rules} == {
+        "no-prisoners-tactical": "each_enemy_unit_destroyed_this_turn",
+    }
+    assert {rule.rule_id: rule.condition for rule in overwhelming_force.scoring_rules} == {
+        "overwhelming-force-tactical": (
+            "each_enemy_unit_started_turn_in_range_of_objective_destroyed"
+        ),
+    }
+    assert {rule.rule_id: rule.condition for rule in secure_no_mans_land.scoring_rules} == {
+        "secure-no-mans-land-tactical": (
+            "control_two_or_more_no_mans_land_objectives_excluding_home"
+        ),
+    }
+    assert {
+        rule.rule_id for rule in assassination.scoring_rules if rule.source_kind == "secondary"
+    } == {
+        "assassination-fixed-character-w4-plus",
+        "assassination-fixed-character-w3-or-less",
+        "assassination-tactical-all-characters-destroyed",
+        "assassination-tactical-character-destroyed",
     }
     assert cleanse.availability is SecondaryMissionAvailability.TACTICAL
     assert cleanse.tournament_fixed_allowed is False

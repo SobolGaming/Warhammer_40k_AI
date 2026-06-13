@@ -54,6 +54,10 @@ Secondary status:
   `fixed_secondary_condition` or `tactical_secondary_condition`; card-specific
   achievement detection still needs focused source and engine work before it can
   be treated as fully implemented.
+- `source_only_rows`: exact card branches or When Drawn/definition rows are
+  tracked in source data with non-policy `secondary` source kind. They are not
+  imported into `MissionScoringPolicy` until the required engine evidence,
+  choices, and adapter-visible payloads exist.
 
 ## Summary
 
@@ -67,8 +71,8 @@ Secondary status:
   `maintain-control` are tracked as source descriptors only and are not
   exposed as runtime mission actions.
 - Secondary missions: 18 `source_tracked` and `policy_loaded`.
-- Secondary scoring rows: 4 fixed rows, 20 tactical rows, and 0 alternate or
-  partial rows.
+- Secondary scoring rows: 4 fixed policy rows, 20 tactical policy rows, and 28
+  source-only branch/procedure rows.
 - Tournament fixed secondaries: 4 cards are flagged as fixed-allowed
   (`A Grievous Blow`, `Assassination`, `Bring It Down`,
   `Engage on All Fronts`).
@@ -118,24 +122,24 @@ Secondary status:
 
 | Secondary Mission | Mission ID | Availability | Tournament Fixed | Fixed Rules | Tactical Rules | Other Rows | Status | Engine Notes |
 | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
-| A Grievous Blow | `a-grievous-blow` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| A Tempting Target | `a-tempting-target` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Assassination | `assassination` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Beacon | `beacon` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Behind Enemy Lines | `behind-enemy-lines` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Bring It Down | `bring-it-down` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_model_w10_or_more_destroyed_this_turn` |
-| Burden of Trust | `burden-of-trust` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Centre Ground | `centre-ground` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| A Grievous Blow | `a-grievous-blow` | `both` | Yes | 1 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Tracks `each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn`; When Drawn discard row remains source-only |
+| A Tempting Target | `a-tempting-target` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track opponent target selection and target control |
+| Assassination | `assassination` | `both` | Yes | 1 | 1 | 4 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track W4+/W3-or-less Character branches and Tactical Character branches |
+| Beacon | `beacon` | `tactical` | No | 0 | 1 | 3 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track beacon choice and outside-deployment/territory branches |
+| Behind Enemy Lines | `behind-enemy-lines` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track first-round redraw and each-unit scoring |
+| Bring It Down | `bring-it-down` | `both` | Yes | 1 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Tracks `each_enemy_model_w10_or_more_destroyed_this_turn` with fixed and tactical caps; When Drawn discard row remains source-only |
+| Burden of Trust | `burden-of-trust` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track guard selection and guarded-objective scoring |
+| Centre Ground | `centre-ground` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track 3VP/5VP centre-distance branches |
 | Cleanse | `cleanse` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks objective cleanse counts; runtime action `cleanse-objective` exists |
 | Defend Stronghold | `defend-stronghold` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks home objective control and enemy absence from own deployment zone |
-| Display of Might | `display-of-might` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Engage on All Fronts | `engage-on-all-fronts` | `both` | Yes | 1 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Forward Position | `forward-position` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| No Prisoners | `no-prisoners` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Outflank | `outflank` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
-| Overwhelming Force | `overwhelming-force` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_started_turn_on_objective_destroyed` |
+| Display of Might | `display-of-might` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track own-turn and opponent-turn No Man's Land unit-count branches |
+| Engage on All Fronts | `engage-on-all-fronts` | `both` | Yes | 1 | 1 | 5 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track presence definition and fixed/tactical three-/four-quarter branches |
+| Forward Position | `forward-position` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track first-round redraw and forward-objective control |
+| No Prisoners | `no-prisoners` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_destroyed_this_turn` |
+| Outflank | `outflank` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track one-edge and opposite-edge branches |
+| Overwhelming Force | `overwhelming-force` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_started_turn_in_range_of_objective_destroyed` |
 | Plunder | `plunder` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks terrain plunder state; runtime action `plunder-terrain` exists |
-| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded` | `generic_condition` |
+| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `control_two_or_more_no_mans_land_objectives_excluding_home` through objective-control records |
 
 ## Runtime Caveats
 
@@ -154,6 +158,7 @@ Secondary status:
   start until their validation, marker state, and scoring semantics exist.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
   tactical draw, scoring, retain/discard, Fixed card states that remain active
-  after scoring, the 20 VP per Fixed Mission card cap, and state-backed awards.
-  Individual card achievement semantics still need card-specific tests before
-  moving from `generic_condition` to `state_backed`.
+  after scoring, the 20 VP per Fixed Mission card cap, state-backed awards, and
+  source-only branch/procedure rows. Individual card achievement semantics still
+  need card-specific tests before moving from `generic_condition` or
+  `source_only_rows` to `state_backed`.

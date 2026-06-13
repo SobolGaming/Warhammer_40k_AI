@@ -12,6 +12,7 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
 
 class VictoryPointSourceKind(StrEnum):
@@ -54,10 +55,13 @@ _SUPPORTED_SECONDARY_SCORING_RULE_CONDITIONS = frozenset(
         "each_enemy_model_w10_or_more_destroyed_this_turn",
         "control_home_objective",
         "no_enemy_units_within_own_deployment_zone",
-        "each_enemy_unit_started_turn_on_objective_destroyed",
+        "each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn",
+        "each_enemy_unit_destroyed_this_turn",
+        "each_enemy_unit_started_turn_in_range_of_objective_destroyed",
         "one_or_more_objectives_cleansed_this_turn",
         "two_or_more_objectives_cleansed_this_turn",
         "one_or_more_terrain_areas_plundered_this_turn",
+        "control_two_or_more_no_mans_land_objectives_excluding_home",
     }
 )
 
@@ -2536,6 +2540,7 @@ class MissionScoringPolicy:
         objective_cleanse_states: tuple[SecondaryObjectiveCleanseState, ...],
         terrain_plunder_states: tuple[SecondaryTerrainPlunderState, ...],
         enemy_unit_ids_in_player_deployment_zone: tuple[str, ...],
+        starting_strength_records: tuple[StartingStrengthRecord, ...] = (),
     ) -> VictoryPointAward | None:
         if type(record) is not ObjectiveControlRecord:
             raise GameLifecycleError("State-backed secondary scoring requires objective record.")
@@ -2554,6 +2559,9 @@ class MissionScoringPolicy:
         destructions = _validate_secondary_unit_destruction_state_tuple(unit_destruction_states)
         cleanses = _validate_secondary_objective_cleanse_state_tuple(objective_cleanse_states)
         plunders = _validate_secondary_terrain_plunder_state_tuple(terrain_plunder_states)
+        starting_strength_by_unit_id = _starting_strength_record_by_unit_id(
+            starting_strength_records
+        )
         enemy_zone_unit_ids = _validate_identifier_tuple(
             "enemy_unit_ids_in_player_deployment_zone",
             enemy_unit_ids_in_player_deployment_zone,
@@ -2591,6 +2599,7 @@ class MissionScoringPolicy:
                 objective_cleanse_states=cleanses,
                 terrain_plunder_states=plunders,
                 enemy_unit_ids_in_player_deployment_zone=enemy_zone_unit_ids,
+                starting_strength_by_unit_id=starting_strength_by_unit_id,
             )
             score_count = _metadata_score_count(evidence)
             if score_count == 0:
@@ -2665,6 +2674,7 @@ class MissionScoringPolicy:
         objective_cleanse_states: tuple[SecondaryObjectiveCleanseState, ...],
         terrain_plunder_states: tuple[SecondaryTerrainPlunderState, ...],
         enemy_unit_ids_in_player_deployment_zone: tuple[str, ...],
+        starting_strength_by_unit_id: dict[str, StartingStrengthRecord],
     ) -> dict[str, JsonValue]:
         requested_player = _validate_identifier("player_id", player_id)
         controlled_objective_ids = _controlled_objective_ids(record, player_id=requested_player)
@@ -2689,6 +2699,40 @@ class MissionScoringPolicy:
                 ),
                 destroyed_model_instance_ids=model_ids,
             )
+        if rule.condition == "each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn":
+            matching = tuple(
+                state
+                for state in _secondary_enemy_unit_destructions_this_turn(
+                    unit_destruction_states,
+                    player_id=requested_player,
+                    battle_round=record.battle_round,
+                    active_player_id=record.active_player_id,
+                )
+                if _starting_strength_for_destroyed_unit(
+                    state.destroyed_unit_instance_id,
+                    starting_strength_by_unit_id=starting_strength_by_unit_id,
+                )
+                >= 13
+            )
+            return _secondary_score_count_evidence(
+                score_count=len(matching),
+                destroyed_unit_instance_ids=tuple(
+                    state.destroyed_unit_instance_id for state in matching
+                ),
+            )
+        if rule.condition == "each_enemy_unit_destroyed_this_turn":
+            matching = _secondary_enemy_unit_destructions_this_turn(
+                unit_destruction_states,
+                player_id=requested_player,
+                battle_round=record.battle_round,
+                active_player_id=record.active_player_id,
+            )
+            return _secondary_score_count_evidence(
+                score_count=len(matching),
+                destroyed_unit_instance_ids=tuple(
+                    state.destroyed_unit_instance_id for state in matching
+                ),
+            )
         if rule.condition == "control_home_objective":
             controlled_home_ids = tuple(
                 objective_id
@@ -2705,7 +2749,7 @@ class MissionScoringPolicy:
                 score_count=0 if enemy_unit_ids_in_player_deployment_zone else 1,
                 enemy_unit_instance_ids=enemy_unit_ids_in_player_deployment_zone,
             )
-        if rule.condition == "each_enemy_unit_started_turn_on_objective_destroyed":
+        if rule.condition == "each_enemy_unit_started_turn_in_range_of_objective_destroyed":
             matching = tuple(
                 state
                 for state in _secondary_enemy_unit_destructions_this_turn(
@@ -2731,6 +2775,17 @@ class MissionScoringPolicy:
                     state.destroyed_unit_instance_id for state in matching
                 ),
                 objective_marker_ids=objective_ids,
+            )
+        if rule.condition == "control_two_or_more_no_mans_land_objectives_excluding_home":
+            no_mans_land_objective_ids = tuple(
+                objective_id
+                for objective_id in controlled_objective_ids
+                if objective_id not in home_objective_ids
+            )
+            return _secondary_score_count_evidence(
+                score_count=1 if len(no_mans_land_objective_ids) >= 2 else 0,
+                controlled_objective_ids=no_mans_land_objective_ids,
+                home_objective_ids=home_objective_ids,
             )
         if rule.condition == "one_or_more_objectives_cleansed_this_turn":
             cleanses = _secondary_objective_cleanses_this_turn(
@@ -3626,6 +3681,35 @@ def _secondary_terrain_plunders_this_turn(
         and state.active_player_id == requested_active
         and state.battle_round == requested_round
     )
+
+
+def _starting_strength_record_by_unit_id(
+    records: tuple[StartingStrengthRecord, ...],
+) -> dict[str, StartingStrengthRecord]:
+    if type(records) is not tuple:
+        raise GameLifecycleError("starting_strength_records must be a tuple.")
+    mapped: dict[str, StartingStrengthRecord] = {}
+    for record in records:
+        if type(record) is not StartingStrengthRecord:
+            raise GameLifecycleError(
+                "starting_strength_records must contain StartingStrengthRecord values."
+            )
+        if record.unit_instance_id in mapped:
+            raise GameLifecycleError("starting_strength_records must not duplicate units.")
+        mapped[record.unit_instance_id] = record
+    return mapped
+
+
+def _starting_strength_for_destroyed_unit(
+    unit_instance_id: str,
+    *,
+    starting_strength_by_unit_id: dict[str, StartingStrengthRecord],
+) -> int:
+    requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
+    record = starting_strength_by_unit_id.get(requested_unit)
+    if record is None:
+        raise GameLifecycleError("Secondary scoring missing StartingStrengthRecord.")
+    return record.starting_model_count
 
 
 def _score_count_evidence(

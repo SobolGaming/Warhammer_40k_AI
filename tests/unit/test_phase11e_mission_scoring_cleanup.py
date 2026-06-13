@@ -68,6 +68,9 @@ from warhammer40k_core.engine.missions import (
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
+    ObjectiveControlResult,
+    ObjectiveControlScore,
+    ObjectiveControlStatus,
     ObjectiveControlTiming,
     resolve_objective_control,
 )
@@ -714,7 +717,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
         phase=BattlePhase.FIGHT,
     )
 
-    assert fixed_state.victory_point_total("player-a") == 8
+    assert fixed_state.victory_point_total("player-a") == 5
     assert tactical_state.victory_point_total("player-a") == 5
     fixed_metadata = _transaction_metadata(
         fixed_state.victory_point_ledger_for_player("player-a").transactions[0]
@@ -723,7 +726,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
         tactical_state.victory_point_ledger_for_player("player-a").transactions[0]
     )
     assert fixed_metadata["score_count_by_rule"] == {"bring-it-down-fixed": 2}
-    assert fixed_metadata["victory_points_by_rule"] == {"bring-it-down-fixed": 8}
+    assert fixed_metadata["victory_points_by_rule"] == {"bring-it-down-fixed": 5}
     assert tactical_metadata["score_count_by_rule"] == {"bring-it-down-tactical": 2}
     assert tactical_metadata["victory_points_by_rule"] == {"bring-it-down-tactical": 5}
 
@@ -770,6 +773,130 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
     assert state.victory_point_total("player-a") == 5
     assert metadata["score_count_by_rule"] == {"overwhelming-force-tactical": 2}
     assert metadata["victory_points_by_rule"] == {"overwhelming-force-tactical": 5}
+
+
+def test_no_prisoners_scores_each_destroyed_enemy_unit_with_cap() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_b_vehicles(("vehicle-unit-3", "vehicle-unit-4", "vehicle-unit-5")),
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="no-prisoners",
+            battle_round=1,
+            source_result_id="phase17-secondary-no-prisoners-draw",
+        )
+    )
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-4")
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-5")
+
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="no-prisoners",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+    )
+
+    metadata = _transaction_metadata(
+        state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    assert state.victory_point_total("player-a") == 5
+    assert metadata["score_count_by_rule"] == {"no-prisoners-tactical": 3}
+    assert metadata["victory_points_by_rule"] == {"no-prisoners-tactical": 5}
+
+
+def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_b_horde_units(("horde-unit-3", "horde-unit-4")),
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="a-grievous-blow",
+            battle_round=1,
+            source_result_id="phase17-secondary-grievous-blow-draw",
+        )
+    )
+    _record_secondary_unit_destruction(state, "army-beta:horde-unit-3")
+    _record_secondary_unit_destruction(state, "army-beta:horde-unit-4")
+
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="a-grievous-blow",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+    )
+
+    metadata = _transaction_metadata(
+        state.victory_point_ledger_for_player("player-a").transactions[0]
+    )
+    assert state.victory_point_total("player-a") == 5
+    assert metadata["score_count_by_rule"] == {"a-grievous-blow-tactical": 2}
+    assert metadata["victory_points_by_rule"] == {"a-grievous-blow-tactical": 5}
+
+
+def test_secure_no_mans_land_scores_two_non_home_objectives_from_control_record() -> None:
+    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    assert state.mission_setup is not None
+    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    home_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-left-home"
+    controlled_non_home_ids = (
+        "take-and-hold-vs-purge-the-foe-layout-3-center-central",
+        "take-and-hold-vs-purge-the-foe-layout-3-upper-central",
+    )
+    record = ObjectiveControlRecord(
+        record_id="phase17-secondary-secure-no-mans-land-record",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        timing=ObjectiveControlTiming.TURN_END,
+        phase=BattlePhase.FIGHT.value,
+        battlefield_id="phase17-secondary-secure-no-mans-land-battlefield",
+        results=(
+            _controlled_objective_result(home_objective_id, player_id="player-a"),
+            *(
+                _controlled_objective_result(objective_id, player_id="player-a")
+                for objective_id in controlled_non_home_ids
+            ),
+        ),
+    )
+
+    award = policy.secondary_award_from_mission_state(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=BattlePhase.FIGHT.value,
+        secondary_mission_id="secure-no-mans-land",
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        hidden=False,
+        record=record,
+        mission_setup=state.mission_setup,
+        unit_destruction_states=(),
+        objective_cleanse_states=(),
+        terrain_plunder_states=(),
+        enemy_unit_ids_in_player_deployment_zone=(),
+        starting_strength_records=tuple(state.starting_strength_records),
+    )
+
+    assert award is not None
+    metadata = cast(dict[str, JsonValue], award.metadata)
+    evidence = cast(dict[str, JsonValue], metadata["evidence_by_rule"])
+    assert award.amount == 5
+    assert metadata["score_count_by_rule"] == {"secure-no-mans-land-tactical": 1}
+    assert evidence["secure-no-mans-land-tactical"] == {
+        "score_count": 1,
+        "controlled_objective_ids": list(controlled_non_home_ids),
+        "home_objective_ids": [home_objective_id],
+        "objective_marker_ids": [],
+        "terrain_feature_ids": [],
+        "destroyed_unit_instance_ids": [],
+        "destroyed_model_instance_ids": [],
+        "enemy_unit_instance_ids": [],
+    }
 
 
 def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
@@ -4299,7 +4426,62 @@ def _config_with_player_b_vehicles(vehicle_unit_ids: tuple[str, ...]) -> GameCon
     )
 
 
+def _config_with_player_b_horde_units(unit_ids: tuple[str, ...]) -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase11e-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_ids=("intercessor-unit-1",),
+            ),
+            ArmyMusterRequest(
+                army_id="army-beta",
+                player_id="player-b",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_ids=("core-combined-arms",),
+                ),
+                unit_selections=tuple(
+                    _unit_muster_selection(
+                        unit_selection_id=unit_id,
+                        datasheet_id="core-boyz-like-infantry",
+                        model_profile_id="core-boyz-like",
+                        model_count=13,
+                    )
+                    for unit_id in unit_ids
+                ),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
+        mission_setup=_mission_setup(),
+    )
+
+
 def _record_secondary_vehicle_destruction(
+    state: GameState,
+    destroyed_unit_instance_id: str,
+    *,
+    started_turn_objective_marker_ids: tuple[str, ...] = (),
+) -> None:
+    _record_secondary_unit_destruction(
+        state,
+        destroyed_unit_instance_id,
+        started_turn_objective_marker_ids=started_turn_objective_marker_ids,
+    )
+
+
+def _record_secondary_unit_destruction(
     state: GameState,
     destroyed_unit_instance_id: str,
     *,
@@ -4317,6 +4499,19 @@ def _record_secondary_vehicle_destruction(
         destroyed_model_instance_ids=tuple(model.model_instance_id for model in unit.own_models),
         started_turn_objective_marker_ids=started_turn_objective_marker_ids,
         source_id=f"phase16:{destroyed_unit_instance_id}:destroyed",
+    )
+
+
+def _controlled_objective_result(
+    objective_id: str,
+    *,
+    player_id: str,
+) -> ObjectiveControlResult:
+    return ObjectiveControlResult(
+        objective_id=objective_id,
+        status=ObjectiveControlStatus.CONTROLLED,
+        controlled_by_player_id=player_id,
+        scores=(ObjectiveControlScore(player_id=player_id, score=1),),
     )
 
 
