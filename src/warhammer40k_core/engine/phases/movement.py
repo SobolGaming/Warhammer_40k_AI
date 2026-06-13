@@ -6531,6 +6531,8 @@ def _movement_transition_batch(
     for placement in after.model_placements:
         if placement.model_instance_id not in before_poses:
             raise GameLifecycleError("Movement transition references an unknown model.")
+        if placement.pose == before_poses[placement.model_instance_id]:
+            continue
         model_path = witness.poses_for_model(placement.model_instance_id)
         displacement_records.append(
             ModelDisplacementRecord(
@@ -6576,6 +6578,8 @@ def _fall_back_transition_batch(
                     destination_id=None,
                 )
             )
+            continue
+        if placement.pose == before_poses[placement.model_instance_id]:
             continue
         model_path = witness.poses_for_model(placement.model_instance_id)
         displacement_records.append(

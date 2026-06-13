@@ -15,6 +15,7 @@ from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
+    ModelDisplacementKind,
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision_request import (
@@ -167,6 +168,53 @@ def test_normal_move_rejects_path_through_enemy_model_base() -> None:
     assert not resolution.is_valid
     assert resolution.path_validation_results[0].violations[0].violation_code == (
         "enemy_model_base_crossed"
+    )
+
+
+def test_normal_move_full_unit_no_op_witness_emits_only_changed_displacement() -> None:
+    scenario = _infantry_scenario()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    moved_model = unit_placement.model_placements[0]
+    moved_end_pose = Pose.at(
+        moved_model.pose.position.x,
+        moved_model.pose.position.y + 1.0,
+        moved_model.pose.position.z,
+        facing_degrees=moved_model.pose.facing.degrees,
+    )
+    witness = _full_unit_witness_with_only_first_model_moved(
+        unit_placement,
+        first_model_end_pose=moved_end_pose,
+    )
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=witness,
+    )
+    batch = resolution.transition_batch(before=unit_placement)
+    model_movements = tuple(
+        cast(dict[str, object], movement)
+        for movement in cast(list[JsonValue], resolution.movement_payload["model_movements"])
+    )
+    no_op_movements = tuple(
+        movement for movement in model_movements if movement["start_pose"] == movement["end_pose"]
+    )
+    displacement = batch.displacements[0]
+
+    assert resolution.is_valid
+    assert len(model_movements) == len(unit_placement.model_placements)
+    assert len(no_op_movements) == len(unit_placement.model_placements) - 1
+    assert len(batch.displacements) == 1
+    assert displacement.model_instance_id == moved_model.model_instance_id
+    assert displacement.displacement_kind is ModelDisplacementKind.NORMAL_MOVE
+    assert displacement.start_pose == moved_model.pose
+    assert displacement.end_pose == moved_end_pose
+    assert displacement.path_witness is not None
+    assert displacement.path_witness.poses_for_model(moved_model.model_instance_id) == (
+        witness.poses_for_model(moved_model.model_instance_id)
     )
 
 
@@ -747,6 +795,29 @@ def _normal_witness_with_first_model_path(
             facing_degrees=(placement.pose.facing.degrees + end_pose.facing.degrees) / 2.0,
         )
         model_paths.append((placement.model_instance_id, (placement.pose, midpoint, end_pose)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _full_unit_witness_with_only_first_model_moved(
+    unit_placement: UnitPlacement,
+    *,
+    first_model_end_pose: Pose,
+) -> PathWitness:
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for index, placement in enumerate(unit_placement.model_placements):
+        start = placement.pose
+        if index == 0:
+            midpoint = Pose.at(
+                (start.position.x + first_model_end_pose.position.x) / 2.0,
+                (start.position.y + first_model_end_pose.position.y) / 2.0,
+                (start.position.z + first_model_end_pose.position.z) / 2.0,
+                facing_degrees=(start.facing.degrees + first_model_end_pose.facing.degrees) / 2.0,
+            )
+            model_paths.append(
+                (placement.model_instance_id, (start, midpoint, first_model_end_pose))
+            )
+            continue
+        model_paths.append((placement.model_instance_id, (start, start)))
     return PathWitness.for_paths(tuple(model_paths))
 
 

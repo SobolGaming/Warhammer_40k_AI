@@ -181,6 +181,67 @@ def test_fall_back_enemy_model_overflight_creates_one_desperate_escape_requireme
     )
 
 
+def test_fall_back_full_unit_no_op_witness_emits_only_changed_displacement() -> None:
+    base_scenario = _scenario()
+    base_unit_placement = base_scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    first_model_pose = base_unit_placement.model_placements[0].pose
+    scenario = _engaged_scenario(
+        enemy_pose=Pose.at(
+            first_model_pose.position.x - 2.0,
+            first_model_pose.position.y,
+            first_model_pose.position.z,
+            facing_degrees=180.0,
+        ),
+    )
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    moved_model = unit_placement.model_placements[0]
+    moved_end_pose = Pose.at(
+        moved_model.pose.position.x + 1.0,
+        moved_model.pose.position.y + 2.0,
+        moved_model.pose.position.z,
+        facing_degrees=moved_model.pose.facing.degrees,
+    )
+    witness = _full_unit_witness_with_only_first_model_moved(
+        unit_placement,
+        first_model_end_pose=moved_end_pose,
+    )
+
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=witness,
+    )
+    batch = resolution.transition_batch(before=unit_placement, destroyed_model_ids=())
+    model_movements = tuple(
+        cast(dict[str, object], movement)
+        for movement in cast(list[object], resolution.movement_payload["model_movements"])
+    )
+    no_op_movements = tuple(
+        movement for movement in model_movements if movement["start_pose"] == movement["end_pose"]
+    )
+    displacement = batch.displacements[0]
+
+    assert resolution.is_valid
+    assert resolution.desperate_escape_requirements == ()
+    assert len(model_movements) == len(unit_placement.model_placements)
+    assert len(no_op_movements) == len(unit_placement.model_placements) - 1
+    assert batch.removals == ()
+    assert len(batch.displacements) == 1
+    assert displacement.model_instance_id == moved_model.model_instance_id
+    assert displacement.displacement_kind is ModelDisplacementKind.FALL_BACK
+    assert displacement.start_pose == moved_model.pose
+    assert displacement.end_pose == moved_end_pose
+    assert displacement.path_witness is not None
+    assert displacement.path_witness.poses_for_model(moved_model.model_instance_id) == (
+        witness.poses_for_model(moved_model.model_instance_id)
+    )
+
+
 def test_fly_and_titanic_fall_back_overflight_avoid_desperate_escape_requirement() -> None:
     for keywords in (("FLY", "INFANTRY"), ("TITANIC", "VEHICLE")):
         scenario = _engaged_scenario(
@@ -1151,6 +1212,29 @@ def _fall_back_witness(
             facing_degrees=(start.facing.degrees + end.facing.degrees) / 2.0,
         )
         model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _full_unit_witness_with_only_first_model_moved(
+    unit_placement: UnitPlacement,
+    *,
+    first_model_end_pose: Pose,
+) -> PathWitness:
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for index, placement in enumerate(unit_placement.model_placements):
+        start = placement.pose
+        if index == 0:
+            midpoint = Pose.at(
+                (start.position.x + first_model_end_pose.position.x) / 2.0,
+                (start.position.y + first_model_end_pose.position.y) / 2.0,
+                (start.position.z + first_model_end_pose.position.z) / 2.0,
+                facing_degrees=(start.facing.degrees + first_model_end_pose.facing.degrees) / 2.0,
+            )
+            model_paths.append(
+                (placement.model_instance_id, (start, midpoint, first_model_end_pose))
+            )
+            continue
+        model_paths.append((placement.model_instance_id, (start, start)))
     return PathWitness.for_paths(tuple(model_paths))
 
 

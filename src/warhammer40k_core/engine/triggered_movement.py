@@ -435,6 +435,8 @@ class TriggeredMovementResolution:
         for placement in self.attempted_placement.model_placements:
             if placement.model_instance_id not in before_poses:
                 raise GameLifecycleError("Triggered movement references an unknown model.")
+            if placement.pose == before_poses[placement.model_instance_id]:
+                continue
             model_path = self.witness.poses_for_model(placement.model_instance_id)
             displacement_records.append(
                 ModelDisplacementRecord(
