@@ -1022,7 +1022,7 @@ def _apply_fight_movement_proposal(
             proposal_request=proposal_request,
             proposal_validation=proposal_validation,
             resolution=None,
-            message="Fight movement PathWitness must include sampled transit poses.",
+            message="Fight movement PathWitness must not repeat only endpoint poses.",
         )
     scenario = _battlefield_scenario(state)
     resolution = resolve_fight_movement(
@@ -1599,7 +1599,7 @@ def _first_proposal_violation_code(proposal_validation: ProposalValidationResult
 
 def _fight_movement_invalid_message(violation_code: str) -> str:
     if violation_code == _ENDPOINT_ONLY_PATH_VIOLATION_CODE:
-        return "Fight movement PathWitness must include sampled transit poses."
+        return "Fight movement PathWitness must not repeat only endpoint poses."
     if violation_code == "movement_distance_exceeded":
         return "Fight movement path exceeds the maximum distance."
     if violation_code in {

@@ -85,7 +85,11 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
-from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
+from warhammer40k_core.geometry.pathing import (
+    PathWitness,
+    PathWitnessPayload,
+    is_degenerate_endpoint_only_real_movement_path,
+)
 from warhammer40k_core.geometry.pose import GeometryError
 from warhammer40k_core.geometry.volume import Model
 
@@ -2089,11 +2093,11 @@ def _resolve_scout_move(
                     model_instance_id=placement.model_instance_id,
                 )
             )
-        if len(poses) == 2 and poses[0] != poses[1]:
+        if is_degenerate_endpoint_only_real_movement_path(poses):
             violations.append(
                 PreBattleViolation(
                     violation_code=PreBattleViolationCode.ENDPOINT_ONLY_PATH,
-                    message="Scout Move requires path evidence beyond start and end poses.",
+                    message="Scout Move witness must not repeat only endpoint poses.",
                     field="witness",
                     model_instance_id=placement.model_instance_id,
                 )

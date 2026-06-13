@@ -2302,7 +2302,7 @@ def _movement_witness_for_unit(
             facing_degrees=start.facing.degrees,
         )
         if endpoint_only:
-            model_paths.append((placement.model_instance_id, (start, end)))
+            model_paths.append((placement.model_instance_id, (start, end, end)))
             continue
         midpoint = Pose.at(
             start.position.x + (dx / 2.0),

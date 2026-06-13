@@ -4510,7 +4510,7 @@ def _path_witness_for_unit_delta(
             facing_degrees=start.facing.degrees,
         )
         if endpoint_only:
-            model_paths.append((model_placement.model_instance_id, (start, end)))
+            model_paths.append((model_placement.model_instance_id, (start, end, end)))
             continue
         model_paths.append((model_placement.model_instance_id, (start, midpoint, end)))
     return PathWitness.for_paths(tuple(model_paths))

@@ -1107,11 +1107,11 @@ class TerrainPathLegalityContext:
                 segments=(),
                 sampled_pose_count=len(sampled_path),
             )
-        if _is_endpoint_only_real_movement_path(path):
+        if is_degenerate_endpoint_only_real_movement_path(path):
             return TerrainPathLegalityResult.invalid(
                 TerrainTraversalViolation(
                     violation_code="endpoint_only_path",
-                    message="Terrain path witness must include non-endpoint path evidence.",
+                    message="Terrain path witness must not repeat only endpoint poses.",
                 ),
                 segments=(),
                 sampled_pose_count=len(sampled_path),
@@ -1698,10 +1698,10 @@ class PathQuery:
                     model_id=model_id,
                     metrics=metrics.to_metrics(),
                 )
-            if _is_endpoint_only_real_movement_path(path):
+            if is_degenerate_endpoint_only_real_movement_path(path):
                 return _invalid(
                     PathFailureReason.ENDPOINT_ONLY_PATH,
-                    "PathWitness must include path evidence beyond start and end poses.",
+                    "PathWitness must not repeat only endpoint poses.",
                     model_id=model_id,
                     metrics=metrics.to_metrics(),
                 )
@@ -1844,18 +1844,12 @@ def _validate_unique_model_path_ids(paths: tuple[ModelPath, ...]) -> None:
         seen.add(model_id)
 
 
-def _straight_line_pose_path(*, start_pose: Pose, end_pose: Pose) -> tuple[Pose, Pose, Pose]:
+def _straight_line_pose_path(*, start_pose: Pose, end_pose: Pose) -> tuple[Pose, Pose]:
     start = validate_pose("PathWitness start_pose", start_pose)
     end = validate_pose("PathWitness end_pose", end_pose)
     if start == end:
         raise GeometryError("PathWitness straight-line endpoints must not match.")
-    midpoint = Pose.at(
-        x=(start.position.x + end.position.x) / 2.0,
-        y=(start.position.y + end.position.y) / 2.0,
-        z=(start.position.z + end.position.z) / 2.0,
-        facing_degrees=(start.facing.degrees + end.facing.degrees) / 2.0,
-    )
-    return (start, midpoint, end)
+    return (start, end)
 
 
 def _validate_identifier(field_name: str, value: object) -> str:
@@ -2373,10 +2367,13 @@ def _has_non_endpoint_interior_pose(path: tuple[Pose, ...]) -> bool:
     return any(pose != start and pose != end for pose in path[1:-1])
 
 
-def _is_endpoint_only_real_movement_path(path: tuple[Pose, ...]) -> bool:
-    if _is_zero_displacement_path(path):
+def is_degenerate_endpoint_only_real_movement_path(path: tuple[Pose, ...]) -> bool:
+    poses = _validate_pose_tuple(path)
+    if _is_zero_displacement_path(poses):
         return False
-    return len(path) < 3 or not _has_non_endpoint_interior_pose(path)
+    if len(poses) == 2:
+        return False
+    return not _has_non_endpoint_interior_pose(poses)
 
 
 def _is_zero_displacement_path(path: tuple[Pose, ...]) -> bool:

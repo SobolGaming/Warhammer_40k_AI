@@ -63,6 +63,7 @@ from warhammer40k_core.geometry.pathing import (
     PathWitness,
     PathWitnessPayload,
     TerrainPathLegalityResult,
+    is_degenerate_endpoint_only_real_movement_path,
 )
 from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
@@ -324,7 +325,7 @@ class FightMovementProposal:
                 proposal_request_id=request.request_id,
                 proposal_kind=request.proposal_kind,
                 violation_code="endpoint_only_path",
-                message="Fight movement PathWitness must include sampled transit poses.",
+                message="Fight movement PathWitness must not repeat only endpoint poses.",
                 field="witness",
             )
         return ProposalValidationResult.valid(
@@ -2795,7 +2796,7 @@ def _validate_fight_witness_matches_unit(
 def _endpoint_only_model_id(witness: PathWitness) -> str | None:
     for model_id in witness.model_ids():
         path = witness.poses_for_model(model_id)
-        if len(path) == 2 and path[0] != path[-1]:
+        if is_degenerate_endpoint_only_real_movement_path(path):
             return model_id
     return None
 

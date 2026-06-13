@@ -34,6 +34,7 @@ def straight_line_witness_for_unit(
     dx: float = 0.0,
     dy: float = 0.0,
     dz: float = 0.0,
+    include_midpoint: bool = True,
 ) -> PathWitness:
     state = lifecycle.state
     if state is None or state.battlefield_state is None:
@@ -44,6 +45,7 @@ def straight_line_witness_for_unit(
         dx=dx,
         dy=dy,
         dz=dz,
+        include_midpoint=include_midpoint,
     )
 
 
@@ -54,6 +56,7 @@ def straight_line_witness_for_state(
     dx: float = 0.0,
     dy: float = 0.0,
     dz: float = 0.0,
+    include_midpoint: bool = True,
 ) -> PathWitness:
     if state.battlefield_state is None:
         raise GameLifecycleError("Movement proposal test helper requires battlefield_state.")
@@ -61,19 +64,22 @@ def straight_line_witness_for_state(
     model_paths: list[tuple[str, tuple[Pose, ...]]] = []
     for placement in unit_placement.model_placements:
         start = placement.pose
-        midpoint = Pose.at(
-            start.position.x + (dx / 2.0),
-            start.position.y + (dy / 2.0),
-            start.position.z + (dz / 2.0),
-            facing_degrees=start.facing.degrees,
-        )
         end = Pose.at(
             start.position.x + dx,
             start.position.y + dy,
             start.position.z + dz,
             facing_degrees=start.facing.degrees,
         )
-        model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+        if include_midpoint:
+            midpoint = Pose.at(
+                start.position.x + (dx / 2.0),
+                start.position.y + (dy / 2.0),
+                start.position.z + (dz / 2.0),
+                facing_degrees=start.facing.degrees,
+            )
+            model_paths.append((placement.model_instance_id, (start, midpoint, end)))
+        else:
+            model_paths.append((placement.model_instance_id, (start, end)))
     return PathWitness.for_paths(tuple(model_paths))
 
 

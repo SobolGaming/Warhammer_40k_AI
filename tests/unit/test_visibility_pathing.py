@@ -177,14 +177,17 @@ def test_visibility_payloads_round_trip_without_object_reprs() -> None:
         assert loader(json.loads(blob)).to_payload() == payload
 
 
-def test_path_query_rejects_endpoint_only_movement_witness() -> None:
-    query = _query_for_single_model(_single_model_witness(Pose.at(0.0, 0.0), Pose.at(4.0, 0.0)))
+def test_path_query_accepts_two_pose_straight_movement_witness() -> None:
+    start = Pose.at(0.0, 0.0)
+    end = Pose.at(4.0, 0.0)
+    witness = PathWitness.for_straight_line_endpoints((("mover-1", start, end),))
+    query = _query_for_single_model(witness)
 
     result = query.evaluate()
 
-    assert not result.is_valid
-    assert result.failure is not None
-    assert result.failure.reason is PathFailureReason.ENDPOINT_ONLY_PATH
+    assert witness.poses_for_model("mover-1") == (start, end)
+    assert result.is_valid
+    assert result.metrics.sampled_pose_count == 5
 
 
 def test_path_query_accepts_explicit_zero_displacement_no_op_witness() -> None:
@@ -239,7 +242,7 @@ def test_path_query_rejects_degenerate_endpoint_only_witnesses(
 def test_path_query_checks_model_collision_along_witness_path() -> None:
     blocker = _model("blocker", 2.0, 0.0)
     query = _query_for_single_model(
-        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(2.0, 0.0), Pose.at(4.0, 0.0)),
+        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(4.0, 0.0)),
         collision_set=CollisionSet(model_blockers=(blocker,)),
     )
 
@@ -264,7 +267,7 @@ def test_path_query_checks_terrain_collision_along_witness_path() -> None:
         height=3.0,
     )
     query = _query_for_single_model(
-        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(2.0, 0.0), Pose.at(4.0, 0.0)),
+        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(4.0, 0.0)),
         collision_set=CollisionSet(terrain_blockers=(terrain,)),
     )
 
@@ -279,7 +282,7 @@ def test_path_query_checks_terrain_collision_along_witness_path() -> None:
 def test_path_query_checks_engagement_range_along_witness_path() -> None:
     enemy = _model("enemy", 2.0, 0.0)
     query = _query_for_single_model(
-        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(1.2, 0.0), Pose.at(4.0, 0.0)),
+        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(4.0, 0.0)),
         collision_set=CollisionSet(engagement_blockers=(enemy,)),
     )
 
@@ -492,7 +495,7 @@ def test_pathing_payloads_round_trip_without_object_reprs() -> None:
 
 def test_explicit_path_result_payload_rejects_mismatched_validity() -> None:
     result = _query_for_single_model(
-        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(4.0, 0.0))
+        _single_model_witness(Pose.at(0.0, 0.0), Pose.at(4.0, 0.0), Pose.at(4.0, 0.0))
     ).evaluate()
     payload = result.to_payload()
     payload["is_valid"] = True

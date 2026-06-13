@@ -1449,7 +1449,7 @@ def _scout_move_witness(
         )
         poses: tuple[Pose, ...]
         if endpoint_only:
-            poses = (start, end)
+            poses = (start, end, end)
         else:
             poses = (
                 start,
