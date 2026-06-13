@@ -267,6 +267,7 @@ def test_faction_integration_links_agent_implementation_contract() -> None:
     assert "remove the generated placeholder marker from implemented files" in normalized_document
     assert "Use existing `RuntimeContentContribution` surfaces" in contract
     assert "Battle-shock hook bindings" in contract
+    assert "Enhancement effect bindings" in contract
     assert "generated Phase 17F execution rows" in contract
     assert "Generated `manifest.py` files are stable aggregators" in contract
     assert "Remove the marker when the file implements source-backed semantics" in contract

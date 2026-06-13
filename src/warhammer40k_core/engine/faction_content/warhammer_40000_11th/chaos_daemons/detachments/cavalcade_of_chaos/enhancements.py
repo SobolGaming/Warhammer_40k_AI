@@ -2,9 +2,16 @@
 # Regenerate with `uv run python tools/generate_faction_content_scaffold.py`.
 from __future__ import annotations
 
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.modifiers import ModifierOperation
+from warhammer40k_core.engine.enhancement_effects import (
+    EnhancementCharacteristicModifier,
+    EnhancementEffectBinding,
+    EnhancementEffectContext,
+)
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
-
-# Generated scaffold placeholder. Remove this marker when implementing semantics.
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_factory import UnitInstance
 
 CONTRIBUTION_ID = ":".join(
     (
@@ -16,13 +23,88 @@ CONTRIBUTION_ID = ":".join(
         "scaffold",
     )
 )
+EFFECT_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:apocalyptic_steeds_upgrade"
+)
+ENHANCEMENT_ID = "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
+ENHANCEMENT_SOURCE_ID = (
+    "gw-11e-faction-detachments-2026-27:enhancement:"
+    "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
+)
+SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:enhancements"
+MODIFIER_ID = f"{EFFECT_ID}:movement-plus-1"
+CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
+CAVALCADE_DETACHMENT_ID = "cavalcade-of-chaos"
+LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"
+MOUNTED = "MOUNTED"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    """Runtime load scaffold only.
+    return RuntimeContentContribution(
+        contribution_id=CONTRIBUTION_ID,
+        enhancement_effect_bindings=(
+            EnhancementEffectBinding(
+                effect_id=EFFECT_ID,
+                source_id=SOURCE_RULE_ID,
+                enhancement_id=ENHANCEMENT_ID,
+                handler=apocalyptic_steeds_effect,
+            ),
+        ),
+    )
 
-    Semantic execution must be supplied by source-backed RuleIR,
-    named handlers, event subscriptions, ability records, or Stratagem
-    handler bindings in implementation PRs.
-    """
-    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
+
+def apocalyptic_steeds_effect(
+    context: EnhancementEffectContext,
+) -> tuple[EnhancementCharacteristicModifier, ...]:
+    if type(context) is not EnhancementEffectContext:
+        raise GameLifecycleError("Apocalyptic Steeds requires an EnhancementEffectContext.")
+    if context.assignment.enhancement_id != ENHANCEMENT_ID:
+        return ()
+    if not (
+        context.army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
+        and CAVALCADE_DETACHMENT_ID in context.army.detachment_selection.detachment_ids
+    ):
+        raise GameLifecycleError("Apocalyptic Steeds requires Cavalcade of Chaos.")
+    unit = context.target_unit
+    if not _unit_has_faction_keyword(unit, LEGIONES_DAEMONICA):
+        raise GameLifecycleError("Apocalyptic Steeds requires LEGIONES DAEMONICA.")
+    if not _unit_has_keyword(unit, MOUNTED):
+        raise GameLifecycleError("Apocalyptic Steeds requires MOUNTED.")
+    return (
+        EnhancementCharacteristicModifier(
+            effect_id=EFFECT_ID,
+            source_id=SOURCE_RULE_ID,
+            enhancement_id=ENHANCEMENT_ID,
+            target_unit_instance_id=unit.unit_instance_id,
+            characteristic=Characteristic.MOVEMENT,
+            operation=ModifierOperation.ADD,
+            operand=1,
+            modifier_id=MODIFIER_ID,
+            replay_payload={
+                "effect_kind": "apocalyptic_steeds_upgrade",
+                "enhancement_source_id": ENHANCEMENT_SOURCE_ID,
+                "assignment_source_id": context.assignment.source_id,
+                "target_unit_selection_id": context.assignment.target_unit_selection_id,
+                "target_unit_instance_id": unit.unit_instance_id,
+                "required_faction_keyword": LEGIONES_DAEMONICA,
+                "required_keyword": MOUNTED,
+                "characteristic": Characteristic.MOVEMENT.value,
+                "operation": ModifierOperation.ADD.value,
+                "operand": 1,
+            },
+        ),
+    )
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
+
+
+def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().replace("_", " ").replace("-", " ").upper()

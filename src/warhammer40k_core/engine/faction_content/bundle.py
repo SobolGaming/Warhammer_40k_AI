@@ -20,6 +20,10 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
 )
+from warhammer40k_core.engine.enhancement_effects import (
+    EnhancementEffectBinding,
+    EnhancementEffectRegistry,
+)
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
@@ -69,6 +73,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     event_subscriptions: list[dict[str, JsonValue]]
     battle_shock_hook_ids: list[str]
     fall_back_hook_ids: list[str]
+    enhancement_effect_binding_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -93,6 +98,7 @@ class RuntimeContentContribution:
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
+    enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
         default_factory=_empty_named_handlers
     )
@@ -186,6 +192,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "enhancement_effect_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution enhancement_effect_bindings",
+                self.enhancement_effect_bindings,
+                EnhancementEffectBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "faction_named_handlers",
             _validate_named_handlers(self.faction_named_handlers),
         )
@@ -202,6 +217,7 @@ class RuntimeContentContribution:
             event_handler_bindings=self.event_handler_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
+            enhancement_effect_bindings=self.enhancement_effect_bindings,
             faction_named_handlers=self.faction_named_handlers,
         )
 
@@ -295,6 +311,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        enhancement_effect_bindings=_combine_unique_values(
+            "enhancement effect binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.enhancement_effect_bindings
+            ),
+            lambda binding: binding.effect_id,
+        ),
         faction_named_handlers=_merged_named_handlers(validated_contributions),
     )
 
@@ -311,6 +336,7 @@ class RuntimeContentBundle:
     event_index: RuntimeContentEventIndex
     battle_shock_hook_registry: BattleShockHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
+    enhancement_effect_registry: EnhancementEffectRegistry
     contribution_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -350,6 +376,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires FallBackEligibilityHookRegistry."
             )
+        if type(self.enhancement_effect_registry) is not EnhancementEffectRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires EnhancementEffectRegistry.")
         object.__setattr__(
             self,
             "contribution_ids",
@@ -475,6 +503,13 @@ class RuntimeContentBundle:
                 for binding in contribution.fall_back_hook_bindings
             )
         )
+        enhancement_effect_registry = EnhancementEffectRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.enhancement_effect_bindings
+            )
+        )
         return cls(
             activation=activation,
             ability_indexes_by_player_id=_ability_indexes_by_player_id(
@@ -493,6 +528,7 @@ class RuntimeContentBundle:
             event_index=event_index,
             battle_shock_hook_registry=battle_shock_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
+            enhancement_effect_registry=enhancement_effect_registry,
             contribution_ids=contribution_ids,
         )
 
@@ -528,6 +564,9 @@ class RuntimeContentBundle:
             ],
             "fall_back_hook_ids": [
                 binding.hook_id for binding in self.fall_back_hook_registry.all_bindings()
+            ],
+            "enhancement_effect_binding_ids": [
+                binding.effect_id for binding in self.enhancement_effect_registry.all_bindings()
             ],
             "faction_execution_record_ids": [
                 record.execution_id for record in self.faction_rule_execution_registry.all_records()
