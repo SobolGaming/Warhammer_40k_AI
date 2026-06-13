@@ -69,7 +69,7 @@ pretty = true
 mypy_path = "src"
 
 [tool.pytest.ini_options]
-addopts = "-ra --strict-markers --strict-config -m 'not benchmark' --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85"
+addopts = "-ra --strict-markers --strict-config -n auto -m 'not benchmark' --benchmark-disable --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85"
 testpaths = ["tests"]
 markers = [
   "benchmark: opt-in performance benchmarks excluded from default test runs",
