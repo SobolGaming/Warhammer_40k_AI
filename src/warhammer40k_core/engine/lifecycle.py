@@ -1510,6 +1510,12 @@ class GameLifecycle:
             stratagem_index=self._command_phase_handler.stratagem_index,
             battle_shock_hooks=self._runtime_content_bundle.battle_shock_hook_registry,
         )
+        self._movement_phase_handler = MovementPhaseHandler(
+            ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
+            parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
+            stratagem_index=self._movement_phase_handler.stratagem_index,
+            fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
+        )
         self._battle_round_flow = BattleRoundFlow(phase_handlers=self._phase_handlers())
         self._runtime_content_activation_input_hash = activation_input_hash
         summary = self._runtime_content_bundle.to_summary_payload()

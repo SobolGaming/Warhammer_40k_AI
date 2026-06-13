@@ -51,6 +51,8 @@ Use existing `RuntimeContentContribution` surfaces:
 - event subscriptions and event handler bindings;
 - Battle-shock hook bindings for rules whose trigger is Battle-shock modifier
   or outcome resolution;
+- Fall Back eligibility hook bindings for rules whose effect is that a Fall Back
+  move does not prevent later Shooting or Charge eligibility;
 - RuleIR runtime bindings;
 - faction named handlers.
 
@@ -66,6 +68,15 @@ row loads the hook through `GameLifecycle` without manual handler injection.
 Hook handlers must mutate authoritative state only through engine-owned
 services and must emit deterministic replay-safe events or explicit unsupported
 diagnostics.
+
+Fall Back eligibility hook bindings are an approved runtime contribution surface
+only for source-backed rules that modify the consequences of a completed Fall
+Back move. Each hook binding must use a `source_id` from the generated Phase 17F
+execution rows for the implemented rule. Hook handlers must return typed
+permission grants; the Movement engine records the authoritative
+`FellBackUnitState`, emits deterministic replay-safe grant payloads, and the
+Shooting and Charge phases consume that engine-owned state. Faction modules must
+not mutate Fall Back, Shooting, or Charge phase state directly.
 
 ## Decision And Mutation
 
@@ -107,7 +118,13 @@ Required:
 - Register named handlers or RuleIR bindings only where semantics are supported.
 - Register Battle-shock hook bindings only for Battle-shock timing semantics,
   and link them to generated Phase 17F execution row IDs.
+- Register Fall Back eligibility hook bindings only for source-backed rules
+  that change Fall Back Shooting or Charge permissions, and link them to
+  generated Phase 17F execution row IDs.
 - Return typed unsupported results with source-linked reasons for unsupported semantics.
 - Add replay and audit assertions for state-changing behavior.
-- Do not edit runtime loader, lifecycle, bundle, or manifest machinery.
+- Do not edit runtime loader, lifecycle, bundle, or manifest machinery in
+  ordinary content PRs. A PR that explicitly introduces a shared runtime surface
+  must update this contract, lifecycle/bundle tests, and integration-plan
+  documentation in the same change.
 ```

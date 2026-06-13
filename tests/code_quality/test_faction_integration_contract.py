@@ -181,6 +181,10 @@ def test_faction_integration_records_phase17g_17h_17i_roadmap_split() -> None:
     assert "Stratagem timing, targeting, validation, and effects" in document
     assert "source-linked Battle-shock hook bindings" in normalized_document
     assert "Battle-shock modifier or outcome resolution" in normalized_document
+    assert "source-linked Fall Back eligibility hook bindings" in normalized_document
+    assert "completed Fall Back move does not prevent later Shooting or Charge" in (
+        normalized_document
+    )
     assert "execution-status overlay" in normalized_document
     assert "faction army rules load and execute for every faction" in normalized_document
     assert "detachment rules load and execute for every detachment" in normalized_document
