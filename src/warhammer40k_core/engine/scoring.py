@@ -2679,6 +2679,7 @@ class MissionScoringPolicy:
         requested_player = _validate_identifier("player_id", player_id)
         controlled_objective_ids = _controlled_objective_ids(record, player_id=requested_player)
         home_objective_ids = _home_objective_ids(mission_setup, player_id=requested_player)
+        central_objective_ids = _central_objective_ids(mission_setup)
         if rule.condition == "each_enemy_model_w10_or_more_destroyed_this_turn":
             matching = _secondary_enemy_unit_destructions_this_turn(
                 unit_destruction_states,
@@ -2780,7 +2781,7 @@ class MissionScoringPolicy:
             no_mans_land_objective_ids = tuple(
                 objective_id
                 for objective_id in controlled_objective_ids
-                if objective_id not in home_objective_ids
+                if objective_id in central_objective_ids
             )
             return _secondary_score_count_evidence(
                 score_count=1 if len(no_mans_land_objective_ids) >= 2 else 0,

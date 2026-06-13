@@ -139,7 +139,7 @@ Secondary status:
 | Outflank | `outflank` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track one-edge and opposite-edge branches |
 | Overwhelming Force | `overwhelming-force` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_started_turn_in_range_of_objective_destroyed` |
 | Plunder | `plunder` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks terrain plunder state; runtime action `plunder-terrain` exists |
-| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `control_two_or_more_no_mans_land_objectives_excluding_home` through objective-control records |
+| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `control_two_or_more_no_mans_land_objectives_excluding_home` through objective-control records filtered to central/No Man's Land objectives |
 
 ## Runtime Caveats
 

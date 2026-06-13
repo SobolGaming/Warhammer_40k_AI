@@ -840,12 +840,12 @@ def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> 
     assert metadata["victory_points_by_rule"] == {"a-grievous-blow-tactical": 5}
 
 
-def test_secure_no_mans_land_scores_two_non_home_objectives_from_control_record() -> None:
+def test_secure_no_mans_land_scores_two_central_objectives_from_control_record() -> None:
     state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
     assert state.mission_setup is not None
     policy = mission_scoring_policy_from_setup(state.mission_setup)
     home_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-left-home"
-    controlled_non_home_ids = (
+    controlled_central_ids = (
         "take-and-hold-vs-purge-the-foe-layout-3-center-central",
         "take-and-hold-vs-purge-the-foe-layout-3-upper-central",
     )
@@ -861,7 +861,7 @@ def test_secure_no_mans_land_scores_two_non_home_objectives_from_control_record(
             _controlled_objective_result(home_objective_id, player_id="player-a"),
             *(
                 _controlled_objective_result(objective_id, player_id="player-a")
-                for objective_id in controlled_non_home_ids
+                for objective_id in controlled_central_ids
             ),
         ),
     )
@@ -889,7 +889,7 @@ def test_secure_no_mans_land_scores_two_non_home_objectives_from_control_record(
     assert metadata["score_count_by_rule"] == {"secure-no-mans-land-tactical": 1}
     assert evidence["secure-no-mans-land-tactical"] == {
         "score_count": 1,
-        "controlled_objective_ids": list(controlled_non_home_ids),
+        "controlled_objective_ids": list(controlled_central_ids),
         "home_objective_ids": [home_objective_id],
         "objective_marker_ids": [],
         "terrain_feature_ids": [],
@@ -897,6 +897,50 @@ def test_secure_no_mans_land_scores_two_non_home_objectives_from_control_record(
         "destroyed_model_instance_ids": [],
         "enemy_unit_instance_ids": [],
     }
+
+
+def test_secure_no_mans_land_does_not_score_opponent_home_as_no_mans_land() -> None:
+    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    assert state.mission_setup is not None
+    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    central_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-center-central"
+    opponent_home_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-right-home"
+    objective_marker_ids = {
+        marker.objective_marker_id for marker in state.mission_setup.objective_markers
+    }
+    assert central_objective_id in objective_marker_ids
+    assert opponent_home_objective_id in objective_marker_ids
+    record = ObjectiveControlRecord(
+        record_id="phase17-secondary-secure-no-mans-land-opponent-home-record",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        timing=ObjectiveControlTiming.TURN_END,
+        phase=BattlePhase.FIGHT.value,
+        battlefield_id="phase17-secondary-secure-no-mans-land-opponent-home-battlefield",
+        results=(
+            _controlled_objective_result(central_objective_id, player_id="player-a"),
+            _controlled_objective_result(opponent_home_objective_id, player_id="player-a"),
+        ),
+    )
+
+    award = policy.secondary_award_from_mission_state(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=BattlePhase.FIGHT.value,
+        secondary_mission_id="secure-no-mans-land",
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        hidden=False,
+        record=record,
+        mission_setup=state.mission_setup,
+        unit_destruction_states=(),
+        objective_cleanse_states=(),
+        terrain_plunder_states=(),
+        enemy_unit_ids_in_player_deployment_zone=(),
+        starting_strength_records=tuple(state.starting_strength_records),
+    )
+
+    assert award is None
 
 
 def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
