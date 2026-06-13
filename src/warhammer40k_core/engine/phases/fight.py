@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.objectives import ObjectiveMarker
@@ -53,7 +53,19 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_activation_abilities import (
+    DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
+    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+    FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
+    FightActivationAbilityContext,
+    FightActivationAbilityHookRegistry,
+    ability_request_activation_payload,
+    build_fight_activation_ability_request,
+    fight_activation_ability_use_from_result,
+    is_fight_activation_ability_decline_payload,
+)
 from warhammer40k_core.engine.fight_order import (
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
     ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
@@ -152,6 +164,9 @@ _FIGHT_PASS_RECORDED_STATUS = "eligible_to_fight_pass_recorded"
 _FIGHT_ACTIVATION_RECORDED_STATUS = "fight_activation_recorded"
 _MELEE_DECLARATION_REQUIRED_STATUS = "melee_declaration_required"
 _MELEE_DECLARATION_ACCEPTED_STATUS = "melee_declaration_accepted"
+_FIGHT_ACTIVATION_ABILITY_REQUIRED_STATUS = "fight_activation_ability_required"
+_FIGHT_ACTIVATION_ABILITY_DECLINED_STATUS = "fight_activation_ability_declined"
+_FIGHT_ACTIVATION_ABILITY_USED_STATUS = "fight_activation_ability_used"
 _UNIT_FOUGHT_STATUS = "unit_fought"
 _FIGHT_INTERRUPT_REQUIRED_STATUS = "fight_interrupt_required"
 _FIGHT_INTERRUPT_DECLINED_STATUS = "fight_interrupt_declined"
@@ -164,6 +179,9 @@ class FightPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     army_catalog: ArmyCatalog | None = None
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
+    fight_activation_ability_hooks: FightActivationAbilityHookRegistry = field(
+        default_factory=FightActivationAbilityHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -177,6 +195,10 @@ class FightPhaseHandler:
             raise GameLifecycleError("FightPhaseHandler army_catalog must be an ArmyCatalog.")
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("FightPhaseHandler stratagem_index must be an index.")
+        if type(self.fight_activation_ability_hooks) is not FightActivationAbilityHookRegistry:
+            raise GameLifecycleError(
+                "FightPhaseHandler fight_activation_ability_hooks must be a registry."
+            )
 
     @property
     def phase(self) -> BattlePhase:
@@ -278,6 +300,12 @@ class FightPhaseHandler:
                 decisions=decisions,
                 reaction_queue=reaction_queue,
                 policy=_fight_policy_for_handler(self),
+            )
+        if result.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE:
+            return _apply_fight_activation_ability_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
             )
         if result.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
             return _apply_fight_interrupt_decision(
@@ -448,6 +476,8 @@ def _advance_active_fight_activation(
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
         unit=unit,
         army_catalog=_army_catalog_for_handler(handler),
+        state=state,
+        source_decision_result_id=activation.result_id,
     )
     if not target_ids or not available_weapons:
         decisions.event_log.append(
@@ -472,6 +502,16 @@ def _advance_active_fight_activation(
             policy=policy,
             activation=activation,
         )
+    ability_status = _request_fight_activation_ability_if_available(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        fight_state=fight_state,
+        activation=activation,
+        target_unit_instance_ids=target_ids,
+    )
+    if ability_status is not None:
+        return ability_status
     epic_status = _request_epic_challenge_if_available(
         handler=handler,
         state=state,
@@ -563,6 +603,98 @@ def _complete_active_fight_activation(
         trigger_event_id=event.event_id,
         policy=policy,
     )
+
+
+def _request_fight_activation_ability_if_available(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    fight_state: FightPhaseState,
+    activation: FightActivationSelection,
+    target_unit_instance_ids: tuple[str, ...],
+) -> LifecycleStatus | None:
+    if _fight_activation_ability_window_resolved(
+        state=state,
+        decisions=decisions,
+        activation=activation,
+    ):
+        return None
+    context = FightActivationAbilityContext(
+        state=state,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id=fight_state.active_player_id,
+        player_id=activation.player_id,
+        unit_instance_id=activation.unit_instance_id,
+        activation=activation,
+        target_unit_instance_ids=target_unit_instance_ids,
+    )
+    ability_options = handler.fight_activation_ability_hooks.options_for(context)
+    if not ability_options:
+        return None
+    request = build_fight_activation_ability_request(
+        request_id=state.next_decision_request_id(),
+        game_id=state.game_id,
+        context=context,
+        ability_options=ability_options,
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "fight_activation_ability_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "phase_body_status": _FIGHT_ACTIVATION_ABILITY_REQUIRED_STATUS,
+                "request_id": request.request_id,
+                "activation_selection": activation.to_payload(),
+                "ability_option_ids": [option.option_id for option in ability_options],
+                "target_unit_instance_ids": list(target_unit_instance_ids),
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.FIGHT.value,
+            "phase_body_status": _FIGHT_ACTIVATION_ABILITY_REQUIRED_STATUS,
+            "unit_instance_id": activation.unit_instance_id,
+            "activation_result_id": activation.result_id,
+        },
+    )
+
+
+def _fight_activation_ability_window_resolved(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    activation: FightActivationSelection,
+) -> bool:
+    for effect in state.persisting_effects:
+        if activation.unit_instance_id not in effect.target_unit_instance_ids:
+            continue
+        effect_payload = effect.effect_payload
+        if not isinstance(effect_payload, dict):
+            continue
+        if effect_payload.get("effect_kind") != FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
+            continue
+        if effect_payload.get("activation_result_id") == activation.result_id:
+            return True
+    for event in decisions.event_log.records:
+        if event.event_type not in {
+            "fight_activation_ability_declined",
+            "fight_activation_ability_used",
+        }:
+            continue
+        payload = event.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("activation_result_id") == activation.result_id:
+            return True
+    return False
 
 
 def _advance_fight_movement_step(
@@ -905,6 +1037,7 @@ def invalid_melee_declaration_status(
         request=proposal_request,
         proposal=proposal,
         army_catalog=army_catalog,
+        state=state,
     )
     if not rule_validation.is_valid:
         return _reject_invalid_fight_proposal(
@@ -1784,6 +1917,100 @@ def invalid_fight_activation_status(
     )
 
 
+def invalid_fight_activation_ability_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    invalid_status = _invalid_finite_decision_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason="invalid_fight_activation_ability_result",
+    )
+    if invalid_status is not None:
+        return invalid_status
+    fight_state = state.fight_phase_state
+    if fight_state is None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight activation ability has no active fight phase state.",
+            payload={
+                "invalid_reason": "invalid_fight_activation_ability_result",
+                "field": "fight_phase_state",
+            },
+        )
+    activation = fight_state.active_activation
+    if activation is None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight activation ability has no active activation.",
+            payload={
+                "invalid_reason": "invalid_fight_activation_ability_result",
+                "field": "active_activation",
+            },
+        )
+    if ability_request_activation_payload(request) != activation.to_payload():
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight activation ability activation context is stale.",
+            payload={
+                "invalid_reason": "invalid_fight_activation_ability_result",
+                "field": "activation_selection",
+            },
+        )
+    if _fight_activation_ability_window_resolved(
+        state=state,
+        decisions=decisions,
+        activation=activation,
+    ):
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight activation ability window has already resolved.",
+            payload={
+                "invalid_reason": "invalid_fight_activation_ability_result",
+                "field": "activation_result_id",
+            },
+        )
+    if result.selected_option_id == DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID:
+        return None
+    ability_use = fight_activation_ability_use_from_result(
+        payload=result.payload,
+        request_id=result.request_id,
+        result_id=result.result_id,
+    )
+    if ability_use.activation_result_id != activation.result_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight activation ability result activation drifted.",
+            payload={
+                "invalid_reason": "invalid_fight_activation_ability_result",
+                "field": "activation_result_id",
+            },
+        )
+    if ability_use.activation_request_id != activation.request_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight activation ability result activation request drifted.",
+            payload={
+                "invalid_reason": "invalid_fight_activation_ability_result",
+                "field": "activation_request_id",
+            },
+        )
+    if ability_use.unit_instance_id != activation.unit_instance_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Fight activation ability result unit drifted.",
+            payload={
+                "invalid_reason": "invalid_fight_activation_ability_result",
+                "field": "unit_instance_id",
+            },
+        )
+    return None
+
+
 def invalid_fight_interrupt_status(
     *,
     state: GameState,
@@ -2186,6 +2413,89 @@ def _apply_fight_activation_decision(
         ),
     )
     del reaction_queue, policy
+    return None
+
+
+def _apply_fight_activation_ability_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    fight_state = _require_fight_state(state)
+    activation = fight_state.active_activation
+    if activation is None:
+        raise GameLifecycleError("Fight activation ability requires active activation.")
+    if result.selected_option_id == DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID:
+        if not is_fight_activation_ability_decline_payload(result.payload):
+            raise GameLifecycleError("Fight activation ability decline payload drift.")
+        decisions.event_log.append(
+            "fight_activation_ability_declined",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": BattlePhase.FIGHT.value,
+                    "phase_body_status": _FIGHT_ACTIVATION_ABILITY_DECLINED_STATUS,
+                    "request_id": result.request_id,
+                    "result_id": result.result_id,
+                    "activation_result_id": activation.result_id,
+                    "result_payload": result.payload,
+                }
+            ),
+        )
+        return None
+    ability_use = fight_activation_ability_use_from_result(
+        payload=result.payload,
+        request_id=result.request_id,
+        result_id=result.result_id,
+    )
+    if ability_use.activation_result_id != activation.result_id:
+        raise GameLifecycleError("Fight activation ability use activation result drift.")
+    if ability_use.activation_request_id != activation.request_id:
+        raise GameLifecycleError("Fight activation ability use activation request drift.")
+    if ability_use.unit_instance_id != activation.unit_instance_id:
+        raise GameLifecycleError("Fight activation ability use target unit drift.")
+    if ability_use.player_id != activation.player_id:
+        raise GameLifecycleError("Fight activation ability use player drift.")
+    ability_use_payload = cast(
+        dict[str, JsonValue],
+        validate_json_value(cast(JsonValue, ability_use.to_payload())),
+    )
+    effect = PersistingEffect(
+        effect_id=f"{ability_use.result_id}:{ability_use.ability_id}:melee-targeting",
+        source_rule_id=ability_use.source_id,
+        owner_player_id=ability_use.player_id,
+        target_unit_instance_ids=(ability_use.unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.FIGHT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT,
+            player_id=_active_player_id(state),
+        ),
+        effect_payload={
+            **ability_use_payload,
+            "effect_kind": FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
+        },
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "fight_activation_ability_used",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "phase_body_status": _FIGHT_ACTIVATION_ABILITY_USED_STATUS,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "activation_result_id": activation.result_id,
+                "ability_use": ability_use_payload,
+                "persisting_effect": effect.to_payload(),
+            }
+        ),
+    )
     return None
 
 

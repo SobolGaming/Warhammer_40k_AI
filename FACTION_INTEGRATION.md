@@ -249,10 +249,12 @@ Battle-shock modifier or outcome resolution, or source-linked Fall Back
 eligibility hook bindings for rules whose effect is that a completed Fall Back
 move does not prevent later Shooting or Charge eligibility, or source-linked
 enhancement effect bindings for selected Enhancement or Upgrade assignments
-that materialize static engine-owned characteristic modifiers. These execution
-surfaces must mutate authoritative game state only through engine-owned services,
-use the shared `DecisionRequest` / `DecisionResult` path for player choices, and
-emit deterministic replay-safe execution results.
+that materialize static engine-owned characteristic modifiers, or source-linked
+Fight activation ability hook bindings for optional selected-to-fight rules
+whose effect is a scoped melee targeting permission. These execution surfaces
+must mutate authoritative game state only through engine-owned services, use the
+shared `DecisionRequest` / `DecisionResult` path for player choices, and emit
+deterministic replay-safe execution results.
 Implementation PRs must use the generated scaffold targets and the
 [Faction Agent Implementation Contract](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
 
@@ -283,6 +285,15 @@ service must apply the static modifier idempotently from Phase 16D
 catalog target requirements and the selected army-construction records, not from
 runtime rule-text parsing.
 
+Fight activation ability hook bindings follow the same Phase 17F mapping rule.
+The binding `source_id` must be the generated execution row ID for the
+implemented rule or enhancement descriptor family until native exact
+enhancement subrows exist. The selected runtime manifest must expose the hook ID
+in the `RuntimeContentBundle` audit summary. Hook handlers return typed ability
+options only; the Fight engine emits the finite use/decline request, records the
+engine-owned persisting melee targeting permission, and lowers accepted melee
+declarations into source-linked attack pools through the shared Fight path.
+
 Phase 17G does not cover broad datasheet, wargear, or weapon ability execution.
 Those rows move to Phase 17H unless they are inseparable from a faction army
 rule, detachment rule, enhancement, or Stratagem implemented in Phase 17G.
@@ -297,7 +308,8 @@ Required tests:
   Shooting or Charge consequences of a completed Fall Back move;
 - enhancements validate eligibility from Phase 16D army-construction records
   and execute their effects through generic IR, named handlers, or enhancement
-  effect bindings for static characteristic modifiers;
+  effect bindings for static characteristic modifiers, including Fight
+  activation ability hooks for optional selected-to-fight enhancement effects;
 - faction and detachment Stratagems validate timing, targeting, CP ledgers,
   repeat-use constraints, and effects through the shared Stratagem path;
 - registered executors and hook bindings cannot return or expose mismatched

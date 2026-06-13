@@ -279,8 +279,10 @@ Phase 17G is underway for actual faction-level semantic execution. The current
 Chaos Daemons slice supports the Shadow of Chaos army-rule Battle-shock runtime
 hook, the Cavalcade of Chaos / Unholy Avalanche Fall Back eligibility hook, and
 the Cavalcade of Chaos / Apocalyptic Steeds Upgrade enhancement effect as a
-source-linked static Movement characteristic modifier; remaining army rules,
-detachment rules, enhancement effects, and
+source-linked static Movement characteristic modifier, plus the Cavalcade of
+Chaos / Soul-Shattering Charge Upgrade selected-to-fight ability hook for
+source-linked melee targeting permissions; remaining army rules, detachment
+rules, enhancement effects, and
 faction/detachment Stratagem timing, targeting, validation, and effects are
 still planned Phase 17G work. Phase 17H is planned for datasheet, wargear, and
 weapon ability execution. Phase 17I is planned for source-content coverage,

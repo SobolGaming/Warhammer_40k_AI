@@ -18,23 +18,36 @@ from tests.unit.test_phase10o_fall_back import (
     _state,  # pyright: ignore[reportPrivateUsage]
 )
 
+from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
+from warhammer40k_core.core.datasheet import (
+    DatasheetDefinition,
+    DatasheetKeywordSet,
+    DatasheetWargearOption,
+)
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
     EnhancementDefinition,
     EnhancementSubtype,
 )
 from warhammer40k_core.core.faction import FactionDefinition
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    FightEligibilityKind,
+    FightOrderingBandKind,
+    FightTypeKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     EnhancementAssignment,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.cavalcade_of_chaos import (  # noqa: E501
@@ -47,6 +60,26 @@ from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityHookBinding,
     FallBackEligibilityHookRegistry,
 )
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+    FightActivationAbilityContext,
+    FightActivationAbilityHookBinding,
+    FightActivationAbilityHookRegistry,
+    FightActivationAbilityOption,
+)
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FightActivationSelection,
+    fight_activation_option_id,
+)
+from warhammer40k_core.engine.fight_resolution import (
+    MELEE_DECLARATION_PROPOSAL_KIND,
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposal,
+    MeleeDeclarationProposalRequest,
+    MeleeTargetAllocation,
+    MeleeWeaponDeclaration,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -55,7 +88,17 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
+)
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.charge import (
     COMPLETE_CHARGE_PHASE_OPTION_ID,
     SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -68,6 +111,7 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseHandler,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
@@ -258,10 +302,146 @@ def test_cavalcade_apocalyptic_steeds_roster_requires_mounted_target() -> None:
     }
 
 
+def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecycle() -> None:
+    config = _cavalcade_config(soul_shattering_charge=True)
+    lifecycle, _movement_status = _advance_to_movement_unit_selection(config)
+    state = _state(lifecycle)
+    army = state.army_definition_for_player("player-a")
+    if army is None:
+        raise AssertionError("test state requires player-a army")
+    unit = army.unit_by_id(_CAVALCADE_UNIT_ID)
+    engaged_model_id = unit.own_models[0].model_instance_id
+    extended_model_id = unit.own_models[1].model_instance_id
+
+    _place_soul_shattering_charge_positions(state)
+    _record_charge_move_for_unit(state, unit_instance_id=_CAVALCADE_UNIT_ID)
+    _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.FIGHT)
+    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
+    state = _state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+    summary = bundle.to_summary_payload()
+
+    assert (
+        enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID in summary["fight_activation_ability_hook_ids"]
+    )
+    assert enhancements.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+
+    activation_request = _decision_request(
+        _drain_fight_movement_requests(
+            lifecycle,
+            lifecycle.advance_until_decision_or_terminal(),
+        )
+    )
+    assert activation_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    ability_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-soul-shattering-activation",
+            request=activation_request,
+            selected_option_id=fight_activation_option_id(
+                unit_instance_id=_CAVALCADE_UNIT_ID,
+                fight_type=FightTypeKind.NORMAL,
+            ),
+        )
+    )
+    ability_request = _decision_request(ability_status)
+    assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
+    ability_option_id = f"use:{enhancements.SOUL_SHATTERING_CHARGE_ABILITY_ID}"
+    assert ability_option_id in {option.option_id for option in ability_request.options}
+
+    melee_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-soul-shattering-use",
+            request=ability_request,
+            selected_option_id=ability_option_id,
+        )
+    )
+    melee_request = _decision_request(melee_status)
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    engaged_weapon = _required_melee_weapon_for_model(
+        proposal_request,
+        model_instance_id=engaged_model_id,
+    )
+    extended_weapon = _required_melee_weapon_for_model(
+        proposal_request,
+        model_instance_id=extended_model_id,
+    )
+
+    assert _ENEMY_UNIT_ID in _engaged_target_ids(engaged_weapon)
+    assert _ENEMY_UNIT_ID in _engaged_target_ids(extended_weapon)
+
+    accepted_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=melee_request.request_id,
+            result_id="phase17g-soul-shattering-melee",
+            payload=_melee_proposal_payload(
+                proposal_request=proposal_request,
+                declarations=(
+                    _melee_declaration_for_weapon(engaged_weapon),
+                    _melee_declaration_for_weapon(extended_weapon),
+                ),
+            ),
+        ).to_result(melee_request)
+    )
+
+    assert accepted_status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    used_event = _event_payload(lifecycle, "fight_activation_ability_used")
+    ability_use = cast(dict[str, JsonValue], used_event["ability_use"])
+    persisting_effect = cast(dict[str, JsonValue], used_event["persisting_effect"])
+    effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
+    assert ability_use["hook_id"] == enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID
+    assert ability_use["source_id"] == enhancements.SOURCE_RULE_ID
+    assert ability_use["enhancement_id"] == enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID
+    assert effect_payload["effect_kind"] == "fight_activation_melee_targeting_distance"
+
+    accepted_event = _event_payload(lifecycle, "melee_declaration_accepted")
+    accepted_proposal = cast(dict[str, JsonValue], accepted_event["proposal"])
+    assert accepted_proposal["unit_instance_id"] == _CAVALCADE_UNIT_ID
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.attack_sequence is not None
+    extended_pools = tuple(
+        pool
+        for pool in fight_state.attack_sequence.attack_pools
+        if pool.attacker_model_instance_id == extended_model_id
+        and pool.target_unit_instance_id == _ENEMY_UNIT_ID
+    )
+    assert len(extended_pools) == 1
+    assert enhancements.SOURCE_RULE_ID in extended_pools[0].targeting_rule_ids
+
+
+def test_cavalcade_soul_shattering_charge_roster_requires_mounted_target() -> None:
+    config = _cavalcade_config(
+        soul_shattering_charge=True,
+        friendly_keywords=("Khorne",),
+    )
+
+    report = validate_roster_legality(
+        catalog=config.army_catalog,
+        request=config.army_muster_requests[0],
+    )
+
+    assert "enhancement_target_keyword_required" in {
+        violation.violation_code for violation in report.violations
+    }
+
+
 def test_cavalcade_enhancement_effect_uses_phase17f_execution_source_id() -> None:
     record = _cavalcade_enhancement_execution_record()
     contribution = enhancements.runtime_contribution()
     binding = contribution.enhancement_effect_bindings[0]
+
+    assert record.execution_id == enhancements.SOURCE_RULE_ID
+    assert binding.source_id == record.execution_id
+
+
+def test_cavalcade_soul_shattering_charge_hook_uses_phase17f_execution_source_id() -> None:
+    record = _cavalcade_enhancement_execution_record()
+    contribution = enhancements.runtime_contribution()
+    binding = contribution.fight_activation_ability_hook_bindings[0]
 
     assert record.execution_id == enhancements.SOURCE_RULE_ID
     assert binding.source_id == record.execution_id
@@ -353,6 +533,78 @@ def test_fall_back_hook_registry_rejects_cavalcade_handler_identity_drift() -> N
         source_drift_registry.grants_for(context)
 
 
+def test_fight_activation_ability_registry_rejects_cavalcade_handler_identity_drift() -> None:
+    activation = FightActivationSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=_CAVALCADE_UNIT_ID,
+        ordering_band=FightOrderingBandKind.FIGHTS_FIRST,
+        fight_type=FightTypeKind.NORMAL,
+        eligibility_reasons=(
+            FightEligibilityKind.CHARGED_THIS_TURN,
+            FightEligibilityKind.CURRENTLY_ENGAGED,
+        ),
+        request_id="phase17g-soul-shattering-activation-request",
+        result_id="phase17g-soul-shattering-activation-result",
+    )
+    context = FightActivationAbilityContext(
+        state=GameState.from_config(_cavalcade_config(soul_shattering_charge=True)),
+        game_id="phase17g-soul-shattering-drift",
+        battle_round=1,
+        active_player_id="player-a",
+        player_id="player-a",
+        unit_instance_id=_CAVALCADE_UNIT_ID,
+        activation=activation,
+        target_unit_instance_ids=(_ENEMY_UNIT_ID,),
+    )
+
+    def hook_id_drift(
+        _context: FightActivationAbilityContext,
+    ) -> FightActivationAbilityOption:
+        return FightActivationAbilityOption(
+            hook_id="phase17g:wrong-hook",
+            source_id=enhancements.SOURCE_RULE_ID,
+            ability_id=enhancements.SOUL_SHATTERING_CHARGE_ABILITY_ID,
+            enhancement_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
+            model_proximity_inches=3.0,
+        )
+
+    hook_drift_registry = FightActivationAbilityHookRegistry.from_bindings(
+        (
+            FightActivationAbilityHookBinding(
+                hook_id=enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID,
+                source_id=enhancements.SOURCE_RULE_ID,
+                handler=hook_id_drift,
+            ),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="hook_id drift"):
+        hook_drift_registry.options_for(context)
+
+    def source_id_drift(
+        _context: FightActivationAbilityContext,
+    ) -> FightActivationAbilityOption:
+        return FightActivationAbilityOption(
+            hook_id=enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID,
+            source_id="phase17g:wrong-source",
+            ability_id=enhancements.SOUL_SHATTERING_CHARGE_ABILITY_ID,
+            enhancement_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
+            model_proximity_inches=3.0,
+        )
+
+    source_drift_registry = FightActivationAbilityHookRegistry.from_bindings(
+        (
+            FightActivationAbilityHookBinding(
+                hook_id=enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID,
+                source_id=enhancements.SOURCE_RULE_ID,
+                handler=source_id_drift,
+            ),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="source_id drift"):
+        source_drift_registry.options_for(context)
+
+
 def _cavalcade_rule_execution_record() -> Phase17FExecutionRecord:
     records = tuple(
         record
@@ -402,6 +654,12 @@ def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
     return require_runtime_content_bundle()
 
 
+def _rehydrate_lifecycle_with_empty_decisions(lifecycle: GameLifecycle) -> GameLifecycle:
+    payload = lifecycle.to_payload()
+    payload["decisions"] = DecisionController().to_payload()
+    return GameLifecycle.from_payload(payload)
+
+
 def _state_at_phase(state: GameState, phase: BattlePhase) -> GameState:
     phase_state = GameState.from_payload(state.to_payload())
     while phase_state.current_battle_phase is not phase:
@@ -414,6 +672,7 @@ def _state_at_phase(state: GameState, phase: BattlePhase) -> GameState:
 def _cavalcade_config(
     *,
     apocalyptic_steeds: bool = False,
+    soul_shattering_charge: bool = False,
     friendly_keywords: tuple[str, ...] = (rule.MOUNTED, "Khorne"),
     enemy_faction_id: str = "core-marine-force",
     enemy_detachment_id: str = "core-combined-arms",
@@ -437,6 +696,7 @@ def _cavalcade_config(
                 unit_selection_id="intercessor-unit-1",
                 datasheet_id=_CAVALCADE_TEST_DATASHEET_ID,
                 apocalyptic_steeds=apocalyptic_steeds,
+                soul_shattering_charge=soul_shattering_charge,
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -483,7 +743,10 @@ def _cavalcade_catalog(
                 detachment_point_cost=1,
                 unit_datasheet_ids=(_CAVALCADE_TEST_DATASHEET_ID,),
                 force_disposition_ids=("phase17g-force",),
-                enhancement_ids=(enhancements.ENHANCEMENT_ID,),
+                enhancement_ids=(
+                    enhancements.ENHANCEMENT_ID,
+                    enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
+                ),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:"
                     "chaos-daemons:cavalcade-of-chaos",
@@ -496,6 +759,15 @@ def _cavalcade_catalog(
                 enhancement_id=enhancements.ENHANCEMENT_ID,
                 name="Apocalyptic Steeds Upgrade",
                 source_id=enhancements.ENHANCEMENT_SOURCE_ID,
+                subtypes=(EnhancementSubtype.UPGRADE,),
+                points=0,
+                target_required_keywords=(enhancements.MOUNTED,),
+                target_required_faction_keywords=(enhancements.LEGIONES_DAEMONICA,),
+            ),
+            EnhancementDefinition(
+                enhancement_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
+                name="Soul-Shattering Charge Upgrade",
+                source_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_SOURCE_ID,
                 subtypes=(EnhancementSubtype.UPGRADE,),
                 points=0,
                 target_required_keywords=(enhancements.MOUNTED,),
@@ -517,6 +789,17 @@ def _cavalcade_datasheet(
         keywords=DatasheetKeywordSet(
             keywords=keywords,
             faction_keywords=("Legiones Daemonica",),
+        ),
+        wargear_options=(
+            *base_datasheet.wargear_options,
+            DatasheetWargearOption(
+                option_id=f"{_CAVALCADE_TEST_DATASHEET_ID}:melee-wargear",
+                model_profile_id="core-intercessor-like",
+                default_wargear_ids=("core-leader-blade",),
+                allowed_wargear_ids=("core-leader-blade",),
+                min_selections=1,
+                max_selections=1,
+            ),
         ),
         attachment_eligibilities=(),
         source_ids=("phase17g:test:chaos-daemons:cavalcade-mounted-daemon",),
@@ -543,7 +826,14 @@ def _army_muster_request(
     unit_selection_id: str,
     datasheet_id: str,
     apocalyptic_steeds: bool = False,
+    soul_shattering_charge: bool = False,
 ) -> ArmyMusterRequest:
+    selected_enhancement_ids = _selected_cavalcade_enhancement_ids(
+        faction_id=faction_id,
+        detachment_id=detachment_id,
+        apocalyptic_steeds=apocalyptic_steeds,
+        soul_shattering_charge=soul_shattering_charge,
+    )
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
@@ -553,13 +843,7 @@ def _army_muster_request(
         detachment_selection=DetachmentSelection(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
-            enhancement_ids=(
-                (enhancements.ENHANCEMENT_ID,)
-                if apocalyptic_steeds
-                and faction_id == rule.CHAOS_DAEMONS_FACTION_ID
-                and detachment_id == rule.CAVALCADE_DETACHMENT_ID
-                else ()
-            ),
+            enhancement_ids=selected_enhancement_ids,
         ),
         unit_selections=(
             UnitMusterSelection(
@@ -574,18 +858,212 @@ def _army_muster_request(
             ),
         ),
         enhancement_assignments=(
-            (
+            tuple(
                 EnhancementAssignment(
-                    enhancement_id=enhancements.ENHANCEMENT_ID,
+                    enhancement_id=enhancement_id,
                     target_unit_selection_id=unit_selection_id,
-                    source_id="phase17g:test:apocalyptic-steeds-assignment",
-                ),
+                    source_id=f"phase17g:test:{enhancement_id}:assignment",
+                )
+                for enhancement_id in selected_enhancement_ids
             )
-            if apocalyptic_steeds
-            and faction_id == rule.CHAOS_DAEMONS_FACTION_ID
-            and detachment_id == rule.CAVALCADE_DETACHMENT_ID
-            else ()
         ),
+    )
+
+
+def _selected_cavalcade_enhancement_ids(
+    *,
+    faction_id: str,
+    detachment_id: str,
+    apocalyptic_steeds: bool,
+    soul_shattering_charge: bool,
+) -> tuple[str, ...]:
+    if not (
+        faction_id == rule.CHAOS_DAEMONS_FACTION_ID
+        and detachment_id == rule.CAVALCADE_DETACHMENT_ID
+    ):
+        return ()
+    selected: list[str] = []
+    if apocalyptic_steeds:
+        selected.append(enhancements.ENHANCEMENT_ID)
+    if soul_shattering_charge:
+        selected.append(enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID)
+    return tuple(selected)
+
+
+def _advance_lifecycle_state_to_phase(lifecycle: GameLifecycle, phase: BattlePhase) -> None:
+    state = _state(lifecycle)
+    while state.current_battle_phase is not phase:
+        if state.current_battle_phase is None:
+            raise AssertionError("battle state ended before expected phase")
+        state.advance_to_next_battle_phase()
+
+
+def _place_soul_shattering_charge_positions(state: GameState) -> None:
+    friendly_placement = _with_model_poses(
+        _unit_placement(state, _CAVALCADE_UNIT_ID),
+        poses=(
+            Pose.at(10.0, 20.0),
+            Pose.at(10.0, 21.9),
+            Pose.at(10.0, 23.8),
+            Pose.at(10.0, 25.7),
+            Pose.at(10.0, 27.6),
+        ),
+    )
+    enemy_placement = _with_model_poses(
+        _unit_placement(state, _ENEMY_UNIT_ID),
+        poses=(
+            Pose.at(12.15, 20.0),
+            Pose.at(14.05, 20.0),
+            Pose.at(15.95, 20.0),
+            Pose.at(17.85, 20.0),
+            Pose.at(19.75, 20.0),
+        ),
+    )
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unit_placement(friendly_placement).with_unit_placement(
+            enemy_placement
+        )
+    )
+
+
+def _unit_placement(state: GameState, unit_instance_id: str) -> UnitPlacement:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    return state.battlefield_state.unit_placement_by_id(unit_instance_id)
+
+
+def _with_model_poses(
+    unit_placement: UnitPlacement,
+    *,
+    poses: tuple[Pose, ...],
+) -> UnitPlacement:
+    if len(poses) != len(unit_placement.model_placements):
+        raise AssertionError("test pose fixture must match unit model count")
+    return UnitPlacement(
+        army_id=unit_placement.army_id,
+        player_id=unit_placement.player_id,
+        unit_instance_id=unit_placement.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id=placement.army_id,
+                player_id=placement.player_id,
+                unit_instance_id=placement.unit_instance_id,
+                model_instance_id=placement.model_instance_id,
+                pose=pose,
+            )
+            for placement, pose in zip(unit_placement.model_placements, poses, strict=True)
+        ),
+    )
+
+
+def _record_charge_move_for_unit(state: GameState, *, unit_instance_id: str) -> None:
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id=f"phase17g-soul-shattering:{unit_instance_id}:charge-fights-first",
+            source_rule_id="core-rules:charge:fights-first",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhase.CHARGE,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id="player-a",
+            ),
+            effect_payload={
+                "effect_kind": "charge_grants_fights_first",
+                "proposal_request_id": "phase17g-soul-shattering-charge-request",
+                "decision_result_id": "phase17g-soul-shattering-charge-result",
+            },
+        )
+    )
+
+
+def _drain_fight_movement_requests(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    current = status
+    while (
+        current.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+        and current.decision_request is not None
+        and current.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    ):
+        request = current.decision_request
+        proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+        assert proposal_request.proposal_kind in {
+            ProposalKind.PILE_IN,
+            ProposalKind.CONSOLIDATE,
+        }
+        context = cast(dict[str, JsonValue], proposal_request.context)
+        current = lifecycle.submit_decision(
+            ParameterizedSubmission(
+                request_id=request.request_id,
+                result_id=f"{request.request_id}:phase17g-no-move",
+                payload=cast(
+                    JsonValue,
+                    {
+                        "proposal_request_id": proposal_request.request_id,
+                        "proposal_kind": proposal_request.proposal_kind.value,
+                        "unit_instance_id": proposal_request.unit_instance_id,
+                        "movement_phase_action": proposal_request.movement_phase_action,
+                        "movement_mode": context["movement_mode"],
+                    },
+                ),
+            ).to_result(request)
+        )
+    return current
+
+
+def _required_melee_weapon_for_model(
+    request: MeleeDeclarationProposalRequest,
+    *,
+    model_instance_id: str,
+) -> dict[str, JsonValue]:
+    for weapon in request.available_weapons:
+        payload = cast(dict[str, JsonValue], weapon)
+        if payload["model_instance_id"] != model_instance_id:
+            continue
+        if payload["is_extra_attacks"] is True:
+            continue
+        if _ENEMY_UNIT_ID in _engaged_target_ids(payload):
+            return payload
+    raise AssertionError(f"missing required melee weapon for model {model_instance_id}")
+
+
+def _engaged_target_ids(weapon_payload: dict[str, JsonValue]) -> tuple[str, ...]:
+    return tuple(cast(list[str], weapon_payload["engaged_target_unit_instance_ids"]))
+
+
+def _melee_declaration_for_weapon(
+    weapon_payload: dict[str, JsonValue],
+) -> MeleeWeaponDeclaration:
+    return MeleeWeaponDeclaration(
+        attacker_model_instance_id=cast(str, weapon_payload["model_instance_id"]),
+        wargear_id=cast(str, weapon_payload["wargear_id"]),
+        weapon_profile_id=cast(str, weapon_payload["weapon_profile_id"]),
+        target_allocations=(MeleeTargetAllocation(_ENEMY_UNIT_ID),),
+    )
+
+
+def _melee_proposal_payload(
+    *,
+    proposal_request: MeleeDeclarationProposalRequest,
+    declarations: tuple[MeleeWeaponDeclaration, ...],
+) -> JsonValue:
+    return cast(
+        JsonValue,
+        MeleeDeclarationProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=MELEE_DECLARATION_PROPOSAL_KIND,
+            player_id=proposal_request.actor_id,
+            battle_round=proposal_request.battle_round,
+            unit_instance_id=proposal_request.unit_instance_id,
+            source_decision_request_id=proposal_request.source_decision_request_id,
+            source_decision_result_id=proposal_request.source_decision_result_id,
+            declarations=declarations,
+        ).to_payload(),
     )
 
 

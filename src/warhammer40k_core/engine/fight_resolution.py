@@ -31,6 +31,9 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -83,6 +86,24 @@ MELEE_DECLARATION_PROPOSAL_KIND = "melee_declaration"
 MELEE_TARGETING_RULE_ID = "fight_phase_melee"
 _BASE_CONTACT_EPSILON = 1e-9
 _CLOSER_EPSILON = 1e-9
+
+
+@dataclass(frozen=True, slots=True)
+class _FightActivationMeleeTargetingEffect:
+    source_rule_id: str
+    model_proximity_inches: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("source_rule_id", self.source_rule_id),
+        )
+        object.__setattr__(
+            self,
+            "model_proximity_inches",
+            _validate_positive_float("model_proximity_inches", self.model_proximity_inches),
+        )
 
 
 class FightMovementProposalPayload(TypedDict):
@@ -1190,6 +1211,8 @@ def available_melee_weapons_payloads(
     ruleset_descriptor: RulesetDescriptor,
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
+    state: GameState | None = None,
+    source_decision_result_id: str | None = None,
 ) -> tuple[JsonValue, ...]:
     return tuple(
         validate_json_value(
@@ -1202,11 +1225,13 @@ def available_melee_weapons_payloads(
                 "maximum_declared_targets": _maximum_attacks_for_profile(weapon["weapon_profile"]),
                 "fixed_attacks": weapon["weapon_profile"].attack_profile.fixed_attacks,
                 "engaged_target_unit_instance_ids": list(
-                    _engaged_enemy_unit_ids_for_model(
+                    _melee_target_unit_ids_for_model(
                         scenario=scenario,
                         ruleset_descriptor=ruleset_descriptor,
                         unit_instance_id=unit.unit_instance_id,
                         model_instance_id=weapon["model_instance_id"],
+                        state=state,
+                        source_decision_result_id=source_decision_result_id,
                     )
                 ),
             }
@@ -1222,6 +1247,7 @@ def validate_melee_declaration_rules(
     request: MeleeDeclarationProposalRequest,
     proposal: MeleeDeclarationProposal,
     army_catalog: ArmyCatalog,
+    state: GameState | None = None,
 ) -> ProposalValidationResult:
     if ruleset_descriptor.descriptor_hash != request.ruleset_descriptor_hash:
         return _invalid_melee_validation(
@@ -1255,6 +1281,8 @@ def validate_melee_declaration_rules(
         ruleset_descriptor=ruleset_descriptor,
         unit=unit,
         available=available,
+        state=state,
+        source_decision_result_id=request.source_decision_result_id,
     )
     declared_primary_model_ids: set[str] = set()
     declared_weapon_keys: set[tuple[str, str, str]] = set()
@@ -1283,11 +1311,13 @@ def validate_melee_declaration_rules(
                 message="Melee declaration selected a non-melee weapon profile.",
                 field="weapon_profile_id",
             )
-        engaged_target_ids = _engaged_enemy_unit_ids_for_model(
+        engaged_target_ids = _melee_target_unit_ids_for_model(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_instance_id=proposal.unit_instance_id,
             model_instance_id=declaration.attacker_model_instance_id,
+            state=state,
+            source_decision_result_id=request.source_decision_result_id,
         )
         if not engaged_target_ids:
             return _invalid_melee_validation(
@@ -1401,13 +1431,22 @@ def melee_attack_sequence_from_proposal(
                     state=state,
                     unit_instance_id=proposal.unit_instance_id,
                 ),
+                extra_rule_ids=_melee_targeting_permission_sources_for_model_target(
+                    scenario=scenario,
+                    target_unit_instance_id=allocation.target_unit_instance_id,
+                    attacker_model_instance_id=declaration.attacker_model_instance_id,
+                    state=state,
+                    source_decision_result_id=proposal.source_decision_result_id,
+                ),
             )
-            target_model_ids = _engaged_model_ids_for_model_and_target_unit(
+            target_model_ids = _target_model_ids_for_melee_attack(
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
                 unit_instance_id=proposal.unit_instance_id,
                 model_instance_id=declaration.attacker_model_instance_id,
                 target_unit_instance_id=allocation.target_unit_instance_id,
+                state=state,
+                source_decision_result_id=proposal.source_decision_result_id,
             )
             pools.append(
                 RangedAttackPool.from_declaration(
@@ -2071,7 +2110,72 @@ def _engaged_enemy_unit_ids_for_model(
     return tuple(sorted(engaged))
 
 
-def _engaged_model_ids_for_model_and_target_unit(
+def _melee_target_unit_ids_for_model(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_instance_id: str,
+    model_instance_id: str,
+    state: GameState | None,
+    source_decision_result_id: str | None,
+) -> tuple[str, ...]:
+    engaged = _engaged_enemy_unit_ids_for_model(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
+    )
+    extended = _extended_melee_target_unit_ids_for_model(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
+        state=state,
+        source_decision_result_id=source_decision_result_id,
+    )
+    return tuple(sorted({*engaged, *extended}))
+
+
+def _extended_melee_target_unit_ids_for_model(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_instance_id: str,
+    model_instance_id: str,
+    state: GameState | None,
+    source_decision_result_id: str | None,
+) -> tuple[str, ...]:
+    effects = _fight_activation_melee_targeting_effects(
+        state=state,
+        unit_instance_id=unit_instance_id,
+        source_decision_result_id=source_decision_result_id,
+    )
+    if not effects:
+        return ()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    source_model = _geometry_model_for_unit_model(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        model_instance_id=model_instance_id,
+    )
+    engaged_unit_ids = _engaged_enemy_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+    )
+    extended: list[str] = []
+    for enemy_unit_id in engaged_unit_ids:
+        enemy_models = _geometry_models_for_unit(scenario=scenario, unit_instance_id=enemy_unit_id)
+        if any(
+            source_model.range_to(enemy_model) <= effect.model_proximity_inches
+            for enemy_model in enemy_models
+            for effect in effects
+        ):
+            extended.append(enemy_unit_id)
+    return tuple(sorted(extended))
+
+
+def _engaged_model_ids_for_model_and_target_unit_or_empty(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -2089,7 +2193,7 @@ def _engaged_model_ids_for_model_and_target_unit(
         scenario=scenario,
         unit_instance_id=target_unit_instance_id,
     )
-    engaged_model_ids = tuple(
+    return tuple(
         target_model.model_id
         for target_model in target_models
         if source_model.is_within_engagement_range(
@@ -2098,9 +2202,136 @@ def _engaged_model_ids_for_model_and_target_unit(
             vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
         )
     )
-    if not engaged_model_ids:
+
+
+def _target_model_ids_for_melee_attack(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_instance_id: str,
+    model_instance_id: str,
+    target_unit_instance_id: str,
+    state: GameState | None,
+    source_decision_result_id: str | None,
+) -> tuple[str, ...]:
+    engaged_model_ids = _engaged_model_ids_for_model_and_target_unit_or_empty(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+    )
+    if engaged_model_ids:
+        return engaged_model_ids
+    effects = _fight_activation_melee_targeting_effects(
+        state=state,
+        unit_instance_id=unit_instance_id,
+        source_decision_result_id=source_decision_result_id,
+    )
+    if not effects:
         raise GameLifecycleError("Melee attack pool target engagement drifted.")
-    return engaged_model_ids
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    source_model = _geometry_model_for_unit_model(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        model_instance_id=model_instance_id,
+    )
+    target_model_ids = tuple(
+        target_model.model_id
+        for target_model in _geometry_models_for_unit(
+            scenario=scenario,
+            unit_instance_id=target_unit_instance_id,
+        )
+        if any(
+            source_model.range_to(target_model) <= effect.model_proximity_inches
+            for effect in effects
+        )
+    )
+    if not target_model_ids:
+        raise GameLifecycleError("Melee attack pool target engagement drifted.")
+    return target_model_ids
+
+
+def _melee_targeting_permission_sources_for_model_target(
+    *,
+    scenario: BattlefieldScenario,
+    target_unit_instance_id: str,
+    attacker_model_instance_id: str,
+    state: GameState | None,
+    source_decision_result_id: str | None,
+) -> tuple[str, ...]:
+    unit_instance_id = _unit_id_for_model(
+        scenario=scenario,
+        model_instance_id=attacker_model_instance_id,
+    )
+    effects = _fight_activation_melee_targeting_effects(
+        state=state,
+        unit_instance_id=unit_instance_id,
+        source_decision_result_id=source_decision_result_id,
+    )
+    if not effects:
+        return ()
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    source_model = _geometry_model_for_unit_model(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        model_instance_id=attacker_model_instance_id,
+    )
+    target_models = _geometry_models_for_unit(
+        scenario=scenario,
+        unit_instance_id=target_unit_instance_id,
+    )
+    return tuple(
+        sorted(
+            {
+                effect.source_rule_id
+                for effect in effects
+                if any(
+                    source_model.range_to(target_model) <= effect.model_proximity_inches
+                    for target_model in target_models
+                )
+            }
+        )
+    )
+
+
+def _fight_activation_melee_targeting_effects(
+    *,
+    state: GameState | None,
+    unit_instance_id: str,
+    source_decision_result_id: str | None,
+) -> tuple[_FightActivationMeleeTargetingEffect, ...]:
+    if state is None or source_decision_result_id is None:
+        return ()
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_activation_result_id = _validate_identifier(
+        "source_decision_result_id",
+        source_decision_result_id,
+    )
+    effects: list[_FightActivationMeleeTargetingEffect] = []
+    for effect in state.persisting_effects:
+        if requested_unit_id not in effect.target_unit_instance_ids:
+            continue
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("effect_kind") != FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
+            continue
+        if payload.get("activation_result_id") != requested_activation_result_id:
+            continue
+        if payload.get("source_id") != effect.source_rule_id:
+            raise GameLifecycleError("Fight activation melee targeting source_id drift.")
+        model_proximity_inches = _validate_positive_float(
+            "model_proximity_inches",
+            payload.get("model_proximity_inches"),
+        )
+        effects.append(
+            _FightActivationMeleeTargetingEffect(
+                source_rule_id=effect.source_rule_id,
+                model_proximity_inches=model_proximity_inches,
+            )
+        )
+    return tuple(sorted(effects, key=lambda stored: stored.source_rule_id))
 
 
 def _required_primary_melee_model_ids(
@@ -2109,6 +2340,8 @@ def _required_primary_melee_model_ids(
     ruleset_descriptor: RulesetDescriptor,
     unit: UnitInstance,
     available: dict[tuple[str, str, str], WeaponProfile],
+    state: GameState | None = None,
+    source_decision_result_id: str | None = None,
 ) -> set[str]:
     model_ids_with_primary: set[str] = set()
     for weapon_key, profile in available.items():
@@ -2118,11 +2351,13 @@ def _required_primary_melee_model_ids(
     for model in unit.own_models:
         if not model.is_alive or model.model_instance_id not in model_ids_with_primary:
             continue
-        if _engaged_enemy_unit_ids_for_model(
+        if _melee_target_unit_ids_for_model(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_instance_id=unit.unit_instance_id,
             model_instance_id=model.model_instance_id,
+            state=state,
+            source_decision_result_id=source_decision_result_id,
         ):
             required.add(model.model_instance_id)
     return required
@@ -2542,12 +2777,14 @@ def _melee_targeting_rule_ids(
     profile: WeaponProfile,
     cleave_bonus: int,
     unit_made_charge_move: bool,
+    extra_rule_ids: tuple[str, ...] = (),
 ) -> tuple[str, ...]:
     rule_ids: list[str] = [MELEE_TARGETING_RULE_ID]
     if cleave_bonus > 0:
         rule_ids.append(cleave_rule_id(cleave_bonus))
     if unit_made_charge_move and has_weapon_keyword(profile, WeaponKeyword.LANCE):
         rule_ids.append(LANCE_RULE_ID)
+    rule_ids.extend(_validate_identifier("extra_rule_id", rule_id) for rule_id in extra_rule_ids)
     return tuple(dict.fromkeys(rule_ids))
 
 
@@ -2866,6 +3103,18 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_positive_float(field_name: str, value: object) -> float:
+    if type(value) is int:
+        converted = float(value)
+    elif type(value) is float:
+        converted = value
+    else:
+        raise GameLifecycleError(f"{field_name} must be a number.")
+    if converted <= 0.0:
+        raise GameLifecycleError(f"{field_name} must be greater than zero.")
+    return converted
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

@@ -51,6 +51,9 @@ from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle_for_armies,
     runtime_content_activation_for_armies,
 )
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+)
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_INTERRUPT_DECISION_TYPE,
@@ -105,6 +108,7 @@ from warhammer40k_core.engine.phases.command import (
 )
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
+    invalid_fight_activation_ability_status,
     invalid_fight_activation_status,
     invalid_fight_attack_sequence_selection_status,
     invalid_fight_interrupt_status,
@@ -239,6 +243,7 @@ _COMMAND_DECISION_TYPES = frozenset(
 _FIGHT_DECISION_TYPES = frozenset(
     (
         FIGHT_ACTIVATION_DECISION_TYPE,
+        FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
         SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -683,6 +688,19 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
+        ):
+            invalid_status = invalid_fight_activation_ability_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                decisions=self.decision_controller,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1522,6 +1540,14 @@ class GameLifecycle:
             stratagem_index=self._movement_phase_handler.stratagem_index,
             fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
         )
+        self._fight_phase_handler = FightPhaseHandler(
+            ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
+            army_catalog=self._fight_phase_handler.army_catalog,
+            stratagem_index=self._fight_phase_handler.stratagem_index,
+            fight_activation_ability_hooks=(
+                self._runtime_content_bundle.fight_activation_ability_hook_registry
+            ),
+        )
         self._battle_round_flow = BattleRoundFlow(phase_handlers=self._phase_handlers())
         self._runtime_content_activation_input_hash = _runtime_content_activation_input_hash(
             config=self._config,
@@ -1763,6 +1789,7 @@ def _fight_decision_owns_request(
 ) -> bool:
     if request.decision_type in {
         FIGHT_ACTIVATION_DECISION_TYPE,
+        FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
         SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     }:
         return True

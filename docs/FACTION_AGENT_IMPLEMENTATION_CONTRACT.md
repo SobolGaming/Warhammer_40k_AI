@@ -56,6 +56,9 @@ Use existing `RuntimeContentContribution` surfaces:
 - enhancement effect bindings for Enhancement or Upgrade effects that are
   selected from Phase 16D army-construction records and materialize static
   engine-owned characteristic modifiers;
+- Fight activation ability hook bindings for optional rules whose timing is
+  when a unit is selected to fight and whose immediate effect is a scoped
+  engine-owned melee targeting permission;
 - RuleIR runtime bindings;
 - faction named handlers.
 
@@ -93,6 +96,18 @@ applies them to authoritative army definitions, keeps application idempotent,
 and emits deterministic replay-safe payloads. Faction modules must not mutate
 army definitions, model characteristics, movement budgets, or battlefield state
 directly.
+
+Fight activation ability hook bindings are an approved runtime contribution
+surface only for source-backed optional rules whose trigger is a unit being
+selected to fight. Each hook binding must use a `source_id` from the generated
+Phase 17F execution rows for the implemented rule or enhancement descriptor
+family until exact subrows exist, and tests must prove that the selected runtime
+manifest row loads the hook through `GameLifecycle` without manual handler
+injection. Hook handlers return typed ability options only; the Fight engine
+owns the finite use/decline `DecisionRequest`, records the authoritative
+`PersistingEffect`, and emits deterministic replay-safe payloads. Faction
+modules must not mutate Fight phase state, melee declarations, attack pools, or
+battlefield state directly.
 
 ## Decision And Mutation
 
@@ -141,6 +156,9 @@ Required:
   Upgrade effects selected through Phase 16D army-construction records, and link
   them to generated Phase 17F enhancement descriptor row IDs until exact
   enhancement subrows exist.
+- Register Fight activation ability hook bindings only for optional
+  selected-to-fight rules, and link them to generated Phase 17F execution row
+  IDs or enhancement descriptor row IDs until exact enhancement subrows exist.
 - Return typed unsupported results with source-linked reasons for unsupported semantics.
 - Add replay and audit assertions for state-changing behavior.
 - Do not edit runtime loader, lifecycle, bundle, or manifest machinery in

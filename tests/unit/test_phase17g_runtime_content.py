@@ -90,6 +90,11 @@ from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityGrant,
     FallBackEligibilityHookBinding,
 )
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FightActivationAbilityContext,
+    FightActivationAbilityHookBinding,
+    FightActivationAbilityOption,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -674,6 +679,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert "core:hazardous" in summary["ability_handler_ids"]
     assert summary["fall_back_hook_ids"] == []
     assert summary["enhancement_effect_binding_ids"] == []
+    assert summary["fight_activation_ability_hook_ids"] == []
     assert summary["contribution_ids"] == ["runtime-content:module-default"]
     assert len(summary["bundle_summary_hash"]) == 64
     assert "object at 0x" not in encoded
@@ -730,6 +736,17 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
         handler=enhancement_effect_handler,
     )
 
+    def fight_activation_ability_handler(
+        _context: FightActivationAbilityContext,
+    ) -> FightActivationAbilityOption | None:
+        return None
+
+    fight_activation_ability_binding = FightActivationAbilityHookBinding(
+        hook_id="combined:fight-activation-ability-hook",
+        source_id="combined:fight-activation-ability-source",
+        handler=fight_activation_ability_handler,
+    )
+
     combined = combine_runtime_content_contributions(
         contribution_id="combined:manifest",
         contributions=(
@@ -739,6 +756,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 ability_handler_bindings=(ability_binding,),
                 fall_back_hook_bindings=(fall_back_binding,),
                 enhancement_effect_bindings=(enhancement_effect_binding,),
+                fight_activation_ability_hook_bindings=(fight_activation_ability_binding,),
             ),
             RuntimeContentContribution(
                 contribution_id="combined:stratagems",
@@ -756,6 +774,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
     assert combined.ability_handler_bindings == (ability_binding,)
     assert combined.fall_back_hook_bindings == (fall_back_binding,)
     assert combined.enhancement_effect_bindings == (enhancement_effect_binding,)
+    assert combined.fight_activation_ability_hook_bindings == (fight_activation_ability_binding,)
     assert tuple(combined.faction_named_handlers) == ("combined:named-handler",)
 
     with pytest.raises(GameLifecycleError, match="ability record IDs must be unique"):
@@ -797,6 +816,21 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 ),
                 RuntimeContentContribution(
                     enhancement_effect_bindings=(enhancement_effect_binding,)
+                ),
+            ),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Fight activation ability hook binding IDs must be unique",
+    ):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-fight-activation-ability-hooks",
+            contributions=(
+                RuntimeContentContribution(
+                    fight_activation_ability_hook_bindings=(fight_activation_ability_binding,)
+                ),
+                RuntimeContentContribution(
+                    fight_activation_ability_hook_bindings=(fight_activation_ability_binding,)
                 ),
             ),
         )
