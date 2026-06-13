@@ -36,6 +36,10 @@ from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionRegistry,
     FactionRuleNamedHandler,
 )
+from warhammer40k_core.engine.fall_back_hooks import (
+    FallBackEligibilityHookBinding,
+    FallBackEligibilityHookRegistry,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionRegistry,
@@ -64,6 +68,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     rule_runtime_binding_ids: list[str]
     event_subscriptions: list[dict[str, JsonValue]]
     battle_shock_hook_ids: list[str]
+    fall_back_hook_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -87,6 +92,7 @@ class RuntimeContentContribution:
     event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
+    fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
         default_factory=_empty_named_handlers
     )
@@ -171,6 +177,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "fall_back_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution fall_back_hook_bindings",
+                self.fall_back_hook_bindings,
+                FallBackEligibilityHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "faction_named_handlers",
             _validate_named_handlers(self.faction_named_handlers),
         )
@@ -186,6 +201,7 @@ class RuntimeContentContribution:
             event_subscriptions=self.event_subscriptions,
             event_handler_bindings=self.event_handler_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
+            fall_back_hook_bindings=self.fall_back_hook_bindings,
             faction_named_handlers=self.faction_named_handlers,
         )
 
@@ -270,6 +286,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        fall_back_hook_bindings=_combine_unique_values(
+            "Fall Back eligibility hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.fall_back_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         faction_named_handlers=_merged_named_handlers(validated_contributions),
     )
 
@@ -285,6 +310,7 @@ class RuntimeContentBundle:
     faction_rule_execution_registry: FactionRuleExecutionRegistry
     event_index: RuntimeContentEventIndex
     battle_shock_hook_registry: BattleShockHookRegistry
+    fall_back_hook_registry: FallBackEligibilityHookRegistry
     contribution_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -320,6 +346,10 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleShockHookRegistry.")
+        if type(self.fall_back_hook_registry) is not FallBackEligibilityHookRegistry:
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires FallBackEligibilityHookRegistry."
+            )
         object.__setattr__(
             self,
             "contribution_ids",
@@ -438,6 +468,13 @@ class RuntimeContentBundle:
                 for binding in contribution.battle_shock_hook_bindings
             )
         )
+        fall_back_hook_registry = FallBackEligibilityHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.fall_back_hook_bindings
+            )
+        )
         return cls(
             activation=activation,
             ability_indexes_by_player_id=_ability_indexes_by_player_id(
@@ -455,6 +492,7 @@ class RuntimeContentBundle:
             faction_rule_execution_registry=faction_registry,
             event_index=event_index,
             battle_shock_hook_registry=battle_shock_hook_registry,
+            fall_back_hook_registry=fall_back_hook_registry,
             contribution_ids=contribution_ids,
         )
 
@@ -487,6 +525,9 @@ class RuntimeContentBundle:
             "event_subscriptions": self.event_index.to_summary_payload(),
             "battle_shock_hook_ids": [
                 binding.hook_id for binding in self.battle_shock_hook_registry.all_bindings()
+            ],
+            "fall_back_hook_ids": [
+                binding.hook_id for binding in self.fall_back_hook_registry.all_bindings()
             ],
             "faction_execution_record_ids": [
                 record.execution_id for record in self.faction_rule_execution_registry.all_records()

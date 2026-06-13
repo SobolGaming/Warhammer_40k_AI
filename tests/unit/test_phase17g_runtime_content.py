@@ -80,6 +80,11 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerRegistry,
 )
 from warhammer40k_core.engine.faction_rule_execution import FactionRuleNamedHandler
+from warhammer40k_core.engine.fall_back_hooks import (
+    FallBackEligibilityContext,
+    FallBackEligibilityGrant,
+    FallBackEligibilityHookBinding,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -662,6 +667,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
         "record:runtime-ambush"
     ]
     assert "core:hazardous" in summary["ability_handler_ids"]
+    assert summary["fall_back_hook_ids"] == []
     assert summary["contribution_ids"] == ["runtime-content:module-default"]
     assert len(summary["bundle_summary_hash"]) == 64
     assert "object at 0x" not in encoded
@@ -695,6 +701,17 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
     def named_handler(context: object) -> object:
         return context
 
+    def fall_back_handler(
+        _context: FallBackEligibilityContext,
+    ) -> FallBackEligibilityGrant | None:
+        return None
+
+    fall_back_binding = FallBackEligibilityHookBinding(
+        hook_id="combined:fall-back-hook",
+        source_id="combined:fall-back-source",
+        handler=fall_back_handler,
+    )
+
     combined = combine_runtime_content_contributions(
         contribution_id="combined:manifest",
         contributions=(
@@ -702,6 +719,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 contribution_id="combined:records",
                 ability_records=(ability_record,),
                 ability_handler_bindings=(ability_binding,),
+                fall_back_hook_bindings=(fall_back_binding,),
             ),
             RuntimeContentContribution(
                 contribution_id="combined:stratagems",
@@ -717,6 +735,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
     assert combined.ability_records == (ability_record,)
     assert combined.stratagem_records == (stratagem_record,)
     assert combined.ability_handler_bindings == (ability_binding,)
+    assert combined.fall_back_hook_bindings == (fall_back_binding,)
     assert tuple(combined.faction_named_handlers) == ("combined:named-handler",)
 
     with pytest.raises(GameLifecycleError, match="ability record IDs must be unique"):
@@ -733,6 +752,17 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
             contributions=(
                 RuntimeContentContribution(ability_handler_bindings=(ability_binding,)),
                 RuntimeContentContribution(ability_handler_bindings=(ability_binding,)),
+            ),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Fall Back eligibility hook binding IDs must be unique",
+    ):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-fall-back-hooks",
+            contributions=(
+                RuntimeContentContribution(fall_back_hook_bindings=(fall_back_binding,)),
+                RuntimeContentContribution(fall_back_hook_bindings=(fall_back_binding,)),
             ),
         )
     with pytest.raises(GameLifecycleError, match="faction handler IDs must be unique"):

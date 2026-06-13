@@ -244,11 +244,13 @@ support for the Phase 17E faction-level items:
 
 Phase 17G must replace `blocked_structured_semantics_required` rows for
 faction-level content with registered generic IR executors, source-linked named
-handlers, or source-linked Battle-shock hook bindings for rules whose timing is
-Battle-shock modifier or outcome resolution. These execution surfaces must
-mutate authoritative game state only through engine-owned services, use the
-shared `DecisionRequest` / `DecisionResult` path for player choices, and emit
-deterministic replay-safe execution results.
+handlers, source-linked Battle-shock hook bindings for rules whose timing is
+Battle-shock modifier or outcome resolution, or source-linked Fall Back
+eligibility hook bindings for rules whose effect is that a completed Fall Back
+move does not prevent later Shooting or Charge eligibility. These execution
+surfaces must mutate authoritative game state only through engine-owned services,
+use the shared `DecisionRequest` / `DecisionResult` path for player choices, and
+emit deterministic replay-safe execution results.
 Implementation PRs must use the generated scaffold targets and the
 [Faction Agent Implementation Contract](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
 
@@ -261,6 +263,14 @@ a later execution-status overlay consolidates implemented hook coverage; Phase
 17G hook PRs must therefore add source-link and lifecycle tests that prove the
 hook is loaded and executed through the selected runtime bundle.
 
+Fall Back eligibility hook bindings follow the same Phase 17F mapping rule. The
+binding `source_id` must be the generated execution row ID for the implemented
+rule, and the selected runtime manifest must carry that ID into the
+`RuntimeContentBundle` audit summary. Hook handlers return typed permission
+grants only; the Movement engine records `FellBackUnitState` and emits
+replay-safe grant payloads, while Shooting and Charge eligibility consume the
+recorded engine state.
+
 Phase 17G does not cover broad datasheet, wargear, or weapon ability execution.
 Those rows move to Phase 17H unless they are inseparable from a faction army
 rule, detachment rule, enhancement, or Stratagem implemented in Phase 17G.
@@ -271,7 +281,8 @@ Required tests:
   engine path, including Battle-shock hooks when the rule timing is
   Battle-shock resolution;
 - detachment rules load and execute for every detachment through registered
-  lifecycle hooks;
+  lifecycle hooks, including Fall Back eligibility hooks when the rule modifies
+  Shooting or Charge consequences of a completed Fall Back move;
 - enhancements validate eligibility from Phase 16D army-construction records
   and execute their effects through generic IR or named handlers;
 - faction and detachment Stratagems validate timing, targeting, CP ledgers,

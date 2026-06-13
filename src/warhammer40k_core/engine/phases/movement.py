@@ -70,6 +70,11 @@ from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fall_back_hooks import (
+    FallBackEligibilityContext,
+    FallBackEligibilityGrant,
+    FallBackEligibilityHookRegistry,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -2025,6 +2030,9 @@ class MovementPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     parameterized_proposals: bool = True
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
+    fall_back_hooks: FallBackEligibilityHookRegistry = field(
+        default_factory=FallBackEligibilityHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -2040,6 +2048,8 @@ class MovementPhaseHandler:
             raise GameLifecycleError("MovementPhaseHandler requires parameterized proposals.")
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("MovementPhaseHandler stratagem_index must be an index.")
+        if type(self.fall_back_hooks) is not FallBackEligibilityHookRegistry:
+            raise GameLifecycleError("MovementPhaseHandler fall_back_hooks must be a registry.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -2206,6 +2216,7 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                fall_back_hooks=self.fall_back_hooks,
             )
         if result.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return _apply_movement_action_decision(
@@ -2224,6 +2235,7 @@ class MovementPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
+                fall_back_hooks=self.fall_back_hooks,
             )
         if result.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
             return _apply_reinforcement_unit_selection_decision(
@@ -4345,6 +4357,7 @@ def _apply_movement_proposal_decision(
     ruleset_descriptor: RulesetDescriptor,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    fall_back_hooks: FallBackEligibilityHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -4668,6 +4681,7 @@ def _apply_movement_proposal_decision(
             ruleset_descriptor=ruleset_descriptor,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
+            fall_back_hooks=fall_back_hooks,
         )
 
     raise GameLifecycleError("Unsupported movement proposal action.")
@@ -4981,6 +4995,7 @@ def _apply_desperate_escape_model_selection_decision(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    fall_back_hooks: FallBackEligibilityHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -5033,6 +5048,7 @@ def _apply_desperate_escape_model_selection_decision(
         fall_back_result=fall_back_result,
         destroyed_model_ids=destroyed_model_ids,
         ruleset_descriptor=ruleset_descriptor,
+        fall_back_hooks=fall_back_hooks,
     )
 
 
@@ -5045,6 +5061,7 @@ def _apply_fall_back_result(
     fall_back_result: FallBackActionResult,
     destroyed_model_ids: tuple[str, ...],
     ruleset_descriptor: RulesetDescriptor,
+    fall_back_hooks: FallBackEligibilityHookRegistry,
     reaction_queue: ReactionQueue | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
 ) -> LifecycleStatus | None:
@@ -5103,15 +5120,44 @@ def _apply_fall_back_result(
             fall_back_result.attempted_placement
         ).with_removed_models(destroyed_model_ids)
     )
+    permission_grants: tuple[FallBackEligibilityGrant, ...] = ()
     if surviving_placement is not None:
+        permission_grants = fall_back_hooks.grants_for(
+            FallBackEligibilityContext(
+                state=state,
+                player_id=active_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_placement.unit_instance_id,
+                movement_request_id=result.request_id,
+                movement_result_id=result.result_id,
+            )
+        )
         state.record_fell_back_unit_state(
             FellBackUnitState(
                 player_id=active_player_id,
                 battle_round=state.battle_round,
                 unit_instance_id=unit_placement.unit_instance_id,
                 desperate_escape_rolls=fall_back_result.desperate_escape_rolls,
+                can_shoot=any(grant.can_shoot for grant in permission_grants),
+                can_declare_charge=any(grant.can_declare_charge for grant in permission_grants),
             )
         )
+        if permission_grants:
+            decisions.event_log.append(
+                "fall_back_eligibility_hooks_resolved",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "request_id": result.request_id,
+                    "result_id": result.result_id,
+                    "grants": [
+                        validate_json_value(grant.to_payload()) for grant in permission_grants
+                    ],
+                },
+            )
     return _request_embark_after_move_or_complete_activation(
         state=state,
         decisions=decisions,
@@ -5121,6 +5167,9 @@ def _apply_fall_back_result(
         movement_payload={
             **fall_back_result.movement_payload,
             "destroyed_model_ids": list(destroyed_model_ids),
+            "fall_back_eligibility_grants": [
+                validate_json_value(grant.to_payload()) for grant in permission_grants
+            ],
         },
         displacement_kind=ModelDisplacementKind.FALL_BACK,
         transition_batch=transition_batch,

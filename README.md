@@ -275,10 +275,13 @@ Executable statuses also fail closed unless a registered generic IR executor or
 named handler runs; APPLIED is not emitted by status alone, and no covered row
 falls through as a missing handler or silent fallback.
 
-Phase 17G is planned for actual faction-level semantic execution: army rules,
-detachment rules, enhancement effects, and faction/detachment Stratagem timing,
-targeting, validation, and effects. Phase 17H is planned for datasheet, wargear,
-and weapon ability execution. Phase 17I is planned for source-content coverage,
+Phase 17G is underway for actual faction-level semantic execution. The current
+Chaos Daemons slice supports the Shadow of Chaos army-rule Battle-shock runtime
+hook and the Cavalcade of Chaos / Unholy Avalanche Fall Back eligibility hook;
+remaining army rules, detachment rules, enhancement effects, and
+faction/detachment Stratagem timing, targeting, validation, and effects are
+still planned Phase 17G work. Phase 17H is planned for datasheet, wargear, and
+weapon ability execution. Phase 17I is planned for source-content coverage,
 execution-status, and unsupported-descriptor audits.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.

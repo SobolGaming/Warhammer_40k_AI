@@ -2,18 +2,112 @@
 # Regenerate with `uv run python tools/generate_faction_content_scaffold.py`.
 from __future__ import annotations
 
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
-
-# Generated scaffold placeholder. Remove this marker when implementing semantics.
+from warhammer40k_core.engine.fall_back_hooks import (
+    FallBackEligibilityContext,
+    FallBackEligibilityGrant,
+    FallBackEligibilityHookBinding,
+)
+from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_factory import UnitInstance
 
 CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:rule:scaffold"
+HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche"
+SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:rule"
+CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
+CAVALCADE_DETACHMENT_ID = "cavalcade-of-chaos"
+LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"
+MOUNTED = "MOUNTED"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    """Runtime load scaffold only.
+    return RuntimeContentContribution(
+        contribution_id=CONTRIBUTION_ID,
+        fall_back_hook_bindings=(
+            FallBackEligibilityHookBinding(
+                hook_id=HOOK_ID,
+                source_id=SOURCE_RULE_ID,
+                handler=fall_back_eligibility_grant,
+            ),
+        ),
+    )
 
-    Semantic execution must be supplied by source-backed RuleIR,
-    named handlers, event subscriptions, ability records, or Stratagem
-    handler bindings in implementation PRs.
-    """
-    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
+
+def fall_back_eligibility_grant(
+    context: FallBackEligibilityContext,
+) -> FallBackEligibilityGrant | None:
+    if type(context) is not FallBackEligibilityContext:
+        raise GameLifecycleError("Unholy Avalanche requires a Fall Back eligibility context.")
+    army = _army_for_player(context.state, player_id=context.player_id)
+    if not _army_has_cavalcade_detachment(army):
+        return None
+    unit = _unit_in_army_by_id(army, unit_instance_id=context.unit_instance_id)
+    if not _unit_has_faction_keyword(unit, LEGIONES_DAEMONICA):
+        return None
+    if not _unit_has_keyword(unit, MOUNTED):
+        return None
+    return FallBackEligibilityGrant(
+        hook_id=HOOK_ID,
+        source_id=SOURCE_RULE_ID,
+        can_shoot=True,
+        can_declare_charge=True,
+        replay_payload={
+            "effect_kind": "unholy_avalanche",
+            "player_id": context.player_id,
+            "battle_round": context.battle_round,
+            "unit_instance_id": unit.unit_instance_id,
+            "movement_request_id": context.movement_request_id,
+            "movement_result_id": context.movement_result_id,
+            "required_faction_keyword": LEGIONES_DAEMONICA,
+            "required_keyword": MOUNTED,
+            "detachment_id": CAVALCADE_DETACHMENT_ID,
+        },
+    )
+
+
+def _army_has_cavalcade_detachment(army: ArmyDefinition) -> bool:
+    return (
+        army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
+        and CAVALCADE_DETACHMENT_ID in army.detachment_selection.detachment_ids
+    )
+
+
+def _army_for_player(state: GameState, *, player_id: str) -> ArmyDefinition:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    for army in state.army_definitions:
+        if army.player_id == requested_player_id:
+            return army
+    raise GameLifecycleError("Unholy Avalanche player army is unknown.")
+
+
+def _unit_in_army_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for unit in army.units:
+        if unit.unit_instance_id == requested_unit_id:
+            return unit
+    raise GameLifecycleError("Unholy Avalanche target unit is not in the selected player army.")
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
+
+
+def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().replace("_", " ").replace("-", " ").upper()
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return stripped
