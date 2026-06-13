@@ -5,7 +5,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.movement_submission_helpers import submit_action_and_movement_proposal
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_action_and_movement_proposal,
+)
 from tests.unit.test_phase10o_fall_back import (
     _advance_to_movement_unit_selection,  # pyright: ignore[reportPrivateUsage]
     _decision_request,  # pyright: ignore[reportPrivateUsage]
@@ -16,16 +19,26 @@ from tests.unit.test_phase10o_fall_back import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
-from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.detachment import (
+    DetachmentDefinition,
+    EnhancementDefinition,
+    EnhancementSubtype,
+)
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.army_mustering import (
+    ArmyMusterRequest,
+    EnhancementAssignment,
+    validate_roster_legality,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.cavalcade_of_chaos import (  # noqa: E501
+    enhancements,
     rule,
 )
 from warhammer40k_core.engine.fall_back_hooks import (
@@ -54,6 +67,7 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     ShootingPhaseHandler,
 )
+from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
@@ -165,6 +179,94 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
     }
 
 
+def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle() -> None:
+    config = _cavalcade_config(apocalyptic_steeds=True)
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    state = _state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+    summary = bundle.to_summary_payload()
+    army = state.army_definitions[0]
+    unit = army.unit_by_id(_CAVALCADE_UNIT_ID)
+
+    assert enhancements.EFFECT_ID in summary["enhancement_effect_binding_ids"]
+    assert enhancements.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    assert all(
+        enhancements.MODIFIER_ID
+        in _characteristic_for_model(model, Characteristic.MOVEMENT).applied_modifier_ids
+        for model in unit.own_models
+    )
+    assert {_model_movement_inches(model) for model in unit.own_models} == {7}
+
+    effect_event = _event_payload(lifecycle, "enhancement_effects_applied")
+    effect_payloads = cast(list[JsonValue], effect_event["effects"])
+    effect_payload = cast(dict[str, JsonValue], effect_payloads[0])
+    replay_payload = cast(dict[str, JsonValue], effect_payload["replay_payload"])
+    model_payloads = cast(list[JsonValue], effect_payload["model_modifiers"])
+    first_model_payload = cast(dict[str, JsonValue], model_payloads[0])
+    assert effect_payload["effect_id"] == enhancements.EFFECT_ID
+    assert effect_payload["source_id"] == enhancements.SOURCE_RULE_ID
+    assert effect_payload["enhancement_id"] == enhancements.ENHANCEMENT_ID
+    assert replay_payload["effect_kind"] == "apocalyptic_steeds_upgrade"
+    assert replay_payload["enhancement_source_id"] == enhancements.ENHANCEMENT_SOURCE_ID
+    assert first_model_payload["before_final"] == 6
+    assert first_model_payload["after_final"] == 7
+
+    selection_request = _decision_request(movement_status)
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-cavalcade-select-apocalyptic-steeds",
+            request=selection_request,
+            selected_option_id=_CAVALCADE_UNIT_ID,
+        )
+    )
+    action_request = _decision_request(action_status)
+    move_status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        action_result_id="phase17g-cavalcade-normal-move-action",
+        proposal_result_id="phase17g-cavalcade-normal-move-proposal",
+        unit_instance_id=_CAVALCADE_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_CAVALCADE_UNIT_ID,
+            dx=7.0,
+        ),
+    )
+
+    assert move_status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+
+
+def test_cavalcade_apocalyptic_steeds_roster_requires_mounted_target() -> None:
+    config = _cavalcade_config(
+        apocalyptic_steeds=True,
+        friendly_keywords=("Khorne",),
+    )
+
+    report = validate_roster_legality(
+        catalog=config.army_catalog,
+        request=config.army_muster_requests[0],
+    )
+
+    assert "enhancement_target_keyword_required" in {
+        violation.violation_code for violation in report.violations
+    }
+
+
+def test_cavalcade_enhancement_effect_uses_phase17f_execution_source_id() -> None:
+    record = _cavalcade_enhancement_execution_record()
+    contribution = enhancements.runtime_contribution()
+    binding = contribution.enhancement_effect_bindings[0]
+
+    assert record.execution_id == enhancements.SOURCE_RULE_ID
+    assert binding.source_id == record.execution_id
+
+
 def test_cavalcade_rule_hook_uses_phase17f_execution_source_id() -> None:
     record = _cavalcade_rule_execution_record()
     contribution = rule.runtime_contribution()
@@ -264,6 +366,34 @@ def _cavalcade_rule_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
+def _cavalcade_enhancement_execution_record() -> Phase17FExecutionRecord:
+    records = tuple(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.faction_id == rule.CHAOS_DAEMONS_FACTION_ID
+        and record.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT_DESCRIPTORS
+        and record.detachment_id == rule.CAVALCADE_DETACHMENT_ID
+    )
+    if len(records) != 1:
+        raise AssertionError("expected one Cavalcade of Chaos enhancement execution record")
+    return records[0]
+
+
+def _characteristic_for_model(
+    model: ModelInstance,
+    characteristic: Characteristic,
+) -> CharacteristicValue:
+    for value in model.characteristics:
+        if value.characteristic is characteristic:
+            return value
+    raise AssertionError(f"model is missing {characteristic.value}")
+
+
+def _model_movement_inches(model: ModelInstance) -> int:
+    value = _characteristic_for_model(model, Characteristic.MOVEMENT)
+    return value.final
+
+
 def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
     require_runtime_content_bundle = cast(
         Callable[[], RuntimeContentBundle],
@@ -283,11 +413,13 @@ def _state_at_phase(state: GameState, phase: BattlePhase) -> GameState:
 
 def _cavalcade_config(
     *,
+    apocalyptic_steeds: bool = False,
+    friendly_keywords: tuple[str, ...] = (rule.MOUNTED, "Khorne"),
     enemy_faction_id: str = "core-marine-force",
     enemy_detachment_id: str = "core-combined-arms",
     enemy_datasheet_id: str = "core-intercessor-like-infantry",
 ) -> GameConfig:
-    catalog = _cavalcade_catalog()
+    catalog = _cavalcade_catalog(friendly_keywords=friendly_keywords)
     return GameConfig(
         game_id="phase17g-cavalcade-unholy-avalanche",
         allow_legacy_non_strict_rosters=True,
@@ -304,6 +436,7 @@ def _cavalcade_config(
                 detachment_id=rule.CAVALCADE_DETACHMENT_ID,
                 unit_selection_id="intercessor-unit-1",
                 datasheet_id=_CAVALCADE_TEST_DATASHEET_ID,
+                apocalyptic_steeds=apocalyptic_steeds,
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -322,10 +455,13 @@ def _cavalcade_config(
     )
 
 
-def _cavalcade_catalog() -> ArmyCatalog:
+def _cavalcade_catalog(
+    *,
+    friendly_keywords: tuple[str, ...] = (rule.MOUNTED, "Khorne"),
+) -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
-    daemon_datasheet = _cavalcade_datasheet(base_datasheet)
+    daemon_datasheet = _cavalcade_datasheet(base_datasheet, keywords=friendly_keywords)
     return replace(
         base_catalog,
         datasheets=(*base_catalog.datasheets, daemon_datasheet),
@@ -347,22 +483,39 @@ def _cavalcade_catalog() -> ArmyCatalog:
                 detachment_point_cost=1,
                 unit_datasheet_ids=(_CAVALCADE_TEST_DATASHEET_ID,),
                 force_disposition_ids=("phase17g-force",),
+                enhancement_ids=(enhancements.ENHANCEMENT_ID,),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:"
                     "chaos-daemons:cavalcade-of-chaos",
                 ),
             ),
         ),
+        enhancements=(
+            *base_catalog.enhancements,
+            EnhancementDefinition(
+                enhancement_id=enhancements.ENHANCEMENT_ID,
+                name="Apocalyptic Steeds Upgrade",
+                source_id=enhancements.ENHANCEMENT_SOURCE_ID,
+                subtypes=(EnhancementSubtype.UPGRADE,),
+                points=0,
+                target_required_keywords=(enhancements.MOUNTED,),
+                target_required_faction_keywords=(enhancements.LEGIONES_DAEMONICA,),
+            ),
+        ),
     )
 
 
-def _cavalcade_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDefinition:
+def _cavalcade_datasheet(
+    base_datasheet: DatasheetDefinition,
+    *,
+    keywords: tuple[str, ...],
+) -> DatasheetDefinition:
     return replace(
         base_datasheet,
         datasheet_id=_CAVALCADE_TEST_DATASHEET_ID,
         name="Mounted Manifestation Daemon",
         keywords=DatasheetKeywordSet(
-            keywords=("Mounted", "Khorne"),
+            keywords=keywords,
             faction_keywords=("Legiones Daemonica",),
         ),
         attachment_eligibilities=(),
@@ -389,6 +542,7 @@ def _army_muster_request(
     detachment_id: str,
     unit_selection_id: str,
     datasheet_id: str,
+    apocalyptic_steeds: bool = False,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -399,6 +553,13 @@ def _army_muster_request(
         detachment_selection=DetachmentSelection(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
+            enhancement_ids=(
+                (enhancements.ENHANCEMENT_ID,)
+                if apocalyptic_steeds
+                and faction_id == rule.CHAOS_DAEMONS_FACTION_ID
+                and detachment_id == rule.CAVALCADE_DETACHMENT_ID
+                else ()
+            ),
         ),
         unit_selections=(
             UnitMusterSelection(
@@ -411,6 +572,19 @@ def _army_muster_request(
                     ),
                 ),
             ),
+        ),
+        enhancement_assignments=(
+            (
+                EnhancementAssignment(
+                    enhancement_id=enhancements.ENHANCEMENT_ID,
+                    target_unit_selection_id=unit_selection_id,
+                    source_id="phase17g:test:apocalyptic-steeds-assignment",
+                ),
+            )
+            if apocalyptic_steeds
+            and faction_id == rule.CHAOS_DAEMONS_FACTION_ID
+            and detachment_id == rule.CAVALCADE_DETACHMENT_ID
+            else ()
         ),
     )
 

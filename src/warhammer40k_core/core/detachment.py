@@ -27,6 +27,8 @@ class EnhancementDefinitionPayload(TypedDict):
     subtypes: list[str]
     points: int | None
     ability_descriptor_ids: list[str]
+    target_required_keywords: list[str]
+    target_required_faction_keywords: list[str]
 
 
 class StratagemDefinitionPayload(TypedDict):
@@ -62,6 +64,8 @@ class EnhancementDefinition:
     subtypes: tuple[EnhancementSubtype, ...] = ()
     points: int | None = None
     ability_descriptor_ids: tuple[str, ...] = ()
+    target_required_keywords: tuple[str, ...] = ()
+    target_required_faction_keywords: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -112,6 +116,22 @@ class EnhancementDefinition:
                 self.ability_descriptor_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "target_required_keywords",
+            _validate_identifier_tuple(
+                "EnhancementDefinition target_required_keywords",
+                self.target_required_keywords,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_required_faction_keywords",
+            _validate_identifier_tuple(
+                "EnhancementDefinition target_required_faction_keywords",
+                self.target_required_faction_keywords,
+            ),
+        )
 
     def stable_identity(self) -> str:
         return f"enhancement:{self.enhancement_id}"
@@ -125,6 +145,8 @@ class EnhancementDefinition:
             "subtypes": [subtype.value for subtype in self.subtypes],
             "points": self.points,
             "ability_descriptor_ids": list(self.ability_descriptor_ids),
+            "target_required_keywords": list(self.target_required_keywords),
+            "target_required_faction_keywords": list(self.target_required_faction_keywords),
         }
 
     @classmethod
@@ -139,6 +161,8 @@ class EnhancementDefinition:
             ),
             points=payload["points"],
             ability_descriptor_ids=tuple(payload["ability_descriptor_ids"]),
+            target_required_keywords=tuple(payload["target_required_keywords"]),
+            target_required_faction_keywords=tuple(payload["target_required_faction_keywords"]),
         )
 
 

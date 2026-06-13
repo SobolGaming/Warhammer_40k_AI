@@ -53,6 +53,9 @@ Use existing `RuntimeContentContribution` surfaces:
   or outcome resolution;
 - Fall Back eligibility hook bindings for rules whose effect is that a Fall Back
   move does not prevent later Shooting or Charge eligibility;
+- enhancement effect bindings for Enhancement or Upgrade effects that are
+  selected from Phase 16D army-construction records and materialize static
+  engine-owned characteristic modifiers;
 - RuleIR runtime bindings;
 - faction named handlers.
 
@@ -77,6 +80,19 @@ permission grants; the Movement engine records the authoritative
 `FellBackUnitState`, emits deterministic replay-safe grant payloads, and the
 Shooting and Charge phases consume that engine-owned state. Faction modules must
 not mutate Fall Back, Shooting, or Charge phase state directly.
+
+Enhancement effect bindings are an approved runtime contribution surface for
+source-backed Enhancement or Upgrade effects whose selected army-construction
+assignment creates a static engine-owned characteristic modifier. Each binding
+must use the generated Phase 17F execution row ID for the implemented
+enhancement descriptor family until exact enhancement subrows exist. Eligibility
+must be validated from Phase 16D `ArmyMusterRequest` / `ArmyDefinition` records
+and structured catalog target requirements. Binding handlers return typed
+modifier descriptors only; the lifecycle-owned enhancement effect service
+applies them to authoritative army definitions, keeps application idempotent,
+and emits deterministic replay-safe payloads. Faction modules must not mutate
+army definitions, model characteristics, movement budgets, or battlefield state
+directly.
 
 ## Decision And Mutation
 
@@ -121,6 +137,10 @@ Required:
 - Register Fall Back eligibility hook bindings only for source-backed rules
   that change Fall Back Shooting or Charge permissions, and link them to
   generated Phase 17F execution row IDs.
+- Register enhancement effect bindings only for source-backed Enhancement or
+  Upgrade effects selected through Phase 16D army-construction records, and link
+  them to generated Phase 17F enhancement descriptor row IDs until exact
+  enhancement subrows exist.
 - Return typed unsupported results with source-linked reasons for unsupported semantics.
 - Add replay and audit assertions for state-changing behavior.
 - Do not edit runtime loader, lifecycle, bundle, or manifest machinery in

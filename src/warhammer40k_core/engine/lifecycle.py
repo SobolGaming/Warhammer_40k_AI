@@ -42,6 +42,7 @@ from warhammer40k_core.engine.deployment import (
     is_deployment_placement_request,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
+from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
@@ -1506,6 +1507,11 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
+        apply_enhancement_effects(
+            state=state,
+            registry=self._runtime_content_bundle.enhancement_effect_registry,
+            decisions=self.decision_controller,
+        )
         self._command_phase_handler = CommandPhaseHandler(
             stratagem_index=self._command_phase_handler.stratagem_index,
             battle_shock_hooks=self._runtime_content_bundle.battle_shock_hook_registry,
@@ -1517,7 +1523,10 @@ class GameLifecycle:
             fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
         )
         self._battle_round_flow = BattleRoundFlow(phase_handlers=self._phase_handlers())
-        self._runtime_content_activation_input_hash = activation_input_hash
+        self._runtime_content_activation_input_hash = _runtime_content_activation_input_hash(
+            config=self._config,
+            armies=tuple(state.army_definitions),
+        )
         summary = self._runtime_content_bundle.to_summary_payload()
         self._runtime_content_audit = cast(
             Mapping[str, JsonValue],

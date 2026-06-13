@@ -36,6 +36,11 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.enhancement_effects import (
+    EnhancementCharacteristicModifier,
+    EnhancementEffectBinding,
+    EnhancementEffectContext,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import (
@@ -668,6 +673,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     ]
     assert "core:hazardous" in summary["ability_handler_ids"]
     assert summary["fall_back_hook_ids"] == []
+    assert summary["enhancement_effect_binding_ids"] == []
     assert summary["contribution_ids"] == ["runtime-content:module-default"]
     assert len(summary["bundle_summary_hash"]) == 64
     assert "object at 0x" not in encoded
@@ -712,6 +718,18 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
         handler=fall_back_handler,
     )
 
+    def enhancement_effect_handler(
+        _context: EnhancementEffectContext,
+    ) -> tuple[EnhancementCharacteristicModifier, ...]:
+        return ()
+
+    enhancement_effect_binding = EnhancementEffectBinding(
+        effect_id="combined:enhancement-effect",
+        source_id="combined:enhancement-source",
+        enhancement_id="combined-enhancement",
+        handler=enhancement_effect_handler,
+    )
+
     combined = combine_runtime_content_contributions(
         contribution_id="combined:manifest",
         contributions=(
@@ -720,6 +738,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 ability_records=(ability_record,),
                 ability_handler_bindings=(ability_binding,),
                 fall_back_hook_bindings=(fall_back_binding,),
+                enhancement_effect_bindings=(enhancement_effect_binding,),
             ),
             RuntimeContentContribution(
                 contribution_id="combined:stratagems",
@@ -736,6 +755,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
     assert combined.stratagem_records == (stratagem_record,)
     assert combined.ability_handler_bindings == (ability_binding,)
     assert combined.fall_back_hook_bindings == (fall_back_binding,)
+    assert combined.enhancement_effect_bindings == (enhancement_effect_binding,)
     assert tuple(combined.faction_named_handlers) == ("combined:named-handler",)
 
     with pytest.raises(GameLifecycleError, match="ability record IDs must be unique"):
@@ -763,6 +783,21 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
             contributions=(
                 RuntimeContentContribution(fall_back_hook_bindings=(fall_back_binding,)),
                 RuntimeContentContribution(fall_back_hook_bindings=(fall_back_binding,)),
+            ),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="enhancement effect binding IDs must be unique",
+    ):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-enhancement-effects",
+            contributions=(
+                RuntimeContentContribution(
+                    enhancement_effect_bindings=(enhancement_effect_binding,)
+                ),
+                RuntimeContentContribution(
+                    enhancement_effect_bindings=(enhancement_effect_binding,)
+                ),
             ),
         )
     with pytest.raises(GameLifecycleError, match="faction handler IDs must be unique"):

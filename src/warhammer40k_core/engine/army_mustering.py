@@ -1339,6 +1339,13 @@ def _append_enhancement_violations(
                     source_id=assignment.source_id,
                 )
             )
+        if enhancement is not None:
+            _append_enhancement_target_requirement_violations(
+                enhancement=enhancement,
+                datasheet=datasheet,
+                assignment=assignment,
+                violations=violations,
+            )
         attached_group = attached_group_by_selection_id.get(assignment.target_unit_selection_id)
         if attached_group is not None:
             enhancement_count_by_attached_group[attached_group] = (
@@ -1376,6 +1383,39 @@ def _append_enhancement_violations(
                     source_id="phase16d:attached-squad-enhancement-limit",
                 )
             )
+
+
+def _append_enhancement_target_requirement_violations(
+    *,
+    enhancement: EnhancementDefinition,
+    datasheet: DatasheetDefinition,
+    assignment: EnhancementAssignment,
+    violations: list[RosterLegalityViolation],
+) -> None:
+    for keyword in enhancement.target_required_keywords:
+        if _datasheet_has_keyword(datasheet, keyword):
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="enhancement_target_keyword_required",
+                message="EnhancementAssignment target unit is missing a required keyword.",
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=enhancement.source_id,
+            )
+        )
+    for keyword in enhancement.target_required_faction_keywords:
+        if _datasheet_has_faction_keyword(datasheet, keyword):
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="enhancement_target_faction_keyword_required",
+                message=(
+                    "EnhancementAssignment target unit is missing a required faction keyword."
+                ),
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=enhancement.source_id,
+            )
+        )
 
 
 def _append_daemonic_pact_violations(
