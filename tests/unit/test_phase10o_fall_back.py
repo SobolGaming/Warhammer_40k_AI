@@ -76,8 +76,8 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-01-0002"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
-_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0272"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-five-fixed-0272"
+_MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
 )
@@ -713,7 +713,7 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
 
 def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_drift() -> None:
     lifecycle, action_request = _advance_to_fall_back_action_request(
-        game_id=_ALL_FAILED_DESPERATE_ESCAPE_GAME_ID,
+        game_id=_MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID,
     )
     fall_back_status = _submit_result(
         lifecycle,
