@@ -2822,6 +2822,7 @@ class GameState:
             enemy_unit_ids_in_player_deployment_zone=(
                 self._enemy_unit_ids_in_player_deployment_zone(card_state.player_id)
             ),
+            starting_strength_records=tuple(self.starting_strength_records),
         )
         if award is None:
             raise GameLifecycleError("State-backed secondary mission requirements are not met.")

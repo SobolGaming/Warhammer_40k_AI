@@ -741,59 +741,24 @@ def primary_mission_rows() -> tuple[SourcePrimaryMissionRow, ...]:
 
 def secondary_mission_rows() -> tuple[SourceSecondaryMissionRow, ...]:
     return (
-        _secondary(
-            "a-grievous-blow",
-            "A Grievous Blow",
-            "both",
-            True,
-            fixed_vp=4,
-            tactical_vp=5,
-            cap=5,
-        ),
-        _secondary("a-tempting-target", "A Tempting Target", "tactical", False, tactical_vp=5),
-        _secondary(
-            "assassination",
-            "Assassination",
-            "both",
-            True,
-            fixed_vp=4,
-            tactical_vp=5,
-        ),
-        _secondary("beacon", "Beacon", "tactical", False, tactical_vp=5),
-        _secondary(
-            "behind-enemy-lines",
-            "Behind Enemy Lines",
-            "tactical",
-            False,
-            tactical_vp=3,
-            cap=5,
-        ),
+        _secondary_a_grievous_blow(),
+        _secondary_a_tempting_target(),
+        _secondary_assassination(),
+        _secondary_beacon(),
+        _secondary_behind_enemy_lines(),
         _secondary_bring_it_down(),
-        _secondary("burden-of-trust", "Burden of Trust", "tactical", False, tactical_vp=2, cap=5),
-        _secondary("centre-ground", "Centre Ground", "tactical", False, tactical_vp=5),
+        _secondary_burden_of_trust(),
+        _secondary_centre_ground(),
         _secondary_cleanse(),
         _secondary_defend_stronghold(),
-        _secondary("display-of-might", "Display of Might", "tactical", False, tactical_vp=5),
-        _secondary(
-            "engage-on-all-fronts",
-            "Engage on All Fronts",
-            "both",
-            True,
-            fixed_vp=4,
-            tactical_vp=5,
-        ),
-        _secondary("forward-position", "Forward Position", "tactical", False, tactical_vp=5),
-        _secondary("no-prisoners", "No Prisoners", "tactical", False, tactical_vp=2, cap=5),
-        _secondary("outflank", "Outflank", "tactical", False, tactical_vp=5),
+        _secondary_display_of_might(),
+        _secondary_engage_on_all_fronts(),
+        _secondary_forward_position(),
+        _secondary_no_prisoners(),
+        _secondary_outflank(),
         _secondary_overwhelming_force(),
         _secondary_plunder(),
-        _secondary(
-            "secure-no-mans-land",
-            "Secure No Man's Land",
-            "tactical",
-            False,
-            tactical_vp=5,
-        ),
+        _secondary_secure_no_mans_land(),
     )
 
 
@@ -1309,56 +1274,195 @@ def mission_pack_scoring_row() -> SourceMissionPackScoringRow:
     )
 
 
-def _secondary(
-    secondary_mission_id: str,
-    name: str,
-    availability: str,
-    tournament_fixed_allowed: bool,
-    *,
-    tactical_vp: int,
-    fixed_vp: int | None = None,
-    alternate_vp: int | None = None,
-    cap: int | None = None,
-) -> SourceSecondaryMissionRow:
-    rules: list[SourceScoringRuleRow] = []
-    if fixed_vp is not None:
-        rules.append(
+def _source_only_secondary_rule(
+    rule_id: str,
+    timing: str,
+    victory_points: int | None,
+    cap: int | None,
+    condition: str,
+) -> SourceScoringRuleRow:
+    return _rule(rule_id, timing, "secondary", victory_points, cap, condition)
+
+
+def _secondary_a_grievous_blow() -> SourceSecondaryMissionRow:
+    condition = "each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn"
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="a-grievous-blow",
+        name="A Grievous Blow",
+        availability="both",
+        tournament_fixed_allowed=True,
+        scoring_rules=(
+            _source_only_secondary_rule(
+                "a-grievous-blow-when-drawn",
+                "when_drawn",
+                None,
+                None,
+                "may_discard_if_no_enemy_units_starting_strength_13_or_more_on_battlefield",
+            ),
+            _rule("a-grievous-blow-fixed", "turn_end", "fixed_secondary", 4, 5, condition),
+            _rule("a-grievous-blow-tactical", "turn_end", "tactical_secondary", 5, 5, condition),
+        ),
+    )
+
+
+def _secondary_a_tempting_target() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="a-tempting-target",
+        name="A Tempting Target",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
             _rule(
-                f"{secondary_mission_id}-fixed",
+                "a-tempting-target-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "a-tempting-target-when-drawn",
+                "when_drawn",
+                None,
+                None,
+                "opponent_selects_one_no_mans_land_non_home_objective_as_tempting_target",
+            ),
+            _source_only_secondary_rule(
+                "a-tempting-target-source-control-target",
+                "your_turn_end",
+                5,
+                None,
+                "control_tempting_target_objective",
+            ),
+        ),
+    )
+
+
+def _secondary_assassination() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="assassination",
+        name="Assassination",
+        availability="both",
+        tournament_fixed_allowed=True,
+        scoring_rules=(
+            _rule(
+                "assassination-fixed",
                 "mission_condition_met",
                 "fixed_secondary",
-                fixed_vp,
-                cap,
+                4,
+                None,
                 "fixed_secondary_condition",
-            )
-        )
-    rules.append(
-        _rule(
-            f"{secondary_mission_id}-tactical",
-            "mission_condition_met",
-            "tactical_secondary",
-            tactical_vp,
-            cap,
-            "tactical_secondary_condition",
-        )
-    )
-    if alternate_vp is not None:
-        rules.append(
+            ),
             _rule(
-                f"{secondary_mission_id}-alternate",
+                "assassination-tactical",
                 "mission_condition_met",
-                "secondary",
-                alternate_vp,
-                cap,
-                "alternate_or_partial_condition",
-            )
-        )
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "assassination-fixed-character-w4-plus",
+                "while_active",
+                4,
+                None,
+                "each_enemy_character_model_w4_or_more_destroyed",
+            ),
+            _source_only_secondary_rule(
+                "assassination-fixed-character-w3-or-less",
+                "while_active",
+                3,
+                None,
+                "each_enemy_character_model_w3_or_less_destroyed",
+            ),
+            _source_only_secondary_rule(
+                "assassination-tactical-character-destroyed",
+                "either_player_turn_end",
+                5,
+                None,
+                "one_or_more_enemy_character_models_destroyed_this_turn",
+            ),
+            _source_only_secondary_rule(
+                "assassination-tactical-all-characters-destroyed",
+                "either_player_turn_end",
+                5,
+                None,
+                "all_enemy_character_models_destroyed_during_battle",
+            ),
+        ),
+    )
+
+
+def _secondary_beacon() -> SourceSecondaryMissionRow:
     return SourceSecondaryMissionRow(
-        secondary_mission_id=secondary_mission_id,
-        name=name,
-        availability=availability,
-        tournament_fixed_allowed=tournament_fixed_allowed,
-        scoring_rules=tuple(rules),
+        secondary_mission_id="beacon",
+        name="Beacon",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "beacon-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "beacon-when-drawn",
+                "when_drawn",
+                None,
+                None,
+                "choose_one_friendly_battlefield_or_embarked_transport_unit_as_beacon",
+            ),
+            _source_only_secondary_rule(
+                "beacon-source-outside-deployment-zone",
+                "opponent_turn_end_or_round_five_turn_end",
+                3,
+                None,
+                "beacon_unit_on_battlefield_outside_own_deployment_zone",
+            ),
+            _source_only_secondary_rule(
+                "beacon-source-outside-territory",
+                "opponent_turn_end_or_round_five_turn_end",
+                5,
+                None,
+                "beacon_unit_on_battlefield_outside_own_territory",
+            ),
+        ),
+    )
+
+
+def _secondary_behind_enemy_lines() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="behind-enemy-lines",
+        name="Behind Enemy Lines",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "behind-enemy-lines-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                3,
+                5,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "behind-enemy-lines-when-drawn-first-round",
+                "when_drawn",
+                None,
+                None,
+                "first_battle_round_may_shuffle_card_back_and_draw_one",
+            ),
+            _source_only_secondary_rule(
+                "behind-enemy-lines-source-each-unit",
+                "your_turn_end",
+                3,
+                5,
+                "each_friendly_non_aircraft_non_battleshocked_unit_wholly_within_opponent_deployment_zone",
+            ),
+        ),
     )
 
 
@@ -1369,12 +1473,19 @@ def _secondary_bring_it_down() -> SourceSecondaryMissionRow:
         availability="both",
         tournament_fixed_allowed=True,
         scoring_rules=(
+            _source_only_secondary_rule(
+                "bring-it-down-when-drawn",
+                "when_drawn",
+                None,
+                None,
+                "may_discard_if_no_enemy_models_w10_or_more_on_battlefield",
+            ),
             _rule(
                 "bring-it-down-fixed",
                 "turn_end",
                 "fixed_secondary",
                 4,
-                None,
+                5,
                 "each_enemy_model_w10_or_more_destroyed_this_turn",
             ),
             _rule(
@@ -1384,6 +1495,72 @@ def _secondary_bring_it_down() -> SourceSecondaryMissionRow:
                 5,
                 5,
                 "each_enemy_model_w10_or_more_destroyed_this_turn",
+            ),
+        ),
+    )
+
+
+def _secondary_burden_of_trust() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="burden-of-trust",
+        name="Burden of Trust",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "burden-of-trust-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                2,
+                5,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "burden-of-trust-guard-selection",
+                "when_drawn_or_start_of_your_turn",
+                None,
+                None,
+                "may_pick_one_friendly_unit_per_objective_to_guard_controlled_objective",
+            ),
+            _source_only_secondary_rule(
+                "burden-of-trust-source-each-guarded-objective",
+                "opponent_turn_end_or_round_five_turn_end",
+                2,
+                5,
+                "each_objective_guarded_by_your_army",
+            ),
+        ),
+    )
+
+
+def _secondary_centre_ground() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="centre-ground",
+        name="Centre Ground",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "centre-ground-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "centre-ground-source-no-enemy-within-three",
+                "your_turn_end",
+                3,
+                None,
+                "friendly_non_aircraft_non_battleshocked_unit_within_3_of_center_and_no_enemy_within_3",
+            ),
+            _source_only_secondary_rule(
+                "centre-ground-source-no-enemy-within-six",
+                "your_turn_end",
+                5,
+                None,
+                "friendly_non_aircraft_non_battleshocked_unit_within_3_of_center_and_no_enemy_within_6",
             ),
         ),
     )
@@ -1441,6 +1618,186 @@ def _secondary_defend_stronghold() -> SourceSecondaryMissionRow:
     )
 
 
+def _secondary_display_of_might() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="display-of-might",
+        name="Display of Might",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "display-of-might-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "display-of-might-source-your-turn",
+                "your_turn_end",
+                2,
+                None,
+                "more_friendly_than_enemy_units_wholly_within_no_mans_land",
+            ),
+            _source_only_secondary_rule(
+                "display-of-might-source-opponent-turn",
+                "opponent_turn_end",
+                5,
+                None,
+                "more_friendly_than_enemy_units_wholly_within_no_mans_land",
+            ),
+        ),
+    )
+
+
+def _secondary_engage_on_all_fronts() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="engage-on-all-fronts",
+        name="Engage on All Fronts",
+        availability="both",
+        tournament_fixed_allowed=True,
+        scoring_rules=(
+            _rule(
+                "engage-on-all-fronts-fixed",
+                "mission_condition_met",
+                "fixed_secondary",
+                4,
+                None,
+                "fixed_secondary_condition",
+            ),
+            _rule(
+                "engage-on-all-fronts-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "engage-on-all-fronts-presence-definition",
+                "definition",
+                None,
+                None,
+                "presence_requires_friendly_non_aircraft_non_battleshocked_unit_wholly_within_quarter_and_more_than_6_from_center",
+            ),
+            _source_only_secondary_rule(
+                "engage-on-all-fronts-fixed-three-quarters",
+                "your_turn_end",
+                2,
+                None,
+                "presence_in_three_table_quarters",
+            ),
+            _source_only_secondary_rule(
+                "engage-on-all-fronts-fixed-four-quarters",
+                "your_turn_end",
+                4,
+                None,
+                "presence_in_four_table_quarters",
+            ),
+            _source_only_secondary_rule(
+                "engage-on-all-fronts-tactical-three-quarters",
+                "your_turn_end",
+                3,
+                None,
+                "presence_in_three_table_quarters",
+            ),
+            _source_only_secondary_rule(
+                "engage-on-all-fronts-tactical-four-quarters",
+                "your_turn_end",
+                5,
+                None,
+                "presence_in_four_table_quarters",
+            ),
+        ),
+    )
+
+
+def _secondary_forward_position() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="forward-position",
+        name="Forward Position",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "forward-position-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "forward-position-when-drawn-first-round",
+                "when_drawn",
+                None,
+                None,
+                "first_battle_round_may_shuffle_card_back_and_draw_one",
+            ),
+            _source_only_secondary_rule(
+                "forward-position-source-control-forward-objective",
+                "your_turn_end",
+                5,
+                None,
+                "control_opponent_home_objective_or_each_expansion_objective",
+            ),
+        ),
+    )
+
+
+def _secondary_no_prisoners() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="no-prisoners",
+        name="No Prisoners",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "no-prisoners-tactical",
+                "turn_end",
+                "tactical_secondary",
+                2,
+                5,
+                "each_enemy_unit_destroyed_this_turn",
+            ),
+        ),
+    )
+
+
+def _secondary_outflank() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="outflank",
+        name="Outflank",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "outflank-tactical",
+                "mission_condition_met",
+                "tactical_secondary",
+                5,
+                None,
+                "tactical_secondary_condition",
+            ),
+            _source_only_secondary_rule(
+                "outflank-source-one-edge",
+                "your_turn_end",
+                3,
+                None,
+                "one_or_more_friendly_non_aircraft_non_battleshocked_units_within_6_of_battlefield_edge_not_within_own_territory",
+            ),
+            _source_only_secondary_rule(
+                "outflank-source-opposite-edges",
+                "your_turn_end",
+                5,
+                None,
+                "two_or_more_friendly_non_aircraft_non_battleshocked_units_within_6_of_opposite_battlefield_edges_with_one_not_within_own_territory",
+            ),
+        ),
+    )
+
+
 def _secondary_overwhelming_force() -> SourceSecondaryMissionRow:
     return SourceSecondaryMissionRow(
         secondary_mission_id="overwhelming-force",
@@ -1454,7 +1811,7 @@ def _secondary_overwhelming_force() -> SourceSecondaryMissionRow:
                 "tactical_secondary",
                 3,
                 5,
-                "each_enemy_unit_started_turn_on_objective_destroyed",
+                "each_enemy_unit_started_turn_in_range_of_objective_destroyed",
             ),
         ),
     )
@@ -1474,6 +1831,25 @@ def _secondary_plunder() -> SourceSecondaryMissionRow:
                 5,
                 None,
                 "one_or_more_terrain_areas_plundered_this_turn",
+            ),
+        ),
+    )
+
+
+def _secondary_secure_no_mans_land() -> SourceSecondaryMissionRow:
+    return SourceSecondaryMissionRow(
+        secondary_mission_id="secure-no-mans-land",
+        name="Secure No Man's Land",
+        availability="tactical",
+        tournament_fixed_allowed=False,
+        scoring_rules=(
+            _rule(
+                "secure-no-mans-land-tactical",
+                "your_turn_end",
+                "tactical_secondary",
+                5,
+                None,
+                "control_two_or_more_no_mans_land_objectives_excluding_home",
             ),
         ),
     )
