@@ -366,19 +366,7 @@ def test_phase17j_primary_source_descriptor_rows_do_not_create_placeholder_scori
         if row.scoring_kind == "event_companion_primary_source_descriptor_only"
     )
 
-    assert descriptor_rows
-    assert all(row.scoring_rules == () for row in descriptor_rows)
-    assert "primary-battlefield-dominance" in {row.primary_mission_id for row in descriptor_rows}
-
-    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
-    setup = MissionSetup.from_mission_pack(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-    with pytest.raises(GameLifecycleError, match="Unsupported primary mission scoring policy"):
-        mission_scoring_policy_from_setup(setup)
+    assert descriptor_rows == ()
 
 
 def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows() -> None:
@@ -394,50 +382,97 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert len(coverage_rows) == 25
     assert status_counts == {
         event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 3,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 9,
-        event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 13,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 22,
+        event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
+    assert {
+        row.primary_mission_id
+        for row in coverage_rows.values()
+        if row.status is event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE
+    } == set()
     assert {
         mission_id: len(primary_rows[mission_id].scoring_rules)
         for mission_id in (
             "primary-unstoppable-force",
+            "primary-battlefield-dominance",
             "primary-meatgrinder",
             "primary-punishment",
             "primary-consecrate",
             "primary-destroyers-wrath",
+            "primary-determined-acquisition",
             "primary-outmaneuver",
             "primary-delaying-action",
+            "primary-locate-and-deny",
             "primary-smoke-and-mirrors",
+            "primary-reconnaissance-sweep",
+            "primary-surveil-the-foe",
             "primary-triangulation",
             "primary-gather-intel",
+            "primary-search-and-scour",
+            "primary-purge-and-secure",
+            "primary-inescapable-dominion",
+            "primary-extract-relic",
+            "primary-sabotage",
+            "primary-secure-asset",
+            "primary-vanguard-operation",
+            "primary-vital-link",
         )
     } == {
         "primary-unstoppable-force": 4,
+        "primary-battlefield-dominance": 3,
         "primary-meatgrinder": 4,
         "primary-punishment": 4,
         "primary-consecrate": 5,
         "primary-destroyers-wrath": 4,
+        "primary-determined-acquisition": 3,
         "primary-outmaneuver": 4,
         "primary-delaying-action": 3,
+        "primary-locate-and-deny": 4,
         "primary-smoke-and-mirrors": 4,
+        "primary-reconnaissance-sweep": 4,
+        "primary-surveil-the-foe": 4,
         "primary-triangulation": 5,
         "primary-gather-intel": 5,
+        "primary-search-and-scour": 4,
+        "primary-purge-and-secure": 4,
+        "primary-inescapable-dominion": 4,
+        "primary-extract-relic": 5,
+        "primary-sabotage": 3,
+        "primary-secure-asset": 4,
+        "primary-vanguard-operation": 4,
+        "primary-vital-link": 5,
     }
     assert primary_rows["primary-meatgrinder"].scoring_kind == (
         "event_companion_primary_source_known_engine_pending"
     )
-    assert coverage_rows["primary-unstoppable-force"].needed_work == ()
-    assert coverage_rows["primary-battlefield-dominance"].needed_work == (
-        "source_primary_scoring_text",
+    assert primary_rows["primary-battlefield-dominance"].scoring_kind == (
+        "event_companion_primary_source_known_engine_pending"
     )
+    assert coverage_rows["primary-unstoppable-force"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
     assert coverage_rows["primary-smoke-and-mirrors"].mission_action_count == 1
     assert coverage_rows["primary-gather-intel"].mission_action_count == 1
+    assert coverage_rows["primary-surveil-the-foe"].mission_action_count == 1
+    assert coverage_rows["primary-locate-and-deny"].mission_action_count == 1
+    assert coverage_rows["primary-extract-relic"].mission_action_count == 1
+    assert coverage_rows["primary-sabotage"].mission_action_count == 1
+    assert coverage_rows["primary-secure-asset"].mission_action_count == 1
+    assert coverage_rows["primary-vanguard-operation"].mission_action_count == 1
+    assert coverage_rows["primary-vital-link"].mission_action_count == 1
     assert "engine_primary_action:decoy-objective" in (
         coverage_rows["primary-smoke-and-mirrors"].needed_work
     )
     assert "engine_primary_action:extract-intelligence" in (
         coverage_rows["primary-gather-intel"].needed_work
+    )
+    assert "engine_primary_action:surveil-enemy-unit" in (
+        coverage_rows["primary-surveil-the-foe"].needed_work
+    )
+    assert "engine_primary_scoring_grammar:cumulative_condition" in (
+        coverage_rows["primary-battlefield-dominance"].needed_work
+    )
+    assert "engine_primary_action:maintain-control" in (
+        coverage_rows["primary-vital-link"].needed_work
     )
     assert "source_objective_role:expansion_objective" in (
         coverage_rows["primary-delaying-action"].needed_work
@@ -451,9 +486,16 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
     mission_pack = warhammer_event_companion_2026_06_mission_pack()
 
     assert set(action_sources) == {
+        "commit-sabotage",
         "decoy-objective",
         "extract-intelligence",
+        "maintain-control",
+        "sensor-sweep-extract-relic",
+        "sensor-sweep-locate-and-deny",
+        "secure-asset",
+        "surveil-enemy-unit",
         "triangulate-objective",
+        "vanguard-operation",
     }
     assert action_sources["decoy-objective"].to_payload() == {
         "mission_action_id": "decoy-objective",
@@ -492,12 +534,54 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
             "gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:extract-intelligence"
         ),
     }
-    with pytest.raises(MissionPackError, match="mission_action_id"):
-        mission_pack.mission_action("decoy-objective")
-    with pytest.raises(MissionPackError, match="mission_action_id"):
-        mission_pack.mission_action("triangulate-objective")
-    with pytest.raises(MissionPackError, match="mission_action_id"):
-        mission_pack.mission_action("extract-intelligence")
+    assert action_sources["surveil-enemy-unit"].to_payload() == {
+        "mission_action_id": "surveil-enemy-unit",
+        "primary_mission_id": "primary-surveil-the-foe",
+        "name": "Surveil the Foe",
+        "start_phase": "shooting",
+        "start_timing": "shooting_phase_action_start",
+        "completion_timing": "immediate",
+        "eligible_unit_policy": "active_player_unit",
+        "target_policy": "visible_enemy_unit_within_18_not_surveilled_this_turn",
+        "use_limit": "unlimited",
+        "effect_descriptor": "enemy_unit_becomes_surveilled_until_turn_end",
+        "engine_exposure_status": "source_known_engine_pending",
+        "source_id": (
+            "gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:surveil-enemy-unit"
+        ),
+    }
+    assert action_sources["sensor-sweep-locate-and-deny"].target_policy == (
+        "operation_marker_requires_more_than_one_marker_remaining"
+    )
+    assert action_sources["sensor-sweep-extract-relic"].effect_descriptor == (
+        "remove_one_opponent_operation_marker_if_action_unit_controls_central_objective_at_turn_end"
+    )
+    assert action_sources["commit-sabotage"].use_limit == (
+        "unlimited_different_objective_per_unit_this_phase"
+    )
+    assert action_sources["secure-asset"].to_payload() == {
+        "mission_action_id": "secure-asset",
+        "primary_mission_id": "primary-secure-asset",
+        "name": "Secure Asset",
+        "start_phase": "shooting",
+        "start_timing": "shooting_phase_action_start",
+        "completion_timing": "turn_end",
+        "eligible_unit_policy": "active_player_unit_within_range_of_non_home_objective",
+        "target_policy": "objective_marker_excluding_home",
+        "use_limit": "once_per_turn",
+        "effect_descriptor": "unit_secures_asset_if_action_unit_controls_target_at_turn_end",
+        "engine_exposure_status": "source_known_engine_pending",
+        "source_id": ("gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:secure-asset"),
+    }
+    assert action_sources["vanguard-operation"].eligible_unit_policy == (
+        "active_player_unit_within_terrain_area_in_enemy_territory"
+    )
+    assert action_sources["maintain-control"].effect_descriptor == (
+        "central_objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end"
+    )
+    for action_id in action_sources:
+        with pytest.raises(MissionPackError, match="mission_action_id"):
+            mission_pack.mission_action(action_id)
 
 
 def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> None:
