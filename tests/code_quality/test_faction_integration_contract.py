@@ -179,6 +179,9 @@ def test_faction_integration_records_phase17g_17h_17i_roadmap_split() -> None:
     assert "detachment rules" in document
     assert "enhancement effects" in document
     assert "Stratagem timing, targeting, validation, and effects" in document
+    assert "source-linked Battle-shock hook bindings" in normalized_document
+    assert "Battle-shock modifier or outcome resolution" in normalized_document
+    assert "execution-status overlay" in normalized_document
     assert "faction army rules load and execute for every faction" in normalized_document
     assert "detachment rules load and execute for every detachment" in normalized_document
 
@@ -259,6 +262,8 @@ def test_faction_integration_links_agent_implementation_contract() -> None:
     assert "Task packets must name the faction or detachment" in document
     assert "remove the generated placeholder marker from implemented files" in normalized_document
     assert "Use existing `RuntimeContentContribution` surfaces" in contract
+    assert "Battle-shock hook bindings" in contract
+    assert "generated Phase 17F execution rows" in contract
     assert "Generated `manifest.py` files are stable aggregators" in contract
     assert "Remove the marker when the file implements source-backed semantics" in contract
     assert "Do not parse raw rule text" in contract

@@ -263,6 +263,160 @@ def _phase16d_catalog(
     )
 
 
+def _daemonic_pact_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    datasheets = (
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-chaos-legionaries",
+            name="Chaos Legionaries",
+            keywords=("Character", "Infantry", "Battleline", "Heretic Astartes"),
+            faction_keywords=("Heretic Astartes",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-bloodletters",
+            name="Bloodletters",
+            keywords=("Infantry", "Battleline", "Khorne"),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-bloodthirster",
+            name="Bloodthirster",
+            keywords=("Character", "Khorne", "Monster"),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-skull-cannon",
+            name="Skull Cannon",
+            keywords=("Khorne", "Vehicle"),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+    )
+    factions = (
+        FactionDefinition(
+            faction_id="chaos-space-marines",
+            name="Chaos Space Marines",
+            faction_keywords=("Heretic Astartes",),
+            source_ids=("phase17g:heretic-astartes",),
+        ),
+        FactionDefinition(
+            faction_id="chaos-daemons",
+            name="Chaos Daemons",
+            faction_keywords=("Legiones Daemonica",),
+            source_ids=("phase17g:legiones-daemonica",),
+        ),
+    )
+    enhancements = (
+        EnhancementDefinition(
+            enhancement_id="phase17g-dark-gift",
+            name="Dark Gift",
+            source_id="phase17g:dark-gift",
+            points=10,
+        ),
+    )
+    detachments = (
+        DetachmentDefinition(
+            detachment_id="phase17g-csm-detachment",
+            name="Phase 17G CSM Detachment",
+            faction_id="chaos-space-marines",
+            detachment_point_cost=1,
+            unit_datasheet_ids=("phase17g-chaos-legionaries",),
+            force_disposition_ids=("phase17g-force",),
+            enhancement_ids=("phase17g-dark-gift",),
+            source_ids=("phase17g:detachment",),
+        ),
+    )
+    return ArmyCatalog(
+        catalog_id="phase17g-daemonic-pact-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="phase17g-daemonic-pact-source",
+        datasheets=datasheets,
+        wargear=base_catalog.wargear,
+        factions=factions,
+        detachments=detachments,
+        enhancements=enhancements,
+        source_ids=("phase17g:daemonic-pact-catalog",),
+    )
+
+
+def _phase17g_datasheet(
+    base_datasheet: DatasheetDefinition,
+    *,
+    datasheet_id: str,
+    name: str,
+    keywords: tuple[str, ...],
+    faction_keywords: tuple[str, ...],
+) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=datasheet_id,
+        name=name,
+        keywords=DatasheetKeywordSet(
+            keywords=keywords,
+            faction_keywords=faction_keywords,
+        ),
+        attachment_eligibilities=(),
+    )
+
+
+def _daemonic_pact_request(
+    catalog: ArmyCatalog,
+    *,
+    unit_points: tuple[RosterUnitPointValue, ...],
+    warlord_selection: WarlordSelection,
+    enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
+) -> ArmyMusterRequest:
+    return _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="chaos-space-marines",
+            detachment_ids=("phase17g-csm-detachment",),
+            enhancement_ids=tuple(
+                assignment.enhancement_id for assignment in enhancement_assignments
+            ),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="legionaries",
+                datasheet_id="phase17g-chaos-legionaries",
+            ),
+            _unit_selection(
+                unit_selection_id="bloodletters",
+                datasheet_id="phase17g-bloodletters",
+            ),
+            _unit_selection(
+                unit_selection_id="bloodthirster",
+                datasheet_id="phase17g-bloodthirster",
+            ),
+            *(
+                (
+                    _unit_selection(
+                        unit_selection_id="skull-cannon",
+                        datasheet_id="phase17g-skull-cannon",
+                    ),
+                )
+                if any(point.unit_selection_id == "skull-cannon" for point in unit_points)
+                else ()
+            ),
+        ),
+        unit_points=unit_points,
+        enhancement_assignments=enhancement_assignments,
+        warlord_selection=warlord_selection,
+    )
+
+
+def _unit_points(unit_selection_id: str, points: int) -> RosterUnitPointValue:
+    return RosterUnitPointValue(
+        unit_selection_id=unit_selection_id,
+        points=points,
+        source_id=f"phase17g:points:{unit_selection_id}",
+    )
+
+
 def _phase16d_transport_roster_request(
     catalog: ArmyCatalog,
     *,
@@ -1092,6 +1246,64 @@ def test_phase16d_strict_roster_reports_missing_source_data_and_unit_limits() ->
     } <= violation_codes
     with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
         muster_army(catalog=catalog, request=request)
+
+
+def test_phase17g_daemonic_pact_allows_legiones_daemonica_allies() -> None:
+    catalog = _daemonic_pact_catalog()
+    request = _daemonic_pact_request(
+        catalog,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("bloodletters", 250),
+            _unit_points("bloodthirster", 250),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="legionaries",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    army = muster_army(catalog=catalog, request=request)
+
+    assert army.roster_legality_report.is_legal
+    assert {unit.datasheet_id for unit in army.units} == {
+        "phase17g-bloodletters",
+        "phase17g-bloodthirster",
+        "phase17g-chaos-legionaries",
+    }
+
+
+def test_phase17g_daemonic_pact_reports_roster_violations() -> None:
+    catalog = _daemonic_pact_catalog()
+    request = _daemonic_pact_request(
+        catalog,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("bloodletters", 250),
+            _unit_points("bloodthirster", 260),
+            _unit_points("skull-cannon", 40),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="phase17g-dark-gift",
+                target_unit_selection_id="bloodthirster",
+                source_id="phase17g:enhancement-assignment",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="bloodthirster",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert {violation.violation_code for violation in report.violations} >= {
+        "daemonic_pact_enhancement_forbidden",
+        "daemonic_pact_god_ratio_exceeded",
+        "daemonic_pact_points_limit_exceeded",
+        "daemonic_pact_warlord_forbidden",
+    }
 
 
 def test_phase16d_enhancement_points_count_toward_strike_force_limit() -> None:

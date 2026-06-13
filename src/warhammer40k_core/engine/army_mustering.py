@@ -10,6 +10,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
 )
 from warhammer40k_core.core.detachment import EnhancementDefinition, EnhancementSubtype
+from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.engine.list_validation import (
@@ -23,6 +24,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelectionPayload,
     battle_size_from_token,
     battle_size_mustering_policy,
+    daemonic_pact_datasheet_allowed_for_faction,
     validate_detachment_selection,
     validate_unit_selection_for_army,
 )
@@ -36,6 +38,13 @@ from warhammer40k_core.engine.unit_factory import (
 
 class ArmyMusteringError(ValueError):
     """Raised when army mustering violates CORE V2 invariants."""
+
+
+DAEMONIC_PACT_SOURCE_ID = "phase17g:chaos-daemons:daemonic-pact"
+DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
+DAEMONIC_PACT_BASE_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
+DAEMONIC_PACT_POINTS_CAP_BY_BATTLE_SIZE = {BattleSize.STRIKE_FORCE: 500}
+DAEMONIC_PACT_GOD_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
 
 
 class ArmyMusterRequestPayload(TypedDict):
@@ -932,6 +941,7 @@ def muster_army(
                 selection=selection,
                 faction=faction,
                 detachment_selection=request.detachment_selection,
+                battle_size=request.battle_size,
             )
             datasheets_by_selection_id[selection.unit_selection_id] = datasheet
             units.append(
@@ -1016,6 +1026,7 @@ def validate_roster_legality(
                     selection=selection,
                     faction=faction,
                     detachment_selection=request.detachment_selection,
+                    battle_size=request.battle_size,
                 )
             )
         except ListValidationError as exc:
@@ -1057,6 +1068,12 @@ def validate_roster_legality(
         ),
         datasheets_by_selection_id=datasheets_by_selection_id,
         enhancement_limit=policy.enhancement_limit,
+        violations=violations,
+    )
+    _append_daemonic_pact_violations(
+        request=request,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
         violations=violations,
     )
     _append_dedicated_transport_manifest_violations(
@@ -1197,7 +1214,16 @@ def _append_warlord_violations(
                 source_id=request.warlord_selection.source_id,
             )
         )
-    if not set(datasheet.keywords.faction_keywords).intersection(faction_keywords):
+    if _is_daemonic_pact_datasheet(datasheet, faction_keywords):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="daemonic_pact_warlord_forbidden",
+                message="Daemonic Pact Legiones Daemonica units cannot be selected as Warlord.",
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=DAEMONIC_PACT_SOURCE_ID,
+            )
+        )
+    elif not set(datasheet.keywords.faction_keywords).intersection(faction_keywords):
         violations.append(
             RosterLegalityViolation(
                 violation_code="warlord_faction_keyword_required",
@@ -1350,6 +1376,165 @@ def _append_enhancement_violations(
                     source_id="phase16d:attached-squad-enhancement-limit",
                 )
             )
+
+
+def _append_daemonic_pact_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    pact_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id, datasheet in datasheets_by_selection_id.items()
+            if _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords)
+        )
+    )
+    if not pact_selection_ids:
+        return
+    if not any(
+        daemonic_pact_datasheet_allowed_for_faction(
+            datasheet=datasheets_by_selection_id[selection_id],
+            faction=faction,
+        )
+        for selection_id in pact_selection_ids
+    ):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="daemonic_pact_base_faction_required",
+                message=("Daemonic Pact requires a Chaos Knights or Heretic Astartes base army."),
+                unit_selection_id=pact_selection_ids[0],
+                source_id=DAEMONIC_PACT_SOURCE_ID,
+            )
+        )
+    _append_daemonic_pact_base_model_violations(
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    _append_daemonic_pact_points_violation(
+        request=request,
+        pact_selection_ids=pact_selection_ids,
+        violations=violations,
+    )
+    _append_daemonic_pact_enhancement_violations(
+        request=request,
+        pact_selection_ids=pact_selection_ids,
+        violations=violations,
+    )
+    _append_daemonic_pact_god_ratio_violations(
+        pact_selection_ids=pact_selection_ids,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+
+
+def _append_daemonic_pact_base_model_violations(
+    *,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    invalid_base_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id, datasheet in datasheets_by_selection_id.items()
+            if not _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords)
+            and not _datasheet_has_any_keyword(datasheet, DAEMONIC_PACT_BASE_KEYWORDS)
+        )
+    )
+    if invalid_base_selection_ids:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="daemonic_pact_base_model_keyword_required",
+                message=(
+                    "Every non-Daemonic Pact model must have the Chaos Knights "
+                    "or Heretic Astartes keyword."
+                ),
+                unit_selection_id=invalid_base_selection_ids[0],
+                source_id=DAEMONIC_PACT_SOURCE_ID,
+            )
+        )
+
+
+def _append_daemonic_pact_points_violation(
+    *,
+    request: ArmyMusterRequest,
+    pact_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    points_by_selection_id = {point.unit_selection_id: point for point in request.unit_points}
+    cap = DAEMONIC_PACT_POINTS_CAP_BY_BATTLE_SIZE.get(request.battle_size)
+    if cap is None:
+        raise ArmyMusteringError("Daemonic Pact points cap is unavailable for battle size.")
+    total = sum(
+        points_by_selection_id[selection_id].points
+        for selection_id in pact_selection_ids
+        if selection_id in points_by_selection_id
+    )
+    if total > cap:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="daemonic_pact_points_limit_exceeded",
+                message="Daemonic Pact Legiones Daemonica units exceed the battle-size limit.",
+                unit_selection_id=pact_selection_ids[0],
+                source_id=DAEMONIC_PACT_SOURCE_ID,
+            )
+        )
+
+
+def _append_daemonic_pact_enhancement_violations(
+    *,
+    request: ArmyMusterRequest,
+    pact_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    pact_selection_id_set = set(pact_selection_ids)
+    for assignment in request.enhancement_assignments:
+        if assignment.target_unit_selection_id not in pact_selection_id_set:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="daemonic_pact_enhancement_forbidden",
+                message="Daemonic Pact Legiones Daemonica units cannot receive Enhancements.",
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=assignment.source_id,
+            )
+        )
+
+
+def _append_daemonic_pact_god_ratio_violations(
+    *,
+    pact_selection_ids: tuple[str, ...],
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    for god_keyword in DAEMONIC_PACT_GOD_KEYWORDS:
+        battleline_count = 0
+        non_battleline_selection_ids: list[str] = []
+        for selection_id in pact_selection_ids:
+            datasheet = datasheets_by_selection_id[selection_id]
+            if not _datasheet_has_keyword(datasheet, god_keyword):
+                continue
+            if _datasheet_has_keyword(datasheet, "BATTLELINE"):
+                battleline_count += 1
+            else:
+                non_battleline_selection_ids.append(selection_id)
+        if len(non_battleline_selection_ids) <= battleline_count:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="daemonic_pact_god_ratio_exceeded",
+                message=(
+                    "Daemonic Pact non-Battleline god-marked units cannot exceed "
+                    "Battleline units with the same god keyword."
+                ),
+                unit_selection_id=sorted(non_battleline_selection_ids)[0],
+                source_id=f"{DAEMONIC_PACT_SOURCE_ID}:{_canonical_keyword(god_keyword).lower()}",
+            )
+        )
 
 
 def _append_dedicated_transport_manifest_violations(
@@ -1563,6 +1748,41 @@ def _datasheet_has_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool
     return requested_keyword in {
         _canonical_keyword(stored_keyword) for stored_keyword in datasheet.keywords.keywords
     }
+
+
+def _datasheet_has_faction_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool:
+    requested_keyword = _canonical_keyword(keyword)
+    return requested_keyword in {
+        _canonical_keyword(stored_keyword) for stored_keyword in datasheet.keywords.faction_keywords
+    }
+
+
+def _datasheet_has_any_keyword(
+    datasheet: DatasheetDefinition,
+    keywords: frozenset[str],
+) -> bool:
+    requested_keywords = {_canonical_keyword(keyword) for keyword in keywords}
+    stored_keywords = {
+        _canonical_keyword(stored_keyword)
+        for stored_keyword in (
+            *datasheet.keywords.keywords,
+            *datasheet.keywords.faction_keywords,
+        )
+    }
+    return bool(requested_keywords & stored_keywords)
+
+
+def _is_daemonic_pact_datasheet(
+    datasheet: DatasheetDefinition,
+    selected_faction_keywords: tuple[str, ...],
+) -> bool:
+    if not _datasheet_has_faction_keyword(datasheet, DAEMONIC_PACT_FACTION_KEYWORD):
+        return False
+    selected_keywords = {_canonical_keyword(keyword) for keyword in selected_faction_keywords}
+    datasheet_faction_keywords = {
+        _canonical_keyword(keyword) for keyword in datasheet.keywords.faction_keywords
+    }
+    return not bool(selected_keywords & datasheet_faction_keywords)
 
 
 def _enhancement_is_upgrade(enhancement: EnhancementDefinition) -> bool:

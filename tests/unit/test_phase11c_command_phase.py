@@ -8,7 +8,13 @@ import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    DiceRollState,
+    ModifiedRollResult,
+    UnmodifiedRollResult,
+)
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -1693,6 +1699,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             result_id="bad-request",
             request=cast(Any, object()),
             roll_state=failed_roll,
+            modified_roll=_modified_roll_from_state(failed_roll),
             total=failed_roll.current_total,
             leadership_target=request.leadership_target,
             passed=False,
@@ -1702,6 +1709,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             result_id="bad-roll-state",
             request=request,
             roll_state=cast(Any, object()),
+            modified_roll=_modified_roll_from_state(failed_roll),
             total=failed_roll.current_total,
             leadership_target=request.leadership_target,
             passed=False,
@@ -1711,6 +1719,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             result_id="bad-spec-drift",
             request=request,
             roll_state=wrong_spec_roll,
+            modified_roll=_modified_roll_from_state(wrong_spec_roll),
             total=wrong_spec_roll.current_total,
             leadership_target=request.leadership_target,
             passed=False,
@@ -1720,6 +1729,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             result_id="bad-total",
             request=request,
             roll_state=failed_roll,
+            modified_roll=_modified_roll_from_state(failed_roll),
             total=failed_roll.current_total + 1,
             leadership_target=request.leadership_target,
             passed=False,
@@ -1729,6 +1739,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             result_id="bad-leadership",
             request=request,
             roll_state=failed_roll,
+            modified_roll=_modified_roll_from_state(failed_roll),
             total=failed_roll.current_total,
             leadership_target=request.leadership_target + 1,
             passed=False,
@@ -1738,6 +1749,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             result_id="bad-passed-type",
             request=request,
             roll_state=failed_roll,
+            modified_roll=_modified_roll_from_state(failed_roll),
             total=failed_roll.current_total,
             leadership_target=request.leadership_target,
             passed=cast(Any, "no"),
@@ -1747,6 +1759,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             result_id="bad-passed-drift",
             request=request,
             roll_state=failed_roll,
+            modified_roll=_modified_roll_from_state(failed_roll),
             total=failed_roll.current_total,
             leadership_target=request.leadership_target,
             passed=True,
@@ -1950,6 +1963,10 @@ def _battle_shock_request_for_unit(
         leadership_target=6,
         below_half_strength_context=context,
     )
+
+
+def _modified_roll_from_state(roll_state: DiceRollState) -> ModifiedRollResult:
+    return ModifiedRollResult.from_unmodified(UnmodifiedRollResult.from_state(roll_state))
 
 
 def _battle_state_with_center_objective_positions(
