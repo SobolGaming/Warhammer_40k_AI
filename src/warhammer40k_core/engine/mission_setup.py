@@ -4,14 +4,20 @@ import math
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.battlefield_regions import (
+    BattlefieldRegion,
+    BattlefieldRegionPayload,
+)
 from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZonePayload
 from warhammer40k_core.core.missions import (
+    BattlefieldLayoutDefinition,
     DeploymentMapDefinition,
     MissionPackDefinition,
     MissionPoolEntry,
     ObjectiveMarkerDefinition,
     ObjectiveMarkerDefinitionPayload,
 )
+from warhammer40k_core.core.terrain_areas import PlacedTerrainArea, PlacedTerrainAreaPayload
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureTemplate,
     TerrainFloorTemplate,
@@ -33,6 +39,7 @@ class MissionSetupPayload(TypedDict):
     source_id: str
     mission_pool_entry_id: str
     primary_mission_id: str
+    battlefield_layout_id: str | None
     deployment_map_id: str
     terrain_layout_id: str
     attacker_player_id: str
@@ -41,6 +48,8 @@ class MissionSetupPayload(TypedDict):
     battlefield_depth_inches: float
     objective_markers: list[ObjectiveMarkerDefinitionPayload]
     deployment_zones: list[DeploymentZonePayload]
+    battlefield_regions: list[BattlefieldRegionPayload]
+    terrain_areas: list[PlacedTerrainAreaPayload]
     terrain_features: list[TerrainFeatureDefinitionPayload]
 
 
@@ -55,6 +64,7 @@ class MissionSetup:
     source_id: str
     mission_pool_entry_id: str
     primary_mission_id: str
+    battlefield_layout_id: str | None
     deployment_map_id: str
     terrain_layout_id: str
     attacker_player_id: str
@@ -63,6 +73,8 @@ class MissionSetup:
     battlefield_depth_inches: float
     objective_markers: tuple[ObjectiveMarkerDefinition, ...]
     deployment_zones: tuple[DeploymentZone, ...]
+    battlefield_regions: tuple[BattlefieldRegion, ...]
+    terrain_areas: tuple[PlacedTerrainArea, ...]
     terrain_features: tuple[TerrainFeatureDefinition, ...]
 
     def __post_init__(self) -> None:
@@ -93,6 +105,14 @@ class MissionSetup:
             self,
             "primary_mission_id",
             _validate_identifier("MissionSetup primary_mission_id", self.primary_mission_id),
+        )
+        object.__setattr__(
+            self,
+            "battlefield_layout_id",
+            _validate_optional_identifier(
+                "MissionSetup battlefield_layout_id",
+                self.battlefield_layout_id,
+            ),
         )
         object.__setattr__(
             self,
@@ -128,6 +148,8 @@ class MissionSetup:
         )
         markers = _validate_objective_markers(self.objective_markers)
         zones = _validate_deployment_zones(self.deployment_zones)
+        regions = _validate_battlefield_regions(self.battlefield_regions)
+        terrain_areas = _validate_terrain_areas(self.terrain_areas)
         features = _validate_terrain_features(self.terrain_features)
         _validate_markers_within_battlefield(
             markers=markers,
@@ -139,6 +161,16 @@ class MissionSetup:
             width=self.battlefield_width_inches,
             depth=self.battlefield_depth_inches,
         )
+        _validate_battlefield_regions_within_battlefield(
+            regions=regions,
+            width=self.battlefield_width_inches,
+            depth=self.battlefield_depth_inches,
+        )
+        _validate_terrain_areas_within_battlefield(
+            terrain_areas=terrain_areas,
+            width=self.battlefield_width_inches,
+            depth=self.battlefield_depth_inches,
+        )
         _validate_terrain_features_within_battlefield(
             features=features,
             width=self.battlefield_width_inches,
@@ -146,6 +178,8 @@ class MissionSetup:
         )
         object.__setattr__(self, "objective_markers", markers)
         object.__setattr__(self, "deployment_zones", zones)
+        object.__setattr__(self, "battlefield_regions", regions)
+        object.__setattr__(self, "terrain_areas", terrain_areas)
         object.__setattr__(self, "terrain_features", features)
 
     @classmethod
@@ -178,12 +212,18 @@ class MissionSetup:
             raise MissionSetupError("Terrain layout is not legal for the mission pool entry.")
         deployment_map = mission_pack.deployment_map(pool_entry.deployment_map_id)
         terrain_layout = mission_pack.terrain_layout_template(selected_terrain_layout_id)
+        battlefield_layout = _battlefield_layout_for_components(
+            mission_pack=mission_pack,
+            deployment_map=deployment_map,
+            terrain_layout=terrain_layout,
+        )
         return cls.from_components(
             mission_pack=mission_pack,
             mission_pool_entry_id=pool_entry.mission_pool_entry_id,
             primary_mission_id=pool_entry.primary_mission_id,
             deployment_map=deployment_map,
             terrain_layout=terrain_layout,
+            battlefield_layout=battlefield_layout,
             attacker_player_id=attacker_player_id,
             defender_player_id=defender_player_id,
         )
@@ -197,6 +237,7 @@ class MissionSetup:
         primary_mission_id: str,
         deployment_map: DeploymentMapDefinition,
         terrain_layout: TerrainLayoutTemplate,
+        battlefield_layout: BattlefieldLayoutDefinition | None = None,
         attacker_player_id: str,
         defender_player_id: str,
     ) -> Self:
@@ -206,6 +247,13 @@ class MissionSetup:
             raise MissionSetupError("deployment_map must be a DeploymentMapDefinition.")
         if type(terrain_layout) is not TerrainLayoutTemplate:
             raise MissionSetupError("terrain_layout must be a TerrainLayoutTemplate.")
+        if (
+            battlefield_layout is not None
+            and type(battlefield_layout) is not BattlefieldLayoutDefinition
+        ):
+            raise MissionSetupError(
+                "battlefield_layout must be a BattlefieldLayoutDefinition or None."
+            )
         pool_entry = _mission_pool_entry_for_components(
             mission_pack=mission_pack,
             mission_pool_entry_id=mission_pool_entry_id,
@@ -217,23 +265,57 @@ class MissionSetup:
             raise MissionSetupError("Deployment map and terrain layout battlefield widths differ.")
         if deployment_map.battlefield_depth_inches != terrain_layout.battlefield_depth_inches:
             raise MissionSetupError("Deployment map and terrain layout battlefield depths differ.")
+        if battlefield_layout is None:
+            battlefield_layout = _battlefield_layout_for_components(
+                mission_pack=mission_pack,
+                deployment_map=deployment_map,
+                terrain_layout=terrain_layout,
+            )
+        if battlefield_layout is not None:
+            _validate_battlefield_layout_matches_components(
+                mission_pack=mission_pack,
+                battlefield_layout=battlefield_layout,
+                deployment_map=deployment_map,
+                terrain_layout=terrain_layout,
+            )
+        objective_markers = (
+            deployment_map.objective_markers
+            if battlefield_layout is None
+            else battlefield_layout.objective_markers
+        )
+        deployment_zones = (
+            deployment_map.deployment_zones_for_players(
+                attacker_player_id=attacker_player_id,
+                defender_player_id=defender_player_id,
+            )
+            if battlefield_layout is None
+            else _deployment_zones_for_players(
+                battlefield_layout.deployment_zones,
+                attacker_player_id=attacker_player_id,
+                defender_player_id=defender_player_id,
+            )
+        )
         return cls(
             mission_pack_id=mission_pack.mission_pack_id,
             source_version=mission_pack.source_version,
             source_id=mission_pack.source_id,
             mission_pool_entry_id=pool_entry.mission_pool_entry_id,
             primary_mission_id=pool_entry.primary_mission_id,
+            battlefield_layout_id=(
+                None if battlefield_layout is None else battlefield_layout.battlefield_layout_id
+            ),
             deployment_map_id=deployment_map.deployment_map_id,
             terrain_layout_id=terrain_layout.terrain_layout_id,
             attacker_player_id=attacker_player_id,
             defender_player_id=defender_player_id,
             battlefield_width_inches=deployment_map.battlefield_width_inches,
             battlefield_depth_inches=deployment_map.battlefield_depth_inches,
-            objective_markers=deployment_map.objective_markers,
-            deployment_zones=deployment_map.deployment_zones_for_players(
-                attacker_player_id=attacker_player_id,
-                defender_player_id=defender_player_id,
+            objective_markers=objective_markers,
+            deployment_zones=deployment_zones,
+            battlefield_regions=(
+                () if battlefield_layout is None else battlefield_layout.battlefield_regions
             ),
+            terrain_areas=(() if battlefield_layout is None else battlefield_layout.terrain_areas),
             terrain_features=instantiate_terrain_layout_template(terrain_layout),
         )
 
@@ -252,6 +334,7 @@ class MissionSetup:
             "source_id": self.source_id,
             "mission_pool_entry_id": self.mission_pool_entry_id,
             "primary_mission_id": self.primary_mission_id,
+            "battlefield_layout_id": self.battlefield_layout_id,
             "deployment_map_id": self.deployment_map_id,
             "terrain_layout_id": self.terrain_layout_id,
             "attacker_player_id": self.attacker_player_id,
@@ -260,6 +343,8 @@ class MissionSetup:
             "battlefield_depth_inches": self.battlefield_depth_inches,
             "objective_markers": [marker.to_payload() for marker in self.objective_markers],
             "deployment_zones": [zone.to_payload() for zone in self.deployment_zones],
+            "battlefield_regions": [region.to_payload() for region in self.battlefield_regions],
+            "terrain_areas": [area.to_payload() for area in self.terrain_areas],
             "terrain_features": [feature.to_payload() for feature in self.terrain_features],
         }
 
@@ -271,6 +356,7 @@ class MissionSetup:
             source_id=payload["source_id"],
             mission_pool_entry_id=payload["mission_pool_entry_id"],
             primary_mission_id=payload["primary_mission_id"],
+            battlefield_layout_id=payload["battlefield_layout_id"],
             deployment_map_id=payload["deployment_map_id"],
             terrain_layout_id=payload["terrain_layout_id"],
             attacker_player_id=payload["attacker_player_id"],
@@ -283,6 +369,12 @@ class MissionSetup:
             ),
             deployment_zones=tuple(
                 DeploymentZone.from_payload(zone) for zone in payload["deployment_zones"]
+            ),
+            battlefield_regions=tuple(
+                BattlefieldRegion.from_payload(region) for region in payload["battlefield_regions"]
+            ),
+            terrain_areas=tuple(
+                PlacedTerrainArea.from_payload(area) for area in payload["terrain_areas"]
             ),
             terrain_features=tuple(
                 TerrainFeatureDefinition.from_payload(feature)
@@ -444,6 +536,72 @@ def _validate_component_belongs_to_mission_pack(
         raise MissionSetupError("Terrain layout payload does not match the mission pack source.")
 
 
+def _battlefield_layout_for_components(
+    *,
+    mission_pack: MissionPackDefinition,
+    deployment_map: DeploymentMapDefinition,
+    terrain_layout: TerrainLayoutTemplate,
+) -> BattlefieldLayoutDefinition | None:
+    matches = [
+        layout
+        for layout in mission_pack.battlefield_layouts
+        if layout.deployment_map_id == deployment_map.deployment_map_id
+        and layout.terrain_layout_id == terrain_layout.terrain_layout_id
+    ]
+    if not matches:
+        return None
+    if len(matches) > 1:
+        raise MissionSetupError("Mission setup components match multiple battlefield layouts.")
+    return matches[0]
+
+
+def _validate_battlefield_layout_matches_components(
+    *,
+    mission_pack: MissionPackDefinition,
+    battlefield_layout: BattlefieldLayoutDefinition,
+    deployment_map: DeploymentMapDefinition,
+    terrain_layout: TerrainLayoutTemplate,
+) -> None:
+    source_layout = next(
+        (
+            candidate
+            for candidate in mission_pack.battlefield_layouts
+            if candidate.battlefield_layout_id == battlefield_layout.battlefield_layout_id
+        ),
+        None,
+    )
+    if source_layout is None:
+        raise MissionSetupError("Battlefield layout is not present in the mission pack.")
+    if source_layout.to_payload() != battlefield_layout.to_payload():
+        raise MissionSetupError(
+            "Battlefield layout payload does not match the mission pack source."
+        )
+    if battlefield_layout.deployment_map_id != deployment_map.deployment_map_id:
+        raise MissionSetupError("Battlefield layout and deployment map IDs differ.")
+    if battlefield_layout.terrain_layout_id != terrain_layout.terrain_layout_id:
+        raise MissionSetupError("Battlefield layout and terrain layout IDs differ.")
+    if battlefield_layout.battlefield_width_inches != deployment_map.battlefield_width_inches:
+        raise MissionSetupError("Battlefield layout and deployment map widths differ.")
+    if battlefield_layout.battlefield_depth_inches != deployment_map.battlefield_depth_inches:
+        raise MissionSetupError("Battlefield layout and deployment map depths differ.")
+    if battlefield_layout.battlefield_width_inches != terrain_layout.battlefield_width_inches:
+        raise MissionSetupError("Battlefield layout and terrain layout widths differ.")
+    if battlefield_layout.battlefield_depth_inches != terrain_layout.battlefield_depth_inches:
+        raise MissionSetupError("Battlefield layout and terrain layout depths differ.")
+    if _objective_marker_payloads(battlefield_layout.objective_markers) != (
+        _objective_marker_payloads(deployment_map.objective_markers)
+    ):
+        raise MissionSetupError(
+            "Battlefield layout objective markers do not match the deployment map."
+        )
+    if _deployment_zone_payloads(battlefield_layout.deployment_zones) != _deployment_zone_payloads(
+        deployment_map.deployment_zones
+    ):
+        raise MissionSetupError(
+            "Battlefield layout deployment zones do not match the deployment map."
+        )
+
+
 def _mission_pool_entry_matches_components(
     *,
     entry: MissionPoolEntry,
@@ -494,6 +652,43 @@ def _validate_deployment_zones(values: object) -> tuple[DeploymentZone, ...]:
     return tuple(sorted(zones, key=lambda zone: zone.deployment_zone_id))
 
 
+def _deployment_zones_for_players(
+    zones: tuple[DeploymentZone, ...],
+    *,
+    attacker_player_id: str,
+    defender_player_id: str,
+) -> tuple[DeploymentZone, ...]:
+    attacker = _validate_identifier("attacker_player_id", attacker_player_id)
+    defender = _validate_identifier("defender_player_id", defender_player_id)
+    if attacker == defender:
+        raise MissionSetupError("Attacker and defender player IDs must differ.")
+    assigned_zones: list[DeploymentZone] = []
+    for zone in zones:
+        if zone.player_id == "attacker":
+            assigned_zones.append(zone.with_player_id(attacker))
+        elif zone.player_id == "defender":
+            assigned_zones.append(zone.with_player_id(defender))
+        else:
+            assigned_zones.append(zone)
+    return tuple(sorted(assigned_zones, key=lambda item: item.deployment_zone_id))
+
+
+def _objective_marker_payloads(
+    markers: tuple[ObjectiveMarkerDefinition, ...],
+) -> tuple[ObjectiveMarkerDefinitionPayload, ...]:
+    return tuple(
+        marker.to_payload() for marker in sorted(markers, key=lambda item: item.objective_marker_id)
+    )
+
+
+def _deployment_zone_payloads(
+    zones: tuple[DeploymentZone, ...],
+) -> tuple[DeploymentZonePayload, ...]:
+    return tuple(
+        zone.to_payload() for zone in sorted(zones, key=lambda item: item.deployment_zone_id)
+    )
+
+
 def _validate_terrain_features(
     values: object,
 ) -> tuple[TerrainFeatureDefinition, ...]:
@@ -511,6 +706,40 @@ def _validate_terrain_features(
         seen.add(value.feature_id)
         features.append(value)
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _validate_battlefield_regions(values: object) -> tuple[BattlefieldRegion, ...]:
+    if type(values) is not tuple:
+        raise MissionSetupError("MissionSetup battlefield_regions must be a tuple.")
+    regions: list[BattlefieldRegion] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not BattlefieldRegion:
+            raise MissionSetupError(
+                "MissionSetup battlefield_regions must contain BattlefieldRegion values."
+            )
+        if value.region_id in seen:
+            raise MissionSetupError("MissionSetup battlefield_regions must not contain duplicates.")
+        seen.add(value.region_id)
+        regions.append(value)
+    return tuple(sorted(regions, key=lambda region: region.region_id))
+
+
+def _validate_terrain_areas(values: object) -> tuple[PlacedTerrainArea, ...]:
+    if type(values) is not tuple:
+        raise MissionSetupError("MissionSetup terrain_areas must be a tuple.")
+    terrain_areas: list[PlacedTerrainArea] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PlacedTerrainArea:
+            raise MissionSetupError(
+                "MissionSetup terrain_areas must contain PlacedTerrainArea values."
+            )
+        if value.terrain_area_id in seen:
+            raise MissionSetupError("MissionSetup terrain_areas must not contain duplicates.")
+        seen.add(value.terrain_area_id)
+        terrain_areas.append(value)
+    return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
 
 
 def _validate_markers_within_battlefield(
@@ -553,6 +782,31 @@ def _validate_terrain_features_within_battlefield(
             raise MissionSetupError("MissionSetup terrain feature y is outside the battlefield.")
 
 
+def _validate_battlefield_regions_within_battlefield(
+    *,
+    regions: tuple[BattlefieldRegion, ...],
+    width: float,
+    depth: float,
+) -> None:
+    for region in regions:
+        min_x, min_y, max_x, max_y = region.bounds()
+        if min_x < 0.0 or max_x > width:
+            raise MissionSetupError("MissionSetup battlefield region x is outside the battlefield.")
+        if min_y < 0.0 or max_y > depth:
+            raise MissionSetupError("MissionSetup battlefield region y is outside the battlefield.")
+
+
+def _validate_terrain_areas_within_battlefield(
+    *,
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+    width: float,
+    depth: float,
+) -> None:
+    for terrain_area in terrain_areas:
+        if not terrain_area.is_within_battlefield(width=width, depth=depth):
+            raise MissionSetupError("MissionSetup terrain area is outside the battlefield.")
+
+
 def _validate_identifier(field_name: str, value: object) -> str:
     if type(value) is not str:
         raise MissionSetupError(f"{field_name} must be a string.")
@@ -560,6 +814,12 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise MissionSetupError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
 
 
 def _validate_positive_number(field_name: str, value: object) -> float:

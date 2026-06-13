@@ -12,7 +12,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetWargearOption
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec, DiceRollState
-from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
+from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.modifiers import ModifierStack, RollModifier
 from warhammer40k_core.core.ruleset_descriptor import (
     CoverEffect,
@@ -14619,6 +14619,7 @@ def _mission_setup() -> MissionSetup:
         source_id=mission_pack.source_id,
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         primary_mission_id="take-and-hold",
+        battlefield_layout_id=None,
         deployment_map_id="phase13b-open-map",
         terrain_layout_id="phase13b-open-layout",
         attacker_player_id="player-a",
@@ -14629,12 +14630,15 @@ def _mission_setup() -> MissionSetup:
             ObjectiveMarkerDefinition(
                 objective_marker_id="phase13b-remote-objective",
                 name="Phase 13B Remote Objective",
+                objective_role=ObjectiveMarkerRole.CENTRAL,
                 x_inches=95.0,
                 y_inches=55.0,
                 source_id="phase13b-test",
             ),
         ),
         deployment_zones=(),
+        battlefield_regions=(),
+        terrain_areas=(),
         terrain_features=(),
     )
 
