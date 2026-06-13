@@ -1,16 +1,23 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
+from dataclasses import replace
 from typing import cast
 
 import pytest
 
+from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
 from warhammer40k_core.core.missions import (
+    BattlefieldLayoutDefinition,
     MissionPackDefinition,
     MissionPackDefinitionPayload,
     MissionPackError,
     MissionSourcePackageDefinition,
     MissionSourceStatus,
+    ObjectiveMarkerDefinitionPayload,
+    ObjectiveMarkerRole,
+    objective_marker_role_from_token,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import (
@@ -163,6 +170,8 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         for cell in mission_pack.primary_mission_matrix_cells
     )
     assert len(layout_ids) == 45
+    assert len(mission_pack.battlefield_layouts) == 2
+    assert len(mission_pack.terrain_area_footprint_templates) == 5
     assert len(deployment_map_ids) == 45
     assert len(mission_pack.mission_pool_entries) == 45
     assert pool_layout_ids == layout_ids
@@ -182,11 +191,23 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
             attacker_player_id="player-alpha",
             defender_player_id="player-beta",
         )
-        assert setup.battlefield_width_inches == 60.0
-        assert setup.battlefield_depth_inches == 44.0
+        assert setup.battlefield_width_inches == 44.0
+        assert setup.battlefield_depth_inches == 60.0
+        if entry.terrain_layout_ids[0] in {
+            "take-and-hold-vs-take-and-hold-layout-1",
+            "take-and-hold-vs-take-and-hold-layout-2",
+        }:
+            assert setup.battlefield_layout_id == entry.terrain_layout_ids[0]
+            assert setup.terrain_features == ()
+            assert len(setup.terrain_areas) == 16
+            assert len(setup.battlefield_regions) == 5
+        else:
+            assert setup.battlefield_layout_id is None
+            assert setup.terrain_areas == ()
+            assert setup.battlefield_regions == ()
+            assert setup.terrain_features
         assert len(setup.objective_markers) == 5
         assert len(setup.deployment_zones) == 2
-        assert setup.terrain_features
 
 
 def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_order() -> None:
@@ -264,12 +285,26 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
 
 def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> None:
     descriptors = event_source.layout_descriptor_rows()
+    layout_a = _layout_descriptor("take-and-hold", "take-and-hold", "a")
+    layout_b = _layout_descriptor("take-and-hold", "take-and-hold", "b")
+    extracted_layout_ids = {layout_a.layout_id, layout_b.layout_id}
+    pending_descriptors = tuple(
+        descriptor for descriptor in descriptors if descriptor.layout_id not in extracted_layout_ids
+    )
 
     assert len(descriptors) == 45
     assert {descriptor.layout_variant for descriptor in descriptors} == {"a", "b", "c"}
     assert {descriptor.source_page for descriptor in descriptors} == set(range(9, 54))
-    assert all(descriptor.battlefield_width_inches == 60.0 for descriptor in descriptors)
-    assert all(descriptor.battlefield_depth_inches == 44.0 for descriptor in descriptors)
+    assert layout_a.battlefield_width_inches == 44.0
+    assert layout_a.battlefield_depth_inches == 60.0
+    assert layout_a.attacker_edge == "north"
+    assert layout_a.defender_edge == "south"
+    assert layout_b.battlefield_width_inches == 44.0
+    assert layout_b.battlefield_depth_inches == 60.0
+    assert layout_b.attacker_edge == "west"
+    assert layout_b.defender_edge == "east"
+    assert all(descriptor.battlefield_width_inches == 44.0 for descriptor in pending_descriptors)
+    assert all(descriptor.battlefield_depth_inches == 60.0 for descriptor in pending_descriptors)
     assert all(len(descriptor.deployment_zone_polygons) == 2 for descriptor in descriptors)
     assert all(len(descriptor.player_territory_polygons) == 2 for descriptor in descriptors)
     assert all(len(descriptor.objective_points) == 5 for descriptor in descriptors)
@@ -278,14 +313,17 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
         for descriptor in descriptors
     )
     assert all(
-        objective.objective_kind in {"attacker_home", "defender_home", "center", "central"}
+        objective.objective_kind
+        in {"attacker_home", "defender_home", "center", "central", "expansion"}
         for descriptor in descriptors
         for objective in descriptor.objective_points
     )
+    assert layout_a.geometry_extraction_status == "layout_geometry_extracted"
+    assert layout_b.geometry_extraction_status == "layout_geometry_extracted"
     assert all(
         descriptor.geometry_extraction_status
         == "layout_identity_source_page_bound_coordinates_pending"
-        for descriptor in descriptors
+        for descriptor in pending_descriptors
     )
     assert _layout_descriptor("take-and-hold", "disruption", "a").source_page == 15
     assert _layout_descriptor("take-and-hold", "reconnaissance", "a").source_page == 18
@@ -293,10 +331,271 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
     assert _layout_descriptor("disruption", "reconnaissance", "a").source_page == 39
     assert _layout_descriptor("disruption", "priority-assets", "a").source_page == 42
     assert _layout_descriptor("reconnaissance", "priority-assets", "a").source_page == 48
+    assert (
+        next(
+            row
+            for row in event_source.battlefield_layout_rows()
+            if row.battlefield_layout_id == layout_a.layout_id
+        ).source_status
+        == "event_companion_layout_geometry_extracted"
+    )
+    assert (
+        next(
+            row
+            for row in event_source.battlefield_layout_rows()
+            if row.battlefield_layout_id == layout_b.layout_id
+        ).source_status
+        == "event_companion_layout_geometry_extracted"
+    )
     assert all(
         row.source_status.endswith("layout_identity_coordinate_extraction_pending")
         for row in event_source.battlefield_layout_rows()
+        if row.battlefield_layout_id not in extracted_layout_ids
     )
+
+
+def test_phase17j_take_and_hold_layout_a_encodes_terrain_areas_and_regions() -> None:
+    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
+    terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
+    deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+
+    assert layout.name == "Take and Hold vs Take and Hold - Battlefield Dominance - Layout A"
+    assert layout.battlefield_width_inches == 44.0
+    assert layout.battlefield_depth_inches == 60.0
+    assert layout.coordinate_origin == "bottom_left"
+    assert layout.attacker_edge == "north"
+    assert layout.defender_edge == "south"
+    assert terrain_layout.terrain_features == ()
+    assert setup.battlefield_layout_id == layout.battlefield_layout_id
+    assert setup.terrain_features == ()
+    assert len(setup.terrain_areas) == 16
+    assert len(setup.battlefield_regions) == 5
+    assert deployment_map.battlefield_width_inches == layout.battlefield_width_inches
+    assert deployment_map.battlefield_depth_inches == layout.battlefield_depth_inches
+
+    assert Counter(area.footprint_template_id for area in layout.terrain_areas) == {
+        "FOOTPRINT_6X4": 4,
+        "FOOTPRINT_10X2_5": 2,
+        "FOOTPRINT_6X2": 4,
+        "FOOTPRINT_7X11_5": 4,
+        "FOOTPRINT_8X11_5_POLYGON": 2,
+    }
+    assert len(layout.terrain_areas) == 16
+    assert sum(area.source_transform == "explicit" for area in layout.terrain_areas) == 8
+    assert (
+        sum(area.source_transform.startswith("mirrored_from:") for area in layout.terrain_areas)
+        == 8
+    )
+    assert all(
+        0.0 <= point.x_inches <= 44.0 and 0.0 <= point.y_inches <= 60.0
+        for area in layout.terrain_areas
+        for point in area.footprint_polygon
+    )
+
+    assert Counter(marker.objective_role.value for marker in layout.objective_markers) == {
+        "attacker_home": 1,
+        "defender_home": 1,
+        "central": 1,
+        "expansion": 2,
+    }
+    objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
+    attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
+    defender_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "defender")
+    assert attacker_zone.contains_point(
+        objective_by_role["attacker_home"].x_inches,
+        objective_by_role["attacker_home"].y_inches,
+    )
+    assert defender_zone.contains_point(
+        objective_by_role["defender_home"].x_inches,
+        objective_by_role["defender_home"].y_inches,
+    )
+
+    regions = {region.region_id: region for region in layout.battlefield_regions}
+    attacker_territory = regions["take-and-hold-vs-take-and-hold-layout-1-attacker-territory"]
+    defender_territory = regions["take-and-hold-vs-take-and-hold-layout-1-defender-territory"]
+    no_mans_land = regions["take-and-hold-vs-take-and-hold-layout-1-no-mans-land"]
+    assert attacker_territory.contains_point(22.0, 45.0)
+    assert not attacker_territory.contains_point(22.0, 15.0)
+    assert defender_territory.contains_point(22.0, 15.0)
+    assert not defender_territory.contains_point(22.0, 45.0)
+    assert no_mans_land.contains_point(objective_by_role["central"].x_inches, 30.0)
+    assert (
+        _shape_area(attacker_zone.shape)
+        + _shape_area(defender_zone.shape)
+        + _shape_area(no_mans_land.shape)
+        == 44.0 * 60.0
+    )
+    assert _shape_area(attacker_territory.shape) + _shape_area(defender_territory.shape) == (
+        44.0 * 60.0
+    )
+
+
+def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> None:
+    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-2")
+    terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
+    deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-2",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+
+    assert layout.name == "Take and Hold vs Take and Hold - Battlefield Dominance - Layout B"
+    assert layout.battlefield_width_inches == 44.0
+    assert layout.battlefield_depth_inches == 60.0
+    assert layout.coordinate_origin == "bottom_left"
+    assert layout.attacker_edge == "west"
+    assert layout.defender_edge == "east"
+    assert terrain_layout.terrain_features == ()
+    assert setup.battlefield_layout_id == layout.battlefield_layout_id
+    assert setup.terrain_features == ()
+    assert len(setup.terrain_areas) == 16
+    assert len(setup.battlefield_regions) == 5
+    assert deployment_map.battlefield_width_inches == layout.battlefield_width_inches
+    assert deployment_map.battlefield_depth_inches == layout.battlefield_depth_inches
+
+    assert Counter(area.footprint_template_id for area in layout.terrain_areas) == {
+        "FOOTPRINT_6X4": 4,
+        "FOOTPRINT_10X2_5": 2,
+        "FOOTPRINT_6X2": 4,
+        "FOOTPRINT_7X11_5": 4,
+        "FOOTPRINT_8X11_5_POLYGON": 2,
+    }
+    assert len(layout.terrain_areas) == 16
+    assert sum(area.source_transform == "explicit" for area in layout.terrain_areas) == 8
+    assert (
+        sum(area.source_transform.startswith("mirrored_from:") for area in layout.terrain_areas)
+        == 8
+    )
+    assert all(
+        0.0 <= point.x_inches <= 44.0 and 0.0 <= point.y_inches <= 60.0
+        for area in layout.terrain_areas
+        for point in area.footprint_polygon
+    )
+
+    assert Counter(marker.objective_role.value for marker in layout.objective_markers) == {
+        "attacker_home": 1,
+        "defender_home": 1,
+        "central": 1,
+        "expansion": 2,
+    }
+    objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
+    attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
+    defender_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "defender")
+    assert attacker_zone.contains_point(
+        objective_by_role["attacker_home"].x_inches,
+        objective_by_role["attacker_home"].y_inches,
+    )
+    assert defender_zone.contains_point(
+        objective_by_role["defender_home"].x_inches,
+        objective_by_role["defender_home"].y_inches,
+    )
+
+    regions = {region.region_id: region for region in layout.battlefield_regions}
+    attacker_territory = regions["take-and-hold-vs-take-and-hold-layout-2-attacker-territory"]
+    defender_territory = regions["take-and-hold-vs-take-and-hold-layout-2-defender-territory"]
+    no_mans_land = regions["take-and-hold-vs-take-and-hold-layout-2-no-mans-land"]
+    assert attacker_territory.contains_point(11.0, 30.0)
+    assert not attacker_territory.contains_point(33.0, 30.0)
+    assert defender_territory.contains_point(33.0, 30.0)
+    assert not defender_territory.contains_point(11.0, 30.0)
+    assert no_mans_land.contains_point(objective_by_role["central"].x_inches, 30.0)
+    assert (
+        _shape_area(attacker_zone.shape)
+        + _shape_area(defender_zone.shape)
+        + _shape_area(no_mans_land.shape)
+        == 44.0 * 60.0
+    )
+    assert _shape_area(attacker_territory.shape) + _shape_area(defender_territory.shape) == (
+        44.0 * 60.0
+    )
+
+
+def test_phase17j_objective_role_payload_is_required() -> None:
+    marker = (
+        warhammer_event_companion_2026_06_mission_pack()
+        .battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
+        .objective_markers[0]
+    )
+    payload = dict(marker.to_payload())
+    payload.pop("objective_role")
+
+    with pytest.raises(MissionPackError, match="objective_role"):
+        type(marker).from_payload(cast(ObjectiveMarkerDefinitionPayload, payload))
+
+
+def test_phase17j_centre_and_center_objective_roles_normalize_to_central() -> None:
+    assert objective_marker_role_from_token("center") is ObjectiveMarkerRole.CENTRAL
+    assert objective_marker_role_from_token("centre") is ObjectiveMarkerRole.CENTRAL
+
+
+def test_phase17j_placed_terrain_area_payload_must_match_template_transform() -> None:
+    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
+    first_area, second_area, *remaining_areas = layout.terrain_areas
+    drifted_area = replace(
+        first_area,
+        footprint_polygon=second_area.footprint_polygon,
+    )
+    drifted_layout = replace(
+        layout,
+        terrain_areas=(drifted_area, second_area, *remaining_areas),
+    )
+
+    with pytest.raises(MissionPackError, match="template transform"):
+        replace(
+            mission_pack,
+            battlefield_layouts=tuple(
+                drifted_layout
+                if candidate.battlefield_layout_id == drifted_layout.battlefield_layout_id
+                else candidate
+                for candidate in mission_pack.battlefield_layouts
+            ),
+        )
+
+
+def test_phase17j_layout_region_invariants_fail_closed() -> None:
+    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+        "take-and-hold-vs-take-and-hold-layout-2"
+    )
+    attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
+    no_mans_land = next(
+        region for region in layout.battlefield_regions if region.region_id.endswith("no-mans-land")
+    )
+    drifted_no_mans_land = replace(no_mans_land, shape=attacker_zone.shape)
+
+    with pytest.raises(MissionPackError, match="no-man's-land"):
+        BattlefieldLayoutDefinition(
+            battlefield_layout_id=layout.battlefield_layout_id,
+            name=layout.name,
+            deployment_map_id=layout.deployment_map_id,
+            terrain_layout_id=layout.terrain_layout_id,
+            battlefield_width_inches=layout.battlefield_width_inches,
+            battlefield_depth_inches=layout.battlefield_depth_inches,
+            coordinate_origin=layout.coordinate_origin,
+            coordinate_orientation=layout.coordinate_orientation,
+            attacker_edge=layout.attacker_edge,
+            defender_edge=layout.defender_edge,
+            objective_markers=layout.objective_markers,
+            deployment_zones=layout.deployment_zones,
+            battlefield_regions=tuple(
+                drifted_no_mans_land
+                if region.region_id == drifted_no_mans_land.region_id
+                else region
+                for region in layout.battlefield_regions
+            ),
+            terrain_areas=layout.terrain_areas,
+            source_id=layout.source_id,
+        )
 
 
 def test_phase17j_card_amendments_are_separate_from_faq_patch_rows() -> None:
@@ -721,6 +1020,19 @@ def _layout_descriptor(
         ):
             return descriptor
     raise AssertionError("Layout descriptor was not found.")
+
+
+def _shape_area(shape: DeploymentZoneShape) -> float:
+    total = 0.0
+    for polygon in shape.polygons:
+        vertices = polygon.vertices
+        previous = vertices[-1]
+        area = 0.0
+        for current in vertices:
+            area += previous.x * current.y - current.x * previous.y
+            previous = current
+        total += abs(area) / 2.0
+    return round(total, 6)
 
 
 def _event_final_scoring_windows(

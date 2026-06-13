@@ -15,7 +15,7 @@ from tests.deployment_submission_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
+from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind, PlacementError
@@ -922,6 +922,7 @@ def _config_with_blocking_objective_marker() -> GameConfig:
     blocking_marker = ObjectiveMarkerDefinition(
         objective_marker_id="phase16a-blocking-objective",
         name="Phase 16A Blocking Objective",
+        objective_role=ObjectiveMarkerRole.CENTRAL,
         x_inches=57.0,
         y_inches=20.0,
         blocks_placement=True,

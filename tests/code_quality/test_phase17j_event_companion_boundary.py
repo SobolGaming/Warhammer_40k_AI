@@ -13,7 +13,9 @@ _FORBIDDEN_PDF_IMPORTS = frozenset(("pypdf", "PyPDF2", "pdfminer", "fitz"))
 _FORBIDDEN_EVENT_RAW_TOKENS = frozenset(
     (
         "event_rules",
+        "terrain_footprints",
         "eng_12-06_warhammer40000_event_companion",
+        "eng_12-06_warhammer40000_terrainareafootprints",
         ".pdf",
     )
 )

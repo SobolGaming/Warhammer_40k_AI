@@ -5,9 +5,28 @@ import json
 from dataclasses import dataclass, replace
 from enum import StrEnum
 
+from warhammer40k_core.core.battlefield_regions import BattlefieldRegion, BattlefieldRegionKind
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
-from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
-from warhammer40k_core.core.missions import MissionPackError, MissionSourcePackageDefinition
+from warhammer40k_core.core.deployment_zones import (
+    DeploymentZone,
+    DeploymentZonePoint,
+    DeploymentZonePolygon,
+    DeploymentZoneShape,
+)
+from warhammer40k_core.core.missions import (
+    BattlefieldLayoutDefinition,
+    MissionPackError,
+    MissionSourcePackageDefinition,
+    ObjectiveMarkerDefinition,
+    objective_marker_role_from_token,
+)
+from warhammer40k_core.core.terrain_areas import (
+    PlacedTerrainArea,
+    SymmetryAxis,
+    TerrainAreaClassification,
+    TerrainAreaFootprintTemplate,
+    mirror_placed_terrain_area,
+)
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as chapter_approved,
@@ -25,9 +44,34 @@ DOCUMENT_VERSION = "1.0"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-BATTLEFIELD_WIDTH_INCHES = 60.0
-BATTLEFIELD_DEPTH_INCHES = 44.0
+BATTLEFIELD_WIDTH_INCHES = 44.0
+BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID = "take-and-hold-vs-take-and-hold-layout-1"
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID = "take-and-hold-vs-take-and-hold-layout-2"
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS = {
+    TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID: (
+        "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_a"
+    ),
+    TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID: (
+        "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_b"
+    ),
+}
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES = {
+    TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID: (
+        "Take and Hold vs Take and Hold - Battlefield Dominance - Layout A"
+    ),
+    TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID: (
+        "Take and Hold vs Take and Hold - Battlefield Dominance - Layout B"
+    ),
+}
+EXTRACTED_TAKE_AND_HOLD_LAYOUT_IDS = frozenset(TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS)
+TERRAIN_AREA_FEATURE_KIND = "terrain_area"
+FOOTPRINT_6X4 = "FOOTPRINT_6X4"
+FOOTPRINT_10X2_5 = "FOOTPRINT_10X2_5"
+FOOTPRINT_6X2 = "FOOTPRINT_6X2"
+FOOTPRINT_7X11_5 = "FOOTPRINT_7X11_5"
+FOOTPRINT_8X11_5_POLYGON = "FOOTPRINT_8X11_5_POLYGON"
 
 
 class GeometryResolutionStatus(StrEnum):
@@ -1977,10 +2021,10 @@ def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
                     player_primary_mission_id=player_primary,
                     opponent_primary_mission_id=opponent_primary,
                     layout_variant=("a", "b", "c")[layout_number - 1],
-                    battlefield_width_inches=BATTLEFIELD_WIDTH_INCHES,
-                    battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
-                    attacker_edge=_attacker_edge(layout_number),
-                    defender_edge=_defender_edge(layout_number),
+                    battlefield_width_inches=_layout_battlefield_width(layout_id),
+                    battlefield_depth_inches=_layout_battlefield_depth(layout_id),
+                    attacker_edge=_layout_attacker_edge(layout_id, layout_number),
+                    defender_edge=_layout_defender_edge(layout_id, layout_number),
                     deployment_zone_polygons=_descriptor_deployment_polygons(
                         layout_id=layout_id,
                         layout_number=layout_number,
@@ -2001,14 +2045,153 @@ def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
-                    geometry_extraction_status=(
-                        "layout_identity_source_page_bound_coordinates_pending"
-                    ),
+                    geometry_extraction_status=_layout_geometry_extraction_status(layout_id),
                     source_page=source_page,
                     source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_id}:descriptor",
                 )
             )
     return tuple(descriptors)
+
+
+def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ...]:
+    source_id = f"{SOURCE_PACKAGE_ID}:terrain-area-footprints-pdf"
+    return (
+        _footprint_template(
+            template_id=FOOTPRINT_6X4,
+            name='6" x 4" Terrain Area Footprint',
+            width=6.0,
+            depth=4.0,
+            vertices=(
+                (-3.0, -1.64),
+                (-1.68, -1.64),
+                (-1.45, -2.0),
+                (0.45, -2.0),
+                (0.88, -1.64),
+                (3.0, -1.64),
+                (3.0, 1.64),
+                (1.38, 1.64),
+                (1.0, 2.0),
+                (-3.0, 2.0),
+            ),
+            source_id=source_id,
+        ),
+        _footprint_template(
+            template_id=FOOTPRINT_10X2_5,
+            name='10" x 2.5" Terrain Area Footprint',
+            width=10.0,
+            depth=2.5,
+            vertices=(
+                (-5.0, -0.88),
+                (-1.15, -0.88),
+                (-0.82, -1.25),
+                (0.4, -1.25),
+                (0.76, -0.88),
+                (5.0, -0.88),
+                (5.0, 0.88),
+                (1.64, 0.88),
+                (1.34, 1.25),
+                (0.2, 1.25),
+                (-0.2, 0.88),
+                (-5.0, 0.88),
+            ),
+            source_id=source_id,
+        ),
+        _footprint_template(
+            template_id=FOOTPRINT_6X2,
+            name='6" x 2" Terrain Area Footprint',
+            width=6.0,
+            depth=2.0,
+            vertices=(
+                (-3.0, -0.72),
+                (-0.74, -0.72),
+                (-0.46, -1.0),
+                (0.76, -1.0),
+                (1.04, -0.72),
+                (3.0, -0.72),
+                (3.0, 0.72),
+                (0.54, 0.72),
+                (0.24, 1.0),
+                (-0.86, 1.0),
+                (-1.12, 0.72),
+                (-3.0, 0.72),
+            ),
+            source_id=source_id,
+        ),
+        _footprint_template(
+            template_id=FOOTPRINT_7X11_5,
+            name='7" x 11.5" Terrain Area Footprint',
+            width=7.0,
+            depth=11.5,
+            vertices=(
+                (-3.5, -5.75),
+                (2.35, -5.75),
+                (2.88, -4.94),
+                (3.5, -4.2),
+                (3.5, 4.58),
+                (2.9, 4.95),
+                (2.46, 5.75),
+                (-3.5, 5.75),
+            ),
+            source_id=source_id,
+        ),
+        _footprint_template(
+            template_id=FOOTPRINT_8X11_5_POLYGON,
+            name='8" x 11.5" Polygon Terrain Area Footprint',
+            width=11.5,
+            depth=8.0,
+            vertices=(
+                (-5.75, -4.0),
+                (3.7, -4.0),
+                (5.75, -2.55),
+                (5.75, 4.0),
+                (-1.05, 4.0),
+                (-2.55, 2.72),
+                (-4.1, 1.08),
+                (-5.75, -0.2),
+            ),
+            source_id=source_id,
+        ),
+    )
+
+
+def battlefield_layout_definitions() -> tuple[BattlefieldLayoutDefinition, ...]:
+    return tuple(
+        _take_and_hold_vs_take_and_hold_layout_definition(layout_id=layout_id)
+        for layout_id in sorted(EXTRACTED_TAKE_AND_HOLD_LAYOUT_IDS)
+    )
+
+
+def _take_and_hold_vs_take_and_hold_layout_definition(
+    *,
+    layout_id: str,
+) -> BattlefieldLayoutDefinition:
+    source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
+    return BattlefieldLayoutDefinition(
+        battlefield_layout_id=layout_id,
+        name=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES[layout_id],
+        deployment_map_id=f"{layout_id}-deployment",
+        terrain_layout_id=layout_id,
+        battlefield_width_inches=BATTLEFIELD_WIDTH_INCHES,
+        battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
+        coordinate_origin="bottom_left",
+        coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
+        attacker_edge=_layout_attacker_edge(layout_id, _layout_number_from_layout_id(layout_id)),
+        defender_edge=_layout_defender_edge(layout_id, _layout_number_from_layout_id(layout_id)),
+        objective_markers=_take_and_hold_vs_take_and_hold_objective_definitions(
+            layout_id=layout_id
+        ),
+        deployment_zones=tuple(
+            DeploymentZone(
+                deployment_zone_id=zone.deployment_zone_id,
+                player_id=zone.player_role,
+                shape=zone.shape,
+            )
+            for zone in _take_and_hold_vs_take_and_hold_deployment_zones(layout_id=layout_id)
+        ),
+        battlefield_regions=_take_and_hold_vs_take_and_hold_regions(layout_id=layout_id),
+        terrain_areas=_take_and_hold_vs_take_and_hold_terrain_areas(layout_id),
+        source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}",
+    )
 
 
 def base_size_source_rows() -> tuple[BaseSizeSourceRecord, ...]:
@@ -2037,6 +2220,25 @@ def _battlefield_layout_row(
     layout_number: int,
     source_page: int,
 ) -> chapter_approved.SourceBattlefieldLayoutRow:
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        return chapter_approved.SourceBattlefieldLayoutRow(
+            battlefield_layout_id=layout_id,
+            name=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES[layout_id],
+            player_force_disposition_id=player_force_disposition_id,
+            opponent_force_disposition_id=opponent_force_disposition_id,
+            layout_number=layout_number,
+            primary_mission_id=primary_mission_id,
+            deployment_map_id=f"{layout_id}-deployment",
+            terrain_layout_id=layout_id,
+            battlefield_width_inches=BATTLEFIELD_WIDTH_INCHES,
+            battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
+            coordinate_origin="bottom_left",
+            coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
+            source_status="event_companion_layout_geometry_extracted",
+            objective_markers=_take_and_hold_vs_take_and_hold_objectives(layout_id=layout_id),
+            deployment_zones=_take_and_hold_vs_take_and_hold_deployment_zones(layout_id=layout_id),
+            terrain_features=(),
+        )
     return chapter_approved.SourceBattlefieldLayoutRow(
         battlefield_layout_id=layout_id,
         name=name,
@@ -2048,11 +2250,9 @@ def _battlefield_layout_row(
         terrain_layout_id=layout_id,
         battlefield_width_inches=BATTLEFIELD_WIDTH_INCHES,
         battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
-        coordinate_origin="top_left",
-        coordinate_orientation="x_right_along_60_inch_edge_y_down_along_44_inch_edge",
-        source_status=(
-            f"event_companion_page_{source_page}_layout_identity_coordinate_extraction_pending"
-        ),
+        coordinate_origin="bottom_left",
+        coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
+        source_status="event_companion_layout_identity_coordinate_extraction_pending",
         objective_markers=_layout_objectives(layout_id=layout_id, layout_number=layout_number),
         deployment_zones=_layout_deployment_zones(
             layout_id=layout_id,
@@ -2070,27 +2270,29 @@ def _layout_objectives(
     layout_id: str,
     layout_number: int,
 ) -> tuple[chapter_approved.SourceBattlefieldObjectiveRow, ...]:
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        return _take_and_hold_vs_take_and_hold_objectives(layout_id=layout_id)
     template = {
         1: (
-            (9.0, 22.0, "attacker_home"),
-            (51.0, 22.0, "defender_home"),
-            (30.0, 22.0, "center"),
-            (24.0, 10.0, "central"),
-            (36.0, 34.0, "central"),
+            (*_pending_layout_point(9.0, 22.0), "attacker_home"),
+            (*_pending_layout_point(51.0, 22.0), "defender_home"),
+            (*_pending_layout_point(30.0, 22.0), "center"),
+            (*_pending_layout_point(24.0, 10.0), "central"),
+            (*_pending_layout_point(36.0, 34.0), "central"),
         ),
         2: (
-            (10.0, 10.0, "attacker_home"),
-            (50.0, 34.0, "defender_home"),
-            (30.0, 22.0, "center"),
-            (18.0, 30.0, "central"),
-            (42.0, 14.0, "central"),
+            (*_pending_layout_point(10.0, 10.0), "attacker_home"),
+            (*_pending_layout_point(50.0, 34.0), "defender_home"),
+            (*_pending_layout_point(30.0, 22.0), "center"),
+            (*_pending_layout_point(18.0, 30.0), "central"),
+            (*_pending_layout_point(42.0, 14.0), "central"),
         ),
         3: (
-            (9.5, 10.5, "attacker_home"),
-            (52.5, 34.5, "defender_home"),
-            (28.5, 8.5, "central"),
-            (30.0, 22.0, "center"),
-            (28.5, 35.5, "central"),
+            (*_pending_layout_point(9.5, 10.5), "attacker_home"),
+            (*_pending_layout_point(52.5, 34.5), "defender_home"),
+            (*_pending_layout_point(28.5, 8.5), "central"),
+            (*_pending_layout_point(30.0, 22.0), "center"),
+            (*_pending_layout_point(28.5, 35.5), "central"),
         ),
     }[layout_number]
     return tuple(
@@ -2105,17 +2307,71 @@ def _layout_objectives(
     )
 
 
+def _take_and_hold_vs_take_and_hold_objectives(
+    *,
+    layout_id: str,
+) -> tuple[chapter_approved.SourceBattlefieldObjectiveRow, ...]:
+    layouts = {
+        TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID: (
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 16.49, 49.82),
+            ("defender-home", "Defender Home Objective", "defender_home", 25.76, 12.72),
+            ("central", "Central Objective", "central", 22.02, 30.0),
+            ("expansion-west", "West Expansion Objective", "expansion", 7.4, 19.16),
+            ("expansion-east", "East Expansion Objective", "expansion", 36.72, 41.87),
+        ),
+        TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID: (
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 6.76, 31.2),
+            ("defender-home", "Defender Home Objective", "defender_home", 37.24, 28.67),
+            ("central", "Central Objective", "central", 22.16, 30.04),
+            ("expansion-south", "South Expansion Objective", "expansion", 19.2, 10.28),
+            ("expansion-north", "North Expansion Objective", "expansion", 24.92, 50.61),
+        ),
+    }
+    return tuple(
+        chapter_approved.SourceBattlefieldObjectiveRow(
+            f"{layout_id}-{suffix}",
+            name,
+            objective_kind,
+            x_inches,
+            y_inches,
+        )
+        for suffix, name, objective_kind, x_inches, y_inches in layouts[layout_id]
+    )
+
+
 def _layout_deployment_zones(
     *,
     layout_id: str,
     layout_number: int,
 ) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        return _take_and_hold_vs_take_and_hold_deployment_zones(layout_id=layout_id)
     if layout_number == 2:
-        attacker = DeploymentZoneShape.rectangle(min_x=0.0, min_y=0.0, max_x=18.0, max_y=18.0)
-        defender = DeploymentZoneShape.rectangle(min_x=42.0, min_y=26.0, max_x=60.0, max_y=44.0)
+        attacker = DeploymentZoneShape.rectangle(
+            min_x=0.0,
+            min_y=0.0,
+            max_x=_pending_layout_x(18.0),
+            max_y=_pending_layout_y(18.0),
+        )
+        defender = DeploymentZoneShape.rectangle(
+            min_x=_pending_layout_x(42.0),
+            min_y=_pending_layout_y(26.0),
+            max_x=BATTLEFIELD_WIDTH_INCHES,
+            max_y=BATTLEFIELD_DEPTH_INCHES,
+        )
     else:
-        attacker = DeploymentZoneShape.rectangle(min_x=0.0, min_y=0.0, max_x=18.0, max_y=44.0)
-        defender = DeploymentZoneShape.rectangle(min_x=42.0, min_y=0.0, max_x=60.0, max_y=44.0)
+        attacker = DeploymentZoneShape.rectangle(
+            min_x=0.0,
+            min_y=0.0,
+            max_x=_pending_layout_x(18.0),
+            max_y=BATTLEFIELD_DEPTH_INCHES,
+        )
+        defender = DeploymentZoneShape.rectangle(
+            min_x=_pending_layout_x(42.0),
+            min_y=0.0,
+            max_x=BATTLEFIELD_WIDTH_INCHES,
+            max_y=BATTLEFIELD_DEPTH_INCHES,
+        )
     return (
         chapter_approved.SourceBattlefieldDeploymentZoneRow(
             deployment_zone_id=f"{layout_id}-attacker",
@@ -2130,11 +2386,67 @@ def _layout_deployment_zones(
     )
 
 
+def _take_and_hold_vs_take_and_hold_deployment_zones(
+    *,
+    layout_id: str,
+) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+        attacker_shape = _shape_from_vertices(
+            (
+                (0.0, 60.0),
+                (44.0, 60.0),
+                (44.0, 48.0),
+                (22.0, 48.0),
+                (22.0, 40.0),
+                (0.0, 40.0),
+            )
+        )
+        defender_shape = _shape_from_vertices(
+            (
+                (0.0, 0.0),
+                (44.0, 0.0),
+                (44.0, 20.0),
+                (22.0, 20.0),
+                (22.0, 12.0),
+                (0.0, 12.0),
+            )
+        )
+    elif layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+        attacker_shape = DeploymentZoneShape.rectangle(
+            min_x=0.0,
+            min_y=0.0,
+            max_x=12.0,
+            max_y=60.0,
+        )
+        defender_shape = DeploymentZoneShape.rectangle(
+            min_x=32.0,
+            min_y=0.0,
+            max_x=44.0,
+            max_y=60.0,
+        )
+    else:
+        raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
+    return (
+        chapter_approved.SourceBattlefieldDeploymentZoneRow(
+            deployment_zone_id=f"{layout_id}-attacker",
+            player_role="attacker",
+            shape=attacker_shape,
+        ),
+        chapter_approved.SourceBattlefieldDeploymentZoneRow(
+            deployment_zone_id=f"{layout_id}-defender",
+            player_role="defender",
+            shape=defender_shape,
+        ),
+    )
+
+
 def _layout_terrain_features(
     *,
     layout_id: str,
     layout_number: int,
 ) -> tuple[chapter_approved.SourceBattlefieldTerrainFeatureRow, ...]:
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        return ()
     templates = {
         1: (
             ("attacker-home-ruin", "ruins", 10.0, 22.0, 8.0, 14.0, "dense"),
@@ -2202,16 +2514,16 @@ def _layout_terrain_features(
         chapter_approved.SourceBattlefieldTerrainFeatureRow(
             feature_id=f"{layout_id}-{feature_suffix}",
             feature_kind=feature_kind,
-            footprint_center_x_inches=x,
-            footprint_center_y_inches=y,
-            footprint_width_inches=width,
-            footprint_depth_inches=depth,
+            footprint_center_x_inches=_pending_layout_x(x),
+            footprint_center_y_inches=_pending_layout_y(y),
+            footprint_width_inches=_pending_layout_x(width),
+            footprint_depth_inches=_pending_layout_y(depth),
             source_note=f"event companion {density} terrain footprint",
             display_geometry=_axis_aligned_display(
-                x=x,
-                y=y,
-                width=width,
-                depth=depth,
+                x=_pending_layout_x(x),
+                y=_pending_layout_y(y),
+                width=_pending_layout_x(width),
+                depth=_pending_layout_y(depth),
                 display_template_id=f"{feature_kind}_{width:g}x{depth:g}",
             ),
         )
@@ -2236,19 +2548,30 @@ def _descriptor_deployment_polygons(
 
 def _no_mans_land_polygon(*, layout_id: str, layout_number: int) -> EventPolygonSourceRecord:
     vertices: tuple[tuple[float, float], ...]
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        return EventPolygonSourceRecord(
+            polygon_id=f"{layout_id}-no-mans-land",
+            role="no_mans_land",
+            vertices=_shape_vertices(_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id)),
+        )
     if layout_number == 2:
         vertices = (
-            (18.0, 0.0),
-            (60.0, 0.0),
-            (60.0, 26.0),
-            (42.0, 26.0),
-            (42.0, 44.0),
-            (0.0, 44.0),
-            (0.0, 18.0),
-            (18.0, 18.0),
+            _pending_layout_point(18.0, 0.0),
+            _pending_layout_point(60.0, 0.0),
+            _pending_layout_point(60.0, 26.0),
+            _pending_layout_point(42.0, 26.0),
+            _pending_layout_point(42.0, 44.0),
+            _pending_layout_point(0.0, 44.0),
+            _pending_layout_point(0.0, 18.0),
+            _pending_layout_point(18.0, 18.0),
         )
     else:
-        vertices = ((18.0, 0.0), (42.0, 0.0), (42.0, 44.0), (18.0, 44.0))
+        vertices = (
+            _pending_layout_point(18.0, 0.0),
+            _pending_layout_point(42.0, 0.0),
+            _pending_layout_point(42.0, 44.0),
+            _pending_layout_point(18.0, 44.0),
+        )
     return EventPolygonSourceRecord(
         polygon_id=f"{layout_id}-no-mans-land",
         role="no_mans_land",
@@ -2261,15 +2584,57 @@ def _territory_polygons(
     layout_id: str,
     layout_number: int,
 ) -> tuple[EventPolygonSourceRecord, ...]:
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        territories = _take_and_hold_vs_take_and_hold_territory_vertices(layout_id)
+        return tuple(
+            EventPolygonSourceRecord(
+                polygon_id=f"{layout_id}-{role}",
+                role=role,
+                vertices=vertices,
+            )
+            for role, vertices in territories
+        )
     if layout_number == 2:
         territories = (
-            ("attacker_territory", ((0.0, 0.0), (30.0, 0.0), (30.0, 22.0), (0.0, 22.0))),
-            ("defender_territory", ((30.0, 22.0), (60.0, 22.0), (60.0, 44.0), (30.0, 44.0))),
+            (
+                "attacker_territory",
+                (
+                    _pending_layout_point(0.0, 0.0),
+                    _pending_layout_point(30.0, 0.0),
+                    _pending_layout_point(30.0, 22.0),
+                    _pending_layout_point(0.0, 22.0),
+                ),
+            ),
+            (
+                "defender_territory",
+                (
+                    _pending_layout_point(30.0, 22.0),
+                    _pending_layout_point(60.0, 22.0),
+                    _pending_layout_point(60.0, 44.0),
+                    _pending_layout_point(30.0, 44.0),
+                ),
+            ),
         )
     else:
         territories = (
-            ("attacker_territory", ((0.0, 0.0), (30.0, 0.0), (30.0, 44.0), (0.0, 44.0))),
-            ("defender_territory", ((30.0, 0.0), (60.0, 0.0), (60.0, 44.0), (30.0, 44.0))),
+            (
+                "attacker_territory",
+                (
+                    _pending_layout_point(0.0, 0.0),
+                    _pending_layout_point(30.0, 0.0),
+                    _pending_layout_point(30.0, 44.0),
+                    _pending_layout_point(0.0, 44.0),
+                ),
+            ),
+            (
+                "defender_territory",
+                (
+                    _pending_layout_point(30.0, 0.0),
+                    _pending_layout_point(60.0, 0.0),
+                    _pending_layout_point(60.0, 44.0),
+                    _pending_layout_point(30.0, 44.0),
+                ),
+            ),
         )
     return tuple(
         EventPolygonSourceRecord(
@@ -2302,6 +2667,23 @@ def _descriptor_terrain(
     layout_id: str,
     layout_number: int,
 ) -> tuple[EventTerrainSourceRecord, ...]:
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        templates = {
+            template.footprint_template_id: template
+            for template in terrain_area_footprint_templates()
+        }
+        return tuple(
+            EventTerrainSourceRecord(
+                feature_id=area.terrain_area_id,
+                feature_kind=area.footprint_template_id,
+                density=area.classification.value,
+                x_inches=area.center_x_inches,
+                y_inches=area.center_y_inches,
+                width_inches=templates[area.footprint_template_id].bounding_width_inches,
+                depth_inches=templates[area.footprint_template_id].bounding_depth_inches,
+            )
+            for area in _take_and_hold_vs_take_and_hold_terrain_areas(layout_id)
+        )
     terrain: list[EventTerrainSourceRecord] = []
     for feature in _layout_terrain_features(layout_id=layout_id, layout_number=layout_number):
         density = "dense" if feature.feature_kind == "ruins" else "light"
@@ -2317,6 +2699,419 @@ def _descriptor_terrain(
             )
         )
     return tuple(terrain)
+
+
+def _take_and_hold_vs_take_and_hold_objective_definitions(
+    *,
+    layout_id: str,
+) -> tuple[ObjectiveMarkerDefinition, ...]:
+    source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
+    return tuple(
+        ObjectiveMarkerDefinition(
+            objective_marker_id=objective.objective_marker_id,
+            name=objective.name,
+            objective_role=objective_marker_role_from_token(objective.objective_kind),
+            x_inches=objective.x_inches,
+            y_inches=objective.y_inches,
+            source_id=(
+                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:"
+                f"objective:{objective.objective_marker_id}"
+            ),
+        )
+        for objective in _take_and_hold_vs_take_and_hold_objectives(layout_id=layout_id)
+    )
+
+
+def _take_and_hold_vs_take_and_hold_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
+    attacker_zone, defender_zone = _take_and_hold_vs_take_and_hold_deployment_zones(
+        layout_id=layout_id
+    )
+    source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
+    territories = dict(_take_and_hold_vs_take_and_hold_territory_vertices(layout_id))
+    return (
+        BattlefieldRegion(
+            region_id=f"{layout_id}-attacker-deployment-region",
+            region_kind=BattlefieldRegionKind.DEPLOYMENT_ZONE,
+            owner_role="attacker",
+            shape=attacker_zone.shape,
+            derived_from=(attacker_zone.deployment_zone_id,),
+            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:attacker-deployment",
+        ),
+        BattlefieldRegion(
+            region_id=f"{layout_id}-defender-deployment-region",
+            region_kind=BattlefieldRegionKind.DEPLOYMENT_ZONE,
+            owner_role="defender",
+            shape=defender_zone.shape,
+            derived_from=(defender_zone.deployment_zone_id,),
+            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:defender-deployment",
+        ),
+        BattlefieldRegion(
+            region_id=f"{layout_id}-no-mans-land",
+            region_kind=BattlefieldRegionKind.NO_MANS_LAND,
+            owner_role=None,
+            shape=_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id),
+            derived_from=(attacker_zone.deployment_zone_id, defender_zone.deployment_zone_id),
+            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:no-mans-land",
+        ),
+        BattlefieldRegion(
+            region_id=f"{layout_id}-attacker-territory",
+            region_kind=BattlefieldRegionKind.TERRITORY,
+            owner_role="attacker",
+            shape=_shape_from_vertices(territories["attacker_territory"]),
+            derived_from=("attacker_edge_north",),
+            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:attacker-territory",
+        ),
+        BattlefieldRegion(
+            region_id=f"{layout_id}-defender-territory",
+            region_kind=BattlefieldRegionKind.TERRITORY,
+            owner_role="defender",
+            shape=_shape_from_vertices(territories["defender_territory"]),
+            derived_from=("defender_edge_south",),
+            source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:defender-territory",
+        ),
+    )
+
+
+def _take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id: str) -> DeploymentZoneShape:
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+        return _shape_from_vertices(
+            (
+                (0.0, 12.0),
+                (22.0, 12.0),
+                (22.0, 20.0),
+                (44.0, 20.0),
+                (44.0, 48.0),
+                (22.0, 48.0),
+                (22.0, 40.0),
+                (0.0, 40.0),
+            )
+        )
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+        return DeploymentZoneShape.rectangle(
+            min_x=12.0,
+            min_y=0.0,
+            max_x=32.0,
+            max_y=60.0,
+        )
+    raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
+
+
+def _take_and_hold_vs_take_and_hold_territory_vertices(
+    layout_id: str,
+) -> tuple[tuple[str, tuple[tuple[float, float], ...]], ...]:
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+        return (
+            ("attacker_territory", ((0.0, 30.0), (44.0, 30.0), (44.0, 60.0), (0.0, 60.0))),
+            ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 30.0), (0.0, 30.0))),
+        )
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+        return (
+            ("attacker_territory", ((0.0, 0.0), (22.0, 0.0), (22.0, 60.0), (0.0, 60.0))),
+            ("defender_territory", ((22.0, 0.0), (44.0, 0.0), (44.0, 60.0), (22.0, 60.0))),
+        )
+    raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
+
+
+def _take_and_hold_vs_take_and_hold_terrain_areas(
+    layout_id: str,
+) -> tuple[PlacedTerrainArea, ...]:
+    templates = {
+        template.footprint_template_id: template for template in terrain_area_footprint_templates()
+    }
+    source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
+    explicit_specs, mirrored_pairs = _take_and_hold_vs_take_and_hold_terrain_area_specs(layout_id)
+    explicit_areas = tuple(
+        PlacedTerrainArea.from_template(
+            terrain_area_id=f"{layout_id}-{area_id}",
+            template=templates[template_id],
+            terrain_feature_kind=TERRAIN_AREA_FEATURE_KIND,
+            classification=classification,
+            center_x_inches=center_x,
+            center_y_inches=center_y,
+            rotation_degrees=rotation,
+            source_layout_id=source_layout_id,
+            source_id=(
+                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}"
+            ),
+        )
+        for area_id, template_id, classification, center_x, center_y, rotation in explicit_specs
+    )
+    explicit_by_suffix = {
+        area.terrain_area_id.removeprefix(f"{layout_id}-"): area for area in explicit_areas
+    }
+    mirrored = tuple(
+        mirror_placed_terrain_area(
+            explicit_by_suffix[source_suffix],
+            battlefield_width_inches=BATTLEFIELD_WIDTH_INCHES,
+            battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
+            terrain_area_id=f"{layout_id}-{target_suffix}",
+            source_id=(
+                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:"
+                f"terrain-area:{target_suffix}"
+            ),
+            symmetry_axis=SymmetryAxis.POINT_CENTER,
+        )
+        for source_suffix, target_suffix in mirrored_pairs
+    )
+    return tuple(sorted((*explicit_areas, *mirrored), key=lambda area: area.terrain_area_id))
+
+
+type TerrainAreaSpec = tuple[
+    str,
+    str,
+    TerrainAreaClassification,
+    float,
+    float,
+    float,
+]
+
+
+def _take_and_hold_vs_take_and_hold_terrain_area_specs(
+    layout_id: str,
+) -> tuple[tuple[TerrainAreaSpec, ...], tuple[tuple[str, str], ...]]:
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+        return (
+            (
+                (
+                    "dense-7x11-5-upper-right",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    36.22,
+                    41.2,
+                    0.0,
+                ),
+                (
+                    "dense-7x11-5-upper-left",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    17.79,
+                    48.3,
+                    180.0,
+                ),
+                (
+                    "light-10x2-5-upper-left",
+                    FOOTPRINT_10X2_5,
+                    TerrainAreaClassification.LIGHT,
+                    7.03,
+                    44.72,
+                    0.0,
+                ),
+                (
+                    "light-6x2-upper-center",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    24.07,
+                    41.38,
+                    0.0,
+                ),
+                (
+                    "light-6x2-east-midfield",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    36.97,
+                    29.12,
+                    0.0,
+                ),
+                (
+                    "light-6x4-lower-left",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    14.3,
+                    10.69,
+                    0.0,
+                ),
+                (
+                    "light-6x4-east-midfield",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    33.7,
+                    24.67,
+                    90.0,
+                ),
+                (
+                    "dense-8x11-5-polygon-central-north",
+                    FOOTPRINT_8X11_5_POLYGON,
+                    TerrainAreaClassification.DENSE,
+                    21.79,
+                    30.95,
+                    0.0,
+                ),
+            ),
+            (
+                ("dense-7x11-5-upper-right", "dense-7x11-5-lower-left"),
+                ("dense-7x11-5-upper-left", "dense-7x11-5-lower-right"),
+                ("light-10x2-5-upper-left", "light-10x2-5-lower-right"),
+                ("light-6x2-upper-center", "light-6x2-lower-center"),
+                ("light-6x2-east-midfield", "light-6x2-west-midfield"),
+                ("light-6x4-lower-left", "light-6x4-upper-right"),
+                ("light-6x4-east-midfield", "light-6x4-west-midfield"),
+                ("dense-8x11-5-polygon-central-north", "dense-8x11-5-polygon-central-south"),
+            ),
+        )
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+        return (
+            (
+                (
+                    "dense-7x11-5-left-home",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    7.02,
+                    29.79,
+                    0.0,
+                ),
+                (
+                    "dense-7x11-5-central-west",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    21.06,
+                    29.8,
+                    0.0,
+                ),
+                (
+                    "dense-8x11-5-polygon-north",
+                    FOOTPRINT_8X11_5_POLYGON,
+                    TerrainAreaClassification.DENSE,
+                    25.19,
+                    49.79,
+                    0.0,
+                ),
+                (
+                    "light-10x2-5-north-west",
+                    FOOTPRINT_10X2_5,
+                    TerrainAreaClassification.LIGHT,
+                    9.11,
+                    44.82,
+                    66.0,
+                ),
+                (
+                    "light-6x4-north-east",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    37.39,
+                    50.11,
+                    30.0,
+                ),
+                (
+                    "light-6x4-north-west",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    17.75,
+                    42.7,
+                    330.0,
+                ),
+                (
+                    "light-6x2-north-east",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    36.65,
+                    43.77,
+                    55.0,
+                ),
+                (
+                    "light-6x2-north-west",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    7.99,
+                    52.46,
+                    35.0,
+                ),
+            ),
+            (
+                ("dense-7x11-5-left-home", "dense-7x11-5-right-home"),
+                ("dense-7x11-5-central-west", "dense-7x11-5-central-east"),
+                ("dense-8x11-5-polygon-north", "dense-8x11-5-polygon-south"),
+                ("light-10x2-5-north-west", "light-10x2-5-south-east"),
+                ("light-6x4-north-east", "light-6x4-south-west"),
+                ("light-6x4-north-west", "light-6x4-south-east"),
+                ("light-6x2-north-east", "light-6x2-south-west"),
+                ("light-6x2-north-west", "light-6x2-south-east"),
+            ),
+        )
+    raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
+
+
+def _footprint_template(
+    *,
+    template_id: str,
+    name: str,
+    width: float,
+    depth: float,
+    vertices: tuple[tuple[float, float], ...],
+    source_id: str,
+) -> TerrainAreaFootprintTemplate:
+    return TerrainAreaFootprintTemplate(
+        footprint_template_id=template_id,
+        name=name,
+        bounding_width_inches=width,
+        bounding_depth_inches=depth,
+        polygon_vertices_inches=tuple(
+            TerrainDisplayPoint(x_inches=x, y_inches=y) for x, y in vertices
+        ),
+        source_id=f"{source_id}:{template_id.lower()}",
+    )
+
+
+def _shape_from_vertices(vertices: tuple[tuple[float, float], ...]) -> DeploymentZoneShape:
+    return DeploymentZoneShape(
+        polygons=(
+            DeploymentZonePolygon(
+                vertices=tuple(DeploymentZonePoint(x=x, y=y) for x, y in vertices)
+            ),
+        )
+    )
+
+
+def _layout_battlefield_width(layout_id: str) -> float:
+    return BATTLEFIELD_WIDTH_INCHES
+
+
+def _layout_battlefield_depth(layout_id: str) -> float:
+    return BATTLEFIELD_DEPTH_INCHES
+
+
+def _layout_attacker_edge(layout_id: str, layout_number: int) -> str:
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+        return "north"
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+        return "west"
+    return _attacker_edge(layout_number)
+
+
+def _layout_defender_edge(layout_id: str, layout_number: int) -> str:
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+        return "south"
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+        return "east"
+    return _defender_edge(layout_number)
+
+
+def _layout_geometry_extraction_status(layout_id: str) -> str:
+    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+        return "layout_geometry_extracted"
+    return "layout_identity_source_page_bound_coordinates_pending"
+
+
+def _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id: str) -> bool:
+    return layout_id in EXTRACTED_TAKE_AND_HOLD_LAYOUT_IDS
+
+
+def _layout_number_from_layout_id(layout_id: str) -> int:
+    suffix = layout_id.rsplit("-", maxsplit=1)[-1]
+    if suffix not in {"1", "2", "3"}:
+        raise MissionPackError("Battlefield layout ID must end in layout number.")
+    return int(suffix)
+
+
+def _pending_layout_point(x_inches: float, y_inches: float) -> tuple[float, float]:
+    return (_pending_layout_x(x_inches), _pending_layout_y(y_inches))
+
+
+def _pending_layout_x(x_inches: float) -> float:
+    return round(x_inches * (BATTLEFIELD_WIDTH_INCHES / 60.0), 2)
+
+
+def _pending_layout_y(y_inches: float) -> float:
+    return round(y_inches * (BATTLEFIELD_DEPTH_INCHES / 44.0), 2)
 
 
 def _axis_aligned_display(
@@ -2547,6 +3342,12 @@ def _import_hash() -> str:
         "matrix": [row.to_payload() for row in primary_mission_matrix_rows()],
         "layouts": [row.to_payload() for row in battlefield_layout_rows()],
         "layout_descriptors": [row.to_payload() for row in layout_descriptor_rows()],
+        "terrain_area_footprint_templates": [
+            template.to_payload() for template in terrain_area_footprint_templates()
+        ],
+        "battlefield_layout_definitions": [
+            layout.to_payload() for layout in battlefield_layout_definitions()
+        ],
         "scoring": mission_pack_scoring_row().to_payload(),
         "tactical_secondary": tactical_secondary_procedure().to_payload(),
         "fixed_secondary": fixed_secondary_procedure().to_payload(),

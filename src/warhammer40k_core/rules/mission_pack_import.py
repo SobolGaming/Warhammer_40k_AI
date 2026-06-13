@@ -19,6 +19,7 @@ from warhammer40k_core.core.missions import (
     SecondaryMissionAvailability,
     SecondaryMissionDefinition,
     TournamentScoringCaps,
+    objective_marker_role_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
@@ -96,6 +97,8 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
         ),
         deployment_maps=deployment_maps,
         terrain_layout_templates=terrain_layouts,
+        terrain_area_footprint_templates=(),
+        battlefield_layouts=(),
         mission_deck=MissionDeckDefinition(
             mission_deck_id="chapter-approved-2026-27-strike-force",
             primary_mission_ids=tuple(mission.primary_mission_id for mission in primary_missions),
@@ -196,6 +199,8 @@ def warhammer_event_companion_2026_06_mission_pack() -> MissionPackDefinition:
         ),
         deployment_maps=deployment_maps,
         terrain_layout_templates=terrain_layouts,
+        terrain_area_footprint_templates=(event_source_data.terrain_area_footprint_templates()),
+        battlefield_layouts=event_source_data.battlefield_layout_definitions(),
         mission_deck=MissionDeckDefinition(
             mission_deck_id="warhammer-event-companion-v1-strike-force",
             primary_mission_ids=tuple(mission.primary_mission_id for mission in primary_missions),
@@ -274,6 +279,7 @@ def _deployment_map_from_battlefield_layout(
             ObjectiveMarkerDefinition(
                 objective_marker_id=objective.objective_marker_id,
                 name=objective.name,
+                objective_role=objective_marker_role_from_token(objective.objective_kind),
                 x_inches=objective.x_inches,
                 y_inches=objective.y_inches,
                 source_id=(
