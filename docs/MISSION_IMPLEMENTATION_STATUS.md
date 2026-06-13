@@ -58,13 +58,14 @@ Secondary status:
 ## Summary
 
 - Primary matrix cells: 25 of 25 `implemented`.
-- Primary scoring coverage: 3 `engine_implemented`, 19
-  `source_known_engine_pending`, 3 `awaiting_source`.
+- Primary scoring coverage: 3 `engine_implemented`, 22
+  `source_known_engine_pending`, 0 `awaiting_source`.
 - Primary source-only actions: `decoy-objective`, `triangulate-objective`,
   `extract-intelligence`, `surveil-enemy-unit`,
   `sensor-sweep-locate-and-deny`, `sensor-sweep-extract-relic`, and
-  `commit-sabotage` are tracked as source descriptors only and are not exposed
-  as runtime mission actions.
+  `commit-sabotage`, `secure-asset`, `vanguard-operation`, and
+  `maintain-control` are tracked as source descriptors only and are not
+  exposed as runtime mission actions.
 - Secondary missions: 20 `source_tracked` and `policy_loaded`.
 - Secondary scoring rows: 6 fixed rows, 22 tactical rows, and 10 alternate or
   partial rows.
@@ -106,10 +107,10 @@ Secondary status:
 | `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:surveil-enemy-unit`, `engine_primary_marker_state:enemy_operation_marker`, `engine_primary_movement_effect:remove_enemy_operation_markers_from_objective`, `engine_primary_condition:enemy_unit_surveilled_marker_exception`, `engine_primary_condition:no_enemy_operation_markers_on_battlefield` |
 | `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:extract-intelligence`, `engine_primary_marker_state:gather_intel_operation_marker`, `engine_primary_condition:control_one_or_more_central_objectives_first_battle_round`, `engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn`, `engine_primary_condition:gather_intel_operation_marker_end_of_battle` |
 | `reconnaissance` | `priority-assets` | Search and Scour | `primary-search-and-scour` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:control_one_or_more_central_objectives`, `engine_primary_condition:enemy_started_turn_in_terrain_destroyed`, `engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two`, `engine_primary_condition:no_enemy_units_wholly_within_own_territory` |
-| `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
-| `priority-assets` | `take-and-hold` | Secure Asset | `primary-secure-asset` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:maintain-control`, `engine_primary_marker_state:vital_link_operation_marker`, `engine_primary_condition:central_objective_operation_marker_bonus`, `engine_primary_condition:controlled_central_objective_bonus`, `engine_primary_scoring_grammar:cumulative_condition` |
+| `priority-assets` | `take-and-hold` | Secure Asset | `primary-secure-asset` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:secure-asset`, `engine_primary_condition:friendly_unit_secured_asset_this_turn`, `engine_primary_condition:enemy_started_turn_near_central_objective_destroyed`, `engine_primary_condition:control_three_or_more_objectives` |
 | `priority-assets` | `disruption` | Extract Relic | `primary-extract-relic` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:sensor-sweep-extract-relic`, `engine_primary_marker_state:opponent_operation_marker`, `engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn`, `engine_primary_condition:enemy_started_turn_on_objective_destroyed`, `engine_primary_condition:single_opponent_operation_marker_terrain_area_state` |
-| `priority-assets` | `reconnaissance` | Vanguard Operation | `primary-vanguard-operation` | `implemented` | `awaiting_source` | 0 | 0 | `source_primary_scoring_text` |
+| `priority-assets` | `reconnaissance` | Vanguard Operation | `primary-vanguard-operation` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:vanguard-operation`, `engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn`, `engine_primary_condition:enemy_territory_terrain_area_control`, `engine_primary_condition:control_opponent_home_objective` |
 | `priority-assets` | `priority-assets` | Sabotage | `primary-sabotage` | `implemented` | `source_known_engine_pending` | 3 | 1 | `engine_primary_action:commit-sabotage`, `engine_primary_condition:each_friendly_unit_committed_sabotage_this_turn`, `engine_primary_condition:sabotage_opponent_territory_objective_bonus`, `engine_primary_scoring_grammar:cumulative_condition` |
 
 ## Secondary Missions
@@ -147,8 +148,9 @@ Secondary status:
   validation and mutation paths.
 - `decoy-objective`, `triangulate-objective`, `extract-intelligence`,
   `surveil-enemy-unit`, `sensor-sweep-locate-and-deny`,
-  `sensor-sweep-extract-relic`, and `commit-sabotage` are source-only
-  descriptors. Do not expose them through
+  `sensor-sweep-extract-relic`, `commit-sabotage`, `secure-asset`,
+  `vanguard-operation`, and `maintain-control` are source-only descriptors. Do
+  not expose them through
   `MissionPackDefinition.mission_action(...)` or Shooting-phase mission action
   start until their validation, marker state, and scoring semantics exist.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -367,24 +366,7 @@ def test_phase17j_primary_source_descriptor_rows_do_not_create_placeholder_scori
         if row.scoring_kind == "event_companion_primary_source_descriptor_only"
     )
 
-    assert descriptor_rows
-    assert all(row.scoring_rules == () for row in descriptor_rows)
-    assert {row.primary_mission_id for row in descriptor_rows} == {
-        "primary-secure-asset",
-        "primary-vanguard-operation",
-        "primary-vital-link",
-    }
-
-    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-06")
-    setup = MissionSetup.from_mission_pack(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-purge-the-foe-vs-priority-assets-layout-1",
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-    setup = replace(setup, primary_mission_id="primary-vital-link")
-    with pytest.raises(GameLifecycleError, match="Unsupported primary mission scoring policy"):
-        mission_scoring_policy_from_setup(setup)
+    assert descriptor_rows == ()
 
 
 def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows() -> None:
@@ -400,18 +382,14 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert len(coverage_rows) == 25
     assert status_counts == {
         event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 3,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 19,
-        event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 3,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 22,
+        event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
         row.primary_mission_id
         for row in coverage_rows.values()
         if row.status is event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE
-    } == {
-        "primary-secure-asset",
-        "primary-vanguard-operation",
-        "primary-vital-link",
-    }
+    } == set()
     assert {
         mission_id: len(primary_rows[mission_id].scoring_rules)
         for mission_id in (
@@ -435,6 +413,9 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
             "primary-inescapable-dominion",
             "primary-extract-relic",
             "primary-sabotage",
+            "primary-secure-asset",
+            "primary-vanguard-operation",
+            "primary-vital-link",
         )
     } == {
         "primary-unstoppable-force": 4,
@@ -457,6 +438,9 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-inescapable-dominion": 4,
         "primary-extract-relic": 5,
         "primary-sabotage": 3,
+        "primary-secure-asset": 4,
+        "primary-vanguard-operation": 4,
+        "primary-vital-link": 5,
     }
     assert primary_rows["primary-meatgrinder"].scoring_kind == (
         "event_companion_primary_source_known_engine_pending"
@@ -472,6 +456,9 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert coverage_rows["primary-locate-and-deny"].mission_action_count == 1
     assert coverage_rows["primary-extract-relic"].mission_action_count == 1
     assert coverage_rows["primary-sabotage"].mission_action_count == 1
+    assert coverage_rows["primary-secure-asset"].mission_action_count == 1
+    assert coverage_rows["primary-vanguard-operation"].mission_action_count == 1
+    assert coverage_rows["primary-vital-link"].mission_action_count == 1
     assert "engine_primary_action:decoy-objective" in (
         coverage_rows["primary-smoke-and-mirrors"].needed_work
     )
@@ -483,6 +470,9 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     )
     assert "engine_primary_scoring_grammar:cumulative_condition" in (
         coverage_rows["primary-battlefield-dominance"].needed_work
+    )
+    assert "engine_primary_action:maintain-control" in (
+        coverage_rows["primary-vital-link"].needed_work
     )
     assert "source_objective_role:expansion_objective" in (
         coverage_rows["primary-delaying-action"].needed_work
@@ -499,10 +489,13 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "commit-sabotage",
         "decoy-objective",
         "extract-intelligence",
+        "maintain-control",
         "sensor-sweep-extract-relic",
         "sensor-sweep-locate-and-deny",
+        "secure-asset",
         "surveil-enemy-unit",
         "triangulate-objective",
+        "vanguard-operation",
     }
     assert action_sources["decoy-objective"].to_payload() == {
         "mission_action_id": "decoy-objective",
@@ -565,6 +558,26 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
     )
     assert action_sources["commit-sabotage"].use_limit == (
         "unlimited_different_objective_per_unit_this_phase"
+    )
+    assert action_sources["secure-asset"].to_payload() == {
+        "mission_action_id": "secure-asset",
+        "primary_mission_id": "primary-secure-asset",
+        "name": "Secure Asset",
+        "start_phase": "shooting",
+        "start_timing": "shooting_phase_action_start",
+        "completion_timing": "turn_end",
+        "eligible_unit_policy": "active_player_unit_within_range_of_non_home_objective",
+        "target_policy": "objective_marker_excluding_home",
+        "use_limit": "once_per_turn",
+        "effect_descriptor": "unit_secures_asset_if_action_unit_controls_target_at_turn_end",
+        "engine_exposure_status": "source_known_engine_pending",
+        "source_id": ("gw-11e-warhammer-event-companion-v1-0-2026-06:primary-action:secure-asset"),
+    }
+    assert action_sources["vanguard-operation"].eligible_unit_policy == (
+        "active_player_unit_within_terrain_area_in_enemy_territory"
+    )
+    assert action_sources["maintain-control"].effect_descriptor == (
+        "central_objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end"
     )
     for action_id in action_sources:
         with pytest.raises(MissionPackError, match="mission_action_id"):

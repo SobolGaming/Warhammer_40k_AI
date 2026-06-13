@@ -838,6 +838,53 @@ def primary_mission_action_source_rows() -> tuple[EventPrimaryMissionActionSourc
             engine_exposure_status="source_known_engine_pending",
             source_id=f"{SOURCE_PACKAGE_ID}:primary-action:commit-sabotage",
         ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="secure-asset",
+            primary_mission_id="primary-secure-asset",
+            name="Secure Asset",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="turn_end",
+            eligible_unit_policy="active_player_unit_within_range_of_non_home_objective",
+            target_policy="objective_marker_excluding_home",
+            use_limit="once_per_turn",
+            effect_descriptor="unit_secures_asset_if_action_unit_controls_target_at_turn_end",
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:secure-asset",
+        ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="vanguard-operation",
+            primary_mission_id="primary-vanguard-operation",
+            name="Vanguard Operation",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="turn_end",
+            eligible_unit_policy="active_player_unit_within_terrain_area_in_enemy_territory",
+            target_policy="terrain_area_in_enemy_territory",
+            use_limit="once_per_turn",
+            effect_descriptor=(
+                "unit_performs_vanguard_operation_if_no_enemy_units_in_terrain_area_at_turn_end"
+            ),
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:vanguard-operation",
+        ),
+        EventPrimaryMissionActionSourceRow(
+            mission_action_id="maintain-control",
+            primary_mission_id="primary-vital-link",
+            name="Maintain Control",
+            start_phase="shooting",
+            start_timing="shooting_phase_action_start",
+            completion_timing="turn_end",
+            eligible_unit_policy="active_player_unit_within_range_of_central_objective",
+            target_policy="central_objective_marker",
+            use_limit="once_per_turn",
+            effect_descriptor=(
+                "central_objective_gains_operation_marker_if_action_unit_controls_target"
+                "_at_turn_end"
+            ),
+            engine_exposure_status="source_known_engine_pending",
+            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:maintain-control",
+        ),
     )
 
 
@@ -1055,6 +1102,12 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:sabotage_opponent_territory_objective_bonus",
         "engine_primary_scoring_grammar:cumulative_condition",
     ),
+    "primary-secure-asset": (
+        "engine_primary_action:secure-asset",
+        "engine_primary_condition:friendly_unit_secured_asset_this_turn",
+        "engine_primary_condition:enemy_started_turn_near_central_objective_destroyed",
+        "engine_primary_condition:control_three_or_more_objectives",
+    ),
     "primary-search-and-scour": (
         "engine_primary_condition:control_one_or_more_central_objectives",
         "engine_primary_condition:enemy_started_turn_in_terrain_destroyed",
@@ -1079,6 +1132,19 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_marker_state:triangulated_objective",
         "engine_primary_condition:triangulated_objective_thresholds",
         "engine_primary_condition:control_four_or_more_objectives",
+    ),
+    "primary-vanguard-operation": (
+        "engine_primary_action:vanguard-operation",
+        "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
+        "engine_primary_condition:enemy_territory_terrain_area_control",
+        "engine_primary_condition:control_opponent_home_objective",
+    ),
+    "primary-vital-link": (
+        "engine_primary_action:maintain-control",
+        "engine_primary_marker_state:vital_link_operation_marker",
+        "engine_primary_condition:central_objective_operation_marker_bonus",
+        "engine_primary_condition:controlled_central_objective_bonus",
+        "engine_primary_scoring_grammar:cumulative_condition",
     ),
 }
 
@@ -1732,6 +1798,114 @@ def _source_known_event_primary_mission_rows_by_id() -> dict[
                     "command_phase_or_round_five_turn_end",
                     4,
                     "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-secure-asset",
+            name="Secure Asset",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "secure-asset-action-turn-end",
+                    "turn_end",
+                    4,
+                    "friendly_unit_secured_asset_this_turn",
+                ),
+                _event_primary_rule(
+                    "secure-asset-central-objective-enemy-destroyed",
+                    "turn_end",
+                    2,
+                    (
+                        "one_or_more_enemy_units_started_turn_within_central_objective_range"
+                        "_destroyed_this_turn"
+                    ),
+                ),
+                _event_primary_rule(
+                    "secure-asset-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "secure-asset-three-objectives",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_three_or_more_objectives_from_battle_round_two",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-vanguard-operation",
+            name="Vanguard Operation",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "vanguard-operation-action-turn-end",
+                    "turn_end",
+                    4,
+                    "friendly_unit_performed_vanguard_operation_this_turn",
+                ),
+                _event_primary_rule(
+                    "vanguard-operation-enemy-destroyed-turn-end",
+                    "turn_end",
+                    2,
+                    "one_or_more_enemy_units_destroyed_this_turn",
+                ),
+                _event_primary_rule(
+                    "vanguard-operation-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "vanguard-operation-opponent-home-end-battle",
+                    "end_of_battle",
+                    10,
+                    "control_opponent_home_objective_end_of_battle",
+                ),
+            ),
+        ),
+        chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id="primary-vital-link",
+            name="Vital Link",
+            max_vp_per_turn=None,
+            scoring_kind="event_companion_primary_source_known_engine_pending",
+            vp_per_controlled_objective=None,
+            scoring_rules=(
+                _event_primary_rule(
+                    "vital-link-central-objective-turn-end",
+                    "turn_end",
+                    2,
+                    "control_one_or_more_central_objectives",
+                ),
+                _event_primary_rule(
+                    "vital-link-operation-marker-central-bonus-turn-end",
+                    "turn_end",
+                    1,
+                    ("each_friendly_operation_marker_within_range_of_controlled_central_objective"),
+                ),
+                _event_primary_rule(
+                    "vital-link-objective-control",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "control_one_or_more_non_home_objectives_from_battle_round_two",
+                ),
+                _event_primary_rule(
+                    "vital-link-central-objective-bonus",
+                    "command_phase_or_round_five_turn_end",
+                    4,
+                    "one_or_more_controlled_non_home_objectives_is_central_objective",
+                ),
+                _event_primary_rule(
+                    "vital-link-opponent-home-end-battle",
+                    "end_of_battle",
+                    10,
+                    "control_opponent_home_objective_end_of_battle",
                 ),
             ),
         ),
