@@ -29,6 +29,14 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalPayload,
+    MovementProposalPayloadPayload,
+    MovementProposalRequest,
+    ProposalKind,
+    ProposalValidationResult,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowPayload
 from warhammer40k_core.engine.unit_coherency import (
@@ -55,6 +63,8 @@ if TYPE_CHECKING:
 
 SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE = "select_triggered_movement"
 DECLINE_TRIGGERED_MOVEMENT_OPTION_ID = "decline_triggered_movement"
+TRIGGERED_MOVEMENT_PROPOSAL_ACTION = "surge_move"
+TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND = "triggered_movement"
 _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
 _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
 
@@ -109,6 +119,13 @@ class TriggeredMovementResolutionPayload(TypedDict):
     coherency_result: UnitCoherencyResultPayload
     rollback_record: MovementRollbackRecordPayload | None
     movement_payload: dict[str, JsonValue]
+
+
+class TriggeredMovementEligibleUnitPayload(TypedDict):
+    unit_instance_id: str
+    hook_id: str
+    source_id: str
+    replay_payload: JsonValue
 
 
 @dataclass(frozen=True, slots=True)
@@ -495,6 +512,52 @@ class TriggeredMovementResolution:
 
 
 @dataclass(frozen=True, slots=True)
+class TriggeredMovementEligibleUnit:
+    unit_instance_id: str
+    hook_id: str
+    source_id: str
+    replay_payload: JsonValue = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "TriggeredMovementEligibleUnit unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "hook_id",
+            _validate_identifier("TriggeredMovementEligibleUnit hook_id", self.hook_id),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("TriggeredMovementEligibleUnit source_id", self.source_id),
+        )
+        object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+
+    def to_payload(self) -> TriggeredMovementEligibleUnitPayload:
+        return {
+            "unit_instance_id": self.unit_instance_id,
+            "hook_id": self.hook_id,
+            "source_id": self.source_id,
+            "replay_payload": self.replay_payload,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TriggeredMovementEligibleUnitPayload) -> Self:
+        return cls(
+            unit_instance_id=payload["unit_instance_id"],
+            hook_id=payload["hook_id"],
+            source_id=payload["source_id"],
+            replay_payload=payload["replay_payload"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class TriggeredMovementRequest:
     request_id: str
     game_id: str
@@ -624,6 +687,52 @@ class TriggeredMovementRequest:
         return tuple(options)
 
 
+def triggered_movement_unit_selection_request(
+    *,
+    state: GameState,
+    player_id: str,
+    descriptor: TriggeredMovementDescriptor,
+    eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
+) -> DecisionRequest:
+    _validate_triggered_movement_state_ready(state)
+    actor_id = _validate_identifier("player_id", player_id)
+    if type(descriptor) is not TriggeredMovementDescriptor:
+        raise GameLifecycleError("Triggered movement unit selection requires a descriptor.")
+    _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
+    unit_options = _validate_eligible_units(eligible_units)
+    if not unit_options:
+        raise GameLifecycleError("Triggered movement unit selection requires eligible units.")
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise GameLifecycleError("Triggered movement requires active_player_id.")
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise GameLifecycleError("Triggered movement requires current battle phase.")
+    return DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+        actor_id=actor_id,
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "current_phase": current_phase.value,
+            "player_id": actor_id,
+            "descriptor": validate_json_value(descriptor.to_payload()),
+            "triggered_movement_kind": descriptor.movement_kind.value,
+            "source_rule_id": descriptor.source_rule_id,
+            "trigger_timing": validate_json_value(descriptor.trigger_timing.to_payload()),
+            "requires_movement_proposal": True,
+            "movement_phase_action": TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
+            "eligible_units": [validate_json_value(unit.to_payload()) for unit in unit_options],
+        },
+        options=_triggered_movement_unit_selection_options(
+            descriptor=descriptor,
+            eligible_units=unit_options,
+        ),
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class TriggeredMovementHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
@@ -703,6 +812,14 @@ class TriggeredMovementHandler:
             cast(TriggeredMovementDescriptorPayload, _payload_object(request_payload, "descriptor"))
         )
         _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
+        if _payload_optional_bool(request_payload, "requires_movement_proposal"):
+            return _apply_triggered_movement_unit_selection_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                descriptor=descriptor,
+                request_payload=request_payload,
+            )
         payload = _decision_payload_object(result.payload)
         unit_instance_id = _payload_string(payload, "unit_instance_id")
         if unit_instance_id != _payload_string(request_payload, "unit_instance_id"):
@@ -799,6 +916,107 @@ class TriggeredMovementHandler:
                 state=state,
                 result=result,
                 unit_instance_id=unit_instance_id,
+                descriptor=descriptor,
+                resolution=resolution,
+                transition_batch=transition_batch,
+            ),
+        )
+        return None
+
+    def apply_proposal_decision(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+        result: DecisionResult,
+        decisions: DecisionController,
+    ) -> LifecycleStatus | None:
+        _validate_triggered_movement_state_ready(state)
+        ruleset_descriptor = _ruleset_descriptor_for_handler(self)
+        proposal_request = _triggered_movement_proposal_request_from_request(request)
+        submission = MovementProposalPayload.from_payload(
+            cast(MovementProposalPayloadPayload, result.payload)
+        )
+        proposal_validation = submission.validation_result_for_request(proposal_request)
+        if not proposal_validation.is_valid:
+            return _reject_invalid_triggered_movement_proposal(
+                state=state,
+                decisions=decisions,
+                result=result,
+                proposal_validation=proposal_validation,
+                message="Triggered movement proposal does not match the pending request.",
+            )
+        descriptor = _descriptor_from_proposal_request(proposal_request)
+        _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
+        scenario = _battlefield_scenario(state)
+        unit_placement = scenario.battlefield_state.unit_placement_by_id(
+            proposal_request.unit_instance_id
+        )
+        if result.actor_id != unit_placement.player_id:
+            raise GameLifecycleError("Triggered movement proposal actor must own the unit.")
+        resolution = resolve_triggered_movement(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            descriptor=descriptor,
+            path_witness=submission.witness,
+            battle_round=state.battle_round,
+            battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            surge_move_states=tuple(state.surge_move_states),
+            hover_mode_states=tuple(state.hover_mode_states),
+        )
+        if not resolution.is_valid:
+            violation_code = _triggered_movement_violation_code(resolution)
+            invalid_payload = _triggered_movement_invalid_payload(
+                state=state,
+                result=result,
+                unit_instance_id=proposal_request.unit_instance_id,
+                descriptor=descriptor,
+                resolution=resolution,
+                violation_code=violation_code,
+            )
+            decisions.event_log.append("triggered_movement_invalid", invalid_payload)
+            retry_request = _triggered_movement_proposal_retry_request(
+                state=state,
+                proposal_request=proposal_request,
+                rejected_result=result,
+            )
+            decisions.request_decision(retry_request)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Triggered movement is invalid.",
+                payload={
+                    **invalid_payload,
+                    "next_request_id": retry_request.request_id,
+                },
+            )
+        transition_batch = resolution.transition_batch(before=unit_placement)
+        battlefield_state = state.battlefield_state
+        if battlefield_state is None:
+            raise GameLifecycleError("Triggered movement requires battlefield_state.")
+        state.replace_battlefield_state(
+            apply_triggered_movement_to_battlefield(
+                battlefield_state=battlefield_state,
+                resolution=resolution,
+            )
+        )
+        if descriptor.movement_kind is TriggeredMovementKind.SURGE:
+            state.record_surge_move_state(
+                SurgeMoveState.from_resolution(
+                    player_id=unit_placement.player_id,
+                    battle_round=state.battle_round,
+                    unit_instance_id=proposal_request.unit_instance_id,
+                    descriptor=descriptor,
+                    request_id=result.request_id,
+                    result_id=result.result_id,
+                )
+            )
+        decisions.event_log.append(
+            "triggered_movement_resolved",
+            _triggered_movement_resolved_payload(
+                state=state,
+                result=result,
+                unit_instance_id=proposal_request.unit_instance_id,
                 descriptor=descriptor,
                 resolution=resolution,
                 transition_batch=transition_batch,
@@ -997,6 +1215,65 @@ def apply_triggered_movement_to_battlefield(
     if not resolution.is_valid:
         raise GameLifecycleError("Invalid triggered movement cannot mutate battlefield_state.")
     return battlefield_state.with_unit_placement(resolution.attempted_placement)
+
+
+def is_triggered_movement_proposal_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Triggered movement proposal check requires a DecisionRequest.")
+    if request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
+        return False
+    payload = request.payload
+    if not isinstance(payload, dict):
+        return False
+    proposal_payload = payload.get("proposal_request")
+    if not isinstance(proposal_payload, dict):
+        return False
+    context = proposal_payload.get("context")
+    if not isinstance(context, dict):
+        return False
+    return context.get("context_kind") == TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND
+
+
+def invalid_triggered_movement_proposal_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    if not is_triggered_movement_proposal_request(request):
+        raise GameLifecycleError("Triggered movement proposal validation received wrong request.")
+    try:
+        proposal_request = _triggered_movement_proposal_request_from_request(request)
+        submission = MovementProposalPayload.from_payload(
+            cast(MovementProposalPayloadPayload, result.payload)
+        )
+    except GameLifecycleError as exc:
+        proposal_request = _triggered_movement_proposal_request_from_request(request)
+        proposal_validation = ProposalValidationResult.invalid(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            violation_code="malformed_proposal_payload",
+            message=str(exc),
+            field=None,
+        )
+        return _reject_invalid_triggered_movement_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_validation=proposal_validation,
+            message="Triggered movement proposal is malformed.",
+        )
+    proposal_validation = submission.validation_result_for_request(proposal_request)
+    if proposal_validation.is_valid:
+        return None
+    return _reject_invalid_triggered_movement_proposal(
+        state=state,
+        decisions=decisions,
+        result=result,
+        proposal_validation=proposal_validation,
+        message="Triggered movement proposal does not match the pending request.",
+    )
 
 
 def triggered_movement_kind_from_token(token: object) -> TriggeredMovementKind:
@@ -1227,6 +1504,313 @@ def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
         for keyword in keywords
     }
     return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
+
+
+def _triggered_movement_unit_selection_options(
+    *,
+    descriptor: TriggeredMovementDescriptor,
+    eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
+) -> tuple[DecisionOption, ...]:
+    options: list[DecisionOption] = []
+    if descriptor.optional:
+        options.append(
+            DecisionOption(
+                option_id=DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+                label="Decline Triggered Movement",
+                payload=validate_json_value(
+                    {
+                        "triggered_movement_kind": descriptor.movement_kind.value,
+                        "displacement_kind": descriptor.displacement_kind.value,
+                        "descriptor": descriptor.to_payload(),
+                        "source_rule_id": descriptor.source_rule_id,
+                        "trigger_timing": descriptor.trigger_timing.to_payload(),
+                        "movement_phase_action": None,
+                        "requires_movement_proposal": False,
+                        "declined": True,
+                    }
+                ),
+            )
+        )
+    for unit in eligible_units:
+        options.append(
+            DecisionOption(
+                option_id=f"{descriptor.movement_kind.value}:{unit.unit_instance_id}",
+                label=f"{descriptor.movement_kind.value.title()} {unit.unit_instance_id}",
+                payload=validate_json_value(
+                    {
+                        "triggered_movement_kind": descriptor.movement_kind.value,
+                        "displacement_kind": descriptor.displacement_kind.value,
+                        "unit_instance_id": unit.unit_instance_id,
+                        "descriptor": descriptor.to_payload(),
+                        "source_rule_id": descriptor.source_rule_id,
+                        "trigger_timing": descriptor.trigger_timing.to_payload(),
+                        "movement_phase_action": TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
+                        "requires_movement_proposal": True,
+                        "eligible_unit": unit.to_payload(),
+                    }
+                ),
+            )
+        )
+    return tuple(options)
+
+
+def _apply_triggered_movement_unit_selection_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    descriptor: TriggeredMovementDescriptor,
+    request_payload: dict[str, JsonValue],
+) -> LifecycleStatus | None:
+    payload = _decision_payload_object(result.payload)
+    player_id = _payload_string(request_payload, "player_id")
+    actor_id = _validate_identifier("Triggered movement result actor_id", result.actor_id)
+    if actor_id != player_id:
+        raise GameLifecycleError("Triggered movement unit selection actor drift.")
+    eligible_units = _eligible_units_from_request_payload(request_payload)
+    if _payload_optional_bool(payload, "declined"):
+        if result.selected_option_id != DECLINE_TRIGGERED_MOVEMENT_OPTION_ID:
+            raise GameLifecycleError("Declined triggered movement result option drift.")
+        if not descriptor.optional:
+            raise GameLifecycleError("Mandatory triggered movement cannot be declined.")
+        decisions.event_log.append(
+            "triggered_movement_declined",
+            _triggered_movement_unit_selection_declined_payload(
+                state=state,
+                result=result,
+                descriptor=descriptor,
+                eligible_units=eligible_units,
+            ),
+        )
+        return None
+    unit_instance_id = _payload_string(payload, "unit_instance_id")
+    selected_unit = _eligible_unit_by_id(eligible_units, unit_instance_id=unit_instance_id)
+    scenario = _battlefield_scenario(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    if actor_id != unit_placement.player_id:
+        raise GameLifecycleError("Triggered movement actor must own the selected unit.")
+    if payload.get("eligible_unit") != selected_unit.to_payload():
+        raise GameLifecycleError("Triggered movement eligible unit payload drift.")
+    request = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=actor_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=descriptor.trigger_timing.phase.value,
+        unit_instance_id=unit_instance_id,
+        proposal_kind=ProposalKind.SURGE_MOVE,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        movement_phase_action=TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
+        context={
+            "context_kind": TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,
+            "descriptor": validate_json_value(descriptor.to_payload()),
+            "selected_unit": validate_json_value(selected_unit.to_payload()),
+            "selection_request_id": result.request_id,
+            "selection_result_id": result.result_id,
+            "selection_option_id": result.selected_option_id,
+        },
+    ).to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "triggered_movement_unit_selected",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": descriptor.trigger_timing.phase.value,
+            "unit_instance_id": unit_instance_id,
+            "triggered_movement_kind": descriptor.movement_kind.value,
+            "source_rule_id": descriptor.source_rule_id,
+            "trigger_timing": descriptor.trigger_timing.to_payload(),
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "proposal_request_id": request.request_id,
+            "eligible_unit": selected_unit.to_payload(),
+            "phase_body_status": "triggered_movement_proposal_pending",
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": descriptor.trigger_timing.phase.value,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "unit_instance_id": unit_instance_id,
+            "decision_type": MOVEMENT_PROPOSAL_DECISION_TYPE,
+            "phase_body_status": "triggered_movement_proposal_pending",
+        },
+    )
+
+
+def _triggered_movement_proposal_request_from_request(
+    request: DecisionRequest,
+) -> MovementProposalRequest:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    if proposal_request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
+        raise GameLifecycleError("Triggered movement requires a movement proposal request.")
+    if proposal_request.proposal_kind is not ProposalKind.SURGE_MOVE:
+        raise GameLifecycleError("Triggered movement proposal kind drift.")
+    context = proposal_request.context or {}
+    if context.get("context_kind") != TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND:
+        raise GameLifecycleError("Triggered movement proposal context drift.")
+    _descriptor_from_proposal_request(proposal_request)
+    return proposal_request
+
+
+def _descriptor_from_proposal_request(
+    proposal_request: MovementProposalRequest,
+) -> TriggeredMovementDescriptor:
+    context = proposal_request.context or {}
+    descriptor_payload = context.get("descriptor")
+    if not isinstance(descriptor_payload, dict):
+        raise GameLifecycleError("Triggered movement proposal missing descriptor context.")
+    return TriggeredMovementDescriptor.from_payload(
+        cast(TriggeredMovementDescriptorPayload, descriptor_payload)
+    )
+
+
+def _triggered_movement_proposal_retry_request(
+    *,
+    state: GameState,
+    proposal_request: MovementProposalRequest,
+    rejected_result: DecisionResult,
+) -> DecisionRequest:
+    return MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=proposal_request.actor_id,
+        game_id=proposal_request.game_id,
+        battle_round=proposal_request.battle_round,
+        phase=proposal_request.phase,
+        unit_instance_id=proposal_request.unit_instance_id,
+        proposal_kind=proposal_request.proposal_kind,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=rejected_result.result_id,
+        movement_phase_action=proposal_request.movement_phase_action,
+        context=proposal_request.context,
+    ).to_decision_request()
+
+
+def _reject_invalid_triggered_movement_proposal(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    proposal_validation: ProposalValidationResult,
+    message: str,
+) -> LifecycleStatus:
+    invalid_payload = _triggered_movement_proposal_invalid_payload(
+        state=state,
+        result=result,
+        proposal_validation=proposal_validation,
+    )
+    decisions.event_log.append("triggered_movement_proposal_invalid", invalid_payload)
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message=message,
+        payload=invalid_payload,
+    )
+
+
+def _triggered_movement_proposal_invalid_payload(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    proposal_validation: ProposalValidationResult,
+) -> dict[str, JsonValue]:
+    return _validate_json_object(
+        "triggered movement proposal invalid payload",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": _current_battle_phase_value(state),
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "triggered_movement_proposal_invalid",
+            "proposal_validation": proposal_validation.to_payload(),
+        },
+    )
+
+
+def _triggered_movement_unit_selection_declined_payload(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    descriptor: TriggeredMovementDescriptor,
+    eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
+) -> dict[str, JsonValue]:
+    return _validate_json_object(
+        "triggered movement unit selection declined payload",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": _current_battle_phase_value(state),
+            "triggered_movement_kind": descriptor.movement_kind.value,
+            "source_rule_id": descriptor.source_rule_id,
+            "trigger_timing": descriptor.trigger_timing.to_payload(),
+            "descriptor": descriptor.to_payload(),
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "phase_body_status": "triggered_movement_declined",
+            "movement_phase_action": None,
+            "declined": True,
+            "eligible_units": [unit.to_payload() for unit in eligible_units],
+        },
+    )
+
+
+def _eligible_units_from_request_payload(
+    payload: dict[str, JsonValue],
+) -> tuple[TriggeredMovementEligibleUnit, ...]:
+    raw_units = payload.get("eligible_units")
+    if not isinstance(raw_units, list):
+        raise GameLifecycleError("Triggered movement unit selection missing eligible units.")
+    units: list[TriggeredMovementEligibleUnit] = []
+    for raw_unit in raw_units:
+        if not isinstance(raw_unit, dict):
+            raise GameLifecycleError("Triggered movement eligible units must be objects.")
+        units.append(
+            TriggeredMovementEligibleUnit.from_payload(
+                cast(TriggeredMovementEligibleUnitPayload, raw_unit)
+            )
+        )
+    return _validate_eligible_units(tuple(units))
+
+
+def _eligible_unit_by_id(
+    eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
+    *,
+    unit_instance_id: str,
+) -> TriggeredMovementEligibleUnit:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    matching = tuple(unit for unit in eligible_units if unit.unit_instance_id == requested_unit_id)
+    if len(matching) != 1:
+        raise GameLifecycleError("Triggered movement selected unit is not eligible.")
+    return matching[0]
+
+
+def _validate_eligible_units(
+    values: object,
+) -> tuple[TriggeredMovementEligibleUnit, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Triggered movement eligible units must be a tuple.")
+    units: list[TriggeredMovementEligibleUnit] = []
+    seen_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TriggeredMovementEligibleUnit:
+            raise GameLifecycleError(
+                "Triggered movement eligible units must contain eligible units."
+            )
+        if value.unit_instance_id in seen_ids:
+            raise GameLifecycleError("Triggered movement eligible unit IDs must be unique.")
+        seen_ids.add(value.unit_instance_id)
+        units.append(value)
+    return tuple(sorted(units, key=lambda unit: unit.unit_instance_id))
 
 
 def _triggered_movement_invalid_payload(

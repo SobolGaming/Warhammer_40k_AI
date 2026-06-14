@@ -2682,6 +2682,7 @@ def _continue_pending_destroyed_transport_disembark(
         model_instance_id=pending.damage_application.model_instance_id,
     )
     destroyed_emission = _emit_damage_event(
+        state=state,
         decisions=decisions,
         hooks=hooks,
         attack_sequence=sequence_without_pending,
@@ -4143,6 +4144,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         model_instance_id=damage.model_instance_id,
     )
     destroyed_emission = _emit_damage_event(
+        state=state,
         decisions=decisions,
         hooks=hooks,
         attack_sequence=attack_sequence,
@@ -4904,6 +4906,7 @@ def _resolve_grouped_damage_from(
         pending_for_die = current_pending.with_allocated_model_ids(updated_allocated_ids)
         if saving_throw is not None and saving_throw.successful:
             _emit_damage_event(
+                state=state,
                 decisions=decisions,
                 hooks=hooks,
                 attack_sequence=save_attack_sequence,
@@ -5461,6 +5464,7 @@ def _apply_damage_after_feel_no_pain(
             model_instance_id=damage.model_instance_id,
         )
     destroyed_emission = _emit_damage_event(
+        state=state,
         decisions=decisions,
         hooks=hooks,
         attack_sequence=attack_sequence,
@@ -5927,6 +5931,7 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             model_instance_id=secondary_damage.model_instance_id,
         )
         destroyed_emission = _emit_damage_event(
+            state=state,
             decisions=decisions,
             hooks=AttackSequenceHooks.empty(),
             attack_sequence=attack_sequence,
@@ -6092,6 +6097,7 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         model_instance_id=damage.model_instance_id,
     )
     destroyed_emission = _emit_damage_event(
+        state=state,
         decisions=decisions,
         hooks=hooks,
         attack_sequence=attack_sequence,
@@ -6839,6 +6845,7 @@ def _selected_anti_keyword_ability_id(pool: RangedAttackPool) -> str | None:
 
 def _emit_damage_event(
     *,
+    state: GameState,
     decisions: DecisionController,
     hooks: AttackSequenceHooks,
     attack_sequence: AttackSequence,
@@ -6886,6 +6893,12 @@ def _emit_damage_event(
         destroyed_event = decisions.event_log.append(
             "model_destroyed",
             {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": attack_sequence.source_phase.value,
+                "destroying_player_id": attack_sequence.attacker_player_id,
+                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
                 "sequence_id": attack_sequence.sequence_id,
                 "attack_context_id": attack_sequence.attack_context_id(),
                 "target_unit_instance_id": damage.target_unit_instance_id,

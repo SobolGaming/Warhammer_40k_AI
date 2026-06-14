@@ -150,6 +150,12 @@ from warhammer40k_core.engine.scoring import (
     initial_victory_point_ledgers,
     secondary_mission_card_mode_from_token,
 )
+from warhammer40k_core.engine.sticky_objective_control import (
+    StickyObjectiveControlState,
+    StickyObjectiveControlStatePayload,
+    apply_sticky_objective_control,
+    sticky_objective_control_state_is_expired,
+)
 from warhammer40k_core.engine.stratagems import StratagemUseRecord, StratagemUseRecordPayload
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
@@ -262,6 +268,7 @@ class GameStatePayload(TypedDict):
     battle_shocked_unit_ids: list[str]
     battle_shocked_unit_states: list[BattleShockedUnitStatePayload]
     objective_control_records: list[ObjectiveControlRecordPayload]
+    sticky_objective_control_states: list[StickyObjectiveControlStatePayload]
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartStatePayload]
     primary_terrain_trap_states: list[PrimaryTerrainTrapStatePayload]
     primary_unit_destruction_states: list[PrimaryUnitDestructionStatePayload]
@@ -350,6 +357,10 @@ def _new_battle_shocked_unit_states() -> list[BattleShockedUnitState]:
 
 
 def _new_objective_control_records() -> list[ObjectiveControlRecord]:
+    return []
+
+
+def _new_sticky_objective_control_states() -> list[StickyObjectiveControlState]:
     return []
 
 
@@ -836,6 +847,9 @@ class GameState:
     objective_control_records: list[ObjectiveControlRecord] = field(
         default_factory=_new_objective_control_records
     )
+    sticky_objective_control_states: list[StickyObjectiveControlState] = field(
+        default_factory=_new_sticky_objective_control_states
+    )
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartState] = field(
         default_factory=_new_primary_objective_turn_start_states
     )
@@ -1034,6 +1048,11 @@ class GameState:
         )
         self.objective_control_records = _validate_objective_control_records(
             self.objective_control_records,
+            game_id=self.game_id,
+            player_ids=self.player_ids,
+        )
+        self.sticky_objective_control_states = _validate_sticky_objective_control_states(
+            self.sticky_objective_control_states,
             game_id=self.game_id,
             player_ids=self.player_ids,
         )
@@ -3037,6 +3056,32 @@ class GameState:
             raise GameLifecycleError("ObjectiveControlRecord already exists.")
         self.objective_control_records.append(record)
 
+    def record_sticky_objective_control_state(
+        self,
+        state: StickyObjectiveControlState,
+    ) -> None:
+        if type(state) is not StickyObjectiveControlState:
+            raise GameLifecycleError(
+                "GameState sticky_objective_control_state must be a sticky state."
+            )
+        if state.game_id != self.game_id:
+            raise GameLifecycleError("StickyObjectiveControlState game_id drift.")
+        if state.player_id not in self.player_ids or state.active_player_id not in self.player_ids:
+            raise GameLifecycleError("StickyObjectiveControlState player_id is not in this game.")
+        if any(
+            stored.state_id == state.state_id for stored in self.sticky_objective_control_states
+        ):
+            raise GameLifecycleError("StickyObjectiveControlState already exists.")
+        active_for_objective = tuple(
+            stored
+            for stored in self.sticky_objective_control_states
+            if stored.objective_id == state.objective_id
+        )
+        if any(stored.player_id != state.player_id for stored in active_for_objective):
+            raise GameLifecycleError("Sticky objective control cannot be held by multiple players.")
+        self.sticky_objective_control_states.append(state)
+        self.sticky_objective_control_states.sort(key=lambda stored: stored.state_id)
+
     def _record_objective_control_record_if_absent(
         self,
         record: ObjectiveControlRecord,
@@ -3599,6 +3644,9 @@ class GameState:
             "objective_control_records": [
                 record.to_payload() for record in self.objective_control_records
             ],
+            "sticky_objective_control_states": [
+                state.to_payload() for state in self.sticky_objective_control_states
+            ],
             "primary_objective_turn_start_states": [
                 state.to_payload() for state in self.primary_objective_turn_start_states
             ],
@@ -3895,6 +3943,10 @@ class GameState:
                 ObjectiveControlRecord.from_payload(record)
                 for record in payload["objective_control_records"]
             ],
+            sticky_objective_control_states=[
+                StickyObjectiveControlState.from_payload(state)
+                for state in payload["sticky_objective_control_states"]
+            ],
             primary_objective_turn_start_states=[
                 PrimaryObjectiveTurnStartState.from_payload(state)
                 for state in payload["primary_objective_turn_start_states"]
@@ -4045,8 +4097,31 @@ class GameState:
                 ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
             )
         )
-        self.record_objective_control_record(record)
-        return record
+        retained_record = apply_sticky_objective_control(
+            record=record,
+            states=tuple(self.sticky_objective_control_states),
+        )
+        self._expire_sticky_objective_control_states(record)
+        self.record_objective_control_record(retained_record)
+        return retained_record
+
+    def _expire_sticky_objective_control_states(
+        self,
+        record: ObjectiveControlRecord,
+    ) -> None:
+        retained: list[StickyObjectiveControlState] = []
+        for state in self.sticky_objective_control_states:
+            if sticky_objective_control_state_is_expired(
+                state=state,
+                record=record,
+                player_ids=tuple(self.player_ids),
+            ):
+                continue
+            retained.append(state)
+        self.sticky_objective_control_states = sorted(
+            retained,
+            key=lambda state: state.state_id,
+        )
 
     def _record_primary_objective_turn_start_boundary_if_available(self) -> None:
         if self.mission_setup is None or self.battlefield_state is None:
@@ -5388,6 +5463,40 @@ def _validate_objective_control_records(
         seen.add(record.record_id)
         validated.append(record)
     return validated
+
+
+def _validate_sticky_objective_control_states(
+    states: object,
+    *,
+    game_id: str,
+    player_ids: tuple[str, ...],
+) -> list[StickyObjectiveControlState]:
+    if not isinstance(states, list):
+        raise GameLifecycleError("GameState sticky objective-control states must be a list.")
+    player_id_set = set(player_ids)
+    validated: list[StickyObjectiveControlState] = []
+    seen_ids: set[str] = set()
+    holder_by_objective: dict[str, str] = {}
+    for state in cast(list[object], states):
+        if type(state) is not StickyObjectiveControlState:
+            raise GameLifecycleError(
+                "GameState sticky objective-control states must contain sticky states."
+            )
+        if state.game_id != game_id:
+            raise GameLifecycleError("StickyObjectiveControlState game_id drift.")
+        if state.player_id not in player_id_set or state.active_player_id not in player_id_set:
+            raise GameLifecycleError("StickyObjectiveControlState player_id is not in this game.")
+        if state.state_id in seen_ids:
+            raise GameLifecycleError("GameState sticky objective-control states must be unique.")
+        current_holder = holder_by_objective.get(state.objective_id)
+        if current_holder is not None and current_holder != state.player_id:
+            raise GameLifecycleError(
+                "Sticky objective-control states cannot have multiple holders per objective."
+            )
+        seen_ids.add(state.state_id)
+        holder_by_objective[state.objective_id] = state.player_id
+        validated.append(state)
+    return sorted(validated, key=lambda stored: stored.state_id)
 
 
 def _validate_primary_objective_turn_start_states(

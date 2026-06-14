@@ -53,6 +53,11 @@ Use existing `RuntimeContentContribution` surfaces:
   or outcome resolution;
 - Fall Back eligibility hook bindings for rules whose effect is that a Fall Back
   move does not prevent later Shooting or Charge eligibility;
+- Movement-end surge hook bindings for opponent Movement phase rules that
+  trigger after an enemy unit ends a move and may grant source-bounded
+  triggered movement;
+- phase-end objective-control hook bindings for detachment rules that retain or
+  alter objective control at phase-end scoring boundaries;
 - enhancement effect bindings for Enhancement or Upgrade effects that are
   selected from Phase 16D army-construction records and materialize static
   engine-owned characteristic modifiers;
@@ -83,6 +88,27 @@ permission grants; the Movement engine records the authoritative
 `FellBackUnitState`, emits deterministic replay-safe grant payloads, and the
 Shooting and Charge phases consume that engine-owned state. Faction modules must
 not mutate Fall Back, Shooting, or Charge phase state directly.
+
+Movement-end surge hook bindings are an approved runtime contribution surface
+only for source-backed rules whose trigger is an enemy unit ending a move during
+the Movement phase. Each hook binding must use a `source_id` from the generated
+Phase 17F execution rows for the implemented rule. Hook handlers return typed
+eligible-unit grants only; the Movement engine owns the D6 surge distance roll,
+the finite triggered-movement unit-selection request, the follow-up
+`submit_movement_proposal` request with proposal kind `surge_move`, PathWitness
+validation, authoritative battlefield mutation, and deterministic replay-safe
+`SurgeMoveState` records. Faction modules must not roll dice, move models,
+write battlefield placements, or bypass the shared decision path.
+
+Phase-end objective-control hook bindings are an approved runtime contribution
+surface only for source-backed rules whose timing is the end of a phase and
+whose effect is retained or adjusted objective control. Each hook binding must
+use a `source_id` from the generated Phase 17F execution rows for the
+implemented rule. Hook handlers return typed objective-control state records
+derived from engine snapshots and objective-control records; `GameState` owns
+the retained-control overlay, expiry checks, and phase-boundary
+objective-control event records. Faction modules must not mutate scoring,
+objective-control history, or battlefield state directly.
 
 Stratagem handler bindings are an approved runtime contribution surface for
 source-backed faction or detachment Stratagems whose timing is represented by an
@@ -166,6 +192,12 @@ Required:
 - Register Fall Back eligibility hook bindings only for source-backed rules
   that change Fall Back Shooting or Charge permissions, and link them to
   generated Phase 17F execution row IDs.
+- Register Movement-end surge hook bindings only for source-backed rules that
+  trigger after enemy Movement phase move completion, and link them to generated
+  Phase 17F execution row IDs.
+- Register phase-end objective-control hook bindings only for source-backed
+  rules that retain or adjust control at phase-end objective-control boundaries,
+  and link them to generated Phase 17F execution row IDs.
 - Register faction or detachment Stratagems through source-backed Stratagem
   records and named handlers only when an engine timing window exists, and prove
   runtime detachment materialization registers them before `use_stratagem`

@@ -248,15 +248,18 @@ handlers, source-linked Battle-shock hook bindings for rules whose timing is
 Battle-shock modifier or outcome resolution, or source-linked Fall Back
 eligibility hook bindings for rules whose effect is that a completed Fall Back
 move does not prevent later Shooting or Charge eligibility, or source-linked
-enhancement effect bindings for selected Enhancement or Upgrade assignments
-that materialize static engine-owned characteristic modifiers, or source-linked
-Fight activation ability hook bindings for optional selected-to-fight rules
-whose effect is a scoped melee targeting permission, or source-linked Stratagem
-handler bindings for faction or detachment Stratagems whose timing is already
-represented by an engine timing window. These execution surfaces must mutate
-authoritative game state only through engine-owned services, use the shared
-`DecisionRequest` / `DecisionResult` path for player choices, and emit
-deterministic replay-safe execution results.
+Movement-end surge hook bindings for opponent Movement phase rules that trigger
+after an enemy unit ends a move, or source-linked phase-end objective-control
+hook bindings for rules that retain or adjust objective control at a phase-end
+boundary, or source-linked enhancement effect bindings for selected Enhancement
+or Upgrade assignments that materialize static engine-owned characteristic
+modifiers, or source-linked Fight activation ability hook bindings for optional
+selected-to-fight rules whose effect is a scoped melee targeting permission, or
+source-linked Stratagem handler bindings for faction or detachment Stratagems
+whose timing is already represented by an engine timing window. These execution
+surfaces must mutate authoritative game state only through engine-owned
+services, use the shared `DecisionRequest` / `DecisionResult` path for player
+choices, and emit deterministic replay-safe execution results.
 Implementation PRs must use the generated scaffold targets and the
 [Faction Agent Implementation Contract](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
 
@@ -276,6 +279,21 @@ rule, and the selected runtime manifest must carry that ID into the
 grants only; the Movement engine records `FellBackUnitState` and emits
 replay-safe grant payloads, while Shooting and Charge eligibility consume the
 recorded engine state.
+
+Movement-end surge hook bindings follow the same Phase 17F mapping rule. The
+binding `source_id` must be the generated execution row ID for the implemented
+rule, and the selected runtime manifest must carry that ID into the
+`RuntimeContentBundle` audit summary. Hook handlers return typed eligible-unit
+grants only; the Movement engine owns surge-distance dice, triggered-movement
+unit selection, the `surge_move` movement proposal request, PathWitness
+validation, battlefield mutation, and replay-safe movement records.
+
+Phase-end objective-control hook bindings follow the same Phase 17F mapping
+rule. The binding `source_id` must be the generated execution row ID for the
+implemented rule, and the selected runtime manifest must carry that ID into the
+`RuntimeContentBundle` audit summary. Hook handlers return typed
+objective-control state records only; `GameState` owns retained-control overlays,
+expiry checks, and phase-boundary objective-control records.
 
 Enhancement effect bindings map to Phase 17F through the generated detachment
 enhancement-descriptor execution row until native exact enhancement subrows
@@ -318,7 +336,10 @@ Required tests:
   Battle-shock resolution;
 - detachment rules load and execute for every detachment through registered
   lifecycle hooks, including Fall Back eligibility hooks when the rule modifies
-  Shooting or Charge consequences of a completed Fall Back move;
+  Shooting or Charge consequences of a completed Fall Back move, Movement-end
+  surge hooks when the rule grants triggered movement after an enemy move ends,
+  and phase-end objective-control hooks when the rule retains or adjusts
+  objective control;
 - enhancements validate eligibility from Phase 16D army-construction records
   and execute their effects through generic IR, named handlers, or enhancement
   effect bindings for static characteristic modifiers, including Fight
@@ -599,9 +620,10 @@ Cavalcade of Chaos / Unholy Avalanche Fall Back eligibility hooks, Cavalcade of
 Chaos / Apocalyptic Steeds Upgrade enhancement effects, Cavalcade of Chaos /
 Soul-Shattering Charge Upgrade selected-to-fight ability hooks, and Cavalcade of
 Chaos / Warp-Riders selected-to-move Stratagem handling through the shared
-`use_stratagem` path. The source-status table remains the Phase 17F baseline
-until a later execution-status overlay replaces blocked rows with implemented
-semantic status.
+`use_stratagem` path, plus Blood Legion / Murdercall Movement-end surge hooks
+and Blood Legion / Blood Tainted phase-end objective-control retention hooks.
+The source-status table remains the Phase 17F baseline until a later
+execution-status overlay replaces blocked rows with implemented semantic status.
 
 ### Adepta Sororitas Execution Status
 

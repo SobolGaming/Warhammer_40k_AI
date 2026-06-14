@@ -5,6 +5,11 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
+    ObjectiveControlTiming,
+    resolve_objective_control,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -12,6 +17,10 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
     PhaseHandler,
+)
+from warhammer40k_core.engine.sticky_objective_control import (
+    PhaseEndObjectiveControlContext,
+    PhaseEndObjectiveControlHookRegistry,
 )
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -28,8 +37,25 @@ _END_WINDOW_RESOLUTION_ORDER = ("non_mission_rules", "mission_rules")
 
 
 class BattleRoundFlow:
-    def __init__(self, *, phase_handlers: Mapping[BattlePhase, PhaseHandler]) -> None:
+    def __init__(
+        self,
+        *,
+        phase_handlers: Mapping[BattlePhase, PhaseHandler],
+        phase_end_objective_control_hooks: PhaseEndObjectiveControlHookRegistry | None = None,
+    ) -> None:
         self._phase_handlers = dict(phase_handlers)
+        self._phase_end_objective_control_hooks = (
+            PhaseEndObjectiveControlHookRegistry.empty()
+            if phase_end_objective_control_hooks is None
+            else phase_end_objective_control_hooks
+        )
+        if (
+            type(self._phase_end_objective_control_hooks)
+            is not PhaseEndObjectiveControlHookRegistry
+        ):
+            raise GameLifecycleError(
+                "BattleRoundFlow requires a phase-end objective-control hook registry."
+            )
 
     def advance(
         self,
@@ -48,6 +74,11 @@ class BattleRoundFlow:
         if handler is None:
             raise GameLifecycleError("BattleRoundFlow missing handler for current battle phase.")
         _emit_start_timing_windows(state=state, decisions=decisions)
+        _emit_phase_start_objective_proximity_snapshot_if_available(
+            state=state,
+            decisions=decisions,
+            registry=self._phase_end_objective_control_hooks,
+        )
         status = handler.begin_phase(
             state=state,
             decisions=decisions,
@@ -66,6 +97,11 @@ class BattleRoundFlow:
             return status
 
         _emit_end_timing_windows(state=state, decisions=decisions)
+        _apply_phase_end_objective_control_hooks(
+            state=state,
+            decisions=decisions,
+            registry=self._phase_end_objective_control_hooks,
+        )
         completed_phase = state.advance_to_next_battle_phase()
         decisions.event_log.append(
             "battle_phase_completed",
@@ -183,6 +219,65 @@ def _emit_start_timing_windows(*, state: GameState, decisions: DecisionControlle
     )
 
 
+def _emit_phase_start_objective_proximity_snapshot_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    registry: PhaseEndObjectiveControlHookRegistry,
+) -> None:
+    if type(registry) is not PhaseEndObjectiveControlHookRegistry:
+        raise GameLifecycleError("Objective proximity snapshot requires a registry.")
+    if not registry.all_bindings():
+        return
+    if state.mission_setup is None or state.battlefield_state is None:
+        return
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise GameLifecycleError("Objective proximity snapshot requires a current phase.")
+    active_player_id = _active_player_id(state)
+    snapshot_id = (
+        f"objective-proximity:{state.game_id}:round-{state.battle_round:02d}:"
+        f"turn:{active_player_id}:phase:{current_phase.value}:start"
+    )
+    if _event_with_payload_id_exists(
+        decisions=decisions,
+        event_type="objective_marker_phase_start_proximity_snapshot",
+        key="snapshot_id",
+        value=snapshot_id,
+    ):
+        return
+    record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=current_phase,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        )
+    )
+    objective_ids_by_unit: dict[str, set[str]] = {}
+    for result in record.results:
+        for contribution in result.contributors:
+            objective_ids_by_unit.setdefault(contribution.unit_instance_id, set()).add(
+                result.objective_id
+            )
+    decisions.event_log.append(
+        "objective_marker_phase_start_proximity_snapshot",
+        {
+            "snapshot_id": snapshot_id,
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": current_phase.value,
+            "objective_ids_by_unit_instance_id": {
+                unit_id: sorted(objective_ids)
+                for unit_id, objective_ids in sorted(objective_ids_by_unit.items())
+            },
+            "removed_model_ids": sorted(state.battlefield_state.removed_model_ids),
+            "source_objective_control_record": record.to_payload(),
+        },
+    )
+
+
 def _emit_end_timing_windows(*, state: GameState, decisions: DecisionController) -> None:
     completed_phase = state.current_battle_phase
     if completed_phase is None:
@@ -233,6 +328,38 @@ def _emit_end_timing_windows(*, state: GameState, decisions: DecisionController)
         ),
         resolution_order=_END_WINDOW_RESOLUTION_ORDER,
     )
+
+
+def _apply_phase_end_objective_control_hooks(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    registry: PhaseEndObjectiveControlHookRegistry,
+) -> None:
+    if type(registry) is not PhaseEndObjectiveControlHookRegistry:
+        raise GameLifecycleError("Phase-end objective-control hooks require a registry.")
+    if not registry.all_bindings():
+        return
+    completed_phase = state.current_battle_phase
+    if completed_phase is None:
+        raise GameLifecycleError("Phase-end objective-control hooks require a current phase.")
+    context = PhaseEndObjectiveControlContext(
+        state=state,
+        event_log=decisions.event_log,
+        completed_phase=completed_phase,
+    )
+    for sticky_state in registry.states_for(context):
+        state.record_sticky_objective_control_state(sticky_state)
+        decisions.event_log.append(
+            "sticky_objective_control_state_recorded",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "phase": completed_phase.value,
+                "sticky_objective_control_state": sticky_state.to_payload(),
+            },
+        )
 
 
 def _emit_timing_window_if_missing(
@@ -290,6 +417,24 @@ def _timing_window_event_exists(
         if not isinstance(timing_window_payload, dict):
             continue
         if timing_window_payload.get("window_id") == window_id:
+            return True
+    return False
+
+
+def _event_with_payload_id_exists(
+    *,
+    decisions: DecisionController,
+    event_type: str,
+    key: str,
+    value: str,
+) -> bool:
+    for record in decisions.event_log.records:
+        if record.event_type != event_type:
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get(key) == value:
             return True
     return False
 
