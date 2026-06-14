@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import dataclass, replace
 from enum import StrEnum
 
@@ -49,12 +50,16 @@ BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID = "take-and-hold-vs-take-and-hold-layout-1"
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID = "take-and-hold-vs-take-and-hold-layout-2"
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID = "take-and-hold-vs-take-and-hold-layout-3"
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS = {
     TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID: (
         "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_a"
     ),
     TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID: (
         "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_b"
+    ),
+    TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID: (
+        "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c"
     ),
 }
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES = {
@@ -64,9 +69,14 @@ TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES = {
     TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID: (
         "Take and Hold vs Take and Hold - Battlefield Dominance - Layout B"
     ),
+    TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID: (
+        "Take and Hold vs Take and Hold - Battlefield Dominance - Layout C"
+    ),
 }
 EXTRACTED_TAKE_AND_HOLD_LAYOUT_IDS = frozenset(TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS)
 TERRAIN_AREA_FEATURE_KIND = "terrain_area"
+LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES = 9.0
+LAYOUT_C_ARC_SEGMENTS = 16
 FOOTPRINT_6X4 = "FOOTPRINT_6X4"
 FOOTPRINT_10X2_5 = "FOOTPRINT_10X2_5"
 FOOTPRINT_6X2 = "FOOTPRINT_6X2"
@@ -328,16 +338,18 @@ class CardAmendmentSet:
 
 
 @dataclass(frozen=True, slots=True)
-class EventPolygonSourceRecord:
-    polygon_id: str
+class EventShapeSourceRecord:
+    shape_id: str
     role: str
-    vertices: tuple[tuple[float, float], ...]
+    polygons: tuple[tuple[tuple[float, float], ...], ...]
 
     def to_payload(self) -> dict[str, object]:
         return {
-            "polygon_id": self.polygon_id,
+            "shape_id": self.shape_id,
             "role": self.role,
-            "vertices": [[x, y] for x, y in self.vertices],
+            "polygons": [
+                [[x, y] for x, y in polygon_vertices] for polygon_vertices in self.polygons
+            ],
         }
 
 
@@ -391,9 +403,9 @@ class WarhammerEventLayoutDescriptor:
     battlefield_depth_inches: float
     attacker_edge: str
     defender_edge: str
-    deployment_zone_polygons: tuple[EventPolygonSourceRecord, ...]
-    no_mans_land_polygon: EventPolygonSourceRecord
-    player_territory_polygons: tuple[EventPolygonSourceRecord, ...]
+    deployment_zone_shapes: tuple[EventShapeSourceRecord, ...]
+    no_mans_land_shape: EventShapeSourceRecord
+    player_territory_shapes: tuple[EventShapeSourceRecord, ...]
     objective_points: tuple[EventObjectivePointRecord, ...]
     terrain_features: tuple[EventTerrainSourceRecord, ...]
     geometry_extraction_status: str
@@ -412,12 +424,10 @@ class WarhammerEventLayoutDescriptor:
             "battlefield_depth_inches": self.battlefield_depth_inches,
             "attacker_edge": self.attacker_edge,
             "defender_edge": self.defender_edge,
-            "deployment_zone_polygons": [
-                polygon.to_payload() for polygon in self.deployment_zone_polygons
-            ],
-            "no_mans_land_polygon": self.no_mans_land_polygon.to_payload(),
-            "player_territory_polygons": [
-                polygon.to_payload() for polygon in self.player_territory_polygons
+            "deployment_zone_shapes": [shape.to_payload() for shape in self.deployment_zone_shapes],
+            "no_mans_land_shape": self.no_mans_land_shape.to_payload(),
+            "player_territory_shapes": [
+                shape.to_payload() for shape in self.player_territory_shapes
             ],
             "objective_points": [objective.to_payload() for objective in self.objective_points],
             "terrain_features": [feature.to_payload() for feature in self.terrain_features],
@@ -2025,15 +2035,15 @@ def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
                     battlefield_depth_inches=_layout_battlefield_depth(layout_id),
                     attacker_edge=_layout_attacker_edge(layout_id, layout_number),
                     defender_edge=_layout_defender_edge(layout_id, layout_number),
-                    deployment_zone_polygons=_descriptor_deployment_polygons(
+                    deployment_zone_shapes=_descriptor_deployment_shapes(
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
-                    no_mans_land_polygon=_no_mans_land_polygon(
+                    no_mans_land_shape=_no_mans_land_shape(
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
-                    player_territory_polygons=_territory_polygons(
+                    player_territory_shapes=_territory_shapes(
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
@@ -2326,6 +2336,25 @@ def _take_and_hold_vs_take_and_hold_objectives(
             ("expansion-south", "South Expansion Objective", "expansion", 19.2, 10.28),
             ("expansion-north", "North Expansion Objective", "expansion", 24.92, 50.61),
         ),
+        TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID: (
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 9.45, 50.3),
+            ("defender-home", "Defender Home Objective", "defender_home", 34.55, 9.7),
+            ("central", "Central Objective", "central", 22.0, 30.0),
+            (
+                "expansion-south-west",
+                "South-west Expansion Objective",
+                "expansion",
+                9.7,
+                10.55,
+            ),
+            (
+                "expansion-north-east",
+                "North-east Expansion Objective",
+                "expansion",
+                34.3,
+                49.45,
+            ),
+        ),
     }
     return tuple(
         chapter_approved.SourceBattlefieldObjectiveRow(
@@ -2423,6 +2452,27 @@ def _take_and_hold_vs_take_and_hold_deployment_zones(
             min_y=0.0,
             max_x=44.0,
             max_y=60.0,
+        )
+    elif layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+        attacker_shape = _shape_from_vertices(
+            _rectangle_with_quarter_circle_cutout_vertices(
+                min_x=0.0,
+                min_y=30.0,
+                max_x=22.0,
+                max_y=60.0,
+                corner="lower_right",
+                radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+            )
+        )
+        defender_shape = _shape_from_vertices(
+            _rectangle_with_quarter_circle_cutout_vertices(
+                min_x=22.0,
+                min_y=0.0,
+                max_x=44.0,
+                max_y=30.0,
+                corner="upper_left",
+                radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+            )
         )
     else:
         raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
@@ -2531,28 +2581,28 @@ def _layout_terrain_features(
     )
 
 
-def _descriptor_deployment_polygons(
+def _descriptor_deployment_shapes(
     *,
     layout_id: str,
     layout_number: int,
-) -> tuple[EventPolygonSourceRecord, ...]:
+) -> tuple[EventShapeSourceRecord, ...]:
     return tuple(
-        EventPolygonSourceRecord(
-            polygon_id=zone.deployment_zone_id,
+        EventShapeSourceRecord(
+            shape_id=zone.deployment_zone_id,
             role=zone.player_role,
-            vertices=_shape_vertices(zone.shape),
+            polygons=_shape_polygons(zone.shape),
         )
         for zone in _layout_deployment_zones(layout_id=layout_id, layout_number=layout_number)
     )
 
 
-def _no_mans_land_polygon(*, layout_id: str, layout_number: int) -> EventPolygonSourceRecord:
+def _no_mans_land_shape(*, layout_id: str, layout_number: int) -> EventShapeSourceRecord:
     vertices: tuple[tuple[float, float], ...]
     if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
-        return EventPolygonSourceRecord(
-            polygon_id=f"{layout_id}-no-mans-land",
+        return EventShapeSourceRecord(
+            shape_id=f"{layout_id}-no-mans-land",
             role="no_mans_land",
-            vertices=_shape_vertices(_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id)),
+            polygons=_shape_polygons(_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id)),
         )
     if layout_number == 2:
         vertices = (
@@ -2572,25 +2622,25 @@ def _no_mans_land_polygon(*, layout_id: str, layout_number: int) -> EventPolygon
             _pending_layout_point(42.0, 44.0),
             _pending_layout_point(18.0, 44.0),
         )
-    return EventPolygonSourceRecord(
-        polygon_id=f"{layout_id}-no-mans-land",
+    return EventShapeSourceRecord(
+        shape_id=f"{layout_id}-no-mans-land",
         role="no_mans_land",
-        vertices=vertices,
+        polygons=(vertices,),
     )
 
 
-def _territory_polygons(
+def _territory_shapes(
     *,
     layout_id: str,
     layout_number: int,
-) -> tuple[EventPolygonSourceRecord, ...]:
+) -> tuple[EventShapeSourceRecord, ...]:
     if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
         territories = _take_and_hold_vs_take_and_hold_territory_vertices(layout_id)
         return tuple(
-            EventPolygonSourceRecord(
-                polygon_id=f"{layout_id}-{role}",
+            EventShapeSourceRecord(
+                shape_id=f"{layout_id}-{role}",
                 role=role,
-                vertices=vertices,
+                polygons=(vertices,),
             )
             for role, vertices in territories
         )
@@ -2637,10 +2687,10 @@ def _territory_polygons(
             ),
         )
     return tuple(
-        EventPolygonSourceRecord(
-            polygon_id=f"{layout_id}-{role}",
+        EventShapeSourceRecord(
+            shape_id=f"{layout_id}-{role}",
             role=role,
-            vertices=vertices,
+            polygons=(vertices,),
         )
         for role, vertices in territories
     )
@@ -2726,6 +2776,9 @@ def _take_and_hold_vs_take_and_hold_regions(*, layout_id: str) -> tuple[Battlefi
         layout_id=layout_id
     )
     source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
+    layout_number = _layout_number_from_layout_id(layout_id)
+    attacker_edge = _layout_attacker_edge(layout_id, layout_number)
+    defender_edge = _layout_defender_edge(layout_id, layout_number)
     territories = dict(_take_and_hold_vs_take_and_hold_territory_vertices(layout_id))
     return (
         BattlefieldRegion(
@@ -2757,7 +2810,7 @@ def _take_and_hold_vs_take_and_hold_regions(*, layout_id: str) -> tuple[Battlefi
             region_kind=BattlefieldRegionKind.TERRITORY,
             owner_role="attacker",
             shape=_shape_from_vertices(territories["attacker_territory"]),
-            derived_from=("attacker_edge_north",),
+            derived_from=(f"attacker_edge_{attacker_edge}",),
             source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:attacker-territory",
         ),
         BattlefieldRegion(
@@ -2765,7 +2818,7 @@ def _take_and_hold_vs_take_and_hold_regions(*, layout_id: str) -> tuple[Battlefi
             region_kind=BattlefieldRegionKind.TERRITORY,
             owner_role="defender",
             shape=_shape_from_vertices(territories["defender_territory"]),
-            derived_from=("defender_edge_south",),
+            derived_from=(f"defender_edge_{defender_edge}",),
             source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:defender-territory",
         ),
     )
@@ -2792,6 +2845,27 @@ def _take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id: str) -> Deploy
             max_x=32.0,
             max_y=60.0,
         )
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+        return _shape_from_polygons(
+            (
+                ((0.0, 0.0), (22.0, 0.0), (22.0, 30.0), (0.0, 30.0)),
+                ((22.0, 30.0), (44.0, 30.0), (44.0, 60.0), (22.0, 60.0)),
+                _quarter_circle_sector_vertices(
+                    center_x=22.0,
+                    center_y=30.0,
+                    radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+                    start_degrees=90.0,
+                    end_degrees=180.0,
+                ),
+                _quarter_circle_sector_vertices(
+                    center_x=22.0,
+                    center_y=30.0,
+                    radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+                    start_degrees=-90.0,
+                    end_degrees=0.0,
+                ),
+            )
+        )
     raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
 
 
@@ -2807,6 +2881,11 @@ def _take_and_hold_vs_take_and_hold_territory_vertices(
         return (
             ("attacker_territory", ((0.0, 0.0), (22.0, 0.0), (22.0, 60.0), (0.0, 60.0))),
             ("defender_territory", ((22.0, 0.0), (44.0, 0.0), (44.0, 60.0), (22.0, 60.0))),
+        )
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+        return (
+            ("attacker_territory", ((0.0, 0.0), (44.0, 60.0), (0.0, 60.0))),
+            ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 60.0))),
         )
     raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
 
@@ -3026,6 +3105,88 @@ def _take_and_hold_vs_take_and_hold_terrain_area_specs(
                 ("light-6x2-north-west", "light-6x2-south-east"),
             ),
         )
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+        return (
+            (
+                (
+                    "dense-7x11-5-north-west",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    9.75,
+                    50.0,
+                    315.0,
+                ),
+                (
+                    "dense-7x11-5-south-west",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    9.7,
+                    11.2,
+                    0.0,
+                ),
+                (
+                    "dense-8x11-5-polygon-central-north-west",
+                    FOOTPRINT_8X11_5_POLYGON,
+                    TerrainAreaClassification.DENSE,
+                    18.3,
+                    32.1,
+                    0.0,
+                ),
+                (
+                    "light-10x2-5-north-center",
+                    FOOTPRINT_10X2_5,
+                    TerrainAreaClassification.LIGHT,
+                    20.65,
+                    46.1,
+                    35.0,
+                ),
+                (
+                    "light-6x4-north-west",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    13.2,
+                    40.55,
+                    90.0,
+                ),
+                (
+                    "light-6x4-central-east",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    32.9,
+                    33.6,
+                    90.0,
+                ),
+                (
+                    "light-6x2-west-midfield",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    5.8,
+                    36.0,
+                    0.0,
+                ),
+                (
+                    "light-6x2-south-west",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    7.2,
+                    23.25,
+                    0.0,
+                ),
+            ),
+            (
+                ("dense-7x11-5-north-west", "dense-7x11-5-south-east"),
+                ("dense-7x11-5-south-west", "dense-7x11-5-north-east"),
+                (
+                    "dense-8x11-5-polygon-central-north-west",
+                    "dense-8x11-5-polygon-central-south-east",
+                ),
+                ("light-10x2-5-north-center", "light-10x2-5-south-center"),
+                ("light-6x4-north-west", "light-6x4-south-east"),
+                ("light-6x4-central-east", "light-6x4-central-west"),
+                ("light-6x2-west-midfield", "light-6x2-east-midfield"),
+                ("light-6x2-south-west", "light-6x2-north-east"),
+            ),
+        )
     raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
 
 
@@ -3051,11 +3212,96 @@ def _footprint_template(
 
 
 def _shape_from_vertices(vertices: tuple[tuple[float, float], ...]) -> DeploymentZoneShape:
+    return _shape_from_polygons((vertices,))
+
+
+def _shape_from_polygons(
+    polygons: tuple[tuple[tuple[float, float], ...], ...],
+) -> DeploymentZoneShape:
     return DeploymentZoneShape(
-        polygons=(
+        polygons=tuple(
             DeploymentZonePolygon(
                 vertices=tuple(DeploymentZonePoint(x=x, y=y) for x, y in vertices)
+            )
+            for vertices in polygons
+        )
+    )
+
+
+def _rectangle_with_quarter_circle_cutout_vertices(
+    *,
+    min_x: float,
+    min_y: float,
+    max_x: float,
+    max_y: float,
+    corner: str,
+    radius: float,
+) -> tuple[tuple[float, float], ...]:
+    if corner == "lower_right":
+        return (
+            (min_x, min_y),
+            *_arc_points(
+                center_x=max_x,
+                center_y=min_y,
+                radius=radius,
+                start_degrees=180.0,
+                end_degrees=90.0,
             ),
+            (max_x, max_y),
+            (min_x, max_y),
+        )
+    if corner == "upper_left":
+        return (
+            (min_x, min_y),
+            (max_x, min_y),
+            (max_x, max_y),
+            *_arc_points(
+                center_x=min_x,
+                center_y=max_y,
+                radius=radius,
+                start_degrees=0.0,
+                end_degrees=-90.0,
+            ),
+        )
+    raise MissionPackError("Unsupported quarter-circle cutout corner.")
+
+
+def _quarter_circle_sector_vertices(
+    *,
+    center_x: float,
+    center_y: float,
+    radius: float,
+    start_degrees: float,
+    end_degrees: float,
+) -> tuple[tuple[float, float], ...]:
+    return (
+        (center_x, center_y),
+        *_arc_points(
+            center_x=center_x,
+            center_y=center_y,
+            radius=radius,
+            start_degrees=start_degrees,
+            end_degrees=end_degrees,
+        ),
+    )
+
+
+def _arc_points(
+    *,
+    center_x: float,
+    center_y: float,
+    radius: float,
+    start_degrees: float,
+    end_degrees: float,
+) -> tuple[tuple[float, float], ...]:
+    return tuple(
+        (
+            round(center_x + radius * math.cos(math.radians(degrees)), 6),
+            round(center_y + radius * math.sin(math.radians(degrees)), 6),
+        )
+        for degrees in (
+            start_degrees + (end_degrees - start_degrees) * index / LAYOUT_C_ARC_SEGMENTS
+            for index in range(LAYOUT_C_ARC_SEGMENTS + 1)
         )
     )
 
@@ -3073,6 +3319,8 @@ def _layout_attacker_edge(layout_id: str, layout_number: int) -> str:
         return "north"
     if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
         return "west"
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+        return "west"
     return _attacker_edge(layout_number)
 
 
@@ -3080,6 +3328,8 @@ def _layout_defender_edge(layout_id: str, layout_number: int) -> str:
     if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
         return "south"
     if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+        return "east"
+    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
         return "east"
     return _defender_edge(layout_number)
 
@@ -3132,10 +3382,10 @@ def _axis_aligned_display(
     )
 
 
-def _shape_vertices(shape: DeploymentZoneShape) -> tuple[tuple[float, float], ...]:
-    if len(shape.polygons) != 1:
-        raise MissionPackError("Event Companion deployment shape must have one polygon.")
-    return tuple((point.x, point.y) for point in shape.polygons[0].vertices)
+def _shape_polygons(shape: DeploymentZoneShape) -> tuple[tuple[tuple[float, float], ...], ...]:
+    return tuple(
+        tuple((point.x, point.y) for point in polygon.vertices) for polygon in shape.polygons
+    )
 
 
 def _base_size_source_record(
