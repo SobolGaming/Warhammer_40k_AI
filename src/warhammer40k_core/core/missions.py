@@ -103,6 +103,11 @@ class DeploymentMapDefinitionPayload(TypedDict):
     source_id: str
 
 
+class ObjectiveMarkerRoleCountPayload(TypedDict):
+    objective_role: str
+    count: int
+
+
 class BattlefieldLayoutDefinitionPayload(TypedDict):
     battlefield_layout_id: str
     name: str
@@ -118,6 +123,7 @@ class BattlefieldLayoutDefinitionPayload(TypedDict):
     deployment_zones: list[DeploymentZonePayload]
     battlefield_regions: list[BattlefieldRegionPayload]
     terrain_areas: list[PlacedTerrainAreaPayload]
+    objective_role_counts: list[ObjectiveMarkerRoleCountPayload]
     source_id: str
 
 
@@ -576,6 +582,7 @@ class BattlefieldLayoutDefinition:
     deployment_zones: tuple[DeploymentZone, ...]
     battlefield_regions: tuple[BattlefieldRegion, ...]
     terrain_areas: tuple[PlacedTerrainArea, ...]
+    objective_role_counts: tuple[tuple[ObjectiveMarkerRole, int], ...]
     source_id: str
 
     def __post_init__(self) -> None:
@@ -658,6 +665,7 @@ class BattlefieldLayoutDefinition:
         )
         regions = _validate_battlefield_regions(self.battlefield_regions)
         terrain_areas = _validate_placed_terrain_areas(self.terrain_areas)
+        objective_role_counts = _validate_objective_role_counts(self.objective_role_counts)
         _validate_markers_within_battlefield(
             markers=markers,
             width=self.battlefield_width_inches,
@@ -682,6 +690,7 @@ class BattlefieldLayoutDefinition:
             objective_markers=markers,
             deployment_zones=zones,
             battlefield_regions=regions,
+            expected_objective_role_counts=objective_role_counts,
             battlefield_width_inches=self.battlefield_width_inches,
             battlefield_depth_inches=self.battlefield_depth_inches,
         )
@@ -689,6 +698,7 @@ class BattlefieldLayoutDefinition:
         object.__setattr__(self, "deployment_zones", zones)
         object.__setattr__(self, "battlefield_regions", regions)
         object.__setattr__(self, "terrain_areas", terrain_areas)
+        object.__setattr__(self, "objective_role_counts", objective_role_counts)
         object.__setattr__(
             self,
             "source_id",
@@ -711,6 +721,10 @@ class BattlefieldLayoutDefinition:
             "deployment_zones": [zone.to_payload() for zone in self.deployment_zones],
             "battlefield_regions": [region.to_payload() for region in self.battlefield_regions],
             "terrain_areas": [terrain_area.to_payload() for terrain_area in self.terrain_areas],
+            "objective_role_counts": [
+                {"objective_role": role.value, "count": count}
+                for role, count in self.objective_role_counts
+            ],
             "source_id": self.source_id,
         }
 
@@ -743,6 +757,13 @@ class BattlefieldLayoutDefinition:
             ),
             terrain_areas=tuple(
                 PlacedTerrainArea.from_payload(area) for area in raw_payload["terrain_areas"]
+            ),
+            objective_role_counts=tuple(
+                (
+                    objective_marker_role_from_token(role_count["objective_role"]),
+                    role_count["count"],
+                )
+                for role_count in raw_payload["objective_role_counts"]
             ),
             source_id=raw_payload["source_id"],
         )
@@ -2253,6 +2274,57 @@ def _validate_placed_terrain_areas(values: object) -> tuple[PlacedTerrainArea, .
     return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
 
 
+def _validate_objective_role_counts(
+    values: object,
+) -> tuple[tuple[ObjectiveMarkerRole, int], ...]:
+    if type(values) is not tuple:
+        raise MissionPackError("BattlefieldLayoutDefinition objective_role_counts must be a tuple.")
+    counts: dict[ObjectiveMarkerRole, int] = {}
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not tuple:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_role_counts entries must be "
+                "role/count pairs."
+            )
+        entry = cast(tuple[object, ...], value)
+        if len(entry) != 2:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_role_counts entries must be "
+                "role/count pairs."
+            )
+        role_token, raw_count = entry
+        role = objective_marker_role_from_token(role_token)
+        if type(raw_count) is not int:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_role_counts count must be an integer."
+            )
+        if raw_count <= 0:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_role_counts count must be positive."
+            )
+        if role in counts:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_role_counts must not duplicate roles."
+            )
+        counts[role] = raw_count
+    required_roles = {
+        ObjectiveMarkerRole.ATTACKER_HOME,
+        ObjectiveMarkerRole.DEFENDER_HOME,
+        ObjectiveMarkerRole.CENTRAL,
+        ObjectiveMarkerRole.EXPANSION,
+    }
+    if set(counts) != required_roles:
+        raise MissionPackError(
+            "BattlefieldLayoutDefinition objective_role_counts must define attacker home, "
+            "defender home, central, and expansion counts."
+        )
+    if counts[ObjectiveMarkerRole.ATTACKER_HOME] != 1:
+        raise MissionPackError("BattlefieldLayoutDefinition must have one attacker home objective.")
+    if counts[ObjectiveMarkerRole.DEFENDER_HOME] != 1:
+        raise MissionPackError("BattlefieldLayoutDefinition must have one defender home objective.")
+    return tuple(sorted(counts.items(), key=lambda item: item[0].value))
+
+
 def _validate_deployment_maps(
     values: object,
 ) -> tuple[DeploymentMapDefinition, ...]:
@@ -2639,6 +2711,7 @@ def _validate_battlefield_layout_region_invariants(
     objective_markers: tuple[ObjectiveMarkerDefinition, ...],
     deployment_zones: tuple[DeploymentZone, ...],
     battlefield_regions: tuple[BattlefieldRegion, ...],
+    expected_objective_role_counts: tuple[tuple[ObjectiveMarkerRole, int], ...],
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
 ) -> None:
@@ -2740,6 +2813,7 @@ def _validate_battlefield_layout_region_invariants(
         objective_markers=objective_markers,
         attacker_deployment_zone=zones_by_role["attacker"],
         defender_deployment_zone=zones_by_role["defender"],
+        expected_objective_role_counts=expected_objective_role_counts,
     )
 
 
@@ -2748,21 +2822,15 @@ def _validate_battlefield_layout_objective_roles(
     objective_markers: tuple[ObjectiveMarkerDefinition, ...],
     attacker_deployment_zone: DeploymentZone,
     defender_deployment_zone: DeploymentZone,
+    expected_objective_role_counts: tuple[tuple[ObjectiveMarkerRole, int], ...],
 ) -> None:
-    expected_counts = {
-        ObjectiveMarkerRole.ATTACKER_HOME: 1,
-        ObjectiveMarkerRole.DEFENDER_HOME: 1,
-        ObjectiveMarkerRole.CENTRAL: 1,
-        ObjectiveMarkerRole.EXPANSION: 2,
-    }
-    actual_counts = {
-        role: sum(1 for marker in objective_markers if marker.objective_role is role)
-        for role in expected_counts
-    }
+    expected_counts = dict(expected_objective_role_counts)
+    actual_counts: dict[ObjectiveMarkerRole, int] = {}
+    for marker in objective_markers:
+        actual_counts[marker.objective_role] = actual_counts.get(marker.objective_role, 0) + 1
     if actual_counts != expected_counts:
         raise MissionPackError(
-            "Battlefield layout objective roles must include one attacker home, one defender "
-            "home, one central, and two expansion markers."
+            "Battlefield layout objective roles must match source-declared objective counts."
         )
     attacker_home = _single_objective_marker_by_role(
         objective_markers,
