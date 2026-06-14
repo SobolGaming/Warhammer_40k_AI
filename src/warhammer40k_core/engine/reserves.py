@@ -1314,6 +1314,7 @@ class StrategicReserveRule:
     edge_distance_inches: float = 6.0
     enemy_horizontal_distance_inches: float = _RESERVE_ENEMY_DISTANCE_INCHES
     earliest_arrival_battle_round: int = 2
+    ignores_mission_arrival_round_blocks: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1338,6 +1339,14 @@ class StrategicReserveRule:
             _validate_positive_int(
                 "StrategicReserveRule earliest_arrival_battle_round",
                 self.earliest_arrival_battle_round,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "ignores_mission_arrival_round_blocks",
+            _validate_bool(
+                "StrategicReserveRule ignores_mission_arrival_round_blocks",
+                self.ignores_mission_arrival_round_blocks,
             ),
         )
 
@@ -1705,6 +1714,7 @@ def resolve_reserve_arrival(
         placement_kind=placement_kind,
         battle_round=requested_round,
         mission_policy=ruleset_descriptor.mission_policy,
+        strategic_reserve_rule=strategic_rule,
     )
     _append_unit_placement_drift_violations(
         violations=violations,
@@ -1990,11 +2000,15 @@ def _append_reserve_state_violations(
     placement_kind: BattlefieldPlacementKind,
     battle_round: int,
     mission_policy: MissionPolicyDescriptor,
+    strategic_reserve_rule: StrategicReserveRule,
 ) -> None:
     if type(mission_policy) is not MissionPolicyDescriptor:
         raise GameLifecycleError("reserve arrival requires a MissionPolicyDescriptor.")
+    if type(strategic_reserve_rule) is not StrategicReserveRule:
+        raise GameLifecycleError("reserve arrival requires a StrategicReserveRule.")
     if (
         battle_round in mission_policy.reserves_arrival_blocked_battle_rounds
+        and not strategic_reserve_rule.ignores_mission_arrival_round_blocks
         and not _reserve_arrival_block_exemption_applies(
             reserve_state=reserve_state,
             mission_policy=mission_policy,
@@ -2038,7 +2052,7 @@ def _append_reserve_state_violations(
                     message="Strategic Reserves placement requires Strategic Reserves state.",
                 )
             )
-        if battle_round == 1:
+        if battle_round < strategic_reserve_rule.earliest_arrival_battle_round:
             violations.append(
                 ReservePlacementViolation(
                     violation_code=(

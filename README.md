@@ -285,14 +285,17 @@ source-linked static Movement characteristic modifier, plus the Cavalcade of
 Chaos / Soul-Shattering Charge Upgrade selected-to-fight ability hook for
 source-linked melee targeting permissions and the Cavalcade of Chaos /
 Warp-Riders selected-to-move Stratagem through the shared `use_stratagem` CP,
-targeting, and temporary movement-keyword path. The slice also supports Blood
-Legion / Murdercall through source-linked Movement-end surge hooks and Blood
-Legion / Blood Tainted through phase-end objective-control retention hooks;
-remaining army rules, detachment rules, enhancement effects, and
-faction/detachment Stratagems are still planned Phase 17G work. Phase 17H is
-planned for datasheet, wargear, and weapon ability execution. Phase 17I is
-planned for source-content coverage, execution-status, and
-unsupported-descriptor audits.
+targeting, and temporary movement-keyword path. Cavalcade also supports From
+Beyond the Veil through the shared end-Movement ingress Stratagem and Strategic
+Reserves placement path, and Inescapable Manifestations through the opponent
+Fall Back reaction window that forces Desperate Escape through the normal
+Movement proposal path. The slice also supports Blood Legion / Murdercall
+through source-linked Movement-end surge hooks and Blood Legion / Blood Tainted
+through phase-end objective-control retention hooks; remaining army rules,
+detachment rules, enhancement effects, and faction/detachment Stratagems are
+still planned Phase 17G work. Phase 17H is planned for datasheet, wargear, and
+weapon ability execution. Phase 17I is planned for source-content coverage,
+execution-status, and unsupported-descriptor audits.
 
 Phase 18A is complete for local CLI/human decision entry and viewer-safe
 datacard projection. CLI helpers render pending finite and parameterized

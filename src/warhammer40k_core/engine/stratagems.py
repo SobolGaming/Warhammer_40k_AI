@@ -116,6 +116,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
     ReserveStatus,
+    StrategicReserveRule,
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
@@ -160,11 +161,14 @@ CORE_HEROIC_INTERVENTION_HANDLER_ID = "core:heroic-intervention"
 CORE_COUNTEROFFENSIVE_HANDLER_ID = "core:counteroffensive"
 CORE_CRUSHING_IMPACT_HANDLER_ID = "core:crushing-impact"
 CORE_EPIC_CHALLENGE_HANDLER_ID = "core:epic-challenge"
+GENERIC_INGRESS_MOVE_HANDLER_ID = "generic:ingress-move"
+GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID = "generic:force-desperate-escape"
 GENERIC_RULE_IR_STRATAGEM_HANDLER_ID = "generic:rule-ir"
 COMMAND_REROLL_DICE_CONTEXT_KEY = "dice_roll_state"
 COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY = "affected_unit_instance_id"
 INSANE_BRAVERY_TARGET_POLICY_ID = "battle_shock_test_unit"
 RAPID_INGRESS_TARGET_POLICY_ID = "reserves_unit"
+STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID = "strategic_reserves_ingress_unit"
 NEW_ORDERS_TARGET_POLICY_ID = "active_tactical_secondary_card"
 FIRE_OVERWATCH_TARGET_POLICY_ID = "out_of_phase_shooting_unit"
 GO_TO_GROUND_TARGET_POLICY_ID = "selected_target_infantry_unit"
@@ -175,6 +179,7 @@ COUNTEROFFENSIVE_TARGET_POLICY_ID = "counteroffensive_unit"
 CRUSHING_IMPACT_TARGET_POLICY_ID = "crushing_impact_unit"
 EPIC_CHALLENGE_TARGET_POLICY_ID = "epic_challenge_unit"
 SELECTED_TO_MOVE_TARGET_POLICY_ID = "selected_to_move_unit"
+ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID = "engaged_with_fall_back_unit"
 EXPLOSIVES_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 CRUSHING_IMPACT_MODEL_CONTEXT_KEY = "model_instance_id"
@@ -184,6 +189,9 @@ HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND = "leap_to_defend"
 HEROIC_INTERVENTION_MODE_INTO_THE_FRAY = "into_the_fray"
 SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
 SELECTED_TO_MOVE_UNIT_CONTEXT_KEY = "selected_to_move_unit_instance_id"
+FALL_BACK_UNIT_CONTEXT_KEY = "fall_back_unit_instance_id"
+FALL_BACK_MODE_CONTEXT_KEY = "fall_back_mode"
+FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND = "forced_fall_back_desperate_escape"
 FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY = "moved_unit_instance_id"
 FIRE_OVERWATCH_MAX_RANGE_INCHES = 24.0
 HEROIC_INTERVENTION_TARGET_RANGE_INCHES = 12.0
@@ -2624,6 +2632,40 @@ def _handler_unavailable_reason(
                 else ("no_eligible_reserve_unit")
             )
         return None
+    if definition.handler_id == GENERIC_INGRESS_MOVE_HANDLER_ID:
+        if context.trigger_kind is not TimingTriggerKind.END_PHASE:
+            return "ingress_move_requires_end_phase"
+        if context.phase is not BattlePhase.MOVEMENT:
+            return "ingress_move_requires_movement_phase"
+        if target_binding is None:
+            return (
+                None
+                if _strategic_reserves_ingress_unit_ids(state=state, player_id=context.player_id)
+                else "no_eligible_strategic_reserve_unit"
+            )
+        return None
+    if definition.handler_id == GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID:
+        if context.trigger_kind is not (
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK
+        ):
+            return "force_desperate_escape_requires_fall_back_selection_trigger"
+        if context.phase is not BattlePhase.MOVEMENT:
+            return "force_desperate_escape_requires_movement_phase"
+        if context.active_player_id == context.player_id:
+            return "force_desperate_escape_requires_opponent_turn"
+        if _fall_back_unit_id_or_none(context) is None:
+            return "missing_fall_back_unit_context"
+        if target_binding is None:
+            return (
+                None
+                if _engaged_fall_back_target_unit_ids(
+                    state=state,
+                    player_id=context.player_id,
+                    context=context,
+                )
+                else "no_eligible_engaged_unit"
+            )
+        return None
     if definition.handler_id == CORE_NEW_ORDERS_HANDLER_ID:
         if target_binding is None:
             return (
@@ -2831,6 +2873,13 @@ def _stratagem_affected_unit_ids(
         crushing_target_id = _crushing_impact_enemy_target_id_or_none(effect_selection)
         if crushing_target_id is not None:
             raw_unit_ids.append(crushing_target_id)
+    if (
+        definition.handler_id == GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID
+        and target_binding is not None
+    ):
+        fall_back_unit_id = _fall_back_unit_id_or_none(context)
+        if fall_back_unit_id is not None:
+            raw_unit_ids.append(fall_back_unit_id)
     if not raw_unit_ids:
         return ()
     return _validate_stratagem_affected_unit_ids(
@@ -3097,6 +3146,13 @@ def _target_binding_error(
         ):
             return "unit_not_eligible_for_rapid_ingress"
         return None
+    if target_spec.target_policy_id == STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID:
+        if _require_target_unit_id(target_binding) not in _strategic_reserves_ingress_unit_ids(
+            state=state,
+            player_id=player_id,
+        ):
+            return "unit_not_eligible_for_strategic_reserves_ingress"
+        return None
     if target_spec.target_policy_id == GO_TO_GROUND_TARGET_POLICY_ID:
         if not _target_unit_has_keyword(
             state=state,
@@ -3165,6 +3221,15 @@ def _target_binding_error(
         if context is None:
             return None
         return _selected_to_move_target_context_error(
+            context=context,
+            target_binding=target_binding,
+        )
+    if target_spec.target_policy_id == ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID:
+        if context is None:
+            return None
+        return _engaged_with_fall_back_unit_target_context_error(
+            state=state,
+            player_id=player_id,
             context=context,
             target_binding=target_binding,
         )
@@ -3297,6 +3362,21 @@ def _rapid_ingress_unit_ids(*, state: GameState, player_id: str) -> tuple[str, .
             reserve_state.unit_instance_id
             for reserve_state in state.unarrived_reserve_states_for_player(player_id)
             if reserve_state.status is ReserveStatus.IN_RESERVES
+        )
+    )
+
+
+def _strategic_reserves_ingress_unit_ids(
+    *,
+    state: GameState,
+    player_id: str,
+) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            reserve_state.unit_instance_id
+            for reserve_state in state.unarrived_reserve_states_for_player(player_id)
+            if reserve_state.status is ReserveStatus.IN_RESERVES
+            and reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
         )
     )
 
@@ -3468,6 +3548,69 @@ def _selected_to_move_unit_id_or_none(context: StratagemEligibilityContext) -> s
     if type(raw_unit_id) is not str:
         return None
     return _validate_identifier("Selected to move unit id", raw_unit_id)
+
+
+def _engaged_with_fall_back_unit_target_context_error(
+    *,
+    state: GameState,
+    player_id: str,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+) -> str | None:
+    if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK:
+        return "fall_back_engagement_requires_fall_back_selection_trigger"
+    if context.phase is not BattlePhase.MOVEMENT:
+        return "fall_back_engagement_requires_movement_phase"
+    fall_back_unit_id = _fall_back_unit_id_or_none(context)
+    if fall_back_unit_id is None:
+        return "missing_fall_back_unit_context"
+    fall_back_owner = _unit_owner(state=state, unit_instance_id=fall_back_unit_id)
+    if fall_back_owner is None:
+        return "unknown_fall_back_unit"
+    if fall_back_owner == player_id:
+        return "fall_back_unit_not_enemy"
+    target_unit_id = _require_target_unit_id(target_binding)
+    if target_unit_id not in _engaged_fall_back_target_unit_ids(
+        state=state,
+        player_id=player_id,
+        context=context,
+    ):
+        return "unit_not_engaged_with_fall_back_unit"
+    return None
+
+
+def _fall_back_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return None
+    raw_unit_id = trigger_payload.get(FALL_BACK_UNIT_CONTEXT_KEY)
+    if type(raw_unit_id) is not str:
+        return None
+    return _validate_identifier("Fall Back unit id", raw_unit_id)
+
+
+def _engaged_fall_back_target_unit_ids(
+    *,
+    state: GameState,
+    player_id: str,
+    context: StratagemEligibilityContext,
+) -> tuple[str, ...]:
+    fall_back_unit_id = _fall_back_unit_id_or_none(context)
+    if fall_back_unit_id is None:
+        return ()
+    return tuple(
+        sorted(
+            unit.unit_instance_id
+            for army in state.army_definitions
+            if army.player_id == player_id
+            for unit in army.units
+            if _units_are_engaged(
+                state=state,
+                first_unit_instance_id=unit.unit_instance_id,
+                second_unit_instance_id=fall_back_unit_id,
+            )
+        )
+    )
 
 
 def _fire_overwatch_target_binding_error(
@@ -4314,7 +4457,10 @@ def _placement_proposal_from_result_payload(payload: JsonValue) -> PlacementProp
 def _proposal_request_is_rapid_ingress(proposal_request: MovementProposalRequest) -> bool:
     context = proposal_request.context or {}
     handler = context.get("stratagem_handler_id")
-    return handler == CORE_RAPID_INGRESS_HANDLER_ID
+    return handler in {
+        CORE_RAPID_INGRESS_HANDLER_ID,
+        GENERIC_INGRESS_MOVE_HANDLER_ID,
+    }
 
 
 def _apply_rapid_ingress_placement(
@@ -4351,6 +4497,7 @@ def _apply_rapid_ingress_placement(
             reserve_state.player_id
         ),
         large_model_exceptions=submitted.large_model_exceptions,
+        strategic_reserve_rule=_strategic_reserve_rule_for_ingress_request(proposal_request),
     )
     if not placement.is_valid:
         invalid_payload = {
@@ -4396,6 +4543,13 @@ def _apply_rapid_ingress_placement(
     )
     arrived_state = placement.arrived_reserve_state()
     state.replace_reserve_state(arrived_state)
+    if _proposal_request_marks_movement_phase_arrival(proposal_request):
+        movement_state = state.movement_phase_state
+        if movement_state is None:
+            raise GameLifecycleError("Ingress arrival requires movement phase state.")
+        state.movement_phase_state = movement_state.with_end_movement_ingress_arrival(
+            arrived_state.unit_instance_id
+        )
     stratagem_use = _stratagem_use_from_proposal_context(proposal_request)
     event_payload = {
         "game_id": state.game_id,
@@ -4421,6 +4575,37 @@ def _apply_rapid_ingress_placement(
     decisions.event_log.append("reinforcement_unit_arrived", validate_json_value(event_payload))
     decisions.event_log.append("rapid_ingress_resolved", validate_json_value(event_payload))
     return None
+
+
+def _strategic_reserve_rule_for_ingress_request(
+    proposal_request: MovementProposalRequest,
+) -> StrategicReserveRule | None:
+    context = proposal_request.context or {}
+    from_start = context.get("from_start_of_battle")
+    if from_start is None:
+        return None
+    if type(from_start) is not bool:
+        raise GameLifecycleError("Ingress from_start_of_battle context must be a bool.")
+    if not from_start:
+        return None
+    return StrategicReserveRule(
+        earliest_arrival_battle_round=1,
+        ignores_mission_arrival_round_blocks=True,
+    )
+
+
+def _proposal_request_marks_movement_phase_arrival(
+    proposal_request: MovementProposalRequest,
+) -> bool:
+    context = proposal_request.context or {}
+    value = context.get("mark_movement_phase_reinforcement_arrival")
+    if value is None:
+        return False
+    if type(value) is not bool:
+        raise GameLifecycleError(
+            "Ingress mark_movement_phase_reinforcement_arrival context must be a bool."
+        )
+    return value
 
 
 def _request_rapid_ingress_placement_retry(
@@ -4545,6 +4730,26 @@ def _apply_supported_stratagem_handler(
             state=state,
             decisions=decisions,
             result=result,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == GENERIC_INGRESS_MOVE_HANDLER_ID:
+        _apply_ingress_move_handler(
+            state=state,
+            decisions=decisions,
+            result=result,
+            context=context,
+            definition=definition,
+            target_binding=target_binding,
+            use_record=use_record,
+        )
+        return
+    if definition.handler_id == GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID:
+        _apply_force_desperate_escape_handler(
+            state=state,
+            decisions=decisions,
             context=context,
             target_binding=target_binding,
             use_record=use_record,
@@ -4677,6 +4882,8 @@ def _validate_supported_stratagem_handler_available(
         CORE_CRUSHING_IMPACT_HANDLER_ID,
         CORE_EPIC_CHALLENGE_HANDLER_ID,
         CORE_HEROIC_INTERVENTION_HANDLER_ID,
+        GENERIC_INGRESS_MOVE_HANDLER_ID,
+        GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
         GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     }:
         return
@@ -5018,7 +5225,7 @@ def _apply_rapid_ingress_handler(
             dict[str, JsonValue],
             validate_json_value(
                 {
-                    "stratagem_handler_id": CORE_RAPID_INGRESS_HANDLER_ID,
+                    "stratagem_handler_id": use_record.handler_id,
                     "stratagem_use": validate_json_value(use_record.to_payload()),
                     "reserve_state": validate_json_value(reserve_state.to_payload()),
                 }
@@ -5043,6 +5250,134 @@ def _apply_rapid_ingress_handler(
             "source_decision_result_id": result.result_id,
             "stratagem_use_id": use_record.use_id,
             "phase_body_status": "rapid_ingress_placement_proposal_required",
+        },
+    )
+
+
+def _apply_ingress_move_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    reserve_state = _reserve_state_for_target(state=state, target_binding=target_binding)
+    if reserve_state.reserve_kind is not ReserveKind.STRATEGIC_RESERVES:
+        raise GameLifecycleError("Ingress move requires a Strategic Reserves target.")
+    _ingress_move_effect_payload(definition)
+    proposal_request = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=context.player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=reserve_state.unit_instance_id,
+        proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        placement_kinds=(BattlefieldPlacementKind.STRATEGIC_RESERVES,),
+        context=cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    "stratagem_handler_id": GENERIC_INGRESS_MOVE_HANDLER_ID,
+                    "stratagem_use": validate_json_value(use_record.to_payload()),
+                    "reserve_state": validate_json_value(reserve_state.to_payload()),
+                    "from_start_of_battle": True,
+                    "mark_movement_phase_reinforcement_arrival": (
+                        context.active_player_id == context.player_id
+                    ),
+                    "placement_scope": "strategic_reserves_only",
+                }
+            ),
+        ),
+    )
+    request = proposal_request.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "placement_proposal_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": context.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": reserve_state.unit_instance_id,
+            "proposal_kind": ProposalKind.STRATEGIC_RESERVES.value,
+            "placement_kinds": [BattlefieldPlacementKind.STRATEGIC_RESERVES.value],
+            "request_id": request.request_id,
+            "source_decision_request_id": result.request_id,
+            "source_decision_result_id": result.result_id,
+            "stratagem_use_id": use_record.use_id,
+            "phase_body_status": "ingress_move_placement_proposal_required",
+        },
+    )
+
+
+def _ingress_move_effect_payload(definition: StratagemDefinition) -> dict[str, JsonValue]:
+    payload = definition.effect_payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Ingress move effect payload must be an object.")
+    if payload.get("effect_kind") != "ingress_move":
+        raise GameLifecycleError("Ingress move effect payload has wrong effect kind.")
+    if payload.get("from_start_of_battle") is not True:
+        raise GameLifecycleError("Ingress move effect payload must allow start-of-battle use.")
+    if payload.get("placement_scope") != "strategic_reserves_only":
+        raise GameLifecycleError("Ingress move effect payload must be Strategic Reserves only.")
+    return payload
+
+
+def _apply_force_desperate_escape_handler(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+) -> None:
+    target_unit_id = _require_target_unit_id(target_binding)
+    fall_back_unit_id = _fall_back_unit_id_or_none(context)
+    if fall_back_unit_id is None:
+        raise GameLifecycleError("Force Desperate Escape requires Fall Back unit context.")
+    effect = PersistingEffect(
+        effect_id=f"{use_record.use_id}:force-desperate-escape:{fall_back_unit_id}",
+        source_rule_id=use_record.source_id,
+        owner_player_id=use_record.player_id,
+        target_unit_instance_ids=(fall_back_unit_id,),
+        started_battle_round=use_record.battle_round,
+        started_phase=BattlePhase.MOVEMENT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=use_record.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            player_id=context.active_player_id or use_record.player_id,
+        ),
+        effect_payload={
+            "effect_kind": FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND,
+            "stratagem_use_id": use_record.use_id,
+            "source_rule_id": use_record.source_id,
+            "source_stratagem_id": use_record.stratagem_id,
+            "forcing_unit_instance_id": target_unit_id,
+            "fall_back_unit_instance_id": fall_back_unit_id,
+            "required_fall_back_mode": "desperate_escape",
+        },
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "forced_fall_back_desperate_escape_registered",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": context.active_player_id,
+            "stratagem_use": use_record.to_payload(),
+            "forcing_unit_instance_id": target_unit_id,
+            "fall_back_unit_instance_id": fall_back_unit_id,
+            "persisting_effect": effect.to_payload(),
         },
     )
 

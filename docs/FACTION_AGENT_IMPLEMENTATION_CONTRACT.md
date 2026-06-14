@@ -115,13 +115,22 @@ source-backed faction or detachment Stratagems whose timing is represented by an
 engine timing window. Selected-to-move Stratagems use the finite
 `use_stratagem` decision surface with trigger kind
 `just_after_friendly_unit_selected_to_move`, after Movement unit selection and
-before Movement action selection. Detachment Stratagem records must enter the
-player Stratagem index only when the owning detachment is selected and
+before Movement action selection. End-of-Movement ingress Stratagems may use the
+generic `generic:ingress-move` handler when they target a source-backed friendly
+Strategic Reserves unit and then emit the normal `submit_placement_proposal`
+Strategic Reserves path. Selected-Fall-Back reaction Stratagems may use the
+generic `generic:force-desperate-escape` handler when the opponent selects a
+Fall Back move and a friendly source-backed target unit is engaged with that
+enemy unit; the handler records engine-owned `PersistingEffect` state and the
+Movement engine emits the resulting Fall Back proposal with
+`fall_back_mode: "desperate_escape"`. Detachment Stratagem records must enter
+the player Stratagem index only when the owning detachment is selected and
 materialized by the runtime content bundle. Handlers must validate timing,
-target ownership, required keywords, CP cost, and repeat-use restrictions through
-the shared Stratagem path, then apply effects through engine-owned state such as
-`PersistingEffect` records. Faction modules must not spend CP, add movement
-keywords, mutate movement state, or adjust terrain legality outside the engine
+target ownership, required keywords, CP cost, and repeat-use restrictions
+through the shared Stratagem path, then apply effects through engine-owned state
+such as `PersistingEffect` records or placement proposal requests. Faction
+modules must not spend CP, add movement keywords, mutate movement state, set
+reserve arrivals, or adjust terrain legality outside the engine
 Stratagem/movement services.
 
 Enhancement effect bindings are an approved runtime contribution surface for
@@ -199,9 +208,11 @@ Required:
   rules that retain or adjust control at phase-end objective-control boundaries,
   and link them to generated Phase 17F execution row IDs.
 - Register faction or detachment Stratagems through source-backed Stratagem
-  records and named handlers only when an engine timing window exists, and prove
-  runtime detachment materialization registers them before `use_stratagem`
-  options are emitted.
+  records and named or approved generic handlers only when an engine timing
+  window exists. End-Movement ingress Stratagems may use
+  `generic:ingress-move`; selected-Fall-Back reaction Stratagems may use
+  `generic:force-desperate-escape`. Prove runtime detachment materialization
+  registers them before `use_stratagem` options are emitted.
 - Register enhancement effect bindings only for source-backed Enhancement or
   Upgrade effects selected through Phase 16D army-construction records, and link
   them to generated Phase 17F enhancement descriptor row IDs until exact

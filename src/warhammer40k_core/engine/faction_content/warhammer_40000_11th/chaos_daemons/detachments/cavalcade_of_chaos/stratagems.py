@@ -15,8 +15,12 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.movement_keyword_effects import movement_keyword_grant_payload
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.stratagems import (
+    ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID,
+    GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+    GENERIC_INGRESS_MOVE_HANDLER_ID,
     SELECTED_TO_MOVE_TARGET_POLICY_ID,
     SELECTED_TO_MOVE_UNIT_CONTEXT_KEY,
+    STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID,
     StratagemAvailabilityKind,
     StratagemCatalogRecord,
     StratagemCategory,
@@ -45,13 +49,23 @@ WARP_RIDERS_HANDLER_ID = (
     "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders"
 )
 WARP_RIDERS_RECORD_ID = f"{SOURCE_RULE_ID}:{WARP_RIDERS_STRATAGEM_ID}"
+FROM_BEYOND_THE_VEIL_STRATAGEM_ID = "chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil"
+FROM_BEYOND_THE_VEIL_RECORD_ID = f"{SOURCE_RULE_ID}:{FROM_BEYOND_THE_VEIL_STRATAGEM_ID}"
+INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID = (
+    "chaos-daemons:cavalcade-of-chaos:inescapable-manifestations"
+)
+INESCAPABLE_MANIFESTATIONS_RECORD_ID = f"{SOURCE_RULE_ID}:{INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID}"
 MOBILE = "MOBILE"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
-        stratagem_records=(_warp_riders_record(),),
+        stratagem_records=(
+            _warp_riders_record(),
+            _from_beyond_the_veil_record(),
+            _inescapable_manifestations_record(),
+        ),
         stratagem_handler_bindings=(
             StratagemHandlerBinding(
                 handler_id=WARP_RIDERS_HANDLER_ID,
@@ -188,6 +202,85 @@ def _warp_riders_record() -> StratagemCatalogRecord:
             effect_payload={
                 "effect_kind": "warp_riders_mobile",
                 "granted_keyword": MOBILE,
+            },
+        ),
+        availability_kind=StratagemAvailabilityKind.DETACHMENT,
+        detachment_id=CAVALCADE_DETACHMENT_ID,
+    )
+
+
+def _from_beyond_the_veil_record() -> StratagemCatalogRecord:
+    return StratagemCatalogRecord(
+        record_id=FROM_BEYOND_THE_VEIL_RECORD_ID,
+        definition=StratagemDefinition(
+            stratagem_id=FROM_BEYOND_THE_VEIL_STRATAGEM_ID,
+            name="From Beyond the Veil",
+            source_id=SOURCE_RULE_ID,
+            command_point_cost=1,
+            category=StratagemCategory.STRATEGIC_PLOY,
+            when_descriptor="End of the Movement phase, from the start of the battle.",
+            target_descriptor="One friendly LEGIONES DAEMONICA MOUNTED unit in Strategic Reserves.",
+            effect_descriptor="Your unit can make an ingress move.",
+            restrictions_descriptor="Cavalcade of Chaos Stratagem.",
+            timing=StratagemTimingDescriptor(
+                trigger_kind=TimingTriggerKind.END_PHASE,
+                phase=BattlePhase.MOVEMENT,
+            ),
+            restriction_policy=StratagemRestrictionPolicy(),
+            target_spec=StratagemTargetSpec(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                enumerable=True,
+                target_policy_id=STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID,
+                required_keywords=(MOUNTED,),
+                required_faction_keywords=(LEGIONES_DAEMONICA,),
+            ),
+            handler_id=GENERIC_INGRESS_MOVE_HANDLER_ID,
+            effect_payload={
+                "effect_kind": "ingress_move",
+                "from_start_of_battle": True,
+                "placement_scope": "strategic_reserves_only",
+            },
+        ),
+        availability_kind=StratagemAvailabilityKind.DETACHMENT,
+        detachment_id=CAVALCADE_DETACHMENT_ID,
+    )
+
+
+def _inescapable_manifestations_record() -> StratagemCatalogRecord:
+    return StratagemCatalogRecord(
+        record_id=INESCAPABLE_MANIFESTATIONS_RECORD_ID,
+        definition=StratagemDefinition(
+            stratagem_id=INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID,
+            name="Inescapable Manifestations",
+            source_id=SOURCE_RULE_ID,
+            command_point_cost=1,
+            category=StratagemCategory.STRATEGIC_PLOY,
+            when_descriptor=(
+                "Your opponent's Movement phase, when a unit is selected to make a Fall Back "
+                "move, if that unit is engaged with a friendly LEGIONES DAEMONICA MOUNTED unit."
+            ),
+            target_descriptor="That LEGIONES DAEMONICA MOUNTED unit.",
+            effect_descriptor=(
+                "When an enemy unit engaged with your unit is selected to make a Fall Back move, "
+                "that enemy unit must use the Desperate Escape mode."
+            ),
+            restrictions_descriptor="Cavalcade of Chaos Stratagem.",
+            timing=StratagemTimingDescriptor(
+                trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+                phase=BattlePhase.MOVEMENT,
+            ),
+            restriction_policy=StratagemRestrictionPolicy(),
+            target_spec=StratagemTargetSpec(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                enumerable=True,
+                target_policy_id=ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID,
+                required_keywords=(MOUNTED,),
+                required_faction_keywords=(LEGIONES_DAEMONICA,),
+            ),
+            handler_id=GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            effect_payload={
+                "effect_kind": "force_desperate_escape",
+                "required_fall_back_mode": "desperate_escape",
             },
         ),
         availability_kind=StratagemAvailabilityKind.DETACHMENT,
