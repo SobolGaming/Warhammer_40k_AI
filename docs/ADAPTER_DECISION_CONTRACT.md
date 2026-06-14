@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, and Phase 17G selected-to-move Stratagem and fight activation ability decisions. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, and Phase 18A hybrid catalog/live unit-model display projection requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, and Phase 17G selected-to-move Stratagem and fight activation ability decisions, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, and Phase 18A hybrid catalog/live unit-model display projection requirements, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -1134,26 +1134,65 @@ terrain preset, origin, rotation, or footprint details.
 
 Phase 18A must extend the viewer projection for
 [Issue #145](https://github.com/SobolGaming/Warhammer_40k_AI/issues/145) before
-local human CLI/UI work is considered complete. `GameViewPayload`, or a
-documented companion payload referenced from it, must expose viewer-safe,
-read-only unit and model display records keyed by stable `unit_instance_id` and
-`model_instance_id` values. The records must let adapters join battlefield
-placements, selected unit/model state, roster panels, inspectors, assignment
-summaries, and datacard-style widgets without importing engine internals or
-inventing rules facts.
+local human CLI/UI work is considered complete. The required ownership boundary
+is a hybrid projection model:
+
+1. Static catalog projection/cache. A versioned, source-hashed
+   `RulesCatalogViewPayload`, or equivalent documented adapter payload, exposes
+   static display records for datasheets, model profiles, weapon profiles,
+   factions, detachments, enhancements, wargear options, and base sizes. The UI
+   may cache this payload, browse it, render roster panels and tooltips from it,
+   and use it to avoid receiving full source blobs in every live game view.
+2. Live viewer-safe unit/model projection. `GameViewPayload` exposes the static
+   catalog version/hash used by the game view plus live, read-only
+   `unit_display_by_id` and `model_display_by_id` records keyed by stable
+   `unit_instance_id` and `model_instance_id` values. These records let adapters
+   join battlefield placements, selected unit/model state, roster panels,
+   inspectors, assignment summaries, and datacard-style widgets without
+   importing engine internals or inventing rules facts.
+
+The static catalog payload is reference data only. The live `GameViewPayload`
+projection remains responsible for current viewer-safe presentation state:
+
+- unit records include unit display name, owner where viewer-visible, datasheet
+  identity, source metadata, viewer-visible keywords and faction keywords, model
+  IDs, selected wargear IDs, and visible status;
+- model records include model display name, unit/datasheet/model-profile IDs,
+  base size or geometry presentation data, viewer-visible wounds
+  remaining/starting wounds, `base_characteristics`, `current_characteristics`,
+  and `visible_modifiers`;
+- `base_characteristics` and `current_characteristics` cover the canonical
+  datacard characteristics `M`, `T`, `SV`, `W`, `LD`, and `OC`;
+- `current_characteristics` are engine-resolved presentation values derived
+  from authoritative catalog/runtime state, timing, Battle-shock, enhancements,
+  Stratagems, detachment rules, auras, mission actions, damaged models,
+  attached units, selected wargear, transport/embark status, and viewer
+  visibility;
+- `visible_modifiers` are audit/display traces with fields such as modifier ID,
+  source kind, source ID, target, applies status, public label, and
+  human-readable operation text. They explain visible changes but are not an
+  executable instruction set that adapters must evaluate.
+
+Adapters may compute purely presentational derivatives, such as catalog ID to
+display label, model base diameter to pixel radius, keyword chips, source-link
+tooltip text, or a "changed from base" badge by comparing `base_characteristics`
+to `current_characteristics`. Adapters must not compute rules-effective
+characteristics, legal weapon profiles after options, detachment or enhancement
+effects, aura application, Battle-shock effects, hidden/revealed status, unit
+visibility, or redaction state from static catalog data plus modifier records.
 
 The Phase 18A unit/model display projection must be deterministic, JSON-safe,
-viewer-scoped, and presentation-only. Unit records must include unit display
-name, datasheet identity, source metadata, viewer-visible keywords and faction
-keywords, and model IDs. Model records must include model display name, model
-profile identity/name where relevant, canonical datacard characteristics `M`,
-`T`, `SV`, `W`, `LD`, and `OC`, base size or geometry presentation data, and
-viewer-visible wounds remaining/starting wounds. Hidden, unknown, or
-not-yet-revealed fields must be represented by explicit redactions or unknown
-values instead of omitted data that forces adapters to infer rules facts. The
-projection must define a version, event cursor, state hash, or equivalent
-adapter-visible invalidation field so UI caches can refresh display data
-without treating it as authoritative rules state.
+viewer-scoped, and presentation-only. Hidden, unknown, or not-yet-revealed
+fields must be represented by explicit redactions or unknown values instead of
+omitted data that forces adapters to infer rules facts. The projection must
+define a version, event cursor, state hash, or equivalent adapter-visible
+invalidation field so UI caches can refresh display data without treating it as
+authoritative rules state. Issue #145 is not complete until a visible known
+model can render through this join without placeholder unknowns:
+
+`battlefield_state` placement -> `unit_display_by_id[unit_instance_id]` ->
+`model_display_by_id[model_instance_id]` ->
+`current_characteristics["M/T/SV/W/LD/OC"]`.
 
 Phase 11E adds scoring state to the viewer projection:
 

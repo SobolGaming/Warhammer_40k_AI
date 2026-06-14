@@ -343,7 +343,7 @@ Next / planned sequence:
 | 17G | Planned | Faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
-| 18A-18D | Planned | Human UI, viewer-safe datacard projections, replay inspection, local visual UI, and network play |
+| 18A-18D | Planned | Human UI, hybrid catalog/live datacard projections, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
 
@@ -4593,17 +4593,34 @@ Invariants:
 - Phase 18A must close GitHub Issue #145 by exposing viewer-safe unit and model
   presentation data through the public adapter projection contract, not through
   UI imports of engine internals or UI-authored rules facts;
-- `GameViewPayload`, or a documented companion payload referenced from it,
-  exposes read-only unit display records keyed by stable `unit_instance_id` and
-  model display records keyed by stable `model_instance_id`;
+- Phase 18A uses a hybrid projection model: a cacheable static catalog view for
+  source-backed reference data plus live engine-resolved unit/model display
+  records for the current game state;
+- a versioned and source-hashed `RulesCatalogViewPayload`, or equivalent
+  documented adapter payload, exposes static datasheets, model profiles, weapon
+  profiles, factions, detachments, enhancements, wargear options, and base-size
+  display records for browsing, roster panels, tooltips, and client caching;
+- `GameViewPayload` exposes the selected static catalog version/hash and live
+  read-only `unit_display_by_id` records keyed by stable `unit_instance_id` and
+  `model_display_by_id` records keyed by stable `model_instance_id`;
 - unit display records include the unit display name, datasheet identity,
   source metadata, viewer-visible keywords and faction keywords, and the model
   IDs needed to join unit/model presentation data to battlefield placement
   data;
 - model display records include model display name, model profile identity/name
-  where relevant, canonical datacard characteristics `M`, `T`, `SV`, `W`, `LD`,
-  and `OC`, base size or geometry presentation data, and viewer-visible wounds
-  remaining/starting wounds;
+  where relevant, base size or geometry presentation data, viewer-visible wounds
+  remaining/starting wounds, base characteristics, current engine-resolved
+  characteristics, and visible modifier display traces for canonical datacard
+  characteristics `M`, `T`, `SV`, `W`, `LD`, and `OC`;
+- current characteristics are projected by the engine from authoritative
+  catalog/runtime state, timing, Battle-shock, enhancements, Stratagems,
+  detachment rules, auras, mission actions, damaged models, attached units,
+  selected wargear, transport/embark status, and viewer visibility; adapters do
+  not evaluate those rules;
+- visible modifier records are audit/display traces with source, target,
+  applies status, public label, and human-readable operation text; they are not
+  executable modifier instructions that UI, network clients, replay inspectors,
+  or AI policies must apply;
 - battlefield placement payloads and assignment/selection summaries can be
   joined to the display projection by stable unit/model IDs without parsing
   source text or reaching into engine-only objects;
@@ -4616,6 +4633,11 @@ Invariants:
 - UI, CLI, network, replay, and inspector adapters treat display projection
   data as presentation state only; engine/catalog/runtime state remains the
   authoritative rules source.
+- adapters may compute purely presentational derivatives such as catalog ID to
+  label, base diameter to pixel radius, keyword tag chips, source-link tooltip
+  text, and "changed from base" badges, but they never compute effective
+  characteristics, legal weapon profiles, detachment/enhancement effects, aura
+  application, Battle-shock effects, hidden/revealed status, or unit visibility.
 
 Required tests:
 
@@ -4626,18 +4648,30 @@ Required tests:
 - `project_game_view(...)` exposes viewer-safe unit/model display records keyed
   by stable IDs and those IDs join to `battlefield_state` unit/model placement
   records;
+- static catalog projection exposes versioned/source-hashed display records for
+  datasheets, model profiles, weapon profiles, factions, detachments,
+  enhancements, wargear options, and base sizes, and `GameViewPayload` identifies
+  the catalog version/hash used by the live projection;
 - selected unit, selected model, roster panel, inspector, assignment summary,
   and datacard-style widgets can render from adapter-visible payloads without
   importing engine internals or fabricating stats;
-- datacard characteristics, base size/geometry presentation, wounds, datasheet
-  source metadata, keywords, and faction keywords round-trip as deterministic
-  JSON-safe payloads;
+- base characteristics, current characteristics, visible modifier display
+  traces, base size/geometry presentation, wounds, datasheet source metadata,
+  keywords, and faction keywords round-trip as deterministic JSON-safe payloads;
+- a fixture with a visible characteristic change proves the engine projects
+  `base_characteristics`, `current_characteristics`, and explanatory
+  `visible_modifiers`, and the adapter does not evaluate modifier arithmetic;
 - opponent-hidden or not-yet-revealed unit/model display fields are redacted or
   exposed as explicit unknowns for non-owning viewers;
 - display projection cache/version invalidation changes when relevant unit,
   model, wound, roster, or placement presentation state changes;
 - adapter projection remains read-only: display payload consumption cannot
   mutate authoritative state and cannot become a rules source.
+- Issue #145 closure test proves a visible known model can render
+  `battlefield_state` placement -> `unit_display_by_id[unit_instance_id]` ->
+  `model_display_by_id[model_instance_id]` ->
+  `current_characteristics["M/T/SV/W/LD/OC"]` without placeholder unknown values
+  or engine-internal imports.
 
 ## Phase 18B: replay inspection and deterministic replay runner
 
@@ -4657,6 +4691,11 @@ Invariants:
 - UI submits only `DecisionResult`s;
 - UI can visualize movement paths, LoS witnesses, attack allocation, scoring, and Stratagem windows;
 - UI never owns authoritative state progression.
+- UI consumes the Phase 18A hybrid catalog/live projection: it may cache static
+  catalog display data and render live `current_characteristics` plus
+  `visible_modifiers`, but it never computes rules-effective datacard values;
+- UI explains visible characteristic changes from modifier display traces and
+  treats hidden/unknown fields as explicit viewer-scoped presentation states.
 
 ## Phase 18D: network/server-authoritative play
 
@@ -4666,6 +4705,11 @@ Invariants:
 - clients render public state and submit decisions;
 - hidden information remains hidden from opponent clients;
 - network resync preserves replay hash/state hash.
+- clients may synchronize/cache static catalog display data by catalog
+  version/hash, but live unit/model presentation comes from server-authored
+  viewer-scoped projections and event deltas;
+- clients do not recompute current datacard characteristics, visible modifiers,
+  hidden/revealed state, or unit/model visibility from static catalog data.
 
 Event Companion adapter/replay/UI requirements:
 
