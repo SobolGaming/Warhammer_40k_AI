@@ -1483,15 +1483,15 @@ def test_projection_and_local_session_boundaries_are_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="viewer_player_id must be a player"):
         session.events_since(EventStreamCursor(), viewer_player_id="player-c")
 
-    empty_lifecycle = GameLifecycle(
-        state=_session_state(session),
-        parameterized_movement_proposals=session.lifecycle.parameterized_movement_proposals,
-    )
-    empty_view = project_game_view(lifecycle=empty_lifecycle, viewer_player_id="player-a")
+    empty_session = LocalGameSession()
+    empty_session.start(_config(game_id="phase11d-empty-view"))
+    empty_view = project_game_view(lifecycle=empty_session.lifecycle, viewer_player_id="player-a")
     assert empty_view["pending_decision"] is None
     assert empty_view["pending_proposal"] is None
 
-    empty_lifecycle.decision_controller.request_decision(
+    malformed_session = LocalGameSession()
+    malformed_session.start(_config(game_id="phase11d-malformed-view"))
+    malformed_session.lifecycle.decision_controller.request_decision(
         DecisionRequest(
             request_id="phase11d-malformed-parameterized-request",
             decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1501,13 +1501,11 @@ def test_projection_and_local_session_boundaries_are_fail_fast() -> None:
         )
     )
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
-        project_game_view(lifecycle=empty_lifecycle, viewer_player_id="player-a")
+        project_game_view(lifecycle=malformed_session.lifecycle, viewer_player_id="player-a")
 
-    mismatched_lifecycle = GameLifecycle(
-        state=_session_state(session),
-        parameterized_movement_proposals=session.lifecycle.parameterized_movement_proposals,
-    )
-    mismatched_lifecycle.decision_controller.request_decision(
+    mismatched_session = LocalGameSession()
+    mismatched_session.start(_config(game_id="phase11d-mismatched-view"))
+    mismatched_session.lifecycle.decision_controller.request_decision(
         DecisionRequest(
             request_id="phase11d-mismatched-parameterized-request",
             decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1522,7 +1520,7 @@ def test_projection_and_local_session_boundaries_are_fail_fast() -> None:
         )
     )
     with pytest.raises(GameLifecycleError, match="metadata must match DecisionRequest"):
-        project_game_view(lifecycle=mismatched_lifecycle, viewer_player_id="player-a")
+        project_game_view(lifecycle=mismatched_session.lifecycle, viewer_player_id="player-a")
 
 
 def _local_session_at_first_movement_action() -> tuple[LocalGameSession, DecisionRequest]:

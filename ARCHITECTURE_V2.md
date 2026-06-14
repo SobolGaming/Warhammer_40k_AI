@@ -105,6 +105,11 @@ scoring/draw pack resolution, separate empty card-amendment and FAQ patch
 records, Base Size Guide source rows with geometry-resolution statuses,
 deployment remainder-drain coverage, and a static audit preventing runtime Event
 Companion PDF parsing.
+**Phase 18A is complete** for local CLI/human decision entry and viewer-safe
+hybrid datacard projections: `interfaces/cli.py` renders pending finite and
+parameterized requests, submits normal lifecycle `DecisionResult`s, and
+`adapters/projection.py` exposes source-hashed static catalog display data plus
+live unit/model display records keyed by stable IDs.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -335,6 +340,7 @@ Completed / implemented foundation:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with pending coordinate extraction, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
+| 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 
 Next / planned sequence:
 
@@ -343,7 +349,7 @@ Next / planned sequence:
 | 17G | Planned | Faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
-| 18A-18D | Planned | Human UI, hybrid catalog/live datacard projections, replay inspection, local visual UI, and network play |
+| 18B-18D | Planned | Replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
 
@@ -4574,6 +4580,12 @@ affecting in-game legality, scoring, or replay state.
 
 ## Phase 18A: local CLI/human DecisionRecord entry
 
+Status: Complete. The implemented adapter contract uses
+`RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v1"` for the static
+catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v2-phase18a"`
+for live game views. Live views expose `rules_catalog`,
+`projection_state_hash`, `unit_display_by_id`, and `model_display_by_id`.
+
 Modules:
 
 - `adapters/contracts.py`
@@ -4598,8 +4610,9 @@ Invariants:
   records for the current game state;
 - a versioned and source-hashed `RulesCatalogViewPayload`, or equivalent
   documented adapter payload, exposes static datasheets, model profiles, weapon
-  profiles, factions, detachments, enhancements, wargear options, and base-size
-  display records for browsing, roster panels, tooltips, and client caching;
+  profiles, factions, detachments, enhancements, wargear, wargear options, and
+  base-size display records for browsing, roster panels, tooltips, and client
+  caching;
 - `GameViewPayload` exposes the selected static catalog version/hash and live
   read-only `unit_display_by_id` records keyed by stable `unit_instance_id` and
   `model_display_by_id` records keyed by stable `model_instance_id`;
@@ -4621,12 +4634,17 @@ Invariants:
   applies status, public label, and human-readable operation text; they are not
   executable modifier instructions that UI, network clients, replay inspectors,
   or AI policies must apply;
+- Battle-shocked units project Objective Control through the shared
+  objective-control characteristic resolver: base `OC` remains the stored model
+  value, current `OC` becomes the `battle_shock` replacement dash, and
+  `visible_modifiers` includes the `battle_shock` trace;
 - battlefield placement payloads and assignment/selection summaries can be
   joined to the display projection by stable unit/model IDs without parsing
   source text or reaching into engine-only objects;
 - hidden, unknown, or not-yet-revealed unit/model presentation fields are
-  represented by explicit viewer-scoped redactions or unknown values, never by
-  omitted data that forces adapters to infer rules facts;
+  represented by explicit viewer-scoped redactions or unknown values when the
+  record itself is visible; entire records are omitted when exposing their
+  stable IDs, counts, or presence would leak hidden opponent information;
 - unit/model display projections are deterministic, JSON-safe, read-only, and
   versionable/cacheable with explicit invalidation through projection version,
   event cursor, state hash, or another documented adapter-visible field;
@@ -4650,8 +4668,8 @@ Required tests:
   records;
 - static catalog projection exposes versioned/source-hashed display records for
   datasheets, model profiles, weapon profiles, factions, detachments,
-  enhancements, wargear options, and base sizes, and `GameViewPayload` identifies
-  the catalog version/hash used by the live projection;
+  enhancements, wargear, wargear options, and base sizes, and `GameViewPayload`
+  identifies the catalog version/hash used by the live projection;
 - selected unit, selected model, roster panel, inspector, assignment summary,
   and datacard-style widgets can render from adapter-visible payloads without
   importing engine internals or fabricating stats;

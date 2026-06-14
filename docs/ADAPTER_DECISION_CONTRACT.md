@@ -70,6 +70,11 @@ The shared contract uses these objects and payloads:
 - `ProposalValidationResult`: typed valid, invalid, stale, or unsupported diagnostics.
 - `EventRecord`: deterministic event-log payload.
 - `GameViewPayload`: read-only viewer projection for adapters.
+- `RulesCatalogViewPayload`: cacheable source-hashed static catalog display
+  projection for datasheets, model profiles, weapon profiles, factions,
+  detachments, enhancements, wargear, wargear options, and base sizes.
+- `RulesCatalogReferencePayload`: live-game reference to the static catalog
+  projection used by a `GameViewPayload`.
 - `EventStreamDeltaPayload`: viewer-scoped adapter event delta.
 - `SecondaryMissionCardState`: reveal-gated Fixed/Tactical secondary mission card state.
 - `VictoryPointLedger`: viewer-scoped scoring ledger with reveal-gated secondary source visibility and generic hidden-transaction support.
@@ -106,6 +111,7 @@ Relevant modules:
 - `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py`
 - `src/warhammer40k_core/engine/scoring.py`
 - `src/warhammer40k_core/engine/lifecycle.py`
+- `src/warhammer40k_core/interfaces/cli.py`
 
 ## Same Contract, Different Producers
 
@@ -1132,46 +1138,58 @@ Adapters should render terrain footprints from this typed display geometry.
 `source_id` remains provenance only; adapters must not parse it to recover
 terrain preset, origin, rotation, or footprint details.
 
-Phase 18A must extend the viewer projection for
-[Issue #145](https://github.com/SobolGaming/Warhammer_40k_AI/issues/145) before
-local human CLI/UI work is considered complete. The required ownership boundary
-is a hybrid projection model:
+Phase 18A extends the viewer projection for
+[Issue #145](https://github.com/SobolGaming/Warhammer_40k_AI/issues/145) with a
+hybrid projection model:
 
-1. Static catalog projection/cache. A versioned, source-hashed
-   `RulesCatalogViewPayload`, or equivalent documented adapter payload, exposes
-   static display records for datasheets, model profiles, weapon profiles,
-   factions, detachments, enhancements, wargear options, and base sizes. The UI
-   may cache this payload, browse it, render roster panels and tooltips from it,
-   and use it to avoid receiving full source blobs in every live game view.
-2. Live viewer-safe unit/model projection. `GameViewPayload` exposes the static
-   catalog version/hash used by the game view plus live, read-only
-   `unit_display_by_id` and `model_display_by_id` records keyed by stable
-   `unit_instance_id` and `model_instance_id` values. These records let adapters
-   join battlefield placements, selected unit/model state, roster panels,
-   inspectors, assignment summaries, and datacard-style widgets without
-   importing engine internals or inventing rules facts.
+1. Static catalog projection/cache. `project_rules_catalog_view(...)` returns a
+   `RulesCatalogViewPayload` with `projection_schema: "rules-catalog-view-v1"`,
+   catalog identity, source package identity, `source_hash`, and display records
+   for datasheets, model profiles, weapon profiles, factions, detachments,
+   enhancements, wargear, wargear options, and base sizes. Adapters may cache this
+   payload by catalog ID/schema/hash and render catalog browsing, roster panels,
+   and tooltips from it.
+2. Live viewer-safe unit/model projection. `GameViewPayload` uses
+   `projection_schema: "game-view-v2-phase18a"`, includes
+   `projection_state_hash`, references the static catalog through
+   `rules_catalog`, and exposes read-only `unit_display_by_id` and
+   `model_display_by_id` maps keyed by stable `unit_instance_id` and
+   `model_instance_id` values. These records let adapters join battlefield
+   placements, selected unit/model state, roster panels, inspectors, assignment
+   summaries, and datacard-style widgets without importing engine internals or
+   inventing rules facts.
 
-The static catalog payload is reference data only. The live `GameViewPayload`
-projection remains responsible for current viewer-safe presentation state:
+`RulesCatalogReferencePayload` in a live view contains
+`projection_schema`, `catalog_id`, `ruleset_id`, `source_package_id`, and
+`source_hash`. The full static catalog remains reference data only. The live
+`GameViewPayload` remains responsible for current viewer-safe presentation
+state:
 
-- unit records include unit display name, owner where viewer-visible, datasheet
-  identity, source metadata, viewer-visible keywords and faction keywords, model
-  IDs, selected wargear IDs, and visible status;
-- model records include model display name, unit/datasheet/model-profile IDs,
-  base size or geometry presentation data, viewer-visible wounds
-  remaining/starting wounds, `base_characteristics`, `current_characteristics`,
-  and `visible_modifiers`;
+- `UnitDisplayPayload` records include `unit_instance_id`, `owner_player_id`,
+  `unit_display_name`, `datasheet_id`, source metadata, viewer-visible keywords
+  and faction keywords, model instance IDs, selected wargear IDs, visibility
+  status, and redaction metadata.
+- `ModelDisplayPayload` records include `model_instance_id`,
+  `unit_instance_id`, `datasheet_id`, `model_profile_id`, display names,
+  `base_size`, starting/current wounds, `base_characteristics`,
+  `current_characteristics`, `visible_modifiers`, source metadata, visibility
+  status, and redaction metadata.
 - `base_characteristics` and `current_characteristics` cover the canonical
-  datacard characteristics `M`, `T`, `SV`, `W`, `LD`, and `OC`;
-- `current_characteristics` are engine-resolved presentation values derived
-  from authoritative catalog/runtime state, timing, Battle-shock, enhancements,
-  Stratagems, detachment rules, auras, mission actions, damaged models,
-  attached units, selected wargear, transport/embark status, and viewer
-  visibility;
-- `visible_modifiers` are audit/display traces with fields such as modifier ID,
-  source kind, source ID, target, applies status, public label, and
-  human-readable operation text. They explain visible changes but are not an
+  datacard characteristics `M`, `T`, `SV`, `W`, `LD`, and `OC`.
+- `CharacteristicDisplayPayload` entries expose `characteristic`, `label`,
+  `value_kind`, raw/base/final values, `display_value`, applied modifier IDs,
+  and redaction metadata. Unknown values use `value_kind: "unknown"` and null
+  values. Dash characteristics retain their engine numeric fields, usually zero,
+  while `display_value` carries `"-"` and `value_kind` distinguishes source dash
+  from replacement dash.
+- `visible_modifiers` are audit/display traces with `modifier_id`,
+  `source_kind`, `source_id`, `target`, `applies_status`, `public_label`, and
+  `operation_text`. They explain visible engine-resolved changes but are not an
   executable instruction set that adapters must evaluate.
+- Battle-shocked units project Objective Control through the same engine helper
+  used by objective scoring: base `OC` remains the stored model characteristic,
+  current `OC` becomes the `battle_shock` replacement dash, and
+  `visible_modifiers` includes the `battle_shock` trace.
 
 Adapters may compute purely presentational derivatives, such as catalog ID to
 display label, model base diameter to pixel radius, keyword chips, source-link
@@ -1181,14 +1199,17 @@ characteristics, legal weapon profiles after options, detachment or enhancement
 effects, aura application, Battle-shock effects, hidden/revealed status, unit
 visibility, or redaction state from static catalog data plus modifier records.
 
-The Phase 18A unit/model display projection must be deterministic, JSON-safe,
-viewer-scoped, and presentation-only. Hidden, unknown, or not-yet-revealed
-fields must be represented by explicit redactions or unknown values instead of
-omitted data that forces adapters to infer rules facts. The projection must
-define a version, event cursor, state hash, or equivalent adapter-visible
-invalidation field so UI caches can refresh display data without treating it as
-authoritative rules state. Issue #145 is not complete until a visible known
-model can render through this join without placeholder unknowns:
+The Phase 18A unit/model display projection is deterministic, JSON-safe,
+viewer-scoped, read-only, and presentation-only. Own units and viewer-visible
+placed opponent units may appear in `unit_display_by_id` and
+`model_display_by_id`. Fully hidden or not-yet-revealed opponent records are
+omitted when exposing their stable IDs, counts, or presence would leak hidden
+information; field-level hidden values inside an otherwise visible record must
+use explicit redactions or unknown values. `projection_state_hash` changes when
+the adapter-visible live display state changes, including wound changes, so UI
+caches can refresh display data without treating it as authoritative rules
+state. Issue #145 is complete because a visible known model can render through
+this join without placeholder unknowns:
 
 `battlefield_state` placement -> `unit_display_by_id[unit_instance_id]` ->
 `model_display_by_id[model_instance_id]` ->
