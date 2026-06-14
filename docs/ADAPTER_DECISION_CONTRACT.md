@@ -263,6 +263,20 @@ The finite decision type is `use_stratagem`. A pending request exposes one optio
 - target-binding payload for fully enumerated targets;
 - restriction context such as same-Stratagem-per-phase and any own once-per-turn/battle/per-target rule already checked by the engine.
 
+Phase 17G adds Movement selected-to-move Stratagem windows to the same finite
+`use_stratagem` contract. After `select_movement_unit` records a unit selection
+and before `select_movement_action` is emitted, the Movement engine may emit an
+optional `use_stratagem` request for the active player with trigger kind
+`just_after_friendly_unit_selected_to_move`. The trigger payload includes
+`selected_to_move_unit_instance_id`, `selection_request_id`, and
+`selection_result_id`. Adapters decline with `decline_stratagem_window` or
+select one engine-emitted Stratagem option; they must not infer additional
+targets or skip directly to movement-action selection while a pending
+`use_stratagem` request exists. Accepted selected-to-move Stratagems may create
+engine-owned temporary movement keyword effects, such as `MOBILE`, that are
+consumed by later movement proposal validation. Adapters must not add movement
+keywords, adjust terrain traversal, spend CP, or mutate movement state directly.
+
 Accepted `StratagemUseRecord` payloads include `active_player_id`, `targeted_unit_instance_ids`, `affected_unit_instance_ids`, and `effect_selection`. The active-player ID is part of the phase-instance key for matched-play same-Stratagem and same-target restrictions. `targeted_unit_instance_ids` is the sorted canonical rules-unit list used for the 11th Edition "same unit targeted" restriction and is scoped to the player using the Stratagem. `affected_unit_instance_ids` records every canonical rules unit affected by the handler, including non-target enemy units hit by an effect. Non-attached units use their own unit instance ID. Units that are part of an attached unit use the attached-unit ID, so a Leader/Support component and Bodyguard component share one phase restriction key. Targetless Stratagems record empty target lists unless their official TARGET field binds a unit.
 
 Source-backed records whose `handler_id` starts with `unsupported:` are catalog descriptors only. They must not emit finite options, must not emit parameterized pending requests, and stale or hand-crafted submissions for them must be rejected with `unsupported_handler` before queue pop, CP spend, or Stratagem-use record creation.
@@ -338,6 +352,9 @@ Required Phase 12 adapter-contract tests:
 - optional additional CP sections rejected before CP spend when the selected section is unaffordable;
 - same-Stratagem-twice-per-phase rejection separate from own Stratagem restrictions;
 - different-Stratagem same-target and attached-unit same-phase rejection through canonical `targeted_unit_instance_ids`, scoped to the player and active-player phase instance;
+- Movement selected-to-move finite Stratagem windows before movement-action
+  selection, including decline and engine-owned temporary movement keyword
+  effects;
 - reactive non-active-player Stratagem use;
 - optional finite and parameterized Stratagem window decline through `GameLifecycle.submit_decision(...)`, including reaction-frame resume and no CP/state mutation;
 - replay/payload round-trip with deterministic JSON-safe records;

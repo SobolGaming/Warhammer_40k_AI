@@ -10,6 +10,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
     RulesetDescriptorError,
+    TerrainFeatureKind,
     TerrainMovementPolicy,
     TerrainMovementPolicyPayload,
 )
@@ -40,6 +41,9 @@ class MovementLegalityStatus(StrEnum):
     LEGAL = "legal"
     INVALID = "invalid"
     UNSUPPORTED = "unsupported"
+
+
+_DESCRIPTOR_ONLY_RUINS_WALL_KEYWORDS = frozenset(("MOBILE",))
 
 
 class MovementCapabilitySetPayload(TypedDict):
@@ -190,7 +194,13 @@ class MovementCapabilitySet:
         is_beast = "is_beast" in flags
         is_vehicle = "is_vehicle" in flags
         is_monster = "is_monster" in flags
-        can_traverse_ruins_walls = "can_traverse_ruins_walls" in flags
+        can_traverse_ruins_walls = (
+            "can_traverse_ruins_walls" in flags
+            or _keywords_allow_ruins_wall_traversal(
+                descriptor=descriptor,
+                keywords=normalized_keywords,
+            )
+        )
         can_move_through_models = has_fly and descriptor.fly_policy.may_move_through_models
         can_move_through_terrain = can_traverse_ruins_walls or (
             has_fly and descriptor.fly_policy.may_move_through_terrain
@@ -741,6 +751,27 @@ def _validate_ruleset_descriptor(value: object) -> RulesetDescriptor:
     if type(value) is not RulesetDescriptor:
         raise MovementLegalityError("Movement legality requires an explicit RulesetDescriptor.")
     return value
+
+
+def _keywords_allow_ruins_wall_traversal(
+    *,
+    descriptor: RulesetDescriptor,
+    keywords: tuple[str, ...],
+) -> bool:
+    if type(descriptor) is not RulesetDescriptor:
+        raise MovementLegalityError("Ruins traversal lookup requires a RulesetDescriptor.")
+    normalized_keywords = set(_validate_keyword_tuple("ruins traversal keywords", keywords))
+    descriptor_only_keywords = normalized_keywords.intersection(
+        _DESCRIPTOR_ONLY_RUINS_WALL_KEYWORDS
+    )
+    if not descriptor_only_keywords:
+        return False
+    for feature_policy in descriptor.terrain_movement_policy.feature_policies:
+        if feature_policy.terrain_feature_kind is not TerrainFeatureKind.RUINS:
+            continue
+        allowed = set(feature_policy.through_terrain_allowed_keywords)
+        return bool(descriptor_only_keywords.intersection(allowed))
+    return False
 
 
 def _validate_optional_movement_phase_action(value: object | None) -> str | None:

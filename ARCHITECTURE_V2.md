@@ -4323,6 +4323,10 @@ Invariants:
 - faction and detachment Stratagems validate CP cost, timing, target legality,
   repeat-use limits, and effect application through the shared Stratagem
   decision/ledger path;
+- selected-to-move Stratagems are emitted after Movement unit selection and
+  before Movement action selection through the same finite `use_stratagem`
+  request/decline path, and any temporary movement keywords are consumed by the
+  Movement engine rather than adapters or faction modules;
 - all semantic handlers consume structured descriptors and never parse PDFs or
   raw rule text at runtime;
 - unsupported faction-level behavior returns typed unsupported execution results
@@ -4338,6 +4342,9 @@ Required tests:
   supported;
 - faction and detachment Stratagems validate timing, targeting, CP ledgers,
   repeat-use constraints, and effects;
+- detachment Stratagem runtime indexes only include records for materialized
+  selected detachments, and lifecycle tests prove selected-to-move options are
+  not emitted for other detachments;
 - UI, headless, network, replay, and tests use the same execution dispatch and
   decision path.
 

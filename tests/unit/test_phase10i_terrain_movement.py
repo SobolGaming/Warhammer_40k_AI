@@ -187,10 +187,10 @@ def test_model_cannot_end_mid_climb() -> None:
     assert result.violations[0].terrain_id == "container-stack"
 
 
-def test_infantry_and_beast_can_traverse_ruins_wall() -> None:
+def test_infantry_beast_and_mobile_can_traverse_ruins_wall() -> None:
     wall = _ruins_wall("ruins-wall")
 
-    for keywords in (("INFANTRY",), ("BEAST",)):
+    for keywords in (("INFANTRY",), ("BEAST",), ("MOBILE",)):
         mover = _model(f"{keywords[0].lower()}-mover", 1.0, 1.0)
         result = _terrain_context(
             _normal_legality_context(keywords=keywords),

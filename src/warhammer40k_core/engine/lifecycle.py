@@ -159,6 +159,8 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
+    StratagemCatalogIndex,
+    StratagemCatalogRecord,
     apply_command_reroll_decision,
     apply_explosives_mortal_wound_feel_no_pain_decision,
     apply_heroic_intervention_charge_move,
@@ -332,6 +334,35 @@ def _validate_runtime_content_armies(
         seen.add(army.army_id)
         validated.append(army)
     return tuple(validated)
+
+
+def _combined_runtime_stratagem_index(
+    bundle: RuntimeContentBundle,
+    *,
+    base_indexes: tuple[StratagemCatalogIndex, ...],
+) -> StratagemCatalogIndex:
+    if type(bundle) is not RuntimeContentBundle:
+        raise GameLifecycleError("Runtime Stratagem index requires RuntimeContentBundle.")
+    if type(base_indexes) is not tuple:
+        raise GameLifecycleError("Runtime Stratagem index base indexes must be a tuple.")
+    records_by_id: dict[str, StratagemCatalogRecord] = {}
+    for base_index in base_indexes:
+        if type(base_index) is not StratagemCatalogIndex:
+            raise GameLifecycleError("Runtime Stratagem index base value must be an index.")
+        for record in base_index.all_records():
+            existing = records_by_id.get(record.record_id)
+            if existing is not None and existing != record:
+                raise GameLifecycleError("Base Stratagem record ID drift across phase indexes.")
+            records_by_id[record.record_id] = record
+    for player_index in bundle.stratagem_indexes_by_player_id.values():
+        for record in player_index.all_records():
+            existing = records_by_id.get(record.record_id)
+            if existing is not None and existing != record:
+                raise GameLifecycleError("Runtime Stratagem record ID drift across player indexes.")
+            records_by_id[record.record_id] = record
+    return StratagemCatalogIndex.from_records(
+        tuple(records_by_id[record_id] for record_id in sorted(records_by_id))
+    )
 
 
 @dataclass(slots=True)
@@ -1525,25 +1556,33 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
+        runtime_stratagem_index = _combined_runtime_stratagem_index(
+            self._runtime_content_bundle,
+            base_indexes=(
+                self._command_phase_handler.stratagem_index,
+                self._movement_phase_handler.stratagem_index,
+                self._fight_phase_handler.stratagem_index,
+            ),
+        )
         apply_enhancement_effects(
             state=state,
             registry=self._runtime_content_bundle.enhancement_effect_registry,
             decisions=self.decision_controller,
         )
         self._command_phase_handler = CommandPhaseHandler(
-            stratagem_index=self._command_phase_handler.stratagem_index,
+            stratagem_index=runtime_stratagem_index,
             battle_shock_hooks=self._runtime_content_bundle.battle_shock_hook_registry,
         )
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
             parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
-            stratagem_index=self._movement_phase_handler.stratagem_index,
+            stratagem_index=runtime_stratagem_index,
             fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(
             ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
             army_catalog=self._fight_phase_handler.army_catalog,
-            stratagem_index=self._fight_phase_handler.stratagem_index,
+            stratagem_index=runtime_stratagem_index,
             fight_activation_ability_hooks=(
                 self._runtime_content_bundle.fight_activation_ability_hook_registry
             ),

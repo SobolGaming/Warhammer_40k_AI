@@ -174,6 +174,7 @@ HEROIC_INTERVENTION_TARGET_POLICY_ID = "heroic_intervention_unit"
 COUNTEROFFENSIVE_TARGET_POLICY_ID = "counteroffensive_unit"
 CRUSHING_IMPACT_TARGET_POLICY_ID = "crushing_impact_unit"
 EPIC_CHALLENGE_TARGET_POLICY_ID = "epic_challenge_unit"
+SELECTED_TO_MOVE_TARGET_POLICY_ID = "selected_to_move_unit"
 EXPLOSIVES_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 CRUSHING_IMPACT_MODEL_CONTEXT_KEY = "model_instance_id"
@@ -182,6 +183,7 @@ HEROIC_INTERVENTION_MODE_CONTEXT_KEY = "mode"
 HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND = "leap_to_defend"
 HEROIC_INTERVENTION_MODE_INTO_THE_FRAY = "into_the_fray"
 SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
+SELECTED_TO_MOVE_UNIT_CONTEXT_KEY = "selected_to_move_unit_instance_id"
 FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY = "moved_unit_instance_id"
 FIRE_OVERWATCH_MAX_RANGE_INCHES = 24.0
 HEROIC_INTERVENTION_TARGET_RANGE_INCHES = 12.0
@@ -249,6 +251,8 @@ class StratagemTargetSpecPayload(TypedDict):
     target_kind: str
     enumerable: bool
     target_policy_id: str
+    required_keywords: list[str]
+    required_faction_keywords: list[str]
 
 
 class StratagemDefinitionPayload(TypedDict):
@@ -440,6 +444,8 @@ class StratagemTargetSpec:
     target_kind: StratagemTargetKind = StratagemTargetKind.NONE
     enumerable: bool = True
     target_policy_id: str = ""
+    required_keywords: tuple[str, ...] = ()
+    required_faction_keywords: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -460,8 +466,28 @@ class StratagemTargetSpec:
                 target_policy_id=self.target_policy_id,
             ),
         )
+        object.__setattr__(
+            self,
+            "required_keywords",
+            _validate_identifier_tuple(
+                "StratagemTargetSpec required_keywords",
+                self.required_keywords,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "required_faction_keywords",
+            _validate_identifier_tuple(
+                "StratagemTargetSpec required_faction_keywords",
+                self.required_faction_keywords,
+            ),
+        )
         if self.target_kind is StratagemTargetKind.NONE and not self.enumerable:
             raise GameLifecycleError("Targetless StratagemTargetSpec must be enumerable.")
+        if self.target_kind is StratagemTargetKind.NONE and (
+            self.required_keywords or self.required_faction_keywords
+        ):
+            raise GameLifecycleError("Targetless StratagemTargetSpec cannot require keywords.")
 
     @property
     def requires_target(self) -> bool:
@@ -472,6 +498,8 @@ class StratagemTargetSpec:
             "target_kind": self.target_kind.value,
             "enumerable": self.enumerable,
             "target_policy_id": self.target_policy_id,
+            "required_keywords": list(self.required_keywords),
+            "required_faction_keywords": list(self.required_faction_keywords),
         }
 
     @classmethod
@@ -480,6 +508,8 @@ class StratagemTargetSpec:
             target_kind=stratagem_target_kind_from_token(payload["target_kind"]),
             enumerable=payload["enumerable"],
             target_policy_id=payload["target_policy_id"],
+            required_keywords=tuple(payload["required_keywords"]),
+            required_faction_keywords=tuple(payload["required_faction_keywords"]),
         )
 
 
@@ -1489,6 +1519,7 @@ def _stratagem_use_options_for_records(
             state=state,
             player_id=context.player_id,
             definition=definition,
+            context=context,
         )
         for binding in bindings:
             if (
@@ -2420,10 +2451,7 @@ def _detachment_gate_allows(
         if army.player_id != player_id:
             continue
         selection = army.detachment_selection
-        return (
-            record.detachment_id in selection.detachment_ids
-            and record.definition.stratagem_id in selection.stratagem_ids
-        )
+        return record.detachment_id in selection.detachment_ids
     return False
 
 
@@ -2904,6 +2932,7 @@ def _enumerated_target_bindings(
     state: GameState,
     player_id: str,
     definition: StratagemDefinition,
+    context: StratagemEligibilityContext | None = None,
 ) -> tuple[StratagemTargetBinding, ...]:
     target_spec = definition.target_spec
     if target_spec.target_kind is StratagemTargetKind.NONE:
@@ -2916,6 +2945,35 @@ def _enumerated_target_bindings(
                 target_secondary_mission_id=card.secondary_mission_id,
             )
             for card in _active_tactical_secondary_cards(state=state, player_id=player_id)
+        )
+    if target_spec.target_policy_id == SELECTED_TO_MOVE_TARGET_POLICY_ID:
+        if context is None:
+            return ()
+        selected_unit_id = _selected_to_move_unit_id_or_none(context)
+        if selected_unit_id is None:
+            return ()
+        target_owner = _unit_owner(state=state, unit_instance_id=selected_unit_id)
+        if target_owner is None:
+            return ()
+        binding = StratagemTargetBinding(
+            target_kind=target_spec.target_kind,
+            target_player_id=target_owner,
+            target_unit_instance_id=selected_unit_id,
+        )
+        return (
+            (binding,)
+            if _target_binding_error(
+                state=state,
+                player_id=player_id,
+                target_spec=target_spec,
+                policy=definition.restriction_policy,
+                target_binding=binding,
+                context=context,
+                ruleset_descriptor=None,
+                army_catalog=None,
+            )
+            is None
+            else ()
         )
     bindings: list[StratagemTargetBinding] = []
     for army in state.army_definitions:
@@ -2937,7 +2995,7 @@ def _enumerated_target_bindings(
                     target_spec=target_spec,
                     policy=definition.restriction_policy,
                     target_binding=binding,
-                    context=None,
+                    context=context,
                     ruleset_descriptor=None,
                     army_catalog=None,
                 )
@@ -3013,6 +3071,18 @@ def _target_binding_error(
         if permission.denial_reason is None:
             raise GameLifecycleError("Denied stratagem target permission must explain denial.")
         return permission.denial_reason
+    if not _target_unit_satisfies_required_keywords(
+        state=state,
+        target_binding=target_binding,
+        required_keywords=target_spec.required_keywords,
+    ):
+        return "unit_missing_required_keyword"
+    if not _target_unit_satisfies_required_faction_keywords(
+        state=state,
+        target_binding=target_binding,
+        required_faction_keywords=target_spec.required_faction_keywords,
+    ):
+        return "unit_missing_required_faction_keyword"
     if target_spec.target_policy_id == INSANE_BRAVERY_TARGET_POLICY_ID:
         if _require_target_unit_id(target_binding) not in _battle_shock_test_unit_ids(
             state=state,
@@ -3091,6 +3161,13 @@ def _target_binding_error(
         ):
             return "unit_not_character"
         return None
+    if target_spec.target_policy_id == SELECTED_TO_MOVE_TARGET_POLICY_ID:
+        if context is None:
+            return None
+        return _selected_to_move_target_context_error(
+            context=context,
+            target_binding=target_binding,
+        )
     if target_spec.target_policy_id not in {"friendly_unit", "any_unit"}:
         return "unsupported_target_policy"
     return None
@@ -3125,6 +3202,40 @@ def _target_unit_has_keyword(
                 continue
             return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
     raise GameLifecycleError("Stratagem target unit is unknown.")
+
+
+def _target_unit_satisfies_required_keywords(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+    required_keywords: tuple[str, ...],
+) -> bool:
+    required = {_canonical_keyword(keyword) for keyword in required_keywords}
+    if not required:
+        return True
+    target_unit_id = _require_target_unit_id(target_binding)
+    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
+    if unit is None:
+        raise GameLifecycleError("Stratagem target unit is unknown.")
+    stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    return required.issubset(stored)
+
+
+def _target_unit_satisfies_required_faction_keywords(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+    required_faction_keywords: tuple[str, ...],
+) -> bool:
+    required = {_canonical_keyword(keyword) for keyword in required_faction_keywords}
+    if not required:
+        return True
+    target_unit_id = _require_target_unit_id(target_binding)
+    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
+    if unit is None:
+        raise GameLifecycleError("Stratagem target unit is unknown.")
+    stored = {_canonical_keyword(keyword) for keyword in unit.faction_keywords}
+    return required.issubset(stored)
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
@@ -3328,6 +3439,35 @@ def _selected_target_unit_ids_or_none(
         seen.add(unit_id)
         unit_ids.append(unit_id)
     return tuple(sorted(unit_ids))
+
+
+def _selected_to_move_target_context_error(
+    *,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> str | None:
+    if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE:
+        return "selected_to_move_requires_unit_selection_trigger"
+    if context.phase is not BattlePhase.MOVEMENT:
+        return "selected_to_move_requires_movement_phase"
+    selected_unit_id = _selected_to_move_unit_id_or_none(context)
+    if selected_unit_id is None:
+        return "missing_selected_to_move_context"
+    if target_binding is None:
+        return None
+    if _require_target_unit_id(target_binding) != selected_unit_id:
+        return "unit_not_selected_to_move"
+    return None
+
+
+def _selected_to_move_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return None
+    raw_unit_id = trigger_payload.get(SELECTED_TO_MOVE_UNIT_CONTEXT_KEY)
+    if type(raw_unit_id) is not str:
+        return None
+    return _validate_identifier("Selected to move unit id", raw_unit_id)
 
 
 def _fire_overwatch_target_binding_error(

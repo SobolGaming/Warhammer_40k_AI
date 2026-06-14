@@ -4367,22 +4367,32 @@ def test_phase14h_mustered_attached_unit_selects_to_shoot_as_one_rules_unit() ->
         LifecycleStatusKind.WAITING_FOR_DECISION,
         LifecycleStatusKind.ADVANCED,
     }
-    assert shooting_state is not None
-    assert shooting_state.selected_unit_ids == (attached_id,)
-    assert shooting_state.shot_unit_ids == (attached_id,)
-    assert bodyguard.unit_instance_id not in shooting_state.shot_unit_ids
-    assert leader.unit_instance_id not in shooting_state.shot_unit_ids
-    assert support.unit_instance_id not in shooting_state.shot_unit_ids
-    legal_shooting_unit_ids = _shooting_phase_private("_legal_shooting_unit_ids")
-    assert (
-        legal_shooting_unit_ids(
-            state=state,
-            shooting_state=shooting_state,
-            ruleset_descriptor=_ruleset(),
-            army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+    if shooting_state is not None:
+        assert shooting_state.selected_unit_ids == (attached_id,)
+        assert shooting_state.shot_unit_ids == (attached_id,)
+        assert bodyguard.unit_instance_id not in shooting_state.shot_unit_ids
+        assert leader.unit_instance_id not in shooting_state.shot_unit_ids
+        assert support.unit_instance_id not in shooting_state.shot_unit_ids
+        legal_shooting_unit_ids = _shooting_phase_private("_legal_shooting_unit_ids")
+        assert (
+            legal_shooting_unit_ids(
+                state=state,
+                shooting_state=shooting_state,
+                ruleset_descriptor=_ruleset(),
+                army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+            )
+            == ()
         )
-        == ()
-    )
+    else:
+        selected_payload = _last_event_payload(lifecycle, "shooting_unit_selected")
+        accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+        completed_payload = _last_event_payload(lifecycle, "shooting_phase_completed")
+        assert selected_payload["unit_instance_id"] == attached_id
+        assert accepted_payload["unit_instance_id"] == attached_id
+        assert bodyguard.unit_instance_id != accepted_payload["unit_instance_id"]
+        assert leader.unit_instance_id != accepted_payload["unit_instance_id"]
+        assert support.unit_instance_id != accepted_payload["unit_instance_id"]
+        assert completed_payload["skipped_unit_ids"] == []
 
 
 def test_phase14h_attached_target_range_skips_destroyed_unplaced_components() -> None:

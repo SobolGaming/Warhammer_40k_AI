@@ -251,9 +251,11 @@ move does not prevent later Shooting or Charge eligibility, or source-linked
 enhancement effect bindings for selected Enhancement or Upgrade assignments
 that materialize static engine-owned characteristic modifiers, or source-linked
 Fight activation ability hook bindings for optional selected-to-fight rules
-whose effect is a scoped melee targeting permission. These execution surfaces
-must mutate authoritative game state only through engine-owned services, use the
-shared `DecisionRequest` / `DecisionResult` path for player choices, and emit
+whose effect is a scoped melee targeting permission, or source-linked Stratagem
+handler bindings for faction or detachment Stratagems whose timing is already
+represented by an engine timing window. These execution surfaces must mutate
+authoritative game state only through engine-owned services, use the shared
+`DecisionRequest` / `DecisionResult` path for player choices, and emit
 deterministic replay-safe execution results.
 Implementation PRs must use the generated scaffold targets and the
 [Faction Agent Implementation Contract](docs/FACTION_AGENT_IMPLEMENTATION_CONTRACT.md).
@@ -294,6 +296,17 @@ options only; the Fight engine emits the finite use/decline request, records the
 engine-owned persisting melee targeting permission, and lowers accepted melee
 declarations into source-linked attack pools through the shared Fight path.
 
+Stratagem records and Stratagem handler bindings follow the same Phase 17F
+mapping rule. Detachment Stratagem records must enter a player's runtime
+Stratagem index only when that detachment is selected and materialized by the
+runtime content bundle. Selected-to-move Movement Stratagems use trigger kind
+`just_after_friendly_unit_selected_to_move` and emit a finite optional
+`use_stratagem` request after `select_movement_unit` and before
+`select_movement_action`. Handlers must validate timing, target ownership,
+required keywords, CP cost, and repeat-use restrictions through the shared
+Stratagem path; any temporary movement keywords must be stored as engine-owned
+persisting effects and consumed by Movement proposal validation.
+
 Phase 17G does not cover broad datasheet, wargear, or weapon ability execution.
 Those rows move to Phase 17H unless they are inseparable from a faction army
 rule, detachment rule, enhancement, or Stratagem implemented in Phase 17G.
@@ -312,6 +325,9 @@ Required tests:
   activation ability hooks for optional selected-to-fight enhancement effects;
 - faction and detachment Stratagems validate timing, targeting, CP ledgers,
   repeat-use constraints, and effects through the shared Stratagem path;
+- selected-to-move Stratagem lifecycle tests prove the record is registered
+  only for the materialized detachment and that the window runs before Movement
+  action selection;
 - registered executors and hook bindings cannot return or expose mismatched
   execution identity payloads;
 - unsupported semantic behavior returns typed unsupported diagnostics with
@@ -577,6 +593,15 @@ the approved blocker.
 | Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+Phase 17G supported runtime slice: Shadow of Chaos Battle-shock hooks,
+Cavalcade of Chaos / Unholy Avalanche Fall Back eligibility hooks, Cavalcade of
+Chaos / Apocalyptic Steeds Upgrade enhancement effects, Cavalcade of Chaos /
+Soul-Shattering Charge Upgrade selected-to-fight ability hooks, and Cavalcade of
+Chaos / Warp-Riders selected-to-move Stratagem handling through the shared
+`use_stratagem` path. The source-status table remains the Phase 17F baseline
+until a later execution-status overlay replaces blocked rows with implemented
+semantic status.
 
 ### Adepta Sororitas Execution Status
 
