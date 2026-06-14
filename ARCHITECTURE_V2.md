@@ -343,7 +343,7 @@ Next / planned sequence:
 | 17G | Planned | Faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
-| 18A-18D | Planned | Human UI, replay inspection, local visual UI, and network play |
+| 18A-18D | Planned | Human UI, viewer-safe datacard projections, replay inspection, local visual UI, and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
 
@@ -4569,9 +4569,12 @@ affecting in-game legality, scoring, or replay state.
 
 Modules:
 
+- `adapters/contracts.py`
+- `adapters/projection.py`
 - `interfaces/cli.py`
 - `engine/decision_controller.py`
 - `engine/decision_record.py`
+- `docs/ADAPTER_DECISION_CONTRACT.md`
 
 Invariants:
 
@@ -4580,6 +4583,32 @@ Invariants:
 - CLI never mutates state directly;
 - CLI-entered decisions produce `DecisionRecord`s identical in shape to headless decisions;
 - hidden information display is scoped to the acting player.
+- Phase 18A must close GitHub Issue #145 by exposing viewer-safe unit and model
+  presentation data through the public adapter projection contract, not through
+  UI imports of engine internals or UI-authored rules facts;
+- `GameViewPayload`, or a documented companion payload referenced from it,
+  exposes read-only unit display records keyed by stable `unit_instance_id` and
+  model display records keyed by stable `model_instance_id`;
+- unit display records include the unit display name, datasheet identity,
+  source metadata, viewer-visible keywords and faction keywords, and the model
+  IDs needed to join unit/model presentation data to battlefield placement
+  data;
+- model display records include model display name, model profile identity/name
+  where relevant, canonical datacard characteristics `M`, `T`, `SV`, `W`, `LD`,
+  and `OC`, base size or geometry presentation data, and viewer-visible wounds
+  remaining/starting wounds;
+- battlefield placement payloads and assignment/selection summaries can be
+  joined to the display projection by stable unit/model IDs without parsing
+  source text or reaching into engine-only objects;
+- hidden, unknown, or not-yet-revealed unit/model presentation fields are
+  represented by explicit viewer-scoped redactions or unknown values, never by
+  omitted data that forces adapters to infer rules facts;
+- unit/model display projections are deterministic, JSON-safe, read-only, and
+  versionable/cacheable with explicit invalidation through projection version,
+  event cursor, state hash, or another documented adapter-visible field;
+- UI, CLI, network, replay, and inspector adapters treat display projection
+  data as presentation state only; engine/catalog/runtime state remains the
+  authoritative rules source.
 
 Required tests:
 
@@ -4587,6 +4616,21 @@ Required tests:
 - invalid CLI choice is rejected;
 - valid CLI choice submits normal `DecisionResult`;
 - DecisionRecord round-trips.
+- `project_game_view(...)` exposes viewer-safe unit/model display records keyed
+  by stable IDs and those IDs join to `battlefield_state` unit/model placement
+  records;
+- selected unit, selected model, roster panel, inspector, assignment summary,
+  and datacard-style widgets can render from adapter-visible payloads without
+  importing engine internals or fabricating stats;
+- datacard characteristics, base size/geometry presentation, wounds, datasheet
+  source metadata, keywords, and faction keywords round-trip as deterministic
+  JSON-safe payloads;
+- opponent-hidden or not-yet-revealed unit/model display fields are redacted or
+  exposed as explicit unknowns for non-owning viewers;
+- display projection cache/version invalidation changes when relevant unit,
+  model, wound, roster, or placement presentation state changes;
+- adapter projection remains read-only: display payload consumption cannot
+  mutate authoritative state and cannot become a rules source.
 
 ## Phase 18B: replay inspection and deterministic replay runner
 

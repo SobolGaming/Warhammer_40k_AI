@@ -1115,6 +1115,29 @@ Adapters should render terrain footprints from this typed display geometry.
 `source_id` remains provenance only; adapters must not parse it to recover
 terrain preset, origin, rotation, or footprint details.
 
+Phase 18A must extend the viewer projection for
+[Issue #145](https://github.com/SobolGaming/Warhammer_40k_AI/issues/145) before
+local human CLI/UI work is considered complete. `GameViewPayload`, or a
+documented companion payload referenced from it, must expose viewer-safe,
+read-only unit and model display records keyed by stable `unit_instance_id` and
+`model_instance_id` values. The records must let adapters join battlefield
+placements, selected unit/model state, roster panels, inspectors, assignment
+summaries, and datacard-style widgets without importing engine internals or
+inventing rules facts.
+
+The Phase 18A unit/model display projection must be deterministic, JSON-safe,
+viewer-scoped, and presentation-only. Unit records must include unit display
+name, datasheet identity, source metadata, viewer-visible keywords and faction
+keywords, and model IDs. Model records must include model display name, model
+profile identity/name where relevant, canonical datacard characteristics `M`,
+`T`, `SV`, `W`, `LD`, and `OC`, base size or geometry presentation data, and
+viewer-visible wounds remaining/starting wounds. Hidden, unknown, or
+not-yet-revealed fields must be represented by explicit redactions or unknown
+values instead of omitted data that forces adapters to infer rules facts. The
+projection must define a version, event cursor, state hash, or equivalent
+adapter-visible invalidation field so UI caches can refresh display data
+without treating it as authoritative rules state.
+
 Phase 11E adds scoring state to the viewer projection:
 
 - `public_secondary_mission_card_states`: Fixed and Tactical card state payloads scoped
