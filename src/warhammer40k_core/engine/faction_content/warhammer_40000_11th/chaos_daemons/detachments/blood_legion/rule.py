@@ -141,7 +141,7 @@ def _blood_tainted_states_for_army(
     objective_record = _current_objective_control_record(context)
     states: list[StickyObjectiveControlState] = []
     seen_state_keys: set[tuple[str, str, str]] = set()
-    for event_id, payload in _model_destroyed_events_for_phase(context):
+    for event_id, payload in _unit_destruction_completion_events_for_phase(context):
         attacking_unit_id = _payload_string(payload, "attacking_unit_instance_id")
         if not _unit_id_is_in_army(army, unit_instance_id=attacking_unit_id):
             continue
@@ -149,11 +149,9 @@ def _blood_tainted_states_for_army(
         if not _unit_is_legiones_daemonica_khorne(attacking_unit):
             continue
         destroyed_unit_id = _payload_string(payload, "target_unit_instance_id")
-        if not _enemy_unit_destroyed_by_phase_end(
-            context=context,
-            player_id=army.player_id,
-            destroyed_unit_instance_id=destroyed_unit_id,
-        ):
+        if _army_owner_for_unit(
+            context.state.army_definitions, unit_instance_id=destroyed_unit_id
+        ) == (army.player_id):
             continue
         for objective_id in objective_ids_by_unit.get(destroyed_unit_id, ()):
             state_key = (objective_id, attacking_unit_id, destroyed_unit_id)
@@ -198,6 +196,7 @@ def _blood_tainted_states_for_army(
                         "attacking_unit_level_of_control": attacking_unit_loc,
                         "opponent_level_of_control": opponent_loc,
                         "model_destroyed_event_id": event_id,
+                        "unit_destruction_completion_event_id": event_id,
                         "required_faction_keyword": LEGIONES_DAEMONICA,
                         "required_keyword": KHORNE,
                     },
@@ -241,9 +240,72 @@ def _model_destroyed_events_for_phase(
     return tuple(events)
 
 
+def _unit_destruction_completion_events_for_phase(
+    context: PhaseEndObjectiveControlContext,
+) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
+    phase_start_removed_model_ids = _phase_start_removed_model_ids(context)
+    final_removed_model_ids = _removed_model_ids(context)
+    destroyed_model_ids_by_unit: dict[str, set[str]] = {}
+    completed_unit_ids: set[str] = set()
+    completion_events: list[tuple[str, dict[str, JsonValue]]] = []
+    for event_id, payload in _model_destroyed_events_for_phase(context):
+        target_unit_id = _payload_string(payload, "target_unit_instance_id")
+        target_unit = _unit_by_id(context.state.army_definitions, unit_instance_id=target_unit_id)
+        target_model_ids = {model.model_instance_id for model in target_unit.own_models}
+        if not target_model_ids <= final_removed_model_ids:
+            continue
+        if target_unit_id in completed_unit_ids:
+            raise GameLifecycleError("Blood Tainted saw destruction after unit completion.")
+        model_id = _payload_string(payload, "model_instance_id")
+        if model_id not in target_model_ids:
+            raise GameLifecycleError("Blood Tainted model-destroyed event target drift.")
+        destroyed_model_ids = destroyed_model_ids_by_unit.setdefault(
+            target_unit_id,
+            set(target_model_ids & phase_start_removed_model_ids),
+        )
+        if model_id in destroyed_model_ids:
+            raise GameLifecycleError("Blood Tainted saw duplicate destroyed-model attribution.")
+        destroyed_model_ids.add(model_id)
+        if target_model_ids <= destroyed_model_ids:
+            completed_unit_ids.add(target_unit_id)
+            completion_events.append((event_id, payload))
+    return tuple(completion_events)
+
+
 def _phase_start_objective_ids_by_unit(
     context: PhaseEndObjectiveControlContext,
 ) -> dict[str, tuple[str, ...]]:
+    payload = _phase_start_snapshot_payload(context)
+    if payload is None:
+        return {}
+    raw_mapping = payload.get("objective_ids_by_unit_instance_id")
+    if not isinstance(raw_mapping, dict):
+        raise GameLifecycleError("Blood Tainted phase-start snapshot is malformed.")
+    mapping: dict[str, tuple[str, ...]] = {}
+    for raw_unit_id, raw_objective_ids in raw_mapping.items():
+        if type(raw_unit_id) is not str or not isinstance(raw_objective_ids, list):
+            raise GameLifecycleError("Blood Tainted phase-start snapshot has invalid entries.")
+        mapping[raw_unit_id] = tuple(
+            _validate_identifier("objective_id", objective_id) for objective_id in raw_objective_ids
+        )
+    return mapping
+
+
+def _phase_start_removed_model_ids(context: PhaseEndObjectiveControlContext) -> set[str]:
+    payload = _phase_start_snapshot_payload(context)
+    if payload is None:
+        return set()
+    raw_model_ids = payload.get("removed_model_ids")
+    if not isinstance(raw_model_ids, list):
+        raise GameLifecycleError("Blood Tainted phase-start snapshot missing removed models.")
+    return {
+        _validate_identifier("removed_model_id", raw_model_id) for raw_model_id in raw_model_ids
+    }
+
+
+def _phase_start_snapshot_payload(
+    context: PhaseEndObjectiveControlContext,
+) -> dict[str, JsonValue] | None:
     active_player_id = _active_player_id(context)
     snapshot_id = (
         f"objective-proximity:{context.state.game_id}:"
@@ -258,41 +320,15 @@ def _phase_start_objective_ids_by_unit(
             continue
         if payload.get("snapshot_id") != snapshot_id:
             continue
-        raw_mapping = payload.get("objective_ids_by_unit_instance_id")
-        if not isinstance(raw_mapping, dict):
-            raise GameLifecycleError("Blood Tainted phase-start snapshot is malformed.")
-        mapping: dict[str, tuple[str, ...]] = {}
-        for raw_unit_id, raw_objective_ids in raw_mapping.items():
-            if type(raw_unit_id) is not str or not isinstance(raw_objective_ids, list):
-                raise GameLifecycleError("Blood Tainted phase-start snapshot has invalid entries.")
-            mapping[raw_unit_id] = tuple(
-                _validate_identifier("objective_id", objective_id)
-                for objective_id in raw_objective_ids
-            )
-        return mapping
-    return {}
+        return payload
+    return None
 
 
-def _enemy_unit_destroyed_by_phase_end(
-    *,
-    context: PhaseEndObjectiveControlContext,
-    player_id: str,
-    destroyed_unit_instance_id: str,
-) -> bool:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    requested_unit_id = _validate_identifier(
-        "destroyed_unit_instance_id",
-        destroyed_unit_instance_id,
-    )
-    owner = _army_owner_for_unit(context.state.army_definitions, unit_instance_id=requested_unit_id)
-    if owner == requested_player_id:
-        return False
+def _removed_model_ids(context: PhaseEndObjectiveControlContext) -> set[str]:
     battlefield_state = context.state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Blood Tainted requires battlefield_state.")
-    removed_ids = set(battlefield_state.removed_model_ids)
-    unit = _unit_by_id(context.state.army_definitions, unit_instance_id=requested_unit_id)
-    return all(model.model_instance_id in removed_ids for model in unit.own_models)
+    return set(battlefield_state.removed_model_ids)
 
 
 def _unit_placements_within(

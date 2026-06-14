@@ -89,7 +89,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 )
 
 _BLOOD_LEGION_DATASHEET_ID = "phase17g-blood-legion-khorne-daemon"
+_BLOOD_LEGION_NON_KHORNE_DATASHEET_ID = "phase17g-blood-legion-non-khorne-daemon"
 _BLOOD_UNIT_ID = "army-alpha:blood-daemon-unit"
+_OTHER_FRIENDLY_UNIT_ID = "army-alpha:non-khorne-daemon-unit"
 _ENEMY_UNIT_ID = "army-beta:enemy-unit"
 _OTHER_DAEMON_DETACHMENT_ID = "warptide"
 
@@ -242,6 +244,51 @@ def test_blood_tainted_records_sticky_control_at_phase_end_boundary() -> None:
     assert retained_result.retained_control_source_id == rule.SOURCE_RULE_ID
 
 
+def test_blood_tainted_credits_only_unit_destruction_completion_attacker() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-blood-tainted-completion-attribution-game",
+        include_other_friendly_unit=True,
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _battle_ready_state(lifecycle=lifecycle, config=config)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    _place_blood_tainted_units_on_center_objective(state)
+    decisions = DecisionController()
+    snapshot_payload = _emit_objective_proximity_snapshot(
+        state=state,
+        decisions=decisions,
+        phase=BattlePhase.SHOOTING,
+        ruleset_descriptor=config.ruleset_descriptor,
+    )
+    objective_id = _single_objective_id_for_unit(snapshot_payload, _ENEMY_UNIT_ID)
+    _destroy_enemy_unit_with_split_attackers_for_blood_tainted(
+        state=state,
+        decisions=decisions,
+    )
+    flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
+        },
+        phase_end_objective_control_hooks=(
+            _runtime_content_bundle(lifecycle).phase_end_objective_control_hook_registry
+        ),
+    )
+
+    status = flow.advance(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.sticky_objective_control_states == []
+    assert all(
+        event.event_type != "sticky_objective_control_state_recorded"
+        for event in decisions.event_log.records
+    )
+    phase_end_record = state.objective_control_records[-1]
+    result = phase_end_record.result_by_objective_id(objective_id)
+    assert result.controlled_by_player_id == "player-a"
+    assert result.retained_control_source_id is None
+
+
 def test_blood_legion_rule_hooks_use_phase17f_execution_source_id() -> None:
     record = _blood_legion_rule_execution_record()
     contribution = rule.runtime_contribution()
@@ -271,6 +318,7 @@ def _blood_legion_config(
     game_id: str = "phase17g-blood-legion-game",
     daemon_detachment_id: str = rule.BLOOD_LEGION_DETACHMENT_ID,
     turn_order: tuple[str, str] = ("player-a", "player-b"),
+    include_other_friendly_unit: bool = False,
 ) -> GameConfig:
     catalog = _blood_legion_catalog()
     return GameConfig(
@@ -289,6 +337,14 @@ def _blood_legion_config(
                 detachment_id=daemon_detachment_id,
                 unit_selection_id="blood-daemon-unit",
                 datasheet_id=_BLOOD_LEGION_DATASHEET_ID,
+                extra_unit_selections=(
+                    (
+                        "non-khorne-daemon-unit",
+                        _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
+                    ),
+                )
+                if include_other_friendly_unit
+                else (),
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -311,9 +367,14 @@ def _blood_legion_catalog() -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
     daemon_datasheet = _blood_legion_datasheet(base_datasheet)
+    non_khorne_daemon_datasheet = _blood_legion_non_khorne_datasheet(base_datasheet)
     return replace(
         base_catalog,
-        datasheets=(*base_catalog.datasheets, daemon_datasheet),
+        datasheets=(
+            *base_catalog.datasheets,
+            daemon_datasheet,
+            non_khorne_daemon_datasheet,
+        ),
         factions=(
             *base_catalog.factions,
             FactionDefinition(
@@ -330,7 +391,10 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 name="Blood Legion",
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
                 detachment_point_cost=2,
-                unit_datasheet_ids=(_BLOOD_LEGION_DATASHEET_ID,),
+                unit_datasheet_ids=(
+                    _BLOOD_LEGION_DATASHEET_ID,
+                    _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
+                ),
                 force_disposition_ids=("phase17g-force",),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:blood-legion",
@@ -365,6 +429,22 @@ def _blood_legion_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDef
     )
 
 
+def _blood_legion_non_khorne_datasheet(
+    base_datasheet: DatasheetDefinition,
+) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=_BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
+        name="Blood Legion Non-Khorne Daemon",
+        keywords=DatasheetKeywordSet(
+            keywords=("Infantry", "Tzeentch"),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+        attachment_eligibilities=(),
+        source_ids=("phase17g:test:chaos-daemons:blood-legion-non-khorne-daemon",),
+    )
+
+
 def _army_muster_request(
     *,
     catalog: ArmyCatalog,
@@ -374,7 +454,21 @@ def _army_muster_request(
     detachment_id: str,
     unit_selection_id: str,
     datasheet_id: str,
+    extra_unit_selections: tuple[tuple[str, str], ...] = (),
 ) -> ArmyMusterRequest:
+    unit_selections = [
+        _unit_muster_selection(
+            unit_selection_id=unit_selection_id,
+            datasheet_id=datasheet_id,
+        )
+    ]
+    unit_selections.extend(
+        _unit_muster_selection(
+            unit_selection_id=extra_unit_selection_id,
+            datasheet_id=extra_datasheet_id,
+        )
+        for extra_unit_selection_id, extra_datasheet_id in extra_unit_selections
+    )
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
@@ -385,16 +479,22 @@ def _army_muster_request(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
         ),
-        unit_selections=(
-            UnitMusterSelection(
-                unit_selection_id=unit_selection_id,
-                datasheet_id=datasheet_id,
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
-                    ),
-                ),
+        unit_selections=tuple(unit_selections),
+    )
+
+
+def _unit_muster_selection(
+    *,
+    unit_selection_id: str,
+    datasheet_id: str,
+) -> UnitMusterSelection:
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="core-intercessor-like",
+                model_count=5,
             ),
         ),
     )
@@ -568,6 +668,8 @@ def _emit_objective_proximity_snapshot(
     active_player_id = state.active_player_id
     if active_player_id is None:
         raise AssertionError("test state requires active_player_id")
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
@@ -595,6 +697,7 @@ def _emit_objective_proximity_snapshot(
             unit_id: sorted(objective_ids)
             for unit_id, objective_ids in sorted(objective_ids_by_unit.items())
         },
+        "removed_model_ids": sorted(state.battlefield_state.removed_model_ids),
         "source_objective_control_record": record.to_payload(),
     }
     decisions.event_log.append("objective_marker_phase_start_proximity_snapshot", payload)
@@ -647,6 +750,44 @@ def _destroy_enemy_unit_for_blood_tainted(
                 "model_instance_id": model_id,
                 "damage_kind": "normal",
                 "damage_event_id": f"phase17g-blood-tainted-damage-{index:02d}",
+                "destroyed_model_rules_triggered": True,
+            },
+        )
+
+
+def _destroy_enemy_unit_with_split_attackers_for_blood_tainted(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    phase = state.current_battle_phase
+    if phase is None:
+        raise AssertionError("test state requires current battle phase")
+    enemy_army = state.army_definition_for_player("player-b")
+    if enemy_army is None:
+        raise AssertionError("test state requires player-b army")
+    enemy_unit = enemy_army.unit_by_id(_ENEMY_UNIT_ID)
+    destroyed_model_ids = tuple(model.model_instance_id for model in enemy_unit.own_models)
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(destroyed_model_ids)
+    )
+    for index, model_id in enumerate(destroyed_model_ids, start=1):
+        attacker_id = _BLOOD_UNIT_ID if index == 1 else _OTHER_FRIENDLY_UNIT_ID
+        decisions.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": phase.value,
+                "destroying_player_id": "player-a",
+                "attacking_unit_instance_id": attacker_id,
+                "target_unit_instance_id": _ENEMY_UNIT_ID,
+                "model_instance_id": model_id,
+                "damage_kind": "normal",
+                "damage_event_id": f"phase17g-blood-tainted-split-damage-{index:02d}",
                 "destroyed_model_rules_triggered": True,
             },
         )

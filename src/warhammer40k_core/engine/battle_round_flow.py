@@ -272,6 +272,7 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
                 unit_id: sorted(objective_ids)
                 for unit_id, objective_ids in sorted(objective_ids_by_unit.items())
             },
+            "removed_model_ids": sorted(state.battlefield_state.removed_model_ids),
             "source_objective_control_record": record.to_payload(),
         },
     )
