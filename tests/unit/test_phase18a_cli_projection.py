@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -9,7 +10,10 @@ from tests.deployment_submission_helpers import submit_all_deployments_if_pendin
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import (
+    PROJECTION_SCHEMA_VERSION,
     RULES_CATALOG_VIEW_SCHEMA_VERSION,
+    GameViewPayload,
+    RulesCatalogViewPayload,
     project_game_view,
     project_rules_catalog_view,
 )
@@ -40,6 +44,8 @@ from warhammer40k_core.interfaces.cli import (
     submit_cli_payload,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+
+FIXTURE_ROOT = Path(__file__).resolve().parents[1] / "fixtures"
 
 
 def test_cli_adapter_renders_finite_options_and_records_normal_decision() -> None:
@@ -181,6 +187,24 @@ def test_rules_catalog_projection_exposes_cacheable_static_display_records() -> 
         "width_mm": None,
     }
     assert validate_json_value(round_trip) == payload
+
+
+def test_local_session_phase18a_projection_sample_contract_joins_datacards() -> None:
+    session, _status = _local_session_at_movement_unit_selection(
+        game_id="phase18a-projection-sample-game"
+    )
+    rules_catalog = session.rules_catalog_view()
+    view = session.view(viewer_player_id="player-a")
+    sample = _phase18a_projection_join_sample(rules_catalog=rules_catalog, view=view)
+
+    assert rules_catalog == project_rules_catalog_view(
+        catalog=session.lifecycle.config.army_catalog
+    )
+    assert rules_catalog["projection_schema"] == RULES_CATALOG_VIEW_SCHEMA_VERSION
+    assert view["projection_schema"] == PROJECTION_SCHEMA_VERSION
+    assert view["projection_state_hash"]
+    assert sample == _fixture_json("phase18a_projection_join_sample.json")
+    assert validate_json_value(json.loads(json.dumps(sample, sort_keys=True))) == sample
 
 
 def test_game_view_exposes_issue145_unit_model_datacard_join_without_unknowns() -> None:
@@ -444,6 +468,84 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _phase18a_projection_join_sample(
+    *,
+    rules_catalog: RulesCatalogViewPayload,
+    view: GameViewPayload,
+) -> JsonValue:
+    battlefield = cast(dict[str, JsonValue], view["battlefield_state"])
+    placed_army = cast(list[dict[str, JsonValue]], battlefield["placed_armies"])[0]
+    unit_placement = cast(list[dict[str, JsonValue]], placed_army["unit_placements"])[0]
+    model_placement = cast(list[dict[str, JsonValue]], unit_placement["model_placements"])[0]
+    unit_id = cast(str, unit_placement["unit_instance_id"])
+    model_id = cast(str, model_placement["model_instance_id"])
+    unit_display = view["unit_display_by_id"][unit_id]
+    model_display = view["model_display_by_id"][model_id]
+    datasheet_id = unit_display["datasheet_id"]
+    model_profile_id = model_display["model_profile_id"]
+    base_size = model_display["base_size"]
+
+    assert datasheet_id is not None
+    assert model_profile_id is not None
+    assert base_size is not None
+
+    characteristic_keys = ("M", "T", "SV", "W", "LD", "OC")
+    return validate_json_value(
+        {
+            "rules_catalog": {
+                "projection_schema": rules_catalog["projection_schema"],
+                "catalog_id": rules_catalog["catalog_id"],
+                "source_package_id": rules_catalog["source_package_id"],
+                "source_hash": rules_catalog["source_hash"],
+                "datasheet": rules_catalog["datasheet_display_by_id"][datasheet_id],
+                "model_profile": rules_catalog["model_profile_display_by_id"][model_profile_id],
+                "base_size": rules_catalog["base_size_display_by_id"][base_size["base_size_id"]],
+            },
+            "game_view": {
+                "projection_schema": view["projection_schema"],
+                "projection_state_hash": view["projection_state_hash"],
+                "rules_catalog": view["rules_catalog"],
+                "battlefield_join": {
+                    "unit_instance_id": unit_id,
+                    "model_instance_id": model_id,
+                    "placement": {
+                        "army_id": unit_placement["army_id"],
+                        "player_id": unit_placement["player_id"],
+                        "unit_instance_id": unit_id,
+                        "model_placement": model_placement,
+                    },
+                },
+                "unit_display": {
+                    "unit_instance_id": unit_display["unit_instance_id"],
+                    "unit_display_name": unit_display["unit_display_name"],
+                    "datasheet_id": unit_display["datasheet_id"],
+                    "keywords": unit_display["keywords"],
+                    "faction_keywords": unit_display["faction_keywords"],
+                    "model_instance_ids": unit_display["model_instance_ids"],
+                    "selected_wargear_ids": unit_display["selected_wargear_ids"],
+                },
+                "model_display": {
+                    "model_instance_id": model_display["model_instance_id"],
+                    "unit_instance_id": model_display["unit_instance_id"],
+                    "model_profile_id": model_display["model_profile_id"],
+                    "model_display_name": model_display["model_display_name"],
+                    "base_size": model_display["base_size"],
+                    "wounds_remaining": model_display["wounds_remaining"],
+                    "starting_wounds": model_display["starting_wounds"],
+                    "current_characteristics": {
+                        key: model_display["current_characteristics"][key]
+                        for key in characteristic_keys
+                    },
+                },
+            },
+        }
+    )
+
+
+def _fixture_json(name: str) -> JsonValue:
+    return validate_json_value(json.loads((FIXTURE_ROOT / name).read_text(encoding="utf-8")))
 
 
 def _session_state(session: LocalGameSession) -> GameState:

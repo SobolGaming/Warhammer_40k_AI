@@ -1196,7 +1196,9 @@ hybrid projection model:
    for datasheets, model profiles, weapon profiles, factions, detachments,
    enhancements, wargear, wargear options, and base sizes. Adapters may cache this
    payload by catalog ID/schema/hash and render catalog browsing, roster panels,
-   and tooltips from it.
+   and tooltips from it. `LocalGameSession.rules_catalog_view()` exposes the same
+   static projection for local UI/CLI clients that already consume
+   `LocalGameSession.view(...)`.
 2. Live viewer-safe unit/model projection. `GameViewPayload` uses
    `projection_schema: "game-view-v2-phase18a"`, includes
    `projection_state_hash`, references the static catalog through
@@ -1297,6 +1299,14 @@ view = project_game_view(
     lifecycle=lifecycle,
     viewer_player_id="player-a",
 )
+```
+
+Local session clients may use the paired session helpers instead of importing
+projection functions directly:
+
+```python
+rules_catalog = session.rules_catalog_view()
+view = session.view(viewer_player_id="player-a")
 ```
 
 When the visible pending request is parameterized, `GameViewPayload.pending_proposal`

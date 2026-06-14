@@ -4612,7 +4612,8 @@ Invariants:
   documented adapter payload, exposes static datasheets, model profiles, weapon
   profiles, factions, detachments, enhancements, wargear, wargear options, and
   base-size display records for browsing, roster panels, tooltips, and client
-  caching;
+  caching, and `LocalGameSession.rules_catalog_view()` exposes that static
+  projection beside the live `LocalGameSession.view(...)` helper;
 - `GameViewPayload` exposes the selected static catalog version/hash and live
   read-only `unit_display_by_id` records keyed by stable `unit_instance_id` and
   `model_display_by_id` records keyed by stable `model_instance_id`;
@@ -4690,6 +4691,9 @@ Required tests:
   `model_display_by_id[model_instance_id]` ->
   `current_characteristics["M/T/SV/W/LD/OC"]` without placeholder unknown values
   or engine-internal imports.
+- Phase 18A projection contract sample fixture pins the static catalog schema,
+  live game-view schema, projection hash, catalog reference, and stable
+  battlefield-to-unit/model datacard join used by UI integration.
 
 ## Phase 18B: replay inspection and deterministic replay runner
 

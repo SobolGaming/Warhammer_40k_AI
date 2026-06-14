@@ -4,7 +4,12 @@ from dataclasses import dataclass, field
 
 from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
 from warhammer40k_core.adapters.event_stream import EventStreamCursor, EventStreamDeltaPayload
-from warhammer40k_core.adapters.projection import GameViewPayload, project_game_view
+from warhammer40k_core.adapters.projection import (
+    GameViewPayload,
+    RulesCatalogViewPayload,
+    project_game_view,
+    project_rules_catalog_view,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -54,6 +59,9 @@ class LocalGameSession:
             lifecycle=self.lifecycle,
             viewer_player_id=viewer_player_id,
         )
+
+    def rules_catalog_view(self) -> RulesCatalogViewPayload:
+        return project_rules_catalog_view(catalog=self.lifecycle.config.army_catalog)
 
     def events_since(
         self,
