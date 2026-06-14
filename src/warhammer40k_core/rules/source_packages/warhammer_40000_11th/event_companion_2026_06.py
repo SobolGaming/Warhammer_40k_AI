@@ -338,16 +338,18 @@ class CardAmendmentSet:
 
 
 @dataclass(frozen=True, slots=True)
-class EventPolygonSourceRecord:
-    polygon_id: str
+class EventShapeSourceRecord:
+    shape_id: str
     role: str
-    vertices: tuple[tuple[float, float], ...]
+    polygons: tuple[tuple[tuple[float, float], ...], ...]
 
     def to_payload(self) -> dict[str, object]:
         return {
-            "polygon_id": self.polygon_id,
+            "shape_id": self.shape_id,
             "role": self.role,
-            "vertices": [[x, y] for x, y in self.vertices],
+            "polygons": [
+                [[x, y] for x, y in polygon_vertices] for polygon_vertices in self.polygons
+            ],
         }
 
 
@@ -401,9 +403,9 @@ class WarhammerEventLayoutDescriptor:
     battlefield_depth_inches: float
     attacker_edge: str
     defender_edge: str
-    deployment_zone_polygons: tuple[EventPolygonSourceRecord, ...]
-    no_mans_land_polygon: EventPolygonSourceRecord
-    player_territory_polygons: tuple[EventPolygonSourceRecord, ...]
+    deployment_zone_shapes: tuple[EventShapeSourceRecord, ...]
+    no_mans_land_shape: EventShapeSourceRecord
+    player_territory_shapes: tuple[EventShapeSourceRecord, ...]
     objective_points: tuple[EventObjectivePointRecord, ...]
     terrain_features: tuple[EventTerrainSourceRecord, ...]
     geometry_extraction_status: str
@@ -422,12 +424,10 @@ class WarhammerEventLayoutDescriptor:
             "battlefield_depth_inches": self.battlefield_depth_inches,
             "attacker_edge": self.attacker_edge,
             "defender_edge": self.defender_edge,
-            "deployment_zone_polygons": [
-                polygon.to_payload() for polygon in self.deployment_zone_polygons
-            ],
-            "no_mans_land_polygon": self.no_mans_land_polygon.to_payload(),
-            "player_territory_polygons": [
-                polygon.to_payload() for polygon in self.player_territory_polygons
+            "deployment_zone_shapes": [shape.to_payload() for shape in self.deployment_zone_shapes],
+            "no_mans_land_shape": self.no_mans_land_shape.to_payload(),
+            "player_territory_shapes": [
+                shape.to_payload() for shape in self.player_territory_shapes
             ],
             "objective_points": [objective.to_payload() for objective in self.objective_points],
             "terrain_features": [feature.to_payload() for feature in self.terrain_features],
@@ -2035,15 +2035,15 @@ def layout_descriptor_rows() -> tuple[WarhammerEventLayoutDescriptor, ...]:
                     battlefield_depth_inches=_layout_battlefield_depth(layout_id),
                     attacker_edge=_layout_attacker_edge(layout_id, layout_number),
                     defender_edge=_layout_defender_edge(layout_id, layout_number),
-                    deployment_zone_polygons=_descriptor_deployment_polygons(
+                    deployment_zone_shapes=_descriptor_deployment_shapes(
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
-                    no_mans_land_polygon=_no_mans_land_polygon(
+                    no_mans_land_shape=_no_mans_land_shape(
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
-                    player_territory_polygons=_territory_polygons(
+                    player_territory_shapes=_territory_shapes(
                         layout_id=layout_id,
                         layout_number=layout_number,
                     ),
@@ -2581,28 +2581,28 @@ def _layout_terrain_features(
     )
 
 
-def _descriptor_deployment_polygons(
+def _descriptor_deployment_shapes(
     *,
     layout_id: str,
     layout_number: int,
-) -> tuple[EventPolygonSourceRecord, ...]:
+) -> tuple[EventShapeSourceRecord, ...]:
     return tuple(
-        EventPolygonSourceRecord(
-            polygon_id=zone.deployment_zone_id,
+        EventShapeSourceRecord(
+            shape_id=zone.deployment_zone_id,
             role=zone.player_role,
-            vertices=_shape_vertices(zone.shape),
+            polygons=_shape_polygons(zone.shape),
         )
         for zone in _layout_deployment_zones(layout_id=layout_id, layout_number=layout_number)
     )
 
 
-def _no_mans_land_polygon(*, layout_id: str, layout_number: int) -> EventPolygonSourceRecord:
+def _no_mans_land_shape(*, layout_id: str, layout_number: int) -> EventShapeSourceRecord:
     vertices: tuple[tuple[float, float], ...]
     if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
-        return EventPolygonSourceRecord(
-            polygon_id=f"{layout_id}-no-mans-land",
+        return EventShapeSourceRecord(
+            shape_id=f"{layout_id}-no-mans-land",
             role="no_mans_land",
-            vertices=_shape_vertices(_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id)),
+            polygons=_shape_polygons(_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id)),
         )
     if layout_number == 2:
         vertices = (
@@ -2622,25 +2622,25 @@ def _no_mans_land_polygon(*, layout_id: str, layout_number: int) -> EventPolygon
             _pending_layout_point(42.0, 44.0),
             _pending_layout_point(18.0, 44.0),
         )
-    return EventPolygonSourceRecord(
-        polygon_id=f"{layout_id}-no-mans-land",
+    return EventShapeSourceRecord(
+        shape_id=f"{layout_id}-no-mans-land",
         role="no_mans_land",
-        vertices=vertices,
+        polygons=(vertices,),
     )
 
 
-def _territory_polygons(
+def _territory_shapes(
     *,
     layout_id: str,
     layout_number: int,
-) -> tuple[EventPolygonSourceRecord, ...]:
+) -> tuple[EventShapeSourceRecord, ...]:
     if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
         territories = _take_and_hold_vs_take_and_hold_territory_vertices(layout_id)
         return tuple(
-            EventPolygonSourceRecord(
-                polygon_id=f"{layout_id}-{role}",
+            EventShapeSourceRecord(
+                shape_id=f"{layout_id}-{role}",
                 role=role,
-                vertices=vertices,
+                polygons=(vertices,),
             )
             for role, vertices in territories
         )
@@ -2687,10 +2687,10 @@ def _territory_polygons(
             ),
         )
     return tuple(
-        EventPolygonSourceRecord(
-            polygon_id=f"{layout_id}-{role}",
+        EventShapeSourceRecord(
+            shape_id=f"{layout_id}-{role}",
             role=role,
-            vertices=vertices,
+            polygons=(vertices,),
         )
         for role, vertices in territories
     )
@@ -3382,8 +3382,10 @@ def _axis_aligned_display(
     )
 
 
-def _shape_vertices(shape: DeploymentZoneShape) -> tuple[tuple[float, float], ...]:
-    return tuple((point.x, point.y) for polygon in shape.polygons for point in polygon.vertices)
+def _shape_polygons(shape: DeploymentZoneShape) -> tuple[tuple[tuple[float, float], ...], ...]:
+    return tuple(
+        tuple((point.x, point.y) for point in polygon.vertices) for polygon in shape.polygons
+    )
 
 
 def _base_size_source_record(

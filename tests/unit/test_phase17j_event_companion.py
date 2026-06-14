@@ -312,8 +312,19 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
     assert layout_c.defender_edge == "east"
     assert all(descriptor.battlefield_width_inches == 44.0 for descriptor in pending_descriptors)
     assert all(descriptor.battlefield_depth_inches == 60.0 for descriptor in pending_descriptors)
-    assert all(len(descriptor.deployment_zone_polygons) == 2 for descriptor in descriptors)
-    assert all(len(descriptor.player_territory_polygons) == 2 for descriptor in descriptors)
+    assert all(len(descriptor.deployment_zone_shapes) == 2 for descriptor in descriptors)
+    assert all(len(descriptor.player_territory_shapes) == 2 for descriptor in descriptors)
+    assert all(
+        len(shape.polygons) == 1
+        for descriptor in descriptors
+        for shape in (*descriptor.deployment_zone_shapes, *descriptor.player_territory_shapes)
+    )
+    assert len(layout_c.no_mans_land_shape.polygons) == 4
+    layout_c_payload = layout_c.to_payload()
+    assert "no_mans_land_polygon" not in layout_c_payload
+    assert cast(dict[str, object], layout_c_payload["no_mans_land_shape"])["polygons"] == [
+        [[x, y] for x, y in polygon] for polygon in layout_c.no_mans_land_shape.polygons
+    ]
     assert all(len(descriptor.objective_points) == 5 for descriptor in descriptors)
     assert all(
         {"dense", "light"} <= {feature.density for feature in descriptor.terrain_features}
