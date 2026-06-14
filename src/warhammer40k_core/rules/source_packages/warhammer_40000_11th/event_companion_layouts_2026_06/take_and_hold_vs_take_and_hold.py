@@ -1,0 +1,316 @@
+from __future__ import annotations
+
+from warhammer40k_core.core.missions import ObjectiveMarkerRole
+from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
+
+from .common import (
+    FOOTPRINT_6X2,
+    FOOTPRINT_6X4,
+    FOOTPRINT_7X11_5,
+    FOOTPRINT_8X11_5_POLYGON,
+    FOOTPRINT_10X2_5,
+    EventBattlefieldLayoutSource,
+    EventObjectiveRoleCountSpec,
+)
+
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID = "take-and-hold-vs-take-and-hold-layout-1"
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID = "take-and-hold-vs-take-and-hold-layout-2"
+TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID = "take-and-hold-vs-take-and-hold-layout-3"
+
+_OBJECTIVE_ROLE_COUNTS: tuple[EventObjectiveRoleCountSpec, ...] = (
+    (ObjectiveMarkerRole.ATTACKER_HOME, 1),
+    (ObjectiveMarkerRole.DEFENDER_HOME, 1),
+    (ObjectiveMarkerRole.CENTRAL, 1),
+    (ObjectiveMarkerRole.EXPANSION, 2),
+)
+
+LAYOUTS = (
+    EventBattlefieldLayoutSource(
+        layout_id=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID,
+        name="Take and Hold vs Take and Hold - Battlefield Dominance - Layout A",
+        source_layout_id=(
+            "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_a"
+        ),
+        objective_specs=(
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 16.49, 49.82),
+            ("defender-home", "Defender Home Objective", "defender_home", 25.76, 12.72),
+            ("central", "Central Objective", "central", 22.02, 30.0),
+            ("expansion-west", "West Expansion Objective", "expansion", 7.4, 19.16),
+            ("expansion-east", "East Expansion Objective", "expansion", 36.72, 41.87),
+        ),
+        objective_role_counts=_OBJECTIVE_ROLE_COUNTS,
+        terrain_area_specs=(
+            (
+                "dense-7x11-5-upper-right",
+                FOOTPRINT_7X11_5,
+                TerrainAreaClassification.DENSE,
+                36.22,
+                41.2,
+                0.0,
+            ),
+            (
+                "dense-7x11-5-upper-left",
+                FOOTPRINT_7X11_5,
+                TerrainAreaClassification.DENSE,
+                17.79,
+                48.3,
+                180.0,
+            ),
+            (
+                "light-10x2-5-upper-left",
+                FOOTPRINT_10X2_5,
+                TerrainAreaClassification.LIGHT,
+                7.03,
+                44.72,
+                0.0,
+            ),
+            (
+                "light-6x2-upper-center",
+                FOOTPRINT_6X2,
+                TerrainAreaClassification.LIGHT,
+                24.07,
+                41.38,
+                0.0,
+            ),
+            (
+                "light-6x2-east-midfield",
+                FOOTPRINT_6X2,
+                TerrainAreaClassification.LIGHT,
+                36.97,
+                29.12,
+                0.0,
+            ),
+            (
+                "light-6x4-lower-left",
+                FOOTPRINT_6X4,
+                TerrainAreaClassification.LIGHT,
+                14.3,
+                10.69,
+                0.0,
+            ),
+            (
+                "light-6x4-east-midfield",
+                FOOTPRINT_6X4,
+                TerrainAreaClassification.LIGHT,
+                33.7,
+                24.67,
+                90.0,
+            ),
+            (
+                "dense-8x11-5-polygon-central-north",
+                FOOTPRINT_8X11_5_POLYGON,
+                TerrainAreaClassification.DENSE,
+                21.79,
+                30.95,
+                0.0,
+            ),
+        ),
+        terrain_area_mirror_pairs=(
+            ("dense-7x11-5-upper-right", "dense-7x11-5-lower-left"),
+            ("dense-7x11-5-upper-left", "dense-7x11-5-lower-right"),
+            ("light-10x2-5-upper-left", "light-10x2-5-lower-right"),
+            ("light-6x2-upper-center", "light-6x2-lower-center"),
+            ("light-6x2-east-midfield", "light-6x2-west-midfield"),
+            ("light-6x4-lower-left", "light-6x4-upper-right"),
+            ("light-6x4-east-midfield", "light-6x4-west-midfield"),
+            ("dense-8x11-5-polygon-central-north", "dense-8x11-5-polygon-central-south"),
+        ),
+    ),
+    EventBattlefieldLayoutSource(
+        layout_id=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID,
+        name="Take and Hold vs Take and Hold - Battlefield Dominance - Layout B",
+        source_layout_id=(
+            "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_b"
+        ),
+        objective_specs=(
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 6.76, 31.2),
+            ("defender-home", "Defender Home Objective", "defender_home", 37.24, 28.67),
+            ("central", "Central Objective", "central", 22.16, 30.04),
+            ("expansion-south", "South Expansion Objective", "expansion", 19.2, 10.28),
+            ("expansion-north", "North Expansion Objective", "expansion", 24.92, 50.61),
+        ),
+        objective_role_counts=_OBJECTIVE_ROLE_COUNTS,
+        terrain_area_specs=(
+            (
+                "dense-7x11-5-left-home",
+                FOOTPRINT_7X11_5,
+                TerrainAreaClassification.DENSE,
+                7.02,
+                29.79,
+                0.0,
+            ),
+            (
+                "dense-7x11-5-central-west",
+                FOOTPRINT_7X11_5,
+                TerrainAreaClassification.DENSE,
+                21.06,
+                29.8,
+                0.0,
+            ),
+            (
+                "dense-8x11-5-polygon-north",
+                FOOTPRINT_8X11_5_POLYGON,
+                TerrainAreaClassification.DENSE,
+                25.19,
+                49.79,
+                0.0,
+            ),
+            (
+                "light-10x2-5-north-west",
+                FOOTPRINT_10X2_5,
+                TerrainAreaClassification.LIGHT,
+                9.11,
+                44.82,
+                66.0,
+            ),
+            (
+                "light-6x4-north-east",
+                FOOTPRINT_6X4,
+                TerrainAreaClassification.LIGHT,
+                37.39,
+                50.11,
+                30.0,
+            ),
+            (
+                "light-6x4-north-west",
+                FOOTPRINT_6X4,
+                TerrainAreaClassification.LIGHT,
+                17.75,
+                42.7,
+                330.0,
+            ),
+            (
+                "light-6x2-north-east",
+                FOOTPRINT_6X2,
+                TerrainAreaClassification.LIGHT,
+                36.65,
+                43.77,
+                55.0,
+            ),
+            (
+                "light-6x2-north-west",
+                FOOTPRINT_6X2,
+                TerrainAreaClassification.LIGHT,
+                7.99,
+                52.46,
+                35.0,
+            ),
+        ),
+        terrain_area_mirror_pairs=(
+            ("dense-7x11-5-left-home", "dense-7x11-5-right-home"),
+            ("dense-7x11-5-central-west", "dense-7x11-5-central-east"),
+            ("dense-8x11-5-polygon-north", "dense-8x11-5-polygon-south"),
+            ("light-10x2-5-north-west", "light-10x2-5-south-east"),
+            ("light-6x4-north-east", "light-6x4-south-west"),
+            ("light-6x4-north-west", "light-6x4-south-east"),
+            ("light-6x2-north-east", "light-6x2-south-west"),
+            ("light-6x2-north-west", "light-6x2-south-east"),
+        ),
+    ),
+    EventBattlefieldLayoutSource(
+        layout_id=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID,
+        name="Take and Hold vs Take and Hold - Battlefield Dominance - Layout C",
+        source_layout_id=(
+            "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c"
+        ),
+        objective_specs=(
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 9.45, 50.3),
+            ("defender-home", "Defender Home Objective", "defender_home", 34.55, 9.7),
+            ("central", "Central Objective", "central", 22.0, 30.0),
+            (
+                "expansion-south-west",
+                "South-west Expansion Objective",
+                "expansion",
+                9.7,
+                10.55,
+            ),
+            (
+                "expansion-north-east",
+                "North-east Expansion Objective",
+                "expansion",
+                34.3,
+                49.45,
+            ),
+        ),
+        objective_role_counts=_OBJECTIVE_ROLE_COUNTS,
+        terrain_area_specs=(
+            (
+                "dense-7x11-5-north-west",
+                FOOTPRINT_7X11_5,
+                TerrainAreaClassification.DENSE,
+                9.75,
+                50.0,
+                315.0,
+            ),
+            (
+                "dense-7x11-5-south-west",
+                FOOTPRINT_7X11_5,
+                TerrainAreaClassification.DENSE,
+                9.7,
+                11.2,
+                0.0,
+            ),
+            (
+                "dense-8x11-5-polygon-central-north-west",
+                FOOTPRINT_8X11_5_POLYGON,
+                TerrainAreaClassification.DENSE,
+                18.3,
+                32.1,
+                0.0,
+            ),
+            (
+                "light-10x2-5-north-center",
+                FOOTPRINT_10X2_5,
+                TerrainAreaClassification.LIGHT,
+                20.65,
+                46.1,
+                35.0,
+            ),
+            (
+                "light-6x4-north-west",
+                FOOTPRINT_6X4,
+                TerrainAreaClassification.LIGHT,
+                13.2,
+                40.55,
+                90.0,
+            ),
+            (
+                "light-6x4-central-east",
+                FOOTPRINT_6X4,
+                TerrainAreaClassification.LIGHT,
+                32.9,
+                33.6,
+                90.0,
+            ),
+            (
+                "light-6x2-west-midfield",
+                FOOTPRINT_6X2,
+                TerrainAreaClassification.LIGHT,
+                5.8,
+                36.0,
+                0.0,
+            ),
+            (
+                "light-6x2-south-west",
+                FOOTPRINT_6X2,
+                TerrainAreaClassification.LIGHT,
+                7.2,
+                23.25,
+                0.0,
+            ),
+        ),
+        terrain_area_mirror_pairs=(
+            ("dense-7x11-5-north-west", "dense-7x11-5-south-east"),
+            ("dense-7x11-5-south-west", "dense-7x11-5-north-east"),
+            (
+                "dense-8x11-5-polygon-central-north-west",
+                "dense-8x11-5-polygon-central-south-east",
+            ),
+            ("light-10x2-5-north-center", "light-10x2-5-south-center"),
+            ("light-6x4-north-west", "light-6x4-south-east"),
+            ("light-6x4-central-east", "light-6x4-central-west"),
+            ("light-6x2-west-midfield", "light-6x2-east-midfield"),
+            ("light-6x2-south-west", "light-6x2-north-east"),
+        ),
+    ),
+)
