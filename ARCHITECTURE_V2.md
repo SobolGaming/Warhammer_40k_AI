@@ -1471,8 +1471,8 @@ Required tests:
 - stale proposal submission is rejected if it does not match the current pending request;
 - adapter projection exposes public game state for a viewer without leaking hidden opponent information;
 - adapter projection exposes pending finite decisions and pending parameterized proposal requests in a UI-readable shape;
-- `LocalGameSession.submit_option(...)` handles finite decisions;
-- `LocalGameSession.submit_payload(...)` or equivalent handles parameterized proposal decisions;
+- `LocalGameSession.submit_option(...)` handles finite decisions with explicit request IDs;
+- `LocalGameSession.submit_parameterized_payload(...)` handles parameterized proposal decisions with explicit request IDs;
 - event cursor returns deterministic event payloads since a supplied cursor;
 - import-boundary tests confirm core, geometry, rules, and engine modules do not import adapters;
 - a golden JSON fixture covers the parameterized Normal Move proposal request; inline JSON-shape regressions cover finite movement action selection, invalid movement and placement proposals, reserve placement, Disembark placement, and viewer-scoped projection/event deltas.

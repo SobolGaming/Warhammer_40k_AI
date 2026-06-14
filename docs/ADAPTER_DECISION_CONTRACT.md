@@ -200,7 +200,7 @@ The adapter helper equivalent is:
 status = submit_option(
     lifecycle=lifecycle,
     request_id="decision-request-000004",
-    selected_option_id="normal_move",
+    option_id="normal_move",
     result_id="ui-result-000017",
 )
 ```
@@ -1031,7 +1031,7 @@ status = lifecycle.submit_decision(result)
 The adapter helper equivalent is:
 
 ```python
-status = submit_payload(
+status = submit_parameterized_payload(
     lifecycle=lifecycle,
     request_id="decision-request-000005",
     payload=movement_payload,
@@ -1483,7 +1483,7 @@ while status is not None:
 
     if request.is_parameterized_submission_request():
         payload = build_parameterized_payload_from_view(view, request)
-        status = session.submit_payload(
+        status = session.submit_parameterized_payload(
             request_id=request.request_id,
             payload=payload,
             result_id=next_result_id(),
@@ -1492,12 +1492,12 @@ while status is not None:
         option_id = choose_finite_option_from_view(view, request)
         status = session.submit_option(
             request_id=request.request_id,
-            selected_option_id=option_id,
+            option_id=option_id,
             result_id=next_result_id(),
         )
 ```
 
-The functions that render UI controls, query a human, call an AI policy, or serialize network packets can vary by adapter. The resulting `submit_option(...)` or `submit_payload(...)` call should not.
+The functions that render UI controls, query a human, call an AI policy, or serialize network packets can vary by adapter. The resulting `submit_option(...)` or `submit_parameterized_payload(...)` call should not.
 
 ## Practical Examples
 

@@ -9,6 +9,7 @@ TEST_ROOTS = (
     ROOT / "tests" / "integration",
     ROOT / "tests" / "replay",
 )
+ADAPTER_HELPER_PATHS = (ROOT / "tests" / "deployment_submission_helpers.py",)
 
 ADAPTER_FACING_NAMES = frozenset(
     (
@@ -18,16 +19,16 @@ ADAPTER_FACING_NAMES = frozenset(
         "ParameterizedSubmission",
         "project_game_view",
         "result_for_option",
-        "result_for_payload",
+        "result_for_parameterized_payload",
         "submit_option",
-        "submit_payload",
+        "submit_parameterized_payload",
     )
 )
 ADAPTER_FACING_METHODS = frozenset(
     (
         "events_since",
         "submit_option",
-        "submit_payload",
+        "submit_parameterized_payload",
         "view",
     )
 )
@@ -59,6 +60,12 @@ FORBIDDEN_BYPASS_HELPERS = frozenset(
         "_submit_parameterized_handler_payload",
     )
 )
+FORBIDDEN_PARAMETERIZED_HELPER_TOKENS = frozenset(
+    (
+        "PARAMETERIZED_DECISION_OPTION_ID",
+        "DecisionResult(",
+    )
+)
 
 
 def test_adapter_facing_tests_submit_choices_through_lifecycle() -> None:
@@ -78,6 +85,21 @@ def test_adapter_facing_tests_submit_choices_through_lifecycle() -> None:
     assert not violations, (
         "Adapter-facing tests must submit player choices through "
         "GameLifecycle.submit_decision(...):\n" + "\n".join(violations)
+    )
+
+
+def test_adapter_submission_helpers_do_not_construct_parameterized_results_directly() -> None:
+    violations: list[str] = []
+
+    for path in ADAPTER_HELPER_PATHS:
+        text = path.read_text(encoding="utf-8")
+        for token in FORBIDDEN_PARAMETERIZED_HELPER_TOKENS:
+            if token in text:
+                violations.append(f"{path.relative_to(ROOT)} contains {token}")
+
+    assert not violations, (
+        "Adapter submission helpers must use generic submission helpers instead of "
+        "constructing parameterized DecisionResult values directly:\n" + "\n".join(violations)
     )
 
 

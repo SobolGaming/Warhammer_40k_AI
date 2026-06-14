@@ -294,13 +294,17 @@ def _local_session_at_movement_unit_selection(
     session = LocalGameSession()
     session.start(_config(game_id=game_id))
     first_status = session.advance_until_decision_or_terminal()
-    assert _decision_request(first_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
+    first_request = _decision_request(first_status)
+    assert first_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
     second_status = session.submit_option(
+        request_id=first_request.request_id,
         option_id="fixed:assassination:bring_it_down",
         result_id=f"{game_id}-secondary-a",
     )
-    assert _decision_request(second_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
+    second_request = _decision_request(second_status)
+    assert second_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
     movement_status = session.submit_option(
+        request_id=second_request.request_id,
         option_id="fixed:assassination:bring_it_down",
         result_id=f"{game_id}-secondary-b",
     )

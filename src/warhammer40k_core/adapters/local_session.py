@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from warhammer40k_core.adapters.decisions import submit_option, submit_payload
+from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
 from warhammer40k_core.adapters.event_stream import EventStreamCursor, EventStreamDeltaPayload
 from warhammer40k_core.adapters.projection import GameViewPayload, project_game_view
 from warhammer40k_core.engine.event_log import JsonValue
@@ -27,16 +27,24 @@ class LocalGameSession:
     def advance_until_decision_or_terminal(self) -> LifecycleStatus:
         return self.lifecycle.advance_until_decision_or_terminal()
 
-    def submit_option(self, *, option_id: str, result_id: str) -> LifecycleStatus:
+    def submit_option(self, *, request_id: str, option_id: str, result_id: str) -> LifecycleStatus:
         return submit_option(
             lifecycle=self.lifecycle,
+            request_id=request_id,
             option_id=option_id,
             result_id=result_id,
         )
 
-    def submit_payload(self, *, payload: JsonValue, result_id: str) -> LifecycleStatus:
-        return submit_payload(
+    def submit_parameterized_payload(
+        self,
+        *,
+        request_id: str,
+        payload: JsonValue,
+        result_id: str,
+    ) -> LifecycleStatus:
+        return submit_parameterized_payload(
             lifecycle=self.lifecycle,
+            request_id=request_id,
             payload=payload,
             result_id=result_id,
         )
