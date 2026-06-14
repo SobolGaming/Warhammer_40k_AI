@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
@@ -47,16 +48,23 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
     validate_roster_legality,
 )
-from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
+    ModelPlacement,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.cavalcade_of_chaos import (  # noqa: E501
     enhancements,
@@ -99,7 +107,10 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalPayload,
     MovementProposalRequest,
+    PlacementProposalPayload,
     ProposalKind,
 )
 from warhammer40k_core.engine.phase import (
@@ -114,7 +125,12 @@ from warhammer40k_core.engine.phases.charge import (
     ChargePhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
+    COMPLETE_REINFORCEMENTS_OPTION_ID,
+    SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
+    DesperateEscapeRequirementReason,
     FallBackModeKind,
     MovementPhaseActionKind,
 )
@@ -123,6 +139,15 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     ShootingPhaseHandler,
 )
+from warhammer40k_core.engine.reserve_declarations import (
+    SELECT_RESERVE_DECLARATION_DECISION_TYPE,
+)
+from warhammer40k_core.engine.reserves import (
+    ReserveKind,
+    ReserveStatus,
+    ReserveUnitPointValue,
+)
+from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
@@ -142,6 +167,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 
 _CAVALCADE_TEST_DATASHEET_ID = "phase17g-cavalcade-mounted-daemon"
 _CAVALCADE_UNIT_ID = "army-alpha:intercessor-unit-1"
+_CAVALCADE_RESERVE_UNIT_ID = "army-alpha:reserve-unit"
 _ENEMY_UNIT_ID = "army-beta:intercessor-unit-2"
 _OTHER_DAEMON_DETACHMENT_ID = "phase17g-other-daemon-detachment"
 _ORDERED_FALL_BACK_OPTION_ID = (
@@ -357,6 +383,14 @@ def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> 
         stratagems.WARP_RIDERS_RECORD_ID
         not in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
     )
+    assert (
+        stratagems.FROM_BEYOND_THE_VEIL_RECORD_ID
+        not in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
+    )
+    assert (
+        stratagems.INESCAPABLE_MANIFESTATIONS_RECORD_ID
+        not in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
+    )
 
     selection_request = _decision_request(movement_status)
     action_status = lifecycle.submit_decision(
@@ -369,6 +403,223 @@ def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> 
     action_request = _decision_request(action_status)
 
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+
+
+def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_one() -> None:
+    config = _cavalcade_config(include_reserve_unit=True)
+    lifecycle, movement_status = _advance_to_movement_unit_selection_with_reserve(config)
+    state = _state(lifecycle)
+    reserve_state = state.reserve_state_for_unit(_CAVALCADE_RESERVE_UNIT_ID)
+    assert reserve_state is not None
+    assert reserve_state.status is ReserveStatus.IN_RESERVES
+    assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
+    _grant_cp(state, player_id="player-a", amount=1)
+    command_points_before_use = state.command_point_total("player-a")
+    summary = _runtime_content_bundle(lifecycle).to_summary_payload()
+
+    assert (
+        stratagems.FROM_BEYOND_THE_VEIL_RECORD_ID
+        in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
+    )
+    assert (
+        stratagems.FROM_BEYOND_THE_VEIL_RECORD_ID
+        not in summary["stratagem_index_record_ids_by_player_id"]["player-b"]
+    )
+
+    selection_request = _decision_request(movement_status)
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-from-veil-select-board-unit",
+            request=selection_request,
+            selected_option_id=_CAVALCADE_UNIT_ID,
+        )
+    )
+    action_status = _decline_stratagem_window_if_present(
+        lifecycle,
+        action_status,
+        result_id="phase17g-from-veil-decline-warp-riders",
+    )
+    action_request = _decision_request(action_status)
+    movement_status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        action_result_id="phase17g-from-veil-normal-move-action",
+        proposal_result_id="phase17g-from-veil-normal-move-proposal",
+        unit_instance_id=_CAVALCADE_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_CAVALCADE_UNIT_ID,
+            dx=1.0,
+        ),
+    )
+    reinforcement_request = _decision_request(movement_status)
+    assert reinforcement_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+    movement_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-from-veil-complete-normal-reinforcements",
+            request=reinforcement_request,
+            selected_option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
+        )
+    )
+    stratagem_request = _decision_request(movement_status)
+    assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
+    from_beyond_option = _required_option_id_containing(
+        stratagem_request,
+        stratagems.FROM_BEYOND_THE_VEIL_STRATAGEM_ID,
+    )
+
+    placement_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-from-veil-use",
+            request=stratagem_request,
+            selected_option_id=from_beyond_option,
+        )
+    )
+    placement_request = _decision_request(placement_status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        placement_request.payload
+    )
+    assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    assert proposal_request.proposal_kind is ProposalKind.STRATEGIC_RESERVES
+    assert proposal_request.placement_kinds == (BattlefieldPlacementKind.STRATEGIC_RESERVES,)
+    assert proposal_request.context is not None
+    assert proposal_request.context["stratagem_handler_id"] == "generic:ingress-move"
+    assert proposal_request.context["from_start_of_battle"] is True
+    assert _state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
+
+    final_status = _submit_placement_proposal(
+        lifecycle,
+        request=placement_request,
+        result_id="phase17g-from-veil-placement",
+        unit_instance_id=reserve_state.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=_strategic_reserve_placement(
+            state,
+            unit_instance_id=reserve_state.unit_instance_id,
+        ),
+    )
+
+    assert final_status.status_kind is not LifecycleStatusKind.INVALID
+    arrived_state = _state(lifecycle).reserve_state_for_unit(reserve_state.unit_instance_id)
+    assert arrived_state is not None
+    assert arrived_state.status is ReserveStatus.ARRIVED
+    movement_phase_state = _state(lifecycle).movement_phase_state
+    assert movement_phase_state is not None
+    assert reserve_state.unit_instance_id in movement_phase_state.moved_unit_ids
+    resolved_event = _event_payload(lifecycle, "rapid_ingress_resolved")
+    stratagem_use = cast(dict[str, JsonValue], resolved_event["stratagem_use"])
+    assert stratagem_use["stratagem_id"] == stratagems.FROM_BEYOND_THE_VEIL_STRATAGEM_ID
+    assert stratagem_use["handler_id"] == "generic:ingress-move"
+
+
+def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> None:
+    config = _cavalcade_config(turn_order=("player-b", "player-a"))
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    state = _state(lifecycle)
+    _move_first_enemy_model_into_side_engagement(lifecycle)
+    _grant_cp(state, player_id="player-a", amount=1)
+    command_points_before_use = state.command_point_total("player-a")
+
+    selection_request = _decision_request(movement_status)
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-inescapable-select-enemy",
+            request=selection_request,
+            selected_option_id=_ENEMY_UNIT_ID,
+        )
+    )
+    action_request = _decision_request(action_status)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert _ORDERED_FALL_BACK_OPTION_ID in {option.option_id for option in action_request.options}
+
+    stratagem_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-inescapable-fall-back-action",
+            request=action_request,
+            selected_option_id=_ORDERED_FALL_BACK_OPTION_ID,
+        )
+    )
+    stratagem_request = _decision_request(stratagem_status)
+    assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
+    inescapable_option = _required_option_id_containing(
+        stratagem_request,
+        stratagems.INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID,
+    )
+
+    proposal_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-inescapable-use",
+            request=stratagem_request,
+            selected_option_id=inescapable_option,
+        )
+    )
+    proposal_decision_request = _decision_request(proposal_status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        proposal_decision_request.payload
+    )
+    assert proposal_decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert proposal_request.proposal_kind is ProposalKind.FALL_BACK
+    assert proposal_request.context is not None
+    assert proposal_request.context["fall_back_mode"] == FallBackModeKind.DESPERATE_ESCAPE.value
+    assert proposal_request.context["declared_fall_back_mode"] == (
+        FallBackModeKind.ORDERED_RETREAT.value
+    )
+    assert proposal_request.context["forced_desperate_escape_source_rule_ids"] == [
+        stratagems.SOURCE_RULE_ID
+    ]
+    assert _state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
+
+    effect_event = _event_payload(lifecycle, "forced_fall_back_desperate_escape_registered")
+    assert effect_event["fall_back_unit_instance_id"] == _ENEMY_UNIT_ID
+    assert effect_event["forcing_unit_instance_id"] == _CAVALCADE_UNIT_ID
+
+    unit_placement = _unit_placement(state, _ENEMY_UNIT_ID)
+    movement_payload = MovementProposalPayload(
+        proposal_request_id=proposal_decision_request.request_id,
+        proposal_kind=ProposalKind.FALL_BACK,
+        unit_instance_id=_ENEMY_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK.value,
+        movement_mode=MovementMode.FALL_BACK.value,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE.value,
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+    )
+    final_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase17g-inescapable-fall-back-proposal",
+            request_id=proposal_decision_request.request_id,
+            decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=proposal_decision_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(movement_payload.to_payload()),
+        )
+    )
+
+    assert final_status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    if final_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
+        assert _decision_request(final_status).decision_type == (
+            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+        )
+    roll_events = [
+        cast(dict[str, JsonValue], event.payload)
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "desperate_escape_roll_resolved"
+    ]
+    assert len(roll_events) == 5
+    first_roll = cast(dict[str, JsonValue], roll_events[0]["desperate_escape_roll"])
+    first_requirement = cast(dict[str, JsonValue], first_roll["requirement"])
+    assert DesperateEscapeRequirementReason.FORCED_BY_RULE.value in cast(
+        list[str],
+        first_requirement["reasons"],
+    )
 
 
 def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle() -> None:
@@ -847,6 +1098,56 @@ def _state_at_phase(state: GameState, phase: BattlePhase) -> GameState:
     return phase_state
 
 
+def _advance_to_movement_unit_selection_with_reserve(
+    config: GameConfig,
+) -> tuple[GameLifecycle, LifecycleStatus]:
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    status = lifecycle.advance_until_decision_or_terminal()
+    secondary_index = 1
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
+    ):
+        request = _decision_request(status)
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase17g-reserve-secondary-{secondary_index:06d}",
+                request=request,
+                selected_option_id="fixed:assassination:bring_it_down",
+            )
+        )
+        secondary_index += 1
+    reserve_index = 1
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
+    ):
+        request = _decision_request(status)
+        declare_option_id = f"declare_strategic_reserves:{_CAVALCADE_RESERVE_UNIT_ID}"
+        option_ids = {option.option_id for option in request.options}
+        selected_option_id = (
+            declare_option_id
+            if declare_option_id in option_ids
+            else "complete_reserve_declarations"
+        )
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase17g-reserve-declaration-{reserve_index:06d}",
+                request=request,
+                selected_option_id=selected_option_id,
+            )
+        )
+        reserve_index += 1
+    movement_status = submit_all_deployments_if_pending(
+        lifecycle,
+        status,
+        result_id_prefix="phase17g-reserve-deploy",
+    )
+    assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    return lifecycle, movement_status
+
+
 def _cavalcade_config(
     *,
     apocalyptic_steeds: bool = False,
@@ -855,6 +1156,8 @@ def _cavalcade_config(
     enemy_faction_id: str = "core-marine-force",
     enemy_detachment_id: str = "core-combined-arms",
     enemy_datasheet_id: str = "core-intercessor-like-infantry",
+    turn_order: tuple[str, str] = ("player-a", "player-b"),
+    include_reserve_unit: bool = False,
 ) -> GameConfig:
     catalog = _cavalcade_catalog(friendly_keywords=friendly_keywords)
     return GameConfig(
@@ -875,6 +1178,7 @@ def _cavalcade_config(
                 datasheet_id=_CAVALCADE_TEST_DATASHEET_ID,
                 apocalyptic_steeds=apocalyptic_steeds,
                 soul_shattering_charge=soul_shattering_charge,
+                extra_unit_selection_ids=("reserve-unit",) if include_reserve_unit else (),
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -887,9 +1191,20 @@ def _cavalcade_config(
             ),
         ),
         player_ids=("player-a", "player-b"),
-        turn_order=("player-a", "player-b"),
+        turn_order=turn_order,
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
         mission_setup=_mission_setup(),
+        reserve_unit_points=(
+            (
+                ReserveUnitPointValue(
+                    unit_instance_id=_CAVALCADE_RESERVE_UNIT_ID,
+                    points=100,
+                    source_id="phase17g:test:cavalcade-reserve-unit:points",
+                ),
+            )
+            if include_reserve_unit
+            else ()
+        ),
     )
 
 
@@ -961,7 +1276,11 @@ def _cavalcade_catalog(
                     enhancements.ENHANCEMENT_ID,
                     enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
                 ),
-                stratagem_ids=(stratagems.WARP_RIDERS_STRATAGEM_ID,),
+                stratagem_ids=(
+                    stratagems.WARP_RIDERS_STRATAGEM_ID,
+                    stratagems.FROM_BEYOND_THE_VEIL_STRATAGEM_ID,
+                    stratagems.INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID,
+                ),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:"
                     "chaos-daemons:cavalcade-of-chaos",
@@ -997,6 +1316,20 @@ def _cavalcade_catalog(
                 source_id=stratagems.SOURCE_RULE_ID,
                 command_point_cost=1,
                 timing_tags=("movement:selected-to-move",),
+            ),
+            CatalogStratagemDefinition(
+                stratagem_id=stratagems.FROM_BEYOND_THE_VEIL_STRATAGEM_ID,
+                name="From Beyond the Veil",
+                source_id=stratagems.SOURCE_RULE_ID,
+                command_point_cost=1,
+                timing_tags=("movement:end-phase", "strategic-reserves:ingress"),
+            ),
+            CatalogStratagemDefinition(
+                stratagem_id=stratagems.INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID,
+                name="Inescapable Manifestations",
+                source_id=stratagems.SOURCE_RULE_ID,
+                command_point_cost=1,
+                timing_tags=("movement:selected-to-fall-back",),
             ),
         ),
     )
@@ -1070,6 +1403,7 @@ def _army_muster_request(
     datasheet_id: str,
     apocalyptic_steeds: bool = False,
     soul_shattering_charge: bool = False,
+    extra_unit_selection_ids: tuple[str, ...] = (),
 ) -> ArmyMusterRequest:
     selected_enhancement_ids = _selected_cavalcade_enhancement_ids(
         faction_id=faction_id,
@@ -1089,15 +1423,16 @@ def _army_muster_request(
             enhancement_ids=selected_enhancement_ids,
         ),
         unit_selections=(
-            UnitMusterSelection(
+            _unit_muster_selection(
                 unit_selection_id=unit_selection_id,
                 datasheet_id=datasheet_id,
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
-                    ),
-                ),
+            ),
+            *(
+                _unit_muster_selection(
+                    unit_selection_id=extra_unit_selection_id,
+                    datasheet_id=datasheet_id,
+                )
+                for extra_unit_selection_id in extra_unit_selection_ids
             ),
         ),
         enhancement_assignments=(
@@ -1109,6 +1444,23 @@ def _army_muster_request(
                 )
                 for enhancement_id in selected_enhancement_ids
             )
+        ),
+    )
+
+
+def _unit_muster_selection(
+    *,
+    unit_selection_id: str,
+    datasheet_id: str,
+) -> UnitMusterSelection:
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="core-intercessor-like",
+                model_count=5,
+            ),
         ),
     )
 
@@ -1175,6 +1527,57 @@ def _unit_placement(state: GameState, unit_instance_id: str) -> UnitPlacement:
     if state.battlefield_state is None:
         raise AssertionError("test state requires battlefield_state")
     return state.battlefield_state.unit_placement_by_id(unit_instance_id)
+
+
+def _strategic_reserve_placement(state: GameState, *, unit_instance_id: str) -> UnitPlacement:
+    army = state.army_definition_for_player("player-a")
+    if army is None:
+        raise AssertionError("player-a army is missing")
+    unit = army.unit_by_id(unit_instance_id)
+    return UnitPlacement(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                pose=Pose.at(3.0, 32.0 + index * 2.0, facing_degrees=0.0),
+            )
+            for index, model in enumerate(unit.own_models)
+        ),
+    )
+
+
+def _submit_placement_proposal(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    result_id: str,
+    unit_instance_id: str,
+    placement_kind: BattlefieldPlacementKind,
+    attempted_placement: UnitPlacement,
+) -> LifecycleStatus:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    payload = PlacementProposalPayload(
+        proposal_request_id=request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=unit_instance_id,
+        placement_kind=placement_kind,
+        attempted_placement=attempted_placement,
+    )
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(payload.to_payload()),
+        )
+    )
 
 
 def _with_model_poses(

@@ -121,7 +121,13 @@ from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratage
 from warhammer40k_core.engine.stratagems import (
     CORE_FIRE_OVERWATCH_HANDLER_ID,
     CORE_RAPID_INGRESS_HANDLER_ID,
+    FALL_BACK_MODE_CONTEXT_KEY,
+    FALL_BACK_UNIT_CONTEXT_KEY,
+    FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND,
+    GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+    GENERIC_INGRESS_MOVE_HANDLER_ID,
     SELECTED_TO_MOVE_UNIT_CONTEXT_KEY,
+    STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogIndex,
     StratagemEligibilityContext,
@@ -130,6 +136,7 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_decline_option,
     stratagem_target_proposal_from_index,
     stratagem_target_proposal_request_payload,
+    stratagem_use_options_for_handler_from_index,
     stratagem_use_options_from_index,
     stratagem_window_declined_for_context,
 )
@@ -228,6 +235,7 @@ class FallBackModeKind(StrEnum):
 class DesperateEscapeRequirementReason(StrEnum):
     ENEMY_MODEL_OVERFLIGHT = "enemy_model_overflight"
     BATTLE_SHOCKED = "battle_shocked"
+    FORCED_BY_RULE = "forced_by_rule"
 
 
 _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT = (
@@ -262,6 +270,18 @@ class MovementUnitSelectionPayload(TypedDict):
     result_id: str
 
 
+class PendingMovementActionSelectionPayload(TypedDict):
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    movement_phase_action: str
+    movement_mode: str
+    fall_back_mode: str | None
+    request_id: str
+    result_id: str
+    selected_option_id: str
+
+
 class MovementPhaseStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
@@ -273,6 +293,7 @@ class MovementPhaseStatePayload(TypedDict):
     moved_unit_ids: list[str]
     movement_distance_records: NotRequired[list[MovementDistanceRecordPayload]]
     active_selection: MovementUnitSelectionPayload | None
+    pending_action: PendingMovementActionSelectionPayload | None
 
 
 class MovementActionAvailabilityContextPayload(TypedDict):
@@ -1143,6 +1164,154 @@ class MovementUnitSelection:
 
 
 @dataclass(frozen=True, slots=True)
+class PendingMovementActionSelection:
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    movement_phase_action: MovementPhaseActionKind
+    movement_mode: MovementMode
+    fall_back_mode: FallBackModeKind | None
+    request_id: str
+    result_id: str
+    selected_option_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("PendingMovementActionSelection player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int(
+                "PendingMovementActionSelection battle_round",
+                self.battle_round,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "PendingMovementActionSelection unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "movement_phase_action",
+            movement_phase_action_kind_from_token(self.movement_phase_action),
+        )
+        object.__setattr__(
+            self,
+            "movement_mode",
+            movement_mode_from_token(self.movement_mode),
+        )
+        if self.fall_back_mode is not None:
+            object.__setattr__(
+                self,
+                "fall_back_mode",
+                fall_back_mode_kind_from_token(self.fall_back_mode),
+            )
+        if (
+            self.movement_phase_action is MovementPhaseActionKind.FALL_BACK
+            and self.fall_back_mode is None
+        ):
+            raise GameLifecycleError("Pending Fall Back action requires fall_back_mode.")
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("PendingMovementActionSelection request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("PendingMovementActionSelection result_id", self.result_id),
+        )
+        object.__setattr__(
+            self,
+            "selected_option_id",
+            _validate_identifier(
+                "PendingMovementActionSelection selected_option_id",
+                self.selected_option_id,
+            ),
+        )
+
+    @classmethod
+    def from_result(
+        cls,
+        *,
+        result: DecisionResult,
+        player_id: str,
+        battle_round: int,
+        unit_instance_id: str,
+        movement_phase_action: MovementPhaseActionKind,
+        movement_mode: MovementMode,
+        fall_back_mode: FallBackModeKind | None,
+    ) -> Self:
+        return cls(
+            player_id=player_id,
+            battle_round=battle_round,
+            unit_instance_id=unit_instance_id,
+            movement_phase_action=movement_phase_action,
+            movement_mode=movement_mode,
+            fall_back_mode=fall_back_mode,
+            request_id=result.request_id,
+            result_id=result.result_id,
+            selected_option_id=result.selected_option_id,
+        )
+
+    def to_decision_result(self) -> DecisionResult:
+        payload: dict[str, JsonValue] = {
+            "movement_phase_action": self.movement_phase_action.value,
+            "unit_instance_id": self.unit_instance_id,
+            "movement_mode": self.movement_mode.value,
+        }
+        if self.fall_back_mode is not None:
+            payload["fall_back_mode"] = self.fall_back_mode.value
+        return DecisionResult(
+            result_id=self.result_id,
+            request_id=self.request_id,
+            decision_type=SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+            actor_id=self.player_id,
+            selected_option_id=self.selected_option_id,
+            payload=validate_json_value(payload),
+        )
+
+    def to_payload(self) -> PendingMovementActionSelectionPayload:
+        return {
+            "player_id": self.player_id,
+            "battle_round": self.battle_round,
+            "unit_instance_id": self.unit_instance_id,
+            "movement_phase_action": self.movement_phase_action.value,
+            "movement_mode": self.movement_mode.value,
+            "fall_back_mode": None if self.fall_back_mode is None else self.fall_back_mode.value,
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+            "selected_option_id": self.selected_option_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PendingMovementActionSelectionPayload) -> Self:
+        fall_back_mode_payload = payload["fall_back_mode"]
+        return cls(
+            player_id=payload["player_id"],
+            battle_round=payload["battle_round"],
+            unit_instance_id=payload["unit_instance_id"],
+            movement_phase_action=movement_phase_action_kind_from_token(
+                payload["movement_phase_action"]
+            ),
+            movement_mode=movement_mode_from_token(payload["movement_mode"]),
+            fall_back_mode=None
+            if fall_back_mode_payload is None
+            else fall_back_mode_kind_from_token(fall_back_mode_payload),
+            request_id=payload["request_id"],
+            result_id=payload["result_id"],
+            selected_option_id=payload["selected_option_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class DisembarkCandidate:
     player_id: str
     battle_round: int
@@ -1245,6 +1414,7 @@ class MovementPhaseState:
     moved_unit_ids: tuple[str, ...] = ()
     movement_distance_records: tuple[MovementDistanceRecord, ...] = ()
     active_selection: MovementUnitSelection | None = None
+    pending_action: PendingMovementActionSelection | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1339,6 +1509,27 @@ class MovementPhaseState:
                 raise GameLifecycleError(
                     "MovementPhaseState active_selection must not already be moved."
                 )
+        if self.pending_action is not None:
+            if type(self.pending_action) is not PendingMovementActionSelection:
+                raise GameLifecycleError(
+                    "MovementPhaseState pending_action must be a PendingMovementActionSelection."
+                )
+            if self.active_selection is None:
+                raise GameLifecycleError(
+                    "MovementPhaseState pending_action requires active_selection."
+                )
+            if self.pending_action.player_id != self.active_player_id:
+                raise GameLifecycleError(
+                    "MovementPhaseState pending_action must match active_player_id."
+                )
+            if self.pending_action.battle_round != self.battle_round:
+                raise GameLifecycleError(
+                    "MovementPhaseState pending_action must match battle_round."
+                )
+            if self.pending_action.unit_instance_id != self.active_selection.unit_instance_id:
+                raise GameLifecycleError(
+                    "MovementPhaseState pending_action must match active_selection."
+                )
 
     def legal_unit_ids(
         self,
@@ -1381,6 +1572,38 @@ class MovementPhaseState:
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
             active_selection=selection,
+            pending_action=None,
+        )
+
+    def with_pending_action(self, pending_action: PendingMovementActionSelection) -> Self:
+        if type(pending_action) is not PendingMovementActionSelection:
+            raise GameLifecycleError(
+                "Movement pending action requires a PendingMovementActionSelection."
+            )
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("Movement pending action requires Move Units step.")
+        if self.active_selection is None:
+            raise GameLifecycleError("Movement pending action requires active_selection.")
+        if pending_action.player_id != self.active_player_id:
+            raise GameLifecycleError("Movement pending action player_id drift.")
+        if pending_action.battle_round != self.battle_round:
+            raise GameLifecycleError("Movement pending action battle_round drift.")
+        if pending_action.unit_instance_id != self.active_selection.unit_instance_id:
+            raise GameLifecycleError("Movement pending action unit drift.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            reinforcements_completed=self.reinforcements_completed,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
+            declined_post_normal_move_disembark_unit_ids=(
+                self.declined_post_normal_move_disembark_unit_ids
+            ),
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
+            active_selection=self.active_selection,
+            pending_action=pending_action,
         )
 
     def with_disembark_declined(self, unit_instance_ids: tuple[str, ...]) -> Self:
@@ -1404,6 +1627,7 @@ class MovementPhaseState:
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
             active_selection=None,
+            pending_action=None,
         )
 
     def with_post_normal_move_disembark_declined(
@@ -1428,6 +1652,7 @@ class MovementPhaseState:
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
             active_selection=None,
+            pending_action=None,
         )
 
     def with_post_normal_move_disembark_counted_as_moved(
@@ -1458,6 +1683,7 @@ class MovementPhaseState:
             moved_unit_ids=(*self.moved_unit_ids, moved_unit_id),
             movement_distance_records=self.movement_distance_records,
             active_selection=None,
+            pending_action=None,
         )
 
     def with_activation_complete(
@@ -1498,6 +1724,7 @@ class MovementPhaseState:
                 ),
             ),
             active_selection=None,
+            pending_action=None,
         )
 
     def with_step(self, step: MovementPhaseStepKind) -> Self:
@@ -1531,6 +1758,35 @@ class MovementPhaseState:
             moved_unit_ids=moved,
             movement_distance_records=self.movement_distance_records,
             active_selection=None,
+            pending_action=None,
+        )
+
+    def with_end_movement_ingress_arrival(self, unit_instance_id: str) -> Self:
+        arrived_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
+            raise GameLifecycleError("End-movement ingress requires Move Units step.")
+        if self.active_selection is not None:
+            raise GameLifecycleError("End-movement ingress requires no active_selection.")
+        selected = self.selected_unit_ids
+        moved = self.moved_unit_ids
+        if arrived_unit_id not in selected:
+            selected = (*selected, arrived_unit_id)
+        if arrived_unit_id not in moved:
+            moved = (*moved, arrived_unit_id)
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            reinforcements_completed=True,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
+            declined_post_normal_move_disembark_unit_ids=(
+                self.declined_post_normal_move_disembark_unit_ids
+            ),
+            selected_unit_ids=selected,
+            moved_unit_ids=moved,
+            movement_distance_records=self.movement_distance_records,
+            active_selection=None,
+            pending_action=None,
         )
 
     def with_reinforcements_completed(self) -> Self:
@@ -1551,6 +1807,7 @@ class MovementPhaseState:
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
             active_selection=None,
+            pending_action=None,
         )
 
     def to_payload(self) -> MovementPhaseStatePayload:
@@ -1571,11 +1828,15 @@ class MovementPhaseState:
             "active_selection": (
                 None if self.active_selection is None else self.active_selection.to_payload()
             ),
+            "pending_action": (
+                None if self.pending_action is None else self.pending_action.to_payload()
+            ),
         }
 
     @classmethod
     def from_payload(cls, payload: MovementPhaseStatePayload) -> Self:
         active_selection_payload = payload["active_selection"]
+        pending_action_payload = payload["pending_action"]
         return cls(
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
@@ -1595,6 +1856,11 @@ class MovementPhaseState:
                 None
                 if active_selection_payload is None
                 else MovementUnitSelection.from_payload(active_selection_payload)
+            ),
+            pending_action=(
+                None
+                if pending_action_payload is None
+                else PendingMovementActionSelection.from_payload(pending_action_payload)
             ),
         )
 
@@ -2098,6 +2364,12 @@ class MovementPhaseHandler:
         _ensure_transport_cargo_phase_states(state)
         active_selection = movement_state.active_selection
         if active_selection is not None:
+            if movement_state.pending_action is not None:
+                return _request_pending_movement_action_proposal(
+                    state=state,
+                    decisions=decisions,
+                    pending_action=movement_state.pending_action,
+                )
             stratagem_status = _request_selected_to_move_stratagem_if_available(
                 state=state,
                 decisions=decisions,
@@ -2429,6 +2701,13 @@ def _complete_reinforcements_step(
     movement_state = state.movement_phase_state
     if movement_state is None or movement_state.step is not MovementPhaseStepKind.MOVE_UNITS:
         raise GameLifecycleError("Completing reserve arrivals requires Move Units step.")
+    end_movement_active_status = _request_end_movement_active_player_stratagem_if_available(
+        state=state,
+        decisions=decisions,
+        stratagem_index=stratagem_index,
+    )
+    if end_movement_active_status is not None:
+        return end_movement_active_status
     end_movement_reaction_status = _request_end_opponent_movement_reaction_if_available(
         state=state,
         decisions=decisions,
@@ -2484,6 +2763,56 @@ def _request_end_opponent_movement_reaction_if_available(
         decisions=decisions,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+    )
+
+
+def _request_end_movement_active_player_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex | None,
+) -> LifecycleStatus | None:
+    if stratagem_index is None:
+        return None
+    active_player_id = _active_player_id(state)
+    window_id = f"end-movement-ingress-round-{state.battle_round:02d}-player-{active_player_id}"
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=active_player_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        timing_window_id=window_id,
+        trigger_payload={
+            "trigger_window": "end_movement_phase",
+            "timing_window_id": window_id,
+        },
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_for_handler_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+        handler_id=GENERIC_INGRESS_MOVE_HANDLER_ID,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "step": MovementPhaseStepKind.MOVE_UNITS.value,
+            "phase_body_status": "end_movement_active_player_stratagem_pending",
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "pending_request_id": request.request_id,
+        },
     )
 
 
@@ -2705,6 +3034,116 @@ def _request_selected_to_move_stratagem_if_available(
     )
 
 
+def _request_selected_to_fall_back_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    pending_action: PendingMovementActionSelection,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+) -> LifecycleStatus | None:
+    if reaction_queue is None or stratagem_index is None:
+        return None
+    if pending_action.movement_phase_action is not MovementPhaseActionKind.FALL_BACK:
+        raise GameLifecycleError("Selected-to-Fall-Back Stratagem requires Fall Back action.")
+    active_player_id = _active_player_id(state)
+    if pending_action.player_id != active_player_id:
+        raise GameLifecycleError("Selected-to-Fall-Back Stratagem active player drift.")
+    trigger_payload = _selected_to_fall_back_trigger_payload(pending_action)
+    for player_id in sorted(player for player in state.player_ids if player != active_player_id):
+        window_id = _selected_to_fall_back_timing_window_id(
+            pending_action=pending_action,
+            reacting_player_id=player_id,
+        )
+        context = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=player_id,
+            trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            timing_window_id=window_id,
+            trigger_payload={**trigger_payload, "timing_window_id": window_id},
+        )
+        if stratagem_window_declined_for_context(decisions=decisions, context=context):
+            continue
+        options = stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=stratagem_index,
+            context=context,
+            handler_id=GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+        )
+        if not options:
+            continue
+        reaction_window = ReactionWindow(
+            timing_window=TimingWindow(
+                window_id=window_id,
+                descriptor=TimingWindowDescriptor(
+                    descriptor_id="generic-force-desperate-escape-selected-fall-back",
+                    trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+                    source_rule_id=GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+                    phase=BattlePhase.MOVEMENT,
+                    source_step="selected_fall_back_reactions",
+                    metadata={**trigger_payload, "timing_window_id": window_id},
+                ),
+                game_id=state.game_id,
+                battle_round=state.battle_round,
+                active_player_id=active_player_id,
+                phase=BattlePhase.MOVEMENT,
+            ),
+            eligible_player_ids=(player_id,),
+        )
+        triggered = reaction_queue.emit_decision_request(
+            state=state,
+            decisions=decisions,
+            reaction_window=reaction_window,
+            parent_phase=BattlePhase.MOVEMENT,
+            parent_step="selected_fall_back_reactions",
+            resume_token=f"{window_id}-resume",
+            actor_id=player_id,
+            decision_type=STRATAGEM_DECISION_TYPE,
+            options=(*options, stratagem_decline_option()),
+            payload_factory=_stratagem_use_payload_factory(context),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=triggered.decision_request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "phase_body_status": "selected_to_fall_back_stratagem_pending",
+                "battle_round": state.battle_round,
+                "active_player_id": active_player_id,
+                "reacting_player_id": player_id,
+                "fall_back_unit_instance_id": pending_action.unit_instance_id,
+            },
+        )
+    return None
+
+
+def _selected_to_fall_back_trigger_payload(
+    pending_action: PendingMovementActionSelection,
+) -> dict[str, JsonValue]:
+    if pending_action.fall_back_mode is None:
+        raise GameLifecycleError("Selected-to-Fall-Back trigger requires fall_back_mode.")
+    return {
+        FALL_BACK_UNIT_CONTEXT_KEY: pending_action.unit_instance_id,
+        FALL_BACK_MODE_CONTEXT_KEY: pending_action.fall_back_mode.value,
+        "movement_mode": pending_action.movement_mode.value,
+        "action_request_id": pending_action.request_id,
+        "action_result_id": pending_action.result_id,
+        "action_selected_option_id": pending_action.selected_option_id,
+    }
+
+
+def _selected_to_fall_back_timing_window_id(
+    *,
+    pending_action: PendingMovementActionSelection,
+    reacting_player_id: str,
+) -> str:
+    return (
+        f"selected-fall-back-round-{pending_action.battle_round:02d}-"
+        f"active-{pending_action.player_id}-unit-{pending_action.unit_instance_id}-"
+        f"reacting-{_validate_identifier('reacting_player_id', reacting_player_id)}"
+    )
+
+
 def _selected_to_move_timing_window_id(active_selection: MovementUnitSelection) -> str:
     if type(active_selection) is not MovementUnitSelection:
         raise GameLifecycleError("Selected-to-move timing window requires active selection.")
@@ -2712,6 +3151,23 @@ def _selected_to_move_timing_window_id(active_selection: MovementUnitSelection) 
         f"selected-to-move-round-{active_selection.battle_round:02d}-"
         f"player-{active_selection.player_id}-unit-{active_selection.unit_instance_id}"
     )
+
+
+def _stratagem_use_payload_factory(
+    context: StratagemEligibilityContext,
+) -> Callable[[str, str, str], JsonValue]:
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Stratagem use payload factory requires a context.")
+
+    def payload_factory(_request_id: str, _decision_type: str, _actor_id: str) -> JsonValue:
+        return validate_json_value(
+            {
+                "stratagem_context": context.to_payload(),
+                "finite": True,
+            }
+        )
+
+    return payload_factory
 
 
 def _stratagem_target_proposal_payload_factory(
@@ -4516,6 +4972,25 @@ def _apply_movement_action_decision(  # noqa: RET503
     if action is MovementPhaseActionKind.FALL_BACK:
         movement_mode = _movement_mode_from_payload(payload=payload, action=action)
         fall_back_mode = _fall_back_mode_from_payload(payload)
+        pending_action = PendingMovementActionSelection.from_result(
+            result=result,
+            player_id=active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=active_selection.unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+            movement_mode=movement_mode,
+            fall_back_mode=fall_back_mode,
+        )
+        fall_back_stratagem_status = _request_selected_to_fall_back_stratagem_if_available(
+            state=state,
+            decisions=decisions,
+            pending_action=pending_action,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+        )
+        if fall_back_stratagem_status is not None:
+            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            return fall_back_stratagem_status
         return _request_movement_proposal(
             state=state,
             decisions=decisions,
@@ -4528,6 +5003,47 @@ def _apply_movement_action_decision(  # noqa: RET503
                 "fall_back_mode": fall_back_mode.value,
             },
         )
+
+
+def _request_pending_movement_action_proposal(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    pending_action: PendingMovementActionSelection,
+) -> LifecycleStatus:
+    if pending_action.movement_phase_action is not MovementPhaseActionKind.FALL_BACK:
+        raise GameLifecycleError("Only pending Fall Back actions are supported.")
+    if pending_action.fall_back_mode is None:
+        raise GameLifecycleError("Pending Fall Back action requires fall_back_mode.")
+    forced_sources = _forced_desperate_escape_sources_for_unit(
+        state=state,
+        unit_instance_id=pending_action.unit_instance_id,
+    )
+    fall_back_mode = (
+        FallBackModeKind.DESPERATE_ESCAPE if forced_sources else pending_action.fall_back_mode
+    )
+    context: dict[str, JsonValue] = {
+        "movement_mode": pending_action.movement_mode.value,
+        "fall_back_mode": fall_back_mode.value,
+    }
+    if forced_sources:
+        context["declared_fall_back_mode"] = pending_action.fall_back_mode.value
+        context["forced_desperate_escape_source_rule_ids"] = [
+            source["source_rule_id"] for source in forced_sources
+        ]
+        context["forced_desperate_escape_stratagem_use_ids"] = [
+            source["stratagem_use_id"] for source in forced_sources
+        ]
+        context["forced_desperate_escape_sources"] = validate_json_value(forced_sources)
+    return _request_movement_proposal(
+        state=state,
+        decisions=decisions,
+        result=pending_action.to_decision_result(),
+        unit_instance_id=pending_action.unit_instance_id,
+        action=MovementPhaseActionKind.FALL_BACK,
+        proposal_kind=ProposalKind.FALL_BACK,
+        context=context,
+    )
 
 
 def _request_movement_proposal(
@@ -4591,6 +5107,71 @@ def _request_movement_proposal(
             "proposal_kind": proposal_kind.value,
         },
     )
+
+
+def _forced_desperate_escape_sources_for_unit(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    sources: list[dict[str, JsonValue]] = []
+    for effect in state.persisting_effects_for_unit(requested_unit_id):
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Persisting effect payload must be an object.")
+        if payload.get("effect_kind") != FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND:
+            continue
+        fall_back_unit_id = payload.get("fall_back_unit_instance_id")
+        if fall_back_unit_id != requested_unit_id:
+            raise GameLifecycleError("Forced Desperate Escape effect target drift.")
+        source_rule_id = payload.get("source_rule_id")
+        stratagem_use_id = payload.get("stratagem_use_id")
+        forcing_unit_id = payload.get("forcing_unit_instance_id")
+        source_stratagem_id = payload.get("source_stratagem_id")
+        required_mode = payload.get("required_fall_back_mode")
+        if (
+            type(source_rule_id) is not str
+            or type(stratagem_use_id) is not str
+            or type(forcing_unit_id) is not str
+            or type(source_stratagem_id) is not str
+            or required_mode != FallBackModeKind.DESPERATE_ESCAPE.value
+        ):
+            raise GameLifecycleError("Forced Desperate Escape effect payload is malformed.")
+        sources.append(
+            {
+                "effect_id": effect.effect_id,
+                "source_rule_id": _validate_identifier("source_rule_id", source_rule_id),
+                "stratagem_use_id": _validate_identifier("stratagem_use_id", stratagem_use_id),
+                "source_stratagem_id": _validate_identifier(
+                    "source_stratagem_id",
+                    source_stratagem_id,
+                ),
+                "forcing_unit_instance_id": _validate_identifier(
+                    "forcing_unit_instance_id",
+                    forcing_unit_id,
+                ),
+                "fall_back_unit_instance_id": requested_unit_id,
+                "required_fall_back_mode": FallBackModeKind.DESPERATE_ESCAPE.value,
+            }
+        )
+    return tuple(sorted(sources, key=lambda source: str(source["effect_id"])))
+
+
+def _forced_desperate_escape_source_rule_ids_from_context(
+    context: dict[str, JsonValue],
+) -> tuple[str, ...]:
+    value = context.get("forced_desperate_escape_source_rule_ids")
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise GameLifecycleError("forced_desperate_escape_source_rule_ids must be a list.")
+    source_ids: list[str] = []
+    for item in value:
+        if type(item) is not str:
+            raise GameLifecycleError("forced_desperate_escape_source_rule_ids must be strings.")
+        source_ids.append(_validate_identifier("forced_desperate_escape_source_rule_id", item))
+    return tuple(sorted(source_ids))
 
 
 def _request_movement_proposal_retry(
@@ -4881,6 +5462,9 @@ def _apply_movement_proposal_decision(
             action=action,
         )
         fall_back_mode = _fall_back_mode_from_proposal_submission(submission=submission)
+        forced_desperate_escape_source_rule_ids = (
+            _forced_desperate_escape_source_rule_ids_from_context(proposal_request.context or {})
+        )
         fall_back_resolution = resolve_fall_back_move(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -4889,6 +5473,7 @@ def _apply_movement_proposal_decision(
             path_witness=submission.witness,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            forced_desperate_escape_source_rule_ids=forced_desperate_escape_source_rule_ids,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
@@ -6498,6 +7083,7 @@ def resolve_fall_back_move(
     path_witness: PathWitness | None = None,
     battle_round: int = 1,
     battle_shocked_unit_ids: tuple[str, ...] = (),
+    forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
     hover_mode_states: tuple[HoverModeState, ...] = (),
     battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
@@ -6506,6 +7092,10 @@ def resolve_fall_back_move(
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> FallBackActionResult:
+    forced_source_ids = _validate_identifier_tuple(
+        "forced_desperate_escape_source_rule_ids",
+        forced_desperate_escape_source_rule_ids,
+    )
     fall_back_witness = (
         _default_fall_back_witness(scenario=scenario, unit_placement=unit_placement)
         if path_witness is None
@@ -6540,6 +7130,7 @@ def resolve_fall_back_move(
         witness=resolved.witness,
         battle_round=battle_round,
         battle_shocked_unit_ids=battle_shocked_unit_ids,
+        forced_desperate_escape_source_rule_ids=forced_source_ids,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -6548,6 +7139,8 @@ def resolve_fall_back_move(
         ),
         "desperate_escape_rolls": [],
     }
+    if forced_source_ids:
+        movement_payload["forced_desperate_escape_source_rule_ids"] = list(forced_source_ids)
     return FallBackActionResult.unresolved(
         unit_instance_id=unit_placement.unit_instance_id,
         attempted_placement=resolved.attempted_placement,
@@ -7108,6 +7701,7 @@ def _desperate_escape_requirements_for_fall_back(
     witness: PathWitness,
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...],
+    forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
 ) -> tuple[DesperateEscapeRequirement, ...]:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Desperate Escape requirements require a scenario.")
@@ -7127,6 +7721,10 @@ def _desperate_escape_requirements_for_fall_back(
             battle_shocked_unit_ids,
         )
     )
+    forced_source_ids = _validate_identifier_tuple(
+        "forced_desperate_escape_source_rule_ids",
+        forced_desperate_escape_source_rule_ids,
+    )
     unit = scenario.unit_instance_for_placement(unit_placement)
     unit_keyword_set = {_canonical_keyword(keyword) for keyword in unit.keywords}
     overflight_exempt = "FLY" in unit_keyword_set or "TITANIC" in unit_keyword_set
@@ -7140,6 +7738,8 @@ def _desperate_escape_requirements_for_fall_back(
         enemy_model_ids: tuple[str, ...] = ()
         if unit_placement.unit_instance_id in battle_shocked_ids:
             reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
+        if forced_source_ids:
+            reasons.append(DesperateEscapeRequirementReason.FORCED_BY_RULE)
         if not overflight_exempt:
             moving_model = geometry_model_for_placement(
                 model=scenario.model_instance_for_placement(placement),
