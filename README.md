@@ -281,9 +281,10 @@ hook, the Cavalcade of Chaos / Unholy Avalanche Fall Back eligibility hook, and
 the Cavalcade of Chaos / Apocalyptic Steeds Upgrade enhancement effect as a
 source-linked static Movement characteristic modifier, plus the Cavalcade of
 Chaos / Soul-Shattering Charge Upgrade selected-to-fight ability hook for
-source-linked melee targeting permissions; remaining army rules, detachment
-rules, enhancement effects, and
-faction/detachment Stratagem timing, targeting, validation, and effects are
+source-linked melee targeting permissions and the Cavalcade of Chaos /
+Warp-Riders selected-to-move Stratagem through the shared `use_stratagem` CP,
+targeting, and temporary movement-keyword path; remaining army rules,
+detachment rules, enhancement effects, and faction/detachment Stratagems are
 still planned Phase 17G work. Phase 17H is planned for datasheet, wargear, and
 weapon ability execution. Phase 17I is planned for source-content coverage,
 execution-status, and unsupported-descriptor audits.

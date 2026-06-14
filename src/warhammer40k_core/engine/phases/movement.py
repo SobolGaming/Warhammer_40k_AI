@@ -75,6 +75,9 @@ from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityGrant,
     FallBackEligibilityHookRegistry,
 )
+from warhammer40k_core.engine.movement_keyword_effects import (
+    movement_keywords_granted_by_effects,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -107,12 +110,16 @@ from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratage
 from warhammer40k_core.engine.stratagems import (
     CORE_FIRE_OVERWATCH_HANDLER_ID,
     CORE_RAPID_INGRESS_HANDLER_ID,
+    SELECTED_TO_MOVE_UNIT_CONTEXT_KEY,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogIndex,
     StratagemEligibilityContext,
     StratagemTargetProposal,
+    create_stratagem_use_decision_request,
+    stratagem_decline_option,
     stratagem_target_proposal_from_index,
     stratagem_target_proposal_request_payload,
+    stratagem_use_options_from_index,
     stratagem_window_declined_for_context,
 )
 from warhammer40k_core.engine.timing_windows import (
@@ -2067,6 +2074,14 @@ class MovementPhaseHandler:
         _ensure_transport_cargo_phase_states(state)
         active_selection = movement_state.active_selection
         if active_selection is not None:
+            stratagem_status = _request_selected_to_move_stratagem_if_available(
+                state=state,
+                decisions=decisions,
+                active_selection=active_selection,
+                stratagem_index=self.stratagem_index,
+            )
+            if stratagem_status is not None:
+                return stratagem_status
             return _request_movement_action(
                 state=state,
                 decisions=decisions,
@@ -2607,6 +2622,64 @@ def _request_fire_overwatch_reaction_if_available(
                 },
             )
     return None
+
+
+def _request_selected_to_move_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    active_selection: MovementUnitSelection,
+    stratagem_index: StratagemCatalogIndex,
+) -> LifecycleStatus | None:
+    if type(active_selection) is not MovementUnitSelection:
+        raise GameLifecycleError("Selected-to-move Stratagem window requires active selection.")
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=active_selection.player_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE,
+        timing_window_id=_selected_to_move_timing_window_id(active_selection),
+        trigger_payload={
+            SELECTED_TO_MOVE_UNIT_CONTEXT_KEY: active_selection.unit_instance_id,
+            "selection_request_id": active_selection.request_id,
+            "selection_result_id": active_selection.result_id,
+        },
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "unit_instance_id": active_selection.unit_instance_id,
+            "phase_body_status": "selected_to_move_stratagem_pending",
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _selected_to_move_timing_window_id(active_selection: MovementUnitSelection) -> str:
+    if type(active_selection) is not MovementUnitSelection:
+        raise GameLifecycleError("Selected-to-move timing window requires active selection.")
+    return (
+        f"selected-to-move-round-{active_selection.battle_round:02d}-"
+        f"player-{active_selection.player_id}-unit-{active_selection.unit_instance_id}"
+    )
 
 
 def _stratagem_target_proposal_payload_factory(
@@ -4413,6 +4486,11 @@ def _apply_movement_proposal_decision(
             path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
+            temporary_movement_keywords=_temporary_movement_keywords_for_unit(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=proposal_request.unit_instance_id,
+            ),
         )
         transition_reason = _aircraft_reserve_transition_reason_for_normal_move(
             resolution=resolution,
@@ -4508,6 +4586,11 @@ def _apply_movement_proposal_decision(
             path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
+            temporary_movement_keywords=_temporary_movement_keywords_for_unit(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=proposal_request.unit_instance_id,
+            ),
         )
         if not advance_resolution.is_valid:
             violation_code = _normal_move_violation_code(advance_resolution)
@@ -4590,6 +4673,11 @@ def _apply_movement_proposal_decision(
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
+            temporary_movement_keywords=_temporary_movement_keywords_for_unit(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=proposal_request.unit_instance_id,
+            ),
         )
         fall_back_resolution = _fall_back_result_with_mode(
             resolution=fall_back_resolution,
@@ -6090,6 +6178,7 @@ def resolve_normal_move(
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    temporary_movement_keywords: tuple[str, ...] = (),
 ) -> NormalMoveResolution:
     resolved = _resolve_unit_move(
         scenario=scenario,
@@ -6111,6 +6200,7 @@ def resolve_normal_move(
         action_label="Normal Move",
         rollback_on_endpoint_coherency=True,
         hover_mode_states=hover_mode_states,
+        temporary_movement_keywords=temporary_movement_keywords,
     )
     return NormalMoveResolution(
         unit_instance_id=unit_placement.unit_instance_id,
@@ -6138,6 +6228,7 @@ def resolve_advance_move(
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    temporary_movement_keywords: tuple[str, ...] = (),
 ) -> AdvanceMoveResolution:
     if type(advance_roll) is not AdvanceRollResult:
         raise GameLifecycleError("Advance requires an AdvanceRollResult.")
@@ -6161,6 +6252,7 @@ def resolve_advance_move(
         action_label="Advance",
         rollback_on_endpoint_coherency=True,
         hover_mode_states=hover_mode_states,
+        temporary_movement_keywords=temporary_movement_keywords,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -6194,6 +6286,7 @@ def resolve_fall_back_move(
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    temporary_movement_keywords: tuple[str, ...] = (),
 ) -> FallBackActionResult:
     fall_back_witness = (
         _default_fall_back_witness(scenario=scenario, unit_placement=unit_placement)
@@ -6220,6 +6313,7 @@ def resolve_fall_back_move(
         action_label="Fall Back",
         rollback_on_endpoint_coherency=False,
         hover_mode_states=hover_mode_states,
+        temporary_movement_keywords=temporary_movement_keywords,
     )
     desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
@@ -6267,6 +6361,7 @@ def _resolve_unit_move(
     action_label: str,
     rollback_on_endpoint_coherency: bool,
     hover_mode_states: tuple[HoverModeState, ...],
+    temporary_movement_keywords: tuple[str, ...],
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -6278,6 +6373,10 @@ def _resolve_unit_move(
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must be an integer.")
     if movement_bonus_inches < 0:
         raise GameLifecycleError(f"{action_label} movement_bonus_inches must not be negative.")
+    validated_temporary_keywords = _validate_identifier_tuple(
+        f"{action_label} temporary_movement_keywords",
+        temporary_movement_keywords,
+    )
     markers = _validate_objective_marker_tuple(
         f"{action_label} objective_markers",
         objective_markers,
@@ -6291,6 +6390,10 @@ def _resolve_unit_move(
         unit=unit,
         ruleset_descriptor=ruleset_descriptor,
         hover_mode_state=hover_mode_state,
+    )
+    effective_movement_keywords = _effective_movement_keywords(
+        aircraft_policy.effective_keywords,
+        temporary_keywords=validated_temporary_keywords,
     )
     witness = (
         _default_move_witness(
@@ -6357,7 +6460,7 @@ def _resolve_unit_move(
             ((placement.model_instance_id, witness.poses_for_model(placement.model_instance_id)),)
         )
         legality_context = MovementLegalityContext.from_keywords(
-            keywords=aircraft_policy.effective_keywords,
+            keywords=effective_movement_keywords,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
@@ -6449,6 +6552,8 @@ def _resolve_unit_move(
             "movement_bonus_inches": movement_bonus_inches,
             "movement_mode": movement_mode.value,
             "movement_distance_modifier_inches": movement_distance_modifier_inches,
+            "movement_keywords": list(effective_movement_keywords),
+            "temporary_movement_keywords": list(validated_temporary_keywords),
             "base_size": model.base_size.to_payload(),
             "start_pose": placement.pose.to_payload(),
             "end_pose": witness.final_pose_for_model(placement.model_instance_id).to_payload(),
@@ -7591,6 +7696,31 @@ def _movement_mode_for_action(
     if movement_mode not in allowed_modes:
         raise GameLifecycleError("Movement mode is not legal for the selected movement action.")
     return movement_mode
+
+
+def _temporary_movement_keywords_for_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> tuple[str, ...]:
+    return movement_keywords_granted_by_effects(
+        state.persisting_effects_for_unit(unit_instance_id),
+        owner_player_id=player_id,
+    )
+
+
+def _effective_movement_keywords(
+    base_keywords: tuple[str, ...],
+    *,
+    temporary_keywords: tuple[str, ...],
+) -> tuple[str, ...]:
+    validated_base = _validate_identifier_tuple("base movement keywords", base_keywords)
+    validated_temporary = _validate_identifier_tuple(
+        "temporary movement keywords",
+        temporary_keywords,
+    )
+    return tuple(sorted({*validated_base, *validated_temporary}))
 
 
 def _model_default_movement_distance_inches(

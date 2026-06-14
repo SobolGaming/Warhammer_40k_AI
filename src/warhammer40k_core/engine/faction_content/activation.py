@@ -172,6 +172,12 @@ class RuntimeContentActivation:
             detachment_ids.update(army.detachment_selection.detachment_ids)
             enhancement_ids.update(army.detachment_selection.enhancement_ids)
             stratagem_ids.update(army.detachment_selection.stratagem_ids)
+            stratagem_ids.update(
+                _catalog_stratagem_ids_for_detachments(
+                    catalog=catalog,
+                    detachment_ids=army.detachment_selection.detachment_ids,
+                )
+            )
             enhancement_ids.update(
                 assignment.enhancement_id for assignment in army.enhancement_assignments
             )
@@ -368,6 +374,19 @@ def _selected_weapon_keywords(
                 _canonical_keyword(ability.ability_kind.value) for ability in profile.abilities
             )
     return tuple(selected)
+
+
+def _catalog_stratagem_ids_for_detachments(
+    *,
+    catalog: ArmyCatalog,
+    detachment_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    selected_detachment_ids = set(_validate_identifier_tuple("detachment_ids", detachment_ids))
+    selected: set[str] = set()
+    for detachment in catalog.detachments:
+        if detachment.detachment_id in selected_detachment_ids:
+            selected.update(detachment.stratagem_ids)
+    return tuple(sorted(selected))
 
 
 def _wargear_by_id(*, catalog: ArmyCatalog, wargear_id: str) -> Wargear:

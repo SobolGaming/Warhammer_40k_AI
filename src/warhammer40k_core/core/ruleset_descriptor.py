@@ -2342,6 +2342,7 @@ def _terrain_feature_movement_policies_for_eleventh() -> tuple[TerrainFeatureMov
         "BELISARIUS_CAWL",
         "IMPERIUM_PRIMARCH",
         "INFANTRY",
+        "MOBILE",
     )
     ruins_upper_floor_keywords = (
         "BEAST",

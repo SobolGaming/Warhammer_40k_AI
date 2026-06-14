@@ -2,27 +2,283 @@
 # Regenerate with `uv run python tools/generate_faction_content_scaffold.py`.
 from __future__ import annotations
 
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
-
-# Generated scaffold placeholder. Remove this marker when implementing semantics.
-
-CONTRIBUTION_ID = ":".join(
-    (
-        "warhammer_40000_11th",
-        "chaos_daemons",
-        "detachment",
-        "cavalcade_of_chaos",
-        "stratagems",
-        "scaffold",
-    )
+from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+    StratagemHandlerBinding,
+    StratagemHandlerContext,
+    StratagemHandlerExecutionResult,
 )
+from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.movement_keyword_effects import movement_keyword_grant_payload
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.stratagems import (
+    SELECTED_TO_MOVE_TARGET_POLICY_ID,
+    SELECTED_TO_MOVE_UNIT_CONTEXT_KEY,
+    StratagemAvailabilityKind,
+    StratagemCatalogRecord,
+    StratagemCategory,
+    StratagemDefinition,
+    StratagemRestrictionPolicy,
+    StratagemTargetKind,
+    StratagemTargetSpec,
+    StratagemTimingDescriptor,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.unit_factory import UnitInstance
+
+from .rule import (
+    CAVALCADE_DETACHMENT_ID,
+    CHAOS_DAEMONS_FACTION_ID,
+    LEGIONES_DAEMONICA,
+    MOUNTED,
+)
+
+CONTRIBUTION_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:stratagems:scaffold"
+)
+SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:stratagems"
+WARP_RIDERS_STRATAGEM_ID = "chaos-daemons:cavalcade-of-chaos:warp-riders"
+WARP_RIDERS_HANDLER_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders"
+)
+WARP_RIDERS_RECORD_ID = f"{SOURCE_RULE_ID}:{WARP_RIDERS_STRATAGEM_ID}"
+MOBILE = "MOBILE"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    """Runtime load scaffold only.
+    return RuntimeContentContribution(
+        contribution_id=CONTRIBUTION_ID,
+        stratagem_records=(_warp_riders_record(),),
+        stratagem_handler_bindings=(
+            StratagemHandlerBinding(
+                handler_id=WARP_RIDERS_HANDLER_ID,
+                handler=apply_warp_riders,
+                validator=validate_warp_riders,
+            ),
+        ),
+    )
 
-    Semantic execution must be supplied by source-backed RuleIR,
-    named handlers, event subscriptions, ability records, or Stratagem
-    handler bindings in implementation PRs.
-    """
-    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
+
+def apply_warp_riders(context: StratagemHandlerContext) -> StratagemHandlerExecutionResult:
+    validation = validate_warp_riders(context)
+    if validation.reason is not None:
+        return validation
+    target_unit_id = _target_unit_id(context)
+    effect = _warp_riders_effect(context=context, target_unit_id=target_unit_id)
+    context.state.record_persisting_effect(effect)
+    replay_payload = {
+        "effect_kind": "warp_riders_mobile",
+        "stratagem_id": WARP_RIDERS_STRATAGEM_ID,
+        "handler_id": WARP_RIDERS_HANDLER_ID,
+        "source_id": SOURCE_RULE_ID,
+        "player_id": context.use_record.player_id,
+        "battle_round": context.use_record.battle_round,
+        "phase": BattlePhase.MOVEMENT.value,
+        "target_unit_instance_id": target_unit_id,
+        "granted_keyword": MOBILE,
+        "persisting_effect_id": effect.effect_id,
+    }
+    context.decisions.event_log.append(
+        "warp_riders_mobile_granted",
+        {
+            "game_id": context.state.game_id,
+            "player_id": context.use_record.player_id,
+            "battle_round": context.use_record.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "stratagem_use": context.use_record.to_payload(),
+            "persisting_effect": effect.to_payload(),
+            "replay_payload": validate_json_value(replay_payload),
+        },
+    )
+    return StratagemHandlerExecutionResult.applied(
+        handler_id=WARP_RIDERS_HANDLER_ID,
+        replay_payload=validate_json_value(replay_payload),
+    )
+
+
+def validate_warp_riders(context: StratagemHandlerContext) -> StratagemHandlerExecutionResult:
+    if type(context) is not StratagemHandlerContext:
+        raise GameLifecycleError("Warp-Riders requires a Stratagem handler context.")
+    if context.definition.stratagem_id != WARP_RIDERS_STRATAGEM_ID:
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="wrong_stratagem",
+        )
+    if context.definition.handler_id != WARP_RIDERS_HANDLER_ID:
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="wrong_handler",
+        )
+    if context.eligibility_context.trigger_kind is not (
+        TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE
+    ):
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="wrong_timing",
+        )
+    if context.eligibility_context.phase is not BattlePhase.MOVEMENT:
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="wrong_phase",
+        )
+    if context.eligibility_context.active_player_id != context.use_record.player_id:
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="wrong_active_player",
+        )
+    target_unit_id = _target_unit_id(context)
+    selected_unit_id = _selected_to_move_unit_id(context)
+    if target_unit_id != selected_unit_id:
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="target_not_selected_to_move",
+        )
+    army = _army_for_player(context.state, player_id=context.use_record.player_id)
+    if not _army_has_cavalcade_detachment(army):
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="detachment_missing",
+        )
+    unit = _unit_in_army_by_id(army, unit_instance_id=target_unit_id)
+    if not _unit_has_faction_keyword(unit, LEGIONES_DAEMONICA):
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="missing_legiones_daemonica",
+        )
+    if not _unit_has_keyword(unit, MOUNTED):
+        return StratagemHandlerExecutionResult.invalid(
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            reason="missing_mounted",
+        )
+    return StratagemHandlerExecutionResult.applied(handler_id=WARP_RIDERS_HANDLER_ID)
+
+
+def _warp_riders_record() -> StratagemCatalogRecord:
+    return StratagemCatalogRecord(
+        record_id=WARP_RIDERS_RECORD_ID,
+        definition=StratagemDefinition(
+            stratagem_id=WARP_RIDERS_STRATAGEM_ID,
+            name="Warp-Riders",
+            source_id=SOURCE_RULE_ID,
+            command_point_cost=1,
+            category=StratagemCategory.STRATEGIC_PLOY,
+            when_descriptor=(
+                "Your Movement phase, when a friendly LEGIONES DAEMONICA MOUNTED unit "
+                "is selected to move."
+            ),
+            target_descriptor="That LEGIONES DAEMONICA MOUNTED unit.",
+            effect_descriptor="Your unit has MOBILE.",
+            restrictions_descriptor="Cavalcade of Chaos Stratagem.",
+            timing=StratagemTimingDescriptor(
+                trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE,
+                phase=BattlePhase.MOVEMENT,
+            ),
+            restriction_policy=StratagemRestrictionPolicy(),
+            target_spec=StratagemTargetSpec(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                enumerable=True,
+                target_policy_id=SELECTED_TO_MOVE_TARGET_POLICY_ID,
+                required_keywords=(MOUNTED,),
+                required_faction_keywords=(LEGIONES_DAEMONICA,),
+            ),
+            handler_id=WARP_RIDERS_HANDLER_ID,
+            effect_payload={
+                "effect_kind": "warp_riders_mobile",
+                "granted_keyword": MOBILE,
+            },
+        ),
+        availability_kind=StratagemAvailabilityKind.DETACHMENT,
+        detachment_id=CAVALCADE_DETACHMENT_ID,
+    )
+
+
+def _warp_riders_effect(
+    *,
+    context: StratagemHandlerContext,
+    target_unit_id: str,
+) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id=f"{context.use_record.use_id}:warp-riders-mobile:{target_unit_id}",
+        source_rule_id=SOURCE_RULE_ID,
+        owner_player_id=context.use_record.player_id,
+        target_unit_instance_ids=(target_unit_id,),
+        started_battle_round=context.state.battle_round,
+        started_phase=BattlePhase.MOVEMENT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=context.state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            player_id=context.use_record.player_id,
+        ),
+        effect_payload=movement_keyword_grant_payload(
+            granted_keywords=(MOBILE,),
+            source_decision_request_id=context.result.request_id,
+            source_decision_result_id=context.result.result_id,
+            stratagem_use_id=context.use_record.use_id,
+        ),
+    )
+
+
+def _target_unit_id(context: StratagemHandlerContext) -> str:
+    target_unit_id = context.target_binding.target_unit_instance_id
+    if target_unit_id is None:
+        raise GameLifecycleError("Warp-Riders requires a target unit.")
+    return target_unit_id
+
+
+def _selected_to_move_unit_id(context: StratagemHandlerContext) -> str:
+    trigger_payload = context.eligibility_context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        raise GameLifecycleError("Warp-Riders requires selected-to-move trigger context.")
+    selected_unit_id = trigger_payload.get(SELECTED_TO_MOVE_UNIT_CONTEXT_KEY)
+    if type(selected_unit_id) is not str:
+        raise GameLifecycleError("Warp-Riders selected-to-move context is missing unit id.")
+    return _validate_identifier("selected_to_move_unit_instance_id", selected_unit_id)
+
+
+def _army_has_cavalcade_detachment(army: ArmyDefinition) -> bool:
+    return (
+        army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
+        and CAVALCADE_DETACHMENT_ID in army.detachment_selection.detachment_ids
+    )
+
+
+def _army_for_player(state: GameState, *, player_id: str) -> ArmyDefinition:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    for army in state.army_definitions:
+        if army.player_id == requested_player_id:
+            return army
+    raise GameLifecycleError("Warp-Riders player army is unknown.")
+
+
+def _unit_in_army_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for unit in army.units:
+        if unit.unit_instance_id == requested_unit_id:
+            return unit
+    raise GameLifecycleError("Warp-Riders target unit is not in the selected player army.")
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
+
+
+def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().replace("_", " ").replace("-", " ").upper()
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return stripped

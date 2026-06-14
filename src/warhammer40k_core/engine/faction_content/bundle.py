@@ -559,6 +559,7 @@ class RuntimeContentBundle:
             ),
             stratagem_indexes_by_player_id=_stratagem_indexes_by_player_id(
                 armies=validated_armies,
+                catalog=catalog,
                 records=stratagem_records,
             ),
             ability_handler_registry=ability_registry,
@@ -688,6 +689,7 @@ def _ability_indexes_by_player_id(
 def _stratagem_indexes_by_player_id(
     *,
     armies: tuple[ArmyDefinition, ...],
+    catalog: ArmyCatalog,
     records: tuple[StratagemCatalogRecord, ...],
 ) -> Mapping[str, StratagemCatalogIndex]:
     return MappingProxyType(
@@ -695,11 +697,27 @@ def _stratagem_indexes_by_player_id(
             army.player_id: build_player_stratagem_index(
                 records,
                 detachment_ids=army.detachment_selection.detachment_ids,
-                stratagem_ids=army.detachment_selection.stratagem_ids,
+                stratagem_ids=_selected_stratagem_ids_for_army(
+                    army=army,
+                    catalog=catalog,
+                ),
             )
             for army in armies
         }
     )
+
+
+def _selected_stratagem_ids_for_army(
+    *,
+    army: ArmyDefinition,
+    catalog: ArmyCatalog,
+) -> tuple[str, ...]:
+    selected: set[str] = set(army.detachment_selection.stratagem_ids)
+    selected_detachment_ids = set(army.detachment_selection.detachment_ids)
+    for detachment in catalog.detachments:
+        if detachment.detachment_id in selected_detachment_ids:
+            selected.update(detachment.stratagem_ids)
+    return tuple(sorted(selected))
 
 
 def _merged_ability_registry(

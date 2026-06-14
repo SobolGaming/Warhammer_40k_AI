@@ -31,6 +31,9 @@ from warhammer40k_core.core.detachment import (
     EnhancementDefinition,
     EnhancementSubtype,
 )
+from warhammer40k_core.core.detachment import (
+    StratagemDefinition as CatalogStratagemDefinition,
+)
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
     FightEligibilityKind,
@@ -45,7 +48,12 @@ from warhammer40k_core.engine.army_mustering import (
     validate_roster_legality,
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.command_points import (
+    CommandPointGainStatus,
+    CommandPointSourceKind,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
@@ -53,6 +61,7 @@ from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.cavalcade_of_chaos import (  # noqa: E501
     enhancements,
     rule,
+    stratagems,
 )
 from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityContext,
@@ -104,11 +113,19 @@ from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
     ChargePhaseHandler,
 )
-from warhammer40k_core.engine.phases.movement import FallBackModeKind, MovementPhaseActionKind
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    FallBackModeKind,
+    MovementPhaseActionKind,
+)
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     ShootingPhaseHandler,
+)
+from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    STRATAGEM_DECISION_TYPE,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.pose import Pose
@@ -126,6 +143,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 _CAVALCADE_TEST_DATASHEET_ID = "phase17g-cavalcade-mounted-daemon"
 _CAVALCADE_UNIT_ID = "army-alpha:intercessor-unit-1"
 _ENEMY_UNIT_ID = "army-beta:intercessor-unit-2"
+_OTHER_DAEMON_DETACHMENT_ID = "phase17g-other-daemon-detachment"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
 )
@@ -154,7 +172,13 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
             selected_option_id=_CAVALCADE_UNIT_ID,
         )
     )
+    action_status = _decline_stratagem_window_if_present(
+        lifecycle,
+        action_status,
+        result_id="phase17g-cavalcade-decline-warp-riders",
+    )
     action_request = _decision_request(action_status)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert _ORDERED_FALL_BACK_OPTION_ID in {option.option_id for option in action_request.options}
     if state.battlefield_state is None:
         raise AssertionError("test state requires battlefield_state")
@@ -223,6 +247,130 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
     }
 
 
+def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> None:
+    config = _cavalcade_config()
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    state = _state(lifecycle)
+    _grant_cp(state, player_id="player-a", amount=1)
+    bundle = _runtime_content_bundle(lifecycle)
+    summary = bundle.to_summary_payload()
+
+    assert stratagems.WARP_RIDERS_HANDLER_ID in summary["stratagem_handler_ids"]
+    assert stratagems.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    assert (
+        stratagems.WARP_RIDERS_RECORD_ID
+        in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
+    )
+    assert (
+        stratagems.WARP_RIDERS_RECORD_ID
+        not in summary["stratagem_index_record_ids_by_player_id"]["player-b"]
+    )
+
+    selection_request = _decision_request(movement_status)
+    stratagem_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-warp-riders-select-mounted",
+            request=selection_request,
+            selected_option_id=_CAVALCADE_UNIT_ID,
+        )
+    )
+    stratagem_request = _decision_request(stratagem_status)
+    assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
+    warp_option = _required_option_id_containing(
+        stratagem_request,
+        stratagems.WARP_RIDERS_STRATAGEM_ID,
+    )
+    command_points_before_use = state.command_point_total("player-a")
+
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-warp-riders-use",
+            request=stratagem_request,
+            selected_option_id=warp_option,
+        )
+    )
+    action_request = _decision_request(action_status)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert state.command_point_total("player-a") == command_points_before_use - 1
+
+    effect_event = _event_payload(lifecycle, "warp_riders_mobile_granted")
+    persisting_effect = cast(dict[str, JsonValue], effect_event["persisting_effect"])
+    effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
+    assert effect_event["player_id"] == "player-a"
+    assert effect_payload["effect_kind"] == "movement_keyword_grant"
+    assert effect_payload["granted_keywords"] == ["MOBILE"]
+    assert persisting_effect["target_unit_instance_ids"] == [_CAVALCADE_UNIT_ID]
+
+    move_status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        action_result_id="phase17g-warp-riders-normal-move-action",
+        proposal_result_id="phase17g-warp-riders-normal-move-proposal",
+        unit_instance_id=_CAVALCADE_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_CAVALCADE_UNIT_ID,
+            dx=1.0,
+        ),
+    )
+
+    assert move_status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    movement_event = _event_payload(lifecycle, "movement_activation_completed")
+    model_movements = cast(list[JsonValue], movement_event["model_movements"])
+    first_model_movement = cast(dict[str, JsonValue], model_movements[0])
+    assert "MOBILE" in cast(list[str], first_model_movement["movement_keywords"])
+    assert first_model_movement["temporary_movement_keywords"] == ["MOBILE"]
+
+
+def test_cavalcade_warp_riders_not_offered_for_non_mounted_selected_unit() -> None:
+    config = _cavalcade_config(friendly_keywords=("Khorne",))
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    _grant_cp(_state(lifecycle), player_id="player-a", amount=1)
+
+    selection_request = _decision_request(movement_status)
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-warp-riders-select-not-mounted",
+            request=selection_request,
+            selected_option_id=_CAVALCADE_UNIT_ID,
+        )
+    )
+    action_request = _decision_request(action_status)
+
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+
+
+def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> None:
+    config = _non_cavalcade_daemon_config()
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    _grant_cp(_state(lifecycle), player_id="player-a", amount=1)
+    summary = _runtime_content_bundle(lifecycle).to_summary_payload()
+
+    assert stratagems.WARP_RIDERS_HANDLER_ID not in summary["stratagem_handler_ids"]
+    assert (
+        stratagems.WARP_RIDERS_RECORD_ID
+        not in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
+    )
+
+    selection_request = _decision_request(movement_status)
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-warp-riders-select-non-cavalcade",
+            request=selection_request,
+            selected_option_id=_CAVALCADE_UNIT_ID,
+        )
+    )
+    action_request = _decision_request(action_status)
+
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+
+
 def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle() -> None:
     config = _cavalcade_config(apocalyptic_steeds=True)
     lifecycle, movement_status = _advance_to_movement_unit_selection(config)
@@ -263,7 +411,13 @@ def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle
             selected_option_id=_CAVALCADE_UNIT_ID,
         )
     )
+    action_status = _decline_stratagem_window_if_present(
+        lifecycle,
+        action_status,
+        result_id="phase17g-cavalcade-apocalyptic-decline-warp-riders",
+    )
     action_request = _decision_request(action_status)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     move_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
@@ -445,6 +599,17 @@ def test_cavalcade_soul_shattering_charge_hook_uses_phase17f_execution_source_id
 
     assert record.execution_id == enhancements.SOURCE_RULE_ID
     assert binding.source_id == record.execution_id
+
+
+def test_cavalcade_warp_riders_uses_phase17f_execution_source_id() -> None:
+    record = _cavalcade_stratagem_execution_record()
+    contribution = stratagems.runtime_contribution()
+    binding = contribution.stratagem_handler_bindings[0]
+    catalog_record = contribution.stratagem_records[0]
+
+    assert record.execution_id == stratagems.SOURCE_RULE_ID
+    assert binding.handler_id == stratagems.WARP_RIDERS_HANDLER_ID
+    assert catalog_record.definition.source_id == record.execution_id
 
 
 def test_cavalcade_rule_hook_uses_phase17f_execution_source_id() -> None:
@@ -631,6 +796,19 @@ def _cavalcade_enhancement_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
+def _cavalcade_stratagem_execution_record() -> Phase17FExecutionRecord:
+    records = tuple(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.faction_id == rule.CHAOS_DAEMONS_FACTION_ID
+        and record.coverage_kind is Phase17ECoverageKind.DETACHMENT_STRATAGEM_DESCRIPTORS
+        and record.detachment_id == rule.CAVALCADE_DETACHMENT_ID
+    )
+    if len(records) != 1:
+        raise AssertionError("expected one Cavalcade of Chaos stratagem execution record")
+    return records[0]
+
+
 def _characteristic_for_model(
     model: ModelInstance,
     characteristic: Characteristic,
@@ -715,6 +893,42 @@ def _cavalcade_config(
     )
 
 
+def _non_cavalcade_daemon_config() -> GameConfig:
+    catalog = _catalog_with_other_daemon_detachment(_cavalcade_catalog())
+    return GameConfig(
+        game_id="phase17g-non-cavalcade-daemon",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-phase17g-non-cavalcade-test"
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _army_muster_request(
+                catalog=catalog,
+                army_id="army-alpha",
+                player_id="player-a",
+                faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
+                detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
+                unit_selection_id="intercessor-unit-1",
+                datasheet_id=_CAVALCADE_TEST_DATASHEET_ID,
+            ),
+            _army_muster_request(
+                catalog=catalog,
+                army_id="army-beta",
+                player_id="player-b",
+                faction_id="core-marine-force",
+                detachment_id="core-combined-arms",
+                unit_selection_id="intercessor-unit-2",
+                datasheet_id="core-intercessor-like-infantry",
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
+        mission_setup=_mission_setup(),
+    )
+
+
 def _cavalcade_catalog(
     *,
     friendly_keywords: tuple[str, ...] = (rule.MOUNTED, "Khorne"),
@@ -747,6 +961,7 @@ def _cavalcade_catalog(
                     enhancements.ENHANCEMENT_ID,
                     enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
                 ),
+                stratagem_ids=(stratagems.WARP_RIDERS_STRATAGEM_ID,),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:"
                     "chaos-daemons:cavalcade-of-chaos",
@@ -772,6 +987,34 @@ def _cavalcade_catalog(
                 points=0,
                 target_required_keywords=(enhancements.MOUNTED,),
                 target_required_faction_keywords=(enhancements.LEGIONES_DAEMONICA,),
+            ),
+        ),
+        stratagems=(
+            *base_catalog.stratagems,
+            CatalogStratagemDefinition(
+                stratagem_id=stratagems.WARP_RIDERS_STRATAGEM_ID,
+                name="Warp-Riders",
+                source_id=stratagems.SOURCE_RULE_ID,
+                command_point_cost=1,
+                timing_tags=("movement:selected-to-move",),
+            ),
+        ),
+    )
+
+
+def _catalog_with_other_daemon_detachment(catalog: ArmyCatalog) -> ArmyCatalog:
+    return replace(
+        catalog,
+        detachments=(
+            *catalog.detachments,
+            DetachmentDefinition(
+                detachment_id=_OTHER_DAEMON_DETACHMENT_ID,
+                name="Other Daemon Detachment",
+                faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
+                detachment_point_cost=1,
+                unit_datasheet_ids=(_CAVALCADE_TEST_DATASHEET_ID,),
+                force_disposition_ids=("phase17g-force",),
+                source_ids=("phase17g:test:other-daemon-detachment",),
             ),
         ),
     )
@@ -1072,3 +1315,39 @@ def _event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, JsonV
         if event.event_type == event_type:
             return cast(dict[str, JsonValue], event.payload)
     raise AssertionError(f"missing event {event_type}")
+
+
+def _decline_stratagem_window_if_present(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=result_id,
+            request=request,
+            selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        )
+    )
+
+
+def _required_option_id_containing(request: DecisionRequest, expected_fragment: str) -> str:
+    option_ids = tuple(option.option_id for option in request.options)
+    matches = tuple(option_id for option_id in option_ids if expected_fragment in option_id)
+    if len(matches) != 1:
+        raise AssertionError(f"expected one option containing {expected_fragment}: {option_ids}")
+    return matches[0]
+
+
+def _grant_cp(state: GameState, *, player_id: str, amount: int) -> None:
+    result = state.gain_command_points(
+        player_id=player_id,
+        amount=amount,
+        source_id=f"phase17g-grant:{player_id}:{amount}",
+        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+    )
+    assert result.status is CommandPointGainStatus.APPLIED

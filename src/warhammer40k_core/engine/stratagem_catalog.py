@@ -57,7 +57,7 @@ def build_player_stratagem_index(
             detachment_ids,
         )
     )
-    selected_stratagem_ids = frozenset(
+    materialized_stratagem_ids = frozenset(
         _validate_identifier_tuple("Player Stratagem index stratagem_ids", stratagem_ids)
     )
     player_records: list[StratagemCatalogRecord] = []
@@ -65,11 +65,14 @@ def build_player_stratagem_index(
         if record.availability_kind is StratagemAvailabilityKind.CORE:
             player_records.append(record)
             continue
+        if record.detachment_id not in selected_detachment_ids:
+            continue
         if (
-            record.detachment_id in selected_detachment_ids
-            and record.definition.stratagem_id in selected_stratagem_ids
+            materialized_stratagem_ids
+            and record.definition.stratagem_id not in materialized_stratagem_ids
         ):
-            player_records.append(record)
+            continue
+        player_records.append(record)
     return StratagemCatalogIndex.from_records(tuple(player_records))
 
 
