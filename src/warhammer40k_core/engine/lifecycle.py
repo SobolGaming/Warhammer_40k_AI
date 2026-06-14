@@ -394,6 +394,10 @@ class GameLifecycle:
         if not self.parameterized_movement_proposals:
             raise GameLifecycleError("GameLifecycle requires parameterized movement proposals.")
 
+    @property
+    def config(self) -> GameConfig:
+        return self._require_config()
+
     def start(self, config: GameConfig) -> LifecycleStatus:
         if type(config) is not GameConfig:
             raise GameLifecycleError("GameLifecycle config must be a GameConfig.")

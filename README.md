@@ -117,6 +117,8 @@ warhammer40k_core/
     headless.py
     ui.py
     network.py
+  interfaces/
+    cli.py
   tests/
     fixtures/
     unit/
@@ -139,8 +141,8 @@ adapters -> may import engine, never the reverse
 
 The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
 
-Current roadmap implementation status: phases 1-15F, phases 16A-16E, and
-Phases 17A-17F plus Phase 17J are complete. Phase 14E is
+Current roadmap implementation status: phases 1-15F, phases 16A-16E,
+Phases 17A-17F plus Phase 17J, and Phase 18A are complete. Phase 14E is
 complete: its allocation-group host includes Benefit of Cover and Plunging Fire
 BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
 choice, automatic allocation groups, defender ordered allocation decisions only
@@ -289,6 +291,16 @@ still planned Phase 17G work. Phase 17H is planned for datasheet, wargear, and
 weapon ability execution. Phase 17I is planned for source-content coverage,
 execution-status, and unsupported-descriptor audits.
 
+Phase 18A is complete for local CLI/human decision entry and viewer-safe
+datacard projection. CLI helpers render pending finite and parameterized
+`DecisionRequest`s, convert human choices into normal `DecisionResult`s through
+the lifecycle, and never mutate state directly. The adapter projection now
+exposes a source-hashed `RulesCatalogViewPayload` plus live
+`unit_display_by_id` and `model_display_by_id` records keyed by stable IDs, with
+engine-resolved M/T/SV/W/LD/OC characteristics, wounds, base size, keywords,
+visible modifier display traces, and cache invalidation through
+`projection_state_hash`.
+
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 
 Phase 17B catalog generation source-links physical model geometry.
@@ -298,7 +310,7 @@ records before runtime instantiation. Each unique model profile must carry a
 representative model height with provenance so LoS, vertical distance, and
 multi-floor terrain collision do not depend on runtime heuristics.
 
-Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus Phase 11E viewer-scoped scoring projection/event rules.
+Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus viewer-scoped scoring, event, and Phase 18A unit/model display projection rules.
 
 ## 5. Test policy
 
