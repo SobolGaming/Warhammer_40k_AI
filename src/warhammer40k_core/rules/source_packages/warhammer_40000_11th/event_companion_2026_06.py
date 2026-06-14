@@ -19,6 +19,7 @@ from warhammer40k_core.core.missions import (
     MissionPackError,
     MissionSourcePackageDefinition,
     ObjectiveMarkerDefinition,
+    ObjectiveMarkerRole,
     objective_marker_role_from_token,
 )
 from warhammer40k_core.core.terrain_areas import (
@@ -51,6 +52,9 @@ BATTLEFIELD_SIZE = "44x60_inches"
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID = "take-and-hold-vs-take-and-hold-layout-1"
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID = "take-and-hold-vs-take-and-hold-layout-2"
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID = "take-and-hold-vs-take-and-hold-layout-3"
+DISRUPTION_VS_RECONNAISSANCE_LAYOUT_A_ID = "disruption-vs-reconnaissance-layout-1"
+DISRUPTION_VS_RECONNAISSANCE_LAYOUT_B_ID = "disruption-vs-reconnaissance-layout-2"
+DISRUPTION_VS_RECONNAISSANCE_LAYOUT_C_ID = "disruption-vs-reconnaissance-layout-3"
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS = {
     TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID: (
         "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_a"
@@ -61,6 +65,21 @@ TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS = {
     TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID: (
         "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c"
     ),
+}
+DISRUPTION_VS_RECONNAISSANCE_LAYOUT_SOURCE_IDS = {
+    DISRUPTION_VS_RECONNAISSANCE_LAYOUT_A_ID: (
+        "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_a"
+    ),
+    DISRUPTION_VS_RECONNAISSANCE_LAYOUT_B_ID: (
+        "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_b"
+    ),
+    DISRUPTION_VS_RECONNAISSANCE_LAYOUT_C_ID: (
+        "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_c"
+    ),
+}
+EXTRACTED_LAYOUT_SOURCE_IDS = {
+    **TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS,
+    **DISRUPTION_VS_RECONNAISSANCE_LAYOUT_SOURCE_IDS,
 }
 TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES = {
     TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID: (
@@ -73,7 +92,22 @@ TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES = {
         "Take and Hold vs Take and Hold - Battlefield Dominance - Layout C"
     ),
 }
-EXTRACTED_TAKE_AND_HOLD_LAYOUT_IDS = frozenset(TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS)
+DISRUPTION_VS_RECONNAISSANCE_LAYOUT_NAMES = {
+    DISRUPTION_VS_RECONNAISSANCE_LAYOUT_A_ID: (
+        "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout A"
+    ),
+    DISRUPTION_VS_RECONNAISSANCE_LAYOUT_B_ID: (
+        "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout B"
+    ),
+    DISRUPTION_VS_RECONNAISSANCE_LAYOUT_C_ID: (
+        "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout C"
+    ),
+}
+EXTRACTED_LAYOUT_NAMES = {
+    **TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES,
+    **DISRUPTION_VS_RECONNAISSANCE_LAYOUT_NAMES,
+}
+EXTRACTED_LAYOUT_IDS = frozenset(EXTRACTED_LAYOUT_SOURCE_IDS)
 TERRAIN_AREA_FEATURE_KIND = "terrain_area"
 LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES = 9.0
 LAYOUT_C_ARC_SEGMENTS = 16
@@ -2166,19 +2200,19 @@ def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ..
 
 def battlefield_layout_definitions() -> tuple[BattlefieldLayoutDefinition, ...]:
     return tuple(
-        _take_and_hold_vs_take_and_hold_layout_definition(layout_id=layout_id)
-        for layout_id in sorted(EXTRACTED_TAKE_AND_HOLD_LAYOUT_IDS)
+        _extracted_layout_definition(layout_id=layout_id)
+        for layout_id in sorted(EXTRACTED_LAYOUT_IDS)
     )
 
 
-def _take_and_hold_vs_take_and_hold_layout_definition(
+def _extracted_layout_definition(
     *,
     layout_id: str,
 ) -> BattlefieldLayoutDefinition:
-    source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
+    source_layout_id = EXTRACTED_LAYOUT_SOURCE_IDS[layout_id]
     return BattlefieldLayoutDefinition(
         battlefield_layout_id=layout_id,
-        name=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES[layout_id],
+        name=EXTRACTED_LAYOUT_NAMES[layout_id],
         deployment_map_id=f"{layout_id}-deployment",
         terrain_layout_id=layout_id,
         battlefield_width_inches=BATTLEFIELD_WIDTH_INCHES,
@@ -2187,19 +2221,18 @@ def _take_and_hold_vs_take_and_hold_layout_definition(
         coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
         attacker_edge=_layout_attacker_edge(layout_id, _layout_number_from_layout_id(layout_id)),
         defender_edge=_layout_defender_edge(layout_id, _layout_number_from_layout_id(layout_id)),
-        objective_markers=_take_and_hold_vs_take_and_hold_objective_definitions(
-            layout_id=layout_id
-        ),
+        objective_markers=_extracted_objective_definitions(layout_id=layout_id),
         deployment_zones=tuple(
             DeploymentZone(
                 deployment_zone_id=zone.deployment_zone_id,
                 player_id=zone.player_role,
                 shape=zone.shape,
             )
-            for zone in _take_and_hold_vs_take_and_hold_deployment_zones(layout_id=layout_id)
+            for zone in _extracted_deployment_zones(layout_id=layout_id)
         ),
-        battlefield_regions=_take_and_hold_vs_take_and_hold_regions(layout_id=layout_id),
-        terrain_areas=_take_and_hold_vs_take_and_hold_terrain_areas(layout_id),
+        battlefield_regions=_extracted_regions(layout_id=layout_id),
+        terrain_areas=_extracted_terrain_areas(layout_id),
+        objective_role_counts=_extracted_objective_role_counts(layout_id),
         source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}",
     )
 
@@ -2230,10 +2263,10 @@ def _battlefield_layout_row(
     layout_number: int,
     source_page: int,
 ) -> chapter_approved.SourceBattlefieldLayoutRow:
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+    if _is_extracted_layout(layout_id):
         return chapter_approved.SourceBattlefieldLayoutRow(
             battlefield_layout_id=layout_id,
-            name=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_NAMES[layout_id],
+            name=EXTRACTED_LAYOUT_NAMES[layout_id],
             player_force_disposition_id=player_force_disposition_id,
             opponent_force_disposition_id=opponent_force_disposition_id,
             layout_number=layout_number,
@@ -2245,8 +2278,8 @@ def _battlefield_layout_row(
             coordinate_origin="bottom_left",
             coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
             source_status="event_companion_layout_geometry_extracted",
-            objective_markers=_take_and_hold_vs_take_and_hold_objectives(layout_id=layout_id),
-            deployment_zones=_take_and_hold_vs_take_and_hold_deployment_zones(layout_id=layout_id),
+            objective_markers=_extracted_objectives(layout_id=layout_id),
+            deployment_zones=_extracted_deployment_zones(layout_id=layout_id),
             terrain_features=(),
         )
     return chapter_approved.SourceBattlefieldLayoutRow(
@@ -2280,8 +2313,8 @@ def _layout_objectives(
     layout_id: str,
     layout_number: int,
 ) -> tuple[chapter_approved.SourceBattlefieldObjectiveRow, ...]:
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
-        return _take_and_hold_vs_take_and_hold_objectives(layout_id=layout_id)
+    if _is_extracted_layout(layout_id):
+        return _extracted_objectives(layout_id=layout_id)
     template = {
         1: (
             (*_pending_layout_point(9.0, 22.0), "attacker_home"),
@@ -2368,13 +2401,86 @@ def _take_and_hold_vs_take_and_hold_objectives(
     )
 
 
+def _disruption_vs_reconnaissance_objectives(
+    *,
+    layout_id: str,
+) -> tuple[chapter_approved.SourceBattlefieldObjectiveRow, ...]:
+    layouts = {
+        DISRUPTION_VS_RECONNAISSANCE_LAYOUT_A_ID: (
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 16.98, 49.88),
+            ("defender-home", "Defender Home Objective", "defender_home", 26.31, 9.65),
+            ("central-south", "South Central Objective", "central", 23.0, 25.7),
+            ("central-north", "North Central Objective", "central", 20.9, 34.1),
+            ("expansion-east", "East Expansion Objective", "expansion", 37.65, 41.4),
+            ("expansion-west", "West Expansion Objective", "expansion", 6.21, 18.9),
+        ),
+        DISRUPTION_VS_RECONNAISSANCE_LAYOUT_B_ID: (
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 7.55, 44.17),
+            ("defender-home", "Defender Home Objective", "defender_home", 36.53, 16.02),
+            ("central-west", "West Central Objective", "central", 14.31, 28.95),
+            ("central-east", "East Central Objective", "central", 29.24, 31.45),
+            ("expansion-north", "North Expansion Objective", "expansion", 24.0, 51.43),
+            ("expansion-south", "South Expansion Objective", "expansion", 20.05, 8.6),
+        ),
+        DISRUPTION_VS_RECONNAISSANCE_LAYOUT_C_ID: (
+            ("attacker-home", "Attacker Home Objective", "attacker_home", 6.45, 45.39),
+            ("defender-home", "Defender Home Objective", "defender_home", 37.4, 14.91),
+            ("central-north-west", "North-west Central Objective", "central", 18.49, 33.93),
+            ("central-south-east", "South-east Central Objective", "central", 25.52, 26.0),
+            ("expansion-north-east", "North-east Expansion Objective", "expansion", 35.62, 50.96),
+            ("expansion-south-west", "South-west Expansion Objective", "expansion", 8.75, 9.07),
+        ),
+    }
+    return tuple(
+        chapter_approved.SourceBattlefieldObjectiveRow(
+            f"{layout_id}-{suffix}",
+            name,
+            objective_kind,
+            x_inches,
+            y_inches,
+        )
+        for suffix, name, objective_kind, x_inches, y_inches in layouts[layout_id]
+    )
+
+
+def _extracted_objectives(
+    *,
+    layout_id: str,
+) -> tuple[chapter_approved.SourceBattlefieldObjectiveRow, ...]:
+    if layout_id in TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS:
+        return _take_and_hold_vs_take_and_hold_objectives(layout_id=layout_id)
+    if layout_id in DISRUPTION_VS_RECONNAISSANCE_LAYOUT_SOURCE_IDS:
+        return _disruption_vs_reconnaissance_objectives(layout_id=layout_id)
+    raise MissionPackError("Unsupported extracted battlefield layout ID.")
+
+
+def _extracted_objective_role_counts(
+    layout_id: str,
+) -> tuple[tuple[ObjectiveMarkerRole, int], ...]:
+    if layout_id in TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS:
+        return (
+            (ObjectiveMarkerRole.ATTACKER_HOME, 1),
+            (ObjectiveMarkerRole.DEFENDER_HOME, 1),
+            (ObjectiveMarkerRole.CENTRAL, 1),
+            (ObjectiveMarkerRole.EXPANSION, 2),
+        )
+    if layout_id in DISRUPTION_VS_RECONNAISSANCE_LAYOUT_SOURCE_IDS:
+        return (
+            (ObjectiveMarkerRole.ATTACKER_HOME, 1),
+            (ObjectiveMarkerRole.DEFENDER_HOME, 1),
+            (ObjectiveMarkerRole.CENTRAL, 2),
+            (ObjectiveMarkerRole.EXPANSION, 2),
+        )
+    raise MissionPackError("Unsupported extracted battlefield layout ID.")
+
+
 def _layout_deployment_zones(
     *,
     layout_id: str,
     layout_number: int,
 ) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
-        return _take_and_hold_vs_take_and_hold_deployment_zones(layout_id=layout_id)
+    if _is_extracted_layout(layout_id):
+        return _extracted_deployment_zones(layout_id=layout_id)
     if layout_number == 2:
         attacker = DeploymentZoneShape.rectangle(
             min_x=0.0,
@@ -2415,11 +2521,14 @@ def _layout_deployment_zones(
     )
 
 
-def _take_and_hold_vs_take_and_hold_deployment_zones(
+def _extracted_deployment_zones(
     *,
     layout_id: str,
 ) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+    if layout_id not in EXTRACTED_LAYOUT_IDS:
+        raise MissionPackError("Unsupported extracted battlefield layout ID.")
+    layout_number = _layout_number_from_layout_id(layout_id)
+    if layout_number == 1:
         attacker_shape = _shape_from_vertices(
             (
                 (0.0, 60.0),
@@ -2440,7 +2549,7 @@ def _take_and_hold_vs_take_and_hold_deployment_zones(
                 (0.0, 12.0),
             )
         )
-    elif layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+    elif layout_number == 2:
         attacker_shape = DeploymentZoneShape.rectangle(
             min_x=0.0,
             min_y=0.0,
@@ -2453,7 +2562,7 @@ def _take_and_hold_vs_take_and_hold_deployment_zones(
             max_x=44.0,
             max_y=60.0,
         )
-    elif layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+    elif layout_number == 3:
         attacker_shape = _shape_from_vertices(
             _rectangle_with_quarter_circle_cutout_vertices(
                 min_x=0.0,
@@ -2475,7 +2584,7 @@ def _take_and_hold_vs_take_and_hold_deployment_zones(
             )
         )
     else:
-        raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
+        raise MissionPackError("Unsupported extracted battlefield layout number.")
     return (
         chapter_approved.SourceBattlefieldDeploymentZoneRow(
             deployment_zone_id=f"{layout_id}-attacker",
@@ -2495,7 +2604,7 @@ def _layout_terrain_features(
     layout_id: str,
     layout_number: int,
 ) -> tuple[chapter_approved.SourceBattlefieldTerrainFeatureRow, ...]:
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+    if _is_extracted_layout(layout_id):
         return ()
     templates = {
         1: (
@@ -2598,11 +2707,11 @@ def _descriptor_deployment_shapes(
 
 def _no_mans_land_shape(*, layout_id: str, layout_number: int) -> EventShapeSourceRecord:
     vertices: tuple[tuple[float, float], ...]
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+    if _is_extracted_layout(layout_id):
         return EventShapeSourceRecord(
             shape_id=f"{layout_id}-no-mans-land",
             role="no_mans_land",
-            polygons=_shape_polygons(_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id)),
+            polygons=_shape_polygons(_extracted_no_mans_land_shape(layout_id)),
         )
     if layout_number == 2:
         vertices = (
@@ -2634,8 +2743,8 @@ def _territory_shapes(
     layout_id: str,
     layout_number: int,
 ) -> tuple[EventShapeSourceRecord, ...]:
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
-        territories = _take_and_hold_vs_take_and_hold_territory_vertices(layout_id)
+    if _is_extracted_layout(layout_id):
+        territories = _extracted_territory_vertices(layout_id)
         return tuple(
             EventShapeSourceRecord(
                 shape_id=f"{layout_id}-{role}",
@@ -2717,7 +2826,7 @@ def _descriptor_terrain(
     layout_id: str,
     layout_number: int,
 ) -> tuple[EventTerrainSourceRecord, ...]:
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+    if _is_extracted_layout(layout_id):
         templates = {
             template.footprint_template_id: template
             for template in terrain_area_footprint_templates()
@@ -2732,7 +2841,7 @@ def _descriptor_terrain(
                 width_inches=templates[area.footprint_template_id].bounding_width_inches,
                 depth_inches=templates[area.footprint_template_id].bounding_depth_inches,
             )
-            for area in _take_and_hold_vs_take_and_hold_terrain_areas(layout_id)
+            for area in _extracted_terrain_areas(layout_id)
         )
     terrain: list[EventTerrainSourceRecord] = []
     for feature in _layout_terrain_features(layout_id=layout_id, layout_number=layout_number):
@@ -2751,7 +2860,7 @@ def _descriptor_terrain(
     return tuple(terrain)
 
 
-def _take_and_hold_vs_take_and_hold_objective_definitions(
+def _extracted_objective_definitions(
     *,
     layout_id: str,
 ) -> tuple[ObjectiveMarkerDefinition, ...]:
@@ -2767,19 +2876,17 @@ def _take_and_hold_vs_take_and_hold_objective_definitions(
                 f"objective:{objective.objective_marker_id}"
             ),
         )
-        for objective in _take_and_hold_vs_take_and_hold_objectives(layout_id=layout_id)
+        for objective in _extracted_objectives(layout_id=layout_id)
     )
 
 
-def _take_and_hold_vs_take_and_hold_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
-    attacker_zone, defender_zone = _take_and_hold_vs_take_and_hold_deployment_zones(
-        layout_id=layout_id
-    )
-    source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
+def _extracted_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
+    attacker_zone, defender_zone = _extracted_deployment_zones(layout_id=layout_id)
+    source_layout_id = EXTRACTED_LAYOUT_SOURCE_IDS[layout_id]
     layout_number = _layout_number_from_layout_id(layout_id)
     attacker_edge = _layout_attacker_edge(layout_id, layout_number)
     defender_edge = _layout_defender_edge(layout_id, layout_number)
-    territories = dict(_take_and_hold_vs_take_and_hold_territory_vertices(layout_id))
+    territories = dict(_extracted_territory_vertices(layout_id))
     return (
         BattlefieldRegion(
             region_id=f"{layout_id}-attacker-deployment-region",
@@ -2801,7 +2908,7 @@ def _take_and_hold_vs_take_and_hold_regions(*, layout_id: str) -> tuple[Battlefi
             region_id=f"{layout_id}-no-mans-land",
             region_kind=BattlefieldRegionKind.NO_MANS_LAND,
             owner_role=None,
-            shape=_take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id),
+            shape=_extracted_no_mans_land_shape(layout_id),
             derived_from=(attacker_zone.deployment_zone_id, defender_zone.deployment_zone_id),
             source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:region:no-mans-land",
         ),
@@ -2824,8 +2931,9 @@ def _take_and_hold_vs_take_and_hold_regions(*, layout_id: str) -> tuple[Battlefi
     )
 
 
-def _take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id: str) -> DeploymentZoneShape:
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+def _extracted_no_mans_land_shape(layout_id: str) -> DeploymentZoneShape:
+    layout_number = _layout_number_from_layout_id(layout_id)
+    if layout_number == 1:
         return _shape_from_vertices(
             (
                 (0.0, 12.0),
@@ -2838,14 +2946,14 @@ def _take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id: str) -> Deploy
                 (0.0, 40.0),
             )
         )
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+    if layout_number == 2:
         return DeploymentZoneShape.rectangle(
             min_x=12.0,
             min_y=0.0,
             max_x=32.0,
             max_y=60.0,
         )
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+    if layout_number == 3:
         return _shape_from_polygons(
             (
                 ((0.0, 0.0), (22.0, 0.0), (22.0, 30.0), (0.0, 30.0)),
@@ -2866,38 +2974,60 @@ def _take_and_hold_vs_take_and_hold_no_mans_land_shape(layout_id: str) -> Deploy
                 ),
             )
         )
-    raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
+    raise MissionPackError("Unsupported extracted battlefield layout number.")
 
 
-def _take_and_hold_vs_take_and_hold_territory_vertices(
+def _extracted_territory_vertices(
     layout_id: str,
 ) -> tuple[tuple[str, tuple[tuple[float, float], ...]], ...]:
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
+    layout_number = _layout_number_from_layout_id(layout_id)
+    if layout_number == 1:
         return (
             ("attacker_territory", ((0.0, 30.0), (44.0, 30.0), (44.0, 60.0), (0.0, 60.0))),
             ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 30.0), (0.0, 30.0))),
         )
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
+    if layout_number == 2:
         return (
             ("attacker_territory", ((0.0, 0.0), (22.0, 0.0), (22.0, 60.0), (0.0, 60.0))),
             ("defender_territory", ((22.0, 0.0), (44.0, 0.0), (44.0, 60.0), (22.0, 60.0))),
         )
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
+    if layout_number == 3:
         return (
             ("attacker_territory", ((0.0, 0.0), (44.0, 60.0), (0.0, 60.0))),
             ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 60.0))),
         )
-    raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
+    raise MissionPackError("Unsupported extracted battlefield layout number.")
 
 
-def _take_and_hold_vs_take_and_hold_terrain_areas(
+def _extracted_terrain_areas(
     layout_id: str,
+) -> tuple[PlacedTerrainArea, ...]:
+    if layout_id in TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS:
+        explicit_specs, mirrored_pairs = _take_and_hold_vs_take_and_hold_terrain_area_specs(
+            layout_id
+        )
+    elif layout_id in DISRUPTION_VS_RECONNAISSANCE_LAYOUT_SOURCE_IDS:
+        explicit_specs, mirrored_pairs = _disruption_vs_reconnaissance_terrain_area_specs(layout_id)
+    else:
+        raise MissionPackError("Unsupported extracted battlefield layout ID.")
+    return _placed_terrain_areas_from_specs(
+        layout_id=layout_id,
+        source_layout_id=EXTRACTED_LAYOUT_SOURCE_IDS[layout_id],
+        explicit_specs=explicit_specs,
+        mirrored_pairs=mirrored_pairs,
+    )
+
+
+def _placed_terrain_areas_from_specs(
+    *,
+    layout_id: str,
+    source_layout_id: str,
+    explicit_specs: tuple[TerrainAreaSpec, ...],
+    mirrored_pairs: tuple[tuple[str, str], ...],
 ) -> tuple[PlacedTerrainArea, ...]:
     templates = {
         template.footprint_template_id: template for template in terrain_area_footprint_templates()
     }
-    source_layout_id = TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_SOURCE_IDS[layout_id]
-    explicit_specs, mirrored_pairs = _take_and_hold_vs_take_and_hold_terrain_area_specs(layout_id)
     explicit_areas = tuple(
         PlacedTerrainArea.from_template(
             terrain_area_id=f"{layout_id}-{area_id}",
@@ -3190,6 +3320,261 @@ def _take_and_hold_vs_take_and_hold_terrain_area_specs(
     raise MissionPackError("Unsupported Take and Hold vs Take and Hold layout ID.")
 
 
+def _disruption_vs_reconnaissance_terrain_area_specs(
+    layout_id: str,
+) -> tuple[tuple[TerrainAreaSpec, ...], tuple[tuple[str, str], ...]]:
+    if layout_id == DISRUPTION_VS_RECONNAISSANCE_LAYOUT_A_ID:
+        return (
+            (
+                (
+                    "dense-7x11-5-east-expansion",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    37.25,
+                    41.28,
+                    0.0,
+                ),
+                (
+                    "dense-7x11-5-attacker-home",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    17.07,
+                    48.89,
+                    180.0,
+                ),
+                (
+                    "light-10x2-5-attacker-midfield",
+                    FOOTPRINT_10X2_5,
+                    TerrainAreaClassification.LIGHT,
+                    29.02,
+                    48.42,
+                    0.0,
+                ),
+                (
+                    "light-6x4-attacker-west",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    6.27,
+                    43.7,
+                    0.0,
+                ),
+                (
+                    "light-6x2-east-midfield",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    36.02,
+                    29.94,
+                    0.0,
+                ),
+                (
+                    "light-6x4-east-midfield",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    32.83,
+                    25.71,
+                    90.0,
+                ),
+                (
+                    "dense-8x11-5-polygon-north-center",
+                    FOOTPRINT_8X11_5_POLYGON,
+                    TerrainAreaClassification.DENSE,
+                    22.57,
+                    35.41,
+                    0.0,
+                ),
+                (
+                    "light-6x2-defender-east",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    33.79,
+                    10.84,
+                    90.0,
+                ),
+            ),
+            (
+                ("dense-7x11-5-east-expansion", "dense-7x11-5-west-expansion"),
+                ("dense-7x11-5-attacker-home", "dense-7x11-5-defender-home"),
+                ("light-10x2-5-attacker-midfield", "light-10x2-5-defender-midfield"),
+                ("light-6x4-attacker-west", "light-6x4-defender-east"),
+                ("light-6x2-east-midfield", "light-6x2-west-midfield"),
+                ("light-6x4-east-midfield", "light-6x4-west-midfield"),
+                (
+                    "dense-8x11-5-polygon-north-center",
+                    "dense-8x11-5-polygon-south-center",
+                ),
+                ("light-6x2-defender-east", "light-6x2-attacker-west"),
+            ),
+        )
+    if layout_id == DISRUPTION_VS_RECONNAISSANCE_LAYOUT_B_ID:
+        return (
+            (
+                (
+                    "dense-7x11-5-attacker-home",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    7.23,
+                    42.21,
+                    0.0,
+                ),
+                (
+                    "dense-7x11-5-central-west",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    16.98,
+                    26.55,
+                    330.0,
+                ),
+                (
+                    "light-6x2-north-west",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    12.15,
+                    51.12,
+                    90.0,
+                ),
+                (
+                    "dense-8x11-5-polygon-south-west",
+                    FOOTPRINT_8X11_5_POLYGON,
+                    TerrainAreaClassification.DENSE,
+                    19.34,
+                    9.64,
+                    315.0,
+                ),
+                (
+                    "light-6x2-south-west",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    8.1,
+                    16.56,
+                    55.0,
+                ),
+                (
+                    "light-6x4-west-midfield",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    8.48,
+                    26.38,
+                    45.0,
+                ),
+                (
+                    "light-10x2-5-north-west",
+                    FOOTPRINT_10X2_5,
+                    TerrainAreaClassification.LIGHT,
+                    17.4,
+                    39.11,
+                    60.0,
+                ),
+                (
+                    "light-6x4-north-east",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    36.39,
+                    49.89,
+                    30.0,
+                ),
+            ),
+            (
+                ("dense-7x11-5-attacker-home", "dense-7x11-5-defender-home"),
+                ("dense-7x11-5-central-west", "dense-7x11-5-central-east"),
+                ("light-6x2-north-west", "light-6x2-south-east"),
+                (
+                    "dense-8x11-5-polygon-south-west",
+                    "dense-8x11-5-polygon-north-east",
+                ),
+                ("light-6x2-south-west", "light-6x2-north-east"),
+                ("light-6x4-west-midfield", "light-6x4-east-midfield"),
+                ("light-10x2-5-north-west", "light-10x2-5-south-east"),
+                ("light-6x4-north-east", "light-6x4-south-west"),
+            ),
+        )
+    if layout_id == DISRUPTION_VS_RECONNAISSANCE_LAYOUT_C_ID:
+        return (
+            (
+                (
+                    "dense-8x11-5-polygon-north-east",
+                    FOOTPRINT_8X11_5_POLYGON,
+                    TerrainAreaClassification.DENSE,
+                    35.51,
+                    50.39,
+                    315.0,
+                ),
+                (
+                    "dense-7x11-5-attacker-home",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    6.85,
+                    44.21,
+                    0.0,
+                ),
+                (
+                    "light-6x2-north-west",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    17.03,
+                    44.15,
+                    0.0,
+                ),
+                (
+                    "light-10x2-5-north-center",
+                    FOOTPRINT_10X2_5,
+                    TerrainAreaClassification.LIGHT,
+                    21.35,
+                    50.07,
+                    90.0,
+                ),
+                (
+                    "light-6x4-south-west-midfield",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    12.69,
+                    18.4,
+                    0.0,
+                ),
+                (
+                    "dense-7x11-5-central-north-west",
+                    FOOTPRINT_7X11_5,
+                    TerrainAreaClassification.DENSE,
+                    20.02,
+                    36.05,
+                    90.0,
+                ),
+                (
+                    "light-6x4-east-midfield",
+                    FOOTPRINT_6X4,
+                    TerrainAreaClassification.LIGHT,
+                    34.71,
+                    29.57,
+                    90.0,
+                ),
+                (
+                    "light-6x2-east-midfield",
+                    FOOTPRINT_6X2,
+                    TerrainAreaClassification.LIGHT,
+                    37.89,
+                    34.1,
+                    0.0,
+                ),
+            ),
+            (
+                (
+                    "dense-8x11-5-polygon-north-east",
+                    "dense-8x11-5-polygon-south-west",
+                ),
+                ("dense-7x11-5-attacker-home", "dense-7x11-5-defender-home"),
+                ("light-6x2-north-west", "light-6x2-south-east"),
+                ("light-10x2-5-north-center", "light-10x2-5-south-center"),
+                ("light-6x4-south-west-midfield", "light-6x4-north-east-midfield"),
+                (
+                    "dense-7x11-5-central-north-west",
+                    "dense-7x11-5-central-south-east",
+                ),
+                ("light-6x4-east-midfield", "light-6x4-west-midfield"),
+                ("light-6x2-east-midfield", "light-6x2-west-midfield"),
+            ),
+        )
+    raise MissionPackError("Unsupported Disruption vs Reconnaissance layout ID.")
+
+
 def _footprint_template(
     *,
     template_id: str,
@@ -3315,33 +3700,25 @@ def _layout_battlefield_depth(layout_id: str) -> float:
 
 
 def _layout_attacker_edge(layout_id: str, layout_number: int) -> str:
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
-        return "north"
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
-        return "west"
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
-        return "west"
+    if _is_extracted_layout(layout_id):
+        return {1: "north", 2: "west", 3: "west"}[layout_number]
     return _attacker_edge(layout_number)
 
 
 def _layout_defender_edge(layout_id: str, layout_number: int) -> str:
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_A_ID:
-        return "south"
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID:
-        return "east"
-    if layout_id == TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_C_ID:
-        return "east"
+    if _is_extracted_layout(layout_id):
+        return {1: "south", 2: "east", 3: "east"}[layout_number]
     return _defender_edge(layout_number)
 
 
 def _layout_geometry_extraction_status(layout_id: str) -> str:
-    if _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id):
+    if _is_extracted_layout(layout_id):
         return "layout_geometry_extracted"
     return "layout_identity_source_page_bound_coordinates_pending"
 
 
-def _is_extracted_take_and_hold_vs_take_and_hold_layout(layout_id: str) -> bool:
-    return layout_id in EXTRACTED_TAKE_AND_HOLD_LAYOUT_IDS
+def _is_extracted_layout(layout_id: str) -> bool:
+    return layout_id in EXTRACTED_LAYOUT_IDS
 
 
 def _layout_number_from_layout_id(layout_id: str) -> int:
