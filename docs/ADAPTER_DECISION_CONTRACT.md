@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, and Phase 18A hybrid catalog/live unit-model display projection requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, and Phase 18A hybrid catalog/live unit-model display projection requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, and Phase 18A hybrid catalog/live unit-model display projection requirements, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, and Phase 18A hybrid catalog/live unit-model display projection requirements, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -41,6 +41,12 @@ The shared contract uses these objects and payloads:
 - `DecisionRecord`: replay-facing record of a request/result pair.
 - `ProposalRequestPayload`: neutral parameterized physical-action request embedded inside a `DecisionRequest.payload`.
 - `MovementProposalPayload`: parameterized movement answer, including `PathWitness`, `movement_mode`, and the explicit `fall_back_mode` when Fall Back was selected.
+- `TriggeredMovementSelection`: finite triggered-movement answer selecting one
+  engine-emitted eligible unit for a source-backed movement reaction or the
+  deterministic decline option.
+- `SurgeMoveProposal`: Movement phase parameterized movement answer containing
+  `proposal_kind: "surge_move"`, action `surge_move`, the selected reacting
+  unit, source trigger context, and a `PathWitness` for every moved model.
 - `ChargeRollResult`: replay-safe Charge phase roll payload containing the declared charging unit, 2D6 maximum distance, and post-roll reachable target snapshot for the later Charge Move proposal.
 - `ChargeMoveProposal`: Charge phase parameterized movement answer containing the proposal request ID, `proposal_kind: "charge_move"`, charging unit ID, `movement_phase_action: "charge_move"`, `movement_mode: "charge"`, selected reachable charge target IDs, and a `PathWitness` unless the player submits the no-move choice.
 - `FightPhaseState`: replay-safe outer Fight phase envelope containing battle round, active player, Start/Pile In/Fight/Consolidate/End step exposure, and the active Fight, movement, or attack sub-state reference.
@@ -78,6 +84,10 @@ The shared contract uses these objects and payloads:
 - `EventStreamDeltaPayload`: viewer-scoped adapter event delta.
 - `SecondaryMissionCardState`: reveal-gated Fixed/Tactical secondary mission card state.
 - `VictoryPointLedger`: viewer-scoped scoring ledger with reveal-gated secondary source visibility and generic hidden-transaction support.
+- `StickyObjectiveControlState`: engine-owned retained-control state emitted by
+  phase-end objective-control hooks. It may affect objective-control projection
+  payloads through `retained_control_source_id`, but adapters must not create or
+  mutate it directly.
 - `ReactionWindow` and `TriggeredDecisionRequest`: interrupt-style finite decisions emitted from typed timing windows.
 - `SequencingDecision`: finite order choice for simultaneous rule conflicts after active-player or roll-off ownership is determined.
 - `PersistingEffect`: replay-safe effect state with deterministic expiration and unit-ID ownership across Embark/Disembark and Attached-unit splits.
@@ -200,6 +210,28 @@ Adapter helper APIs should take `request_id` explicitly even when a local wrappe
 Movement action option payloads include the selected `movement_mode`. Default Normal Move and Advance keep their existing option IDs, while Take to the Skies variants append the mode, for example `normal_move:fly_take_to_skies` or `advance:fly_take_to_skies`. Fall Back options are explicitly mode-scoped: `fall_back:ordered_retreat` or `fall_back:desperate_escape`, with `:fly_take_to_skies` appended when that movement mode is selected. Remain Stationary resolves as a finite action. Normal Move, Advance, and Fall Back always emit a follow-up `submit_movement_proposal` request carrying the same mode context; adapters must submit the actual `PathWitness` and model poses through that parameterized request.
 
 Accepted Fall Back proposals may include source-backed `fall_back_eligibility_grants` in the resulting `movement_activation_completed` event. These grants are replay-safe audit payloads produced by runtime faction content and do not create a new adapter choice. The Movement engine remains the only writer of `FellBackUnitState.can_shoot` and `FellBackUnitState.can_declare_charge`; Shooting and Charge phase selection consume those recorded permissions instead of adapters inferring Fall Back exceptions locally.
+
+Phase 17G Movement-end surge rules use the same finite/proposal split as other
+physical movement. After an enemy unit completes a Normal Move, Advance, or
+Fall Back in the Movement phase, the engine may emit `select_triggered_movement`
+for the reacting player. Optional surge windows include
+`decline_triggered_movement`; each legal reacting unit is exposed through a
+deterministic `surge:<unit_instance_id>` option. The option payload identifies
+the selected rules unit, source hook, source rule, triggering unit, triggering
+move event, and engine-rolled maximum surge distance. Selecting a surge unit
+records only that finite choice and immediately emits a parameterized
+`submit_movement_proposal` request with proposal kind `surge_move`. Adapters
+must not roll the D6 locally, invent candidate units, move models from the
+finite option payload, or continue the Movement phase while either request is
+pending.
+
+Phase 17G phase-end objective-control retention hooks do not create
+adapter-submitted decisions. The engine snapshots objective proximity at the
+start of each phase, evaluates source-backed phase-end conditions, records any
+`StickyObjectiveControlState`, and overlays retained control in the
+phase-boundary objective-control event. Adapter projections may display
+`retained_control_source_id` and sticky-control events, but clients must not
+create, expire, score, or mutate retained objective-control state directly.
 
 Phase 11E mission-scoring decisions that are player-facing are finite decisions:
 
@@ -804,6 +836,8 @@ The contract currently covers these proposal families:
 - Normal Move;
 - Advance after dice/reroll resolution;
 - Fall Back, including explicit `ordered_retreat` or `desperate_escape` mode context and Desperate Escape follow-up behavior where applicable;
+- Surge Move, including source-trigger context, engine-rolled maximum distance,
+  and PathWitness movement evidence;
 - Reinforcement placement;
 - Deep Strike placement;
 - Strategic Reserves placement;
@@ -860,6 +894,20 @@ Example proposal request:
 ```
 
 The adapter then supplies the exact proposal payload.
+
+Surge Move proposals use the same `submit_movement_proposal` wrapper with
+`proposal_kind: "surge_move"` and `movement_phase_action: "surge_move"`. The
+pending request is emitted only after a source-backed triggered-movement finite
+selection, and its context includes the source rule ID, hook ID, trigger event,
+triggering enemy unit, selected reacting unit, and maximum surge distance rolled
+by the engine. The adapter payload must preserve the request ID, proposal kind,
+unit ID, movement action, and movement mode from the request and provide
+per-model movement entries with a `PathWitness` for every moved model. Malformed,
+stale, wrong-kind, wrong-unit, wrong-action, wrong-source, over-distance, missing
+witness, witness-start/model-ID drift, pathing/terrain, and coherency failures
+are rejected through the shared movement proposal diagnostics. Accepted
+`surge_move` proposals mutate battlefield placement only through the Movement
+engine and emit replay-safe triggered-movement resolution events.
 
 Example Normal Move submission:
 

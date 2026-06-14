@@ -245,7 +245,10 @@ def test_scaffold_contributions_have_stable_ids_and_placeholders_are_empty() -> 
             or contribution.event_handler_bindings
             or contribution.battle_shock_hook_bindings
             or contribution.fall_back_hook_bindings
+            or contribution.movement_end_surge_hook_bindings
             or contribution.enhancement_effect_bindings
+            or contribution.fight_activation_ability_hook_bindings
+            or contribution.phase_end_objective_control_hook_bindings
             or contribution.faction_named_handlers
         ):
             invalid_modules.append(module_path)

@@ -42,6 +42,7 @@ class ProposalKind(StrEnum):
     NORMAL_MOVE = "normal_move"
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
+    SURGE_MOVE = "surge_move"
     CHARGE_MOVE = "charge_move"
     PILE_IN = "pile_in"
     CONSOLIDATE = "consolidate"

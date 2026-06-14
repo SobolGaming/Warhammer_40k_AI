@@ -75,6 +75,11 @@ from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityGrant,
     FallBackEligibilityHookRegistry,
 )
+from warhammer40k_core.engine.movement_end_surge_hooks import (
+    MovementEndSurgeContext,
+    MovementEndSurgeGrant,
+    MovementEndSurgeHookRegistry,
+)
 from warhammer40k_core.engine.movement_keyword_effects import (
     movement_keywords_granted_by_effects,
 )
@@ -98,6 +103,12 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.reaction_windows import (
+    ReactionWindow as TriggeredReactionWindow,
+)
+from warhammer40k_core.engine.reaction_windows import (
+    ReactionWindowKind,
+)
 from warhammer40k_core.engine.reserves import (
     LargeModelReservePlacementException,
     ReinforcementPlacement,
@@ -152,6 +163,12 @@ from warhammer40k_core.engine.transports import (
     resolve_disembark,
     resolve_embark,
     transport_movement_status_from_token,
+)
+from warhammer40k_core.engine.triggered_movement import (
+    TriggeredMovementDescriptor,
+    TriggeredMovementEligibleUnit,
+    TriggeredMovementKind,
+    triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
@@ -2040,6 +2057,9 @@ class MovementPhaseHandler:
     fall_back_hooks: FallBackEligibilityHookRegistry = field(
         default_factory=FallBackEligibilityHookRegistry.empty
     )
+    movement_end_surge_hooks: MovementEndSurgeHookRegistry = field(
+        default_factory=MovementEndSurgeHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -2057,6 +2077,10 @@ class MovementPhaseHandler:
             raise GameLifecycleError("MovementPhaseHandler stratagem_index must be an index.")
         if type(self.fall_back_hooks) is not FallBackEligibilityHookRegistry:
             raise GameLifecycleError("MovementPhaseHandler fall_back_hooks must be a registry.")
+        if type(self.movement_end_surge_hooks) is not MovementEndSurgeHookRegistry:
+            raise GameLifecycleError(
+                "MovementPhaseHandler movement_end_surge_hooks must be a registry."
+            )
 
     @property
     def phase(self) -> BattlePhase:
@@ -2088,6 +2112,14 @@ class MovementPhaseHandler:
                 active_selection=active_selection,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
+
+        surge_status = _request_movement_end_surge_if_available(
+            state=state,
+            decisions=decisions,
+            registry=self.movement_end_surge_hooks,
+        )
+        if surge_status is not None:
+            return surge_status
 
         if state.transport_cargo_states:
             disembark_status = _request_pre_move_disembark_if_available(
@@ -2700,6 +2732,192 @@ def _stratagem_target_proposal_payload_factory(
         )
 
     return payload_factory
+
+
+def _request_movement_end_surge_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    registry: MovementEndSurgeHookRegistry,
+) -> LifecycleStatus | None:
+    if type(registry) is not MovementEndSurgeHookRegistry:
+        raise GameLifecycleError("Movement-end surge trigger requires a registry.")
+    if not registry.all_bindings():
+        return None
+    active_player_id = _active_player_id(state)
+    for record in decisions.event_log.records:
+        if record.event_type != "movement_activation_completed":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("game_id") != state.game_id:
+            continue
+        if payload.get("battle_round") != state.battle_round:
+            continue
+        if payload.get("phase") != BattlePhase.MOVEMENT.value:
+            continue
+        if payload.get("active_player_id") != active_player_id:
+            continue
+        movement_action = payload.get("movement_phase_action")
+        if movement_action not in {
+            MovementPhaseActionKind.NORMAL_MOVE.value,
+            MovementPhaseActionKind.ADVANCE.value,
+            MovementPhaseActionKind.FALL_BACK.value,
+        }:
+            continue
+        triggering_unit_id = payload.get("unit_instance_id")
+        if type(triggering_unit_id) is not str:
+            raise GameLifecycleError("Movement completion event missing unit_instance_id.")
+        triggering_unit = _unit_instance_by_id(
+            state=state,
+            unit_instance_id=triggering_unit_id,
+        )
+        if _unit_has_keyword(triggering_unit, "AIRCRAFT"):
+            continue
+        if _movement_end_surge_event_already_processed(
+            decisions=decisions,
+            trigger_event_id=record.event_id,
+        ):
+            continue
+        for reacting_player_id in sorted(
+            player_id for player_id in state.player_ids if player_id != active_player_id
+        ):
+            context = MovementEndSurgeContext(
+                state=state,
+                triggering_unit_instance_id=triggering_unit_id,
+                triggering_player_id=active_player_id,
+                reacting_player_id=reacting_player_id,
+                trigger_event_id=record.event_id,
+                movement_phase_action=movement_action,
+            )
+            grants = registry.grants_for(context)
+            if not grants:
+                continue
+            roll_state = _dice_roll_manager_for_state(state=state, decisions=decisions).roll(
+                _movement_end_surge_distance_roll_spec(
+                    source_rule_id=grants[0].source_id,
+                    player_id=reacting_player_id,
+                    triggering_unit_instance_id=triggering_unit_id,
+                    trigger_event_id=record.event_id,
+                )
+            )
+            descriptor = TriggeredMovementDescriptor(
+                movement_kind=TriggeredMovementKind.SURGE,
+                source_rule_id=grants[0].source_id,
+                trigger_timing=TriggeredReactionWindow(
+                    phase=BattlePhase.MOVEMENT,
+                    window_kind=ReactionWindowKind.RULE_TRIGGER,
+                    source_step=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE.value,
+                    source_event_id=record.event_id,
+                ),
+                max_distance_inches=float(roll_state.current_total),
+                movement_mode=MovementMode.NORMAL,
+                allow_battle_shocked=False,
+                allow_within_engagement_range=False,
+                one_per_phase=True,
+                optional=True,
+            )
+            request = triggered_movement_unit_selection_request(
+                state=state,
+                player_id=reacting_player_id,
+                descriptor=descriptor,
+                eligible_units=_eligible_triggered_movement_units_from_grants(grants),
+            )
+            decisions.request_decision(request)
+            decisions.event_log.append(
+                "movement_end_surge_triggered",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "reacting_player_id": reacting_player_id,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "triggering_unit_instance_id": triggering_unit_id,
+                    "trigger_event_id": record.event_id,
+                    "movement_phase_action": movement_action,
+                    "surge_distance_roll": roll_state.to_payload(),
+                    "descriptor": descriptor.to_payload(),
+                    "grants": [grant.to_payload() for grant in grants],
+                    "request_id": request.request_id,
+                    "phase_body_status": "movement_end_surge_pending",
+                },
+            )
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=request,
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "reacting_player_id": reacting_player_id,
+                    "triggering_unit_instance_id": triggering_unit_id,
+                    "decision_type": request.decision_type,
+                    "phase_body_status": "movement_end_surge_pending",
+                },
+            )
+    return None
+
+
+def _movement_end_surge_distance_roll_spec(
+    *,
+    source_rule_id: str,
+    player_id: str,
+    triggering_unit_instance_id: str,
+    trigger_event_id: str,
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=(
+            "Movement-end surge distance "
+            f"{source_rule_id} for {triggering_unit_instance_id} from {trigger_event_id}"
+        ),
+        roll_type="movement_end_surge.distance",
+        actor_id=player_id,
+    )
+
+
+def _eligible_triggered_movement_units_from_grants(
+    grants: tuple[MovementEndSurgeGrant, ...],
+) -> tuple[TriggeredMovementEligibleUnit, ...]:
+    units: list[TriggeredMovementEligibleUnit] = []
+    for grant in grants:
+        units.append(
+            TriggeredMovementEligibleUnit(
+                unit_instance_id=grant.unit_instance_id,
+                hook_id=grant.hook_id,
+                source_id=grant.source_id,
+                replay_payload=grant.replay_payload,
+            )
+        )
+    return tuple(sorted(units, key=lambda unit: unit.unit_instance_id))
+
+
+def _movement_end_surge_event_already_processed(
+    *,
+    decisions: DecisionController,
+    trigger_event_id: str,
+) -> bool:
+    requested_event_id = _validate_identifier("trigger_event_id", trigger_event_id)
+    for record in decisions.event_log.records:
+        if record.event_type not in {
+            "movement_end_surge_triggered",
+            "triggered_movement_declined",
+            "triggered_movement_unit_selected",
+            "triggered_movement_resolved",
+        }:
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("trigger_event_id") == requested_event_id:
+            return True
+        trigger_timing = payload.get("trigger_timing")
+        if isinstance(trigger_timing, dict) and trigger_timing.get("source_event_id") == (
+            requested_event_id
+        ):
+            return True
+    return False
 
 
 def _active_player_end_movement_overwatch_trigger_unit_ids(
@@ -7820,6 +8038,11 @@ def _unit_instance_by_id(*, state: GameState, unit_instance_id: str) -> UnitInst
             if unit.unit_instance_id == requested_unit_id:
                 return unit
     raise GameLifecycleError("Unknown unit_instance_id.")
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
 
 
 def _transport_status_for_movement_action(

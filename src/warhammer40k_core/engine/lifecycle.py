@@ -186,6 +186,8 @@ from warhammer40k_core.engine.transports import (
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     TriggeredMovementHandler,
+    invalid_triggered_movement_proposal_status,
+    is_triggered_movement_proposal_request,
 )
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
@@ -423,7 +425,14 @@ class GameLifecycle:
             ruleset_descriptor=config.ruleset_descriptor
         )
         self.state = GameState.from_config(config)
-        self._battle_round_flow = BattleRoundFlow(phase_handlers=self._phase_handlers())
+        self._battle_round_flow = BattleRoundFlow(
+            phase_handlers=self._phase_handlers(),
+            phase_end_objective_control_hooks=(
+                self._runtime_content_bundle.phase_end_objective_control_hook_registry
+                if self._runtime_content_bundle is not None
+                else None
+            ),
+        )
         current_setup_step = self.state.current_setup_step
         if current_setup_step is None:
             raise GameLifecycleError("GameLifecycle start requires an initial setup step.")
@@ -588,6 +597,13 @@ class GameLifecycle:
                     state=state,
                     request=pending_request,
                     result=result,
+                )
+            elif is_triggered_movement_proposal_request(pending_request):
+                malformed_status = invalid_triggered_movement_proposal_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                    decisions=self.decision_controller,
                 )
             elif _is_fight_movement_proposal_request(pending_request):
                 malformed_status = invalid_fight_movement_proposal_status(
@@ -1023,6 +1039,19 @@ class GameLifecycle:
                     result=result,
                     decisions=self.decision_controller,
                 )
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and is_triggered_movement_proposal_request(record.request)
+        ):
+            triggered_status = self._triggered_movement_handler.apply_proposal_decision(
+                state=state,
+                request=record.request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if triggered_status is not None:
+                return triggered_status
             return self.advance_until_decision_or_terminal()
         if (
             record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
@@ -1490,7 +1519,14 @@ class GameLifecycle:
             pending_request=lifecycle._pending_decision_request(),
         )
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
-        lifecycle._battle_round_flow = BattleRoundFlow(phase_handlers=lifecycle._phase_handlers())
+        lifecycle._battle_round_flow = BattleRoundFlow(
+            phase_handlers=lifecycle._phase_handlers(),
+            phase_end_objective_control_hooks=(
+                lifecycle._runtime_content_bundle.phase_end_objective_control_hook_registry
+                if lifecycle._runtime_content_bundle is not None
+                else None
+            ),
+        )
         return lifecycle
 
     def _phase_handlers(self) -> Mapping[BattlePhase, PhaseHandler]:
@@ -1582,6 +1618,9 @@ class GameLifecycle:
             parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
             stratagem_index=runtime_stratagem_index,
             fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
+            movement_end_surge_hooks=(
+                self._runtime_content_bundle.movement_end_surge_hook_registry
+            ),
         )
         self._fight_phase_handler = FightPhaseHandler(
             ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
@@ -1591,7 +1630,12 @@ class GameLifecycle:
                 self._runtime_content_bundle.fight_activation_ability_hook_registry
             ),
         )
-        self._battle_round_flow = BattleRoundFlow(phase_handlers=self._phase_handlers())
+        self._battle_round_flow = BattleRoundFlow(
+            phase_handlers=self._phase_handlers(),
+            phase_end_objective_control_hooks=(
+                self._runtime_content_bundle.phase_end_objective_control_hook_registry
+            ),
+        )
         self._runtime_content_activation_input_hash = _runtime_content_activation_input_hash(
             config=self._config,
             armies=tuple(state.army_definitions),

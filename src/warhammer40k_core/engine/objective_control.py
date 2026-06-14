@@ -68,6 +68,7 @@ class ObjectiveControlResultPayload(TypedDict):
     scores: list[ObjectiveControlScorePayload]
     contributors: list[ObjectiveControlContributionPayload]
     unsupported_reason: str | None
+    retained_control_source_id: str | None
 
 
 class ObjectiveMarkerEndpointViolationPayload(TypedDict):
@@ -195,6 +196,7 @@ class ObjectiveControlResult:
     scores: tuple[ObjectiveControlScore, ...]
     contributors: tuple[ObjectiveControlContribution, ...] = ()
     unsupported_reason: str | None = None
+    retained_control_source_id: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -230,6 +232,14 @@ class ObjectiveControlResult:
             _validate_optional_identifier(
                 "ObjectiveControlResult unsupported_reason",
                 self.unsupported_reason,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "retained_control_source_id",
+            _validate_optional_identifier(
+                "ObjectiveControlResult retained_control_source_id",
+                self.retained_control_source_id,
             ),
         )
         _validate_result_status(self)
@@ -301,6 +311,7 @@ class ObjectiveControlResult:
             "scores": [score.to_payload() for score in self.scores],
             "contributors": [contribution.to_payload() for contribution in self.contributors],
             "unsupported_reason": self.unsupported_reason,
+            "retained_control_source_id": self.retained_control_source_id,
         }
 
     @classmethod
@@ -315,6 +326,7 @@ class ObjectiveControlResult:
                 for contribution in payload["contributors"]
             ),
             unsupported_reason=payload["unsupported_reason"],
+            retained_control_source_id=payload["retained_control_source_id"],
         )
 
 
@@ -963,16 +975,22 @@ def _validate_result_status(result: ObjectiveControlResult) -> None:
             raise GameLifecycleError("Unsupported objective control results must be empty.")
         if result.unsupported_reason is None:
             raise GameLifecycleError("Unsupported objective control requires a reason.")
+        if result.retained_control_source_id is not None:
+            raise GameLifecycleError("Unsupported objective control cannot retain control.")
         return
     if result.unsupported_reason is not None:
         raise GameLifecycleError("Supported objective control results must not include a reason.")
     if result.status is ObjectiveControlStatus.UNCONTROLLED:
         if result.controlled_by_player_id is not None or result.scores:
             raise GameLifecycleError("Uncontrolled objective results must not have scores.")
+        if result.retained_control_source_id is not None:
+            raise GameLifecycleError("Uncontrolled objective results cannot retain control.")
         return
     if result.status is ObjectiveControlStatus.CONTESTED:
         if result.controlled_by_player_id is not None:
             raise GameLifecycleError("Contested objective results cannot have a controller.")
+        if result.retained_control_source_id is not None:
+            raise GameLifecycleError("Contested objective results cannot retain control.")
         if len(result.scores) < 2:
             raise GameLifecycleError("Contested objective results require at least two scores.")
         highest_score = max(score.score for score in result.scores)
@@ -992,6 +1010,8 @@ def _validate_result_status(result: ObjectiveControlResult) -> None:
         )
         if controller_score != (highest_score,):
             raise GameLifecycleError("Controlled objective controller score must be highest.")
+        if result.retained_control_source_id is not None:
+            return
         if sum(1 for score in result.scores if score.score == highest_score) != 1:
             raise GameLifecycleError("Controlled objective requires a unique highest score.")
         return

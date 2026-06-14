@@ -48,10 +48,18 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityHookBinding,
     FightActivationAbilityHookRegistry,
 )
+from warhammer40k_core.engine.movement_end_surge_hooks import (
+    MovementEndSurgeHookBinding,
+    MovementEndSurgeHookRegistry,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionRegistry,
     RuleRuntimeBinding,
+)
+from warhammer40k_core.engine.sticky_objective_control import (
+    PhaseEndObjectiveControlHookBinding,
+    PhaseEndObjectiveControlHookRegistry,
 )
 from warhammer40k_core.engine.stratagem_catalog import build_player_stratagem_index
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex, StratagemCatalogRecord
@@ -77,8 +85,10 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     event_subscriptions: list[dict[str, JsonValue]]
     battle_shock_hook_ids: list[str]
     fall_back_hook_ids: list[str]
+    movement_end_surge_hook_ids: list[str]
     enhancement_effect_binding_ids: list[str]
     fight_activation_ability_hook_ids: list[str]
+    phase_end_objective_control_hook_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -103,8 +113,10 @@ class RuntimeContentContribution:
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
+    movement_end_surge_hook_bindings: tuple[MovementEndSurgeHookBinding, ...] = ()
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
     fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
+    phase_end_objective_control_hook_bindings: tuple[PhaseEndObjectiveControlHookBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
         default_factory=_empty_named_handlers
     )
@@ -198,6 +210,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "movement_end_surge_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution movement_end_surge_hook_bindings",
+                self.movement_end_surge_hook_bindings,
+                MovementEndSurgeHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "enhancement_effect_bindings",
             _validate_tuple(
                 "RuntimeContentContribution enhancement_effect_bindings",
@@ -212,6 +233,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution fight_activation_ability_hook_bindings",
                 self.fight_activation_ability_hook_bindings,
                 FightActivationAbilityHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "phase_end_objective_control_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution phase_end_objective_control_hook_bindings",
+                self.phase_end_objective_control_hook_bindings,
+                PhaseEndObjectiveControlHookBinding,
             ),
         )
         object.__setattr__(
@@ -232,8 +262,12 @@ class RuntimeContentContribution:
             event_handler_bindings=self.event_handler_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
+            movement_end_surge_hook_bindings=self.movement_end_surge_hook_bindings,
             enhancement_effect_bindings=self.enhancement_effect_bindings,
             fight_activation_ability_hook_bindings=self.fight_activation_ability_hook_bindings,
+            phase_end_objective_control_hook_bindings=(
+                self.phase_end_objective_control_hook_bindings
+            ),
             faction_named_handlers=self.faction_named_handlers,
         )
 
@@ -327,6 +361,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        movement_end_surge_hook_bindings=_combine_unique_values(
+            "movement-end surge hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.movement_end_surge_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         enhancement_effect_bindings=_combine_unique_values(
             "enhancement effect binding",
             tuple(
@@ -342,6 +385,15 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.fight_activation_ability_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        phase_end_objective_control_hook_bindings=_combine_unique_values(
+            "phase-end objective-control hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.phase_end_objective_control_hook_bindings
             ),
             lambda binding: binding.hook_id,
         ),
@@ -361,8 +413,10 @@ class RuntimeContentBundle:
     event_index: RuntimeContentEventIndex
     battle_shock_hook_registry: BattleShockHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
+    movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
     enhancement_effect_registry: EnhancementEffectRegistry
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
+    phase_end_objective_control_hook_registry: PhaseEndObjectiveControlHookRegistry
     contribution_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -402,6 +456,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires FallBackEligibilityHookRegistry."
             )
+        if type(self.movement_end_surge_hook_registry) is not MovementEndSurgeHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires MovementEndSurgeHookRegistry.")
         if type(self.enhancement_effect_registry) is not EnhancementEffectRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires EnhancementEffectRegistry.")
         if (
@@ -410,6 +466,13 @@ class RuntimeContentBundle:
         ):
             raise GameLifecycleError(
                 "RuntimeContentBundle requires FightActivationAbilityHookRegistry."
+            )
+        if (
+            type(self.phase_end_objective_control_hook_registry)
+            is not PhaseEndObjectiveControlHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires PhaseEndObjectiveControlHookRegistry."
             )
         object.__setattr__(
             self,
@@ -536,6 +599,13 @@ class RuntimeContentBundle:
                 for binding in contribution.fall_back_hook_bindings
             )
         )
+        movement_end_surge_hook_registry = MovementEndSurgeHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.movement_end_surge_hook_bindings
+            )
+        )
         enhancement_effect_registry = EnhancementEffectRegistry.from_bindings(
             tuple(
                 binding
@@ -548,6 +618,15 @@ class RuntimeContentBundle:
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.fight_activation_ability_hook_bindings
+            )
+        )
+        phase_end_objective_control_hook_registry = (
+            PhaseEndObjectiveControlHookRegistry.from_bindings(
+                tuple(
+                    binding
+                    for contribution in validated_contributions
+                    for binding in contribution.phase_end_objective_control_hook_bindings
+                )
             )
         )
         return cls(
@@ -569,8 +648,10 @@ class RuntimeContentBundle:
             event_index=event_index,
             battle_shock_hook_registry=battle_shock_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
+            movement_end_surge_hook_registry=movement_end_surge_hook_registry,
             enhancement_effect_registry=enhancement_effect_registry,
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
+            phase_end_objective_control_hook_registry=(phase_end_objective_control_hook_registry),
             contribution_ids=contribution_ids,
         )
 
@@ -607,12 +688,19 @@ class RuntimeContentBundle:
             "fall_back_hook_ids": [
                 binding.hook_id for binding in self.fall_back_hook_registry.all_bindings()
             ],
+            "movement_end_surge_hook_ids": [
+                binding.hook_id for binding in self.movement_end_surge_hook_registry.all_bindings()
+            ],
             "enhancement_effect_binding_ids": [
                 binding.effect_id for binding in self.enhancement_effect_registry.all_bindings()
             ],
             "fight_activation_ability_hook_ids": [
                 binding.hook_id
                 for binding in self.fight_activation_ability_hook_registry.all_bindings()
+            ],
+            "phase_end_objective_control_hook_ids": [
+                binding.hook_id
+                for binding in self.phase_end_objective_control_hook_registry.all_bindings()
             ],
             "faction_execution_record_ids": [
                 record.execution_id for record in self.faction_rule_execution_registry.all_records()
