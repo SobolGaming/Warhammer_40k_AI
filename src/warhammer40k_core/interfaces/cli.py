@@ -3,6 +3,10 @@ from __future__ import annotations
 from typing import TypedDict
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
+from warhammer40k_core.adapters.decisions import (
+    submit_option,
+    submit_parameterized_payload,
+)
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -84,40 +88,46 @@ def parameterized_submission_from_cli_payload(
 def submit_cli_choice(
     *,
     lifecycle: GameLifecycle,
+    request_id: str,
     choice: str,
     result_id: str,
 ) -> LifecycleStatus:
-    request = _pending_request(lifecycle)
-    submission = finite_option_submission_from_cli_choice(
-        request=request,
-        choice=choice,
+    request = _pending_request(lifecycle, request_id=request_id)
+    option_id = _option_id_for_cli_choice(request=request, choice=choice)
+    return submit_option(
+        lifecycle=lifecycle,
+        request_id=request.request_id,
+        option_id=option_id,
         result_id=result_id,
     )
-    return lifecycle.submit_decision(submission.to_result(request))
 
 
 def submit_cli_payload(
     *,
     lifecycle: GameLifecycle,
+    request_id: str,
     payload: JsonValue,
     result_id: str,
 ) -> LifecycleStatus:
-    request = _pending_request(lifecycle)
-    submission = parameterized_submission_from_cli_payload(
-        request=request,
+    return submit_parameterized_payload(
+        lifecycle=lifecycle,
+        request_id=request_id,
         payload=payload,
         result_id=result_id,
     )
-    return lifecycle.submit_decision(submission.to_result(request))
 
 
-def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest:
+def _pending_request(lifecycle: GameLifecycle, *, request_id: str) -> DecisionRequest:
     if type(lifecycle) is not GameLifecycle:
         raise GameLifecycleError("CLI submission requires a GameLifecycle.")
     pending_requests = lifecycle.decision_controller.queue.pending_requests
     if not pending_requests:
         raise GameLifecycleError("CLI submission requires a pending DecisionRequest.")
-    return pending_requests[0]
+    pending_request = pending_requests[0]
+    expected_request_id = _validate_cli_request_id(request_id)
+    if pending_request.request_id != expected_request_id:
+        raise GameLifecycleError("CLI submission request_id does not match pending request.")
+    return pending_request
 
 
 def _option_id_for_cli_choice(*, request: DecisionRequest, choice: str) -> str:
@@ -144,4 +154,13 @@ def _validate_cli_choice(value: object) -> str:
     stripped = value.strip()
     if not stripped:
         raise GameLifecycleError("CLI choice must not be empty.")
+    return stripped
+
+
+def _validate_cli_request_id(value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError("CLI request_id must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError("CLI request_id must not be empty.")
     return stripped

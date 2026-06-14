@@ -28,12 +28,16 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
-from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseActionKind,
+)
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.interfaces.cli import (
     render_decision_request_for_cli,
     submit_cli_choice,
+    submit_cli_payload,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
@@ -47,6 +51,7 @@ def test_cli_adapter_renders_finite_options_and_records_normal_decision() -> Non
     prompt = render_decision_request_for_cli(request)
     follow_up = submit_cli_choice(
         lifecycle=session.lifecycle,
+        request_id=prompt["request_id"],
         choice="tactical",
         result_id="phase18a-cli-secondary-a",
     )
@@ -80,12 +85,62 @@ def test_invalid_cli_choice_is_rejected_without_queue_or_record_mutation() -> No
     with pytest.raises(GameLifecycleError, match="out of range"):
         submit_cli_choice(
             lifecycle=session.lifecycle,
+            request_id=request.request_id,
             choice="99",
             result_id="phase18a-cli-invalid-choice",
         )
 
     assert session.lifecycle.decision_controller.queue.pending_requests == (request,)
     assert session.lifecycle.decision_controller.records == ()
+
+
+def test_stale_cli_choice_is_rejected_without_queue_or_record_mutation() -> None:
+    session = LocalGameSession()
+    session.start(_config(game_id="phase18a-cli-stale-choice-game"))
+    status = session.advance_until_decision_or_terminal()
+    request = _decision_request(status)
+
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        submit_cli_choice(
+            lifecycle=session.lifecycle,
+            request_id="phase18a-stale-cli-request",
+            choice="tactical",
+            result_id="phase18a-cli-stale-choice",
+        )
+
+    assert session.lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert session.lifecycle.decision_controller.records == ()
+
+
+def test_stale_cli_payload_is_rejected_when_parameterized_request_is_pending() -> None:
+    session, movement_status = _local_session_at_movement_unit_selection(
+        game_id="phase18a-cli-stale-payload-game"
+    )
+    movement_request = _decision_request(movement_status)
+    action_status = session.submit_option(
+        request_id=movement_request.request_id,
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase18a-cli-stale-payload-unit",
+    )
+    action_request = _decision_request(action_status)
+    proposal_status = session.submit_option(
+        request_id=action_request.request_id,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        result_id="phase18a-cli-stale-payload-action",
+    )
+    proposal_request = _decision_request(proposal_status)
+    before_record_count = len(session.lifecycle.decision_controller.records)
+
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        submit_cli_payload(
+            lifecycle=session.lifecycle,
+            request_id="phase18a-stale-cli-payload-request",
+            payload={"accepted": True},
+            result_id="phase18a-cli-stale-payload",
+        )
+
+    assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
+    assert len(session.lifecycle.decision_controller.records) == before_record_count
 
 
 def test_rules_catalog_projection_exposes_cacheable_static_display_records() -> None:

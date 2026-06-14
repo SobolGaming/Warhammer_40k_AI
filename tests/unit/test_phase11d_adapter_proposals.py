@@ -1502,6 +1502,29 @@ def test_adapter_helpers_and_cursor_reject_invalid_inputs() -> None:
     }
 
 
+def test_parameterized_helper_rejects_stale_request_id_when_proposal_is_pending() -> None:
+    session, action_request = _local_session_at_first_movement_action()
+    proposal_request = _decision_request(
+        session.submit_option(
+            request_id=action_request.request_id,
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            result_id="phase11d-helper-stale-proposal-action",
+        )
+    )
+    before_record_count = len(session.lifecycle.decision_controller.records)
+
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        submit_parameterized_payload(
+            lifecycle=session.lifecycle,
+            request_id="phase11d-helper-stale-proposal-request",
+            payload={"accepted": True},
+            result_id="phase11d-helper-stale-proposal",
+        )
+
+    assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
+    assert len(session.lifecycle.decision_controller.records) == before_record_count
+
+
 def test_projection_and_local_session_boundaries_are_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="requires a GameLifecycle"):
         project_game_view(
