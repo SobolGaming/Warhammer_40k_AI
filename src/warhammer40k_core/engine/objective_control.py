@@ -691,11 +691,11 @@ def _objective_control_contribution(
         marker_diameter_inches=marker.marker_diameter_inches,
     )
     battle_shocked = placement.unit_instance_id in battle_shocked_unit_ids
-    objective_control_characteristic = _model_objective_control_characteristic(
+    objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=False,
     )
-    effective_objective_control_characteristic = _model_objective_control_characteristic(
+    effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=battle_shocked,
     )
@@ -781,11 +781,11 @@ def _terrain_objective_contribution(
     if vertical_gap > DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES:
         return None
     battle_shocked = placement.unit_instance_id in battle_shocked_unit_ids
-    objective_control_characteristic = _model_objective_control_characteristic(
+    objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=False,
     )
-    effective_objective_control_characteristic = _model_objective_control_characteristic(
+    effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=battle_shocked,
     )
@@ -937,7 +937,7 @@ def _spatial_index_for_endpoint_query(
     return SpatialIndex(models=models)
 
 
-def _model_objective_control_characteristic(
+def model_objective_control_characteristic(
     model: ModelInstance,
     *,
     battle_shocked: bool,

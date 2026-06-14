@@ -14,6 +14,7 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -82,6 +83,13 @@ class WeaponProfileDisplayPayload(TypedDict):
     profile: JsonValue
 
 
+class WargearDisplayPayload(TypedDict):
+    wargear_id: str
+    display_name: str
+    weapon_profile_ids: list[str]
+    profile: JsonValue
+
+
 class FactionDisplayPayload(TypedDict):
     faction_id: str
     display_name: str
@@ -128,6 +136,7 @@ class RulesCatalogViewPayload(TypedDict):
     source_hash: str
     datasheet_display_by_id: dict[str, DatasheetDisplayPayload]
     model_profile_display_by_id: dict[str, ModelProfileDisplayPayload]
+    wargear_display_by_id: dict[str, WargearDisplayPayload]
     weapon_profile_display_by_id: dict[str, WeaponProfileDisplayPayload]
     faction_display_by_id: dict[str, FactionDisplayPayload]
     detachment_display_by_id: dict[str, DetachmentDisplayPayload]
@@ -242,6 +251,7 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
     model_profile_display_by_id: dict[str, ModelProfileDisplayPayload] = {}
     datasheet_display_by_id: dict[str, DatasheetDisplayPayload] = {}
     wargear_option_display_by_id: dict[str, WargearOptionDisplayPayload] = {}
+    wargear_display_by_id: dict[str, WargearDisplayPayload] = {}
     weapon_profile_display_by_id: dict[str, WeaponProfileDisplayPayload] = {}
 
     for datasheet in catalog.datasheets:
@@ -299,6 +309,18 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
         }
 
     for item in catalog.wargear:
+        wargear_display: WargearDisplayPayload = {
+            "wargear_id": item.wargear_id,
+            "display_name": item.name,
+            "weapon_profile_ids": [profile.profile_id for profile in item.weapon_profiles],
+            "profile": validate_json_value(item.to_payload()),
+        }
+        _insert_unique(
+            wargear_display_by_id,
+            item.wargear_id,
+            wargear_display,
+            field_name="wargear_display_by_id",
+        )
         for weapon_profile in item.weapon_profiles:
             weapon_profile_display: WeaponProfileDisplayPayload = {
                 "weapon_profile_id": weapon_profile.profile_id,
@@ -321,6 +343,7 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
         "source_hash": _rules_catalog_source_hash(catalog),
         "datasheet_display_by_id": datasheet_display_by_id,
         "model_profile_display_by_id": model_profile_display_by_id,
+        "wargear_display_by_id": wargear_display_by_id,
         "weapon_profile_display_by_id": weapon_profile_display_by_id,
         "faction_display_by_id": {
             faction.faction_id: {
@@ -555,10 +578,14 @@ def _model_display_payload(
             "redaction": _redaction(reason="not_visible_to_viewer"),
         }
     base_characteristics = _model_characteristic_display_map(
+        state=state,
+        unit=unit,
         model=model,
         use_base_values=True,
     )
     current_characteristics = _model_characteristic_display_map(
+        state=state,
+        unit=unit,
         model=model,
         use_base_values=False,
     )
@@ -592,21 +619,50 @@ def _model_display_payload(
 
 def _model_characteristic_display_map(
     *,
+    state: GameState,
+    unit: UnitInstance,
     model: ModelInstance,
     use_base_values: bool,
 ) -> dict[str, CharacteristicDisplayPayload]:
     by_characteristic = {value.characteristic: value for value in model.characteristics}
     payload: dict[str, CharacteristicDisplayPayload] = {}
     for characteristic, label in _DATACARD_CHARACTERISTICS:
-        value = by_characteristic.get(characteristic)
-        if value is None:
-            raise GameLifecycleError("Model display projection missing datacard characteristic.")
+        value = _model_display_characteristic(
+            by_characteristic=by_characteristic,
+            state=state,
+            unit=unit,
+            model=model,
+            characteristic=characteristic,
+            use_base_values=use_base_values,
+        )
         payload[label] = _characteristic_display_payload(
             value=value,
             label=label,
             use_base_values=use_base_values,
         )
     return payload
+
+
+def _model_display_characteristic(
+    *,
+    by_characteristic: dict[Characteristic, CharacteristicValue],
+    state: GameState,
+    unit: UnitInstance,
+    model: ModelInstance,
+    characteristic: Characteristic,
+    use_base_values: bool,
+) -> CharacteristicValue:
+    if characteristic is Characteristic.OBJECTIVE_CONTROL:
+        return model_objective_control_characteristic(
+            model,
+            battle_shocked=(
+                False if use_base_values else unit.unit_instance_id in state.battle_shocked_unit_ids
+            ),
+        )
+    value = by_characteristic.get(characteristic)
+    if value is None:
+        raise GameLifecycleError("Model display projection missing datacard characteristic.")
+    return value
 
 
 def _characteristic_display_payload(
@@ -618,16 +674,13 @@ def _characteristic_display_payload(
     if type(value) is not CharacteristicValue:
         raise GameLifecycleError("Characteristic display requires CharacteristicValue.")
     final = value.base if use_base_values else value.final
-    raw = value.raw if value.is_numeric else None
-    base = value.base if value.is_numeric else None
-    numeric_final = final if value.is_numeric else None
     return {
         "characteristic": value.characteristic.value,
         "label": label,
         "value_kind": value.value_kind.value,
-        "raw": raw,
-        "base": base,
-        "final": numeric_final,
+        "raw": value.raw,
+        "base": value.base,
+        "final": final,
         "display_value": _characteristic_display_value(
             characteristic=value.characteristic,
             value=final,

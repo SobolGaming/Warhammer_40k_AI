@@ -98,6 +98,18 @@ def test_rules_catalog_projection_exposes_cacheable_static_display_records() -> 
     assert len(payload["source_hash"]) == 64
     assert "core-intercessor-like-infantry" in payload["datasheet_display_by_id"]
     assert "core-intercessor-like" in payload["model_profile_display_by_id"]
+    assert payload["wargear_display_by_id"]["core-bolt-rifle"] == {
+        "wargear_id": "core-bolt-rifle",
+        "display_name": "Core bolt rifle",
+        "weapon_profile_ids": ["core-bolt-rifle:standard"],
+        "profile": {
+            "wargear_id": "core-bolt-rifle",
+            "name": "Core bolt rifle",
+            "weapon_profiles": [
+                payload["weapon_profile_display_by_id"]["core-bolt-rifle:standard"]["profile"]
+            ],
+        },
+    }
     assert "core-bolt-rifle:standard" in payload["weapon_profile_display_by_id"]
     assert "core-marine-force" in payload["faction_display_by_id"]
     assert "core-combined-arms" in payload["detachment_display_by_id"]
@@ -188,6 +200,53 @@ def test_live_projection_reports_engine_resolved_characteristic_modifiers() -> N
             "applies_status": "applied",
             "public_label": "phase18a-move-plus-one",
             "operation_text": ("Engine-resolved modifier phase18a-move-plus-one applies to M."),
+        }
+    ]
+
+
+def test_live_projection_reports_battle_shock_objective_control_modifier() -> None:
+    session, _status = _local_session_at_movement_unit_selection(
+        game_id="phase18a-battle-shock-game"
+    )
+    state = _session_state(session)
+    model_id = _first_model(state).model_instance_id
+    unit_id = state.army_definitions[0].units[0].unit_instance_id
+    before = project_game_view(lifecycle=session.lifecycle, viewer_player_id="player-a")
+
+    state.battle_shocked_unit_ids = [unit_id]
+    after = project_game_view(lifecycle=session.lifecycle, viewer_player_id="player-a")
+    model_display = after["model_display_by_id"][model_id]
+    base_oc = model_display["base_characteristics"]["OC"]
+    current_oc = model_display["current_characteristics"]["OC"]
+
+    assert before["projection_state_hash"] != after["projection_state_hash"]
+    assert before["model_display_by_id"][model_id]["current_characteristics"]["OC"]["final"] == 2
+    assert base_oc["final"] == 2
+    assert current_oc == {
+        "characteristic": "objective_control",
+        "label": "OC",
+        "value_kind": "replacement_dash",
+        "raw": 0,
+        "base": 0,
+        "final": 0,
+        "display_value": "-",
+        "applied_modifier_ids": ["battle_shock"],
+        "redaction": {"hidden": False, "reason": None},
+    }
+    assert model_display["visible_modifiers"] == [
+        {
+            "modifier_id": "battle_shock",
+            "source_kind": "engine_resolved_characteristic",
+            "source_id": "battle_shock",
+            "target": {
+                "target_kind": "model_characteristic",
+                "model_instance_id": model_id,
+                "characteristic": "objective_control",
+                "characteristic_label": "OC",
+            },
+            "applies_status": "applied",
+            "public_label": "battle_shock",
+            "operation_text": "Engine-resolved modifier battle_shock applies to OC.",
         }
     ]
 

@@ -72,7 +72,7 @@ The shared contract uses these objects and payloads:
 - `GameViewPayload`: read-only viewer projection for adapters.
 - `RulesCatalogViewPayload`: cacheable source-hashed static catalog display
   projection for datasheets, model profiles, weapon profiles, factions,
-  detachments, enhancements, wargear options, and base sizes.
+  detachments, enhancements, wargear, wargear options, and base sizes.
 - `RulesCatalogReferencePayload`: live-game reference to the static catalog
   projection used by a `GameViewPayload`.
 - `EventStreamDeltaPayload`: viewer-scoped adapter event delta.
@@ -1146,7 +1146,7 @@ hybrid projection model:
    `RulesCatalogViewPayload` with `projection_schema: "rules-catalog-view-v1"`,
    catalog identity, source package identity, `source_hash`, and display records
    for datasheets, model profiles, weapon profiles, factions, detachments,
-   enhancements, wargear options, and base sizes. Adapters may cache this
+   enhancements, wargear, wargear options, and base sizes. Adapters may cache this
    payload by catalog ID/schema/hash and render catalog browsing, roster panels,
    and tooltips from it.
 2. Live viewer-safe unit/model projection. `GameViewPayload` uses
@@ -1179,11 +1179,17 @@ state:
 - `CharacteristicDisplayPayload` entries expose `characteristic`, `label`,
   `value_kind`, raw/base/final values, `display_value`, applied modifier IDs,
   and redaction metadata. Unknown values use `value_kind: "unknown"` and null
-  values.
+  values. Dash characteristics retain their engine numeric fields, usually zero,
+  while `display_value` carries `"-"` and `value_kind` distinguishes source dash
+  from replacement dash.
 - `visible_modifiers` are audit/display traces with `modifier_id`,
   `source_kind`, `source_id`, `target`, `applies_status`, `public_label`, and
   `operation_text`. They explain visible engine-resolved changes but are not an
   executable instruction set that adapters must evaluate.
+- Battle-shocked units project Objective Control through the same engine helper
+  used by objective scoring: base `OC` remains the stored model characteristic,
+  current `OC` becomes the `battle_shock` replacement dash, and
+  `visible_modifiers` includes the `battle_shock` trace.
 
 Adapters may compute purely presentational derivatives, such as catalog ID to
 display label, model base diameter to pixel radius, keyword chips, source-link

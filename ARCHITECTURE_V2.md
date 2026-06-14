@@ -4610,8 +4610,9 @@ Invariants:
   records for the current game state;
 - a versioned and source-hashed `RulesCatalogViewPayload`, or equivalent
   documented adapter payload, exposes static datasheets, model profiles, weapon
-  profiles, factions, detachments, enhancements, wargear options, and base-size
-  display records for browsing, roster panels, tooltips, and client caching;
+  profiles, factions, detachments, enhancements, wargear, wargear options, and
+  base-size display records for browsing, roster panels, tooltips, and client
+  caching;
 - `GameViewPayload` exposes the selected static catalog version/hash and live
   read-only `unit_display_by_id` records keyed by stable `unit_instance_id` and
   `model_display_by_id` records keyed by stable `model_instance_id`;
@@ -4633,6 +4634,10 @@ Invariants:
   applies status, public label, and human-readable operation text; they are not
   executable modifier instructions that UI, network clients, replay inspectors,
   or AI policies must apply;
+- Battle-shocked units project Objective Control through the shared
+  objective-control characteristic resolver: base `OC` remains the stored model
+  value, current `OC` becomes the `battle_shock` replacement dash, and
+  `visible_modifiers` includes the `battle_shock` trace;
 - battlefield placement payloads and assignment/selection summaries can be
   joined to the display projection by stable unit/model IDs without parsing
   source text or reaching into engine-only objects;
@@ -4663,8 +4668,8 @@ Required tests:
   records;
 - static catalog projection exposes versioned/source-hashed display records for
   datasheets, model profiles, weapon profiles, factions, detachments,
-  enhancements, wargear options, and base sizes, and `GameViewPayload` identifies
-  the catalog version/hash used by the live projection;
+  enhancements, wargear, wargear options, and base sizes, and `GameViewPayload`
+  identifies the catalog version/hash used by the live projection;
 - selected unit, selected model, roster panel, inspector, assignment summary,
   and datacard-style widgets can render from adapter-visible payloads without
   importing engine internals or fabricating stats;

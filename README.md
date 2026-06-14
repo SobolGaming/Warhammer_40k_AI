@@ -297,9 +297,9 @@ datacard projection. CLI helpers render pending finite and parameterized
 the lifecycle, and never mutate state directly. The adapter projection now
 exposes a source-hashed `RulesCatalogViewPayload` plus live
 `unit_display_by_id` and `model_display_by_id` records keyed by stable IDs, with
-engine-resolved M/T/SV/W/LD/OC characteristics, wounds, base size, keywords,
-visible modifier display traces, and cache invalidation through
-`projection_state_hash`.
+engine-resolved M/T/SV/W/LD/OC characteristics including Battle-shock OC,
+wargear display records, wounds, base size, keywords, visible modifier display
+traces, and cache invalidation through `projection_state_hash`.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 

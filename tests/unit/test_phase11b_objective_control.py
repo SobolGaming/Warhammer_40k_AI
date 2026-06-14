@@ -51,7 +51,7 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
     ObjectiveMarkerEndpointViolation,
     ObjectiveMarkerEndpointViolationPayload,
-    _model_objective_control_characteristic,  # pyright: ignore[reportPrivateUsage]
+    model_objective_control_characteristic,
     objective_control_status_from_token,
     objective_control_timing_from_token,
     objective_marker_endpoint_violations,
@@ -124,7 +124,7 @@ def test_battle_shocked_unit_contributes_oc_zero() -> None:
     )
     player_a_army = state.army_definition_for_player("player-a")
     assert player_a_army is not None
-    shocked_characteristic = _model_objective_control_characteristic(
+    shocked_characteristic = model_objective_control_characteristic(
         player_a_army.units[0].own_models[0],
         battle_shocked=True,
     )
